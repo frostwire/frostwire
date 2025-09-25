@@ -28,9 +28,9 @@ import com.frostwire.service.ErrorService;
  * a new option, this class should be used.  This class allows for options
  * to be added to already existing panes as well as for options to be added
  * to new panes that you can also add here.  To add a new top-level pane,
- * create a new <tt>OptionsPaneImpl</tt> and call the addOption method.
+ * create a new `OptionsPaneImpl` and call the addOption method.
  * To add option items to that pane, add subclasses of
- * <tt>AbstractPaneItem</tt>.
+ * `AbstractPaneItem`.
  */
 class OptionsPaneFactory {
     /**

@@ -26,7 +26,7 @@ public final class MessageService {
      */
     private static final int FORGET_ANSWER = 0;
     /**
-     * <tt>MessageService</tt> instance, following singleton.
+     * `MessageService` instance, following singleton.
      */
     private static final MessageService INSTANCE = new MessageService();
     /**
@@ -43,7 +43,7 @@ public final class MessageService {
     }
 
     /**
-     * Instance accessor for the <tt>MessageService</tt>.
+     * Instance accessor for the `MessageService`.
      */
     public static MessageService instance() {
         return INSTANCE;
@@ -53,7 +53,7 @@ public final class MessageService {
      * Convenience method for determining which window should be the parent
      * of message windows.
      *
-     * @return the <tt>Component</tt> that should act as the parent of message
+     * @return the `Component` that should act as the parent of message
      * windows
      */
     public static Component getParentComponent() {
@@ -175,7 +175,7 @@ public final class MessageService {
      *
      * @param dialogKey the key to use for access to showing/hiding this dialog
      * @param message   The message to display int he dialog
-     * @param msgType   The <tt>JOptionPane</tt> message type. @see javax.swing.JOptionPane.
+     * @param msgType   The `JOptionPane` message type. @see javax.swing.JOptionPane.
      *                  May be one of ERROR_MESSAGE, WARNING_MESSAGE, INFORMATION_MESSAGE,
      *                  or PLAIN_MESSAGE.
      */
@@ -192,7 +192,7 @@ public final class MessageService {
      * @param message   The message to display int he dialog
      * @param ignore    the Boolean setting to store/retrieve whether or not to
      *                  ignore this message in the future.
-     * @param msgType   The <tt>JOptionPane</tt> message type. @see javax.swing.JOptionPane.
+     * @param msgType   The `JOptionPane` message type. @see javax.swing.JOptionPane.
      *                  May be one of ERROR_MESSAGE, WARNING_MESSAGE, INFORMATION_MESSAGE,
      *                  or PLAIN_MESSAGE.
      */

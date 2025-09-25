@@ -57,7 +57,7 @@ public class SkinPopupMenu extends JPopupMenu {
         }
 
         /**
-         * Returns the name of the L&F class that renders this component.
+         * Returns the name of the L&amp;F class that renders this component.
          *
          * @return the string "PopupMenuSeparatorUI"
          * @see JComponent#getUIClassID

@@ -16,7 +16,7 @@ import java.util.prefs.Preferences;
  * Maintains a list of recent searches and persists this list automatically
  * using {@link Preferences}. A recent searches popup menu can be installed on
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 class RecentSearches implements ActionListener {
     private Preferences prefsNode;

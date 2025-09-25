@@ -64,7 +64,7 @@ class ColumnSelectionMenu {
     private final LimeJTable _table;
 
     /**
-     * Constructs the popupmenu & actionlistener associated with the
+     * Constructs the popupmenu and actionlistener associated with the
      * table & model.
      */
     ColumnSelectionMenu(LimeJTable table) {
@@ -103,7 +103,7 @@ class ColumnSelectionMenu {
     }
 
     /**
-     * Creates & adds a checkbox-setting with a listener.
+     * Creates and adds a checkbox-setting with a listener.
      */
     private static void addSetting(JMenu parent,
                                    final String name,

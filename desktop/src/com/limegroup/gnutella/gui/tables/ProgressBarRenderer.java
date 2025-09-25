@@ -26,7 +26,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 /**
- * This class handles rendering a <tt>JProgressBar</tt> for improved
+ * This class handles rendering a `JProgressBar` for improved
  * performance in tables.
  *
  * @author gubatron

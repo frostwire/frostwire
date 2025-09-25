@@ -33,9 +33,7 @@ import java.util.NoSuchElementException;
  * <p>
  * This class is not thread-safe.
  *
- * <p>
- *
- * @modified David Soh (yunharla00@hotmail.com)
+ * Modified by David Soh (yunharla00@hotmail.com):
  * added getIterator() for enhanced AutoCompleteTextField use.
  */
 @SuppressWarnings("ALL")
@@ -44,13 +42,13 @@ public class StringTrie<V> {
      * Our representation consists of a tree of nodes whose edges are labelled
      * by strings.  The first characters of all labels of all edges of a node
      * must be distinct.  Typically the edges are sorted, but this is
-     * determined by TrieNode.<p>
+     * determined by TrieNode.
      * <p>
      * An abstract TrieNode is a mapping from String keys to values,
      * { <K1, V1>, ..., <KN, VN> }, where all Ki and Kj are distinct for all
      * i != j.  For any node N, define KEY(N) to be the concatenation of all
      * labels on the edges from the root to that node.  Then the abstraction
-     * function is:<p>
+     * function is:
      *
      * <blockquote>
      * { <KEY(N), N.getValue() | N is a child of root
@@ -60,15 +58,14 @@ public class StringTrie<V> {
      * An earlier version used character labels on edges.  This made
      * implementation simpler but used more memory because one node would be
      * allocated to each character in long strings if that string had no
-     * common prefixes with other elements of the Trie.<p>
+     * common prefixes with other elements of the Trie.
+     * <p>
      *
-     * <dl>
-     * <dt>INVARIANT:</td>
-     * <dd>For any node N, for any edges Ei and Ej from N,<br>
-     *     i != j &lt;==&gt;
-     *     Ei.getLabel().getCharAt(0) != Ej.getLabel().getCharAt(0)</dd>
-     * <dd>Also, all invariants for TrieNode and TrieEdge must hold.</dd>
-     * </dl>
+     * INVARIANT:
+     * For any node N, for any edges Ei and Ej from N,<br>
+     *     i != j <==>;=
+     *     Ei.getLabel().getCharAt(0) != Ej.getLabel().getCharAt(0)
+     * Also, all invariants for TrieNode and TrieEdge must hold.
      */
     private TrieNode<V> root;
     /**
@@ -88,22 +85,22 @@ public class StringTrie<V> {
     /**
      * Makes this empty.
      *
-     * @modifies this.
+     * Modifies `this`.
      */
     public void clear() {
         this.root = new TrieNode<>();
     }
 
     /**
-     * Returns the canonical version of the given string.<p>
+     * Returns the canonical version of the given string.
      * <p>
      * In the basic version, strings are added and searched without
-     * modification. So this simply returns its parameter s.<p>
+     * modification. So this simply returns its parameter s.
      * <p>
      * Other overrides may also perform a conversion to the NFC form
      * (inter-operable across platforms) or to the NFKC form after removal of
      * accents and diacritics from the NFKD form (ideal for searches using
-     * strings in natural language).<p>
+     * strings in natural language).
      * <p>
      * Made public instead of protected, because the public Prefix operations
      * below may need to use a coherent conversion of search prefixes.
@@ -115,14 +112,14 @@ public class StringTrie<V> {
     }
 
     /**
-     * Matches the pattern <tt>b</tt> against the text
-     * <tt>a[startOffset...stopOffset - 1]</tt>.
+     * Matches the pattern `b` against the text
+     * `a[startOffset...stopOffset - 1]`.
      *
-     * @return the first <tt>j</tt> so that:<br>
-     * <tt>0 &lt;= i &lt; b.length()</tt> AND<br>
-     * <tt>a[startOffset + j] != b[j]</tt> [a and b differ]<br>
-     * OR <tt>stopOffset == startOffset + j</tt> [a is undefined];<br>
-     * Returns -1 if no such <tt>j</tt> exists, i.e., there is a match.<br>
+     * @return the first `j` so that:<br>
+     * `0 &lt;= i &lt; b.length()` AND<br>
+     * `a[startOffset + j] != b[j]` [a and b differ]<br>
+     * OR `stopOffset == startOffset + j` [a is undefined];<br>
+     * Returns -1 if no such `j` exists, i.e., there is a match.<br>
      * Examples:
      * <ol>
      * <li>a = "abcde", startOffset = 0, stopOffset = 5, b = "abc"<br>
@@ -154,10 +151,12 @@ public class StringTrie<V> {
 
     /**
      * Maps the given key (which may be empty) to the given value.
+     * <p>
+     * Modifies `this`.
      *
-     * @return the old value associated with key, or <tt>null</tt> if none
-     * @requires value != null
-     * @modifies this
+     * @return the old value associated with key, or `null` if none
+     * @param key The key to add.
+     * @param value  The value to add. Cannot be null.
      */
     public V add(String key, V value) {
         // early conversion of key, for best performance
@@ -252,7 +251,7 @@ public class StringTrie<V> {
     /**
      * Returns the value associated with the given key, or null if none.
      *
-     * @return the <tt>Object</tt> value or <tt>null</tt>
+     * @return the `Object` value or `null`
      */
     public V get(String key) {
         // early conversion of search key
@@ -267,9 +266,10 @@ public class StringTrie<V> {
 
     /**
      * Ensures no values are associated with the given key.
+     * <p>
+     * Modifies `this`.
      *
-     * @return <tt>true</tt> if any values were actually removed
-     * @modifies this.
+     * @return `true` if any values were actually removed
      */
     public boolean remove(String key) {
         // early conversion of search key
@@ -292,7 +292,7 @@ public class StringTrie<V> {
      * so that k.startsWith(prefix) and get(k) == v.  The remove() operation
      * on the iterator is unimplemented.
      *
-     * @requires this not modified while iterator in use.
+     * Requires `this` not modified while iterator in use.
      */
     public Iterator<V> getPrefixedBy(String prefix) {
         // Early conversion of search key
@@ -304,13 +304,13 @@ public class StringTrie<V> {
     /**
      * Same as getPrefixedBy(prefix.substring(startOffset, stopOffset).
      * This is useful as an optimization in certain applications to avoid
-     * allocations.<p>
+     * allocations.
      * <p>
      * Important: canonicalization of prefix substring is NOT performed here!
      * But it can be performed early on the whole buffer using the public
-     * method <tt>canonicalCase(String)</tt> of this.
-     *
-     * @requires 0 &lt;= startOffset &lt;= stopOffset &lt;= prefix.length
+     * method `canonicalCase(String)` of this.
+     * <p>
+     * Requires 0 &lt;= startOffset &lt;= stopOffset &lt;= prefix.length
      * @see #canonicalCase(String)
      */
     public Iterator<V> getPrefixedBy(String prefix,
@@ -372,12 +372,12 @@ public class StringTrie<V> {
      * Ensures that this consumes the minimum amount of memory.  If
      * valueCompactor is not null, also sets each node's value to
      * valueCompactor.apply(node).  Any exceptions thrown by a call to
-     * valueCompactor are thrown by this.<p>
+     * valueCompactor are thrown by this.
      * <p>
      * This method should typically be called after add(..)'ing a number of
      * nodes.  Insertions can be done after the call to compact, but they might
      * be slower.  Because this method only affects the performance of this,
-     * there is no <tt>modifies</tt> clause listed.
+     * there is no `modifies` clause listed.
      */
     public void trim(Function<V, ? extends V> valueCompactor)
             throws IllegalArgumentException, ClassCastException {
@@ -530,7 +530,7 @@ public class StringTrie<V> {
  * Each of these [String label, TrieNode child] pairs is considered an "edge".
  * The first character of each label must be distinct.  When managing
  * children, different implementations may trade space for time.  Each node
- * also stores an arbitrary Object value.<p>
+ * also stores an arbitrary Object value.
  * <p>
  * Design note: this is a "dumb" class.  It is <i>only</i> responsible for
  * managing its value and its children.  None of its operations are recursive;
@@ -545,7 +545,7 @@ final class TrieNode<E> {
      * The list of children.  Children are stored as a sorted Vector because
      * it is a more compact than a tree or linked lists.  Insertions and
      * deletions are more expensive, but they are rare compared to
-     * searching.<p>
+     * searching.
      * <p>
      * INVARIANT: children are sorted by distinct first characters of edges,
      * i.e., for all i &lt; j,<br>
@@ -594,7 +594,7 @@ final class TrieNode<E> {
      * children[i].getLabelStart() == c<br>
      * If !exact, returns the largest i so that:
      * children[i].getLabelStart() &lt;= c<br>
-     * In either case, returns -1 if no such i exists.<p>
+     * In either case, returns -1 if no such i exists.
      * <p>
      * This method uses binary search and runs in O(log N) time, where
      * N = children.size().<br>

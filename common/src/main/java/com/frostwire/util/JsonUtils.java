@@ -23,8 +23,8 @@ import com.google.gson.GsonBuilder;
 
 /**
  * Simple JSON utility class based on google-gson.
- * <p/>
- * Visit google-gson: {@link https://code.google.com/p/google-gson/} for more information.
+ * <p>
+ * Visit <a href="https://github.com/google/gson">the Gson repo</a> for more information.
  *
  * @author gubatron
  * @author aldenml
@@ -39,7 +39,7 @@ public final class JsonUtils {
     /**
      * This method serializes the specified object into its equivalent Json
      * representation.
-     * <p/>
+     * <p>
      * This method should only be used when the specified object is not a generic type.
      *
      * @param obj the object for which Json representation is to be created
@@ -52,7 +52,7 @@ public final class JsonUtils {
     /**
      * This method serializes the specified object into its equivalent Json
      * representation.
-     * <p/>
+     * <p>
      * This method should only be used when the specified object is not a generic type.
      *
      * @param obj the object for which Json representation is to be created
@@ -64,7 +64,7 @@ public final class JsonUtils {
 
     /**
      * This method deserializes the specified Json into an object of the specified class.
-     * <p/>
+     * <p>
      * This method should not be used if the desired type is a generic type.
      *
      * @param <T>      the type of the desired object

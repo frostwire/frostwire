@@ -32,9 +32,9 @@ import java.util.List;
  * The data can be retrieved using <code>toByteArray()</code> and
  * <code>toString()</code>.
  * <p>
- * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
+ * Closing a `ByteArrayOutputStream` has no effect. The methods in
  * this class can be called after the stream has been closed without
- * generating an <tt>IOException</tt>.
+ * generating an `IOException`.
  * <p>
  * This is an alternative implementation of the {@link java.io.ByteArrayOutputStream}
  * class. The original implementation only allocates 32 bytes at the beginning.
@@ -217,9 +217,9 @@ public class ByteArrayOutputStream extends OutputStream {
     }
 
     /**
-     * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
+     * Closing a `ByteArrayOutputStream` has no effect. The methods in
      * this class can be called after the stream has been closed without
-     * generating an <tt>IOException</tt>.
+     * generating an `IOException`.
      */
     @Override
     public void close() {

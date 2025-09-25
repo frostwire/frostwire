@@ -109,7 +109,7 @@ public final class NetworkUtils {
 
     /**
      * If the user has decided to use a custom network interface it will use it, along with the given port.
-     * @return "0.0.0.0:<port>,[::]:<port>" if !useCustomNetworkInterface, otherwise  [customInetAddress:<port>]
+     * @return "0.0.0.0:[port],[::]:[port]" if !useCustomNetworkInterface, otherwise  [customInetAddress:[port]]
      */
     public static String getLibtorrentFormattedNetworkInterface(boolean useCustomNetworkInterface,
                                                                 String defaultInetAddress,

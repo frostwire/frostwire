@@ -139,7 +139,7 @@ public class Action {
      * <p>
      * Returns the hashcode for this <code>Action</code>.
      *
-     * @return a hash code for this <code>Action<code>.
+     * @return a hash code for this <code>Action</code>.
      */
     public int hashCode() {
         if (hashcode != 0) {

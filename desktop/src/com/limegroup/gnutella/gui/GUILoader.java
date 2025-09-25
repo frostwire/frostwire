@@ -31,15 +31,15 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * This class constructs an <tt>Initializer</tt> instance that constructs
+ * This class constructs an `Initializer` instance that constructs
  * all of the necessary classes for the application.
  */
 class GUILoader {
     /**
-     * Creates an <tt>Initializer</tt> instance that constructs the
+     * Creates an `Initializer` instance that constructs the
      * necessary classes for the application.
-     * <p/>
-     * <p>Invoked by com.limegroup.gnutella.gui.Main by reflection.
+     * <p>
+     * Invoked by com.limegroup.gnutella.gui.Main by reflection.
      *
      * @param args  the array of command line arguments
      * @param frame the splash screen; null, if no splash is displayed
@@ -92,7 +92,7 @@ class GUILoader {
      * Display a standardly formatted internal error message
      * coming from the backend.
      *
-     * @param err the <tt>Throwable</tt> object containing information
+     * @param err the `Throwable` object containing information
      *            about the error
      */
     private static void showCorruptionError(Throwable err) {

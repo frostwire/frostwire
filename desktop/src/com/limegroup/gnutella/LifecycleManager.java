@@ -28,7 +28,7 @@ public interface LifecycleManager {
     void shutdown();
 
     /**
-     * Shuts down & executes something after shutdown completes.
+     * Shuts down and executes something after shutdown completes.
      */
     void shutdown(String toExecute);
 

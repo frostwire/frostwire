@@ -15,7 +15,7 @@ public class FWProcess {
     }
 
     /**
-     * Executes the specified command and arguments in <tt>cmdarray</tt>.
+     * Executes the specified command and arguments in `cmdarray`.
      *
      * @param cmdarray command and arguments
      * @return a wrapper object for the spawned process

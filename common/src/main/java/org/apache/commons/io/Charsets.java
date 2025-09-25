@@ -57,7 +57,7 @@ public class Charsets {
     //
 
     /**
-     * CharEncodingISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1. </p>
+     * CharEncodingISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1.
      * <p>
      * Every implementation of the Java platform is required to support this character encoding.
      * </p>

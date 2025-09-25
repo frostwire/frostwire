@@ -7,7 +7,7 @@ import java.io.StringWriter;
 
 /**
  * This class maintains protected constants and variables for
- * <tt>LocalServletInfo</tt> and <tt>LocalClientInfo</tt>,
+ * `LocalServletInfo` and `LocalClientInfo`,
  * the classes that contain the data for the client machine
  * reporting the bug.  This class simply ensures that they are
  * using the same values.  It also handles generating a bug
@@ -121,7 +121,7 @@ abstract class LocalAbstractInfo {
      * Prints the bug's name. This is used primarily in generating the
      * servlet log.
      *
-     * @return a <tt>String</tt> containing the bug's name.
+     * @return a `String` containing the bug's name.
      */
     public String toString() {
         return _bugName;

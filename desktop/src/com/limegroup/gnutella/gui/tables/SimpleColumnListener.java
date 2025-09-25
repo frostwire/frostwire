@@ -2,7 +2,7 @@ package com.limegroup.gnutella.gui.tables;
 
 /**
  * A simple callback for table columns, having events for
- * when a column is made visible & when a column is made invisible.
+ * when a column is made visible and when a column is made invisible.
  */
 public interface SimpleColumnListener {
     /**

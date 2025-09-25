@@ -16,7 +16,7 @@ public final class BooleanSettingImpl extends AbstractSetting implements Boolean
     private boolean value;
 
     /**
-     * Creates a new <tt>BooleanSetting</tt> instance with the specified
+     * Creates a new `BooleanSetting` instance with the specified
      * key and default value.
      *
      * @param key         the constant key to use for the setting

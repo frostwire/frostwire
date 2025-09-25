@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 /**
- * This class shows the <tt>JFileChooser</tt> when the user presses
+ * This class shows the `JFileChooser` when the user presses
  * the button to add a new directory to the shared directories.  It
  * adds the directory only if does not already exist in the list.
  */

@@ -12,7 +12,7 @@ import java.awt.*;
  * component.
  * </p>
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public class PromptSupport {
     /**

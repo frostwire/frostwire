@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * This class handles all of the data for a single download, representing
  * one "line" in the download window.  It continually updates the
- * displayed data for the download from the contained <tt>Downloader</tt>
+ * displayed data for the download from the contained `Downloader`
  * instance.
  */
 public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
@@ -181,7 +181,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Must initialize data.
      *
-     * @param downloader the <tt>Downloader</tt>
+     * @param downloader the `Downloader`
      *                   that provides access to
      *                   information about the download
      */
@@ -222,10 +222,10 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     }
 
     /**
-     * Returns the <tt>Object</tt> stored at the specified column in this
+     * Returns the `Object` stored at the specified column in this
      * line of data.
      *
-     * @return the <tt>Object</tt> stored at that index
+     * @return the `Object` stored at that index
      */
     public Object getValueAt(int index) {
         final LimeTableColumn column = columns.get(index);
@@ -335,7 +335,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
 
     /**
      * Updates all of the data for this download, obtaining fresh information
-     * from the contained <tt>Downloader</tt> instance.
+     * from the contained `Downloader` instance.
      */
     @Override
     public void update() {

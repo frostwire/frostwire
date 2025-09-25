@@ -24,11 +24,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * This class acts as a proxy and as a "decorator" for an underlying instance
- * of a <tt>MutableTreeNode</tt> implementation.<p>
+ * of a `MutableTreeNode` implementation.<p>
  * <p>
  * This class includes the most of the functionality of a
- * <tt>DefaultMutableTreeNode</tt>, which it simply wraps, without the
- * coupling that directly subclassing <tt>DefaultMutableTreeNode</tt>
+ * `DefaultMutableTreeNode`, which it simply wraps, without the
+ * coupling that directly subclassing `DefaultMutableTreeNode`
  * would incur.
  */
 public class OptionsTreeNode extends DefaultMutableTreeNode {
@@ -62,18 +62,18 @@ public class OptionsTreeNode extends DefaultMutableTreeNode {
     }
 
     /**
-     * Defines the class' representation as a <tt>String</tt> object, used
-     * in determining how it is displayed in the <tt>JTree</tt>.
+     * Defines the class' representation as a `String` object, used
+     * in determining how it is displayed in the `JTree`.
      *
-     * @return the <tt>String</tt> identifier for the display of this class
+     * @return the `String` identifier for the display of this class
      */
     public String toString() {
         return _displayName;
     }
 
     /**
-     * Returns the <tt>String</tt> denoting both the title of the node
-     * as well as the unique identifying <tt>String</tt> for the node.
+     * Returns the `String` denoting both the title of the node
+     * as well as the unique identifying `String` for the node.
      */
     public String getTitleKey() {
         return _titleKey;

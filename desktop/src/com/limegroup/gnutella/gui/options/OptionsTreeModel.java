@@ -5,7 +5,7 @@ import javax.swing.tree.MutableTreeNode;
 import java.io.IOException;
 
 /**
- * This class creates the <tt>TreeModel</tt> used in the <tt>JTree</tt> of
+ * This class creates the `TreeModel` used in the `JTree` of
  * the options pane.
  */
 final class OptionsTreeModel extends DefaultTreeModel {
@@ -19,8 +19,8 @@ final class OptionsTreeModel extends DefaultTreeModel {
     private OptionsTreeNode ROOT = null;
 
     /**
-     * The constructor constructs the <tt>MutableTreeNode</tt> instances
-     * as well as the <tt>TreeModel</tt>.
+     * The constructor constructs the `MutableTreeNode` instances
+     * as well as the `TreeModel`.
      */
     OptionsTreeModel() {
         super(null);
@@ -29,7 +29,7 @@ final class OptionsTreeModel extends DefaultTreeModel {
     }
 
     /**
-     * Adds a new <tt>OptionsTreeNode</tt> to one of the root node's
+     * Adds a new `OptionsTreeNode` to one of the root node's
      * children.  This should only be called during tree construction.
      * The first key cannot denote the root.
      *
@@ -77,8 +77,8 @@ final class OptionsTreeModel extends DefaultTreeModel {
      * @param node      the current node to search through
      * @param parentKey the key that will match the key of the parent node
      *                  we are searching for
-     * @return the <tt>MutableTreeNode</tt> instance corresponding to
-     * the specified key, or <tt>null</tt> if it could not be found
+     * @return the `MutableTreeNode` instance corresponding to
+     * the specified key, or `null` if it could not be found
      * @throws IOException if a corresponding key does not exist
      */
     private MutableTreeNode getParentNode(

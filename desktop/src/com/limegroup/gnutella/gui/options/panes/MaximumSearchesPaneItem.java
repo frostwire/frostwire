@@ -35,7 +35,7 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("Maximum Searches");
     private final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");
     /**
-     * Handle to the <tt>WholeNumberField</tt> where the user selects the
+     * Handle to the `WholeNumberField` where the user selects the
      * time to live for outgoing searches.
      */
     private final WholeNumberField _maxSearchesField;
@@ -46,7 +46,7 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      *
      */
     public MaximumSearchesPaneItem() {
@@ -55,7 +55,7 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
         /*
           Constant for the key of the locale-specific <code>String</code> for the
           label on the component that allows to user to change the setting for
-          this <tt>PaneItem</tt>.
+          this `PaneItem`.
          */
         String OPTION_LABEL = I18n.tr("Maximum Searches:");
         LabeledComponent comp = new LabeledComponent(OPTION_LABEL,
@@ -65,9 +65,9 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.<p>
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -76,7 +76,7 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.<p>
      * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.

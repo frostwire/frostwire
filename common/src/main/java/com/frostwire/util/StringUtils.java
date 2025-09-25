@@ -208,8 +208,8 @@ public class StringUtils {
      *  </pre>
      *
      * @return an array A s.t. s.equals(A[0]+d0+A[1]+d1+...+A[N]), where
-     * for all dI, dI.size()==1 && delimiters.indexOf(dI)>=0; and for
-     * all c in A[i], delimiters.indexOf(c)<0
+     * for all dI, dI.size()==1 &amp;&amp; delimiters.indexOf(dI)&gt;=0; and for
+     * all c in A[i], delimiters.indexOf(c)&lt;0
      */
     public static String[] splitNoCoalesce(String s, String delimiters) {
         //Tokenize s based on delimiters, adding to buffer.
@@ -302,11 +302,11 @@ public class StringUtils {
      * to set each character of each string to lower case before doing the
      * comparison.  Uses the default <code>Locale</code> for case conversion.
      *
-     * @param str       the string in which to search for the <tt>substring</tt>
+     * @param str       the string in which to search for the `substring`
      *                  argument
-     * @param substring the substring to search for in <tt>str</tt>
-     * @return if the <tt>substring</tt> argument occurs as a substring within
-     * <tt>str</tt>, then the index of the first character of the first such
+     * @param substring the substring to search for in `str`
+     * @return if the `substring` argument occurs as a substring within
+     * `str`, then the index of the first character of the first such
      * substring is returned; if it does not occur as a substring, -1 is
      * returned
      */
@@ -320,14 +320,14 @@ public class StringUtils {
      * to set each character of each string to lower case before doing the
      * comparison.
      *
-     * @param str       the string in which to search for the <tt>substring</tt>
+     * @param str       the string in which to search for the `substring`
      *                  argument
-     * @param substring the substring to search for in <tt>str</tt>
+     * @param substring the substring to search for in `str`
      * @param locale    the <code>Locale</code> to use when converting the
      *                  case of <code>str</code> and <code>substring</code>.  This is necessary because
      *                  case conversion is <code>Locale</code> specific.
-     * @return if the <tt>substring</tt> argument occurs as a substring within
-     * <tt>str</tt>, then the index of the first character of the first such
+     * @return if the `substring` argument occurs as a substring within
+     * `str`, then the index of the first character of the first such
      * substring is returned; if it does not occur as a substring, -1 is
      * returned
      */

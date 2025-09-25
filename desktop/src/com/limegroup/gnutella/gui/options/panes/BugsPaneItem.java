@@ -41,7 +41,7 @@ public final class BugsPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      */
     public BugsPaneItem() {
         super(
@@ -80,9 +80,9 @@ public final class BugsPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -96,7 +96,7 @@ public final class BugsPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.

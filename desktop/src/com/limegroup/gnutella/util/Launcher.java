@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * This class launches files in their associated applications and opens
  * urls in the default browser for different operating systems.  This
- * really only works meaningfully for the Mac and Windows.<p>
+ * really only works meaningfully for the Mac and Windows.
  * <p>
  * Acknowledgement goes to Eric Albert for demonstrating the general
  * technique for loading the MRJ classes in his frequently-used
@@ -93,7 +93,7 @@ public final class Launcher {
     }
 
     /**
-     * Launches the file whose abstract path is specified in the <tt>File</tt>
+     * Launches the file whose abstract path is specified in the `File`
      * parameter. This method will not launch any file with .exe, .vbs, .lnk,
      * .bat, .sys, or .com extensions, diplaying an error if one of the file is
      * of one of these types.
@@ -127,7 +127,6 @@ public final class Launcher {
      * Launches the Explorer/Finder and highlights the file.
      *
      * @param file the file to show in explorer
-     * @return null, if not supported by platform; the launched process otherwise
      * @see #launchFile(File)
      */
     public static void launchExplorer(File file) throws IOException, SecurityException {

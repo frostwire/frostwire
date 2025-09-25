@@ -31,7 +31,7 @@ public final class IntSetting extends AbstractNumberSetting<Integer> {
     private int value;
 
     /**
-     * Creates a new <tt>IntSetting</tt> instance with the specified
+     * Creates a new `IntSetting` instance with the specified
      * key and default value.
      */
     IntSetting(Properties defaultProps, Properties props, String key,

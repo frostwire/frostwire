@@ -12,7 +12,7 @@ import java.text.MessageFormat;
  * <code>MessageCallback</code> includes methods to handle a fixed message
  * (<code>showError</code>) or a variable length message (<code>showFormattedError</code>).
  * A formatted message accepts arbitrary parameters you format when
- * you implement <MessageCallback>. For example, one partial
+ * you implement MessageCallback. For example, one partial
  * implementation of <code>MessageCallback</code> using {@link MessageFormat}
  * could be:
  * <p>
@@ -66,13 +66,13 @@ public interface MessageCallback {
 
     /**
      * Shows a locale-specific error message to the user, using the
-     * given message key & the arguments for that key.
+     * given message key and the arguments for that key.
      */
     void showFormattedError(String errorKey, Object... args);
 
     /**
      * Shows a locale-specific formatted error to the user, using the
-     * given message key & the arguments for that key.
+     * given message key and the arguments for that key.
      * The message is only displayed if the Switch indicates
      * the user had chosen to display the message.
      *
@@ -103,7 +103,7 @@ public interface MessageCallback {
 
     /**
      * Shows a locale-specific formatted message to the user, using the
-     * given message key & the arguments for that key.
+     * given message key and the arguments for that key.
      *
      * @param messageKey the key for looking up the locale-specific message
      *                   in the resource bundles
@@ -112,7 +112,7 @@ public interface MessageCallback {
 
     /**
      * Shows a locale-specific formatted message to the user, using the
-     * given message key & the arguments for that key.
+     * given message key and the arguments for that key.
      * The message is only displayed if the Switch indicates
      * the user had chosen to display the message.
      *

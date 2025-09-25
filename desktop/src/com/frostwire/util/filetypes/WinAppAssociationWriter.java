@@ -168,16 +168,16 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
      * Checks whether the given assocation already existed in Windows registry.
      * <PRE>
      * The evaluation will based on the following rule:
-     * 1. mimetype == null && fileExt == null
+     * 1. mimetype == null &amp;&amp; fileExt == null
      * return false
-     * 2. mimetype == null && fileExt != null
+     * 2. mimetype == null &amp;&amp; fileExt != null
      * return !(fileExt existed in the reg table)
-     * 3. mimetype != null && fileExt == null
+     * 3. mimetype != null &amp;&amp; fileExt == null
      * return !(mimetype existed in the reg table)
-     * 4. mimetype != null && fileExt != null
-     * return ( (mimetype existed in the reg table) &&
-     * (fileExt existed in the reg table) &&
-     * (getFileExtByMimeType(mimetype) == fileExt) &&
+     * 4. mimetype != null &amp;&amp; fileExt != null
+     * return ( (mimetype existed in the reg table) &amp;&amp;
+     * (fileExt existed in the reg table) &amp;&amp;
+     * (getFileExtByMimeType(mimetype) == fileExt) &amp;&amp;
      * (getMimeTypeByFileExt(fileExt) == mimetype) )
      * </PRE>
      *
@@ -223,16 +223,15 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
     /**
      * Registers the given association info in the specified level.
      * <PRE>
-     * <p>
      * The register process will following the rules below
-     * 1. mimetype == null && fileExt != null
+     * 1. mimetype == null &amp;&amp; fileExt != null
      * Since fileExt does not exist in this case
      * 1.1 adds the fileExt
      * 1.2 adds description, icon file and action list for this fileExt
-     * 2. mimetype != null && fileExt == null
+     * 2. mimetype != null &amp;&amp; fileExt == null
      * Since mimetype does not exist in this case
      * just adds the mimetype in the reg table
-     * 3. mimetype != null && fileExt != null
+     * 3. mimetype != null &amp;&amp; fileExt != null
      * 3.1 Adds the mime type into the reg table if necessary
      * 3.2 Adds the file extension into the reg table if necessary
      * 3.3 Adds the description, icon file and action list for the fileExt

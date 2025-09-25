@@ -29,7 +29,7 @@ import javax.swing.*;
  */
 final class FileMenu extends AbstractMenu {
     /**
-     * Creates a new <tt>FileMenu</tt>, using the <tt>key</tt>
+     * Creates a new `FileMenu`, using the `key`
      * argument for setting the locale-specific title and
      * accessibility text.
      *
@@ -48,7 +48,7 @@ final class FileMenu extends AbstractMenu {
     }
 
     /**
-     * Returns a new <tt>JMenuItem</tt> instance that is configured from
+     * Returns a new `JMenuItem` instance that is configured from
      * the action.
      */
     private JMenuItem createMenuItem(Action action) {

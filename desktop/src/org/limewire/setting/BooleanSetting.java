@@ -20,7 +20,7 @@ public interface BooleanSetting extends Setting, Switch {
     /**
      * Mutator for this setting.
      *
-     * @param bool the <tt>boolean</tt> to store
+     * @param bool the `boolean` to store
      */
     void setValue(boolean bool);
 

@@ -11,7 +11,7 @@ import javax.swing.*;
  */
 public class MessageHandler implements MessageCallback {
     /**
-     * Creats a new <tt>MessageHandler</tt> for displaying messages to the user.
+     * Creats a new `MessageHandler` for displaying messages to the user.
      */
     public MessageHandler() {
     }

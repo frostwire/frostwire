@@ -110,7 +110,7 @@ public final class FatalBugManager {
     }
 
     /**
-     * Sends a bug to the servlet & then exits.
+     * Sends a bug to the servlet and then exits.
      */
     private static void sendToServlet(LocalClientInfo info) {
         try {

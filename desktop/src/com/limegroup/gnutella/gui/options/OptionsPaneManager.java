@@ -44,12 +44,12 @@ public final class OptionsPaneManager {
      */
     private final JPanel MAIN_PANEL = new JPanel();
     /**
-     * Constant for the <tt>CardLayout</tt> used in the main panel.
+     * Constant for the `CardLayout` used in the main panel.
      */
     private final CardLayout CARD_LAYOUT = new CardLayout();
     /**
-     * Constant for the <tt>ArrayList</tt> containing all of the visible
-     * <tt>OptionsPane</tt> instances.
+     * Constant for the `ArrayList` containing all of the visible
+     * `OptionsPane` instances.
      */
     private final List<OptionsPane> OPTIONS_PANE_LIST = new ArrayList<>();
     /**
@@ -62,7 +62,7 @@ public final class OptionsPaneManager {
     private final OptionsPaneFactory FACTORY = new OptionsPaneFactory();
 
     /**
-     * The constructor sets the layout and adds all of the <tt>OptionPane</tt>
+     * The constructor sets the layout and adds all of the `OptionPane`
      * instances.
      */
     OptionsPaneManager() {
@@ -96,8 +96,8 @@ public final class OptionsPaneManager {
     }
 
     /**
-     * Sets the options for each <tt>OptionPane</tt> instance in the
-     * <tt>ArrayList</tt> of <tt>OptionPane</tt>s when the window is shown.
+     * Sets the options for each `OptionPane` instance in the
+     * `ArrayList` of `OptionPane`s when the window is shown.
      */
     public void initOptions() {
         for (OptionsPane op : OPTIONS_PANE_LIST) {
@@ -107,7 +107,7 @@ public final class OptionsPaneManager {
 
     /**
      * Applies the current settings in the options windows, storing them
-     * to disk.  This method delegates to the <tt>OptionsPaneManager</tt>.
+     * to disk.  This method delegates to the `OptionsPaneManager`.
      *
      * @throws IOException if the options could not be fully applied
      */

@@ -30,7 +30,7 @@ import java.awt.geom.Rectangle2D;
  * {@link PromptTextUI} implementation for rendering prompts on
  * {@link JTextField}s and uses a {@link JTextField} as a prompt component.
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public class PromptTextFieldUI extends PromptTextUI {
     /**

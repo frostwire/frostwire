@@ -41,13 +41,13 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     private final JRadioButton SOCKS5_PROXY_BUTTON = new JRadioButton("Socks v5");
     private final JRadioButton HTTP_PROXY_BUTTON = new JRadioButton("HTTP");
     /**
-     * Constant <tt>JTextField</tt> instance that holds the ip address to use
+     * Constant `JTextField` instance that holds the ip address to use
      * as a proxy.
      */
     private final JTextField PROXY_HOST_FIELD =
             new SizedTextField(12, SizePolicy.RESTRICT_HEIGHT);
     /**
-     * Constant <tt>WholeNumberField</tt> instance that holds the port of the
+     * Constant `WholeNumberField` instance that holds the port of the
      * proxy.
      */
     private final WholeNumberField PROXY_PORT_FIELD =
@@ -55,7 +55,7 @@ public final class ProxyPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      */
     public ProxyPaneItem() {
         super(TITLE, LABEL);
@@ -75,7 +75,7 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         add(getHorizontalSeparator());
         BoxPanel panel = new BoxPanel(BoxPanel.X_AXIS);
         /*
-          Constant for the key of the locale-specific <tt>String</tt> for the
+          Constant for the key of the locale-specific `String` for the
           label on the proxy host field.
          */
         String PROXY_HOST_LABEL_KEY = I18n.tr("Proxy:");
@@ -85,7 +85,7 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         panel.add(comp.getComponent());
         panel.addHorizontalComponentGap();
         /*
-          Constant for the key of the locale-specific <tt>String</tt> for the
+          Constant for the key of the locale-specific `String` for the
           label on the port text field.
          */
         String PROXY_PORT_LABEL_KEY = I18n.tr("Port:");
@@ -96,10 +96,9 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.
-     * <p/>
-     * <p/>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Defines the abstract method in `AbstractPaneItem`.
+     * <p>
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -120,9 +119,8 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.
-     * <p/>
-     * <p/>
+     * Defines the abstract method in `AbstractPaneItem`.
+     * <p>
      * Applies the options currently set in this window, displaying an error
      * message to the user if a setting could not be applied.
      *

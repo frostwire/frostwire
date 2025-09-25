@@ -42,7 +42,7 @@ public abstract class AbstractTab implements Tab {
      */
     private String toolTip;
     /**
-     * <tt>Icon</tt> instance to use for this tab.
+     * `Icon` instance to use for this tab.
      */
     private Icon icon;
 

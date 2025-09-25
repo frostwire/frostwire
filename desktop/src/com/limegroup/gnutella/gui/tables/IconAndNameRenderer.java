@@ -21,8 +21,8 @@ public final class IconAndNameRenderer extends DefaultTableBevelledCellRenderer 
     }
 
     /**
-     * Returns the <tt>Component</tt> that displays the icons & names
-     * based on the <tt>IconAndNameHolder</tt> object.
+     * Returns the `Component` that displays the icons and names
+     * based on the `IconAndNameHolder` object.
      */
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

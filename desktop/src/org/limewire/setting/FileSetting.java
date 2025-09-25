@@ -14,7 +14,7 @@ public class FileSetting extends AbstractSetting {
     private String absolutePath;
 
     /**
-     * Creates a new <tt>SettingBool</tt> instance with the specified
+     * Creates a new `SettingBool` instance with the specified
      * key and default value.
      *
      * @param key         the constant key to use for the setting

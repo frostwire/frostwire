@@ -28,7 +28,7 @@ public final class TablesHandlerSettings extends LimeWireSettings {
      * and the Setting is the actual setting.  The subclass of
      * Setting is either BooleanSetting or IntSetting.
      * The name of the setting is in the format of:
-     * <columnId>_<width|order|visible>
+     * \<columnId\>_\<width|order|visible\>
      */
     private static final Map<String, Setting> SETS = new HashMap<>();
 

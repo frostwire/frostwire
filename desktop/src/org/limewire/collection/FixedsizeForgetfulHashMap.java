@@ -57,7 +57,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * Create a new instance that holds only the last "size" entries.
      *
      * @param size the number of entries to hold
-     * @throws IllegalArgumentException if size is less < 1.
+     * @throws IllegalArgumentException if size is less than 1.
      */
     public FixedsizeForgetfulHashMap(int size) {
         this(size, (size * 4) / 3 + 10, 0.75f);

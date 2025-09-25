@@ -37,7 +37,7 @@ public final class TaskThrottle {
     private final static Object recycleLock = new Object();
 
     /**
-     * Checks if it's not too early to submit this task again. Updates the Map<TaskName -> TimestampLastSubmitted> when it's ready, assuming the task will be launched right after checking if(ready) async(theTask)
+     * Checks if it's not too early to submit this task again. Updates the Map&lt;TaskName -> TimestampLastSubmitted&gt; when it's ready, assuming the task will be launched right after checking if(ready) async(theTask)
      *
      * @param taskName
      * @param minIntervalInMillis

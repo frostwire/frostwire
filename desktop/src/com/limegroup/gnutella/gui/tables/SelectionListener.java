@@ -20,7 +20,7 @@ final class SelectionListener implements ListSelectionListener {
     }
 
     /**
-     * Implements the <tt>ListSelectionListener</tt> interface, setting
+     * Implements the `ListSelectionListener` interface, setting
      * the states of buttons, menus, and anything else depending on the
      * characteristics of the currently selected row.
      *

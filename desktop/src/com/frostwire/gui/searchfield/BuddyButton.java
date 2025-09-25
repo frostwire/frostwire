@@ -8,7 +8,7 @@ import java.awt.*;
  * Non focusable, no border, no margin and insets button with no content area
  * filled.
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public class BuddyButton extends JButton {
     private static final long serialVersionUID = -2281078972367520220L;

@@ -37,7 +37,7 @@ import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPL
 
 /**
  * This class manages the "view" menu that allows the user to dynamically select
- * which tabs should be viewable at runtime & themes to use.
+ * which tabs should be viewable at runtime and themes to use.
  */
 final class ViewMenu extends AbstractMenu {
     ViewMenu() {

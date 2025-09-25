@@ -33,7 +33,7 @@ import java.awt.event.MouseEvent;
  * Checklist for Editable/Interactive cell renderers (which will need a corresponding {@link AbstractCellEditor} implementation)
  * <p>
  * If you are writing a renderer for a cell editor, remember to:
- * 1. Make sure the Model for your table <code>isCellEditable()</model> method returns true for that column.
+ * 1. Make sure the Model for your table <code>isCellEditable()</code> method returns true for that column.
  * 2. Make sure to add the proper default cell editors on your mediator's setDefaultEditors class (on that particular column).
  * 3. Make sure to add the proper default cell renderer on {@link AbstractTableMediator} <code>setDefaultRenderers()</code>
  * 4. Avoid using FlowLayout as it will wrap if your component won't fit into the column.

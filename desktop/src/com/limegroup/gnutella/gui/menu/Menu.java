@@ -26,9 +26,9 @@ import javax.swing.*;
  */
 interface Menu {
     /**
-     * Returns the <tt>JMenu</tt> instance for this <tt>Menu</tt>.
+     * Returns the `JMenu` instance for this `Menu`.
      *
-     * @return the <tt>JMenu</tt> instance for this <tt>Menu</tt>
+     * @return the `JMenu` instance for this `Menu`
      */
     JMenu getMenu();
 }

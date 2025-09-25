@@ -180,7 +180,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * @see com.frostwire.android.gui.MainApplication::onCreate() for ctx.interfaces and the rest of the context
+     * See com.frostwire.android.gui.MainApplication#onCreate() for ctx.interfaces and the rest of the context
      */
     @Override
     public void start() {

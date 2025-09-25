@@ -262,12 +262,12 @@ public class ShareTorrentDialog extends JDialog {
 
     /**
      * Animates the feedbackLabel (which lives on the Glass Pane invisibly and is shown during the animation)
-     * <p/>
+     * <p>
      * To animate this component we wrap the JLabel on a TimelineJLabel.
      * If we ever need to animate more labels, we'll probably just extend JLabel in the future.
-     * <p/>
+     * <p>
      * The animation interpolates 2 properties. The color of the text, and the y position of the text.
-     * <p/>
+     * <p>
      * It looks like it disappears by changing the color into the background color.
      */
     private void showFeedback(String title, double x, double y) {

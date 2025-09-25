@@ -77,7 +77,7 @@ public class LibraryMediator {
     }
 
     /**
-     * @return the <tt>LibraryMediator</tt> instance
+     * @return the `LibraryMediator` instance
      */
     public static LibraryMediator instance() {
         if (INSTANCE == null) {

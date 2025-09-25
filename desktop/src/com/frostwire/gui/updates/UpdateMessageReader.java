@@ -187,7 +187,6 @@ final class UpdateMessageReader implements ContentHandler {
      * away the message is meant for everyone, unless there is a more specific
      * message ahead.
      * <p>
-     * <p>
      * If you want a full-blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {

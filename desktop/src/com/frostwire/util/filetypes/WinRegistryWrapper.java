@@ -29,8 +29,8 @@ import java.net.URL;
  */
 class WinRegistryWrapper {
     /**
-     * Windows handles to <tt>HKEY_CURRENT_USER</tt> and
-     * <tt>HKEY_LOCAL_MACHINE</tt> hives.
+     * Windows handles to `HKEY_CURRENT_USER` and
+     * `HKEY_LOCAL_MACHINE` hives.
      */
     public final static int HKEY_CLASSES_ROOT = 0x80000000;
     public final static int HKEY_CURRENT_USER = 0x80000001;

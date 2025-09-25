@@ -100,7 +100,7 @@ final class KeywordMediaType implements Serializable {
     /**
      * @param schema                   a MIME compliant non-localizable identifier,
      *                                 that matches file categories (and XSD schema names).
-     * @param descriptionKeyResourceId a media identifier that can be used
+     * @param id                       a media identifier that can be used
      *                                 to retreive a localizable descriptive text.
      * @param extensions               a list of all file extensions of this
      *                                 type.  Must be all lowercase.  If null, this matches

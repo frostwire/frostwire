@@ -620,7 +620,7 @@ public final class LC implements Externalizable {
     /**
      * Sets a wrap after the number of columns/rows that is defined in the {@link net.miginfocom.layout.AC}.
      * <p>
-     * Same functionality as {@link #setWrapAfter(int 0)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setWrapAfter(int)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -645,7 +645,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setNoCache(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setNoCache(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -657,7 +657,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setFlowX(boolean false)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setFlowX(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -669,7 +669,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setFlowX(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setFlowX(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -681,7 +681,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setFillX(boolean true)} and {@link #setFillY(boolean true)} conmbined.T his method returns
+     * Same functionality as {@link #setFillX(boolean)} and {@link #setFillY(boolean)} conmbined.T his method returns
      * <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
@@ -695,7 +695,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setFillX(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setFillX(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -707,7 +707,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setFillY(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setFillY(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -745,7 +745,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setTopToBottom(boolean false)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setTopToBottom(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -757,7 +757,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setTopToBottom(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setTopToBottom(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -770,7 +770,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setNoGrid(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setNoGrid(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
@@ -782,7 +782,7 @@ public final class LC implements Externalizable {
     }
 
     /**
-     * Same functionality as {@link #setVisualPadding(boolean false)} only this method returns <code>this</code> for chaining multiple calls.
+     * Same functionality as {@link #setVisualPadding(boolean)} only this method returns <code>this</code> for chaining multiple calls.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *

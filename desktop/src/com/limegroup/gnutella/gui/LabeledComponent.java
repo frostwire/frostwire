@@ -4,23 +4,23 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class creates a standardized <tt>JPanel</tt> that includes a
- * <tt>Component</tt> with a <tt>JLabel</tt> next to it.<p>
+ * This class creates a standardized `JPanel` that includes a
+ * `Component` with a `JLabel` next to it.
  * <p>
  * The label can be placed to the left, to the right, on top, or on bottom
- * of the <tt>Component</tt> depending on the parameters used in the
+ * of the `Component` depending on the parameters used in the
  * constructor.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class LabeledComponent {
     /**
      * Constant alignment key for aligning the label to the left of the
-     * <tt>Component</tt>.
+     * `Component`.
      */
     public static final int LEFT = 10;
     /**
      * Constant alignment key for aligning the label to the right of the
-     * <tt>Component</tt>.
+     * `Component`.
      */
     private static final int RIGHT = 11;
     /**
@@ -34,32 +34,32 @@ public final class LabeledComponent {
     public static final int NO_GLUE = 150;
     /**
      * Constant alignment key for aligning the label on the top of the
-     * <tt>Component</tt> justified in the center.
+     * `Component` justified in the center.
      */
     private static final int TOP_CENTER = 12;
     /**
      * Constant alignment key for aligning the label on the top of the
-     * <tt>Component</tt> with left justification.
+     * `Component` with left justification.
      */
     private static final int TOP_LEFT = 13;
     /**
      * Constant alignment key for aligning the label on the top of the
-     * <tt>Component</tt> with right justification.
+     * `Component` with right justification.
      */
     private static final int TOP_RIGHT = 14;
     /**
      * Constant alignment key for aligning the label onthe bottom of the
-     * <tt>Component</tt> justified in the center.
+     * `Component` justified in the center.
      */
     private static final int BOTTOM_CENTER = 15;
     /**
      * Constant alignment key for aligning the label onthe bottom of the
-     * <tt>Component</tt> with left justification.
+     * `Component` with left justification.
      */
     private static final int BOTTOM_LEFT = 16;
     /**
      * Constant alignment key for aligning the label on the bottom of the
-     * <tt>Component</tt> with right justification.
+     * `Component` with right justification.
      */
     private static final int BOTTOM_RIGHT = 17;
     /**
@@ -83,16 +83,16 @@ public final class LabeledComponent {
      */
     private static final int SURROUND_GLUE = 140;
     /**
-     * Constant for the <tt>JPanel</tt> containing the label and field.
+     * Constant for the `JPanel` containing the label and field.
      */
     private final BoxPanel PANEL = new BoxPanel(BoxPanel.X_AXIS);
 
     /**
-     * Constructs a <tt>JPanel</tt> with a label next to a field with
-     * standard spacing between them.<p>
+     * Constructs a `JPanel` with a label next to a field with
+     * standard spacing between them.
      * <p>
      * This constructor places the label to the left of the
-     * <tt>Component</tt>.
+     * `Component`.
      *
      * @param key  the key for the text for the locale-specific label
      * @param comp the component to put the label next to
@@ -102,11 +102,11 @@ public final class LabeledComponent {
     }
 
     /**
-     * Constructs a <tt>JPanel</tt> with a label next to a field with
-     * standard spacing between them.<p>
+     * Constructs a `JPanel` with a label next to a field with
+     * standard spacing between them.
      * <p>
      * This constructor places the label to the left of the
-     * <tt>Component</tt>.
+     * `Component`.
      *
      * @param key  the key for the text for the locale-specific label
      * @param comp the component to put the label next to
@@ -118,19 +118,19 @@ public final class LabeledComponent {
     }
 
     /**
-     * Constructs a <tt>JPanel</tt> with a label next to a field with
-     * standard spacing between them.<p>
+     * Constructs a `JPanel` with a label next to a field with
+     * standard spacing between them.
      * <p>
      * This method allows for a great deal of customizability for the
      * layout of the given component, such as different alignments of
-     * the label in relation to the <tt>Component</tt> as well as a
+     * the label in relation to the `Component` as well as a
      * glue on any of the four sides that forces the label/component
      * pair to one side of the panel.
      *
      * @param key       the key for the locale-specific label
      * @param comp      the component to put the label next to
      * @param alignment specifies the placement of the label in relation
-     *                  to the <tt>Component</tt>
+     *                  to the `Component`
      * @param glue      specifies the type of glue to add to the panel
      */
     public LabeledComponent(final String key, final Component comp,
@@ -234,11 +234,11 @@ public final class LabeledComponent {
     }
 
     /**
-     * Returns the <tt>Component</tt> that contains the <tt>JLabel</tt>
-     * and its associated <tt>Component</tt>.
+     * Returns the `Component` that contains the `JLabel`
+     * and its associated `Component`.
      *
-     * @return the <tt>Component</tt> that contains the <tt>JLabel</tt>
-     * and the <tt>Component</tt> next to it
+     * @return the `Component` that contains the `JLabel`
+     * and the `Component` next to it
      */
     public JComponent getComponent() {
         return PANEL;

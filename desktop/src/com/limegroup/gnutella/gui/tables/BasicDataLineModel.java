@@ -478,7 +478,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * @return true if List contains the Object o in column col.
      * if a particular column is searched frequently, using a HashMap.
-     * The add(Object, int) & sort function should be overriden to initialize
+     * The add(Object, int) and sort function should be overriden to initialize
      * the HashMap.
      */
     public boolean contains(Object o, int col) {
@@ -495,7 +495,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * @return true if the List contains a DataLine that was initialized
      * by Object o.
      * if searching is done frequently, using a HashMap.
-     * The add(Object, int) & sort function should be overriden to initialize
+     * The add(Object, int) and sort function should be overriden to initialize
      * the HashMap.
      */
     public boolean contains(Object o) {
@@ -521,7 +521,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * @return the index of the first DataLine that contains Object o
      * in column col.
      * if a particular column is searched frequently, using a HashMap.
-     * The add(Object, int) & sort function should be overriden to initialize
+     * The add(Object, int) and sort function should be overriden to initialize
      * the HashMap.
      */
     public int getRow(Object o, int col) {
@@ -538,7 +538,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * @return the index of the first DataLine that was initialized by Object o.
      * if searching is done frequently, using a HashMap.
-     * The add(Object, int) & sort function should be overriden to initialize
+     * The add(Object, int) and sort function should be overriden to initialize
      * the HashMap.
      */
     public int getRow(E o) {

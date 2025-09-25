@@ -56,7 +56,7 @@ public final class ButtonRow extends JPanel {
      */
     private static final long serialVersionUID = 2171794172705055068L;
     /**
-     * The array of <tt>JButton</tt>s.
+     * The array of `JButton`s.
      */
     private JButton[] _buttons;
 
@@ -71,11 +71,11 @@ public final class ButtonRow extends JPanel {
      * Creates a row of buttons with standard separation between
      * each button, aligned either vertically or horizontally,
      * with or without glue.  The lengths of all arrays must be equal,
-     * or this will throw <tt>IllegalArgumentException</tt>.
+     * or this will throw `IllegalArgumentException`.
      *
      * @param labelKeys   the array of keys for looking up the locale-specific
      *                    labels to use for the buttons
-     * @param listeners   the array of <tt>ActionListeners</tt> to use
+     * @param listeners   the array of `ActionListeners` to use
      *                    for the buttons
      * @param orientation the orientation to use for the row of buttons,
      *                    either ButtonRow.X_AXIS or ButtonRow.Y_AXIS
@@ -257,7 +257,7 @@ public final class ButtonRow extends JPanel {
      * This method allows access to specific buttons in the button row.
      *
      * @param index the index of the button to retrieve
-     * @return the <tt>JButton</tt> at that index
+     * @return the `JButton` at that index
      * @throws ArrayIndexOutOfBoundsException if the index is out of bounds
      */
     public JButton getButtonAtIndex(int index) {

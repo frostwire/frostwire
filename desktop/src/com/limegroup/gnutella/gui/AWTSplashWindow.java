@@ -15,7 +15,7 @@ package com.limegroup.gnutella.gui;
 import java.awt.*;
 
 /**
- * Splash Window to show an image during startup of an application.<p>
+ * Splash Window to show an image during startup of an application.
  * <p>
  * Usage:
  * <pre>
@@ -92,7 +92,7 @@ public class AWTSplashWindow extends Window {
     /**
      * Constructs and displays a AWTSplashWindow.<p>
      * This method is useful for startup splashs.
-     * Dispose the return frame to get rid of the splash window.<p>
+     * Dispose the return frame to get rid of the splash window.
      *
      * @param splashImage The image to be displayed.
      * @return Returns the frame that owns the AWTSplashWindow.

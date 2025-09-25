@@ -26,16 +26,16 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * This class provides a skeletal implementation of the <tt>PaneItem</tt>
- * interface.<p>
+ * This class provides a skeletal implementation of the `PaneItem`
+ *interface.
  * <p>
  * It provides the basic implementation for displaying one option within
- * a larger window of options. Each <tt>AbstractPaneItem</tt> has a titled
+ * a larger window of options. Each `AbstractPaneItem` has a titled
  * border and a label describing the option.  The label is followed by
- * standardized spacing.<p>
+ * standardized spacing.
  * <p>
  * It includes several convenience methods that subclasses may us to
- * simplify panel construction.<p>
+ * simplify panel construction.
  * <p>
  * Subclasses only need to override the applyOptions() method for storing
  * options to disk.
@@ -70,20 +70,20 @@ public abstract class AbstractPaneItem implements PaneItem {
     }
 
     /**
-     * Implements the <tt>PaneItem</tt> interface. <p>
+     * Implements the `PaneItem` interface.
      * <p>
-     * Returns the <tt>Container</tt> for this set of options.
+     * Returns the `Container` for this set of options.
      *
-     * @return the <tt>Container</tt> for this set of options
+     * @return the `Container` for this set of options
      */
     public Container getContainer() {
         return CONTAINER;
     }
 
     /**
-     * Implements the <tt>PaneItem</tt> interface. <p>
+     * Implements the `PaneItem` interface.
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      * <p>
      * Subclasses must define this method to set their initial options
@@ -92,9 +92,9 @@ public abstract class AbstractPaneItem implements PaneItem {
     public abstract void initOptions();
 
     /**
-     * Implements the <tt>PaneItem</tt> interface. <p>
+     * Implements the `PaneItem` interface.
      * <p>
-     * Applies the options currently set in this <tt>PaneItem</tt>.<p>
+     * Applies the options currently set in this `PaneItem`.
      * <p>
      * Subclasses must define this method to apply their specific options.
      *
@@ -103,19 +103,19 @@ public abstract class AbstractPaneItem implements PaneItem {
     public abstract boolean applyOptions() throws IOException;
 
     /**
-     * Adds the specified <tt>Component</tt> to the enclosed <tt>Container</tt>
+     * Adds the specified `Component` to the enclosed `Container`
      * instance.
      *
-     * @param comp the <tt>Component</tt> to add
+     * @param comp the `Component` to add
      */
     final void add(Component comp) {
         CONTAINER.add(comp);
     }
 
     /**
-     * Returns a <tt>Component</tt> standardly sized for horizontal separators.
+     * Returns a `Component` standardly sized for horizontal separators.
      *
-     * @return the constant <tt>Component</tt> used as a standard horizontal
+     * @return the constant `Component` used as a standard horizontal
      * separator
      */
     final Component getHorizontalSeparator() {
@@ -123,9 +123,9 @@ public abstract class AbstractPaneItem implements PaneItem {
     }
 
     /**
-     * Returns a <tt>Component</tt> standardly sized for vertical separators.
+     * Returns a `Component` standardly sized for vertical separators.
      *
-     * @return the constant <tt>Component</tt> used as a standard vertical
+     * @return the constant `Component` used as a standard vertical
      * separator
      */
     final Component getVerticalSeparator() {

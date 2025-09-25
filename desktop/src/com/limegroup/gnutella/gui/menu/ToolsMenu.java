@@ -34,7 +34,7 @@ final class ToolsMenu extends AbstractMenu {
     private final UpdateAction updateAction;
 
     /**
-     * Creates a new <tt>ToolsMenu</tt>, using the <tt>key</tt>
+     * Creates a new `ToolsMenu`, using the `key`
      * argument for setting the locale-specific title and
      * accessibility text.
      */

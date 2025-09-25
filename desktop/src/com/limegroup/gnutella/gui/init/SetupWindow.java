@@ -27,8 +27,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * This abstract class creates a <tt>JPanel</tt> that uses
- * <tt>BoxLayout</tt> for setup windows.  It defines many of the
+ * This abstract class creates a `JPanel` that uses
+ * `BoxLayout` for setup windows.  It defines many of the
  * basic accessor and mutator methods required by subclasses.
  */
 abstract class SetupWindow extends JPanel {
@@ -45,7 +45,7 @@ abstract class SetupWindow extends JPanel {
      */
     final SetupManager _manager;
     /**
-     * Variable for the name of this window for use with <tt>CardLayout</tt>.
+     * Variable for the name of this window for use with `CardLayout`.
      */
     private final String _key;
     /**
@@ -68,7 +68,7 @@ abstract class SetupWindow extends JPanel {
     /**
      * Creates a new setup window with the specified label.
      *
-     * @param key      the title of the window for use with <tt>CardLayout</tt>
+     * @param key      the title of the window for use with `CardLayout`
      *                 and for use in obtaining the locale-specific caption for this
      *                 window
      * @param labelKey the key for locale-specific label to be displayed
@@ -81,7 +81,7 @@ abstract class SetupWindow extends JPanel {
     /**
      * Creates a new setup window with the specified label.
      *
-     * @param key      the title of the window for use with <tt>CardLayout</tt>
+     * @param key      the title of the window for use with `CardLayout`
      *                 and for use in obtaining the locale-specific caption for this
      *                 window
      * @param labelKey the key for locale-specific label to be displayed
@@ -150,7 +150,7 @@ abstract class SetupWindow extends JPanel {
 
     /**
      * Accessor for the unique identifying key of the window
-     * in the <tt>CardLayout</tt>.
+     * in the `CardLayout`.
      *
      * @return the unique identifying key for the window.
      */
@@ -238,7 +238,7 @@ abstract class SetupWindow extends JPanel {
     }
 
     /**
-     * @param setupComponent the <tt>Component</tt> to add to this window
+     * @param setupComponent the `Component` to add to this window
      */
     void setSetupComponent(JComponent setupComponent) {
         setupComponent.setBorder(new EmptyBorder(20, 10, 10, 10));
@@ -257,7 +257,7 @@ abstract class SetupWindow extends JPanel {
          * Creates a label that can have multiple lines and that has the
          * default width.
          *
-         * @param s the <tt>String</tt> to display in the label
+         * @param s the `String` to display in the label
          */
         MultiLineLabel(String s) {
             setEditable(false);

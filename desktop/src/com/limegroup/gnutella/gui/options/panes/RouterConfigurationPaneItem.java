@@ -40,7 +40,7 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("Router Configuration");
     private final static String LABEL = I18n.tr("FrostWire can configure itself to work from behind a firewall or router. Using Universal Plug \'n Play (UPnP) and other NAT traversal techniques FrostWire can automatically configure your router or firewall for optimal performance. If your router does not support UPnP, FrostWire can be set to advertise an external port manually. (You may also have to configure your router if you choose manual configuration, but FrostWire will try its best so you don't have to.)");
     /**
-     * Constant <tt>WholeNumberField</tt> instance that holds the port
+     * Constant `WholeNumberField` instance that holds the port
      * to force to.
      */
     private final WholeNumberField PORT_0_FIELD = new SizedWholeNumberField();
@@ -54,7 +54,7 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      */
     public RouterConfigurationPaneItem() {
         super(TITLE, LABEL);
@@ -107,9 +107,9 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.<p>
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -121,7 +121,7 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.<p>
      * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.

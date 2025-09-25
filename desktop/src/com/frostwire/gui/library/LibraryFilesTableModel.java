@@ -50,7 +50,7 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
     /**
      * Override the normal refresh.
      * Because the DataLine's don't cache any data,
-     * we can just call update & they'll show the correct info
+     * we can just call update and they'll show the correct info
      * now.
      */
     public Object refresh() {

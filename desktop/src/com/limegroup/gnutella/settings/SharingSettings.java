@@ -42,7 +42,7 @@ public class SharingSettings extends LimeProps {
     /**
      * The default folder where Torrent Data will be saved. This folder CANNOT BE SHARED
      * to avoid sharing inconsistencies.
-     * <p/>
+     * <p>
      * In the case of FrostWire Portable, we'll name the default torrent data folder "Downloads"
      * In regular frostwire it's "Torrent Data"
      */

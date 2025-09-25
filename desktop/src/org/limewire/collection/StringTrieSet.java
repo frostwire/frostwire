@@ -16,8 +16,8 @@ import java.util.List;
  * See <a href="http://en.wikipedia.org/wiki/Trie">Trie</a> for more information.
  * <p>
  *
- * @modified David Soh (yunharla00@hotmail.com)
- * 1. added getIterator() & getIterator(String) for enhanced AutoCompleteTextField use.
+ * Modified by David Soh (yunharla00@hotmail.com):
+ * 1. added getIterator() and getIterator(String) for enhanced AutoCompleteTextField use.
  * 2. disallowed adding duplicates
  */
 public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
@@ -56,7 +56,7 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
     /**
      * Removes a value from the Set.
      *
-     * @return <tt>true</tt> if a value was actually removed.
+     * @return `true` if a value was actually removed.
      */
     public boolean removeEntry(String data) {
         return map.remove(data);

@@ -38,7 +38,7 @@ final class HelpMenu extends AbstractMenu {
     private final ShowSendFeedbackDialogAction showSendFeedbackDialogAction;
 
     /**
-     * Creates a new <tt>HelpMenu</tt>, using the <tt>key</tt>
+     * Creates a new `HelpMenu`, using the `key`
      * argument for setting the locale-specific title and
      * accessibility text.
      */

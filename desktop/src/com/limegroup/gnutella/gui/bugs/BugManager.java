@@ -45,7 +45,7 @@ import java.util.concurrent.ExecutorService;
  * This can do any of the following:
  * - Send the bug directly to the servlet
  * - Allow the bug to be reviewed before sending
- * - Allow the user to copy the bug & email it if sending fails.
+ * - Allow the user to copy the bug and email it if sending fails.
  * - Suppress the bug entirely
  */
 public final class BugManager {
@@ -123,7 +123,7 @@ public final class BugManager {
 
     /**
      * Private to ensure that only this class can construct a
-     * <tt>BugManager</tt>, thereby ensuring that only one instance is created.
+     * `BugManager`, thereby ensuring that only one instance is created.
      */
     private BugManager() {
         localClientInfoFactory = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();

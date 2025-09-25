@@ -22,11 +22,11 @@ package com.limegroup.gnutella;
  * The list of all downloads in progress.  DownloadManager has a fixed number
  * of download slots given by the MAX_SIM_DOWNLOADS property.  It is
  * responsible for starting downloads and scheduling and queueing them as
- * needed.  This class is thread safe.<p>
+ * needed.  This class is thread safe.
  * <p>
  * As with other classes in this package, a DownloadManager instance may not be
  * used until initialize(..) is called.  The arguments to this are not passed
- * in to the constructor in case there are circular dependencies.<p>
+ * in to the constructor in case there are circular dependencies.
  * <p>
  * DownloadManager provides ways to serialize download state to disk.  Reads
  * are initiated by RouterService, since we have to wait until the GUI is

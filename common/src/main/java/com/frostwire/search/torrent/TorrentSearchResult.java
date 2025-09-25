@@ -30,7 +30,7 @@ public interface TorrentSearchResult extends FileSearchResult {
 
     /**
      * Returns the torrent uri, could be a magnet uri.
-     * <p/>
+     * <p>
      * Should be renamed to getTorrentUri
      *
      * @return
@@ -49,7 +49,7 @@ public interface TorrentSearchResult extends FileSearchResult {
 
     /**
      * Returns the info hash of the torrent.
-     * <p/>
+     * <p>
      * Should be renamed to getInfoHash
      *
      * @return

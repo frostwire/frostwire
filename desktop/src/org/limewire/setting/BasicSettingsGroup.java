@@ -29,7 +29,7 @@ import java.util.Properties;
  */
 public class BasicSettingsGroup extends AbstractSettingsGroup {
     /**
-     * Constant for the <tt>SettingsFactory</tt> that subclasses can use
+     * Constant for the `SettingsFactory` that subclasses can use
      * to create new settings which will be stored in the properties file.
      */
     private final SettingsFactory FACTORY;
@@ -43,9 +43,9 @@ public class BasicSettingsGroup extends AbstractSettingsGroup {
     }
 
     /**
-     * Returns the <tt>Properties</tt> instance that stores all settings.
+     * Returns the `Properties` instance that stores all settings.
      *
-     * @return the <tt>Properties</tt> instance for storing settings
+     * @return the `Properties` instance for storing settings
      */
     @SuppressWarnings("unused")
     public Properties getProperties() {
@@ -53,7 +53,7 @@ public class BasicSettingsGroup extends AbstractSettingsGroup {
     }
 
     /**
-     * Returns the <tt>SettingsFactory</tt> instance that stores the properties.
+     * Returns the `SettingsFactory` instance that stores the properties.
      */
     public SettingsFactory getFactory() {
         return FACTORY;

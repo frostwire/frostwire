@@ -7,7 +7,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * TODO: comment
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 class NativeSearchFieldSupport {
     public static final String FIND_POPUP_PROPERTY = "JTextField.Search.FindPopup";

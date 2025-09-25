@@ -461,7 +461,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
 
     /**
      * Removes all files from <code>deselected</code> that are ancestors
-     * of <code>file</code or vice versa.
+     * of <code>file</code> or vice versa.
      */
     private void removeFromPath(File file) {
         // remove all children, file itself is removed here too

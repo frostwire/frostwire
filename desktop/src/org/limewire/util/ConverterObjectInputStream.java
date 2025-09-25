@@ -38,34 +38,15 @@ import java.util.Map;
  * mapping between the old and new name, and you can add more lookups with
  * <p>
  * Pre-set package and class mapping:
- * <table cellpadding="5">
- * <tr>
- * <td><b>Old Name</b></td>
- * <td><b>New Name</b></td>
- * </tr>
- * <td>com.limegroup.gnutella.util.FileComparator</td>
- * <td>org.limewire.collection.FileComparator</td>
- * </tr>
- * <tr>
- * <td>com.limegroup.gnutella.downloader.Interval</td>
- * <td>org.limewire.collection.Interval</td>
- * </tr>
- * <tr>
- * <td>com.limegroup.gnutella.util.IntervalSet</td>
- * <td> org.limewire.collection.IntervalSet</td>
- * </tr>
- * <tr>
- * <td>com.limegroup.gnutella.util.Comparators$CaseInsensitiveStringComparator</td>
- * <td> org.limewire.collection.Comparators$CaseInsensitiveStringComparator</td>
- * </tr>
- * <td>com.limegroup.gnutella.util.StringComparator</td>
- * <td> org.limewire.collection.StringComparator</td>
- * </tr>
- * <tr>
- * <td>com.sun.java.util.collections</td>
- * <td>java.util</td>
- * </tr>
- * </table>
+ * | Old Name                                      	   	   	   	   	   	   	 | New Name                                                            |
+ * | ----------------------------------------------------------------------- | ------------------------------------------------------------------- |
+ * | com.limegroup.gnutella.util.FileComparator    	   	   	   	   	   	   	 | org.limewire.collection.FileComparator                              |
+ * | com.limegroup.gnutella.downloader.Interval    	   	   	   	   	   	   	 | org.limewire.collection.Interval                                    |
+ * | com.limegroup.gnutella.util.IntervalSet 	   	   	   	   	   	   	   	 | org.limewire.collection.IntervalSet                                 |
+ * | com.limegroup.gnutella.util.Comparators$CaseInsensitiveStringComparator | org.limewire.collection.Comparators$CaseInsensitiveStringComparator |
+ * | com.limegroup.gnutella.util.StringComparator 	   	   	   	   	   	   	 | org.limewire.collection.StringComparator                            |
+ * | com.sun.java.util.collections 	   	   	   	   	   	   	   	   	   	   	 | java.util                                                           |
+ * <p>
  * None of the earlier forms of the class need to exist in the classpath.
  */
 class ConverterObjectInputStream extends ObjectInputStream {
@@ -108,7 +89,7 @@ class ConverterObjectInputStream extends ObjectInputStream {
      * looked up if a new package name exists, it is prepended to the name of
      * the class the corresponding class is loaded.</li>
      * <li>Otherwise the original ObjectStreamClass is returned.</li>
-     * <ul>
+     * </ul>
      */
     protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
         ObjectStreamClass read = super.readClassDescriptor();

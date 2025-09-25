@@ -392,7 +392,7 @@ public class SearchField extends JXSearchField {
     }
 
     /**
-     * Fills the popup with text & shows it.
+     * Fills the popup with text and shows it.
      */
     void showPopup(Iterator<String> iter) {
         getPopupComponent(); // construct the component.

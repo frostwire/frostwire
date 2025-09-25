@@ -4,9 +4,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 /**
- * This is a convenience class that extends <tt>JPanel<tt> and gives the
- * panel a padded border and gives it a <tt>BoxLayout</tt> instead of the
- * default <tt>FlowLayout</tt>.
+ * This is a convenience class that extends `JPanel` and gives the
+ * panel a padded border and gives it a `BoxLayout` instead of the
+ * default `FlowLayout`.
  */
 public class PaddedPanel extends JPanel {
     /**

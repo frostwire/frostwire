@@ -553,7 +553,7 @@ public class LimeJTable extends JTable implements JSortTable {
     }
 
     /**
-     * Paints the table & a focused row border.
+     * Paints the table and a focused row border.
      */
     public void paint(Graphics g) {
         try {

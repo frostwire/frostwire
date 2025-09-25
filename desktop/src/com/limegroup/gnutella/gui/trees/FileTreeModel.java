@@ -175,7 +175,6 @@ public class FileTreeModel extends AbstractTreeModel {
      * <p>
      * The default filter excludes hidden files and files that are not
      * directories.
-     * <p>
      *
      * @param filter can be <code>null</code>
      */

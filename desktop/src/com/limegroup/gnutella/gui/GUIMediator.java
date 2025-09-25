@@ -73,14 +73,12 @@ import java.util.concurrent.LinkedBlockingQueue;
  * of "hub" for the frontend. This should be the only common class that all
  * frontend components have access to, reducing the overall dependencies and
  * therefore increasing the modularity of the code.
- * <p/>
- * <p/>
+ * <p>
  * Any functions or services that should be accessible to multiple classes
  * should be added to this class. These currently include such functions as
  * easily displaying standardly-formatted messages to the user, obtaining
  * locale-specific strings, and obtaining image resources, among others.
- * <p/>
- * <p/>
+ * <p>
  * All of the methods in this class should be called from the event- dispatch
  * (Swing) thread.
  */
@@ -91,7 +89,7 @@ public final class GUIMediator {
      */
     private final static String DISCONNECTED_MESSAGE = I18n.tr("Your machine does not appear to have an active Internet connection or a firewall is blocking FrostWire from accessing the internet. FrostWire will automatically keep trying to connect you to the network unless you select \"Disconnect\" from the File menu.");
     /**
-     * <tt>List</tt> of <tt>RefreshListener</tt> classes to notify of UI refresh
+     * `List` of `RefreshListener` classes to notify of UI refresh
      * events.
      */
     private static final List<RefreshListener> REFRESH_LIST = new ArrayList<>();
@@ -109,7 +107,7 @@ public final class GUIMediator {
      */
     private static GUIMediator _instance;
     /**
-     * The main <tt>JFrame</tt> for the application.
+     * The main `JFrame` for the application.
      */
     private static JFrame FRAME;
     /**
@@ -117,7 +115,7 @@ public final class GUIMediator {
      */
     private static PopupMenu TRAY_MENU;
     /**
-     * Handle to the <tt>OptionsMediator</tt> class that is responsible for
+     * Handle to the `OptionsMediator` class that is responsible for
      * displaying customizable options to the user.
      */
     private static OptionsMediator OPTIONS_MEDIATOR;
@@ -139,17 +137,17 @@ public final class GUIMediator {
     private final RefreshTimer timer;
     private boolean _remoteDownloadsAllowed;
     /**
-     * Constant handle to the <tt>MainFrame</tt> instance that handles
+     * Constant handle to the `MainFrame` instance that handles
      * constructing all of the primary gui components.
      */
     private final MainFrame MAIN_FRAME;
     /**
-     * Constant handle to the <tt>DownloadMediator</tt> class that is
+     * Constant handle to the `DownloadMediator` class that is
      * responsible for displaying active downloads to the user.
      */
     private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
     /**
-     * Constant handle to the <tt>DownloadView</tt> class that is responsible
+     * Constant handle to the `DownloadView` class that is responsible
      * for displaying the status of the network and connectivity to the user.
      */
     private StatusLine STATUS_LINE;
@@ -170,7 +168,7 @@ public final class GUIMediator {
     /**
      * Singleton accessor for this class.
      *
-     * @return the <tt>GUIMediator</tt> instance
+     * @return the `GUIMediator` instance
      */
     public static synchronized GUIMediator instance() {
         if (_instance == null)
@@ -186,10 +184,10 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns a boolean specifying whether or not the wrapped <tt>JFrame</tt>
+     * Returns a boolean specifying whether or not the wrapped `JFrame`
      * is visible or not.
      *
-     * @return <tt>true</tt> if the <tt>JFrame</tt> is visible, <tt>false</tt>
+     * @return `true` if the `JFrame` is visible, `false`
      * otherwise
      */
     public static boolean isAppVisible() {
@@ -277,10 +275,10 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns a <tt>Dimension</tt> instance containing the dimensions of the
+     * Returns a `Dimension` instance containing the dimensions of the
      * wrapped JFrame.
      *
-     * @return a <tt>Dimension</tt> instance containing the width and height of
+     * @return a `Dimension` instance containing the width and height of
      * the wrapped JFrame
      */
     static Dimension getAppSize() {
@@ -288,10 +286,10 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns a <tt>Point</tt> instance containing the x, y position of the
-     * wrapped <ttJFrame</tt> on the screen.
+     * Returns a `Point` instance containing the x, y position of the
+     * wrapped `JFrame` on the screen.
      *
-     * @return a <tt>Point</tt> instance containing the x, y position of the
+     * @return a `Point` instance containing the x, y position of the
      * wrapped JFrame
      */
     static Point getAppLocation() {
@@ -299,9 +297,9 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the main application <tt>JFrame</tt> instance.
+     * Returns the main application `JFrame` instance.
      *
-     * @return the main application <tt>JFrame</tt> instance
+     * @return the main application `JFrame` instance
      */
     public static JFrame getAppFrame() {
         if (FRAME == null) {
@@ -326,7 +324,7 @@ public final class GUIMediator {
     /**
      * Returns whether or not the options window is visible
      *
-     * @return <tt>true</tt> if the options window is visible, <tt>false</tt>
+     * @return `true` if the options window is visible, `false`
      * otherwise
      */
     static boolean isOptionsVisible() {
@@ -345,9 +343,9 @@ public final class GUIMediator {
     }
 
     /**
-     * Gets a handle to the options window main <tt>JComponent</tt> instance.
+     * Gets a handle to the options window main `JComponent` instance.
      *
-     * @return the options window main <tt>JComponent</tt>, or <tt>null</tt> if
+     * @return the options window main `JComponent`, or `null` if
      * the options window has not yet been constructed (the window is
      * guaranteed to be constructed if it is visible)
      */
@@ -358,7 +356,7 @@ public final class GUIMediator {
     }
 
     /**
-     * @return the <tt>ShellAssociationManager</tt> instance.
+     * @return the `ShellAssociationManager` instance.
      */
     public static ShellAssociationManager getAssociationManager() {
         if (ASSOCIATION_MANAGER == null) {
@@ -560,7 +558,7 @@ public final class GUIMediator {
      *
      * @param name the name of the icon to return without path information, as in
      *             "plug"
-     * @return the <tt>ImageIcon</tt> object specified in the param string
+     * @return the `ImageIcon` object specified in the param string
      */
     public static ImageIcon getThemeImage(final String name) {
         return ResourceManager.getThemeImage(name);
@@ -579,12 +577,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user in the form of a yes or no question.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the locale-specific message to display
      * @return an integer indicating a yes or a no response from the user
@@ -594,7 +591,7 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user in the form of a yes or no question.
      *
      * @param message the locale-specific message to display
@@ -607,11 +604,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user in the form of a yes or no question.
      * <p>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message      the locale-specific message to display
      * @param defaultValue the IntSetting to store/retrieve the default value
@@ -629,10 +626,9 @@ public final class GUIMediator {
     /**
      * Displays a locale-specific message to the user in the form of a
      * yes/no/{other} question.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message      the locale-specific message to display
      * @param defaultValue the IntSetting to store/retrieve the default value
@@ -644,13 +640,12 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user in the form of a yes or no or cancel
      * question.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the locale-specific message to display
      * @return an integer indicating a yes or a no response from the user
@@ -660,13 +655,12 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user in the form of a yes or no or cancel
      * question.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message      for the locale-specific message to display
      * @param defaultValue the IntSetting to store/retrieve the default value
@@ -678,12 +672,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param messageKey the key for the locale-specific message to display
      */
@@ -692,12 +685,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the locale-specific message to display
      * @param ignore  the BooleanSetting that stores/retrieves whether or not to
@@ -708,17 +700,16 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific disposable message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param messageKey the key for the locale-specific message to display
      * @param ignore     the BooleanSetting that stores/retrieves whether or not to
      *                   display this message.
-     * @param msgType    The <tt>JOptionPane</tt> message type. @see
+     * @param msgType    The `JOptionPane` message type. @see
      *                   javax.swing.JOptionPane.
      */
     private static void showDisposableMessage(@SuppressWarnings("SameParameterValue") final String messageKey, final String message, @SuppressWarnings("SameParameterValue") final Switch ignore, @SuppressWarnings("SameParameterValue") int msgType) {
@@ -726,12 +717,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Hides a
+     * Acts as a proxy for the `MessageService` class. Hides a
      * locale-specific disposable message.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param messageKey the key for the locale-specific message to display
      */
@@ -740,12 +730,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the locale-specific message to display.
      */
@@ -755,12 +744,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the key for the locale-specific message to display.
      * @param ignore  the BooleanSetting for that stores/retrieves whether or not to
@@ -772,12 +760,11 @@ public final class GUIMediator {
     }
 
     /**
-     * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
+     * Acts as a proxy for the `MessageService` class. Displays a
      * locale-specific warning message to the user.
-     * <p/>
-     * <p/>
-     * The <tt>messageKey</tt> parameter must be the key for a locale- specific
-     * message <tt>String</tt> and not a hard-coded value.
+     * <p>
+     * The `messageKey` parameter must be the key for a locale- specific
+     * message `String` and not a hard-coded value.
      *
      * @param message the locale-specific message to display.
      */
@@ -789,8 +776,7 @@ public final class GUIMediator {
     /**
      * Acts as a proxy for the Launcher class so that other classes only need to
      * know about this mediator class.
-     * <p/>
-     * <p/>
+     * <p>
      * Opens the specified url in a browser.
      *
      * @param url the url to open
@@ -816,11 +802,10 @@ public final class GUIMediator {
     /**
      * Acts as a proxy for the Launcher class so that other classes only need to
      * know about this mediator class.
-     * <p/>
-     * <p/>
+     * <p>
      * Launches the file specified in its associated application.
      *
-     * @param file a <tt>File</tt> instance denoting the abstract pathname of the
+     * @param file a `File` instance denoting the abstract pathname of the
      *             file to launch
      */
     public static void launchFile(File file) {
@@ -838,11 +823,10 @@ public final class GUIMediator {
     /**
      * Acts as a proxy for the Launcher class so that other classes only need to
      * know about this mediator class.
-     * <p/>
-     * <p/>
-     * Opens <tt>file</tt> in a platform specific file manager.
+     * <p>
+     * Opens `file` in a platform specific file manager.
      *
-     * @param file a <tt>File</tt> instance denoting the abstract pathname of the
+     * @param file a `File` instance denoting the abstract pathname of the
      *             file to launch
      */
     public static void launchExplorer(File file) {
@@ -884,9 +868,9 @@ public final class GUIMediator {
      * Returns the point for the placing the specified component on the center
      * of the screen.
      *
-     * @param comp the <tt>Component</tt> to use for getting the relative center
+     * @param comp the `Component` to use for getting the relative center
      *             point
-     * @return the <tt>Point</tt> for centering the specified <tt>Component</tt>
+     * @return the `Point` for centering the specified `Component`
      * on the screen
      */
     static Point getScreenCenterPoint(Component comp) {
@@ -900,10 +884,10 @@ public final class GUIMediator {
     }
 
     /**
-     * Adds the specified <tt>RefreshListener</tt> instance to the list of
+     * Adds the specified `RefreshListener` instance to the list of
      * listeners to be notified when a UI refresh event occurs.
      *
-     * @param listener new <tt>RefreshListener</tt> to add
+     * @param listener new `RefreshListener` to add
      */
     public static void addRefreshListener(RefreshListener listener) {
         if (!REFRESH_LIST.contains(listener))
@@ -911,9 +895,9 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the <tt>Locale</tt> instance currently in use.
+     * Returns the `Locale` instance currently in use.
      *
-     * @return the <tt>Locale</tt> instance currently in use
+     * @return the `Locale` instance currently in use
      */
     public static Locale getLocale() {
         return ResourceManager.getLocale();
@@ -991,10 +975,10 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the <tt>MainFrame</tt> instance. <tt>MainFrame</tt> maintains
+     * Returns the `MainFrame` instance. `MainFrame` maintains
      * handles to all of the major gui classes.
      *
-     * @return the <tt>MainFrame</tt> instance
+     * @return the `MainFrame` instance
      */
     public MainFrame getMainFrame() {
         return MAIN_FRAME;

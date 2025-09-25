@@ -24,7 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Extend <tt>JScrollPane</tt> so that a scrolled html file is shown
+ * Extend `JScrollPane` so that a scrolled html file is shown
  */
 final class ScrollingTextPane extends JScrollPane {
     /**
@@ -32,7 +32,7 @@ final class ScrollingTextPane extends JScrollPane {
      */
     private static final long serialVersionUID = 1706678462639869854L;
     /**
-     * <tt>JEditorPane</tt> to show the text
+     * `JEditorPane` to show the text
      */
     private final JEditorPane EDITOR_PANE;
     /**
@@ -101,8 +101,8 @@ final class ScrollingTextPane extends JScrollPane {
     }
 
     /**
-     * Adds a <tt>HyperlinkListener</tt> instance to the underlying
-     * <tt>JEditorPane</tt> instance.
+     * Adds a `HyperlinkListener` instance to the underlying
+     * `JEditorPane` instance.
      *
      * @param listener the listener for hyperlinks
      */

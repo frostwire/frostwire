@@ -9,10 +9,10 @@ import java.beans.PropertyChangeListener;
  */
 public interface Tab {
     /**
-     * Returns the <tt>JComponent</tt> instance containing all of the
+     * Returns the `JComponent` instance containing all of the
      * UI elements for the tab.
      *
-     * @return the <tt>JComponent</tt> intance containing  all of the
+     * @return the `JComponent` intance containing  all of the
      * UI elements for the tab
      */
     JComponent getComponent();
@@ -32,9 +32,9 @@ public interface Tab {
     String getToolTip();
 
     /**
-     * Returns the <tt>Icon</tt> instance for the tab.
+     * Returns the `Icon` instance for the tab.
      *
-     * @return the <tt>Icon</tt> instance for the tab
+     * @return the `Icon` instance for the tab
      */
     Icon getIcon();
 

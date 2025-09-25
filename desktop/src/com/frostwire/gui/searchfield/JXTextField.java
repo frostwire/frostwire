@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * {@link JTextField}, with integrated support for prompts and buddies.
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  * @see PromptSupport
  * @see BuddySupport
  */

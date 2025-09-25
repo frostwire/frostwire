@@ -27,7 +27,7 @@ import java.awt.event.ComponentEvent;
 import java.util.StringTokenizer;
 
 /**
- * This class uses a <tt>JTextArea</tt> to simulate a <tt>JLabel</tt> that
+ * This class uses a `JTextArea` to simulate a `JLabel` that
  * allows multiple-line labels.  It does this by using JLabel's values for
  * border, font, etc.
  */
@@ -56,7 +56,7 @@ public class MultiLineLabel extends JTextArea {
      * Creates a label that can have multiple lines and that has the
      * default width.
      *
-     * @param s the <tt>String</tt> to display in the label
+     * @param s the `String` to display in the label
      */
     public MultiLineLabel(String s) {
         this(s, false);
@@ -75,7 +75,7 @@ public class MultiLineLabel extends JTextArea {
      * Creates a label with new lines inserted after the specified number
      * of pixels have been filled on each line.
      *
-     * @param s      the <tt>String</tt> to display in the label
+     * @param s      the `String` to display in the label
      * @param pixels the pixel limit for each line
      */
     public MultiLineLabel(String s, int pixels) {
@@ -93,7 +93,7 @@ public class MultiLineLabel extends JTextArea {
 
     /**
      * New constructor that takes an array of strings.  This creates a
-     * new <tt>MultiLineLabel</tt> with the string at each index in
+     * new `MultiLineLabel` with the string at each index in
      * the array placed on its own line.  The array cannot contain
      * any null strings.
      *
@@ -110,7 +110,7 @@ public class MultiLineLabel extends JTextArea {
      * Creates a label that can have multiple lines and that sets the
      * number of rows and columns for the JTextArea.
      *
-     * @param s      the <tt>String</tt> to display in the label
+     * @param s      the `String` to display in the label
      * @param pixels the pixel limit for each line.
      * @param rows   the number of rows to include in the label
      * @param cols   the number of columns to include in the label
@@ -127,7 +127,7 @@ public class MultiLineLabel extends JTextArea {
     /**
      * Change the text before passing it up to the super setText.
      *
-     * @param s      the <tt>String</tt> to display in the label
+     * @param s      the `String` to display in the label
      * @param pixels the pixel limit for each line
      */
     private void setText(String s, int pixels) {
@@ -145,7 +145,7 @@ public class MultiLineLabel extends JTextArea {
     /**
      * Change the text before passing it up to the super setText.
      *
-     * @param s the <tt>String</tt> to display in the label
+     * @param s the `String` to display in the label
      */
     public void setText(String s) {
         _theText = s;
@@ -183,7 +183,7 @@ public class MultiLineLabel extends JTextArea {
      * closest word to the number of pixels specified in the 'pixels'
      * parameter.
      *
-     * @param message the <tt>String</tt> to display in the label
+     * @param message the `String` to display in the label
      * @param pixels  the pixel width on each line before
      *                inserting a new line character
      */

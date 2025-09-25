@@ -39,8 +39,9 @@ public class KeywordFilter implements SearchFilter {
     private final List<String> ban = new ArrayList<>();
 
     /**
-     * @modifies this
-     * @effects bans the given phrase.  Capitalization does not matter.
+     * Bans the given phrase regardless of capitalization.
+     * Modifies `this`.
+     * @param phrase The phrase to ban.
      */
     public void disallow(String phrase) {
         String canonical = phrase.toLowerCase(Locale.US);
@@ -50,8 +51,7 @@ public class KeywordFilter implements SearchFilter {
     }
 
     /**
-     * @modifies this
-     * @effects bans several well-known "adult" words.
+     * Bans several well-known "adult" words.
      */
     public void disallowAdult() {
         disallow("adult");

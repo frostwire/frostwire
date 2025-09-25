@@ -430,8 +430,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Repeat search will be disabled if, for example, the original
      * search was performed too recently.
      *
-     * @return <tt>true</tt> if the repeat search feature is currently
-     * enabled, otherwise <tt>false</tt>
+     * @return `true` if the repeat search feature is currently
+     * enabled, otherwise `false`
      */
     private boolean isRepeatSearchEnabled() {
         return FILTER != null;
@@ -487,7 +487,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * (Used for all tables that will have results.)
      * <p>
      * Currently:
-     * - Sorts the count column, if it is visible & real-time sorting is on.
+     * - Sorts the count column, if it is visible and real-time sorting is on.
      * - Adds listeners, so the filters can be displayed when necessary.
      */
     private void setupRealTable() {

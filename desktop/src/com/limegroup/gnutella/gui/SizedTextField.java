@@ -23,24 +23,24 @@ import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import java.awt.*;
 
 /**
- * This class creates a <tt>JTextField</tt> with a standardized size.<p>
+ * This class creates a `JTextField` with a standardized size.<p>
  * <p>
  * It sets the preffered and maximum size of the field to the standard
- * <tt>Dimension</tt> or sets the preferred and maximum sizes to the
- * <tt>Dimension</tt> argument.
+ * `Dimension` or sets the preferred and maximum sizes to the
+ * `Dimension` argument.
  */
 public final class SizedTextField extends LimeTextField {
     /**
-     * Constant for the standard height for <tt>JTextField</tt>.
+     * Constant for the standard height for `JTextField`.
      */
     private static final int STANDARD_HEIGHT = 28;
     /**
-     * Constant for the standard <tt>Dimension</tt> for <tt>JTextField</tt>.
+     * Constant for the standard `Dimension` for `JTextField`.
      */
     private static final Dimension STANDARD_DIMENSION = new Dimension(500, STANDARD_HEIGHT);
 
     /**
-     * Creates a <tt>JTextField</tt> with a standard size.
+     * Creates a `JTextField` with a standard size.
      */
     SizedTextField() {
         setPreferredSize(STANDARD_DIMENSION);
@@ -48,7 +48,7 @@ public final class SizedTextField extends LimeTextField {
     }
 
     /**
-     * Creates a <tt>JTextField</tt> with a standard size and with the
+     * Creates a `JTextField` with a standard size and with the
      * specified number of columns.
      *
      * @param columns the number of columns to use in the field

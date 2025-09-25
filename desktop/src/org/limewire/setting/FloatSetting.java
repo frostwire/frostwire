@@ -31,7 +31,7 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
     private float value;
 
     /**
-     * Creates a new <tt>FloatSetting</tt> instance with the specified
+     * Creates a new `FloatSetting` instance with the specified
      * key and default value.
      *
      * @param defaultProps Default properties

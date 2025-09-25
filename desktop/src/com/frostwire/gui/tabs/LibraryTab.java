@@ -38,7 +38,7 @@ public final class LibraryTab extends AbstractTab {
     /**
      * Constructs the elements of the tab.
      *
-     * @param lm the <tt>LibraryMediator</tt> instance
+     * @param lm the `LibraryMediator` instance
      */
     public LibraryTab(LibraryMediator lm) {
         super(I18n.tr("Library"), I18n.tr("Browse, Search and Play files in your computer. Wi-Fi sharing, Internet Radio and more."), "library_tab");
@@ -55,7 +55,7 @@ public final class LibraryTab extends AbstractTab {
     private static JPanel createPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         /*
-          Constant for the <tt>Component</tt> instance containing the
+          Constant for the `Component` instance containing the
           elements of this tab.
          */
         JComponent COMPONENT = LIBRARY_MEDIATOR.getComponent();

@@ -8,8 +8,8 @@ import java.io.PrintStream;
  */
 public final class ErrorService {
     /**
-     * The <tt>ErrorCallback</tt> instance that callbacks are sent to.
-     * As a default the <tt>PrintStreamErrorCallback</tt> is set,
+     * The `ErrorCallback` instance that callbacks are sent to.
+     * As a default the `PrintStreamErrorCallback` is set,
      * which prints to {@link System#out}.
      */
     private volatile static ErrorCallback _errorCallback =
@@ -22,7 +22,7 @@ public final class ErrorService {
     }
 
     /**
-     * Sets the <tt>ErrorCallback</tt> class to use.
+     * Sets the `ErrorCallback` class to use.
      */
     public static void setErrorCallback(ErrorCallback callback) {
         _errorCallback = callback;

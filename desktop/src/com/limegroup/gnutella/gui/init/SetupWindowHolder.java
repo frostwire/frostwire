@@ -29,12 +29,12 @@ import java.awt.*;
  */
 final class SetupWindowHolder extends JPanel {
     /**
-     * The <tt>CardLayout</tt> instance for the setup windows.
+     * The `CardLayout` instance for the setup windows.
      */
     private final CardLayout CARD_LAYOUT = new CardLayout();
 
     /**
-     * Sets the <tt>CardLayout</tt> for the setup windows.
+     * Sets the `CardLayout` for the setup windows.
      */
     SetupWindowHolder() {
         setLayout(CARD_LAYOUT);
@@ -43,7 +43,7 @@ final class SetupWindowHolder extends JPanel {
     /**
      * Adds the specified window to the CardLayout based on its title.
      *
-     * @param window the <tt>SetupWindow</tt> to add
+     * @param window the `SetupWindow` to add
      */
     void add(SetupWindow window) {
         add(window, window.getKey());
@@ -52,7 +52,7 @@ final class SetupWindowHolder extends JPanel {
     /**
      * Shows the window specified by its title.
      *
-     * @param key the unique key of the <tt>Component</tt> to show
+     * @param key the unique key of the `Component` to show
      */
     void show(String key) {
         CARD_LAYOUT.show(this, key);

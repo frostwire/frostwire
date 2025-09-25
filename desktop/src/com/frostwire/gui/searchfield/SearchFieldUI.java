@@ -17,7 +17,7 @@ import java.beans.PropertyChangeListener;
 /**
  * The default {@link JXSearchField} UI delegate.
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public class SearchFieldUI extends BuddyTextFieldUI {
     public static final Insets NO_INSETS = new Insets(0, 0, 0, 0);

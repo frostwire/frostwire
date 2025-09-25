@@ -103,7 +103,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     private Timer longPressTimer;
 
     /**
-     * Constructs a new <tt>MediaPlayerComponent</tt>.
+     * Constructs a new `MediaPlayerComponent`.
      */
     public MediaPlayerComponent() {
         mediaPlayer = MediaPlayer.instance();

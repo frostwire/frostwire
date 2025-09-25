@@ -217,7 +217,7 @@ public final class DimConstraint implements Externalizable {
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
      * @param size The new gap.
-     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean).
+     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean)
      */
     public void setGapAfter(BoundSize size) {
         this.gapAfter = size;
@@ -250,7 +250,7 @@ public final class DimConstraint implements Externalizable {
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
      * @param size The new gap.
-     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean).
+     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean)
      */
     public void setGapBefore(BoundSize size) {
         this.gapBefore = size;
@@ -270,7 +270,7 @@ public final class DimConstraint implements Externalizable {
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
      * @return The current size. Never <code>null</code> since v3.5.
-     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean).
+     * @see net.miginfocom.layout.ConstraintParser#parseBoundSize(String, boolean, boolean)
      */
     public BoundSize getSize() {
         return size;
@@ -355,7 +355,7 @@ public final class DimConstraint implements Externalizable {
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
      *
-     * @return code>true</code> means that components should grow.
+     * @return <code>true</code> means that components should grow.
      */
     public boolean isFill() {
         return fill;

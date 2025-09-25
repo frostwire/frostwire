@@ -31,21 +31,21 @@ import java.util.Enumeration;
 
 /**
  * Manages the <code>JTree</code> instance of the options window.  This
- * class constructs the <tt>TreeModel</tt> and forwards many method calls
- * the contained <tt>TreeModel</tt>.<p>
+ * class constructs the `TreeModel` and forwards many method calls
+ * the contained `TreeModel`.<p>
  * <p>
- * In addition, this class controls the <tt>Component</tt> that contains
- * the <tt>JTree</tt> instance and provides access to that
- * <tt>Component</tt>.
+ * In addition, this class controls the `Component` that contains
+ * the `JTree` instance and provides access to that
+ * `Component`.
  */
 public final class OptionsTreeManager {
     /**
-     * Handle to the main <tt>JScrollPane</tt> instance for the main window
-     * that contains the <tt>JTree</tt>.
+     * Handle to the main `JScrollPane` instance for the main window
+     * that contains the `JTree`.
      */
     private final JScrollPane SCROLL_PANE;
     /**
-     * Handle to the main <tt>JTree</tt> instance that displays the options.
+     * Handle to the main `JTree` instance that displays the options.
      */
     private final JTree TREE;
     /**
@@ -55,8 +55,8 @@ public final class OptionsTreeManager {
     private final FilteredTreeModel FILTERED_TREE_MODEL = new FilteredTreeModel(TREE_MODEL, true);
 
     /**
-     * The constructor constructs the <tt>JTree</tt>, the <tt>TreeModel</tt>,
-     * and the <tt>JScrollPane</tt>.
+     * The constructor constructs the `JTree`, the `TreeModel`,
+     * and the `JScrollPane`.
      */
     OptionsTreeManager() {
         TREE = new JTree();

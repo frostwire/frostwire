@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * TODO: Make all these SetSetting classes extend from an AbstractSetSetting<T> class
+ * TODO: Make all these SetSetting classes extend from an AbstractSetSetting class
  * <p>
  * Provides a <code>String</code> <code>Set</code> setting value. As a
  * subclass of <code>Setting</code>, the setting has a key.
