@@ -436,4 +436,6 @@
     <string name="restarting_torrent_engine">正在使用新端口设置重启种子引擎…</string>
     <string name="torrent_engine_restarted">种子引擎已使用新端口设置重启</string>
     <string name="error_restarting_torrent_engine">重启种子引擎错误：%s</string>
+    <string name="apply">应用</string>
+    <string name="cancel">取消</string>
 </resources>

@@ -444,4 +444,6 @@
     <string name="restarting_torrent_engine">Neustart der Torrent-Engine mit neuen Port-Einstellungen…</string>
     <string name="torrent_engine_restarted">Torrent-Engine mit neuen Port-Einstellungen neu gestartet</string>
     <string name="error_restarting_torrent_engine">Fehler beim Neustart der Torrent-Engine: %s</string>
+    <string name="apply">Anwenden</string>
+    <string name="cancel">Abbrechen</string>
 </resources>

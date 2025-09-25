@@ -431,4 +431,6 @@
     <string name="restarting_torrent_engine">إعادة تشغيل محرك التورنت بإعدادات المنافذ الجديدة…</string>
     <string name="torrent_engine_restarted">تم إعادة تشغيل محرك التورنت بإعدادات المنافذ الجديدة</string>
     <string name="error_restarting_torrent_engine">خطأ في إعادة تشغيل محرك التورنت: %s</string>
+    <string name="apply">تطبيق</string>
+    <string name="cancel">إلغاء</string>
 </resources>

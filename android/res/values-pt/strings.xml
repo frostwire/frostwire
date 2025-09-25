@@ -441,4 +441,6 @@
     <string name="restarting_torrent_engine">Reiniciando motor de torrent com novas configurações de porta…</string>
     <string name="torrent_engine_restarted">Motor de torrent reiniciado com novas configurações de porta</string>
     <string name="error_restarting_torrent_engine">Erro ao reiniciar motor de torrent: %s</string>
+    <string name="apply">Aplicar</string>
+    <string name="cancel">Cancelar</string>
 </resources>

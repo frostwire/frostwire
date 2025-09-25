@@ -452,4 +452,6 @@
     <string name="restarting_torrent_engine">Redémarrage du moteur torrent avec nouveaux paramètres de ports…</string>
     <string name="torrent_engine_restarted">Moteur torrent redémarré avec nouveaux paramètres de ports</string>
     <string name="error_restarting_torrent_engine">Erreur lors du redémarrage du moteur torrent : %s</string>
+    <string name="apply">Appliquer</string>
+    <string name="cancel">Annuler</string>
 </resources>

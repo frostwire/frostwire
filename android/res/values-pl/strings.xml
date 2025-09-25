@@ -437,4 +437,6 @@
     <string name="restarting_torrent_engine">Ponowne uruchamianie silnika torrent z nowymi ustawieniami portów…</string>
     <string name="torrent_engine_restarted">Silnik torrent uruchomiony ponownie z nowymi ustawieniami portów</string>
     <string name="error_restarting_torrent_engine">Błąd ponownego uruchamiania silnika torrent: %s</string>
+    <string name="apply">Zastosuj</string>
+    <string name="cancel">Anuluj</string>
 </resources>

@@ -537,4 +537,6 @@
     <string name="restarting_torrent_engine">Перезапуск торрент-движка с новыми настройками портов…</string>
     <string name="torrent_engine_restarted">Торрент-движок перезапущен с новыми настройками портов</string>
     <string name="error_restarting_torrent_engine">Ошибка перезапуска торрент-движка: %s</string>
+    <string name="apply">Применить</string>
+    <string name="cancel">Отмена</string>
 </resources>

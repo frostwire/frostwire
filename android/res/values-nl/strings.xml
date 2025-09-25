@@ -433,4 +433,6 @@
     <string name="restarting_torrent_engine">Herstarten torrent engine met nieuwe poortinstellingen…</string>
     <string name="torrent_engine_restarted">Torrent engine herstart met nieuwe poortinstellingen</string>
     <string name="error_restarting_torrent_engine">Fout bij herstarten torrent engine: %s</string>
+    <string name="apply">Toepassen</string>
+    <string name="cancel">Annuleren</string>
 </resources>

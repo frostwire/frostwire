@@ -440,4 +440,6 @@
     <string name="restarting_torrent_engine">Riavvio motore torrent con nuove impostazioni porte…</string>
     <string name="torrent_engine_restarted">Motore torrent riavviato con nuove impostazioni porte</string>
     <string name="error_restarting_torrent_engine">Errore nel riavvio del motore torrent: %s</string>
+    <string name="apply">Applica</string>
+    <string name="cancel">Annulla</string>
 </resources>

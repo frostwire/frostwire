@@ -240,6 +240,9 @@ public final class PortRangePreference extends DialogPreference {
         protected void onPrepareDialogBuilder(@NonNull AlertDialog.Builder builder) {
             super.onPrepareDialogBuilder(builder);
             
+            // Set explicit button labels to make it clear to users
+            builder.setPositiveButton(R.string.apply, null);
+            builder.setNegativeButton(R.string.cancel, null);
             builder.setNeutralButton(R.string.port_range_reset_default, null);
         }
 
