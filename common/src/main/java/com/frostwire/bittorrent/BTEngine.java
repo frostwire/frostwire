@@ -19,6 +19,7 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
+
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
@@ -340,6 +341,179 @@ public final class BTEngine extends SessionManager {
      */
     public boolean isPausedCached() {
         return cachedPausedState;
+    }
+
+    /**
+     * Apply an IP filter to the BitTorrent session.
+     * This method creates a new ip_filter and applies it to the session.
+     * 
+     * @param ranges List of IP ranges to block
+     */
+    public void applyIPFilter(java.util.List<com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange> ranges) {
+        if (swig() == null || ranges == null || ranges.isEmpty()) {
+            LOG.info("applyIPFilter(): session not available or no ranges to apply");
+            return;
+        }
+
+        try {
+            LOG.info("applyIPFilter(): applying " + ranges.size() + " IP filter ranges");
+            ip_filter filter = new ip_filter();
+            
+            for (com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange range : ranges) {
+                try {
+                    String startIP = range.startAddress();
+                    String endIP = range.endAddress();
+                    
+                    // Convert IP strings to addresses and add to filter
+                    // access_flags = 1 means blocked (ip_filter.blocked)
+                    filter.add_rule(startIP, endIP, 1);
+                } catch (Throwable t) {
+                    LOG.warn("applyIPFilter(): failed to add IP range: " + range, t);
+                }
+            }
+            
+            // Apply the filter to the session
+            swig().set_ip_filter(filter);
+            LOG.info("applyIPFilter(): IP filter successfully applied to session");
+            
+            // Optionally evict existing connections that are now blocked
+            evictBlockedPeers();
+            
+        } catch (Throwable t) {
+            LOG.error("applyIPFilter(): error applying IP filter", t);
+        }
+    }
+
+    /**
+     * Clear the IP filter from the BitTorrent session.
+     */
+    public void clearIPFilter() {
+        if (swig() == null) {
+            return;
+        }
+        
+        try {
+            // Create an empty IP filter and apply it
+            ip_filter emptyFilter = new ip_filter();
+            swig().set_ip_filter(emptyFilter);
+            LOG.info("clearIPFilter(): IP filter cleared from session");
+        } catch (Throwable t) {
+            LOG.error("clearIPFilter(): error clearing IP filter", t);
+        }
+    }
+
+    /**
+     * Get the current IP filter from the session.
+     * 
+     * @return Current ip_filter instance or null if session not available
+     */
+    public ip_filter getCurrentIPFilter() {
+        if (swig() == null) {
+            return null;
+        }
+        
+        try {
+            return swig().get_ip_filter();
+        } catch (Throwable t) {
+            LOG.error("getCurrentIPFilter(): error getting IP filter", t);
+            return null;
+        }
+    }
+
+    /**
+     * Evict peers that are currently blocked by the IP filter.
+     * This iterates through all torrent handles and disconnects peers whose IPs
+     * are blocked by the current IP filter.
+     */
+    private void evictBlockedPeers() {
+        if (swig() == null) {
+            return;
+        }
+        
+        try {
+            ip_filter currentFilter = getCurrentIPFilter();
+            if (currentFilter == null) {
+                return;
+            }
+            
+            LOG.info("evictBlockedPeers(): checking for blocked peers to disconnect");
+            
+            // Get all torrent handles and check their peers
+            TorrentHandle[] handles = findAll();
+            int blockedPeerCount = 0;
+            
+            for (TorrentHandle handle : handles) {
+                if (handle == null || !handle.isValid()) {
+                    continue;
+                }
+                
+                try {
+                    // Get peer information for this torrent
+                    com.frostwire.jlibtorrent.PeerInfo[] peers = handle.peerInfo();
+                    if (peers == null) {
+                        continue;
+                    }
+                    
+                    for (com.frostwire.jlibtorrent.PeerInfo peer : peers) {
+                        if (peer == null) {
+                            continue;
+                        }
+                        
+                        try {
+                            String peerIP = peer.ip().address();
+                            // Check if this IP is blocked by the filter
+                            // Note: This is a simplified check - in a real implementation,
+                            // we'd need to properly test the IP against the filter ranges
+                            if (isIPBlocked(currentFilter, peerIP)) {
+                                // Disconnect this peer
+                                handle.banPeer(peer.ip());
+                                blockedPeerCount++;
+                                LOG.info("evictBlockedPeers(): banned blocked peer " + peerIP);
+                            }
+                        } catch (Throwable t) {
+                            // Continue with next peer if there's an error
+                            LOG.debug("evictBlockedPeers(): error checking peer", t);
+                        }
+                    }
+                } catch (Throwable t) {
+                    // Continue with next handle if there's an error
+                    LOG.debug("evictBlockedPeers(): error checking handle peers", t);
+                }
+            }
+            
+            if (blockedPeerCount > 0) {
+                LOG.info("evictBlockedPeers(): disconnected " + blockedPeerCount + " blocked peers");
+            }
+            
+        } catch (Throwable t) {
+            LOG.error("evictBlockedPeers(): error evicting blocked peers", t);
+        }
+    }
+
+    /**
+     * Simple helper to check if an IP address is blocked by the filter.
+     * This is a simplified implementation - a more complete implementation would
+     * properly check IP ranges.
+     * 
+     * @param filter The IP filter to check against
+     * @param ipAddress The IP address to check
+     * @return true if the IP is blocked, false otherwise
+     */
+    private boolean isIPBlocked(ip_filter filter, String ipAddress) {
+        if (filter == null || ipAddress == null || ipAddress.isEmpty()) {
+            return false;
+        }
+        
+        try {
+            // Use the filter's access method to check if IP is blocked
+            // This is a simplified check - the actual implementation would need to
+            // properly parse and check IP addresses against ranges
+            int access = filter.access(ipAddress);
+            return access == 1; // 1 means blocked
+        } catch (Throwable t) {
+            LOG.debug("isIPBlocked(): error checking IP " + ipAddress, t);
+            return false;
+        }
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {

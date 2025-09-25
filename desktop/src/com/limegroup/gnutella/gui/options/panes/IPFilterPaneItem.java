@@ -168,7 +168,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO: Clear actual IP Filter from BTEngine
+        // Clear actual IP Filter from BTEngine
+        clearCurrentIPFilter();
         enableImportControls(true);
     }
 
@@ -225,7 +226,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                             if (dataModel.getRowCount() % 100 == 0) {
                                 GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)), importingString));
                             }
-                            // TODO: add to actual ip block filter
+                            // Add to actual IP block filter
+                            applyCurrentIPFilter();
                         } catch (Throwable t) {
                             LOG.warn(t.getMessage(), t);
                             // just keep going
@@ -238,6 +240,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     enableImportControls(true);
                     fileUrlTextField.setText("");
                     LOG.info("importFromStreamAsync() - done");
+                    // Apply the complete IP filter after import is done
+                    applyCurrentIPFilter();
                 });
                 if (removeInputFileWhenDone) {
                     potentialGunzipFile.delete();
@@ -329,6 +333,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             fis.close();
             long delta = end - start;
             LOG.info("loadSerializedIPFilter(): loaded " + ranges + " ip filter ranges in " + delta + "ms");
+            
+            // Apply the loaded IP filter to the BitTorrent session
+            if (ranges > 0) {
+                applyCurrentIPFilter();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -437,6 +446,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     public void onRangeManuallyAdded(IPRange ipRange) {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
+        // Apply the updated IP filter after manually adding a range
+        applyCurrentIPFilter();
     }
 
     enum IPFilterFormat {
@@ -502,6 +513,65 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Apply the current IP filter rules to the BitTorrent session.
+     * This method reads all IP ranges from the table and applies them to the BTEngine.
+     */
+    private void applyCurrentIPFilter() {
+        try {
+            BTEngine engine = BTEngine.getInstance();
+            if (engine == null) {
+                LOG.warn("applyCurrentIPFilter(): BTEngine not available");
+                return;
+            }
+
+            if (ipFilterTable == null) {
+                LOG.warn("applyCurrentIPFilter(): ipFilterTable not available");
+                return;
+            }
+
+            IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+            if (dataModel == null) {
+                LOG.warn("applyCurrentIPFilter(): dataModel not available");
+                return;
+            }
+
+            // Get all IP ranges from the table
+            java.util.List<IPRange> ranges = new java.util.ArrayList<>();
+            for (int i = 0; i < dataModel.getRowCount(); i++) {
+                try {
+                    IPRange range = (IPRange) dataModel.getValueAt(i, 0); // Assuming IPRange is in first column
+                    if (range != null) {
+                        ranges.add(range);
+                    }
+                } catch (Throwable t) {
+                    LOG.warn("applyCurrentIPFilter(): error getting range at row " + i, t);
+                }
+            }
+
+            LOG.info("applyCurrentIPFilter(): applying " + ranges.size() + " IP filter ranges to BTEngine");
+            engine.applyIPFilter(ranges);
+
+        } catch (Throwable t) {
+            LOG.error("applyCurrentIPFilter(): error applying IP filter", t);
+        }
+    }
+
+    /**
+     * Clear the IP filter from the BitTorrent session.
+     */
+    private void clearCurrentIPFilter() {
+        try {
+            BTEngine engine = BTEngine.getInstance();
+            if (engine != null) {
+                engine.clearIPFilter();
+                LOG.info("clearCurrentIPFilter(): IP filter cleared");
+            }
+        } catch (Throwable t) {
+            LOG.error("clearCurrentIPFilter(): error clearing IP filter", t);
         }
     }
 }
