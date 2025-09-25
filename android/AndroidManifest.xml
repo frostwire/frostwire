@@ -19,7 +19,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="auto"
-        android:versionCode="753"
+        android:versionCode="754"
         android:versionName="3.0.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
