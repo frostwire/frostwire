@@ -56,7 +56,6 @@
   <string name="playlist_last_added">Ultimele adăugate</string>
   <string name="new_empty_playlist">Playlist nou</string>
   <string name="save">Salvare</string>
-  <string name="cancel">Anulare</string>
   <string name="overwrite">Suprascrie</string>
   <string name="new_playlist_name_template">Listă de redare <xliff:g id="number">%d</xliff:g></string>
   <string name="create_playlist_prompt">Numele listei de redare</string>

@@ -434,5 +434,4 @@
     <string name="torrent_engine_restarted">Torrent motoru yeni port ayarlarıyla yeniden başlatıldı</string>
     <string name="error_restarting_torrent_engine">Torrent motoru yeniden başlatma hatası: %s</string>
     <string name="apply">Uygula</string>
-    <string name="cancel">İptal</string>
 </resources>

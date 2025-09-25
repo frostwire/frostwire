@@ -56,7 +56,6 @@
   <string name="playlist_last_added">Востаннє додано</string>
   <string name="new_empty_playlist">Новий</string>
   <string name="save">Зберегти</string>
-  <string name="cancel">Скасувати</string>
   <string name="overwrite">Перезаписати</string>
   <string name="new_playlist_name_template">Список <xliff:g id="number">%d</xliff:g></string>
   <string name="create_playlist_prompt">Назва списку</string>
