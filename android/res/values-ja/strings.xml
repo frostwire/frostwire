@@ -414,4 +414,24 @@
     <string name="subs_details">7日間の試用期間中は料金が発生しません。\n\n7日間の試用期間が終了するとすぐに、または以前の加入者に対しては即時にサブスクリプション料金が発生します。\n\nサブスクリプション期間の終了の少なくとも24時間前にキャンセルされない限り、サブスクリプションは自動的に更新されます。\n\nGoogle Playでの自動更新とキャンセルについては、「サブスクリプションの管理」を押してください。</string>
     <string name="subscriptions">📅 定期購読</string>
     <string name="rewarded_video_ad">📺 報酬付きビデオ広告</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">着信接続のポート範囲</string>
+    <string name="incoming_connection_port_range_summary">着信接続のポートを設定</string>
+    <string name="port_range_dialog_title">ポート範囲の設定</string>
+    <string name="port_range_start_port">開始ポート</string>
+    <string name="port_range_end_port">終了ポート</string>
+    <string name="port_range_reset_default">デフォルトにリセット</string>
+    <string name="port_range_current_range">現在の範囲: %1$d - %2$d</string>
+    <string name="port_range_default_range">デフォルト範囲: 1024 - 57000</string>
+    <string name="port_range_invalid_range">無効なポート範囲です。開始ポートは終了ポート以下である必要があります。</string>
+    <string name="port_range_invalid_port">ポート値は1024から65535の間である必要があります。</string>
+    <string name="restart_torrent_engine_title">トレントエンジンを再起動しますか？</string>
+    <string name="restart_torrent_engine_message">ポート範囲設定が保存されました。新しいポート設定を適用するために、トレントエンジンを今すぐ再起動しますか？\n\n注意：これにより、すべてのアクティブな転送が一時的に停止し、進行状況が保存されます。</string>
+    <string name="restart_now">今すぐ再起動</string>
+    <string name="restart_later">後で再起動</string>
+    <string name="port_settings_saved_restart_later">ポート設定が保存されました。変更はFrostWireの再起動時に適用されます。</string>
+    <string name="restarting_torrent_engine">新しいポート設定でトレントエンジンを再起動中…</string>
+    <string name="torrent_engine_restarted">新しいポート設定でトレントエンジンが再起動されました</string>
+    <string name="error_restarting_torrent_engine">トレントエンジンの再起動エラー: %s</string>
 </resources>

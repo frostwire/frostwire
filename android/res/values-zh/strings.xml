@@ -416,4 +416,24 @@
     <string name="subs_details">在7天试用期内不会收取费用。\n\n订阅费将在7天试用期结束后立即收取，或对于之前的订阅者立即收取。\n\n订阅将在订阅期结束前至少24小时内未取消的情况下自动续订。\n\n点击\'管理订阅\'进行Google Play中的自动续订和取消操作。</string>
     <string name="subscriptions">📅 订阅</string>
     <string name="rewarded_video_ad">📺 奖励视频广告</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">入站连接端口范围</string>
+    <string name="incoming_connection_port_range_summary">配置入站连接端口</string>
+    <string name="port_range_dialog_title">设置端口范围</string>
+    <string name="port_range_start_port">起始端口</string>
+    <string name="port_range_end_port">结束端口</string>
+    <string name="port_range_reset_default">重置为默认</string>
+    <string name="port_range_current_range">当前范围：%1$d - %2$d</string>
+    <string name="port_range_default_range">默认范围：1024 - 57000</string>
+    <string name="port_range_invalid_range">无效的端口范围。起始端口必须小于或等于结束端口。</string>
+    <string name="port_range_invalid_port">端口值必须在1024到65535之间。</string>
+    <string name="restart_torrent_engine_title">重启种子引擎？</string>
+    <string name="restart_torrent_engine_message">端口范围设置已保存。您想现在重启种子引擎以应用新的端口设置吗？\n\n注意：这将暂时停止所有活动的传输并保存其进度。</string>
+    <string name="restart_now">立即重启</string>
+    <string name="restart_later">稍后重启</string>
+    <string name="port_settings_saved_restart_later">端口设置已保存。更改将在重启FrostWire时应用。</string>
+    <string name="restarting_torrent_engine">正在使用新端口设置重启种子引擎…</string>
+    <string name="torrent_engine_restarted">种子引擎已使用新端口设置重启</string>
+    <string name="error_restarting_torrent_engine">重启种子引擎错误：%s</string>
 </resources>

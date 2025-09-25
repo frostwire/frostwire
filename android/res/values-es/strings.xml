@@ -445,4 +445,24 @@
     <string name="subs_details">No se te cobrará durante el período de prueba de 7 días.\n\nLa suscripción se cobra tan pronto como finaliza el período de prueba de 7 días o inmediatamente para suscriptores anteriores.\n\nLa suscripción se renueva automáticamente a menos que se cancele al menos 24 horas antes del final del período de suscripción.\n\nPresiona \'Administrar Suscripciones\' para renovaciones automáticas y cancelaciones en Google Play.</string>
     <string name="subscriptions">📅 Suscripciones</string>
     <string name="rewarded_video_ad">📺 Anuncio de Video con Recompensa</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Rango de Puertos para Conexiones Entrantes</string>
+    <string name="incoming_connection_port_range_summary">Configurar puertos para conexiones entrantes</string>
+    <string name="port_range_dialog_title">Establecer Rango de Puertos</string>
+    <string name="port_range_start_port">Puerto Inicial</string>
+    <string name="port_range_end_port">Puerto Final</string>
+    <string name="port_range_reset_default">Restablecer Valores Predeterminados</string>
+    <string name="port_range_current_range">Rango actual: %1$d - %2$d</string>
+    <string name="port_range_default_range">Rango predeterminado: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Rango de puertos inválido. El puerto inicial debe ser menor o igual al puerto final.</string>
+    <string name="port_range_invalid_port">Los valores de puerto deben estar entre 1024 y 65535.</string>
+    <string name="restart_torrent_engine_title">¿Reiniciar Motor de Torrents?</string>
+    <string name="restart_torrent_engine_message">La configuración de rango de puertos ha sido guardada. ¿Deseas reiniciar el motor de torrents ahora para aplicar la nueva configuración de puertos?\n\nNota: Esto detendrá temporalmente todas las transferencias activas y guardará su progreso.</string>
+    <string name="restart_now">Reiniciar Ahora</string>
+    <string name="restart_later">Reiniciar Más Tarde</string>
+    <string name="port_settings_saved_restart_later">Configuración de puertos guardada. Los cambios se aplicarán cuando FrostWire se reinicie.</string>
+    <string name="restarting_torrent_engine">Reiniciando motor de torrents con nueva configuración de puertos…</string>
+    <string name="torrent_engine_restarted">Motor de torrents reiniciado con nueva configuración de puertos</string>
+    <string name="error_restarting_torrent_engine">Error al reiniciar motor de torrents: %s</string>
 </resources>

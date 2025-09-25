@@ -413,4 +413,24 @@
     <string name="subs_details">7일간의 체험 기간 동안에는 요금이 부과되지 않습니다.\n\n7일 체험 기간이 끝나는 대로, 또는 이전 구독자의 경우 즉시 구독료가 청구됩니다.\n\n구독은 구독 기간이 끝나기 최소 24시간 전에 취소되지 않는 한 자동으로 갱신됩니다.\n\nGoogle Play에서 자동 갱신 및 취소를 관리하려면 \'구독 관리\'를 누르세요.</string>
     <string name="subscriptions">📅 구독</string>
     <string name="rewarded_video_ad">📺 보상형 비디오 광고</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">인바운드 연결 포트 범위</string>
+    <string name="incoming_connection_port_range_summary">인바운드 연결용 포트 구성</string>
+    <string name="port_range_dialog_title">포트 범위 설정</string>
+    <string name="port_range_start_port">시작 포트</string>
+    <string name="port_range_end_port">종료 포트</string>
+    <string name="port_range_reset_default">기본값으로 재설정</string>
+    <string name="port_range_current_range">현재 범위: %1$d - %2$d</string>
+    <string name="port_range_default_range">기본 범위: 1024 - 57000</string>
+    <string name="port_range_invalid_range">유효하지 않은 포트 범위입니다. 시작 포트는 종료 포트보다 작거나 같아야 합니다.</string>
+    <string name="port_range_invalid_port">포트 값은 1024와 65535 사이여야 합니다.</string>
+    <string name="restart_torrent_engine_title">토런트 엔진을 다시 시작하시겠습니까?</string>
+    <string name="restart_torrent_engine_message">포트 범위 설정이 저장되었습니다. 새 포트 설정을 적용하기 위해 토런트 엔진을 지금 다시 시작하시겠습니까?\n\n참고: 이렇게 하면 모든 활성 전송이 일시적으로 중지되고 진행 상황이 저장됩니다.</string>
+    <string name="restart_now">지금 다시 시작</string>
+    <string name="restart_later">나중에 다시 시작</string>
+    <string name="port_settings_saved_restart_later">포트 설정이 저장되었습니다. FrostWire가 다시 시작될 때 변경 사항이 적용됩니다.</string>
+    <string name="restarting_torrent_engine">새 포트 설정으로 토런트 엔진 다시 시작 중…</string>
+    <string name="torrent_engine_restarted">새 포트 설정으로 토런트 엔진이 다시 시작되었습니다</string>
+    <string name="error_restarting_torrent_engine">토런트 엔진 다시 시작 오류: %s</string>
 </resources>

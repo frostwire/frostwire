@@ -413,4 +413,24 @@
     <string name="subs_details">Er worden geen kosten in rekening gebracht tijdens de 7-daagse proefperiode.\n\nHet abonnement wordt in rekening gebracht zodra de 7-daagse proefperiode eindigt of onmiddellijk voor eerdere abonnees.\n\nHet abonnement wordt automatisch verlengd, tenzij het ten minste 24 uur voor het einde van de abonnementsperiode wordt opgezegd.\n\nDruk op \'Beheer Abonnementen\' voor automatische verlengingen en annuleringen in Google Play.</string>
     <string name="subscriptions">📅 Abonnementen</string>
     <string name="rewarded_video_ad">📺 Beloonde videoadvertentie</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Poortbereik voor Inkomende Verbindingen</string>
+    <string name="incoming_connection_port_range_summary">Configureer poorten voor inkomende verbindingen</string>
+    <string name="port_range_dialog_title">Poortbereik Instellen</string>
+    <string name="port_range_start_port">Start Poort</string>
+    <string name="port_range_end_port">Eind Poort</string>
+    <string name="port_range_reset_default">Standaard Herstellen</string>
+    <string name="port_range_current_range">Huidig bereik: %1$d - %2$d</string>
+    <string name="port_range_default_range">Standaard bereik: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Ongeldig poortbereik. Start poort moet kleiner zijn dan of gelijk aan eind poort.</string>
+    <string name="port_range_invalid_port">Poortwaarden moeten tussen 1024 en 65535 zijn.</string>
+    <string name="restart_torrent_engine_title">Torrent Engine Herstarten?</string>
+    <string name="restart_torrent_engine_message">Poortbereik instellingen zijn opgeslagen. Wilt u de torrent engine nu herstarten om de nieuwe poortinstellingen toe te passen?\n\nOpmerking: Dit zal tijdelijk alle actieve overdrachten stoppen en hun voortgang opslaan.</string>
+    <string name="restart_now">Nu Herstarten</string>
+    <string name="restart_later">Later Herstarten</string>
+    <string name="port_settings_saved_restart_later">Poort instellingen opgeslagen. Wijzigingen worden toegepast wanneer FrostWire wordt herstart.</string>
+    <string name="restarting_torrent_engine">Herstarten torrent engine met nieuwe poortinstellingen…</string>
+    <string name="torrent_engine_restarted">Torrent engine herstart met nieuwe poortinstellingen</string>
+    <string name="error_restarting_torrent_engine">Fout bij herstarten torrent engine: %s</string>
 </resources>
