@@ -16,34 +16,31 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.limegroup.gnutella.settings;
-
-import org.limewire.setting.BooleanSetting;
-import org.limewire.setting.StringArraySetting;
+package com.frostwire.bittorrent;
 
 /**
- * Settings for filters
+ * Interface for IP ranges used in IP filtering.
+ * This provides a common interface for both desktop and Android implementations.
+ * 
+ * @author gubatron
+ * @author aldenml
  */
-public class FilterSettings extends LimeProps {
+public interface IPRange {
     /**
-     * Sets whether or not search results including "adult content" are
-     * banned.
+     * Get the description/label for this IP range
+     * @return Description string
      */
-    public static final BooleanSetting FILTER_ADULT =
-            FACTORY.createBooleanSetting("FILTER_ADULT", false);
+    String description();
+    
     /**
-     * An array of words that the user has banned from appearing in
-     * search results.
+     * Get the start IP address of this range
+     * @return Start IP address as string
      */
-    public static final StringArraySetting BANNED_WORDS =
-            FACTORY.createStringArraySetting("BANNED_WORDS", new String[0]);
-
+    String startAddress();
+    
     /**
-     * Sets whether or not IP filtering is enabled for BitTorrent connections.
+     * Get the end IP address of this range
+     * @return End IP address as string
      */
-    public static final BooleanSetting IP_FILTER_ENABLED =
-            FACTORY.createBooleanSetting("IP_FILTER_ENABLED", false);
-
-    private FilterSettings() {
-    }
+    String endAddress();
 }

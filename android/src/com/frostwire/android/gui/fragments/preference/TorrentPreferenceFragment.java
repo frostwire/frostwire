@@ -107,6 +107,16 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
             });
         }
 
+        SwitchPreference prefIPFilterEnabled = findPreference(Constants.PREF_KEY_TORRENT_IP_FILTER_ENABLED);
+        if (prefIPFilterEnabled != null) {
+            prefIPFilterEnabled.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabled = (boolean) newValue;
+                // Handle IP filter enable/disable
+                onIPFilterEnabledChanged(enabled);
+                return true;
+            });
+        }
+
         final BTEngine e = BTEngine.getInstance();
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);
@@ -186,5 +196,60 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
                 return btEngine.maxPeers() == value;
         }
         return false;
+    }
+
+    /**
+     * Handle IP filter enabled/disabled setting change.
+     * Note: For Android, we currently only support enabling/disabling the feature.
+     * The actual IP filter rules would need to be loaded from files or managed through
+     * a dedicated IP filter management interface.
+     */
+    private void onIPFilterEnabledChanged(boolean enabled) {
+        final BTEngine engine = BTEngine.getInstance();
+        if (engine == null) {
+            return;
+        }
+
+        if (enabled) {
+            // For now, we just log that IP filtering would be enabled
+            // In a full implementation, this would load and apply IP filter rules
+            com.frostwire.util.Logger.getLogger(getClass()).info("IP filtering enabled on Android - feature ready for IP filter rules");
+            
+            // If there were stored IP filter rules, they would be applied here
+            // For now, create an empty filter to demonstrate the functionality
+            java.util.List<IPRange> emptyRanges = new java.util.ArrayList<>();
+            engine.applyIPFilter(emptyRanges);
+        } else {
+            engine.clearIPFilter();
+            com.frostwire.util.Logger.getLogger(getClass()).info("IP filtering disabled on Android");
+        }
+    }
+
+    /**
+     * Simple IP range class for Android implementation.
+     * This is a minimal implementation for demonstration purposes.
+     */
+    private static class IPRange implements com.frostwire.bittorrent.IPRange {
+        private final String description;
+        private final String startAddress;
+        private final String endAddress;
+
+        public IPRange(String description, String startAddress, String endAddress) {
+            this.description = description;
+            this.startAddress = startAddress;
+            this.endAddress = endAddress;
+        }
+
+        public String description() {
+            return description;
+        }
+
+        public String startAddress() {
+            return startAddress;
+        }
+
+        public String endAddress() {
+            return endAddress;
+        }
     }
 }
