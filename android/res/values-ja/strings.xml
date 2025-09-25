@@ -435,4 +435,5 @@
     <string name="torrent_engine_restarted">新しいポート設定でトレントエンジンが再起動されました</string>
     <string name="error_restarting_torrent_engine">トレントエンジンの再起動エラー: %s</string>
     <string name="apply">適用</string>
+    <string name="port_range_cancel">キャンセル</string>
 </resources>

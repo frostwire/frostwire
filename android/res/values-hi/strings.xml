@@ -440,4 +440,5 @@
     <string name="torrent_engine_restarted">Torrent engine restarted with new port settings</string>
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
+    <string name="port_range_cancel">Cancel</string>
 </resources>

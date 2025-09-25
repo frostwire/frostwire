@@ -434,4 +434,5 @@
     <string name="torrent_engine_restarted">새 포트 설정으로 토런트 엔진이 다시 시작되었습니다</string>
     <string name="error_restarting_torrent_engine">토런트 엔진 다시 시작 오류: %s</string>
     <string name="apply">적용</string>
+    <string name="port_range_cancel">취소</string>
 </resources>

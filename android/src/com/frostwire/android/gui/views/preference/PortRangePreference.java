@@ -242,7 +242,7 @@ public final class PortRangePreference extends DialogPreference {
             
             // Set explicit button labels to make it clear to users
             builder.setPositiveButton(R.string.apply, null);
-            builder.setNegativeButton(R.string.cancel, null);
+            builder.setNegativeButton(R.string.port_range_cancel, null);
             builder.setNeutralButton(R.string.port_range_reset_default, null);
         }
 
