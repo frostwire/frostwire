@@ -111,8 +111,11 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
         if (prefIPFilterEnabled != null) {
             prefIPFilterEnabled.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean enabled = (boolean) newValue;
-                // Handle IP filter enable/disable
-                onIPFilterEnabledChanged(enabled);
+                // Handle IP filter enable/disable on background thread
+                com.frostwire.android.util.SystemUtils.postToHandler(
+                    com.frostwire.android.util.SystemUtils.HandlerThreadName.CONFIG_MANAGER,
+                    () -> onIPFilterEnabledChanged(enabled)
+                );
                 return true;
             });
         }
@@ -205,6 +208,8 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
      * a dedicated IP filter management interface.
      */
     private void onIPFilterEnabledChanged(boolean enabled) {
+        com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash("TorrentPreferenceFragment.onIPFilterEnabledChanged");
+        
         final BTEngine engine = BTEngine.getInstance();
         if (engine == null) {
             return;

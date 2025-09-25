@@ -528,8 +528,15 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     /**
      * Apply the current IP filter rules to the BitTorrent session.
      * This method reads all IP ranges from the table and applies them to the BTEngine.
+     * This method must be called from a background thread as IP lists can be very large.
      */
     private void applyCurrentIPFilter() {
+        // Ensure we're not on the UI thread since IP filtering can be expensive
+        if (javax.swing.SwingUtilities.isEventDispatchThread()) {
+            BackgroundQueuedExecutorService.schedule(this::applyCurrentIPFilter);
+            return;
+        }
+        
         try {
             // Check if IP filtering is enabled
             if (!FilterSettings.IP_FILTER_ENABLED.getValue()) {
@@ -577,8 +584,15 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     /**
      * Clear the IP filter from the BitTorrent session.
+     * This method must be called from a background thread.
      */
     private void clearCurrentIPFilter() {
+        // Ensure we're not on the UI thread
+        if (javax.swing.SwingUtilities.isEventDispatchThread()) {
+            BackgroundQueuedExecutorService.schedule(this::clearCurrentIPFilter);
+            return;
+        }
+        
         try {
             BTEngine engine = BTEngine.getInstance();
             if (engine != null) {
@@ -592,19 +606,22 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     /**
      * Handle IP filter enabled/disabled checkbox change.
+     * Operations are performed on background thread since IP filtering can be expensive.
      */
     private void onIPFilterEnabledChanged() {
-        boolean enabled = enableIPFilterCheckBox.isSelected();
-        FilterSettings.IP_FILTER_ENABLED.setValue(enabled);
-        
-        if (enabled) {
-            // Apply current IP filter
-            applyCurrentIPFilter();
-            LOG.info("onIPFilterEnabledChanged(): IP filtering enabled");
-        } else {
-            // Clear IP filter
-            clearCurrentIPFilter();
-            LOG.info("onIPFilterEnabledChanged(): IP filtering disabled");
-        }
+        BackgroundQueuedExecutorService.schedule(() -> {
+            boolean enabled = enableIPFilterCheckBox.isSelected();
+            FilterSettings.IP_FILTER_ENABLED.setValue(enabled);
+            
+            if (enabled) {
+                // Apply current IP filter
+                applyCurrentIPFilter();
+                LOG.info("onIPFilterEnabledChanged(): IP filtering enabled");
+            } else {
+                // Clear IP filter
+                clearCurrentIPFilter();
+                LOG.info("onIPFilterEnabledChanged(): IP filtering disabled");
+            }
+        });
     }
 }
