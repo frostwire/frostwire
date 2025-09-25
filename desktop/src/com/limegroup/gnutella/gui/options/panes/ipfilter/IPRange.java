@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.options.panes.ipfilter;
 
+import com.frostwire.bittorrent.IPRange;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,7 +27,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 
-public class IPRange {
+public class IPRange implements com.frostwire.bittorrent.IPRange {
     private String description;
     private String startAddress;
     private String endAddress;

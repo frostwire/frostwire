@@ -349,7 +349,7 @@ public final class BTEngine extends SessionManager {
      * 
      * @param ranges List of IP ranges to block
      */
-    public void applyIPFilter(java.util.List<com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange> ranges) {
+    public void applyIPFilter(java.util.List<IPRange> ranges) {
         if (swig() == null || ranges == null || ranges.isEmpty()) {
             LOG.info("applyIPFilter(): session not available or no ranges to apply");
             return;
@@ -359,7 +359,7 @@ public final class BTEngine extends SessionManager {
             LOG.info("applyIPFilter(): applying " + ranges.size() + " IP filter ranges");
             ip_filter filter = new ip_filter();
             
-            for (com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange range : ranges) {
+            for (IPRange range : ranges) {
                 try {
                     String startIP = range.startAddress();
                     String endIP = range.endAddress();

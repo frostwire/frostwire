@@ -34,6 +34,7 @@ import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterHttpListener;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.settings.FilterSettings;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
@@ -63,6 +64,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private JButton clearFilterButton;
     private JButton addRangeManuallyButton;
     private IconButton fileChooserIcon;
+    private JCheckBox enableIPFilterCheckBox;
     private boolean initialized;
     private int lastPercentage = -1;
     private long lastPercentageUpdateTimestamp;
@@ -97,6 +99,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
         ipFilterTable = IPFilterTableMediator.getInstance();
         BackgroundQueuedExecutorService.schedule(this::loadSerializedIPFilter);
+        
+        // Add enable/disable checkbox
+        enableIPFilterCheckBox = new JCheckBox(I18n.tr("Enable IP Filtering"));
+        enableIPFilterCheckBox.setSelected(FilterSettings.IP_FILTER_ENABLED.getValue());
+        enableIPFilterCheckBox.addActionListener(e -> onIPFilterEnabledChanged());
+        panel.add(enableIPFilterCheckBox, "span, wrap");
+        
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP Filter list (p2p format only supported)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
@@ -522,6 +531,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
      */
     private void applyCurrentIPFilter() {
         try {
+            // Check if IP filtering is enabled
+            if (!FilterSettings.IP_FILTER_ENABLED.getValue()) {
+                LOG.info("applyCurrentIPFilter(): IP filtering is disabled, skipping");
+                return;
+            }
+
             BTEngine engine = BTEngine.getInstance();
             if (engine == null) {
                 LOG.warn("applyCurrentIPFilter(): BTEngine not available");
@@ -540,7 +555,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
 
             // Get all IP ranges from the table
-            java.util.List<IPRange> ranges = new java.util.ArrayList<>();
+            java.util.List<com.frostwire.bittorrent.IPRange> ranges = new java.util.ArrayList<>();
             for (int i = 0; i < dataModel.getRowCount(); i++) {
                 try {
                     IPRange range = (IPRange) dataModel.getValueAt(i, 0); // Assuming IPRange is in first column
@@ -572,6 +587,24 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
         } catch (Throwable t) {
             LOG.error("clearCurrentIPFilter(): error clearing IP filter", t);
+        }
+    }
+
+    /**
+     * Handle IP filter enabled/disabled checkbox change.
+     */
+    private void onIPFilterEnabledChanged() {
+        boolean enabled = enableIPFilterCheckBox.isSelected();
+        FilterSettings.IP_FILTER_ENABLED.setValue(enabled);
+        
+        if (enabled) {
+            // Apply current IP filter
+            applyCurrentIPFilter();
+            LOG.info("onIPFilterEnabledChanged(): IP filtering enabled");
+        } else {
+            // Clear IP filter
+            clearCurrentIPFilter();
+            LOG.info("onIPFilterEnabledChanged(): IP filtering disabled");
         }
     }
 }
