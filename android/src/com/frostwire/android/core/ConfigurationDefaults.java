@@ -130,8 +130,8 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED, false);
 
         // Incoming connection port range settings
-        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START, 0);
-        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END, 65535);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START, 1024);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END, 57000);
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 

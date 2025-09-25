@@ -1,5 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
@@ -45,20 +45,31 @@ import com.frostwire.android.util.SystemUtils;
  */
 public final class PortRangePreference extends DialogPreference {
 
-    private int startPort;
-    private int endPort;
+    private int startPort = 1024; // Default values
+    private int endPort = 57000;
 
     public PortRangePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialog_preference_port_range);
-        loadCurrentValues();
-        updateSummary();
+        loadCurrentValuesAsync();
+        updateSummary(); // Show defaults initially
     }
 
-    private void loadCurrentValues() {
-        ConfigurationManager cm = ConfigurationManager.instance();
-        startPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
-        endPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
+    private void loadCurrentValuesAsync() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
+            ConfigurationManager cm = ConfigurationManager.instance();
+            int start = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
+            int end = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
+            
+            // Post back to UI thread to update the values
+            SystemUtils.postToUIThread(() -> onConfigurationManagerPortRange(start, end));
+        });
+    }
+    
+    private void onConfigurationManagerPortRange(int start, int end) {
+        startPort = start;
+        endPort = end;
+        updateSummary();
     }
 
     private void updateSummary() {
@@ -137,9 +148,9 @@ public final class PortRangePreference extends DialogPreference {
             
             dialog.setOnShowListener(dialogInterface -> {
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
-                    // Reset to default values [0, 65535]
-                    startPortEditText.setText("0");
-                    endPortEditText.setText("65535");
+                    // Reset to default values [1024, 57000]
+                    startPortEditText.setText("1024");
+                    endPortEditText.setText("57000");
                 });
             });
             
@@ -153,7 +164,7 @@ public final class PortRangePreference extends DialogPreference {
                     int startPort = Integer.parseInt(startPortEditText.getText().toString().trim());
                     int endPort = Integer.parseInt(endPortEditText.getText().toString().trim());
                     
-                    if (startPort < 0 || startPort > 65535 || endPort < 0 || endPort > 65535) {
+                    if (startPort < 1024 || startPort > 65535 || endPort < 1024 || endPort > 65535) {
                         Toast.makeText(getContext(), R.string.port_range_invalid_port, Toast.LENGTH_LONG).show();
                         return;
                     }
