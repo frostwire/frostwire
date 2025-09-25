@@ -158,6 +158,9 @@
     <string name="restart_now">Restart Now</string>
     <string name="restart_later">Restart Later</string>
     <string name="port_settings_saved_restart_later">Port settings saved. Changes will be applied when FrostWire is restarted.</string>
+    <string name="restarting_torrent_engine">Restarting torrent engine with new port settings…</string>
+    <string name="torrent_engine_restarted">Torrent engine restarted with new port settings</string>
+    <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="dummy_summary" translatable="false">[Summary]</string>
     <string name="dummy_engine" translatable="false">[Engine]</string>
     <string name="dummy_sources" translatable="false">[Sources]</string>

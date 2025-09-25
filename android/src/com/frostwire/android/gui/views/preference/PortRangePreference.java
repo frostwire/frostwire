@@ -134,14 +134,14 @@ public final class PortRangePreference extends DialogPreference {
                 restartTorrentEngineInternal();
             } catch (Exception e) {
                 SystemUtils.postToUIThread(() -> 
-                    UIUtils.showLongMessage(getContext(), "Error restarting torrent engine: " + e.getMessage()));
+                    UIUtils.showLongMessage(getContext(), getContext().getString(R.string.error_restarting_torrent_engine, e.getMessage())));
             }
         });
     }
 
     private void restartTorrentEngineInternal() {
         SystemUtils.postToUIThread(() -> 
-            UIUtils.showLongMessage(getContext(), "Restarting torrent engine with new port settings..."));
+            UIUtils.showLongMessage(getContext(), getContext().getString(R.string.restarting_torrent_engine)));
         
         try {
             // Step 1: Save resume data for all transfers
@@ -158,11 +158,11 @@ public final class PortRangePreference extends DialogPreference {
             BTEngine.getInstance().resume();
             
             SystemUtils.postToUIThread(() -> 
-                UIUtils.showLongMessage(getContext(), "Torrent engine restarted with new port settings"));
+                UIUtils.showLongMessage(getContext(), getContext().getString(R.string.torrent_engine_restarted)));
             
         } catch (Exception e) {
             SystemUtils.postToUIThread(() -> 
-                UIUtils.showLongMessage(getContext(), "Error restarting torrent engine: " + e.getMessage()));
+                UIUtils.showLongMessage(getContext(), getContext().getString(R.string.error_restarting_torrent_engine, e.getMessage())));
         }
     }
 
