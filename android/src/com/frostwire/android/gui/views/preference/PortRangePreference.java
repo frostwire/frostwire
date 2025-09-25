@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -249,15 +250,21 @@ public final class PortRangePreference extends DialogPreference {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog dialog = (AlertDialog) super.onCreateDialog(savedInstanceState);
-            
+
+            dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.apply), this);
+            dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), this);
+            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.port_range_reset_default), (android.content.DialogInterface.OnClickListener) null);
+
             dialog.setOnShowListener(dialogInterface -> {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
-                    // Reset to default values [1024, 57000]
-                    startPortEditText.setText("1024");
-                    endPortEditText.setText("57000");
-                });
+                Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                if (neutralButton != null) {
+                    neutralButton.setOnClickListener(view -> {
+                        startPortEditText.setText("1024");
+                        endPortEditText.setText("57000");
+                    });
+                }
             });
-            
+
             return dialog;
         }
 
