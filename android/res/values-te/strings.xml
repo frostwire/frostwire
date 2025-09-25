@@ -411,4 +411,24 @@
     <string name="subs_details">7 రోజుల ట్రయల్ కాలంలో మీరు చార్జ్ చేయబడరు.\n\n7 రోజుల ట్రయల్ కాలం ముగిసిన వెంటనే లేదా గత సబ్‌స్క్రైబర్‌లకు వెంటనే సబ్‌స్క్రిప్షన్ ఛార్జ్ చేయబడుతుంది.\n\nసబ్‌స్క్రిప్షన్ పీరియడ్ ముగియడానికి కనీసం 24 గంటల ముందు రద్దు చేయకపోతే సబ్‌స్క్రిప్షన్ ఆటోమేటిక్‌గా రీన్యూ అవుతుంది.\n\nGoogle Playలో ఆటో రీన్యూవల్స్ మరియు రద్దులకు \'సబ్‌స్క్రిప్షన్లను నిర్వహించు\' నొక్కండి.</string>
     <string name="subscriptions">📅 చందాలు</string>
     <string name="rewarded_video_ad">📺 బహుమతి వీడియో ప్రకటన</string>
+
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Incoming Connection Port Range</string>
+    <string name="incoming_connection_port_range_summary">Configure ports for incoming connections</string>
+    <string name="port_range_dialog_title">Set Port Range</string>
+    <string name="port_range_start_port">Starting Port</string>
+    <string name="port_range_end_port">Ending Port</string>
+    <string name="port_range_reset_default">Reset to Default</string>
+    <string name="port_range_current_range">Current range: %1$d - %2$d</string>
+    <string name="port_range_default_range">Default range: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Invalid port range. Start port must be less than or equal to end port.</string>
+    <string name="port_range_invalid_port">Port values must be between 1024 and 65535.</string>
+    <string name="restart_torrent_engine_title">Restart Torrent Engine?</string>
+    <string name="restart_torrent_engine_message">Port range settings have been saved. Do you want to restart the torrent engine now to apply the new port settings?\n\nNote: This will temporarily stop all active transfers and save their progress.</string>
+    <string name="restart_now">Restart Now</string>
+    <string name="restart_later">Restart Later</string>
+    <string name="port_settings_saved_restart_later">Port settings saved. Changes will be applied when FrostWire is restarted.</string>
+    <string name="restarting_torrent_engine">Restarting torrent engine with new port settings…</string>
+    <string name="torrent_engine_restarted">Torrent engine restarted with new port settings</string>
+    <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
 </resources>
