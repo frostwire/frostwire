@@ -38,7 +38,14 @@ import androidx.preference.PreferenceDialogFragment;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTContext;
+import com.frostwire.bittorrent.BTEngine;
+
+import java.util.Locale;
+import java.util.Random;
 
 /**
  * Preference for setting incoming connection port range
@@ -90,6 +97,103 @@ public final class PortRangePreference extends DialogPreference {
             endPort = end;
             persistPortRange();
             updateSummary();
+            showRestartEngineDialog();
+        }
+    }
+    
+    private void showRestartEngineDialog() {
+        // Show dialog using the preference fragment context
+        try {
+            Context context = getContext();
+            if (context instanceof androidx.fragment.app.FragmentActivity) {
+                androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) context;
+                
+                // Create a simple confirmation dialog
+                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setTitle(R.string.restart_torrent_engine_title)
+                    .setMessage(R.string.restart_torrent_engine_message)
+                    .setPositiveButton(R.string.restart_now, (dialogInterface, which) -> {
+                        restartTorrentEngine();
+                    })
+                    .setNegativeButton(R.string.restart_later, (dialogInterface, which) -> {
+                        UIUtils.showLongMessage(context, R.string.port_settings_saved_restart_later);
+                    })
+                    .create();
+                    
+                dialog.show();
+            }
+        } catch (Exception e) {
+            // If we can't show the dialog, just show a toast
+            UIUtils.showLongMessage(getContext(), R.string.port_settings_saved_restart_later);
+        }
+    }
+
+    private void restartTorrentEngine() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            try {
+                restartTorrentEngineInternal();
+            } catch (Exception e) {
+                SystemUtils.postToUIThread(() -> 
+                    UIUtils.showLongMessage(getContext(), "Error restarting torrent engine: " + e.getMessage()));
+            }
+        });
+    }
+
+    private void restartTorrentEngineInternal() {
+        SystemUtils.postToUIThread(() -> 
+            UIUtils.showLongMessage(getContext(), "Restarting torrent engine with new port settings..."));
+        
+        try {
+            // Step 1: Save resume data for all transfers
+            TransferManager.instance().pauseTorrents();
+            
+            // Step 2: Stop the BTEngine
+            BTEngine.getInstance().pause();
+            Thread.sleep(1000); // Give it a moment to pause properly
+            
+            // Step 3: Update BTContext with new port settings
+            updateBTContextWithNewPorts();
+            
+            // Step 4: Resume the BTEngine
+            BTEngine.getInstance().resume();
+            
+            SystemUtils.postToUIThread(() -> 
+                UIUtils.showLongMessage(getContext(), "Torrent engine restarted with new port settings"));
+            
+        } catch (Exception e) {
+            SystemUtils.postToUIThread(() -> 
+                UIUtils.showLongMessage(getContext(), "Error restarting torrent engine: " + e.getMessage()));
+        }
+    }
+
+    private void updateBTContextWithNewPorts() {
+        BTContext ctx = BTEngine.ctx;
+        if (ctx != null) {
+            // Get the new port configuration using the same logic as MainApplication
+            int configuredStartPort = startPort;
+            int configuredEndPort = endPort;
+            
+            int port0, port1;
+            if (configuredStartPort == 1024 && configuredEndPort == 57000) {
+                // Use default port range [37000, 57000] when user hasn't configured specific ports
+                port0 = 37000 + new Random().nextInt(20000);
+                port1 = port0 + 10; // 10 retries
+            } else {
+                // Use user-configured port range
+                if (configuredStartPort == configuredEndPort) {
+                    // Single port specified
+                    port0 = configuredStartPort;
+                    port1 = port0 + 1; // Just try the single port
+                } else {
+                    // Port range specified
+                    port0 = configuredStartPort;
+                    port1 = configuredEndPort;
+                }
+            }
+            
+            String iface = "0.0.0.0:%1$d,[::]:%1$d";
+            ctx.interfaces = String.format(Locale.US, iface, port0);
+            ctx.retries = port1 - port0;
         }
     }
 
