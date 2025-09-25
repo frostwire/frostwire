@@ -292,7 +292,7 @@ public class StringTrie<V> {
      * so that k.startsWith(prefix) and get(k) == v.  The remove() operation
      * on the iterator is unimplemented.
      *
-     * Requies `this` not modified while iterator in use.
+     * Requires `this` not modified while iterator in use.
      */
     public Iterator<V> getPrefixedBy(String prefix) {
         // Early conversion of search key
