@@ -1,79 +1,40 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.frostwire.bittorrent;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
-import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
-import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
-
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.ErrorCode;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionManager;
-import com.frostwire.jlibtorrent.SessionParams;
-import com.frostwire.jlibtorrent.SettingsPack;
-import com.frostwire.jlibtorrent.Sha1Hash;
-import com.frostwire.jlibtorrent.Sha256Hash;
-import com.frostwire.jlibtorrent.TcpEndpoint;
-import com.frostwire.jlibtorrent.TorrentFlags;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
-import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.swig.bdecode_node;
-import com.frostwire.jlibtorrent.swig.byte_vector;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.libtorrent;
-import com.frostwire.jlibtorrent.swig.save_state_flags_t;
-import com.frostwire.jlibtorrent.swig.session_params;
-import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -95,7 +56,7 @@ public final class BTEngine extends SessionManager {
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
     private static final String STATE_VERSION_KEY = "state_version";
     // this constant only changes when the libtorrent settings_pack ABI is
-    // incompatible with the previous version, it should only happen from
+    // incompatible with the previous version. It should only happen from
     // time to time, not in every version
     private static final String STATE_VERSION_VALUE = "1.2.0.6";
     private final static CountDownLatch ctxSetupLatch = new CountDownLatch(1);
@@ -103,10 +64,10 @@ public final class BTEngine extends SessionManager {
     private final InnerListener innerListener;
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
     private BTEngineListener listener;
-    
+
     // Cached paused state to avoid blocking EDT calls
     private volatile boolean cachedPausedState = false;
-    
+
     // Store priorities for V2-only torrents that are added as paused and need priority application when ADD_TORRENT alert fires
     private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
 
@@ -180,7 +141,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * See com.frostwire.android.gui.MainApplication#onCreate() for ctx.interfaces and the rest of the context
+     * See com.frostwire.android.gui.MainApplication#onCreate() for `ctx.interfaces` and the rest of the context
      */
     @Override
     public void start() {
@@ -261,7 +222,7 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-        ctx.dataDir = dataDir; // this will be removed when we start using platform
+        ctx.dataDir = dataDir; // this will be removed when we start using the platform
         super.moveStorage(dataDir);
     }
 
@@ -356,7 +317,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * Override pause method to maintain cached state
+     * Override pause method to maintain the cached state
      */
     @Override
     public void pause() {
@@ -365,7 +326,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * Override resume method to maintain cached state
+     * Override resume method to maintain the cached state
      */
     @Override
     public void resume() {
@@ -374,7 +335,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * Non-blocking method to check if engine is paused
+     * Non-blocking method to check if the engine is paused
      * Uses cached state to avoid EDT blocking calls
      */
     public boolean isPausedCached() {
@@ -397,7 +358,7 @@ public final class BTEngine extends SessionManager {
         Priority[] priorities = null;
         Sha1Hash infoHashV1 = getSafeHashForFind(ti);
         TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
-        boolean exists = th != null;
+        boolean torrentHandleExists = th != null;
         if (th != null) {
             if (th.isValid()) {
                 priorities = th.filePriorities();
@@ -413,7 +374,7 @@ public final class BTEngine extends SessionManager {
         }
 
         download(ti, saveDir, priorities, null, null);
-        if (!exists) {
+        if (!torrentHandleExists) {
             saveResumeTorrent(ti);
         }
     }
@@ -558,7 +519,7 @@ public final class BTEngine extends SessionManager {
             entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
             torrent = new File(e.dict().get(TORRENT_ORIG_PATH_KEY).string());
         } catch (Throwable e) {
-            // can't recover original torrent path
+            // can't recover an original torrent path
         }
         return torrent;
     }
@@ -570,7 +531,7 @@ public final class BTEngine extends SessionManager {
             entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
             savePath = new File(e.dict().get("save_path").string());
         } catch (Throwable e) {
-            // can't recover original torrent path
+            // can't recover the original torrent path
         }
         return savePath;
     }
@@ -633,12 +594,12 @@ public final class BTEngine extends SessionManager {
                 // Check if this is a V2-only torrent with stored priorities
                 String infoHashStr = alert.handle().infoHash().toString();
                 LOG.info("BTEngine.fireDownloadAdded() - alert hash: " + infoHashStr);
-                
-                Priority[] storedPriorities = null;
+
+                Priority[] storedPriorities;
                 synchronized (pendingV2TorrentPriorities) {
                     // Try to find stored priorities using the alert hash
                     storedPriorities = pendingV2TorrentPriorities.remove(infoHashStr);
-                    
+
                     // If not found, try to find by iterating through stored hashes (for debugging)
                     if (storedPriorities == null) {
                         LOG.info("BTEngine.fireDownloadAdded() - stored priority keys: " + pendingV2TorrentPriorities.keySet());
@@ -652,7 +613,7 @@ public final class BTEngine extends SessionManager {
                                 } catch (Exception e) {
                                     // V2-only torrent
                                 }
-                                
+
                                 if (v1Hash == null) {
                                     // This is a V2-only torrent, try to match by V2 hash
                                     Sha256Hash v2Hash = ti.infoHashV2();
@@ -668,7 +629,7 @@ public final class BTEngine extends SessionManager {
                         }
                     }
                 }
-                
+
                 if (storedPriorities != null) {
                     LOG.info("BTEngine.fireDownloadAdded() - applying stored priorities for v2-only torrent: " + infoHashStr);
                     try {
@@ -680,7 +641,7 @@ public final class BTEngine extends SessionManager {
                 } else {
                     LOG.info("BTEngine.fireDownloadAdded() - no stored priorities found for hash: " + infoHashStr);
                 }
-                
+
                 BTDownload dl = new BTDownload(this, th);
                 if (listener != null) {
                     listener.downloadAdded(this, dl);
@@ -769,27 +730,24 @@ public final class BTEngine extends SessionManager {
                     throw new IllegalArgumentException("The priorities length should be equals to the number of files");
                 }
                 th.prioritizeFiles(priorities);
-                fireDownloadUpdate(th);
-                th.resume();
             } else {
                 // did they just add the entire torrent (therefore not selecting any priorities)
                 final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.numFiles());
                 th.prioritizeFiles(wholeTorrentPriorities);
-                fireDownloadUpdate(th);
-                th.resume();
             }
-        } else { // new download (including v2-only torrents)
-            // Add paused to avoid the race where default priorities are used
+            fireDownloadUpdate(th);
+            th.resume();
+        } else { // new Download (including v2-only torrents)
+            // Adds paused to avoid the race where default priorities are used
             download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
-            
+
             // For v2-only torrents, we can't find by v1 hash, so we need to find it differently
             // We'll wait a bit and then look for it by iterating through handles or rely on alerts
-            th = null;
             if (infoHashV1 != null) {
                 // Try to find by v1 hash for v1-only and hybrid torrents
                 th = find(infoHashV1);
             }
-            
+
             if (th != null) {
                 LOG.info("BTEngine.download() - new download - torrent_handle found in session");
                 // Re-apply priorities on the handle to be 100% sure they stick
@@ -807,7 +765,7 @@ public final class BTEngine extends SessionManager {
             } else {
                 if (infoHashV1 == null) {
                     LOG.info("BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
-                    // Store priorities for V2-only torrents to apply them when ADD_TORRENT alert fires
+                    // Store priorities for V2-only torrents to apply them when the ADD_TORRENT alert fires
                     if (priorities != null) {
                         try {
                             Sha256Hash v2Hash = ti.infoHashV2();
@@ -831,7 +789,7 @@ public final class BTEngine extends SessionManager {
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
         try {
-            // libtorrent perform all kind of tests
+            // libtorrent perform all kinds of tests
             // to avoid non-usable addresses
             String address = alert.externalAddress().toString();
             LOG.info("External IP: " + address);
@@ -862,7 +820,7 @@ public final class BTEngine extends SessionManager {
      * Helper method to safely get a hash that can be used with the find() method.
      * For v2-only torrents, this will try to use the torrent handle's infoHash() if available,
      * but for finding existing torrents, we need to handle the case where v1 hash is null.
-     * 
+     *
      * @param ti TorrentInfo object
      * @return Sha1Hash if available, or null if this is a v2-only torrent
      */
