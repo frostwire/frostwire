@@ -1,8 +1,9 @@
-FrostWire 3.0.0 build <UNRELEASED> SEP/25/2025
+FrostWire 3.0.0 build <UNRELEASED> SEP/27/2025
  - new: Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new: Knaben search performer, a new torrent search source
  - new: TorrentCSV search performer, a new torrent search source
  - new: Settings > Torrent Settings > Incoming Connection Port Range selection
+ - new: Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
  - yt_dlp-2025.09.23
  - removed: Torlock search performer (old site is down, new site is malicious)
  - freeze: ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background

@@ -21,8 +21,10 @@ package com.frostwire.android.gui.transfers;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.android.util.TorrentUtils;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.util.Logger;
@@ -57,6 +59,9 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
+        
+        // Seed the finished HTTP download if seeding is enabled
+        TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_AUDIO, manager);
     }
 
     @Override

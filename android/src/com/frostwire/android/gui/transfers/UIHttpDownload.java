@@ -21,9 +21,11 @@ package com.frostwire.android.gui.transfers;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.android.util.TorrentUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.transfers.HttpDownload;
@@ -64,6 +66,9 @@ public class UIHttpDownload extends HttpDownload {
     protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
+        
+        // Seed the finished HTTP download if seeding is enabled
+        TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_DOCUMENTS, manager);
     }
 
     @Override
