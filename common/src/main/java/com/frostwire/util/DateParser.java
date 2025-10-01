@@ -82,6 +82,13 @@ public final class DateParser {
             return sdf;
         });
     
+    private static final ThreadLocal<SimpleDateFormat> FORMAT_YYYY_MM_DD_HH_MM_SS_Z = 
+        ThreadLocal.withInitial(() -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z", Locale.US);
+            sdf.setLenient(false);
+            return sdf;
+        });
+    
     // Array of all cached formatters for fallback parsing
     private static final ThreadLocal<SimpleDateFormat>[] CACHED_FORMATTERS = new ThreadLocal[]{
         FORMAT_YYYY_MM_DD_HH_MM_SS,
@@ -90,7 +97,8 @@ public final class DateParser {
         FORMAT_YYYY_MM_DD,
         FORMAT_DD_MM_YYYY,
         FORMAT_MM_DD_YYYY,
-        FORMAT_YYYY_MM_DD_SLASH
+        FORMAT_YYYY_MM_DD_SLASH,
+        FORMAT_YYYY_MM_DD_HH_MM_SS_Z
     };
     
     private DateParser() {
