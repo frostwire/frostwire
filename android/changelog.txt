@@ -25,6 +25,7 @@ FrostWire 3.0.1 build 755 OCT/01/2025
  - maintenance: archive.org search fixed
  - maintenance: glotorrents search fixed
  - speed-up: reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
+ - crash: ConcurrentModificationException in Ssl$FWHostnameVerifier 
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0

@@ -23,6 +23,7 @@ frostwire (7.0.0) stable; urgency=high
  * New: libtorrent::set_piece_hashes_posix_disk_io to avoid SIGSEGV/SIGBUS leaks to macos when creating torrents
  * Crash:don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
  * Crash:StatusLine seedingStatusButton.getText()
+ * Crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  * Cleanup:Remove unused sun.awt.X11 classes (linux)
  * Maintenance:fix javadoc errors, javadoc cleanup
  * Maintenance:all license headers are consistent with GPL 3.0
