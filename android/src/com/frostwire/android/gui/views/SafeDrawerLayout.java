@@ -53,8 +53,8 @@ public class SafeDrawerLayout extends DrawerLayout {
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             measureSuccess = true;
-        } catch (IllegalStateException e) {
-            LOG.error("IllegalStateException in DrawerLayout.onMeasure()", e);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            LOG.error("DrawerLayout.onMeasure() failed; falling back to imposed measure specs", e);
         }
 
         // If super.onMeasure() didn't successfully set the dimensions,
