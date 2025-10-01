@@ -1,31 +1,32 @@
 FrostWire 3.0.1 build 755 OCT/01/2025
- - new: Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
- - new: Knaben search performer, a new torrent search source
- - new: TorrentCSV search performer, a new torrent search source
- - new: Settings > Torrent Settings > Incoming Connection Port Range selection
- - new: Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
+ - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
+ - new:Knaben search performer, a new torrent search source
+ - new:TorrentCSV search performer, a new torrent search source
+ - new:Settings > Torrent Settings > Incoming Connection Port Range selection
+ - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
  - yt_dlp-2025.09.23
- - removed: Torlock search performer (old site is down, new site is malicious)
- - freeze: ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
- - freeze: sorting through too many results could cause an ANR when cleaning up titles
- - freeze: ANR in MusicPlaybackService.setDataSource
- - freeze: ANR in MusicPlaybackService.playFDs
- - fix: logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
- - fix: ForegroundServiceStartNotAllowedException by adding foreground check and error handling
- - fix: Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
- - fix: Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
- - fix: ClassCastException in SearchResultListAdapter OnLinkClickListener
- - fix: HandlerDispatcher NullPointerException crashes in Picasso image loading
- - freeze: in playFDs
- - freeze in MusicPlaybackService.setDataSource
- - crash: NPE in ImagfeFetcher.loadCurrentArtwork()
- - improvement: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
- - Avoid possible context leak on EngineBroadcastReceiver
- - maintenance: all license headers are GPL 3.0
- - maintenance: archive.org search fixed
- - maintenance: glotorrents search fixed
- - speed-up: reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
- - crash: ConcurrentModificationException in Ssl$FWHostnameVerifier 
+ - removed:Torlock search performer (old site is down, new site is malicious)
+ - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
+ - freeze:sorting through too many results could cause an ANR when cleaning up titles
+ - freeze:ANR in MusicPlaybackService.setDataSource
+ - freeze:ANR in MusicPlaybackService.playFDs
+ - fix:logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
+ - fix:ForegroundServiceStartNotAllowedException by adding foreground check and error handling
+ - fix:Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
+ - fix:Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
+ - fix:ClassCastException in SearchResultListAdapter OnLinkClickListener
+ - fix:HandlerDispatcher NullPointerException crashes in Picasso image loading
+ - freeze:in playFDs
+ - freeze:in MusicPlaybackService.setDataSource
+ - crash:NPE in ImageFetcher.loadCurrentArtwork()
+ - improvement:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+ - maintenance:Avoid possible context leak on EngineBroadcastReceiver
+ - maintenance:all license headers are GPL 3.0
+ - maintenance:archive.org search fixed
+ - maintenance:glotorrents search fixed
+ - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
+ - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
+ - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
