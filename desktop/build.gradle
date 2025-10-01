@@ -178,6 +178,7 @@ sourceSets {
 
     test {
         java {
+            srcDir '../common/src/test/java'
             srcDir 'tests/java'
         }
     }

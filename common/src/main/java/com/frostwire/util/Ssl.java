@@ -168,14 +168,16 @@ public final class Ssl {
         }
 
         public static void addValidDomain(String domain) {
-            LOG.info("addValidDomain: " + domain);
-            validDomainsSet.add(domain);
-            int firstDotIndex = domain.indexOf(".");
-            int secondDotIndex = domain.indexOf(".", firstDotIndex);
-            if (secondDotIndex != -1) {
-                String baseDomain = domain.substring(firstDotIndex + 1);
-                LOG.info("addValidDomain: " + baseDomain);
-                validDomainsSet.add(baseDomain);
+            synchronized (validDomainsSet) {
+                LOG.info("addValidDomain: " + domain);
+                validDomainsSet.add(domain);
+                int firstDotIndex = domain.indexOf(".");
+                int secondDotIndex = domain.indexOf(".", firstDotIndex);
+                if (secondDotIndex != -1) {
+                    String baseDomain = domain.substring(firstDotIndex + 1);
+                    LOG.info("addValidDomain: " + baseDomain);
+                    validDomainsSet.add(baseDomain);
+                }
             }
         }
 
@@ -183,10 +185,13 @@ public final class Ssl {
         public boolean verify(String s, SSLSession sslSession) {
             if (!validDomainsSet.contains(s)) {
                 // check if the s is a subdomain
-                for (String baseDomain : validDomainsSet) {
-                    if (s.contains(baseDomain)) {
-                        validDomainsSet.add(s);
-                        return true;
+                // Create a copy to avoid ConcurrentModificationException when adding during iteration
+                synchronized (validDomainsSet) {
+                    for (String baseDomain : validDomainsSet) {
+                        if (s.contains(baseDomain)) {
+                            validDomainsSet.add(s);
+                            return true;
+                        }
                     }
                 }
             }
@@ -197,12 +202,15 @@ public final class Ssl {
             LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + "...");
             if (!validDomainsSet.contains(hostname)) {
                 // check if the s is a subdomain
-                for (String baseDomain : validDomainsSet) {
-                    if (hostname.contains(baseDomain)) {
-                        validDomainsSet.add(hostname);
-                        LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": TRUE, validDomainSet updated with: " + hostname);
+                // Create a copy to avoid ConcurrentModificationException when adding during iteration
+                synchronized (validDomainsSet) {
+                    for (String baseDomain : validDomainsSet) {
+                        if (hostname.contains(baseDomain)) {
+                            validDomainsSet.add(hostname);
+                            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": TRUE, validDomainSet updated with: " + hostname);
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
