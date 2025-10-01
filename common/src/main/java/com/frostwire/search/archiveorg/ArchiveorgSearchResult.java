@@ -22,10 +22,9 @@ import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.util.DateParser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * @author gubatron
@@ -95,17 +94,7 @@ public final class ArchiveorgSearchResult extends AbstractSearchResult implement
     }
 
     private long parsePublicDate(String publicdate) {
-        // 2009-12-02T15:41:50Z
-        // 2008-02-20T22:02:21Z
-        //"yyyy-MM-dd'T'HH:mm:ss'Z'"
-        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        long result = -1;
-        try {
-            result = date.parse(publicdate).getTime();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return result;
+        return DateParser.parseIsoDate(publicdate);
     }
 
     public String getDomainName() {

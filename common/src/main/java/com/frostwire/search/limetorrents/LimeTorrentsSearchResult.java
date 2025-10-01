@@ -19,11 +19,9 @@
 package com.frostwire.search.limetorrents;
 
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.DateParser;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.UrlUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Created by alejandroarturom on 08/26/2016
@@ -115,32 +113,6 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
     }
 
     private long parseAgeString(String dateString) {
-        long now = System.currentTimeMillis();
-        try {
-            if (dateString.contains("1 Year+")) {
-                return now - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
-            }
-            if (dateString.contains("Last Month")) {
-                return now - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
-            }
-            if (dateString.contains("months ago")) {
-                int months = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long monthInMillis = 31L * 24L * 60L * 60L * 1000L;
-                return now - months * monthInMillis;
-            }
-            if (dateString.contains("days ago")) {
-                int days = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long dayInMillis = 24L * 60L * 60L * 1000L;
-                return now - days * dayInMillis;
-            }
-            if (dateString.contains("Yesterday")) {
-                return now - 24L * 60L * 60L * 1000L; // one day in milliseconds
-            }
-            // this format seems to be not used anymore
-            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            now = myFormat.parse(dateString.trim()).getTime();
-        } catch (Throwable t) {
-        }
-        return now;
+        return DateParser.parseRelativeAge(dateString);
     }
 }

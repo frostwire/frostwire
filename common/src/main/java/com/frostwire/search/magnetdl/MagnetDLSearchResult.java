@@ -19,11 +19,9 @@
 package com.frostwire.search.magnetdl;
 
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.DateParser;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.UrlUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * @author gubatron
@@ -113,36 +111,6 @@ public final class MagnetDLSearchResult extends AbstractTorrentSearchResult {
     }
 
     private long parseAgeString(String dateString) {
-        long now = System.currentTimeMillis();
-        try {
-            if (dateString.contains("year")) {
-                int years = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long yearInMillis = 365L * 24L * 60L * 60L * 1000L;
-                return now - years * yearInMillis;
-            }
-            if (dateString.contains("month")) {
-                int months = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long monthInMillis = 31L * 24L * 60L * 60L * 1000L;
-                return now - months * monthInMillis;
-            }
-            if (dateString.contains("day")) {
-                int days = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long dayInMillis = 24L * 60L * 60L * 1000L;
-                return now - days * dayInMillis;
-            }
-            if (dateString.contains("hour")) {
-                int hours = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
-                long hourInMillis = 60L * 60L * 1000L;
-                return now - hours * hourInMillis;
-            }
-            if (dateString.contains("Yesterday")) {
-                return now - 24L * 60L * 60L * 1000L; // one day in milliseconds
-            }
-            // this format seems to be not used anymore
-            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            now = myFormat.parse(dateString.trim()).getTime();
-        } catch (Throwable t) {
-        }
-        return now;
+        return DateParser.parseRelativeAge(dateString);
     }
 }
