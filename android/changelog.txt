@@ -1,4 +1,4 @@
-FrostWire 3.0.0 build 754 SEP/28/2025
+FrostWire 3.0.1 build 755 OCT/01/2025
  - new: Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new: Knaben search performer, a new torrent search source
  - new: TorrentCSV search performer, a new torrent search source
@@ -24,6 +24,7 @@ FrostWire 3.0.0 build 754 SEP/28/2025
  - maintenance: all license headers are GPL 3.0
  - maintenance: archive.org search fixed
  - maintenance: glotorrents search fixed
+ - speed-up: reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0

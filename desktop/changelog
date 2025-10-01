@@ -29,6 +29,7 @@ frostwire (7.0.0) stable; urgency=high
  * Maintenance:simplified donations buttons in status bar to a single 'Donate' button
  * Maintenance:added don't show me again for linux warning when mplayer isn't found
  * Maintenance:fwplayer_osx.arm64 rebuilt with OpenSSL 3.5.3 support
+ * Speed-up: reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  * jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  * jlibtorrent:g++-9 upgraded to g++-11 for linux build
  * jlibtorrent:new Sha256Hash::swig()
