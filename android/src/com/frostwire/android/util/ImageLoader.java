@@ -83,6 +83,17 @@ public final class ImageLoader {
     }
     
     /**
+     * Gets the current ImageLoader instance without creating a new one.
+     * Returns null if no instance exists or it has been shutdown.
+     */
+    public static synchronized ImageLoader getInstanceIfExists() {
+        if (instance != null && !instance.shutdown && instance.picasso != null) {
+            return instance;
+        }
+        return null;
+    }
+    
+    /**
      * Checks if the current ImageLoader instance is healthy and recreates it if needed.
      * This helps recover from Picasso internal crashes.
      */
@@ -376,10 +387,14 @@ public final class ImageLoader {
         shutdown = true;
         if (picasso != null) {
             try {
-                picasso.getClass().getMethod("shutdown").invoke(picasso);
-            } catch (Throwable ignored) {
-                LOG.warn("Failed to shutdown Picasso gracefully", ignored);
+                // Picasso 3.0 has a shutdown method that properly cleans up resources
+                // including unregistering the NetworkBroadcastReceiver
+                picasso.shutdown();
+                LOG.info("Picasso shutdown completed successfully");
+            } catch (Throwable t) {
+                LOG.warn("Failed to shutdown Picasso gracefully", t);
             }
+            picasso = null;
         }
     }
 

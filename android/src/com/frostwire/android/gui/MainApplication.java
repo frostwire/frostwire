@@ -250,6 +250,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
      * This helps prevent crashes when the app is backgrounded and foregrounded.
      */
     private static class ImageLoaderLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+        private int activityCount = 0;
         
         @Override
         public void onActivityCreated(android.app.Activity activity, android.os.Bundle savedInstanceState) {
@@ -258,7 +259,16 @@ public class MainApplication extends MultiDexApplication implements Configuratio
 
         @Override
         public void onActivityStarted(android.app.Activity activity) {
-            // No action needed
+            activityCount++;
+            // When first activity starts, ensure ImageLoader is healthy
+            if (activityCount == 1) {
+                LOG.info("App coming to foreground, ensuring ImageLoader is healthy");
+                try {
+                    ImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+                } catch (Throwable t) {
+                    LOG.error("Error ensuring ImageLoader health on app foreground", t);
+                }
+            }
         }
 
         @Override
@@ -278,7 +288,20 @@ public class MainApplication extends MultiDexApplication implements Configuratio
 
         @Override
         public void onActivityStopped(android.app.Activity activity) {
-            // No action needed
+            activityCount--;
+            // When last activity stops, shutdown ImageLoader to prevent background crashes
+            if (activityCount == 0) {
+                LOG.info("App going to background, shutting down ImageLoader");
+                try {
+                    // Get the instance without recreating it
+                    ImageLoader imageLoader = ImageLoader.getInstanceIfExists();
+                    if (imageLoader != null) {
+                        imageLoader.shutdown();
+                    }
+                } catch (Throwable t) {
+                    LOG.error("Error shutting down ImageLoader on app background", t);
+                }
+            }
         }
 
         @Override
