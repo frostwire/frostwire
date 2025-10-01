@@ -289,18 +289,11 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         @Override
         public void onActivityStopped(android.app.Activity activity) {
             activityCount--;
-            // When last activity stops, shutdown ImageLoader to prevent background crashes
+            // Don't shutdown ImageLoader when going to background - this causes race conditions
+            // with Picasso's NetworkBroadcastReceiver which may still receive events after
+            // the Handler is nullified. Picasso manages its own lifecycle properly.
             if (activityCount == 0) {
-                LOG.info("App going to background, shutting down ImageLoader");
-                try {
-                    // Get the instance without recreating it
-                    ImageLoader imageLoader = ImageLoader.getInstanceIfExists();
-                    if (imageLoader != null) {
-                        imageLoader.shutdown();
-                    }
-                } catch (Throwable t) {
-                    LOG.error("Error shutting down ImageLoader on app background", t);
-                }
+                LOG.info("App going to background, keeping ImageLoader alive");
             }
         }
 
