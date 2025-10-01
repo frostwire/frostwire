@@ -47,9 +47,11 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(8, 30, TimeUnit.SECONDS);
     private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
     private final ThreadPool pool;
+    private final OkHttpClient sharedClient;
 
     public OkHttpClientWrapper(final ThreadPool pool) {
         this.pool = pool;
+        this.sharedClient = newOkHttpClient(pool).build();
     }
 
     public static void cancelAllRequests() {
@@ -103,15 +105,16 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
 
     @Override
     public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        okHttpClient.connectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS);
-        okHttpClient.followRedirects(false);
+        OkHttpClient client = sharedClient.newBuilder()
+                .connectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS)
+                .followRedirects(false)
+                .build();
         Request req = new Request.Builder().
                 url(url).
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
-        Response resp = okHttpClient.build().newCall(req).execute();
+        Response resp = client.newCall(req).execute();
         closeQuietly(resp.body());
         copyMultiMap(resp.headers().toMultimap(), outputHeaders);
         return resp.code();
@@ -120,11 +123,15 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     @Override
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
         byte[] result = null;
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookies);
+        OkHttpClient client = sharedClient.newBuilder()
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .build();
+        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookies);
         ResponseBody responseBody = null;
         try {
-            responseBody = getSyncResponse(okHttpClient, builder).body();
+            responseBody = getSyncResponse(client, builder).body();
             if (responseBody != null) {
                 result = responseBody.bytes();
             }
@@ -141,12 +148,16 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     @Override
     public String get(String url, int timeoutMillis, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
         String result = null;
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeoutMillis, userAgent, referrer, cookie);
+        OkHttpClient client = sharedClient.newBuilder()
+                .connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+                .readTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
+                .build();
+        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookie);
         addCustomHeaders(customHeaders, builder);
         ResponseBody responseBody = null;
         try {
-            responseBody = getSyncResponse(okHttpClient, builder).body();
+            responseBody = getSyncResponse(client, builder).body();
             if (responseBody != null) {
                 result = responseBody.string();
             }
@@ -175,10 +186,14 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             fos = new FileOutputStream(file, false);
             rangeStart = -1;
         }
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, null);
+        OkHttpClient client = sharedClient.newBuilder()
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .build();
+        final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, null);
         addRangeHeader(rangeStart, -1, builder);
-        final Response response = getSyncResponse(okHttpClient, builder);
+        final Response response = getSyncResponse(client, builder);
         final Headers headers = response.headers();
         onHeaders(headers);
         final InputStream in = response.body().byteStream();
@@ -221,18 +236,24 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
 
     private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
         canceled = false;
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, null, null);
+        OkHttpClient.Builder clientBuilder = sharedClient.newBuilder()
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .followRedirects(false);
+        if (gzip) {
+            clientBuilder.addInterceptor(new GzipRequestInterceptor());
+        }
+        OkHttpClient client = clientBuilder.build();
+        final Request.Builder builder = prepareRequestBuilder(url, userAgent, null, null);
         final RequestBody requestBody = RequestBody.create(postData, MediaType.parse(postContentType));
-        prepareOkHttpClientForPost(okHttpClient, gzip);
         builder.post(requestBody);
-        return getPostSyncResponse(builder);
+        return getPostSyncResponse(client, builder);
     }
 
-    private String getPostSyncResponse(Request.Builder builder) throws IOException {
+    private String getPostSyncResponse(OkHttpClient client, Request.Builder builder) throws IOException {
         String result = null;
-        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Response response = this.getSyncResponse(okHttpClient, builder);
+        final Response response = this.getSyncResponse(client, builder);
         try {
             int httpResponseCode = response.code();
             if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
@@ -250,16 +271,6 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         return result;
     }
 
-    private void prepareOkHttpClientForPost(OkHttpClient.Builder okHttpClient, boolean gzip) {
-        okHttpClient.followRedirects(false);
-        if (gzip) {
-            if (okHttpClient.interceptors().size() > 0) {
-                okHttpClient.interceptors().remove(0);
-                okHttpClient.interceptors().add(0, new GzipRequestInterceptor());
-            }
-        }
-    }
-
     private void addRangeHeader(long rangeStart, long rangeEnd, Request.Builder builderRef) {
         if (rangeStart < 0) {
             return;
@@ -274,11 +285,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         builderRef.addHeader("Range", sb.toString());
     }
 
-    private Request.Builder prepareRequestBuilder(OkHttpClient.Builder okHttpClient, String url, int timeout, String userAgent, String referrer, String cookie) {
-        okHttpClient.connectTimeout(timeout, TimeUnit.MILLISECONDS);
-        okHttpClient.readTimeout(timeout, TimeUnit.MILLISECONDS);
-        okHttpClient.writeTimeout(timeout, TimeUnit.MILLISECONDS);
-        okHttpClient.interceptors().clear();
+    private Request.Builder prepareRequestBuilder(String url, String userAgent, String referrer, String cookie) {
         Request.Builder builder = new Request.Builder();
         builder.url(url);
         if (!StringUtils.isNullOrEmpty(userAgent)) {
@@ -310,13 +317,9 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         }
     }
 
-    private Response getSyncResponse(OkHttpClient.Builder okHttpClient, Request.Builder builder) throws IOException {
+    private Response getSyncResponse(OkHttpClient client, Request.Builder builder) throws IOException {
         final Request request = builder.build();
-        return okHttpClient.build().newCall(request).execute();
-    }
-
-    private OkHttpClient.Builder newOkHttpClient() {
-        return newOkHttpClient(pool);
+        return client.newCall(request).execute();
     }
 
     /**
