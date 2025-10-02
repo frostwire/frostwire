@@ -27,7 +27,7 @@ FrostWire 3.0.1 build 755 OCT/01/2025
  - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
- - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded
+ - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
