@@ -289,17 +289,19 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         @Override
         public void onActivityStopped(android.app.Activity activity) {
             activityCount--;
-            // When last activity stops, shutdown ImageLoader to prevent background crashes
+            // When last activity stops, clear cache but DON'T shutdown to prevent HandlerDispatcher NPE
             if (activityCount == 0) {
-                LOG.info("App going to background, shutting down ImageLoader");
+                LOG.info("App going to background, clearing ImageLoader cache");
                 try {
                     // Get the instance without recreating it
                     ImageLoader imageLoader = ImageLoader.getInstanceIfExists();
                     if (imageLoader != null) {
-                        imageLoader.shutdown();
+                        // Clear cache to free memory but keep Picasso alive to prevent
+                        // HandlerDispatcher NullPointerException on network state changes
+                        imageLoader.clear();
                     }
                 } catch (Throwable t) {
-                    LOG.error("Error shutting down ImageLoader on app background", t);
+                    LOG.error("Error clearing ImageLoader cache on app background", t);
                 }
             }
         }
