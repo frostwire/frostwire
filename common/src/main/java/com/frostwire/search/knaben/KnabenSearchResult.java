@@ -19,9 +19,7 @@
 package com.frostwire.search.knaben;
 
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import com.frostwire.util.DateParser;
 
 /**
  * @author gubatron
@@ -95,32 +93,6 @@ public final class KnabenSearchResult extends AbstractTorrentSearchResult {
     }
 
     private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
-        if (dateString == null || dateString.trim().isEmpty()) {
-            return result;
-        }
-        
-        try {
-            // Common date formats that might be used by Knaben API
-            SimpleDateFormat[] formats = {
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US),
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US),
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US),
-                new SimpleDateFormat("yyyy-MM-dd", Locale.US),
-                new SimpleDateFormat("dd/MM/yyyy", Locale.US),
-                new SimpleDateFormat("MM/dd/yyyy", Locale.US),
-                new SimpleDateFormat("yyyy/MM/dd", Locale.US)
-            };
-            
-            for (SimpleDateFormat format : formats) {
-                try {
-                    result = format.parse(dateString.trim()).getTime();
-                    break;
-                } catch (Exception ignored) {
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return result;
+        return DateParser.parseTorrentDate(dateString);
     }
 }

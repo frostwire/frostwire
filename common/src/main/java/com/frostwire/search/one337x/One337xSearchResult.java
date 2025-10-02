@@ -21,6 +21,7 @@ package com.frostwire.search.one337x;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.DateParser;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -109,41 +110,6 @@ public final class One337xSearchResult extends AbstractTorrentSearchResult {
     }
 
     private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
-        try {
-            String[] ds = dateString.split(" ");
-            if (ds[1].contains("hour")) {
-                try {
-                    int hours = Integer.parseInt(ds[0]);
-                    return result - (hours * 60 * 60 * 1000L);
-                } catch (Exception ignored) {
-                }
-            }
-            if (ds[1].contains("year")) {
-                try {
-                    int years = Integer.parseInt(ds[0]);
-                    return result - (years * 365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
-                } catch (Exception ignored) {
-                }
-            }
-            if (ds[1].contains("month")) {
-                try {
-                    int months = Integer.parseInt(ds[0]);
-                    return result - (months * 31L * 24L * 60L * 60L * 1000L); // a month in milliseconds
-                } catch (Exception ignored) {
-                }
-            }
-            if (ds[1].contains("minute")) {
-                try {
-                    int minutes = Integer.parseInt(ds[0]);
-                    return result - (minutes * 60L * 1000L); // a month in milliseconds
-                } catch (Exception ignored) {
-                }
-            }
-            return result;
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return result;
+        return DateParser.parseRelativeAge(dateString);
     }
 }

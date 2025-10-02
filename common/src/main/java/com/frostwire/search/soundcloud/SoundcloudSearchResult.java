@@ -23,12 +23,11 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.util.DateParser;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.http.HttpClient;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.io.IOException;
 
 
@@ -37,7 +36,6 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
-    private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
     private final String displayName;
     private final String username;
     private final String trackUrl;
@@ -192,11 +190,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     private long buildDate(String str) {
-        try {
-            return new SimpleDateFormat(DATE_FORMAT, Locale.US).parse(str).getTime();
-        } catch (Throwable e) {
-            return System.currentTimeMillis();
-        }
+        return DateParser.parseTorrentDate(str);
     }
 
     private String buildDownloadUrl(SoundcloudItem item, String clientId, String appVersion) {

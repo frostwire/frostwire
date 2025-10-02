@@ -20,6 +20,7 @@ package com.frostwire.search.torrentdownloads;
 
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.DateParser;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -28,8 +29,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * @author alejandroarturom
@@ -122,12 +121,6 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
     }
 
     private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
-        try {
-            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString).getTime();
-        } catch (Throwable ignored) {
-        }
-        return result;
+        return DateParser.parseSimpleDate(dateString);
     }
 }
