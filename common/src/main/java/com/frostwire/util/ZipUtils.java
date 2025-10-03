@@ -20,6 +20,7 @@ package com.frostwire.util;
 
 import org.apache.commons.io.FileUtils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -57,6 +58,7 @@ public final class ZipUtils {
     private static void unzipEntries(File folder, ZipInputStream zis, int itemCount, long time, ZipListener listener) throws IOException {
         ZipEntry ze = null;
         int item = 0;
+        byte[] buffer = new byte[32768]; // 32 KiB buffer shared across all entries
         while ((ze = zis.getNextEntry()) != null) {
             item++;
             String fileName = ze.getName();
@@ -72,11 +74,11 @@ public final class ZipUtils {
                 int progress = (item == itemCount) ? 100 : (int) (((double) (item * 100)) / (double) (itemCount));
                 listener.onUnzipping(fileName, progress);
             }
-            try (FileOutputStream fos = new FileOutputStream(newFile)) {
+            try (FileOutputStream fos = new FileOutputStream(newFile);
+                 BufferedOutputStream bos = new BufferedOutputStream(fos, 32768)) { // 32 KiB buffer
                 int n;
-                byte[] buffer = new byte[1024];
                 while ((n = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, n);
+                    bos.write(buffer, 0, n);
                     if (listener != null && listener.isCanceled()) { // not the best way
                         throw new IOException("Uncompress operation cancelled");
                     }

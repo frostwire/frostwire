@@ -25,6 +25,7 @@ import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -177,6 +178,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
         FileOutputStream fos;
+        BufferedOutputStream bos = null;
         long rangeStart;
         canceled = false;
         if (resume && file.exists()) {
@@ -186,6 +188,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             fos = new FileOutputStream(file, false);
             rangeStart = -1;
         }
+        bos = new BufferedOutputStream(fos, 32768); // 32 KiB buffer
         OkHttpClient client = sharedClient.newBuilder()
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
                 .readTimeout(timeout, TimeUnit.MILLISECONDS)
@@ -197,14 +200,15 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         final Headers headers = response.headers();
         onHeaders(headers);
         final InputStream in = response.body().byteStream();
-        byte[] b = new byte[4096];
+        byte[] b = new byte[32768]; // 32 KiB buffer
         int n;
         while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
             if (!canceled) {
-                fos.write(b, 0, n);
+                bos.write(b, 0, n);
                 onData(b, 0, n);
             }
         }
+        closeQuietly(bos);
         closeQuietly(fos);
         closeQuietly(response.body());
         if (canceled) {
