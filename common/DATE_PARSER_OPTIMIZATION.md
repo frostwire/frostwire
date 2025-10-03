@@ -37,7 +37,7 @@ Created a centralized `DateParser` utility class (`com.frostwire.util.DateParser
 3. `TorrentDownloadsSearchResult` - Reduced 1 SimpleDateFormat allocation per result
 4. `LimeTorrentsSearchResult` - Reduced 1 SimpleDateFormat allocation per result
 5. `MagnetDLSearchResult` - Reduced 1 SimpleDateFormat allocation per result
-6. `ArchiveorgSearchResult` - Reduced 1 SimpleDateFormat allocation per result
+6. `InternetArchiveSearchResult` - Reduced 1 SimpleDateFormat allocation per result
 7. `IdopeSearchResult` - Eliminated inline date parsing code
 8. `Torrentz2SearchResult` - Eliminated inline date parsing code
 9. `One337xSearchResult` - Eliminated inline date parsing code
