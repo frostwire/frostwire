@@ -58,9 +58,15 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         this.dl = dl;
         this.dl.setListener(new StatusListener());
         this.displayName = dl.getDisplayName();
-        this.size = calculateSize(dl);
-        this.items = calculateItems(dl);
+        // Initialize with default values to avoid EDT blocking on heavy I/O
+        this.size = dl.getSize();
+        this.items = new LinkedList<>();
         this.partial = dl.isPartial();
+        // Calculate size and items in background to avoid EDT violations
+        BackgroundQueuedExecutorService.schedule(() -> {
+            this.size = calculateSize(dl);
+            this.items = calculateItems(dl);
+        });
         if (dl.isFinished(true) &&
                 !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
             dl.pause();
@@ -291,9 +297,12 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
     void updateUI(BTDownload dl) {
         displayName = dl.getDisplayName();
-        size = calculateSize(dl);
-        items = calculateItems(dl);
         partial = dl.isPartial();
+        // Calculate size and items in background to avoid EDT violations
+        BackgroundQueuedExecutorService.schedule(() -> {
+            size = calculateSize(dl);
+            items = calculateItems(dl);
+        });
     }
 
     private void checkSequentialDownload() {

@@ -22,6 +22,7 @@ package com.frostwire.gui.components.transfers;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -41,30 +42,40 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     @Override
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload != null && btDownload.getDl() != null) {
-            try {
-                List<TransferItem> items = btDownload.getDl().getItems();
-                if (items != null && items.size() > 0) {
-                    if (this.btDownload != btDownload) {
-                        this.btDownload = btDownload;
-                        tableMediator.clearTable();
-                        int i = 0;
-                        for (TransferItem item : items) {
-                            if (!item.isSkipped()) {
-                                tableMediator.add(new TransferItemHolder(i++, item));
+            // Move heavy I/O work to background thread to avoid EDT violations
+            BackgroundQueuedExecutorService.schedule(() -> {
+                try {
+                    List<TransferItem> items = btDownload.getDl().getItems();
+                    if (items != null && items.size() > 0) {
+                        // Update UI on EDT
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                if (this.btDownload != btDownload) {
+                                    this.btDownload = btDownload;
+                                    tableMediator.clearTable();
+                                    int i = 0;
+                                    for (TransferItem item : items) {
+                                        if (!item.isSkipped()) {
+                                            tableMediator.add(new TransferItemHolder(i++, item));
+                                        }
+                                    }
+                                } else {
+                                    int i = 0;
+                                    for (TransferItem item : items) {
+                                        if (!item.isSkipped()) {
+                                            tableMediator.update(new TransferItemHolder(i++, item));
+                                        }
+                                    }
+                                }
+                            } catch (Throwable e) {
+                                LOG.error("Error updating transfer files details UI", e);
                             }
-                        }
-                    } else {
-                        int i = 0;
-                        for (TransferItem item : items) {
-                            if (!item.isSkipped()) {
-                                tableMediator.update(new TransferItemHolder(i++, item));
-                            }
-                        }
+                        });
                     }
+                } catch (Throwable e) {
+                    LOG.error("Error fetching transfer files details", e);
                 }
-            } catch (Throwable e) {
-                LOG.error("Error updating transfer files details", e);
-            }
+            });
         }
     }
 
