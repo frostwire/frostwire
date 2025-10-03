@@ -18,6 +18,9 @@
 
 package com.frostwire.search;
 
+import com.frostwire.licenses.CreativeCommonsLicense;
+import com.frostwire.licenses.License;
+
 /**
  * Performance regression test for PerformersHelper.
  * This test ensures that the sanitize method optimization doesn't break functionality
@@ -53,7 +56,7 @@ public class PerformersHelperPerformanceTest {
             for (MockSearchResult sr : searchResults) {
                 String normalized = PerformersHelper.searchResultAsNormalizedString(sr);
                 // Basic validation - should not be null or empty for non-empty inputs
-                if (sr.getDisplayName().length() > 0 && (normalized == null || normalized.trim().isEmpty())) {
+                if (!sr.getDisplayName().isEmpty() && normalized.trim().isEmpty()) {
                     throw new RuntimeException("Normalization failed for: " + sr.getDisplayName());
                 }
             }
@@ -68,7 +71,7 @@ public class PerformersHelperPerformanceTest {
         System.out.println("Average time per normalization: " + 
                           String.format("%.4f", durationMs / (iterations * searchResults.length)) + " ms");
         
-        // Test should complete in reasonable time (less than 2 seconds for this test size)
+        // Test should complete in a reasonable time (less than 2 seconds for this test size)
         if (durationMs > 2000) {
             throw new RuntimeException("Performance regression detected! Test took " + 
                                      String.format("%.2f", durationMs) + " ms, expected < 2000 ms");
@@ -76,7 +79,7 @@ public class PerformersHelperPerformanceTest {
         
         // Test correctness with some examples
         System.out.println("\nCorrectness validation:");
-        for (int i = 0; i < Math.min(3, searchResults.length); i++) {
+        for (int i = 0; i < 3; i++) {
             String original = searchResults[i].getDisplayName();
             String normalized = PerformersHelper.searchResultAsNormalizedString(searchResults[i]);
             System.out.println("\"" + original + "\" -> \"" + normalized + "\"");
@@ -109,7 +112,17 @@ public class PerformersHelperPerformanceTest {
         public String getSource() {
             return "test";
         }
-        
+
+        @Override
+        public License getLicense() {
+            return CreativeCommonsLicense.standard("Attribution", "BY", "4.0");
+        }
+
+        @Override
+        public String getThumbnailUrl() {
+            return "";
+        }
+
         @Override
         public long getCreationTime() {
             return System.currentTimeMillis();
