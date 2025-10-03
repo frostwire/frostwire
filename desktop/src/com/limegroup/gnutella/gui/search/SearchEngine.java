@@ -147,7 +147,7 @@ public abstract class SearchEngine {
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine IDOPE = new SearchEngine(SearchEngineID.IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.se") {
+    private static final SearchEngine IDOPE = new SearchEngine(SearchEngineID.IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.hair") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
