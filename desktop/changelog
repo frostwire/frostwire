@@ -12,6 +12,7 @@ frostwire (7.0.0) stable; urgency=high
  * Maintenance:MacEventHandler is now compatible with JDK 23 and JDK 24
  * Maintenance:Archive.org search
  * Maintenance:GloTorrents search
+ * Maintenance:Idope search
  * Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
  * New:Strict EDT Mode to catch long running tasks stalling event dispatch thread
  * EDT freeze:moved media checks off EDT; coalesce selection; add EDT I/O guard
