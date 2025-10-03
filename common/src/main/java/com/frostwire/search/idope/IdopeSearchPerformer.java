@@ -19,46 +19,56 @@
 package com.frostwire.search.idope;
 
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.UrlUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * FrostWire's idope search performer.
+ * <p>
+ * This search performer uses the same API that idope uses to construct search results. It is much simpler than parsing
+ * an HTML search page of results (which now isn't possible without using JavaScript). Usage of this API is subject to
+ * change without notice, so it will likely require updating whenever idope changes something (assuming they do so in
+ * the first place). At least, however, it'll be easier to work with.
+ */
 public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
+    /**
+     * An idope search result, as represented in FrostWire.
+     * <p>
+     * idope's internal search API sends a large JSON array of objects. We retrieve this array in the performer and then
+     * parse it into an instance of this class, which contains the data we want.
+     * <p>
+     * Each search result contains the following:
+     * - Name
+     * - ID (used for constructing the details page in IdopeSearchResult)
+     * - Size (in bytes)
+     * - Date added
+     * - Hash (used for constructing the magnet link)
+     * - Number of seeders
+     */
+    private static class Result {
+        public int id;           // Used for the information page
+        public String name;      // The name of the torrent
+        public String info_hash; // idope's hash of the torrent (used for getting the torrent's details page)
+        public int seeders;      // How many seeders are currently seeding the torrent
+        public long size;        // The torrent's size (in bytes)
+        public long added;       // How old the torrent is
+    }
+
     private static final Logger LOG = Logger.getLogger(IdopeSearchPerformer.class);
     private static Pattern pattern;
-    private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
         super("idope.hair", token, keywords, timeout, 1, 0);
-        if (pattern == null) {
-            pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
-                    "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
-                    "<div  class=\"resultdivtopname\" >[\n][\\s|\t]+(?<filename>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottontime\">(?<age>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottonlength\">(?<filesize>.*?)\\p{Z}(?<unit>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottonseed\">(?<seeds>.*?)</div>");
-        }
     }
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/torrent-list/" + encodedKeywords;
-    }
-
-    private IdopeSearchResult fromMatcher(SearchMatcher matcher) {
-        String infoHash = matcher.group("infohash");
-        String detailsURL = "https://" + getDomainName() + "/torrent/" + matcher.group("keyword") + "/" + infoHash;
-        String filename = matcher.group("filename");
-        String fileSizeMagnitude = matcher.group("filesize");
-        String fileSizeUnit = matcher.group("unit");
-        String ageString = matcher.group("age");
-        int seeds = Integer.parseInt(matcher.group("seeds"));
-        return new IdopeSearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+        return "https://" + getDomainName() + "/api.php?url=/q.php?cat=0&q=" + encodedKeywords;
     }
 
     @Override
@@ -68,42 +78,23 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             return Collections.emptyList();
         }
 
-        final String HTML_PREFIX_MARKER = "<div id=\"div2child\">";
-        int htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER) + HTML_PREFIX_MARKER.length();
-        final String HTML_SUFFIX_MARKER = "<div id=\"rightdiv\">";
-        int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER);
-
-        String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length() - htmlPrefixIndex);
-
+        Result[] responseResults = JsonUtils.toObject(page, Result[].class);
         ArrayList<IdopeSearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((pattern.matcher(reducedHtml)));
-        boolean matcherFound;
-        int MAX_RESULTS = 10;
-        do {
-            try {
-                matcherFound = matcher.find();
-            } catch (Throwable t) {
-                matcherFound = false;
-                LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
-            }
-            if (matcherFound) {
-                IdopeSearchResult sr = fromMatcher(matcher);
-                results.add(sr);
-            } else {
-                isDDOSProtectionActive = reducedHtml.contains("Cloudflare");
-                if (!isDDOSProtectionActive) {
-                    LOG.warn("IdopeSearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
-                } else {
-                    LOG.warn("IdopeSearchPerformer search matcher disabled. DDOS protection active.");
-                }
-            }
-        } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
-        return results;
-    }
 
-    @Override
-    public boolean isDDOSProtectionActive() {
-        return isDDOSProtectionActive;
+        for (Result result : responseResults) {
+            results.add(
+                new IdopeSearchResult(
+                        result.id,
+                        result.info_hash,
+                        result.name,
+                        result.size,
+                        result.added,
+                        result.seeders
+                )
+            );
+        }
+
+        return results;
     }
 
     @Override

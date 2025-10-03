@@ -19,8 +19,6 @@
 package com.frostwire.search.idope;
 
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.util.DateParser;
-import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.UrlUtils;
 
 public final class IdopeSearchResult extends AbstractTorrentSearchResult {
@@ -33,22 +31,30 @@ public final class IdopeSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    IdopeSearchResult(String detailsUrl,
+    IdopeSearchResult(int id,
                       String infoHash,
                       String filename,
-                      String fileSizeMagnitude,
-                      String fileSizeUnit,
-                      String ageString,
-                      int seeds,
-                      String trackers) {
-        this.detailsUrl = detailsUrl;
+                      long size,
+                      long age,
+                      int seeds) {
+        this.detailsUrl = "https://idope.hair/tortpb?id=" + id;
         this.infoHash = infoHash;
-        this.displayName = HtmlManipulator.replaceHtmlEntities(filename.trim());
+        this.displayName = filename;
         this.filename = filename + ".torrent";
-        this.size = parseSize(fileSizeMagnitude + " " + fileSizeUnit);
-        this.creationTime = parseCreationTime(ageString);
+        this.size = size;
+        this.creationTime = age;
         this.seeds = seeds;
-        this.torrentUrl = UrlUtils.buildMagnetUrl(infoHash, filename, trackers);
+        this.torrentUrl = UrlUtils.buildMagnetUrl(
+                infoHash,
+                filename,
+                // Yes, idope also hardcodes its trackers in magnet URLs, so we have no choice but to do the same thing
+                // here.
+                "&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce" +
+                "&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337" +
+                "&tr=udp%3A%2F%2Fmovies.zsw.ca%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce" +
+                "&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" +
+                "&tr=udp%3A%2F%2Ftracker.0x.tf%3A6969%2Fannounce"
+        );
     }
 
     @Override
@@ -94,9 +100,5 @@ public final class IdopeSearchResult extends AbstractTorrentSearchResult {
     @Override
     public String getTorrentUrl() {
         return torrentUrl;
-    }
-
-    private long parseCreationTime(String dateString) {
-        return DateParser.parseRelativeAge(dateString);
     }
 }
