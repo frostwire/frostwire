@@ -16,20 +16,23 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
+package com.frostwire.search.internetarchive;
+
+import java.util.List;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgFile {
-    public String filename;
-    public String source;
-    public String size;
-    public String format;
-    public String md5;
-    public String mtime;
-    public String crc32;
-    public String sha1;
-    public String length;
+public final class InternetArchiveItem {
+    public Object title;
+    public String mediatype;
+    //public Object description;
+    public String licenseurl;
+    public String publicdate;
+    public int downloads;
+    public int month;
+    public String identifier;
+    public List<String> format;
+    public List<String> collection;
 }

@@ -19,8 +19,8 @@
 package com.frostwire.tests;
 
 import com.frostwire.search.*;
-import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
-import com.frostwire.search.archiveorg.ArchiveorgSearchResult;
+import com.frostwire.search.internetarchive.InternetArchiveCrawledSearchResult;
+import com.frostwire.search.internetarchive.InternetArchiveSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import org.junit.jupiter.api.Assertions;
@@ -29,30 +29,30 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArchiveorgSearchPerformerTest {
-    private static final Logger LOG = Logger.getLogger(ArchiveorgSearchPerformerTest.class);
+public class InternetArchiveSearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(InternetArchiveSearchPerformerTest.class);
 
     @Test
     public void testSearch() {
-        List<ArchiveorgCrawledSearchResult> searchResults = new ArrayList<>();
-        SearchPerformer searchPerformer = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.ARCHIVEORG_ID).getPerformer(1, "free book");
+        List<InternetArchiveCrawledSearchResult> searchResults = new ArrayList<>();
+        SearchPerformer searchPerformer = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.INTERNET_ARCHIVE_ID).getPerformer(1, "free book");
         searchPerformer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
                 LOG.info("Results: " + results.size());
                 for (SearchResult r : results) {
-                    if (r instanceof ArchiveorgSearchResult) {
+                    if (r instanceof InternetArchiveSearchResult) {
                         searchPerformer.crawl((CrawlableSearchResult) r);
                         continue;
                     }
-                    if (!(r instanceof ArchiveorgCrawledSearchResult)) {
+                    if (!(r instanceof InternetArchiveCrawledSearchResult)) {
                         continue;
                     }
-                    ArchiveorgCrawledSearchResult sr = (ArchiveorgCrawledSearchResult) r;
+                    InternetArchiveCrawledSearchResult sr = (InternetArchiveCrawledSearchResult) r;
                     searchResults.add(sr);
-                    LOG.info("[ArchiveorgSearchPerformerTest] source: " + sr.getSource());
-                    LOG.info("[ArchiveorgSearchPerformerTest] size: " + sr.getSize());
-                    LOG.info("[ArchiveorgSearchPerformerTest] ---------------------");
+                    LOG.info("[InternetArchiveSearchPerformerTest] source: " + sr.getSource());
+                    LOG.info("[InternetArchiveSearchPerformerTest] size: " + sr.getSize());
+                    LOG.info("[InternetArchiveSearchPerformerTest] ---------------------");
                 }
             }
 
@@ -67,6 +67,6 @@ public class ArchiveorgSearchPerformerTest {
             }
         });
         searchPerformer.perform();
-        Assertions.assertTrue(searchResults.size() > 0, "[ArchiveorgSearchPerformerTest] No results found");
+        Assertions.assertTrue(searchResults.size() > 0, "[InternetArchiveSearchPerformerTest] No results found");
     }
 }

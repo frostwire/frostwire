@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
+package com.frostwire.search.internetarchive;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
 import com.frostwire.search.HttpSearchResult;
@@ -29,14 +29,14 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult<ArchiveorgSearchResult> implements HttpSearchResult {
+public class InternetArchiveCrawledSearchResult extends AbstractCrawledSearchResult<InternetArchiveSearchResult> implements HttpSearchResult {
     private static final String DOWNLOAD_URL = "https://%s/download/%s/%s";
     private final String filename;
     private final String displayName;
     private final String downloadUrl;
     private final long size;
 
-    public ArchiveorgCrawledSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file) {
+    public InternetArchiveCrawledSearchResult(InternetArchiveSearchResult sr, InternetArchiveFile file) {
         super(sr);
         this.filename = FilenameUtils.getName(file.filename);
         this.displayName = FilenameUtils.getBaseName(filename) + " (" + sr.getDisplayName() + ")";
@@ -64,7 +64,7 @@ public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult<A
         return downloadUrl;
     }
 
-    private long calcSize(ArchiveorgFile file) {
+    private long calcSize(InternetArchiveFile file) {
         try {
             return Long.parseLong(file.size);
         } catch (Throwable e) {

@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
+package com.frostwire.search.internetarchive;
 
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
@@ -35,10 +35,10 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<ArchiveorgSearchResult> {
+public class InternetArchiveSearchPerformer extends CrawlPagedWebSearchPerformer<InternetArchiveSearchResult> {
     private static final int MAX_RESULTS = 12;
 
-    public ArchiveorgSearchPerformer(String domainName, long token, String keywords, int timeout) {
+    public InternetArchiveSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS);
     }
 
@@ -56,10 +56,10 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-        ArchiveorgItem[] items = JsonUtils.toObject(page, ArchiveorgItem[].class);
-        for (ArchiveorgItem item : items) {
+        InternetArchiveItem[] items = JsonUtils.toObject(page, InternetArchiveItem[].class);
+        for (InternetArchiveItem item : items) {
             if (!isStopped() && filter(item)) {
-                ArchiveorgSearchResult sr = new ArchiveorgSearchResult(getDomainName(), item);
+                InternetArchiveSearchResult sr = new InternetArchiveSearchResult(getDomainName(), item);
                 result.add(sr);
             }
         }
@@ -67,30 +67,30 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     }
 
     @Override
-    protected String getCrawlUrl(ArchiveorgSearchResult sr) {
+    protected String getCrawlUrl(InternetArchiveSearchResult sr) {
         return "https://" + getDomainName() + "/details/" + sr.getIdentifier() + "?output=json";
     }
 
     @Override
-    protected List<? extends SearchResult> crawlResult(ArchiveorgSearchResult sr, byte[] data) throws Exception {
-        List<ArchiveorgCrawledSearchResult> list = new LinkedList<>();
+    protected List<? extends SearchResult> crawlResult(InternetArchiveSearchResult sr, byte[] data) throws Exception {
+        List<InternetArchiveCrawledSearchResult> list = new LinkedList<>();
         String json = new String(data, StandardCharsets.UTF_8);
-        List<ArchiveorgFile> files = readFiles(json);
+        List<InternetArchiveFile> files = readFiles(json);
         long totalSize = calcTotalSize(files);
-        for (ArchiveorgFile file : files) {
+        for (InternetArchiveFile file : files) {
             if (isStreamable(file.filename)) {
-                list.add(new ArchiveorgCrawledStreamableSearchResult(sr, file));
+                list.add(new InternetArchiveCrawledStreamableSearchResult(sr, file));
             } else if (file.filename.endsWith(".torrent")) {
-                list.add(new ArchiveorgTorrentSearchResult(sr, file, totalSize));
+                list.add(new InternetArchiveTorrentSearchResult(sr, file, totalSize));
             } else {
-                list.add(new ArchiveorgCrawledSearchResult(sr, file));
+                list.add(new InternetArchiveCrawledSearchResult(sr, file));
             }
         }
         return list;
     }
 
-    private List<ArchiveorgFile> readFiles(String json) {
-        List<ArchiveorgFile> result = new LinkedList<>();
+    private List<InternetArchiveFile> readFiles(String json) {
+        List<InternetArchiveFile> result = new LinkedList<>();
         JsonElement element = JsonParser.parseString(json);
         JsonObject obj = element.getAsJsonObject();
         JsonObject files = obj.getAsJsonObject("files");
@@ -99,7 +99,7 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
             Map.Entry<String, JsonElement> e = it.next();
             String name = e.getKey();
             String value = e.getValue().toString();
-            ArchiveorgFile file = JsonUtils.toObject(value, ArchiveorgFile.class);
+            InternetArchiveFile file = JsonUtils.toObject(value, InternetArchiveFile.class);
             if (filter(file)) {
                 file.filename = cleanName(name);
                 result.add(file);
@@ -115,9 +115,9 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         return name;
     }
 
-    private long calcTotalSize(List<ArchiveorgFile> files) {
+    private long calcTotalSize(List<InternetArchiveFile> files) {
         long size = 0;
-        for (ArchiveorgFile f : files) {
+        for (InternetArchiveFile f : files) {
             try {
                 size += Long.parseLong(f.size);
             } catch (Throwable e) {
@@ -127,11 +127,11 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         return size;
     }
 
-    private boolean filter(ArchiveorgItem item) {
+    private boolean filter(InternetArchiveItem item) {
         return !(item.collection != null && item.collection.contains("samples_only"));
     }
 
-    private boolean filter(ArchiveorgFile file) {
+    private boolean filter(InternetArchiveFile file) {
         return !(file.format != null && file.format.equalsIgnoreCase("metadata"));
     }
 

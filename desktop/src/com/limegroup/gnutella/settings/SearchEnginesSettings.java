@@ -29,7 +29,7 @@ public class SearchEnginesSettings extends LimeProps {
     // search providers.
     public static final BooleanSetting TPB_SEARCH_ENABLED = FACTORY.createBooleanSetting("TPB_SEARCH2_ENABLED", true);
     public static final BooleanSetting SOUNDCLOUD_SEARCH_ENABLED = FACTORY.createBooleanSetting("SOUNDCLOUD_SEARCH2_ENABLED", true);
-    public static final BooleanSetting ARCHIVEORG_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);
+    public static final BooleanSetting INTERNET_ARCHIVE_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);
     public static final BooleanSetting FROSTCLICK_SEARCH_ENABLED = FACTORY.createBooleanSetting("FROSTCLICK_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTDOWNLOADS_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTDOWNLOADS_SEARCH_ENABLED", true);
     public static final BooleanSetting LIMETORRENTS_SEARCH_ENABLED = FACTORY.createBooleanSetting("LIMETORRENTS_SEARCH_ENABLED", true);

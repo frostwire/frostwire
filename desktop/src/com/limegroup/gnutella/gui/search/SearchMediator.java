@@ -25,7 +25,7 @@ import com.frostwire.gui.filters.SearchFilterFactory;
 import com.frostwire.gui.filters.SearchFilterFactoryImpl;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.*;
-import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
+import com.frostwire.search.internetarchive.InternetArchiveCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
@@ -66,7 +66,7 @@ public final class SearchMediator {
     static final String DOWNLOAD_PARTIAL_FILES_STRING = I18n.tr("Download Partial Files");
     static final String TORRENT_DETAILS_STRING = I18n.tr("Torrent Details");
     static final String SOUNDCLOUD_DETAILS_STRING = I18n.tr("View in Soundcloud");
-    static final String ARCHIVEORG_DETAILS_STRING = I18n.tr("View in Archive.org");
+    static final String INTERNET_ARCHIVE_DETAILS_STRING = I18n.tr("View in Archive.org");
     static final String TELLURIDE_DETAILS_STRING = I18n.tr("View in");
     static final String CLOSE_TAB_STRING = I18n.tr("Close Tab");
     static final String CLOSE_ALL_TABS = I18n.tr("Close All Tabs");
@@ -221,8 +221,8 @@ public final class SearchMediator {
                 ui = new SoundcloudUISearchResult((SoundcloudSearchResult) sr, engine, query);
             } else if (sr instanceof TorrentSearchResult) {
                 ui = new TorrentUISearchResult((TorrentSearchResult) sr, engine, query);
-            } else if (sr instanceof ArchiveorgCrawledSearchResult) {
-                ui = new ArchiveorgUISearchResult((ArchiveorgCrawledSearchResult) sr, engine, query);
+            } else if (sr instanceof InternetArchiveCrawledSearchResult) {
+                ui = new InternetArchiveUISearchResult((InternetArchiveCrawledSearchResult) sr, engine, query);
             } else if (sr instanceof TellurideSearchResult) {
                 TellurideSearchResult tsr = (TellurideSearchResult) sr;
                 ui = new TellurideUISearchResult(tsr, engine, query, false);
