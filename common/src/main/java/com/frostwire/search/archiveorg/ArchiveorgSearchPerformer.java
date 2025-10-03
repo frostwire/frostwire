@@ -56,8 +56,8 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-        ArchiveorgResponse response = JsonUtils.toObject(page, ArchiveorgResponse.class);
-        for (ArchiveorgItem item : response.response.docs) {
+        ArchiveorgItem[] items = JsonUtils.toObject(page, ArchiveorgItem[].class);
+        for (ArchiveorgItem item : items) {
             if (!isStopped() && filter(item)) {
                 ArchiveorgSearchResult sr = new ArchiveorgSearchResult(getDomainName(), item);
                 result.add(sr);
