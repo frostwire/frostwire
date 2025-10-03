@@ -150,7 +150,9 @@ dependencies {
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
     // FlatLaf for dark theme support
     implementation 'com.formdev:flatlaf:3.6'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation platform('org.junit:junit-bom:5.9.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 sourceSets {
