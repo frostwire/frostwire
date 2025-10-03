@@ -24,6 +24,7 @@ FrostWire 3.0.1 build 755 OCT/01/2025
  - maintenance:all license headers are GPL 3.0
  - maintenance:archive.org search fixed
  - maintenance:glotorrents search fixed
+ - maintenance:idope search fixed
  - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
  - speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
