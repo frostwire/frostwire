@@ -25,7 +25,7 @@ import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
-import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
+import com.frostwire.search.internetarchive.InternetArchiveTorrentSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
@@ -136,7 +136,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         }
         SearchResult sr = uiSearchResult.getSearchResult();
         // Two-step download. e.g. show me contents of a torrent first, or starts a telluride search
-        boolean isPartialDownload = sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult || sr instanceof YTSearchResult;
+        boolean isPartialDownload = sr instanceof CrawlableSearchResult || sr instanceof InternetArchiveTorrentSearchResult || sr instanceof YTSearchResult;
 
         labelDownload.setIcon(showSolid ? download_solid : download_transparent);
         labelDownload.setVisible(!isPartialDownload);
