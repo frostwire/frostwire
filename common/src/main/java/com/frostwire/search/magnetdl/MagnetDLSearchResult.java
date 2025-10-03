@@ -36,21 +36,30 @@ public final class MagnetDLSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    MagnetDLSearchResult(String detailsUrl,
-                             String magnet,
-                             String fileSize,
-                             String unit,
-                             String age,
-                             String seeds,
-                             String title) {
-        this.detailsUrl = detailsUrl;
-        this.torrentUrl = magnet + "&" + UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS;
-        this.infoHash = magnet.substring(20,60);
-        this.filename = parseFileName(title);
-        this.size = parseSize(fileSize + " " + unit);
-        this.creationTime = parseAgeString(age);
-        this.seeds = parseSeeds(seeds);
-        this.displayName = title;
+    MagnetDLSearchResult(int id,
+                         String filename,
+                         String infoHash,
+                         long size,
+                         long age,
+                         int seeds) {
+        this.detailsUrl = "https://magnetdl.homes/tortpb?id=" + id;
+        this.infoHash = infoHash;
+        this.filename = filename + ".torrent";
+        this.size = size;
+        this.creationTime = age;
+        this.seeds = seeds;
+        this.displayName = filename;
+        this.torrentUrl = UrlUtils.buildMagnetUrl(
+            infoHash,
+            filename,
+            // Yes, MagnetDL also hardcodes its trackers in magnet URLs, so we have no choice but to do the same thing
+            // here.
+            "&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce" +
+            "&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337" +
+            "&tr=udp%3A%2F%2Fmovies.zsw.ca%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce" +
+            "&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" +
+            "&tr=udp%3A%2F%2Ftracker.0x.tf%3A6969%2Fannounce"
+        );
     }
 
     @Override
@@ -96,21 +105,5 @@ public final class MagnetDLSearchResult extends AbstractTorrentSearchResult {
     @Override
     public String getTorrentUrl() {
         return torrentUrl;
-    }
-
-    private String parseFileName(String decodedFileName) {
-        return HtmlManipulator.replaceHtmlEntities(decodedFileName.trim()) + ".torrent";
-    }
-
-    private int parseSeeds(String group) {
-        try {
-            return Integer.parseInt(group);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private long parseAgeString(String dateString) {
-        return DateParser.parseRelativeAge(dateString);
     }
 }
