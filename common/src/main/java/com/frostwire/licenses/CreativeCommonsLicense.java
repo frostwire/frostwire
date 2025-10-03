@@ -39,9 +39,9 @@ public final class CreativeCommonsLicense extends License {
         this.acronym = acronym;
     }
 
-    static CreativeCommonsLicense standard(String name, String acronym, String version) {
+    public static CreativeCommonsLicense standard(String name, String acronym, String version) {
         String fullName = "Creative Commons " + name + " " + version;
-        String url = "http://creativecommons.org/licenses/" + acronym.toLowerCase(Locale.US) + "/" + version + "/";
+        String url = "https://creativecommons.org/licenses/" + acronym.toLowerCase(Locale.US) + "/" + version + "/";
         String fullAcronym = "CC " + acronym.toUpperCase(Locale.US) + " " + version;
         return new CreativeCommonsLicense(fullName, url, fullAcronym);
     }

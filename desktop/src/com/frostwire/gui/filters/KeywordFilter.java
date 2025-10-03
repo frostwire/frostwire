@@ -34,7 +34,7 @@ import java.util.Locale;
  */
 public class KeywordFilter implements SearchFilter {
     /**
-     * INVARIANT: strings in ban contain only lowercase
+     * INVARIANT: strings in a ban contain only lowercase
      */
     private final List<String> ban = new ArrayList<>();
 
@@ -119,7 +119,7 @@ public class KeywordFilter implements SearchFilter {
     }
 
     /**
-     * Returns true if phrase matches any of the entries in ban.
+     * Returns true if the phrase matches any of the entries in a ban.
      */
     private boolean matches(String phrase) {
         String canonical = phrase.toLowerCase(Locale.US);

@@ -88,7 +88,6 @@ dependencies {
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
 
-
     def jlibtorrent_version = '2.0.12.5'
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
@@ -158,6 +157,8 @@ sourceSets {
     main {
         java {
             srcDir '../common/src/main/java'
+
+            // TODO: move 'main' sources to src/main/java
             srcDir 'src'
         }
 
@@ -179,6 +180,8 @@ sourceSets {
     test {
         java {
             srcDir '../common/src/test/java'
+
+            // TODO: move 'test' sources to src/test/java
             srcDir 'tests/java'
         }
     }
