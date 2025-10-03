@@ -34,7 +34,7 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
-        super("idope.se", token, keywords, timeout, 1, 0);
+        super("idope.hair", token, keywords, timeout, 1, 0);
         if (pattern == null) {
             pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
                     "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
