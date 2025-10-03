@@ -21,7 +21,7 @@ package com.frostwire.util;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author gubatron
@@ -46,6 +46,6 @@ public class UserAgentGenerator {
     }
 
     public static String getUserAgent() {
-        return USER_AGENTS.get(new Random(System.currentTimeMillis()).nextInt(USER_AGENTS.size()));
+        return USER_AGENTS.get(ThreadLocalRandom.current().nextInt(USER_AGENTS.size()));
     }
 }
