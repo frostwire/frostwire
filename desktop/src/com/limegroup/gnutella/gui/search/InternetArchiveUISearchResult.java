@@ -19,7 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.tabs.TransfersTab;
-import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
+import com.frostwire.search.internetarchive.InternetArchiveCrawledSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
@@ -29,10 +29,10 @@ import javax.swing.*;
  * @author gubatron
  * @author aldenml
  */
-public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
-    private final ArchiveorgCrawledSearchResult sr;
+public final class InternetArchiveUISearchResult extends AbstractUISearchResult {
+    private final InternetArchiveCrawledSearchResult sr;
 
-    ArchiveorgUISearchResult(ArchiveorgCrawledSearchResult sr, SearchEngine se, String query) {
+    InternetArchiveUISearchResult(InternetArchiveCrawledSearchResult sr, SearchEngine se, String query) {
         super(sr, se, query);
         this.sr = sr;
     }
@@ -47,7 +47,7 @@ public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
     @Override
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp) {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
-        PopupUtils.addMenuItem(SearchMediator.ARCHIVEORG_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 2);
+        PopupUtils.addMenuItem(SearchMediator.INTERNET_ARCHIVE_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 2);
         return popupMenu;
     }
 

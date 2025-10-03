@@ -16,44 +16,20 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
-
-import com.frostwire.search.torrent.TorrentSearchResult;
+package com.frostwire.search.internetarchive;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgTorrentSearchResult extends ArchiveorgCrawledSearchResult implements TorrentSearchResult {
-    private final long size;
-
-    public ArchiveorgTorrentSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file, long size) {
-        super(sr, file);
-        this.size = size;
-    }
-
-    @Override
-    public String getTorrentUrl() {
-        return getDownloadUrl();
-    }
-
-    @Override
-    public String getReferrerUrl() {
-        return getDetailsUrl();
-    }
-
-    @Override
-    public int getSeeds() {
-        return 3;
-    }
-
-    @Override
-    public String getHash() {
-        return null;
-    }
-
-    @Override
-    public long getSize() {
-        return size;
-    }
+public class InternetArchiveFile {
+    public String filename;
+    public String source;
+    public String size;
+    public String format;
+    public String md5;
+    public String mtime;
+    public String crc32;
+    public String sha1;
+    public String length;
 }

@@ -16,23 +16,21 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
+package com.frostwire.search.internetarchive;
 
-import java.util.List;
+import com.frostwire.search.StreamableSearchResult;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class ArchiveorgItem {
-    public Object title;
-    public String mediatype;
-    //public Object description;
-    public String licenseurl;
-    public String publicdate;
-    public int downloads;
-    public int month;
-    public String identifier;
-    public List<String> format;
-    public List<String> collection;
+public class InternetArchiveCrawledStreamableSearchResult extends InternetArchiveCrawledSearchResult implements StreamableSearchResult {
+    public InternetArchiveCrawledStreamableSearchResult(InternetArchiveSearchResult sr, InternetArchiveFile file) {
+        super(sr, file);
+    }
+
+    @Override
+    public String getStreamUrl() {
+        return getDownloadUrl();
+    }
 }

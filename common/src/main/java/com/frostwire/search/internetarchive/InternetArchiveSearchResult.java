@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.archiveorg;
+package com.frostwire.search.internetarchive;
 
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * @author gubatron
  * @author aldenml
  */
-public final class ArchiveorgSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+public final class InternetArchiveSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
     private final String identifier;
     private final String title;
     private final String detailsUrl;
@@ -38,7 +38,7 @@ public final class ArchiveorgSearchResult extends AbstractSearchResult implement
     private final License licence;
     private final long creationTime;
 
-    public ArchiveorgSearchResult(String domainName, ArchiveorgItem item) {
+    public InternetArchiveSearchResult(String domainName, InternetArchiveItem item) {
         this.identifier = item.identifier;
         this.domainName = domainName;
         this.detailsUrl = "http://" + domainName + "/details/" + item.identifier;
