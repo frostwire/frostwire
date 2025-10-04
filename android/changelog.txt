@@ -1,4 +1,4 @@
-FrostWire 3.0.1 build 755 OCT/01/2025
+FrostWire 3.0.2 build 756 OCT/03/2025
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
