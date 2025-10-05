@@ -203,8 +203,6 @@ public class EngineForegroundService extends Service implements IEngineService {
             }
         }
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.view_permanent_status_notification);
-
         PendingIntent showFrostWireIntent = PendingIntent.getActivity(
                 this,
                 0,
@@ -223,15 +221,33 @@ public class EngineForegroundService extends Service implements IEngineService {
                 PendingIntent.FLAG_IMMUTABLE
         );
 
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
+        // Try to create notification with RemoteViews (custom layout)
+        try {
+            RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.view_permanent_status_notification);
+            remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
+            remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
 
-        return new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.frostwire_notification_flat)
-                .setContent(remoteViews)
-                .setContentIntent(showFrostWireIntent)
-                .setOngoing(true)
-                .build();
+            Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.frostwire_notification_flat)
+                    .setContent(remoteViews)
+                    .setContentIntent(showFrostWireIntent)
+                    .setOngoing(true)
+                    .build();
+
+            LOG.info("createPersistentNotification() created notification with RemoteViews successfully");
+            return notification;
+        } catch (Throwable e) {
+            LOG.error("Failed to create notification with RemoteViews in EngineForegroundService, using fallback", e);
+            // Fallback to simple notification without custom layout
+            return new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.frostwire_notification_flat)
+                    .setContentTitle("FrostWire")
+                    .setContentText("FrostWire is running")
+                    .setContentIntent(showFrostWireIntent)
+                    .setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .build();
+        }
     }
 
     private void scheduleTorrentEngineWork() {

@@ -149,26 +149,52 @@ public final class NotificationUpdateDaemon {
             return;
         }
 
-        RemoteViews remoteViews = new RemoteViews(mParentContext.getPackageName(),
-                R.layout.view_permanent_status_notification);
-
         PendingIntent showFrostWireIntent = createShowFrostWireIntent();
         PendingIntent shutdownIntent = createShutdownIntent();
 
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
+        try {
+            RemoteViews remoteViews = new RemoteViews(mParentContext.getPackageName(),
+                    R.layout.view_permanent_status_notification);
 
-        Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.frostwire_notification_flat)
-                .setContentIntent(showFrostWireIntent)
-                .setContent(remoteViews)
-                .setOngoing(true) // Makes the notification persistent
-                .build();
+            remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
+            remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
 
-        notification.flags |= Notification.FLAG_NO_CLEAR;
+            Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.frostwire_notification_flat)
+                    .setContentIntent(showFrostWireIntent)
+                    .setContent(remoteViews)
+                    .setOngoing(true) // Makes the notification persistent
+                    .build();
 
-        notificationViews = remoteViews;
-        notificationObject = notification;
+            notification.flags |= Notification.FLAG_NO_CLEAR;
+
+            notificationViews = remoteViews;
+            notificationObject = notification;
+            LOG.info("setupNotification() completed successfully with RemoteViews");
+        } catch (Throwable e) {
+            LOG.error("Failed to create notification with RemoteViews, falling back to simple notification", e);
+            // Fallback to a simple notification without custom layout
+            try {
+                Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.frostwire_notification_flat)
+                        .setContentTitle("FrostWire")
+                        .setContentText("FrostWire is running")
+                        .setContentIntent(showFrostWireIntent)
+                        .setOngoing(true)
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .build();
+
+                notification.flags |= Notification.FLAG_NO_CLEAR;
+
+                notificationViews = null; // Signal that we're using fallback
+                notificationObject = notification;
+                LOG.info("setupNotification() completed with fallback notification");
+            } catch (Throwable fallbackError) {
+                LOG.error("Failed to create fallback notification", fallbackError);
+                notificationViews = null;
+                notificationObject = null;
+            }
+        }
     }
 
     private PendingIntent createShowFrostWireIntent() {
@@ -261,16 +287,48 @@ public final class NotificationUpdateDaemon {
         String sUp = UIUtils.rate2speed(uploadRate);
 
         if (notificationViews != null) {
-            notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-            notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+            // Update RemoteViews if available
+            try {
+                notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+                notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+            } catch (Throwable e) {
+                LOG.error("Failed to update RemoteViews, will recreate notification", e);
+                setupNotification(); // Try to recreate the notification
+                return IDLE_UPDATE_INTERVAL_MS;
+            }
+        } else {
+            // Update simple notification content
+            try {
+                PendingIntent showFrostWireIntent = createShowFrostWireIntent();
+                String contentText = "↓ " + downloads + " @ " + sDown + ", ↑ " + uploads + " @ " + sUp;
+
+                Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.frostwire_notification_flat)
+                        .setContentTitle("FrostWire is running")
+                        .setContentText(contentText)
+                        .setContentIntent(showFrostWireIntent)
+                        .setOngoing(true)
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .build();
+
+                notification.flags |= Notification.FLAG_NO_CLEAR;
+                notificationObject = notification;
+            } catch (Throwable e) {
+                LOG.error("Failed to update fallback notification", e);
+                return IDLE_UPDATE_INTERVAL_MS;
+            }
         }
 
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null && notificationObject != null) {
             try {
                 manager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
-            } catch (SecurityException t) {
-                LOG.warn(t.getMessage(), t);
+            } catch (SecurityException e) {
+                LOG.warn("SecurityException posting notification: " + e.getMessage(), e);
+            } catch (Throwable e) {
+                LOG.error("Failed to post notification: " + e.getMessage(), e);
+                // Try to recreate notification on next update
+                setupNotification();
             }
         } else {
             LOG.warn("NotificationManager or notificationObject is null. Cannot update notification.");
