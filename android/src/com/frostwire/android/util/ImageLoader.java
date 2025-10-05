@@ -384,17 +384,35 @@ public final class ImageLoader {
     }
 
     public void shutdown() {
-        shutdown = true;
-        if (picasso != null) {
-            try {
-                // Picasso 3.0 has a shutdown method that properly cleans up resources
-                // including unregistering the NetworkBroadcastReceiver
-                picasso.shutdown();
-                LOG.info("Picasso shutdown completed successfully");
-            } catch (Throwable t) {
-                LOG.warn("Failed to shutdown Picasso gracefully", t);
+        synchronized (ImageLoader.class) {
+            if (shutdown) {
+                LOG.info("ImageLoader already shutdown, skipping");
+                return;
             }
-            picasso = null;
+            LOG.info("ImageLoader shutdown requested - marking as shutdown but keeping Picasso alive to prevent HandlerDispatcher NPE");
+            shutdown = true;
+
+            // DO NOT call picasso.shutdown() here!
+            // Picasso 3's HandlerDispatcher has a race condition where NetworkBroadcastReceiver
+            // can receive network state change broadcasts after the Handler becomes null,
+            // causing NullPointerException in HandlerDispatcher.dispatchNetworkStateChange()
+            //
+            // Instead, we just mark this instance as shutdown and clear the cache.
+            // The Picasso instance will be cleaned up when the process dies.
+
+            if (picasso != null) {
+                try {
+                    LOG.info("Clearing Picasso cache during shutdown");
+                    picasso.evictAll();
+                } catch (Throwable t) {
+                    LOG.warn("Failed to clear Picasso cache during shutdown", t);
+                }
+                // Keep picasso reference alive to prevent HandlerDispatcher NPE
+                // picasso = null; // DO NOT null this out
+            }
+
+            // Only null out the singleton instance reference
+            instance = null;
         }
     }
 
