@@ -75,6 +75,18 @@ public final class ImageLoader {
             synchronized (ImageLoader.class) {
                 if (instance == null || instance.shutdown) {
                     LOG.info("Creating new ImageLoader instance" + (instance != null && instance.shutdown ? " (previous was shutdown)" : ""));
+                    
+                    // If there's an old instance being replaced, properly shut down its Picasso
+                    // to unregister NetworkBroadcastReceiver BEFORE creating new instance
+                    if (instance != null && instance.picasso != null) {
+                        try {
+                            LOG.info("Shutting down old Picasso instance to unregister NetworkBroadcastReceiver");
+                            instance.picasso.shutdown();
+                        } catch (Throwable t) {
+                            LOG.warn("Error shutting down old Picasso instance", t);
+                        }
+                    }
+                    
                     instance = new ImageLoader(context);
                 }
             }
@@ -100,6 +112,18 @@ public final class ImageLoader {
     public static synchronized void ensureHealthyInstance(Context context) {
         if (instance == null || instance.shutdown || instance.picasso == null) {
             LOG.info("Recreating ImageLoader instance due to unhealthy state");
+            
+            // If there's an old instance being replaced, properly shut down its Picasso
+            // to unregister NetworkBroadcastReceiver BEFORE creating new instance
+            if (instance != null && instance.picasso != null) {
+                try {
+                    LOG.info("Shutting down old Picasso instance to unregister NetworkBroadcastReceiver");
+                    instance.picasso.shutdown();
+                } catch (Throwable t) {
+                    LOG.warn("Error shutting down old Picasso instance", t);
+                }
+            }
+            
             instance = new ImageLoader(context);
         }
     }
@@ -392,13 +416,17 @@ public final class ImageLoader {
             LOG.info("ImageLoader shutdown requested - marking as shutdown but keeping Picasso alive to prevent HandlerDispatcher NPE");
             shutdown = true;
 
-            // DO NOT call picasso.shutdown() here!
+            // DO NOT call picasso.shutdown() here when app is going away!
             // Picasso 3's HandlerDispatcher has a race condition where NetworkBroadcastReceiver
             // can receive network state change broadcasts after the Handler becomes null,
             // causing NullPointerException in HandlerDispatcher.dispatchNetworkStateChange()
             //
             // Instead, we just mark this instance as shutdown and clear the cache.
             // The Picasso instance will be cleaned up when the process dies.
+            //
+            // NOTE: picasso.shutdown() IS called when replacing an old instance with a new one
+            // (see getInstance() and ensureHealthyInstance()) to properly unregister receivers
+            // before the old instance is discarded.
 
             if (picasso != null) {
                 try {
