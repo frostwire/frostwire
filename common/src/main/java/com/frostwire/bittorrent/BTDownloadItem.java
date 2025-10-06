@@ -76,8 +76,14 @@ public class BTDownloadItem implements TransferItem {
         if (!th.isValid()) {
             return 0;
         }
-        long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
-        return progress[index];
+        try {
+            long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
+            return progress[index];
+        } catch (Throwable e) {
+            // Handle memory allocation errors (std::bad_alloc) or other exceptions
+            // from native jlibtorrent code
+            return 0;
+        }
     }
 
     @Override
