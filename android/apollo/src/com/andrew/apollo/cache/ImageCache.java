@@ -701,5 +701,29 @@ public final class ImageCache {
         protected int sizeOf(final String paramString, final Bitmap paramBitmap) {
             return getBitmapSize(paramBitmap);
         }
+
+        /**
+         * Called when a bitmap is evicted from the cache.
+         * Recycles the bitmap to free native memory immediately rather than waiting for GC.
+         *
+         * Native bitmap memory is not tracked by the Java heap, so without explicit recycle()
+         * calls, native memory can accumulate and cause native OOM errors even when Java heap
+         * has plenty of space.
+         *
+         * @param evicted  Whether the entry was evicted or removed
+         * @param key      The key for the entry
+         * @param oldValue The bitmap being removed
+         * @param newValue The new bitmap (if being replaced), or null
+         */
+        @Override
+        protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
+            super.entryRemoved(evicted, key, oldValue, newValue);
+
+            // Only recycle if the bitmap is actually being removed (newValue is null)
+            // and the bitmap hasn't already been recycled
+            if (newValue == null && oldValue != null && !oldValue.isRecycled()) {
+                oldValue.recycle();
+            }
+        }
     }
 }
