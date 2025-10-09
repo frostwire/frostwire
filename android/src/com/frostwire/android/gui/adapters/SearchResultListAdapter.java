@@ -373,22 +373,26 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             return;
         }
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            // 1.  Pre–compute and remember the expensive bits only once
-            Map<SearchResult, String> normalized   = new HashMap<>();
-            Map<SearchResult, Integer> levenshtein = new HashMap<>();
+            // atomically snapshot to get size for pre-allocation
+            List<SearchResult> snapshot;
+            synchronized (listLock) {
+                snapshot = new ArrayList<>(fullList);
+            }
+
+            // Pre-size HashMaps to avoid rehashing (account for load factor 0.75)
+            // This eliminates 3-5 array copies during growth
+            final int capacity = (int) (snapshot.size() / 0.75f) + 1;
+            Map<SearchResult, String> normalized   = new HashMap<>(capacity);
+            Map<SearchResult, Integer> levenshtein = new HashMap<>(capacity);
 
             List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
             tokens.removeIf(PerformersHelper.stopwords::contains);
 
-            // atomically snapshot and build maps from it
-            List<SearchResult> snapshot;
-            synchronized (listLock) {
-                snapshot = new ArrayList<>(fullList);
-                for (SearchResult r : snapshot) {
-                    String n  = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
-                    normalized.put(r, n);
-                    levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
-                }
+            // Build maps with pre-sized capacity
+            for (SearchResult r : snapshot) {
+                String n  = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
+                normalized.put(r, n);
+                levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
             }
 
             List<SearchResult> sorted = snapshot;
