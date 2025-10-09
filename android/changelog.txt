@@ -30,6 +30,7 @@ FrostWire 3.0.4 build 758 OCT/08/2025
  - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
  - speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
  - speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
+ - spped-up:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
  - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
