@@ -80,6 +80,12 @@ public final class ImageCache {
     private static final int DISK_CACHE_INDEX = 0;
 
     /**
+     * Target dimensions for album art (reasonable size for display)
+     */
+    private static final int TARGET_IMAGE_WIDTH = 512;
+    private static final int TARGET_IMAGE_HEIGHT = 512;
+
+    /**
      * LRU cache
      */
     private MemoryCache mLruCache;
@@ -316,26 +322,53 @@ public final class ImageCache {
         waitUntilUnpaused();
         final String key = hashKeyForDisk(data);
         if (mDiskCache != null) {
+            DiskLruCache.Snapshot snapshot = null;
             InputStream inputStream = null;
             try {
-                final DiskLruCache.Snapshot snapshot = mDiskCache.get(key);
+                snapshot = mDiskCache.get(key);
                 if (snapshot != null) {
+                    // First pass: Get dimensions
                     inputStream = snapshot.getInputStream(DISK_CACHE_INDEX);
                     if (inputStream != null) {
-                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        if (bitmap != null) {
-                            return bitmap;
+                        final BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(inputStream, null, options);
+
+                        // Close first stream
+                        try {
+                            inputStream.close();
+                        } catch (final IOException ignored) {
+                        }
+
+                        // Calculate inSampleSize
+                        options.inSampleSize = calculateInSampleSize(options, TARGET_IMAGE_WIDTH, TARGET_IMAGE_HEIGHT);
+
+                        // Second pass: Decode with sampling
+                        // Need to get a fresh input stream since we can't rewind
+                        inputStream = snapshot.getInputStream(DISK_CACHE_INDEX);
+                        if (inputStream != null) {
+                            options.inJustDecodeBounds = false;
+                            final Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+                            if (bitmap != null) {
+                                return bitmap;
+                            }
                         }
                     }
                 }
             } catch (final IOException e) {
                 Log.e(TAG, "getBitmapFromDiskCache - " + e);
+            } catch (final OutOfMemoryError e) {
+                Log.e(TAG, "getBitmapFromDiskCache - OutOfMemoryError, evicting cache", e);
+                evictAll();
             } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
                     }
                 } catch (final IOException ignored) {
+                }
+                if (snapshot != null) {
+                    snapshot.close();
                 }
             }
         }
@@ -377,13 +410,14 @@ public final class ImageCache {
         }
         Bitmap artwork = null;
         waitUntilUnpaused();
+        ParcelFileDescriptor parcelFileDescriptor = null;
         try {
             final Uri uri = ContentUris.withAppendedId(mArtworkUri, albumId);
-            final ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver()
-                    .openFileDescriptor(uri, "r");
+            parcelFileDescriptor = context.getContentResolver().openFileDescriptor(uri, "r");
             if (parcelFileDescriptor != null) {
                 final FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                artwork = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                // Use sampled decoding to reduce memory usage
+                artwork = decodeSampledBitmapFromFileDescriptor(fileDescriptor, TARGET_IMAGE_WIDTH, TARGET_IMAGE_HEIGHT);
             }
         } catch (final IllegalStateException e) {
             // Log.e(TAG, "IllegalStateExcetpion - getArtworkFromFile - ", e);
@@ -395,6 +429,13 @@ public final class ImageCache {
         } catch (final NullPointerException e) {
             // Log.e(TAG, "NullPointerException - getArtworkFromFile - ", e);
         } catch (SecurityException ignored) {
+        } finally {
+            if (parcelFileDescriptor != null) {
+                try {
+                    parcelFileDescriptor.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
         return artwork;
     }
@@ -491,6 +532,61 @@ public final class ImageCache {
      */
     private static long getUsableSpace(final File path) {
         return path.getUsableSpace();
+    }
+
+    /**
+     * Calculate the inSampleSize value for efficient bitmap loading.
+     * This uses a power-of-2 value to reduce memory usage while maintaining quality.
+     *
+     * @param options   The BitmapFactory.Options containing image dimensions
+     * @param reqWidth  The requested width of the resulting bitmap
+     * @param reqHeight The requested height of the resulting bitmap
+     * @return The inSampleSize value (always a power of 2)
+     */
+    private static int calculateInSampleSize(final BitmapFactory.Options options,
+                                             final int reqWidth, final int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    /**
+     * Decode a sampled bitmap from a FileDescriptor using inSampleSize to reduce memory usage.
+     * This performs a two-pass decode: first to get dimensions, second to decode with sampling.
+     *
+     * @param fd        The FileDescriptor containing the image data
+     * @param reqWidth  The requested width of the resulting bitmap
+     * @param reqHeight The requested height of the resulting bitmap
+     * @return The decoded and sampled Bitmap, or null if decoding fails
+     */
+    private static Bitmap decodeSampledBitmapFromFileDescriptor(final FileDescriptor fd,
+                                                                final int reqWidth, final int reqHeight) {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFileDescriptor(fd, null, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFileDescriptor(fd, null, options);
     }
 
     /**
