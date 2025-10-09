@@ -23,25 +23,32 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchResult;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.frostwire.util.http.HttpClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TPBSearchPerformerTest {
     private static final Logger LOG = Logger.getLogger(TPBSearchPerformerTest.class);
+    private static final int MIRROR_HEAD_TIMEOUT_MS = 1500;
+    private static final int PERFORMER_TIMEOUT_MS = 5000;
+    private static final long TEST_TOKEN = 1337L;
+    private static final String TEST_KEYWORDS = "free book";
 
     @Test
     public void testTPBSearch() {
         final List<TPBSearchResult> tpbResults = new ArrayList<>();
         TPBSearchPerformer tpbSearchPerformer = initializeSearchPerformer();
-        assert (tpbSearchPerformer != null);
+        assertNotNull(tpbSearchPerformer, "[TPBSearchPerformerTest] Failed to initialize search performer");
         CountDownLatch latch = new CountDownLatch(1);
 
         tpbSearchPerformer.setListener(new SearchListener() {
@@ -88,31 +95,109 @@ public class TPBSearchPerformerTest {
     }
 
     private TPBSearchPerformer initializeSearchPerformer() {
-        SearchEngine tpbEngine = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TPB_ID);
-        assertNotNull(tpbEngine, "[TPBSearchPerformerTest] TPB engine is null");
-        int wait = 250;
-        int maxWait = 15000;
-        int currentWait = 0;
-        while (!tpbEngine.isReady() && currentWait < maxWait) {
-            try {
-                Thread.sleep(wait);
-                currentWait += wait;
-            } catch (InterruptedException e) {
-                LOG.error("[TPBSearchPerformerTest] Error waiting for TPB engine to be ready: " + e.getMessage());
-            }
-            LOG.info("[TPBSearchPerformerTest] Waiting " + currentWait + "ms for TPB engine to be ready...");
-        }
-        if (currentWait > maxWait) {
-            LOG.error("TPB engine is not ready after " + maxWait + "ms");
-            fail("[TPBSearchPerformerTest] TPB engine is not ready after " + maxWait + "ms");
-            return null;
+        MirrorStatus fastestMirror = selectFastestMirror();
+        return new TPBSearchPerformer(fastestMirror.domain, TEST_TOKEN, TEST_KEYWORDS, PERFORMER_TIMEOUT_MS);
+    }
+
+    private MirrorStatus selectFastestMirror() {
+        HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+        String[] mirrors = TPBSearchPerformer.getMirrors();
+        List<MirrorStatus> statuses = new ArrayList<>(mirrors.length);
+        for (String mirror : mirrors) {
+            statuses.add(checkMirror(httpClient, mirror, MIRROR_HEAD_TIMEOUT_MS));
         }
 
-        if (tpbEngine.isReady()) {
-            TPBSearchPerformer searchPerformer = (TPBSearchPerformer) tpbEngine.getPerformer(1337, "free book");
-            LOG.info("[TPBSearchPerformerTest] TPB engine is ready with domain: " + searchPerformer.getDomainName() + ", after " + currentWait + "ms");
-            return searchPerformer;
+        List<MirrorStatus> onlineMirrors = statuses.stream()
+                .filter(MirrorStatus::isOnline)
+                .collect(Collectors.toList());
+
+        if (onlineMirrors.isEmpty()) {
+            String snapshot = statuses.stream()
+                    .map(this::formatMirrorStatus)
+                    .collect(Collectors.joining(", "));
+            fail("[TPBSearchPerformerTest] No TPB mirrors responded successfully. Snapshot: " + snapshot);
         }
-        return null;
+
+        List<MirrorStatus> offlineMirrors = statuses.stream()
+                .filter(status -> !status.isOnline())
+                .collect(Collectors.toList());
+        if (!offlineMirrors.isEmpty()) {
+            String offlineSummary = offlineMirrors.stream()
+                    .map(this::formatMirrorStatus)
+                    .collect(Collectors.joining(", "));
+            LOG.warn("[TPBSearchPerformerTest] Offline mirrors detected: " + offlineSummary);
+        }
+
+        MirrorStatus fastest = onlineMirrors.stream()
+                .min(Comparator.comparingLong(MirrorStatus::getResponseTimeMs))
+                .orElseThrow();
+
+        LOG.info("[TPBSearchPerformerTest] Fastest mirror: " + fastest.domain +
+                " (HTTP " + fastest.statusCode + " in " + fastest.responseTimeMs + "ms)");
+        return fastest;
+    }
+
+    private MirrorStatus checkMirror(HttpClient httpClient, String mirror, int timeoutMs) {
+        long start = System.currentTimeMillis();
+        int statusCode = -1;
+        boolean online = false;
+        String errorMessage = null;
+        try {
+            statusCode = httpClient.head("https://" + mirror, timeoutMs, null);
+            online = statusCode >= 200 && statusCode < 400;
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+        long duration = System.currentTimeMillis() - start;
+
+        if (online) {
+            LOG.info("[TPBSearchPerformerTest] Mirror " + mirror + " responded with HTTP " + statusCode +
+                    " in " + duration + "ms");
+        } else {
+            String reason = statusCode > 0 ? ("HTTP " + statusCode) : (errorMessage != null ? errorMessage : "no response");
+            LOG.warn("[TPBSearchPerformerTest] Mirror " + mirror + " failed (" + reason + ") after " + duration + "ms");
+        }
+
+        return new MirrorStatus(mirror, online, duration, statusCode, errorMessage);
+    }
+
+    private String formatMirrorStatus(MirrorStatus status) {
+        StringBuilder builder = new StringBuilder(status.domain);
+        builder.append(" -> ");
+        if (status.isOnline()) {
+            builder.append("HTTP ").append(status.statusCode)
+                    .append(" in ").append(status.responseTimeMs).append("ms");
+        } else if (status.statusCode > 0) {
+            builder.append("HTTP ").append(status.statusCode);
+        } else if (status.errorMessage != null) {
+            builder.append(status.errorMessage);
+        } else {
+            builder.append("no response");
+        }
+        return builder.toString();
+    }
+
+    private static final class MirrorStatus {
+        private final String domain;
+        private final boolean online;
+        private final long responseTimeMs;
+        private final int statusCode;
+        private final String errorMessage;
+
+        private MirrorStatus(String domain, boolean online, long responseTimeMs, int statusCode, String errorMessage) {
+            this.domain = domain;
+            this.online = online;
+            this.responseTimeMs = responseTimeMs;
+            this.statusCode = statusCode;
+            this.errorMessage = errorMessage;
+        }
+
+        private boolean isOnline() {
+            return online;
+        }
+
+        private long getResponseTimeMs() {
+            return responseTimeMs;
+        }
     }
 }

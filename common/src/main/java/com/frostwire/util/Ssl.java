@@ -137,7 +137,6 @@ public final class Ssl {
                 "thepiratebay.party",
                 "thepiratebay.zone",
                 "thepiratebay0.org",
-                "thepiratebay10.org",
                 "thepiratebay10.xyz",
                 "thepiratebay7.com",
                 "torrent-paradise.ml",
