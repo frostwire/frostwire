@@ -286,32 +286,36 @@ public final class UIUtils {
     }
 
     /**
-     * Takes a screenshot of the given view
+     * Takes a screenshot of the given view using modern Canvas-based rendering.
+     * Replaces deprecated setDrawingCacheEnabled() API (removed in Android 12+).
      *
+     * @param view The view to capture
      * @return File with jpeg of the screenshot taken. null if there was a problem.
      */
     public static File takeScreenshot(View view) {
-        view.setDrawingCacheEnabled(true);
-        try {
-            Thread.sleep(300);
-        } catch (Throwable ignore) {
+        if (view == null || view.getWidth() <= 0 || view.getHeight() <= 0) {
+            return null;
         }
-        Bitmap drawingCache = null;
-        try {
-            drawingCache = view.getDrawingCache();
-        } catch (Throwable ignored) {
-        }
+
         Bitmap screenshotBitmap = null;
-        if (drawingCache != null) {
-            try {
-                screenshotBitmap = Bitmap.createBitmap(drawingCache);
-            } catch (Throwable ignored) {
-            }
+        try {
+            // Modern approach: Use Canvas to draw the view
+            screenshotBitmap = Bitmap.createBitmap(
+                    view.getWidth(),
+                    view.getHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+            android.graphics.Canvas canvas = new android.graphics.Canvas(screenshotBitmap);
+            view.draw(canvas);
+        } catch (Throwable t) {
+            LOG.error("Failed to create screenshot bitmap", t);
+            return null;
         }
-        view.setDrawingCacheEnabled(false);
+
         if (screenshotBitmap == null) {
             return null;
         }
+
         File screenshotFile = new File(Environment.getExternalStorageDirectory().toString(), "fwPlayerScreenshot.tmp.jpg");
         if (screenshotFile.exists()) {
             screenshotFile.delete();
@@ -320,15 +324,23 @@ public final class UIUtils {
             } catch (IOException ignore) {
             }
         }
+
         try {
             FileOutputStream fos = new FileOutputStream(screenshotFile);
             screenshotBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
         } catch (Throwable t) {
+            LOG.error("Failed to save screenshot to file", t);
             screenshotFile.delete();
             screenshotFile = null;
+        } finally {
+            // Recycle bitmap to free memory immediately
+            if (screenshotBitmap != null && !screenshotBitmap.isRecycled()) {
+                screenshotBitmap.recycle();
+            }
         }
+
         return screenshotFile;
     }
 
