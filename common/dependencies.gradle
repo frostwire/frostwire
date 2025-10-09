@@ -1,0 +1,17 @@
+sourceSets {
+  main {
+    java {
+      srcDir 'src/main/java'
+    }
+
+    test {
+      java {
+        srcDir 'src/test/java'
+      }
+    }
+  }
+}
+
+dependencies {
+  implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+}
