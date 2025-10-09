@@ -404,6 +404,12 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         private TransferDetailsClickListener transferDetailsClickListener;
         private final TransferStateStrings transferStateStrings;
 
+        // Performance: Cache formatted strings to avoid repeated allocations
+        private String cachedSpeedString = "";
+        private long lastSpeedValue = -1;
+        private String cachedSizeString = "";
+        private long lastSizeValue = -1;
+
         private TextView title;
         private ProgressBar progress;
         private TextView status;
@@ -458,6 +464,31 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             }
         }
 
+        /**
+         * Performance optimization: Get cached speed string or format new one if speed changed.
+         * Avoids repeated String.format() and UIUtils.getBytesInHuman() calls when speed unchanged.
+         */
+        private String getSpeedString(long speedBytes) {
+            if (speedBytes != lastSpeedValue) {
+                lastSpeedValue = speedBytes;
+                cachedSpeedString = UIUtils.getBytesInHuman(speedBytes) + "/s";
+            }
+            return cachedSpeedString;
+        }
+
+        /**
+         * Performance optimization: Get cached size string or format new one if size changed.
+         * Avoids repeated UIUtils.getBytesInHuman() calls when size unchanged.
+         */
+        private String getSizeString(double sizeBytes) {
+            long sizeLong = (long) sizeBytes;
+            if (sizeLong != lastSizeValue) {
+                lastSizeValue = sizeLong;
+                cachedSizeString = UIUtils.getBytesInHuman(sizeLong);
+            }
+            return cachedSizeString;
+        }
+
         private void ensureComponentsReferenced(View view) {
             if (title == null) {
                 title = view.findViewById(R.id.view_transfer_list_item_title);
@@ -500,8 +531,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             setProgress(progress, download.getProgress());
             String downloadStatus = transferStateStrings.get(download.getState());
             status.setText(downloadStatus);
-            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
-            size.setText(UIUtils.getBytesInHuman(download.getSize()));
+            // Performance: Use cached string formatting
+            speed.setText(getSpeedString(download.getDownloadSpeed()));
+            size.setText(getSizeString(download.getSize()));
             buttonDetails.setVisibility(View.GONE);
             File previewFile = download.previewFile();
             if (previewFile != null && WebSearchPerformer.isStreamable(previewFile.getName())) {
@@ -538,21 +570,18 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             buttonPlay.setOnClickListener(null);
 
             final String downloadStatus = transferStateStrings.get(download.getState());
-            status.setText(downloadStatus);
+            // Performance: Cache network status check result in NetworkManager to avoid repeated system calls
             if (!NetworkManager.instance().isInternetDataConnectionUp()) {
-                status.setText(
-                        String.format(
-                                Locale.US,
-                                "%s (%s)",
-                                downloadStatus,
-                                view.getResources().getText(R.string.check_internet_connection)
-                        )
-                );
+                // Only format this compound string when network is down (rare case)
+                status.setText(downloadStatus + " (" + view.getResources().getText(R.string.check_internet_connection) + ")");
                 seeds.setText("");
                 peers.setText("");
+            } else {
+                status.setText(downloadStatus);
             }
-            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
-            size.setText(UIUtils.getBytesInHuman(download.getSize()));
+            // Performance: Use cached string formatting
+            speed.setText(getSpeedString(download.getDownloadSpeed()));
+            size.setText(getSizeString(download.getSize()));
             if (download instanceof UIBittorrentDownload) {
                 UIBittorrentDownload uidl = (UIBittorrentDownload) download;
                 if (uidl.hasPaymentOptions()) {
@@ -570,8 +599,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             title.setCompoundDrawables(null, null, null, null);
             setProgress(progress, download.getProgress());
             status.setText(transferStateStrings.get(download.getState()));
-            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
-            size.setText(UIUtils.getBytesInHuman(download.getSize()));
+            // Performance: Use cached string formatting
+            speed.setText(getSpeedString(download.getDownloadSpeed()));
+            size.setText(getSizeString(download.getSize()));
             buttonDetails.setVisibility(View.GONE);
             File previewFile = download.previewFile();
             if (previewFile != null) {
@@ -596,7 +626,8 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         }
 
         private void setPaymentOptionDrawable(UIBittorrentDownload download, TextView title) {
-            if (Ref.alive(resourcesRef)) {
+            // BUGFIX: Logic was inverted - should return when NOT alive, not when alive
+            if (!Ref.alive(resourcesRef)) {
                 return;
             }
             final PaymentOptions paymentOptions = download.getPaymentOptions();
@@ -700,26 +731,31 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         return null;
     }
 
+    /**
+     * Format peers count efficiently without excessive string allocations.
+     * Optimized to avoid String.replaceAll() which creates multiple intermediate strings.
+     */
     private static String formatPeers(BittorrentDownload dl) {
         int connectedPeers = dl.getConnectedPeers();
         int peers = dl.getTotalPeers();
-        String tmp = connectedPeers > peers ? "%1" : "%1 " + "/" + " %2";
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedPeers));
-        tmp = tmp.replaceAll("%2", String.valueOf(peers));
-        return tmp;
+        if (connectedPeers > peers) {
+            return String.valueOf(connectedPeers);
+        }
+        return connectedPeers + " / " + peers;
     }
 
+    /**
+     * Format seeds count efficiently without excessive string allocations.
+     * Optimized to avoid String.replaceAll() which creates multiple intermediate strings.
+     */
     private static String formatSeeds(BittorrentDownload dl) {
         int connectedSeeds = dl.getConnectedSeeds();
         int seeds = dl.getTotalSeeds();
-        String tmp = connectedSeeds > seeds ? "%1" : "%1 " + "/" + " %2";
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedSeeds));
-        String param2 = "?";
-        if (seeds != -1) {
-            param2 = String.valueOf(seeds);
+        if (connectedSeeds > seeds) {
+            return String.valueOf(connectedSeeds);
         }
-        tmp = tmp.replaceAll("%2", param2);
-        return tmp;
+        String seedsStr = (seeds == -1) ? "?" : String.valueOf(seeds);
+        return connectedSeeds + " / " + seedsStr;
     }
 }
 
