@@ -33,7 +33,8 @@ FrostWire 3.0.4 build 758 OCT/08/2025
  - speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
  - speed-up:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
  - speed-up:Optimize hot paths for string sanitizers - eliminate regex compilation overhead in search and scrapes (UrlUtils and StringUtils)
- - speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing 
+ - speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing
+ - speed-up:Optimize MainApplication startup by deferring heavy initialization
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
  - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
