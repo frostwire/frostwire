@@ -36,4 +36,10 @@ jobs:
           architecture: x64 # (x64 or x86) - defaults to x64    - name: Grant execute permission for gradlew
           run: chmod +x gradlew
       - name: Run tests
-        run: cd desktop && ./gradlew test
+        run: |
+            cd desktop
+            if [ "${{ github.event.inputs.test_suite }}" = "all" ] || [ -z "${{ github.event.inputs.test_suite }}" ]; then
+              ./gradlew test
+            else
+              ./gradlew test --tests "com.frostwire.${{ github.event.inputs.test_suite }}.*"
+            fi
