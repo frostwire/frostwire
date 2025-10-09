@@ -65,6 +65,14 @@ public final class UrlUtils {
     private UrlUtils() {
     }
 
+    /**
+     * Hot-path method: URL-encodes a string and converts spaces to %20.
+     * Optimized to use String.replace instead of replaceAll for literal plus-sign replacement,
+     * avoiding regex compilation overhead.
+     * 
+     * @param s the string to encode, may be null
+     * @return the URL-encoded string with spaces as %20, or empty string if input is null
+     */
     public static String encode(String s) {
         if (s == null) {
             return "";
@@ -72,7 +80,8 @@ public final class UrlUtils {
 
         try {
             // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
-            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replaceAll("\\+", "%20");
+            // Using replace() instead of replaceAll() - it's a literal replacement, no regex needed
+            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
             LOG.error("UrlUtils.encode() -> " + e.getMessage(), e);
             return "";
