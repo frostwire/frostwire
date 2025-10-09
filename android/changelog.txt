@@ -26,6 +26,7 @@ FrostWire 3.0.4 build 758 OCT/08/2025
  - maintenance:glotorrents search fixed
  - maintenance:idope search fixed
  - maintenance:magnetdl search fixed
+ - maintenance:add BitmapFactory.inSampleSize to prevent OOM crashes
  - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
  - speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
