@@ -1,4 +1,4 @@
-FrostWire 3.0.3 build 757 OCT/04/2025
+FrostWire 3.0.4 build 758 OCT/08/2025
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
@@ -32,6 +32,7 @@ FrostWire 3.0.3 build 757 OCT/04/2025
  - speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
+ - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
