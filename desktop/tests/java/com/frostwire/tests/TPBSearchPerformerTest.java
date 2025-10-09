@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,12 +73,16 @@ public class TPBSearchPerformerTest {
         });
 
         tpbSearchPerformer.perform();
+        boolean completed = false;
         try {
             LOG.info("[TPBSearchPerformerTest] Waiting for results...");
-            latch.await();
+            completed = latch.await(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOG.error("[TPBSearchPerformerTest] Error waiting for results: " + e.getMessage());
+            fail("[TPBSearchPerformerTest] Interrupted while waiting for results");
         }
+        assertTrue(completed, "[TPBSearchPerformerTest] Timed out waiting for results from TPB performer");
         LOG.info("[TPBSearchPerformerTest] Results found: " + tpbResults.size() + " using domain: " + tpbSearchPerformer.getDomainName());
         assertFalse(tpbResults.isEmpty(), "[TPBSearchPerformerTest] No results found using domain: " + tpbSearchPerformer.getDomainName());
     }
