@@ -379,38 +379,58 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                 snapshot = new ArrayList<>(fullList);
             }
 
-            // Pre-size HashMaps to avoid rehashing (account for load factor 0.75)
+            // Pre-size maps to avoid rehashing (account for load factor 0.75)
             // This eliminates 3-5 array copies during growth
             final int capacity = (int) (snapshot.size() / 0.75f) + 1;
-            Map<SearchResult, String> normalized   = new HashMap<>(capacity);
-            Map<SearchResult, Integer> levenshtein = new HashMap<>(capacity);
 
             List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
             tokens.removeIf(PerformersHelper.stopwords::contains);
 
-            // Build maps with pre-sized capacity
+            // PRE-COMPUTE sorting keys once: O(n × k × m)
+            // This is the key optimization - previously we recomputed these in every comparison!
+            Map<SearchResult, SortKey> sortKeys = new HashMap<>(capacity);
+
             for (SearchResult r : snapshot) {
-                String n  = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
-                normalized.put(r, n);
-                levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
+                String normalized = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
+                int matchedTokens = PerformersHelper.countMatchedTokens(normalized, tokens);
+                int levenshteinDist = PerformersHelper.levenshteinDistance(normalized, currentQuery);
+                sortKeys.put(r, new SortKey(matchedTokens, levenshteinDist));
             }
 
-            List<SearchResult> sorted = snapshot;
-
-            sorted.sort((a, b) -> {
-                int m1 = PerformersHelper.countMatchedTokens(normalized.get(a), tokens);
-                int m2 = PerformersHelper.countMatchedTokens(normalized.get(b), tokens);
-                if (m1 != m2) return Integer.compare(m2, m1);   // best ► first
-                return Integer.compare(levenshtein.get(a), levenshtein.get(b));
+            // Sort using pre-computed keys: O(n log n) with O(1) key lookups
+            // Previously this was O(n² log n) due to recomputing countMatchedTokens in comparator
+            snapshot.sort((a, b) -> {
+                SortKey ka = sortKeys.get(a);
+                SortKey kb = sortKeys.get(b);
+                // Sort by matched tokens (descending), then by Levenshtein distance (ascending)
+                if (ka.matchedTokens != kb.matchedTokens) {
+                    return Integer.compare(kb.matchedTokens, ka.matchedTokens); // best → first
+                }
+                return Integer.compare(ka.levenshteinDistance, kb.levenshteinDistance);
             });
 
             SystemUtils.postToUIThread(() -> {
                 synchronized (listLock) {
                     fullList.clear();          // replace the list atomically
-                    fullList.addAll(sorted);
+                    fullList.addAll(snapshot);
                 }
             });
         });
+    }
+
+    /**
+     * Pre-computed sorting key for O(n log n) sort instead of O(n² log n).
+     * Stores the expensive-to-compute values that were previously recalculated
+     * on every comparison during the sort.
+     */
+    private static final class SortKey {
+        final int matchedTokens;
+        final int levenshteinDistance;
+
+        SortKey(int matchedTokens, int levenshteinDistance) {
+            this.matchedTokens = matchedTokens;
+            this.levenshteinDistance = levenshteinDistance;
+        }
     }
 
     private static class OnLinkClickListener implements OnClickListener {
