@@ -30,9 +30,33 @@ import android.graphics.Paint;
  */
 public final class BitmapUtils {
     /**
+     * Thread-local array pools for stackBlur to reduce allocations.
+     * These are reused across multiple blur operations on the same thread.
+     */
+    private static final ThreadLocal<int[]> pixelBufferPool = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> rBufferPool = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> gBufferPool = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> bBufferPool = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> vminBufferPool = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> dvBufferPool = new ThreadLocal<>();
+
+    /**
      * This class is never instantiated
      */
     private BitmapUtils() {
+    }
+
+    /**
+     * Get a reusable int array from the thread-local pool, or allocate if needed.
+     * Reduces GC pressure by reusing arrays across multiple blur operations.
+     */
+    private static int[] getOrAllocateBuffer(ThreadLocal<int[]> pool, int requiredSize) {
+        int[] buffer = pool.get();
+        if (buffer == null || buffer.length < requiredSize) {
+            buffer = new int[requiredSize];
+            pool.set(buffer);
+        }
+        return buffer;
     }
 
     /**
@@ -99,24 +123,26 @@ public final class BitmapUtils {
         final int w = mBitmap.getWidth();
         final int h = mBitmap.getHeight();
 
-        final int[] pix = new int[w * h];
-        mBitmap.getPixels(pix, 0, w, 0, 0, w, h);
-
         final int wm = w - 1;
         final int hm = h - 1;
         final int wh = w * h;
         final int div = blurRadius + blurRadius + 1;
 
-        final int[] r = new int[wh];
-        final int[] g = new int[wh];
-        final int[] b = new int[wh];
-        final int[] vmin = new int[Math.max(w, h)];
+        // Use pooled arrays to reduce allocations
+        final int[] pix = getOrAllocateBuffer(pixelBufferPool, wh);
+        final int[] r = getOrAllocateBuffer(rBufferPool, wh);
+        final int[] g = getOrAllocateBuffer(gBufferPool, wh);
+        final int[] b = getOrAllocateBuffer(bBufferPool, wh);
+        final int[] vmin = getOrAllocateBuffer(vminBufferPool, Math.max(w, h));
+
+        mBitmap.getPixels(pix, 0, w, 0, 0, w, h);
         int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
 
         int divsum = div + 1 >> 1;
         divsum *= divsum;
-        final int[] dv = new int[256 * divsum];
-        for (i = 0; i < 256 * divsum; i++) {
+        final int dvSize = 256 * divsum;
+        final int[] dv = getOrAllocateBuffer(dvBufferPool, dvSize);
+        for (i = 0; i < dvSize; i++) {
             dv[i] = i / divsum;
         }
 
