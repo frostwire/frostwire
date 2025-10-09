@@ -136,18 +136,18 @@ public final class UrlUtils {
     public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs, int maxNumberOfMirrorsToTest) {
         String fastestMirror;
         ArrayList<String> mirrorList = new ArrayList<>(Arrays.asList(mirrors));
-        ArrayList<MirrorHeadDuration> mirrorDurations = new ArrayList<>();
         Collections.shuffle(mirrorList);
         if (maxNumberOfMirrorsToTest > 0 && mirrorList.size() > maxNumberOfMirrorsToTest) {
             mirrorList = new ArrayList<>(mirrorList.subList(0, maxNumberOfMirrorsToTest));
         }
         final CountDownLatch latch = new CountDownLatch(mirrorList.size());
         ExecutorService executor = Executors.newFixedThreadPool(4);
+        final java.util.List<MirrorHeadDuration> synchronizedMirrorDurations = Collections.synchronizedList(new ArrayList<>());
         for (String randomMirror : mirrorList) {
             executor.submit(() -> {
                 try {
                     long duration = testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs);
-                    mirrorDurations.add(
+                    synchronizedMirrorDurations.add(
                             new MirrorHeadDuration(
                                     randomMirror,
                                     duration
@@ -162,12 +162,18 @@ public final class UrlUtils {
         try {
             latch.await();
         } catch (InterruptedException e) {
+            executor.shutdown();
             return mirrors[0];
+        } finally {
+            executor.shutdown();
         }
         //filter out all null elements from mirrorDurations
-        mirrorDurations.removeIf(Objects::isNull);
-        if (mirrorDurations.size() > 1) {
-            mirrorDurations.sort((o1, o2) -> {
+        synchronizedMirrorDurations.removeIf(Objects::isNull);
+        if (synchronizedMirrorDurations.isEmpty()) {
+            return mirrors[0];
+        }
+        if (synchronizedMirrorDurations.size() > 1) {
+            synchronizedMirrorDurations.sort((o1, o2) -> {
                 if (o1.duration() < o2.duration()) {
                     return -1;
                 } else if (o1.duration() > o2.duration()) {
@@ -177,8 +183,8 @@ public final class UrlUtils {
             });
         }
 
-        fastestMirror = mirrorDurations.get(0).mirror();
-        LOG.info("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + mirrorDurations.get(0).duration() + "ms");
+        fastestMirror = synchronizedMirrorDurations.get(0).mirror();
+        LOG.info("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + synchronizedMirrorDurations.get(0).duration() + "ms");
         return fastestMirror;
     }
 
