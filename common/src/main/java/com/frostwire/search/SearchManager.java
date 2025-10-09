@@ -123,7 +123,6 @@ public final class SearchManager {
                     list.add(sr);
                 }
                 crawl(performer, csr);
-                Thread.yield();
             } else {
                 list.add(sr);
             }
@@ -231,7 +230,7 @@ public final class SearchManager {
         static final SearchManager INSTANCE = new SearchManager(3, 6);
     }
 
-    private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
+    private static abstract class SearchTask implements Runnable, Comparable<SearchTask> {
         protected final SearchManager manager;
         final SearchPerformer performer;
         private final int ordinal;
@@ -240,7 +239,6 @@ public final class SearchManager {
             this.manager = manager;
             this.performer = performer;
             this.ordinal = ordinal;
-            this.setName(performer.getClass().getName() + "-SearchTask");
         }
 
         public long token() {
@@ -268,6 +266,7 @@ public final class SearchManager {
 
         @Override
         public void run() {
+            Thread.currentThread().setName(performer.getClass().getName() + "-SearchTask");
             try {
                 if (!stopped()) {
                     performer.perform();
@@ -292,6 +291,7 @@ public final class SearchManager {
 
         @Override
         public void run() {
+            Thread.currentThread().setName(performer.getClass().getName() + "-CrawlTask");
             try {
                 if (!stopped()) {
                     performer.crawl(sr);
