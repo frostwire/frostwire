@@ -76,8 +76,6 @@ public class MainApplication extends MultiDexApplication implements Configuratio
 
         // Enable StrictMode in debug builds
         RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
-        //RunStrict.disableStrictModePolicyForUnbufferedIO();
-
         // Clear ZipPathValidator on Android 14+ (API 34+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ZipPathValidator.clearCallback();
