@@ -21,6 +21,7 @@ package org.limewire.util;
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Provides static methods to split, check for substrings, change case and
@@ -31,6 +32,12 @@ public class StringUtils {
      * Collator used for internationalization.
      */
     private volatile static Collator COLLATOR;
+
+    /**
+     * Pre-compiled pattern for matching multiple consecutive whitespace characters.
+     * Used by hot-path methods to avoid repeated regex compilation.
+     */
+    private static final Pattern MULTI_SPACE = Pattern.compile("\\s+");
 
     static {
         COLLATOR = Collator.getInstance(Locale.getDefault());
@@ -320,7 +327,14 @@ public class StringUtils {
         return isNullOrEmpty(s, false);
     }
 
+    /**
+     * Hot-path method: Removes consecutive whitespace characters, replacing them with a single space.
+     * Optimized to reuse pre-compiled pattern MULTI_SPACE.
+     * 
+     * @param s the string to process, may be null
+     * @return the string with consecutive whitespace collapsed to single spaces, or null if input is null
+     */
     public static String removeDoubleSpaces(String s) {
-        return s != null ? s.replaceAll("\\s+", " ") : null;
+        return s != null ? MULTI_SPACE.matcher(s).replaceAll(" ") : null;
     }
 }

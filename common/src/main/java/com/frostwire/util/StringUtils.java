@@ -415,12 +415,51 @@ public class StringUtils {
         return isNullOrEmpty(s, false);
     }
 
+    /**
+     * Hot-path method: Removes consecutive whitespace characters, replacing them with a single space.
+     * Optimized to reuse pre-compiled pattern from HtmlPatterns.MULTI_SPACE.
+     * 
+     * @param s the string to process, may be null
+     * @return the string with consecutive whitespace collapsed to single spaces, or null if input is null
+     */
     public static String removeDoubleSpaces(String s) {
-        return s != null ? s.replaceAll("\\s+", " ") : null;
+        return s != null ? HtmlPatterns.MULTI_SPACE.matcher(s).replaceAll(" ") : null;
     }
 
+    /**
+     * Hot-path method: Removes characters outside allowed Unicode categories (letters, numbers, punctuation, separators).
+     * Optimized to use StringBuilder loop instead of regex for better performance.
+     * Allowed categories: \p{L} (letters), \p{N} (numbers), \p{P} (punctuation), \p{Z} (separators).
+     * 
+     * @param s the string to filter, must not be null
+     * @return the filtered string containing only allowed characters
+     */
     public static String removeUnicodeCharacters(String s) {
-        return s.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]","");
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+        
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            int type = Character.getType(c);
+            
+            // Check if character belongs to allowed Unicode categories:
+            // \p{L} = Letters (types 1-5)
+            // \p{N} = Numbers (types 9-11)  
+            // \p{P} = Punctuation (types 20-24)
+            // \p{Z} = Separators (types 12-14)
+            boolean isLetter = (type >= Character.UPPERCASE_LETTER && type <= Character.OTHER_LETTER);
+            boolean isNumber = (type >= Character.DECIMAL_DIGIT_NUMBER && type <= Character.OTHER_NUMBER);
+            boolean isPunctuation = (type >= Character.DASH_PUNCTUATION && type <= Character.OTHER_PUNCTUATION);
+            boolean isSeparator = (type >= Character.SPACE_SEPARATOR && type <= Character.PARAGRAPH_SEPARATOR);
+            
+            if (isLetter || isNumber || isPunctuation || isSeparator) {
+                sb.append(c);
+            }
+        }
+        
+        return sb.toString();
     }
 
     public static String getLocaleString(Map<String, String> strMap, String defaultStr) {
