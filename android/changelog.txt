@@ -41,6 +41,7 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing
  - speed-up:Optimize MainApplication startup by deferring heavy initialization
  - speed-up:Optimize RecyclerView onBindViewHolder() hot paths
+ - refactor: SearchManager tasks to Runnable and remove Thread.yield() from hot path
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
  - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
