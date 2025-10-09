@@ -12,6 +12,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'me.champeau.jmh' version '0.7.2'
 }
 
 group = 'com.frostwire'
@@ -162,6 +163,8 @@ sourceSets {
 
             // TODO: move 'main' sources to src/main/java
             srcDir 'src'
+            // Exclude JMH benchmarks from main compilation
+            exclude 'jmh/**'
         }
 
         resources {
@@ -185,6 +188,13 @@ sourceSets {
 
             // TODO: move 'test' sources to src/test/java
             srcDir 'tests/java'
+        }
+    }
+
+    // JMH benchmarks source set (managed by JMH plugin)
+    jmh {
+        java {
+            srcDir 'src/jmh/java'
         }
     }
 }
@@ -325,4 +335,15 @@ test {
         showStackTraces = false
         exceptionFormat = "full"
     }
+}
+
+// JMH microbenchmark configuration
+jmh {
+    warmupIterations = 3
+    iterations = 5
+    fork = 2
+    jvmArgs = ['-Xmx2g']
+    resultFormat = 'JSON'
+    resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
+    // includes parameter can be overridden via: -Pjmh.includes=LoggerBench
 }

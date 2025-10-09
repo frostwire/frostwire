@@ -41,6 +41,9 @@ public class ThreadPool extends ThreadPoolExecutor {
     private final String name;
     private static Logger LOG = Logger.getLogger(ThreadPool.class);
 
+    // ThreadLocal StringBuilder pool to avoid per-task string allocations
+    private final ThreadLocal<StringBuilder> nameBuilder = ThreadLocal.withInitial(() -> new StringBuilder(64));
+
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
         super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
         this.name = name;
@@ -71,12 +74,18 @@ public class ThreadPool extends ThreadPoolExecutor {
 
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
-        String threadName = null;
+        // Reuse ThreadLocal StringBuilder to avoid 3-4 string allocations per task
+        StringBuilder sb = nameBuilder.get();
+        sb.setLength(0); // reset for reuse
+        sb.append(name).append("-thread-").append(threadNumber.getAndIncrement()).append("-");
+
         if (r instanceof Thread) {
-            Thread thread = (Thread) r;
-            threadName = thread.getName();
+            sb.append(((Thread) r).getName());
+        } else {
+            sb.append('@').append(r.hashCode());
         }
-        t.setName(name + "-thread-" + threadNumber.getAndIncrement() + "-" + (threadName != null ? threadName : "@" + r.hashCode()));
+
+        t.setName(sb.toString());
 
         if (DEBUG_MODE_ON && name.startsWith("SearchManager")) {
             LOG.info("ThreadPool(" + name + "): beforeExecute: " + t.getName());

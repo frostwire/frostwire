@@ -40,7 +40,8 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     private static MagnetDownloader magnetDownloader = null;
 
     static {
-        UNIT_TO_BYTES = new HashMap<>();
+        // Pre-size: 5 entries at 0.75 load factor = 8 capacity
+        UNIT_TO_BYTES = new HashMap<>(8);
         UNIT_TO_BYTES.put("bytes", 1);
         UNIT_TO_BYTES.put("B", 1);
         UNIT_TO_BYTES.put("KB", 1024);

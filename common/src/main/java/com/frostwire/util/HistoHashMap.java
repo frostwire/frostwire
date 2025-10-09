@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public final class HistoHashMap<K> {
-    private final HashMap<K, Integer> map = new HashMap<>();
+    // Pre-size for typical usage: ~50 keys at 0.75 load factor = 64 capacity
+    private final HashMap<K, Integer> map = new HashMap<>(64);
     // creates the comparator as a field to avoid GC pressure every
     // time histogram is called, but still not static (no need)
     private final Comparator<Entry<K, Integer>> cmp = (o1, o2) -> o2.getValue().compareTo(o1.getValue());
