@@ -32,6 +32,10 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
      * This simple implementation creates a Bitmap copy of the list item
      * currently shown at ListView <code>position</code>.
      */
+    /**
+     * Creates a floating view for drag-and-drop using modern Canvas-based rendering.
+     * Replaces deprecated setDrawingCacheEnabled() API (removed in Android 12+).
+     */
     @Override
     public View onCreateFloatView(int position) {
         View v = mListView.getChildAt(position + mListView.getHeaderViewsCount()
@@ -43,23 +47,29 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
 
         v.setPressed(false);
 
-        v.setDrawingCacheEnabled(true);
-        final Bitmap drawingCache = v.getDrawingCache();
+        // Modern approach: Use Canvas to capture the view
+        try {
+            if (v.getWidth() > 0 && v.getHeight() > 0) {
+                mFloatBitmap = Bitmap.createBitmap(
+                        v.getWidth(),
+                        v.getHeight(),
+                        Bitmap.Config.ARGB_8888
+                );
+                android.graphics.Canvas canvas = new android.graphics.Canvas(mFloatBitmap);
+                v.draw(canvas);
 
-        if (drawingCache != null) {
-            mFloatBitmap = Bitmap.createBitmap(drawingCache);
-            v.setDrawingCacheEnabled(false);
+                ImageView iv = new ImageView(mListView.getContext());
+                iv.setBackgroundColor(mFloatBGColor);
+                iv.setPadding(0, 0, 0, 0);
+                iv.setImageBitmap(mFloatBitmap);
 
-            ImageView iv = new ImageView(mListView.getContext());
-            iv.setBackgroundColor(mFloatBGColor);
-            iv.setPadding(0, 0, 0, 0);
-            iv.setImageBitmap(mFloatBitmap);
-
-            return iv;
-        } else {
-            v.setDrawingCacheEnabled(false);
-            return null;
+                return iv;
+            }
+        } catch (Throwable t) {
+            // Fallback to null if bitmap creation fails
         }
+
+        return null;
     }
 
     /**
