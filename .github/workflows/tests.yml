@@ -1,46 +1,41 @@
-# This workflow will build execute ./gradlew test
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
 name: desktop tests
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
-    inputs:
-      test_suite:
-        description: 'Test suite to run'
-        required: false
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - util
-          - search
-          - mp4
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - util
+          - search
+          - mp4
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 24 
-        uses: actions/setup-java@v1
-        with:
-          java-version: 24 # The JDK version to make available on the path.
-          java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
-          architecture: x64 # (x64 or x86) - defaults to x64    - name: Grant execute permission for gradlew
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run tests
-        run: |
-            cd desktop
-            if [ "${{ github.event.inputs.test_suite }}" = "all" ] || [ -z "${{ github.event.inputs.test_suite }}" ]; then
-              ./gradlew test
-            else
-              ./gradlew test --tests "com.frostwire.${{ github.event.inputs.test_suite }}.*"
-            fi
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 25 
+        uses: actions/setup-java@v1
+        with:
+          java-version: 25
+          java-package: jdk
+          architecture: x64
+      - name: Grant execute permission for gradlew # <--- CORRECTED: Now a separate, properly indented step
+        run: chmod +x gradlew
+      - name: Run tests
+        run: |
+            cd desktop
+            if [ "${{ github.event.inputs.test_suite }}" = "all" ] || [ -z "${{ github.event.inputs.test_suite }}" ]; then
+              ./gradlew test
+            else
+              ./gradlew test --tests "com.frostwire.${{ github.event.inputs.test_suite }}.*"
+            fi
