@@ -324,8 +324,13 @@ test {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
 
     filter {
-        //include specific method in any of the tests
-        includeTestsMatching "com.frostwire.tests.*"
+        //include specific method in any of the tests        
+        includeTestsMatching "com.frostwire.util.*"
+        includeTestsMatching "com.frostwire.mp4.*"
+        includeTestsMatching "com.frostwire.platform.*"
+        includeTestsMatching "com.frostwire.search.*"
+        includeTestsMatching "com.frostwire.util.*"
+        includeTestsMatching "com.frostwire.tests.*"        
     }
 
     testLogging {
