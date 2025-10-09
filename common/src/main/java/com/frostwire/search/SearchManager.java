@@ -25,6 +25,7 @@ import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,8 +55,9 @@ public final class SearchManager {
         LOG.info("SearchManager: instantResultsThreads: " + instantResultsThreads + " crawlExecutorThreads: " + crawlResultsThreads);
         this.singlePageRequestExecutor = new ThreadPool("SearchManager-executor", instantResultsThreads, instantResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
         this.crawlingExecutor = new ThreadPool("SearchManager-crawlExecutor", crawlResultsThreads, crawlResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
-        this.tasks = Collections.synchronizedList(new LinkedList<>());
-        this.tables = Collections.synchronizedList(new LinkedList<>());
+        // Pre-size: typical workload has ~100 concurrent tasks and ~10 tables
+        this.tasks = Collections.synchronizedList(new ArrayList<>(128));
+        this.tables = Collections.synchronizedList(new ArrayList<>(16));
     }
 
     public static SearchManager getInstance() {

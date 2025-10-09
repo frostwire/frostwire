@@ -80,11 +80,16 @@ public final class Logger {
     }
 
     public void info(String msg, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
-        } else {
-            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (!jul.isLoggable(INFO)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(INFO, name, "", msg);
     }
 
     public void info(String msg) {
@@ -92,7 +97,16 @@ public final class Logger {
     }
 
     public void info(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (!jul.isLoggable(INFO)) {
+            return;
+        }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(Level.INFO, name, "", msg, e);
     }
 
     public void info(String msg, Throwable e) {
@@ -100,11 +114,16 @@ public final class Logger {
     }
 
     public void warn(String msg, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(WARNING, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
-        } else {
-            jul.logp(WARNING, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (!jul.isLoggable(WARNING)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(WARNING, name, "", msg);
     }
 
     public void warn(String msg) {
@@ -112,11 +131,16 @@ public final class Logger {
     }
 
     public void warn(String msg, Throwable e, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
-        } else {
-            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (!jul.isLoggable(WARNING)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(WARNING, name, "", msg, e);
     }
 
     public void warn(String msg, Throwable e) {
@@ -124,11 +148,16 @@ public final class Logger {
     }
 
     public void error(String msg, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(Level.SEVERE, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
-        } else {
-            jul.logp(Level.SEVERE, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (!jul.isLoggable(Level.SEVERE)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(Level.SEVERE, name, "", msg);
     }
 
     public void error(String msg) {
@@ -136,11 +165,16 @@ public final class Logger {
     }
 
     public void error(String msg, Throwable e, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
-        } else {
-            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (!jul.isLoggable(Level.SEVERE)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(Level.SEVERE, name, "", msg, e);
     }
 
     public void error(String msg, Throwable e) {
@@ -148,11 +182,16 @@ public final class Logger {
     }
 
     public void debug(String msg, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
-        } else {
-            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (!jul.isLoggable(INFO)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(INFO, name, "", msg);
     }
 
     public void debug(String msg) {
@@ -160,11 +199,16 @@ public final class Logger {
     }
 
     public void debug(String msg, Throwable e, boolean showCallingMethodInfo) {
-        if (contextPrefix == null) {
-            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
-        } else {
-            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (!jul.isLoggable(INFO)) {
+            return;
         }
+        if (showCallingMethodInfo) {
+            msg = appendCallingMethodInfo(msg);
+        }
+        if (contextPrefix != null) {
+            msg = contextPrefix + msg;
+        }
+        jul.logp(Level.INFO, name, "", msg, e);
     }
 
     public void debug(String msg, Throwable e) {
