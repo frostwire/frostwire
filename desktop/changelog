@@ -37,6 +37,7 @@ frostwire (7.0.0) stable; urgency=high
  * Speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
  * Speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
  * Speed-up:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
+ * Speed-up:Optimize hot-path string sanitizers - eliminate regex compilation overhead in search and scrapes (UrlUtils and StringUtils)
  * Fixed:thread leak and data race in UrlUtils.getFastestMirrorDomain
  * jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  * jlibtorrent:g++-9 upgraded to g++-11 for linux build
