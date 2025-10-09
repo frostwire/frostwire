@@ -28,6 +28,7 @@ FrostWire 3.0.4 build 758 OCT/09/2025
  - maintenance:magnetdl search fixed
  - maintenance:add BitmapFactory.inSampleSize to prevent OOM crashes
  - maintenance:Add Bitmap.recycle() to prevent native memory leaks
+ - maintenance:Replace deprecated setDrawingCacheEnabled() with Canvas API
  - speed-up:Optimize search sorting from O(n² log n) to O(n log n)
  - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
  - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
