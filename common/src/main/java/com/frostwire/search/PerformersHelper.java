@@ -310,20 +310,82 @@ public final class PerformersHelper {
         return distance <= threshold;
     }
 
+    /**
+     * ThreadLocal cache for working arrays to avoid repeated allocations.
+     * Each thread gets its own pair of arrays that grow as needed.
+     */
+    private static final ThreadLocal<int[][]> LEVENSHTEIN_ARRAYS = ThreadLocal.withInitial(() -> new int[2][64]);
+
+    /**
+     * Optimized Levenshtein distance using two rolling arrays instead of a full matrix.
+     * This reduces space complexity from O(n*m) to O(min(n,m)).
+     * 
+     * Memory optimization: Uses ThreadLocal cached arrays to avoid repeated allocations
+     * for similar-length strings across multiple calls.
+     * 
+     * Performance: Reduces allocation from ~60-160KB per call (for typical 80-200 char strings)
+     * to O(min(n,m)) integers that are reused across calls via ThreadLocal caching.
+     * 
+     * @param a first string
+     * @param b second string
+     * @return the Levenshtein distance between the two strings
+     */
     public static int levenshteinDistance(String a, String b) {
-        int[][] dp = new int[a.length() + 1][b.length() + 1];
-        for (int i = 0; i <= a.length(); i++) {
-            for (int j = 0; j <= b.length(); j++) {
-                if (i == 0) {
-                    dp[i][j] = j;
-                } else if (j == 0) {
-                    dp[i][j] = i;
-                } else {
-                    dp[i][j] = Math.min(dp[i - 1][j - 1] + costOfSubstitution(a.charAt(i - 1), b.charAt(j - 1)), Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1));
-                }
-            }
+        int n = a.length();
+        int m = b.length();
+        
+        // Handle empty string cases
+        if (n == 0) return m;
+        if (m == 0) return n;
+        
+        // Swap strings so that n <= m to minimize space usage
+        if (n > m) {
+            String tmp = a;
+            a = b;
+            b = tmp;
+            int tmpLen = n;
+            n = m;
+            m = tmpLen;
         }
-        return dp[a.length()][b.length()];
+        
+        // Get cached arrays from ThreadLocal, growing them if needed
+        int[][] arrays = LEVENSHTEIN_ARRAYS.get();
+        if (arrays[0].length < n + 1) {
+            // Grow arrays to next power of 2 for efficiency
+            int newSize = Integer.highestOneBit(n) << 1;
+            arrays[0] = new int[newSize];
+            arrays[1] = new int[newSize];
+        }
+        
+        int[] prevRow = arrays[0];
+        int[] currRow = arrays[1];
+        
+        // Initialize first row
+        for (int i = 0; i <= n; i++) {
+            prevRow[i] = i;
+        }
+        
+        // Compute distance using rolling arrays
+        for (int j = 1; j <= m; j++) {
+            currRow[0] = j;
+            char bChar = b.charAt(j - 1);
+            
+            for (int i = 1; i <= n; i++) {
+                int cost = (a.charAt(i - 1) == bChar) ? 0 : 1;
+                currRow[i] = Math.min(
+                    Math.min(currRow[i - 1] + 1,      // insertion
+                             prevRow[i] + 1),          // deletion
+                    prevRow[i - 1] + cost              // substitution
+                );
+            }
+            
+            // Swap rows for next iteration
+            int[] temp = prevRow;
+            prevRow = currRow;
+            currRow = temp;
+        }
+        
+        return prevRow[n];
     }
 
     private static int costOfSubstitution(char a, char b) {
