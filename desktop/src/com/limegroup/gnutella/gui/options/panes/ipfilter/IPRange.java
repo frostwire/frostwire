@@ -25,7 +25,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 
-public class IPRange {
+public class IPRange implements com.frostwire.bittorrent.IPRange {
     private String description;
     private String startAddress;
     private String endAddress;
