@@ -361,9 +361,8 @@ public final class BTEngine extends SessionManager {
             
             for (IPRange range : ranges) {
                 try {
-                    String startIP = range.startAddress();
-                    String endIP = range.endAddress();
-                    
+                    address startIP = new Address(range.startAddress()).swig();
+                    address endIP = new Address(range.endAddress()).swig();
                     // Convert IP strings to addresses and add to filter
                     // access_flags = 1 means blocked (ip_filter.blocked)
                     filter.add_rule(startIP, endIP, 1);
@@ -421,9 +420,35 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
+     * TODO: Move this to SessionManager in jlibtorrent
+     * @return
+     */
+    public TorrentHandle[] getTorrentHandles() {
+        if (swig() == null) {
+            return new TorrentHandle[0];
+        }
+        try {
+            torrent_handle_vector handles = swig().get_torrents();
+            if (handles == null || handles.isEmpty()) {
+                return new TorrentHandle[0];
+            }
+            TorrentHandle[] result = new TorrentHandle[handles.size()];
+            for (int i = 0; i < handles.size(); i++) {
+                result[i] = new TorrentHandle(handles.get(i));
+            }
+            return result;
+        } catch (Throwable t) {
+            LOG.error("getTorrentHandles(): error getting torrent handles", t);
+            return new TorrentHandle[0];
+        }
+    }
+
+    /**
      * Evict peers that are currently blocked by the IP filter.
      * This iterates through all torrent handles and disconnects peers whose IPs
      * are blocked by the current IP filter.
+     *
+     * Gubatron Note: This could be redundant.
      */
     private void evictBlockedPeers() {
         if (swig() == null) {
@@ -437,9 +462,10 @@ public final class BTEngine extends SessionManager {
             }
             
             LOG.info("evictBlockedPeers(): checking for blocked peers to disconnect");
-            
+
+
             // Get all torrent handles and check their peers
-            TorrentHandle[] handles = findAll();
+            TorrentHandle[] handles = getTorrentHandles();
             int blockedPeerCount = 0;
             
             for (TorrentHandle handle : handles) {
@@ -449,8 +475,8 @@ public final class BTEngine extends SessionManager {
                 
                 try {
                     // Get peer information for this torrent
-                    com.frostwire.jlibtorrent.PeerInfo[] peers = handle.peerInfo();
-                    if (peers == null) {
+                    List<PeerInfo> peers = handle.peerInfo();
+                    if (peers.isEmpty()) {
                         continue;
                     }
                     
@@ -460,23 +486,25 @@ public final class BTEngine extends SessionManager {
                         }
                         
                         try {
-                            String peerIP = peer.ip().address();
+                            String peerIP = peer.ip();
                             // Check if this IP is blocked by the filter
                             // Note: This is a simplified check - in a real implementation,
                             // we'd need to properly test the IP against the filter ranges
                             if (isIPBlocked(currentFilter, peerIP)) {
                                 // Disconnect this peer
-                                handle.banPeer(peer.ip());
+                                address peer_address = new Address(peer.ip()).swig();
+                                currentFilter.add_rule(peer_address, peer_address, 1);
+                                swig().set_ip_filter(currentFilter); // makes sure filter is applied immediately to that ip dropping existing connections
                                 blockedPeerCount++;
                                 LOG.info("evictBlockedPeers(): banned blocked peer " + peerIP);
                             }
                         } catch (Throwable t) {
-                            // Continue with next peer if there's an error
+                            // Continue with the next peer if there's an error
                             LOG.debug("evictBlockedPeers(): error checking peer", t);
                         }
                     }
                 } catch (Throwable t) {
-                    // Continue with next handle if there's an error
+                    // Continue with the next handle if there's an error
                     LOG.debug("evictBlockedPeers(): error checking handle peers", t);
                 }
             }
@@ -508,8 +536,8 @@ public final class BTEngine extends SessionManager {
             // Use the filter's access method to check if IP is blocked
             // This is a simplified check - the actual implementation would need to
             // properly parse and check IP addresses against ranges
-            int access = filter.access(ipAddress);
-            return access == 1; // 1 means blocked
+            long access = filter.access(new Address(ipAddress).swig());
+            return access == 1; // "1" means blocked
         } catch (Throwable t) {
             LOG.debug("isIPBlocked(): error checking IP " + ipAddress, t);
             return false;

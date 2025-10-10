@@ -18,8 +18,6 @@
 
 package com.limegroup.gnutella.gui.options.panes.ipfilter;
 
-import com.frostwire.bittorrent.IPRange;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
