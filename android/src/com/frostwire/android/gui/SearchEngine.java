@@ -27,7 +27,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.search.SearchPerformer;
-import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.internetarchive.InternetArchiveSearchPerformer;
 import com.frostwire.search.btdigg.BTDiggSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -174,7 +174,7 @@ public abstract class SearchEngine {
     public static final SearchEngine ARCHIVE = new SearchEngine("Archive.org", Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new ArchiveorgSearchPerformer("archive.org", token, keywords, DEFAULT_TIMEOUT);
+            return new InternetArchiveSearchPerformer("archive.org", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

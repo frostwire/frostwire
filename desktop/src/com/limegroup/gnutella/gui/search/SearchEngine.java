@@ -19,7 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchPerformer;
-import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.internetarchive.InternetArchiveSearchPerformer;
 import com.frostwire.search.btdigg.BTDiggSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -60,7 +60,7 @@ public abstract class SearchEngine {
         BT_DIGG,
         TPB_ID,
         SOUNDCLOUD_ID,
-        ARCHIVEORG_ID,
+        INTERNET_ARCHIVE_ID,
         FROSTCLICK_ID,
         ONE337X_ID,
         IDOPE_ID,
@@ -108,10 +108,10 @@ public abstract class SearchEngine {
             return new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine ARCHIVEORG = new SearchEngine(SearchEngineID.ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
+    private static final SearchEngine INTERNET_ARCHIVE = new SearchEngine(SearchEngineID.INTERNET_ARCHIVE_ID, "Archive.org", SearchEnginesSettings.INTERNET_ARCHIVE_SEARCH_ENABLED, "archive.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new ArchiveorgSearchPerformer(ARCHIVEORG.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+            return new InternetArchiveSearchPerformer(INTERNET_ARCHIVE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
     private static final SearchEngine FROSTCLICK = new SearchEngine(SearchEngineID.FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
@@ -229,7 +229,7 @@ public abstract class SearchEngine {
         return Arrays.asList(
                 YT,
                 BT_DIGG,
-                ARCHIVEORG,
+                INTERNET_ARCHIVE,
                 GLOTORRENTS,
                 IDOPE,
                 KNABEN,
