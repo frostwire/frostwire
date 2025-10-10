@@ -128,15 +128,21 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         @Override
         public void onClick(View v) {
             clickedViewRef = Ref.weak(v);
-            if (Ref.alive(adapterRef) && Ref.alive(adapterRef.get().fragmentManagerRef)) {
-                UIUtils.showEditTextDialog(adapterRef.get().fragmentManagerRef.get(),
-                        R.string.enter_valid_tracker_url_here,
-                        R.string.add_tracker,
-                        R.string.add,
-                        true,
-                        false,
-                        null,
-                        this);
+            if (Ref.alive(adapterRef)) {
+                TrackerRecyclerViewAdapter adapter = adapterRef.get();
+                if (adapter != null && Ref.alive(adapter.fragmentManagerRef)) {
+                    FragmentManager fm = adapter.fragmentManagerRef.get();
+                    if (fm != null) {
+                        UIUtils.showEditTextDialog(fm,
+                                R.string.enter_valid_tracker_url_here,
+                                R.string.add_tracker,
+                                R.string.add,
+                                true,
+                                false,
+                                null,
+                                this);
+                    }
+                }
             }
         }
 

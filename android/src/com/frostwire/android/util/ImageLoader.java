@@ -318,8 +318,8 @@ public final class ImageLoader {
                 LOG.info("AsyncLoader.run() main thread update cancelled, picasso target reference lost.");
                 return;
             }
-            if (targetRef.get() == null) {
-                LOG.warn("AsyncLoader.run() aborted: Target image view can't be null");
+            if (!Ref.alive(targetRef)) {
+                LOG.warn("AsyncLoader.run() aborted: Target ImageView reference lost");
                 return;
             }
             if (p == null) {
