@@ -66,27 +66,9 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED, false);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_MOPUB, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false); // full blown implementation, turned off as it's handled by mopub mediation
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 100);
-        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, 60000); // 1 min
-        defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 3);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 10);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, 3);
+        defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_VPN_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
-        defaultValues.put(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES, Constants.MIN_REWARD_AD_FREE_MINUTES);
-        defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
-                new String[]{
-                        Constants.AD_NETWORK_SHORTCODE_MOPUB,
-                        Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
-                        Constants.AD_NETWORK_SHORTCODE_REMOVEADS
-                });
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);
-
-        defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);
         defaultValues.put(Constants.PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN, 2000);

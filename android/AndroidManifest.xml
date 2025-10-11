@@ -181,22 +181,6 @@
                 android:screenOrientation="portrait"
                 android:label="@string/activity_preferences_name" />
         <activity
-                android:name="com.frostwire.android.gui.activities.BuyActivity"
-                android:screenOrientation="portrait"
-                android:label="@string/remove_ads"
-                android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "app://com.frostwire.android” -->
-                <data
-                        android:host="com.frostwire.android"
-                        android:scheme="app" />
-            </intent-filter>
-        </activity>
-        <activity
                 android:name="com.frostwire.android.gui.activities.AboutActivity"
                 android:screenOrientation="portrait"
                 android:label="@string/about" />

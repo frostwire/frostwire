@@ -58,6 +58,17 @@
     <string name="about">About</string>
     <string name="remove_ads">Remove Ads</string>
     <string name="remove_ads_description">Enjoy the ad-free experience, support FrostWire</string>
+    <string name="support_offer_header">Support FrostWire</string>
+    <string name="support_offer_donation_title">Support FrostWire</string>
+    <string name="support_offer_donation_message">Your donation helps keep FrostWire free.</string>
+    <string name="support_offer_donation_action">Donate</string>
+    <string name="support_offer_donation_badge">Donate</string>
+    <string name="support_offer_vpn_title">Protect your privacy</string>
+    <string name="support_offer_vpn_message">Get FrostWire VPN and download safely.</string>
+    <string name="support_offer_vpn_action">Get VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Support FrostWire</string>
+    <string name="support_offer_default_message">Keep FrostWire strong with a donation or VPN subscription.</string>
     <string name="send_file_using">Send file using</string>
     <string name="downloads">Downloads</string>
     <string name="settings">Settings</string>

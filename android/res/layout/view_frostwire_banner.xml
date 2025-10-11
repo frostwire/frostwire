@@ -18,89 +18,111 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fw_banner_linear_layout"
-    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_marginBottom="7dp">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="7dp"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:gravity="center_vertical"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:background="@null"
-            android:layout_gravity="center_horizontal|start"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:src="@drawable/ad_cancel"
-            android:visibility="invisible"
-            app:tint="@color/app_icon_primary" />
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <TextView
-                android:gravity="center"
-                android:id="@+id/fwbanner_advertisement_text"
-                android:layout_gravity="center"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:layout_width="wrap_content"
-                android:text="@string/advertisement"
-                android:textColor="@color/app_text_disabled"
-                android:visibility="gone" />
+            android:id="@+id/fwbanner_header_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/support_offer_header"
+            android:textColor="@color/app_text_disabled"
+            android:textSize="@dimen/text_micro" />
 
         <ImageButton
-                android:background="@null"
-                android:id="@+id/fwbanner_dismiss_maxview_button"
-                android:layout_gravity="center_vertical|end"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_width="wrap_content"
-                android:src="@drawable/ad_cancel"
-                android:visibility="gone"
-                app:tint="@color/app_icon_primary"/>
+            android:id="@+id/fwbanner_dismiss_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:src="@drawable/ad_cancel"
+            android:tint="@color/app_icon_primary"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
-            maxads:adUnitId="c902517bad27d4d7"
-            android:id="@+id/applovin_banner_maxadview_320x50"
-            android:layout_height="50dp"
-            android:layout_width="320dp"
-            android:layout_gravity="center_horizontal"
+    <LinearLayout
+        android:id="@+id/fwbanner_support_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/blue_light_button_background_selector_off"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/fwbanner_support_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@null"
+            android:tint="@color/white"
             android:visibility="gone" />
 
-    <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
-            maxads:adUnitId="84abad953f40b933"
-            android:id="@+id/applovin_banner_maxadview_320x250"
-            android:layout_height="250dp"
-            android:layout_width="300dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="25dp"
-            android:visibility="gone" />
-
-    <ImageView
-            android:id="@+id/fwbanner_fallback_imageview"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:visibility="visible" />
-
-    <TextView
-            android:gravity="center"
-            android:id="@+id/fwbanner_remove_ads_text_link"
-            android:layout_gravity="center"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:paddingTop="20dp"
-            android:paddingBottom="5dp"
-            android:text="@string/remove_ads"
-            android:textColor="@color/basic_blue_highlight_dark"
-            android:textSize="@dimen/text_medium"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fwbanner_support_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/fwbanner_support_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_small" />
+
+            <Button
+                android:id="@+id/fwbanner_support_action"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/blue_dark_button_background_selector"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/fwbanner_support_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/ad_menu_item_background"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/white"
             android:textStyle="bold"
-            android:visibility="visible" />
+            android:visibility="gone" />
+    </LinearLayout>
 
 </LinearLayout>
