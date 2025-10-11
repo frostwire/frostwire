@@ -69,7 +69,6 @@ public class FWBannerView extends LinearLayout {
     private ImageView supportIcon;
     private TextView supportTitle;
     private TextView supportMessage;
-    private TextView supportBadge;
     private Button supportAction;
     private ImageButton dismissButton;
 
@@ -102,7 +101,6 @@ public class FWBannerView extends LinearLayout {
         supportIcon = findViewById(R.id.fwbanner_support_icon);
         supportTitle = findViewById(R.id.fwbanner_support_title);
         supportMessage = findViewById(R.id.fwbanner_support_message);
-        supportBadge = findViewById(R.id.fwbanner_support_badge);
         supportAction = findViewById(R.id.fwbanner_support_action);
         dismissButton = findViewById(R.id.fwbanner_dismiss_button);
 
@@ -180,13 +178,6 @@ public class FWBannerView extends LinearLayout {
         supportTitle.setText(offer.titleRes);
         supportMessage.setText(offer.messageRes);
         supportAction.setText(offer.actionTextRes);
-
-        if (offer.badgeTextRes != 0) {
-            supportBadge.setText(offer.badgeTextRes);
-            supportBadge.setVisibility(VISIBLE);
-        } else {
-            supportBadge.setVisibility(GONE);
-        }
 
         UIUtils.setupClickUrl(supportContainer, offer.getUrl());
         UIUtils.setupClickUrl(supportAction, offer.getUrl());
