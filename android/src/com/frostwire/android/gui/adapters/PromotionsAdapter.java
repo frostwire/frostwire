@@ -32,7 +32,6 @@ import androidx.annotation.NonNull;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
@@ -54,12 +53,10 @@ import java.util.List;
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     //private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
-    private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
     private final ImageLoader imageLoader;
     private FWBannerView fwBannerView;
-    private int specialOfferLayout;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
 
@@ -138,15 +135,10 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
-        int addSpecialOffer = 1;
-        int banner = 1;
         int slideCount = (slides != null) ? slides.size() : 0;
+        int banner = Offers.disabledAds() ? 0 : 1;
         int addAllFeaturesButtonAtTheEnd = 1;
-        if (Offers.disabledAds()) {
-            addSpecialOffer = 0;
-            banner = 0;
-        }
-        return addSpecialOffer + banner + slideCount + addAllFeaturesButtonAtTheEnd;
+        return banner + slideCount + addAllFeaturesButtonAtTheEnd;
     }
 
     @Override
@@ -157,30 +149,22 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // [0] FIRST POSITION: A special offer/ad or an invisible view if we're not showing ads
-        // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
-        int specialOfferLayout = pickSpecialOfferLayout();
         boolean adsAreOn = !Offers.disabledAds();
-        if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER && !adsAreOn) {
-            return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-        } else if (position == 0 && adsAreOn) {
-            return removeAdsOfferView();
-        }
+        int bannerOffset = adsAreOn ? 1 : 0;
 
-        // [1] SECOND POSITION: The banner ad or an invisible view if we're not showing ads
-        if (position == 1 && adsAreOn) {
+        if (adsAreOn && position == 0) {
             return getFwBannerView();
-        } else if (position == 1) {
-            return View.inflate(getContext(), R.layout.view_invisible_promo, null);
         }
 
-        // [2..N-1] SLIDES
-        if (position > 1 && position < getCount() - 1) {
-            return super.getView(position - 2, null, parent);
+        int slideCount = (slides != null) ? slides.size() : 0;
+        int slideStart = bannerOffset;
+        int slideEnd = slideStart + slideCount;
+
+        if (position >= slideStart && position < slideEnd) {
+            return super.getView(position - bannerOffset, null, parent);
         }
 
-        // [N] Last position: "ALL FREE DOWNLOADS" Button that takes user to the FrostWire Features page
-        if (position == getCount() - 1) {
+        if (position == slideEnd) {
             return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
         }
         return View.inflate(getContext(), R.layout.view_invisible_promo, null);
@@ -188,58 +172,16 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     private FWBannerView getFwBannerView() {
         if (fwBannerView == null) {
-            fwBannerView = new FWBannerView(
-                    getContext(),
-                    null,
-                    true,
-                    false,
-                    false,
-                    FWBannerView.UNIT_ID_HOME);
-            fwBannerView.setOnBannerLoadedListener(() -> {
-                        fwBannerView.setShowDismissButton(false);
-                        fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
-                    }
-            );
-            fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_HOME);
-            fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+            fwBannerView = new FWBannerView(getContext(), null);
+            fwBannerView.setShowDismissButton(false);
+            fwBannerView.setOnBannerDismissedListener(() -> fwBannerView.setVisibility(View.GONE));
             fwBannerView.loadMaxBanner();
         }
         return fwBannerView;
     }
 
-    private View removeAdsOfferView() {
-        String pitch = getContext().getString(UIUtils.randomPitchResId(true));
-        View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
-        TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
-        if (pitchTitle != null) {
-            pitchTitle.setText(pitch);
-        }
-        return specialOfferView;
-    }
-
-    /**
-     * Decide what the special offer layout we should use.
-     */
-    private int pickSpecialOfferLayout() {
-        if (Offers.removeAdsOffersEnabled()) {
-            specialOfferLayout = R.layout.view_remove_ads_notification;
-            return R.layout.view_remove_ads_notification;
-        }
-        specialOfferLayout = NO_SPECIAL_OFFER;
-        return NO_SPECIAL_OFFER;
-    }
-
     public void onAllFeaturedDownloadsClick(String from) {
         UIUtils.openURL(getContext(), Constants.ALL_FEATURED_DOWNLOADS_URL + "?from=" + from);
-    }
-
-    public void onSpecialOfferClick() {
-        if (specialOfferLayout == R.layout.view_remove_ads_notification) {
-            // take to buy remove ads screen
-            MainActivity mainActivity = (MainActivity) getContext();
-            Intent i = new Intent(getContext(), BuyActivity.class);
-            mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
-        }
     }
 
     public void onDestroyView() {

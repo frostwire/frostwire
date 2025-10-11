@@ -79,7 +79,6 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -87,7 +86,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author gubatron
@@ -106,12 +104,15 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
      * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memory leaks
      */
     private final List<Dialog> dialogs;
+    private final List<TransferUiState> previousUiStates;
     private List<Transfer> list;
 
     public TransferListAdapter(Context context, List<Transfer> list) {
         this.contextRef = new WeakReference<>(context);
         this.dialogs = new ArrayList<>();
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
+        List<Transfer> initialList = list == null ? Collections.emptyList() : list;
+        this.list = new ArrayList<>(initialList);
+        this.previousUiStates = new ArrayList<>(captureUiStates(this.list));
         viewOnClickListener = new ViewOnClickListener();
         viewOnLongClickListener = new ViewOnLongClickListener();
         openOnClickListener = new OpenOnClickListener(context);
@@ -148,22 +149,19 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     public void updateList(List<Transfer> newList) {
-        if (list == null) {
-            list = new ArrayList<>(newList);
-            notifyDataSetChanged();
-            return;
+        List<Transfer> safeNewList = newList == null ? Collections.emptyList() : newList;
+        if (safeNewList == list) {
+            safeNewList = new ArrayList<>(safeNewList);
         }
+        List<TransferUiState> newUiStates = captureUiStates(safeNewList);
 
-        // Use DiffUtil to calculate the difference and dispatch granular updates
-        // This avoids rebinding ALL items when only a few changed
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(list, newList));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates));
 
-        // Update the list
         list.clear();
-        list.addAll(newList);
+        list.addAll(safeNewList);
+        previousUiStates.clear();
+        previousUiStates.addAll(newUiStates);
 
-        // Dispatch granular updates (notifyItemInserted, notifyItemRemoved, notifyItemChanged, etc.)
-        // This preserves animations and only rebinds changed items
         diffResult.dispatchUpdatesTo(this);
     }
 
@@ -177,10 +175,10 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
      * - Bonus: Smooth item animations (fade, move) visible to user
      */
     private static class TransferDiffCallback extends DiffUtil.Callback {
-        private final List<Transfer> oldList;
-        private final List<Transfer> newList;
+        private final List<TransferUiState> oldList;
+        private final List<TransferUiState> newList;
 
-        TransferDiffCallback(List<Transfer> oldList, List<Transfer> newList) {
+        TransferDiffCallback(List<TransferUiState> oldList, List<TransferUiState> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }
@@ -197,60 +195,88 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            Transfer oldTransfer = oldList.get(oldItemPosition);
-            Transfer newTransfer = newList.get(newItemPosition);
-
-            // For BittorrentDownload, use info hash as unique identifier
-            if (oldTransfer instanceof BittorrentDownload && newTransfer instanceof BittorrentDownload) {
-                String oldHash = ((BittorrentDownload) oldTransfer).getInfoHash();
-                String newHash = ((BittorrentDownload) newTransfer).getInfoHash();
-                if (oldHash != null && newHash != null) {
-                    return oldHash.equals(newHash);
-                }
-            }
-
-            // Fall back to save path comparison (unique per transfer)
-            File oldPath = oldTransfer.getSavePath();
-            File newPath = newTransfer.getSavePath();
-            if (oldPath != null && newPath != null) {
-                return oldPath.getAbsolutePath().equals(newPath.getAbsolutePath());
-            }
-
-            // Last resort: display name comparison
-            return oldTransfer.getDisplayName().equals(newTransfer.getDisplayName());
+            TransferUiState oldState = oldList.get(oldItemPosition);
+            TransferUiState newState = newList.get(newItemPosition);
+            return oldState.id.equals(newState.id);
         }
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            Transfer oldTransfer = oldList.get(oldItemPosition);
-            Transfer newTransfer = newList.get(newItemPosition);
+            TransferUiState oldState = oldList.get(oldItemPosition);
+            TransferUiState newState = newList.get(newItemPosition);
+            return oldState.hasSameContent(newState);
+        }
+    }
 
-            // Compare the transfer state and progress to determine if UI needs updating
-            if (oldTransfer.getState() != newTransfer.getState()) {
+    private static List<TransferUiState> captureUiStates(List<Transfer> transfers) {
+        if (transfers == null || transfers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<TransferUiState> snapshot = new ArrayList<>(transfers.size());
+        for (Transfer transfer : transfers) {
+            snapshot.add(new TransferUiState(transfer));
+        }
+        return snapshot;
+    }
+
+    private static String resolveTransferId(Transfer transfer) {
+        if (transfer instanceof BittorrentDownload) {
+            String hash = ((BittorrentDownload) transfer).getInfoHash();
+            if (hash != null && !hash.isEmpty()) {
+                return "bt:" + hash;
+            }
+        }
+        File savePath = transfer.getSavePath();
+        if (savePath != null) {
+            return "path:" + savePath.getAbsolutePath();
+        }
+        String displayName = transfer.getDisplayName();
+        if (displayName != null && !displayName.isEmpty()) {
+            return "name:" + displayName;
+        }
+        return "instance:" + System.identityHashCode(transfer);
+    }
+
+    private static final class TransferUiState {
+        private final String id;
+        private final TransferState state;
+        private final int progress;
+        private final long downloadSpeed;
+        private final int connectedSeeds;
+        private final int totalSeeds;
+        private final int connectedPeers;
+        private final int totalPeers;
+
+        private TransferUiState(Transfer transfer) {
+            this.id = resolveTransferId(transfer);
+            this.state = transfer.getState();
+            this.progress = transfer.getProgress();
+            this.downloadSpeed = transfer.getDownloadSpeed();
+            if (transfer instanceof BittorrentDownload) {
+                BittorrentDownload bt = (BittorrentDownload) transfer;
+                this.connectedSeeds = bt.getConnectedSeeds();
+                this.totalSeeds = bt.getTotalSeeds();
+                this.connectedPeers = bt.getConnectedPeers();
+                this.totalPeers = bt.getTotalPeers();
+            } else {
+                this.connectedSeeds = -1;
+                this.totalSeeds = -1;
+                this.connectedPeers = -1;
+                this.totalPeers = -1;
+            }
+        }
+
+        private boolean hasSameContent(TransferUiState other) {
+            if (other == null) {
                 return false;
             }
-
-            if (oldTransfer.getProgress() != newTransfer.getProgress()) {
-                return false;
-            }
-
-            if (oldTransfer.getDownloadSpeed() != newTransfer.getDownloadSpeed()) {
-                return false;
-            }
-
-            // For BittorrentDownload, also check seeds/peers
-            if (oldTransfer instanceof BittorrentDownload && newTransfer instanceof BittorrentDownload) {
-                BittorrentDownload oldBt = (BittorrentDownload) oldTransfer;
-                BittorrentDownload newBt = (BittorrentDownload) newTransfer;
-
-                if (oldBt.getConnectedSeeds() != newBt.getConnectedSeeds() ||
-                    oldBt.getConnectedPeers() != newBt.getConnectedPeers()) {
-                    return false;
-                }
-            }
-
-            // Contents are the same - no need to rebind
-            return true;
+            return state == other.state &&
+                    progress == other.progress &&
+                    downloadSpeed == other.downloadSpeed &&
+                    connectedSeeds == other.connectedSeeds &&
+                    totalSeeds == other.totalSeeds &&
+                    connectedPeers == other.connectedPeers &&
+                    totalPeers == other.totalPeers;
         }
     }
 

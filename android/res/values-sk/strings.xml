@@ -244,7 +244,7 @@
     <string name="cancel_delete_menu_action">Zastaviť a mazať dáta</string>
     <string name="seeding_settings_explanation">Používatelia BitTorrent na internete budú môcť stiahnuť kúsky súboru dátového vašej torrentov semena.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Prevody Torrent sa nespustí, kým sa pripojiť k sieti Wi-Fi. (Skontrolujte nastavenie siete týkajúce sa využitia dát 3G/4G)</string>
-    <string name="distraction_free_search_results">Rozptýlenie Free Search (beta)</string>
+    <string name="distraction_free_search_results">Rozptýlenie Free Search</string>
     <string name="automatic_renewal">Automatické obnovenie</string>
     <string name="audio">Audio</string>
     <string name="enable_dht">Povoliť DHT</string>

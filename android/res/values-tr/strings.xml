@@ -306,7 +306,7 @@
     <string name="wifi_networks_only">Yalnızca kablosuz ağlar</string>
     <string name="distraction_free_search_results_summary">Daha fazla sonuç görüntülemek için kullanıcı arabirimi bileşenlerini gizleyin. Etkinleştirmek için uygulamanın yeniden başlatılması gerekiyor.</string>
     <string name="donate_your_time">Zaman bağışlayın</string>
-    <string name="distraction_free_search_results">Dikkat dağıtımı Ücretsiz Arama (beta)</string>
+    <string name="distraction_free_search_results">Dikkat dağıtımı Ücretsiz Arama</string>
     <string name="help_translate_or_proofread_frostwire">FrostWire\'ı tercüme etmeye veya düzeltmeye yardımcı olun</string>
     <string name="changelog">Değişiklikler</string>
     <string name="cloud_download_aborted_on_mobile_data">Geçerli ayar, Wifi şebekesinde değilken indirmeyi engeller</string>

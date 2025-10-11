@@ -39,12 +39,9 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.SupportOffer;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
 
 /**
@@ -57,12 +54,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationPreferencesFragment.DIALOG.stop.http";
 
-    private static PausedAdsOnPreferenceClickListener pausedAdsPreferenceClickListener;
-
-    // TODO: refactor this
-    // due to the separation of fragments and activities
-    public static long removeAdsPurchaseTime = 0;
-
     public ApplicationPreferencesFragment() {
         super(R.xml.settings_application);
     }
@@ -74,7 +65,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         setupStorageOption();
         setupDataSaving();
         setupTheme();
-        setupStore(removeAdsPurchaseTime);
+        setupSupportPreference();
     }
 
     @Override
@@ -268,115 +259,20 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         }
     }
 
-    //////////////////////////////
-    // AD REMOVAL PREFERENCE LOGIC
-
-    /// ///////////////////////////
-    private void setupStore(final long purchaseTimestamp) {
-        pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
-        SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            SetupStoreTaskParamHolder resultTaskParamHolder = checkMinutesLeftPausedAsync(paramHolder);
-            SystemUtils.postToUIThread(() -> setupStorePostTask(paramHolder, resultTaskParamHolder));
-        });
-    }
-
-    private static class SetupStoreTaskParamHolder {
-        final long purchaseTimestamp;
-        int minutesPaused = -1;
-        WeakReference<ApplicationPreferencesFragment> appPrefsFragRef;
-
-        SetupStoreTaskParamHolder(ApplicationPreferencesFragment referent, long purchaseTimestamp) {
-            appPrefsFragRef = Ref.weak(referent);
-            this.purchaseTimestamp = purchaseTimestamp;
-        }
-    }
-
-    private static SetupStoreTaskParamHolder checkMinutesLeftPausedAsync(SetupStoreTaskParamHolder paramHolder) {
-        SystemUtils.ensureBackgroundThreadOrCrash("ApplicationPreferencesFragment::checkMinutesLeftPausedAsync");
-        paramHolder.minutesPaused = Offers.getMinutesLeftPausedAsync();
-        return paramHolder;
-    }
-
-    private static void setupStorePostTask(SetupStoreTaskParamHolder paramHolder,
-                                           @SuppressWarnings("unused") SetupStoreTaskParamHolder unusedResultTaskParamHolder) {
-        SystemUtils.ensureUIThreadOrCrash("ApplicationPreferencesFragment::setupStorePostTask");
-        if (!Ref.alive(paramHolder.appPrefsFragRef)) {
+    private void setupSupportPreference() {
+        Preference preference = findPreference("frostwire.prefs.offers.buy_no_ads");
+        if (preference == null) {
             return;
         }
-        ApplicationPreferencesFragment applicationPreferencesFragment = paramHolder.appPrefsFragRef.get();
-        if (applicationPreferencesFragment == null) {
-            return;
-        }
-        Activity settingsActivity = applicationPreferencesFragment.getActivity();
-        if (settingsActivity == null) {
-            return;
-        }
-        final long purchaseTimestamp = paramHolder.purchaseTimestamp;
-
-        Preference p = applicationPreferencesFragment.findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (p == null) {
-            return;
-        }
-        if (Offers.disabledAds() && pausedAdsPreferenceClickListener.adsPaused()) {
-            final int minutesPausedLeft = paramHolder.minutesPaused;
-            // Paused summary
-            String summaryMinutesLeft = minutesPausedLeft > 1 ?
-                    applicationPreferencesFragment.getString(R.string.minutes_left_ad_free, minutesPausedLeft) :
-                    applicationPreferencesFragment.getString(R.string.minute_left_ad_free);
-            p.setSummary(summaryMinutesLeft);
-            p.setOnPreferenceClickListener(pausedAdsPreferenceClickListener);
-        }
-    }
-
-    private static final class DoNothingOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
-
-        @Override
-        public boolean onPreferenceClick(@NonNull Preference preference) {
-            return true;
-        }
-    }
-
-    private static final class PausedAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
-        private WeakReference<Activity> activityRef;
-        private static int rewarded_video_minutes = -1;
-        private static long paused_timestamp = -1;
-        private static int clicksLeft = 10;
-
-        PausedAdsOnPreferenceClickListener(Activity activity) {
-            activityRef = Ref.weak(activity);
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, PausedAdsOnPreferenceClickListener::loadPausedAdsInfoAsync);
-        }
-
-        @Override
-        public boolean onPreferenceClick(@NonNull Preference preference) {
-            // reset reward video timer
-            LOG.info("onPreferenceClick() clicks left: " + clicksLeft);
-            if (adsPaused() && --clicksLeft <= 0) {
-                clicksLeft = 10;
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Offers::unPauseAdsAsync);
-                if (Ref.alive(activityRef)) {
-                    activityRef.get().finish();
-                }
-                LOG.info("onPreferenceClick(): ads un-paused");
-                return true;
+        SupportOffer offer = SupportOffer.random();
+        preference.setTitle(offer.titleRes);
+        preference.setSummary(offer.messageRes);
+        preference.setOnPreferenceClickListener(pref -> {
+            Activity activity = getActivity();
+            if (activity != null) {
+                offer.open(activity);
             }
             return true;
-        }
-
-        private boolean adsPaused() {
-            long pause_duration = rewarded_video_minutes * 60_000L;
-            long time_on_pause = System.currentTimeMillis() - paused_timestamp;
-            return time_on_pause < pause_duration;
-        }
-
-        private static void loadPausedAdsInfoAsync() {
-            ConfigurationManager CM = ConfigurationManager.instance();
-            rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
-            paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
-        }
+        });
     }
-    /////////////////////////////////////
-    // END OF AD REMOVAL PREFERENCE LOGIC
-    /////////////////////////////////////
 }

@@ -92,11 +92,6 @@ public class PromotionsView extends LinearLayout {
                 return;
             }
             PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
-            if (position == 0) {
-                promoAdapter.onSpecialOfferClick();
-                return;
-            }
-
             // FROSTWIRE FEATURES VIEW
             if (position == promoAdapter.getCount() - 1) {
                 promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");

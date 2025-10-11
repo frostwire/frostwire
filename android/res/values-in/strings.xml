@@ -308,7 +308,7 @@
     <string name="wifi_networks_only">Jaringan wifi saja</string>
     <string name="distraction_free_search_results_summary">Menyembunyikan komponen UI menunjukkan hasil yang lebih. Kebutuhan aplikasi Restart untuk berlaku.</string>
     <string name="donate_your_time">Menyumbangkan waktu Anda</string>
-    <string name="distraction_free_search_results">Cari tanpa gangguan (beta)</string>
+    <string name="distraction_free_search_results">Cari tanpa gangguan</string>
     <string name="help_translate_or_proofread_frostwire">Membantu menerjemahkan atau mengoreksi FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Pengaturan arus mencegah download bila tidak pada jaringan Wifi</string>

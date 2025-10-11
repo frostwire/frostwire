@@ -51,7 +51,6 @@ import androidx.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
@@ -100,7 +99,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
     private FWBannerView fwBannerView;
-    private boolean mopubLoaded = false;
     private boolean isVertical;
 
     public PreviewPlayerActivity() {
@@ -203,16 +201,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             hideAd();
             return;
         }
-        if (!UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD)) {
-            hideAd();
-            return;
-        }
         if (fwBannerView == null) {
             fwBannerView = findViewById(R.id.activity_preview_player_320x50_banner);
         }
         if (fwBannerView != null) {
             fwBannerView.setOnBannerDismissedListener(this::hideAd);
             fwBannerView.loadMaxBanner();
+            fwBannerView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -347,12 +342,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton);
             if (Offers.disabledAds()) {
                 hideAd();
-                fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             } else {
-                if (mopubLoaded) {
-                    fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
-                } else {
-                    fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+                if (fwBannerView != null) {
+                    fwBannerView.setVisibility(View.VISIBLE);
                 }
             }
             v.setRotation(0);
@@ -624,14 +616,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             }
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
-        } finally {
-            mopubLoaded = false;
         }
     }
 
     private void hideAd() {
         if (fwBannerView != null) {
-            fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
+            fwBannerView.setVisibility(View.GONE);
         }
     }
 

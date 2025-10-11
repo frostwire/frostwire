@@ -139,15 +139,4 @@ public final class SettingsActivity extends AbstractActivity
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
-                data != null &&
-                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
-            // We (onActivityResult) are invoked before onResume()
-            ApplicationPreferencesFragment.removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 }

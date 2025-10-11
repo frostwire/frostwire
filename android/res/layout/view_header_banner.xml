@@ -18,27 +18,27 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_search_advertisement_header_layout"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:background="@color/app_background_color_dark"
     android:orientation="vertical"
     android:visibility="gone">
 
-    <!-- header with "advertisement" and dismiss button on top -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp">
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <TextView
+            android:id="@+id/view_search_header_banner_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:text="@string/advertisement"
+            android:text="@string/support_offer_header"
             android:textColor="@color/app_text_light"
             android:textSize="@dimen/text_micro" />
 
@@ -48,52 +48,57 @@
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="14dp"
             android:background="@null"
-            android:src="@drawable/keyword_tag_close_clear_cancel_full"
             android:contentDescription="@null"
-            android:visibility="invisible"
-            app:tint="@color/basic_gray_text_light" />
+            android:src="@drawable/keyword_tag_close_clear_cancel_full"
+            android:tint="@color/basic_gray_text_light"
+            android:visibility="invisible" />
     </RelativeLayout>
-    <!-- end of header -->
 
-    <!-- fallback banner on the bottom, mopub banner on top -->
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <!-- fallback banner -->
+    <LinearLayout
+        android:id="@+id/view_search_header_banner_support_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/blue_light_button_background_selector_off"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
         <LinearLayout
-                android:id="@+id/view_search_header_banner_fallback_banner_linear_layout"
-                android:layout_width="320dp"
-                android:layout_height="50dp"
-                android:layout_centerInParent="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/blue_light_button_background_selector_off">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
-                    android:id="@+id/view_search_header_banner_fallback_banner_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/remove_ads"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                android:id="@+id/view_search_header_banner_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_small"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/view_search_header_banner_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_small" />
         </LinearLayout>
 
-        <!-- applovin banner -->
-        <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
-                android:id="@+id/view_search_header_banner_maxadview"
-                android:background="@color/basic_color_dark"
-                maxads:adUnitId="95c5db83dbc84c6b"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="2dp"
-                android:visibility="gone" />
-    </RelativeLayout>
+        <Button
+            android:id="@+id/view_search_header_banner_action"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blue_dark_button_background_selector"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
 </LinearLayout>

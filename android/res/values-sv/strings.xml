@@ -249,7 +249,7 @@
     <string name="cancel_delete_menu_action">Stoppa och ta bort data</string>
     <string name="seeding_settings_explanation">BitTorrent användare på Internet kommer att kunna ladda ner filen bitar av data din torrents frö.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent överföringar kommer inte att starta förrän du ansluter till ett Wi-Fi-nätverk. (Kontrollera nätverksinställningarna om 3G/4G dataanvändning)</string>
-    <string name="distraction_free_search_results">Distraktion Free Search (beta)</string>
+    <string name="distraction_free_search_results">Distraktion Free Search</string>
     <string name="automatic_renewal">Automatisk förnyelse</string>
     <string name="audio">Audio</string>
     <string name="enable_dht">Aktivera DHT</string>

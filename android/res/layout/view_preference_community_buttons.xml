@@ -43,15 +43,15 @@
             app:tint="@color/app_icon_primary" />
 
         <ImageButton
-            android:id="@+id/view_preference_community_twitter_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="10dp"
-            android:background="@color/transparent"
-            android:contentDescription="@null"
-            android:src="@drawable/about_social_twitter"
-            app:tint="@color/app_icon_primary"/>
+                android:id="@+id/view_preference_community_twitter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="10dp"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:src="@drawable/about_social_twitter"
+                app:tint="@color/app_icon_primary" />
 
         <ImageButton
             android:id="@+id/view_preference_community_reddit_button"

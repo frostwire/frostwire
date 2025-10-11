@@ -311,7 +311,7 @@
     <string name="distraction_free_search_results_summary">Nascondi componenti dell\'interfaccia utente per mostrare più risultati. Ha bisogno di riavvio app per avere effetto.</string>
     <string name="donate_your_time">Dona il tuo tempo</string>
     <string name="advertisement">annuncio pubblicitario</string>
-    <string name="distraction_free_search_results">Distrazione Ricerca libera (beta)</string>
+    <string name="distraction_free_search_results">Distrazione Ricerca libera</string>
     <string name="help_translate_or_proofread_frostwire">Aiutare a tradurre o correggere le bozze FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Impostazione corrente impedisce scaricano quando non è in rete Wifi</string>

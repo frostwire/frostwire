@@ -27,8 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-
-import java.util.Random;
+import com.frostwire.android.offers.SupportOffer;
 
 
 /**
@@ -47,24 +46,28 @@ public class AdMenuItemView extends RelativeLayout {
         super.onFinishInflate();
 
         View.inflate(getContext(), R.layout.view_ad_menuitem, this);
+    }
+
+    public void bind(SupportOffer offer) {
         TextView textHeadline = findViewById(R.id.view_ad_menu_item_headline);
         TextView textSubtitle = findViewById(R.id.view_ad_menu_item_subtitle);
-        TextView textThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail);
+        TextView textBadge = findViewById(R.id.view_ad_menu_item_thumbnail);
         ImageView imageThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
-        textHeadline.setText(R.string.support_frostwire);
+        textHeadline.setText(offer.titleRes);
+        textSubtitle.setText(offer.messageRes);
 
-        Random myRand = new Random();
-        boolean isEven = (myRand.nextInt() % 2) == 0;
-
-        if (isEven) {
-            textSubtitle.setText(R.string.save_bandwidth);
-            textThumbnail.setVisibility(VISIBLE);
-            textThumbnail.setText(R.string.ad_free);
-        } else {
-            textSubtitle.setText(R.string.remove_ads);
+        if (offer.badgeTextRes != 0) {
+            textBadge.setText(offer.badgeTextRes);
+            textBadge.setVisibility(VISIBLE);
+            imageThumbnail.setVisibility(GONE);
+        } else if (offer.iconRes != 0) {
+            imageThumbnail.setImageResource(offer.iconRes);
             imageThumbnail.setVisibility(VISIBLE);
-            imageThumbnail.setImageResource(R.drawable.ad_menu_speaker);
+            textBadge.setVisibility(GONE);
+        } else {
+            textBadge.setVisibility(GONE);
+            imageThumbnail.setVisibility(GONE);
         }
     }
 }

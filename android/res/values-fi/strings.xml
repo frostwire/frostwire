@@ -247,7 +247,7 @@
     <string name="cancel_delete_menu_action">Lopeta ja poista data</string>
     <string name="seeding_settings_explanation">BitTorrent käyttäjiä Internetissä voi ladata tiedoston paloina tietojen torrentien siemen.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent siirtoja ei käynnisty ennen kuin yhdistää Wi-Fi-verkkoon. (Tarkista verkon asetukset koskien 3G/4G datamäärää)</string>
-    <string name="distraction_free_search_results">Häiriötekijä Free Search (beta)</string>
+    <string name="distraction_free_search_results">Häiriötekijä Free Search</string>
     <string name="automatic_renewal">Automaattinen uusiminen</string>
     <string name="audio">Audio</string>
     <string name="enable_dht">Ota DHT</string>

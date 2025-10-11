@@ -309,7 +309,7 @@
     <string name="wifi_networks_only">Alleen Wi-Fi-netwerken</string>
     <string name="distraction_free_search_results_summary">Verberg componenten van de gebruikersinterface om meer resultaten te laten zien. Moet app herstart door te voeren.</string>
     <string name="donate_your_time">Doneer uw tijd</string>
-    <string name="distraction_free_search_results">Zoeken zonder afleiding (beta)</string>
+    <string name="distraction_free_search_results">Zoeken zonder afleiding</string>
     <string name="help_translate_or_proofread_frostwire">Help vertalen of proeflezen FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Huidige instelling voorkomt het downloaden wanneer ze niet op de website Wifi netwerk</string>

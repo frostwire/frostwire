@@ -25,8 +25,8 @@ import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -371,26 +371,47 @@ public final class UIUtils {
     }
 
     public static void openURL(Context context, String url) {
-        try {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.addCategory(Intent.CATEGORY_BROWSABLE);
-            i.setData(Uri.parse(url));
-            if (i.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(i);
-            } else {
-                LOG.info("openURL: Will try default android browser component... (not guaranteed to exist on all distributions)");
-                // Fallback to default android component (not guaranteed to exist on all android distributions)
-                ComponentName componentName = new ComponentName("com.android.browser", "com.android.browser.BrowserActivity");
-                i.setComponent(componentName);
-                try {
-                    context.startActivity(i);
-                } catch (ActivityNotFoundException e) {
-                    LOG.error("openURL: No default browser component activity found to open URL: " + url, e);
-                }
-            }
-        } catch (ActivityNotFoundException e) {
-            LOG.error("openURL: No activity found to open URL: " + url, e);
+        if (context == null || url == null) {
+            LOG.warn("openURL: invalid context or url");
+            return;
         }
+
+        String trimmedUrl = url.trim();
+        if (trimmedUrl.isEmpty()) {
+            LOG.warn("openURL: empty url after trimming");
+            return;
+        }
+
+        Uri uri = Uri.parse(trimmedUrl);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+
+        Activity activity = unwrapActivity(context);
+        Context launchContext = activity != null ? activity : context.getApplicationContext();
+        if (launchContext == null) {
+            launchContext = context;
+        }
+
+        if (activity == null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        try {
+            launchContext.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            LOG.error("openURL: No activity found to open URL: " + trimmedUrl, e);
+            showShortMessage(context, R.string.no_browser_found);
+        }
+    }
+
+    private static Activity unwrapActivity(Context context) {
+        Context current = context;
+        int depth = 0;
+        while (current instanceof ContextWrapper && !(current instanceof Activity) && depth < 10) {
+            current = ((ContextWrapper) current).getBaseContext();
+            depth++;
+        }
+        return current instanceof Activity ? (Activity) current : null;
     }
 
     public static void setupClickUrl(View v, final String url) {
