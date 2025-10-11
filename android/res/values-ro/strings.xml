@@ -306,7 +306,7 @@
     <string name="wifi_networks_only">Numai rețele Wi-Fi</string>
     <string name="distraction_free_search_results_summary">Componentele se ascunde interfața cu utilizatorul pentru a afișa mai multe rezultate. Are nevoie de repornirea aplicației pentru a intra în vigoare.</string>
     <string name="donate_your_time">Doneaza timpul</string>
-    <string name="distraction_free_search_results">Distragerii Căutare liberă (versiune beta)</string>
+    <string name="distraction_free_search_results">Distragerii Căutare liberă</string>
     <string name="help_translate_or_proofread_frostwire">Ajuta la traduce sau recitești FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Setarea curentă previne descărcarea atunci când nu este pe rețea Wi-Fi</string>

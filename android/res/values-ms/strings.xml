@@ -245,7 +245,7 @@
     <string name="cancel_delete_menu_action">Berhenti dan Padam Data</string>
     <string name="seeding_settings_explanation">Pengguna BitTorrent di internet akan dapat memuat turun ketulan fail data benih torrents anda.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Pemindahan Torrent tidak akan bermula sehingga anda bersambung ke rangkaian Wi-Fi. (Semak Tetapan Rangkaian anda mengenai penggunaan data 3G/4G)</string>
-    <string name="distraction_free_search_results">Gangguan Search Percuma (beta)</string>
+    <string name="distraction_free_search_results">Gangguan Search Percuma</string>
     <string name="automatic_renewal">Pembaharuan automatik</string>
     <string name="audio">Audio</string>
     <string name="enable_dht">Membolehkan DHT</string>

@@ -348,7 +348,7 @@
     <string name="distraction_free_search_results_summary">Chowaj komponenty UI aby pokazać rezultaty. Wymaga zrestartowania aplikacji.</string>
     <string name="filter_by_keyword">Filtruj według słów kluczowych…</string>
     <string name="donate_your_time">Podaruj swój czas</string>
-    <string name="distraction_free_search_results">Wyszukiwanie przeciw roztargnieniowe (beta)</string>
+    <string name="distraction_free_search_results">Wyszukiwanie przeciw roztargnieniowe</string>
     <string name="sources_channels">Źródła / Kanały</string>
     <string name="help_translate_or_proofread_frostwire">Pomóż przetłumaczyć lub ulepszyć FrostWire</string>
     <string name="changelog">Changelog</string>

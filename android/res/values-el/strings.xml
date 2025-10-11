@@ -309,7 +309,7 @@
     <string name="wifi_networks_only">μόνο σε δίκτυα Wi-Fi</string>
     <string name="distraction_free_search_results_summary">Απόκρυψη UI συστατικά για να δείξει περισσότερα αποτελέσματα. Ανάγκες εφαρμογή επανεκκίνηση για να τεθεί σε ισχύ.</string>
     <string name="donate_your_time">Δώρισε το χρόνο σας</string>
-    <string name="distraction_free_search_results">Απόσπαση της προσοχής Δωρεάν αναζήτηση (beta)</string>
+    <string name="distraction_free_search_results">Απόσπαση της προσοχής Δωρεάν αναζήτηση</string>
     <string name="help_translate_or_proofread_frostwire">Βοηθήστε να μεταφράζει ή να διορθώσουν FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Τρέχουσα ρύθμιση αποτρέπει τη λήψη, όταν δεν σε δίκτυο Wi-Fi</string>
