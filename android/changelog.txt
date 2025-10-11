@@ -63,8 +63,8 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - com.squareup.okhttp3:okhttp:5.1.0
  - androidx.work:work-runtime-ktx:2.10.4
  - com.google.firebase:firebase-bom:34.3.0
- - com.applovin:applovin-sdk:13.4.0
- - com.applovin.mediation:unityads-adapter:4.16.1.0
+ - removed: com.applovin:applovin-sdk
+ - removed: com.applovin.mediation:unityads-adapter
  - Maintenance:all license headers are consistent with GPL 3.0
  - jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  - jlibtorrent:g++-9 upgraded to g++-11 for linux build
