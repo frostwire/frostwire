@@ -308,7 +308,7 @@
     <string name="wifi_networks_only">Pouze Wi-Fi sítě</string>
     <string name="distraction_free_search_results_summary">Skrýt UI komponenty pro zobrazení více výsledků. Potřebuje restart aplikace se projeví.</string>
     <string name="donate_your_time">Darovat svůj čas</string>
-    <string name="distraction_free_search_results">Rozptýlení Free Search (beta)</string>
+    <string name="distraction_free_search_results">Rozptýlení Free Search</string>
     <string name="help_translate_or_proofread_frostwire">Pomoci s překladem nebo korekturou FrostWire</string>
     <string name="changelog">Changelog</string>
     <string name="cloud_download_aborted_on_mobile_data">Aktuální nastavení zabraňuje stahování, pokud není v síti Wi-Fi</string>

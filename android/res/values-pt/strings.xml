@@ -311,7 +311,7 @@
     <string name="wifi_networks_only">Somente as redes Wi-Fi</string>
     <string name="distraction_free_search_results_summary">Ocultar componentes de interface do usuário para mostrar mais resultados. Necessita de reiniciar o aplicativo para ter efeito.</string>
     <string name="donate_your_time">Doe seu tempo</string>
-    <string name="distraction_free_search_results">Pesquisa Livre de Distração (beta)</string>
+    <string name="distraction_free_search_results">Pesquisa Livre de Distração</string>
     <string name="help_translate_or_proofread_frostwire">Ajude a traduzir ou corrigir FrostWire</string>
     <string name="changelog">Registro de alterações</string>
     <string name="cloud_download_aborted_on_mobile_data">Configuração atual evita o download quando não estiver na rede Wifi</string>

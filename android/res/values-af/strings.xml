@@ -281,7 +281,7 @@
     <string name="failed_to_set_wallpaper">Kon nie plakpapier stel nie</string>
     <string name="cancel_delete_menu_action">Stop en verwyder data</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent-oordragte sal nie begin voordat jy aan \'n Wi-Fi-netwerk koppel nie. (Gaan jou netwerk instellings rakende 3G/4G data gebruik)</string>
-    <string name="distraction_free_search_results">Afleiding Vrye Soek (Beta)</string>
+    <string name="distraction_free_search_results">Afleiding Vrye Soek</string>
     <string name="your_android_wall_paper_will_change">Jou Android-agtergrond sal oor \'n paar sekondes verander</string>
     <string name="automatic_renewal">Outomatiese Hernuwing</string>
     <string name="sources_channels">Bronne / Kanale</string>

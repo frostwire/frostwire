@@ -309,7 +309,7 @@
     <string name="wifi_networks_only">Mạng Wifi chỉ</string>
     <string name="distraction_free_search_results_summary">Ẩn các thành phần giao diện người dùng để hiển thị nhiều kết quả hơn. Nhu cầu ứng dụng khởi động lại để có hiệu lực.</string>
     <string name="donate_your_time">Cống hiến thời gian của bạn</string>
-    <string name="distraction_free_search_results">Tìm kiếm không phân tâm (beta)</string>
+    <string name="distraction_free_search_results">Tìm kiếm không phân tâm</string>
     <string name="help_translate_or_proofread_frostwire">Trợ giúp dịch hoặc hiệu đính FrostWire</string>
     <string name="changelog">Những thay đổi gần đây</string>
     <string name="cloud_download_aborted_on_mobile_data">Cài đặt hiện ngăn chặn tải khi không vào mạng Wifi</string>
