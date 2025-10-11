@@ -1,9 +1,10 @@
-FrostWire 3.0.4 build 758 OCT/10/2025
+FrostWire 3.0.4 build 758 OCT/11/2025
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
  - new:Settings > Torrent Settings > Incoming Connection Port Range selection
  - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
+ - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
  - yt_dlp-2025.09.26
  - removed:Torlock search performer (old site is down, new site is malicious)
  - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
@@ -43,6 +44,7 @@ FrostWire 3.0.4 build 758 OCT/10/2025
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
  - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
  - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
+ - Distraction free search now on by default, much better experience
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
