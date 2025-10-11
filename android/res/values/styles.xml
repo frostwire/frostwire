@@ -105,7 +105,7 @@
 
     <!-- Transfers list begin -->
 
-    <style name="TransfersList"></style>
+    <style name="TransfersList" />
 
     <!--v21-->
     <style name="TransfersList.Item.Title">
@@ -195,7 +195,7 @@
         <item name="android:fontFamily">sans-serif-regular</item>
     </style>
 
-    <style name="ListItemTime" parent="ListItemSize.browsePeerList"></style>
+    <style name="ListItemTime" parent="ListItemSize.browsePeerList" />
 
     <style name="ListItemExtra">
         <item name="android:singleLine">true</item>
@@ -253,90 +253,6 @@
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/app_text_secondary</item>
-    </style>
-
-    <!-- Buy No Ads Activity -->
-    <style name="BuyNoAdsCardTitle">
-        <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_medium</item>
-    </style>
-
-    <style name="BuyNoAdsCardTitle.Bold">
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BuyNoAdsCardTitle.Purchase">
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="BuyNoAdsCardPrice">
-        <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
-    </style>
-
-    <style name="BuyNoAdsCardDescription">
-        <item name="android:textColor">@color/app_text_secondary</item>
-        <item name="android:textSize">@dimen/text_x_medium</item>
-    </style>
-
-    <style name="BuyNoAdsCardHint">
-        <item name="android:textColor">@color/basic_background</item>
-        <item name="android:background">@drawable/product_card_hint_button_background</item>
-        <item name="android:textSize">@dimen/text_x_small</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">3dp</item>
-        <item name="android:paddingBottom">3dp</item>
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-    </style>
-
-    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold">
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="BuyNoAdsBuyButton" parent="BuyNoAdsCardHint">
-        <item name="android:paddingTop">6dp</item>
-        <item name="android:paddingBottom">6dp</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">20dp</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
-
-    </style>
-
-    <style name="BuyNoAdsAdText">
-        <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_xx_large</item>
-    </style>
-
-    <style name="BuyNoAdsAdText.Support">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BuyNoAdsAdText.Project">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textSize">@dimen/text_x_large</item>
-    </style>
-
-    <style name="BuyNoAdsAdText.Remove">
-        <item name="android:textColor">@color/basic_background</item>
-        <item name="android:textSize">28.0sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BuyNoAdsAdText.AdFree">
-        <item name="android:textSize">@dimen/text_x_large</item>
-        <item name="android:textColor">@color/basic_color_dark</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingLeft">24dp</item>
-        <item name="android:paddingRight">24dp</item>
     </style>
 
 

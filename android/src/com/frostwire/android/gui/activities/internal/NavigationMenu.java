@@ -38,12 +38,12 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.activities.AboutActivity;
-import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.SupportOffer;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.google.android.material.navigation.NavigationView;
@@ -192,10 +192,11 @@ public final class NavigationMenu {
         SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initAdRemovalMenuItemListener");
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
-        menuAd.setOnClickListener(v -> {
-            Intent intent = new Intent(activity, BuyActivity.class);
-            activity.startActivity(intent);
-        });
+        SupportOffer offer = SupportOffer.random();
+        adMenuItemView.bind(offer);
+        View.OnClickListener clickListener = v -> offer.open(activity);
+        menuAd.setOnClickListener(clickListener);
+        adMenuItemView.setOnClickListener(clickListener);
         return adMenuItemView;
     }
 

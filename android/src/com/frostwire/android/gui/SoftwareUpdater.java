@@ -135,24 +135,12 @@ public final class SoftwareUpdater {
         }
 
         ConfigurationManager CM = ConfigurationManager.instance();
-        CM.setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
-
-        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD, update.config.mopubAlbumArtBannerThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD, update.config.mopubPreviewBannerThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, update.config.mopubSearchHeaderBannerThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, update.config.mopubSearchHeaderBannerIntervalInMs);
-
-        CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, update.config.interstitialFirstDisplayDelayInMinutes);
-
-        if (update.config.rewardAdFreeMinutes > Constants.MAX_REWARD_AD_FREE_MINUTES) {
-            update.config.rewardAdFreeMinutes = Constants.MIN_REWARD_AD_FREE_MINUTES;
+        int supportThreshold = update.config.supportVpnThreshold;
+        if (supportThreshold < 0 || supportThreshold > 100) {
+            supportThreshold = 50;
         }
-        CM.setInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES, update.config.rewardAdFreeMinutes);
+        CM.setInt(Constants.PREF_KEY_GUI_SUPPORT_VPN_THRESHOLD, supportThreshold);
 
-        // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
     }
 
@@ -177,18 +165,7 @@ public final class SoftwareUpdater {
     private static class Config {
         @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         Map<String, Boolean> activeSearchEngines;
-        String[] waterfall;
-        int removeAdsB2bThreshold = 50;
-        int mopubAlbumArtBannerThreshold = 50;
-        int mopubPreviewBannerThreshold = 101;
-        int interstitialOffersTransferStarts = 3;
-        int interstitialTransferOffersTimeoutInMinutes = 10;
-        int interstitialFirstDisplayDelayInMinutes = 3;
-        int rewardAdFreeMinutes = Constants.MIN_REWARD_AD_FREE_MINUTES;
-
-        // ux stats
-        int mopubSearchHeaderBannerThreshold = 80;
-        int mopubSearchHeaderBannerIntervalInMs = 60000; // 1 min
+        int supportVpnThreshold = 50;
     }
 
     private static boolean checkUpdateAsyncTask(MainActivity activity,

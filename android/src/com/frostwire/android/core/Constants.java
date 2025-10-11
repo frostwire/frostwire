@@ -97,20 +97,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED = "frostwire.prefs.gui.search.search.filter_drawer_button_clicked";
     public static final String PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START = "frostwire.prefs.gui.show_transfers_on_download_start";
     public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG = "frostwire.prefs.gui.show_new_transfer_dialog";
-    public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
-    public static final String PREF_KEY_GUI_USE_REMOVEADS = "frostwire.prefs.gui.use_removeads";
-    public static final String PREF_KEY_GUI_USE_MOPUB = "frostwire.prefs.gui.use_mopub";
-    public static final String PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD = "frostwire.prefs.gui.removeads_back_to_back_threshold";
-    public static final String PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_album_art_banner_threshold";
-    public static final String PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_preview_banner_threshold";
-    public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_search_header_banner_threshold";
-    public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS = "frostwire.prefs.gui.mopub_search_header_banner_dismiss_interval_in_ms_int";
-    public static final String PREF_KEY_GUI_REWARD_AD_FREE_MINUTES = "frostwire.prefs.gui.reward_ad_free_minutes";
-
-    public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_transfer_offers_timeout_in_minutes";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_first_display_delay_in_minutes";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY = "frostwire.prefs.gui.interstitial_on_resume_last_display";
+    public static final String PREF_KEY_GUI_SUPPORT_VPN_THRESHOLD = "frostwire.prefs.gui.support_vpn_threshold";
     public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP = "frostwire.prefs.gui.installation_timestamp";
 
     public static final String PREF_KEY_GUI_PLAYER_REPEAT_MODE = "com.frostwire.android.player.REPEAT_MODE";
@@ -206,10 +193,6 @@ public final class Constants {
     public static final String TRANSLATE_HELP_URL = "https://github.com/frostwire/frostwire";
     public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
 
-    public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
-    public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
-    public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
-
     public static final String FROSTWIRE_VPN_URL = "https://www.frostwire.com/vpn";
 
     public static final String PIA_VPN_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
@@ -222,12 +205,6 @@ public final class Constants {
 
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
     public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://blog.frostwire.com/2016/12/05/how-to-create-playlists-on-frostwire-for-android/";
-
-    public static final int MIN_REWARD_AD_FREE_MINUTES = 30;
-    public static final int MAX_REWARD_AD_FREE_MINUTES = 240;
-
-    public static final String FW_REWARDED_VIDEO_MINUTES = "FW_REWARDED_VIDEO_MINUTES";
-    public static final String FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP = "FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP";
 
     private Constants() {
     }

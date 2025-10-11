@@ -23,14 +23,9 @@
             android:title="@string/general_settings">
         <Preference
                 android:key="frostwire.prefs.offers.buy_no_ads"
-                android:layout="@layout/view_preference_buy_ads"
-                android:summary="@string/remove_ads_description"
-                android:title="@string/remove_ads">
-            <intent
-                    android:action="android.intent.action.VIEW"
-                    android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
-                    android:targetPackage="com.frostwire.android" />
-        </Preference>
+                android:layout="@layout/view_preference_support"
+                android:summary="@string/support_offer_default_message"
+                android:title="@string/support_offer_default_title" />
         <SwitchPreference
                 android:key="frostwire.prefs.internal.connect_disconnect"
                 android:summary="@string/bittorrent_network_summary"

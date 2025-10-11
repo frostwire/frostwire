@@ -72,7 +72,6 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -408,17 +407,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         lastInstance = this;
-        if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
-                data != null &&
-                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
-            // We (onActivityResult) are invoked before onResume()
-            if (fwBannerView != null) {
-                fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
-            }
-            showAlbumArt();
-            long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
-            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
-        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -642,7 +630,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             fwBannerView.setShowDismissButton(false);
             fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
-            fwBannerView.setShowFallbackBannerOnDismiss(false);
             fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
             deferredInitAlbumArtBanner();
             fwBannerView.loadMaxBanner();
@@ -678,17 +665,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        if (fwBannerView.areLayerVisible(FWBannerView.Layers.APPLOVIN)) {
-            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
-            return;
-        }
-
         if (waitingToInitAlbumArtBanner.get()) {
-
-            if (!fwBannerView.areLayerVisible(FWBannerView.Layers.FALLBACK)) {
-                fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
-            }
-
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
             return;
         }
