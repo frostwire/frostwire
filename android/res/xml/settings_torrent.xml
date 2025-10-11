@@ -43,6 +43,11 @@
             android:key="frostwire.prefs.torrent.sequential_transfers_enabled"
             android:summary="@string/enable_sequential_download_summary"
             android:title="@string/sequential_download"/>
+        <SwitchPreference
+            android:key="frostwire.prefs.torrent.ip_filter_enabled"
+            android:summary="@string/ip_filter_enabled_summary"
+            android:title="@string/ip_filter_enabled"
+            android:defaultValue="false"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_download_speed"
             android:summary="@string/torrent_max_download_speed_summary"

@@ -38,6 +38,12 @@ public class FilterSettings extends LimeProps {
     public static final StringArraySetting BANNED_WORDS =
             FACTORY.createStringArraySetting("BANNED_WORDS", new String[0]);
 
+    /**
+     * Sets whether or not IP filtering is enabled for BitTorrent connections.
+     */
+    public static final BooleanSetting IP_FILTER_ENABLED =
+            FACTORY.createBooleanSetting("IP_FILTER_ENABLED", false);
+
     private FilterSettings() {
     }
 }

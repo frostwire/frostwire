@@ -299,6 +299,8 @@
     <string name="issue_with_tip_donation_uri">There\'s something wrong with the Tip/Donation web address</string>
     <string name="enable_dht">Enable DHT</string>
     <string name="enable_dht_summary">Use the Distributed Hash Table to announce/search torrent peers</string>
+    <string name="ip_filter_enabled">Enable IP Filtering</string>
+    <string name="ip_filter_enabled_summary">Block connections from known bad IP addresses and ranges</string>
     <string name="dummy_build" translatable="false">[build number]</string>
     <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
     <string name="basic" translatable="false">Basic</string>
