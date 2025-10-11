@@ -66,6 +66,7 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.TransfersNoSeedsView;
+import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.HeaderBanner;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -111,6 +112,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private boolean showTorrentSettingsOnClick;
     private TransfersNoSeedsView transfersNoSeedsView;
     private HeaderBanner headerBanner;
+    private FWBannerView supportBanner;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -247,6 +249,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onResume() {
         super.onResume();
         HeaderBanner.onResumeHideOrUpdate(headerBanner);
+        if (supportBanner != null) {
+            supportBanner.setCompactMode(true);
+            if (!supportBanner.isLoaded()) {
+                supportBanner.loadMaxBanner();
+            } else {
+                supportBanner.setVisibility(View.VISIBLE);
+            }
+        }
         initTimerServiceSubscription();
         onTime();
     }
@@ -259,6 +269,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
         adapter = null;
         HeaderBanner.destroy(headerBanner);
+        if (supportBanner != null) {
+            supportBanner.destroy();
+            supportBanner = null;
+        }
     }
 
     @Override
@@ -597,6 +611,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
         initVPNStatusButton(v);
         transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
+        supportBanner = findView(v, R.id.fragment_transfers_support_banner);
+        if (supportBanner != null) {
+            supportBanner.setCompactMode(true);
+            supportBanner.loadMaxBanner();
+        }
         headerBanner = findView(v, R.id.fragment_header_banner);
     }
 

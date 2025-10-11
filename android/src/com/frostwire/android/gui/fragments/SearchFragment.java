@@ -76,6 +76,7 @@ import com.frostwire.android.gui.views.PromotionsView;
 import com.frostwire.android.gui.views.SearchInputView;
 import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
+import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.HeaderBanner;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
@@ -120,6 +121,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private final FileTypeCounter fileTypeCounter;
     private OnClickListener headerClickListener;
     private HeaderBanner headerBanner;
+    private FWBannerView supportBanner;
     private final AtomicBoolean cancelling = new AtomicBoolean(false);
 
     public SearchFragment() {
@@ -254,6 +256,10 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (promotions != null) {
             promotions.destroyPromotionsBanner();
         }
+        if (supportBanner != null) {
+            supportBanner.destroy();
+            supportBanner = null;
+        }
     }
 
     @Override
@@ -289,6 +295,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             }
         });
         switchView(view, R.id.fragment_search_promos);
+        supportBanner = findView(view, R.id.fragment_search_support_banner);
+        if (supportBanner != null) {
+            supportBanner.setCompactMode(true);
+            supportBanner.setVisibility(View.GONE);
+        }
     }
 
     public static class NotAvailableDialog extends AbstractDialog {
@@ -336,6 +347,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         deepSearchProgress.setVisibility(View.VISIBLE);
 
+        showSupportBanner();
+
         postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performTellurideSearch(pageUrl, adapter));
         searchInput.setText(" "); // an empty space so the 'x' button is shown.
         switchView(view, R.id.fragment_search_list);
@@ -354,6 +367,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             refreshFileTypeCounters(false, fileTypeCounter.fsr);
             showSearchView(getView());
         });
+        showSupportBanner();
     }
 
     private void startMagnetDownload(String magnet) {
@@ -457,6 +471,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().cancelSearch());
         postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
         searchInput.setFileTypeCountersVisible(false);
+        hideSupportBanner();
         currentQuery = null;
         searchProgress.setProgressEnabled(false);
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
@@ -464,6 +479,25 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         showSearchView(getView());
         UIUtils.forceShowKeyboard(getContext());
         cancelling.set(false);
+    }
+
+    private void showSupportBanner() {
+        if (supportBanner == null) {
+            return;
+        }
+        supportBanner.setCompactMode(true);
+        if (!supportBanner.isLoaded()) {
+            supportBanner.loadMaxBanner();
+        } else {
+            supportBanner.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideSupportBanner() {
+        if (supportBanner == null) {
+            return;
+        }
+        supportBanner.setVisibility(View.GONE);
     }
 
     private void showSearchView(View view) {

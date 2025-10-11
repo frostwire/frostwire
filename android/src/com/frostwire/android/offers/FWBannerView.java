@@ -19,6 +19,7 @@
 package com.frostwire.android.offers;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,11 +72,17 @@ public class FWBannerView extends LinearLayout {
     private TextView supportMessage;
     private Button supportAction;
     private ImageButton dismissButton;
+    private ImageButton compactCloseButton;
 
     private OnBannerDismissedListener onBannerDismissedListener;
     private OnBannerLoadedListener onBannerLoadedListener;
 
     private SupportOffer currentOffer;
+    private boolean compactMode;
+    private int defaultPaddingStart;
+    private int defaultPaddingTop;
+    private int defaultPaddingEnd;
+    private int defaultPaddingBottom;
 
     public FWBannerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -103,8 +110,19 @@ public class FWBannerView extends LinearLayout {
         supportMessage = findViewById(R.id.fwbanner_support_message);
         supportAction = findViewById(R.id.fwbanner_support_action);
         dismissButton = findViewById(R.id.fwbanner_dismiss_button);
+        compactCloseButton = findViewById(R.id.fwbanner_support_compact_close);
+
+        if (supportContainer != null) {
+            defaultPaddingStart = supportContainer.getPaddingStart();
+            defaultPaddingTop = supportContainer.getPaddingTop();
+            defaultPaddingEnd = supportContainer.getPaddingEnd();
+            defaultPaddingBottom = supportContainer.getPaddingBottom();
+        }
 
         dismissButton.setOnClickListener(v -> dismissBanner());
+        if (compactCloseButton != null) {
+            compactCloseButton.setOnClickListener(v -> dismissBanner());
+        }
         setVisibility(GONE);
     }
 
@@ -114,6 +132,11 @@ public class FWBannerView extends LinearLayout {
 
     public void setOnBannerDismissedListener(OnBannerDismissedListener listener) {
         this.onBannerDismissedListener = listener;
+    }
+
+    public void setCompactMode(boolean compactMode) {
+        this.compactMode = compactMode;
+        applyCompactMode();
     }
 
     public void setShowDismissButton(boolean showDismissButton) {
@@ -183,6 +206,8 @@ public class FWBannerView extends LinearLayout {
         UIUtils.setupClickUrl(supportAction, offer.getUrl());
         UIUtils.setupClickUrl(this, offer.getUrl());
 
+        applyCompactMode();
+
         setVisibility(VISIBLE);
         supportContainer.setVisibility(VISIBLE);
 
@@ -195,6 +220,27 @@ public class FWBannerView extends LinearLayout {
         setVisibility(GONE);
         if (onBannerDismissedListener != null) {
             onBannerDismissedListener.dispatch();
+        }
+    }
+
+    private void applyCompactMode() {
+        if (supportContainer == null) {
+            return;
+        }
+
+        supportContainer.setPaddingRelative(defaultPaddingStart, defaultPaddingTop, defaultPaddingEnd, defaultPaddingBottom);
+
+        if (supportMessage != null) {
+            if (compactMode) {
+                supportMessage.setVisibility(GONE);
+            } else {
+                CharSequence text = supportMessage.getText();
+                supportMessage.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
+            }
+        }
+
+        if (compactCloseButton != null) {
+            compactCloseButton.setVisibility(compactMode ? VISIBLE : GONE);
         }
     }
 }
