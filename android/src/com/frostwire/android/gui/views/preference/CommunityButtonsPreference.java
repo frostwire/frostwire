@@ -63,7 +63,7 @@ public class CommunityButtonsPreference extends Preference {
         ImageButton twitterButton = (ImageButton) holder.findViewById(R.id.view_preference_community_twitter_button);
 
         String referrerParam = "?ref=android_preferences";
-        UIUtils.setupClickUrl(blogButton, "https://blog.frostwire.com/" + referrerParam);
+        UIUtils.setupClickUrl(blogButton, Constants.FROSTWIRE_BLOG_URL + referrerParam);
         UIUtils.setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
         UIUtils.setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
         UIUtils.setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);

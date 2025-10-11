@@ -194,9 +194,8 @@ public final class NavigationMenu {
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
         SupportOffer offer = SupportOffer.random();
         adMenuItemView.bind(offer);
-        View.OnClickListener clickListener = v -> offer.open(activity);
-        menuAd.setOnClickListener(clickListener);
-        adMenuItemView.setOnClickListener(clickListener);
+        UIUtils.setupClickUrl(menuAd, offer.getUrl());
+        UIUtils.setupClickUrl(adMenuItemView, offer.getUrl());
         return adMenuItemView;
     }
 

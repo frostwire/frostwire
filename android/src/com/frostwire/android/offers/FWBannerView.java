@@ -31,6 +31,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
 /**
@@ -187,9 +188,9 @@ public class FWBannerView extends LinearLayout {
             supportBadge.setVisibility(GONE);
         }
 
-        View.OnClickListener action = v -> offer.open(getContext());
-        supportContainer.setOnClickListener(action);
-        supportAction.setOnClickListener(action);
+        UIUtils.setupClickUrl(supportContainer, offer.getUrl());
+        UIUtils.setupClickUrl(supportAction, offer.getUrl());
+        UIUtils.setupClickUrl(this, offer.getUrl());
 
         setVisibility(VISIBLE);
         supportContainer.setVisibility(VISIBLE);
