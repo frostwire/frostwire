@@ -42,13 +42,7 @@ import com.frostwire.util.Logger;
  */
 public class FWBannerView extends LinearLayout {
 
-    public static final String UNIT_ID_HOME = "support_home";
-    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "support_preview_vertical";
-    static final String UNIT_ID_SEARCH_HEADER = "support_search_header";
     public static final String UNIT_ID_AUDIO_PLAYER = "support_audio_player";
-    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "support_preview_horizontal";
-    public static final String UNIT_ID_INTERSTITIAL_MOBILE = "support_interstitial";
-    public static final String UNIT_ID_REWARDED_AD = "support_rewarded";
 
     public enum Layers {
         APPLOVIN,

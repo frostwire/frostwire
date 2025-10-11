@@ -18,114 +18,116 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fw_banner_linear_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="7dp"
-    android:orientation="vertical">
-
-    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fw_banner_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="4dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:layout_marginBottom="7dp"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="5dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
         <TextView
-            android:id="@+id/fwbanner_header_label"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/support_offer_header"
-            android:textColor="@color/app_text_disabled"
-            android:textSize="@dimen/text_micro" />
+                android:id="@+id/fwbanner_header_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/support_offer_header"
+                android:textColor="@color/app_text_disabled"
+                android:textSize="@dimen/text_micro" />
 
         <ImageButton
-            android:id="@+id/fwbanner_dismiss_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:contentDescription="@null"
-            android:src="@drawable/ad_cancel"
-            android:tint="@color/app_icon_primary"
-            android:visibility="gone" />
+                android:id="@+id/fwbanner_dismiss_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ad_cancel"
+                android:visibility="gone"
+                app:tint="@color/app_icon_primary" />
     </LinearLayout>
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="8dp">
-
-        <LinearLayout
-            android:id="@+id/fwbanner_support_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/blue_light_button_background_selector_off"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="12dp">
-
-            <ImageView
-            android:id="@+id/fwbanner_support_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:contentDescription="@null"
-            android:tint="@color/white"
-            android:visibility="gone" />
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="4dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/fwbanner_support_title"
-                android:layout_width="wrap_content"
+                android:id="@+id/fwbanner_support_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_medium"
-                android:textStyle="bold" />
+                android:background="@drawable/blue_light_button_background_selector_off"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="10dp">
 
-            <TextView
-                android:id="@+id/fwbanner_support_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_small" />
-        </LinearLayout>
+            <ImageView
+                    android:id="@+id/fwbanner_support_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@null"
+                    android:visibility="gone"
+                    app:tint="@color/white" />
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:id="@+id/fwbanner_support_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold" />
+
+                <TextView
+                        android:id="@+id/fwbanner_support_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_small" />
+            </LinearLayout>
 
             <Button
-                android:id="@+id/fwbanner_support_action"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/blue_dark_button_background_selector"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                    android:id="@+id/fwbanner_support_action"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/blue_dark_button_background_selector"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/fwbanner_support_compact_close"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="top|end"
-            android:background="@drawable/ad_cancel"
-            android:contentDescription="@string/dismiss"
-            android:scaleType="center"
-            android:tint="@color/white"
-            android:visibility="gone" />
+                android:id="@+id/fwbanner_support_compact_close"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/ad_cancel"
+                android:contentDescription="@string/dismiss"
+                android:scaleType="center"
+                android:visibility="gone"
+                app:tint="@color/white" />
     </FrameLayout>
 
 </LinearLayout>
