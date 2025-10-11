@@ -94,6 +94,7 @@
     <string name="cancel_menu_action">Stop Transfer</string>
     <string name="cancel_delete_menu_action">Stop and Delete Data</string>
     <string name="remove_torrent_and_data">Remove Torrent and Data</string>
+    <string name="no_browser_found">No browser found to open this link.</string>
     <string name="media_type_documents">Books/Docs</string>
     <string name="media_type_applications">Applications</string>
     <string name="media_type_audio">Audio</string>
@@ -391,7 +392,7 @@
     <string name="advertisement">Advertisement</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
     <string name="all_free_downloads">All free downloads</string>
-    <string name="distraction_free_search_results">Distraction Free Search (beta)</string>
+    <string name="distraction_free_search_results">Distraction Free Search</string>
     <string name="distraction_free_search_results_summary">Hide UI components to show more results. Needs app restart to take effect.</string>
     <string name="general_settings">General</string>
     <string name="search_torrent_settings">Search/Torrent Settings</string>

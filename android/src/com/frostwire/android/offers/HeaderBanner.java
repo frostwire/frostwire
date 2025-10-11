@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
 /**
@@ -134,9 +135,8 @@ public final class HeaderBanner extends LinearLayout {
         messageView.setText(offer.messageRes);
         actionButton.setText(offer.actionTextRes);
 
-        View.OnClickListener action = v -> offer.open(getContext());
-        supportContainer.setOnClickListener(action);
-        actionButton.setOnClickListener(action);
+        UIUtils.setupClickUrl(supportContainer, offer.getUrl());
+        UIUtils.setupClickUrl(actionButton, offer.getUrl());
 
         setBannerViewVisibility(VisibleBannerType.ALL, true);
         dismissButton.setVisibility(VISIBLE);

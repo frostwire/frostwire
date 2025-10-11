@@ -54,7 +54,7 @@ public final class SupportOffer {
     public final int badgeTextRes;
     @DrawableRes
     public final int iconRes;
-    public final String url;
+    private final String url;
 
     private SupportOffer(Type type,
                          @StringRes int titleRes,
@@ -95,7 +95,7 @@ public final class SupportOffer {
                 R.string.support_offer_donation_action,
                 R.string.support_offer_donation_badge,
                 R.drawable.contextmenu_icon_donation_fiat,
-                Constants.FROSTWIRE_GIVE_URL + "android-support"
+                Constants.FROSTWIRE_GIVE_URL + "android"
         );
     }
 
@@ -113,5 +113,9 @@ public final class SupportOffer {
 
     public void open(Context context) {
         UIUtils.openURL(context, url);
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
