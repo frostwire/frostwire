@@ -54,19 +54,23 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/fwbanner_support_container"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/blue_light_button_background_selector_off"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:layout_marginBottom="8dp">
 
-        <ImageView
+        <LinearLayout
+            android:id="@+id/fwbanner_support_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blue_light_button_background_selector_off"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <ImageView
             android:id="@+id/fwbanner_support_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -98,18 +102,30 @@
                 android:textSize="@dimen/text_small" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/fwbanner_support_action"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:background="@drawable/blue_dark_button_background_selector"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/fwbanner_support_action"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/blue_dark_button_background_selector"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/fwbanner_support_compact_close"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|end"
+            android:background="@drawable/ad_cancel"
+            android:contentDescription="@string/dismiss"
+            android:scaleType="center"
+            android:tint="@color/white"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </LinearLayout>
