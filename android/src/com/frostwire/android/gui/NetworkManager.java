@@ -23,9 +23,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.os.Build;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -37,15 +41,23 @@ import java.util.List;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
+ * Modern network monitoring using ConnectivityManager.NetworkCallback (API 21+).
+ * Replaces deprecated CONNECTIVITY_CHANGE broadcasts and TYPE_WIFI/TYPE_MOBILE constants.
+ *
  * @author gubatron
  * @author aldenml
  */
 public final class NetworkManager {
 
+    private static final Logger LOG = Logger.getLogger(NetworkManager.class);
+
     private final Context appContext;
     private boolean tunnelUp;
+    private volatile boolean isWifiConnected;
+    private volatile boolean isMobileConnected;
 
     private WeakReference<ConnectivityManager> connManRef;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     // this is one of the few justified occasions in which
     // holding a context in a static field has no problems,
@@ -70,31 +82,130 @@ public final class NetworkManager {
 
     private NetworkManager(Context context) {
         this.appContext = context.getApplicationContext();
+        registerNetworkCallback();
+    }
+
+    /**
+     * Registers a NetworkCallback to monitor network changes using modern Android APIs.
+     * This replaces the deprecated CONNECTIVITY_CHANGE broadcast approach.
+     */
+    private void registerNetworkCallback() {
+        try {
+            ConnectivityManager connectivityManager = getConnectivityManager();
+            if (connectivityManager == null) {
+                LOG.error("ConnectivityManager is null, cannot register network callback");
+                return;
+            }
+
+            // Initial network state check
+            updateNetworkState();
+
+            // Register callback for future network changes
+            NetworkRequest request = new NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build();
+
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    LOG.info("Network available: " + network);
+                    updateNetworkState();
+                    notifyNetworkChange();
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    LOG.info("Network lost: " + network);
+                    updateNetworkState();
+                    notifyNetworkChange();
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities capabilities) {
+                    LOG.info("Network capabilities changed: " + network);
+                    updateNetworkState();
+                    notifyNetworkChange();
+                }
+            };
+
+            connectivityManager.registerNetworkCallback(request, networkCallback);
+            LOG.info("NetworkCallback registered successfully");
+        } catch (Throwable t) {
+            LOG.error("Error registering NetworkCallback", t);
+        }
+    }
+
+    /**
+     * Unregisters the network callback. Should be called when the manager is no longer needed.
+     */
+    public void unregisterNetworkCallback() {
+        if (networkCallback != null) {
+            try {
+                ConnectivityManager connectivityManager = getConnectivityManager();
+                if (connectivityManager != null) {
+                    connectivityManager.unregisterNetworkCallback(networkCallback);
+                    LOG.info("NetworkCallback unregistered successfully");
+                }
+            } catch (Throwable t) {
+                LOG.error("Error unregistering NetworkCallback", t);
+            } finally {
+                networkCallback = null;
+            }
+        }
+    }
+
+    /**
+     * Updates the current network state by checking active network capabilities.
+     * Uses modern NetworkCapabilities API instead of deprecated TYPE_WIFI/TYPE_MOBILE.
+     */
+    private void updateNetworkState() {
+        ConnectivityManager connectivityManager = getConnectivityManager();
+        if (connectivityManager == null) {
+            isWifiConnected = false;
+            isMobileConnected = false;
+            return;
+        }
+
+        Network activeNetwork = connectivityManager.getActiveNetwork();
+        if (activeNetwork == null) {
+            isWifiConnected = false;
+            isMobileConnected = false;
+            return;
+        }
+
+        NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        if (capabilities == null) {
+            isWifiConnected = false;
+            isMobileConnected = false;
+            return;
+        }
+
+        isWifiConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+        isMobileConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
+    }
+
+    /**
+     * Sends a local broadcast to notify the app of network state changes.
+     */
+    private void notifyNetworkChange() {
+        boolean isDataUp = isInternetDataConnectionUp();
+        detectTunnel();
+        Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
+        intent.putExtra("isDataUp", isDataUp);
+        LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent);
     }
 
     public boolean isInternetDataConnectionUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-
-        boolean wifiUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
-        boolean mobileUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
-
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
-        return wifiUp != mobileUp;
-    }
-
-    private boolean isNetworkTypeUp(ConnectivityManager connectivityManager, final int networkType) {
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(networkType);
-        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+        return isWifiConnected != isMobileConnected;
     }
 
     public boolean isDataMobileUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-        return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
+        return isMobileConnected;
     }
 
     public boolean isDataWIFIUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-        return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
+        return isWifiConnected;
     }
 
     private ConnectivityManager getConnectivityManager() {

@@ -138,12 +138,18 @@ public final class ImageLoader {
     }
 
     private ImageLoader(Context context) {
-        Builder picassoBuilder = new Builder(context)
+        // Wrap context to prevent Picasso from registering NetworkBroadcastReceiver
+        // This prevents HandlerDispatcher NPE crashes in Picasso 3.0.0-alpha06
+        // See: SafeContextWrapper for details on the race condition
+        Context safeContext = new SafeContextWrapper(context.getApplicationContext());
+
+        Builder picassoBuilder = new Builder(safeContext)
                 .callFactory(createHttpClient(context.getApplicationContext()));
+
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
-        
+
         // Build Picasso with defensive error handling to prevent HandlerDispatcher crashes
         try {
             this.picasso = picassoBuilder.build();
@@ -152,11 +158,12 @@ public final class ImageLoader {
             } catch (Throwable ignored) {
                 LOG.warn("Failed to set Picasso indicators enabled", ignored);
             }
+            LOG.info("Picasso instance created successfully with SafeContextWrapper to prevent NetworkBroadcastReceiver crashes");
         } catch (Throwable t) {
             LOG.error("Failed to build Picasso instance", t);
             // Create a fallback builder with minimal configuration
             try {
-                this.picasso = new Builder(context).build();
+                this.picasso = new Builder(safeContext).build();
             } catch (Throwable fallbackError) {
                 LOG.error("Failed to create fallback Picasso instance", fallbackError);
                 throw new RuntimeException("Unable to initialize Picasso", fallbackError);
