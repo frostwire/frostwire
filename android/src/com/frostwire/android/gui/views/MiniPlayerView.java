@@ -35,7 +35,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.TaskThrottle;
 
@@ -148,7 +148,7 @@ public class MiniPlayerView extends LinearLayout {
 
         if (currentAlbumId != -1) {
             Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
-            ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
+            FWImageLoader.getInstance(getContext()).load(albumUri, coverImage);
         } else if (coverImage != null) {
             coverImage.setBackgroundResource(R.drawable.default_artwork);
         }

@@ -53,16 +53,19 @@ import kotlin.jvm.functions.Function1;
 import okhttp3.OkHttpClient;
 
 /**
+ * FrostWire Image Loader - Wrapper around Coil image loading library.
+ * Renamed from ImageLoader to FWImageLoader to avoid confusion with coil3.ImageLoader.
+ * 
  * @author gubatron
  * @author aldenml
  */
-public final class ImageLoader {
+public final class FWImageLoader {
 
-    private static final HandlerThread imageLoaderThread = new HandlerThread("ImageLoader-Thread", Process.THREAD_PRIORITY_DISPLAY);
+    private static final HandlerThread imageLoaderThread = new HandlerThread("FWImageLoader-Thread", Process.THREAD_PRIORITY_DISPLAY);
 
     private static Handler handler;
 
-    private static final Logger LOG = Logger.getLogger(ImageLoader.class);
+    private static final Logger LOG = Logger.getLogger(FWImageLoader.class);
 
     private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
@@ -70,29 +73,29 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
-    private ImageLoader imageLoader;
+    private coil3.ImageLoader coilImageLoader;
 
     private boolean shutdown;
 
-    private static ImageLoader instance;
+    private static FWImageLoader instance;
 
-    public static ImageLoader getInstance(Context context) {
+    public static FWImageLoader getInstance(Context context) {
         if (instance == null || instance.shutdown) {
-            synchronized (ImageLoader.class) {
+            synchronized (FWImageLoader.class) {
                 if (instance == null || instance.shutdown) {
-                    LOG.info("Creating new ImageLoader instance" + (instance != null && instance.shutdown ? " (previous was shutdown)" : ""));
+                    LOG.info("Creating new FWImageLoader instance" + (instance != null && instance.shutdown ? " (previous was shutdown)" : ""));
                     
-                    // If there's an old instance being replaced, properly shut down its ImageLoader
-                    if (instance != null && instance.imageLoader != null) {
+                    // If there's an old instance being replaced, properly shut down its Coil ImageLoader
+                    if (instance != null && instance.coilImageLoader != null) {
                         try {
                             LOG.info("Shutting down old Coil ImageLoader instance");
-                            instance.imageLoader.shutdown();
+                            instance.coilImageLoader.shutdown();
                         } catch (Throwable t) {
                             LOG.warn("Error shutting down old Coil ImageLoader instance", t);
                         }
                     }
                     
-                    instance = new ImageLoader(context);
+                    instance = new FWImageLoader(context);
                 }
             }
         }
@@ -100,35 +103,35 @@ public final class ImageLoader {
     }
     
     /**
-     * Gets the current ImageLoader instance without creating a new one.
+     * Gets the current FWImageLoader instance without creating a new one.
      * Returns null if no instance exists or it has been shutdown.
      */
-    public static synchronized ImageLoader getInstanceIfExists() {
-        if (instance != null && !instance.shutdown && instance.imageLoader != null) {
+    public static synchronized FWImageLoader getInstanceIfExists() {
+        if (instance != null && !instance.shutdown && instance.coilImageLoader != null) {
             return instance;
         }
         return null;
     }
     
     /**
-     * Checks if the current ImageLoader instance is healthy and recreates it if needed.
+     * Checks if the current FWImageLoader instance is healthy and recreates it if needed.
      * This helps recover from internal crashes.
      */
     public static synchronized void ensureHealthyInstance(Context context) {
-        if (instance == null || instance.shutdown || instance.imageLoader == null) {
-            LOG.info("Recreating ImageLoader instance due to unhealthy state");
+        if (instance == null || instance.shutdown || instance.coilImageLoader == null) {
+            LOG.info("Recreating FWImageLoader instance due to unhealthy state");
             
-            // If there's an old instance being replaced, properly shut down its ImageLoader
-            if (instance != null && instance.imageLoader != null) {
+            // If there's an old instance being replaced, properly shut down its Coil ImageLoader
+            if (instance != null && instance.coilImageLoader != null) {
                 try {
                     LOG.info("Shutting down old Coil ImageLoader instance");
-                    instance.imageLoader.shutdown();
+                    instance.coilImageLoader.shutdown();
                 } catch (Throwable t) {
                     LOG.warn("Error shutting down old Coil ImageLoader instance", t);
                 }
             }
             
-            instance = new ImageLoader(context);
+            instance = new FWImageLoader(context);
         }
     }
 
@@ -141,14 +144,14 @@ public final class ImageLoader {
         return Uri.withAppendedPath(ARTIST_THUMBNAILS_URI, artistName);
     }
 
-    private ImageLoader(Context context) {
+    private FWImageLoader(Context context) {
         // Coil doesn't have the NetworkBroadcastReceiver issues that Picasso had,
         // so we can use the context directly without SafeContextWrapper
         Context appContext = context.getApplicationContext();
 
         // Build Coil ImageLoader
         try {
-            ImageLoader.Builder coilBuilder = new ImageLoader.Builder(appContext);
+            coil3.ImageLoader.Builder coilBuilder = new coil3.ImageLoader.Builder(appContext);
             
             // Configure OkHttp network fetcher
             OkHttpClient okHttpClient = createHttpClient(appContext);
@@ -178,13 +181,13 @@ public final class ImageLoader {
                 coilBuilder.logger(new DebugLogger());
             }
             
-            this.imageLoader = coilBuilder.build();
+            this.coilImageLoader = coilBuilder.build();
             LOG.info("Coil ImageLoader instance created successfully");
         } catch (Throwable t) {
             LOG.error("Failed to build Coil ImageLoader instance", t);
             // Create a fallback builder with minimal configuration
             try {
-                this.imageLoader = new ImageLoader.Builder(appContext).build();
+                this.coilImageLoader = new coil3.ImageLoader.Builder(appContext).build();
             } catch (Throwable fallbackError) {
                 LOG.error("Failed to create fallback Coil ImageLoader instance", fallbackError);
                 throw new RuntimeException("Unable to initialize Coil ImageLoader", fallbackError);
@@ -291,10 +294,10 @@ public final class ImageLoader {
 
     private void load(int resourceId, Uri uri, ImageView target, Params p) {
         if (shutdown) {
-            LOG.info("ImageLoader is shutdown, skipping load request");
+            LOG.info("FWImageLoader is shutdown, skipping load request");
             return;
         }
-        if (imageLoader == null) {
+        if (coilImageLoader == null) {
             LOG.warn("Coil ImageLoader instance is null, cannot load image");
             return;
         }
@@ -304,7 +307,7 @@ public final class ImageLoader {
                 Ref.weak(target),
                 p,
                 shutdown,
-                Ref.weak(imageLoader));
+                Ref.weak(coilImageLoader));
         
         try {
             handler.post(asyncLoader);
@@ -326,15 +329,15 @@ public final class ImageLoader {
         private final WeakReference<ImageView> targetRef;
         private final Params p;
         private final boolean shutdown;
-        private final WeakReference<ImageLoader> imageLoader;
+        private final WeakReference<coil3.ImageLoader> coilImageLoader;
 
-        AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<ImageLoader> imageLoaderRef) {
+        AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<coil3.ImageLoader> coilImageLoaderRef) {
             this.resourceId = resourceId;
             this.uri = uri;
             this.targetRef = targetRef;
             this.p = p;
             this.shutdown = shutdown;
-            this.imageLoader = imageLoaderRef;
+            this.coilImageLoader = coilImageLoaderRef;
         }
 
         @Override
@@ -342,8 +345,8 @@ public final class ImageLoader {
             if (shutdown) {
                 return;
             }
-            if (!Ref.alive(imageLoader)) {
-                LOG.info("AsyncLoader.run() main thread update cancelled, imageLoader target reference lost.");
+            if (!Ref.alive(coilImageLoader)) {
+                LOG.info("AsyncLoader.run() main thread update cancelled, coilImageLoader target reference lost.");
                 return;
             }
             if (!Ref.alive(targetRef)) {
@@ -365,7 +368,7 @@ public final class ImageLoader {
                     () -> {
                         try {
                             if (!Ref.alive(targetRef)) {
-                                LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
+                                LOG.info("FWImageLoader.load() main thread update cancelled, ImageView target reference lost.");
                                 return;
                             }
                             
@@ -434,22 +437,22 @@ public final class ImageLoader {
                             }
                             
                             // Execute request
-                            imageLoader.get().enqueue(requestBuilder.build());
+                            coilImageLoader.get().enqueue(requestBuilder.build());
                             
                         } catch (Throwable t) {
                             if (BuildConfig.DEBUG) {
-                                LOG.error("ImageLoader::AsyncLoader::run() error posting to main looper in DEBUG mode", t);
+                                LOG.error("FWImageLoader::AsyncLoader::run() error posting to main looper in DEBUG mode", t);
                                 throw t;
                             }
-                            LOG.error("ImageLoader::AsyncLoader::run() error posted caught posting to main looper: " + t.getMessage(), t);
+                            LOG.error("FWImageLoader::AsyncLoader::run() error posted caught posting to main looper: " + t.getMessage(), t);
                         }
                     });
         }
     }
 
     public Bitmap get(Uri uri) {
-        if (shutdown || imageLoader == null) {
-            LOG.info("ImageLoader is shutdown or imageLoader is null, returning null for get() request");
+        if (shutdown || coilImageLoader == null) {
+            LOG.info("FWImageLoader is shutdown or coilImageLoader is null, returning null for get() request");
             return null;
         }
         try {
@@ -465,7 +468,7 @@ public final class ImageLoader {
                 .data(uri)
                 .build();
             
-            coil3.request.ImageResult result = imageLoader.execute(request);
+            coil3.request.ImageResult result = coilImageLoader.execute(request);
             if (result instanceof SuccessResult) {
                 // Get the image and convert to bitmap
                 coil3.Image image = ((SuccessResult) result).getImage();
@@ -487,15 +490,15 @@ public final class ImageLoader {
     }
 
     public void clear() {
-        if (imageLoader != null) {
+        if (coilImageLoader != null) {
             try {
                 // Clear memory cache
-                MemoryCache memoryCache = imageLoader.getMemoryCache();
+                MemoryCache memoryCache = coilImageLoader.getMemoryCache();
                 if (memoryCache != null) {
                     memoryCache.clear();
                 }
                 // Clear disk cache
-                DiskCache diskCache = imageLoader.getDiskCache();
+                DiskCache diskCache = coilImageLoader.getDiskCache();
                 if (diskCache != null) {
                     diskCache.clear();
                 }
@@ -506,22 +509,22 @@ public final class ImageLoader {
     }
 
     public void shutdown() {
-        synchronized (ImageLoader.class) {
+        synchronized (FWImageLoader.class) {
             if (shutdown) {
-                LOG.info("ImageLoader already shutdown, skipping");
+                LOG.info("FWImageLoader already shutdown, skipping");
                 return;
             }
-            LOG.info("ImageLoader shutdown requested");
+            LOG.info("FWImageLoader shutdown requested");
             shutdown = true;
 
             // Coil doesn't have the HandlerDispatcher race condition that Picasso had,
             // so we can safely shutdown and clear the cache
-            if (imageLoader != null) {
+            if (coilImageLoader != null) {
                 try {
                     LOG.info("Clearing Coil cache during shutdown");
                     clear();
                     LOG.info("Shutting down Coil ImageLoader");
-                    imageLoader.shutdown();
+                    coilImageLoader.shutdown();
                 } catch (Throwable t) {
                     LOG.warn("Failed to clear/shutdown Coil ImageLoader during shutdown", t);
                 }
@@ -545,12 +548,12 @@ public final class ImageLoader {
                 startImageLoaderBackground(mainApplication);
             }
         } catch (Throwable t) {
-            LOG.error("Error starting ImageLoader", t);
+            LOG.error("Error starting FWImageLoader", t);
             // Try to initialize directly if thread approach fails
             try {
                 startImageLoaderBackground(mainApplication);
             } catch (Throwable fallbackError) {
-                LOG.error("Failed to start ImageLoader with fallback", fallbackError);
+                LOG.error("Failed to start FWImageLoader with fallback", fallbackError);
             }
         }
     }
@@ -558,13 +561,13 @@ public final class ImageLoader {
     private static void startImageLoaderBackground(MainApplication mainApplication) {
         try {
             if (instance == null || instance.shutdown) {
-                LOG.info("Creating ImageLoader instance in background thread");
-                ImageLoader.getInstance(mainApplication);
+                LOG.info("Creating FWImageLoader instance in background thread");
+                FWFWImageLoader.getInstance(mainApplication);
             } else {
-                LOG.info("ImageLoader instance already exists and is healthy");
+                LOG.info("FWImageLoader instance already exists and is healthy");
             }
         } catch (Throwable t) {
-            LOG.error("Error creating ImageLoader instance in background", t);
+            LOG.error("Error creating FWImageLoader instance in background", t);
         }
     }
 
@@ -606,13 +609,13 @@ public final class ImageLoader {
      */
     private static final class RetryCallback implements Callback {
 
-        // ImageLoader is a singleton already
-        private final WeakReference<ImageLoader> loader;
+        // FWImageLoader is a singleton already
+        private final WeakReference<FWImageLoader> loader;
         private final Uri uri;
         private final WeakReference<ImageView> target;
         private final Params params;
 
-        RetryCallback(ImageLoader loader, Uri uri, ImageView target, Params params) {
+        RetryCallback(FWImageLoader loader, Uri uri, ImageView target, Params params) {
             this.loader = Ref.weak(loader);
             this.uri = uri;
             this.target = Ref.weak(target);

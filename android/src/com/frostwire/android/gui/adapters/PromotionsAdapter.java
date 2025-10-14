@@ -37,7 +37,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
 
@@ -63,7 +63,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
         super(ctx, R.layout.view_promotions_item);
         this.slides = slides;
-        this.imageLoader = ImageLoader.getInstance(ctx);
+        this.imageLoader = FWImageLoader.getInstance(ctx);
         this.promotionDownloader = promotionDownloader;
     }
 
