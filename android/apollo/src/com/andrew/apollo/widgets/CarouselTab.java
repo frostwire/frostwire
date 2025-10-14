@@ -32,7 +32,7 @@ import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -103,9 +103,9 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     }
 
     /**
-     * Filter used to blur image in ImageLoader
+     * Filter used to blur image in FWImageLoader
      */
-    private static class BlurFilter implements ImageLoader.Filter {
+    private static class BlurFilter implements FWImageLoader.Filter {
         @Override
         public Bitmap filter(Bitmap source) {
             // scale down image to operate in less pixels
@@ -135,10 +135,10 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      *            artist image is missing.
      */
     public void blurPhoto(final Activity context, final String artist, final String album) {
-        final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
-        ImageLoader.Filter filter = new BlurFilter();
-        loader.load(ImageLoader.getArtistArtUri(artist),
-                    ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
+        final FWImageLoader loader = FWImageLoader.getInstance(context.getApplicationContext());
+        FWImageLoader.Filter filter = new BlurFilter();
+        loader.load(FWImageLoader.getArtistArtUri(artist),
+                    FWImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
                     filter,
                     mPhoto,
                     true);

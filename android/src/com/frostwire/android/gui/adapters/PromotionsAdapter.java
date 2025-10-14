@@ -55,7 +55,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     //private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
-    private final ImageLoader imageLoader;
+    private final FWImageLoader imageLoader;
     private FWBannerView fwBannerView;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 

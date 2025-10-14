@@ -26,7 +26,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 
 /**
  * This class wraps up completing some arbitrary long running work when loading
@@ -118,12 +118,12 @@ public abstract class ImageWorker {
             return;
         }
 
-        final ImageLoader loader = ImageLoader.getInstance(mContext.getApplicationContext());
+        final FWImageLoader loader = FWImageLoader.getInstance(mContext.getApplicationContext());
         if (ImageType.ALBUM.equals(imageType)) {
-            final Uri albumArtUri = ImageLoader.getAlbumArtUri(albumId);
+            final Uri albumArtUri = FWImageLoader.getAlbumArtUri(albumId);
             loader.load(albumArtUri, imageView, R.drawable.default_artwork);
         } else if (ImageType.ARTIST.equals(imageType)) {
-            final Uri artistArtUri = ImageLoader.getArtistArtUri(artistName);
+            final Uri artistArtUri = FWImageLoader.getArtistArtUri(artistName);
             loader.load(artistArtUri, imageView, R.drawable.default_artwork);
         }
     }

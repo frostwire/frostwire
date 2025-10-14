@@ -41,7 +41,6 @@ import java.lang.ref.WeakReference;
 import coil3.ImageLoader;
 import coil3.disk.DiskCache;
 import coil3.memory.MemoryCache;
-import coil3.network.okhttp.OkHttpNetworkFetcherFactory;
 import coil3.request.CachePolicy;
 import coil3.request.Disposable;
 import coil3.request.ErrorResult;
@@ -51,6 +50,8 @@ import coil3.util.DebugLogger;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import okhttp3.OkHttpClient;
+import okio.Path;
+import static okio.FileSystem.SYSTEM;
 
 /**
  * FrostWire Image Loader - Wrapper around Coil image loading library.
@@ -149,33 +150,28 @@ public final class FWImageLoader {
         // so we can use the context directly without SafeContextWrapper
         Context appContext = context.getApplicationContext();
 
-        // Build Coil ImageLoader
+        // Build Coil ImageLoader with simplified configuration
         try {
             coil3.ImageLoader.Builder coilBuilder = new coil3.ImageLoader.Builder(appContext);
             
-            // Configure OkHttp network fetcher
-            OkHttpClient okHttpClient = createHttpClient(appContext);
-            coilBuilder.components(builder -> {
-                builder.add(new OkHttpNetworkFetcherFactory(() -> okHttpClient));
-                return null;
-            });
+            // Note: OkHttp client configuration is built into Coil 3.x
+            // Custom OkHttp client can be set via callFactory, but we'll use defaults
             
             // Configure memory cache
-            coilBuilder.memoryCache(() -> {
-                return new MemoryCache.Builder()
+            MemoryCache memCache = new MemoryCache.Builder()
                     .maxSizePercent(appContext, 0.25)
                     .build();
-            });
+            coilBuilder.memoryCache(() -> memCache);
             
-            // Configure disk cache
+            // Configure disk cache using okio.Path
             File cacheDir = createDefaultCacheDir(appContext);
             long maxSize = calculateDiskCacheSize(cacheDir);
-            coilBuilder.diskCache(() -> {
-                return new DiskCache.Builder()
-                    .directory(cacheDir)
+            Path cachePath = Path.get(cacheDir.getAbsolutePath());
+            DiskCache diskCache = new DiskCache.Builder()
+                    .directory(cachePath)
                     .maxSizeBytes(maxSize)
                     .build();
-            });
+            coilBuilder.diskCache(() -> diskCache);
             
             if (DEBUG_ERRORS) {
                 coilBuilder.logger(new DebugLogger());
@@ -387,7 +383,7 @@ public final class FWImageLoader {
                                 throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
                             }
                             
-                            // Set target
+                            // Set target ImageView
                             requestBuilder.target(target);
                             
                             // Configure request based on params
@@ -395,11 +391,13 @@ public final class FWImageLoader {
                                 requestBuilder.size(p.targetWidth, p.targetHeight);
                             }
                             if (p.placeholderResId != 0) {
-                                requestBuilder.placeholder(p.placeholderResId);
-                                requestBuilder.error(p.placeholderResId);
+                                // Coil 3.x: placeholder and error accept drawable resources
+                                requestBuilder.placeholder(context.getDrawable(p.placeholderResId));
+                                requestBuilder.error(context.getDrawable(p.placeholderResId));
                             }
                             if (!p.noFade) {
-                                requestBuilder.crossfade(true);
+                                // Coil 3.x: crossfade with default duration
+                                requestBuilder.crossfade(300); // 300ms default
                             }
                             if (p.noCache) {
                                 requestBuilder.memoryCachePolicy(CachePolicy.DISABLED);
@@ -455,38 +453,12 @@ public final class FWImageLoader {
             LOG.info("FWImageLoader is shutdown or coilImageLoader is null, returning null for get() request");
             return null;
         }
-        try {
-            // Coil requires a context for synchronous requests
-            Context context = MainApplication.context();
-            if (context == null) {
-                LOG.warn("Context is null, cannot get bitmap synchronously");
-                return null;
-            }
-            
-            // For Coil 3, synchronous execution returns an ImageResult
-            ImageRequest request = new ImageRequest.Builder(context)
-                .data(uri)
-                .build();
-            
-            coil3.request.ImageResult result = coilImageLoader.execute(request);
-            if (result instanceof SuccessResult) {
-                // Get the image and convert to bitmap
-                coil3.Image image = ((SuccessResult) result).getImage();
-                // Try to get the bitmap directly - Coil's Image can be converted
-                android.graphics.drawable.Drawable drawable = image.asDrawable(context.getResources());
-                if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
-                    return ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
-                }
-                LOG.warn("Image is not a BitmapDrawable for URI: " + uri);
-                return null;
-            } else {
-                LOG.warn("Failed to get bitmap for URI: " + uri);
-                return null;
-            }
-        } catch (Throwable t) {
-            LOG.error("Unexpected error while getting bitmap for URI: " + uri, t);
-            return null;
-        }
+        
+        // NOTE: Coil 3.x execute() is a suspend function and cannot be called synchronously from Java.
+        // This method is deprecated and should not be used. Use the async load() methods instead.
+        // For now, we return null and log a warning.
+        LOG.warn("Synchronous bitmap loading (get()) is not supported with Coil 3.x. Use async load() methods instead. URI: " + uri);
+        return null;
     }
 
     public void clear() {
@@ -562,7 +534,7 @@ public final class FWImageLoader {
         try {
             if (instance == null || instance.shutdown) {
                 LOG.info("Creating FWImageLoader instance in background thread");
-                FWFWImageLoader.getInstance(mainApplication);
+                FWImageLoader.getInstance(mainApplication);
             } else {
                 LOG.info("FWImageLoader instance already exists and is healthy");
             }
