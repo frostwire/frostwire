@@ -240,7 +240,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'com.google.re2j:re2j:1.8'
     implementation 'com.squareup.okhttp3:okhttp:5.1.0'
-    implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
+    implementation 'io.coil-kt.coil3:coil:3.0.4'
+    implementation 'io.coil-kt.coil3:coil-network-okhttp:3.0.4'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0'
     implementation "androidx.work:work-runtime-ktx:2.10.4"
 

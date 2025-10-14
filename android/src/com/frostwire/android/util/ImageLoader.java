@@ -33,17 +33,23 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.http.OkHttpClientWrapper;
-import com.squareup.picasso3.MemoryPolicy;
-import com.squareup.picasso3.NetworkPolicy;
-import com.squareup.picasso3.Picasso;
-import com.squareup.picasso3.Picasso.Builder;
-import com.squareup.picasso3.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import okhttp3.Cache;
+import coil3.ImageLoader;
+import coil3.asDrawable;
+import coil3.disk.DiskCache;
+import coil3.memory.MemoryCache;
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory;
+import coil3.request.ImageRequest;
+import coil3.request.CachePolicy;
+import coil3.request.Disposable;
+import coil3.request.ErrorResult;
+import coil3.request.SuccessResult;
+import coil3.util.DebugLogger;
+import kotlin.jvm.functions.Function1;
 import okhttp3.OkHttpClient;
 
 /**
@@ -64,7 +70,7 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
-    private Picasso picasso;
+    private ImageLoader imageLoader;
 
     private boolean shutdown;
 
@@ -76,14 +82,13 @@ public final class ImageLoader {
                 if (instance == null || instance.shutdown) {
                     LOG.info("Creating new ImageLoader instance" + (instance != null && instance.shutdown ? " (previous was shutdown)" : ""));
                     
-                    // If there's an old instance being replaced, properly shut down its Picasso
-                    // to unregister NetworkBroadcastReceiver BEFORE creating new instance
-                    if (instance != null && instance.picasso != null) {
+                    // If there's an old instance being replaced, properly shut down its ImageLoader
+                    if (instance != null && instance.imageLoader != null) {
                         try {
-                            LOG.info("Shutting down old Picasso instance to unregister NetworkBroadcastReceiver");
-                            instance.picasso.shutdown();
+                            LOG.info("Shutting down old Coil ImageLoader instance");
+                            instance.imageLoader.shutdown();
                         } catch (Throwable t) {
-                            LOG.warn("Error shutting down old Picasso instance", t);
+                            LOG.warn("Error shutting down old Coil ImageLoader instance", t);
                         }
                     }
                     
@@ -99,7 +104,7 @@ public final class ImageLoader {
      * Returns null if no instance exists or it has been shutdown.
      */
     public static synchronized ImageLoader getInstanceIfExists() {
-        if (instance != null && !instance.shutdown && instance.picasso != null) {
+        if (instance != null && !instance.shutdown && instance.imageLoader != null) {
             return instance;
         }
         return null;
@@ -107,20 +112,19 @@ public final class ImageLoader {
     
     /**
      * Checks if the current ImageLoader instance is healthy and recreates it if needed.
-     * This helps recover from Picasso internal crashes.
+     * This helps recover from internal crashes.
      */
     public static synchronized void ensureHealthyInstance(Context context) {
-        if (instance == null || instance.shutdown || instance.picasso == null) {
+        if (instance == null || instance.shutdown || instance.imageLoader == null) {
             LOG.info("Recreating ImageLoader instance due to unhealthy state");
             
-            // If there's an old instance being replaced, properly shut down its Picasso
-            // to unregister NetworkBroadcastReceiver BEFORE creating new instance
-            if (instance != null && instance.picasso != null) {
+            // If there's an old instance being replaced, properly shut down its ImageLoader
+            if (instance != null && instance.imageLoader != null) {
                 try {
-                    LOG.info("Shutting down old Picasso instance to unregister NetworkBroadcastReceiver");
-                    instance.picasso.shutdown();
+                    LOG.info("Shutting down old Coil ImageLoader instance");
+                    instance.imageLoader.shutdown();
                 } catch (Throwable t) {
-                    LOG.warn("Error shutting down old Picasso instance", t);
+                    LOG.warn("Error shutting down old Coil ImageLoader instance", t);
                 }
             }
             
@@ -138,35 +142,52 @@ public final class ImageLoader {
     }
 
     private ImageLoader(Context context) {
-        // Wrap context to prevent Picasso from registering NetworkBroadcastReceiver
-        // This prevents HandlerDispatcher NPE crashes in Picasso 3.0.0-alpha06
-        // See: SafeContextWrapper for details on the race condition
-        Context safeContext = new SafeContextWrapper(context.getApplicationContext());
+        // Coil doesn't have the NetworkBroadcastReceiver issues that Picasso had,
+        // so we can use the context directly without SafeContextWrapper
+        Context appContext = context.getApplicationContext();
 
-        Builder picassoBuilder = new Builder(safeContext)
-                .callFactory(createHttpClient(context.getApplicationContext()));
-
-        if (DEBUG_ERRORS) {
-            picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
-        }
-
-        // Build Picasso with defensive error handling to prevent HandlerDispatcher crashes
+        // Build Coil ImageLoader
         try {
-            this.picasso = picassoBuilder.build();
-            try {
-                this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
-            } catch (Throwable ignored) {
-                LOG.warn("Failed to set Picasso indicators enabled", ignored);
+            ImageLoader.Builder coilBuilder = new ImageLoader.Builder(appContext);
+            
+            // Configure OkHttp network fetcher
+            OkHttpClient okHttpClient = createHttpClient(appContext);
+            coilBuilder.components(builder -> {
+                builder.add(new OkHttpNetworkFetcherFactory(() -> okHttpClient));
+                return null;
+            });
+            
+            // Configure memory cache
+            coilBuilder.memoryCache(() -> {
+                return new MemoryCache.Builder()
+                    .maxSizePercent(appContext, 0.25)
+                    .build();
+            });
+            
+            // Configure disk cache
+            File cacheDir = createDefaultCacheDir(appContext);
+            long maxSize = calculateDiskCacheSize(cacheDir);
+            coilBuilder.diskCache(() -> {
+                return new DiskCache.Builder()
+                    .directory(cacheDir)
+                    .maxSizeBytes(maxSize)
+                    .build();
+            });
+            
+            if (DEBUG_ERRORS) {
+                coilBuilder.logger(new DebugLogger());
             }
-            LOG.info("Picasso instance created successfully with SafeContextWrapper to prevent NetworkBroadcastReceiver crashes");
+            
+            this.imageLoader = coilBuilder.build();
+            LOG.info("Coil ImageLoader instance created successfully");
         } catch (Throwable t) {
-            LOG.error("Failed to build Picasso instance", t);
+            LOG.error("Failed to build Coil ImageLoader instance", t);
             // Create a fallback builder with minimal configuration
             try {
-                this.picasso = new Builder(safeContext).build();
+                this.imageLoader = new ImageLoader.Builder(appContext).build();
             } catch (Throwable fallbackError) {
-                LOG.error("Failed to create fallback Picasso instance", fallbackError);
-                throw new RuntimeException("Unable to initialize Picasso", fallbackError);
+                LOG.error("Failed to create fallback Coil ImageLoader instance", fallbackError);
+                throw new RuntimeException("Unable to initialize Coil ImageLoader", fallbackError);
             }
         }
     }
@@ -273,8 +294,8 @@ public final class ImageLoader {
             LOG.info("ImageLoader is shutdown, skipping load request");
             return;
         }
-        if (picasso == null) {
-            LOG.warn("Picasso instance is null, cannot load image");
+        if (imageLoader == null) {
+            LOG.warn("Coil ImageLoader instance is null, cannot load image");
             return;
         }
         AsyncLoader asyncLoader = new AsyncLoader(
@@ -283,7 +304,7 @@ public final class ImageLoader {
                 Ref.weak(target),
                 p,
                 shutdown,
-                Ref.weak(picasso));
+                Ref.weak(imageLoader));
         
         try {
             handler.post(asyncLoader);
@@ -305,15 +326,15 @@ public final class ImageLoader {
         private final WeakReference<ImageView> targetRef;
         private final Params p;
         private final boolean shutdown;
-        private final WeakReference<Picasso> picasso;
+        private final WeakReference<ImageLoader> imageLoader;
 
-        AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
+        AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<ImageLoader> imageLoaderRef) {
             this.resourceId = resourceId;
             this.uri = uri;
             this.targetRef = targetRef;
             this.p = p;
             this.shutdown = shutdown;
-            this.picasso = picassoRef;
+            this.imageLoader = imageLoaderRef;
         }
 
         @Override
@@ -321,8 +342,8 @@ public final class ImageLoader {
             if (shutdown) {
                 return;
             }
-            if (!Ref.alive(picasso)) {
-                LOG.info("AsyncLoader.run() main thread update cancelled, picasso target reference lost.");
+            if (!Ref.alive(imageLoader)) {
+                LOG.info("AsyncLoader.run() main thread update cancelled, imageLoader target reference lost.");
                 return;
             }
             if (!Ref.alive(targetRef)) {
@@ -340,30 +361,6 @@ public final class ImageLoader {
                 throw new RuntimeException("Possible context leak");
             }
             
-            RequestCreator rc;
-            try {
-                if (uri != null) {
-                    rc = picasso.get().load(uri);
-                } else if (resourceId != -1) {
-                    rc = picasso.get().load(resourceId);
-                } else {
-                    throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
-                }
-                
-                if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
-                if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
-                if (p.fit) rc.fit();
-                if (p.centerInside) rc.centerInside();
-                if (p.noFade) rc.noFade();
-                if (p.noCache) {
-                    rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
-                    rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
-                }
-            } catch (Throwable t) {
-                LOG.error("Failed to create RequestCreator or configure request", t);
-                return;
-            }
-            
             SystemUtils.postToUIThread(
                     () -> {
                         try {
@@ -371,11 +368,61 @@ public final class ImageLoader {
                                 LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
                                 return;
                             }
-                            if (p.callback != null) {
-                                rc.into(targetRef.get(), new CallbackWrapper(p.callback));
+                            
+                            ImageView target = targetRef.get();
+                            Context context = target.getContext();
+                            
+                            // Build Coil request
+                            ImageRequest.Builder requestBuilder = new ImageRequest.Builder(context);
+                            
+                            // Set data (URI or resource ID)
+                            if (uri != null) {
+                                requestBuilder.data(uri);
+                            } else if (resourceId != -1) {
+                                requestBuilder.data(resourceId);
                             } else {
-                                rc.into(targetRef.get());
+                                throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
                             }
+                            
+                            // Set target
+                            requestBuilder.target(target);
+                            
+                            // Configure request based on params
+                            if (p.targetWidth != 0 && p.targetHeight != 0) {
+                                requestBuilder.size(p.targetWidth, p.targetHeight);
+                            }
+                            if (p.placeholderResId != 0) {
+                                requestBuilder.placeholder(p.placeholderResId);
+                                requestBuilder.error(p.placeholderResId);
+                            }
+                            if (!p.noFade) {
+                                requestBuilder.crossfade(true);
+                            }
+                            if (p.noCache) {
+                                requestBuilder.memoryCachePolicy(CachePolicy.DISABLED);
+                                requestBuilder.diskCachePolicy(CachePolicy.DISABLED);
+                            }
+                            
+                            // Add listener if callback is provided
+                            if (p.callback != null) {
+                                final Callback callback = p.callback;
+                                requestBuilder.listener(
+                                    (Function1<ImageRequest, kotlin.Unit>) request -> null,
+                                    (Function1<SuccessResult, kotlin.Unit>) result -> {
+                                        callback.onSuccess();
+                                        return null;
+                                    },
+                                    (Function1<ErrorResult, kotlin.Unit>) result -> {
+                                        callback.onError(result.getThrowable());
+                                        return null;
+                                    },
+                                    null
+                                );
+                            }
+                            
+                            // Execute request
+                            imageLoader.get().enqueue(requestBuilder.build());
+                            
                         } catch (Throwable t) {
                             if (BuildConfig.DEBUG) {
                                 LOG.error("ImageLoader::AsyncLoader::run() error posting to main looper in DEBUG mode", t);
@@ -388,15 +435,36 @@ public final class ImageLoader {
     }
 
     public Bitmap get(Uri uri) {
-        if (shutdown || picasso == null) {
-            LOG.info("ImageLoader is shutdown or picasso is null, returning null for get() request");
+        if (shutdown || imageLoader == null) {
+            LOG.info("ImageLoader is shutdown or imageLoader is null, returning null for get() request");
             return null;
         }
         try {
-            return picasso.load(uri).get();
-        } catch (IOException e) {
-            LOG.warn("IOException while getting bitmap for URI: " + uri, e);
-            return null;
+            // Coil requires a context for synchronous requests
+            Context context = MainApplication.context();
+            if (context == null) {
+                LOG.warn("Context is null, cannot get bitmap synchronously");
+                return null;
+            }
+            
+            ImageRequest request = new ImageRequest.Builder(context)
+                .data(uri)
+                .build();
+            
+            coil3.request.ImageResult result = imageLoader.execute(request);
+            if (result instanceof SuccessResult) {
+                coil3.Image image = ((SuccessResult) result).getImage();
+                // Get the drawable and extract bitmap if it's a BitmapDrawable
+                android.graphics.drawable.Drawable drawable = coil3.AsDrawableKt.asDrawable(image, context.getResources());
+                if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                    return ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
+                }
+                LOG.warn("Image is not a BitmapDrawable for URI: " + uri);
+                return null;
+            } else {
+                LOG.warn("Failed to get bitmap for URI: " + uri);
+                return null;
+            }
         } catch (Throwable t) {
             LOG.error("Unexpected error while getting bitmap for URI: " + uri, t);
             return null;
@@ -404,12 +472,20 @@ public final class ImageLoader {
     }
 
     public void clear() {
-        if (picasso != null) {
+        if (imageLoader != null) {
             try {
-                //cache.clear();
-                picasso.evictAll();
+                // Clear memory cache
+                MemoryCache memoryCache = imageLoader.getMemoryCache();
+                if (memoryCache != null) {
+                    memoryCache.clear();
+                }
+                // Clear disk cache
+                DiskCache diskCache = imageLoader.getDiskCache();
+                if (diskCache != null) {
+                    diskCache.clear();
+                }
             } catch (Throwable t) {
-                LOG.error("Error while clearing Picasso cache", t);
+                LOG.error("Error while clearing Coil cache", t);
             }
         }
     }
@@ -420,33 +496,23 @@ public final class ImageLoader {
                 LOG.info("ImageLoader already shutdown, skipping");
                 return;
             }
-            LOG.info("ImageLoader shutdown requested - marking as shutdown but keeping Picasso alive to prevent HandlerDispatcher NPE");
+            LOG.info("ImageLoader shutdown requested");
             shutdown = true;
 
-            // DO NOT call picasso.shutdown() here when app is going away!
-            // Picasso 3's HandlerDispatcher has a race condition where NetworkBroadcastReceiver
-            // can receive network state change broadcasts after the Handler becomes null,
-            // causing NullPointerException in HandlerDispatcher.dispatchNetworkStateChange()
-            //
-            // Instead, we just mark this instance as shutdown and clear the cache.
-            // The Picasso instance will be cleaned up when the process dies.
-            //
-            // NOTE: picasso.shutdown() IS called when replacing an old instance with a new one
-            // (see getInstance() and ensureHealthyInstance()) to properly unregister receivers
-            // before the old instance is discarded.
-
-            if (picasso != null) {
+            // Coil doesn't have the HandlerDispatcher race condition that Picasso had,
+            // so we can safely shutdown and clear the cache
+            if (imageLoader != null) {
                 try {
-                    LOG.info("Clearing Picasso cache during shutdown");
-                    picasso.evictAll();
+                    LOG.info("Clearing Coil cache during shutdown");
+                    clear();
+                    LOG.info("Shutting down Coil ImageLoader");
+                    imageLoader.shutdown();
                 } catch (Throwable t) {
-                    LOG.warn("Failed to clear Picasso cache during shutdown", t);
+                    LOG.warn("Failed to clear/shutdown Coil ImageLoader during shutdown", t);
                 }
-                // Keep picasso reference alive to prevent HandlerDispatcher NPE
-                // picasso = null; // DO NOT null this out
             }
 
-            // Only null out the singleton instance reference
+            // Null out the singleton instance reference
             instance = null;
         }
     }
@@ -514,31 +580,13 @@ public final class ImageLoader {
         String params();
     }
 
-    private static final class CallbackWrapper implements
-            com.squareup.picasso3.Callback {
 
-        private final Callback cb;
-
-        CallbackWrapper(Callback cb) {
-            this.cb = cb;
-        }
-
-        @Override
-        public void onSuccess() {
-            cb.onSuccess();
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            cb.onError(e);
-        }
-    }
 
     /**
      * This class is necessary, because passing an anonymous inline
      * class pin the ImageView target to memory with a hard reference
      * in the background thread pool, creating a potential memory leak.
-     * Picasso already creates a weak reference to the target while
+     * Coil already creates a weak reference to the target while
      * creating and submitting the callable to the background.
      */
     private static final class RetryCallback implements Callback {
@@ -581,25 +629,20 @@ public final class ImageLoader {
 
 
     private static OkHttpClient createHttpClient(Context context) {
-        File cacheDir = createDefaultCacheDir(context);
-        long maxSize = calculateDiskCacheSize(cacheDir);
-
-        Cache cache = new Cache(cacheDir, maxSize);
-
-        OkHttpClient.Builder b = new OkHttpClient.Builder().cache(cache);
+        // Coil manages its own disk cache, so we don't need to set up OkHttp cache here
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
         OkHttpClient.Builder nullSslBuilder = OkHttpClientWrapper.configNullSsl(b);
         return nullSslBuilder.build();
     }
 
-    // ------- below code copied from com.squareup.picasso3.Utils -------
-    // copied here to keep code independence
+    // Cache configuration for Coil image loading
 
-    private static final String PICASSO_CACHE = "picasso-cache";
+    private static final String IMAGE_CACHE = "image-cache";
     private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
     private static File createDefaultCacheDir(Context context) {
-        File cache = SystemUtils.getCacheDir(context, PICASSO_CACHE);
+        File cache = SystemUtils.getCacheDir(context, IMAGE_CACHE);
         if (!cache.exists()) {
             //noinspection ResultOfMethodCallIgnored
             cache.mkdirs();

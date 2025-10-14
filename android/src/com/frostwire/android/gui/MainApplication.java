@@ -307,15 +307,14 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         @Override
         public void onActivityStopped(android.app.Activity activity) {
             activityCount--;
-            // When last activity stops, clear cache but DON'T shutdown to prevent HandlerDispatcher NPE
+            // When last activity stops, clear cache to free memory
             if (activityCount == 0) {
                 LOG.info("App going to background, clearing ImageLoader cache");
                 try {
                     // Get the instance without recreating it
-                    ImageLoader imageLoader = ImageLoader.getInstanceIfExists();
+                    com.frostwire.android.util.ImageLoader imageLoader = com.frostwire.android.util.ImageLoader.getInstanceIfExists();
                     if (imageLoader != null) {
-                        // Clear cache to free memory but keep Picasso alive to prevent
-                        // HandlerDispatcher NullPointerException on network state changes
+                        // Clear cache to free memory
                         imageLoader.clear();
                     }
                 } catch (Throwable t) {
