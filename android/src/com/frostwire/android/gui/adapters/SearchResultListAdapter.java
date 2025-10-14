@@ -77,7 +77,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private static final int NO_FILE_TYPE = -1;
     private final OnLinkClickListener linkListener;
     private final PreviewClickListener previewClickListener;
-    private final ImageLoader thumbLoader;
+    private final FWImageLoader thumbLoader;
     private int fileType;
     private FilteredSearchResults filteredSearchResults;
 

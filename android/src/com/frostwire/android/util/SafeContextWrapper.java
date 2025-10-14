@@ -47,6 +47,7 @@ import com.frostwire.util.Logger;
  * @author aldenml
  * @deprecated No longer needed after migration from Picasso to Coil
  */
+@Deprecated
 public class SafeContextWrapper extends ContextWrapper {
 
     private static final Logger LOG = Logger.getLogger(SafeContextWrapper.class);

@@ -177,7 +177,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     @Override
     public void onLowMemory() {
         ImageCache.getInstance(this).evictAll();
-        FWFWImageLoader.getInstance(this).clear();
+        FWImageLoader.getInstance(this).clear();
         // Ensure FWImageLoader instance is healthy after memory pressure
         FWImageLoader.ensureHealthyInstance(this);
         super.onLowMemory();
@@ -312,7 +312,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
                 LOG.info("App going to background, clearing FWImageLoader cache");
                 try {
                     // Get the instance without recreating it
-                    FWImageLoader fwImageLoader = FWFWImageLoader.getInstanceIfExists();
+                    FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
                     if (fwImageLoader != null) {
                         // Clear cache to free memory
                         fwImageLoader.clear();
