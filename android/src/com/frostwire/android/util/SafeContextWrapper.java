@@ -30,21 +30,22 @@ import com.frostwire.util.Logger;
 /**
  * A Context wrapper that prevents registration of CONNECTIVITY_CHANGE broadcast receivers.
  *
- * This is a workaround for Picasso 3.0.0-alpha06's HandlerDispatcher race condition where
- * NetworkBroadcastReceiver can receive broadcasts after the Handler has been nulled out,
- * causing NullPointerException in HandlerDispatcher.dispatchNetworkStateChange().
+ * DEPRECATED: This class was created as a workaround for Picasso 3.0.0-alpha06's 
+ * HandlerDispatcher race condition. Since the app has migrated to Coil for image loading,
+ * this workaround is no longer needed and this class can be safely removed in future cleanup.
  *
- * By preventing the registration of network connectivity receivers, we avoid the crash
+ * Original purpose: Picasso's NetworkBroadcastReceiver could receive broadcasts after the 
+ * Handler had been nulled out, causing NullPointerException in HandlerDispatcher.dispatchNetworkStateChange().
+ * By preventing the registration of network connectivity receivers, we avoided the crash
  * while still allowing Picasso to function normally for image loading.
  *
  * NOTE: CONNECTIVITY_CHANGE broadcast was deprecated in API 24 and restricted in API 26+.
  * Modern apps should use ConnectivityManager.NetworkCallback instead (see NetworkManager).
- * However, Picasso 3.0.0-alpha06 still uses the deprecated broadcast approach internally,
- * which causes both deprecation issues and race condition crashes. This wrapper blocks
- * Picasso's attempt to register the deprecated receiver as a defensive measure.
+ * Coil doesn't have these issues as it uses modern Android networking APIs.
  *
  * @author gubatron
  * @author aldenml
+ * @deprecated No longer needed after migration from Picasso to Coil
  */
 public class SafeContextWrapper extends ContextWrapper {
 
