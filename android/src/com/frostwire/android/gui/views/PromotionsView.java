@@ -108,7 +108,7 @@ public class PromotionsView extends LinearLayout {
         // When the activity configuration changes (for example, orientation)
         // the GridView is kept in memory, then the need of this forced unbind.
         //
-        // Additionally, I'm recycling the picasso drawables for older devices. 
+        // Additionally, I'm recycling the image drawables for older devices. 
         unbindPromotionDrawables();
 
         destroyPromotionsBanner();
