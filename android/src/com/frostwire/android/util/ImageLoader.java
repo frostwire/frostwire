@@ -39,16 +39,16 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import coil3.ImageLoader;
-import coil3.asDrawable;
 import coil3.disk.DiskCache;
 import coil3.memory.MemoryCache;
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory;
-import coil3.request.ImageRequest;
 import coil3.request.CachePolicy;
 import coil3.request.Disposable;
 import coil3.request.ErrorResult;
+import coil3.request.ImageRequest;
 import coil3.request.SuccessResult;
 import coil3.util.DebugLogger;
+import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import okhttp3.OkHttpClient;
 
@@ -407,16 +407,29 @@ public final class ImageLoader {
                             if (p.callback != null) {
                                 final Callback callback = p.callback;
                                 requestBuilder.listener(
-                                    (Function1<ImageRequest, kotlin.Unit>) request -> null,
-                                    (Function1<SuccessResult, kotlin.Unit>) result -> {
-                                        callback.onSuccess();
-                                        return null;
-                                    },
-                                    (Function1<ErrorResult, kotlin.Unit>) result -> {
-                                        callback.onError(result.getThrowable());
-                                        return null;
-                                    },
-                                    null
+                                    new coil3.request.ImageRequest.Listener() {
+                                        @Override
+                                        public void onStart(@org.jetbrains.annotations.NotNull ImageRequest request) {
+                                            // Request started
+                                        }
+                                        
+                                        @Override
+                                        public void onSuccess(@org.jetbrains.annotations.NotNull ImageRequest request, 
+                                                             @org.jetbrains.annotations.NotNull SuccessResult result) {
+                                            callback.onSuccess();
+                                        }
+                                        
+                                        @Override
+                                        public void onError(@org.jetbrains.annotations.NotNull ImageRequest request, 
+                                                           @org.jetbrains.annotations.NotNull ErrorResult result) {
+                                            callback.onError(result.getThrowable());
+                                        }
+                                        
+                                        @Override
+                                        public void onCancel(@org.jetbrains.annotations.NotNull ImageRequest request) {
+                                            // Request cancelled
+                                        }
+                                    }
                                 );
                             }
                             
@@ -447,15 +460,17 @@ public final class ImageLoader {
                 return null;
             }
             
+            // For Coil 3, synchronous execution returns an ImageResult
             ImageRequest request = new ImageRequest.Builder(context)
                 .data(uri)
                 .build();
             
             coil3.request.ImageResult result = imageLoader.execute(request);
             if (result instanceof SuccessResult) {
+                // Get the image and convert to bitmap
                 coil3.Image image = ((SuccessResult) result).getImage();
-                // Get the drawable and extract bitmap if it's a BitmapDrawable
-                android.graphics.drawable.Drawable drawable = coil3.AsDrawableKt.asDrawable(image, context.getResources());
+                // Try to get the bitmap directly - Coil's Image can be converted
+                android.graphics.drawable.Drawable drawable = image.asDrawable(context.getResources());
                 if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
                     return ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
                 }
