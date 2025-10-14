@@ -60,7 +60,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -182,7 +182,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
 
         if (thumbnailUrl != null) {
-            ImageLoader.getInstance(this).load(Uri.parse(thumbnailUrl), img, R.drawable.default_artwork);
+            FWImageLoader.getInstance(this).load(Uri.parse(thumbnailUrl), img, R.drawable.default_artwork);
         }
 
         final Button downloadButton = findView(R.id.activity_preview_player_download_button);

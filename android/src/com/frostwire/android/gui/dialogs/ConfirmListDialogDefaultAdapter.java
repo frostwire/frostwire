@@ -33,7 +33,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
 
@@ -145,7 +145,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
         ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
         final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
         if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
-            ImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView);
+            FWImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView);
         }
 
         final int itemThumbnailResourceId = getItemThumbnailResourceId(item);

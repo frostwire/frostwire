@@ -47,7 +47,7 @@ import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
 import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.FileSearchResult;
@@ -86,7 +86,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         this.linkListener = new OnLinkClickListener();
         this.previewClickListener = new PreviewClickListener(context, this);
         this.fileType = NO_FILE_TYPE;
-        this.thumbLoader = ImageLoader.getInstance(context);
+        this.thumbLoader = FWImageLoader.getInstance(context);
     }
 
     public int getFileType() {

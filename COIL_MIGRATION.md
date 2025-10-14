@@ -22,8 +22,10 @@ implementation 'io.coil-kt.coil3:coil:3.0.4'
 implementation 'io.coil-kt.coil3:coil-network-okhttp:3.0.4'
 ```
 
-### 2. ImageLoader.java Migration
-**File:** `android/src/com/frostwire/android/util/ImageLoader.java`
+### 2. ImageLoader → FWImageLoader Rename
+**File:** `android/src/com/frostwire/android/util/FWImageLoader.java` (renamed from `ImageLoader.java`)
+
+The FrostWire image loader wrapper class was renamed from `ImageLoader` to `FWImageLoader` to avoid confusion with Coil's `coil3.ImageLoader` class. This makes it clear when code is referring to FrostWire's wrapper versus Coil's underlying implementation.
 
 #### Key API Changes:
 
@@ -111,8 +113,11 @@ Since ImageLoader heavily depends on Android framework components, comprehensive
 
 ## Migration Impact
 
+### Class Renaming
+The wrapper class was renamed from `ImageLoader` to `FWImageLoader` to avoid confusion with `coil3.ImageLoader`. All calling code has been updated to use the new name.
+
 ### No API Changes for Consumers
-The `ImageLoader` singleton class maintains the same public API:
+The `FWImageLoader` singleton class maintains the same public API:
 - `getInstance(Context)`
 - `load(Uri, ImageView)`
 - `load(int resourceId, ImageView)`
@@ -120,8 +125,6 @@ The `ImageLoader` singleton class maintains the same public API:
 - `get(Uri)` - for synchronous bitmap loading
 - `clear()` - cache clearing
 - `shutdown()` - cleanup
-
-All calling code continues to work without modification.
 
 ### SafeContextWrapper Status
 The `SafeContextWrapper` class has been marked as deprecated and can be removed in future cleanup. It was only needed to work around Picasso's NetworkBroadcastReceiver registration issues.
@@ -131,9 +134,10 @@ The `SafeContextWrapper` class has been marked as deprecated and can be removed 
 If issues are discovered with Coil, rollback is straightforward:
 
 1. Revert the dependency change in `build.gradle`
-2. Revert `ImageLoader.java` changes
-3. Remove `@Deprecated` annotation from `SafeContextWrapper`
-4. Rebuild and test
+2. Revert `FWImageLoader.java` back to `ImageLoader.java` with Picasso implementation
+3. Update all references from `FWImageLoader` back to `ImageLoader`
+4. Remove `@Deprecated` annotation from `SafeContextWrapper`
+5. Rebuild and test
 
 The commit history preserves the working Picasso implementation for reference.
 

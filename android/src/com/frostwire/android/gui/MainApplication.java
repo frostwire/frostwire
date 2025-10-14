@@ -34,7 +34,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.RunStrict;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
@@ -131,7 +131,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
 
         // Start image loader
-        ImageLoader.start(this);
+        FWImageLoader.start(this);
 
         // Initialize search components
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
@@ -177,9 +177,9 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     @Override
     public void onLowMemory() {
         ImageCache.getInstance(this).evictAll();
-        ImageLoader.getInstance(this).clear();
-        // Ensure ImageLoader instance is healthy after memory pressure
-        ImageLoader.ensureHealthyInstance(this);
+        FWFWImageLoader.getInstance(this).clear();
+        // Ensure FWImageLoader instance is healthy after memory pressure
+        FWImageLoader.ensureHealthyInstance(this);
         super.onLowMemory();
     }
 
@@ -187,8 +187,8 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         if (level >= TRIM_MEMORY_MODERATE) {
-            // On moderate to severe memory pressure, ensure our ImageLoader is healthy
-            ImageLoader.ensureHealthyInstance(this);
+            // On moderate to severe memory pressure, ensure our FWImageLoader is healthy
+            FWImageLoader.ensureHealthyInstance(this);
         }
     }
 
@@ -264,7 +264,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     }
 
     /**
-     * Lifecycle callbacks to handle ImageLoader health during app transitions.
+     * Lifecycle callbacks to handle FWImageLoader health during app transitions.
      * This helps prevent crashes when the app is backgrounded and foregrounded.
      */
     private static class ImageLoaderLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
@@ -278,24 +278,24 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         @Override
         public void onActivityStarted(android.app.Activity activity) {
             activityCount++;
-            // When first activity starts, ensure ImageLoader is healthy
+            // When first activity starts, ensure FWImageLoader is healthy
             if (activityCount == 1) {
-                LOG.info("App coming to foreground, ensuring ImageLoader is healthy");
+                LOG.info("App coming to foreground, ensuring FWImageLoader is healthy");
                 try {
-                    ImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+                    FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
                 } catch (Throwable t) {
-                    LOG.error("Error ensuring ImageLoader health on app foreground", t);
+                    LOG.error("Error ensuring FWImageLoader health on app foreground", t);
                 }
             }
         }
 
         @Override
         public void onActivityResumed(android.app.Activity activity) {
-            // Ensure ImageLoader is healthy when activities resume
+            // Ensure FWImageLoader is healthy when activities resume
             try {
-                ImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+                FWImageLoader.ensureHealthyInstance(activity.getApplicationContext());
             } catch (Throwable t) {
-                LOG.error("Error ensuring ImageLoader health on activity resume", t);
+                LOG.error("Error ensuring FWImageLoader health on activity resume", t);
             }
         }
 
@@ -309,16 +309,16 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             activityCount--;
             // When last activity stops, clear cache to free memory
             if (activityCount == 0) {
-                LOG.info("App going to background, clearing ImageLoader cache");
+                LOG.info("App going to background, clearing FWImageLoader cache");
                 try {
                     // Get the instance without recreating it
-                    com.frostwire.android.util.ImageLoader imageLoader = com.frostwire.android.util.ImageLoader.getInstanceIfExists();
-                    if (imageLoader != null) {
+                    FWImageLoader fwImageLoader = FWFWImageLoader.getInstanceIfExists();
+                    if (fwImageLoader != null) {
                         // Clear cache to free memory
-                        imageLoader.clear();
+                        fwImageLoader.clear();
                     }
                 } catch (Throwable t) {
-                    LOG.error("Error clearing ImageLoader cache on app background", t);
+                    LOG.error("Error clearing FWImageLoader cache on app background", t);
                 }
             }
         }
