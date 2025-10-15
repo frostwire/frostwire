@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import coil3.ImageLoader;
+import coil3.asDrawable;
 import coil3.disk.DiskCache;
 import coil3.memory.MemoryCache;
 import coil3.request.CachePolicy;
@@ -46,6 +47,7 @@ import coil3.request.Disposable;
 import coil3.request.ErrorResult;
 import coil3.request.ImageRequest;
 import coil3.request.SuccessResult;
+import coil3.target.ImageViewTarget;
 import coil3.util.DebugLogger;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -383,17 +385,21 @@ public final class FWImageLoader {
                                 throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
                             }
                             
-                            // Set target ImageView
-                            requestBuilder.target(target);
+                            // Set target ImageView using ImageViewTarget
+                            requestBuilder.target(new ImageViewTarget(target));
                             
                             // Configure request based on params
                             if (p.targetWidth != 0 && p.targetHeight != 0) {
                                 requestBuilder.size(p.targetWidth, p.targetHeight);
                             }
                             if (p.placeholderResId != 0) {
-                                // Coil 3.x: placeholder and error accept drawable resources
-                                requestBuilder.placeholder(context.getDrawable(p.placeholderResId));
-                                requestBuilder.error(context.getDrawable(p.placeholderResId));
+                                // Coil 3.x: Pass resource ID directly - Coil handles conversion internally
+                                // We need to create drawable and convert to Image
+                                android.graphics.drawable.Drawable placeholderDrawable = context.getDrawable(p.placeholderResId);
+                                if (placeholderDrawable != null) {
+                                    requestBuilder.placeholder(coil3.ImageKt.asImage(placeholderDrawable));
+                                    requestBuilder.error(coil3.ImageKt.asImage(placeholderDrawable));
+                                }
                             }
                             if (!p.noFade) {
                                 // Coil 3.x: crossfade with default duration
