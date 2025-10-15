@@ -81,7 +81,22 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         int promoWidth = gridView.getColumnWidth();
         int promoHeight = (int) (promoWidth * PROMO_HEIGHT_TO_WIDTH_RATIO);
         if (promoWidth > 0 && promoHeight > 0 && imageView != null) {
-            imageLoader.load(Uri.parse(viewItem.imageSrc), imageView, promoWidth, promoHeight);
+            // Tag the ImageView with the current image URL to prevent redundant loads
+            final String imageUrl = viewItem.imageSrc;
+            final Object currentTag = imageView.getTag(R.id.view_promotions_item_image);
+            
+            // Only load if this is a new image URL for this ImageView
+            if (currentTag == null || !imageUrl.equals(currentTag)) {
+                imageView.setTag(R.id.view_promotions_item_image, imageUrl);
+                
+                // Add a small delay to allow view recycling to settle
+                imageView.postDelayed(() -> {
+                    // Double-check the tag hasn't changed (view wasn't recycled)
+                    if (imageUrl.equals(imageView.getTag(R.id.view_promotions_item_image))) {
+                        imageLoader.load(Uri.parse(imageUrl), imageView, promoWidth, promoHeight);
+                    }
+                }, 100); // 100ms delay
+            }
         }
 
         final Slide theSlide = viewItem;
