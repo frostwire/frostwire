@@ -391,14 +391,11 @@ public final class FWImageLoader {
                             if (p.targetWidth != 0 && p.targetHeight != 0) {
                                 requestBuilder.size(p.targetWidth, p.targetHeight);
                             }
-                            // Note: Coil 3.x placeholder/error API is complex in Java
-                            // For now, we'll skip placeholders - they can be added later if needed
+                            // Note: Coil 3.x placeholder/error/crossfade API is complex in Java
+                            // For now, we'll skip these features - they can be added later if needed
                             // The ImageView will just show empty/previous content until image loads
+                            // Images will load without crossfade animation
                             
-                            if (!p.noFade) {
-                                // Coil 3.x: Use crossfade with boolean
-                                requestBuilder.crossfade(true);
-                            }
                             if (p.noCache) {
                                 requestBuilder.memoryCachePolicy(CachePolicy.DISABLED);
                                 requestBuilder.diskCachePolicy(CachePolicy.DISABLED);
