@@ -377,7 +377,9 @@ public final class FWImageLoader {
                             
                             // Set data (URI or resource ID)
                             if (uri != null) {
-                                requestBuilder.data(uri);
+                                // Convert Android Uri to String for Coil
+                                // Coil can handle String URLs, file paths, content:// URIs, etc.
+                                requestBuilder.data(uri.toString());
                             } else if (resourceId != -1) {
                                 requestBuilder.data(resourceId);
                             } else {
