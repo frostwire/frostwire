@@ -379,8 +379,11 @@ public final class FWImageLoader {
                             if (uri != null) {
                                 // Convert Android Uri to String for Coil
                                 // Coil can handle String URLs, file paths, content:// URIs, etc.
-                                requestBuilder.data(uri.toString());
+                                String uriString = uri.toString();
+                                LOG.info("FWImageLoader loading image from URI: " + uriString);
+                                requestBuilder.data(uriString);
                             } else if (resourceId != -1) {
+                                LOG.info("FWImageLoader loading image from resource ID: " + resourceId);
                                 requestBuilder.data(resourceId);
                             } else {
                                 throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
@@ -403,38 +406,45 @@ public final class FWImageLoader {
                                 requestBuilder.diskCachePolicy(CachePolicy.DISABLED);
                             }
                             
-                            // Add listener if callback is provided
-                            if (p.callback != null) {
-                                final Callback callback = p.callback;
-                                requestBuilder.listener(
-                                    new coil3.request.ImageRequest.Listener() {
-                                        @Override
-                                        public void onStart(@org.jetbrains.annotations.NotNull ImageRequest request) {
-                                            // Request started
-                                        }
-                                        
-                                        @Override
-                                        public void onSuccess(@org.jetbrains.annotations.NotNull ImageRequest request, 
-                                                             @org.jetbrains.annotations.NotNull SuccessResult result) {
+                            // Add listener for logging and callbacks
+                            final Callback callback = p.callback;
+                            requestBuilder.listener(
+                                new coil3.request.ImageRequest.Listener() {
+                                    @Override
+                                    public void onStart(@org.jetbrains.annotations.NotNull ImageRequest request) {
+                                        LOG.info("FWImageLoader: Image load started");
+                                    }
+                                    
+                                    @Override
+                                    public void onSuccess(@org.jetbrains.annotations.NotNull ImageRequest request, 
+                                                         @org.jetbrains.annotations.NotNull SuccessResult result) {
+                                        LOG.info("FWImageLoader: Image loaded successfully");
+                                        if (callback != null) {
                                             callback.onSuccess();
                                         }
-                                        
-                                        @Override
-                                        public void onError(@org.jetbrains.annotations.NotNull ImageRequest request, 
-                                                           @org.jetbrains.annotations.NotNull ErrorResult result) {
+                                    }
+                                    
+                                    @Override
+                                    public void onError(@org.jetbrains.annotations.NotNull ImageRequest request, 
+                                                       @org.jetbrains.annotations.NotNull ErrorResult result) {
+                                        LOG.error("FWImageLoader: Image load failed: " + result.getThrowable().getMessage(), result.getThrowable());
+                                        if (callback != null) {
                                             callback.onError(result.getThrowable());
                                         }
-                                        
-                                        @Override
-                                        public void onCancel(@org.jetbrains.annotations.NotNull ImageRequest request) {
-                                            // Request cancelled
-                                        }
                                     }
-                                );
-                            }
+                                    
+                                    @Override
+                                    public void onCancel(@org.jetbrains.annotations.NotNull ImageRequest request) {
+                                        LOG.info("FWImageLoader: Image load cancelled");
+                                    }
+                                }
+                            );
                             
                             // Execute request
-                            coilImageLoader.get().enqueue(requestBuilder.build());
+                            ImageRequest request = requestBuilder.build();
+                            LOG.info("FWImageLoader enqueueing Coil request");
+                            coilImageLoader.get().enqueue(request);
+                            LOG.info("FWImageLoader request enqueued successfully");
                             
                         } catch (Throwable t) {
                             if (BuildConfig.DEBUG) {
