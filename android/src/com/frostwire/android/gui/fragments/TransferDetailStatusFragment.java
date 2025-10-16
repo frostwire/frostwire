@@ -101,9 +101,7 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
         shareRatioTextView.setText(getShareRatio(uiBittorrentDownload));
         peersTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedPeers(), uiBittorrentDownload.getTotalPeers()));
         seedsTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedSeeds(), uiBittorrentDownload.getTotalSeeds()));
-        if (torrentHandle != null) {
-            activeTimeTextView.setText(seconds2time(torrentHandle.status().activeDuration()/1000));
-            seedingTimeTextView.setText(seconds2time(torrentHandle.status().seedingDuration()/1000));
-        }
+        activeTimeTextView.setText(seconds2time(uiBittorrentDownload.getDl().getActiveDuration()/1000));
+        seedingTimeTextView.setText(seconds2time(uiBittorrentDownload.getDl().getSeedingDuration()/1000));
     }
 }

@@ -326,6 +326,26 @@ public final class BTDownload implements BittorrentDownload {
         return status != null ? status.listSeeds() : 0;
     }
 
+    public long getActiveDuration() {
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.activeDuration() : 0;
+    }
+
+    public long getSeedingDuration() {
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.seedingDuration() : 0;
+    }
+
+    public boolean isAnnouncingToDht() {
+        TorrentStatus status = getCachedStatus();
+        return status != null && status.announcingToDht();
+    }
+
+    public boolean isAnnouncingToLsd() {
+        TorrentStatus status = getCachedStatus();
+        return status != null && status.announcingToLsd();
+    }
+
     @Override
     public File getContentSavePath() {
         try {

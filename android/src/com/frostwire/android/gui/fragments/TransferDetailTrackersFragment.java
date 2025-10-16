@@ -107,9 +107,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
-        TorrentStatus status = uiBittorrentDownload.getDl().getTorrentHandle().status();
-        boolean announcingToDht = status.announcingToDht();
-        boolean announcingToLSD = status.announcingToLsd();
+        boolean announcingToDht = uiBittorrentDownload.getDl().isAnnouncingToDht();
+        boolean announcingToLSD = uiBittorrentDownload.getDl().isAnnouncingToLsd();
 
         dhtStatus.setText(announcingToDht ? R.string.working : R.string.disabled);
         lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
