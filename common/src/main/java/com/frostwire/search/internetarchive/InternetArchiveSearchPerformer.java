@@ -57,6 +57,9 @@ public class InternetArchiveSearchPerformer extends CrawlPagedWebSearchPerformer
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
         InternetArchiveItem[] items = JsonUtils.toObject(page, InternetArchiveItem[].class);
+        if (items == null) {
+            return result;
+        }
         for (InternetArchiveItem item : items) {
             if (!isStopped() && filter(item)) {
                 InternetArchiveSearchResult sr = new InternetArchiveSearchResult(getDomainName(), item);
@@ -94,6 +97,9 @@ public class InternetArchiveSearchPerformer extends CrawlPagedWebSearchPerformer
         JsonElement element = JsonParser.parseString(json);
         JsonObject obj = element.getAsJsonObject();
         JsonObject files = obj.getAsJsonObject("files");
+        if (files == null) {
+            return result;
+        }
         Iterator<Map.Entry<String, JsonElement>> it = files.entrySet().iterator();
         while (it.hasNext() && !isStopped()) {
             Map.Entry<String, JsonElement> e = it.next();
