@@ -73,7 +73,11 @@ public final class BTDownload implements BittorrentDownload {
         this.engine = engine;
         this.th = th;
         this.savePath = new File(th.savePath());
-        this.created = new Date(th.status().addedTime());
+        // Cache the initial status to avoid blocking JNI call during initialization
+        TorrentStatus initialStatus = th.status();
+        this.created = new Date(initialStatus.addedTime());
+        this.cachedStatus = initialStatus;
+        this.lastStatusUpdateTime = System.currentTimeMillis();
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
         this.parts = ti != null ? createPartsFile(savePath.getAbsolutePath(), ti) : null;
@@ -726,6 +730,7 @@ public final class BTDownload implements BittorrentDownload {
         } else {
             th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         }
+        invalidateStatusCache();
     }
 
     public File partsFile() {
