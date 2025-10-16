@@ -20,7 +20,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="auto"
         android:versionCode="760"
-        android:versionName="3.0.6>
+        android:versionName="3.0.6">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
