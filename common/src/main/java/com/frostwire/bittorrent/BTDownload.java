@@ -42,6 +42,7 @@ import java.util.*;
 public final class BTDownload implements BittorrentDownload {
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
+    private static final long STATUS_CACHE_MILLIS = 1000; // Cache status for 1 second to avoid ANR
     private static final int[] ALERT_TYPES = {
             AlertType.TORRENT_FINISHED.swig(),
             AlertType.TORRENT_REMOVED.swig(),
@@ -65,6 +66,8 @@ public final class BTDownload implements BittorrentDownload {
     private long lastSaveResumeTime;
     private String predominantFileExtension;
     private volatile boolean removing;
+    private volatile TorrentStatus cachedStatus;
+    private volatile long lastStatusUpdateTime;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
@@ -121,11 +124,13 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
-        return th.isValid() && (isPaused(th.status()) || engine.isPausedCached() || !engine.isRunning());
+        TorrentStatus status = getCachedStatus();
+        return status != null && (isPaused(status) || engine.isPausedCached() || !engine.isRunning());
     }
 
     public boolean isSeeding() {
-        return th.isValid() && th.status().isSeeding();
+        TorrentStatus status = getCachedStatus();
+        return status != null && status.isSeeding();
     }
 
     public boolean isFinished() {
@@ -133,7 +138,14 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isFinished(boolean force) {
-        return th.isValid() && th.status(force).isFinished();
+        if (!th.isValid()) {
+            return false;
+        }
+        if (force) {
+            return th.status(force).isFinished();
+        }
+        TorrentStatus status = getCachedStatus();
+        return status != null && status.isFinished();
     }
 
     public TransferState getState() {
@@ -147,7 +159,10 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return TransferState.ERROR;
         }
-        final TorrentStatus status = th.status();
+        final TorrentStatus status = getCachedStatus();
+        if (status == null) {
+            return TransferState.ERROR;
+        }
         final boolean isPaused = isPaused(status);
         if (isPaused && status.isFinished()) {
             return TransferState.FINISHED;
@@ -201,8 +216,8 @@ public final class BTDownload implements BittorrentDownload {
         if (th == null || !th.isValid()) {
             return 0;
         }
-        TorrentStatus ts = th.status();
-        if (ts == null) { // this can't never happens
+        TorrentStatus ts = getCachedStatus();
+        if (ts == null) {
             return 0;
         }
         float fp = ts.progress();
@@ -223,27 +238,39 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getBytesReceived() {
-        return th.isValid() ? th.status().totalDone() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.totalDone() : 0;
     }
 
     public long getTotalBytesReceived() {
-        return th.isValid() ? th.status().allTimeDownload() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.allTimeDownload() : 0;
     }
 
     public long getBytesSent() {
-        return th.isValid() ? th.status().totalUpload() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.totalUpload() : 0;
     }
 
     public long getTotalBytesSent() {
-        return th.isValid() ? th.status().allTimeUpload() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.allTimeUpload() : 0;
     }
 
     public long getDownloadSpeed() {
-        return (!th.isValid() || isFinished() || isPaused() || isSeeding()) ? 0 : th.status().downloadPayloadRate();
+        if (!th.isValid() || isFinished() || isPaused() || isSeeding()) {
+            return 0;
+        }
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.downloadPayloadRate() : 0;
     }
 
     public long getUploadSpeed() {
-        return (!th.isValid() || (isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().uploadPayloadRate();
+        if (!th.isValid() || (isFinished() && !isSeeding()) || isPaused()) {
+            return 0;
+        }
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.uploadPayloadRate() : 0;
     }
 
     @Override
@@ -251,8 +278,33 @@ public final class BTDownload implements BittorrentDownload {
         return getDownloadSpeed() > 0;
     }
 
+    /**
+     * Gets cached status or fetches fresh status if cache is stale.
+     * This prevents ANR by avoiding frequent blocking JNI calls on UI thread.
+     */
+    private TorrentStatus getCachedStatus() {
+        if (!th.isValid()) {
+            return null;
+        }
+        long now = System.currentTimeMillis();
+        if (cachedStatus == null || (now - lastStatusUpdateTime) > STATUS_CACHE_MILLIS) {
+            cachedStatus = th.status();
+            lastStatusUpdateTime = now;
+        }
+        return cachedStatus;
+    }
+
+    /**
+     * Invalidates the cached status to force a refresh on next access.
+     */
+    private void invalidateStatusCache() {
+        cachedStatus = null;
+        lastStatusUpdateTime = 0;
+    }
+
     public int getConnectedPeers() {
-        return th.isValid() ? th.status().numPeers() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.numPeers() : 0;
     }
 
     public TorrentHandle getTorrentHandle() {
@@ -260,15 +312,18 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public int getTotalPeers() {
-        return th.isValid() ? th.status().listPeers() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.listPeers() : 0;
     }
 
     public int getConnectedSeeds() {
-        return th.isValid() ? th.status().numSeeds() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.numSeeds() : 0;
     }
 
     public int getTotalSeeds() {
-        return th.isValid() ? th.status().listSeeds() : 0;
+        TorrentStatus status = getCachedStatus();
+        return status != null ? status.listSeeds() : 0;
     }
 
     @Override
@@ -310,7 +365,10 @@ public final class BTDownload implements BittorrentDownload {
         if (ti == null) {
             return 0;
         }
-        TorrentStatus status = th.status();
+        TorrentStatus status = getCachedStatus();
+        if (status == null) {
+            return 0;
+        }
         long left = ti.totalSize() - status.totalDone();
         long rate = status.downloadPayloadRate();
         if (left <= 0) {
@@ -329,6 +387,7 @@ public final class BTDownload implements BittorrentDownload {
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
         th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
+        invalidateStatusCache();
         doResumeData(true);
     }
 
@@ -339,6 +398,7 @@ public final class BTDownload implements BittorrentDownload {
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
         th.setFlags(TorrentFlags.AUTO_MANAGED);
         th.resume();
+        invalidateStatusCache();
         doResumeData(true);
     }
 
@@ -632,7 +692,8 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isSequentialDownload() {
-        return th.isValid() && th.status().flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+        TorrentStatus status = getCachedStatus();
+        return status != null && status.flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
     }
 
     public void setSequentialDownload(boolean sequential) {
@@ -779,12 +840,15 @@ public final class BTDownload implements BittorrentDownload {
             AlertType type = alert.type();
             switch (type) {
                 case TORRENT_FINISHED:
+                    invalidateStatusCache();
                     torrentFinished();
                     break;
                 case TORRENT_REMOVED:
+                    invalidateStatusCache();
                     torrentRemoved();
                     break;
                 case TORRENT_CHECKED:
+                    invalidateStatusCache();
                     torrentChecked();
                     break;
                 case SAVE_RESUME_DATA:
