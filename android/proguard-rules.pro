@@ -69,6 +69,9 @@
 -keep class com.chaquo.python.** { *; }
 -dontwarn com.chaquo.python.**
 
+# coil3 - PlatformContext is not needed at runtime
+-dontwarn coil3.PlatformContext
+
 # GMS
 -keep public class com.google.android.gms.** { public protected *; }
 
