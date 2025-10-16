@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import coil3.ComponentRegistry;
 import coil3.ImageLoader;
 import coil3.disk.DiskCache;
 import coil3.memory.MemoryCache;
@@ -48,11 +49,12 @@ import coil3.request.ImageRequest;
 import coil3.request.SuccessResult;
 import coil3.target.ImageViewTarget;
 import coil3.util.DebugLogger;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
+import coil3.network.okhttp.OkHttpNetworkFetcher;
 import okhttp3.OkHttpClient;
 import okio.Path;
 import static okio.FileSystem.SYSTEM;
+import kotlin.jvm.internal.Reflection;
+import kotlin.reflect.KClass;
 
 /**
  * FrostWire Image Loader - Wrapper around Coil image loading library.
@@ -154,9 +156,13 @@ public final class FWImageLoader {
         // Build Coil ImageLoader with simplified configuration
         try {
             coil3.ImageLoader.Builder coilBuilder = new coil3.ImageLoader.Builder(appContext);
-            
-            // Note: OkHttp client configuration is built into Coil 3.x
-            // Custom OkHttp client can be set via callFactory, but we'll use defaults
+
+            final OkHttpClient okHttpClient = createHttpClient(appContext);
+            ComponentRegistry.Builder componentRegistryBuilder = new ComponentRegistry.Builder();
+            @SuppressWarnings("unchecked")
+            KClass<coil3.Uri> uriKClass = (KClass<coil3.Uri>) (KClass<?>) Reflection.getOrCreateKotlinClass(coil3.Uri.class);
+            componentRegistryBuilder.add(OkHttpNetworkFetcher.factory(okHttpClient), uriKClass);
+            coilBuilder.components(componentRegistryBuilder.build());
             
             // Configure memory cache
             MemoryCache memCache = new MemoryCache.Builder()

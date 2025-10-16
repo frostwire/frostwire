@@ -1,4 +1,4 @@
-FrostWire 3.0.4 build 758 OCT/11/2025
+FrostWire 3.0.6 build 760 OCT/15/2025
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
@@ -6,6 +6,7 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
  - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
  - yt_dlp-2025.09.26
+ - replaced:Picasso for Coil image loading library
  - removed:Torlock search performer (old site is down, new site is malicious)
  - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
  - freeze:sorting through too many results could cause an ANR when cleaning up titles
@@ -16,7 +17,7 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - fix:Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
  - fix:Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
  - fix:ClassCastException in SearchResultListAdapter OnLinkClickListener
- - fix:HandlerDispatcher NullPointerException crashes in Picasso image loading
+ - fix:HandlerDispatcher NullPointerException crashes in Picasso image loading (removed on build 760)
  - freeze:in playFDs
  - freeze:in MusicPlaybackService.setDataSource
  - crash:NPE in ImageFetcher.loadCurrentArtwork()
@@ -43,7 +44,7 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - speed-up:Optimize RecyclerView onBindViewHolder() hot paths
  - refactor: SearchManager tasks to Runnable and remove Thread.yield() from hot path
  - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
- - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down
+ - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down (removed on build 760)
  - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
  - Distraction free search now on by default, much better experience
  - org.jetbrains:annotations:26.0.2-1
@@ -51,7 +52,7 @@ FrostWire 3.0.4 build 758 OCT/11/2025
  - androidx.browser:browser:1.9.0
  - com.chaquo.python:gradle:16.1.0, now with linked 16KB mode compatible with android compile sdk 36
  - org.codehaus.groovy:groovy-all:3.0.25
- - com.squareup.picasso3:picasso:3.0.0-alpha06 and refactor of ImageLoader to use it
+ - com.squareup.picasso3:picasso:3.0.0-alpha06 and refactor of ImageLoader to use it (removed on build 760)
  - com.google.gms:google-services:4.4.3
  - com.google.firebase:firebase-crashlytics-gradle:3.0.6
  - androidx.core:core:1.17.0
