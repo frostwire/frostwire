@@ -5,7 +5,7 @@ FrostWire 3.0.7 build 761 OCT/16/2025
  - new:Settings > Torrent Settings > Incoming Connection Port Range selection
  - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
  - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
- - yt_dlp-2025.09.26
+ - yt_dlp-2025.10.14
  - replaced:Picasso for Coil image loading library
  - removed:Torlock search performer (old site is down, new site is malicious)
  - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
@@ -54,6 +54,7 @@ FrostWire 3.0.7 build 761 OCT/16/2025
  - com.chaquo.python:gradle:16.1.0, now with linked 16KB mode compatible with android compile sdk 36
  - org.codehaus.groovy:groovy-all:3.0.25
  - com.squareup.picasso3:picasso:3.0.0-alpha06 and refactor of ImageLoader to use it (removed on build 760)
+ - new: io.coil-kt.coil3:coil:3.0.4 and io.coil-kt.coil3:coil-network-okhttp:3.0.4
  - com.google.gms:google-services:4.4.3
  - com.google.firebase:firebase-crashlytics-gradle:3.0.6
  - androidx.core:core:1.17.0
