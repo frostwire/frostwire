@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.frostwire.util.Logger;
@@ -46,20 +47,19 @@ public class SafeDrawerLayout extends DrawerLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = android.view.View.MeasureSpec.getSize(widthMeasureSpec);
-        int height = android.view.View.MeasureSpec.getSize(heightMeasureSpec);
-        boolean measureSuccess = false;
-
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            measureSuccess = true;
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            LOG.error("DrawerLayout.onMeasure() failed; falling back to imposed measure specs", e);
-        }
-
-        // If super.onMeasure() didn't successfully set the dimensions,
-        // we need to explicitly call setMeasuredDimension()
-        if (!measureSuccess) {
+        } catch (Exception e) {
+            LOG.error("DrawerLayout.onMeasure() threw exception; falling back to imposed measure specs", e);
+            // Fall back to using the provided measure specs
+            int width = View.resolveSize(
+                    View.MeasureSpec.getSize(widthMeasureSpec),
+                    widthMeasureSpec
+            );
+            int height = View.resolveSize(
+                    View.MeasureSpec.getSize(heightMeasureSpec),
+                    heightMeasureSpec
+            );
             setMeasuredDimension(width, height);
         }
     }
