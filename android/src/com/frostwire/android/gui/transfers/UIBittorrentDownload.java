@@ -53,7 +53,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     private String displayName;
     private double size;
-    private List<TransferItem> items;
+    private volatile List<TransferItem> items;
 
     private boolean noSpaceAvailableInCurrentMount;
 
@@ -66,7 +66,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         this.displayName = dl.getDisplayName();
         this.size = calculateSize(dl);
-        this.items = calculateItems(dl);
+        // Don't eagerly load items to prevent excessive memory retention.
+        // Items will be lazily loaded when first accessed via getItems().
+        // This prevents TransactionTooLargeException when fragments are destroyed.
+        this.items = null;
 
         if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
             dl.resume();
@@ -271,6 +274,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public List<TransferItem> getItems() {
+        // Lazy-load items to prevent excessive memory retention and Bundle serialization
+        if (items == null) {
+            items = calculateItems(dl);
+        }
         return items;
     }
 
@@ -287,8 +294,20 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     void updateUI(BTDownload dl) {
         displayName = dl.getDisplayName();
         size = calculateSize(dl);
-        items = calculateItems(dl);
+        // Recalculate items only if they're already loaded (avoid forcing large list into memory)
+        if (items != null) {
+            items = calculateItems(dl);
+        }
         checkSequentialDownload();
+    }
+
+    /**
+     * Clears the cached items list to free memory.
+     * Items will be lazily reloaded when next accessed via getItems().
+     * This helps prevent TransactionTooLargeException during activity lifecycle transitions.
+     */
+    public void clearCachedItems() {
+        items = null;
     }
 
     private double calculateSize(BTDownload dl) {

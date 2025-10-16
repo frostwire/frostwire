@@ -113,6 +113,16 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         updateCommonComponents();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clear cached items to free memory and prevent TransactionTooLargeException
+        // during activity lifecycle transitions (especially on pause/stop)
+        if (uiBittorrentDownload != null) {
+            uiBittorrentDownload.clearCachedItems();
+        }
+    }
+
     public void onTime() {
         if (uiBittorrentDownload == null) {
             Intent intent = getActivity().getIntent();

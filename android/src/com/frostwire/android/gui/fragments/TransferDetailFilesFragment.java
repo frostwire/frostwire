@@ -59,6 +59,9 @@ import java.util.List;
  */
 
 public class TransferDetailFilesFragment extends AbstractTransferDetailFragment {
+    private static final int PAGE_SIZE = 500;  // Load 500 files at a time to prevent ANR
+    private static final int LARGE_FILE_LIST_THRESHOLD = 1000;  // Trigger pagination for 1000+ files
+
     private TextView fileNumberTextView;
     private TextView totalSizeTextView;
     private RecyclerView recyclerView;
@@ -87,7 +90,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             return;
         }
         if (adapter == null) {
-            adapter = new TransferDetailFilesRecyclerViewAdapter(items);
+            // Use pagination for large file lists (1000+) to prevent ANR
+            boolean usePagination = items.size() >= LARGE_FILE_LIST_THRESHOLD;
+            adapter = new TransferDetailFilesRecyclerViewAdapter(items, usePagination ? PAGE_SIZE : Integer.MAX_VALUE);
         }
         updateComponents();
     }
@@ -159,7 +164,8 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             bundleResult.putInt("progress", transferItem.getProgress());
             bundleResult.putString("downloadedPercentage", UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));
             bundleResult.putBoolean("isComplete", transferItem.isComplete());
-            bundleResult.putSerializable("previewFile", previewFile((BTDownloadItem) transferItem));
+            // Don't serialize File objects to Bundle to prevent TransactionTooLargeException.
+            // PreviewFile will be recalculated in updateTransferDataPost if needed.
         }
 
         private static void updateTransferDataPost(TransferDetailFilesTransferItemViewHolder holder,
@@ -172,7 +178,11 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
             holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
             holder.playButtonImageView.setTag(transferItem);
-            holder.updatePlayButtonVisibility(bundle.getBoolean("isComplete"), (File) bundle.getSerializable("previewFile"));
+            // Only pass previewFile hint, recalculate to avoid serialization overhead
+            boolean isComplete = bundle.getBoolean("isComplete");
+            File previewFile = isComplete ? (transferItem instanceof BTDownloadItem ?
+                    previewFile((BTDownloadItem) transferItem) : null) : null;
+            holder.updatePlayButtonVisibility(isComplete, previewFile);
         }
 
         private void initComponents() {
@@ -198,9 +208,49 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     private final static class TransferDetailFilesRecyclerViewAdapter extends RecyclerView.Adapter<TransferDetailFilesTransferItemViewHolder> {
 
         private final List<TransferItem> items;
+        private final int pageSize;
+        private int currentPage = 0;
+        private List<TransferItem> allItems;
 
-        TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
-            this.items = new LinkedList<>(items);
+        TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items, int pageSize) {
+            this.allItems = new LinkedList<>(items);
+            this.pageSize = pageSize;
+            this.items = new LinkedList<>();
+            loadNextPage();
+        }
+
+        /**
+         * Loads the next page of items. For large lists (1000+), only loads PAGE_SIZE items at a time.
+         */
+        private void loadNextPage() {
+            if (allItems == null || allItems.isEmpty()) {
+                return;
+            }
+            int startIndex = currentPage * pageSize;
+            int endIndex = Math.min(startIndex + pageSize, allItems.size());
+
+            if (startIndex < allItems.size()) {
+                items.addAll(allItems.subList(startIndex, endIndex));
+                currentPage++;
+            }
+        }
+
+        /**
+         * Checks if more pages are available to load.
+         */
+        boolean hasMorePages() {
+            return allItems != null && (currentPage * pageSize) < allItems.size();
+        }
+
+        /**
+         * Loads more pages when user scrolls near the end.
+         */
+        void loadMorePages() {
+            if (hasMorePages()) {
+                int startIndex = items.size();
+                loadNextPage();
+                notifyItemRangeInserted(startIndex, items.size() - startIndex);
+            }
         }
 
         @Override
@@ -214,6 +264,11 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             if (items.isEmpty()) {
                 return;
             }
+            // Load more pages when user is near the end (within 100 items)
+            if (hasMorePages() && (i >= items.size() - 100)) {
+                loadMorePages();
+            }
+
             TransferItem transferItem = items.get(i);
             if (transferItem != null) {
                 viewHolder.updateTransferItem(transferItem);
@@ -242,7 +297,17 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 //Fatal Exception: java.lang.IllegalArgumentException
                 //Comparison method violates its general contract!
             }
-            AbstractTransferDetailFragment.updateAdapterItems(this, items, freshItems);
+            // For paginated lists, update allItems but only refresh current page items
+            if (freshItems != null) {
+                allItems = new LinkedList<>(freshItems);
+                // Reset pagination when items are refreshed
+                if (items.size() > 0) {
+                    currentPage = 0;
+                    items.clear();
+                    loadNextPage();
+                    notifyDataSetChanged();
+                }
+            }
         }
     }
 
