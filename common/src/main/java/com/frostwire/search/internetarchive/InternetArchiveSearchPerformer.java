@@ -56,11 +56,11 @@ public class InternetArchiveSearchPerformer extends CrawlPagedWebSearchPerformer
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-        InternetArchiveItem[] items = JsonUtils.toObject(page, InternetArchiveItem[].class);
-        if (items == null) {
+        InternetArchiveResponse response = JsonUtils.toObject(page, InternetArchiveResponse.class);
+        if (response == null || response.response == null || response.response.docs == null) {
             return result;
         }
-        for (InternetArchiveItem item : items) {
+        for (InternetArchiveItem item : response.response.docs) {
             if (!isStopped() && filter(item)) {
                 InternetArchiveSearchResult sr = new InternetArchiveSearchResult(getDomainName(), item);
                 result.add(sr);
