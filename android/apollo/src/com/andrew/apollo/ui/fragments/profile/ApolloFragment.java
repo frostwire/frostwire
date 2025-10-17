@@ -417,10 +417,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * {@inheritDoc}
      */
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Enable the options menu
-        setHasOptionsMenu(true);
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         initLoader();
     }
 

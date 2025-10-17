@@ -54,17 +54,6 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
     }
 
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Enable the options menu
-        setHasOptionsMenu(true);
-        // Start the loader
-        if (isAdded()) {
-            getLoaderManager().initLoader(Fragments.ARTIST_FRAGMENT_LOADER_ID, savedInstanceState, this);
-        }
-    }
-
-    @Override
     protected ArtistAdapter createAdapter() {
         int layout;
         if (isSimpleLayout()) {

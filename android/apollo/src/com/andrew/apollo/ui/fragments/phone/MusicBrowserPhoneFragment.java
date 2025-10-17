@@ -112,12 +112,6 @@ public final class MusicBrowserPhoneFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Enable the options menu
-        setHasOptionsMenu(true);
-    }
 
     @Override
     public void onPause() {
