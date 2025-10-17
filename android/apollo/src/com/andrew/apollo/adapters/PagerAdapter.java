@@ -108,8 +108,17 @@ public class PagerAdapter extends FragmentPagerAdapter {
     @Override
     public androidx.fragment.app.Fragment getItem(final int position) {
         final Holder mCurrentHolder = mHolderList.get(position);
-        return Fragment.instantiate(mFragmentActivity,
-                mCurrentHolder.mClassName, mCurrentHolder.mParams);
+        try {
+            // Use reflection to instantiate the fragment class with the constructor pattern
+            Class<?> fragmentClass = Class.forName(mCurrentHolder.mClassName);
+            Fragment fragment = (Fragment) fragmentClass.getDeclaredConstructor().newInstance();
+            if (mCurrentHolder.mParams != null) {
+                fragment.setArguments(mCurrentHolder.mParams);
+            }
+            return fragment;
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot instantiate fragment: " + mCurrentHolder.mClassName, e);
+        }
     }
 
     @Override

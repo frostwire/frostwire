@@ -127,15 +127,23 @@ public final class SettingsActivity extends AbstractActivity
     }
 
     private void switchToFragment(String fragmentName, Bundle args, CharSequence title) {
-        //Fragment f = Fragment.instantiate(this, fragmentName, args);
-        androidx.fragment.app.Fragment f = androidx.fragment.app.Fragment.instantiate(this, fragmentName, args);
-        androidx.fragment.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setTransition(TRANSIT_FRAGMENT_FADE);
-        transaction.replace(R.id.activity_settings_content, f);
-        transaction.commitAllowingStateLoss();
+        try {
+            // Use reflection to instantiate the fragment class instead of deprecated Fragment.instantiate()
+            Class<?> fragmentClass = Class.forName(fragmentName);
+            androidx.fragment.app.Fragment f = (androidx.fragment.app.Fragment) fragmentClass.getDeclaredConstructor().newInstance();
+            if (args != null) {
+                f.setArguments(args);
+            }
+            androidx.fragment.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setTransition(TRANSIT_FRAGMENT_FADE);
+            transaction.replace(R.id.activity_settings_content, f);
+            transaction.commitAllowingStateLoss();
 
-        if (title != null) {
-            setTitle(title);
+            if (title != null) {
+                setTitle(title);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot instantiate fragment: " + fragmentName, e);
         }
     }
 
