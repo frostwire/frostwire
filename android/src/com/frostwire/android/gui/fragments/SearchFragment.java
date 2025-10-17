@@ -136,11 +136,10 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(android.view.View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setupAdapter();
         setupPromoSlides();
-        setRetainInstance(true);
         lastInstance = this;
     }
 
