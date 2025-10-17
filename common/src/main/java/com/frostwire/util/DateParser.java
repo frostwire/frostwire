@@ -90,6 +90,7 @@ public final class DateParser {
         });
     
     // Array of all cached formatters for fallback parsing
+    @SuppressWarnings("unchecked")
     private static final ThreadLocal<SimpleDateFormat>[] CACHED_FORMATTERS = new ThreadLocal[]{
         FORMAT_YYYY_MM_DD_HH_MM_SS,
         FORMAT_YYYY_MM_DD_T_HH_MM_SS_Z,

@@ -59,6 +59,7 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
     /**
      * Constructor of <code>AlbumAdapter</code>
      */
+    @SuppressWarnings("deprecation")
     public AlbumAdapter(final Activity context, final int layoutId) {
         super(context, layoutId, 0);
         // Cache the transparent overlay
@@ -103,7 +104,9 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             if (mImageFetcher != null && Ref.alive(holder.mBackground)) {
                 if (mLayoutId == R.layout.list_item_detailed_no_background) {
                     holder.mBackground.get().setBackground(null);
-                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_background_main));
+                    @SuppressWarnings("deprecation")
+                    int bgColor = convertView.getResources().getColor(R.color.app_background_main);
+                    holder.mBackground.get().setBackgroundColor(bgColor);
                 } else {
                     // Asynchronously load the artist image on the background view
                     mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
