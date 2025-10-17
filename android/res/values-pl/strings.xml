@@ -278,7 +278,6 @@
     <string name="sd_permission_no_accessible_path">Wybrana ścieżka na karcie SD nie jest już dostępna. Naciśnij OK, aby wybrać ponownie. </string>
     <string name="frostwire_is_running">FrostWire jest uruchomiony</string>
     <string name="select_option_below">Wybierz opcję poniżej:</string>
-    <string name="use_limetorrents">Używaj Limetorrents</string>
     <string name="error_no_internet_connection">Błąd: Sprawdź połączenie z internetem</string>
     <string name="invalid_filename">Nieprawidłowa nazwa pliku</string>
     <string name="wifi_network_unavailable">Sieć Wi-Fi Jest Niedostępna</string>

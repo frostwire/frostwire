@@ -35,13 +35,12 @@ Created a centralized `DateParser` utility class (`com.frostwire.util.DateParser
 1. `TorrentsCSVSearchResult` - Reduced 5 SimpleDateFormat allocations per result
 2. `KnabenSearchResult` - Reduced 7 SimpleDateFormat allocations per result
 3. `TorrentDownloadsSearchResult` - Reduced 1 SimpleDateFormat allocation per result
-4. `LimeTorrentsSearchResult` - Reduced 1 SimpleDateFormat allocation per result
-5. `MagnetDLSearchResult` - Reduced 1 SimpleDateFormat allocation per result
-6. `InternetArchiveSearchResult` - Reduced 1 SimpleDateFormat allocation per result
-7. `IdopeSearchResult` - Eliminated inline date parsing code
-8. `Torrentz2SearchResult` - Eliminated inline date parsing code
-9. `One337xSearchResult` - Eliminated inline date parsing code
-10. `SoundcloudSearchResult` - Reduced 1 SimpleDateFormat allocation per result (+ fixed mm→MM bug)
+4. `MagnetDLSearchResult` - Reduced 1 SimpleDateFormat allocation per result
+5. `InternetArchiveSearchResult` - Reduced 1 SimpleDateFormat allocation per result
+6. `IdopeSearchResult` - Eliminated inline date parsing code
+7. `Torrentz2SearchResult` - Eliminated inline date parsing code
+8. `One337xSearchResult` - Eliminated inline date parsing code
+9. `SoundcloudSearchResult` - Reduced 1 SimpleDateFormat allocation per result (+ fixed mm→MM bug)
 
 ### Performance Metrics
 

@@ -264,7 +264,6 @@
     <string name="frostwire_is_running">FrostWire est en cours d\'exécution</string>
     <string name="http_download_status_save_dir_error">Sauv.répertoire n\'existe pas ou ne peut pas être créé.</string>
     <string name="select_option_below">Sélectionnez l\'option ci-dessous:</string>
-    <string name="use_limetorrents">Utilisez Limetorrents</string>
     <string name="use_magnetdl">Utilisez MagnetDL</string>
     <string name="use_glotorrents">Utilisez GloTorrents</string>
     <string name="error_no_internet_connection">Erreur: Vérifiez la connexion Internet</string>

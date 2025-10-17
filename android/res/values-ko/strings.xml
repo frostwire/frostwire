@@ -251,7 +251,6 @@
     <string name="http_download_status_save_dir_error">저장 디렉토리가 없거나 만들 수 없습니다.</string>
     <string name="select_option_below">아래에서 옵션을 선택하십시오.</string>
     <string name="device_storage">장치 저장소</string>
-    <string name="use_limetorrents">Limetorrents사용</string>
     <string name="error_no_internet_connection">오류 : 인터넷 연결 확인</string>
     <string name="why_we_need_storage_permissions">스토리지 권한이 필요한 이유</string>
     <string name="invalid_filename">잘못된 파일 이름</string>

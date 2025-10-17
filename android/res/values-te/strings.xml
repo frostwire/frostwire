@@ -281,7 +281,6 @@
     <string name="select_option_below">దిగువ ఎంపికను ఎంచుకోండి:</string>
     <string name="device_storage">పరికరం యొక్క నిల్వ</string>
     <string name="donate_your_time">మీ సమయం దానం</string>
-    <string name="use_limetorrents">Limetorrents ఉపయోగించండి</string>
     <string name="error_no_internet_connection">లోపం: ఇంటర్నెట్ కనెక్షన్ను తనిఖీ చేయండి</string>
     <string name="azureus_manager_item_error">లోపం</string>
     <string name="why_we_need_storage_permissions">మాకు నిల్వ అనుమతులు అవసరం ఎందుకు.</string>

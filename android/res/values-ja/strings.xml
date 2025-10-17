@@ -283,7 +283,6 @@
     <string name="current_plan">現在の計画</string>
     <string name="sd_permission_no_accessible_path">SDで選択したパスにアクセスできなくなりました。 OKを押してもう一度選択してください。</string>
     <string name="select_option_below">以下のオプションを選択してください：</string>
-    <string name="use_limetorrents">Limetorrentsを使用する</string>
     <string name="error_no_internet_connection">エラー：インターネット接続を確認してください</string>
     <string name="wifi_network_unavailable">Wi-Fiネットワークを利用できません</string>
     <string name="select_all">すべて選択</string>

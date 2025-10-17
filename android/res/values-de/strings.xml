@@ -256,7 +256,6 @@
     <string name="http_download_status_save_dir_error">Speichern Verzeichnis ist nicht vorhanden oder kann nicht erstellt werden</string>
     <string name="select_option_below">Wählen Sie nachfolgend:</string>
     <string name="device_storage">Geräte-Storage</string>
-    <string name="use_limetorrents">Benutze Limetorrents</string>
     <string name="use_magnetdl">Benutze MagnetDL</string>
     <string name="use_glotorrents">Benutze GloTorrents</string>
     <string name="error_no_internet_connection">Fehler: Überprüfen Internetverbindung</string>

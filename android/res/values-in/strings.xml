@@ -250,7 +250,6 @@
     <string name="http_download_status_save_dir_error">Hemat direktori tidak ada atau tidak dapat dibuat</string>
     <string name="select_option_below">Pilih opsi di bawah ini:</string>
     <string name="device_storage">Perangkat penyimpanan</string>
-    <string name="use_limetorrents">Gunakan Limetorrents</string>
     <string name="error_no_internet_connection">Kesalahan: Periksa sambungan Internet</string>
     <string name="why_we_need_storage_permissions">Mengapa kita perlu izin penyimpanan.</string>
     <string name="invalid_filename">Nama file tidak sah</string>

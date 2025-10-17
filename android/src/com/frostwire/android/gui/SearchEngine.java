@@ -34,7 +34,6 @@ import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.knaben.KnabenSearchPerformer;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
@@ -192,13 +191,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new LimeTorrentsSearchPerformer("www.limetorrents.info", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public static final SearchEngine NYAA = new SearchEngine("Nyaa", Constants.PREF_KEY_SEARCH_USE_NYAA) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -328,7 +320,6 @@ public abstract class SearchEngine {
             SOUNCLOUD,
             ARCHIVE,
             TORRENTDOWNLOADS,
-            LIMETORRENTS,
             NYAA,
             GLOTORRENTS,
             TORRENTSCSV,

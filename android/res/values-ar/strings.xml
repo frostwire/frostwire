@@ -254,7 +254,6 @@
     <string name="http_download_status_save_dir_error">حفظ الدليل غير موجود أو لا يمكن إنشاء</string>
     <string name="select_option_below">الخيار اختار:</string>
     <string name="device_storage">التخزين الجهاز</string>
-    <string name="use_limetorrents">استخدام Limetorrents</string>
     <string name="error_no_internet_connection">خطأ: تحقق من اتصال الإنترنت</string>
     <string name="why_we_need_storage_permissions">لماذا نحن بحاجة أذونات التخزين.</string>
     <string name="invalid_filename">اسم الملف غير صالح</string>

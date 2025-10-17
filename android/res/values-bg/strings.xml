@@ -223,7 +223,6 @@
     <string name="select_option_below">Изберете опция по-долу:</string>
     <string name="device_storage">Съхранение на устройството</string>
     <string name="donate_your_time">Дарете си време</string>
-    <string name="use_limetorrents">Използвайте Limetorrents</string>
     <string name="error_no_internet_connection">Грешка: Проверете интернет връзката</string>
     <string name="azureus_manager_item_error">Грешка</string>
     <string name="why_we_need_storage_permissions">Защо имаме нужда от разрешения за съхранение.</string>

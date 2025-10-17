@@ -223,7 +223,6 @@
     <string name="select_option_below">ตัวเลือกเลือกด้านล่าง:</string>
     <string name="device_storage">อุปกรณ์จัดเก็บข้อมูลของ</string>
     <string name="donate_your_time">บริจาคเวลาของคุณ</string>
-    <string name="use_limetorrents">ใช้ Limetorrents</string>
     <string name="error_no_internet_connection">ข้อผิดพลาด: ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="azureus_manager_item_error">ความผิดพลาด</string>
     <string name="why_we_need_storage_permissions">ทำไมเราต้องมีสิทธิ์การจัดเก็บข้อมูล</string>
