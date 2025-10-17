@@ -39,9 +39,12 @@ import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.util.Logger;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * This dialog should evolve to allow us for reuse on a number of situations in which you
@@ -71,7 +74,11 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
+    private static final String BUNDLE_KEY_LIST_DATA_CACHE_KEY = "listDataCacheKey";
     private static final String BUNDLE_KEY_SELECTION_MODE = "selectionMode";
+
+    // Static cache to store large JSON data outside of bundles to prevent TransactionTooLargeException
+    private static final Map<String, String> LIST_DATA_CACHE = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * TODOS: 1. Add an optional text filter control that will be connected to the adapter.
@@ -136,8 +143,11 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         bundle.putString(BUNDLE_KEY_DIALOG_TITLE, dialogTitle);
         bundle.putString(BUNDLE_KEY_DIALOG_TEXT, dialogText);
 
+        // Store large JSON data in static cache instead of bundle to prevent TransactionTooLargeException
         if (listDataInJSON != null) {
-            bundle.putString(BUNDLE_KEY_LIST_DATA, listDataInJSON);
+            String cacheKey = UUID.randomUUID().toString();
+            LIST_DATA_CACHE.put(cacheKey, listDataInJSON);
+            bundle.putString(BUNDLE_KEY_LIST_DATA_CACHE_KEY, cacheKey);
         }
         bundle.putInt(BUNDLE_KEY_SELECTION_MODE, selectionMode.ordinal());
         this.selectionMode = selectionMode;
@@ -220,7 +230,15 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     private void initListViewAndAdapter(Bundle bundle) {
         ListView listView = findView(dlg, R.id.dialog_confirm_list_listview);
 
-        String listDataString = bundle.getString(BUNDLE_KEY_LIST_DATA);
+        // Retrieve JSON from cache using the cache key
+        String listDataString = null;
+        String cacheKey = bundle.getString(BUNDLE_KEY_LIST_DATA_CACHE_KEY);
+        if (cacheKey != null) {
+            listDataString = LIST_DATA_CACHE.get(cacheKey);
+        } else {
+            // Fallback for old bundles that stored data directly (backwards compatibility)
+            listDataString = bundle.getString(BUNDLE_KEY_LIST_DATA);
+        }
         List<T> listData = deserializeData(listDataString);
 
         if (selectionMode == null) {
@@ -285,6 +303,19 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
             }
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        // Clean up cache entry for this dialog to prevent memory leaks
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String cacheKey = bundle.getString(BUNDLE_KEY_LIST_DATA_CACHE_KEY);
+            if (cacheKey != null) {
+                LIST_DATA_CACHE.remove(cacheKey);
+            }
+        }
+        super.onDestroy();
     }
 
     void setOnYesListener(OnClickListener listener) {
