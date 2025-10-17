@@ -35,6 +35,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.util.UIUtils;
@@ -211,6 +214,8 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private final int pageSize;
         private int currentPage = 0;
         private List<TransferItem> allItems;
+        private final Handler mainHandler = new Handler(Looper.getMainLooper());
+        private Runnable pendingLoadMoreRunnable;
 
         TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items, int pageSize) {
             this.allItems = new LinkedList<>(items);
@@ -265,8 +270,15 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 return;
             }
             // Load more pages when user is near the end (within 100 items)
+            // Defer the load to prevent calling notify methods during layout computation
             if (hasMorePages() && (i >= items.size() - 100)) {
-                loadMorePages();
+                if (pendingLoadMoreRunnable == null) {
+                    pendingLoadMoreRunnable = () -> {
+                        loadMorePages();
+                        pendingLoadMoreRunnable = null;
+                    };
+                    mainHandler.post(pendingLoadMoreRunnable);
+                }
             }
 
             TransferItem transferItem = items.get(i);
