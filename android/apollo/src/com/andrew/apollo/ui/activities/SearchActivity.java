@@ -19,13 +19,10 @@
 package com.andrew.apollo.ui.activities;
 
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -48,6 +45,10 @@ import android.widget.TextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.appcompat.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -144,7 +145,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         }
         // Prepare the loader. Either re-connect with an existing one,
         // or start a new one.
-        getLoaderManager().initLoader(0, null, this);
+        androidx.loader.app.LoaderManager.getInstance(this).initLoader(0, null, this);
     }
 
     @Override
@@ -154,7 +155,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         mFilterString = !TextUtils.isEmpty(query) ? query : null;
         // Set the prefix
         mAdapter.setPrefix(mFilterString);
-        getLoaderManager().restartLoader(0, null, this);
+        androidx.loader.app.LoaderManager.getInstance(this).restartLoader(0, null, this);
     }
 
     @Override
@@ -267,7 +268,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         mFilterString = !TextUtils.isEmpty(newText) ? newText : null;
         // Set the prefix
         mAdapter.setPrefix(mFilterString);
-        getLoaderManager().restartLoader(0, null, this);
+        androidx.loader.app.LoaderManager.getInstance(this).restartLoader(0, null, this);
         return true;
     }
 

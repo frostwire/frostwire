@@ -172,7 +172,7 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
      */
     public void refreshQueue() {
         if (isAdded()) {
-            getLoaderManager().restartLoader(Fragments.QUEUE_FRAGMENT_LOADER_ID, null, this);
+            androidx.loader.app.LoaderManager.getInstance(this).restartLoader(Fragments.QUEUE_FRAGMENT_LOADER_ID, null, this);
         }
     }
 
