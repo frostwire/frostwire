@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Song;
@@ -106,13 +107,15 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
                     musicViewHolder.mLineTwo.get().setText(dataHolder.mLineTwo);
                 }
                 if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
-                    musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
-                    musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
-                    musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
+                    int highlightColor = ContextCompat.getColor(getContext(), com.frostwire.android.R.color.app_text_highlight);
+                    musicViewHolder.mLineOne.get().setTextColor(highlightColor);
+                    musicViewHolder.mLineOneRight.get().setTextColor(highlightColor);
+                    musicViewHolder.mLineTwo.get().setTextColor(highlightColor);
                 } else {
-                    musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
-                    musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
-                    musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+                    int primaryColor = ContextCompat.getColor(getContext(), com.frostwire.android.R.color.app_text_primary);
+                    musicViewHolder.mLineOne.get().setTextColor(primaryColor);
+                    musicViewHolder.mLineOneRight.get().setTextColor(primaryColor);
+                    musicViewHolder.mLineTwo.get().setTextColor(primaryColor);
                 }
             }
         }

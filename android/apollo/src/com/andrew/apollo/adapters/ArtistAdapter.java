@@ -24,6 +24,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.core.content.ContextCompat;
+
 import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
@@ -62,7 +65,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
     public ArtistAdapter(final Activity context, final int layoutId) {
         super(context, layoutId, 0);
         // Cache the transparent overlay
-        mOverlayColor = context.getResources().getColor(R.color.list_item_background);
+        mOverlayColor = ContextCompat.getColor(context, R.color.list_item_background);
     }
 
     /**
@@ -90,7 +93,8 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             if (Ref.alive(holder.mBackground)) {
                 if (mLayoutId == R.layout.list_item_detailed_no_background) {
                     holder.mBackground.get().setBackground(null);
-                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_background_main));
+                    int bgColor = ContextCompat.getColor(getContext(), R.color.app_background_main);
+                    holder.mBackground.get().setBackgroundColor(bgColor);
                 } else {
                     // Set the background image
                     mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
