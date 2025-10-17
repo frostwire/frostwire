@@ -380,7 +380,6 @@
     <string name="current_plan">Текущий план</string>
     <string name="sd_permission_no_accessible_path">Вы выбрали в SD путь не доступен больше. Нажмите кнопку OK, чтобы выбрать снова.</string>
     <string name="select_option_below">Выберите вариант ниже:</string>
-    <string name="use_limetorrents">Используйте Limetorrents</string>
     <string name="error_no_internet_connection">Ошибка: Проверьте подключение к Интернету</string>
     <string name="invalid_filename">Неверное имя файла</string>
     <string name="wifi_network_unavailable">Wi-Fi сеть не доступна</string>

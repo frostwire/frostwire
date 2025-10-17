@@ -264,7 +264,6 @@
     <string name="issue_with_tip_donation_uri">提示/捐款网址有问题</string>
     <string name="frostwire_is_running">FrostWire正在运行</string>
     <string name="select_option_below">选择以下选项：</string>
-    <string name="use_limetorrents">使用Limetorrents</string>
     <string name="error_no_internet_connection">错误：检查Internet连接</string>
     <string name="why_we_need_storage_permissions">为什么我们需要存储权限。</string>
     <string name="invalid_filename">无效的文件名</string>

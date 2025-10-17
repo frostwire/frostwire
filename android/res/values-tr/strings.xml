@@ -254,7 +254,6 @@
     <string name="http_download_status_save_dir_error">Kaydet dizini yok veya oluşturulamıyor</string>
     <string name="select_option_below">Aşağıdaki seçeneği seçin:</string>
     <string name="device_storage">Cihazın depolaması</string>
-    <string name="use_limetorrents">Limetorrents\'u Kullan</string>
     <string name="error_no_internet_connection">Hata: İnternet bağlantısını kontrol et</string>
     <string name="why_we_need_storage_permissions">Neden depolama izinlerine ihtiyacımız var.</string>
     <string name="invalid_filename">Geçersiz dosya adı</string>

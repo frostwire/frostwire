@@ -252,7 +252,6 @@
     <string name="http_download_status_save_dir_error">Lưu thư mục không tồn tại hoặc không thể được tạo ra</string>
     <string name="select_option_below">Chọn tùy chọn dưới đây:</string>
     <string name="device_storage">lưu trữ của thiết bị</string>
-    <string name="use_limetorrents">Chọn Limetorrents</string>
     <string name="error_no_internet_connection">Lỗi: Kiểm tra kết nối Internet</string>
     <string name="why_we_need_storage_permissions">Tại sao chúng ta cần cho phép lưu trữ.</string>
     <string name="invalid_filename">Tên tập tin không hợp lệ</string>

@@ -217,7 +217,6 @@
     <string name="http_download_status_save_dir_error">Directorul Salvați nu există sau nu pot fi create</string>
     <string name="select_option_below">Selectați opțiunea de mai jos:</string>
     <string name="device_storage">De stocare a dispozitivului</string>
-    <string name="use_limetorrents">Utilizați Limetorrents</string>
     <string name="error_no_internet_connection">Eroare: Verificați conexiunea la Internet</string>
     <string name="azureus_manager_item_error">Eroare</string>
     <string name="why_we_need_storage_permissions">De ce avem nevoie de permisiuni de stocare.</string>

@@ -250,7 +250,6 @@
     <string name="http_download_status_save_dir_error">Directory Save bestaat niet of kan niet worden gemaakt</string>
     <string name="select_option_below">Kies hieronder een optie:</string>
     <string name="device_storage">Device\'s Storage</string>
-    <string name="use_limetorrents">Gebruik Limetorrents</string>
     <string name="error_no_internet_connection">Error: Check internetverbinding</string>
     <string name="why_we_need_storage_permissions">Waarom moeten we de opslag permissies.</string>
     <string name="invalid_filename">Ongeldige bestandsnaam</string>

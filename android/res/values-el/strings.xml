@@ -265,7 +265,6 @@
     <string name="frostwire_is_running">FrostWire είναι σε λειτουργία</string>
     <string name="http_download_status_save_dir_error">Αποθήκευση κατάλογος δεν υπάρχει ή δεν μπορεί να δημιουργηθεί</string>
     <string name="select_option_below">Επιλέξτε από τις παρακάτω επιλογές:</string>
-    <string name="use_limetorrents">Χρήση Limetorrents</string>
     <string name="error_no_internet_connection">Σφάλμα: Ελέγξτε τη σύνδεση στο Internet</string>
     <string name="why_we_need_storage_permissions">Γιατί χρειαζόμαστε άδειες αποθήκευσης.</string>
     <string name="invalid_filename">Άκυρο όνομα αρχείου</string>

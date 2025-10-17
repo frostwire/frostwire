@@ -227,7 +227,6 @@
     <string name="select_option_below">Velg alternativ nedenfor:</string>
     <string name="device_storage">Enhetens lagrings</string>
     <string name="donate_your_time">Donere tid</string>
-    <string name="use_limetorrents">Bruk Limetorrents</string>
     <string name="error_no_internet_connection">Feil: Kontroller Internett-tilkobling</string>
     <string name="azureus_manager_item_error">Feil</string>
     <string name="why_we_need_storage_permissions">Hvorfor vi trenger lager tillatelser.</string>

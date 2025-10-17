@@ -219,7 +219,6 @@
     <string name="http_download_status_save_dir_error">Save könyvtár nem létezik vagy nem hozható létre</string>
     <string name="select_option_below">Válassza az alábbi lehetőségek közül:</string>
     <string name="device_storage">Eszköz tárolás</string>
-    <string name="use_limetorrents">Használja Limetorrents</string>
     <string name="error_no_internet_connection">Hiba: Az internetkapcsolat ellenőrzése</string>
     <string name="azureus_manager_item_error">Hiba</string>
     <string name="why_we_need_storage_permissions">Miért van szükségünk tárolási engedélyeket.</string>

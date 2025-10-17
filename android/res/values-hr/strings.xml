@@ -281,7 +281,6 @@
     <string name="frostwire_is_running">FrostWire je pokrenut</string>
     <string name="select_option_below">Odaberite opciju u nastavku:</string>
     <string name="donate_your_time">Donirajte svoje vrijeme</string>
-    <string name="use_limetorrents">Koristi Limetorrents</string>
     <string name="error_no_internet_connection">Pogreška: Provjerite internetsku vezu</string>
     <string name="invalid_filename">Pogrešan naziv datoteke</string>
     <string name="wifi_network_unavailable">Wi-Fi mreža nije dostupna</string>

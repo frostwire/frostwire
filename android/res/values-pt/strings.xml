@@ -156,7 +156,6 @@
     <string name="add_transfer_label">Cole um magnet ou URL do torrent</string>
     <string name="drawer_open">Abrir Gaveta de navegação</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
-    <string name="use_limetorrents">Use Limetorrents</string>
     <string name="use_magnetdl">Use MagnetDL</string>
     <string name="use_glotorrents">Use GloTorrents</string>
     <string name="transfer_status_demuxing">Demuxeando</string>

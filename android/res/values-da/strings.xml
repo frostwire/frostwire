@@ -251,7 +251,6 @@
     <string name="http_download_status_save_dir_error">Gem mappe eksisterer ikke eller kan ikke oprettes</string>
     <string name="select_option_below">Vælg valgmulighed nedenfor:</string>
     <string name="device_storage">Enhedens Opbevaring</string>
-    <string name="use_limetorrents">Brug Limetorrents</string>
     <string name="error_no_internet_connection">Fejl: Kontroller internetforbindelsen</string>
     <string name="why_we_need_storage_permissions">Hvorfor vi har brug for tilladelser opbevaring.</string>
     <string name="invalid_filename">Ugyldigt filnavn</string>

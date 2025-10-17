@@ -58,10 +58,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentz2" />
     <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_limetorrents"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_limetorrents" />
-    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_magnetdl"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_magnetdl" />

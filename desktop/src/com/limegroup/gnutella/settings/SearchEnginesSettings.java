@@ -32,7 +32,6 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting INTERNET_ARCHIVE_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);
     public static final BooleanSetting FROSTCLICK_SEARCH_ENABLED = FACTORY.createBooleanSetting("FROSTCLICK_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTDOWNLOADS_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTDOWNLOADS_SEARCH_ENABLED", true);
-    public static final BooleanSetting LIMETORRENTS_SEARCH_ENABLED = FACTORY.createBooleanSetting("LIMETORRENTS_SEARCH_ENABLED", true);
     public static final BooleanSetting ONE337X_SEARCH_ENABLED = FACTORY.createBooleanSetting("ONE337X_SEARCH_ENABLED", true);
     public static final BooleanSetting IDOPE_SEARCH_ENABLED = FACTORY.createBooleanSetting("IDOPE_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTZ2_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTZ2_SEARCH_ENABLED", true);

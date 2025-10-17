@@ -26,7 +26,6 @@ import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.knaben.KnabenSearchPerformer;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
@@ -65,7 +64,6 @@ public abstract class SearchEngine {
         ONE337X_ID,
         IDOPE_ID,
         TORRENTDOWNLOADS_ID,
-        LIMETORRENTS_ID,
         NYAA_ID,
         TORRENTZ2_ID,
         MAGNETDL_ID,
@@ -126,12 +124,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-    private static final SearchEngine LIMETORRENTS = new SearchEngine(SearchEngineID.LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.info") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
     private static final SearchEngine NYAA = new SearchEngine(SearchEngineID.NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
@@ -233,7 +225,6 @@ public abstract class SearchEngine {
                 GLOTORRENTS,
                 IDOPE,
                 KNABEN,
-                LIMETORRENTS,
                 MAGNETDL,
                 NYAA,
                 ONE337X,

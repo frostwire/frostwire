@@ -220,7 +220,6 @@
     <string name="http_download_status_save_dir_error">Захаваць каталог не існуе ці не можа быць створаны</string>
     <string name="select_option_below">Выберыце варыянт ніжэй:</string>
     <string name="device_storage">Захоўванне прылады</string>
-    <string name="use_limetorrents">Выкарыстоўвайце Limetorrents</string>
     <string name="error_no_internet_connection">Памылка: Праверце падключэнне да Інтэрнэту</string>
     <string name="azureus_manager_item_error">Памылка</string>
     <string name="why_we_need_storage_permissions">Навошта нам патрэбныя правы захоўвання.</string>

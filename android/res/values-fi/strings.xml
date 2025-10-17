@@ -226,7 +226,6 @@
     <string name="select_option_below">Valitse vaihtoehto alla:</string>
     <string name="device_storage">Laitteen varastointi</string>
     <string name="donate_your_time">Lahjoita aikaasi</string>
-    <string name="use_limetorrents">Käytä Limetorrents</string>
     <string name="error_no_internet_connection">Virhe: Tarkista Internet-yhteys</string>
     <string name="azureus_manager_item_error">Virhe</string>
     <string name="why_we_need_storage_permissions">Siksi tarvitaan varastointi käyttöoikeudet.</string>
