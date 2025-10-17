@@ -829,6 +829,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Checks whether the passed intent contains a playback request,
      * and starts playback if that's the case
      */
+    @SuppressWarnings("deprecation")
     private void startPlayback() {
         Intent intent = getIntent();
 
@@ -1327,6 +1328,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
          * Constructor of <code>TimeHandler</code>
          */
         TimeHandler(final AudioPlayerActivity player) {
+            super(android.os.Looper.getMainLooper());
             mAudioPlayer = new WeakReference<>(player);
         }
 

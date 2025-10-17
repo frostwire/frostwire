@@ -119,7 +119,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.transferComparator = new TransferComparator();
         setHasOptionsMenu(true);
         selectedStatus = TransferStatus.ALL;
-        vpnRichToastHandler = new Handler();
+        vpnRichToastHandler = new Handler(android.os.Looper.getMainLooper());
         tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
     }
 
