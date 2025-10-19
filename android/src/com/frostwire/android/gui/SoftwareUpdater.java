@@ -50,6 +50,8 @@ public final class SoftwareUpdater {
     private boolean oldVersion;
     private Update update;
     private long updateTimestamp;
+    private static String cachedSoundCloudClientId = null;
+    private static String cachedSoundCloudAppVersion = null;
 
     private SoftwareUpdater() {
         this.oldVersion = false;
@@ -116,7 +118,19 @@ public final class SoftwareUpdater {
     }
 
     private void updateConfiguration(Update update, MainActivity mainActivity) {
-        if (update.config == null) {
+        if (update != null) {
+            // Cache SoundCloud credentials if provided
+            if (update.sc_client_id != null && !update.sc_client_id.trim().isEmpty()) {
+                cachedSoundCloudClientId = update.sc_client_id;
+                LOG.info("updateConfiguration: cached sc_client_id");
+            }
+            if (update.sc_app_version != null && !update.sc_app_version.trim().isEmpty()) {
+                cachedSoundCloudAppVersion = update.sc_app_version;
+                LOG.info("updateConfiguration: cached sc_app_version");
+            }
+        }
+
+        if (update == null || update.config == null) {
             return;
         }
 
@@ -159,6 +173,16 @@ public final class SoftwareUpdater {
 
         Map<String, String> updateMessages;
         public Config config;
+
+        /**
+         * SoundCloud client ID for API requests
+         */
+        public String sc_client_id;
+
+        /**
+         * SoundCloud app version for API requests
+         */
+        public String sc_app_version;
     }
 
     @SuppressWarnings("CanBeFinal")
@@ -206,5 +230,21 @@ public final class SoftwareUpdater {
         if (ALWAYS_SHOW_UPDATE_DIALOG || result) {
             softwareUpdater.notifyUserAboutUpdate(activity);
         }
+    }
+
+    /**
+     * Gets the cached SoundCloud client ID from the remote update.
+     * Returns a default value if not yet fetched or invalid.
+     */
+    public static String getSoundCloudClientId() {
+        return cachedSoundCloudClientId != null ? cachedSoundCloudClientId : "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
+    }
+
+    /**
+     * Gets the cached SoundCloud app version from the remote update.
+     * Returns a default value if not yet fetched or invalid.
+     */
+    public static String getSoundCloudAppVersion() {
+        return cachedSoundCloudAppVersion != null ? cachedSoundCloudAppVersion : "1713906596";
     }
 }
