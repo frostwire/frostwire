@@ -26,6 +26,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.internetarchive.InternetArchiveSearchPerformer;
 import com.frostwire.search.btdigg.BTDiggSearchPerformer;
@@ -166,7 +167,10 @@ public abstract class SearchEngine {
     public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new SoundcloudSearchPerformer("api-v2.sndcdn.com", token, keywords, DEFAULT_TIMEOUT);
+            SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer("api-v2.sndcdn.com", token, keywords, DEFAULT_TIMEOUT);
+            // Inject dynamic credentials fetched from remote server
+            performer.setCredentials(SoftwareUpdater.getSoundCloudClientId(), SoftwareUpdater.getSoundCloudAppVersion());
+            return performer;
         }
     };
 
