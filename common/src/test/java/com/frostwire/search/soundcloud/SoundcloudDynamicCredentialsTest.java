@@ -54,8 +54,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class SoundcloudDynamicCredentialsTest {
 
     private static final Logger LOG = Logger.getLogger(SoundcloudDynamicCredentialsTest.class);
-    private static final String DEFAULT_CLIENT_ID = "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
-    private static final String DEFAULT_APP_VERSION = "1713906596";
+    private static final String DEFAULT_CLIENT_ID = "MHDG7vIKasWstY0FaB07rK5WUoUjjCDC";
+    private static final String DEFAULT_APP_VERSION = "1760349581";
     private static final String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
 
     @BeforeAll
