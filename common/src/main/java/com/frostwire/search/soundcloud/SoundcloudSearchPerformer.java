@@ -30,15 +30,75 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
-    private static final String SOUNDCLOUD_APP_VERSION = "1713906596";
+    // Default fallback values (use getters to get current values from cache)
+    public static final String DEFAULT_SOUNDCLOUD_CLIENTID = "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
+    public static final String DEFAULT_SOUNDCLOUD_APP_VERSION = "1713906596";
+
+    // Fields to store instance-specific credentials (can be overridden via setters)
+    private String instanceClientId;
+    private String instanceAppVersion;
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
+        this.instanceClientId = DEFAULT_SOUNDCLOUD_CLIENTID;
+        this.instanceAppVersion = DEFAULT_SOUNDCLOUD_APP_VERSION;
+    }
+
+    /**
+     * Sets the client ID and app version for this performer instance.
+     * Used on desktop to inject dynamically fetched credentials from the remote update server.
+     */
+    public void setCredentials(String clientId, String appVersion) {
+        if (clientId != null && !clientId.trim().isEmpty()) {
+            this.instanceClientId = clientId;
+        }
+        if (appVersion != null && !appVersion.trim().isEmpty()) {
+            this.instanceAppVersion = appVersion;
+        }
+    }
+
+    /**
+     * Gets the client ID to use for this performer instance.
+     */
+    private String getClientId() {
+        return this.instanceClientId != null ? this.instanceClientId : DEFAULT_SOUNDCLOUD_CLIENTID;
+    }
+
+    /**
+     * Gets the app version to use for this performer instance.
+     */
+    private String getAppVersion() {
+        return this.instanceAppVersion != null ? this.instanceAppVersion : DEFAULT_SOUNDCLOUD_APP_VERSION;
     }
 
     public static String resolveUrl(String url) {
-        return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
+        return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + DEFAULT_SOUNDCLOUD_CLIENTID + "&app_version=" + DEFAULT_SOUNDCLOUD_APP_VERSION;
+    }
+
+    public LinkedList<SoundcloudSearchResult> fromJsonWithCredentials(String json, boolean fromPastedUrl) {
+        LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
+        if (json.contains("\"collection\":")) {
+            SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
+            if (obj != null && obj.collection != null) {
+                obj.collection.stream().
+                        filter(SoundcloudItem::isValidSearchResult).
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, getClientId(), getAppVersion())));
+            }
+        } else if (json.contains("\"tracks\":")) {
+            SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
+            if (obj != null && obj.tracks != null) {
+                obj.tracks.stream().
+                        filter(SoundcloudItem::isValidSearchResult).
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, getClientId(), getAppVersion())));
+            }
+        } else { // assume it's a single item
+            SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
+            if (item != null && item.isValidSearchResult(fromPastedUrl)) {
+                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, getClientId(), getAppVersion());
+                r.add(sr);
+            }
+        }
+        return r;
     }
 
     public static LinkedList<SoundcloudSearchResult> fromJson(String json, boolean fromPastedUrl) {
@@ -48,19 +108,19 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             if (obj != null && obj.collection != null) {
                 obj.collection.stream().
                         filter(SoundcloudItem::isValidSearchResult).
-                        forEach(item -> r.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION)));
             }
         } else if (json.contains("\"tracks\":")) {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
             if (obj != null && obj.tracks != null) {
                 obj.tracks.stream().
                         filter(SoundcloudItem::isValidSearchResult).
-                        forEach(item -> r.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION)));
             }
         } else { // assume it's a single item
             SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
             if (item != null && item.isValidSearchResult(fromPastedUrl)) {
-                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION);
                 r.add(sr);
             }
         }
@@ -69,7 +129,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://api-v2.soundcloud.com/search/tracks?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + SOUNDCLOUD_CLIENTID;
+        return "https://api-v2.soundcloud.com/search/tracks?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + getClientId();
     }
 
     @Override
@@ -80,7 +140,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         if (obj != null && obj.collection != null) {
             obj.collection.stream().
                     filter(item -> !isStopped() && item.isValidSearchResult()).
-                    forEach(item -> result.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
+                    forEach(item -> result.add(new SoundcloudSearchResult(item, getClientId(), getAppVersion())));
         }
         return result;
     }
