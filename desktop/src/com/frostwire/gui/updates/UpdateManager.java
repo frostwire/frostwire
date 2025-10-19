@@ -21,6 +21,7 @@ package com.frostwire.gui.updates;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.CommonUtils;
 import com.frostwire.util.OSUtils;
@@ -230,6 +231,16 @@ public final class UpdateManager implements Serializable {
         // frostwire.com/update.xml
         // and parse the given XML.
         //LOG.info("UpdateManager.checkForUpdates() - Invoked");
+
+        // Fetch SoundCloud configuration from remote server in background
+        BackgroundQueuedExecutorService.schedule(() -> {
+            try {
+                SoundCloudConfigFetcher.fetchAndUpdateConfig();
+            } catch (Throwable e) {
+                LOG.warn("Failed to fetch SoundCloud config: " + e.getMessage());
+            }
+        });
+
         UpdateMessageReader umr = new UpdateMessageReader();
         umr.readUpdateFile();
         // if it fails to read an update, we just go on, might be that the
