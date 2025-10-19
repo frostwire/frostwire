@@ -29,6 +29,7 @@ import com.frostwire.search.knaben.KnabenSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
+import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -103,7 +104,10 @@ public abstract class SearchEngine {
     private static final SearchEngine SOUNDCLOUD = new SearchEngine(SearchEngineID.SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api-v2.soundcloud.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+            SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+            // Inject dynamic credentials fetched from remote server
+            performer.setCredentials(SoundCloudConfigFetcher.getClientId(), SoundCloudConfigFetcher.getAppVersion());
+            return performer;
         }
     };
     private static final SearchEngine INTERNET_ARCHIVE = new SearchEngine(SearchEngineID.INTERNET_ARCHIVE_ID, "Archive.org", SearchEnginesSettings.INTERNET_ARCHIVE_SEARCH_ENABLED, "archive.org") {
