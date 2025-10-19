@@ -19,6 +19,7 @@
 package com.frostwire.tests;
 
 import com.frostwire.desktop.DesktopPlatform;
+import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
@@ -41,16 +42,30 @@ public class SoundcloudSearchPerformerTest {
     @Test
     public void testSoundcloudSearchPerformer() {
         Platforms.set(new DesktopPlatform());
+
+        // Fetch remote SoundCloud configuration
+        LOG.info("Fetching remote SoundCloud configuration...");
+        SoundCloudConfigFetcher.fetchAndUpdateConfig();
+        String clientId = SoundCloudConfigFetcher.getClientId();
+        String appVersion = SoundCloudConfigFetcher.getAppVersion();
+        LOG.info("Remote SoundCloud credentials fetched - ClientID: " + clientId + ", AppVersion: " + appVersion);
+
         String TEST_SEARCH_TERM = UrlUtils.encode("free download");
-        SoundcloudSearchPerformer searchPerformer = new SoundcloudSearchPerformer("api-v2.sndcdn.com", 1, TEST_SEARCH_TERM, 5000);
+        SoundcloudSearchPerformer searchPerformer = new SoundcloudSearchPerformer("api-v2.soundcloud.com", 1, TEST_SEARCH_TERM, 5000);
+
+        // Inject the remote credentials
+        searchPerformer.setCredentials(clientId, appVersion);
+        LOG.info("Injected credentials into search performer");
+
         SoundcloudSearchListener searchListener = new SoundcloudSearchListener();
         searchPerformer.setListener(searchListener);
         try {
+            LOG.info("Starting search with remote credentials...");
             searchPerformer.perform();
             searchPerformer.stop();
         } catch (Throwable t) {
             t.printStackTrace();
-            LOG.info("Aborting test.");
+            LOG.error("Aborting test: " + t.getMessage());
             fail(t.getMessage());
             return;
         }
