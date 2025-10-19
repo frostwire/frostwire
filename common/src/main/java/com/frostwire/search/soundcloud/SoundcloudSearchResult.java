@@ -66,7 +66,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         } else {
             this.progressiveFormatJSONFetcherURL = null;
         }
-        this.hash = Integer.toHexString(item.id * 953 * 631);
+        this.hash = Long.toHexString(item.id * 953 * 631);
         this.downloadUrl = null;
     }
 
