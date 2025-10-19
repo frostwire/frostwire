@@ -9,6 +9,7 @@ frostwire (7.0.0) stable; urgency=high
  * New:Torrent Transfer > Advanced > Check local data feature. If a file belonging to a torrent is now on disk it can be force checked
  * Maintenance:mplayer not available in linux warning can now not be shown ever again
  * Removed:Torlock search performer (old site is down, new site is malicious)
+ * Removed:LimeTorrents search performer
  * Maintenance:MacEventHandler is now compatible with JDK 23 and JDK 24
  * Maintenance:Archive.org search
  * Maintenance:GloTorrents search
@@ -267,7 +268,7 @@ frostwire (7.0.0) stable; urgency=high
  * lt:fix renaming of filenames that are too long for the filesystem
  * lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 03 Oct 2025 11:46:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 17 Oct 2025 14:13:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38

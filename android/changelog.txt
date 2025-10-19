@@ -1,4 +1,4 @@
-FrostWire 3.0.7 build 761 OCT/16/2025
+FrostWire 3.0.8 build 762 OCT/17/2025
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
@@ -8,6 +8,7 @@ FrostWire 3.0.7 build 761 OCT/16/2025
  - yt_dlp-2025.10.14
  - replaced:Picasso for Coil image loading library
  - removed:Torlock search performer (old site is down, new site is malicious)
+ - removed:LimeTorrents search performer
  - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
  - freeze:sorting through too many results could cause an ANR when cleaning up titles
  - freeze:ANR in MusicPlaybackService.setDataSource
