@@ -1,4 +1,5 @@
 frostwire (7.0.0) stable; urgency=high
+ * New:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
  * New:TorrentCSV search performer
  * New:Knaben Database Search Performer

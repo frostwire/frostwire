@@ -1,4 +1,5 @@
 FrostWire 3.0.8 build 762 OCT/17/2025
+ - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
