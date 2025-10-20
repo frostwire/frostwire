@@ -43,7 +43,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("archive.org", GUIMediator.getThemeImage("archive_source"));
             sourceIcons.put("tpb", GUIMediator.getThemeImage("tpb_source"));
             sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torrentdownloads_source"));
-            sourceIcons.put("limetorrents", GUIMediator.getThemeImage("limetorrent")); // Thank you trollmad3 for the icon
             sourceIcons.put("zooqle", GUIMediator.getThemeImage("zooqle_source"));
             sourceIcons.put("magnetdl", GUIMediator.getThemeImage("magnetdl_source"));
             sourceIcons.put("default", GUIMediator.getThemeImage("seeding_small_source"));
