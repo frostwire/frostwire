@@ -107,6 +107,13 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     private final List<TransferUiState> previousUiStates;
     private List<Transfer> list;
 
+    /**
+     * Track whether an update is in progress to prevent concurrent updates during animations.
+     * This prevents the "Tmp detached view should be removed from RecyclerView" crash.
+     */
+    private volatile boolean updateInProgress = false;
+    private volatile List<Transfer> pendingUpdate = null;
+
     public TransferListAdapter(Context context, List<Transfer> list) {
         this.contextRef = new WeakReference<>(context);
         this.dialogs = new ArrayList<>();
@@ -149,20 +156,52 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     public void updateList(List<Transfer> newList) {
-        List<Transfer> safeNewList = newList == null ? Collections.emptyList() : newList;
+        // If update is already in progress, queue the pending update instead of trying
+        // to dispatch immediately. This prevents concurrent modifications during animations,
+        // which causes the "Tmp detached view should be removed from RecyclerView" crash.
+        if (updateInProgress) {
+            pendingUpdate = newList;
+            return;
+        }
+
+        performUpdate(newList);
+    }
+
+    /**
+     * Performs the actual update, applying DiffUtil and dispatching changes.
+     * Called from updateList() when safe, or from dispatchUpdatesTo listener when previous update completes.
+     */
+    private void performUpdate(List<Transfer> newList) {
+        if (newList == null) {
+            newList = Collections.emptyList();
+        }
+
+        List<Transfer> safeNewList = newList;
         if (safeNewList == list) {
             safeNewList = new ArrayList<>(safeNewList);
         }
+
         List<TransferUiState> newUiStates = captureUiStates(safeNewList);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
 
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates));
+        updateInProgress = true;
+        try {
+            list.clear();
+            list.addAll(safeNewList);
+            previousUiStates.clear();
+            previousUiStates.addAll(newUiStates);
 
-        list.clear();
-        list.addAll(safeNewList);
-        previousUiStates.clear();
-        previousUiStates.addAll(newUiStates);
+            diffResult.dispatchUpdatesTo(this);
+        } finally {
+            updateInProgress = false;
 
-        diffResult.dispatchUpdatesTo(this);
+            // If a new update was queued while this one was in progress, process it now
+            if (pendingUpdate != null) {
+                List<Transfer> next = pendingUpdate;
+                pendingUpdate = null;
+                performUpdate(next);
+            }
+        }
     }
 
     /**
