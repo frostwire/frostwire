@@ -185,28 +185,54 @@ public class FWBannerView extends LinearLayout {
             return;
         }
 
-        if (offer.iconRes != 0) {
-            supportIcon.setImageResource(offer.iconRes);
-            supportIcon.setVisibility(VISIBLE);
-        } else {
-            supportIcon.setVisibility(GONE);
+        try {
+            if (offer.iconRes != 0) {
+                supportIcon.setImageResource(offer.iconRes);
+                supportIcon.setVisibility(VISIBLE);
+            } else {
+                supportIcon.setVisibility(GONE);
+            }
+
+            supportTitle.setText(offer.titleRes);
+            supportMessage.setText(offer.messageRes);
+            supportAction.setText(offer.actionTextRes);
+
+            UIUtils.setupClickUrl(supportContainer, offer.getUrl());
+            UIUtils.setupClickUrl(supportAction, offer.getUrl());
+            UIUtils.setupClickUrl(this, offer.getUrl());
+
+            applyCompactMode();
+
+            // Post to handler to ensure visibility changes happen after layout pass completes.
+            // This prevents ArrayIndexOutOfBoundsException in View$AttachInfo that can occur
+            // when content capture events race with view visibility transitions.
+            post(() -> {
+                safeSetVisibility(this, VISIBLE);
+                safeSetVisibility(supportContainer, VISIBLE);
+            });
+
+            if (onBannerLoadedListener != null) {
+                onBannerLoadedListener.dispatch();
+            }
+        } catch (Exception e) {
+            LOG.error("Error binding offer to banner view", e);
         }
+    }
 
-        supportTitle.setText(offer.titleRes);
-        supportMessage.setText(offer.messageRes);
-        supportAction.setText(offer.actionTextRes);
-
-        UIUtils.setupClickUrl(supportContainer, offer.getUrl());
-        UIUtils.setupClickUrl(supportAction, offer.getUrl());
-        UIUtils.setupClickUrl(this, offer.getUrl());
-
-        applyCompactMode();
-
-        setVisibility(VISIBLE);
-        supportContainer.setVisibility(VISIBLE);
-
-        if (onBannerLoadedListener != null) {
-            onBannerLoadedListener.dispatch();
+    /**
+     * Safely set view visibility, catching any framework-level exceptions that may occur
+     * during content capture event recording or other visibility-triggered callbacks.
+     * This prevents ArrayIndexOutOfBoundsException that can occur in View$AttachInfo.
+     */
+    private void safeSetVisibility(View view, int visibility) {
+        try {
+            view.setVisibility(visibility);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            LOG.warn("ArrayIndexOutOfBoundsException while setting visibility", e);
+            // Log but don't crash - the view will be visible anyway or the operation
+            // will be retried on the next frame
+        } catch (Exception e) {
+            LOG.error("Error setting view visibility", e);
         }
     }
 
