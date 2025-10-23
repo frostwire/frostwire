@@ -243,7 +243,9 @@ public final class BTEngine extends SessionManager {
                     session_params params = session_params.read_session_params(n);
                     buffer.clear(); // prevents GC
                     SessionParams result = new SessionParams(params);
-                    if (OSUtils.isMacOSX()) {
+                    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+                        // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
+                        // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
                         result.setPosixDiskIO();
                     } else {
                         result.setDefaultDiskIO();
@@ -265,7 +267,9 @@ public final class BTEngine extends SessionManager {
     private SessionParams defaultParams() {
         SettingsPack sp = defaultSettings();
         SessionParams params = new SessionParams(sp);
-        if (OSUtils.isMacOSX()) {
+        if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+            // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
+            // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
             params.setPosixDiskIO();
         } else {
             params.setDefaultDiskIO();
