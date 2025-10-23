@@ -51,8 +51,24 @@ public class Main {
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
 
+        // Check if we're on Linux and running under Wayland
+        if (OSUtils.isLinux()) {
+            String sessionType = System.getenv("XDG_SESSION_TYPE");
+            if (sessionType != null && sessionType.equalsIgnoreCase("wayland")) {
+                System.err.println("\n========================================");
+                System.err.println("FrostWire requires an X.org session to run.");
+                System.err.println("Your system is currently using Wayland.");
+                System.err.println("\nPlease switch to X.org or Xwayland and try again.");
+                System.err.println("========================================\n");
+                System.exit(1);
+            }
+        }
+
+        String arch = System.getProperty("os.arch").toLowerCase();
+        boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");
+
         if (CommonUtils.isRunningFromGradle() || CommonUtils.isStepDebuggerAttached()) {
-            // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
+            // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls
             System.out.println("Main: FrostWire is running in DEVELOPMENT environment.");
             com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(2000));
             System.out.println("Main: Strict EDT mode is ON. (The application will fail fast if the EDT [Event Dispatcher Thread] stalls for more than 2000 ms)");
