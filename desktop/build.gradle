@@ -12,7 +12,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'me.champeau.jmh' version '0.7.2'
+    id 'me.champeau.jmh' version '0.7.2' /* JMH microbenchmarking framework */
 }
 
 group = 'com.frostwire'
@@ -71,6 +71,14 @@ application {
 
     if (OperatingSystem.current().isMacOsX()) {
         applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true']
+    } else if (OperatingSystem.current().isLinux()) {
+        // Optimize rendering for Linux - works with X.org
+        applicationDefaultJvmArgs += [
+            '-Dsun.java2d.xrender=true',            // Use XRender - most stable on Linux with X.org
+            '-Dsun.java2d.opengl=false',            // OpenGL can crash entire display session
+            '-Dsun.java2d.accelblit=false',         // Disable accelerated blitting for stability
+            '-Dsun.java2d.pixmaps=false'            // Disable pixmap acceleration for better X11 compatibility
+        ]
     }
 }
 
