@@ -38,8 +38,11 @@ public class FramedDialog extends LimeJFrame {
         toFront();
         setVisible(true);
         dialog.toFront();
-        dialog.setVisible(true);
-        dispose();
+        // Schedule dialog visibility change on EDT to prevent blocking
+        SwingUtilities.invokeLater(() -> {
+            dialog.setVisible(true);
+            dispose();
+        });
     }
 
     public JDialog getDialog() {
