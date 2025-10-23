@@ -89,7 +89,8 @@ dependencies {
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
 
-    def jlibtorrent_version = '2.0.13.6'
+    def jlibtorrent_version = '2.0.12.7'
+
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"

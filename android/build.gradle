@@ -264,7 +264,7 @@ dependencies {
     implementation 'androidx.media2:media2-widget:1.3.0'
     implementation 'androidx.media2:media2-player:1.3.0'
 
-    def jlibtorrent_version = '2.0.12.5'
+    def jlibtorrent_version = '2.0.12.7'
     implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
