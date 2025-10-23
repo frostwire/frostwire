@@ -183,13 +183,16 @@ public final class ThemeMediator {
         UISettings.UI_THEME.setValue(theme.name());
 
         // refresh *this* instance so users see the effect right away
-        for (Window w : Window.getWindows()) {
-            try {
-                SwingUtilities.updateComponentTreeUI(w);
-            } catch (Throwable e) {
-                e.printStackTrace();
+        // Do this asynchronously to avoid blocking the EDT for long periods
+        SwingUtilities.invokeLater(() -> {
+            for (Window w : Window.getWindows()) {
+                try {
+                    SwingUtilities.updateComponentTreeUI(w);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        });
 
         // Inform the user that a restart is needed for a 100% clean switch,
         // but do not actually restart the JVM
