@@ -89,7 +89,7 @@ dependencies {
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
 
-    def jlibtorrent_version = '2.0.12.5'
+    def jlibtorrent_version = '2.0.13.6'
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
@@ -105,7 +105,11 @@ dependencies {
         if (os.isWindows()) {
             implementation "com.frostwire:jlibtorrent-windows:${jlibtorrent_version}"
         } else if (os.isLinux()) {
-            implementation "com.frostwire:jlibtorrent-linux:${jlibtorrent_version}"
+            if (is_arm64) {
+                implementation "com.frostwire:jlibtorrent-linux-arm64:${jlibtorrent_version}"
+            } else {
+                implementation "com.frostwire:jlibtorrent-linux-x86_64:${jlibtorrent_version}"
+            }
         } else if (os.isMacOsX()) {
             // if it's arm mac
             if (is_arm64) {
@@ -135,7 +139,11 @@ dependencies {
         if (os.isWindows()) {
             implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-windows-${jlibtorrent_version}.jar")
         } else if (os.isLinux()) {
-            implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-linux-${jlibtorrent_version}.jar")
+            if (is_arm64) {
+                implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-linux-arm64-${jlibtorrent_version}.jar")
+            } else {
+                implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-linux-x86_64-${jlibtorrent_version}.jar")
+            }
         } else if (os.isMacOsX()) {
             // if it's arm mac
             if (is_arm64) {
