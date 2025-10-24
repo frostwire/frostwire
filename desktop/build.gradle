@@ -177,9 +177,7 @@ sourceSets {
     main {
         java {
             srcDir '../common/src/main/java'
-
-            // TODO: move 'main' sources to src/main/java
-            srcDir 'src'
+            srcDir 'src/main/java'
             // Exclude JMH benchmarks from main compilation
             exclude 'jmh/**'
         }
@@ -202,9 +200,7 @@ sourceSets {
     test {
         java {
             srcDir '../common/src/test/java'
-
-            // TODO: move 'test' sources to src/test/java
-            srcDir 'tests/java'
+            srcDir 'src/test/java'
         }
     }
 
