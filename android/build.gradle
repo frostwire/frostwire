@@ -152,7 +152,7 @@ android {
             java {
                 srcDir '../common/src/main/java'
                 srcDir 'apollo/src'
-                srcDir 'src'
+                srcDir 'src/main/java'
                 exclude 'test/**'
             }
             jniLibs.srcDirs = ['libs']
