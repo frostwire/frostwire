@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author gubatron
@@ -150,7 +149,7 @@ public final class UrlUtils {
             mirrorList = new ArrayList<>(mirrorList.subList(0, maxNumberOfMirrorsToTest));
         }
         final CountDownLatch latch = new CountDownLatch(mirrorList.size());
-        ExecutorService executor = Executors.newFixedThreadPool(4);
+        ExecutorService executor = ThreadPool.newThreadPool("UrlUtils-MirrorFinder", 4, true);
         final java.util.List<MirrorHeadDuration> synchronizedMirrorDurations = Collections.synchronizedList(new ArrayList<>());
         for (String randomMirror : mirrorList) {
             executor.submit(() -> {

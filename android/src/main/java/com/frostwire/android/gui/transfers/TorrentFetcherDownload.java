@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.os.Handler;
+import android.os.HandlerThread;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -42,6 +44,14 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(TorrentFetcherDownload.class);
 
+    private static final Handler HANDLER;
+
+    static {
+        HandlerThread handlerThread = new HandlerThread("TorrentFetcher-HandlerThread");
+        handlerThread.start();
+        HANDLER = new Handler(handlerThread.getLooper());
+    }
+
     private final TransferManager manager;
     private final TorrentDownloadInfo info;
     private final Date created;
@@ -62,16 +72,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         this.tokenId = new Random(System.currentTimeMillis()).nextLong();
         state = TransferState.DOWNLOADING_TORRENT;
 
-        //TODO stop creating threads for each download, use HandlerThread with looper
-        //  private static final Handler handler;
-        //  static {
-        //    HandlerThread HT = new HandlerThread("AsyncStartDownload-HandlerThread");
-        //    HT.start();
-        //    handler = new Handler(HT.getLooper());
-        //  }
-        Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + info.getTorrentUrl());
-        t.setDaemon(true);
-        t.start();
+        // Use shared HandlerThread with looper to avoid creating a thread per download
+        HANDLER.post(new FetcherRunnable());
     }
 
     String getTorrentUri() {
