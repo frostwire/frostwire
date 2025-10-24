@@ -152,8 +152,16 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
 
     @Override
     public List<TorrentFileEntry> deserializeData(String listDataInJSON) {
+        if (listDataInJSON == null || listDataInJSON.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         final TorrentFileEntryList torrentFileEntryList = JsonUtils.toObject(listDataInJSON, TorrentFileEntryList.class);
-        return torrentFileEntryList.list;
+        if (torrentFileEntryList == null || torrentFileEntryList.list == null) {
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>(torrentFileEntryList.list);
     }
 
     @Override
