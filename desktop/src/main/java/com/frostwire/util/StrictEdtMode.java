@@ -2,13 +2,14 @@ package com.frostwire.util;
 
 // StrictEdtMode.java
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
+
 import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,11 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class StrictEdtMode {
     private static final ScheduledExecutorService SCH =
-            Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "edt-strict-watchdog");
-                t.setDaemon(true);
-                return t;
-            });
+            ExecutorsHelper.newScheduledThreadPool(1, "edt-strict-watchdog");
 
     public static void install(Duration threshold) {
         EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();

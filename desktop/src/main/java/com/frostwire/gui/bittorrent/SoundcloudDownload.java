@@ -24,6 +24,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
+import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * @author gubatron
@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
  */
 public class SoundcloudDownload extends HttpBTDownload {
     private static final Logger LOG = Logger.getLogger(SoundcloudDownload.class);
-    private static final Executor SOUNDCLOUD_THREAD_POOL = Executors.newFixedThreadPool(6);
+    private static final Executor SOUNDCLOUD_THREAD_POOL = ThreadPool.newThreadPool("SoundcloudDownload", 6, true);
     private final SoundcloudSearchResult sr;
     private final File tempAudio;
 

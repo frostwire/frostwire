@@ -31,7 +31,7 @@ public class BackgroundExecutorService {
     /**
      * Queue for items to be run in the background.
      */
-    private static final ExecutorService QUEUE = ExecutorsHelper.newProcessingQueue(" ");
+    private static final ExecutorService QUEUE = ExecutorsHelper.newProcessingQueue("BackgroundExecutorService");
 
     private BackgroundExecutorService() {
     }
