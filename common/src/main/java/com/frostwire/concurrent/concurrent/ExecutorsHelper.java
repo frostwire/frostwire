@@ -117,6 +117,18 @@ public class ExecutorsHelper {
     }
 
     /**
+     * Creates a new ScheduledThreadPool with the specified number of threads.
+     *
+     * @param corePoolSize the number of threads to keep in the pool
+     * @param name the name of the threads in the pool
+     * @return a ScheduledExecutorService
+     */
+    public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize, String name) {
+        return Executors.unconfigurableScheduledExecutorService(
+                new ScheduledThreadPoolExecutor(corePoolSize, daemonThreadFactory(name)));
+    }
+
+    /**
      * Returns a thread factory of daemon threads, using the given name.
      */
     static ThreadFactory daemonThreadFactory(String name) {
