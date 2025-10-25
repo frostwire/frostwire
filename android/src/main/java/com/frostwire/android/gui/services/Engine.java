@@ -29,9 +29,11 @@ import android.telephony.TelephonyManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
@@ -263,7 +265,6 @@ public final class Engine implements IEngineService {
         fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         fileFilter.addDataScheme("file");
 
-        IntentFilter connectivityFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         IntentFilter audioFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
         IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
@@ -274,8 +275,11 @@ public final class Engine implements IEngineService {
             LOG.error(t.getMessage(), t);
         }
 
+        // Connectivity is now monitored through NetworkManager using modern NetworkCallback API (replaces deprecated CONNECTIVITY_ACTION)
+        // Register for local broadcasts from NetworkManager about network changes
         try {
-            ContextCompat.registerReceiver(context, receiver, connectivityFilter, ContextCompat.RECEIVER_EXPORTED);
+            LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
+                    new IntentFilter(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION));
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
