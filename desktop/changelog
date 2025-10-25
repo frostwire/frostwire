@@ -1,12 +1,4 @@
 frostwire (7.0.0) stable; urgency=high
- * EDT freeze:Comprehensive fix for EDT violations in transfers UI with multiple optimization layers
- * EDT freeze:Move BTDownloadModel.refresh() to background thread to prevent EDT blocking during model updates
- * EDT freeze:Add debouncing to BTDownloadDataLine.update() to prevent rapid successive JNI calls
- * EDT freeze:Throttle TransferActionsRenderer state checks to 200ms intervals during table rendering
- * EDT freeze:Move clearable downloads check to background thread in BTDownloadMediator.doRefresh()
- * EDT freeze:Add count caching to BTDownloadModel with background updates every 500ms
- * EDT freeze:Cache active uploads for hidden downloads in BTDownloadRowFilteredModel
- * EDT freeze:Use cached transfer state instead of expensive JNI calls in button state updates
  * New:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
  * New:TorrentCSV search performer
@@ -51,6 +43,14 @@ frostwire (7.0.0) stable; urgency=high
  * Speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing
  * Speed-up:Refactor SearchManager tasks to Runnable and remove Thread.yield() from hot path
  * Fixed:thread leak and data race in UrlUtils.getFastestMirrorDomain
+ * EDT freeze:Comprehensive fix for EDT violations in transfers UI with multiple optimization layers
+ * EDT freeze:Move BTDownloadModel.refresh() to background thread to prevent EDT blocking during model updates
+ * EDT freeze:Add debouncing to BTDownloadDataLine.update() to prevent rapid successive JNI calls
+ * EDT freeze:Throttle TransferActionsRenderer state checks to 200ms intervals during table rendering
+ * EDT freeze:Move clearable downloads check to background thread in BTDownloadMediator.doRefresh()
+ * EDT freeze:Add count caching to BTDownloadModel with background updates every 500ms
+ * EDT freeze:Cache active uploads for hidden downloads in BTDownloadRowFilteredModel
+ * EDT freeze:Use cached transfer state instead of expensive JNI calls in button state updates
  * jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  * jlibtorrent:g++-9 upgraded to g++-11 for linux build
  * jlibtorrent:new Sha256Hash::swig()
@@ -277,7 +277,7 @@ frostwire (7.0.0) stable; urgency=high
  * lt:fix renaming of filenames that are too long for the filesystem
  * lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 17 Oct 2025 14:13:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 25 Oct 2025 11:10:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
