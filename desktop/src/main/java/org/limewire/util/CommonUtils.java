@@ -455,9 +455,103 @@ public class CommonUtils {
         return jvmArgs != null && jvmArgs.contains("debug=1");
     }
 
+    public static boolean isRunningFromIntelliJ() {
+        // Check for the custom flag set by gradle build script
+        String ideFlag = System.getProperty("fw.running.from.ide");
+        if (ideFlag != null && ideFlag.equals("true")) {
+            return true;
+        }
+
+        // IntelliJ sets the idea.paths.selector system property
+        if (System.getProperty("idea.paths.selector") != null) {
+            return true;
+        }
+
+        // Also check for other IntelliJ indicators
+        if (System.getProperty("idea.home") != null) {
+            return true;
+        }
+
+        if (System.getProperty("idea.version") != null) {
+            return true;
+        }
+
+        // Check if running through gradle wrapper via IntelliJ
+        String classPath = System.getProperty("java.class.path");
+        if (classPath != null && classPath.contains("idea")) {
+            return true;
+        }
+
+        // Check if .idea folder exists in current directory (IntelliJ project marker)
+        File ideaFolder = new File(".idea");
+        if (ideaFolder.exists() && ideaFolder.isDirectory()) {
+            return true;
+        }
+
+        // Check parent directories for .idea folder
+        File currentDir = new File(System.getProperty("user.dir"));
+        for (int i = 0; i < 5; i++) {
+            File checkDir = new File(currentDir, ".idea");
+            if (checkDir.exists() && checkDir.isDirectory()) {
+                return true;
+            }
+            currentDir = currentDir.getParentFile();
+            if (currentDir == null) {
+                break;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isStepDebuggerAttached() {
-        String jvmArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toString();
-        return jvmArgs != null && jvmArgs.contains("-agentlib:jdwp");
+        // Only check for debugger in development environment to avoid startup overhead in production
+        // In production, we assume no debugger is attached
+        boolean isDevelopment = isRunningFromGradle() || isRunningFromIntelliJ();
+        if (!isDevelopment) {
+            return false;
+        }
+
+        // Check if a debugger is actually attached, not just if the JDWP agent is available
+        // The JDWP agent can be listening without a debugger being connected
+        try {
+            // Try to get the runtime MXBean and check debug mode
+            com.sun.management.HotSpotDiagnosticMXBean bean =
+                java.lang.management.ManagementFactory.getPlatformMXBean(com.sun.management.HotSpotDiagnosticMXBean.class);
+            // If we can access diagnostic MXBean and debugger is attached, this would return true
+            // However, a more reliable check is to see if current thread is a debugger thread
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        // Check if any of the current threads have debugger indicators in their name
+        // These are typically the actual debugger threads
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup parent;
+        while ((parent = rootGroup.getParent()) != null) {
+            rootGroup = parent;
+        }
+
+        Thread[] threads = new Thread[rootGroup.activeCount()];
+        int n = rootGroup.enumerate(threads);
+
+        // Check for debugger indicators in thread names
+        for (int i = 0; i < n; i++) {
+            String threadName = threads[i].getName();
+            if (threadName != null) {
+                // Check for various debugger thread indicators
+                if (threadName.contains("JDWP") ||
+                    threadName.contains("Debugger") ||
+                    threadName.contains("debug") ||
+                    threadName.contains("Debug") ||
+                    threadName.contains("IntelliJ") ||
+                    threadName.contains("Suspend Helper")) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
