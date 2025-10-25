@@ -359,7 +359,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             if (donationButtons != null && StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.getValue()) {
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
                 BAR.add(donationButtons, gbc);
-                BAR.add(Box.createHorizontalStrut(10));
+                BAR.add(Box.createHorizontalStrut(10), gbc);
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             }
 
