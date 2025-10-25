@@ -2,10 +2,13 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.transfers.TransferState;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Filters out certain rows from the data model.
@@ -21,6 +24,15 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
      * A list of all filtered results.
      */
     private final List<BTDownloadDataLine> HIDDEN;
+
+    /**
+     * Cache hidden uploads count to avoid iterating HIDDEN list on every status refresh.
+     * The cache update is done in background thread to prevent EDT blocking.
+     */
+    private volatile int cachedHiddenUploads = 0;
+    private volatile long lastHiddenCountUpdateTime = 0;
+    private static final long HIDDEN_COUNT_CACHE_INTERVAL_MS = 500;
+    private final AtomicBoolean isUpdatingHiddenCount = new AtomicBoolean(false);
 
     /**
      * Constructs a TableRowFilter with the specified TableLineFilter.
@@ -101,17 +113,49 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
 
     @Override
     int getActiveUploads() {
+        // Get count from parent (visible uploads)
         int count = super.getActiveUploads();
-        try {
-            for (BTDownloadDataLine aHIDDEN : HIDDEN) {
-                BTDownload downloader = aHIDDEN.getInitializeObject();
-                if (downloader.isCompleted() && downloader.getState() == TransferState.SEEDING) {
-                    count++;
-                }
-            }
-        } catch (Throwable e) {
-            // ignore, multi-threading issues?
+
+        // Add count from hidden uploads (use cache)
+        long now = System.currentTimeMillis();
+        if (now - lastHiddenCountUpdateTime >= HIDDEN_COUNT_CACHE_INTERVAL_MS) {
+            // Trigger background update (non-blocking on EDT)
+            scheduleHiddenUploadsUpdate();
         }
+        count += cachedHiddenUploads;
+
         return count;
+    }
+
+    /**
+     * Schedules a background thread to update the hidden uploads cache.
+     * This prevents EDT blocking when there are many hidden downloads.
+     */
+    private void scheduleHiddenUploadsUpdate() {
+        // Prevent multiple concurrent updates
+        if (!isUpdatingHiddenCount.compareAndSet(false, true)) {
+            return;
+        }
+
+        BackgroundQueuedExecutorService.schedule(() -> {
+            try {
+                int count = 0;
+                try {
+                    for (BTDownloadDataLine aHIDDEN : HIDDEN) {
+                        BTDownload downloader = aHIDDEN.getInitializeObject();
+                        if (downloader != null && downloader.isCompleted() && downloader.getState() == TransferState.SEEDING) {
+                            count++;
+                        }
+                    }
+                } catch (Throwable e) {
+                    // ignore, multi-threading issues?
+                    System.err.println("Error updating hidden uploads cache: " + e.getMessage());
+                }
+                cachedHiddenUploads = count;
+                lastHiddenCountUpdateTime = System.currentTimeMillis();
+            } finally {
+                isUpdatingHiddenCount.set(false);
+            }
+        });
     }
 }
