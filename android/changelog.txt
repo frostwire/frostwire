@@ -25,6 +25,13 @@ FrostWire 3.0.8 build 762 OCT/17/2025
  - crash:NPE in ImageFetcher.loadCurrentArtwork()
  - improvement:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  - improvement:Optimize stackBlur() with array pooling to reduce allocations
+ - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
+ - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
+ - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
+ - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
+ - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
+ - improvement:Added visual status indicators in transfers screen when protections pause downloads
  - maintenance:Avoid possible context leak on EngineBroadcastReceiver
  - maintenance:all license headers are GPL 3.0
  - maintenance:archive.org search fixed
