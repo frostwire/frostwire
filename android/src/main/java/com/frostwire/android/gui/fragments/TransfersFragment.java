@@ -412,6 +412,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
                 });
             }
+            // Refresh network state on background thread to detect VPN/WiFi protection violations
+            // Only refresh if protections are enabled to avoid expensive network interface enumeration
+            ConfigurationManager CM = ConfigurationManager.instance();
+            boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+            boolean wifiOnlyEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+            if (vpnGuardEnabled || wifiOnlyEnabled) {
+                postToHandler(SystemUtils.HandlerThreadName.MISC,
+                        () -> NetworkManager.instance().refreshNetworkState());
+            }
             onCheckDHT();
         }
     }
@@ -471,6 +480,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         // Saving Data on Mobile
         if (TransferManager.instance().isMobileAndDataSavingsOn()) {
             textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
+            return;
+        }
+        // VPN Guard Active
+        ConfigurationManager CM = ConfigurationManager.instance();
+        boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+        NetworkManager nm = NetworkManager.instance();
+        boolean hasVpn = nm.isTunnelUp() || nm.isVpnConnected();
+        if (vpnGuardEnabled && !hasVpn) {
+            textDHTPeers.setText(R.string.bittorrent_off_vpn_required);
             return;
         }
         // BitTorrent Turned off
