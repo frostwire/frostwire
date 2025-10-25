@@ -310,12 +310,16 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     /**
      * Override the default refreshing so that we can
      * set the clear button appropriately.
+     * Now delegates expensive state checks to background thread.
      */
     public void doRefresh() {
         if (DATA_MODEL == null) {
             return;
         }
         DATA_MODEL.refresh();
+
+        // Update UI for selected row using cached values from data line
+        // Don't call getState() directly as it may trigger expensive JNI calls
         if (TABLE != null) {
             int[] selRows = TABLE.getSelectedRows();
             if (selRows.length > 0) {
@@ -323,8 +327,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 if (dataLine != null) {
                     BTDownload dl = dataLine.getInitializeObject();
                     if (dl != null) {
+                        // Use cached state from dataLine instead of calling getState()
+                        // These operations use cached status values already updated by the model refresh
                         boolean completed = dl.isCompleted();
-                        retryAction.setEnabled(dl.getState() == TransferState.ERROR_NOT_ENOUGH_PEERS);
+                        TransferState cachedState = dataLine.getCachedTransferState();
+                        retryAction.setEnabled(cachedState == TransferState.ERROR_NOT_ENOUGH_PEERS);
                         resumeAction.setEnabled(dl.isResumable());
                         pauseAction.setEnabled(dl.isPausable());
                         exploreAction.setEnabled(completed);
@@ -333,19 +340,29 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 }
             }
         }
-        int n = DATA_MODEL.getRowCount();
-        boolean anyClearable = false;
-        for (int i = n - 1; i >= 0; i--) {
-            BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
-            if (btDownloadDataLine != null) {
-                BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
-                if (initializeObject != null && isClearable(initializeObject)) {
-                    anyClearable = true;
-                    break;
+
+        // Perform expensive clearable check in background thread
+        BackgroundQueuedExecutorService.schedule(() -> {
+            try {
+                int n = DATA_MODEL.getRowCount();
+                boolean anyClearable = false;
+                for (int i = n - 1; i >= 0; i--) {
+                    BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
+                    if (btDownloadDataLine != null) {
+                        BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
+                        if (initializeObject != null && isClearable(initializeObject)) {
+                            anyClearable = true;
+                            break;
+                        }
+                    }
                 }
+                // Post result back to EDT
+                final boolean finalAnyClearable = anyClearable;
+                SwingUtilities.invokeLater(() -> clearInactiveAction.setEnabled(finalAnyClearable));
+            } catch (Exception e) {
+                System.err.println("Error checking for clearable downloads: " + e.getMessage());
             }
-        }
-        clearInactiveAction.setEnabled(anyClearable);
+        });
     }
 
     public int getActiveDownloads() {
