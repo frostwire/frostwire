@@ -42,7 +42,8 @@ class JXSearchFieldAddon {
         UIManager.put("SearchField.clearIcon", getIcon("clear.png"));
         UIManager.put("SearchField.clearRolloverIcon", getIcon("clear_rollover.png"));
         UIManager.put("SearchField.clearPressedIcon", getIcon("clear_pressed.png"));
-        UIManager.put("SearchField.buttonMargin", new InsetsUIResource(0, 0, 0, 0));
+        // Default margin for the default theme - will be overridden by theme-specific values
+        UIManager.put("SearchField.buttonMargin", new InsetsUIResource(0, 4, 0, 0));
         UIManager.put("SearchField.popupSource", SEARCH_FIELD_SOURCE);
     }
 

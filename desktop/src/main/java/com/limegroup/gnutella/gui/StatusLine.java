@@ -443,9 +443,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         bandwidthUsageDown = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("downloading_small")));
         bandwidthUsageUp = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("uploading_small")));
         //updateBandwidth();
-        // don't allow easy clipping
-        bandwidthUsageDown.setMinimumSize(new Dimension(60, 20));
-        bandwidthUsageUp.setMinimumSize(new Dimension(60, 20));
+        // don't allow easy clipping - increased to accommodate full transfer counts and speeds
+        bandwidthUsageDown.setMinimumSize(new Dimension(110, 20));
+        bandwidthUsageUp.setMinimumSize(new Dimension(110, 20));
         // add right-click listeners
         bandwidthUsageDown.addMouseListener(STATUS_BAR_LISTENER);
         bandwidthUsageUp.addMouseListener(STATUS_BAR_LISTENER);

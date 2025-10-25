@@ -184,8 +184,10 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         }
         searchField.customSetUIProperty("layoutStyle", UIManager.get("SearchField.layoutStyle"));
         searchField.customSetUIProperty("promptFontStyle", UIManager.get("SearchField.promptFontStyle"));
-        if (shouldReplaceResource(searchField.getOuterMargin())) {
-            searchField.setOuterMargin(UIManager.getInsets("SearchField.buttonMargin"));
+        // Always apply the outer margin from UIManager to ensure theme switching works correctly
+        Insets buttonMargin = UIManager.getInsets("SearchField.buttonMargin");
+        if (buttonMargin != null) {
+            searchField.setOuterMargin(buttonMargin);
         }
         updateButtons();
         if (shouldReplaceResource(clearButton().getIcon())) {

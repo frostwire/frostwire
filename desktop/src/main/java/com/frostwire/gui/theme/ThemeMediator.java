@@ -247,6 +247,7 @@ public final class ThemeMediator {
         Runnable task = () -> {
             purgeSynthOverrides();
             FlatLightLaf.setup();
+            installFlatLightLafDefaults();
 
             for (Window w : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(w);
@@ -300,7 +301,7 @@ public final class ThemeMediator {
         UIManager.put("TableHeader.background", dark);
         // Delete dialog buttons background gets fixed with this
         UIManager.put("OptionPane.background", reallyDark);
-        // (you’ll almost certainly want a contrasting foreground as well)
+        // (you'll almost certainly want a contrasting foreground as well)
         UIManager.put("TableHeader.foreground", new ColorUIResource(Color.WHITE));
 
         // everything that is a JPanel will now be dark:
@@ -312,8 +313,25 @@ public final class ThemeMediator {
 
         // all JToggleButtons get this bg:
         UIManager.put("ToggleButton.background", reallyDark);
-        // when they are “selected”:
+        // when they are "selected":
         UIManager.put("ToggleButton.select", reallyDark.darker());
+
+        // Restore search field defaults for dark theme to match default LAF
+        installSearchFieldDefaults();
+    }
+
+    private static void installFlatLightLafDefaults() {
+        // Restore search field defaults for light theme to match default LAF
+        UIManager.put("TextField.background", new ColorUIResource(Color.WHITE));
+        installSearchFieldDefaults();
+    }
+
+    private static void installSearchFieldDefaults() {
+        // Set outer margin with left padding
+        UIManager.put("SearchField.buttonMargin", new InsetsUIResource(0, 4, 0, 0));
+        // Set layout style based on OS (MAC for macOS, VISTA for others)
+        String layoutStyle = OSUtils.isMacOSX() ? "MAC" : "VISTA";
+        UIManager.put("SearchField.layoutStyle", layoutStyle);
     }
 
     public static Font fixLabelFont(JLabel label) {
