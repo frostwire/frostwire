@@ -34,6 +34,14 @@ compileJava {
 
 application {
     mainClass = 'com.limegroup.gnutella.gui.Main'
+
+    // Detect if running from IDE (Gradle Wrapper or direct IDE execution)
+    // IntelliJ wraps the main class execution in a gradle task with a specific naming pattern
+    def isRunningFromIDE = System.getenv('IDEA_INITIAL_DIRECTORY') != null ||
+                           System.getProperty('idea.paths.selector') != null ||
+                           gradle.startParameter.taskNames.any { it.matches('.*\\.main\\(.*') } ||
+                           gradle.startParameter.taskNames.any { it.contains('com.limegroup.gnutella.gui.Main') }
+
     applicationDefaultJvmArgs = ['-Djava.library.path=lib/native',
                                  '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
                                  '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
@@ -56,6 +64,11 @@ application {
                                  '-Ddebug=1',
 //'-XX:NativeMemoryTracking=detail',
     ]
+
+    // Add IDE flag when running from IDE
+    if (isRunningFromIDE) {
+        applicationDefaultJvmArgs.add('-Dfw.running.from.ide=true')
+    }
 
     def flight_recorder = false
 
