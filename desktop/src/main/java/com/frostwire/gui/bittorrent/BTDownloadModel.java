@@ -20,8 +20,11 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class provides access to the `ArrayList` that stores all of the
@@ -29,6 +32,17 @@ import java.util.HashSet;
  */
 public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDownload> {
     private final HashSet<String> _hashDownloads;
+    private final AtomicBoolean isRefreshing = new AtomicBoolean(false);
+
+    /**
+     * Cache active downloads/uploads counts to avoid iterating through all downloads
+     * on every status line refresh. Updates are done in background thread.
+     */
+    private volatile int cachedActiveDownloads = 0;
+    private volatile int cachedActiveUploads = 0;
+    private volatile long lastCountUpdateTime = 0;
+    private static final long COUNT_CACHE_INTERVAL_MS = 500; // Update count cache every 500ms
+    private final AtomicBoolean isUpdatingCounts = new AtomicBoolean(false);
 
     /**
      * Initialize the model by setting the class of its DataLines.
@@ -45,28 +59,73 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
         return new BTDownloadDataLine();
     }
 
+    /**
+     * Returns the count of active downloads.
+     * Uses cached value to avoid expensive iteration on every status line refresh.
+     * Cache is updated periodically in background thread.
+     */
     int getActiveDownloads() {
-        int size = getRowCount();
-        int count = 0;
-        for (int i = 0; i < size; i++) {
-            BTDownload downloader = get(i).getInitializeObject();
-            if (!downloader.isCompleted() && downloader.getState() == TransferState.DOWNLOADING) {
-                count++;
-            }
+        long now = System.currentTimeMillis();
+        if (now - lastCountUpdateTime >= COUNT_CACHE_INTERVAL_MS) {
+            scheduleCountCacheUpdate();
         }
-        return count;
+        return cachedActiveDownloads;
     }
 
+    /**
+     * Returns the count of active uploads.
+     * Uses cached value to avoid expensive iteration on every status line refresh.
+     * Cache is updated periodically in background thread.
+     */
     int getActiveUploads() {
-        int size = getRowCount();
-        int count = 0;
-        for (int i = 0; i < size; i++) {
-            BTDownload downloader = get(i).getInitializeObject();
-            if (downloader.isCompleted() && downloader.getState() == TransferState.SEEDING) {
-                count++;
-            }
+        long now = System.currentTimeMillis();
+        if (now - lastCountUpdateTime >= COUNT_CACHE_INTERVAL_MS) {
+            scheduleCountCacheUpdate();
         }
-        return count;
+        return cachedActiveUploads;
+    }
+
+    /**
+     * Schedules a background thread to recalculate active download/upload counts.
+     * This prevents EDT blocking when there are many downloads.
+     */
+    private void scheduleCountCacheUpdate() {
+        // Prevent multiple concurrent updates
+        if (!isUpdatingCounts.compareAndSet(false, true)) {
+            return;
+        }
+
+        BackgroundQueuedExecutorService.schedule(() -> {
+            try {
+                int size = getRowCount();
+                int downloads = 0;
+                int uploads = 0;
+
+                try {
+                    for (int i = 0; i < size; i++) {
+                        BTDownload downloader = get(i).getInitializeObject();
+                        if (downloader != null) {
+                            boolean completed = downloader.isCompleted();
+                            TransferState state = downloader.getState();
+
+                            if (!completed && state == TransferState.DOWNLOADING) {
+                                downloads++;
+                            } else if (completed && state == TransferState.SEEDING) {
+                                uploads++;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error updating active counts cache: " + e.getMessage());
+                }
+
+                cachedActiveDownloads = downloads;
+                cachedActiveUploads = uploads;
+                lastCountUpdateTime = System.currentTimeMillis();
+            } finally {
+                isUpdatingCounts.set(false);
+            }
+        });
     }
 
     public int getTotalDownloads() {
@@ -76,20 +135,58 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     /**
      * Over-ride the default refresh so that we can
      * set the CLEAR_BUTTON as appropriate.
+     * This method now uses background threads to avoid EDT blocking.
      */
     public Object refresh() {
+        // Prevent multiple concurrent refresh operations
+        if (!isRefreshing.compareAndSet(false, true)) {
+            return Boolean.TRUE;
+        }
+
         try {
             int size = getRowCount();
-            for (int i = 0; i < size; i++) {
-                BTDownloadDataLine ud = get(i);
-                ud.update();
+            if (size == 0) {
+                isRefreshing.set(false);
+                return Boolean.TRUE;
             }
-            fireTableRowsUpdated(0, size);
+
+            // Perform updates in background thread to avoid EDT blocking
+            BackgroundQueuedExecutorService.schedule(() -> {
+                try {
+                    int currentSize = getRowCount();
+                    for (int i = 0; i < currentSize; i++) {
+                        try {
+                            BTDownloadDataLine ud = get(i);
+                            if (ud != null) {
+                                ud.update();
+                            }
+                        } catch (Exception e) {
+                            // Continue updating other rows even if one fails
+                            System.err.println("Error updating row " + i + ": " + e.getMessage());
+                        }
+                    }
+                    // Fire table update on EDT after background work is done
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        int currentSize2 = getRowCount();
+                        if (currentSize2 > 0) {
+                            fireTableRowsUpdated(0, currentSize2 - 1);
+                        }
+                    });
+                } catch (Exception e) {
+                    System.out.println("ATTENTION: Send the following output to the FrostWire Development team.");
+                    System.out.println("===============================START COPY & PASTE=======================================");
+                    e.printStackTrace();
+                    System.out.println("===============================END COPY & PASTE=======================================");
+                } finally {
+                    isRefreshing.set(false);
+                }
+            });
         } catch (Exception e) {
             System.out.println("ATTENTION: Send the following output to the FrostWire Development team.");
             System.out.println("===============================START COPY & PASTE=======================================");
             e.printStackTrace();
             System.out.println("===============================END COPY & PASTE=======================================");
+            isRefreshing.set(false);
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
