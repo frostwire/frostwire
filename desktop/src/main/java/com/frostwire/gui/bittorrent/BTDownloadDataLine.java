@@ -29,6 +29,7 @@ import com.limegroup.gnutella.gui.tables.*;
 import javax.swing.*;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class handles all of the data for a single download, representing
@@ -164,6 +165,13 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private TransferHolder transferHolder;
     private SeedingHolder seedingHolder;
 
+    /**
+     * Cache the last update time to debounce rapid successive updates
+     * Helps reduce excessive JNI calls to torrent_handle.status()
+     */
+    private final AtomicLong lastUpdateTime = new AtomicLong(0);
+    private static final long MIN_UPDATE_INTERVAL_MS = 100; // Min 100ms between updates
+
     static LimeTableColumn staticGetColumn(int idx) {
         try {
             return columns.get(idx);
@@ -212,6 +220,14 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
 
     public boolean isFinished() {
         return initializer != null && initializer.isCompleted() && !isSeeding();
+    }
+
+    /**
+     * Returns the cached transfer state without triggering expensive JNI calls.
+     * This is safe to call from the EDT as it only returns the last cached value.
+     */
+    public TransferState getCachedTransferState() {
+        return transferState;
     }
 
     public String getDisplayName() {
@@ -336,33 +352,49 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Updates all of the data for this download, obtaining fresh information
      * from the contained `Downloader` instance.
+     *
+     * This method implements debouncing to avoid rapid successive updates
+     * which can cause EDT blocking due to expensive JNI calls.
      */
     @Override
     public void update() {
-        transferState = initializer.getState();
-        progress = initializer.getProgress();
-        download = initializer.getBytesReceived();
-        upload = initializer.getBytesSent();
-        downloadSpeed = initializer.getDownloadSpeed();
-        uploadSpeed = initializer.getUploadSpeed();
-        timeLeft = initializer.getETA();
-        seeds = initializer.getSeedsString();
-        peers = initializer.getPeersString();
-        shareRatio = initializer.getShareRatio();
-        seedToPeerRatio = initializer.getSeedToPeerRatio();
-        size = initializer.getSize();
-        dateCreated = initializer.getDateCreated();
-        if (initializer.getCopyrightLicenseBroker() != null &&
-                initializer.getCopyrightLicenseBroker().license != null) {
-            license = initializer.getCopyrightLicenseBroker().license.getName();
-        } else {
-            license = "";
+        // Debounce: skip update if too soon after last update
+        long now = System.currentTimeMillis();
+        long lastUpdate = lastUpdateTime.get();
+        if (now - lastUpdate < MIN_UPDATE_INTERVAL_MS) {
+            return;
         }
-        if (initializer.getPaymentOptions() != null) {
-            paymentOptions = initializer.getPaymentOptions();
-        }
-        if (getInitializeObject().isCompleted()) {
-            showNotification();
+        lastUpdateTime.set(now);
+
+        try {
+            transferState = initializer.getState();
+            progress = initializer.getProgress();
+            download = initializer.getBytesReceived();
+            upload = initializer.getBytesSent();
+            downloadSpeed = initializer.getDownloadSpeed();
+            uploadSpeed = initializer.getUploadSpeed();
+            timeLeft = initializer.getETA();
+            seeds = initializer.getSeedsString();
+            peers = initializer.getPeersString();
+            shareRatio = initializer.getShareRatio();
+            seedToPeerRatio = initializer.getSeedToPeerRatio();
+            size = initializer.getSize();
+            dateCreated = initializer.getDateCreated();
+            if (initializer.getCopyrightLicenseBroker() != null &&
+                    initializer.getCopyrightLicenseBroker().license != null) {
+                license = initializer.getCopyrightLicenseBroker().license.getName();
+            } else {
+                license = "";
+            }
+            if (initializer.getPaymentOptions() != null) {
+                paymentOptions = initializer.getPaymentOptions();
+            }
+            if (getInitializeObject().isCompleted()) {
+                showNotification();
+            }
+        } catch (Exception e) {
+            // Log but don't crash if there's an issue fetching status
+            System.err.println("Error updating BTDownloadDataLine: " + e.getMessage());
         }
     }
 
