@@ -18,15 +18,12 @@
 
 package com.frostwire.android.gui.services;
 
-import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
+import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.NetworkInfo.DetailedState;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
@@ -69,8 +66,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
-            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleConnectivityChange(context, intent));
+            } else if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
+                postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleNetworkStateChange(context, intent));
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
@@ -83,96 +80,89 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info(msg);
     }
 
-    private void handleConnectivityChange(Context context, Intent intent) {
-        NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-        if (networkInfo == null) {
-            LOG.warn("EngineBroadcastReceiver.handleConnectivityChange() aborted, could not get NetworkInfo");
+    /**
+     * Handles network state changes from NetworkManager.
+     * Applies user's WiFi-only and VPN guard settings.
+     */
+    private void handleNetworkStateChange(Context context, Intent intent) {
+        ensureBackgroundThreadOrCrash("EngineBroadcastReceiver.handleNetworkStateChange must be called from a background thread");
+
+        NetworkManager networkManager = NetworkManager.instance();
+        boolean isDataUp = intent.getBooleanExtra("isDataUp", false);
+
+        if (isDataUp) {
+            handleConnectedNetwork(context, networkManager);
+        } else {
+            handleDisconnectedNetwork(networkManager);
+        }
+
+        handleNetworkStatusChange();
+        reopenNetworkSockets();
+    }
+
+    /**
+     * Handles network connection with WiFi-only and VPN guard protections.
+     */
+    private void handleConnectedNetwork(Context context, NetworkManager networkManager) {
+        ConfigurationManager CM = ConfigurationManager.instance();
+
+        // Check WiFi-only setting: don't start services if only mobile data is available
+        // and user requires WiFi
+        if (!networkManager.isDataWIFIUp() && !networkManager.isDataMobileUp()) {
+            LOG.info("Connected to network but no WiFi or mobile data detected");
             return;
         }
-        DetailedState detailedState = networkInfo.getDetailedState();
-        switch (detailedState) {
-            case CONNECTED:
-                handleConnectedNetwork(context, networkInfo);
-                handleNetworkStatusChange();
-                reopenNetworkSockets();
-                break;
-            case DISCONNECTED:
-                handleDisconnectedNetwork(networkInfo);
-                handleNetworkStatusChange();
-                reopenNetworkSockets();
-                break;
-            case CONNECTING:
-            case DISCONNECTING:
-                handleNetworkStatusChange();
-                break;
-            default:
-                break;
+
+        boolean useTorrentsOnMobileData = !CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+        boolean isMobileDataOnly = networkManager.isDataMobileUp() && !networkManager.isDataWIFIUp();
+
+        // If only mobile data is available and user doesn't allow torrents on mobile
+        if (isMobileDataOnly && !useTorrentsOnMobileData) {
+            LOG.info("Connected to mobile network but user has WiFi-only setting enabled. Pausing torrents.");
+            TransferManager.instance().pauseTorrents();
+            Engine.instance().stopServices(true);
+            return;
         }
+
+        // Check VPN guard: if user requires VPN for torrents, check if VPN is available
+        boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+        boolean hasVpn = networkManager.isTunnelUp() || networkManager.isVpnConnected();
+
+        if (vpnGuardEnabled && !hasVpn) {
+            LOG.info("VPN guard enabled but no VPN detected. Pausing torrents.");
+            TransferManager.instance().pauseTorrents();
+            Engine.instance().stopServices(true);
+            return;
+        }
+
+        if (Engine.instance().isDisconnected()) {
+            LOG.info("Connected to network. Starting services.");
+            Engine.instance().startServices();
+        }
+
+        if (shouldStopSeeding()) {
+            TransferManager.instance().stopSeedingTorrents();
+        }
+    }
+
+    /**
+     * Handles network disconnection with VPN guard consideration.
+     */
+    private void handleDisconnectedNetwork(NetworkManager networkManager) {
+        LOG.info("Disconnected from network");
+
+        // If VPN guard is enabled and we still have VPN, don't stop
+        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                (networkManager.isTunnelUp() || networkManager.isVpnConnected())) {
+            LOG.info("Network disconnected but VPN is still active. Not stopping services.");
+            return;
+        }
+
+        Engine.instance().stopServices(true);
     }
 
     private void handleNetworkStatusChange() {
         NetworkManager.queryNetworkStatusBackground(NetworkManager.instance());
-    }
-
-    private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
-        ensureBackgroundThreadOrCrash("EngineBroadcastReceiver.handleDisconnectedNetwork must be called from a background thread");
-        LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
-
-        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                isNetworkVPN(networkInfo)) {
-            //don't stop
-            return;
-        }
-
-        // Already running on background thread (posted from onReceive), no need for additional postToHandler
-        Engine.instance().stopServices(true);
-    }
-
-    private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
-        NetworkManager networkManager = NetworkManager.instance();
-        if (networkManager.isInternetDataConnectionUp()) {
-            ConfigurationManager CM = ConfigurationManager.instance();
-            boolean useTorrentsOnMobileData = !CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
-
-            // "Boolean Master", just for fun.
-            // Let a <= "mobile up",
-            //     b <= "use torrents on mobile"
-            //
-            // In English:
-            // is mobile data up and not user torrents on mobile? then abort else start services.
-            //
-            // In Boolean:
-            // if (a && !b) then return; else start services.
-            //
-            // since early 'return' statements are a source of evil, I'll use boolean algebra...
-            // so that we can instead just start services under the right conditions.
-            //
-            // negating "a && !b" I get...
-            // ^(a && !b) => ^a || b
-            //
-            // In English:
-            // if not mobile up or use torrents on mobile data then start services. (no else needed)
-            //
-            // mobile up means only mobile data is up and wifi is down.
-
-            if (!networkManager.isDataMobileUp() || useTorrentsOnMobileData) {
-                LOG.info("Connected to " + networkInfo.getTypeName());
-                if (Engine.instance().isDisconnected()) {
-                    // avoid ANR error inside a broadcast receiver
-
-                    if (CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                            !(networkManager.isTunnelUp() || isNetworkVPN(networkInfo))) {
-                        //don't start
-                        return;
-                    }
-
-                    Engine.instance().startServices();
-                }
-                if (shouldStopSeeding()) {
-                    TransferManager.instance().stopSeedingTorrents();
-                }
-            }
-        }
     }
 
     private boolean shouldStopSeeding() {
@@ -192,8 +182,12 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             e.printStackTrace();
         }
         if (Engine.instance().isDisconnected()) {
-            if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) ||
-                    NetworkManager.instance().isTunnelUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            ConfigurationManager CM = ConfigurationManager.instance();
+            boolean vpnGuardEnabled = CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+            boolean hasVpn = networkManager.isTunnelUp() || networkManager.isVpnConnected();
+
+            if (!vpnGuardEnabled || hasVpn) {
                 Engine.instance().startServices();
             }
         }
@@ -212,15 +206,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    // on some devices, the VPN network is properly identified with
-    // the VPN type, some research is necessary to determine if this
-    // is valid a valid check, and probably replace the dev/tun test
-    private static boolean isNetworkVPN(NetworkInfo networkInfo) {
-        // the constant TYPE_VPN=17 is in API 21, but using
-        // the type name is OK for now
-        String typeName = networkInfo.getTypeName();
-        return typeName != null && typeName.contains("VPN");
-    }
 
     private static void reopenNetworkSockets() {
         // sleep for a second, since IPv6 addresses takes time to be reported
