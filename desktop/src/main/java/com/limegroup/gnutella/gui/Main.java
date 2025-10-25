@@ -67,11 +67,16 @@ public class Main {
         String arch = System.getProperty("os.arch").toLowerCase();
         boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");
 
-        if (CommonUtils.isRunningFromGradle() || CommonUtils.isStepDebuggerAttached()) {
+        // Only enable StrictEdtMode when running from Gradle, but NOT when step debugger is attached
+        // (stepping through code will naturally cause EDT delays that aren't real violations)
+        if (CommonUtils.isRunningFromGradle() && !CommonUtils.isStepDebuggerAttached()) {
             // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls
-            System.out.println("Main: FrostWire is running in DEVELOPMENT environment.");
+            System.out.println("Main: FrostWire is running in DEVELOPMENT environment (Gradle).");
             com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(2000));
             System.out.println("Main: Strict EDT mode is ON. (The application will fail fast if the EDT [Event Dispatcher Thread] stalls for more than 2000 ms)");
+        } else if (CommonUtils.isStepDebuggerAttached()) {
+            System.out.println("Main: FrostWire is running in DEVELOPMENT environment (IntelliJ Debugger attached).");
+            System.out.println("Main: Strict EDT mode is OFF while stepping through code to avoid false positives.");
         } else {
             System.out.println("FrostWire is running in a PRODUCTION environment.");
         }

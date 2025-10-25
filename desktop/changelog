@@ -1,4 +1,13 @@
 frostwire (7.0.0) stable; urgency=high
+ * EDT freeze:Comprehensive fix for EDT violations in transfers UI with multiple optimization layers
+ * EDT freeze:Move BTDownloadModel.refresh() to background thread to prevent EDT blocking during model updates
+ * EDT freeze:Add debouncing to BTDownloadDataLine.update() to prevent rapid successive JNI calls
+ * EDT freeze:Throttle TransferActionsRenderer state checks to 200ms intervals during table rendering
+ * EDT freeze:Move clearable downloads check to background thread in BTDownloadMediator.doRefresh()
+ * EDT freeze:Add count caching to BTDownloadModel with background updates every 500ms
+ * EDT freeze:Cache active uploads for hidden downloads in BTDownloadRowFilteredModel
+ * EDT freeze:Use cached transfer state instead of expensive JNI calls in button state updates
+ * EDT freeze:Fix StrictEdtMode logic to not interfere with IntelliJ step debugging
  * New:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
  * New:TorrentCSV search performer
