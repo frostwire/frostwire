@@ -55,6 +55,9 @@ public final class NetworkManager {
     private boolean tunnelUp;
     private volatile boolean isWifiConnected;
     private volatile boolean isMobileConnected;
+    private volatile boolean isVpnConnected;
+    private volatile boolean wasWifiConnected;
+    private volatile boolean wasMobileConnected;
 
     private WeakReference<ConnectivityManager> connManRef;
     private ConnectivityManager.NetworkCallback networkCallback;
@@ -163,6 +166,7 @@ public final class NetworkManager {
         if (connectivityManager == null) {
             isWifiConnected = false;
             isMobileConnected = false;
+            isVpnConnected = false;
             return;
         }
 
@@ -170,6 +174,7 @@ public final class NetworkManager {
         if (activeNetwork == null) {
             isWifiConnected = false;
             isMobileConnected = false;
+            isVpnConnected = false;
             return;
         }
 
@@ -177,11 +182,17 @@ public final class NetworkManager {
         if (capabilities == null) {
             isWifiConnected = false;
             isMobileConnected = false;
+            isVpnConnected = false;
             return;
         }
 
+        // Save previous state to detect transitions
+        wasWifiConnected = isWifiConnected;
+        wasMobileConnected = isMobileConnected;
+
         isWifiConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
         isMobileConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
+        isVpnConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN);
     }
 
     /**
@@ -195,6 +206,25 @@ public final class NetworkManager {
         LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent);
     }
 
+    /**
+     * Refresh network and VPN state, triggering notification if changed.
+     * This should be called periodically to detect VPN disconnections that
+     * might not trigger NetworkCallback.
+     */
+    public void refreshNetworkState() {
+        boolean wasVpnConnected = isVpnConnected;
+        boolean wasTunnelUp = tunnelUp;
+
+        updateNetworkState();
+        detectTunnel();
+
+        // If VPN status changed, notify even if network itself didn't change
+        if (wasVpnConnected != isVpnConnected || wasTunnelUp != tunnelUp) {
+            LOG.info("VPN state changed, notifying network listeners");
+            notifyNetworkChange();
+        }
+    }
+
     public boolean isInternetDataConnectionUp() {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
         return isWifiConnected != isMobileConnected;
@@ -206,6 +236,14 @@ public final class NetworkManager {
 
     public boolean isDataWIFIUp() {
         return isWifiConnected;
+    }
+
+    public boolean isVpnConnected() {
+        return isVpnConnected;
+    }
+
+    public boolean hasNetworkStateTransitioned() {
+        return wasWifiConnected != isWifiConnected || wasMobileConnected != isMobileConnected;
     }
 
     private ConnectivityManager getConnectivityManager() {
