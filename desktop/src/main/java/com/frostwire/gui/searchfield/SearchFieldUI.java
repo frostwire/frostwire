@@ -1,6 +1,7 @@
 package com.frostwire.gui.searchfield;
 
 import com.frostwire.gui.searchfield.JXSearchField.LayoutStyle;
+import com.frostwire.gui.theme.ThemeMediator;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -189,6 +190,11 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         if (buttonMargin != null) {
             searchField.setOuterMargin(buttonMargin);
         }
+        // Ensure search field background is white across all themes
+        searchField.setBackground(java.awt.Color.WHITE);
+        // Only set opaque for FlatLaf themes; default theme needs transparency for rounded border effect
+        boolean isFlatLafTheme = ThemeMediator.isDarkLafThemeOn() || ThemeMediator.isLightLafThemeOn();
+        searchField.setOpaque(isFlatLafTheme);
         updateButtons();
         if (shouldReplaceResource(clearButton().getIcon())) {
             clearButton().setIcon(UIManager.getIcon("SearchField.clearIcon"));

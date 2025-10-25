@@ -295,7 +295,11 @@ public final class ThemeMediator {
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
         UIManager.put("Table.alternateRowColor", reallyDark);
-        UIManager.put("TextField.background", reallyDark);
+        // text fields should always have white background
+        ColorUIResource white = new ColorUIResource(Color.WHITE);
+        UIManager.put("TextField.background", white);
+        UIManager.put("TextPane.background", white);
+        UIManager.put("EditorPane.background", white);
 
         // test: make all table-header backgrounds bright yellow
         UIManager.put("TableHeader.background", dark);
@@ -321,8 +325,13 @@ public final class ThemeMediator {
     }
 
     private static void installFlatLightLafDefaults() {
-        // Restore search field defaults for light theme to match default LAF
-        UIManager.put("TextField.background", new ColorUIResource(Color.WHITE));
+        // text fields should always have white background
+        ColorUIResource white = new ColorUIResource(Color.WHITE);
+        UIManager.put("TextField.background", white);
+        UIManager.put("TextPane.background", white);
+        UIManager.put("EditorPane.background", white);
+        // Reset label background to transparent (don't override FlatLaf's default)
+        UIManager.put("Label.background", null);
         installSearchFieldDefaults();
     }
 
@@ -332,6 +341,8 @@ public final class ThemeMediator {
         // Set layout style based on OS (MAC for macOS, VISTA for others)
         String layoutStyle = OSUtils.isMacOSX() ? "MAC" : "VISTA";
         UIManager.put("SearchField.layoutStyle", layoutStyle);
+        // Ensure search field has white background
+        UIManager.put("SearchField.background", new ColorUIResource(Color.WHITE));
     }
 
     public static Font fixLabelFont(JLabel label) {
@@ -677,6 +688,10 @@ public final class ThemeMediator {
             defaults.put("defaultFont", font);
         }
         defaults.put("Panel.background", SkinColors.LIGHT_BACKGROUND_COLOR);
+        // text fields should always have white background
+        defaults.put("TextField.background", new ColorUIResource(Color.WHITE));
+        defaults.put("TextPane.background", new ColorUIResource(Color.WHITE));
+        defaults.put("EditorPane.background", new ColorUIResource(Color.WHITE));
         // progressbar
         int paddingEnabled = defaults.getInt("ProgressBar[Enabled+Indeterminate].progressPadding");
         int paddingDisabled = defaults.getInt("ProgressBar[Disabled+Indeterminate].progressPadding");

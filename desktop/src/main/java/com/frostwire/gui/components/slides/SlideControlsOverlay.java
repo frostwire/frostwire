@@ -72,6 +72,8 @@ final class SlideControlsOverlay extends JPanel {
             JLabel labelTitle = new JLabel(controller.getSlide().title);
             labelTitle.setForeground(TEXT_FOREGROUND);
             labelTitle.setFont(deriveFont(true, TITLE_TEXT_FONT_SIZE_DELTA));
+            // Ensure label is transparent for overlay effect
+            labelTitle.setOpaque(false);
             add(labelTitle, "alignx left, aligny baseline, pushx");
         }
     }
@@ -140,6 +142,14 @@ final class SlideControlsOverlay extends JPanel {
             labelAuthor.setBackground(Color.BLACK);
             container.setOpaque(true);
             container.setBackground(Color.BLACK);
+        } else if (ThemeMediator.isLightLafThemeOn()) {
+            // Light theme: use transparent labels for overlay effect
+            labelAuthor.setOpaque(false);
+            container.setOpaque(false);
+        } else {
+            // Default theme: transparent for overlay effect
+            labelAuthor.setOpaque(false);
+            container.setOpaque(false);
         }
 
         labelAuthor.setForeground(TEXT_FOREGROUND);
