@@ -94,6 +94,9 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
             visibleRect.x += size.width;
             visibleRect.width -= size.width;
         }
+        // Add 5-pixel padding before right-side components to prevent them from being flushed to border
+        int rightPadding = 5;
+        visibleRect.width -= rightPadding;
         for (Component comp : BuddySupport.getRight(textField)) {
             if (!comp.isVisible()) {
                 continue;
@@ -157,6 +160,8 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
         for (Component comp : BuddySupport.getRight(textField)) {
             insets.right += comp.isVisible() ? comp.getPreferredSize().width : 0;
         }
+        // Add 5-pixel padding to the right to prevent text from touching the buttons
+        insets.right += 5;
         Insets outerMargin = BuddySupport.getOuterMargin(textField);
         if (outerMargin != null) {
             insets.left += outerMargin.left;
