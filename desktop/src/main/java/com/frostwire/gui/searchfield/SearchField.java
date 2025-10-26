@@ -196,6 +196,10 @@ public class SearchField extends JXSearchField {
         enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
         enableEvents(AWTEvent.FOCUS_EVENT_MASK);
         ThemeMediator.fixKeyStrokes(this);
+        // Set darker text color for better readability on white backgrounds
+        setDisabledTextColor(new Color(40, 40, 40));
+        setForeground(new Color(40, 40, 40));
+        putClientProperty("promptForeground", new Color(40, 40, 40));
     }
 
     /**

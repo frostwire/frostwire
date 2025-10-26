@@ -62,6 +62,10 @@ public class GoogleSearchField extends SearchField {
         setPrompt(I18n.tr("Hints by Google"));
         setSearchMode(SearchMode.REGULAR);
         setBackground(UIManager.getColor("TextField.background"));
+        // Set darker text color for better readability on white backgrounds
+        setDisabledTextColor(new Color(40, 40, 40));
+        setForeground(new Color(40, 40, 40));
+        putClientProperty("promptForeground", new Color(40, 40, 40));
         initCloudSearchField(this);
     }
 
