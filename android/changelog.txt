@@ -1,4 +1,4 @@
-FrostWire 3.0.8 build 762 OCT/17/2025
+FrostWire 3.0.9 build 763 OCT/27/2025
  - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source
@@ -6,7 +6,7 @@ FrostWire 3.0.8 build 762 OCT/17/2025
  - new:Settings > Torrent Settings > Incoming Connection Port Range selection
  - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
  - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
- - yt_dlp-2025.10.14
+ - yt_dlp-2025.10.22
  - replaced:Picasso for Coil image loading library
  - removed:Torlock search performer (old site is down, new site is malicious)
  - removed:LimeTorrents search performer
