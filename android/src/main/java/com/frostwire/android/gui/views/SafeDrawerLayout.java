@@ -49,31 +49,16 @@ public class SafeDrawerLayout extends DrawerLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            // Ensure setMeasuredDimension was actually called by the parent
-            // If getMeasuredWidth() or getMeasuredHeight() are 0, the parent didn't set dimensions
-            if (getMeasuredWidth() == 0 || getMeasuredHeight() == 0) {
-                LOG.warn("DrawerLayout.onMeasure() did not set measured dimension; using fallback");
-                int width = View.resolveSize(
-                        View.MeasureSpec.getSize(widthMeasureSpec),
-                        widthMeasureSpec
-                );
-                int height = View.resolveSize(
-                        View.MeasureSpec.getSize(heightMeasureSpec),
-                        heightMeasureSpec
-                );
-                setMeasuredDimension(width, height);
-            }
+        } catch (IllegalStateException e) {
+            // DrawerLayout.onMeasure() didn't call setMeasuredDimension()
+            LOG.error("DrawerLayout.onMeasure() did not set measured dimension; using fallback", e);
+            int width = View.getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+            int height = View.getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+            setMeasuredDimension(width, height);
         } catch (Exception e) {
             LOG.error("DrawerLayout.onMeasure() threw exception; falling back to imposed measure specs", e);
-            // Fall back to using the provided measure specs
-            int width = View.resolveSize(
-                    View.MeasureSpec.getSize(widthMeasureSpec),
-                    widthMeasureSpec
-            );
-            int height = View.resolveSize(
-                    View.MeasureSpec.getSize(heightMeasureSpec),
-                    heightMeasureSpec
-            );
+            int width = View.getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+            int height = View.getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
             setMeasuredDimension(width, height);
         }
     }
