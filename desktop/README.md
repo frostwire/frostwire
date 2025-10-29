@@ -100,8 +100,8 @@ cd frostwire/desktop
 Then run the project with:
 
 `./gradlew run`
-    
-If you are using Windows, run the project with `run.bat`.
+
+On Windows, use `gradlew.bat run` instead.
 
 # HAVING ISSUES BUILDING?
 
@@ -119,14 +119,14 @@ If the build is not broken, hit us up at the [Developer Forum](http://forum.fros
 
 | Location        | Contains    |
 | ------------- |:-------------:|
-| **src/com/frostwire/**     | Search, mp3 parsing, Json Engine, mplayer integration, bittorrent, . |
-| **src/com/limegroup/gnutella/gui/**      | Everything the user sees on screen is here.Like Java Swing? this is  probably a great place to learn more about it. If you're going to be adding new UI elements make sure you put them inside **com.frostwire.gui.\*** (Most of the stuff on **com.limewire.gui** are legacy code from LimeWire) Good starting points to see how it all works are the **\*Mediator.java** files. Being the McDaddy **GUIMediator.java** |
+| **src/main/java/com/frostwire/**     | Search, mp3 parsing, Json Engine, mplayer integration, bittorrent, . |
+| **src/main/java/com/limegroup/gnutella/gui/**      | Everything the user sees on screen is here.Like Java Swing? this is  probably a great place to learn more about it. If you're going to be adding new UI elements make sure you put them inside **com.frostwire.gui.\*** (Most of the stuff on **com.limewire.gui** are legacy code from LimeWire) Good starting points to see how it all works are the **\*Mediator.java** files. Being the McDaddy **GUIMediator.java** |
 | **resources/** | This is where most graphical assets are stored.      |
 | **lib/jars** | This is where we keep pre-compiled jars from projects we don't maintain.     |
-| **lib/jars-src** | This is where we keep the sources of those third party projects. We do this because we hope one day we'll be accepted into  debian or ubuntu and it's a requirement that your packages  can be compiled without any binary dependency. This also helps us help those projects, sometimes we fix bugs that affect us and we send patches back to those projects.  Also on eclipse it's awesome to be able to browse the source  of those dependencies and to step-by-step debug to see what  the hell those developers were thinking.|
+| **lib/native** | This is where we keep native libraries for different operating systems.     |
+| **lib/native-src** | This is where we keep the sources of native libraries. |
 | **lib/messagebundles**  |   Where we keep the translation files. |
 | **lib/icons**  |  Where we keep the FrostWire launcher icons for the differentoperating systems. |
-| **splashes/**  |  Where we keep all the splash screens for each major version of FrostWire. There are tools there to build the splash.jar and to build a collage of pictures with all the splashes for a release. |
 
 
 # Coding Guidelines
@@ -198,7 +198,7 @@ Frostwire Desktop is offered under the [GNU General Public License Version 3 (GP
 
 ### Official FrostWire sites
 
-[Main Website Frostwire.com](httpss://www.frostwire.com) |
+[Main Website Frostwire.com](https://www.frostwire.com) |
 [FrostWire SubReddit](https://reddit.com/frostwire) |
 [FrostWire Discord Chatrooms](https://www.frostwire.com/chat) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
