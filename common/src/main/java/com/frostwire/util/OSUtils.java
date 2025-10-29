@@ -225,7 +225,7 @@ public class OSUtils {
         return isWindows() || isMacOSX();
     }
 
-    /** In the case for arm64, Java returns instead os.arch=aarch64, see getArchitectureInPOSIX() */
+    /** In the case for arm64, Java returns instead os.arch=aarch64 */
     public static String getArchitecture() {
         return System.getProperty("os.arch");
     }
