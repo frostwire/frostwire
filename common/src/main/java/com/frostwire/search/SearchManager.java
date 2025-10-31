@@ -64,7 +64,7 @@ public final class SearchManager {
         return Loader.INSTANCE;
     }
 
-    public void perform(final SearchPerformer performer) {
+    public void perform(final ISearchPerformer performer) {
         if (performer != null) {
             if (performer.getToken() < 0) {
                 throw new IllegalArgumentException("Search token id must be >= 0");
@@ -114,7 +114,7 @@ public final class SearchManager {
         executor.execute(task);
     }
 
-    private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
+    private void onResults(ISearchPerformer performer, List<? extends SearchResult> results) {
         var list = new LinkedList<SearchResult>();
         results.forEach(sr -> {
             if (sr instanceof CrawlableSearchResult) {
@@ -173,7 +173,7 @@ public final class SearchManager {
         }
     }
 
-    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
+    private void crawl(ISearchPerformer performer, CrawlableSearchResult sr) {
         if (performer != null && !performer.isStopped()) {
             try {
                 CrawlTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
@@ -232,10 +232,10 @@ public final class SearchManager {
 
     private static abstract class SearchTask implements Runnable, Comparable<SearchTask> {
         protected final SearchManager manager;
-        final SearchPerformer performer;
+        final ISearchPerformer performer;
         private final int ordinal;
 
-        SearchTask(SearchManager manager, SearchPerformer performer, int ordinal) {
+        SearchTask(SearchManager manager, ISearchPerformer performer, int ordinal) {
             this.manager = manager;
             this.performer = performer;
             this.ordinal = ordinal;
@@ -260,7 +260,7 @@ public final class SearchManager {
     }
 
     private static final class PerformTask extends SearchTask {
-        PerformTask(SearchManager manager, SearchPerformer performer, int order) {
+        PerformTask(SearchManager manager, ISearchPerformer performer, int order) {
             super(manager, performer, order);
         }
 
@@ -284,7 +284,7 @@ public final class SearchManager {
     private static final class CrawlTask extends SearchTask {
         private final CrawlableSearchResult sr;
 
-        CrawlTask(SearchManager manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
+        CrawlTask(SearchManager manager, ISearchPerformer performer, CrawlableSearchResult sr, int order) {
             super(manager, performer, order);
             this.sr = sr;
         }

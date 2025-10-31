@@ -24,7 +24,7 @@ import com.frostwire.regex.Pattern;
  * @author gubatron
  * @author aldenml
  */
-public interface RegexSearchPerformer<T extends SearchResult> extends SearchPerformer {
+public interface RegexSearchPerformer<T extends SearchResult> extends ISearchPerformer {
     Pattern getPattern();
 
     Pattern getAltPattern();

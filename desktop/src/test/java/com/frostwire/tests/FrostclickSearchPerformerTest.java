@@ -20,7 +20,7 @@ package com.frostwire.tests;
 
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
-import com.frostwire.search.SearchPerformer;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.util.Logger;

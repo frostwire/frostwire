@@ -59,6 +59,9 @@ public final class SearchMatcher {
         if (str == null) {
             return null;
         }
-        return new String(str.toCharArray());
+        // Create a new String instance to allow original HTML to be garbage collected.
+        // Using new String(str) is more efficient than toCharArray() which creates
+        // an intermediate char array before creating the new String.
+        return new String(str);
     }
 }

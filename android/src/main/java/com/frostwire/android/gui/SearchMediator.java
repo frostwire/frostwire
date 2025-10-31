@@ -21,13 +21,13 @@ package com.frostwire.android.gui;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.search.CrawlPagedWebSearchPerformer;
+import com.frostwire.search.CrawlCacheManager;
 import com.frostwire.search.CrawledSearchResult;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
-import com.frostwire.search.SearchPerformer;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
@@ -159,11 +159,11 @@ public final class SearchMediator {
     }
 
     public void clearCache() {
-        CrawlPagedWebSearchPerformer.clearCache();
+        CrawlCacheManager.clearCache();
     }
 
     public long getCacheSize() {
-        return CrawlPagedWebSearchPerformer.getCacheSize();
+        return CrawlCacheManager.getCacheNumEntries();
     }
 
     public void markOpened(SearchResult sr, SearchResultListAdapter adapter) {

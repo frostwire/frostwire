@@ -26,7 +26,9 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.search.AbstractSearchPerformer;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchListener;
+import com.frostwire.search.SearchError;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
@@ -140,12 +142,16 @@ public final class TellurideCourier {
     }
 
 
-    public static class SearchPerformer<T extends AbstractListAdapter> extends AbstractSearchPerformer {
+    public static class SearchPerformer<T extends AbstractListAdapter> implements ISearchPerformer {
+        private final long token;
         private final String pageUrl;
         private final TellurideCourierCallback<T> courierCallback;
 
+        protected boolean stopped;
+        private SearchListener listener;
+
         public SearchPerformer(long token, String pageUrl, T adapter) {
-            super(token);
+            this.token = token;
             this.pageUrl = pageUrl;
             this.courierCallback = new TellurideCourierCallback<>(this, pageUrl, adapter);
         }
@@ -162,10 +168,42 @@ public final class TellurideCourier {
         }
 
         @Override
+        public long getToken() {
+            return token;
+        }
+
+        @Override
         public void stop() {
-            super.stop();
+            stopped = true;
+            try {
+                if (listener != null) {
+                    listener.onStopped(token);
+                }
+            } catch (Throwable e) {
+                LOG.warn("Error sending finished signal to listener: " + e.getMessage());
+            }
             courierCallback.abort();
             lastKnownCallback = null;
+        }
+
+        @Override
+        public boolean isStopped() {
+            return stopped;
+        }
+
+        @Override
+        public SearchListener getListener() {
+            return listener;
+        }
+
+        @Override
+        public void setListener(SearchListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public boolean isDDOSProtectionActive() {
+            return false;
         }
 
         @Override

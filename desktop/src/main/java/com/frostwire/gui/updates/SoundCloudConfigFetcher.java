@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.updates;
 
-import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
