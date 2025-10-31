@@ -27,23 +27,25 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.SoftwareUpdater;
-import com.frostwire.search.SearchPerformer;
-import com.frostwire.search.internetarchive.InternetArchiveSearchPerformer;
-import com.frostwire.search.btdigg.BTDiggSearchPerformer;
-import com.frostwire.search.frostclick.FrostClickSearchPerformer;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
-import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
-import com.frostwire.search.idope.IdopeSearchPerformer;
-import com.frostwire.search.knaben.KnabenSearchPerformer;
-import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
-import com.frostwire.search.nyaa.NyaaSearchPerformer;
-import com.frostwire.search.one337x.One337xSearchPerformer;
-import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
-import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
-import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
-import com.frostwire.search.tpb.TPBSearchPerformer;
-import com.frostwire.search.yt.YTSearchPerformer;
+import com.frostwire.search.frostclick.FrostClickSearchPattern;
+import com.frostwire.search.nyaa.NyaaSearchPattern;
+import com.frostwire.search.knaben.KnabenSearchPattern;
+import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
+import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
+import com.frostwire.search.internetarchive.InternetArchiveCrawlingStrategy;
+import com.frostwire.search.tpb.TPBSearchPattern;
+import com.frostwire.search.tpb.TPBMirrors;
+import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
+import com.frostwire.search.yt.YTSearchPattern;
+import com.frostwire.search.one337x.One337xSearchPattern;
+import com.frostwire.search.btdigg.BTDiggSearchPattern;
+import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
+import com.frostwire.search.idope.IdopeSearchPattern;
+import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
@@ -84,7 +86,7 @@ public abstract class SearchEngine {
         return name;
     }
 
-    public abstract SearchPerformer getPerformer(long token, String keywords);
+    public abstract ISearchPerformer getPerformer(long token, String keywords);
 
     public TellurideCourier.SearchPerformer getTelluridePerformer(long currentSearchToken, String pageUrl, SearchResultListAdapter adapter) {
         // override me
@@ -166,39 +168,62 @@ public abstract class SearchEngine {
 
     public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer("api-v2.sndcdn.com", token, keywords, DEFAULT_TIMEOUT);
-            // Inject dynamic credentials fetched from remote server
-            performer.setCredentials(SoftwareUpdater.getSoundCloudClientId(), SoftwareUpdater.getSoundCloudAppVersion());
-            return performer;
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture with JSON API parsing for audio streaming
+            // Get dynamic credentials fetched from remote server
+            String clientId = SoftwareUpdater.getSoundCloudClientId();
+            String appVersion = SoftwareUpdater.getSoundCloudAppVersion();
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new SoundcloudSearchPattern(clientId, appVersion),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine ARCHIVE = new SearchEngine("Archive.org", Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new InternetArchiveSearchPerformer("archive.org", token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture with crawling strategy
+            // Search page returns preliminary results, strategy fetches file list from detail pages
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new InternetArchiveSearchPattern(),
+                    new InternetArchiveCrawlingStrategy(),
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", Constants.PREF_KEY_SEARCH_USE_FROSTCLICK) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_TIMEOUT, FROSTWIRE_ANDROID_USER_AGENT);
-        }
-    };
-
-    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorrentDownloadsSearchPerformer("www.torrentdownloads.me", token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture with custom headers for API authentication
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new FrostClickSearchPattern(FROSTWIRE_ANDROID_USER_AGENT.toString(), FROSTWIRE_ANDROID_USER_AGENT.getUUID(), FROSTWIRE_ANDROID_USER_AGENT.getHeadersMap()),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine NYAA = new SearchEngine("Nyaa", Constants.PREF_KEY_SEARCH_USE_NYAA) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using SearchPerformerFactory with regex-based HTML parsing pattern
+            // NyaaSearchPattern extracts anime torrent metadata from search result table
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new NyaaSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
@@ -206,18 +231,29 @@ public abstract class SearchEngine {
         private String domainName = null;
 
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
+        public ISearchPerformer getPerformer(long token, String keywords) {
             if (domainName == null) {
                 throw new RuntimeException("check your logic, this search performer has no domain name ready");
             }
-            return new TPBSearchPerformer(domainName, token, keywords, DEFAULT_TIMEOUT);
+            // V2: Using new flat architecture with regex pattern for dual HTML format support
+            // TPB requires access to domain for URL construction, so create V2 SearchEngine directly
+            String encodedKeywords = UrlUtils.encode(keywords);
+            com.frostwire.search.SearchPerformer searchEngine = new com.frostwire.search.SearchPerformer(
+                    token,
+                    keywords,
+                    encodedKeywords,
+                    new TPBSearchPattern(domainName),  // Pass domain to pattern
+                    null,  // No crawling needed - complete data on search page
+                    DEFAULT_TIMEOUT
+            );
+            return searchEngine;
         }
 
         protected void postInitWork() {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.getMirrors(), 6000, 6);
+                domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBMirrors.getMirrors(), 6000, 6);
             }
             ).start();
         }
@@ -230,60 +266,112 @@ public abstract class SearchEngine {
 
     public static final SearchEngine ONE337X = new SearchEngine("1337x", Constants.PREF_KEY_SEARCH_USE_ONE337X) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new One337xSearchPerformer("www.1377x.to", token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture with crawling strategy
+            // Search page returns crawlable results, strategy fetches detail pages
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new One337xSearchPattern(),
+                    new com.frostwire.search.one337x.One337xCrawlingStrategy(),
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
-    public static final SearchEngine IDOPE = new SearchEngine("Idope", Constants.PREF_KEY_SEARCH_USE_IDOPE) {
+    public static final SearchEngine IDOPE = new SearchEngine("idope", Constants.PREF_KEY_SEARCH_USE_IDOPE) {
 
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture with JSON API parsing (no crawling needed)
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new IdopeSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
-    public static final SearchEngine TORRENTZ2 = new SearchEngine("Torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
+    public static final SearchEngine TORRENTZ2 = new SearchEngine("torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
 
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT / 2);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture (no crawling needed - Torrentz2 provides complete data)
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new Torrentz2SearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
-    public static final SearchEngine MAGNETDL = new SearchEngine("MagnetDL", Constants.PREF_KEY_SEARCH_USE_MAGNETDL) {
+    public static final SearchEngine MAGNETDL = new SearchEngine("magnetdl", Constants.PREF_KEY_SEARCH_USE_MAGNETDL) {
 
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture (no crawling needed - MagnetDL provides complete data via JSON API)
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new MagnetDLSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
 
-    public static final SearchEngine GLOTORRENTS = new SearchEngine("GloTorrents", Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS) {
+    public static final SearchEngine GLOTORRENTS = new SearchEngine("glotorrents", Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture (no crawling needed - GloTorrents provides complete data)
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new GloTorrentsSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine TORRENTSCSV = new SearchEngine("TorrentsCSV", Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorrentsCSVSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using SearchPerformerFactory with JSON API pattern
+            // TorrentsCSVSearchPattern provides complete torrent metadata via JSON API
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new TorrentsCSVSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine KNABEN = new SearchEngine("Knaben", Constants.PREF_KEY_SEARCH_USE_KNABEN) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new KnabenSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using SearchPerformerFactory with custom pattern that declares POST_JSON HTTP method
+            // KnabenSearchPattern specifies HTTP method and constructs the JSON request body
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new KnabenSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
+        public ISearchPerformer getPerformer(long token, String keywords) {
             return null;
         }
 
@@ -293,17 +381,31 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine BT_DIGG = new SearchEngine("BTDigg", Constants.PREF_KEY_SEARCH_USE_BT_DIGG) {
+    private static final SearchEngine BT_DIGG = new SearchEngine("btdigg", Constants.PREF_KEY_SEARCH_USE_BT_DIGG) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new BTDiggSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture (no crawling needed)
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new BTDiggSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
         }
     };
 
     public static final SearchEngine YT = new SearchEngine("YT", Constants.PREF_KEY_SEARCH_USE_YT) {
         @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new YTSearchPerformer(token, keywords, DEFAULT_TIMEOUT, 1);
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new YTSearchPattern(),
+                    null,  // No crawling needed for YouTube
+                    DEFAULT_TIMEOUT
+            );
         }
 
         @Override
@@ -323,7 +425,6 @@ public abstract class SearchEngine {
             BT_DIGG,
             SOUNCLOUD,
             ARCHIVE,
-            TORRENTDOWNLOADS,
             NYAA,
             GLOTORRENTS,
             TORRENTSCSV,

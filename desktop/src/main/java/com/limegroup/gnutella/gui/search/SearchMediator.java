@@ -25,15 +25,16 @@ import com.frostwire.gui.filters.SearchFilterFactory;
 import com.frostwire.gui.filters.SearchFilterFactoryImpl;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.*;
+import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.internetarchive.InternetArchiveCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.yt.YTSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.I18NConvert;
@@ -115,12 +116,12 @@ public final class SearchMediator {
                     databaseCrawlCache = new DatabaseCrawlCache();
                     LOG.info("SearchMediator() - crawl cache reset successful");
                 }
-                CrawlPagedWebSearchPerformer.setCache(databaseCrawlCache);
+                CrawlCacheManager.setCache(databaseCrawlCache);
             } catch (Throwable t) {
                 LOG.error("could not set database crawl cache", t);
             }
-        }, "CrawlPagedWebSearchPerformer-initializer").start();
-        CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
+        }, "CrawlCacheManager-initializer").start();
+        CrawlCacheManager.setMagnetDownloader(new LibTorrentMagnetDownloader());
         this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override
@@ -242,10 +243,12 @@ public final class SearchMediator {
                     UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
                     result.add(ui2);
                 }
-            } else if (sr instanceof YTSearchResult) {
-                // if we have some other video search results for Telluride searches
-                // we can reuse TelluridePartialUISearchResult to display them
-                ui = new TelluridePartialUISearchResult<>((YTSearchResult) sr, engine, query);
+            } else if (sr instanceof CompositeFileSearchResult) {
+                // V2 flat architecture - CompositeFileSearchResult from V2 search patterns
+                CompositeFileSearchResult cfsr = (CompositeFileSearchResult) sr;
+                // Create UI wrapper for all CompositeFileSearchResult instances
+                // They can be streaming (YouTube), torrents (1337X), or other content types
+                ui = new FileSearchResultUIWrapper(cfsr, engine, query);
             }
             if (ui != null) {
                 result.add(ui);
@@ -291,8 +294,13 @@ public final class SearchMediator {
             return;
         }
 
-        if (lines.length == 1 && !(lines[0].getSearchResult() instanceof TelluridePartialUISearchResult)) {
-            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+        if (lines.length == 1) {
+            UISearchResult uiSearchResult = lines[0].getSearchResult();
+            SearchResult sr = uiSearchResult.getSearchResult();
+            // Only switch to Transfers for direct downloads, not for preliminary results
+            if (!sr.isPreliminary() && !(uiSearchResult instanceof TelluridePartialUISearchResult)) {
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+            }
         }
 
         for (SearchResultDataLine line : lines) {
@@ -431,7 +439,7 @@ public final class SearchMediator {
 
         for (SearchEngine se : SearchEngine.getEngines()) {
             if (se.isEnabled() && se.isReady()) {
-                SearchPerformer p = se.getPerformer(token, query);
+                ISearchPerformer p = se.getPerformer(token, query);
                 manager.perform(p);
             }
         }
@@ -541,10 +549,21 @@ public final class SearchMediator {
                     try {
                         SearchFilter filter = getSearchFilterFactory().createFilter();
                         SearchResultDisplayer searchResultDisplayer = getSearchResultDisplayer();
+                        int added = 0;
+                        NamedMediaType firstMediaType = null;
                         for (UISearchResult sr : uiResults) {
                             if (filter.allow(sr)) {
                                 searchResultDisplayer.addQueryResult(token, sr, rp);
+                                added++;
+                                // Track the first media type to auto-select the appropriate tab
+                                if (firstMediaType == null && sr.getExtension() != null) {
+                                    firstMediaType = NamedMediaType.getFromExtension(sr.getExtension());
+                                }
                             }
+                        }
+                        // Auto-select the appropriate media type tab for the first result
+                        if (firstMediaType != null && added > 0) {
+                            rp.selectMediaType(firstMediaType);
                         }
                     } catch (Exception e) {
                         LOG.error("Error adding search result to UI", e);
@@ -564,7 +583,7 @@ public final class SearchMediator {
 
     public void clearCache() {
         try {
-            CrawlPagedWebSearchPerformer.clearCache();
+            CrawlCacheManager.clearCache();
         } catch (Throwable ignored) {
         }
     }
@@ -572,7 +591,7 @@ public final class SearchMediator {
     public long getTotalTorrents() {
         long r = 0;
         try {
-            r = CrawlPagedWebSearchPerformer.getCacheNumEntries();
+            r = CrawlCacheManager.getCacheNumEntries();
         } catch (Throwable ignored) {
         }
         return r;

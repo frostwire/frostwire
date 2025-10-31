@@ -41,7 +41,7 @@ import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
-import com.frostwire.search.CrawlPagedWebSearchPerformer;
+import com.frostwire.search.CrawlCacheManager;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
 
@@ -193,8 +193,8 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     }
 
     private void initializeCrawlPagedWebSearchPerformer(Context context) {
-        CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(context));
-        CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
+        CrawlCacheManager.setCache(new DiskCrawlCache(context));
+        CrawlCacheManager.setMagnetDownloader(new LibTorrentMagnetDownloader());
     }
 
     // don't try to refactor this into an async call since this guy runs on a thread

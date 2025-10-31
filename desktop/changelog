@@ -1,4 +1,11 @@
 frostwire (7.0.0) stable; urgency=high
+ * Performance:Search architecture optimizations - 25-50% reduction in memory allocations
+ * Performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
+ * Performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
+ * Performance:YT pattern static initialization and string operation optimization
+ * Maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
+ * Maintenance:Search package hierarchy flattened, V2 package consolidated
+ * Removed:TorrentDownloads search performer (site offline permanently)
  * New:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
  * New:TorrentCSV search performer

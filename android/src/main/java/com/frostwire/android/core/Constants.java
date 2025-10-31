@@ -72,7 +72,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_SOUNDCLOUD = "frostwire.prefs.search.use_soundcloud";
     public static final String PREF_KEY_SEARCH_USE_ARCHIVEORG = "frostwire.prefs.search.use_archiveorg";
     public static final String PREF_KEY_SEARCH_USE_FROSTCLICK = "frostwire.prefs.search.use_frostclick";
-    public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
     public static final String PREF_KEY_SEARCH_USE_NYAA = "frostwire.prefs.search.use_nyaa";
     public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
     public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";

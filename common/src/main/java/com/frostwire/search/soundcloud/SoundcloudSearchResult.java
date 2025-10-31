@@ -48,7 +48,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final long size;
     private final String hash;
 
-    SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
+    public SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
         this.username = buildUsername(item);
         this.trackUrl = item.permalink_url;

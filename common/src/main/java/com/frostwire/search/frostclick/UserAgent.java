@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -129,7 +129,7 @@ public class UserAgent {
     }
 
     private Map<String, String> initHeadersMap(String operatingSystem, String fwVersion, String buildNumber) {
-        Map<String, String> map = new HashMap<String, String>(); //can't use Java7 notation :( Dalvik is still behind.
+        Map<String, String> map = new HashMap<String, String>();
         map.put(OS_KEY, operatingSystem);
         map.put(FW_VERSION_KEY, fwVersion);
         map.put(BUILD_KEY, buildNumber);
@@ -144,19 +144,4 @@ public class UserAgent {
         }
         return str;
     }
-
-    /*
-    public static void main(String[] args) {
-        String[] agents = new String[] { "frostwire-1.2.2-build-117-REL_vL2R-0_4.2.2_17", "frostwire-1.3.0-build-125-REL_vr3_rQ_4.3_18"};
-        for (String agent : agents) {
-            UserAgent ua = new UserAgent(agent,"UUID-HERE");
-            System.out.println("CODENAME: " + ua.getOSVersionMap().get("CODENAME"));
-            System.out.println("INCREMENTAL: " + ua.getOSVersionMap().get("INCREMENTAL"));
-            System.out.println("RELEASE: " + ua.getOSVersionMap().get("RELEASE"));
-            System.out.println("SDK_INT: " + ua.getOSVersionMap().get("SDK_INT"));
-            System.out.println("=====================================");
-            System.out.println("=====================================");
-        }
-    }
-    */
 }

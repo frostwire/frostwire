@@ -29,7 +29,6 @@ import com.frostwire.search.internetarchive.InternetArchiveTorrentSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.yt.YTSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -135,29 +134,35 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             updatePlayButton();
         }
         SearchResult sr = uiSearchResult.getSearchResult();
-        // Two-step download. e.g. show me contents of a torrent first, or starts a telluride search
-        boolean isPartialDownload = sr instanceof CrawlableSearchResult || sr instanceof InternetArchiveTorrentSearchResult || sr instanceof YTSearchResult;
+        // Preliminary results require a secondary search/step (format selection, file selection, etc.)
+        boolean isPreliminary = sr.isPreliminary() || sr instanceof CrawlableSearchResult || sr instanceof InternetArchiveTorrentSearchResult;
 
         labelDownload.setIcon(showSolid ? download_solid : download_transparent);
-        labelDownload.setVisible(!isPartialDownload);
+        labelDownload.setVisible(!isPreliminary);
 
-        // [+] Partial Download
+        // [+] Preliminary Download - shows format/content selection
         labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
-        labelPartialDownload.setVisible(isPartialDownload);
+        labelPartialDownload.setVisible(isPreliminary);
     }
 
     private boolean isSearchResultPlayable() {
+        SearchResult sr = uiSearchResult.getSearchResult();
+
+        // Partial download results (TelluridePartialUISearchResult, YouTube, etc.) are playable
         if (uiSearchResult instanceof TelluridePartialUISearchResult) {
             return true;
         }
-        if (uiSearchResult.getSearchResult() instanceof SoundcloudSearchResult) {
+
+        if (sr instanceof SoundcloudSearchResult) {
             return true;
         }
-        if (uiSearchResult.getSearchResult() instanceof TellurideSearchResult) {
+        if (sr instanceof TellurideSearchResult) {
             return true;
         }
-        if (uiSearchResult.getSearchResult() instanceof StreamableSearchResult) {
-            if (((StreamableSearchResult) uiSearchResult.getSearchResult()).getStreamUrl() != null) {
+
+        // Streamable results with actual stream URLs
+        if (sr instanceof StreamableSearchResult) {
+            if (((StreamableSearchResult) sr).getStreamUrl() != null) {
                 if (uiSearchResult.getExtension() != null) {
                     MediaType mediaType = MediaType.getMediaTypeForExtension(uiSearchResult.getExtension());
                     return mediaType != null && ((mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType()));
@@ -174,7 +179,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private void labelPlay_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult searchResult = uiSearchResult.getSearchResult();
-            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) || searchResult instanceof TellurideSearchResult || searchResult instanceof YTSearchResult) {
+            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) || searchResult instanceof TellurideSearchResult || searchResult.isPreliminary()) {
                 uiSearchResult.play();
             }
             updatePlayButton();
@@ -182,15 +187,16 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     /**
-     * Handles both partial download and download button
+     * Handles both preliminary and direct downloads
      */
     private void labelDownloadAction_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult sr = uiSearchResult.getSearchResult();
             boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
             uiSearchResult.download(isTorrent);
-            boolean showTransfers = !(uiSearchResult instanceof TelluridePartialUISearchResult);
-            if (showTransfers) {
+            // Only show Transfers tab for direct downloads, not for preliminary results that trigger secondary searches
+            boolean isPreliminary = sr.isPreliminary() || uiSearchResult instanceof TelluridePartialUISearchResult;
+            if (!isPreliminary) {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }
         }

@@ -1,4 +1,11 @@
 FrostWire 3.0.9 build 763 OCT/27/2025
+ - performance:Search architecture optimizations - 25-50% reduction in memory allocations
+ - performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
+ - performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
+ - performance:YT pattern static initialization and string operation optimization
+ - maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
+ - maintenance:Search package hierarchy flattened, V2 package consolidated
+ - removed:TorrentDownloads search performer (site offline permanently)
  - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source

@@ -36,4 +36,20 @@ public interface SearchResult {
     License getLicense();
 
     String getThumbnailUrl();
+
+    /**
+     * Indicates if this is a preliminary/partial search result that requires a secondary search
+     * or additional step before the actual download can begin.
+     *
+     * Examples: YouTube videos (need format selection), torrents (need file selection),
+     * crawlable results (need to fetch content list).
+     *
+     * When true, the UI should show a "+" icon instead of a download icon, and clicking
+     * it should trigger a secondary search rather than starting a direct download.
+     *
+     * @return true if this is a preliminary result requiring additional interaction, false for direct downloads
+     */
+    default boolean isPreliminary() {
+        return false;
+    }
 }

@@ -70,7 +70,9 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         addedOn = sr.getCreationTime() > 0 ? new Date(sr.getCreationTime()) : null;
         actionsHolder = new SearchResultActionsHolder(sr);
         name = new SearchResultNameHolder(sr);
-        seeds = RESULT.getSeeds() <= 0 || !(RESULT instanceof TorrentUISearchResult) && !(RESULT instanceof TelluridePartialUISearchResult<?>) ? "" : String.valueOf(RESULT.getSeeds());
+        // Show seeds for torrents and preliminary results (YouTube view counts, torrent downloads, etc)
+        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && ((RESULT instanceof TorrentUISearchResult) || isPreliminaryUI(RESULT));
+        seeds = shouldShowSeeds ? String.valueOf(RESULT.getSeeds()) : "";
         icon = getIcon();
         size = new SizeHolder(getSize());
         source = new SourceHolder(RESULT);
@@ -235,5 +237,10 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
 
     public SearchEngine getSearchEngine() {
         return RESULT.getSearchEngine();
+    }
+
+    private boolean isPreliminaryUI(UISearchResult uiResult) {
+        com.frostwire.search.SearchResult sr = uiResult.getSearchResult();
+        return sr.isPreliminary() || (uiResult instanceof TelluridePartialUISearchResult);
     }
 }

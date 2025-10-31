@@ -34,7 +34,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
-import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
+import com.frostwire.search.soundcloud.SoundcloudUtils;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
@@ -917,10 +917,10 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     if (trackUrl.contains("?in=")) {
                         url = trackUrl.substring(0, trackUrl.indexOf("?in="));
                     }
-                    String resolveURL = SoundcloudSearchPerformer.resolveUrl(url);
+                    String resolveURL = SoundcloudUtils.resolveUrl(url);
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     String json = client.get(resolveURL, 10000);
-                    LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson(json, fromPastedUrl);
+                    LinkedList<SoundcloudSearchResult> results = SoundcloudUtils.fromJson(json, fromPastedUrl);
                     if (results.isEmpty()) {
                         GUIMediator.safeInvokeLater(() -> GUIMediator.showError(I18n.tr("Sorry, Couldn't find a valid download location at") + "<br><br><a href=\"" + trackUrl + "\">" + trackUrl + "</a>"));
                         return;

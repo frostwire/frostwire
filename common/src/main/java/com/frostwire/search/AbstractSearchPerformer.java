@@ -27,7 +27,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public abstract class AbstractSearchPerformer implements SearchPerformer {
+public abstract class AbstractSearchPerformer implements ISearchPerformer {
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
     private final long token;
     protected boolean stopped;

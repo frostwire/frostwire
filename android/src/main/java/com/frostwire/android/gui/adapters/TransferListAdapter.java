@@ -69,7 +69,7 @@ import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.search.WebSearchPerformer;
+import com.frostwire.search.StreamableUtils;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
@@ -607,7 +607,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             size.setText(getSizeString(download.getSize()));
             buttonDetails.setVisibility(View.GONE);
             File previewFile = download.previewFile();
-            if (previewFile != null && WebSearchPerformer.isStreamable(previewFile.getName())) {
+            if (previewFile != null && StreamableUtils.isStreamable(previewFile.getName())) {
                 buttonPlay.setTag(previewFile);
                 buttonPlay.setVisibility(View.VISIBLE);
                 buttonPlay.setOnClickListener(playOnClickListener);

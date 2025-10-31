@@ -121,7 +121,7 @@ public final class PerformersHelper {
     /**
      * This method is only public allow reuse inside the package search, consider it a private API
      */
-    public static List<? extends SearchResult> crawlTorrentInfo(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
+    public static List<? extends SearchResult> crawlTorrentInfo(ISearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
         List<TorrentCrawledSearchResult> list = new LinkedList<>();
         if (data == null) {
             return list;
@@ -152,7 +152,7 @@ public final class PerformersHelper {
         }
     }
 
-    public static List<? extends SearchResult> crawlTorrentInfo(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
+    public static List<? extends SearchResult> crawlTorrentInfo(ISearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
         return crawlTorrentInfo(performer, sr, data, false);
     }
 

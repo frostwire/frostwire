@@ -18,8 +18,9 @@
 
 package com.frostwire.search.telluride;
 
-import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchListener;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.UrlUtils;
@@ -33,24 +34,33 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * V2-compatible search performer for Telluride (cloud backup/streaming platform).
+ * Uses non-HTTP transport (local process on desktop, Python VM RPC on Android).
+ * Implements ISearchPerformer directly without extending legacy V1 base classes.
+ *
  * This search performer only launches the RPC backend on desktop since we don't include
  * a standalone Python VM for desktop.
  * In Android, a new Python VM is used for search and then some methods here are used, like getValidResults()
  */
-public class TellurideSearchPerformer extends AbstractSearchPerformer {
+public class TellurideSearchPerformer implements ISearchPerformer {
     private static final Logger LOG = Logger.getLogger(TellurideSearchPerformer.class);
     private static Gson gson = null;
     private static Calendar calendar = null;
+
+    private final long token;
     private final CountDownLatch performerLatch;
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
     private final File tellurideLauncher;
 
+    protected boolean stopped;
+    private SearchListener listener;
+
     public TellurideSearchPerformer(long token,
                                     String _url,
                                     TellurideSearchPerformerListener _performerListener,
                                     File _tellurideLauncher) {
-        super(token);
+        this.token = token;
 
         // Many of these could turn into a URL fix method.
         if (_url.contains("instagram.com/reel")) {
@@ -206,6 +216,59 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             performerListener.onError(getToken(), errorMessage);
         }
         performerLatch.countDown();
+    }
+
+    @Override
+    public long getToken() {
+        return token;
+    }
+
+    @Override
+    public void stop() {
+        stopped = true;
+        try {
+            if (listener != null) {
+                listener.onStopped(token);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending finished signal to listener: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    @Override
+    public SearchListener getListener() {
+        return listener;
+    }
+
+    @Override
+    public void setListener(SearchListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return false;
+    }
+
+    protected void onResults(List<? extends com.frostwire.search.SearchResult> results) {
+        if (stopped) {
+            return;
+        }
+        try {
+            if (results == null) {
+                results = new ArrayList<>();
+            }
+            if (listener != null) {
+                listener.onResults(token, results);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending results to listener: " + e.getMessage());
+        }
     }
 
     private static boolean noCodec(String codec) {
