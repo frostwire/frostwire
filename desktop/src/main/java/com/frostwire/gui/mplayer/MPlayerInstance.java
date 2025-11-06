@@ -155,32 +155,11 @@ public class MPlayerInstance {
             cmdList.add("0");
             cmdList.add("-noautosub");
             cmdList.add("-vo");
-            if (OSUtils.isMacOSX()) {
-                cmdList.add("corevideo:buffer_name=fwmplayer");
-            } else if (OSUtils.isWindows()) {
-                cmdList.add("direct3d,gl,directx,sdl");
-            } else if (OSUtils.isLinux()) {
-                cmdList.add("x11,gl,sdl");
-            }
-            if (OSUtils.isWindows()) {
-                cmdList.add("-double");
-                cmdList.add("-priority");
-                cmdList.add("high");
-                cmdList.add("-framedrop");
-                if (FileUtils.hasExtension(fileOrUrl, "wma", "wmv", "asf")) {
-                    cmdList.add("-demuxer");
-                    cmdList.add("lavf");
-                }
-            }
-            if (OSUtils.isLinux()) {
-                cmdList.add("-double");
-                cmdList.add("-framedrop");
-            }
+            cmdList.add("null");
+            cmdList.add("-ao");
+            cmdList.add("pulse,alsa,");
             cmdList.add("-volume");
             cmdList.add(String.valueOf(initialVolume));
-            if (OSUtils.isLinux()) {
-                cmdList.add("-zoom");
-            }
             if (OSUtils.isMacOSX()) {
                 cmdList.add(fileOrUrl);
             } else if (OSUtils.isWindows()) {
@@ -590,8 +569,6 @@ public class MPlayerInstance {
         cmdList.add("0");
         cmdList.add("-noautosub");
         cmdList.add("-vo");
-        cmdList.add("null");
-        cmdList.add("-ao");
         cmdList.add("null");
         cmdList.add("-frames");
         cmdList.add("0");
