@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
@@ -32,10 +33,18 @@ import java.util.LinkedList;
  */
 public class FragmentedDemuxTest {
 
+    private File getTestResource(String fileName) throws IOException {
+        URL resource = getClass().getResource(fileName);
+        if (resource == null) {
+            throw new IOException("Test resource not found: " + fileName);
+        }
+        return new File(resource.getPath());
+    }
+
     @Test
     public void testFragmented1() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+        File fIn = getTestResource("/com/frostwire/mp4/test_audio.m4a");
+        File fOut = new File(System.getProperty("java.io.tmpdir"), "test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
         final InputChannel chIn = new InputChannel(in.getChannel());
@@ -238,8 +247,8 @@ public class FragmentedDemuxTest {
 
     @Test
     public void testFragmented3() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/audio_frag.mp4");
-        File fOut = new File("/Users/aldenml/Downloads/test_out_ref.mp4");
+        File fIn = getTestResource("/com/frostwire/mp4/test_video.mp4");
+        File fOut = new File(System.getProperty("java.io.tmpdir"), "test_out_ref.mp4");
 
         Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
@@ -253,9 +262,9 @@ public class FragmentedDemuxTest {
 
     @Test
     public void testFragmented4() throws IOException {
-        File fIn1 = new File("/Users/aldenml/Downloads/video_frag.mp4");
-        File fIn2 = new File("/Users/aldenml/Downloads/audio_frag.mp4");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+        File fIn1 = getTestResource("/com/frostwire/mp4/test_video.mp4");
+        File fIn2 = getTestResource("/com/frostwire/mp4/test_audio.m4a");
+        File fOut = new File(System.getProperty("java.io.tmpdir"), "test_out.mp4");
 
         Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};

@@ -215,6 +215,11 @@ sourceSets {
             srcDir '../common/src/test/java'
             srcDir 'src/test/java'
         }
+
+        resources {
+            srcDir '../common/src/test/resources'
+            srcDir 'src/test/resources'
+        }
     }
 
     // JMH benchmarks source set (managed by JMH plugin)
