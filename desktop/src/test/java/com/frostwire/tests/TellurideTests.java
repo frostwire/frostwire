@@ -206,7 +206,7 @@ public class TellurideTests {
 
         TellurideLauncher.launch(tellurideLauncherFile,
                 "https://www.youtube.com/watch?v=ye2CLllRO8I",
-                null,
+                new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
                 false,
                 true,
