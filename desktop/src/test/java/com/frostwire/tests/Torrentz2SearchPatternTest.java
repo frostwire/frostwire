@@ -30,6 +30,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public final class Torrentz2SearchPatternTest {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPatternTest.class);
 
     @Test
+    @Disabled("Disabled due to persistent socket timeout - likely Cloudflare anti-bot or server issues. Requires manual testing.")
     public void torrentz2SearchTest() {
         String searchTerm = "ubuntu";
         String encodedKeywords = UrlUtils.encode(searchTerm);
@@ -57,7 +59,7 @@ public final class Torrentz2SearchPatternTest {
                 searchTerm,
                 new Torrentz2SearchPattern(),
                 null,  // No crawling strategy needed
-                5000   // 5 second timeout
+                15000  // 15 second timeout (Torrentz2 can be slow due to Cloudflare or server load)
             );
 
         Torrentz2SearchListener listener = new Torrentz2SearchListener();
