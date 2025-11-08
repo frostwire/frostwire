@@ -79,7 +79,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_IDOPE = "frostwire.prefs.search.use_idope";
     public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
     public static final String PREF_KEY_SEARCH_USE_GLOTORRENTS = "frostwire.prefs.search.use_glotorrents";
-    public static final String PREF_KEY_SEARCH_USE_BT_DIGG = "frostwire.prefs.search.use_bt_digg";
     public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER = "frostwire.prefs.search.use_telluride_courier";
     public static final String PREF_KEY_SEARCH_USE_YT = "frostwire.prefs.search.use_yt";
     public static final String PREF_KEY_SEARCH_USE_TORRENTSCSV = "frostwire.prefs.search.use_torrentscsv";

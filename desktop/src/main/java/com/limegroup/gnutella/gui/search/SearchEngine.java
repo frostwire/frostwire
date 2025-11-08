@@ -36,7 +36,6 @@ import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.one337x.One337xCrawlingStrategy;
-import com.frostwire.search.btdigg.BTDiggSearchPattern;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
@@ -60,7 +59,6 @@ public abstract class SearchEngine {
     private static final int DEFAULT_TIMEOUT = 5000;
 
     public enum SearchEngineID {
-        BT_DIGG,
         TPB_ID,
         SOUNDCLOUD_ID,
         INTERNET_ARCHIVE_ID,
@@ -76,20 +74,6 @@ public abstract class SearchEngine {
         TORRENTSCSV_ID,
         KNABEN_ID
     }
-
-    private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "btdigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed - BTDigg provides complete data)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new BTDiggSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
@@ -327,7 +311,6 @@ public abstract class SearchEngine {
     public static List<SearchEngine> getEngines() {
         return Arrays.asList(
                 YT,
-                BT_DIGG,
                 INTERNET_ARCHIVE,
                 GLOTORRENTS,
                 IDOPE,

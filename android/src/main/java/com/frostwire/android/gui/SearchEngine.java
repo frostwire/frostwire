@@ -42,7 +42,6 @@ import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
-import com.frostwire.search.btdigg.BTDiggSearchPattern;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
@@ -381,20 +380,6 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine BT_DIGG = new SearchEngine("btdigg", Constants.PREF_KEY_SEARCH_USE_BT_DIGG) {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new BTDiggSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
-
     public static final SearchEngine YT = new SearchEngine("YT", Constants.PREF_KEY_SEARCH_USE_YT) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
@@ -422,7 +407,6 @@ public abstract class SearchEngine {
             IDOPE,
             FROSTCLICK,
             TPB,
-            BT_DIGG,
             SOUNCLOUD,
             ARCHIVE,
             NYAA,

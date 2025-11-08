@@ -39,7 +39,6 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting MAGNETDL_ENABLED = FACTORY.createBooleanSetting("MAGNETDL_ENABLED", true);
     public static final BooleanSetting GLOTORRENTS_ENABLED = FACTORY.createBooleanSetting("GLOTORRENTS_ENABLED", true);
     public static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
-    public static final BooleanSetting BT_DIGG_SEARCH_ENABLED = FACTORY.createBooleanSetting("BT_DIGG_SEARCH_ENABLED", true);
     public static final BooleanSetting YT_SEARCH_ENABLED = FACTORY.createBooleanSetting("YT_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTSCSV_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTSCSV_SEARCH_ENABLED", true);
     public static final BooleanSetting KNABEN_SEARCH_ENABLED = FACTORY.createBooleanSetting("KNABEN_SEARCH_ENABLED", false);

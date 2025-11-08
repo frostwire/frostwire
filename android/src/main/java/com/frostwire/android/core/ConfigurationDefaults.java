@@ -89,7 +89,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BT_DIGG, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YT, Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_KNABEN, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV, true);

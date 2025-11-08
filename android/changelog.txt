@@ -6,6 +6,7 @@ FrostWire 3.0.9 build 763 OCT/27/2025
  - maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
  - maintenance:Search package hierarchy flattened, V2 package consolidated
  - removed:TorrentDownloads search performer (site offline permanently)
+ - removed:BTDigg search performer (protected by Cloudflare, unable to reliably parse search results)
  - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:Knaben search performer, a new torrent search source

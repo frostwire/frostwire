@@ -6,6 +6,7 @@ frostwire (7.0.0) stable; urgency=high
  * Maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
  * Maintenance:Search package hierarchy flattened, V2 package consolidated
  * Removed:TorrentDownloads search performer (site offline permanently)
+ * Removed:BTDigg search performer (protected by Cloudflare, unable to reliably parse search results)
  * New:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
  * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
  * New:TorrentCSV search performer
