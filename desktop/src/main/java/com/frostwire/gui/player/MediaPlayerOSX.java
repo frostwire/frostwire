@@ -48,12 +48,12 @@ public class MediaPlayerOSX extends MediaPlayer {
         f = f.getParentFile(); // jre
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
-        f = new File(f, "MacOS" + File.separator + "fwplayer_osx" + "." + OSUtils.getMacOSArchitecture());
+        f = new File(f, "MacOS" + File.separator + "fwplayer_macos" + "." + OSUtils.getMacOSArchitecture());
         return f.getAbsolutePath();
     }
 
     private String getNonReleasePlayerPath() {
-        return FrostWireUtils.getDevelopmentFrostWireDesktopFolderPath() + "/lib/native/fwplayer_osx" + "." + OSUtils.getMacOSArchitecture();
+        return FrostWireUtils.getDevelopmentFrostWireDesktopFolderPath() + "/lib/native/fwplayer_macos" + "." + OSUtils.getMacOSArchitecture();
     }
 
 

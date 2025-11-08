@@ -244,6 +244,20 @@ public class OSUtils {
         return os_arch;
     }
 
+    /**
+     * arm64, x86_64
+     */
+    public static String getLinuxArchitecture() {
+        String os_arch = System.getProperty("os.arch");
+        if ("aarch64".equals(os_arch)) {
+            return "arm64";
+        }
+        if ("i386".equals(os_arch) || "x86".equals(os_arch)) {
+            return "x86_64";
+        }
+        return os_arch;
+    }
+
     public static boolean isMachineX64() {
         String value = System.getProperty("sun.arch.data.model");
         return value != null && value.equals("64");

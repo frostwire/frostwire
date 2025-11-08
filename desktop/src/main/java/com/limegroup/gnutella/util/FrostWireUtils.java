@@ -151,13 +151,13 @@ public final class FrostWireUtils {
         String pathPrefix;
         // From Command line:
         // fwJarFolder=.../frostwire/desktop/build
-        // .../frostwire/desktop/lib/native/fwplayer_osx
+        // .../frostwire/desktop/lib/native/fwplayer_macos.<arch>
         if (fwJarFolder.getAbsolutePath().endsWith("build")) {
             pathPrefix = fwJarFolder.getParentFile().getAbsolutePath();
         } else {
             // From IntelliJ:
             // fwJarFolder=.../frostwire/desktop/build/classes
-            // .../frostwire/desktop/build/lib/native/fwplayer_osx
+            // .../frostwire/desktop/build/lib/native/fwplayer_macos.<arch>
             pathPrefix = fwJarFolder.getParentFile().getParentFile().getAbsolutePath();
         }
         return pathPrefix;

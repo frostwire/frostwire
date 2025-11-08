@@ -3,6 +3,7 @@ package com.frostwire.gui.player;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.QuestionsHandler;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import com.frostwire.util.OSUtils;
 
 import java.io.File;
@@ -12,6 +13,17 @@ public class MediaPlayerLinux extends MediaPlayer {
 
     @Override
     protected String getPlayerPath() {
+        // Try FrostWire's architecture-specific player first
+        String arch = OSUtils.getLinuxArchitecture();
+        String fwPlayerPath = FrostWireUtils.getDevelopmentFrostWireDesktopFolderPath() +
+            "/lib/native/fwplayer_linux." + arch;
+        File fwPlayer = new File(fwPlayerPath);
+
+        if (fwPlayer.exists()) {
+            return fwPlayerPath;
+        }
+
+        // Fall back to system mplayer
         File f = new File(MPLAYER_DEFAULT_LINUX_PATH);
         if (!f.exists() && QuestionsHandler.MPLAYER_MISSING_WARNING.getValue()) {
             GUIMediator.safeInvokeLater(() -> {
