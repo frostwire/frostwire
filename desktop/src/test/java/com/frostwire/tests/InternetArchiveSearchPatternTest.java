@@ -25,6 +25,8 @@ import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
 import com.frostwire.search.internetarchive.InternetArchiveCrawlingStrategy;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -52,7 +54,7 @@ public final class InternetArchiveSearchPatternTest {
         String encodedKeywords = UrlUtils.encode(searchTerm);
 
         // Create V2 SearchPerformer with crawling strategy
-        com.frostwire.search.SearchPerformer performer =
+        ISearchPerformer performer =
             SearchPerformerFactory.createSearchPerformer(
                 1,
                 searchTerm,
@@ -102,7 +104,7 @@ public final class InternetArchiveSearchPatternTest {
             LOG.info("InternetArchiveSearchListener.onResults: Got " + results.size() + " results");
 
             for (SearchResult result : results) {
-                FileSearchResult sr = (FileSearchResult) result;
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
                 LOG.info("InternetArchiveSearchListener.onResults:");
                 LOG.info("\\t DisplayName: " + sr.getDisplayName());
                 LOG.info("\\t Size: " + sr.getSize());

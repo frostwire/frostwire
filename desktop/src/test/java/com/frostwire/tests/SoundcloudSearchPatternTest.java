@@ -28,6 +28,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
+import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;

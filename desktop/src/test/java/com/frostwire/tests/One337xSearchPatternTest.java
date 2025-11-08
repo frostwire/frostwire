@@ -20,6 +20,8 @@ package com.frostwire.tests;
 
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.one337x.One337xSearchPattern;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
@@ -64,22 +66,24 @@ public final class One337xSearchPatternTest {
             if (checked >= 3) break;
             checked++;
 
-            assertFalse(result.getDisplayName() == null || result.getDisplayName().isEmpty(),
+            CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+
+            assertFalse(sr.getDisplayName() == null || sr.getDisplayName().isEmpty(),
                     "Result " + checked + ": displayName is null or empty");
-            LOG.info("Result " + checked + " - displayName: " + result.getDisplayName());
+            LOG.info("Result " + checked + " - displayName: " + sr.getDisplayName());
 
-            assertFalse(result.getDetailsUrl() == null || result.getDetailsUrl().isEmpty(),
+            assertFalse(sr.getDetailsUrl() == null || sr.getDetailsUrl().isEmpty(),
                     "Result " + checked + ": detailsUrl is null or empty");
-            LOG.info("Result " + checked + " - detailsUrl: " + result.getDetailsUrl());
+            LOG.info("Result " + checked + " - detailsUrl: " + sr.getDetailsUrl());
 
-            assertEquals("1337x", result.getSource(),
+            assertEquals("1337x", sr.getSource(),
                     "Result " + checked + ": source should be 1337x");
 
-            assertFalse(result.isPreliminary(),
+            assertFalse(sr.isPreliminary(),
                     "Result " + checked + ": should NOT be preliminary (crawling is done inside performer, not in UI)");
             LOG.info("Result " + checked + " - isPreliminary: false ✓");
 
-            assertTrue(result.isCrawlable(),
+            assertTrue(sr.isCrawlable(),
                     "Result " + checked + ": should be crawlable (performer crawls details page internally)");
             LOG.info("Result " + checked + " - isCrawlable: true ✓");
 

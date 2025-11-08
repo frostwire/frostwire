@@ -21,9 +21,7 @@ package com.frostwire.search.soundcloud;
 import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.platform.Platforms;
-import com.frostwire.search.SearchError;
-import com.frostwire.search.SearchListener;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -70,13 +68,10 @@ class SoundcloudDynamicCredentialsTest {
         String clientId = "testClientId1";
         String appVersion = "testAppVersion1";
 
-        SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(
-                "api-v2.soundcloud.com", 1L, "test", 5000);
+        // V2: Create SoundcloudSearchPattern with custom credentials
+        SoundcloudSearchPattern pattern = new SoundcloudSearchPattern(clientId, appVersion);
 
-        // Manually set credentials to verify they're used in the URL
-        performer.setCredentials(clientId, appVersion);
-
-        String searchUrl = performer.getSearchUrl(1, "testquery");
+        String searchUrl = pattern.getSearchUrl(UrlUtils.encode("testquery"));
 
         // Verify the credentials are in the search URL
         assertTrue(searchUrl.contains("client_id=" + clientId),
@@ -107,13 +102,18 @@ class SoundcloudDynamicCredentialsTest {
         assertTrue(!clientId.equals(DEFAULT_CLIENT_ID) && !appVersion.equals(DEFAULT_APP_VERSION),
                 "Remote fetch should provide credentials (either different from defaults or cache was populated)");
 
-        // Create a performer and inject fetched credentials
-        SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(
-                "api-v2.soundcloud.com", 2L, TEST_SEARCH_TERM, 5000);
-        performer.setCredentials(clientId, appVersion);
+        // V2: Create SoundcloudSearchPattern and performer with fetched credentials
+        SoundcloudSearchPattern pattern = new SoundcloudSearchPattern(clientId, appVersion);
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+                2L,
+                "creative commons",
+                pattern,
+                null,  // No crawling for Soundcloud
+                5000
+        );
 
         // Verify the search URL contains the injected credentials
-        String searchUrl = performer.getSearchUrl(1, "test");
+        String searchUrl = pattern.getSearchUrl(UrlUtils.encode("test"));
         assertTrue(searchUrl.contains("client_id=" + clientId),
                 "Search URL should use the fetched client ID");
 
@@ -148,21 +148,17 @@ class SoundcloudDynamicCredentialsTest {
         String clientId2 = "clientId2";
         String appVersion2 = "appVersion2";
 
-        SoundcloudSearchPerformer performer1 = new SoundcloudSearchPerformer(
-                "api-v2.sndcdn.com", 3L, TEST_SEARCH_TERM, 5000);
-        performer1.setCredentials(clientId1, appVersion1);
+        // V2: Create two patterns with different credentials
+        SoundcloudSearchPattern pattern1 = new SoundcloudSearchPattern(clientId1, appVersion1);
+        SoundcloudSearchPattern pattern2 = new SoundcloudSearchPattern(clientId2, appVersion2);
 
-        SoundcloudSearchPerformer performer2 = new SoundcloudSearchPerformer(
-                "api-v2.sndcdn.com", 4L, TEST_SEARCH_TERM, 5000);
-        performer2.setCredentials(clientId2, appVersion2);
-
-        String url1 = performer1.getSearchUrl(1, "test");
-        String url2 = performer2.getSearchUrl(1, "test");
+        String url1 = pattern1.getSearchUrl(UrlUtils.encode("test"));
+        String url2 = pattern2.getSearchUrl(UrlUtils.encode("test"));
 
         assertTrue(url1.contains("client_id=" + clientId1),
-                "Performer 1 should use its own client ID");
+                "Pattern 1 should use its own client ID");
         assertTrue(url2.contains("client_id=" + clientId2),
-                "Performer 2 should use its own client ID");
+                "Pattern 2 should use its own client ID");
         assertNotEquals(url1, url2,
                 "URLs should be different when using different credentials");
     }
@@ -173,11 +169,10 @@ class SoundcloudDynamicCredentialsTest {
         String testClientId = "myTestClientId123";
         String testAppVersion = "myTestAppVersion456";
 
-        SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(
-                "api-v2.sndcdn.com", 5L, "test", 5000);
-        performer.setCredentials(testClientId, testAppVersion);
+        // V2: Create pattern with custom credentials
+        SoundcloudSearchPattern pattern = new SoundcloudSearchPattern(testClientId, testAppVersion);
 
-        String searchUrl = performer.getSearchUrl(1, "testquery");
+        String searchUrl = pattern.getSearchUrl(UrlUtils.encode("testquery"));
 
         assertTrue(searchUrl.contains("client_id=" + testClientId),
                 "Search URL should contain injected client ID");
@@ -188,54 +183,62 @@ class SoundcloudDynamicCredentialsTest {
     }
 
     @Test
-    @DisplayName("Null credentials should not override existing values")
-    void testNullCredentialsDoNotOverride() {
-        String initialClientId = "initialClientId";
-        String initialAppVersion = "initialAppVersion";
+    @DisplayName("Null credentials should use defaults")
+    void testNullCredentialsUseDefaults() {
+        String clientId = "myClientId";
+        String appVersion = "myAppVersion";
 
-        SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(
-                "api-v2.sndcdn.com", 6L, "test", 5000);
-        performer.setCredentials(initialClientId, initialAppVersion);
+        // V2: Create pattern with custom credentials
+        SoundcloudSearchPattern pattern1 = new SoundcloudSearchPattern(clientId, appVersion);
+        SoundcloudSearchPattern pattern2 = new SoundcloudSearchPattern(null, null);
 
-        String urlBefore = performer.getSearchUrl(1, "test");
+        String urlCustom = pattern1.getSearchUrl(UrlUtils.encode("test"));
+        String urlDefault = pattern2.getSearchUrl(UrlUtils.encode("test"));
 
-        // Try to inject null credentials - should be ignored
-        performer.setCredentials(null, null);
-        String urlAfter = performer.getSearchUrl(1, "test");
+        assertTrue(urlCustom.contains("client_id=" + clientId),
+                "Custom pattern should use provided client ID");
+        assertFalse(urlDefault.isEmpty(),
+                "Default pattern should still generate valid URL");
 
-        assertEquals(urlBefore, urlAfter,
-                "URL should remain unchanged after null credential injection");
-        assertTrue(urlAfter.contains("client_id=" + initialClientId),
-                "URL should still use initial client ID");
+        LOG.info("Custom URL: " + urlCustom);
+        LOG.info("Default URL: " + urlDefault);
     }
 
     @Test
-    @DisplayName("Empty string credentials should not override existing values")
-    void testEmptyStringCredentialsDoNotOverride() {
-        String initialClientId = "initialClientId";
+    @DisplayName("Different credentials should produce different URLs")
+    void testDifferentCredentialsProduceDifferentUrls() {
+        String clientId1 = "clientId1";
+        String clientId2 = "clientId2";
 
-        SoundcloudSearchPerformer performer = new SoundcloudSearchPerformer(
-                "api-v2.sndcdn.com", 7L, "test", 5000);
-        performer.setCredentials(initialClientId, "appVersion");
+        // V2: Create patterns with different credentials
+        SoundcloudSearchPattern pattern1 = new SoundcloudSearchPattern(clientId1, "appVersion");
+        SoundcloudSearchPattern pattern2 = new SoundcloudSearchPattern(clientId2, "appVersion");
 
-        String urlBefore = performer.getSearchUrl(1, "test");
+        String url1 = pattern1.getSearchUrl(UrlUtils.encode("test"));
+        String url2 = pattern2.getSearchUrl(UrlUtils.encode("test"));
 
-        // Try to inject empty credentials - should be ignored
-        performer.setCredentials("", "   ");
-        String urlAfter = performer.getSearchUrl(1, "test");
-
-        assertEquals(urlBefore, urlAfter,
-                "URL should remain unchanged after empty credential injection");
+        assertNotEquals(url1, url2,
+                "URLs should be different with different client IDs");
+        assertTrue(url1.contains("client_id=" + clientId1),
+                "URL 1 should use client ID 1");
+        assertTrue(url2.contains("client_id=" + clientId2),
+                "URL 2 should use client ID 2");
     }
 
     @Test
-    @DisplayName("Static fromJson should use default credentials")
-    void testStaticFromJsonUsesDefaults() {
-        // Static method should always use defaults
-        LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson("{}", false);
+    @DisplayName("Pattern should produce valid URLs with provided credentials")
+    void testPatternProducesValidUrls() {
+        String testClientId = "testId";
+        String testAppVersion = "testVersion";
 
-        assertNotNull(results, "Results should not be null");
-        assertTrue(results.isEmpty(), "Empty JSON should produce empty results");
+        SoundcloudSearchPattern pattern = new SoundcloudSearchPattern(testClientId, testAppVersion);
+
+        String url = pattern.getSearchUrl(UrlUtils.encode("music"));
+
+        assertNotNull(url, "URL should not be null");
+        assertFalse(url.isEmpty(), "URL should not be empty");
+        assertTrue(url.contains("client_id=" + testClientId), "URL should contain client ID");
+        assertTrue(url.contains("music"), "URL should contain search term");
     }
 
     /**

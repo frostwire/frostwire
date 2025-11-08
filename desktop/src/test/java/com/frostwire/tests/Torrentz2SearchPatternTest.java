@@ -22,6 +22,8 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.Logger;
@@ -49,7 +51,7 @@ public final class Torrentz2SearchPatternTest {
         String encodedKeywords = UrlUtils.encode(searchTerm);
 
         // Create V2 SearchPerformer using SearchPerformerFactory
-        com.frostwire.search.SearchPerformer performer =
+        ISearchPerformer performer =
             SearchPerformerFactory.createSearchPerformer(
                 1,
                 searchTerm,
@@ -92,7 +94,7 @@ public final class Torrentz2SearchPatternTest {
             LOG.info("Torrentz2SearchListener.onResults: Got " + results.size() + " results");
 
             for (SearchResult result : results) {
-                FileSearchResult sr = (FileSearchResult) result;
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
                 LOG.info("Torrentz2SearchListener.onResults:");
                 LOG.info("\t DisplayName: " + sr.getDisplayName());
                 LOG.info("\t Size: " + sr.getSize());

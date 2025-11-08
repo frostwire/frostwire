@@ -23,6 +23,8 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.btdigg.BTDiggSearchPattern;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,7 @@ public final class BTDiggSearchPatternTest {
         String searchTerm = "ubuntu";
 
         // Create V2 SearchPerformer using SearchPerformerFactory
-        com.frostwire.search.SearchPerformer performer =
+        ISearchPerformer performer =
             SearchPerformerFactory.createSearchPerformer(
                 1,
                 searchTerm,
@@ -89,7 +91,7 @@ public final class BTDiggSearchPatternTest {
             LOG.info("BTDiggSearchListener.onResults: Got " + results.size() + " results");
 
             for (SearchResult result : results) {
-                com.frostwire.search.FileSearchResult sr = (com.frostwire.search.FileSearchResult) result;
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
                 LOG.info("BTDiggSearchListener.onResults:");
                 LOG.info("\t DisplayName: " + sr.getDisplayName());
                 LOG.info("\t Size: " + sr.getSize());

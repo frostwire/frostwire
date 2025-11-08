@@ -56,7 +56,7 @@ public class YTSearchPatternTest {
         };
 
         // V2: Using new flat architecture via SearchPerformerFactory
-        SearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
                 1,
                 "frostwire",
                 new YTSearchPattern(),

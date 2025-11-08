@@ -21,8 +21,10 @@ package com.frostwire.tests;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.knaben.KnabenSearchPerformer;
-import com.frostwire.search.knaben.KnabenSearchResult;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.knaben.KnabenSearchPattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -34,6 +36,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
+ * V2 Architecture: Uses KnabenSearchPattern with SearchPerformerFactory
  * gradle test --tests "com.frostwire.tests.KnabenSearchPerformerTest.knabenSearchTest"
  */
 public class KnabenSearchPerformerTest {
@@ -41,11 +44,21 @@ public class KnabenSearchPerformerTest {
     
     @Test
     public void knabenSearchTest() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("ubuntu");
-        KnabenSearchPerformer performer = new KnabenSearchPerformer(1, TEST_SEARCH_TERM, 10000);
+        String TEST_SEARCH_TERM = "ubuntu";
+
+        // V2: Use SearchPerformerFactory with KnabenSearchPattern
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+                1,
+                TEST_SEARCH_TERM,
+                new KnabenSearchPattern(),
+                null,  // No crawling for Knaben
+                10000
+        );
+
         KnabenSearchListener listener = new KnabenSearchListener();
         performer.setListener(listener);
         try {
+            LOG.info("Starting Knaben search for: " + TEST_SEARCH_TERM);
             performer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -68,12 +81,12 @@ public class KnabenSearchPerformerTest {
                 return;
             }
             for (SearchResult result : results) {
-                KnabenSearchResult sr = (KnabenSearchResult) result;
-                LOG.info("KnabenSearchPerformer.SearchListener.onResults:");
-                LOG.info("\t Hash: " + sr.getHash());
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+                LOG.info("KnabenSearchListener.onResults:");
+                LOG.info("\t Hash: " + (sr.getTorrentHash().isPresent() ? sr.getTorrentHash().get() : "NONE"));
                 LOG.info("\t Size: " + sr.getSize());
                 LOG.info("\t Display Name: " + sr.getDisplayName());
-                LOG.info("\t Seeds: " + sr.getSeeds());
+                LOG.info("\t Seeds: " + (sr.getSeeds().isPresent() ? sr.getSeeds().get() : "0"));
                 LOG.info("\t Details URL: " + sr.getDetailsUrl());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
@@ -93,12 +106,12 @@ public class KnabenSearchPerformerTest {
                     failedTests.add("getFilename is null or empty");
                 }
 
-                if (StringUtils.isNullOrEmpty(sr.getHash())) {
-                    failedTests.add("getHash is null or empty");
+                if (!sr.getTorrentHash().isPresent()) {
+                    failedTests.add("getTorrentHash is not present");
                 }
 
-                if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
-                    failedTests.add("getTorrentUrl is null or empty");
+                if (!sr.getTorrentUrl().isPresent()) {
+                    failedTests.add("getTorrentUrl is not present");
                 }
 
                 if (failedTests.size() > 0) {

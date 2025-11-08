@@ -21,6 +21,8 @@ package com.frostwire.tests;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.nyaa.NyaaSearchPattern;
 import com.frostwire.util.Logger;
@@ -46,7 +48,7 @@ public final class NyaaSearchPatternTest {
         String searchTerm = "one punch man";
 
         // Create V2 SearchPerformer using SearchPerformerFactory
-        com.frostwire.search.SearchPerformer performer =
+        ISearchPerformer performer =
                 SearchPerformerFactory.createSearchPerformer(
                         1,
                         searchTerm,
@@ -91,7 +93,7 @@ public final class NyaaSearchPatternTest {
             resultCount = results.size();
 
             for (SearchResult result : results) {
-                com.frostwire.search.FileSearchResult sr = (com.frostwire.search.FileSearchResult) result;
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
                 LOG.info("NyaaSearchListener.onResults:");
                 LOG.info("\t DisplayName: " + sr.getDisplayName());
                 LOG.info("\t Source: " + sr.getSource());

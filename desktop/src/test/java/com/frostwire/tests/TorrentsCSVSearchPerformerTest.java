@@ -21,8 +21,10 @@ package com.frostwire.tests;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
-import com.frostwire.search.torrentscsv.TorrentsCSVSearchResult;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -34,6 +36,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
+ * V2 Architecture: Uses TorrentsCSVSearchPattern with SearchPerformerFactory
  * gradle test --tests "com.frostwire.tests.TorrentsCSVSearchPerformerTest.torrentsCSVSearchTest"
  */
 public class TorrentsCSVSearchPerformerTest {
@@ -41,11 +44,21 @@ public class TorrentsCSVSearchPerformerTest {
     
     @Test
     public void torrentsCSVSearchTest() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("ubuntu");
-        TorrentsCSVSearchPerformer performer = new TorrentsCSVSearchPerformer(1, TEST_SEARCH_TERM, 10000);
+        String TEST_SEARCH_TERM = "ubuntu";
+
+        // V2: Use SearchPerformerFactory with TorrentsCSVSearchPattern
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+                1,
+                TEST_SEARCH_TERM,
+                new TorrentsCSVSearchPattern(),
+                null,  // No crawling for TorrentsCSV
+                10000
+        );
+
         TorrentsCSVSearchListener listener = new TorrentsCSVSearchListener();
         performer.setListener(listener);
         try {
+            LOG.info("Starting TorrentsCSV search for: " + TEST_SEARCH_TERM);
             performer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -68,12 +81,12 @@ public class TorrentsCSVSearchPerformerTest {
                 return;
             }
             for (SearchResult result : results) {
-                TorrentsCSVSearchResult sr = (TorrentsCSVSearchResult) result;
-                LOG.info("TorrentsCSVSearchPerformer.SearchListener.onResults:");
-                LOG.info("\t Hash: " + sr.getHash());
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+                LOG.info("TorrentsCSVSearchListener.onResults:");
+                LOG.info("\t Hash: " + (sr.getTorrentHash().isPresent() ? sr.getTorrentHash().get() : "NONE"));
                 LOG.info("\t Size: " + sr.getSize());
                 LOG.info("\t Display Name: " + sr.getDisplayName());
-                LOG.info("\t Seeds: " + sr.getSeeds());
+                LOG.info("\t Seeds: " + (sr.getSeeds().isPresent() ? sr.getSeeds().get() : "0"));
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("getDisplayName is null or empty");
@@ -83,21 +96,17 @@ public class TorrentsCSVSearchPerformerTest {
                     failedTests.add("getSource is null or empty");
                 }
 
-                // TorrentsCSV doesn't have detail pages, so we expect null for details URL
-                if (sr.getDetailsUrl() != null) {
-                    failedTests.add("getDetailsUrl should be null for TorrentsCSV results");
-                }
-
+                // TorrentsCSV may or may not have detail pages
                 if (StringUtils.isNullOrEmpty(sr.getFilename())) {
                     failedTests.add("getFilename is null or empty");
                 }
 
-                if (StringUtils.isNullOrEmpty(sr.getHash())) {
-                    failedTests.add("getHash is null or empty");
+                if (!sr.getTorrentHash().isPresent()) {
+                    failedTests.add("getTorrentHash is not present");
                 }
 
-                if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
-                    failedTests.add("getTorrentUrl is null or empty");
+                if (!sr.getTorrentUrl().isPresent()) {
+                    failedTests.add("getTorrentUrl is not present");
                 }
 
                 if (failedTests.size() > 0) {

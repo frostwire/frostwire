@@ -22,9 +22,10 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPattern;
-import com.frostwire.search.tpb.TPBSearchPerformer;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
@@ -119,7 +120,7 @@ public final class TPBSearchPatternTest {
         assertNotNull(results, "[TPBSearchPatternTest] parseResults returned null");
         assertFalse(results.isEmpty(), "[TPBSearchPatternTest] parseResults returned empty list for NEW format");
 
-        FileSearchResult result = results.get(0);
+        CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
 
         // Validate result properties
         assertNotNull(result.getDisplayName(), "[TPBSearchPatternTest] displayName is null");
@@ -159,7 +160,7 @@ public final class TPBSearchPatternTest {
         assertNotNull(results, "[TPBSearchPatternTest] parseResults returned null");
         assertFalse(results.isEmpty(), "[TPBSearchPatternTest] parseResults returned empty list for OLD format");
 
-        FileSearchResult result = results.get(0);
+        CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
 
         // Validate result properties for OLD format
         assertNotNull(result.getDisplayName(), "[TPBSearchPatternTest] displayName is null (OLD format)");
@@ -175,7 +176,7 @@ public final class TPBSearchPatternTest {
     }
 
     /**
-     * Performs real search against working TPB mirror using V2 SearchEngine
+     * Performs real search against working TPB mirror using V2 SearchPerformerFactory
      * This simulates exactly how the app performs searches
      */
     private void performRealSearch(String domain) {
@@ -186,23 +187,22 @@ public final class TPBSearchPatternTest {
         CountDownLatch latch = new CountDownLatch(1);
         List<String> errors = new ArrayList<>();
 
-        // Create V2 SearchEngine exactly as SearchEngine.TPB.getPerformer() does
-        SearchEngine searchEngine = new SearchEngine(
+        // Create V2 SearchPerformer using factory (as the app does)
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
                 TEST_TOKEN,
                 TEST_KEYWORDS,
-                encodedKeywords,
                 new TPBSearchPattern(domain),
                 null,  // No crawling needed
                 SEARCH_TIMEOUT_MS
         );
 
         // Wrap in SearchListener to capture results
-        searchEngine.setListener(new SearchListener() {
+        performer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
                 LOG.info("[TPBSearchPatternTest] Got " + results.size() + " results");
                 for (SearchResult r : results) {
-                    FileSearchResult fr = (FileSearchResult) r;
+                    CompositeFileSearchResult fr = (CompositeFileSearchResult) r;
                     allResults.add(fr);
                     LOG.info("[TPBSearchPatternTest]   - " + fr.getDisplayName() +
                             " (" + fr.getSize() + " bytes, " +
@@ -224,7 +224,7 @@ public final class TPBSearchPatternTest {
         });
 
         // Execute search
-        searchEngine.perform();
+        performer.perform();
 
         // Wait for results (with shorter timeout for test environment)
         boolean completed = false;
@@ -251,12 +251,13 @@ public final class TPBSearchPatternTest {
         if (!allResults.isEmpty()) {
             // Validate each result
             for (FileSearchResult result : allResults) {
-                assertNotNull(result.getDisplayName(), "[TPBSearchPatternTest] Result displayName is null");
-                assertFalse(result.getDisplayName().isEmpty(), "[TPBSearchPatternTest] Result displayName is empty");
-                assertEquals("TPB", result.getSource(), "[TPBSearchPatternTest] Result source should be 'TPB'");
-                assertTrue(result.isTorrent(), "[TPBSearchPatternTest] Result should be a torrent");
-                assertFalse(result.isPreliminary(), "[TPBSearchPatternTest] Result should NOT be preliminary");
-                assertTrue(result.getSize() > 0, "[TPBSearchPatternTest] Result size should be > 0");
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+                assertNotNull(sr.getDisplayName(), "[TPBSearchPatternTest] Result displayName is null");
+                assertFalse(sr.getDisplayName().isEmpty(), "[TPBSearchPatternTest] Result displayName is empty");
+                assertEquals("TPB", sr.getSource(), "[TPBSearchPatternTest] Result source should be 'TPB'");
+                assertTrue(sr.isTorrent(), "[TPBSearchPatternTest] Result should be a torrent");
+                assertFalse(sr.isPreliminary(), "[TPBSearchPatternTest] Result should NOT be preliminary");
+                assertTrue(sr.getSize() > 0, "[TPBSearchPatternTest] Result size should be > 0");
             }
             LOG.info("[TPBSearchPatternTest] Real search integration test PASSED with " + allResults.size() + " results");
         } else {
@@ -270,7 +271,13 @@ public final class TPBSearchPatternTest {
     private String findFastestWorkingMirror() {
         LOG.info("[TPBSearchPatternTest] Finding fastest TPB mirror...");
 
-        String[] mirrors = TPBSearchPerformer.getMirrors();
+        // Known TPB mirrors to try
+        String[] mirrors = {
+            "pirate-bay.info",
+            "thepiratebay.org",
+            "tpb.party",
+            "pirateproxy.sh"
+        };
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
 
         List<MirrorStatus> statuses = new ArrayList<>();

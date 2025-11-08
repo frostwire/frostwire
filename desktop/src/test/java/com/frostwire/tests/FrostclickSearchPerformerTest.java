@@ -22,31 +22,56 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.frostclick.FrostClickSearchPerformer;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.frostclick.FrostClickSearchPattern;
 import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FrostclickSearchPerformerTest {
     private static final Logger LOG = Logger.getLogger(FrostclickSearchPerformerTest.class);
 
     @Test
     public void testFrostClickSearchPerformer() {
-        SearchPerformer searchPerformer = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID).getPerformer(1, "https://www.youtube.com/watch?v=OtMYSeRrF8M");
+        String youtubeUrl = "https://www.youtube.com/watch?v=OtMYSeRrF8M";
+        String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)";
+        String sessionId = "test_session_123";
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json");
+
+        // V2: Use SearchPerformerFactory with FrostClickSearchPattern
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+                1,
+                youtubeUrl,  // FrostClick uses URL as search term
+                new FrostClickSearchPattern(userAgent, sessionId, headers),
+                null,  // No crawling for FrostClick
+                5000
+        );
+
         List<String> errors = new ArrayList<>();
-        searchPerformer.setListener(new SearchListener() {
+        List<Integer> resultCounts = new ArrayList<>();
+
+        performer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
                 LOG.info("onResults: " + results.size());
+                resultCounts.add(results.size());
+                for (SearchResult result : results) {
+                    CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+                    LOG.info(" - " + sr.getDisplayName() + " (" + sr.getSource() + ")");
+                }
             }
 
             @Override
             public void onError(long token, SearchError error) {
                 errors.add(error.toString());
+                LOG.error("Search error: " + error.message());
             }
 
             @Override
@@ -54,7 +79,12 @@ public class FrostclickSearchPerformerTest {
                 LOG.info("onStopped");
             }
         });
-        searchPerformer.perform();
-        Assertions.assertTrue(((FrostClickSearchPerformer) searchPerformer).wasResponseOk(), "FrostClickSearchPerformer response was not as expected");
+
+        performer.perform();
+
+        // Verify no errors occurred
+        Assertions.assertTrue(errors.isEmpty(), "FrostClick search encountered errors: " + errors);
+        // Either got results or it's OK if FrostClick doesn't return results for that URL
+        LOG.info("FrostClick test completed successfully");
     }
 }

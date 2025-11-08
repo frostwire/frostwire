@@ -21,37 +21,50 @@ package com.frostwire.tests;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.nyaa.NyaaSearchPerformer;
-import com.frostwire.search.nyaa.NyaaSearchResult;
+import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.nyaa.NyaaSearchPattern;
 import com.frostwire.util.Logger;
+import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
-import org.limewire.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * V2 Architecture: Uses NyaaSearchPattern with SearchPerformerFactory
+ */
 public class NyaaSearchPerformerTest {
     private static final Logger LOG = Logger.getLogger(NyaaSearchPerformerTest.class);
     @Test
     public void nyaaSearchPerformerTest() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("free");
-        NyaaSearchPerformer nyaa = new NyaaSearchPerformer("nyaa.si", 1, TEST_SEARCH_TERM, 5000);
+        String TEST_SEARCH_TERM = "free";
+
+        // V2: Use SearchPerformerFactory with NyaaSearchPattern
+        ISearchPerformer performer = SearchPerformerFactory.createSearchPerformer(
+                1,
+                TEST_SEARCH_TERM,
+                new NyaaSearchPattern(),
+                null,  // No crawling for Nyaa
+                5000
+        );
+
         NyaaSearchListener listener = new NyaaSearchListener();
-        nyaa.setListener(listener);
+        performer.setListener(listener);
         try {
-            nyaa.perform();
+            LOG.info("Starting Nyaa search for: " + TEST_SEARCH_TERM);
+            performer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
-            if (!nyaa.isDDOSProtectionActive()) {
-                LOG.info("Aborting test.");
-                fail(t.getMessage());
-            }
+            LOG.info("Aborting test.");
+            fail(t.getMessage());
             return;
         }
-        if (listener.failedTests.size() > 0 && !nyaa.isDDOSProtectionActive()) {
+        if (listener.failedTests.size() > 0) {
             fail(listener.getFailedMessages());
         }
     }
@@ -66,9 +79,10 @@ public class NyaaSearchPerformerTest {
                 return;
             }
             for (SearchResult result : results) {
-                NyaaSearchResult sr = (NyaaSearchResult) result;
-                LOG.info("NyaaSearchPerformer.SearchListener.onResults:");
-                LOG.info("\t Hash: " + sr.getHash());
+                CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
+                LOG.info("NyaaSearchListener.onResults:");
+                LOG.info("\t DisplayName: " + sr.getDisplayName());
+                LOG.info("\t Hash: " + (sr.getTorrentHash().isPresent() ? sr.getTorrentHash().get() : "NONE"));
                 LOG.info("\t Size: " + sr.getSize());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
@@ -83,11 +97,11 @@ public class NyaaSearchPerformerTest {
                 if (StringUtils.isNullOrEmpty(sr.getFilename())) {
                     failedTests.add("getFilename() null or empty");
                 }
-                if (StringUtils.isNullOrEmpty(sr.getHash())) {
-                    failedTests.add("getHash() null or empty");
+                if (!sr.getTorrentHash().isPresent()) {
+                    failedTests.add("getTorrentHash() not present");
                 }
-                if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
-                    failedTests.add("getTorrentUrl() null or empty");
+                if (!sr.getTorrentUrl().isPresent()) {
+                    failedTests.add("getTorrentUrl() not present");
                 }
                 if (failedTests.size() > 0) {
                     return;
@@ -108,7 +122,7 @@ public class NyaaSearchPerformerTest {
             if (failedTests.size() == 0) {
                 return "";
             }
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (String msg : failedTests) {
                 buffer.append(msg);
                 buffer.append("\n");
