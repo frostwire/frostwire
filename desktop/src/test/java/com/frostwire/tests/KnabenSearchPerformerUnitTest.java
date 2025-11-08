@@ -37,23 +37,27 @@ public class KnabenSearchPerformerUnitTest {
     
     @Test
     public void testJsonParsing() {
-        // Sample JSON response that might be returned by Knaben API
+        // Sample JSON response matching Knaben API format with "hits" array
         String sampleJson = """
         {
-            "torrents": [
+            "hits": [
                 {
-                    "name": "Ubuntu 22.04 LTS Desktop",
-                    "infohash": "1234567890abcdef1234567890abcdef12345678",
-                    "size": 4000000000,
-                    "seeds": 50,
-                    "created": "2024-01-15 10:30:00"
+                    "title": "Ubuntu 22.04 LTS Desktop",
+                    "hash": "1234567890abcdef1234567890abcdef12345678",
+                    "magnetUrl": "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
+                    "details": "https://knaben.org/torrents/ubuntu-2204",
+                    "bytes": 4000000000,
+                    "seeders": 50,
+                    "date": "2024-01-15T10:30:00Z"
                 },
                 {
                     "title": "Ubuntu Server 22.04",
                     "hash": "abcdef1234567890abcdef1234567890abcdef12",
-                    "length": 2000000000,
+                    "magnetUrl": "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
+                    "details": "https://knaben.org/torrents/ubuntu-server",
+                    "bytes": 2000000000,
                     "seeders": 25,
-                    "upload_date": "2024-01-10"
+                    "date": "2024-01-10T00:00:00Z"
                 }
             ]
         }
@@ -78,17 +82,21 @@ public class KnabenSearchPerformerUnitTest {
 
     @Test
     public void testAlternativeJsonFormat() {
-        // Test with a different JSON format (direct array)
+        // Test with minimal hits format
         String sampleJson = """
-        [
-            {
-                "filename": "Ubuntu 22.04.torrent",
-                "info_hash": "fedcba0987654321fedcba0987654321fedcba09",
-                "bytes": 3000000000,
-                "seeder": 30,
-                "date": "2024-01-12 15:45:30"
-            }
-        ]
+        {
+            "hits": [
+                {
+                    "title": "Ubuntu 22.04.torrent",
+                    "hash": "fedcba0987654321fedcba0987654321fedcba09",
+                    "magnetUrl": "magnet:?xt=urn:btih:fedcba0987654321fedcba0987654321fedcba09",
+                    "details": "https://knaben.org/torrents/ubuntu",
+                    "bytes": 3000000000,
+                    "seeders": 30,
+                    "date": "2024-01-12T15:45:30Z"
+                }
+            ]
+        }
         """;
 
         KnabenSearchPattern pattern = new KnabenSearchPattern();
@@ -112,15 +120,14 @@ public class KnabenSearchPerformerUnitTest {
         {
             "hits": [
                 {
-                    "bytes": 328613232,
-                    "cachedOrigin": "The Pirate Bay (proxy)",
-                    "category": "XXX",
-                    "categoryId": [5000000],
-                    "date": "2019-09-01T22:00:00+00:00",
+                    "title": "Sample Torrent File",
+                    "hash": "1234567890abcdef1234567890abcdef12345678",
+                    "magnetUrl": "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Sample+Torrent+File",
                     "details": "https://knaben.xyz/thepiratebay/description.php?id=123456",
-                    "name": "Sample Torrent File",
-                    "infohash": "1234567890abcdef1234567890abcdef12345678",
-                    "seeds": 42
+                    "bytes": 328613232,
+                    "date": "2019-09-01T22:00:00Z",
+                    "seeders": 42,
+                    "category": "XXX"
                 }
             ]
         }
