@@ -18,6 +18,7 @@
 
 package com.frostwire.platform;
 
+import com.frostwire.desktop.DesktopPlatform;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ public class FileSystemWalkTest {
 
     @BeforeEach
     public void setUp() {
+        Platforms.set(new DesktopPlatform());
         fs = new DefaultFileSystem();
     }
 
