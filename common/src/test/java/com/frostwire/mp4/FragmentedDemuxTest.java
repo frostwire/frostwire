@@ -27,19 +27,13 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
+import static com.frostwire.TestUtil.getTestResource;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public class FragmentedDemuxTest {
-
-    private File getTestResource(String fileName) throws IOException {
-        URL resource = getClass().getResource(fileName);
-        if (resource == null) {
-            throw new IOException("Test resource not found: " + fileName);
-        }
-        return new File(resource.getPath());
-    }
 
     @Test
     public void testFragmented1() throws IOException {

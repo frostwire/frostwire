@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static com.frostwire.TestUtil.getTestResource;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -31,8 +33,8 @@ public class SimpleDemuxTest {
 
     @Test
     public void testSimpleAudio() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+        File fIn = getTestResource("/com/frostwire/mp4/test_audio.m4a");
+        File fOut = new File(System.getProperty("java.io.tmpdir"), "test_out.mp4");
 
         Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
