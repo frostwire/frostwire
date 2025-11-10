@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.ByteBuffer;
 
 /**
@@ -33,10 +34,17 @@ public class FreeTest {
 
     @Test
     public void test1() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test.mp4");
-
+        File fIn = getTestResource("/com/frostwire/mp4/test_video.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "rw");
         IsoFile.free(in, Box.udta, ByteBuffer.allocate(100 * 1024));
         IO.close(in);
+    }
+
+    private File getTestResource(String fileName) throws IOException {
+        URL resource = getClass().getResource(fileName);
+        if (resource == null) {
+            throw new IOException("Test resource not found: " + fileName);
+        }
+        return new File(resource.getPath());
     }
 }
