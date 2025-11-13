@@ -182,8 +182,12 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         //  make the 'Firewall Status' label
         GUIMediator.setSplashScreenString(I18n.tr("Playing with pixels for the Firewall indicator..."));
         createFirewallLabel();
-        //  make the 'Bandwidth Usage' label
-        createBandwidthLabel();
+        //  make the 'Bandwidth Usage' label - defer to avoid EDT blocking with file I/O
+        // Create placeholder labels first
+        bandwidthUsageDown = new LazyTooltip((ImageIcon) null);
+        bandwidthUsageUp = new LazyTooltip((ImageIcon) null);
+        // Defer the actual icon loading to avoid file system I/O on EDT
+        SwingUtilities.invokeLater(this::createBandwidthLabel);
         // make the social buttons
         GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Facebook..."));
         createFacebookButton();
@@ -440,15 +444,37 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Sets up the 'Bandwidth Usage' label.
      */
     private void createBandwidthLabel() {
-        bandwidthUsageDown = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("downloading_small")));
-        bandwidthUsageUp = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("uploading_small")));
+        // Load icons (this was deferred to avoid EDT blocking with file I/O)
+        ImageIcon downloadIcon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("downloading_small"));
+        ImageIcon uploadIcon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("uploading_small"));
+
+        // Update existing placeholder labels with real icons
+        if (bandwidthUsageDown != null) {
+            bandwidthUsageDown.setIcon(downloadIcon);
+        } else {
+            bandwidthUsageDown = new LazyTooltip(downloadIcon);
+        }
+
+        if (bandwidthUsageUp != null) {
+            bandwidthUsageUp.setIcon(uploadIcon);
+        } else {
+            bandwidthUsageUp = new LazyTooltip(uploadIcon);
+        }
+
         //updateBandwidth();
         // don't allow easy clipping - increased to accommodate full transfer counts and speeds
         bandwidthUsageDown.setMinimumSize(new Dimension(110, 20));
         bandwidthUsageUp.setMinimumSize(new Dimension(110, 20));
         // add right-click listeners
-        bandwidthUsageDown.addMouseListener(STATUS_BAR_LISTENER);
-        bandwidthUsageUp.addMouseListener(STATUS_BAR_LISTENER);
+        if (!bandwidthUsageDown.getMouseListeners().toString().contains("STATUS_BAR_LISTENER")) {
+            bandwidthUsageDown.addMouseListener(STATUS_BAR_LISTENER);
+        }
+        if (!bandwidthUsageUp.getMouseListeners().toString().contains("STATUS_BAR_LISTENER")) {
+            bandwidthUsageUp.addMouseListener(STATUS_BAR_LISTENER);
+        }
+
+        // Refresh the UI to show the new icons
+        refresh();
     }
 
     /**
