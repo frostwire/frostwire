@@ -26,6 +26,7 @@ import org.limewire.util.StringUtils;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import java.awt.*;
+import java.awt.image.ImageObserver;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -169,21 +170,32 @@ public final class ResourceManager {
      * <p>
      * This tries, in order, the exact location, the location as a png, and the
      * location as a gif.
+     * <p>
+     * Uses deferred image loading to avoid blocking the EDT.
      */
     private static ImageIcon getImageFromURL(String location, boolean file) {
         // try exact filename first.
         URL img = toURL(location, file);
         if (img != null)
-            return new ImageIcon(img);
+            return createDeferredImageIcon(img);
         // try with png second
         img = toURL(location + ".png", file);
         if (img != null)
-            return new ImageIcon(img);
+            return createDeferredImageIcon(img);
         // try with gif third
         img = toURL(location + ".gif", file);
         if (img != null)
-            return new ImageIcon(img);
+            return createDeferredImageIcon(img);
         return null;
+    }
+
+    /**
+     * Creates an ImageIcon with deferred image loading to avoid blocking the EDT.
+     * Uses Toolkit.getDefaultToolkit().getImage() which loads asynchronously.
+     */
+    private static ImageIcon createDeferredImageIcon(URL url) {
+        Image image = Toolkit.getDefaultToolkit().getImage(url);
+        return new ImageIcon(image);
     }
 
     /**
