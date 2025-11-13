@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -48,6 +50,10 @@ public final class SplashWindow {
      * The JWindow the splash uses.
      */
     private volatile JWindow splashWindow;
+    /**
+     * Cache for OS icons to avoid file I/O during painting
+     */
+    private final Map<String, BufferedImage> osIconCache = new HashMap<>();
 
     /**
      * Returns the single instance of the SplashWindow.
@@ -80,6 +86,10 @@ public final class SplashWindow {
         glassPane.add(Box.createVerticalGlue(), 0);
         glassPane.add(Box.createVerticalStrut(6));
         //glassPane.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+
+        // Preload OS icons to avoid file I/O during painting
+        preloadOSIcons();
+
         URL imageURL = null;
         try {
             imageURL = Main.getChosenSplashURL();
@@ -112,6 +122,34 @@ public final class SplashWindow {
         }
     }
 
+    private void preloadOSIcons() {
+        // Preload all OS icons into cache to avoid file I/O during paint
+        try {
+            preloadOSIcon("windows", OSUtils.isWindows());
+            preloadOSIcon("android", false);
+            preloadOSIcon("mac", OSUtils.isMacOSX());
+            preloadOSIcon("linux", OSUtils.isLinux());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private void preloadOSIcon(String osName, boolean on) throws Throwable {
+        String prefix = "org/limewire/gui/images/";
+        String suffix = "_desktop_splash.png";
+        String on_off = on ? "on" : "off";
+        String cacheKey = osName + "_" + on_off;
+        if (!osIconCache.containsKey(cacheKey)) {
+            URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
+            if (iconURL != null) {
+                BufferedImage img = ImageIO.read(iconURL);
+                if (img != null) {
+                    osIconCache.put(cacheKey, img);
+                }
+            }
+        }
+    }
+
     private void paintOSIcons(Graphics g) {
         try {
             paintOSIcon("windows", OSUtils.isWindows(), 10, 10, g); //+33px to the right each. (icons are 28x28)
@@ -123,13 +161,13 @@ public final class SplashWindow {
         }
     }
 
-    private void paintOSIcon(String osName, boolean on, int x, @SuppressWarnings("SameParameterValue") int y, Graphics g) throws Throwable {
-        String prefix = "org/limewire/gui/images/";
-        String suffix = "_desktop_splash.png";
+    private void paintOSIcon(String osName, boolean on, int x, @SuppressWarnings("SameParameterValue") int y, Graphics g) {
         String on_off = on ? "on" : "off";
-        URL macIconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
-        BufferedImage img = ImageIO.read(macIconURL);
-        g.drawImage(img, x, y, null);
+        String cacheKey = osName + "_" + on_off;
+        BufferedImage img = osIconCache.get(cacheKey);
+        if (img != null) {
+            g.drawImage(img, x, y, null);
+        }
     }
 
     /**
