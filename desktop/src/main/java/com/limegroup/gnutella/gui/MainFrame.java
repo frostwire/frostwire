@@ -154,7 +154,26 @@ public final class MainFrame {
         contentPane.add(APPLICATION_HEADER, "growx, dock north");
         contentPane.add(TABBED_PANE, "wrap");
         contentPane.add(getStatusLine().getComponent(), "dock south, shrink 0");
-        setMinimalSize(FRAME, APPLICATION_HEADER, APPLICATION_HEADER, TABBED_PANE, getStatusLine().getComponent());
+
+        // Defer expensive layout calculations to avoid EDT blocking
+        // Set a default minimum size first to avoid issues
+        FRAME.setMinimumSize(new Dimension(800, 600));
+
+        // Calculate the real minimum size in a background thread
+        new Thread(() -> {
+            try {
+                Thread.sleep(100); // Give UI time to settle
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        setMinimalSize(FRAME, APPLICATION_HEADER, APPLICATION_HEADER, TABBED_PANE, getStatusLine().getComponent());
+                    } catch (Exception e) {
+                        // Ignore errors during deferred layout calculation
+                    }
+                });
+            } catch (InterruptedException ignored) {
+            }
+        }, "MainFrame-MinimalSizeCalculator").start();
+
         if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
             FRAME.addWindowListener(MagnetClipboardListener.getInstance());
         }
