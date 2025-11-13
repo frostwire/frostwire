@@ -81,7 +81,7 @@ public final class SearchMediator {
      * Query text is too long.
      */
     private static final int QUERY_TOO_LONG = 3;
-    private static final SearchMediator instance = new SearchMediator();
+    private static volatile SearchMediator instance;
     /**
      * This instance handles the display of all search results.
      * TODO: Changed to package-protected for testing to add special results
@@ -99,14 +99,19 @@ public final class SearchMediator {
         // Set the splash screen text...
         final String splashScreenString = I18n.tr("Loading Search Window...");
         GUIMediator.setSplashScreenString(splashScreenString);
-        GUIMediator.addRefreshListener(getSearchResultDisplayer());
-        // Link up the tabs of results with the filters of the input screen.
-        getSearchResultDisplayer().setSearchListener(e -> {
-            SearchResultMediator resultPanel = getSearchResultDisplayer().getSelectedResultPanel();
-            if (resultPanel != null) {
-                resultPanel.updateFiltersPanel();
-            }
+
+        // Defer SearchResultDisplayer initialization to avoid blocking EDT with class loading
+        SwingUtilities.invokeLater(() -> {
+            GUIMediator.addRefreshListener(getSearchResultDisplayer());
+            // Link up the tabs of results with the filters of the input screen.
+            getSearchResultDisplayer().setSearchListener(e -> {
+                SearchResultMediator resultPanel = getSearchResultDisplayer().getSelectedResultPanel();
+                if (resultPanel != null) {
+                    resultPanel.updateFiltersPanel();
+                }
+            });
         });
+
         new Thread(() -> {
             try {
                 DatabaseCrawlCache databaseCrawlCache = new DatabaseCrawlCache();
@@ -141,6 +146,13 @@ public final class SearchMediator {
     }
 
     public static SearchMediator instance() {
+        if (instance == null) {
+            synchronized (SearchMediator.class) {
+                if (instance == null) {
+                    instance = new SearchMediator();
+                }
+            }
+        }
         return instance;
     }
 
@@ -377,7 +389,13 @@ public final class SearchMediator {
 
     public static SearchResultDisplayer getSearchResultDisplayer() {
         if (RESULT_DISPLAYER == null) {
-            RESULT_DISPLAYER = new SearchResultDisplayer();
+            synchronized (SearchMediator.class) {
+                if (RESULT_DISPLAYER == null) {
+                    // Create a placeholder to avoid null pointer exceptions while loading
+                    SearchResultDisplayer temp = new SearchResultDisplayer();
+                    RESULT_DISPLAYER = temp;
+                }
+            }
         }
         return RESULT_DISPLAYER;
     }
