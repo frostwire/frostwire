@@ -96,14 +96,17 @@ public class MPlayerInstance {
     }
 
     private static void runCommand(String[] command) {
-        try {
-            if (!OSUtils.isWindows()) {
-                command[0] = findCommand(command[0]);
+        // Run in background thread to avoid blocking EDT with Process.waitFor()
+        new Thread(() -> {
+            try {
+                if (!OSUtils.isWindows()) {
+                    command[0] = findCommand(command[0]);
+                }
+                Runtime.getRuntime().exec(command).waitFor();
+            } catch (Throwable e) {
+                LOGGER.error(e.getMessage(), e);
             }
-            Runtime.getRuntime().exec(command).waitFor();
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        }, "MPlayer-Command-Runner").start();
     }
 
     private static String findCommand(String name) {
