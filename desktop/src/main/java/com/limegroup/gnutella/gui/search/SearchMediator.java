@@ -41,6 +41,8 @@ import org.limewire.util.I18NConvert;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.text.Normalizer;
 import java.util.*;
 
@@ -87,6 +89,7 @@ public final class SearchMediator {
      * TODO: Changed to package-protected for testing to add special results
      */
     private static SearchResultDisplayer RESULT_DISPLAYER;
+    private static JComponent RESULT_COMPONENT_PLACEHOLDER;
     private static SearchFilterFactory SEARCH_FILTER_FACTORY;
     private final long MAX_CRAWLCACHE_SIZE = 250 * 1000 * 1024;
     private final SearchManager manager;
@@ -379,21 +382,53 @@ public final class SearchMediator {
     /**
      * Returns the `JComponent` instance containing all of the
      * search result UI components.
+     * Returns a placeholder immediately to avoid blocking EDT.
+     * The real component is created asynchronously.
      *
      * @return the `JComponent` instance containing all of the
      * search result UI components
      */
     public static JComponent getResultComponent() {
-        return getSearchResultDisplayer().getComponent();
+        if (RESULT_COMPONENT_PLACEHOLDER == null) {
+            // Return a placeholder panel immediately to avoid EDT blocking
+            RESULT_COMPONENT_PLACEHOLDER = new JPanel();
+            RESULT_COMPONENT_PLACEHOLDER.setLayout(new BorderLayout());
+            RESULT_COMPONENT_PLACEHOLDER.setBackground(Color.WHITE);
+
+            // Defer the real SearchResultDisplayer creation to avoid EDT blocking with class loading
+            SwingUtilities.invokeLater(() -> {
+                synchronized (SearchMediator.class) {
+                    if (RESULT_DISPLAYER == null && RESULT_COMPONENT_PLACEHOLDER != null) {
+                        RESULT_DISPLAYER = new SearchResultDisplayer();
+                        // Update placeholder with real component
+                        RESULT_COMPONENT_PLACEHOLDER.removeAll();
+                        RESULT_COMPONENT_PLACEHOLDER.add(RESULT_DISPLAYER.getComponent(), BorderLayout.CENTER);
+                        RESULT_COMPONENT_PLACEHOLDER.revalidate();
+                        RESULT_COMPONENT_PLACEHOLDER.repaint();
+                    }
+                }
+            });
+        }
+        return RESULT_COMPONENT_PLACEHOLDER;
     }
 
     public static SearchResultDisplayer getSearchResultDisplayer() {
         if (RESULT_DISPLAYER == null) {
             synchronized (SearchMediator.class) {
                 if (RESULT_DISPLAYER == null) {
-                    // Create a placeholder to avoid null pointer exceptions while loading
-                    SearchResultDisplayer temp = new SearchResultDisplayer();
-                    RESULT_DISPLAYER = temp;
+                    // Ensure placeholder exists (in case this is called before getResultComponent)
+                    if (RESULT_COMPONENT_PLACEHOLDER == null) {
+                        RESULT_COMPONENT_PLACEHOLDER = new JPanel();
+                        RESULT_COMPONENT_PLACEHOLDER.setLayout(new BorderLayout());
+                        RESULT_COMPONENT_PLACEHOLDER.setBackground(Color.WHITE);
+                    }
+                    // Create SearchResultDisplayer and update placeholder if needed
+                    RESULT_DISPLAYER = new SearchResultDisplayer();
+                    if (RESULT_COMPONENT_PLACEHOLDER.getComponentCount() == 0) {
+                        RESULT_COMPONENT_PLACEHOLDER.add(RESULT_DISPLAYER.getComponent(), BorderLayout.CENTER);
+                        RESULT_COMPONENT_PLACEHOLDER.revalidate();
+                        RESULT_COMPONENT_PLACEHOLDER.repaint();
+                    }
                 }
             }
         }
