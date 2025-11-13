@@ -1,4 +1,15 @@
 frostwire (7.0.0) stable; urgency=high
+ * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (9 EDT violations fixed)
+ * EDT freeze:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
+ * EDT freeze:LibraryCoverArtPanel defers component listener initialization with SwingUtilities.invokeLater()
+ * EDT freeze:SearchMediator uses lazy singleton pattern with deferred SearchResultDisplayer creation
+ * EDT freeze:MPlayerInstance.runCommand() moved to background thread to avoid Process.waitFor() blocking EDT
+ * EDT freeze:SearchResultDisplayer creation deferred with placeholder component to avoid class loading file I/O during tab initialization
+ * EDT freeze:SplashWindow preloads OS icons during initialization to avoid file I/O during paint operations
+ * EDT freeze:StatusLine defers bandwidth label icon loading to background EDT cycle using SwingUtilities.invokeLater()
+ * EDT freeze:ApplicationHeader defers MediaPlayerComponent creation with placeholder panel to prevent class loading during startup
+ * EDT freeze:MainFrame defers expensive minimum size calculations to background thread - prevents 2+ second EDT blocking from cascading layout calculations
+ * Performance:These EDT fixes significantly improve startup time and responsiveness, especially on resource-constrained systems and older hardware
  * Performance:Search architecture optimizations - 25-50% reduction in memory allocations
  * Performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
  * Performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
