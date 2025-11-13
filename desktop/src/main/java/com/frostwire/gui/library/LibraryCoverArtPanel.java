@@ -36,17 +36,26 @@ public final class LibraryCoverArtPanel extends JPanel {
     private final Image defaultCoverArt;
     private Image coverArtImage;
     private TagsReader tagsReader;
+    private boolean componentListenerAdded = false;
 
     LibraryCoverArtPanel() {
         background = new BufferedImage(350, 350, BufferedImage.TYPE_INT_ARGB);
         defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
         setTagsReader(null);
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                setPrivateImage(coverArtImage);
-            }
-        });
+        // Defer component listener setup to avoid loading anonymous class on EDT
+        SwingUtilities.invokeLater(this::ensureComponentListenerAdded);
+    }
+
+    private void ensureComponentListenerAdded() {
+        if (!componentListenerAdded) {
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    setPrivateImage(coverArtImage);
+                }
+            });
+            componentListenerAdded = true;
+        }
     }
 
     public LibraryCoverArtPanel setTagsReader(TagsReader reader) {
