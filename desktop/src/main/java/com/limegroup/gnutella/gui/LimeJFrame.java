@@ -65,10 +65,19 @@ public class LimeJFrame extends JFrame {
     }
 
     private void initialize() {
-        ImageIcon limeIcon = GUIMediator.getThemeImage(GUIConstants.FROSTWIRE_64x64_ICON);
-        setIconImage(limeIcon.getImage());
         if (OSUtils.isMacOSX()) {
             setupPopupHide();
+        }
+        // Defer icon loading to avoid EDT blocking with file I/O
+        SwingUtilities.invokeLater(this::loadWindowIcon);
+    }
+
+    private void loadWindowIcon() {
+        try {
+            ImageIcon limeIcon = GUIMediator.getThemeImage(GUIConstants.FROSTWIRE_64x64_ICON);
+            setIconImage(limeIcon.getImage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

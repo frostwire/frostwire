@@ -50,25 +50,33 @@ public final class MediaButton extends JButton {
         setContentAreaFilled(false);
         setBorderPainted(false);
         setRolloverEnabled(true);
-        if (!StringUtils.isNullOrEmpty(upName)) {
-            ImageIcon upIcon = GUIMediator.getThemeImage(upName);
-            setIcon(upIcon);
-        } else {
-            setIcon(null);
-        }
+        setIcon(null);
         setHorizontalAlignment(SwingConstants.CENTER);
-        if (!StringUtils.isNullOrEmpty(downName)) {
-            ImageIcon downIcon = GUIMediator.getThemeImage(downName);
-            setPressedIcon(downIcon);
-            setRolloverIcon(downIcon);
-        } else {
-            setPressedIcon(null);
-            setRolloverIcon(null);
-        }
-        //        setPreferredSize(new Dimension(
-        //            getIcon().getIconWidth(), getIcon().getIconHeight()));
+        setPressedIcon(null);
+        setRolloverIcon(null);
         setMargin(new Insets(0, 0, 0, 0));
         setBorder(null);
         setToolTipText(tipText);
+
+        // Defer icon loading to avoid EDT blocking with file I/O
+        SwingUtilities.invokeLater(this::loadIcons);
+    }
+
+    private void loadIcons() {
+        try {
+            if (!StringUtils.isNullOrEmpty(upName)) {
+                ImageIcon upIcon = GUIMediator.getThemeImage(upName);
+                setIcon(upIcon);
+            }
+            if (!StringUtils.isNullOrEmpty(downName)) {
+                ImageIcon downIcon = GUIMediator.getThemeImage(downName);
+                setPressedIcon(downIcon);
+                setRolloverIcon(downIcon);
+            }
+            revalidate();
+            repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
