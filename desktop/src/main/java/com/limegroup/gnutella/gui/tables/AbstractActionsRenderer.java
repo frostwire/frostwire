@@ -37,18 +37,31 @@ import java.awt.event.MouseEvent;
  */
 public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellRenderer {
     private final static float BUTTONS_TRANSPARENCY = 0.85f;
-    private final static ImageIcon play_solid;
-    private final static AlphaIcon play_transparent;
-    private final static ImageIcon download_solid;
-    private final static AlphaIcon download_transparent;
-    private static final ImageIcon share_solid;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon play_solid;
+    private static AlphaIcon play_transparent;
+    private static ImageIcon download_solid;
+    private static AlphaIcon download_transparent;
+    private static ImageIcon share_solid;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
-        play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
-        download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+            play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
+            download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
+            download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
+            share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected AbstractActionsHolder actionsHolder;
@@ -75,6 +88,7 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     }
 
     private void setupUI() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         setLayout(new GridBagLayout());
         GridBagConstraints c;
         labelPlay = new JLabel(play_transparent);
