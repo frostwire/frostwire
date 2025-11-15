@@ -35,14 +35,27 @@ import java.awt.event.MouseEvent;
  * @author aldenml
  */
 public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRenderer {
-    private static final ImageIcon seed_solid;
-    private static final AlphaIcon seed_faded;
-    private static final ImageIcon loading;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon seed_solid;
+    private static AlphaIcon seed_faded;
+    private static ImageIcon loading;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        seed_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_seeding_over"));
-        seed_faded = new AlphaIcon(seed_solid, 0.5f);
-        loading = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("indeterminate_small_progress"));
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            seed_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_seeding_over"));
+            seed_faded = new AlphaIcon(seed_solid, 0.5f);
+            loading = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("indeterminate_small_progress"));
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private JLabel labelSeed;
@@ -53,6 +66,7 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     }
 
     private void setupUI() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         setLayout(new GridBagLayout());
         GridBagConstraints c;
         c = new GridBagConstraints();

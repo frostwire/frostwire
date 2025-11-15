@@ -36,16 +36,29 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 
 public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCellRenderer {
-    private final static ImageIcon play_solid;
-    private final static AlphaIcon play_transparent;
-    private final static ImageIcon share_solid;
-    private final static AlphaIcon share_faded;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon play_solid;
+    private static AlphaIcon play_transparent;
+    private static ImageIcon share_solid;
+    private static AlphaIcon share_faded;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        play_solid = GUIMediator.getThemeImage("search_result_play_over");
-        play_transparent = new AlphaIcon(play_solid, 0.1f);
-        share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
-        share_faded = new AlphaIcon(share_solid, 0.1f);
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            play_solid = GUIMediator.getThemeImage("search_result_play_over");
+            play_transparent = new AlphaIcon(play_solid, 0.1f);
+            share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
+            share_faded = new AlphaIcon(share_solid, 0.1f);
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private final JLabel playButton;
@@ -53,6 +66,7 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
     private TransferDetailFiles.TransferItemHolder transferItemHolder;
 
     public TransferDetailFilesActionsRenderer() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
         setLayout(new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!]"));
         playButton = new JLabel(play_transparent);
