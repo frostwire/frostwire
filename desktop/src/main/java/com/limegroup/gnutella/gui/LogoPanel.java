@@ -27,6 +27,8 @@ import java.awt.event.MouseEvent;
  * This class contains the logo and the searching icon for the application.
  */
 final class LogoPanel extends BoxPanel {
+    private JLabel labelLogo;
+
     /**
      * Constructs a new panel containing the logo and the search icon.
      */
@@ -36,10 +38,7 @@ final class LogoPanel extends BoxPanel {
     }
 
     private void setupUI() {
-        JLabel labelLogo = new JLabel();
-        ImageIcon logoIcon = GUIMediator.getThemeImage("logo_header");
-        labelLogo.setIcon(logoIcon);
-        labelLogo.setSize(logoIcon.getIconWidth(), logoIcon.getIconHeight());
+        labelLogo = new JLabel();
         GUIUtils.setOpaque(false, this);
         add(Box.createHorizontalGlue());
         add(labelLogo);
@@ -53,5 +52,20 @@ final class LogoPanel extends BoxPanel {
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
         });
+
+        // Defer icon loading to avoid EDT blocking with file I/O
+        SwingUtilities.invokeLater(this::loadLogoIcon);
+    }
+
+    private void loadLogoIcon() {
+        try {
+            ImageIcon logoIcon = GUIMediator.getThemeImage("logo_header");
+            labelLogo.setIcon(logoIcon);
+            labelLogo.setSize(logoIcon.getIconWidth(), logoIcon.getIconHeight());
+            revalidate();
+            repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
