@@ -41,16 +41,29 @@ import java.awt.event.MouseEvent;
  */
 public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRenderer {
     private static final Logger LOG = Logger.getLogger(PaymentOptionsRenderer.class);
-    private final static ImageIcon bitcoin_enabled;
-    private final static ImageIcon bitcoin_disabled;
-    private final static ImageIcon paypal_enabled;
-    private final static ImageIcon paypal_disabled;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon bitcoin_enabled;
+    private static ImageIcon bitcoin_disabled;
+    private static ImageIcon paypal_enabled;
+    private static ImageIcon paypal_disabled;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        bitcoin_enabled = GUIMediator.getThemeImage("bitcoin_enabled");
-        bitcoin_disabled = GUIMediator.getThemeImage("bitcoin_disabled");
-        paypal_enabled = GUIMediator.getThemeImage("paypal_enabled");
-        paypal_disabled = GUIMediator.getThemeImage("paypal_disabled");
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            bitcoin_enabled = GUIMediator.getThemeImage("bitcoin_enabled");
+            bitcoin_disabled = GUIMediator.getThemeImage("bitcoin_disabled");
+            paypal_enabled = GUIMediator.getThemeImage("paypal_enabled");
+            paypal_disabled = GUIMediator.getThemeImage("paypal_disabled");
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private final TableActionLabel labelBitcoin;
@@ -59,6 +72,7 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
     private PaymentOptions paymentOptions;
 
     public PaymentOptionsRenderer() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         labelBitcoin = new TableActionLabel(bitcoin_enabled, bitcoin_disabled);
         labelPaypal = new TableActionLabel(paypal_enabled, paypal_disabled);
         setupUI();
