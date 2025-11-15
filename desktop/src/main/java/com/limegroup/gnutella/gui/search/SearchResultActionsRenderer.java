@@ -45,22 +45,35 @@ import java.awt.event.MouseListener;
  */
 public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCellRenderer {
     private final static float BUTTONS_TRANSPARENCY = 0.85f;
-    private final static ImageIcon play_solid;
-    private final static AlphaIcon play_transparent;
-    private final static ImageIcon download_solid;
-    private final static AlphaIcon download_transparent;
-    private final static ImageIcon details_solid;
-    private final static AlphaIcon details_transparent;
-    private final static ImageIcon speaker_icon;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon play_solid;
+    private static AlphaIcon play_transparent;
+    private static ImageIcon download_solid;
+    private static AlphaIcon download_transparent;
+    private static ImageIcon details_solid;
+    private static AlphaIcon details_transparent;
+    private static ImageIcon speaker_icon;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
-        play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
-        download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        details_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
-        details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-        speaker_icon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+            play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
+            download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
+            download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
+            details_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
+            details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
+            speaker_icon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private JLabel labelPlay;
@@ -74,6 +87,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void setupUI() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         setLayout(new GridBagLayout());
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
