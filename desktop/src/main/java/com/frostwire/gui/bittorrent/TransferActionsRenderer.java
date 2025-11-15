@@ -38,16 +38,29 @@ import java.io.File;
  * @author aldenml
  */
 public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRenderer {
-    private static final ImageIcon play_solid;
-    private static final AlphaIcon play_transparent;
-    private static final ImageIcon share_solid;
-    private static final AlphaIcon share_faded;
+    // Lazy-loaded icons to avoid EDT blocking during class loading
+    private static ImageIcon play_solid;
+    private static AlphaIcon play_transparent;
+    private static ImageIcon share_solid;
+    private static AlphaIcon share_faded;
+    private static volatile boolean iconsLoaded = false;
 
-    static {
-        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
-        play_transparent = new AlphaIcon(play_solid, 0.1f);
-        share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
-        share_faded = new AlphaIcon(share_solid, 0.1f);
+    /**
+     * Lazy load icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
+        try {
+            play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+            play_transparent = new AlphaIcon(play_solid, 0.1f);
+            share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
+            share_faded = new AlphaIcon(share_solid, 0.1f);
+            iconsLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private JLabel labelPlay;
@@ -67,6 +80,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     }
 
     private void setupUI() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         setLayout(new GridBagLayout());
         GridBagConstraints c;
         c = new GridBagConstraints();
