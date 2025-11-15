@@ -640,7 +640,9 @@ public final class SearchResultDisplayer implements RefreshListener {
          * Forwards events to the activeSearchListener.
          */
         public void stateChanged(ChangeEvent e) {
-            _activeSearchListener.stateChanged(e);
+            if (_activeSearchListener != null) {
+                _activeSearchListener.stateChanged(e);
+            }
             fixIcons();
         }
     }
