@@ -36,8 +36,15 @@ import java.util.Map;
  */
 public class SourceRenderer extends DefaultTableBevelledCellRenderer implements TableCellRenderer {
     private static final Map<String, ImageIcon> sourceIcons = new HashMap<>();
+    private static volatile boolean iconsLoaded = false;
 
-    static {
+    /**
+     * Lazy load source icons on first access to avoid EDT blocking during class loading
+     */
+    private static synchronized void ensureIconsLoaded() {
+        if (iconsLoaded) {
+            return;
+        }
         try {
             sourceIcons.put("soundcloud", GUIMediator.getThemeImage("soundcloud_off"));
             sourceIcons.put("archive.org", GUIMediator.getThemeImage("archive_source"));
@@ -46,6 +53,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("magnetdl", GUIMediator.getThemeImage("magnetdl_source"));
             sourceIcons.put("default", GUIMediator.getThemeImage("seeding_small_source"));
             sourceIcons.put("1337x", GUIMediator.getThemeImage("1337_source")); // Thank you AholicKnight for the icon.
+            iconsLoaded = true;
         } catch (Throwable e) {
             // just print it
             e.printStackTrace();
@@ -99,6 +107,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
     }
 
     private void updateIcon() {
+        ensureIconsLoaded(); // Ensure icons are loaded on first use
         if (sourceHolder != null) {
             String sourceName = sourceHolder.getSourceName().toLowerCase();
             if (sourceName.contains("-")) {
