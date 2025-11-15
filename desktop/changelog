@@ -1,5 +1,5 @@
 frostwire (7.0.0) stable; urgency=high
- * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (9 EDT violations fixed)
+ * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (19 EDT violations fixed)
  * EDT freeze:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
  * EDT freeze:LibraryCoverArtPanel defers component listener initialization with SwingUtilities.invokeLater()
  * EDT freeze:SearchMediator uses lazy singleton pattern with deferred SearchResultDisplayer creation
@@ -9,6 +9,17 @@ frostwire (7.0.0) stable; urgency=high
  * EDT freeze:StatusLine defers bandwidth label icon loading to background EDT cycle using SwingUtilities.invokeLater()
  * EDT freeze:ApplicationHeader defers MediaPlayerComponent creation with placeholder panel to prevent class loading during startup
  * EDT freeze:MainFrame defers expensive minimum size calculations to background thread - prevents 2+ second EDT blocking from cascading layout calculations
+ * EDT freeze:AbstractTab implements lazy icon loading to defer tab icon loading via SwingUtilities.invokeLater() on first getIcon() call
+ * EDT freeze:SearchResultActionsRenderer defers 5 action button icons (play, download, details, speaker) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:AbstractActionsRenderer defers 3 action button icons (play, download, share) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:SourceRenderer defers 7 source icons (soundcloud, archive.org, tpb, zooqle, magnetdl, default, 1337x) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:TransferActionsRenderer defers 2 action button icons (play, share) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:TransferSeedingRenderer defers 2 seeding icons (seed, loading) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:TransferDetailFilesActionsRenderer defers 2 file action icons (play, share) via lazy static initialization with ensureIconsLoaded()
+ * EDT freeze:PaymentOptionsRenderer defers 4 payment method icons (bitcoin_enabled, bitcoin_disabled, paypal_enabled, paypal_disabled) via lazy static initialization
+ * EDT freeze:LogoPanel defers logo_header icon loading via SwingUtilities.invokeLater() with placeholder label
+ * EDT freeze:MediaButton defers button icon loading (up and down icons) via SwingUtilities.invokeLater() in loadIcons() method
+ * EDT freeze:LimeJFrame defers window icon loading via SwingUtilities.invokeLater() in loadWindowIcon() method
  * Performance:These EDT fixes significantly improve startup time and responsiveness, especially on resource-constrained systems and older hardware
  * Performance:Search architecture optimizations - 25-50% reduction in memory allocations
  * Performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
