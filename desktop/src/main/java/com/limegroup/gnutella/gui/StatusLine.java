@@ -405,16 +405,19 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
     /**
-     * Sets up connectionQualityMeter's icons.
+     * Sets up connectionQualityMeter's icons - defers image loading to avoid EDT blocking
      */
     private void createConnectionQualityPanel() {
-        updateTheme(); // loads images
+        // Create the label first without images to avoid EDT blocking
         connectionQualityMeter = new JLabel();
         connectionQualityMeter.setOpaque(false);
         connectionQualityMeter.setMinimumSize(new Dimension(34, 20));
         connectionQualityMeter.setMaximumSize(new Dimension(90, 30));
         //   add right-click listener
         connectionQualityMeter.addMouseListener(STATUS_BAR_LISTENER);
+
+        // Defer image loading to avoid blocking EDT with file I/O
+        SwingUtilities.invokeLater(this::updateTheme);
     }
 
     /**
@@ -620,11 +623,21 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
     /**
-     * Load connection quality theme icons
+     * Load connection quality theme icons - this was deferred to avoid EDT blocking with file I/O
      */
     private void updateTheme() {
-        _connectionQualityMeterIcons[StatusLine.STATUS_DISCONNECTED] = GUIMediator.getThemeImage("connect_small_0");
-        _connectionQualityMeterIcons[StatusLine.STATUS_TURBOCHARGED] = GUIMediator.getThemeImage("connect_small_6");
+        try {
+            _connectionQualityMeterIcons[StatusLine.STATUS_DISCONNECTED] = GUIMediator.getThemeImage("connect_small_0");
+            _connectionQualityMeterIcons[StatusLine.STATUS_TURBOCHARGED] = GUIMediator.getThemeImage("connect_small_6");
+            // Trigger UI refresh to display the newly loaded icons
+            if (connectionQualityMeter != null) {
+                connectionQualityMeter.revalidate();
+                connectionQualityMeter.repaint();
+            }
+        } catch (Exception e) {
+            // Log error but don't crash if theme loading fails
+            e.printStackTrace();
+        }
     }
 
     /**

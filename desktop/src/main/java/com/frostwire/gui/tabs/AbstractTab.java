@@ -45,14 +45,19 @@ public abstract class AbstractTab implements Tab {
      * `Icon` instance to use for this tab.
      */
     private Icon icon;
+    /**
+     * Icon name for lazy loading to avoid EDT blocking with file I/O
+     */
+    private String iconName;
 
     /**
-     * Constructs the elements of the tab.
+     * Constructs the elements of the tab - defers icon loading to avoid EDT blocking.
      */
     AbstractTab(String title, String tooltip, String icon) {
         this.title = title;
         this.toolTip = tooltip;
-        this.icon = GUIMediator.getThemeImage(icon);
+        this.iconName = icon;
+        this.icon = null; // Will be lazily loaded on first getIcon() call
         this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
@@ -67,6 +72,15 @@ public abstract class AbstractTab implements Tab {
     }
 
     public Icon getIcon() {
+        // Lazy load icon on first access to avoid EDT blocking with file I/O during construction
+        if (icon == null && iconName != null) {
+            try {
+                icon = GUIMediator.getThemeImage(iconName);
+            } catch (Exception e) {
+                // Log error but don't crash if icon loading fails
+                e.printStackTrace();
+            }
+        }
         return icon;
     }
 
