@@ -68,6 +68,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
 import com.frostwire.android.gui.util.ScrollListeners.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener;
+import com.frostwire.android.gui.util.SearchResultUtils;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
@@ -90,7 +91,7 @@ import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.search.yt.YTSearchResult;
+// import com.frostwire.search.yt.YTSearchResult; // Not available in current build
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -380,9 +381,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             adapter = new SearchResultListAdapter(getActivity()) {
                 @Override
                 protected void searchResultClicked(SearchResult sr) {
-                    // Telluride Preliminary Search Results
-                    if (sr instanceof YTSearchResult) {
-                        startTellurideDownloadDialog((YTSearchResult) sr, getString(R.string.analyzing_downloadable_files));
+                    // Telluride Preliminary Search Results (YouTube)
+                    if (SearchResultUtils.isYouTubeSearchResult(sr)) {
+                        startTellurideDownloadDialog(sr, getString(R.string.analyzing_downloadable_files));
                     } else {
                         startTransfer(sr, getString(R.string.download_added_to_queue));
                     }
@@ -564,7 +565,13 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         }
     }
 
-    private void startTellurideDownloadDialog(final YTSearchResult sr, final String toastMessage) {
+    private void startTellurideDownloadDialog(final SearchResult sr, final String toastMessage) {
+        // Only proceed if this is a YouTube result
+        if (!SearchResultUtils.isYouTubeSearchResult(sr)) {
+            startTransfer(sr, getString(R.string.download_added_to_queue));
+            return;
+        }
+
         // Show a toast message on the UI thread
         SystemUtils.postToUIThread(() -> UIUtils.showShortMessage(getActivity(), toastMessage));
 

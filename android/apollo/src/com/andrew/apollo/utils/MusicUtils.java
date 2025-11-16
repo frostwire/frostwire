@@ -1183,6 +1183,9 @@ public final class MusicUtils {
      * @return The ID for a playlist.
      */
     public static long getIdForPlaylist(final Context context, final String name) {
+        if (context == null) {
+            return -1;
+        }
         Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
         Cursor cursor = context.getContentResolver().query(playlistContentUri, new String[]{BaseColumns._ID}, PlaylistsColumns.NAME + "=?", new String[]{name}, PlaylistsColumns.NAME);
         return getFirstId(cursor, -1);

@@ -118,7 +118,7 @@ public final class SearchMediator {
         Collections.shuffle(shuffledEngines);
         for (SearchEngine se : shuffledEngines) {
             if (se.isEnabled() && se.isReady()) {
-                SearchPerformer p = se.getPerformer(currentSearchToken, query);
+                ISearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
             }
         }

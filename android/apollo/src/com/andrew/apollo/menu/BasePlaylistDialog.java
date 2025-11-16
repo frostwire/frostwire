@@ -63,12 +63,16 @@ abstract class BasePlaylistDialog extends DialogFragment {
 
     /* The default edit text text */ String mDefaultname;
 
+    /* Cached activity reference to handle fragment detachment */
+    private androidx.fragment.app.FragmentActivity mCachedActivity;
+
     private final static Logger LOG = Logger.getLogger(BasePlaylistDialog.class);
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        mCachedActivity = getActivity();
+        mPlaylistDialog = new AlertDialog.Builder(mCachedActivity).create();
+        LayoutInflater inflater = LayoutInflater.from(mCachedActivity);
         View view = inflater.inflate(R.layout.dialog_default_input, null);
         mPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mPlaylistDialog.setView(view);
@@ -185,8 +189,13 @@ abstract class BasePlaylistDialog extends DialogFragment {
             mSaveButton.setEnabled(false);
         } else {
             mSaveButton.setEnabled(true);
+            // Check if activity is still available (fragment not detached)
+            if (mCachedActivity == null) {
+                LOG.warn("enableSaveButton: Activity is null, fragment may have been detached");
+                return;
+            }
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                int saveButtonResourceTextId = MusicUtils.getIdForPlaylist(getActivity(), playlistName) >= 0 ?
+                int saveButtonResourceTextId = MusicUtils.getIdForPlaylist(mCachedActivity, playlistName) >= 0 ?
                         R.string.overwrite :
                         R.string.save;
                 SystemUtils.postToUIThread(() -> mSaveButton.setText(saveButtonResourceTextId));

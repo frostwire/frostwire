@@ -42,6 +42,7 @@ import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.SearchResultUtils;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -56,7 +57,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.yt.YTSearchResult;
+// import com.frostwire.search.yt.YTSearchResult; // Not available in current build
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -353,7 +354,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private static boolean isTelluridePartialSearchResult(SearchResult sr) {
-        return sr instanceof YTSearchResult;
+        // YouTube results are "Telluride Preliminary Search Results" that need format/quality selection
+        return SearchResultUtils.isYouTubeSearchResult(sr);
     }
 
     private int getFileTypeIconId() {
