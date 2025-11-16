@@ -1,4 +1,4 @@
-FrostWire 3.0.9 build 763 OCT/27/2025
+FrostWire 3.0.10 build 764 NOV/16/2025
  - performance:Search architecture optimizations - 25-50% reduction in memory allocations
  - performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
  - performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
@@ -37,6 +37,20 @@ FrostWire 3.0.9 build 763 OCT/27/2025
  - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
  - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - fix:NullPointerException in BasePlaylistDialog when fragment is detached from activity
+ - fix:NullPointerException in MusicUtils.getIdForPlaylist() with defensive null check
+ - fix:NameError in telluride.py query_video() - undefined qjs_path variable
+ - new:YouTube search results now handled via details URL detection (youtube.com)
+ - new:SearchResultUtils utility class for reusable search result utilities
+ - new:Telluride dialog now works with generic SearchResult instead of YTSearchResult
+ - yt_dlp-2025.11.12
+ - maintenance:Removed commented imports and debug code
+ - maintenance:Fixed typo in PREF_KEY_NETWORK_ENABLE_DHT constant (froswire -> frostwire)
+ - maintenance:Updated gradle plugin to 8.13.1
+ - maintenance:Updated okhttp3 to 5.3.0
+ - maintenance:Updated coil to 3.3.0
+ - maintenance:Updated androidx.work to 2.11.0
+ - maintenance:Updated Firebase BOM to 34.6.0
  - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
  - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
  - improvement:Added visual status indicators in transfers screen when protections pause downloads
