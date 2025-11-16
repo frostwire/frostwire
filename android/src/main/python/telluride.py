@@ -13,7 +13,7 @@ def query_video(page_url):
     ydl_opts = {'nocheckcertificate' : True,
                 'quiet': True,
                 'restrictfilenames': True,
-                'format': 'bestaudio/best'
+                'format': 'bestaudio/best',
                }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
