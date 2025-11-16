@@ -91,7 +91,6 @@ import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-// import com.frostwire.search.yt.YTSearchResult; // Not available in current build
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;

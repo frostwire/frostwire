@@ -33,7 +33,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.0'
+        classpath 'com.android.tools.build:gradle:8.13.1'
         classpath 'org.codehaus.groovy:groovy-all:3.0.25'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -248,14 +248,14 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'com.google.re2j:re2j:1.8'
-    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
-    implementation 'io.coil-kt.coil3:coil:3.0.4'
-    implementation 'io.coil-kt.coil3:coil-network-okhttp:3.0.4'
+    implementation 'com.squareup.okhttp3:okhttp:5.3.0'
+    implementation 'io.coil-kt.coil3:coil:3.3.0'
+    implementation 'io.coil-kt.coil3:coil-network-okhttp:3.3.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0'
-    implementation "androidx.work:work-runtime-ktx:2.10.4"
+    implementation 'androidx.work:work-runtime-ktx:2.11.0'
 
     // Firebase Crashlytics
-    implementation platform('com.google.firebase:firebase-bom:34.3.0')
+    implementation platform('com.google.firebase:firebase-bom:34.6.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'

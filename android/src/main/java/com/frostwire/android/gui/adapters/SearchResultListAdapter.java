@@ -57,7 +57,6 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-// import com.frostwire.search.yt.YTSearchResult; // Not available in current build
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
