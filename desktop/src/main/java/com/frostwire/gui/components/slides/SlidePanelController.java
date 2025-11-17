@@ -19,7 +19,6 @@
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.util.MediaSource;
-import java.io.File;
 import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.StringUtils;
 
