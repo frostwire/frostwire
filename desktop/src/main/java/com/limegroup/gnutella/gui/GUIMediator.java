@@ -25,7 +25,6 @@ import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.util.MediaSource;
 import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -33,9 +32,9 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.service.ErrorService;
 import com.frostwire.service.Switch;
+import com.frostwire.util.MediaSource;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.ThreadPool;
-import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
@@ -1175,7 +1174,7 @@ public final class GUIMediator {
      *
      * @param song - song to play now
      */
-    public void launchMedia(MediaSource song, boolean isPreview) {
+    public void launchMedia(MediaSource song) {
         playInOS(song);
     }
 

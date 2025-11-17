@@ -49,7 +49,6 @@ public final class Platforms {
     /**
      * Shortcut to current platform file system.
      *
-     * @return
      */
     public static FileSystem fileSystem() {
         return get().fileSystem();
@@ -58,34 +57,30 @@ public final class Platforms {
     /**
      * Shortcut to current platform application settings.
      *
-     * @return
      */
     public static AppSettings appSettings() {
         return get().appSettings();
     }
 
     /**
-     * Shortcut to current platform file system data method.
+     * Shortcut to the current platform file system data method.
      *
-     * @return
      */
     public static File data() {
         return get().systemPaths().data();
     }
 
     /**
-     * Shortcut to current platform file system torrents method.
+     * Shortcut to the current platform file system torrents method.
      *
-     * @return
      */
     public static File torrents() {
         return get().systemPaths().torrents();
     }
 
     /**
-     * Shortcut to current platform file system temp method.
+     * Shortcut to the current platform file system temp method.
      *
-     * @return
      */
     public static File temp() {
         return get().systemPaths().temp();
