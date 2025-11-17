@@ -514,7 +514,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             providers[i] = new FileProvider(DATA_MODEL.getFile(rows[i]));
         }
         if (stopAudio || !playAudio) {
-            // Media player instance not available anymore
+            // Intentionally left blank: no action required if media player instance is not available or audio should not play.
         }
         if (playAudio) {
             GUILauncher.launch(providers);
