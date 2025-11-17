@@ -1,10 +1,4 @@
 frostwire (7.0.0) stable; urgency=high
- * Removed:FrostWire Media Player custom built-in audio/video player (fwplayer binaries for Windows/macOS/Linux)
- * Removed:MPlayer integration code and process management for audio playback
- * Removed:Player settings panel and configuration options
- * Removed:Playback state tracking and speaker icon indicators in UI components (TransferActionsRenderer, LibraryFilesTableDataLine, SearchResultActionsRenderer, etc.)
- * Removed:Speaker icon assets (speaker.png, speaker_light.png)
- * New:Audio and video playback now uses the operating system's default media player instead of custom player infrastructure
  * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (19 EDT violations fixed)
  * EDT freeze:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
  * EDT freeze:LibraryCoverArtPanel defers component listener initialization with SwingUtilities.invokeLater()
@@ -54,6 +48,12 @@ frostwire (7.0.0) stable; urgency=high
  * Maintenance:MagnetDL search
  * Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
  * New:Strict EDT Mode to catch long running tasks stalling event dispatch thread
+ * Removed:FrostWire Media Player custom built-in audio/video player (fwplayer binaries for Windows/macOS/Linux)
+ * Removed:MPlayer integration code and process management for audio playback
+ * Removed:Player settings panel and configuration options
+ * Removed:Playback state tracking and speaker icon indicators in UI components (TransferActionsRenderer, LibraryFilesTableDataLine, SearchResultActionsRenderer, etc.)
+ * Removed:Speaker icon assets (speaker.png, speaker_light.png)
+ * New:Audio and video playback now uses the operating system's default media player instead of custom player infrastructure
  * EDT freeze:moved media checks off EDT; coalesce selection; add EDT I/O guard
  * EDT freeze: Fix in TransferDetailFiles by moving heavy I/O to background thread, would stall app when opening large torrents on startup
  * Cleanup:removed all remnants of azureus source code
@@ -313,7 +313,7 @@ frostwire (7.0.0) stable; urgency=high
  * lt:fix renaming of filenames that are too long for the filesystem
  * lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 25 Oct 2025 11:10:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 17 Nov 2025 16:12:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
