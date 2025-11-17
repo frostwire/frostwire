@@ -150,7 +150,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         if (dl.canPreview()) {
             File file = dl.getPreviewFile();
             if (file != null) {
-                GUIMediator.instance().launchMedia(new MediaSource(file), !dl.isCompleted());
+                GUIMediator.instance().launchMedia(new MediaSource(file));
             }
             updatePlayButton();
         }

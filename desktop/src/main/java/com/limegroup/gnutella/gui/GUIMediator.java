@@ -1175,7 +1175,7 @@ public final class GUIMediator {
      *
      * @param song - song to play now
      */
-    public void launchMedia(MediaSource song, boolean isPreview) {
+    public void launchMedia(MediaSource song) {
         playInOS(song);
     }
 
