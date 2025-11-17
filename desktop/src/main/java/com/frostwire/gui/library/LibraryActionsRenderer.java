@@ -18,8 +18,8 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.AbstractActionsRenderer;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public final class LibraryActionsRenderer extends AbstractActionsRenderer {
                 filesView = LibraryFilesTableMediator.instance().getFilesView();
             }
             if (mediaSource != null && !actionsHolder.isPlaying()) {
-                MediaPlayer.instance().asyncLoadMedia(mediaSource, true, filesView);
+                GUIMediator.instance().playInOS(mediaSource);
             }
         }
     }

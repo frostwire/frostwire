@@ -41,10 +41,6 @@ public class TagsReader {
         TagsData data = null;
         if (parser != null) {
             data = parser.parse();
-            // aldenml: fallback to mplayer parsing, refactor this logic (remove it)
-            if (data == null || isEmpty(data)) {
-                data = new MPlayerParser(file).parse();
-            }
         } else {
             LOG.warn("Unable to create tags parser for file: " + file);
         }

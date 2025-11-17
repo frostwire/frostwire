@@ -1,4 +1,10 @@
 frostwire (7.0.0) stable; urgency=high
+ * Removed:FrostWire Media Player custom built-in audio/video player (fwplayer binaries for Windows/macOS/Linux)
+ * Removed:MPlayer integration code and process management for audio playback
+ * Removed:Player settings panel and configuration options
+ * Removed:Playback state tracking and speaker icon indicators in UI components (TransferActionsRenderer, LibraryFilesTableDataLine, SearchResultActionsRenderer, etc.)
+ * Removed:Speaker icon assets (speaker.png, speaker_light.png)
+ * New:Audio and video playback now uses the operating system's default media player instead of custom player infrastructure
  * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (19 EDT violations fixed)
  * EDT freeze:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
  * EDT freeze:LibraryCoverArtPanel defers component listener initialization with SwingUtilities.invokeLater()

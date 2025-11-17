@@ -22,7 +22,7 @@ import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.library.tags.TagsData;
 import com.frostwire.gui.library.tags.TagsReader;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -107,7 +107,7 @@ public class LibraryUtils {
 
     public static boolean directoryContainsAudio(File directory) {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
-        return directoryContainsExtension(directory, 4, ignore, MediaPlayer.getPlayableExtensions());
+        return directoryContainsExtension(directory, 4, ignore, PlaybackUtil.getPlayableExtensions());
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -154,7 +154,7 @@ public class LibraryUtils {
         HistoHashMap<String> albumNames = new HistoHashMap<>();
         HistoHashMap<String> genres = new HistoHashMap<>();
         for (File mf : mediaFiles) {
-            if (MediaPlayer.isPlayableFile(mf)) {
+            if (PlaybackUtil.isPlayableFile(mf)) {
                 TagsData mt = new TagsReader(mf).parse();
                 artistNames.update(mt.getArtist());
                 artistsAlbums.update(mt.getArtist() + " - " + mt.getAlbum());

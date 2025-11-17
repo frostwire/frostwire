@@ -21,7 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.*;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -278,7 +278,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     @Override
     public File getPreviewFile() {
         BTDownloadItem item = getFirstBiggestItem();
-        if (item != null && MediaPlayer.isPlayableFile(item.getFile())) {
+        if (item != null && PlaybackUtil.isPlayableFile(item.getFile())) {
             long downloaded = item.getSequentialDownloaded();
             long size = item.getSize();
             //LOG.debug("Downloaded: " + downloaded + ", seq: " + dl.isSequentialDownload());
@@ -307,7 +307,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
     private void checkSequentialDownload() {
         BTDownloadItem item = getFirstBiggestItem();
-        if (item != null && MediaPlayer.isPlayableFile(item.getFile())) {
+        if (item != null && PlaybackUtil.isPlayableFile(item.getFile())) {
             long downloaded = item.getSequentialDownloaded();
             long size = item.getSize();
             if (size > 0) {

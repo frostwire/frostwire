@@ -21,8 +21,8 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DialogOption;
@@ -350,8 +350,8 @@ final class BTDownloadActions {
                     file = null;
                 }
             }
-            if (file != null && MediaPlayer.isPlayableFile(file)) {
-                MediaPlayer.instance().loadMedia(new MediaSource(file), false, false);
+            if (file != null && PlaybackUtil.isPlayableFile(file)) {
+                GUIMediator.instance().playInOS(new MediaSource(file));
             }
         }
     }

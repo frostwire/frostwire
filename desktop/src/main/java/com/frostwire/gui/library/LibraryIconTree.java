@@ -18,9 +18,7 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.IconRepainter;
-import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 
@@ -38,7 +36,6 @@ import java.util.logging.Logger;
  */
 class LibraryIconTree extends JTree {
     private static final Logger LOG = Logger.getLogger(LibraryIconTree.class.getName());
-    private Image speaker;
 
     private LibraryIconTree() {
         loadIcons();
@@ -53,26 +50,10 @@ class LibraryIconTree extends JTree {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        try {
-            MediaPlayer player = MediaPlayer.instance();
-            MediaPlaybackState playerState = player.getState();
-            if (playerState != MediaPlaybackState.Stopped &&
-                    playerState != MediaPlaybackState.Closed &&
-                    playerState != MediaPlaybackState.Failed) {
-                if (player.getCurrentMedia() != null) {
-                    TreePath path = getAudioPath();
-                    if (path != null) {
-                        paintIcon(g, speaker, path);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            LOG.log(Level.WARNING, "Error painting the speaker icon", e);
-        }
+        // Media player removed
     }
 
     private void loadIcons() {
-        speaker = ((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"))).getImage();
     }
 
     private void paintIcon(Graphics g, Image image, TreePath path) {
@@ -80,7 +61,7 @@ class LibraryIconTree extends JTree {
         if (rect != null) {
             Dimension lsize = rect.getSize();
             Point llocation = rect.getLocation();
-            g.drawImage(image, llocation.x + getWidth() - speaker.getWidth(null) - 4, llocation.y + (lsize.height - speaker.getHeight(null)) / 2, null);
+            g.drawImage(image, llocation.x + getWidth() - image.getWidth(null) - 4, llocation.y + (lsize.height - image.getHeight(null)) / 2, null);
         }
     }
 

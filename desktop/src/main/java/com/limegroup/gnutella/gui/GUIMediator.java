@@ -25,8 +25,7 @@ import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
 import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -1172,23 +1171,12 @@ public final class GUIMediator {
     }
 
     /**
-     * Launches the specified audio/video in the player.
+     * Launches the specified audio/video in the OS default player.
      *
      * @param song - song to play now
      */
     public void launchMedia(MediaSource song, boolean isPreview) {
-        if (MediaPlayer.instance().getCurrentMedia() != null)
-            try {
-                MediaPlayer.instance().stop();
-                // it needs to pause for a bit, otherwise it'll play the same song.
-                // must be a sync bug somewhere, but this fixes it
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        //MediaPlayer.instance().loadSong(song);
-        boolean playNextSong = song.getFile() == null || !MediaType.getVideoMediaType().matches(song.getFile().getAbsolutePath());
-        MediaPlayer.instance().asyncLoadMedia(song, isPreview, playNextSong);
+        playInOS(song);
     }
 
     /**

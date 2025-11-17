@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.gui.player.MediaPlayerComponent;
 import com.frostwire.gui.searchfield.GoogleSearchField;
 import com.frostwire.gui.searchfield.SearchField;
 import com.frostwire.gui.tabs.LibraryTab;
@@ -102,26 +101,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         searchPanels.setOpaque(false);
         add(searchPanels, "alignx center, growx");
 
-        // Setup the media player - use placeholder to avoid EDT blocking from class loading
-        JPanel playerPlaceholder = new JPanel();
-        playerPlaceholder.setOpaque(false);
-        playerPlaceholder.setName("playerPlaceholder");
-        add(playerPlaceholder, "dock east, growy, gapafter 10px!");
-
-        // Defer MediaPlayerComponent creation to avoid class loading on EDT
-        SwingUtilities.invokeLater(() -> {
-            try {
-                JComponent player = new MediaPlayerComponent().getMediaPanel();
-                player.setOpaque(false);
-                // Find and replace the placeholder
-                ApplicationHeader.this.remove(playerPlaceholder);
-                ApplicationHeader.this.add(player, "dock east, growy, gapafter 10px!");
-                ApplicationHeader.this.revalidate();
-                ApplicationHeader.this.repaint();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        // Media player removed - now using OS default audio player
 
         GUIMediator.addRefreshListener(this);
         final ActionListener schemaListener = new SchemaListener();
