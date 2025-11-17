@@ -18,7 +18,8 @@
 
 package com.frostwire.gui.components.slides;
 
-import com.frostwire.gui.player.StreamMediaSource;
+import com.frostwire.util.MediaSource;
+import java.io.File;
 import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.StringUtils;
 
@@ -87,12 +88,8 @@ class SlidePanelController {
 
     private void previewMedia(String mediaURL, boolean showMediaPlayer, int flagUsingFWPlayerForMediaType) {
         if (!StringUtils.isNullOrEmpty(mediaURL)) {
-            StreamMediaSource mediaSource = new StreamMediaSource(mediaURL, slide.title, slide.clickURL, showMediaPlayer);
-            if (slide.hasFlag(flagUsingFWPlayerForMediaType)) {
-                GUIMediator.instance().launchMedia(mediaSource, true);
-            } else {
-                GUIMediator.instance().playInOS(mediaSource);
-            }
+            // Stream playback - open in browser
+            GUIMediator.openURL(mediaURL);
         }
     }
 }

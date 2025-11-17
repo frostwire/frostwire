@@ -18,8 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.GUIMediator;
 
 import javax.swing.*;
@@ -30,7 +28,6 @@ import java.awt.*;
  * @author aldenml
  */
 class LibraryIconList extends JList<Object> {
-    private Image speaker;
     private Image loading;
 
     LibraryIconList(ListModel<Object> dataModel) {
@@ -41,15 +38,10 @@ class LibraryIconList extends JList<Object> {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        MediaPlayer player = MediaPlayer.instance();
-        if (player.getState() != MediaPlaybackState.Stopped &&
-                player.getState() != MediaPlaybackState.Closed &&
-                player.getState() != MediaPlaybackState.Failed) {
-        }
+        // Media player removed
     }
 
     private void loadIcons() {
-        speaker = GUIMediator.getThemeImage("speaker").getImage();
         loading = GUIMediator.getThemeImage("indeterminate_small_progress").getImage();
     }
 
@@ -57,7 +49,7 @@ class LibraryIconList extends JList<Object> {
         Rectangle rect = getUI().getCellBounds(this, index, index);
         Dimension lsize = rect.getSize();
         Point llocation = rect.getLocation();
-        g.drawImage(image, llocation.x + lsize.width - speaker.getWidth(null) - 4, llocation.y + (lsize.height - speaker.getHeight(null)) / 2, null);
+        g.drawImage(image, llocation.x + lsize.width - image.getWidth(null) - 4, llocation.y + (lsize.height - image.getHeight(null)) / 2, null);
     }
 
 

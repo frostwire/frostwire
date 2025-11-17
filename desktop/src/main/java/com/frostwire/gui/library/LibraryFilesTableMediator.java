@@ -21,8 +21,8 @@ package com.frostwire.gui.library;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.library.tags.TagsReader;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
@@ -340,7 +340,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         for (int i = 0; i < size; i++) {
             try {
                 File file = DATA_MODEL.get(i).getFile();
-                if (MediaPlayer.isPlayableFile(file)) {
+                if (PlaybackUtil.isPlayableFile(file)) {
                     result.add(new MediaSource(DATA_MODEL.get(i).getFile()));
                 }
             } catch (Exception e) {
@@ -436,8 +436,9 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
                     BTDownloadMediator.instance().remove(dm);
                 }
                 // close media player if still playing
-                if (MediaPlayer.instance().isThisBeingPlayed(file)) {
-                    MediaPlayer.instance().stop();
+                // Media player instance not available anymore, file can be deleted
+                if (false) {
+                    // Media player was removed
                 }
                 // removeOptions > 2 => OS offers trash options
                 boolean removed = FileUtils.delete(file, removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
@@ -468,8 +469,8 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         if (line == null || line.getFile() == null) {
             return;
         }
-        if (getMediaType().equals(MediaType.getAudioMediaType()) && MediaPlayer.isPlayableFile(line.getFile())) {
-            MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, getFilesView());
+        if (getMediaType().equals(MediaType.getAudioMediaType()) && PlaybackUtil.isPlayableFile(line.getFile())) {
+            GUIMediator.instance().playInOS(new MediaSource(line.getFile()));
             return;
         }
         launch(true);
@@ -489,7 +490,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             if (selectedFile.isDirectory()) {
                 GUIMediator.launchExplorer(selectedFile);
                 return;
-            } else if (!MediaPlayer.isPlayableFile(selectedFile)) {
+            } else if (!PlaybackUtil.isPlayableFile(selectedFile)) {
                 String extension = FilenameUtils.getExtension(selectedFile.getName());
                 if (extension != null && extension.equalsIgnoreCase("torrent")) {
                     GUIMediator.instance().openTorrentFile(selectedFile, true);
@@ -513,7 +514,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             providers[i] = new FileProvider(DATA_MODEL.getFile(rows[i]));
         }
         if (stopAudio || !playAudio) {
-            MediaPlayer.instance().stop();
+            // Media player instance not available anymore
         }
         if (playAudio) {
             GUILauncher.launch(providers);
@@ -595,7 +596,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
 
     @Override
     protected MediaSource createMediaSource(LibraryFilesTableDataLine line) {
-        if (MediaPlayer.isPlayableFile(line.getInitializeObject())) {
+        if (PlaybackUtil.isPlayableFile(line.getInitializeObject())) {
             return new MediaSource(line.getInitializeObject());
         } else {
             return null;

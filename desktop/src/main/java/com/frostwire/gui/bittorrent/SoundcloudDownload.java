@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.mp3.*;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferState;
@@ -177,18 +177,6 @@ public class SoundcloudDownload extends HttpBTDownload {
                 if (!setAlbumArt(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath())) {
                     boolean renameTo = tempAudio.renameTo(completeFile);
                     if (!renameTo) {
-                        if (!MediaPlayer.instance().isThisBeingPlayed(tempAudio)) {
-                            state = TransferState.ERROR_MOVING_INCOMPLETE;
-                            cleanupIncomplete();
-                            return;
-                        } else {
-                            boolean copiedTo = HttpBTDownload.copyPlayingTemp(tempAudio, completeFile);
-                            if (!copiedTo) {
-                                state = TransferState.ERROR_MOVING_INCOMPLETE;
-                                cleanupIncomplete();
-                                return;
-                            }
-                        }
                         state = TransferState.ERROR_MOVING_INCOMPLETE;
                         cleanupIncomplete();
                         return;

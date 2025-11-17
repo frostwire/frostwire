@@ -21,8 +21,8 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
+import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
@@ -165,8 +165,8 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         @Override
         public void actionPerformed(ActionEvent e) {
             File file = transferItemHolder.transferItem.getFile();
-            if (MediaPlayer.isPlayableFile(file)) {
-                MediaPlayer.instance().asyncLoadMedia(new MediaSource(file), false, false);
+            if (PlaybackUtil.isPlayableFile(file)) {
+                GUIMediator.instance().playInOS(new MediaSource(file));
             } else {
                 GUIMediator.launchFile(file);
             }

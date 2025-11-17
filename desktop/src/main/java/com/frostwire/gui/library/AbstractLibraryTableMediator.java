@@ -19,8 +19,7 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -179,7 +178,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         try {
             MediaSource mediaSource = createMediaSource(line);
             if (mediaSource != null) {
-                MediaPlayer.instance().asyncLoadMedia(mediaSource, false, getFilesView());
+                GUIMediator.instance().playInOS(mediaSource);
             }
         } catch (Exception e) {
             e.printStackTrace();

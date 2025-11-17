@@ -20,7 +20,7 @@ package com.frostwire.gui.library;
 
 import com.frostwire.bittorrent.BTInfoAdditionalMetadataHolder;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconManager;
@@ -199,23 +199,22 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
      */
     public Object getValueAt(int idx) {
         try {
-            boolean isPlaying = isPlaying();
             switch (idx) {
                 case ACTIONS_IDX:
-                    actionsHolder.setPlaying(isPlaying);
+                    actionsHolder.setPlaying(false);
                     return actionsHolder;
                 case ICON_IDX:
                     return new PlayableIconCell(getIcon());
                 case NAME_IDX:
                     return nameCell;
                 case SIZE_IDX:
-                    return new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), isPlaying, idx);
+                    return new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), false, idx);
                 case TYPE_IDX:
-                    return new PlayableCell(this, _type, isPlaying, idx);
+                    return new PlayableCell(this, _type, false, idx);
                 case PATH_IDX:
-                    return new PlayableCell(this, _path, isPlaying, idx);
+                    return new PlayableCell(this, _path, false, idx);
                 case MODIFICATION_TIME_IDX:
-                    return new PlayableCell(this, lastModified, lastModified.toString(), isPlaying, idx);
+                    return new PlayableCell(this, lastModified, lastModified.toString(), false, idx);
                 case PAYMENT_OPTIONS_IDX:
                     return paymentOptions;
                 case LICENSE_IDX:
@@ -225,10 +224,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             t.printStackTrace();
         }
         return null;
-    }
-
-    private boolean isPlaying() {
-        return initializer != null && MediaPlayer.instance().isThisBeingPlayed(initializer);
     }
 
     public LimeTableColumn getColumn(int idx) {

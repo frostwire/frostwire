@@ -27,7 +27,7 @@ import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.gui.library.LibraryFilesTableMediator;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
@@ -520,7 +520,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 saveLocation = null;
             }
         }
-        return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation) || (saveLocation.isFile() && MediaPlayer.isPlayableFile(saveLocation)));
+        return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation) || (saveLocation.isFile() && PlaybackUtil.isPlayableFile(saveLocation)));
     }
 
     private boolean isHttpTransfer(BTDownload d) {
@@ -544,7 +544,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     hasMediaFiles = true;
                 } else if (saveLocation != null) {
                     if (saveLocation.isFile()) {
-                        hasMediaFiles = MediaPlayer.isPlayableFile(saveLocation);
+                        hasMediaFiles = PlaybackUtil.isPlayableFile(saveLocation);
                         hasMP4s = org.limewire.util.FileUtils.hasExtension(saveLocation.getAbsolutePath(), "mp4");
                     } else if (saveLocation.isDirectory()) {
                         // directory scans are off-EDT here

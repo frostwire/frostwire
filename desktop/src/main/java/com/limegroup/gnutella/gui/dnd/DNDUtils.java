@@ -18,7 +18,7 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.util.URIUtils;
 import com.frostwire.util.OSUtils;
 
@@ -168,7 +168,7 @@ public class DNDUtils {
 
     private static boolean containsPlayableFile(File[] files) {
         for (File file : files) {
-            if (MediaPlayer.isPlayableFile(file)) {
+            if (PlaybackUtil.isPlayableFile(file)) {
                 return true;
             } else if (file.isDirectory()) {
                 if (com.frostwire.gui.library.LibraryUtils.directoryContainsAudio(file)) {

@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -135,14 +134,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     }
 
     private void playStream(String streamUrl) {
-        MediaType mediaType = MediaType.getMediaTypeForExtension(extension);
-        if (mediaType != null) {
-            boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
-            if (isVideo) {
-                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
-            } else {
-                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
-            }
-        }
+        // Stream playback - open in browser
+        GUIMediator.openURL(streamUrl);
     }
 }

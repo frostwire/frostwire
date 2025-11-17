@@ -61,7 +61,6 @@ public final class OptionsConstructor {
     static final String SHARED_BASIC_KEY = "OPTIONS_SHARED_BASIC_TITLE";
     private static final String BITTORRENT_KEY = "OPTIONS_BITTORRENT_MAIN_TITLE";
     private static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
-    private static final String PLAYER_KEY = "OPTIONS_PLAYER_MAIN_TITLE";
     private static final String STATUS_BAR_KEY = "OPTIONS_STATUS_BAR_MAIN_TITLE";
     private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
     private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
@@ -187,8 +186,6 @@ public final class OptionsConstructor {
         // REMOVE:WI-FI
         //addOption(OptionsMediator.ROOT_NODE_KEY, LIBRARY_KEY, I18n.tr("Library"), LibraryFoldersPaneItem.class, WiFiSharingPaneItem.class, LibraryInternetRadioPaneItem.class);
         addOption(OptionsMediator.ROOT_NODE_KEY, LIBRARY_KEY, I18n.tr("Library"), LibraryFoldersPaneItem.class);
-        // player
-        addOption(OptionsMediator.ROOT_NODE_KEY, PLAYER_KEY, I18n.tr("Player"), PlayerPaneItem.class);
         // search options
         addOption(OptionsMediator.ROOT_NODE_KEY, SEARCH_KEY, I18n.tr("Searching"), SearchEnginesPaneItem.class, MaximumSearchesPaneItem.class, SmartSearchDBPaneItem.class, DetailsPaneItem.class, AutoSearchClipboardURLsPaneItem.class);
         //status bar

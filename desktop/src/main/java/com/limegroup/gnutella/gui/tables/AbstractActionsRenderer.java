@@ -145,7 +145,7 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
 
     private void updatePlayButton() {
         cancelEdit();
-        labelPlay.setIcon(actionsHolder.isPlaying() ? IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker")) : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon((showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {

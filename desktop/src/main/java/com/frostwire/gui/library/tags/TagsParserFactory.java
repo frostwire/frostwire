@@ -51,7 +51,7 @@ class TagsParserFactory {
         } else if (isJaudiotagger(ext)) {
             return new JaudiotaggerParser(file);
         } else {
-            return new MPlayerParser(file);
+            return null; // No parser available for this file type
         }
     }
 

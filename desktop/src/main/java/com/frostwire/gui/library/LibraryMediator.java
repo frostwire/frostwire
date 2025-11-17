@@ -18,8 +18,7 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.gui.player.MediaSource;
+import com.frostwire.util.MediaSource;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.DividerLocationSettingUpdater;
@@ -181,7 +180,7 @@ public class LibraryMediator {
     }
 
     public void selectCurrentMedia() {
-        final MediaSource currentMedia = MediaPlayer.instance().getCurrentMedia();
+        final MediaSource currentMedia = null;
         if (currentMedia != null && currentMedia.getFile() != null) {
             //selects the audio node at the top
             LibraryExplorer libraryFiles = getLibraryExplorer();

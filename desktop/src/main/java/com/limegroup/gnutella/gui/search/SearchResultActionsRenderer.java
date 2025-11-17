@@ -19,7 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.AlphaIcon;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.search.CrawlableSearchResult;
@@ -52,7 +52,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private static AlphaIcon download_transparent;
     private static ImageIcon details_solid;
     private static AlphaIcon details_transparent;
-    private static ImageIcon speaker_icon;
     private static volatile boolean iconsLoaded = false;
 
     /**
@@ -69,7 +68,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
             details_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
             details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-            speaker_icon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
             iconsLoaded = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,13 +185,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void updatePlayButton() {
-        labelPlay.setIcon((isStreamableSourceBeingPlayed(uiSearchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon((showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult searchResult = uiSearchResult.getSearchResult();
-            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) || searchResult instanceof TellurideSearchResult || searchResult.isPreliminary()) {
+            if (searchResult instanceof StreamableSearchResult || searchResult instanceof TellurideSearchResult || searchResult.isPreliminary()) {
                 uiSearchResult.play();
             }
             updatePlayButton();
@@ -214,15 +212,5 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }
         }
-    }
-
-    private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
-        SearchResult delegateSearchResult = sr.getSearchResult();
-        if (delegateSearchResult instanceof SoundcloudSearchResult) {
-            if (!((SoundcloudSearchResult) delegateSearchResult).fetchedDownloadUrl()) {
-                return false;
-            }
-        }
-        return delegateSearchResult instanceof StreamableSearchResult && MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult) delegateSearchResult).getStreamUrl());
     }
 }

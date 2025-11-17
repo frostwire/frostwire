@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.tables.AbstractActionsHolder;
 import com.limegroup.gnutella.gui.tables.DataLine;
 
@@ -37,7 +37,7 @@ public final class LibraryActionsHolder extends AbstractActionsHolder {
     public boolean isPlayable() {
         Object dl = getDataLine();
         if (dl instanceof LibraryFilesTableDataLine) {
-            return MediaPlayer.isPlayableFile(((LibraryFilesTableDataLine) dl).getFile());
+            return PlaybackUtil.isPlayableFile(((LibraryFilesTableDataLine) dl).getFile());
         }
         return false;
     }
