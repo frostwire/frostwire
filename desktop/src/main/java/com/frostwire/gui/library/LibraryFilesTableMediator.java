@@ -437,9 +437,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
                 }
                 // close media player if still playing
                 // Media player instance not available anymore, file can be deleted
-                if (false) {
-                    // Media player was removed
-                }
                 // removeOptions > 2 => OS offers trash options
                 boolean removed = FileUtils.delete(file, removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
                 if (removed) {
