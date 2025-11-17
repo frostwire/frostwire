@@ -97,10 +97,8 @@ public final class Ssl {
 
     static final class FWHostnameVerifier implements HostnameVerifier {
         private static final String[] validDomains = {
-                "api-v2.soundcloud.com",
-                "soundcloud.com",
                 "api-v2.sndcdn.com",
-                "sndcdn.com",
+                "api-v2.soundcloud.com",
                 "api.frostclick.com",
                 "archive.org",
                 "btdig.com",
@@ -123,6 +121,7 @@ public final class Ssl {
                 "igcdn.com",
                 "igsonar.com",
                 "instagram.com",
+                "i.ytimg.com",
                 "knaben.org",
                 "magnetdl.homes",
                 "nyaa.si",
@@ -131,7 +130,9 @@ public final class Ssl {
                 "pirateproxylive.org",
                 "scontent.cdninstagram.com",
                 "sndcdn.com",
+                "sndcdn.com",
                 "sni.cloudflaressl.com",
+                "soundcloud.com",
                 "static.frostclick.com",
                 "static.frostwire.com",
                 "thehiddenbay.com",
