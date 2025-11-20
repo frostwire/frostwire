@@ -13,8 +13,17 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    name: ${{matrix.config.name}}
+    runs-on: ${{matrix.config.os}}
+    strategy:
+      matrix:
+        config:
+          - name: Windows_64bit
+            os: windows-latest
+          - name: macOS_Apple_Silicon
+            os: macos-latest
+          - name: Ubuntu
+            os: ubuntu-latest
     permissions:
       contents: read
       packages: write
