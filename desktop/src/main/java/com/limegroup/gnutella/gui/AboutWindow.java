@@ -110,12 +110,6 @@ final class AboutWindow {
                 append("<li><a href='https://jlibtorrent.org'>JLibTorrent</a> ").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='https://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
                 append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersion());
-
-        if (!OSUtils.isLinux()) {
-            String mplayerVersion = "1.4.0";
-            sb.append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> ");
-            sb.append(mplayerVersion);
-        }
         //  introduction
         sb.append("<h1>").append(I18n.tr("FrostWire Logo Designer")).append("</h1>");
         sb.append("<ul><li>Luis Ramirez (Venezuela - <a href='http://www.elblogo.com'>ElBlogo.com</a>)</li></ul>");
