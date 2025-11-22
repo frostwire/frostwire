@@ -238,7 +238,7 @@ public class OSUtils {
         if ("aarch64".equals(os_arch)) {
             return "arm64";
         }
-        if ("i386".equals(os_arch) || "x86".equals(os_arch)) {
+        if ("amd64".equals(os_arch) || "i386".equals(os_arch) || "x86".equals(os_arch)) {
             return "x86_64";
         }
         return os_arch;
