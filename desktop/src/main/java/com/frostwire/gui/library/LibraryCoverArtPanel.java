@@ -20,7 +20,7 @@ package com.frostwire.gui.library;
 
 import com.frostwire.gui.library.tags.TagsReader;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.frostwire.gui.library.LibraryUtils;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public final class LibraryCoverArtPanel extends JPanel {
                 }
             });
             componentListenerAdded = true;
-            LibraryUtils.getExecutor().submit(() -> {
+            BackgroundExecutorService.schedule(() -> {
                 defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
                 if (tagsReader == null) {
                     SwingUtilities.invokeLater(() -> setPrivateImage(defaultCoverArt));
@@ -75,7 +75,7 @@ public final class LibraryCoverArtPanel extends JPanel {
 
     public void setDefault() {
         this.tagsReader = null;
-        LibraryUtils.getExecutor().submit(() -> {
+        BackgroundExecutorService.schedule(() -> {
             Image image = retrieveImage();
             setPrivateImage(image);
         });
@@ -92,7 +92,7 @@ public final class LibraryCoverArtPanel extends JPanel {
             System.err.println("LibraryCoverArtPanel.asyncFetchImage() aborted. No tagsReader set. Check your logic");
             return;
         }
-        LibraryUtils.getExecutor().submit(() -> {
+        BackgroundExecutorService.schedule(() -> {
             Image image = retrieveImage();
             if (tagsReader.getFile() != null) {
                 setPrivateImage(image);
