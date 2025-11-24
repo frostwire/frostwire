@@ -20,6 +20,7 @@ package com.frostwire.gui.library;
 
 import com.frostwire.gui.library.tags.TagsReader;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.frostwire.gui.library.LibraryUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,14 +34,14 @@ import java.awt.image.BufferedImage;
  */
 public final class LibraryCoverArtPanel extends JPanel {
     private final BufferedImage background;
-    private final Image defaultCoverArt;
+    private volatile Image defaultCoverArt;
     private Image coverArtImage;
     private TagsReader tagsReader;
     private boolean componentListenerAdded = false;
 
     LibraryCoverArtPanel() {
         background = new BufferedImage(350, 350, BufferedImage.TYPE_INT_ARGB);
-        defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
+        defaultCoverArt = null;
         setTagsReader(null);
         // Defer component listener setup to avoid loading anonymous class on EDT
         SwingUtilities.invokeLater(this::ensureComponentListenerAdded);
@@ -55,6 +56,12 @@ public final class LibraryCoverArtPanel extends JPanel {
                 }
             });
             componentListenerAdded = true;
+            LibraryUtils.getExecutor().submit(() -> {
+                defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
+                if (tagsReader == null) {
+                    SwingUtilities.invokeLater(() -> setPrivateImage(defaultCoverArt));
+                }
+            });
         }
     }
 
