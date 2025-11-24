@@ -197,9 +197,7 @@ public final class SplashWindow {
     void setStatusText(final String text) {
         runLater(() -> {
             glassPane.setText(text);
-            // force a redraw so the status is shown immediately,
-            // even if we're currently in the Swing thread.
-            glassPane.paintImmediately(0, 0, glassPane.getWidth(), glassPane.getHeight());
+            glassPane.repaint();
         });
     }
 
