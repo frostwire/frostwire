@@ -33,7 +33,7 @@ public class LanguageButton extends JPanel {
 
     LanguageButton() {
         bHeader = new JButton();
-        updateLanguageFlag();
+        SwingUtilities.invokeLater(this::updateLanguageFlag);
         //when pressed displays a dialog that allows you to change the language.
         ActionListener languageButtonListener = e -> {
             LanguageWindow lw = new LanguageWindow();
