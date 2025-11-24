@@ -44,6 +44,10 @@ jobs:
     - name: Build with Gradle
       run: cd desktop && ./gradlew build
 
+    - name: "[Linux] Build JAR"
+      if: runner.os != 'Windows' && runner.os != 'macOS'
+      run: ./gradlew jar
+
     # Uncomment the following step to enable publishing builds when a release is made.
     #
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
