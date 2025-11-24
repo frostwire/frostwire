@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,7 +27,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +54,7 @@ public final class SplashWindow {
     /**
      * Cache for OS icons to avoid file I/O during painting
      */
-    private final Map<String, BufferedImage> osIconCache = new HashMap<>();
+    private final ConcurrentHashMap<String, BufferedImage> osIconCache = new ConcurrentHashMap<>();
 
     /**
      * Returns the single instance of the SplashWindow.
@@ -88,7 +89,7 @@ public final class SplashWindow {
         //glassPane.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
         // Preload OS icons to avoid file I/O during painting
-        preloadOSIcons();
+        BackgroundExecutorService.schedule(this::preloadOSIcons);
 
         URL imageURL = null;
         try {
@@ -134,20 +135,22 @@ public final class SplashWindow {
         }
     }
 
-    private void preloadOSIcon(String osName, boolean on) throws Throwable {
+    private void preloadOSIcon(String osName, boolean on) {
         String prefix = "org/limewire/gui/images/";
         String suffix = "_desktop_splash.png";
         String on_off = on ? "on" : "off";
         String cacheKey = osName + "_" + on_off;
-        if (!osIconCache.containsKey(cacheKey)) {
-            URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
-            if (iconURL != null) {
-                BufferedImage img = ImageIO.read(iconURL);
-                if (img != null) {
-                    osIconCache.put(cacheKey, img);
+        osIconCache.computeIfAbsent(cacheKey, k -> {
+            try {
+                URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
+                if (iconURL != null) {
+                    return ImageIO.read(iconURL);
                 }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-        }
+            return null;
+        });
     }
 
     private void paintOSIcons(Graphics g) {
