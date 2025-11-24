@@ -89,8 +89,6 @@ application {
         applicationDefaultJvmArgs += [
             '-Dsun.java2d.xrender=true',            // Use XRender - most stable on Linux with X.org
             '-Dsun.java2d.opengl=false',            // OpenGL can crash entire display session
-            '-Dsun.java2d.accelblit=false',         // Disable accelerated blitting for stability
-            '-Dsun.java2d.pixmaps=false'            // Disable pixmap acceleration for better X11 compatibility
         ]
     }
 }

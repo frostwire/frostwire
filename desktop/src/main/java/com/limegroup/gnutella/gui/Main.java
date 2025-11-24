@@ -55,11 +55,12 @@ public class Main {
         if (OSUtils.isLinux()) {
             String sessionType = System.getenv("XDG_SESSION_TYPE");
             if (sessionType != null && sessionType.equalsIgnoreCase("wayland")) {
-                System.err.println("\n========================================");
+                System.err.println("\n===================================================");
                 System.err.println("FrostWire requires an X.org session to run.");
                 System.err.println("Your system is currently using Wayland.");
-                System.err.println("\nPlease switch to X.org or Xwayland and try again.");
-                System.err.println("========================================\n");
+                System.err.println("\nPlease switch to X.org or Xwayland and try again.\n");
+		System.err.println("You can switch to X.org in the login screen of your\ndistro, usually on the settings icon at the bottom\ncorner of the screen.");
+                System.err.println("===================================================\n");
                 System.exit(1);
             }
         }
