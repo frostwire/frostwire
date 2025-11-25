@@ -40,7 +40,11 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     }
 
     private void initActionListener() {
-        iconButton.addActionListener(e -> GUIMediator.openURL(VPN_URL));
+        iconButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                GUIMediator.openURL(VPN_URL);
+            }
+        });
     }
 
     /**
