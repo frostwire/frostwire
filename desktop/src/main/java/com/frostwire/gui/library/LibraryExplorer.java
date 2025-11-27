@@ -61,15 +61,24 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     private TreeSelectionListener treeSelectionListener;
 
     LibraryExplorer() {
-        setupUI();
+        // Set layout immediately so the panel can be added to parent
+        setLayout(new BorderLayout());
+        // Defer expensive UI initialization to avoid EDT violation
+        // setupUI triggers >2 second EDT blocking: LibraryFilesTransferHandler creation and JScrollPane
+        SwingUtilities.invokeLater(this::setupUI);
     }
 
     @Override
     public void refresh() {
-        tree.repaint();
+        if (tree != null) {
+            tree.repaint();
+        }
     }
 
     public void refreshSelection(boolean clearCache) {
+        if (tree == null) {
+            return;
+        }
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
         String searchPrompt;
         if (node == null) {
@@ -111,13 +120,14 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     }
 
     private void setupUI() {
-        setLayout(new BorderLayout());
         setMinimumSize(new Dimension(177, 170));
         setPreferredSize(new Dimension(177, 170));
         GUIMediator.addRefreshListener(this);
         setupModel();
         setupTree();
         add(new JScrollPane(tree));
+        revalidate();
+        repaint();
     }
 
     private void setupModel() {
@@ -172,12 +182,17 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     }
 
     DirectoryHolder getSelectedDirectoryHolder() {
+        if (tree == null) {
+            return null;
+        }
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
         return node instanceof DirectoryHolderNode ? ((DirectoryHolderNode) node).getDirectoryHolder() : null;
     }
 
     public void clearSelection() {
-        tree.clearSelection();
+        if (tree != null) {
+            tree.clearSelection();
+        }
     }
 
     void refreshSelection() {
@@ -222,6 +237,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     }
 
     public void selectDirectoryHolderAt(final int index) {
+        if (tree == null) {
+            return;
+        }
         if (index >= 0 && index < tree.getRowCount()) {
             GUIMediator.safeInvokeLater(() -> {
                 tree.setSelectionRow(index);
