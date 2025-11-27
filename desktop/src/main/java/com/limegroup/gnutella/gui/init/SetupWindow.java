@@ -108,7 +108,8 @@ abstract class SetupWindow extends JPanel {
         jpTop.add(jpTitle, BorderLayout.CENTER);
         JLabel jlTitle = new JLabel(I18n.tr(_key));
         jlTitle.setBorder(BorderFactory.createEmptyBorder(5, 8, 5, 5));
-        jlTitle.setFont(new Font("Dialog", Font.BOLD, 16));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> jlTitle.setFont(new Font("Dialog", Font.BOLD, 16)));
         //jlTitle.setForeground(Color.black);
         jlTitle.setOpaque(false);
         jpTitle.add(jlTitle, BorderLayout.NORTH);
@@ -117,7 +118,8 @@ abstract class SetupWindow extends JPanel {
         jtaDescription.setBorder(BorderFactory.createEmptyBorder(5, 8, 5, 8));
         //jtaDescription.setForeground(Color.black);
         jtaDescription.setBackground(jpTitle.getBackground());
-        jtaDescription.setFont(new Font("Dialog", Font.PLAIN, 12));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> jtaDescription.setFont(new Font("Dialog", Font.PLAIN, 12)));
         jpTitle.add(jtaDescription, BorderLayout.CENTER);
         if (_moreInfoURL != null) {
             JLabel jlURL = new URLLabel(_moreInfoURL, I18n.tr("Learn more about this option..."));

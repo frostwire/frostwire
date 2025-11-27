@@ -250,7 +250,8 @@ class PartialFilesDialog extends JDialog {
             }
         }
         JLabel labelTitle = new JLabel(title);
-        labelTitle.setFont(new Font("Dialog", Font.BOLD, 18));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> labelTitle.setFont(new Font("Dialog", Font.BOLD, 18)));
         labelTitle.setHorizontalAlignment(SwingConstants.LEFT);
         c = new GridBagConstraints();
         c.gridx = 0;

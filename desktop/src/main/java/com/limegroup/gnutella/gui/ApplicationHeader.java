@@ -146,7 +146,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
         buttonContainer.setOpaque(false);
         ButtonGroup group = new ButtonGroup();
-        Font buttonFont = new Font("Helvetica", Font.BOLD, 10);
         buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
         for (Tabs t : GUIMediator.Tabs.values()) {
             final Tabs finalTab = t; //java...
@@ -154,7 +153,8 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 continue;
             }
             AbstractButton button = createTabButton(tabs.get(t));
-            button.setFont(buttonFont);
+            // Defer font loading to avoid EDT violation
+            SwingUtilities.invokeLater(() -> button.setFont(new Font("Helvetica", Font.BOLD, 10)));
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

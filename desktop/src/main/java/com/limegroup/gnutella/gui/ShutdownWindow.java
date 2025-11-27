@@ -63,7 +63,8 @@ class ShutdownWindow extends JDialog {
         add(backgroundPanel);
         Insets insets = backgroundPanel.getInsets();
         JLabel label = new JLabel(I18n.tr("Please wait while FrostWire shuts down..."));
-        label.setFont(new Font("Dialog", Font.PLAIN, 16));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> label.setFont(new Font("Dialog", Font.PLAIN, 16)));
         Dimension labelPrefSize = label.getPreferredSize();
         backgroundPanel.add(label);
         label.setBounds(65 + insets.left, 400 + insets.top, labelPrefSize.width, labelPrefSize.height);

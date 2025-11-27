@@ -140,17 +140,20 @@ public final class TransfersTab extends AbstractTab {
     private JTextArea createTextFilterComponent() {
         filterText = new JTextArea();
         filterText.setEditable(true);
-        filterText.setText(FILTER_TEXT_HINT);
-        filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
-        filterText.setForeground(Color.GRAY);
-        filterText.addMouseListener(new TextFilterMouseAdapter());
-        filterText.addKeyListener(new TextFilterKeyAdapter());
-        filterText.addFocusListener(new TextFilterFocusAdapter());
-        filterText.selectAll();
-        final CompoundBorder compoundBorder =
-                BorderFactory.createCompoundBorder(filterText.getBorder(),
-                        BorderFactory.createEmptyBorder(4, 2, 2, 2));
-        filterText.setBorder(compoundBorder);
+        // Defer heavy initialization to avoid EDT violation
+        SwingUtilities.invokeLater(() -> {
+            filterText.setText(FILTER_TEXT_HINT);
+            filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
+            filterText.setForeground(Color.GRAY);
+            filterText.addMouseListener(new TextFilterMouseAdapter());
+            filterText.addKeyListener(new TextFilterKeyAdapter());
+            filterText.addFocusListener(new TextFilterFocusAdapter());
+            filterText.selectAll();
+            final CompoundBorder compoundBorder =
+                    BorderFactory.createCompoundBorder(filterText.getBorder(),
+                            BorderFactory.createEmptyBorder(4, 2, 2, 2));
+            filterText.setBorder(compoundBorder);
+        });
         return filterText;
     }
 

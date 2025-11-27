@@ -60,7 +60,8 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         JPanel labelAndLink = new JPanel(new FlowLayout());
         JLabel hideLink = new JLabel("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
         hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
-        hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13)));
         hideLink.addMouseListener(hideDetailsActionListener);
         labelAndLink.add(new JLabel(I18n.tr("Transfer Detail")));
         labelAndLink.add(hideLink, "left, gapleft 10px, growx");
@@ -115,16 +116,19 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         piecesButton.addActionListener(e -> showDetailComponent(PIECES_CARD));
         trackersButton.addActionListener(e -> showDetailComponent(TRACKERS_CARD));
         peersButton.addActionListener(e -> showDetailComponent(PEERS_CARD));
-        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 11);
-        final Dimension buttonDimension = new Dimension(80, 24);
-        applyFontAndDimensionToFilterToggleButtons(
-                smallHelvetica,
-                buttonDimension,
-                generalButton,
-                filesButton,
-                piecesButton,
-                trackersButton,
-                peersButton);
+        // Defer font loading and dimension setting to avoid EDT violation
+        SwingUtilities.invokeLater(() -> {
+            final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 11);
+            final Dimension buttonDimension = new Dimension(80, 24);
+            applyFontAndDimensionToFilterToggleButtons(
+                    smallHelvetica,
+                    buttonDimension,
+                    generalButton,
+                    filesButton,
+                    piecesButton,
+                    trackersButton,
+                    peersButton);
+        });
         switcherButtonsGroup.add(generalButton);
         switcherButtonsGroup.add(filesButton);
         switcherButtonsGroup.add(piecesButton);

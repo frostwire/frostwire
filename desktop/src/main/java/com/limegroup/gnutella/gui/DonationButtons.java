@@ -47,12 +47,12 @@ class DonationButtons extends JPanel {
 
         private void initComponent(String text, final String donationURL, String tipText) {
             boolean isDarkTheme = ThemeMediator.isDarkLafThemeOn();
-            Font buttonFont = new Font("Dialog", Font.BOLD, 12);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setBorder(isDarkTheme ? BorderFactory.createLineBorder(Color.BLACK) : null);
             setContentAreaFilled(false);
             setOpaque(false);
-            setFont(buttonFont);
+            // Defer font loading to avoid EDT violation
+            SwingUtilities.invokeLater(() -> setFont(new Font("Dialog", Font.BOLD, 12)));
             setForeground(isDarkTheme ? FONT_COLOR_DARK_THEME : FONT_COLOR);
             setBackground(isDarkTheme ? Color.darkGray : new Color(0xedf1f4));
             setText(text);

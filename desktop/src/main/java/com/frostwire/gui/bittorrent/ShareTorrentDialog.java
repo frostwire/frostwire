@@ -100,7 +100,8 @@ public class ShareTorrentDialog extends JDialog {
                 torrent_name) : String.format(I18n.tr(
                 "Use the following text to share the \"%s\" file"),
                 torrent_name));
-        _introLabel.setFont(new Font("Dialog", Font.BOLD, 13));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> _introLabel.setFont(new Font("Dialog", Font.BOLD, 13)));
         container.add(_introLabel, c);
         // TEXT AREA
         c = new GridBagConstraints();
@@ -113,8 +114,8 @@ public class ShareTorrentDialog extends JDialog {
         textArea = new JEditorPane();
         textArea.setEditable(false);
         updateTextArea();
-        Font f = new Font("Dialog", Font.PLAIN, 14);
-        textArea.setFont(f);
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> textArea.setFont(new Font("Dialog", Font.PLAIN, 14)));
         textArea.setMargin(new Insets(10, 10, 10, 10));
         textArea.setBorder(BorderFactory.createEtchedBorder());
         textArea.addFocusListener(new FocusAdapter() {
@@ -166,7 +167,8 @@ public class ShareTorrentDialog extends JDialog {
                 I18n.tr("<strong>Keep FrostWire Open</strong> until the file has been downloaded by at least one other friend.") + "</p><p>&nbsp;</p><p> >" +
                 I18n.tr("<strong>The more, the merrier.</strong> The more people sharing the faster it can be downloaded by others.") + "</p><p>&nbsp;</p><p> >" +
                 I18n.tr("<strong>Your files can be discovered by others.</strong> Once you share this link and you seed the files they will be available to everybody on the BitTorrent network.") + "</p></html>");
-        _tipsLabel.setFont(new Font("Dialog", Font.PLAIN, 14));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> _tipsLabel.setFont(new Font("Dialog", Font.PLAIN, 14)));
         Border tipsBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED);
         tipsBorder.getBorderInsets(_tipsLabel).set(20, 20, 20, 20);
         _tipsLabel.setBorder(tipsBorder);
@@ -177,7 +179,8 @@ public class ShareTorrentDialog extends JDialog {
         glass.setVisible(true);
         feedbackLabel = new JLabel(I18n.tr("Feedback here to clipboard"));
         feedbackLabel.setVisible(false);
-        feedbackLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        // Defer font loading to avoid EDT violation
+        SwingUtilities.invokeLater(() -> feedbackLabel.setFont(new Font("Arial", Font.BOLD, 14)));
         glass.add(feedbackLabel);
         feedbackLabel.setBounds(100, 100, 300, 20);
         addEscapeKeyListener();
@@ -197,7 +200,8 @@ public class ShareTorrentDialog extends JDialog {
         }
         for (int i = 0; i < actions.length; i++) {
             JButton buttonAtIndex = buttonRow.getButtonAtIndex(i);
-            buttonAtIndex.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+            // Defer font loading to avoid EDT violation
+            SwingUtilities.invokeLater(() -> buttonAtIndex.setFont(new Font("Lucida Grande", Font.BOLD, 16)));
         }
     }
 
