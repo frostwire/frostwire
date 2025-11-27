@@ -56,8 +56,9 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
     private final String _name;
     /**
      * The icon used to display this mediaType/LimeXMLSchema.
+     * Loaded lazily to avoid EDT blocking during initialization.
      */
-    private final Icon _icon;
+    private Icon _icon;
 
     /**
      * Constructs a new NamedMediaType, associating the MediaType with the
@@ -68,7 +69,9 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
             throw new NullPointerException("Null media type.");
         this._mediaType = mt;
         this._name = constructName(_mediaType);
-        this._icon = getIcon(_mediaType);
+        // Defer icon loading to avoid EDT violation
+        // Icon loading triggers expensive ClassLoader resource operations (>2 second EDT block)
+        this._icon = null;
     }
 
     /**
@@ -150,8 +153,12 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
 
     /**
      * Returns the icon representing this NamedMediaType.
+     * Loads the icon lazily on first access to avoid EDT blocking during initialization.
      */
     public Icon getIcon() {
+        if (_icon == null) {
+            _icon = loadIcon(_mediaType);
+        }
         return _icon;
     }
 
@@ -179,13 +186,14 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
 
     @Override
     public int hashCode() {
-        return _mediaType.hashCode() + _name.hashCode() + _icon.hashCode();
+        // Don't include icon in hashCode to avoid forcing icon loading
+        return _mediaType.hashCode() + _name.hashCode();
     }
 
     /**
      * Retrieves the icon representing the MediaType/Schema.
      */
-    private Icon getIcon(MediaType type) {
+    private Icon loadIcon(MediaType type) {
         final ImageIcon icon;
         if (type == MediaType.getAnyTypeMediaType())
             icon = GUIMediator.getThemeImage("lime");
