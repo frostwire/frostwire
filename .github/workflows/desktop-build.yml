@@ -46,7 +46,7 @@ jobs:
 
     - name: "[Linux] Build JAR"
       if: runner.os != 'Windows' && runner.os != 'macOS'
-      run: ./gradlew jar
+      run: cd desktop && ./gradlew jar
 
     # Uncomment the following step to enable publishing builds when a release is made.
     #
