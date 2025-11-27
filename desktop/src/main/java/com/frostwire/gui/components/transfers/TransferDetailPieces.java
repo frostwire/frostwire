@@ -56,22 +56,30 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 5,
                 true);
         hexHivePanelAdapter = new HexHiveAdapter();
-        pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
-        totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
+        // Create labels without HTML content to avoid EDT violation
+        pieceSizeLabel = new JLabel();
+        totalPiecesLabel = new JLabel();
         add(totalPiecesLabel, "gapleft 10px");
         add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
         hexHivePanel.setBackground(Color.WHITE);
         hexHivePanel.setOpaque(true);
-        JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
-        jScrollPane.setOpaque(true);
-        jScrollPane.getViewport().setOpaque(true);
-        jScrollPane.getViewport().setBackground(new Color(backgroundColor));
-        jScrollPane.setBackground(new Color(backgroundColor));
-        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
-        repaint();
+        // Defer HTML content and JScrollPane creation to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
+            totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
+            JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
+            jScrollPane.setOpaque(true);
+            jScrollPane.getViewport().setOpaque(true);
+            jScrollPane.getViewport().setBackground(new Color(backgroundColor));
+            jScrollPane.setBackground(new Color(backgroundColor));
+            jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+            jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
+            revalidate();
+            repaint();
+        });
     }
 
     @Override

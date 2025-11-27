@@ -58,13 +58,18 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
                 "",
                 "[top][grow]"));
         JPanel labelAndLink = new JPanel(new FlowLayout());
-        JLabel hideLink = new JLabel("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
+        // Create label without HTML content to avoid EDT violation
+        JLabel hideLink = new JLabel();
         hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
-        // Defer font loading to avoid EDT violation
-        SwingUtilities.invokeLater(() -> hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13)));
         hideLink.addMouseListener(hideDetailsActionListener);
         labelAndLink.add(new JLabel(I18n.tr("Transfer Detail")));
         labelAndLink.add(hideLink, "left, gapleft 10px, growx");
+        // Defer HTML content and font loading to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            hideLink.setText("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
+            hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13));
+        });
         add(labelAndLink, "left, gapleft 10px, growx");
         add(createDetailSwitcherButtons(), "push, right, wrap");
         add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
