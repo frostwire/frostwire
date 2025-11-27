@@ -46,8 +46,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     static final int STATUS_DISCONNECTED = 0;
     static final int STATUS_TURBOCHARGED = 1;
     private final ImageIcon[] _connectionQualityMeterIcons = new ImageIcon[7];
-    private final VPNStatusRefresher vpnStatusRefresher;
-    private final VPNStatusButton vpnStatusButton;
+    private VPNStatusRefresher vpnStatusRefresher;
+    private VPNStatusButton vpnStatusButton;
     /**
      * The main container for the status line component.
      */
@@ -150,72 +150,77 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Creates a new status line in the disconnected state.
      */
     StatusLine() {
-        GUIMediator.setSplashScreenString(I18n.tr("Loading Status Window..."));
-        getComponent().addMouseListener(STATUS_BAR_LISTENER);
-        GUIMediator.getAppFrame().addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent arg0) {
-                refresh();
-            }
+        // Create the BAR panel immediately so it can be added to the layout
+        getComponent();
 
-            public void componentMoved(ComponentEvent arg0) {
-            }
+        // Defer all expensive initialization to avoid EDT violation
+        // StatusLine initialization triggers >2 second EDT blocking during startup
+        SwingUtilities.invokeLater(() -> {
+            GUIMediator.setSplashScreenString(I18n.tr("Loading Status Window..."));
+            getComponent().addMouseListener(STATUS_BAR_LISTENER);
+            GUIMediator.getAppFrame().addComponentListener(new ComponentListener() {
+                public void componentResized(ComponentEvent arg0) {
+                    refresh();
+                }
 
-            public void componentShown(ComponentEvent arg0) {
-            }
+                public void componentMoved(ComponentEvent arg0) {
+                }
 
-            public void componentHidden(ComponentEvent arg0) {
-            }
+                public void componentShown(ComponentEvent arg0) {
+                }
+
+                public void componentHidden(ComponentEvent arg0) {
+                }
+            });
+            GUIMediator.setSplashScreenString(I18n.tr("Creating donation buttons so you can give us a hand..."));
+            createDonationButtonsComponent();
+            //  make icons and panels for connection quality
+            GUIMediator.setSplashScreenString(I18n.tr("Creating Connection Quality Indicator..."));
+            createConnectionQualityPanel();
+            // VPN status
+            vpnStatusButton = new VPNStatusButton();
+            vpnStatusRefresher = VPNStatusRefresher.getInstance();
+            vpnStatusRefresher.addRefreshListener(vpnStatusButton);
+            vpnStatusRefresher.addRefreshListener(this);
+            //  make the 'Language' button
+            GUIMediator.setSplashScreenString(I18n.tr("Adding flags here and there..."));
+            createLanguageButton();
+            //  make the 'Firewall Status' label
+            GUIMediator.setSplashScreenString(I18n.tr("Playing with pixels for the Firewall indicator..."));
+            createFirewallLabel();
+            //  make the 'Bandwidth Usage' label
+            bandwidthUsageDown = new LazyTooltip((ImageIcon) null);
+            bandwidthUsageUp = new LazyTooltip((ImageIcon) null);
+            createBandwidthLabel();
+            // make the social buttons
+            GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Facebook..."));
+            createFacebookButton();
+            GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Twitter..."));
+            createTwitterButton();
+            createInstagramButton();
+            createDiscordButton();
+            createSettingsButton();
+            // male Seeding status label
+            GUIMediator.setSplashScreenString(I18n.tr("Painting seeding sign..."));
+            createSeedingStatusLabel();
+            //  make the center panel
+            GUIMediator.setSplashScreenString(I18n.tr("Creating center panel..."));
+            createCenterPanel();
+            // Set the bars to not be connected.
+            setConnectionQuality(0);
+
+
+            /*
+             The refresh listener for updating the bandwidth usage every second.
+            */
+            GUIMediator.addRefreshListener(() -> {
+                if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue()) {
+                    updateBandwidth();
+                }
+                updateCenterPanel();
+            });
+            refresh();
         });
-        GUIMediator.setSplashScreenString(I18n.tr("Creating donation buttons so you can give us a hand..."));
-        createDonationButtonsComponent();
-        //  make icons and panels for connection quality
-        GUIMediator.setSplashScreenString(I18n.tr("Creating Connection Quality Indicator..."));
-        createConnectionQualityPanel();
-        // VPN status
-        vpnStatusButton = new VPNStatusButton();
-        vpnStatusRefresher = VPNStatusRefresher.getInstance();
-        vpnStatusRefresher.addRefreshListener(vpnStatusButton);
-        vpnStatusRefresher.addRefreshListener(this);
-        //  make the 'Language' button
-        GUIMediator.setSplashScreenString(I18n.tr("Adding flags here and there..."));
-        createLanguageButton();
-        //  make the 'Firewall Status' label
-        GUIMediator.setSplashScreenString(I18n.tr("Playing with pixels for the Firewall indicator..."));
-        createFirewallLabel();
-        //  make the 'Bandwidth Usage' label - defer to avoid EDT blocking with file I/O
-        // Create placeholder labels first
-        bandwidthUsageDown = new LazyTooltip((ImageIcon) null);
-        bandwidthUsageUp = new LazyTooltip((ImageIcon) null);
-        // Defer the actual icon loading to avoid file system I/O on EDT
-        SwingUtilities.invokeLater(this::createBandwidthLabel);
-        // make the social buttons
-        GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Facebook..."));
-        createFacebookButton();
-        GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Twitter..."));
-        createTwitterButton();
-        createInstagramButton();
-        createDiscordButton();
-        createSettingsButton();
-        // male Seeding status label
-        GUIMediator.setSplashScreenString(I18n.tr("Painting seeding sign..."));
-        createSeedingStatusLabel();
-        //  make the center panel
-        GUIMediator.setSplashScreenString(I18n.tr("Creating center panel..."));
-        createCenterPanel();
-        // Set the bars to not be connected.
-        setConnectionQuality(0);
-
-
-        /*
-         The refresh listener for updating the bandwidth usage every second.
-        */
-        GUIMediator.addRefreshListener(() -> {
-            if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue()) {
-                updateBandwidth();
-            }
-            updateCenterPanel();
-        });
-        refresh();
     }
 
     public void updateVPNDropProtectionLabelState() {
