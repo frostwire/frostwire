@@ -122,7 +122,12 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         JComponent comp = super.getScrolledTablePane();
         if (adjustmentListener == null) {
             adjustmentListener = this::adjustmentListener_adjustmentValueChanged;
-            SCROLL_PANE.getVerticalScrollBar().addAdjustmentListener(adjustmentListener);
+            // Defer listener addition since SCROLL_PANE creation is deferred in parent class
+            SwingUtilities.invokeLater(() -> {
+                if (SCROLL_PANE != null) {
+                    SCROLL_PANE.getVerticalScrollBar().addAdjustmentListener(adjustmentListener);
+                }
+            });
         }
         return comp;
     }

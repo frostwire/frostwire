@@ -454,9 +454,15 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             return TABLE_PANE;
         JPanel tablePane = new JPanel();
         tablePane.setLayout(new BoxLayout(tablePane, BoxLayout.Y_AXIS));
-        SCROLL_PANE = new JScrollPane(TABLE);
-        tablePane.add(SCROLL_PANE);
         TABLE_PANE = tablePane;
+        // Defer JScrollPane creation to avoid EDT violation
+        // JScrollPane initialization triggers expensive Nimbus theme loading (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            SCROLL_PANE = new JScrollPane(TABLE);
+            tablePane.add(SCROLL_PANE);
+            tablePane.revalidate();
+            tablePane.repaint();
+        });
         return tablePane;
     }
 

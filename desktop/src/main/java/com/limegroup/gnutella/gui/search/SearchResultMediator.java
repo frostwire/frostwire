@@ -515,13 +515,19 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             return TABLE_PANE;
         JPanel tablePane = new JPanel();
         tablePane.setLayout(new BoxLayout(tablePane, BoxLayout.LINE_AXIS));
-        SCROLL_PANE = new JScrollPane(TABLE);
-        SCROLL_PANE.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 6, 0, 6), SCROLL_PANE.getBorder()));
-        tablePane.add(SCROLL_PANE);
-        scrollPaneSearchOptions = createSearchOptionsPanel();
-        scrollPaneSearchOptions.setVisible(false); // put this in a configuration
-        tablePane.add(scrollPaneSearchOptions);
         TABLE_PANE = tablePane;
+        // Defer JScrollPane creation to avoid EDT violation
+        // JScrollPane initialization triggers expensive Nimbus theme loading (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            SCROLL_PANE = new JScrollPane(TABLE);
+            SCROLL_PANE.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 6, 0, 6), SCROLL_PANE.getBorder()));
+            tablePane.add(SCROLL_PANE);
+            scrollPaneSearchOptions = createSearchOptionsPanel();
+            scrollPaneSearchOptions.setVisible(false); // put this in a configuration
+            tablePane.add(scrollPaneSearchOptions);
+            tablePane.revalidate();
+            tablePane.repaint();
+        });
         return tablePane;
     }
 
@@ -635,18 +641,23 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         centerPanel.add(southButtonsPanel, "south");
 
-        JScrollPane scrollPane = new JScrollPane(centerPanel);
-        scrollPane.setOpaque(false);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(28, 10, 4, 10));
+        // Defer JScrollPane creation to avoid EDT violation during initialization
         JComponent table = getScrolledTablePane();
         table.setOpaque(false);
-        background.add(scrollPane);
         background.add(table);
         MAIN_PANEL.add(background);
+        SwingUtilities.invokeLater(() -> {
+            JScrollPane scrollPane = new JScrollPane(centerPanel);
+            scrollPane.setOpaque(false);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.getViewport().setOpaque(false);
+            scrollPane.getViewport().setBackground(Color.WHITE);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder(28, 10, 4, 10));
+            background.add(scrollPane, 0); // Insert at the beginning
+            background.revalidate();
+            background.repaint();
+        });
         addButtonRow();
     }
 
