@@ -82,6 +82,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private ImageIcon updateImageButtonOff;
     private long updateButtonAnimationStartedTimestamp;
     private SearchField librarySearchField;
+    private JPanel tabButtonContainer;
 
     ApplicationHeader(Map<Tabs, Tab> tabs) {
         setMinimumSize(new Dimension(1000, 54));
@@ -171,6 +172,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     }
 
     private void addTabButtons(final Map<Tabs, Tab> tabs) {
+        JPanel buttonContainer = buildTabButtonContainer(tabs);
+        replaceTabButtonContainer(buttonContainer);
+    }
+
+    private JPanel buildTabButtonContainer(final Map<Tabs, Tab> tabs) {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
         buttonContainer.setOpaque(false);
         ButtonGroup group = new ButtonGroup();
@@ -221,7 +227,21 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
             button.setSelected(t.equals(GUIMediator.Tabs.SEARCH));
         }
-        add(buttonContainer, "");
+        return buttonContainer;
+    }
+
+    private void replaceTabButtonContainer(JPanel newContainer) {
+        if (tabButtonContainer != null) {
+            remove(tabButtonContainer);
+        }
+        tabButtonContainer = newContainer;
+        add(tabButtonContainer, "");
+        revalidate();
+        repaint();
+    }
+
+    void refreshTabButtons(Map<Tabs, Tab> tabs) {
+        addTabButtons(tabs);
     }
 
     /**
@@ -234,9 +254,10 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
      * @see MainFrame#setSelectedTab(Tabs)
      */
     void selectTab(Tab t) {
-        Component[] components = getComponents();
-        JPanel buttonContainer = (JPanel) components[1];
-        Component[] buttons = buttonContainer.getComponents();
+        if (tabButtonContainer == null) {
+            return;
+        }
+        Component[] buttons = tabButtonContainer.getComponents();
         for (Component c : buttons) {
             if (c instanceof AbstractButton) {
                 AbstractButton b = (AbstractButton) c;

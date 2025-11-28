@@ -41,6 +41,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,6 +81,7 @@ public final class MainFrame {
      * The array of tabs in the main application window.
      */
     private final Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
+    private final EnumSet<Tabs> addedCards = EnumSet.noneOf(Tabs.class);
     /**
      * The last state of the X/Y location and the time it was set.
      * This is necessary to preserve the maximize size & prior size,
@@ -88,6 +90,7 @@ public final class MainFrame {
      */
     private WindowState lastState = null;
     private final ApplicationHeader APPLICATION_HEADER;
+    private Tabs currentSelectedTab;
 
     /**
      * Initializes the primary components of the main application window,
@@ -149,12 +152,24 @@ public final class MainFrame {
         JPanel contentPane = new JPanel();
         FRAME.setContentPane(contentPane);
         contentPane.setLayout(new MigLayout("insets 0, gap 0"));
-        // Build tabs first to populate TABS map (but defer addTabs to avoid EDT violations)
-        buildTabs();
+        boolean useSearchTransfersSplitView = UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
+        // Build base tabs first to populate TABS map (but defer heavy tabs to avoid EDT violations)
+        buildTabs(useSearchTransfersSplitView);
         APPLICATION_HEADER = new ApplicationHeader(TABS);
         contentPane.add(APPLICATION_HEADER, "growx, dock north");
         contentPane.add(TABBED_PANE, "wrap");
         contentPane.add(getStatusLine().getComponent(), "dock south, shrink 0");
+        setSelectedTab(resolveDefaultTab());
+        SwingUtilities.invokeLater(() -> {
+            Tabs selected = getSelectedTab();
+            if (selected != null) {
+                Tab tab = TABS.get(selected);
+                if (tab != null) {
+                    APPLICATION_HEADER.selectTab(tab);
+                }
+            }
+        });
+        scheduleDeferredTabInitialization(useSearchTransfersSplitView);
 
         // Defer expensive layout calculations to avoid EDT blocking
         // Set a default minimum size first to avoid issues
@@ -253,7 +268,7 @@ public final class MainFrame {
     /**
      * Build the Tab Structure based on advertising mode and Windows
      */
-    private void buildTabs() {
+    private void buildTabs(boolean useSearchTransfersSplitView) {
         SearchTab searchTab = new SearchTab();
         LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
         // keep references to the tab objects.
@@ -262,18 +277,53 @@ public final class MainFrame {
 
         TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
         // Add Search and Library tabs immediately so they're visible
-        addTabsPartial(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
+        addTabsPartial(useSearchTransfersSplitView);
+    }
 
-        // Defer TransfersTab creation to avoid EDT violations from expensive component initialization
+    private void scheduleDeferredTabInitialization(boolean useSearchTransfersSplitView) {
         SwingUtilities.invokeLater(() -> {
-            TransfersTab transfersTab = new TransfersTab(getBTDownloadMediator());
-            TABS.put(Tabs.TRANSFERS, transfersTab);
-            SearchTransfersTab searchTransfers = new SearchTransfersTab(searchTab, transfersTab);
-            TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
-            // Add all tabs now that TRANSFERS and SEARCH_TRANSFERS are populated
-            addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
+            Tabs previousTab = getSelectedTab();
+            TransfersTab transfersTab;
+            if (!TABS.containsKey(Tabs.TRANSFERS)) {
+                transfersTab = new TransfersTab(getBTDownloadMediator());
+                TABS.put(Tabs.TRANSFERS, transfersTab);
+            } else {
+                Tab existingTransfers = TABS.get(Tabs.TRANSFERS);
+                transfersTab = existingTransfers instanceof TransfersTab ? (TransfersTab) existingTransfers : null;
+            }
+            if (!TABS.containsKey(Tabs.SEARCH_TRANSFERS) && transfersTab != null) {
+                Tab searchTab = TABS.get(Tabs.SEARCH);
+                if (searchTab instanceof SearchTab) {
+                    SearchTransfersTab searchTransfers = new SearchTransfersTab((SearchTab) searchTab, transfersTab);
+                    TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
+                }
+            }
+            // Add all tabs now that deferred tabs are populated
+            addTabs(useSearchTransfersSplitView);
             TABBED_PANE.setRequestFocusEnabled(false);
+            ApplicationHeader header = APPLICATION_HEADER;
+            if (header != null) {
+                header.refreshTabButtons(TABS);
+            }
+            Tabs tabToRestore = previousTab != null ? previousTab : resolveDefaultTab();
+            if (tabToRestore == null || !tabToRestore.isEnabled()) {
+                tabToRestore = resolveDefaultTab();
+            }
+            setSelectedTab(tabToRestore);
         });
+    }
+
+    private Tabs resolveDefaultTab() {
+        if (Tabs.SEARCH.isEnabled()) {
+            return Tabs.SEARCH;
+        }
+        if (Tabs.SEARCH_TRANSFERS.isEnabled() && TABS.containsKey(Tabs.SEARCH_TRANSFERS)) {
+            return Tabs.SEARCH_TRANSFERS;
+        }
+        if (Tabs.TRANSFERS.isEnabled() && TABS.containsKey(Tabs.TRANSFERS)) {
+            return Tabs.TRANSFERS;
+        }
+        return Tabs.LIBRARY;
     }
 
     /**
@@ -284,22 +334,20 @@ public final class MainFrame {
         // Only add Search and Library tabs initially
         Tab searchTab = TABS.get(Tabs.SEARCH);
         if (searchTab != null && Tabs.SEARCH.isEnabled()) {
-            addTab(searchTab);
+            addTabIfAbsent(Tabs.SEARCH, searchTab);
         }
         Tab libraryTab = TABS.get(Tabs.LIBRARY);
         if (libraryTab != null && Tabs.LIBRARY.isEnabled()) {
-            addTab(libraryTab);
+            addTabIfAbsent(Tabs.LIBRARY, libraryTab);
         }
     }
 
     private void addTabs(boolean useSearchTransfersSplitView) {
         updateEnabledTabs(useSearchTransfersSplitView);
-        // Add all enabled tabs - CardLayout will handle duplicates by updating the existing component
-        // This preserves Search and Library tabs added by addTabsPartial() while adding Transfers
         for (Tabs tabEnum : Tabs.values()) {
             final Tab tab = TABS.get(tabEnum);
             if (tabEnum.isEnabled() && tab != null) {
-                TABBED_PANE.add(tab.getComponent(), tab.getTitle());
+                addTabIfAbsent(tabEnum, tab);
             }
         }
     }
@@ -311,8 +359,17 @@ public final class MainFrame {
      * @param tab the `Tab` instance containing data for the tab to
      *            add
      */
-    private void addTab(Tab tab) {
-        TABBED_PANE.add(tab.getComponent(), tab.getTitle());
+    private void addTabIfAbsent(Tabs tabEnum, Tab tab) {
+        if (tab == null || addedCards.contains(tabEnum)) {
+            return;
+        }
+        String title = tab.getTitle();
+        JComponent component = tab.getComponent();
+        if (component == null) {
+            return;
+        }
+        TABBED_PANE.add(component, title);
+        addedCards.add(tabEnum);
     }
 
     /**
@@ -411,16 +468,7 @@ public final class MainFrame {
     }
 
     final Tabs getSelectedTab() {
-        Component comp = getCurrentTabComponent();
-        if (comp != null) {
-            for (Tabs t : TABS.keySet()) {
-                JComponent tabComponent = TABS.get(t).getComponent();
-                if (comp.equals(tabComponent)) {
-                    return t;
-                }
-            }
-        }
-        return null;
+        return currentSelectedTab != null ? currentSelectedTab : resolveDefaultTab();
     }
 
     /**
@@ -429,23 +477,32 @@ public final class MainFrame {
      * @param tab index to select
      */
     void setSelectedTab(GUIMediator.Tabs tab) {
+        if (tab == null) {
+            return;
+        }
+        if (!tab.isEnabled()) {
+            Tabs fallback = resolveDefaultTab();
+            if (fallback == tab) {
+                return;
+            }
+            setSelectedTab(fallback);
+            return;
+        }
         CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
         Tab t = TABS.get(tab);
-        cl.show(TABBED_PANE, t.getTitle());
-        APPLICATION_HEADER.selectTab(t);
-    }
-
-    private Component getCurrentTabComponent() {
-        Component currentPanel = null;
-        for (Component component : TABBED_PANE.getComponents()) {
-            if (component.isVisible()) {
-                if (component instanceof JPanel)
-                    currentPanel = component;
-                else if (component instanceof JScrollPane)
-                    currentPanel = ((JScrollPane) component).getViewport().getComponent(0);
+        if (t == null) {
+            Tabs fallback = resolveDefaultTab();
+            if (fallback != tab) {
+                setSelectedTab(fallback);
             }
+            return;
         }
-        return currentPanel;
+        addTabIfAbsent(tab, t);
+        cl.show(TABBED_PANE, t.getTitle());
+        currentSelectedTab = tab;
+        if (APPLICATION_HEADER != null) {
+            APPLICATION_HEADER.selectTab(t);
+        }
     }
 
     final Tab getTab(Tabs tabs) {
