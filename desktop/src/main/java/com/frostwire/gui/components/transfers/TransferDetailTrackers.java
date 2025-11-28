@@ -31,43 +31,50 @@ import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private static final Logger LOG = Logger.getLogger(TransferDetailTrackers.class);
-    private final TransferDetailTrackersTableMediator tableMediator;
+    private TransferDetailTrackersTableMediator tableMediator;
 
     TransferDetailTrackers() {
         super(new MigLayout("fillx, gap 0 0, insets 0 0 0 0"));
-        tableMediator = new TransferDetailTrackersTableMediator();
-        add(tableMediator.getComponent(), "growx, growy");
+        // Defer table mediator creation to avoid EDT violation
+        // JTable initialization triggers expensive UI updates (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            tableMediator = new TransferDetailTrackersTableMediator();
+            add(tableMediator.getComponent(), "growx, growy");
+            revalidate();
+            repaint();
+        });
     }
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        if (btDownload != null && btDownload.getDl() != null) {
+        if (tableMediator == null || btDownload == null || btDownload.getDl() == null) {
+            return;
+        }
+        try {
             tableMediator.clearTable();
-            try {
-                TorrentHandle torrentHandle = btDownload.getDl().getTorrentHandle();
-                if (torrentHandle == null) {
-                    return;
-                }
-                TorrentStatus status = torrentHandle.status();
-                // Let's create the DHT, LSD and PEX TrackerItemHolders
-                List<PeerInfo> peerInfos = torrentHandle.peerInfo();
-                List<AnnounceEntry> items = torrentHandle.trackers();
-                if (items != null && items.size() > 0) {
-                    int i = 0;
-                    for (AnnounceEntry item : items) {
-                        tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
-                    }
-                }
-                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, status, peerInfos);
-                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, status, peerInfos);
-                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, status, peerInfos);
-                // gotta add them last and in reverse order so they appear at the top by default
-                tableMediator.add(pexTrackerItemHolder);
-                tableMediator.add(lsdTrackerItemHolder);
-                tableMediator.add(dhtTrackerItemHolder);
-            } catch (Throwable e) {
-                LOG.error("Error updating data: " + e.getMessage());
+            TorrentHandle torrentHandle = btDownload.getDl().getTorrentHandle();
+            if (torrentHandle == null) {
+                return;
             }
+            TorrentStatus status = torrentHandle.status();
+            // Let's create the DHT, LSD and PEX TrackerItemHolders
+            List<PeerInfo> peerInfos = torrentHandle.peerInfo();
+            List<AnnounceEntry> items = torrentHandle.trackers();
+            if (items != null && items.size() > 0) {
+                int i = 0;
+                for (AnnounceEntry item : items) {
+                    tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
+                }
+            }
+            TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, status, peerInfos);
+            TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, status, peerInfos);
+            TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, status, peerInfos);
+            // gotta add them last and in reverse order so they appear at the top by default
+            tableMediator.add(pexTrackerItemHolder);
+            tableMediator.add(lsdTrackerItemHolder);
+            tableMediator.add(dhtTrackerItemHolder);
+        } catch (Throwable e) {
+            LOG.error("Error updating data: " + e.getMessage());
         }
     }
 

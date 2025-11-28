@@ -29,46 +29,53 @@ import java.util.List;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
-    private final TransferDetailPeersTableMediator tableMediator;
+    private TransferDetailPeersTableMediator tableMediator;
     private BittorrentDownload btDownload;
 
     TransferDetailPeers() {
         super(new MigLayout("fillx, insets 0 0 0 0, gap 0 0"));
-        tableMediator = new TransferDetailPeersTableMediator();
-        add(tableMediator.getComponent(), "growx, growy");
+        // Defer table mediator creation to avoid EDT violation
+        // JTable initialization triggers expensive UI updates (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            tableMediator = new TransferDetailPeersTableMediator();
+            add(tableMediator.getComponent(), "growx, growy");
+            revalidate();
+            repaint();
+        });
     }
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        if (btDownload != null && btDownload.getDl() != null) {
-            if (this.btDownload != btDownload) {
-                tableMediator.clearTable();
-            }
-            this.btDownload = btDownload;
-            try {
-                List<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
-                if (items != null && items.size() > 0) {
-                    if (tableMediator.getSize() == 0) {
-                        int i = 0;
-                        for (PeerInfo item : items) {
-                            tableMediator.add(new PeerItemHolder(i++, item));
-                        }
-                    } else {
-                        int i = 0;
-                        for (PeerInfo item : items) {
-                            try {
-                                tableMediator.update(new PeerItemHolder(i++, item));
-                            } catch (IndexOutOfBoundsException ignored) {
-                                // peer might not be there anymore, reload table from scratch
-                                tableMediator.clearTable();
-                                updateData(btDownload);
-                            }
+        if (tableMediator == null || btDownload == null || btDownload.getDl() == null) {
+            return;
+        }
+        if (this.btDownload != btDownload) {
+            tableMediator.clearTable();
+        }
+        this.btDownload = btDownload;
+        try {
+            List<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
+            if (items != null && items.size() > 0) {
+                if (tableMediator.getSize() == 0) {
+                    int i = 0;
+                    for (PeerInfo item : items) {
+                        tableMediator.add(new PeerItemHolder(i++, item));
+                    }
+                } else {
+                    int i = 0;
+                    for (PeerInfo item : items) {
+                        try {
+                            tableMediator.update(new PeerItemHolder(i++, item));
+                        } catch (IndexOutOfBoundsException ignored) {
+                            // peer might not be there anymore, reload table from scratch
+                            tableMediator.clearTable();
+                            updateData(btDownload);
                         }
                     }
                 }
-            } catch (Throwable e) {
-                LOG.error("Error updating data: " + e.getMessage());
             }
+        } catch (Throwable e) {
+            LOG.error("Error updating data: " + e.getMessage());
         }
     }
 

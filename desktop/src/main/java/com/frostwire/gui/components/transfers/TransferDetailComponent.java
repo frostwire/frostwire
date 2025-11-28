@@ -78,33 +78,39 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
     private JPanel createDetailComponentHolder() {
         detailComponentHolder = new JPanel(new CardLayout());
-        TransferDetailGeneral generalComponent;
-        detailComponentHolder.add(generalComponent = new TransferDetailGeneral(), GENERAL_CARD);
-        TransferDetailFiles filesComponent;
-        detailComponentHolder.add(filesComponent = new TransferDetailFiles(), FILES_CARD);
-        TransferDetailPieces piecesComponent;
-        detailComponentHolder.add(piecesComponent = new TransferDetailPieces(), PIECES_CARD);
-        TransferDetailTrackers trackersComponent;
-        detailComponentHolder.add(trackersComponent = new TransferDetailTrackers(), TRACKERS_CARD);
-        TransferDetailPeers peersComponent;
-        detailComponentHolder.add(peersComponent = new TransferDetailPeers(), PEERS_CARD);
         cardPanelMap = new HashMap<>();
-        cardPanelMap.put(GENERAL_CARD, generalComponent);
-        cardPanelMap.put(FILES_CARD, filesComponent);
-        cardPanelMap.put(PIECES_CARD, piecesComponent);
-        cardPanelMap.put(TRACKERS_CARD, trackersComponent);
-        cardPanelMap.put(PEERS_CARD, peersComponent);
         HashMap<String, JToggleButton> cardButtonMap = new HashMap<>();
         cardButtonMap.put(GENERAL_CARD, generalButton);
         cardButtonMap.put(FILES_CARD, filesButton);
         cardButtonMap.put(PIECES_CARD, piecesButton);
         cardButtonMap.put(TRACKERS_CARD, trackersButton);
         cardButtonMap.put(PEERS_CARD, peersButton);
-        // Auto click on the last shown JPanel button selector
-        String lastTransferSelected = UISettings.LAST_SELECTED_TRANSFER_DETAIL_JPANEL.getValue();
-        if (cardButtonMap.containsKey(lastTransferSelected)) {
-            cardButtonMap.get(lastTransferSelected).doClick();
-        }
+        // Defer detail component creation to avoid EDT violation
+        // Creating all detail components blocks EDT (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            TransferDetailGeneral generalComponent;
+            detailComponentHolder.add(generalComponent = new TransferDetailGeneral(), GENERAL_CARD);
+            TransferDetailFiles filesComponent;
+            detailComponentHolder.add(filesComponent = new TransferDetailFiles(), FILES_CARD);
+            TransferDetailPieces piecesComponent;
+            detailComponentHolder.add(piecesComponent = new TransferDetailPieces(), PIECES_CARD);
+            TransferDetailTrackers trackersComponent;
+            detailComponentHolder.add(trackersComponent = new TransferDetailTrackers(), TRACKERS_CARD);
+            TransferDetailPeers peersComponent;
+            detailComponentHolder.add(peersComponent = new TransferDetailPeers(), PEERS_CARD);
+            cardPanelMap.put(GENERAL_CARD, generalComponent);
+            cardPanelMap.put(FILES_CARD, filesComponent);
+            cardPanelMap.put(PIECES_CARD, piecesComponent);
+            cardPanelMap.put(TRACKERS_CARD, trackersComponent);
+            cardPanelMap.put(PEERS_CARD, peersComponent);
+            // Auto click on the last shown JPanel button selector
+            String lastTransferSelected = UISettings.LAST_SELECTED_TRANSFER_DETAIL_JPANEL.getValue();
+            if (cardButtonMap.containsKey(lastTransferSelected)) {
+                cardButtonMap.get(lastTransferSelected).doClick();
+            }
+            detailComponentHolder.revalidate();
+            detailComponentHolder.repaint();
+        });
         return detailComponentHolder;
     }
 

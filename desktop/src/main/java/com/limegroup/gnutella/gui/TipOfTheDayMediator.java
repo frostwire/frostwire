@@ -173,8 +173,13 @@ public final class TipOfTheDayMediator {
      */
     private void setText(String tip) {
         String foreHex = GUIUtils.colorToHex(_foreground);
-        tipPane.setText("<html><font face='arial,helvetica,sanserif' color='#" + foreHex + "'>" + tip + "</font>");
-        tipPane.setCaretPosition(0);
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        final String htmlContent = "<html><font face='arial,helvetica,sanserif' color='#" + foreHex + "'>" + tip + "</font>";
+        SwingUtilities.invokeLater(() -> {
+            tipPane.setText(htmlContent);
+            tipPane.setCaretPosition(0);
+        });
     }
 
     /**

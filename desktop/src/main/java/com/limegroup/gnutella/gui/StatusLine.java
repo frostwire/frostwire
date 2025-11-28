@@ -303,8 +303,11 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 remainingWidth -= GUIConstants.SEPARATOR;
             }
             //  subtract center component
-            int indicatorWidth = centerComponent.getWidth();
-            remainingWidth -= indicatorWidth;
+            int indicatorWidth = 0;
+            if (centerComponent != null) {
+                indicatorWidth = centerComponent.getWidth();
+                remainingWidth -= indicatorWidth;
+            }
             //  add components to panel, if room
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.insets = new Insets(0, 0, 0, 0);
@@ -344,24 +347,42 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             }
             gbc = new GridBagConstraints();
             gbc.gridx = GridBagConstraints.RELATIVE;
-            BAR.add(seedingStatusButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
-            BAR.add(createSeparator(), gbc);
-            updateSeedingStatus();
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-            BAR.add(facebookButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-            BAR.add(twitterButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-            BAR.add(instagramButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-            BAR.add(createSeparator(), gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-            BAR.add(discordButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            if (seedingStatusButton != null) {
+                BAR.add(seedingStatusButton, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
+                Component sep = createSeparator();
+                if (sep != null) {
+                    BAR.add(sep, gbc);
+                }
+                updateSeedingStatus();
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
+            if (facebookButton != null) {
+                BAR.add(facebookButton, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
+            if (twitterButton != null) {
+                BAR.add(twitterButton, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
+            if (instagramButton != null) {
+                BAR.add(instagramButton, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
+            Component sep = createSeparator();
+            if (sep != null) {
+                BAR.add(sep, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
+            if (discordButton != null) {
+                BAR.add(discordButton, gbc);
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            }
             //  make center panel stretchy
             gbc.weightx = 1;
-            BAR.add(centerPanel, gbc);
+            if (centerPanel != null) {
+                BAR.add(centerPanel, gbc);
+            }
             gbc.weightx = 0;
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
             // donation buttons
@@ -372,8 +393,13 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             }
 
-            BAR.add(createSeparator(), gbc);
-            BAR.add(settingsButton);
+            sep = createSeparator();
+            if (sep != null) {
+                BAR.add(sep, gbc);
+            }
+            if (settingsButton != null) {
+                BAR.add(settingsButton);
+            }
 
             try {
                 //some macosx versions are throwing a deep NPE when this is invoked all the way down at
@@ -511,6 +537,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * the update panel and the status link handler.
      */
     private void updateCenterPanel() {
+        if (centerPanel == null) {
+            return;
+        }
         long now = System.currentTimeMillis();
         if (_nextUpdateTime > now)
             return;
@@ -560,7 +589,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Updates the status text.
      */
     void setStatusText(final String text) {
-        GUIMediator.safeInvokeAndWait(() -> STATUS_COMPONENT.setText(text));
+        if (STATUS_COMPONENT != null) {
+            GUIMediator.safeInvokeAndWait(() -> STATUS_COMPONENT.setText(text));
+        }
     }
 
     /**
@@ -622,8 +653,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      */
     void loadFinished() {
         updateCenterPanel();
-        centerPanel.revalidate();
-        centerPanel.repaint();
+        if (centerPanel != null) {
+            centerPanel.revalidate();
+            centerPanel.repaint();
+        }
         refresh();
     }
 

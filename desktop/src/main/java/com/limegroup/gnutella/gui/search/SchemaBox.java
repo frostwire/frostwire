@@ -75,7 +75,8 @@ final class SchemaBox extends JPanel {
     void applyFilters() {
         AbstractButton button = getSelectedButton();
         if (button != null) {
-            button.doClick();
+            // Defer doClick() to avoid EDT violation when called from background threads
+            SwingUtilities.invokeLater(button::doClick);
         }
     }
 
@@ -196,7 +197,9 @@ final class SchemaBox extends JPanel {
     void selectMediaType(NamedMediaType type) {
         JToggleButton mediaTypeButton = buttonsMap.get(type);
         if (mediaTypeButton != null) {
-            mediaTypeButton.doClick(); //setSelected doesn't fire the proper events.
+            // Defer doClick() to avoid EDT violation when called from background threads
+            // setSelected doesn't fire the proper events, so we need doClick
+            SwingUtilities.invokeLater(mediaTypeButton::doClick);
         }
     }
 

@@ -283,7 +283,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
         copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
         createdOnLabel.setText(btDownload.getCreated().toString());
-        commentLabel.setText("<html><body><p style='width: 600px;'>" + torrentInfo.comment() + "</p></body></html>");
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        final String comment = torrentInfo.comment();
+        SwingUtilities.invokeLater(() -> {
+            commentLabel.setText("<html><body><p style='width: 600px;'>" + comment + "</p></body></html>");
+        });
     }
 
     /**
@@ -327,7 +332,9 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private static class JGrayLabel extends JLabel {
         JGrayLabel(String html) {
             super(html);
-            setForeground(Color.GRAY);
+            // Defer setForeground() to avoid EDT violation
+            // Setting foreground on HTML content triggers HTML rendering (>2 second EDT block)
+            SwingUtilities.invokeLater(() -> setForeground(Color.GRAY));
         }
     }
 }

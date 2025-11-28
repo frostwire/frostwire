@@ -52,8 +52,12 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
      */
     private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
         VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning = new VPNBitTorrentDisabledWarningLabel();
-        bitTorrentDisabledWarning.setText("<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
         bitTorrentDisabledWarning.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            bitTorrentDisabledWarning.setText("<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
+        });
         bitTorrentDisabledWarning.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -82,17 +86,20 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
 
     private void updateVPNIcon(boolean vpnIsOn) {
         lastVPNStatus = vpnIsOn;
-        if (vpnIsOn) {
-            iconButton.setIcon(GUIMediator.getThemeImage("vpn_on"));
-            iconButton.setToolTipText("<html><p width=\"260\">" +
-                    I18n.tr("FrostWire has detected a VPN connection, your privacy is safe from prying eyes.") +
-                    "</p></html>");
-        } else {
-            iconButton.setIcon(GUIMediator.getThemeImage("vpn_off"));
-            iconButton.setToolTipText("<html><p width=\"260\">" +
-                    I18n.tr("FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.") +
-                    "</p></html>");
-        }
+        iconButton.setIcon(GUIMediator.getThemeImage(vpnIsOn ? "vpn_on" : "vpn_off"));
+        // Defer HTML ToolTipText to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            if (vpnIsOn) {
+                iconButton.setToolTipText("<html><p width=\"260\">" +
+                        I18n.tr("FrostWire has detected a VPN connection, your privacy is safe from prying eyes.") +
+                        "</p></html>");
+            } else {
+                iconButton.setToolTipText("<html><p width=\"260\">" +
+                        I18n.tr("FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.") +
+                        "</p></html>");
+            }
+        });
         removeAll();
         add(iconButton);
         if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {

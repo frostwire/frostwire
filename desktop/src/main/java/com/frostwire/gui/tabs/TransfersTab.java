@@ -65,15 +65,18 @@ public final class TransfersTab extends AbstractTab {
     }
 
     public void showTransfers(FilterMode mode) {
-        if (mode == FilterMode.ALL) {
-            filterAllButton.doClick();
-        } else if (mode == FilterMode.DOWNLOADING) {
-            filterDownloadingButton.doClick();
-        } else if (mode == FilterMode.FINISHED) {
-            filterFinishedButton.doClick();
-        } else if (mode == FilterMode.SEEDING) {
-            filterSeedingButton.doClick();
-        }
+        // Defer doClick() to avoid EDT violation when called from background threads
+        SwingUtilities.invokeLater(() -> {
+            if (mode == FilterMode.ALL) {
+                filterAllButton.doClick();
+            } else if (mode == FilterMode.DOWNLOADING) {
+                filterDownloadingButton.doClick();
+            } else if (mode == FilterMode.FINISHED) {
+                filterFinishedButton.doClick();
+            } else if (mode == FilterMode.SEEDING) {
+                filterSeedingButton.doClick();
+            }
+        });
     }
 
     private void initComponents() {

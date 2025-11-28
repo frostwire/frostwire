@@ -57,16 +57,22 @@ class IntentPanel extends JPanel {
         willNot.setLayout(new GridBagLayout());
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(10, 10, 10, 10);
-        willNotButton.setText("<html><div display=\"block\" color=\"#515151\" size=\"13\">" + I18n.tr("I <b>will not</b> use FrostWire {0} for copyright infringement.", FrostWireUtils.getFrostWireVersion()) + "</div></html>");
         willNotButton.setOpaque(false);
         willNotButton.setIconTextGap(10);
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        final String willNotText = "<html><div display=\"block\" color=\"#515151\" size=\"13\">" + I18n.tr("I <b>will not</b> use FrostWire {0} for copyright infringement.", FrostWireUtils.getFrostWireVersion()) + "</div></html>";
+        SwingUtilities.invokeLater(() -> willNotButton.setText(willNotText));
         willNot.add(willNotButton, gbc);
         willNot.setBorder(BorderFactory.createEtchedBorder(GUIUtils.hexToColor("C8C8C8"), GUIUtils.hexToColor("FBFBFB")));
         DitherPanel mightUse = new DitherPanel(ditherer);
         mightUse.setLayout(new GridBagLayout());
-        mightUseButton.setText("<html><div display=\"block\" color=\"#515151\" size=\"13\">" + I18n.tr("I <b>might use</b> FrostWire {0} for copyright infringement.", FrostWireUtils.getFrostWireVersion()) + "</div></html>");
         mightUseButton.setOpaque(false);
         mightUseButton.setIconTextGap(10);
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        final String mightUseText = "<html><div display=\"block\" color=\"#515151\" size=\"13\">" + I18n.tr("I <b>might use</b> FrostWire {0} for copyright infringement.", FrostWireUtils.getFrostWireVersion()) + "</div></html>";
+        SwingUtilities.invokeLater(() -> mightUseButton.setText(mightUseText));
         mightUse.add(mightUseButton, gbc);
         mightUse.setBorder(BorderFactory.createEtchedBorder(GUIUtils.hexToColor("C8C8C8"), GUIUtils.hexToColor("FBFBFB")));
         almostDone.setFont(almostDone.getFont().deriveFont(24f));

@@ -57,13 +57,17 @@ public class ExperimentalFeaturesPaneItem extends AbstractPaneItem {
 
     @Override
     public void initOptions() {
-        alphaCheckbox.setText("<html><strong>" + I18n.tr("Enable ALPHA features") + "</strong>. " + I18n.tr("Bleeding edge, unstable, tested by developers only, very risky.") + "</html>");
-        betaCheckbox.setText("<html><strong>" + I18n.tr("Enable BETA features") + "</strong>. " + I18n.tr("Feature complete, unknown bugs, tested by QA, somewhat risky.") + "</html>");
         alphaCheckbox.setSelected(initialAlphaValue);
         betaCheckbox.setSelected(initialBetaValue);
         add(alphaCheckbox);
         add(betaCheckbox);
         add(note);
+        // Defer HTML content to avoid EDT violation
+        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> {
+            alphaCheckbox.setText("<html><strong>" + I18n.tr("Enable ALPHA features") + "</strong>. " + I18n.tr("Bleeding edge, unstable, tested by developers only, very risky.") + "</html>");
+            betaCheckbox.setText("<html><strong>" + I18n.tr("Enable BETA features") + "</strong>. " + I18n.tr("Feature complete, unknown bugs, tested by QA, somewhat risky.") + "</html>");
+        });
         if (FrostWireUtils.isIsRunningFromSource()) {
             alphaCheckbox.setEnabled(false);
             betaCheckbox.setEnabled(false);

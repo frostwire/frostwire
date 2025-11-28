@@ -255,16 +255,26 @@ public final class MainFrame {
     private void buildTabs() {
         SearchTab searchTab = new SearchTab();
         TransfersTab transfersTab = new TransfersTab(getBTDownloadMediator());
-        LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
+        // Defer LibraryTab creation to avoid EDT violation from LibraryMediator initialization
+        // which triggers class loading of AbstractLibraryTableMediator and MediaType
         // keep references to the tab objects.
         TABS.put(Tabs.SEARCH, searchTab);
         TABS.put(Tabs.TRANSFERS, transfersTab);
-        TABS.put(Tabs.LIBRARY, libraryTab);
+        // TABS.put(Tabs.LIBRARY, libraryTab) - will be added in deferred initialization
         SearchTransfersTab searchTransfers = new SearchTransfersTab(searchTab, transfersTab);
         TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
         TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
         addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
         TABBED_PANE.setRequestFocusEnabled(false);
+
+        // Defer LibraryTab creation to a later time
+        SwingUtilities.invokeLater(() -> {
+            LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
+            TABS.put(Tabs.LIBRARY, libraryTab);
+            if (Tabs.LIBRARY.isEnabled()) {
+                addTab(libraryTab);
+            }
+        });
     }
 
     private void addTabs(boolean useSearchTransfersSplitView) {

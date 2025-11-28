@@ -67,7 +67,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
      * Button background for unselected button
      */
     private final Image headerButtonBackgroundUnselected;
-    private final GoogleSearchField cloudSearchField;
+    private GoogleSearchField cloudSearchField;
     private final JPanel searchPanels;
     private final LogoPanel logoPanel;
     private JLabel updateButton;
@@ -96,7 +96,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         addTabButtons(tabs);
 
         // Setup the search field
-        cloudSearchField = new GoogleSearchField();
         searchPanels = createSearchPanel();
         searchPanels.setOpaque(false);
         add(searchPanels, "alignx center, growx");
@@ -105,19 +104,41 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
         GUIMediator.addRefreshListener(this);
         final ActionListener schemaListener = new SchemaListener();
+        // Defer expensive initialization to avoid EDT violation
+        // GoogleSearchField constructor and SchemaListener.actionPerformed() both trigger class loading (>2 second EDT block)
+        SwingUtilities.invokeLater(() -> initializeSearchFields(schemaListener));
+    }
+
+    private void initializeSearchFields(ActionListener schemaListener) {
+        cloudSearchField = new GoogleSearchField();
+        CardLayout cl = (CardLayout) searchPanels.getLayout();
+        searchPanels.add(cloudSearchField, CLOUD_SEARCH_FIELD);
+        cl.show(searchPanels, CLOUD_SEARCH_FIELD);
+        searchPanels.revalidate();
+        searchPanels.repaint();
+
+        // Defer LibraryMediator access to avoid EDT violation from static initializers
+        SwingUtilities.invokeLater(() -> {
+            librarySearchField = LibraryMediator.instance().getLibrarySearch().getSearchField();
+            searchPanels.add(librarySearchField, LIBRARY_SEARCH_FIELD);
+            searchPanels.revalidate();
+            searchPanels.repaint();
+        });
+
         schemaListener.actionPerformed(null);
     }
 
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new CardLayout());
-        createLibrarySearchField();
-        panel.add(cloudSearchField, CLOUD_SEARCH_FIELD);
-        panel.add(librarySearchField, LIBRARY_SEARCH_FIELD);
+        // CloudSearchField and LibrarySearchField will be added in deferred initialization
+        // to avoid EDT violation from SearchField class loading and initialization
+        createLibrarySearchField(panel);
         return panel;
     }
 
-    private void createLibrarySearchField() {
-        librarySearchField = LibraryMediator.instance().getLibrarySearch().getSearchField();
+    private void createLibrarySearchField(JPanel panel) {
+        // LibrarySearch field will be initialized later in initializeSearchFields
+        // to avoid EDT violation from LibraryMediator and SearchField initialization
     }
 
     private void createUpdateButton() {
@@ -146,7 +167,15 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
         buttonContainer.setOpaque(false);
         ButtonGroup group = new ButtonGroup();
-        buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
+
+        // Defer separator creation to avoid EDT violation
+        // ThemeMediator.createAppHeaderSeparator() triggers expensive theme operations
+        SwingUtilities.invokeLater(() -> {
+            buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
+            buttonContainer.revalidate();
+            buttonContainer.repaint();
+        });
+
         for (Tabs t : GUIMediator.Tabs.values()) {
             final Tabs finalTab = t; //java...
             if (tabs.get(t) == null || !t.isEnabled()) {
@@ -168,6 +197,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 }
 
                 void prepareSearchTabAsSearchTrigger(final Tabs tab) {
+                    if (cloudSearchField == null || librarySearchField == null) {
+                        return;
+                    }
                     String query = null;
                     if (tab == Tabs.SEARCH || tab == Tabs.SEARCH_TRANSFERS) {
                         if (!cloudSearchField.getText().isEmpty()) {
@@ -186,7 +218,14 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             });
             group.add(button);
             buttonContainer.add(button);
-            buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
+
+            // Defer separator creation to avoid EDT violation
+            SwingUtilities.invokeLater(() -> {
+                buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
+                buttonContainer.revalidate();
+                buttonContainer.repaint();
+            });
+
             button.setSelected(t.equals(GUIMediator.Tabs.SEARCH));
         }
         add(buttonContainer, "");
@@ -261,13 +300,19 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     }
 
     void showSearchField(Tab t) {
-        cloudSearchField.setText("");
-        librarySearchField.setText("");
+        if (cloudSearchField != null) {
+            cloudSearchField.setText("");
+        }
+        if (librarySearchField != null) {
+            librarySearchField.setText("");
+        }
         CardLayout cl = (CardLayout) (searchPanels.getLayout());
         if (t instanceof LibraryTab) {
             cl.show(searchPanels, LIBRARY_SEARCH_FIELD);
         } else {
-            cl.show(searchPanels, CLOUD_SEARCH_FIELD);
+            if (cloudSearchField != null) {
+                cl.show(searchPanels, CLOUD_SEARCH_FIELD);
+            }
         }
     }
 
@@ -363,8 +408,10 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     }
 
     void startSearch(String query) {
-        cloudSearchField.setText(query);
-        cloudSearchField.getActionListeners()[0].actionPerformed(null);
+        if (cloudSearchField != null) {
+            cloudSearchField.setText(query);
+            cloudSearchField.getActionListeners()[0].actionPerformed(null);
+        }
     }
 
     /**

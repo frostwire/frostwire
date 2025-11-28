@@ -56,7 +56,21 @@ public class LibrarySearch extends JPanel {
     private String status;
 
     LibrarySearch() {
-        setupUI();
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        setMinimumSize(new Dimension(200, 20));
+        setPreferredSize(new Dimension(200, 20));
+        statusLabel = new JLabel();
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 0));
+        add(statusLabel, BorderLayout.CENTER);
+        // Defer SearchField creation to avoid EDT violation
+        // SearchField class loading and initialization blocks EDT (>2 second EDT block)
+        SwingUtilities.invokeLater(this::createSearchField);
+    }
+
+    private void createSearchField() {
+        searchField = new SearchField();
+        setupUIListeners();
     }
 
     public void searchFor(final String query, final boolean displayTextOnSearchBox) {
@@ -106,26 +120,22 @@ public class LibrarySearch extends JPanel {
         statusLabel.setText(status);
     }
 
-    private void setupUI() {
-        setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        setMinimumSize(new Dimension(200, 20));
-        setPreferredSize(new Dimension(200, 20));
-        statusLabel = new JLabel();
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 0));
-        add(statusLabel, BorderLayout.CENTER);
-        searchField = new SearchField();
+    private void setupUIListeners() {
         searchField.setSearchMode(SearchMode.INSTANT);
         searchField.setInstantSearchDelay(50);
         searchField.setPrompt(I18n.tr("Search in Library"));
         Font origFont = searchField.getFont();
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         searchField.setFont(newFont);
+        // Defer SearchLibraryAction creation to avoid EDT violation with class loading
         searchField.addActionListener(new ActionListener() {
-            private final SearchLibraryAction a = new SearchLibraryAction();
+            private SearchLibraryAction a;
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (a == null) {
+                    a = new SearchLibraryAction();
+                }
                 if (searchField.getText().length() == 0) {
                     a.perform(".");
                 } else {
