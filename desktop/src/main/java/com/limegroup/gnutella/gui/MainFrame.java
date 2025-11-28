@@ -260,29 +260,46 @@ public final class MainFrame {
         TABS.put(Tabs.SEARCH, searchTab);
         TABS.put(Tabs.LIBRARY, libraryTab);
 
+        TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
+        // Add Search and Library tabs immediately so they're visible
+        addTabsPartial(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
+
         // Defer TransfersTab creation to avoid EDT violations from expensive component initialization
         SwingUtilities.invokeLater(() -> {
             TransfersTab transfersTab = new TransfersTab(getBTDownloadMediator());
             TABS.put(Tabs.TRANSFERS, transfersTab);
             SearchTransfersTab searchTransfers = new SearchTransfersTab(searchTab, transfersTab);
             TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
-            // Re-add tabs now that TRANSFERS and SEARCH_TRANSFERS are populated
-            TABBED_PANE.removeAll();
+            // Add all tabs now that TRANSFERS and SEARCH_TRANSFERS are populated
             addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
+            TABBED_PANE.setRequestFocusEnabled(false);
         });
+    }
 
-        TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
-        addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
-        TABBED_PANE.setRequestFocusEnabled(false);
+    /**
+     * Add only Search and Library tabs initially (lightweight tabs that don't block EDT)
+     */
+    private void addTabsPartial(boolean useSearchTransfersSplitView) {
+        updateEnabledTabs(useSearchTransfersSplitView);
+        // Only add Search and Library tabs initially
+        Tab searchTab = TABS.get(Tabs.SEARCH);
+        if (searchTab != null && Tabs.SEARCH.isEnabled()) {
+            addTab(searchTab);
+        }
+        Tab libraryTab = TABS.get(Tabs.LIBRARY);
+        if (libraryTab != null && Tabs.LIBRARY.isEnabled()) {
+            addTab(libraryTab);
+        }
     }
 
     private void addTabs(boolean useSearchTransfersSplitView) {
-        TABBED_PANE.removeAll();
         updateEnabledTabs(useSearchTransfersSplitView);
+        // Add all enabled tabs - CardLayout will handle duplicates by updating the existing component
+        // This preserves Search and Library tabs added by addTabsPartial() while adding Transfers
         for (Tabs tabEnum : Tabs.values()) {
             final Tab tab = TABS.get(tabEnum);
             if (tabEnum.isEnabled() && tab != null) {
-                addTab(tab);
+                TABBED_PANE.add(tab.getComponent(), tab.getTitle());
             }
         }
     }
@@ -302,7 +319,6 @@ public final class MainFrame {
      * @param useSearchTransfersSplitView true if you want the old split style.
      */
     private void updateEnabledTabs(boolean useSearchTransfersSplitView) {
-        TABBED_PANE.removeAll();
         Tabs.SEARCH.setEnabled(!useSearchTransfersSplitView);
         Tabs.TRANSFERS.setEnabled(!useSearchTransfersSplitView);
         Tabs.SEARCH_TRANSFERS.setEnabled(useSearchTransfersSplitView);
