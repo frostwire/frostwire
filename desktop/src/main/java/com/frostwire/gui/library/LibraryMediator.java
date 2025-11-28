@@ -58,6 +58,11 @@ public class LibraryMediator {
         idScanned = new HashSet<>();
         getComponent(); // creates MAIN_PANEL
         scrollbarValues = new HashMap<>();
+        // Defer split pane creation to avoid EDT violation from LibraryFilesTableMediator class loading
+        SwingUtilities.invokeLater(this::initializeSplitPane);
+    }
+
+    private void initializeSplitPane() {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
         splitPane.setContinuousLayout(true);
         splitPane.setResizeWeight(0.5);
@@ -72,6 +77,8 @@ public class LibraryMediator {
         });
         DividerLocationSettingUpdater.install(splitPane, UISettings.UI_LIBRARY_MAIN_DIVIDER_LOCATION);
         MAIN_PANEL.add(splitPane);
+        MAIN_PANEL.revalidate();
+        MAIN_PANEL.repaint();
     }
 
     /**

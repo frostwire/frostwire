@@ -58,7 +58,14 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     /**
      * The clicker forwarder.
      */
-    private final MouseListener CLICK_FORWARDER = new Clicker();
+    private MouseListener CLICK_FORWARDER = null;
+
+    private MouseListener getClickForwarder() {
+        if (CLICK_FORWARDER == null) {
+            CLICK_FORWARDER = new Clicker();
+        }
+        return CLICK_FORWARDER;
+    }
     /**
      * Button background for selected button
      */
@@ -92,9 +99,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         logoUpdateButtonsPanel.add(updateButton);
         add(logoUpdateButtonsPanel, "growx, alignx center");
 
-        // Setup the tab buttons
-        addTabButtons(tabs);
-
         // Setup the search field
         searchPanels = createSearchPanel();
         searchPanels.setOpaque(false);
@@ -105,8 +109,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         GUIMediator.addRefreshListener(this);
         final ActionListener schemaListener = new SchemaListener();
         // Defer expensive initialization to avoid EDT violation
-        // GoogleSearchField constructor and SchemaListener.actionPerformed() both trigger class loading (>2 second EDT block)
-        SwingUtilities.invokeLater(() -> initializeSearchFields(schemaListener));
+        // Tab button creation (JRadioButton), GoogleSearchField, and SchemaListener all trigger class loading
+        SwingUtilities.invokeLater(() -> {
+            addTabButtons(tabs);
+            initializeSearchFields(schemaListener);
+        });
     }
 
     private void initializeSearchFields(ActionListener schemaListener) {
@@ -167,14 +174,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
         buttonContainer.setOpaque(false);
         ButtonGroup group = new ButtonGroup();
-
-        // Defer separator creation to avoid EDT violation
-        // ThemeMediator.createAppHeaderSeparator() triggers expensive theme operations
-        SwingUtilities.invokeLater(() -> {
-            buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
-            buttonContainer.revalidate();
-            buttonContainer.repaint();
-        });
+        buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
 
         for (Tabs t : GUIMediator.Tabs.values()) {
             final Tabs finalTab = t; //java...
@@ -218,14 +218,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             });
             group.add(button);
             buttonContainer.add(button);
-
-            // Defer separator creation to avoid EDT violation
-            SwingUtilities.invokeLater(() -> {
-                buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
-                buttonContainer.revalidate();
-                buttonContainer.repaint();
-            });
-
+            buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
             button.setSelected(t.equals(GUIMediator.Tabs.SEARCH));
         }
         add(buttonContainer, "");
@@ -285,7 +278,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.addMouseListener(CLICK_FORWARDER);
+        button.addMouseListener(getClickForwarder());
         button.setToolTipText(t.getToolTip());
         button.setHorizontalTextPosition(SwingConstants.CENTER);
         button.setVerticalTextPosition(SwingConstants.BOTTOM);

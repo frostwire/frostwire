@@ -32,36 +32,45 @@ import javax.swing.*;
  * @author aldenml
  */
 public final class SearchTransfersTab extends AbstractTab {
-    private final JSplitPane searchDownloadSplitPane;
+    private final SearchTab searchTab;
+    private final TransfersTab transfersTab;
+    private JSplitPane searchDownloadSplitPane;
 
     public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
         // It will look like the SearchTab.
         super(I18n.tr("Search"),
                 I18n.tr("Search and Download Files from the Internet."),
                 "search_tab");
-        searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                searchTab.getComponent(),
-                transfersTab.getComponent());
-        searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-        searchDownloadSplitPane.setContinuousLayout(true);
-        searchDownloadSplitPane.setResizeWeight(0.6);
-        searchDownloadSplitPane.setDividerLocation(UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
-        searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
-            JSplitPane splitPane = (JSplitPane) evt.getSource();
-            int current = splitPane.getDividerLocation();
-            if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
-                splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
-            }
-            UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
-        });
+        this.searchTab = searchTab;
+        this.transfersTab = transfersTab;
+        this.searchDownloadSplitPane = null;
     }
 
     @Override
     public JComponent getComponent() {
+        if (searchDownloadSplitPane == null) {
+            searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                    searchTab.getComponent(),
+                    transfersTab.getComponent());
+            searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
+            searchDownloadSplitPane.setContinuousLayout(true);
+            searchDownloadSplitPane.setResizeWeight(0.6);
+            searchDownloadSplitPane.setDividerLocation(UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
+            searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
+                JSplitPane splitPane = (JSplitPane) evt.getSource();
+                int current = splitPane.getDividerLocation();
+                if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
+                    splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
+                }
+                UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
+            });
+        }
         return searchDownloadSplitPane;
     }
 
     public void setDividerLocation(int newLocation) {
-        searchDownloadSplitPane.setDividerLocation(newLocation);
+        if (searchDownloadSplitPane != null) {
+            searchDownloadSplitPane.setDividerLocation(newLocation);
+        }
     }
 }

@@ -558,7 +558,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             buttonOptions.setText(scrollPaneSearchOptions.isVisible() ? strHideOpts : strShowOpts);
             buttonOptions.setIcon(!scrollPaneSearchOptions.isVisible() ? GUIMediator.getThemeImage("search_tools_left") : GUIMediator.getThemeImage("search_tools_right"));
             buttonOptions.setHorizontalTextPosition(!scrollPaneSearchOptions.isVisible() ? SwingConstants.RIGHT : SwingConstants.LEFT);
-            if (scrollPaneSearchOptions.isVisible()) {
+            if (scrollPaneSearchOptions.isVisible() && searchOptionsPanel != null) {
                 searchOptionsPanel.onOptionsPanelShown();
             }
         });
@@ -735,13 +735,17 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     void updateFiltersPanel() {
         schemaBox.applyFilters();
-        searchOptionsPanel.updateFiltersPanel();
+        if (searchOptionsPanel != null) {
+            searchOptionsPanel.updateFiltersPanel();
+        }
     }
 
     void resetFiltersPanel() {
         schemaBox.applyFilters();
-        searchOptionsPanel.resetFilters();
-        searchOptionsPanel.updateFiltersPanel();
+        if (searchOptionsPanel != null) {
+            searchOptionsPanel.resetFilters();
+            searchOptionsPanel.updateFiltersPanel();
+        }
     }
 
     @Override
