@@ -390,7 +390,48 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
             }
         } else if (this.getActivity() != null) {
-            setupAdapter(this.getActivity());
+            // Initialize adapter on background thread to avoid blocking JNI calls in captureUiStates()
+            WeakReference<TransfersFragment> contextRef = Ref.weak(this);
+            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                    () -> {
+                        if (!Ref.alive(contextRef)) {
+                            Ref.free(contextRef);
+                            return;
+                        }
+                        TransfersFragment fragment = contextRef.get();
+                        if (fragment == null || fragment.getActivity() == null) {
+                            Ref.free(contextRef);
+                            return;
+                        }
+                        try {
+                            // Prepare transfers list and adapter on background thread
+                            List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
+                            transfers.sort(fragment.transferComparator);
+
+                            // Create adapter on background thread to avoid blocking captureUiStates() on main thread
+                            TransferListAdapter newAdapter = new TransferListAdapter(fragment.getActivity(), transfers);
+
+                            fragment.getActivity().runOnUiThread(() -> {
+                                if (!Ref.alive(contextRef)) {
+                                    Ref.free(contextRef);
+                                    return;
+                                }
+                                try {
+                                    if (contextRef.get().adapter == null && contextRef.get().list != null) {
+                                        contextRef.get().list.setLayoutManager(contextRef.get().recyclerViewLayoutManager);
+                                        contextRef.get().list.setAdapter(newAdapter);
+                                        contextRef.get().adapter = newAdapter;
+                                    }
+                                } catch (Throwable t) {
+                                    LOG.error("Failed to setup adapter: " + t.getMessage(), t);
+                                    Ref.free(contextRef);
+                                }
+                            });
+                        } catch (Throwable t) {
+                            LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
+                            Ref.free(contextRef);
+                        }
+                    });
         }
         // mark the selected tab
         int i = 0;
