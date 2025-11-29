@@ -29,8 +29,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://chaquo.com/maven" }
-        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url = "https://chaquo.com/maven" }
+        maven { url = "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.1'
@@ -38,7 +38,7 @@ buildscript {
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
-        classpath 'com.google.gms:google-services:4.4.3'
+        classpath 'com.google.gms:google-services:4.4.4'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
 
         classpath 'com.chaquo.python:gradle:16.1.0'
