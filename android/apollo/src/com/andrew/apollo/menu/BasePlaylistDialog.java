@@ -42,8 +42,6 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 
-import java.util.concurrent.CountDownLatch;
-
 /**
  * A simple base class for the playlist dialogs.
  *
@@ -98,19 +96,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
         noButton.setOnClickListener(new NegativeButtonOnClickListener(mPlaylistDialog));
         yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, mPlaylistDialog));
 
-        mPlaylist.post(new Runnable() {
-
-            @Override
-            public void run() {
-                // Request focus to the edit text
-                mPlaylist.requestFocus();
-                // Select the playlist name
-                mPlaylist.selectAll();
-            }
-        });
-
-
-        final CountDownLatch latch = new CountDownLatch(1);
+        // Initialize on background thread - do not block main thread
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             initObjects(savedInstanceState);
             mPlaylist.setText(mDefaultname);
@@ -122,16 +108,18 @@ abstract class BasePlaylistDialog extends DialogFragment {
                 }
                 mPlaylistDialog.show();
             });
-            latch.countDown();
         });
 
-        try {
-            LOG.info("BasePlaylistDialog.onCreateDialog() waiting for latch...");
-            latch.await();
-            LOG.info("BasePlaylistDialog.onCreateDialog() done waiting for latch...");
-        } catch (InterruptedException e) {
-            LOG.error("BasePlaylistDialog.onCreateDialog() interrupted", e);
-        }
+        mPlaylist.post(new Runnable() {
+
+            @Override
+            public void run() {
+                // Request focus to the edit text
+                mPlaylist.requestFocus();
+                // Select the playlist name
+                mPlaylist.selectAll();
+            }
+        });
         return mPlaylistDialog;
     }
 
