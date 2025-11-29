@@ -113,6 +113,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransfersNoSeedsView transfersNoSeedsView;
     private HeaderBanner headerBanner;
     private FWBannerView supportBanner;
+    // Cached menu visibility states to avoid blocking JNI calls in onPrepareOptionsMenu()
+    private volatile boolean cachedHasCompleteOrErrored;
+    private volatile boolean cachedHasActive;
+    private volatile boolean cachedHasInactive;
+    private volatile boolean cachedHasSeeding;
+    private volatile boolean cachedHasComplete;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -170,39 +176,47 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
-        updateMenuItemVisibility(menu);
+        updateMenuItemVisibilityFromCache(menu);
         super.onPrepareOptionsMenu(menu);
     }
 
-    private void updateMenuItemVisibility(Menu menu) {
+    private void updateMenuItemVisibilityFromCache(Menu menu) {
         TransferManager tm = TransferManager.instance();
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
-        final List<Transfer> transfers = tm.getTransfers();
+        if (cachedHasCompleteOrErrored) {
+            menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+        }
+        if (!bittorrentDisconnected && cachedHasActive) {
+            menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+        }
+        if (cachedHasInactive) {
+            menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+        }
+        if (!cachedHasSeeding && cachedHasComplete) {
+            menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+        }
+        if (cachedHasSeeding && cachedHasComplete) {
+            menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+            menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+        }
+        if (cachedHasSeeding) {
+            menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+        }
+    }
+
+    private void updateMenuItemVisibilityCache(final List<Transfer> transfers) {
         if (transfers.size() > 0) {
-            if (someTransfersComplete(transfers) || someTransfersErrored(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-            }
-            if (!bittorrentDisconnected) {
-                if (someTransfersActive(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
-                }
-            }
-            //let's show it even if bittorrent is disconnected
-            //user should get a message telling them to check why they can't resume.
-            //Preferences > Connectivity is disconnected.
-            if (someTransfersInactive(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
-            }
-            if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-            }
-            if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-            }
-            if (someTransfersSeeding(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-            }
+            cachedHasCompleteOrErrored = someTransfersComplete(transfers) || someTransfersErrored(transfers);
+            cachedHasActive = someTransfersActive(transfers);
+            cachedHasInactive = someTransfersInactive(transfers);
+            cachedHasSeeding = someTransfersSeeding(transfers);
+            cachedHasComplete = someTransfersComplete(transfers);
+        } else {
+            cachedHasCompleteOrErrored = false;
+            cachedHasActive = false;
+            cachedHasInactive = false;
+            cachedHasSeeding = false;
+            cachedHasComplete = false;
         }
     }
 
@@ -349,6 +363,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
                             if (contextRef.get().getActivity() == null) {
                                 return;
+                            }
+
+                            // Update menu visibility cache from background thread to avoid blocking JNI calls in onPrepareOptionsMenu()
+                            try {
+                                contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
+                            } catch (Throwable t) {
+                                LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
                             }
 
                             contextRef.get().getActivity().runOnUiThread(() -> {
