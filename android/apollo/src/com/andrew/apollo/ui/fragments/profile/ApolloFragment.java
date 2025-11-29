@@ -374,13 +374,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::onAddToFavorites);
             return;
         }
-        FavoritesStore favoritesStore = FavoritesStore.getInstance(getActivity());
+        final Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+        final FavoritesStore favoritesStore = FavoritesStore.getInstance(activity);
+        if (favoritesStore == null) {
+            return;
+        }
         if (mSongList != null) {
             int added = 0;
             for (Long songId : mSongList) {
                 try {
-                    final Song song = MusicUtils.getSong(getActivity(), songId);
-                    if (song != null && favoritesStore != null) {
+                    final Song song = MusicUtils.getSong(activity, songId);
+                    if (song != null) {
                         favoritesStore.addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
                         added++;
                     }
@@ -389,16 +396,32 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 }
             }
             if (added > 0) {
-                final String message = getResources().getQuantityString(
+                final String message = activity.getResources().getQuantityString(
                         R.plurals.NNNtrackstoplaylist, added, added);
 
-                SystemUtils.postToUIThread(() -> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
+                SystemUtils.postToUIThread(() -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    final Activity uiActivity = getActivity();
+                    if (uiActivity == null || uiActivity.isFinishing()) {
+                        return;
+                    }
+                    AppMsg.makeText(uiActivity, message, AppMsg.STYLE_CONFIRM).show();
+                });
             }
-        } else if (mSelectedId != -1 && favoritesStore != null) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
-                final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, 1);
-                SystemUtils.postToUIThread(() -> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
+        } else if (mSelectedId != -1) {
+            favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
+            final String message = activity.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, 1);
+            SystemUtils.postToUIThread(() -> {
+                if (!isAdded()) {
+                    return;
+                }
+                final Activity uiActivity = getActivity();
+                if (uiActivity == null || uiActivity.isFinishing()) {
+                    return;
+                }
+                AppMsg.makeText(uiActivity, message, AppMsg.STYLE_CONFIRM).show();
             });
         }
     }
