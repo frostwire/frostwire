@@ -66,6 +66,7 @@ import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
@@ -164,30 +165,48 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             return;
         }
 
-        performUpdate(newList);
+        // Prepare diff calculation on background thread to avoid blocking JNI calls
+        prepareUpdateOnBackgroundThread(newList);
     }
 
     /**
-     * Performs the actual update, applying DiffUtil and dispatching changes.
-     * Called from updateList() when safe, or from dispatchUpdatesTo listener when previous update completes.
+     * Prepares the adapter update on background thread to avoid blocking JNI calls
+     * when capturing UI states. Once done, posts result back to main thread.
      */
-    private void performUpdate(List<Transfer> newList) {
+    private void prepareUpdateOnBackgroundThread(List<Transfer> newList) {
         if (newList == null) {
             newList = Collections.emptyList();
         }
 
-        List<Transfer> safeNewList = newList;
-        if (safeNewList == list) {
-            safeNewList = new ArrayList<>(safeNewList);
-        }
+        final List<Transfer> safeNewList = newList;
+        final List<Transfer> finalSafeNewList = (safeNewList == list) ? new ArrayList<>(safeNewList) : safeNewList;
 
-        List<TransferUiState> newUiStates = captureUiStates(safeNewList);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
+        // Do expensive work on background thread
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            try {
+                // Capture UI states on background thread to avoid blocking JNI calls
+                final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
+                // Calculate diff on background thread
+                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
 
+                // Post result back to main thread for UI update
+                if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
+                    ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult));
+                }
+            } catch (Throwable e) {
+                LOG.error("Error preparing adapter update on background thread", e);
+            }
+        });
+    }
+
+    /**
+     * Applies the diff result on main thread (safe for RecyclerView updates).
+     */
+    private void applyDiffResult(List<Transfer> newTransferList, List<TransferUiState> newUiStates, DiffUtil.DiffResult diffResult) {
         updateInProgress = true;
         try {
             list.clear();
-            list.addAll(safeNewList);
+            list.addAll(newTransferList);
             previousUiStates.clear();
             previousUiStates.addAll(newUiStates);
 
@@ -199,9 +218,17 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             if (pendingUpdate != null) {
                 List<Transfer> next = pendingUpdate;
                 pendingUpdate = null;
-                performUpdate(next);
+                prepareUpdateOnBackgroundThread(next);
             }
         }
+    }
+
+    /**
+     * Performs the actual update, applying DiffUtil and dispatching changes.
+     * Called from updateList() when safe, or from dispatchUpdatesTo listener when previous update completes.
+     */
+    private void performUpdate(List<Transfer> newList) {
+        prepareUpdateOnBackgroundThread(newList);
     }
 
     /**
