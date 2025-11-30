@@ -242,6 +242,15 @@ jar {
     }
 }
 
+// Configure distribution tasks to handle duplicate jar files
+tasks.withType(Tar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Zip).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 // gettext tasks
 
 tasks.register('gettextInit') {
