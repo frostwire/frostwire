@@ -201,13 +201,15 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         }
 
         selectAllCheckboxOnCheckedChangeListener = (buttonView, isChecked) -> {
-            if (buttonView.isChecked()) {
-                adapter.checkAll();
-            } else {
-                adapter.clearChecked();
+            if (adapter != null) {
+                if (buttonView.isChecked()) {
+                    adapter.checkAll();
+                } else {
+                    adapter.clearChecked();
+                }
+                updateSelectedCount();
+                updateSelectedInBundle();
             }
-            updateSelectedCount();
-            updateSelectedInBundle();
         };
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
