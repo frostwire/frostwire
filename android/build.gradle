@@ -238,7 +238,7 @@ dependencies {
     implementation 'androidx.browser:browser:1.9.0'
     implementation 'androidx.core:core:1.17.0'
     implementation 'androidx.exifinterface:exifinterface:1.4.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
