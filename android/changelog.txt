@@ -1,59 +1,77 @@
-FrostWire 3.0.10 build 764 NOV/16/2025
- - performance:Search architecture optimizations - 25-50% reduction in memory allocations
- - performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
- - performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
- - performance:YT pattern static initialization and string operation optimization
- - maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
- - maintenance:Search package hierarchy flattened, V2 package consolidated
- - removed:TorrentDownloads search performer (site offline permanently)
- - removed:BTDigg search performer (protected by Cloudflare, unable to reliably parse search results)
- - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
- - new:Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
+FrostWire 3.0.11 build 765 NOV/29/2025
+ - new:Powered by jlibtorrent 2.0.12.7 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
+ - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
  - new:Knaben search performer, a new torrent search source
  - new:TorrentCSV search performer, a new torrent search source
  - new:Settings > Torrent Settings > Incoming Connection Port Range selection
  - new:Seed finished HTTP transfers if seeding is enabled (automatically creates torrent of finished download like on desktop)
- - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.
- - yt_dlp-2025.10.22
- - replaced:Picasso for Coil image loading library
- - removed:Torlock search performer (old site is down, new site is malicious)
- - removed:LimeTorrents search performer
+ - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
+ - new:YT search results now handled via details URL detection (youtube.com)
+ - new:SearchResultUtils utility class for reusable search result utilities
+ - new:Telluride dialog now works with generic SearchResult instead of YTSearchResult
+ - new:Distraction free search now on by default, much better experience
+ - performance:Search architecture optimizations - 25-50% reduction in memory allocations
+ - performance:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
+ - performance:SearchMatcher memory optimization reduces garbage collection pressure by 25%
+ - performance:YT pattern static initialization and string operation optimization
+ - performance:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+ - performance:Optimize stackBlur() with array pooling to reduce allocations
+ - performance:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
+ - performance:Performance optimized periodic checks run on background thread to keep UI responsive
+ - performance:Added visual status indicators in transfers screen when protections pause downloads
+ - performance:Optimize search sorting from O(n² log n) to O(n log n)
+ - performance:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
+ - performance:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
+ - performance:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
+ - performance:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
+ - performance:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
+ - performance:Optimize hot paths for string sanitizers - eliminate regex compilation overhead in search and scrapes (UrlUtils and StringUtils)
+ - performance:Optimize hot paths for Logger, ThreadPool, and collection sizing
+ - performance:Optimize MainApplication startup by deferring heavy initialization
+ - performance:Optimize RecyclerView onBindViewHolder() hot paths
+ - crash:ANR crashes in Transfers list when updating transfer state due to blocking JNI calls
+ - crash:ANR crash in menu preparation - menu visibility now cached on background thread
+ - crash:ANR crash during transfer list adapter initialization - UI state capture moved to background thread
+ - crash:ANR crash in transfer detail fragment - download/upload speeds cached on background thread
+ - crash:ANR crash in onCheckDHT - DHT status updates cached on background thread
+ - crash:ANR crash in BasePlaylistDialog - removed blocking CountDownLatch.await() on main thread
+ - crash:ANR crash in transfer list adapter - DiffUtil calculations moved to background thread
+ - crash:NullPointerException in AbstractConfirmListDialog when "select all" clicked with empty list
+ - crash:logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
+ - crash:ForegroundServiceStartNotAllowedException by adding foreground check and error handling
+ - crash:Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
+ - crash:Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
+ - crash:ClassCastException in SearchResultListAdapter OnLinkClickListener
+ - crash:HandlerDispatcher NullPointerException crashes in Picasso image loading (removed on build 760)
+ - crash:NPE in ImageFetcher.loadCurrentArtwork()
+ - crash:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
+ - crash:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
+ - crash:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
+ - crash:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - crash:NullPointerException in BasePlaylistDialog when fragment is detached from activity
+ - crash:NullPointerException in MusicUtils.getIdForPlaylist() with defensive null check
+ - crash:NameError in telluride.py query_video() - undefined qjs_path variable
+ - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
+ - crash:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down (removed on build 760)
+ - crash:thread leak and data race in UrlUtils.getFastestMirrorDomain
  - freeze:ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
  - freeze:sorting through too many results could cause an ANR when cleaning up titles
  - freeze:ANR in MusicPlaybackService.setDataSource
  - freeze:ANR in MusicPlaybackService.playFDs
- - fix:logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
- - fix:ForegroundServiceStartNotAllowedException by adding foreground check and error handling
- - fix:Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
- - fix:Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
- - fix:ClassCastException in SearchResultListAdapter OnLinkClickListener
- - fix:HandlerDispatcher NullPointerException crashes in Picasso image loading (removed on build 760)
  - freeze:in playFDs
  - freeze:in MusicPlaybackService.setDataSource
- - crash:NPE in ImageFetcher.loadCurrentArtwork()
- - improvement:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
- - improvement:Optimize stackBlur() with array pooling to reduce allocations
- - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
- - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
- - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
- - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
- - fix:NullPointerException in BasePlaylistDialog when fragment is detached from activity
- - fix:NullPointerException in MusicUtils.getIdForPlaylist() with defensive null check
- - fix:NameError in telluride.py query_video() - undefined qjs_path variable
- - new:YouTube search results now handled via details URL detection (youtube.com)
- - new:SearchResultUtils utility class for reusable search result utilities
- - new:Telluride dialog now works with generic SearchResult instead of YTSearchResult
- - yt_dlp-2025.11.12
+ - maintenance:Guard favorites toast when fragment detached
+ - maintenance:ProGuard now uses proguard-android-optimize.txt for better code optimization and APK size reduction
+ - maintenance:Updated gradle plugin to 8.13.1
+ - maintenance:Updated okhttp3 to 5.3.2
+ - maintenance:Updated androidx.lifecycle:lifecycle-viewmodel-ktx to 2.10.0
+ - maintenance:Updated Kotlin to 2.2.21
+ - maintenance:Updated com.google.gms:google-services to 4.4.4
+ - maintenance:Updated com.google.android.ump:user-messaging-platform to 4.0.0
+ - maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
+ - maintenance:Search package hierarchy flattened, V2 package consolidated
  - maintenance:Removed commented imports and debug code
  - maintenance:Fixed typo in PREF_KEY_NETWORK_ENABLE_DHT constant (froswire -> frostwire)
- - maintenance:Updated gradle plugin to 8.13.1
- - maintenance:Updated okhttp3 to 5.3.0
- - maintenance:Updated coil to 3.3.0
- - maintenance:Updated androidx.work to 2.11.0
- - maintenance:Updated Firebase BOM to 34.6.0
- - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
- - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
- - improvement:Added visual status indicators in transfers screen when protections pause downloads
  - maintenance:Avoid possible context leak on EngineBroadcastReceiver
  - maintenance:all license headers are GPL 3.0
  - maintenance:archive.org search fixed
@@ -64,21 +82,13 @@ FrostWire 3.0.10 build 764 NOV/16/2025
  - maintenance:add BitmapFactory.inSampleSize to prevent OOM crashes
  - maintenance:Add Bitmap.recycle() to prevent native memory leaks
  - maintenance:Replace deprecated setDrawingCacheEnabled() with Canvas API
- - speed-up:Optimize search sorting from O(n² log n) to O(n log n)
- - speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
- - speed-up:Replace global Hashtable throttling with lock-free ConcurrentHashMap in TaskThrottle
- - speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
- - speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
- - speed-up:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
- - speed-up:Optimize hot paths for string sanitizers - eliminate regex compilation overhead in search and scrapes (UrlUtils and StringUtils)
- - speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing
- - speed-up:Optimize MainApplication startup by deferring heavy initialization
- - speed-up:Optimize RecyclerView onBindViewHolder() hot paths
- - refactor: SearchManager tasks to Runnable and remove Thread.yield() from hot path
- - crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
- - fix:Picasso HandlerDispatcher NullPointerException on network state changes when app is backgrounded by keeping Picasso alive instead of shutting down (removed on build 760)
- - fix:thread leak and data race in UrlUtils.getFastestMirrorDomain
- - Distraction free search now on by default, much better experience
+ - refactor:SearchManager tasks to Runnable and remove Thread.yield() from hot path
+ - removed:TorrentDownloads search performer (site offline permanently)
+ - removed:BTDigg search performer (protected by Cloudflare, unable to reliably parse search results)
+ - removed:Torlock search performer (old site is down, new site is malicious)
+ - removed:LimeTorrents search performer
+ - replaced:Picasso for Coil image loading library
+ - yt_dlp-2025.11.12
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
@@ -86,17 +96,21 @@ FrostWire 3.0.10 build 764 NOV/16/2025
  - org.codehaus.groovy:groovy-all:3.0.25
  - com.squareup.picasso3:picasso:3.0.0-alpha06 and refactor of ImageLoader to use it (removed on build 760)
  - new: io.coil-kt.coil3:coil:3.0.4 and io.coil-kt.coil3:coil-network-okhttp:3.0.4
- - com.google.gms:google-services:4.4.3
+ - com.google.gms:google-services:4.4.4
  - com.google.firebase:firebase-crashlytics-gradle:3.0.6
  - androidx.core:core:1.17.0
  - androidx.exifinterface:exifinterface:1.4.1
- - androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4
+ - androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0
  - com.google.android.material:material:1.13.0
  - com.google.code.gson:gson:2.13.2
  - com.google.re2j:re2j:1.8
- - com.squareup.okhttp3:okhttp:5.1.0
- - androidx.work:work-runtime-ktx:2.10.4
- - com.google.firebase:firebase-bom:34.3.0
+ - com.squareup.okhttp3:okhttp:5.3.2
+ - androidx.work:work-runtime-ktx:2.11.0
+ - com.google.firebase:firebase-bom:34.6.0
+ - com.google.android.ump:user-messaging-platform:4.0.0
+ - org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21
+ - io.coil-kt.coil3:coil:3.3.0
+ - io.coil-kt.coil3:coil-network-okhttp:3.3.0
  - removed: com.applovin:applovin-sdk
  - removed: com.applovin.mediation:unityads-adapter
  - Maintenance:all license headers are consistent with GPL 3.0
