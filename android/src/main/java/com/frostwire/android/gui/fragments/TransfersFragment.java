@@ -119,6 +119,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private volatile boolean cachedHasInactive;
     private volatile boolean cachedHasSeeding;
     private volatile boolean cachedHasComplete;
+    // Cached DHT state to avoid blocking JNI calls in onCheckDHT()
+    private volatile boolean cachedDhtEnabled;
+    private volatile long cachedDhtPeers;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -483,6 +486,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 postToHandler(SystemUtils.HandlerThreadName.MISC,
                         () -> NetworkManager.instance().refreshNetworkState());
             }
+            // Update DHT cache on background thread to avoid blocking JNI calls
+            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::checkDHTBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
+                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                        () -> updateDHTCache());
+            }
+            // Update UI with cached DHT state
             onCheckDHT();
         }
     }
@@ -528,6 +537,27 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
+    /**
+     * Updates DHT cache on background thread to avoid blocking JNI calls.
+     * Must be called from background thread.
+     */
+    private void updateDHTCache() {
+        try {
+            if (BTEngine.ctx == null) {
+                cachedDhtEnabled = false;
+                cachedDhtPeers = 0;
+                return;
+            }
+            BTEngine btEngine = BTEngine.getInstance();
+            cachedDhtEnabled = btEngine.isDhtRunning();
+            cachedDhtPeers = btEngine.stats().dhtNodes();
+        } catch (Throwable e) {
+            LOG.error("Failed to update DHT cache", e);
+            cachedDhtEnabled = false;
+            cachedDhtPeers = 0;
+        }
+    }
+
     private void onCheckDHT() {
         if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
             return;
@@ -560,16 +590,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             textDHTPeers.setText(R.string.bittorrent_off);
             return;
         }
-        BTEngine btEngine = BTEngine.getInstance();
-        boolean dhtEnabled = btEngine.isDhtRunning();
-        long dhtPeers = btEngine.stats().dhtNodes();
+        // Use cached DHT state to avoid blocking JNI calls on main thread
         // No DHT
-        if (!dhtEnabled) {
+        if (!cachedDhtEnabled) {
             textDHTPeers.setVisibility(View.INVISIBLE);
             return;
         }
         // DHT On.
-        textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
+        textDHTPeers.setText(cachedDhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
     }
 
     @Override
