@@ -12,7 +12,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'me.champeau.jmh' version '0.7.2' /* JMH microbenchmarking framework */
+    id 'me.champeau.jmh' version '0.7.3' /* JMH microbenchmarking framework */
 }
 
 group = 'com.frostwire'
