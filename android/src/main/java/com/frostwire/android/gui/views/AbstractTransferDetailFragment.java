@@ -65,6 +65,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private TextView detailProgressStatusTextView;
     private TextView detailProgressDownSpeedTextView;
     private TextView detailProgressUpSpeedTextView;
+    // Cached transfer data to avoid blocking JNI calls on main thread
+    private volatile int cachedProgress;
+    private volatile long cachedDownloadSpeed;
+    private volatile long cachedUploadSpeed;
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
@@ -110,6 +114,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     public void onResume() {
         super.onResume();
         ensureTorrentHandle(); // Purposefully not async.
+        // Populate cache before updating UI
+        updateTransferDataCache();
         updateCommonComponents();
     }
 
@@ -140,7 +146,11 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
                 return;
             }
         }
-        updateCommonComponents();
+        // Update transfer data cache on background thread to avoid blocking JNI calls
+        if (TaskThrottle.isReadyToSubmitTask("AbstractTransferDetailFragment::updateTransferCache", 500)) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::updateTransferDataCache);
+        }
+        updateCommonComponentsFromCache();
         updateComponents();
     }
 
@@ -155,7 +165,27 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         }
     }
 
-    private void updateCommonComponents() {
+    /**
+     * Updates transfer data cache on background thread to avoid blocking JNI calls.
+     * Must be called from background thread.
+     */
+    private void updateTransferDataCache() {
+        try {
+            if (uiBittorrentDownload != null) {
+                cachedProgress = uiBittorrentDownload.getProgress();
+                cachedDownloadSpeed = uiBittorrentDownload.getDownloadSpeed();
+                cachedUploadSpeed = uiBittorrentDownload.getUploadSpeed();
+            }
+        } catch (Throwable e) {
+            LOG.error("Failed to update transfer data cache", e);
+        }
+    }
+
+    /**
+     * Updates UI components using cached transfer data.
+     * Safe to call on main thread since it uses cached values.
+     */
+    private void updateCommonComponentsFromCache() {
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -163,7 +193,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
         }
         if (detailProgressProgressBar != null) {
-            detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
+            detailProgressProgressBar.setProgress(cachedProgress);
         }
         if (detailProgressStatusTextView != null) {
             if (transferStateStrings == null) {
@@ -172,11 +202,15 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
         if (detailProgressDownSpeedTextView != null) {
-            detailProgressDownSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed())));
+            detailProgressDownSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(cachedDownloadSpeed)));
         }
         if (detailProgressUpSpeedTextView != null) {
-            detailProgressUpSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed())));
+            detailProgressUpSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(cachedUploadSpeed)));
         }
+    }
+
+    private void updateCommonComponents() {
+        updateCommonComponentsFromCache();
     }
 
     /**
