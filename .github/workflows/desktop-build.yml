@@ -33,7 +33,7 @@ jobs:
     - name: Set up JDK 25
       uses: actions/setup-java@v4
       with:
-        java-version: '25'
+        java-version: '25.0.1'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
@@ -46,7 +46,7 @@ jobs:
 
     - name: "[Linux] Build JAR"
       if: runner.os != 'Windows' && runner.os != 'macOS'
-      run: ./gradlew jar
+      run: cd desktop && ./gradlew jar
 
     # Uncomment the following step to enable publishing builds when a release is made.
     #
