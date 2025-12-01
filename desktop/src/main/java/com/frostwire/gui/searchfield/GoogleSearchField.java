@@ -117,6 +117,7 @@ public class GoogleSearchField extends SearchField {
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
         cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
+        cloudSearchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, cloudSearchField.getPreferredSize().height));
         cloudSearchField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

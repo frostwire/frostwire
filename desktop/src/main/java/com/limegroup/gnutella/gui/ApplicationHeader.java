@@ -86,7 +86,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     ApplicationHeader(Map<Tabs, Tab> tabs) {
         setMinimumSize(new Dimension(1000, 54));
-        setLayout(new MigLayout("ins 0, ay 50%, filly,", "[][][grow][][]"));
+        setLayout(new MigLayout("ins 0 0 0 10, ay 50%, filly,", "[][][grow]", "[top, pref!]"));
         headerButtonBackgroundSelected = GUIMediator.getThemeImage("selected_header_button_background").getImage();
         headerButtonBackgroundUnselected = GUIMediator.getThemeImage("unselected_header_button_background").getImage();
 
@@ -98,12 +98,17 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         //only one will be shown at the time.
         logoUpdateButtonsPanel.add(logoPanel);
         logoUpdateButtonsPanel.add(updateButton);
-        add(logoUpdateButtonsPanel, "growx, alignx center");
+        add(logoUpdateButtonsPanel, "");
+
+        // Placeholder for tab buttons - will be replaced with actual buttons in deferred initialization
+        tabButtonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
+        tabButtonContainer.setOpaque(false);
+        add(tabButtonContainer, "");
 
         // Setup the search field
         searchPanels = createSearchPanel();
         searchPanels.setOpaque(false);
-        add(searchPanels, "alignx center, growx");
+        add(searchPanels, "pushx, growx, ay 50%");
 
         // Media player removed - now using OS default audio player
 
@@ -137,7 +142,20 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     }
 
     private JPanel createSearchPanel() {
-        JPanel panel = new JPanel(new CardLayout());
+        JPanel panel = new JPanel(new CardLayout()) {
+            @Override
+            public Dimension getMaximumSize() {
+                Dimension pref = getPreferredSize();
+                return new Dimension(Integer.MAX_VALUE, pref.height);
+            }
+
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension pref = super.getPreferredSize();
+                // Ensure the panel can grow to fill available width
+                return new Dimension(Math.max(pref.width, 100), pref.height);
+            }
+        };
         // CloudSearchField and LibrarySearchField will be added in deferred initialization
         // to avoid EDT violation from SearchField class loading and initialization
         createLibrarySearchField(panel);
@@ -231,11 +249,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     }
 
     private void replaceTabButtonContainer(JPanel newContainer) {
-        if (tabButtonContainer != null) {
-            remove(tabButtonContainer);
+        tabButtonContainer.removeAll();
+        Component[] components = newContainer.getComponents();
+        for (Component c : components) {
+            tabButtonContainer.add(c);
         }
-        tabButtonContainer = newContainer;
-        add(tabButtonContainer, "");
         revalidate();
         repaint();
     }

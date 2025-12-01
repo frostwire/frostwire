@@ -200,6 +200,8 @@ public class SearchField extends JXSearchField {
         setDisabledTextColor(new Color(40, 40, 40));
         setForeground(new Color(40, 40, 40));
         putClientProperty("promptForeground", new Color(40, 40, 40));
+        // Allow search field to grow horizontally in layout managers
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, getPreferredSize().height));
     }
 
     /**
