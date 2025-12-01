@@ -456,6 +456,12 @@ public class CommonUtils {
     }
 
     public static boolean isRunningFromIntelliJ() {
+        // If running from distribution package, definitely not IntelliJ
+        String distributionFlag = System.getProperty("fw.running.from.distribution");
+        if (distributionFlag != null && distributionFlag.equals("true")) {
+            return false;
+        }
+
         // Check for the custom flag set by gradle build script
         String ideFlag = System.getProperty("fw.running.from.ide");
         if (ideFlag != null && ideFlag.equals("true")) {
@@ -520,8 +526,8 @@ public class CommonUtils {
                 java.lang.management.ManagementFactory.getPlatformMXBean(com.sun.management.HotSpotDiagnosticMXBean.class);
             // If we can access diagnostic MXBean and debugger is attached, this would return true
             // However, a more reliable check is to see if current thread is a debugger thread
-        } catch (Exception e) {
-            // Ignore
+        } catch (Throwable e) {
+            // Ignore - NoClassDefFoundError can be thrown if HotSpotDiagnosticMXBean is not available
         }
 
         // Check if any of the current threads have debugger indicators in their name
