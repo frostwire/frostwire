@@ -79,6 +79,7 @@ telluride/telluride_macos*
 desktop/lib/native-src/osx/machine_name
 desktop/lib/native-src/osx/machine_name.arm64
 desktop/lib/native-src/osx/machine_name.x86_64
+desktop/lib/jars/frostwire.jar
 telluride/.vscode/
 telluride/telluride.build/
 telluride/telluride.dist/
