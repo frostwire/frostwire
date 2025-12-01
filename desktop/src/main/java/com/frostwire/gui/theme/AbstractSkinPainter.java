@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 import javax.swing.plaf.nimbus.AbstractRegionPainter;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.RenderingHints;
 
 /**
  * @author gubatron
@@ -80,6 +81,32 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
 
     protected final boolean testValid(int x, int y, int w, int h) {
         return x >= 0 && y >= 0 && (w - x) > 0 && (h - y) > 0;
+    }
+
+    /**
+     * Draws a shape with anti-aliasing disabled for performance.
+     * This is useful for drawing borders and shapes that don't require smooth rendering.
+     */
+    protected final void drawShapeNoAA(Graphics2D g, Shape s) {
+        Object antiAlias = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.draw(s);
+        if (antiAlias != null) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAlias);
+        }
+    }
+
+    /**
+     * Fills a shape with anti-aliasing disabled for performance.
+     * This is useful for filling backgrounds and shapes that don't require smooth rendering.
+     */
+    protected final void fillShapeNoAA(Graphics2D g, Shape s) {
+        Object antiAlias = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.fill(s);
+        if (antiAlias != null) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAlias);
+        }
     }
 
     final Image getImage(String name) {

@@ -42,16 +42,16 @@ public final class SkinScrollBarButtonPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width - 1, height)) {
             Shape s = shapeGenerator.createRectangle(0, 0, width - 1, height);
             g.setPaint(getScrollBarButtonBoxPaint(s));
-            g.fill(s);
+            fillShapeNoAA(g, s);
             g.setPaint(getScrollBarButtonBoxBorderColor());
-            g.draw(s);
+            drawShapeNoAA(g, s);
         }
     }
 
     private void paintArrowButton(Graphics2D g, double x, double y) {
         Shape s = shapeGenerator.createArrowLeft(x, y, 7, 8);
         g.setPaint(getScrollBarButtonArrowColor());
-        g.fill(s);
+        fillShapeNoAA(g, s);
     }
 
     private Color getScrollBarButtonArrowColor() {

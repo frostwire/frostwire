@@ -53,22 +53,6 @@ public class Main {
         String arch = System.getProperty("os.arch").toLowerCase();
         boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");	
 
-        // Check if we're on Linux and running under Wayland
-        if (OSUtils.isLinux() && isARM64) {
-            String sessionType = System.getenv("XDG_SESSION_TYPE");
-            if (sessionType != null && sessionType.equalsIgnoreCase("wayland")) {
-                System.err.println("\n===================================================");
-		System.err.println("FrostWire is not compatible with Wayland on ARM64 chips,");
-		System.err.println("It will make your session crash if we continue.\n");
-	        System.err.println("FrostWire requires an X.org session to run on ARM64.");
-                System.err.println("Your Linux arm64 system is currently using Wayland.");
-                System.err.println("\nPlease switch to X.org or Xwayland and try again.\n");
-		System.err.println("You can switch to X.org in the login screen of your\ndistro, usually on the settings icon at the bottom\ncorner of the screen.");
-                System.err.println("===================================================\n");
-                System.exit(1);
-            }
-        }
-
         // Check if running in a development environment (Gradle or IntelliJ)
         boolean isDevEnvironment = CommonUtils.isRunningFromGradle() || CommonUtils.isRunningFromIntelliJ();
         boolean hasDebugger = CommonUtils.isStepDebuggerAttached();

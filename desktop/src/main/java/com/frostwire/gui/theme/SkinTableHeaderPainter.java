@@ -38,7 +38,7 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width - 1, height - 1)) {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(getTableHeaderPaint(s));
-            g.fill(s);
+            fillShapeNoAA(g, s);
             paintBorder(g, width, height);
         }
     }
@@ -50,7 +50,7 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
         path.lineTo(width - 1, height - 1);
         path.lineTo(width - 1, 0);
         g.setPaint(SkinColors.TABLE_HEADER_BORDER_COLOR);
-        g.draw(path);
+        drawShapeNoAA(g, path);
     }
 
     private Paint getTableHeaderPaint(Shape s) {

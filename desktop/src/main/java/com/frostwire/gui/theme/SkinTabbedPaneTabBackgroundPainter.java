@@ -54,7 +54,7 @@ public final class SkinTabbedPaneTabBackgroundPainter extends AbstractSkinPainte
         if (testValid(0, 0, width, height)) {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(SkinColors.LIGHT_BACKGROUND_COLOR);
-            g.fill(s);
+            fillShapeNoAA(g, s);
             paintBorder(g, width, height);
         }
     }
@@ -64,7 +64,7 @@ public final class SkinTabbedPaneTabBackgroundPainter extends AbstractSkinPainte
         if (testValid(0, 0, w, height)) {
             Shape s = shapeGenerator.createRectangle(0, 0, w, height);
             g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
-            g.fill(s);
+            fillShapeNoAA(g, s);
             paintBorder(g, width, height);
         }
     }
@@ -80,7 +80,7 @@ public final class SkinTabbedPaneTabBackgroundPainter extends AbstractSkinPainte
         path.lineTo(w, h);
         path.lineTo(width, h);
         g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
-        g.draw(path);
+        drawShapeNoAA(g, path);
     }
 
     public enum State {

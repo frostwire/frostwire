@@ -41,7 +41,7 @@ public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width, height)) {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(color);
-            g.fill(s);
+            fillShapeNoAA(g, s);
         }
     }
 

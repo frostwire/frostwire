@@ -37,9 +37,9 @@ public final class SkinScrollBarTrackPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width, height)) {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(getScrollBarTrackPaint(s));
-            g.fill(s);
+            fillShapeNoAA(g, s);
             g.setColor(SkinColors.SCROLL_TRACK_BORDER_COLOR);
-            g.draw(s);
+            drawShapeNoAA(g, s);
         }
     }
 

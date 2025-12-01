@@ -46,9 +46,9 @@ application {
                                  '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
                                  '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
                                  '--enable-native-access=ALL-UNNAMED',
-'-XX:+PreserveFramePointer',
-'-XX:ErrorFile=./hs_err_pid%p.log',
-'-XX:+CreateCoredumpOnCrash',
+				 '-XX:+PreserveFramePointer',
+				 '-XX:ErrorFile=./hs_err_pid%p.log',
+				 '-XX:+CreateCoredumpOnCrash',
                                  '-Xms64m',
                                  '-Xmx512m',
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
@@ -62,7 +62,7 @@ application {
                                  '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
                                  '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
                                  '-Ddebug=1',
-//'-XX:NativeMemoryTracking=detail',
+				 //'-XX:NativeMemoryTracking=detail',
     ]
 
     // Add IDE flag when running from IDE
@@ -85,10 +85,16 @@ application {
     if (OperatingSystem.current().isMacOsX()) {
         applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true']
     } else if (OperatingSystem.current().isLinux()) {
-        // Optimize rendering for Linux - works with X.org
+        // Optimize rendering for Linux - works with X.org and Wayland
+	def sessionType = System.getenv("XDG_SESSION_TYPE") ?: "x11"
+	def isWayland = sessionType.toLowerCase().contains("wayland")
+	def xrenderValue = isWayland ? "-Dsun.java2d.xrender=false" : "-Dsun.java2d.xrender=true"
+        System.out.println("xrenderValue=" + xrenderValue)
+        // System.getEnv  
         applicationDefaultJvmArgs += [
-            '-Dsun.java2d.xrender=true',            // Use XRender - most stable on Linux with X.org
-            '-Dsun.java2d.opengl=false',            // OpenGL can crash entire display session
+            xrenderValue,
+            //'-Djdk.gtk.version=2',
+            '-Dsun.java2d.opengl=false',   // OpenGL can crash entire display session
         ]
     }
 }

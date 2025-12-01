@@ -64,7 +64,7 @@ public final class SkinTextFieldBorderPainter extends AbstractSkinPainter {
         if (testValid(x, y, w, h)) {
             Shape s = shapeGenerator.createRoundRectangle(x, y, w, h, CornerSize.BORDER);
             g.setPaint(color);
-            g.draw(s);
+            drawShapeNoAA(g, s);
         }
     }
 

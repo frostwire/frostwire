@@ -40,7 +40,7 @@ public final class SkinMenuItemBackgroundPainter extends AbstractSkinPainter {
         if (testValid(x, 0, w, height)) {
             Shape s = shapeGenerator.createRectangle(x, 0, w, height);
             g.setPaint(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
-            g.fill(s);
+            fillShapeNoAA(g, s);
         }
     }
 

@@ -36,6 +36,7 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
+import java.awt.RenderingHints;
 import java.util.*;
 
 /**
@@ -557,17 +558,35 @@ public class LimeJTable extends JTable implements JSortTable {
      */
     public void paint(Graphics g) {
         try {
-            super.paint(g);
+            // Disable LCD text rendering for better performance when painting many cells
+            if (g instanceof Graphics2D) {
+                Graphics2D g2d = (Graphics2D) g;
+                Object lcdHint = g2d.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                try {
+                    super.paint(g);
+                } finally {
+                    if (lcdHint != null) {
+                        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, lcdHint);
+                    }
+                }
+            } else {
+                super.paint(g);
+            }
         } catch (Exception e) {
             //ignore
         }
         int focusedRow = getFocusedRow(true);
         if (focusedRow != -1 && focusedRow < getRowCount()) {
-            Border rowBorder = UIManager.getBorder("Table.focusRowHighlightBorder");
-            if (rowBorder != null) {
-                Rectangle rect = getCellRect(focusedRow, 0, true);
-                rect.width = getWidth();
-                rowBorder.paintBorder(this, g, rect.x, rect.y, rect.width, rect.height);
+            // Only draw the focused row border if it's visible in the viewport
+            Rectangle viewportRect = getVisibleRect();
+            Rectangle rect = getCellRect(focusedRow, 0, true);
+            if (viewportRect.intersects(rect)) {
+                Border rowBorder = UIManager.getBorder("Table.focusRowHighlightBorder");
+                if (rowBorder != null) {
+                    rect.width = getWidth();
+                    rowBorder.paintBorder(this, g, rect.x, rect.y, rect.width, rect.height);
+                }
             }
         }
     }

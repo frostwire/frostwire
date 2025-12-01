@@ -37,10 +37,10 @@ public final class SkinScrollBarThumbPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width - 2, height - 2)) {
             Shape s1 = shapeGenerator.createRectangle(0, 0, width, height);
             g.setColor(SkinColors.SCROLL_THUMB_BORDER_COLOR);
-            g.fill(s1);
+            fillShapeNoAA(g, s1);
             Shape s2 = shapeGenerator.createRectangle(1, 1, width - 2, height - 1);
             g.setPaint(getScrollBarThumbPaint(s2));
-            g.fill(s2);
+            fillShapeNoAA(g, s2);
         }
     }
 

@@ -56,9 +56,9 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
         if (testValid(d, d, width, height)) {
             Shape s = shapeGenerator.createRectangle(d, d, width, height);
             g.setPaint(getProgressBarPaint(s));
-            g.fill(s);
+            fillShapeNoAA(g, s);
             g.setPaint(getProgressBarBorderPaint());
-            g.draw(s);
+            drawShapeNoAA(g, s);
         }
     }
 
@@ -66,7 +66,7 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
         if (testValid(0, 0, width, height)) {
             Shape s = shapeGenerator.createProgressBarIndeterminatePattern(0, 0, width, height);
             g.setPaint(getProgressBarIndeterminatePaint(s));
-            g.fill(s);
+            fillShapeNoAA(g, s);
         }
     }
 

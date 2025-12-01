@@ -40,10 +40,10 @@ public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
         if (testValid(0, 0, w, h)) {
             Shape s = shapeGenerator.createRectangle(0, 0, w, h);
             g.setPaint(SkinColors.LIGHT_BACKGROUND_COLOR);
-            g.fill(s);
+            fillShapeNoAA(g, s);
             // border
             g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
-            g.draw(s);
+            drawShapeNoAA(g, s);
         }
     }
 

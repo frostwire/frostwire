@@ -51,6 +51,11 @@ public final class SkinPanelUI extends SynthPanelUI {
 
     @Override
     public void update(Graphics g, JComponent c) {
+        paint(g, c);
+    }
+
+    @Override
+    public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
             if (Boolean.TRUE.equals(c.getClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND))) {
                 g.setColor(SkinColors.DARK_BOX_BACKGROUND_COLOR);
@@ -63,9 +68,8 @@ public final class SkinPanelUI extends SynthPanelUI {
                 g.setColor(c.getBackground());
                 g.fillRect(0, 0, c.getWidth(), c.getHeight());
             }
-        } else {
-            super.update(g, c);
         }
+        super.paint(g, c);
     }
 
     @Override
