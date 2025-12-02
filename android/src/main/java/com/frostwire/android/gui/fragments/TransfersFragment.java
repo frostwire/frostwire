@@ -375,18 +375,21 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
                             }
 
-                            contextRef.get().getActivity().runOnUiThread(() -> {
-                                if (!Ref.alive(contextRef)) {
-                                    Ref.free(contextRef);
-                                    return;
-                                }
-                                try {
-                                    contextRef.get().updateTransferList(tfCopy);
-                                } catch (Throwable t) {
-                                    LOG.error("onTime() " + t.getMessage(), t);
-                                    Ref.free(contextRef);
-                                }
-                            });
+                            FragmentActivity activity = contextRef.get().getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(() -> {
+                                    if (!Ref.alive(contextRef)) {
+                                        Ref.free(contextRef);
+                                        return;
+                                    }
+                                    try {
+                                        contextRef.get().updateTransferList(tfCopy);
+                                    } catch (Throwable t) {
+                                        LOG.error("onTime() " + t.getMessage(), t);
+                                        Ref.free(contextRef);
+                                    }
+                                });
+                            }
 
                         });
             } else {
@@ -412,9 +415,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             transfers.sort(fragment.transferComparator);
 
                             // Create adapter on background thread to avoid blocking captureUiStates() on main thread
-                            TransferListAdapter newAdapter = new TransferListAdapter(fragment.getActivity(), transfers);
+                            FragmentActivity adapterActivity = fragment.getActivity();
+                            if (adapterActivity == null) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            TransferListAdapter newAdapter = new TransferListAdapter(adapterActivity, transfers);
 
-                            fragment.getActivity().runOnUiThread(() -> {
+                            adapterActivity.runOnUiThread(() -> {
                                 if (!Ref.alive(contextRef)) {
                                     Ref.free(contextRef);
                                     return;
@@ -446,16 +454,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         tab.select();
                     } else {
                         try {
-                            getActivity().runOnUiThread(() -> {
-                                try {
-                                    tab.select();
-                                } catch (Throwable t) {
-                                    if (BuildConfig.DEBUG) {
-                                        throw t;
+                            FragmentActivity activity = getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(() -> {
+                                    try {
+                                        tab.select();
+                                    } catch (Throwable t) {
+                                        if (BuildConfig.DEBUG) {
+                                            throw t;
+                                        }
+                                        LOG.error("onTime() " + t.getMessage(), t);
                                     }
-                                    LOG.error("onTime() " + t.getMessage(), t);
-                                }
-                            });
+                                });
+                            }
                         } catch (Throwable ignored) {
                         }
                     }
