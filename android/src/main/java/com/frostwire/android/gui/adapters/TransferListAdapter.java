@@ -210,7 +210,13 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             previousUiStates.clear();
             previousUiStates.addAll(newUiStates);
 
-            diffResult.dispatchUpdatesTo(this);
+            try {
+                diffResult.dispatchUpdatesTo(this);
+            } catch (IllegalStateException e) {
+                // RecyclerView is computing layout or scrolling, fall back to full refresh
+                LOG.warn("RecyclerView computing layout, using notifyDataSetChanged: " + e.getMessage());
+                notifyDataSetChanged();
+            }
         } finally {
             updateInProgress = false;
 
