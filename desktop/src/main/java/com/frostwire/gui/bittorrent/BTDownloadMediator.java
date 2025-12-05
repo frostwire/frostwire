@@ -743,10 +743,37 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     if (seedDataFile.exists()) {
                         saveDir = torrentFile.getParentFile();
                     }
+
+                    // Ensure the .torrent exists under the configured Torrents directory
+                    File torrentToUse = torrentFile;
+                    try {
+                        File torrentsDir = com.limegroup.gnutella.settings.SharingSettings.TORRENTS_DIR_SETTING.getValue();
+                        if (torrentsDir != null) {
+                            if (!torrentsDir.exists()) {
+                                // noinspection ResultOfMethodCallIgnored
+                                torrentsDir.mkdirs();
+                            }
+                            File parent = torrentFile.getParentFile();
+                            // If the .torrent is outside the configured torrentsDir, copy it there
+                            if (parent == null || !torrentsDir.equals(parent)) {
+                                File target = new File(torrentsDir, torrentFile.getName());
+                                try {
+                                    java.nio.file.Files.copy(torrentFile.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                    torrentToUse = target;
+                                } catch (Throwable ignored) {
+                                    // fall back to original file if copy fails
+                                    torrentToUse = torrentFile;
+                                }
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                        // best effort only
+                    }
+
                     if (saveDir == null) {
-                        BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                        BTEngine.getInstance().download(torrentToUse, null, filesSelection);
                     } else {
-                        GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
+                        GUIMediator.instance().openTorrentForSeed(torrentToUse, saveDir);
                     }
                 } catch (Exception e) {
                     LOG.error(e.toString(), e);

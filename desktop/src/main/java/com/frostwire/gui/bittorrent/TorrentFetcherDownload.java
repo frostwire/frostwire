@@ -266,7 +266,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 try {
                     TorrentInfo ti = TorrentInfo.bdecode(data);
                     boolean[] selection = calculateSelection(ti, relativePath);
-                    BTEngine.getInstance().download(ti, null, selection, peers);
+                    BTEngine.getInstance().download(ti, null, selection, peers, true);
                 } catch (Throwable e) {
                     LOG.error("Error downloading torrent", e);
                 }
@@ -283,7 +283,7 @@ public class TorrentFetcherDownload implements BTDownload {
                             }
                         }
                         TorrentInfo ti = TorrentInfo.bdecode(data);
-                        BTEngine.getInstance().download(ti, null, selection, peers);
+                        BTEngine.getInstance().download(ti, null, selection, peers, true);
                         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
