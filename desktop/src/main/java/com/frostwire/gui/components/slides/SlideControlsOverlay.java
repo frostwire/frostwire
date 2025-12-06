@@ -34,8 +34,11 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 /**
  * @author gubatron
@@ -50,11 +53,20 @@ final class SlideControlsOverlay extends JPanel {
     private static final int SOCIAL_BAR_HEIGHT = 55;
     private final SlidePanelController controller;
     private final Composite overlayComposite;
+    private BufferedImage cachedBackground;
+    private int lastWidth = -1;
+    private int lastHeight = -1;
 
     SlideControlsOverlay(SlidePanelController controller) {
         this.controller = controller;
         this.overlayComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, BACKGROUND_ALPHA);
         setupUI();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                invalidateCache();
+            }
+        });
     }
 
     private void setupUI() {
@@ -201,18 +213,53 @@ final class SlideControlsOverlay extends JPanel {
         }
     }
 
+    private void invalidateCache() {
+        cachedBackground = null;
+        repaint();
+    }
+
+    private BufferedImage getOrCreateCachedBackground() {
+        int width = getWidth();
+        int height = getHeight();
+        
+        if (cachedBackground == null || lastWidth != width || lastHeight != height) {
+            if (width <= 0 || height <= 0) {
+                return null;
+            }
+            
+            cachedBackground = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = cachedBackground.createGraphics();
+            try {
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                Color background = getBackground();
+                
+                // Draw overlay with alpha composite
+                g2d.setComposite(overlayComposite);
+                g2d.setColor(background);
+                g2d.fillRect(0, 0, width, height);
+                
+                // Draw social bar
+                g2d.setComposite(AlphaComposite.SrcOver);
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, height - SOCIAL_BAR_HEIGHT, width, SOCIAL_BAR_HEIGHT);
+            } finally {
+                g2d.dispose();
+            }
+            
+            lastWidth = width;
+            lastHeight = height;
+        }
+        
+        return cachedBackground;
+    }
+
     @Override
     public void paint(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        Color background = getBackground();
-        Composite c = g2d.getComposite();
-        g2d.setComposite(overlayComposite);
-        g2d.setColor(background);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
-        g2d.setComposite(c);
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, getHeight() - SOCIAL_BAR_HEIGHT, getWidth(), SOCIAL_BAR_HEIGHT);
-        g2d.setColor(background);
+        BufferedImage bg = getOrCreateCachedBackground();
+        if (bg != null) {
+            g.drawImage(bg, 0, 0, null);
+        }
         super.paint(g);
     }
 
