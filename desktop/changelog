@@ -1,3 +1,10 @@
+frostwire (7.0.1)) stable; urgency=high
+ * Fixes bug where .torrent files were not saved in the user's torrent folder when starting a download from a search result
+ * Installer now removes old FrostWire 6 installation if present
+ * EDT freeze: LanguageUtils.getLocales() 
+ 
+ -- FrostWire Team <contact@frostwire.com>  Sat, 6 Dec 2025 05:38:00 -0600
+
 frostwire (7.0.0) stable; urgency=high
  * EDT freeze:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (19 EDT violations fixed)
  * EDT freeze:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
