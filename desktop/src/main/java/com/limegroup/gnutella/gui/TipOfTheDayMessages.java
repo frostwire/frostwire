@@ -3,10 +3,9 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.util.OSUtils;
 
 class TipOfTheDayMessages {
-    private static final String FIRST_MESSAGE = I18n.tr("<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire installer features no bundled offers or advertisement and you can download it for free. You can help support the continued development of FrostWire with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">BTC</a></li><li><a href=\"{3}\">ETH or ERC-20 tokens</a></li></ul><br>Thank you for your continued support.",
+    private static final String FIRST_MESSAGE = I18n.tr("<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire installer features no bundled offers or advertisement and you can download it for free. You can help support the continued development of FrostWire with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">ETH/EVM compatible or ERC-20 tokens like USDC/USDT</a></li></ul><br>Thank you for your continued support.",
             "https://www.frostwire.com/?id=donate&amt=open",
             "https://www.frostwire.com/?id=donate&amt=open",
-            "https://www.frostwire.com/bitcoin",
             "https://www.frostwire.com/ethereum");
 
     /**
