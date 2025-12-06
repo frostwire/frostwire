@@ -162,15 +162,19 @@ public final class SetupManager {
         }
         assert prior != null;
         prior.setNext(prior);
-        // Actually display the setup dialog.
-        createDialog(windows.get(0));
+        // Build the dialog structure first
+        SetupWindow firstWindow = windows.get(0);
+        buildDialog(firstWindow);
+        // Defer pack and show to a separate EDT event to avoid blocking current event
+        // This allows the EDT watchdog timer to reset between events
+        SwingUtilities.invokeLater(this::packAndShowDialog);
     }
 
     /*
      * Creates the main `JDialog` instance and
      * creates all of the setup window classes, buttons, etc.
      */
-    private void createDialog(SetupWindow firstWindow) {
+    private void buildDialog(SetupWindow firstWindow) {
         dialogFrame = new FramedDialog();
         dialogFrame.setTitle("FrostWire Setup");
         WindowAdapter onCloseAdapter = new WindowAdapter() {
@@ -180,7 +184,8 @@ public final class SetupManager {
         };
         dialogFrame.addWindowListener(onCloseAdapter);
         JDialog dialog = dialogFrame.getDialog();
-        dialog.setModal(true);
+        // Set modal to false initially to allow pack() to complete without blocking
+        dialog.setModal(false);
         dialog.setTitle(I18n.tr("FrostWire Setup Wizard"));
         dialog.addWindowListener(onCloseAdapter);
         // set the layout of the content pane
@@ -218,7 +223,18 @@ public final class SetupManager {
         if (!OSUtils.isWindows()) {
             container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
         }
+    }
+
+    /*
+     * Packs and shows the dialog. pack() is performed first, then modal is set to true
+     * before showing to ensure proper modal behavior while avoiding EDT blocking during pack.
+     */
+    private void packAndShowDialog() {
+        JDialog dialog = dialogFrame.getDialog();
+        // Pack the dialog to realize components and trigger native initialization
         dialog.pack();
+        // Now that pack() is complete, set modal to true for proper blocking behavior
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         SplashWindow.instance().setVisible(false);
         dialogFrame.showDialog();
         SplashWindow.instance().setVisible(true);
