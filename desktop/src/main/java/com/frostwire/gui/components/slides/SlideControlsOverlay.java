@@ -241,8 +241,6 @@ final class SlideControlsOverlay extends JPanel {
             cachedBackground = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = cachedBackground.createGraphics();
             try {
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
                 Color background = getBackground();
                 
                 // Draw overlay with alpha composite
