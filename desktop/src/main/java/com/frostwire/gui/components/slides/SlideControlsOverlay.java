@@ -222,9 +222,15 @@ final class SlideControlsOverlay extends JPanel {
         int width = getWidth();
         int height = getHeight();
         
+        // Check for invalid dimensions first
+        if (width <= 0 || height <= 0) {
+            return null;
+        }
+        
         if (cachedBackground == null || lastWidth != width || lastHeight != height) {
-            if (width <= 0 || height <= 0) {
-                return null;
+            // Dispose of old cached image to free memory
+            if (cachedBackground != null) {
+                cachedBackground.flush();
             }
             
             cachedBackground = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -240,7 +246,7 @@ final class SlideControlsOverlay extends JPanel {
                 g2d.fillRect(0, 0, width, height);
                 
                 // Draw social bar
-                g2d.setComposite(AlphaComposite.SrcOver);
+                g2d.setComposite(AlphaComposite.SRC_OVER);
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, height - SOCIAL_BAR_HEIGHT, width, SOCIAL_BAR_HEIGHT);
             } finally {
