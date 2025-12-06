@@ -184,8 +184,7 @@ public final class SetupManager {
         };
         dialogFrame.addWindowListener(onCloseAdapter);
         JDialog dialog = dialogFrame.getDialog();
-        // Set modal to false initially to allow pack() to complete without blocking
-        dialog.setModal(false);
+        dialog.setModal(true);
         dialog.setTitle(I18n.tr("FrostWire Setup Wizard"));
         dialog.addWindowListener(onCloseAdapter);
         // set the layout of the content pane
@@ -226,15 +225,13 @@ public final class SetupManager {
     }
 
     /*
-     * Packs and shows the dialog. pack() is performed first, then modal is set to true
-     * before showing to ensure proper modal behavior while avoiding EDT blocking during pack.
+     * Packs and shows the dialog in a separate EDT event.
+     * This defers the expensive pack() operation to prevent EDT blocking.
      */
     private void packAndShowDialog() {
         JDialog dialog = dialogFrame.getDialog();
         // Pack the dialog to realize components and trigger native initialization
         dialog.pack();
-        // Now that pack() is complete, set modal to true for proper blocking behavior
-        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         SplashWindow.instance().setVisible(false);
         dialogFrame.showDialog();
         SplashWindow.instance().setVisible(true);
