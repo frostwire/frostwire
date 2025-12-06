@@ -83,14 +83,14 @@ public class LanguageUtils {
     }
 
     /**
-     * Returns an array of supported language as a LanguageInfo[], always having
+     * Returns an array of supported languages as a Locale[], always having
      * the English language as the first element.
      * <p>
      * This will only include languages that can be displayed using the given
      * font. If the font is null, all languages are returned.
      * <p>
-     * Note: If preloadLocales() was called on a background thread, this method
-     * will use the cached results and will be fast. Otherwise, it will perform
+     * Note: If preloadLocales() was called before this method, it will use
+     * the cached results and will be fast. Otherwise, it will perform
      * expensive I/O operations which may cause EDT violations if called on the EDT.
      */
     public static Locale[] getLocales(Font font) {
