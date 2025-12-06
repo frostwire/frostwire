@@ -232,13 +232,8 @@ public final class SetupManager {
         JDialog dialog = dialogFrame.getDialog();
         // Pack the dialog to realize components and trigger native initialization
         dialog.pack();
-        // Hide splash before showing setup dialog
         SplashWindow.instance().setVisible(false);
-        // Show the modal dialog, which blocks until setup is complete
         dialogFrame.showDialog();
-        // After setup completes, restore splash visibility
-        // Note: Due to invokeLater in FramedDialog.showDialog(), this line executes
-        // immediately, but the modal dialog appears asynchronously and blocks EDT
         SplashWindow.instance().setVisible(true);
     }
 
