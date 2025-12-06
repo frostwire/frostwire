@@ -48,11 +48,12 @@ public class LanguageUtils {
     private static volatile Locale[] cachedLocales = null;
 
     /**
-     * Pre-loads all available locales on a background thread to avoid EDT violations.
+     * Pre-loads all available locales to avoid EDT violations.
      * This method should be called early during initialization, before any UI needs the locales.
      * It caches the results so subsequent calls to getLocales() are fast.
+     * This method is thread-safe and can be called multiple times; it will only load once.
      */
-    public static void preloadLocales() {
+    public static synchronized void preloadLocales() {
         if (cachedLocales != null) {
             return; // Already loaded
         }
