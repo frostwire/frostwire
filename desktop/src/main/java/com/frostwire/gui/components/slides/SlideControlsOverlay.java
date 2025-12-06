@@ -272,6 +272,16 @@ final class SlideControlsOverlay extends JPanel {
         super.paint(g);
     }
 
+    @Override
+    public void removeNotify() {
+        // Clean up cached image when component is removed from container
+        if (cachedBackground != null) {
+            cachedBackground.flush();
+            cachedBackground = null;
+        }
+        super.removeNotify();
+    }
+
     private static final class InstallAction extends AbstractAction {
         private final SlidePanelController controller;
 
