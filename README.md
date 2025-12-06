@@ -9,7 +9,7 @@ Here you will find the sources necessary to build [FrostWire for Android](http:/
 
 # Coding Guidelines
 
-[5 Object Oriented Programming Principles learned during the last 15 years](http://bit.ly/y0hdR4)
+[5 Object Oriented Programming Principles learned during the last 15 years](https://www.gubatron.com/blog/5-object-oriented-programming-principles-learned-during-the-last-15-years/)
 
 * Keep it simple, stupid. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
 * Do not repeat yourself. ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)) Re-use your own code and our code. It'll be faster to code, and easier to maintain.
