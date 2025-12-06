@@ -294,7 +294,7 @@ final class Initializer {
      * Initializes any early UI tasks, such as HTML loading and the Bug Manager.
      */
     private void initializeEarlyUI() {
-        // Pre-load locales on background thread to avoid EDT violations later
+        // Pre-load locales to avoid EDT violations when locales are later accessed on the EDT.
         // This must be done before SetupManager creates the LanguagePanel
         LanguageUtils.preloadLocales();
         
