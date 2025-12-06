@@ -218,7 +218,7 @@ final class SlideControlsOverlay extends JPanel {
             cachedBackground.flush();
             cachedBackground = null;
         }
-        repaint();
+        // Note: repaint() is not needed here as component resize automatically triggers repaint
     }
 
     private BufferedImage getOrCreateCachedBackground() {
@@ -233,8 +233,8 @@ final class SlideControlsOverlay extends JPanel {
         boolean needsRecreation = cachedBackground == null || lastWidth != width || lastHeight != height;
         
         if (needsRecreation) {
-            // Dispose of old cached image to free memory (only if exists and dimensions changed)
-            if (cachedBackground != null && (lastWidth != width || lastHeight != height)) {
+            // Dispose of old cached image to free memory before creating new one
+            if (cachedBackground != null) {
                 cachedBackground.flush();
             }
             
