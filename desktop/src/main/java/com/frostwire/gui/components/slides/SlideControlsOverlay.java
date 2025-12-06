@@ -214,7 +214,10 @@ final class SlideControlsOverlay extends JPanel {
     }
 
     private void invalidateCache() {
-        cachedBackground = null;
+        if (cachedBackground != null) {
+            cachedBackground.flush();
+            cachedBackground = null;
+        }
         repaint();
     }
 
@@ -227,9 +230,11 @@ final class SlideControlsOverlay extends JPanel {
             return null;
         }
         
-        if (cachedBackground == null || lastWidth != width || lastHeight != height) {
-            // Dispose of old cached image to free memory
-            if (cachedBackground != null) {
+        boolean needsRecreation = cachedBackground == null || lastWidth != width || lastHeight != height;
+        
+        if (needsRecreation) {
+            // Dispose of old cached image to free memory (only if exists and dimensions changed)
+            if (cachedBackground != null && (lastWidth != width || lastHeight != height)) {
                 cachedBackground.flush();
             }
             
