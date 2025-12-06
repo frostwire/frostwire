@@ -249,7 +249,7 @@ final class SlideControlsOverlay extends JPanel {
                 g2d.fillRect(0, 0, width, height);
                 
                 // Draw social bar
-                g2d.setComposite(AlphaComposite.SRC_OVER);
+                g2d.setComposite(AlphaComposite.SrcOver);
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, height - SOCIAL_BAR_HEIGHT, width, SOCIAL_BAR_HEIGHT);
             } finally {
