@@ -40,7 +40,37 @@ public class LanguageUtils {
     private static final String BUNDLE_POSTFIX = ".class";
     private static final String BUNDLE_MARKER = "org/limewire/i18n/Messages.class";
     private static final Logger LOG = Logger.getLogger(LanguageUtils.class);
+    
+    /**
+     * Cached locales to avoid expensive I/O operations on EDT.
+     * This cache is populated by calling preloadLocales() on a background thread.
+     */
+    private static volatile Locale[] cachedLocales = null;
 
+    /**
+     * Pre-loads all available locales on a background thread to avoid EDT violations.
+     * This method should be called early during initialization, before any UI needs the locales.
+     * It caches the results so subsequent calls to getLocales() are fast.
+     */
+    public static void preloadLocales() {
+        if (cachedLocales != null) {
+            return; // Already loaded
+        }
+        
+        final List<Locale> locales = new LinkedList<>();
+        File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
+        if (jar != null) {
+            addLocalesFromJar(locales, jar);
+        } else {
+            LOG.warn("Could not find bundle jar to determine locales");
+        }
+        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
+        locales.remove(Locale.ENGLISH);
+        locales.add(0, Locale.ENGLISH);
+        
+        cachedLocales = locales.toArray(new Locale[0]);
+    }
+    
     /**
      * Applies this language code to be the new language of the program.
      */
@@ -57,23 +87,44 @@ public class LanguageUtils {
      * <p>
      * This will only include languages that can be displayed using the given
      * font. If the font is null, all languages are returned.
+     * <p>
+     * Note: If preloadLocales() was called on a background thread, this method
+     * will use the cached results and will be fast. Otherwise, it will perform
+     * expensive I/O operations which may cause EDT violations if called on the EDT.
      */
     public static Locale[] getLocales(Font font) {
-        final List<Locale> locales = new LinkedList<>();
-        File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
-        if (jar != null) {
-            addLocalesFromJar(locales, jar);
+        // Use cached locales if available, otherwise load them now
+        Locale[] locales;
+        if (cachedLocales != null) {
+            // Use cached copy
+            locales = cachedLocales.clone();
         } else {
-            LOG.warn("Could not find bundle jar to determine locales");
+            // Fall back to loading them now (may be slow on EDT)
+            final List<Locale> localeList = new LinkedList<>();
+            File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
+            if (jar != null) {
+                addLocalesFromJar(localeList, jar);
+            } else {
+                LOG.warn("Could not find bundle jar to determine locales");
+            }
+            localeList.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
+            localeList.remove(Locale.ENGLISH);
+            localeList.add(0, Locale.ENGLISH);
+            locales = localeList.toArray(new Locale[0]);
         }
-        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
-        locales.remove(Locale.ENGLISH);
-        locales.add(0, Locale.ENGLISH);
-        // remove languages that cannot be displayed using this font
+        
+        // Filter by font capability if needed (this is fast)
         if (font != null && !OSUtils.isMacOSX()) {
-            locales.removeIf(locale -> !GUIUtils.canDisplay(font, locale.getDisplayName(locale)));
+            List<Locale> filtered = new LinkedList<>();
+            for (Locale locale : locales) {
+                if (GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
+                    filtered.add(locale);
+                }
+            }
+            return filtered.toArray(new Locale[0]);
         }
-        return locales.toArray(new Locale[0]);
+        
+        return locales;
     }
 
     /**
