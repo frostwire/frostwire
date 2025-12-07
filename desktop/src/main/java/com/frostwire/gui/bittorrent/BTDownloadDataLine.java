@@ -166,6 +166,14 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private SeedingHolder seedingHolder;
 
     /**
+     * Cached SizeHolder instances to avoid creating them on EDT during getValueAt()
+     * These are only updated during the update() method when values actually change
+     */
+    private SizeHolder cachedSizeHolder;
+    private SizeHolder cachedBytesDownloadedHolder;
+    private SizeHolder cachedBytesUploadedHolder;
+
+    /**
      * Cache the last update time to debounce rapid successive updates
      * Helps reduce excessive JNI calls to torrent_handle.status()
      */
@@ -254,11 +262,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         } else if (column == PAYMENT_OPTIONS_COLUMN) {
             return paymentOptions;
         } else if (column == SIZE_COLUMN) {
-            if (initializer.isPartialDownload()) {
-                return new SizeHolder(size, PARTIAL_DOWNLOAD_TEXT);
-            } else {
-                return new SizeHolder(size);
-            }
+            return cachedSizeHolder;
         } else if (column == STATUS_COLUMN) {
             String status = TRANSFER_STATE_STRING_MAP.get(transferState);
             if (status == null) {
@@ -268,9 +272,9 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         } else if (column == PROGRESS_COLUMN) {
             return progress;
         } else if (column == BYTES_DOWNLOADED_COLUMN) {
-            return new SizeHolder(download);
+            return cachedBytesDownloadedHolder;
         } else if (column == BYTES_UPLOADED_COLUMN) {
-            return new SizeHolder(upload);
+            return cachedBytesUploadedHolder;
         } else if (column == DOWNLOAD_SPEED_COLUMN) {
             return downloadSpeed;
         } else if (column == UPLOAD_SPEED_COLUMN) {
@@ -380,6 +384,15 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
             seedToPeerRatio = initializer.getSeedToPeerRatio();
             size = initializer.getSize();
             dateCreated = initializer.getDateCreated();
+
+            // Update cached SizeHolder instances here (off EDT) to avoid creating them during rendering
+            if (initializer.isPartialDownload()) {
+                cachedSizeHolder = new SizeHolder(size, PARTIAL_DOWNLOAD_TEXT);
+            } else {
+                cachedSizeHolder = new SizeHolder(size);
+            }
+            cachedBytesDownloadedHolder = new SizeHolder(download);
+            cachedBytesUploadedHolder = new SizeHolder(upload);
             if (initializer.getCopyrightLicenseBroker() != null &&
                     initializer.getCopyrightLicenseBroker().license != null) {
                 license = initializer.getCopyrightLicenseBroker().license.getName();
