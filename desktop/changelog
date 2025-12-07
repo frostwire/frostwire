@@ -1,4 +1,4 @@
-frostwire (7.0.1)) stable; urgency=high
+frostwire (7.0.1) stable; urgency=high
  * Fixes bug where .torrent files were not saved in the user's torrent folder when starting a download from a search result
  * Installer now removes old FrostWire 6 installation if present
  * EDT freeze: LanguageUtils.getLocales()
