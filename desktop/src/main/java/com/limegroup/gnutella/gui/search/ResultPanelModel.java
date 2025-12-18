@@ -231,7 +231,9 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
             return relevanceComparison * _ascending;
         }
 
-        int seedsComparison = Integer.compare(a.getSeeds(), b.getSeeds());
+        Integer aSeeds = a.getSeedsAsInteger();
+        Integer bSeeds = b.getSeedsAsInteger();
+        int seedsComparison = Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds);
         if (seedsComparison != 0) {
             return seedsComparison * _ascending;
         }

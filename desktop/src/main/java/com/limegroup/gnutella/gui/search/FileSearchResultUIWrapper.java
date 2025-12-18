@@ -135,7 +135,11 @@ public final class FileSearchResultUIWrapper extends AbstractUISearchResult {
 
     @Override
     public int getSeeds() {
-        // For YouTube/streaming results, use view count
-        return searchResult.getViewCount().orElse(1000);
+        // For torrent results, return actual seed count
+        if (searchResult.isTorrent()) {
+            return searchResult.getSeeds().orElse(0);
+        }
+        // For YouTube/streaming results, use view count as a proxy for popularity
+        return searchResult.getViewCount().orElse(0);
     }
 }

@@ -81,8 +81,9 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         addedOn = sr.getCreationTime() > 0 ? new Date(sr.getCreationTime()) : null;
         actionsHolder = new SearchResultActionsHolder(sr);
         name = new SearchResultNameHolder(sr);
-        // Show seeds for torrents and preliminary results (YouTube view counts, torrent downloads, etc)
-        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && ((RESULT instanceof TorrentUISearchResult) || isPreliminaryUI(RESULT));
+        // Show seeds for non-preliminary results (torrents, etc) that have seed counts
+        // Preliminary results (YouTube, etc) have isPreliminary=true and should not show seeds
+        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && !isPreliminaryUI(RESULT);
         seeds = shouldShowSeeds ? String.valueOf(RESULT.getSeeds()) : "";
         icon = getIcon();
         size = new SizeHolder(getSize());
@@ -94,6 +95,9 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * Updates cached data about this line.
      */
     public void update() {
+        // Use the same shouldShowSeeds logic as initialize() to ensure consistent display
+        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && !isPreliminaryUI(RESULT);
+        seeds = shouldShowSeeds ? String.valueOf(RESULT.getSeeds()) : "";
         computeRankingMetrics();
     }
 
@@ -242,6 +246,12 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
 
     public int getSeeds() {
         return RESULT.getSeeds();
+    }
+
+    public Integer getSeedsAsInteger() {
+        int seedValue = RESULT.getSeeds();
+        boolean shouldShowSeeds = seedValue > 0 && !isPreliminaryUI(RESULT);
+        return shouldShowSeeds ? seedValue : null;
     }
 
     public double getRelevanceScore() {
