@@ -1,9 +1,14 @@
+frostwire (7.0.2) stable; urgency=high
+ * Improves search result sorting prioritizing keywords, then seeds/popularity and avoiding irrelevant results on top
+
+ -- FrostWire Team <contact@frostwire.com> Thu, 18 Dec 2025 09:26:00 -0600
+
 frostwire (7.0.1) stable; urgency=high
  * Fixes bug where .torrent files were not saved in the user's torrent folder when starting a download from a search result
  * Installer now removes old FrostWire 6 installation if present
  * EDT freeze: LanguageUtils.getLocales()
  * EDT freeze: Cache overlay background to eliminate EDT blocking in SlideControlsOverlay
- 
+
  -- FrostWire Team <contact@frostwire.com>  Sat, 6 Dec 2025 09:23:00 -0600
 
 frostwire (7.0.0) stable; urgency=high
