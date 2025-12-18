@@ -88,7 +88,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         } else if (!isSorted() || _activeColumn != SearchTableColumns.COUNT_IDX) {
             return super.compare(ta, tb);
         } else {
-            return compareCount(ta, tb);
+            return compareScores(ta, tb);
         }
     }
 
@@ -225,10 +225,18 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     /**
      * Compares the count between two rows.
      */
-    private int compareCount(SearchResultDataLine a, SearchResultDataLine b) {
-        int c1 = a.getSeeds();
-        int c2 = b.getSeeds();
-        return (c1 - c2) * _ascending;
+    private int compareScores(SearchResultDataLine a, SearchResultDataLine b) {
+        int relevanceComparison = Double.compare(a.getRelevanceScore(), b.getRelevanceScore());
+        if (relevanceComparison != 0) {
+            return relevanceComparison * _ascending;
+        }
+
+        int seedsComparison = Integer.compare(a.getSeeds(), b.getSeeds());
+        if (seedsComparison != 0) {
+            return seedsComparison * _ascending;
+        }
+
+        return AbstractTableMediator.compare(a.getDisplayName(), b.getDisplayName()) * _ascending;
     }
 
     /**
