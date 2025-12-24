@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The component that holds the different panels to present
@@ -52,6 +53,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     private HashMap<String, TransferDetailPanel> cardPanelMap;
     private TransferDetailPanel currentComponent;
     private BittorrentDownload selectedBittorrentDownload;
+    private final AtomicBoolean updateScheduled = new AtomicBoolean(false);
 
     public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
         super(new MigLayout("fill, insets 0 0 0 0",
@@ -177,8 +179,22 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     @Override
     public void refresh() {
         // we're a Refresh listener of the GUIMediator, this gets invoked every 1 second
+        // Offload expensive updateData() calls to background thread to avoid EDT blocking
         if (GUIMediator.instance().getSelectedTab() == GUIMediator.Tabs.TRANSFERS && isVisible() && currentComponent != null && selectedBittorrentDownload != null) {
-            currentComponent.updateData(selectedBittorrentDownload);
+            if (updateScheduled.compareAndSet(false, true)) {
+                final BittorrentDownload btDownloadToUpdate = selectedBittorrentDownload;
+                final TransferDetailPanel panelToUpdate = currentComponent;
+                com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+                    try {
+                        panelToUpdate.updateData(btDownloadToUpdate);
+                    } catch (Throwable e) {
+                        // Log but don't crash if there's an issue updating details
+                        System.err.println("Error updating transfer details: " + e.getMessage());
+                    } finally {
+                        updateScheduled.set(false);
+                    }
+                }, "TransferDetailComponent-refresh");
+            }
         }
     }
 
