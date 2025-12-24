@@ -34,6 +34,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author gubatron
@@ -68,6 +69,7 @@ public final class BTDownload implements BittorrentDownload {
     private volatile boolean removing;
     private volatile TorrentStatus cachedStatus;
     private volatile long lastStatusUpdateTime;
+    private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
@@ -283,19 +285,47 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     /**
-     * Gets cached status or fetches fresh status if cache is stale.
-     * This prevents ANR by avoiding frequent blocking JNI calls on UI thread.
+     * Gets cached status without blocking on EDT.
+     * Returns stale cached data immediately if available, scheduling async refresh if cache is stale.
+     * This prevents EDT blocking during rendering by never synchronously calling expensive JNI methods.
      */
     private TorrentStatus getCachedStatus() {
         if (!th.isValid()) {
             return null;
         }
         long now = System.currentTimeMillis();
-        if (cachedStatus == null || (now - lastStatusUpdateTime) > STATUS_CACHE_MILLIS) {
-            cachedStatus = th.status();
-            lastStatusUpdateTime = now;
+        long lastUpdate = lastStatusUpdateTime;
+
+        // If cache is still valid, return it immediately (fast path)
+        if (cachedStatus != null && (now - lastUpdate) <= STATUS_CACHE_MILLIS) {
+            return cachedStatus;
         }
-        return cachedStatus;
+
+        // Cache is stale or null, return what we have and schedule async refresh
+        // This prevents EDT blocking during rendering
+        if (statusRefreshScheduled.compareAndSet(false, true)) {
+            scheduleStatusRefresh();
+        }
+
+        return cachedStatus; // Return stale data (null if no cache yet)
+    }
+
+    /**
+     * Schedules asynchronous refresh of status cache to avoid blocking operations on EDT.
+     */
+    private void scheduleStatusRefresh() {
+        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+            try {
+                if (th.isValid()) {
+                    cachedStatus = th.status();
+                    lastStatusUpdateTime = System.currentTimeMillis();
+                }
+            } catch (Exception e) {
+                LOG.warn("Error refreshing torrent status cache: " + e.getMessage());
+            } finally {
+                statusRefreshScheduled.set(false);
+            }
+        }, "BTDownload-StatusRefresh");
     }
 
     /**
@@ -304,6 +334,7 @@ public final class BTDownload implements BittorrentDownload {
     private void invalidateStatusCache() {
         cachedStatus = null;
         lastStatusUpdateTime = 0;
+        statusRefreshScheduled.set(false); // Allow immediate refresh on next access
     }
 
     public int getConnectedPeers() {
