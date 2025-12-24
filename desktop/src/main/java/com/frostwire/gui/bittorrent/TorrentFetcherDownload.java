@@ -282,9 +282,20 @@ public class TorrentFetcherDownload implements BTDownload {
                                 return;
                             }
                         }
+                        // Decode on EDT (fast), then offload expensive download() to background
                         TorrentInfo ti = TorrentInfo.bdecode(data);
-                        BTEngine.getInstance().download(ti, null, selection, peers, true);
-                        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+                        boolean[] finalSelection = selection;
+                        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+                            try {
+                                BTEngine.getInstance().download(ti, null, finalSelection, peers, true);
+                            } catch (Throwable e) {
+                                LOG.error("Error downloading torrent", e);
+                            }
+                            // Switch back to EDT to show transfers tab
+                            GUIMediator.safeInvokeLater(() ->
+                                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL)
+                            );
+                        }, "TorrentFetcherDownload-download");
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
                     }
