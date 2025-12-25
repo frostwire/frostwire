@@ -37,6 +37,7 @@ import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.VPNDropGuard;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -285,7 +286,7 @@ public class TorrentFetcherDownload implements BTDownload {
                         // Decode on EDT (fast), then offload expensive download() to background
                         TorrentInfo ti = TorrentInfo.bdecode(data);
                         boolean[] finalSelection = selection;
-                        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+                        BackgroundQueuedExecutorService.schedule(() -> {
                             try {
                                 BTEngine.getInstance().download(ti, null, finalSelection, peers, true);
                             } catch (Throwable e) {
@@ -295,7 +296,7 @@ public class TorrentFetcherDownload implements BTDownload {
                             GUIMediator.safeInvokeLater(() ->
                                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL)
                             );
-                        }, "TorrentFetcherDownload-download");
+                        });
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
                     }

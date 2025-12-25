@@ -23,6 +23,7 @@ import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.RefreshListener;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
 
@@ -184,7 +185,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
             if (updateScheduled.compareAndSet(false, true)) {
                 final BittorrentDownload btDownloadToUpdate = selectedBittorrentDownload;
                 final TransferDetailPanel panelToUpdate = currentComponent;
-                com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+                BackgroundQueuedExecutorService.schedule(() -> {
                     try {
                         panelToUpdate.updateData(btDownloadToUpdate);
                     } catch (Throwable e) {
@@ -193,7 +194,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
                     } finally {
                         updateScheduled.set(false);
                     }
-                }, "TransferDetailComponent-refresh");
+                });
             }
         }
     }
