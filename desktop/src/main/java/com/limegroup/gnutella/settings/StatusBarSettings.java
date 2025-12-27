@@ -36,6 +36,11 @@ public class StatusBarSettings extends LimeProps {
      */
     public static final BooleanSetting BANDWIDTH_DISPLAY_ENABLED =
             FACTORY.createBooleanSetting("BANDWIDTH_DISPLAY_ENABLED", true);
+    /**
+     * Whether or not VPN-Drop protection checkbox should be displayed.
+     */
+    public static final BooleanSetting VPN_DROP_PROTECTION_DISPLAY_ENABLED =
+            FACTORY.createBooleanSetting("VPN_DROP_PROTECTION_DISPLAY_ENABLED", true);
     public static final BooleanSetting DONATION_BUTTONS_DISPLAY_ENABLED =
             FACTORY.createBooleanSetting("DONATION_BUTTONS_DISPLAY_ENABLED", true);
 

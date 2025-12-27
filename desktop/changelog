@@ -1,3 +1,12 @@
+frostwire (7.0.3) stable; urgency=high
+ * Add VPN-Drop protection checkbox to status bar for quick toggle of BitTorrent pause when VPN is disconnected
+ * VPN-Drop protection setting changes and dialog dismissals now properly update status bar checkbox state
+ * Extract VPN-Drop protection logic to VPNDropGuard.applyVPNDropProtection() to avoid code duplication
+ * Cache VPN status in VPNDropGuard to avoid expensive VPNs.isVPNActive() system calls on setting changes
+ * All VPN-Drop protection operations use BackgroundQueuedExecutor to prevent EDT blocking
+
+ -- FrostWire Team <contact@frostwire.com> Sat, 27 Dec 2025 09:00:00 -0600
+
 frostwire (7.0.2) stable; urgency=high
  * Fixes bug where seed counts disappeared from torrent search results wrapped in FileSearchResultUIWrapper
  * Improves search result sorting prioritizing keywords, then seeds/popularity and avoiding irrelevant results on top

@@ -48,6 +48,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private final ImageIcon[] _connectionQualityMeterIcons = new ImageIcon[7];
     private VPNStatusRefresher vpnStatusRefresher;
     private VPNStatusButton vpnStatusButton;
+    private VPNDropProtectionCheckbox vpnDropProtectionCheckbox;
     /**
      * The main container for the status line component.
      */
@@ -96,6 +97,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 jpm.add(jcbmi);
                 jcbmi = new SkinCheckBoxMenuItem(new ShowVPNAction());
                 jcbmi.setState(StatusBarSettings.VPN_DISPLAY_ENABLED.getValue());
+                jpm.add(jcbmi);
+                jcbmi = new SkinCheckBoxMenuItem(new ShowVPNDropProtectionAction());
+                jcbmi.setState(StatusBarSettings.VPN_DROP_PROTECTION_DISPLAY_ENABLED.getValue());
                 jpm.add(jcbmi);
                 //  add 'Show International Localization' menu item
                 jcbmi = new SkinCheckBoxMenuItem(new ShowLanguageStatusAction());
@@ -182,6 +186,13 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             vpnStatusRefresher = VPNStatusRefresher.getInstance();
             vpnStatusRefresher.addRefreshListener(vpnStatusButton);
             vpnStatusRefresher.addRefreshListener(this);
+            // VPN-Drop protection checkbox
+            vpnDropProtectionCheckbox = new VPNDropProtectionCheckbox();
+            vpnStatusRefresher.addRefreshListener((vpnIsOn) -> {
+                if (vpnDropProtectionCheckbox != null) {
+                    vpnDropProtectionCheckbox.updateCheckboxState();
+                }
+            });
             //  make the 'Language' button
             GUIMediator.setSplashScreenString(I18n.tr("Adding flags here and there..."));
             createLanguageButton();
@@ -226,6 +237,12 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     public void updateVPNDropProtectionLabelState() {
         if (vpnStatusButton != null) {
             vpnStatusButton.onStatusUpdated(vpnStatusButton.getLastVPNStatus());
+        }
+    }
+
+    public void updateVPNDropProtectionCheckboxState() {
+        if (vpnDropProtectionCheckbox != null) {
+            vpnDropProtectionCheckbox.updateCheckboxState();
         }
     }
 
@@ -322,6 +339,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
                 vpnStatusRefresher.refresh(); // async call
                 remainingWidth = addStatusIndicator(vpnStatusButton, sepWidth, remainingWidth, gbc);
+            }
+            //  add VPN-Drop protection checkbox if enabled and there's room
+            if (StatusBarSettings.VPN_DROP_PROTECTION_DISPLAY_ENABLED.getValue() && vpnDropProtectionCheckbox != null) {
+                remainingWidth = addStatusIndicator(vpnDropProtectionCheckbox, sepWidth, remainingWidth, gbc);
             }
             //  add the language button if there's room
             if (getLanguageSetting().getValue() && remainingWidth > indicatorWidth) {
@@ -816,6 +837,20 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
         public void actionPerformed(ActionEvent e) {
             StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.invert();
+            refresh();
+        }
+    }
+
+    /**
+     * Action for the 'Show VPN-Drop Protection' menu item.
+     */
+    private class ShowVPNDropProtectionAction extends AbstractAction {
+        ShowVPNDropProtectionAction() {
+            putValue(Action.NAME, I18n.tr("Show VPN-Drop Protection"));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            StatusBarSettings.VPN_DROP_PROTECTION_DISPLAY_ENABLED.invert();
             refresh();
         }
     }

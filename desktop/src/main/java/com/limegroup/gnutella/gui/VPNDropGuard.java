@@ -20,6 +20,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.limegroup.gnutella.gui.MainFrame;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import net.miginfocom.swing.MigLayout;
@@ -30,6 +31,8 @@ import java.awt.*;
 import static com.limegroup.gnutella.gui.I18n.tr;
 
 public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
+    private static boolean lastKnownVPNStatus = false;
+
     private static boolean canUseBitTorrent(boolean showExplanationDialog) {
         return canUseBitTorrent(showExplanationDialog, null);
     }
@@ -76,6 +79,13 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
                     } catch (Throwable ignored) {
                     }
                 }
+                // Update the status bar checkbox to reflect the disabled state
+                GUIMediator.safeInvokeLater(() -> {
+                    MainFrame mainFrame = GUIMediator.instance().getMainFrame();
+                    if (mainFrame != null) {
+                        mainFrame.getStatusLine().updateVPNDropProtectionCheckboxState();
+                    }
+                });
                 MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
                 BackgroundQueuedExecutorService.schedule(() -> {
                     if (BTEngine.getInstance().isPausedCached()) {
@@ -106,19 +116,30 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
         return canUseBitTorrent(true);
     }
 
-    @Override
-    public void onStatusUpdated(boolean vpnIsOn) {
+    /**
+     * Applies VPN-Drop protection logic based on cached VPN status and protection setting.
+     * Uses the last known VPN status to avoid expensive system calls.
+     * This is called both when VPN status changes and when the protection setting changes.
+     */
+    public static void applyVPNDropProtection() {
         boolean vpnDropProtectionOn = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
         BTEngine instance = BTEngine.getInstance();
+
         if (vpnDropProtectionOn) {
-            if (vpnIsOn && instance.isPausedCached()) {
+            if (lastKnownVPNStatus && instance.isPausedCached()) {
                 instance.resume();
             }
-            if (!vpnIsOn && !instance.isPausedCached()) {
+            if (!lastKnownVPNStatus && !instance.isPausedCached()) {
                 instance.pause();
             }
         } else if (!vpnDropProtectionOn && instance.isPausedCached()) {
             instance.resume();
         }
+    }
+
+    @Override
+    public void onStatusUpdated(boolean vpnIsOn) {
+        lastKnownVPNStatus = vpnIsOn;
+        applyVPNDropProtection();
     }
 }
