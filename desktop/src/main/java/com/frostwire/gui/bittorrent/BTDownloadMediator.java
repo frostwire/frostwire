@@ -43,9 +43,9 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
-import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
@@ -789,6 +789,10 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentSearchResult(final TorrentSearchResult sr, final boolean partialDownload) {
+        // Check VPN-Drop protection before initiating torrent search result download
+        if (!VPNDropGuard.canUseBitTorrent()) {
+            return;
+        }
         GUIMediator.safeInvokeLater(() -> {
             TorrentFetcherDownload d;
             if (!partialDownload && sr instanceof TorrentItemSearchResult) {

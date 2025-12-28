@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
 import javax.swing.*;
@@ -47,6 +48,10 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
+        // Check VPN-Drop protection before initiating torrent download
+        if (!VPNDropGuard.canUseBitTorrent()) {
+            return;
+        }
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
         showSearchResultWebPage(false);
