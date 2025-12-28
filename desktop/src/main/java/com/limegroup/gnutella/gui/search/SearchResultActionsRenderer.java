@@ -32,6 +32,7 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -205,6 +206,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult sr = uiSearchResult.getSearchResult();
             boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+            // Check VPN-Drop protection for torrent transfers
+            if (isTorrent && !VPNDropGuard.canUseBitTorrent()) {
+                return;
+            }
             uiSearchResult.download(isTorrent);
             // Only show Transfers tab for direct downloads, not for preliminary results that trigger secondary searches
             boolean isPreliminary = sr.isPreliminary() || uiSearchResult instanceof TelluridePartialUISearchResult;

@@ -35,6 +35,7 @@ import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
@@ -238,6 +239,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             if (lines.length == 1 && lines[0] != null) {
                 final SearchResult sr = lines[0].getInitializeObject().getSearchResult();
                 if (sr instanceof TorrentSearchResult) {
+                    // Check VPN-Drop protection for torrent transfers
+                    if (!VPNDropGuard.canUseBitTorrent()) {
+                        return;
+                    }
                     GUIMediator.instance().openTorrentSearchResult((TorrentSearchResult) sr, true);
                 }
             }

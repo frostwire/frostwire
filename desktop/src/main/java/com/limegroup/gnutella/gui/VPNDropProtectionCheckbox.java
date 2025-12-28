@@ -22,46 +22,88 @@ import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
- * A checkbox component for the status bar that toggles VPN-Drop protection.
+ * A compact checkbox component for the status bar that toggles VPN-Drop protection.
  * When enabled, BitTorrent transfers will be paused if the VPN is disconnected.
+ * Features clickable VPN link that opens VPN info page.
  */
-public class VPNDropProtectionCheckbox extends JCheckBox {
+public class VPNDropProtectionCheckbox extends JPanel {
+    private final JCheckBox checkbox;
 
     public VPNDropProtectionCheckbox() {
-        super(I18n.tr("VPN-Drop protection"));
+        super(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        setOpaque(false);
+
+        // Create checkbox with minimal text
+        checkbox = new JCheckBox();
+        checkbox.setOpaque(false);
+        checkbox.setFont(new Font(checkbox.getFont().getName(), Font.PLAIN, 9));
 
         // Set initial state
         updateCheckboxState();
 
         // Add listener for checkbox changes
-        addActionListener(e -> {
+        checkbox.addActionListener(e -> {
             // Disable the checkbox while we process the change
-            setEnabled(false);
+            checkbox.setEnabled(false);
 
             // Use BackgroundQueuedExecutor to avoid blocking the EDT
             BackgroundQueuedExecutorService.schedule(() -> {
                 try {
-                    boolean newValue = isSelected();
+                    boolean newValue = checkbox.isSelected();
                     ConnectionSettings.VPN_DROP_PROTECTION.setValue(newValue);
 
                     // Apply the protection logic (defined in VPNDropGuard to avoid duplication)
                     VPNDropGuard.applyVPNDropProtection();
                 } finally {
                     // Re-enable the checkbox on the EDT
-                    GUIMediator.safeInvokeLater(() -> setEnabled(true));
+                    GUIMediator.safeInvokeLater(() -> checkbox.setEnabled(true));
                 }
             });
         });
 
+        // Add checkbox to panel
+        add(checkbox);
+
+        // Create clickable VPN link label
+        JLabel vpnLink = new JLabel(I18n.tr("VPN"));
+        vpnLink.setFont(new Font(vpnLink.getFont().getName(), Font.PLAIN, 9));
+        vpnLink.setForeground(new Color(0, 0, 200)); // Blue color for link
+        vpnLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Add underline and hover effects
+        vpnLink.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                vpnLink.setText("<html><u>VPN</u></html>");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                vpnLink.setText(I18n.tr("VPN"));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GUIMediator.openURL(VPNStatusButton.VPN_URL);
+            }
+        });
+
+        add(vpnLink);
+        add(new JLabel(I18n.tr("-Drop protection")));
+
         setToolTipText(I18n.tr("When enabled, BitTorrent transfers will pause if your VPN is disconnected"));
+        setPreferredSize(new Dimension(130, 20));
     }
 
     /**
      * Updates the checkbox state to reflect the current setting value.
      */
     public void updateCheckboxState() {
-        setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
+        checkbox.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
     }
 }

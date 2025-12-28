@@ -34,6 +34,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
@@ -347,6 +348,10 @@ public final class SearchMediator {
         }
         SearchResult sr = line.getSearchResult().getSearchResult();
         boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+        // Check VPN-Drop protection for torrent transfers
+        if (isTorrent && !VPNDropGuard.canUseBitTorrent()) {
+            return;
+        }
         line.getSearchResult().download(isTorrent);
     }
 
