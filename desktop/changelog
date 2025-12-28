@@ -11,6 +11,8 @@ frostwire (7.0.2) stable; urgency=high
  * Ensure VPN-Drop guard dialog appears when attempting to start new torrent transfers without active VPN
  * Add VPN-Drop protection check when opening torrent files (.torrent files and magnet links from pasted URLs)
  * Fix: VPN-Drop guard dialog now properly appears when attempting to download torrents from search results
+ * Compact UI layout: VPN status indicator and VPN-Drop protection checkbox now use minimal spacing for cleaner appearance
+ * Ultra-compact VPN icon: Remove button margins for minimal horizontal space usage in status bar
 
  -- FrostWire Team <contact@frostwire.com> Sat, 28 Dec 2025 14:28:00 -0600
 

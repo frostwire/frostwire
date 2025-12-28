@@ -35,7 +35,7 @@ public class VPNDropProtectionCheckbox extends JPanel {
     private final JCheckBox checkbox;
 
     public VPNDropProtectionCheckbox() {
-        super(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setOpaque(false);
 
         // Create checkbox with minimal text

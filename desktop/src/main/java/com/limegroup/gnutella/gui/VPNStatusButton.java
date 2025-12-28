@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -33,10 +34,34 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     private boolean lastVPNStatus;
 
     VPNStatusButton() {
+        // Use compact FlowLayout with minimal gaps
+        super(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        setOpaque(false);
+        zeroInsets(this);
+
         iconButton = new IconButton("vpn_off", true);
         iconButton.setBorder(null);
+        iconButton.setMargin(new Insets(0, 0, 0, 0));
+        iconButton.setContentAreaFilled(false);
+        iconButton.setBorderPainted(false);
+        iconButton.setOpaque(false);
+
         vpnDropGuardLabel = createVPNDisconnectLabel();
         initActionListener();
+
+        // Set compact size
+        Dimension size = new Dimension(20, 20);
+        setMinimumSize(size);
+        setPreferredSize(size);
+        setMaximumSize(size);
+    }
+
+    private static void zeroInsets(JComponent jc) {
+        Insets insets = jc.getInsets();
+        insets.left = 0;
+        insets.right = 0;
+        insets.top = 0;
+        insets.bottom = 0;
     }
 
     private void initActionListener() {
