@@ -237,7 +237,7 @@ public final class SoftwareUpdater {
      * Returns a default value if not yet fetched or invalid.
      */
     public static String getSoundCloudClientId() {
-        return cachedSoundCloudClientId != null ? cachedSoundCloudClientId : "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
+        return cachedSoundCloudClientId != null ? cachedSoundCloudClientId : "dH1Xed1fpITYonugor6sw39jvdq58M3h";
     }
 
     /**
@@ -245,6 +245,6 @@ public final class SoftwareUpdater {
      * Returns a default value if not yet fetched or invalid.
      */
     public static String getSoundCloudAppVersion() {
-        return cachedSoundCloudAppVersion != null ? cachedSoundCloudAppVersion : "1713906596";
+        return cachedSoundCloudAppVersion != null ? cachedSoundCloudAppVersion : "1766155513";
     }
 }
