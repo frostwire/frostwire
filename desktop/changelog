@@ -9,6 +9,7 @@ frostwire (7.0.2) stable; urgency=high
  * VPN-Drop protection checkbox now compact with smaller font and clickable "VPN" link to info page
  * Add VPN-Drop protection check when starting new torrent transfers from search results (button, context menu, and batch download)
  * Ensure VPN-Drop guard dialog appears when attempting to start new torrent transfers without active VPN
+ * Add VPN-Drop protection check when opening torrent files (.torrent files and magnet links from pasted URLs)
 
  -- FrostWire Team <contact@frostwire.com> Sat, 28 Dec 2025 14:28:00 -0600
 

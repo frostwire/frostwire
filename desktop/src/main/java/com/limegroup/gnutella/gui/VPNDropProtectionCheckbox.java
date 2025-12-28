@@ -94,7 +94,9 @@ public class VPNDropProtectionCheckbox extends JPanel {
         });
 
         add(vpnLink);
-        add(new JLabel(I18n.tr("-Drop protection")));
+        JLabel dropProtectionLabel = new JLabel(I18n.tr("-Drop protection"));
+        dropProtectionLabel.setFont(new Font(dropProtectionLabel.getFont().getName(), Font.PLAIN, 9));
+        add(dropProtectionLabel);
 
         setToolTipText(I18n.tr("When enabled, BitTorrent transfers will pause if your VPN is disconnected"));
         setPreferredSize(new Dimension(130, 20));

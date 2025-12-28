@@ -40,6 +40,7 @@ import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -1117,6 +1118,10 @@ public final class GUIMediator {
     }
 
     public void openTorrentFile(File torrentFile, boolean partialSelection) {
+        // Check VPN-Drop protection before opening torrent file
+        if (!VPNDropGuard.canUseBitTorrent()) {
+            return;
+        }
         BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
         List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
         Runnable onOpenRunnable = () -> {
@@ -1138,6 +1143,10 @@ public final class GUIMediator {
     }
 
     public void openTorrentURI(String uri, boolean partialDownload) {
+        // Check VPN-Drop protection before opening torrent URI (magnet link or .torrent URL)
+        if (!VPNDropGuard.canUseBitTorrent()) {
+            return;
+        }
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openTorrentURI(uri, partialDownload);
     }
