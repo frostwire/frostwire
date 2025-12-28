@@ -14,7 +14,7 @@ frostwire (7.0.2) stable; urgency=high
  * Compact UI layout: VPN status indicator and VPN-Drop protection checkbox now use minimal spacing for cleaner appearance
  * Ultra-compact VPN icon: Remove button margins for minimal horizontal space usage in status bar
 
- -- FrostWire Team <contact@frostwire.com> Sat, 28 Dec 2025 14:28:00 -0600
+ -- FrostWire Team <contact@frostwire.com> Sun, 28 Dec 2025 14:41:00 -0600
 
 frostwire (7.0.1) stable; urgency=high
  * Fixes bug where .torrent files were not saved in the user's torrent folder when starting a download from a search result
