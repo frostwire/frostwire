@@ -165,9 +165,18 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return TransferState.ERROR;
         }
-        final TorrentStatus status = getCachedStatus();
+        TorrentStatus status = getCachedStatus();
+        // If cache was invalidated and is null, fetch fresh status
+        // This prevents ERROR status from being shown for newly started torrents
+        if (status == null && th.isValid()) {
+            status = th.status();
+            if (status != null) {
+                cachedStatus = status;
+                lastStatusUpdateTime = System.currentTimeMillis();
+            }
+        }
         if (status == null) {
-            return TransferState.ERROR;
+            return TransferState.DOWNLOADING;  // Default for new torrents, not ERROR
         }
         final boolean isPaused = isPaused(status);
         if (isPaused && status.isFinished()) {

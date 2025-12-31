@@ -1,5 +1,4 @@
-
-FrostWire 3.0.13 build 767 DEC/30/2025
+FrostWire 3.0.14 build 768 DEC/30/2025
  - crash:Race condition in BTEngine initialization - ConfigurationManager wasn't fully initialized before BTEngineInitializer read port preferences, causing port 0 binding failures
  - crash:Session failed to initialize when BTEngineInitializer started without waiting for ConfigurationManager to load preferences
  - crash:Torrent downloads never started despite successful session initialization - AsyncStartDownload was checking for old TorrentSearchResult interface but new search architecture returns CompositeFileSearchResult
@@ -7,6 +6,7 @@ FrostWire 3.0.13 build 767 DEC/30/2025
  - fix:Added support for both old TorrentSearchResult interface and new CompositeFileSearchResult.isTorrent() in AsyncStartDownload
  - fix:Call ConfigurationManager.instance() to block until preferences are fully loaded before starting BTEngineInitializer
  - fix:BTEngine now properly listens on configured port ranges instead of failing with port 0
+ - fix:Transfer status showing "Error" for newly started torrents - invalidated status cache now fetches fresh status instead of returning ERROR
  - maintenance:Updated gradle plugin to 8.13.2
  - maintenance:Updated yt_dlp to 2025.12.08
  - maintenance:Updated androidx.exifinterface:exifinterface to 1.4.2
