@@ -102,9 +102,25 @@ public class AsyncStartDownload {
     private static Transfer doInBackground(final Context ctx, final SearchResult sr, final String message) {
         Transfer transfer = null;
         try {
-            if (sr instanceof TorrentSearchResult &&
-                    !(sr instanceof TorrentCrawledSearchResult)) {
-                transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
+            // Check both old TorrentSearchResult interface and new CompositeFileSearchResult with isTorrent()
+            boolean isTorrent = false;
+            String torrentUrl = null;
+
+            if (sr instanceof TorrentSearchResult && !(sr instanceof TorrentCrawledSearchResult)) {
+                // Old architecture: TorrentSearchResult
+                isTorrent = true;
+                torrentUrl = ((TorrentSearchResult) sr).getTorrentUrl();
+            } else if (sr instanceof com.frostwire.search.CompositeFileSearchResult) {
+                // New architecture: CompositeFileSearchResult with torrent metadata
+                com.frostwire.search.CompositeFileSearchResult csr = (com.frostwire.search.CompositeFileSearchResult) sr;
+                if (csr.isTorrent()) {
+                    isTorrent = true;
+                    torrentUrl = csr.getTorrentUrl().orElse(null);
+                }
+            }
+
+            if (isTorrent && torrentUrl != null) {
+                transfer = TransferManager.instance().downloadTorrent(torrentUrl,
                         new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) ctx, false), sr.getDisplayName());
             } else {
                 transfer = TransferManager.instance().download(sr);

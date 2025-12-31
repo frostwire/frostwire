@@ -1,3 +1,14 @@
+
+FrostWire 3.0.13 build 767 DEC/30/2025
+ - crash:Race condition in BTEngine initialization - ConfigurationManager wasn't fully initialized before BTEngineInitializer read port preferences, causing port 0 binding failures
+ - crash:Session failed to initialize when BTEngineInitializer started without waiting for ConfigurationManager to load preferences
+ - crash:Torrent downloads never started despite successful session initialization - AsyncStartDownload was checking for old TorrentSearchResult interface but new search architecture returns CompositeFileSearchResult
+ - crash:Search results from torrent sources (TPB, 1337X, MagnetDL, etc.) weren't recognized as torrents after V2 architecture consolidation
+ - fix:Added support for both old TorrentSearchResult interface and new CompositeFileSearchResult.isTorrent() in AsyncStartDownload
+ - fix:Call ConfigurationManager.instance() to block until preferences are fully loaded before starting BTEngineInitializer
+ - fix:BTEngine now properly listens on configured port ranges instead of failing with port 0
+
+
 FrostWire 3.0.12 build 766 DEC/02/2025
  - new:Powered by jlibtorrent 2.0.12.7 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new:No more third party ads or advertising tracking of any kind. Only frostwire support requests, vpn suggestions and promotional free downloads.

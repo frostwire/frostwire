@@ -82,7 +82,6 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
         }
 
         try {
-            LOG.info("createHandpickedTorrentDownloadDialog!");
             final HandpickedTorrentDownloadDialog dlg =
                     HandpickedTorrentDownloadDialog.newInstance(
                             contextRef.get(),
