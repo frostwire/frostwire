@@ -7,6 +7,11 @@ FrostWire 3.0.13 build 767 DEC/30/2025
  - fix:Added support for both old TorrentSearchResult interface and new CompositeFileSearchResult.isTorrent() in AsyncStartDownload
  - fix:Call ConfigurationManager.instance() to block until preferences are fully loaded before starting BTEngineInitializer
  - fix:BTEngine now properly listens on configured port ranges instead of failing with port 0
+ - maintenance:Updated gradle plugin to 8.13.2
+ - maintenance:Updated yt_dlp to 2025.12.08
+ - maintenance:Updated androidx.exifinterface:exifinterface to 1.4.2
+ - maintenance:Updated androidx.swiperefreshlayout:swiperefreshlayout to 1.2.0
+ - maintenance:Updated com.google.firebase:firebase-bom to 34.7.0
 
 
 FrostWire 3.0.12 build 766 DEC/02/2025
