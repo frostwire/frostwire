@@ -113,6 +113,10 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         // Initialize configuration manager (reads SharedPreferences - can be slow)
         ConfigurationManager.create(this);
 
+        // CRITICAL: Wait for ConfigurationManager to be fully initialized before using it
+        // This prevents race condition where BTEngineInitializer reads preferences before they're loaded
+        ConfigurationManager.instance();
+
         // Set menu icons visible
         AbstractActivity.setMenuIconsVisible(true);
 
@@ -125,6 +129,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         Engine.instance().onApplicationCreate(this);
 
         // Start BitTorrent engine on dedicated thread
+        // Now safe to start since ConfigurationManager is fully initialized
         new Thread(new BTEngineInitializer()).start();
 
         // Load theme asynchronously
@@ -216,7 +221,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             ConfigurationManager cm = ConfigurationManager.instance();
             int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
             int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
-            
+
             int port0, port1;
             if (configuredStartPort == 1024 && configuredEndPort == 57000) {
                 // Use default port range [37000, 57000] when user hasn't configured specific ports
@@ -234,7 +239,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
                     port1 = configuredEndPort;
                 }
             }
-            
+
             String iface = "0.0.0.0:%1$d,[::]:%1$d";
             ctx.interfaces = String.format(Locale.US, iface, port0);
             ctx.retries = port1 - port0;
