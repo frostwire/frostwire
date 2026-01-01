@@ -11,7 +11,6 @@ import java.awt.*;
  * @author Peter Weishapl (petw@gmx.net)
  */
 public class BuddyButton extends JButton {
-    private static final long serialVersionUID = -2281078972367520220L;
 
     public BuddyButton() {
         this(null);

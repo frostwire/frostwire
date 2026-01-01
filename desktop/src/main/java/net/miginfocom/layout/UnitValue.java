@@ -191,7 +191,6 @@ public final class UnitValue implements Serializable {
     // ************************************************
     // Persistence Delegate and Serializable combined.
     // ************************************************
-    private static final long serialVersionUID = 1L;
 
     static {
         UNIT_MAP.put("px", PIXEL);

@@ -328,7 +328,6 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     private void addActions() {
         InputMap map = TABLE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         Action enter = new AbstractAction() {
-            private static final long serialVersionUID = 5177362850526818763L;
 
             public void actionPerformed(ActionEvent e) {
                 handleActionKey();
@@ -336,7 +335,6 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         };
         installAction(map, enter, KeyEvent.VK_ENTER, "limewire.action");
         Action delete = new AbstractAction() {
-            private static final long serialVersionUID = 6973509148820061808L;
 
             public void actionPerformed(ActionEvent e) {
                 if (!TABLE.isEditing())

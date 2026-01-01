@@ -12,7 +12,6 @@ public final class SpeedRenderer extends DefaultTableBevelledCellRenderer {
     /**
      *
      */
-    private static final long serialVersionUID = -3181771818657704593L;
 
     /**
      * Constructs the speed drawer.

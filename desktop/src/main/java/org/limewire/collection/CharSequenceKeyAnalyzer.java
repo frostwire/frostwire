@@ -32,7 +32,6 @@ import org.limewire.collection.PatriciaTrie.KeyAnalyzer;
  * </pre>
  */
 public class CharSequenceKeyAnalyzer implements KeyAnalyzer<CharSequence> {
-    private static final long serialVersionUID = -7032449491269434877L;
     private static final int[] BITS = createIntBitMask(16);
 
     private static int[] createIntBitMask(int bitCount) {

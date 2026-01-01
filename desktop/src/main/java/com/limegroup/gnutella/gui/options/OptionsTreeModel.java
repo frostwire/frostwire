@@ -12,7 +12,6 @@ final class OptionsTreeModel extends DefaultTreeModel {
     /**
      *
      */
-    private static final long serialVersionUID = -3443600214760041469L;
     /**
      * Constant handle to the root node of the tree.
      */

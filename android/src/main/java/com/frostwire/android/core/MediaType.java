@@ -42,7 +42,6 @@ import java.util.TreeSet;
  */
 public class MediaType implements Serializable {
 
-    private static final long serialVersionUID = 3999062781289258389L;
 
     // These values should match standard MIME content-type
     // categories and/or XSD schema names.
@@ -342,7 +341,6 @@ public class MediaType implements Serializable {
      * Compares <code>String</code> objects without regard to case.
      */
     public static final class CaseInsensitiveStringComparator implements Comparator<String>, Serializable {
-        private static final long serialVersionUID = 263123571237995212L;
 
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);

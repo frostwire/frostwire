@@ -115,7 +115,6 @@ public interface HttpClient {
     }
 
     class HttpRangeException extends IOException {
-        private static final long serialVersionUID = 1891038288667531894L;
 
         HttpRangeException(String message) {
             super(message);
@@ -123,7 +122,6 @@ public interface HttpClient {
     }
 
     final class RangeNotSupportedException extends HttpRangeException {
-        private static final long serialVersionUID = -3356618211960630147L;
 
         RangeNotSupportedException(String message) {
             super(message);
@@ -131,7 +129,6 @@ public interface HttpClient {
     }
 
     final class HttpRangeOutOfBoundsException extends HttpRangeException {
-        private static final long serialVersionUID = -335661829606230147L;
 
         HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
             super("HttpRange Out of Bounds error: start=" + rangeStart + " expected file size=" + expectedFileSize);

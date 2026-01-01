@@ -1,7 +1,6 @@
 package com.frostwire.mp3;
 
 public class UnsupportedTagException extends BaseException {
-    private static final long serialVersionUID = 1L;
 
     public UnsupportedTagException() {
         super();

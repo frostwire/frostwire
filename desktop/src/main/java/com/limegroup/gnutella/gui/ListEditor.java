@@ -48,7 +48,6 @@ public class ListEditor extends JPanel {
     /**
      *
      */
-    private static final long serialVersionUID = 5689653237762528073L;
     private static final int DEFAULT_COLUMNS = 10;  //size of editor
     /**
      * INVARIANT: model contains exactly the same elements as realModel.
@@ -184,7 +183,6 @@ public class ListEditor extends JPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 8474390737220207662L;
 
         AddAction() {
             putValue(Action.NAME, I18n.tr("Add"));
@@ -239,7 +237,6 @@ public class ListEditor extends JPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 6931596656024307229L;
 
         RemoveAction() {
             putValue(Action.NAME, I18n.tr("Remove"));

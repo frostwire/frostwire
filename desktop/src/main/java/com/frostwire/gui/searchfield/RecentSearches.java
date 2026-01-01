@@ -234,7 +234,6 @@ class RecentSearches implements ActionListener {
      * The popup menu returned by
      */
     public static class RecentSearchesPopup extends JPopupMenu implements ActionListener, ChangeListener {
-        private static final long serialVersionUID = 3389724537449677787L;
         private final RecentSearches recentSearches;
         private final JTextField searchField;
         private JMenuItem clear;

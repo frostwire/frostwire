@@ -40,7 +40,6 @@ public class LimeTextField extends JTextField {
     /**
      *
      */
-    private static final long serialVersionUID = -1994520183255049424L;
     /**
      * The undo action.
      */
@@ -48,7 +47,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = 675409703997007078L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).undo();
@@ -61,7 +59,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = 5342970192703043838L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).cut();
@@ -74,7 +71,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = -3484207766103231841L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).copy();
@@ -87,7 +83,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = -967931044746884556L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).paste();
@@ -100,7 +95,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = -1239306786560704952L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).replaceSelection("");
@@ -113,7 +107,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = 4783056991868525860L;
 
         public void actionPerformed(ActionEvent e) {
             getField(e).selectAll();
@@ -178,7 +171,6 @@ public class LimeTextField extends JTextField {
             /**
              *
              */
-            private static final long serialVersionUID = -6004124495511263059L;
 
             public void show(Component invoker, int x, int y) {
                 ((LimeTextField) invoker).updateActions();
@@ -285,7 +277,6 @@ public class LimeTextField extends JTextField {
         /**
          *
          */
-        private static final long serialVersionUID = -2088365927213389348L;
 
         /**
          * Constructs a new FieldAction looking up the name from the MessagesBundles.

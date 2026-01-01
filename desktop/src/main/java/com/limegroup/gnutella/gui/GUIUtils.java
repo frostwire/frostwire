@@ -274,7 +274,6 @@ public final class GUIUtils {
                 /**
                  *
                  */
-                private static final long serialVersionUID = 3219036624812939826L;
 
                 public void actionPerformed(ActionEvent ae) {
                     Window parent;

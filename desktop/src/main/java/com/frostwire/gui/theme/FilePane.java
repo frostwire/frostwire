@@ -62,7 +62,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     /**
      *
      */
-    private static final long serialVersionUID = -7006852608530881336L;
     private final static String ACTION_CANCEL = "cancelSelection";
     private final static String ACTION_EDIT_FILE_NAME = "editFileName";
     private static final int VIEWTYPE_COUNT = 2;
@@ -559,7 +558,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
             /**
              *
              */
-            private static final long serialVersionUID = 7343396893205583428L;
 
             public int getNextMatch(String prefix, int startIndex, Position.Bias bias) {
                 ListModel<Object> model = getModel();
@@ -682,7 +680,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
             /**
              *
              */
-            private static final long serialVersionUID = 2765367470318527427L;
 
             // Handle Escape key events here
             protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
@@ -903,7 +900,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
                 /**
                  *
                  */
-                private static final long serialVersionUID = 1165291121008749795L;
                 private Action basicNewFolderAction;
 
                 // Initializer
@@ -1308,7 +1304,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = -4836669546572282852L;
         private final int viewType;
 
         ViewTypeAction(int viewType) {
@@ -1341,7 +1336,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = 7056739425130909334L;
 
         SortableListModel() {
             getDetailsTableModel().addTableModelListener(this);
@@ -1370,7 +1364,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = 6898830676567042099L;
         final JFileChooser chooser;
         final BasicDirectoryModel directoryModel;
         ShellFolderColumnInfo[] columns;
@@ -1609,7 +1602,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = 7059979171474189234L;
         private final JTextField tf;
 
         DetailsTableCellEditor(JTextField tf) {
@@ -1635,7 +1627,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = 4795829282408806063L;
         final JFileChooser chooser;
         final DateFormat df;
 
@@ -1777,7 +1768,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         /**
          *
          */
-        private static final long serialVersionUID = -7099480042235528638L;
 
         public Component getListCellRendererComponent(JList<?> list, Object value,
                                                       int index, boolean isSelected,

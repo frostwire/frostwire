@@ -26,7 +26,6 @@ package com.frostwire.util.filetypes;
  * @see AssociationService
  */
 public class AssociationException extends Exception {
-    private static final long serialVersionUID = 2585950054034209174L;
 
     /**
      * Constructs an <code>AssociationException</code> object with no detail message.

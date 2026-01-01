@@ -29,7 +29,6 @@ class ShutdownWindow extends JDialog {
     /**
      *
      */
-    private static final long serialVersionUID = 446845150731872693L;
     private final ImageIcon backgroundImage;
 
     ShutdownWindow() {

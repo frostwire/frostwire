@@ -505,7 +505,6 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 3856730985269585441L;
 
         RootNotEditableTree(TreeModel newModel) {
             super(newModel);
@@ -545,7 +544,6 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Check box tree cell renderer.
      */
     private class FileTreeCellRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = -8299879264709364378L;
         private final JCheckBox checkBox = configureCheckBox(new JCheckBox());
         private final DefaultTreeCellRenderer labelRenderer = new DefaultTreeCellRenderer();
 
@@ -583,13 +581,11 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         /**
          *
          */
-        private static final long serialVersionUID = -8422311328409412824L;
 
         FileTreeCellEditor() {
             super(configureCheckBox(new JCheckBox()));
             //setColors((JCheckBox)editorComponent, true);
             delegate = new EditorDelegate() {
-                private static final long serialVersionUID = -7007164079287676831L;
 
                 @Override
                 public void setValue(Object value) {

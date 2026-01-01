@@ -464,7 +464,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 6985964072155472329L;
         private final Object selected;
 
         CheckBoxListSelectionEvent(Object source, Object selected) {
@@ -489,7 +488,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = -2715339837857605924L;
         private final E selected;
         private final boolean checked;
 
@@ -535,7 +533,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = -8173830762677196193L;
 
         SelectAllAction() {
             putValue(Action.NAME, I18n.tr
@@ -572,7 +569,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 2839028569443961323L;
 
         private void shift(int row) {
             if (row != highLightedRow) {
@@ -654,7 +650,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 8487646158995389360L;
         private final CustomEditorDelegate customDelegate;
 
         CheckBoxCellEditor() {
@@ -693,7 +688,6 @@ public class CheckBoxList<E> extends BoxPanel {
          * update control
          */
         private class CustomEditorDelegate extends EditorDelegate implements MouseListener {
-            private static final long serialVersionUID = -7007164079207676831L;
             private Object lastValue;
 
             CustomEditorDelegate() {
@@ -791,7 +785,6 @@ public class CheckBoxList<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 7370736947464891601L;
         private E obj;
         private final JCheckBox checkBox;
         private final JLabel label;
@@ -905,7 +898,6 @@ public class CheckBoxList<E> extends BoxPanel {
             /**
              *
              */
-            private static final long serialVersionUID = 2099563643830495610L;
             private final Icon iconReg;
             private final Icon iconHi;
 

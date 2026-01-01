@@ -31,7 +31,6 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
     /**
      *
      */
-    private static final long serialVersionUID = -4697217283217173076L;
     /**
      * HashMap for quick access to indexes.
      */

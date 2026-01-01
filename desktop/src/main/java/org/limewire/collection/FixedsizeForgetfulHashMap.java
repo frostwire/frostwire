@@ -47,7 +47,6 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
     /**
      *
      */
-    private static final long serialVersionUID = -519304540549432803L;
     /**
      * Maximum number of elements to be stored in the underlying hashMap
      */

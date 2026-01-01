@@ -13,7 +13,6 @@ public class LanguageWindow extends JDialog {
     /**
      *
      */
-    private static final long serialVersionUID = 1794098818746665242L;
     private static final int MIN_DIALOG_WIDTH = 350;
     private static final String TRANSLATE_URL = "https://github.com/frostwire/frostwire";
     private JCheckBox showLanguageCheckbox;

@@ -7,7 +7,6 @@ import java.awt.*;
 import java.util.Date;
 
 public class DateRenderer extends DefaultTableBevelledCellRenderer {
-    private static final long serialVersionUID = -5183888170958098871L;
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,

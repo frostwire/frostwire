@@ -39,7 +39,6 @@ import java.awt.event.KeyEvent;
  * @see RecentSearches
  */
 public class JXSearchField extends JXTextField {
-    private static final long serialVersionUID = -6555528038058656677L;
     /**
      * The default instant search delay.
      */
@@ -638,7 +637,6 @@ public class JXSearchField extends JXTextField {
      * text in the search field to <code>null</code>.
      */
     class ClearAction extends AbstractAction {
-        private static final long serialVersionUID = -3349455592229414653L;
 
         ClearAction() {
             putValue(SHORT_DESCRIPTION, "Clear Search Text");
@@ -665,7 +663,6 @@ public class JXSearchField extends JXTextField {
      * Invoked when the find button is pressed.
      */
     public class FindAction extends AbstractAction {
-        private static final long serialVersionUID = 6512288404613230232L;
 
         FindAction() {
         }

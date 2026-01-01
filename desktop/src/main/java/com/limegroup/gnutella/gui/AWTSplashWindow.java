@@ -46,7 +46,6 @@ public class AWTSplashWindow extends Window {
     /**
      *
      */
-    private static final long serialVersionUID = 720067738309164784L;
     private final Image splashImage;
     /**
      * This attribute indicates whether the method

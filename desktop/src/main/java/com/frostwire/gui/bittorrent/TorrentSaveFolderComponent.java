@@ -103,7 +103,6 @@ public final class TorrentSaveFolderComponent extends JPanel {
     }
 
     private class DefaultAction extends AbstractAction {
-        private static final long serialVersionUID = 7266666461649699221L;
 
         DefaultAction() {
             putValue(Action.NAME, I18n.tr("Use Default"));
@@ -116,7 +115,6 @@ public final class TorrentSaveFolderComponent extends JPanel {
     }
 
     private class BrowseAction extends AbstractAction {
-        private static final long serialVersionUID = 2976380710515726420L;
 
         BrowseAction() {
             putValue(Action.NAME, I18n.tr("Browse..."));

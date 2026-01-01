@@ -29,7 +29,6 @@ public class OpenLinkAction extends AbstractAction {
     /**
      *
      */
-    private static final long serialVersionUID = -7243267672146519961L;
     private final String url;
 
     public OpenLinkAction(String url, String name) {

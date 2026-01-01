@@ -7,7 +7,6 @@ public class SkinPopupMenu extends JPopupMenu {
     /**
      *
      */
-    private static final long serialVersionUID = 182325604729450397L;
 
     @Override
     public void addSeparator() {
@@ -28,7 +27,6 @@ public class SkinPopupMenu extends JPopupMenu {
             /**
              *
              */
-            private static final long serialVersionUID = 957774055453803270L;
 
             protected PropertyChangeListener createActionPropertyChangeListener(Action a) {
                 PropertyChangeListener pcl = createActionChangeListener(this);
@@ -50,7 +48,6 @@ public class SkinPopupMenu extends JPopupMenu {
         /**
          *
          */
-        private static final long serialVersionUID = -2601567679361541634L;
 
         public Separator() {
             super(JSeparator.HORIZONTAL);

@@ -48,7 +48,6 @@ final class KeywordMediaType implements Serializable {
      * Type for 'torrents'
      */
     public static final KeywordMediaType TYPE_TORRENTS = new KeywordMediaType(6, SCHEMA_TORRENTS, new String[]{"torrent"});
-    private static final long serialVersionUID = 3999062781289258389L;
     /**
      * Type for 'documents'
      */
@@ -284,7 +283,6 @@ final class KeywordMediaType implements Serializable {
      * Compares <code>String</code> objects without regard to case.
      */
     public static final class CaseInsensitiveStringComparator implements Comparator<String>, Serializable {
-        private static final long serialVersionUID = 263123571237995212L;
 
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);

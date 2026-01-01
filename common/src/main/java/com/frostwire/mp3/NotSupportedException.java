@@ -1,7 +1,6 @@
 package com.frostwire.mp3;
 
 public class NotSupportedException extends BaseException {
-    private static final long serialVersionUID = 1L;
 
     public NotSupportedException() {
         super();

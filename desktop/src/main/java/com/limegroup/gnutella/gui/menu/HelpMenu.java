@@ -95,7 +95,6 @@ final class HelpMenu extends AbstractMenu {
         /**
          *
          */
-        private static final long serialVersionUID = -4964160055694967725L;
 
         ShowTipOfTheDayAction() {
             super(I18n.tr("Tip of the &Day"));
@@ -114,7 +113,6 @@ final class HelpMenu extends AbstractMenu {
         /**
          *
          */
-        private static final long serialVersionUID = 2425666944873627828L;
 
         ShowAboutDialogAction() {
             super(I18n.tr("&About FrostWire"));

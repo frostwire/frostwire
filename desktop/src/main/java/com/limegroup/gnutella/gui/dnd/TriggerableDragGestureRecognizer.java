@@ -13,7 +13,6 @@ public class TriggerableDragGestureRecognizer extends DragGestureRecognizer {
     /**
      *
      */
-    private static final long serialVersionUID = 514682570826668981L;
 
     TriggerableDragGestureRecognizer(DragGestureListener dgl) {
         super(DragSource.getDefaultDragSource(), null, TransferHandler.NONE, dgl);

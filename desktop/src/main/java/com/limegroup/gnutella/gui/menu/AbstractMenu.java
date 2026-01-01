@@ -101,7 +101,6 @@ abstract class AbstractMenu implements Menu {
     }
 
     private static class MenuAction extends AbstractAction {
-        private static final long serialVersionUID = -4311768902578846258L;
 
         MenuAction(String name) {
             super(name);

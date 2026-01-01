@@ -69,7 +69,6 @@ public class CheckBoxListPanel<E> extends BoxPanel {
         /**
          *
          */
-        private static final long serialVersionUID = 5346177338334373472L;
 
         InternalJScrollPane(Component comp) {
             super(comp);

@@ -33,7 +33,6 @@ import java.awt.event.MouseEvent;
  * @author aldenml
  */
 public class ActionIconAndNameEditor extends AbstractCellEditor implements TableCellEditor {
-    private static final long serialVersionUID = 2661028644256459921L;
     private static final Logger LOG = Logger.getLogger(ActionIconAndNameEditor.class);
     private final Rectangle actionRegion;
     private ActionListener action;

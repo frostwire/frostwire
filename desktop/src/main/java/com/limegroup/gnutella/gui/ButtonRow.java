@@ -54,7 +54,6 @@ public final class ButtonRow extends JPanel {
     /**
      *
      */
-    private static final long serialVersionUID = 2171794172705055068L;
     /**
      * The array of `JButton`s.
      */

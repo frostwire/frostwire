@@ -396,7 +396,6 @@ class PartialFilesDialog extends JDialog {
     }
 
     private final class TorrentTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = -8689494570949104116L;
         private final TorrentInfo _torrent;
         private final TorrentFileInfo[] _fileInfos;
 

@@ -9,7 +9,6 @@ public final class CenteredRenderer extends DefaultTableBevelledCellRenderer {
     /**
      *
      */
-    private static final long serialVersionUID = 4600574816511326644L;
 
     public CenteredRenderer() {
         super();

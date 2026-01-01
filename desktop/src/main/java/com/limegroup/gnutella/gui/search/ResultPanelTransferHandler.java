@@ -10,7 +10,6 @@ class ResultPanelTransferHandler extends LimeTransferHandler {
     /**
      *
      */
-    private static final long serialVersionUID = 6250741497962589713L;
     /**
      * The ResultPanel this is handling.
      */

@@ -26,7 +26,6 @@ package com.frostwire.util.filetypes;
  * @see AssociationService
  */
 public class RegisterFailedException extends AssociationException {
-    private static final long serialVersionUID = -7837641271063350515L;
 
     /**
      * Constructs a <code>RegisterFailedException</code> object with the specified

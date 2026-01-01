@@ -275,7 +275,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
              *
              */
             @Serial
-            private static final long serialVersionUID = -8830541272140418635L;
 
             public Dimension getMaximumSize() {
                 return new Dimension(Short.MAX_VALUE, super.getPreferredSize().height);
@@ -892,7 +891,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     //
     class DirectoryComboBoxRenderer extends DefaultListCellRenderer {
         @Serial
-        private static final long serialVersionUID = -8500297350257807164L;
         final IndentIcon ii = new IndentIcon();
 
         public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -938,7 +936,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      */
     protected class DirectoryComboBoxModel extends AbstractListModel<Object> implements ComboBoxModel<Object> {
         @Serial
-        private static final long serialVersionUID = -4248097879659126453L;
         final Vector<File> directories = new Vector<>();
         int[] depths = null;
         File selectedDirectory = null;
@@ -1062,7 +1059,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      */
     public static class FilterComboBoxRenderer extends DefaultListCellRenderer {
         @Serial
-        private static final long serialVersionUID = -33803419008776614L;
 
         public Component getListCellRendererComponent(JList<?> list,
                                                       Object value, int index, boolean isSelected,
@@ -1080,7 +1076,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      */
     protected class FilterComboBoxModel extends AbstractListModel<Object> implements ComboBoxModel<Object>, PropertyChangeListener {
         @Serial
-        private static final long serialVersionUID = -1131578002217361954L;
         FileFilter[] filters;
 
         FilterComboBoxModel() {

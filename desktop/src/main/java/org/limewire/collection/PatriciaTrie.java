@@ -1419,7 +1419,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * The actual Trie nodes.
      */
     private static class TrieEntry<K, V> implements Map.Entry<K, V>, Serializable {
-        private static final long serialVersionUID = 4596023148184140013L;
         private K key;
         private V value;
         /**
@@ -1829,7 +1828,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         /**
          *
          */
-        private static final long serialVersionUID = -1736000794623484155L;
         final K prefix;
         final int offset;
         final int length;
@@ -1950,7 +1948,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         /**
          *
          */
-        private static final long serialVersionUID = 4268580791803450065L;
         /**
          * The key to start from, null if the beginning.
          */

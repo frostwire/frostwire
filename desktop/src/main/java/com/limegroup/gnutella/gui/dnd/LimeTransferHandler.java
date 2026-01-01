@@ -14,7 +14,6 @@ public class LimeTransferHandler extends TransferHandler {
     /**
      *
      */
-    private static final long serialVersionUID = 7753614134944789178L;
     private static TriggerableDragGestureRecognizer recognizer;
     private final int supportedActions;
 

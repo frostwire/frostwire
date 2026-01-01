@@ -204,7 +204,6 @@ public class LibrarySearch extends JPanel {
 
     private class SearchLibraryAction extends AbstractAction {
         @Serial
-        private static final long serialVersionUID = -2182314529781104010L;
 
         SearchLibraryAction() {
             putValue(Action.NAME, I18n.tr("Search"));

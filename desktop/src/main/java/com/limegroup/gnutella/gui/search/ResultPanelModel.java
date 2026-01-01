@@ -36,7 +36,6 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     /**
      *
      */
-    private static final long serialVersionUID = -2382156313320196261L;
     /**
      * The columns.
      */

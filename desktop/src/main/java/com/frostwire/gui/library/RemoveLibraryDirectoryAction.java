@@ -30,7 +30,6 @@ import java.io.File;
  * Removes selected root folders from a {@link RecursiveLibraryDirectoryPanel}.
  */
 public class RemoveLibraryDirectoryAction extends AbstractAction {
-    private static final long serialVersionUID = -6729288511779797455L;
     private final RecursiveLibraryDirectoryPanel recursiveSharingPanel;
 
     public RemoveLibraryDirectoryAction(RecursiveLibraryDirectoryPanel recursiveSharingPanel) {

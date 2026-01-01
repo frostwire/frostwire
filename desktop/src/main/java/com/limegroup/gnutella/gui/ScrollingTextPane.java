@@ -30,7 +30,6 @@ final class ScrollingTextPane extends JScrollPane {
     /**
      *
      */
-    private static final long serialVersionUID = 1706678462639869854L;
     /**
      * `JEditorPane` to show the text
      */
@@ -61,7 +60,6 @@ final class ScrollingTextPane extends JScrollPane {
             /**
              *
              */
-            private static final long serialVersionUID = 1486050927440198480L;
 
             public void actionPerformed(ActionEvent e) {
                 scroll();

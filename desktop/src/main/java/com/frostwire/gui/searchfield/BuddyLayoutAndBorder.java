@@ -10,7 +10,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManager, Border, PropertyChangeListener, UIResource {
-    private static final long serialVersionUID = 2275551286621857718L;
     private JTextField textField;
     private Border borderDelegate;
 

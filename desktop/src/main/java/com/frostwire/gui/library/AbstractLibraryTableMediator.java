@@ -200,7 +200,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
     static class SendToFriendAction extends AbstractAction {
         @Serial
-        private static final long serialVersionUID = 1329472129818371471L;
 
         SendToFriendAction() {
             super(tr("Send to friend"));

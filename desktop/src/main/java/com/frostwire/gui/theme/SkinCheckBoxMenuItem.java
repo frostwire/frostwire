@@ -6,7 +6,6 @@ public class SkinCheckBoxMenuItem extends JCheckBoxMenuItem {
     /**
      *
      */
-    private static final long serialVersionUID = -5903015325829909427L;
 
     public SkinCheckBoxMenuItem(Action a) {
         super(a);

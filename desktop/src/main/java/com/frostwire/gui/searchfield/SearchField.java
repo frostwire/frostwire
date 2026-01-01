@@ -134,7 +134,6 @@ public class SearchField extends JXSearchField {
             /**
              *
              */
-            private static final long serialVersionUID = -6004124495511263059L;
 
             public void show(Component invoker, int x, int y) {
                 ((SearchField) invoker).updateActions();
@@ -523,7 +522,6 @@ public class SearchField extends JXSearchField {
         /**
          *
          */
-        private static final long serialVersionUID = 601999394867955024L;
 
         ClearHistory() {
             super(I18n.tr("Clear History"));
@@ -547,7 +545,6 @@ public class SearchField extends JXSearchField {
         /**
          *
          */
-        private static final long serialVersionUID = -7324769835640667828L;
         private String currentText;
 
         AutoCompleteList() {

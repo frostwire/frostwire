@@ -29,7 +29,6 @@ public final class IconRenderer extends DefaultTableBevelledCellRenderer {
     /**
      *
      */
-    private static final long serialVersionUID = 8144602599802586291L;
 
     /**
      * The constructor sets this `JLabel` to be opaque and sets the

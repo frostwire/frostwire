@@ -53,7 +53,6 @@ public class BoundSize implements Serializable {
     // ************************************************
     // Persistence Delegate and Serializable combined.
     // ************************************************
-    private static final long serialVersionUID = 1L;
 
     static {
         if (LayoutUtil.HAS_BEANS) {

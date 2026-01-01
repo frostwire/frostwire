@@ -43,7 +43,6 @@ public class SkinComboPopup extends BasicComboPopup {
     /**
      *
      */
-    private static final long serialVersionUID = -3629162645341440812L;
 
     /**
      * Creates combo popup for the specified combobox.

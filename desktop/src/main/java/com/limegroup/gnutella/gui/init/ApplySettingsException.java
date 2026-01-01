@@ -26,7 +26,6 @@ class ApplySettingsException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = 6921739192150900295L;
 
     /**
      * Constructs an ApplySettingsException with the specified detail

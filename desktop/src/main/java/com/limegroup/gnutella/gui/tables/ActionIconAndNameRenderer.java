@@ -31,7 +31,6 @@ public final class ActionIconAndNameRenderer extends DefaultTableBevelledCellRen
     /**
      *
      */
-    private static final long serialVersionUID = 8244672573299436077L;
 
     /**
      * Constructs a new IconAndNameRenderer with the Icon aligned to the left

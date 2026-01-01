@@ -11,7 +11,6 @@ import java.awt.*;
  * @see BuddySupport
  */
 class JXTextField extends JTextField {
-    private static final long serialVersionUID = 7120788755640067659L;
 
     JXTextField(String promptText) {
         this(promptText, null);

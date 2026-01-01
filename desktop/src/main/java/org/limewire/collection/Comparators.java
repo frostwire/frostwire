@@ -69,7 +69,6 @@ public final class Comparators {
      */
     public static final class CaseInsensitiveStringComparator implements
             Comparator<String>, Serializable {
-        private static final long serialVersionUID = 263123571237995212L;
 
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);

@@ -1237,7 +1237,6 @@ throw new IOException("error");  // BAD
 
 // Use specific types
 final class RangeNotSupportedException extends HttpRangeException {
-    private static final long serialVersionUID = -3356618211960630147L;
     RangeNotSupportedException(String message) {
         super(message);
     }
@@ -1251,7 +1250,7 @@ final class HttpRangeOutOfBoundsException extends HttpRangeException {
 }
 ```
 
-**Why**: Allows catch blocks to handle specific error categories; includes serialVersionUID for serialization safety.
+**Why**: Allows catch blocks to handle specific error categories; enables proper exception handling for different failure modes.
 
 ### Callback/Listener Pattern
 

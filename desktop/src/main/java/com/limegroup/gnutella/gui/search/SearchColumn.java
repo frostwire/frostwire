@@ -15,7 +15,6 @@ class SearchColumn extends LimeTableColumn {
     /**
      *
      */
-    private static final long serialVersionUID = -5131410067087443020L;
     private int _width;
     private int _order;
     private boolean _visible;

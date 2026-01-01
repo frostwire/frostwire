@@ -35,7 +35,6 @@ public class OptionsTreeNode extends DefaultMutableTreeNode {
     /**
      *
      */
-    private static final long serialVersionUID = 5889522847540513086L;
     /**
      * The key for uniquely identifying this node.
      */

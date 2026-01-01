@@ -104,7 +104,6 @@ public class PromptTextFieldUI extends PromptTextUI {
     }
 
     private static final class LabelField extends JTextField {
-        private static final long serialVersionUID = -4888828236256139176L;
         boolean hasFocus;
 
         @Override

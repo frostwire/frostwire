@@ -13,7 +13,6 @@ public class WholeNumberField extends LimeTextField {
     /**
      *
      */
-    private static final long serialVersionUID = 5004162823300212516L;
     private final Toolkit toolkit;
     private final NumberFormat integerFormatter;
 
@@ -56,7 +55,6 @@ public class WholeNumberField extends LimeTextField {
         /**
          *
          */
-        private static final long serialVersionUID = 4371239029188384061L;
 
         public void insertString(int offs,
                                  String str,

@@ -110,7 +110,6 @@ public class FilePaneEx extends FilePane {
         /**
          *
          */
-        private static final long serialVersionUID = 3795594739034737323L;
         private final int viewType;
 
         ViewTypeAction(int viewType) {

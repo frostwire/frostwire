@@ -34,7 +34,6 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
     /**
      *
      */
-    private static final long serialVersionUID = 2859783399965055446L;
 
     LibraryFilesTableModel() {
         super(LibraryFilesTableDataLine.class);
