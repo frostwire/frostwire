@@ -10,7 +10,6 @@ import java.util.Comparator;
  * Strings in 1.2+.
  */
 final class StringComparator implements Comparator<String>, Serializable {
-    static final long serialVersionUID = -624599003446177506L;
 
     /**
      * Returns ((String)a).compareTo((String)b).

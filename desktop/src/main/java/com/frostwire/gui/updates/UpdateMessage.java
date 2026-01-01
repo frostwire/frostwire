@@ -27,7 +27,6 @@ import java.util.Date;
  * POJO to represent an UpdateMessage.
  */
 final class UpdateMessage implements Serializable {
-    public static final long serialVersionUID = 44L;
     private int _hashCode = -1; //set to <= 0 if you want it to be recalculated on this.hashCode()
     private String _message;
     private String _messageInstallerReady;

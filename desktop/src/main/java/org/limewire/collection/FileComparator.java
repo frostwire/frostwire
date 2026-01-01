@@ -10,7 +10,6 @@ import java.util.Comparator;
  * in 1.1.8 do not implement the Comparable interface, unlike Files in 1.2+.
  */
 final class FileComparator implements Comparator<File>, Serializable {
-    static final long serialVersionUID = 879961226428880051L;
 
     /**
      * Returns (((File)a).getAbsolutePath()).compareTo(
