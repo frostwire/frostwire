@@ -1157,6 +1157,406 @@ Before asking for code to be committed, ensure:
 
 ---
 
+## Additional Patterns & Best Practices
+
+Based on deeper codebase exploration, here are additional patterns commonly used throughout FrostWire:
+
+### Error Handling
+
+**Pattern**: Always catch `Throwable` (not just `Exception`) in critical paths, provide context in error messages (URLs, keys, file paths), and handle specific exception types for guidance.
+
+```java
+try {
+    url = getSearchUrl(page, keywords);
+    String text = fetchSearchPage(url);
+} catch (Throwable e) {
+    if (url == null) url = "n.a";
+    if (e instanceof SSLPeerUnverifiedException) {
+        LOG.error("Add " + getDomain() + " to Ssl.FWHostnameVerifier...");
+    }
+    LOG.error("Error [" + url + "]: " + e.getMessage(), e);
+}
+```
+
+**Why**: Provides actionable error information; catches all failure types including `Error`; avoids silent failures.
+
+### Resource Cleanup
+
+**Pattern**: Use try-with-resources for AutoCloseable; defensive try-finally for others; always suppress exceptions in finally.
+
+```java
+// Modern: try-with-resources
+try (InputStream is = new FileInputStream(file)) {
+    // ... use is ...
+}
+
+// Legacy: try-finally
+ZipFile zip = null;
+try {
+    zip = new ZipFile(file);
+    // ... use zip ...
+} finally {
+    try {
+        if (zip != null) zip.close();
+    } catch (Throwable e) {
+        // Suppress cleanup exceptions
+    }
+}
+```
+
+### Logging Conventions
+
+**Pattern**: Use structured logging with context, appropriate levels, and stack trace extraction.
+
+```java
+private static final Logger LOG = Logger.getLogger(ClassName.class);
+
+// Methods available:
+LOG.info("Message");
+LOG.info("Message", showCallerInfo);  // Include stack trace
+LOG.error("Message", exception);
+LOG.warn("Message", exception);
+
+// Set context prefix for thread identification
+Logger.setContextPrefix("prefix");
+```
+
+**Guidelines**:
+- Never log passwords, tokens, API keys, or real IP addresses
+- Use SEVERE/ERROR only for unexpected conditions
+- Use INFO for normal operations users might want to see
+- Use DEBUG for development diagnostics
+
+### Exception Handling Strategy
+
+**Pattern**: Create specific exception types for different error conditions; include causes; make classes final.
+
+```java
+// Don't use generic exceptions
+throw new IOException("error");  // BAD
+
+// Use specific types
+final class RangeNotSupportedException extends HttpRangeException {
+    private static final long serialVersionUID = -3356618211960630147L;
+    RangeNotSupportedException(String message) {
+        super(message);
+    }
+}
+
+final class HttpRangeOutOfBoundsException extends HttpRangeException {
+    HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
+        super("Range out of bounds: start=" + rangeStart +
+              " expected size=" + expectedFileSize);
+    }
+}
+```
+
+**Why**: Allows catch blocks to handle specific error categories; includes serialVersionUID for serialization safety.
+
+### Callback/Listener Pattern
+
+**Pattern**: Define listener interfaces with `on*` methods; provide adapter classes with empty implementations; wrap callbacks in try-catch.
+
+```java
+interface HttpClientListener {
+    void onError(HttpClient client, Throwable e);
+    void onData(HttpClient client, byte[] buffer, int offset, int length);
+    void onComplete(HttpClient client);
+    void onCancel(HttpClient client);
+    void onHeaders(HttpClient client, Map<String, List<String>> headerFields);
+}
+
+abstract class HttpClientListenerAdapter implements HttpClientListener {
+    public void onError(HttpClient client, Throwable e) { }
+    public void onData(HttpClient client, byte[] buffer, int offset, int length) { }
+    public void onComplete(HttpClient client) { }
+    public void onCancel(HttpClient client) { }
+    public void onHeaders(HttpClient client, Map<String, List<String>> headerFields) { }
+}
+
+// Always wrap callbacks to prevent exceptions escaping
+protected void onResults(List<? extends SearchResult> results) {
+    try {
+        if (results == null) results = new ArrayList<>();
+        listener.onResults(token, results);
+    } catch (Throwable e) {
+        LOG.warn("Error sending results to listener: " + e.getMessage());
+    }
+}
+```
+
+### State Management & Caching
+
+**Pattern**: Use volatile for cached status; AtomicBoolean with compareAndSet for concurrent updates; ConcurrentHashMap for lock-free access.
+
+```java
+// Cached expensive computation
+private volatile TorrentStatus cachedStatus;
+private volatile long lastStatusUpdateTime;
+private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
+
+// Usage: check then update atomically
+if (!statusRefreshScheduled.compareAndSet(false, true)) {
+    return;  // Already updating
+}
+try {
+    cachedStatus = expensiveComputation();
+} finally {
+    statusRefreshScheduled.set(false);
+}
+```
+
+**Why**: Volatile for visibility; compareAndSet prevents concurrent cache updates; separates read-heavy from write-heavy operations.
+
+### Task Throttling
+
+**Pattern**: Prevent tasks from executing more frequently than necessary using TaskThrottle utility.
+
+```java
+// Only runs if 1000ms has passed since last execution
+if (TaskThrottle.isReadyToSubmitTask("search-operation", 1000)) {
+    performSearch();
+}
+```
+
+**Why**: Reduces wake-ups, prevents CPU spikes, respects rate limits, prevents duplicate work.
+
+### Configuration Management (Android)
+
+**Pattern**: Initialize ConfigurationManager in background thread; use CountDownLatch for synchronization; timeout to prevent ANR.
+
+```java
+public static void create(Context context) {
+    if (instance != null) {
+        throw new RuntimeException("create() can only be called once");
+    }
+    creatorThread = new Thread(() -> {
+        instance = new ConfigurationManager(context.getApplicationContext());
+        creationLatch.countDown();
+    });
+    creatorThread.setName("ConfigurationManager::creator");
+    creatorThread.start();
+}
+
+public static ConfigurationManager instance() {
+    if (instance == null) {
+        try {
+            // ANRs triggered after 5 seconds, timeout after 4 seconds
+            creationLatch.await(4, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    if (instance == null) {
+        throw new RuntimeException("ConfigurationManager initialization timed out");
+    }
+    return instance;
+}
+```
+
+**Why**: SharedPreferences I/O is expensive and can block UI; background initialization with timeout prevents ANR.
+
+### HTTP Client Factory Pattern
+
+**Pattern**: Create context-specific HTTP client pools to limit concurrency per operation type.
+
+```java
+public enum HttpContext {
+    SEARCH,    // Web queries (limited connections)
+    DOWNLOAD,  // Downloads (more connections)
+    MISC       // Other operations
+}
+
+public static HttpClient getInstance(HttpContext context) {
+    if (okHttpClientPools == null) {
+        okHttpClientPools = buildThreadPools();
+    }
+    synchronized (okHTTPClientLock) {
+        if (!fwOKHTTPClients.containsKey(context)) {
+            fwOKHTTPClients.put(context,
+                new OkHttpClientWrapper(okHttpClientPools.get(context)));
+        }
+    }
+    return fwOKHTTPClients.get(context);
+}
+
+private static Map<HttpContext, ThreadPool> buildThreadPools() {
+    final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
+    map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 2, 2, 2, ...));
+    map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 2, 2, 2, ...));
+    map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 2, 2, ...));
+    return map;
+}
+```
+
+**Why**: Prevents search operations from starving downloads; limits per-context resource usage; allows tuning per operation type.
+
+### Immutability Patterns
+
+**Pattern**: Use enums for state machines, readonly interfaces for data, final classes for exceptions.
+
+```java
+// Enum for state machine
+public enum TransferState {
+    DOWNLOADING,
+    SEEDING,
+    PAUSED,
+    ERROR,
+    COMPLETE;
+
+    public static boolean isErrored(TransferState state) {
+        return state == ERROR || state == /* other errors */;
+    }
+}
+
+// Readonly interface
+public interface Transfer {
+    String getName();      // immutable String
+    double getSize();      // primitive
+    TransferState getState();  // immutable enum
+    List<TransferItem> getItems();  // defensive copy
+    // No setters!
+}
+
+// Final exceptions
+final class RangeNotSupportedException extends HttpRangeException { }
+```
+
+### Build File Conventions
+
+**Pattern**: Extract version info from manifest in Gradle; generate descriptive outputs; use platform detection for JVM args.
+
+```gradle
+// Extract version from manifest
+def manifestVersionCode() {
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new groovy.xml.XmlParser().parse(manifestFile)
+    return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
+}
+
+// Dynamic APK naming
+def changeApkOutput(variant) {
+    def suffix = project.ext.versionName + '-b' + project.ext.versionCode
+    variant.outputs.all { output ->
+        outputFileName = "frostwire-android-" + suffix + '.apk'
+    }
+}
+
+// Platform-specific JVM arguments
+application {
+    mainClass = 'com.limegroup.gnutella.gui.Main'
+    applicationDefaultJvmArgs = [
+        '-Djava.library.path=lib/native',
+        '-Xms64m', '-Xmx512m', '-Xss256k'
+    ]
+    if (OperatingSystem.current().isMacOsX()) {
+        applicationDefaultJvmArgs += ['-Dsun.java2d.metal=true']
+    }
+}
+```
+
+### File I/O with Progress
+
+**Pattern**: Pre-allocate buffers; provide progress callbacks; support cancellation; use proper exception handling.
+
+```java
+byte[] buffer = new byte[32768];  // Pre-allocated 32KB buffer
+int itemCount = getItemCount(zipFile);
+int item = 0;
+
+while ((ze = zis.getNextEntry()) != null) {
+    item++;
+    File newFile = new File(folder, ze.getName());
+
+    // Report progress
+    if (listener != null) {
+        int progress = (int)(((double)(item * 100)) / itemCount);
+        listener.onUnzipping(ze.getName(), progress);
+    }
+
+    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+        int n;
+        while ((n = zis.read(buffer)) > 0) {
+            fos.write(buffer, 0, n);
+            // Support cancellation
+            if (listener != null && listener.isCanceled()) {
+                throw new IOException("Operation cancelled");
+            }
+        }
+    } finally {
+        zis.closeEntry();
+    }
+}
+```
+
+### Dependency Injection Pattern
+
+**Pattern**: Pass dependencies via constructor (required); provide setters for optional; use factories for complex construction.
+
+```java
+// Constructor injection for required dependencies
+public BTDownload(BTEngine engine, TorrentHandle th) {
+    this.engine = engine;      // Required
+    this.th = th;              // Required
+    this.innerListener = new InnerListener();
+    engine.addListener(innerListener);
+}
+
+// Setter injection for optional dependencies
+public void setListener(SearchListener listener) {
+    this.listener = listener;
+}
+
+// Factory for complex construction
+public static HttpClient getInstance(HttpContext context) {
+    // Logic to decide which implementation to create
+}
+```
+
+### Testing Organization
+
+**Pattern**: Mirror source structure; name tests descriptively; test complex logic, especially in common/.
+
+```
+common/src/main/java/.../SearchPattern.java
+desktop/src/test/java/.../SearchPatternTest.java
+                         (.../SearchPerformerTest.java)
+```
+
+**Guidelines**:
+- Write tests for reproducible bugs
+- Prefer tests in `common/` when possible (no platform dependencies)
+- Use platform-specific tests only when necessary
+- Name tests descriptively: `testShouldReturnNegativeWhenInputIsEmpty`
+- Mock external dependencies (network, file system)
+
+### Security Best Practices
+
+**Pattern**: Validate response codes, escape filenames, check SSL certificates, avoid logging sensitive data.
+
+```java
+// Validate response codes
+if (responseCode == 403) {
+    throw new ResponseCodeNotSupportedException(403);
+}
+
+// Escape filenames to prevent directory traversal
+private static String escapeFilename(String s) {
+    return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
+}
+
+// Check SSL certificates
+if (e instanceof SSLPeerUnverifiedException) {
+    LOG.error("Add domain to SSL verifier list");
+}
+
+// Never log sensitive data
+LOG.error("Login failed");  // OK
+LOG.error("Login failed: " + password);  // BAD - never do this!
+```
+
+---
+
 ## Summary
 
 When working on FrostWire:
