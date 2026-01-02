@@ -236,10 +236,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else if (itemId == R.id.fragment_transfers_menu_clear_all) {
             TransferManager.instance().clearComplete();
             getActivity().invalidateOptionsMenu();
+            onTime(true);  // Force immediate UI update after clearing
             return true;
         } else if (itemId == R.id.fragment_transfers_menu_pause_stop_all) {
             TransferManager.instance().stopHttpTransfers();
             TransferManager.instance().pauseTorrents();
+            onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
             return true;
         } else if (itemId == R.id.fragment_transfers_menu_resume_all) {
             if (bittorrentDisconnected) {
@@ -247,6 +249,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             } else {
                 if (NetworkManager.instance().isInternetDataConnectionUp()) {
                     TransferManager.instance().resumeResumableTransfers();
+                    onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
                 } else {
                     UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
                 }
@@ -254,9 +257,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             return true;
         } else if (itemId == R.id.fragment_transfers_menu_seed_all) {
             new SeedAction(getActivity()).onClick();
+            onTime(true);  // Force immediate UI update after seeding
             return true;
         } else if (itemId == R.id.fragment_transfers_menu_stop_seeding_all) {
             TransferManager.instance().stopSeedingTorrents();
+            onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -338,11 +343,21 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     public void onTime() {
+        onTime(false);
+    }
+
+    /**
+     * Refreshes the transfers list. If forceUpdate is true, bypasses the TaskThrottle check
+     * to provide immediate feedback for user actions like cancel/remove.
+     *
+     * @param forceUpdate if true, refresh immediately without throttle (for manual user actions)
+     */
+    public void onTime(boolean forceUpdate) {
         if (!isVisible()) {
             return;
         }
         if (adapter != null) {
-            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
+            if (forceUpdate || TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
                 postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
                         () -> {

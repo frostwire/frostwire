@@ -182,26 +182,28 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
-        if (Ref.alive(contextRef) && deleteData && isComplete()) {
-            // Let's remove all the file descriptors from the fetchers
-            //deleteFilesFromContentResolver(contextRef.get(), deleteTorrent);
-
-            getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
-
-                if (SystemUtils.hasAndroid10()) {
-                    Librarian.mediaStoreDeleteFromDownloads(item.getFile());
-                }
-
-                // delete from the internal folder
-                try {
-                    if (item.getFile().isFile()) {
-                        item.getFile().delete();
-                    }
-                } catch (Throwable t) {
-                    LOG.error("UIBittorrentDownload::remove failed to delete the internal file -> " + item.getFile().getAbsolutePath());
+        // Remove from UI immediately, then delete files in background
+        // This provides immediate visual feedback instead of waiting for file deletion (can be slow)
+        if (deleteData && isComplete()) {
+            // Delete files asynchronously to avoid blocking UI update
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
+                // This block runs on CONFIG_MANAGER thread (safe for I/O operations)
+                if (Ref.alive(contextRef)) {
+                    getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
+                        if (SystemUtils.hasAndroid10()) {
+                            Librarian.mediaStoreDeleteFromDownloads(item.getFile());
+                        }
+                        // delete from the internal folder
+                        try {
+                            if (item.getFile().isFile()) {
+                                item.getFile().delete();
+                            }
+                        } catch (Throwable t) {
+                            LOG.error("UIBittorrentDownload::remove failed to delete the internal file -> " + item.getFile().getAbsolutePath());
+                        }
+                    });
                 }
             });
-
         }
 
         dl.remove(deleteTorrent, deleteData);

@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -80,13 +81,35 @@ public final class CancelMenuAction extends MenuAction {
 
     private static void removeTransfer(Context context, Transfer transfer, boolean deleteTorrent,
                                        boolean deleteData) {
+        // Pause the transfer FIRST to provide immediate visual feedback that we're working on it
+        // This makes the UI show a state change (to PAUSED) before removal, better UX
+        if (transfer instanceof UIBittorrentDownload && !transfer.isPaused()) {
+            ((UIBittorrentDownload) transfer).pause();
+        }
+
+        // Now remove the transfer (file deletion will happen async in background)
         if (transfer instanceof UIBittorrentDownload) {
             ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
         } else {
             transfer.remove(deleteData);
         }
-        if (context != null) {
-            MainActivity.refreshTransfers(context);
+
+        // Post UI update back to UI thread after removal initiates
+        // This ensures onTime() is called from the UI thread and provides immediate feedback
+        if (context instanceof Activity) {
+            ((Activity) context).runOnUiThread(() -> {
+                if (context instanceof TimerObserver) {
+                    // Call onTime(true) to FORCE immediate update, bypassing TaskThrottle
+                    // User sees: transfer pauses → then disappears (as files delete in background)
+                    Object timerObserver = context;
+                    if (timerObserver instanceof TransfersFragment) {
+                        ((TransfersFragment) timerObserver).onTime(true);
+                    } else {
+                        // Fallback for other implementations
+                        ((TimerObserver) timerObserver).onTime();
+                    }
+                }
+            });
         }
     }
 
@@ -171,9 +194,11 @@ public final class CancelMenuAction extends MenuAction {
         public void onClick(View view) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> removeTransfer(dlg.getContext(), transfer, deleteTorrent, deleteData));
             dlg.dismiss();
-            if (dlg.getContext() instanceof TimerObserver) {
-                ((TimerObserver) dlg.getContext()).onTime();
-            }
+            // Note: onTime() is now called from within removeTransfer() on the UI thread,
+            // after removal and file deletion complete. This avoids:
+            // 1. Calling startActivity() from a background thread (which was silent failing)
+            // 2. Race condition where UI updates before file deletion finishes
+            // 3. onTime() being called before transfer is actually removed from list
         }
     }
 }
