@@ -1,3 +1,9 @@
+FrostWire 3.0.15 build 769 JAN/01/2026
+ - fix:Transfer removal now disappears immediately from UI without reappearing - removed from adapter instantly and manager synchronously before refresh cycle can re-add it
+ - fix:Transfers list UI responsiveness improved for stop/cancel/delete operations - adapter updates now use targeted item removal instead of full list rebuilds
+ - improvement:Parallel execution for independent background tasks - file I/O, icon loading, and search operations now run concurrently instead of sequentially
+
+
 FrostWire 3.0.14 build 768 DEC/30/2025
  - crash:Race condition in BTEngine initialization - ConfigurationManager wasn't fully initialized before BTEngineInitializer read port preferences, causing port 0 binding failures
  - crash:Session failed to initialize when BTEngineInitializer started without waiting for ConfigurationManager to load preferences
