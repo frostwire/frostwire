@@ -34,6 +34,7 @@ import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterHttpListener;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
@@ -96,7 +97,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         // ipFilterTableModel should be loaded in separate thread
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
         ipFilterTable = IPFilterTableMediator.getInstance();
-        BackgroundQueuedExecutorService.schedule(this::loadSerializedIPFilter);
+        DesktopParallelExecutor.execute(this::loadSerializedIPFilter);
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP Filter list (p2p format only supported)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
@@ -175,7 +176,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     public void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
         // decompress if zip file
         // import file
-        BackgroundQueuedExecutorService.schedule(() -> {
+        DesktopParallelExecutor.execute(() -> {
             LOG.info("importFromStreamAsync(): thread invoked", true);
             File decompressedFile;
             try {

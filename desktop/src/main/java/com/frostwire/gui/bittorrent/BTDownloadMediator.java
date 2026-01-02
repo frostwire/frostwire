@@ -53,6 +53,7 @@ import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.TableSettings;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
@@ -342,7 +343,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
 
         // Perform expensive clearable check in background thread
-        BackgroundQueuedExecutorService.schedule(() -> {
+        DesktopParallelExecutor.execute(() -> {
             try {
                 int n = DATA_MODEL.getRowCount();
                 boolean anyClearable = false;
@@ -927,7 +928,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public void downloadSoundcloudFromTrackUrlOrSearchResult(final String trackUrl, final SoundcloudSearchResult sr, boolean fromPastedUrl) {
         if (sr != null) {
-            BackgroundQueuedExecutorService.schedule(() -> {
+            DesktopParallelExecutor.execute(() -> {
                 System.out.println("BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult about to get download url");
                 final String downloadUrl = sr.getDownloadUrl();
                 System.out.println("BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult: " + downloadUrl);
@@ -942,7 +943,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 });
             });
         } else if (trackUrl != null) {
-            BackgroundQueuedExecutorService.schedule(() -> {
+            DesktopParallelExecutor.execute(() -> {
                 try {
                     String url = trackUrl;
                     if (trackUrl.contains("?in=")) {

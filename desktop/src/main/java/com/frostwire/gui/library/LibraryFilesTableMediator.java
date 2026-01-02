@@ -39,6 +39,7 @@ import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.gui.util.GUILauncher;
 import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
@@ -312,7 +313,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         List<List<File>> partitionedFiles = split(Arrays.asList(dirHolder.getFiles()));
         for (List<File> partition : partitionedFiles) {
             final List<File> fPartition = partition;
-            BackgroundQueuedExecutorService.schedule(() -> {
+            DesktopParallelExecutor.execute(() -> {
                 for (final File file : fPartition) {
                     GUIMediator.safeInvokeLater(() -> addUnsorted(file));
                 }
@@ -421,7 +422,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             final CheckBoxListPanel<File> listPanel,
             final Object[] removeOptions,
             final int option) {
-        return BackgroundQueuedExecutorService.submit(() -> {
+        return DesktopParallelExecutor.submit(() -> {
             // remove still selected files
             List<File> selected = listPanel.getSelectedElements();
             List<String> undeletedFileNames;

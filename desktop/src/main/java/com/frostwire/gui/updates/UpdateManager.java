@@ -22,6 +22,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.CommonUtils;
 import com.frostwire.util.OSUtils;
@@ -233,7 +234,7 @@ public final class UpdateManager implements Serializable {
         //LOG.info("UpdateManager.checkForUpdates() - Invoked");
 
         // Fetch SoundCloud configuration from remote server in background
-        BackgroundQueuedExecutorService.schedule(() -> {
+        DesktopParallelExecutor.execute(() -> {
             try {
                 SoundCloudConfigFetcher.fetchAndUpdateConfig();
             } catch (Throwable e) {

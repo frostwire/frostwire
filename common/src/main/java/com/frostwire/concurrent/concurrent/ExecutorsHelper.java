@@ -110,7 +110,7 @@ public class ExecutorsHelper {
     public static ExecutorService newFixedSizeThreadPool(int size, String name) {
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(size, size,
                 5L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(),
+                new LinkedBlockingQueue<>(4),
                 daemonThreadFactory(name));
         tpe.allowCoreThreadTimeOut(true);
         return Executors.unconfigurableExecutorService(tpe);

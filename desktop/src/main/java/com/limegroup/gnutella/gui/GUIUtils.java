@@ -23,6 +23,7 @@ import com.frostwire.util.PlaybackUtil;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.CommonUtils;
 import com.frostwire.util.OSUtils;
@@ -424,9 +425,9 @@ public final class GUIUtils {
         if (GUIMediator.isPlaylistVisible()) {
             if (PlaybackUtil.isPlayableFile(file)) {
                 if (false) {
-                    BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
+                    DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
                 } else if (!isPlaying) {
-                    BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
+                    DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
                 }
                 return true;
             }

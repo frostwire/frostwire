@@ -24,6 +24,7 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.SearchSettings;
 
 import javax.swing.*;
@@ -77,7 +78,7 @@ public final class SmartSearchDBPaneItem extends AbstractPaneItem {
      */
     public void initOptions() {
         _numTorrentsLabel.setText("...");
-        BackgroundQueuedExecutorService.schedule(() -> {
+        DesktopParallelExecutor.execute(() -> {
             _numTorrents = SearchMediator.instance().getTotalTorrents();
             GUIMediator.safeInvokeLater(() -> {
                 _numTorrentsLabel.setText(String.valueOf(_numTorrents));

@@ -27,6 +27,7 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
@@ -203,7 +204,6 @@ public class LibrarySearch extends JPanel {
     }
 
     private class SearchLibraryAction extends AbstractAction {
-        @Serial
 
         SearchLibraryAction() {
             putValue(Action.NAME, I18n.tr("Search"));
@@ -231,7 +231,7 @@ public class LibrarySearch extends JPanel {
             DirectoryHolder directoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
             if (directoryHolder != null) {
                 currentSearchRunnable = new SearchFilesRunnable(query);
-                BackgroundQueuedExecutorService.schedule(currentSearchRunnable);
+                DesktopParallelExecutor.execute(currentSearchRunnable);
             }
         }
 

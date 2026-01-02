@@ -26,6 +26,7 @@ import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 
@@ -117,7 +118,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
                 if (scsr.fetchedDownloadUrl()) {
                     playStream(ssr.getStreamUrl());
                 } else {
-                    BackgroundQueuedExecutorService.schedule(() -> {
+                    DesktopParallelExecutor.execute(() -> {
                         String url = ssr.getStreamUrl();
                         GUIMediator.safeInvokeLater(() -> playStream(url));
                     });

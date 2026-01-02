@@ -22,6 +22,7 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
 import javax.swing.*;
@@ -40,7 +41,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
-        BackgroundQueuedExecutorService.schedule(() -> {
+        DesktopParallelExecutor.execute(() -> {
             sr.getDownloadUrl();
             GUIMediator.instance().safeInvokeLater(() -> {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);

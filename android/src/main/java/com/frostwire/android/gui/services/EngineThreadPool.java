@@ -48,7 +48,7 @@ final public class EngineThreadPool extends ThreadPool {
     private final WeakHashMap<Thread, TaskInfo> taskInfo;
 
     EngineThreadPool() {
-        super("Engine", CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECS, new LinkedBlockingQueue<>(), false);
+        super("Engine", CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECS, new LinkedBlockingQueue<>(4), false);
         taskStack = new WeakHashMap<>();
         taskInfo = new WeakHashMap<>();
     }

@@ -131,8 +131,14 @@ The `common/` directory houses core utilities and abstractions used by both plat
 **Infrastructure:**
 ```java
 // Located in: com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService
-BackgroundQueuedExecutorService.schedule(Runnable r)  // Queue for background execution
-BackgroundQueuedExecutorService.submit(Callable<T> c) // Submit with return value
+// For SEQUENTIAL background work (tasks must execute one-at-a-time)
+BackgroundQueuedExecutorService.schedule(Runnable r)  // Queue for background execution (single-threaded)
+BackgroundQueuedExecutorService.submit(Callable<T> c) // Submit with return value (single-threaded)
+
+// Located in: com.limegroup.gnutella.gui.util.DesktopParallelExecutor
+// For PARALLEL background work (independent tasks can run concurrently)
+DesktopParallelExecutor.execute(Runnable r)  // Queue for parallel background execution (4 threads)
+DesktopParallelExecutor.submit(Callable<T> c) // Submit with return value (4 threads)
 
 // Located in: com.limegroup.gnutella.gui.GUIMediator
 GUIMediator.safeInvokeAndWait(Runnable r)  // Sync execution on EDT
@@ -213,11 +219,27 @@ SwingUtilities.invokeLater(() -> {
 });
 ```
 
+**Executor Selection Guide:**
+
+Use `BackgroundQueuedExecutorService` for:
+- Torrent operations (single download context)
+- UI state changes that must be serialized
+- Tasks that modify shared state
+- Operations that must execute in order
+- Single-resource operations (e.g., transferring one file)
+
+Use `DesktopParallelExecutor` for:
+- File I/O operations (loading, removing, searching)
+- Icon/resource loading for multiple items
+- Network I/O (independent HTTP requests)
+- Search operations on independent queries
+- Media operations on different files
+
 **Key EDT Rules:**
-1. Never use bare `new Thread()` - use `BackgroundQueuedExecutorService`
+1. Never use bare `new Thread()` - use `BackgroundQueuedExecutorService` or `DesktopParallelExecutor`
 2. Check if work is expensive before executing on EDT
 3. Use caching for frequently-accessed expensive computations
-4. Load icons, fonts, and HTML content in background
+4. Load icons, fonts, and HTML content in background (use `DesktopParallelExecutor`)
 5. Post UI updates via `GUIMediator.safeInvokeLater()` not `SwingUtilities.invokeLater()`
 6. Never call `Future.get()` on EDT - only on background threads
 

@@ -28,6 +28,7 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
@@ -266,7 +267,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> {
+            DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> {
                 IconManager.instance().getIconForFile(initializer);
                 _iconLoaded = true;
                 _model.refresh();
