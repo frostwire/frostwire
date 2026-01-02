@@ -1,7 +1,7 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.util.Logger;
 
 /**
  * @author gubatron
@@ -37,7 +38,7 @@ import com.frostwire.jlibtorrent.TorrentStatus;
  * @author marcelinkaaa
  */
 public final class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
-    //private static Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
+    private static final Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
     private HexHiveView hexHiveView;
@@ -81,6 +82,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         if (uiBittorrentDownload == null) {
             return;
         }
+
         ensureTorrentHandleAsync();
         if (torrentHandle == null) {
             return;

@@ -1,7 +1,7 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,11 @@ import androidx.annotation.Nullable;
 
 import com.frostwire.android.R;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
+import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author aldenml
@@ -44,7 +49,18 @@ import com.frostwire.android.util.SystemUtils;
  *         Created on 11/23/17.
  */
 public class HexHiveView<T> extends View {
-    //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
+    private static final Logger LOG = Logger.getLogger(HexHiveView.class);
+    // Dedicated 2-threaded executor for HexHiveView rendering
+    // Allows parallel rendering without blocking sequential handler queues
+    private static ExecutorService hexHiveRenderExecutor;
+
+    private static ExecutorService getHexHiveRenderExecutor() {
+        if (hexHiveRenderExecutor == null) {
+            hexHiveRenderExecutor = ExecutorsHelper.newFixedSizeThreadPool(2, "HexHiveView-Renderer");
+        }
+        return hexHiveRenderExecutor;
+    }
+
     private Paint bitmapPaint;
     private Paint hexagonBorderPaint;
     private CubePaint emptyHexPaint;
@@ -140,10 +156,15 @@ public class HexHiveView<T> extends View {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                asyncDraw(canvasWidth, canvasHeight, hexDataAdapter);
-                SystemUtils.postToUIThread(this::invalidate);
-            });
+            // Use dedicated 2-threaded HexHiveView executor for background drawing.
+            // This prevents blocking the single-threaded MISC handler when rendering large hexagons.
+            // Throttle to 100ms minimum to prevent excessive redraws during piece downloading.
+            if (TaskThrottle.isReadyToSubmitTask("HexHiveView::updateData", 100)) {
+                getHexHiveRenderExecutor().execute(() -> {
+                    asyncDraw(canvasWidth, canvasHeight, hexDataAdapter);
+                    SystemUtils.postToUIThread(this::invalidate);
+                });
+            }
         }
     }
 
@@ -309,32 +330,49 @@ public class HexHiveView<T> extends View {
 
     @SuppressWarnings("rawtypes")
     private void asyncDraw(int canvasWidth, int canvasHeight, HexDataAdapter adapter) {
-        // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
-        DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
-        boolean evenRow = true;
-        int pieceIndex = 0;
-        float heightQuarter = DP.hexHeight / 4;
-        float threeQuarters = heightQuarter * 3;
-        // if we have just one piece to draw, we'll draw it in the center
-        if (DP.numHexs == 1) {
-            DP.hexCenterBuffer.x = DP.center.x;
-            DP.hexCenterBuffer.y = DP.center.y;
-        }
-        boolean drawCubes = DP.numHexs <= 600;
-        Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        while (pieceIndex < DP.numHexs) {
-            drawHexagon(DP, canvas, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
-            pieceIndex++;
-            DP.hexCenterBuffer.x += (int) (DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4));
-            float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
-            if (rightSide >= DP.end.x) {
-                evenRow = !evenRow;
-                DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-                DP.hexCenterBuffer.y += (int) threeQuarters;
+        try {
+            // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
+            DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
+            boolean evenRow = true;
+            int pieceIndex = 0;
+            float heightQuarter = DP.hexHeight / 4;
+            float threeQuarters = heightQuarter * 3;
+            // if we have just one piece to draw, we'll draw it in the center
+            if (DP.numHexs == 1) {
+                DP.hexCenterBuffer.x = DP.center.x;
+                DP.hexCenterBuffer.y = DP.center.y;
             }
+            boolean drawCubes = DP.numHexs <= 600;
+            Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+
+            // For large piece counts, draw initial batch for responsive UI, rest loads progressively
+            int hexagonsDrawn = 0;
+            final int maxHexagonsForFirstDraw = 1200; // Draw initial batch
+
+            while (pieceIndex < DP.numHexs) {
+                // Check if we should stop drawing and show partial results
+                if (hexagonsDrawn >= maxHexagonsForFirstDraw) {
+                    break;
+                }
+
+                drawHexagon(DP, canvas, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
+                hexagonsDrawn++;
+
+                pieceIndex++;
+                DP.hexCenterBuffer.x += (int) (DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4));
+                float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
+                if (rightSide >= DP.end.x) {
+                    evenRow = !evenRow;
+                    DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
+                    DP.hexCenterBuffer.y += (int) threeQuarters;
+                }
+            }
+
+            compressedBitmap = bitmap;
+        } catch (Exception e) {
+            LOG.error("asyncDraw failed with exception: " + e.getMessage(), e);
         }
-        compressedBitmap = bitmap;
     }
 
     // Drawing/Geometry functions
