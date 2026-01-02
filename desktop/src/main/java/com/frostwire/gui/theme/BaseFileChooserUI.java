@@ -1,6 +1,6 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -274,7 +274,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             /**
              *
              */
-            @Serial
 
             public Dimension getMaximumSize() {
                 return new Dimension(Short.MAX_VALUE, super.getPreferredSize().height);
@@ -890,7 +889,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     // Renderer for DirectoryComboBox
     //
     class DirectoryComboBoxRenderer extends DefaultListCellRenderer {
-        @Serial
         final IndentIcon ii = new IndentIcon();
 
         public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -935,7 +933,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      * Data model for a type-face selection combo-box.
      */
     protected class DirectoryComboBoxModel extends AbstractListModel<Object> implements ComboBoxModel<Object> {
-        @Serial
         final Vector<File> directories = new Vector<>();
         int[] depths = null;
         File selectedDirectory = null;
@@ -1058,7 +1055,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      * Render different type sizes and styles.
      */
     public static class FilterComboBoxRenderer extends DefaultListCellRenderer {
-        @Serial
 
         public Component getListCellRendererComponent(JList<?> list,
                                                       Object value, int index, boolean isSelected,
@@ -1075,7 +1071,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      * Data model for a type-face selection combo-box.
      */
     protected class FilterComboBoxModel extends AbstractListModel<Object> implements ComboBoxModel<Object>, PropertyChangeListener {
-        @Serial
         FileFilter[] filters;
 
         FilterComboBoxModel() {

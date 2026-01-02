@@ -1,6 +1,6 @@
 /*
  *     Created by Angel Leon (@gubatron)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -250,12 +250,10 @@ final class UpdateMessage implements Serializable {
         return _hashCode;
     }
 
-    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
     }
 
-    @Serial
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }

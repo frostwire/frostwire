@@ -1,6 +1,6 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -182,11 +182,18 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
-        // Remove from UI immediately, then delete files in background
-        // This provides immediate visual feedback instead of waiting for file deletion (can be slow)
-        if (deleteData && isComplete()) {
-            // Delete files asynchronously to avoid blocking UI update
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
+        // Post all cleanup operations asynchronously to avoid blocking the UI thread
+        // This includes torrent removal, file deletion, and media store cleanup
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
+            // Remove from bittorrent engine (can take time)
+            try {
+                dl.remove(deleteTorrent, deleteData);
+            } catch (Throwable t) {
+                LOG.error("UIBittorrentDownload::remove failed to remove from bittorrent engine", t);
+            }
+
+            // Delete files if requested
+            if (deleteData && isComplete()) {
                 // This block runs on CONFIG_MANAGER thread (safe for I/O operations)
                 if (Ref.alive(contextRef)) {
                     getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
@@ -203,10 +210,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
                         }
                     });
                 }
-            });
-        }
-
-        dl.remove(deleteTorrent, deleteData);
+            }
+        });
     }
 
     @Override

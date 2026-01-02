@@ -1,6 +1,6 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -330,9 +330,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     public void updateTransferList(TransfersHolder transfersHolder) {
+        updateTransferList(transfersHolder, false);
+    }
+
+    public void updateTransferList(TransfersHolder transfersHolder, boolean forceUpdate) {
         if (isVisible() && isAdded()) {
             if (adapter != null) {
-                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers);
+                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers, forceUpdate);
+                android.util.Log.d("TransfersFragment.updateTransferList", "updateList called with forceUpdate=" + forceUpdate);
             }
             if (selectedStatus == TransferStatus.SEEDING) {
                 TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersHolder.allTransfers);
@@ -353,21 +358,28 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
      * @param forceUpdate if true, refresh immediately without throttle (for manual user actions)
      */
     public void onTime(boolean forceUpdate) {
+        long onTimeStart = System.currentTimeMillis();
         if (!isVisible()) {
             return;
         }
         if (adapter != null) {
             if (forceUpdate || TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
+                android.util.Log.d("TransfersFragment.onTime", "Starting background work, forceUpdate=" + forceUpdate);
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
                 postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
                         () -> {
+                            long bgStart = System.currentTimeMillis();
+                            android.util.Log.d("TransfersFragment.onTime", "Background thread started");
                             if (!Ref.alive(contextRef)) {
                                 Ref.free(contextRef);
                                 return;
                             }
                             TransfersHolder transfersHolder;
                             try {
+                                long sortStart = System.currentTimeMillis();
                                 transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                                long sortEnd = System.currentTimeMillis();
+                                android.util.Log.d("TransfersFragment.onTime", "sortSelectedStatusTransfersInBackground took " + (sortEnd - sortStart) + "ms");
                             } catch (Throwable t) {
                                 LOG.error("onTime() " + t.getMessage(), t);
                                 Ref.free(contextRef);
@@ -385,20 +397,29 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
                             // Update menu visibility cache from background thread to avoid blocking JNI calls in onPrepareOptionsMenu()
                             try {
+                                long menuStart = System.currentTimeMillis();
                                 contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
+                                long menuEnd = System.currentTimeMillis();
+                                android.util.Log.d("TransfersFragment.onTime", "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
                             } catch (Throwable t) {
                                 LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
                             }
 
                             FragmentActivity activity = contextRef.get().getActivity();
                             if (activity != null) {
+                                android.util.Log.d("TransfersFragment.onTime", "Posting UI update to main thread, forceUpdate=" + forceUpdate);
                                 activity.runOnUiThread(() -> {
+                                    long uiStart = System.currentTimeMillis();
+                                    android.util.Log.d("TransfersFragment.onTime", "UI thread executing updateTransferList, elapsed=" + (uiStart - onTimeStart) + "ms");
                                     if (!Ref.alive(contextRef)) {
                                         Ref.free(contextRef);
                                         return;
                                     }
                                     try {
-                                        contextRef.get().updateTransferList(tfCopy);
+                                        long updateStart = System.currentTimeMillis();
+                                        contextRef.get().updateTransferList(tfCopy, forceUpdate);  // Pass forceUpdate flag!
+                                        long updateEnd = System.currentTimeMillis();
+                                        android.util.Log.d("TransfersFragment.onTime", "updateTransferList completed in " + (updateEnd - updateStart) + "ms, total=" + (updateEnd - onTimeStart) + "ms");
                                     } catch (Throwable t) {
                                         LOG.error("onTime() " + t.getMessage(), t);
                                         Ref.free(contextRef);
