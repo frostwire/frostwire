@@ -26,8 +26,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
@@ -38,6 +41,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 /**
@@ -46,6 +50,7 @@ import com.frostwire.util.Ref;
  * @author marcelinkaaa
  */
 public final class CancelMenuAction extends MenuAction {
+    private static final Logger LOG = Logger.getLogger(CancelMenuAction.class);
 
     private final Transfer transfer;
     private final boolean deleteData;
@@ -75,41 +80,29 @@ public final class CancelMenuAction extends MenuAction {
     public void onClick(final Context context) {
         CancelMenuActionDialog.newInstance(
                         transfer,
-                        deleteData, deleteTorrent).
+                        deleteData, deleteTorrent,
+                        this).  // Pass 'this' to access FragmentManager and Activity
                 show(getFragmentManager());
     }
 
     private static void removeTransfer(Context context, Transfer transfer, boolean deleteTorrent,
-                                       boolean deleteData) {
+                                       boolean deleteData, TimerObserver timerObserver) {
         // Pause the transfer FIRST to provide immediate visual feedback that we're working on it
         // This makes the UI show a state change (to PAUSED) before removal, better UX
-        if (transfer instanceof UIBittorrentDownload && !transfer.isPaused()) {
-            ((UIBittorrentDownload) transfer).pause();
+        if (transfer instanceof UIBittorrentDownload) {
+            UIBittorrentDownload bt = ((UIBittorrentDownload) transfer);
+            if (!bt.isPaused()) {
+                bt.pause();
+            }
         }
 
-        // Now remove the transfer (file deletion will happen async in background)
+        // CRITICAL: Remove from manager SYNCHRONOUSLY (quick operation, ~1-10ms)
+        // This prevents onTime() from seeing it in TransferManager and adding it back to adapter
+        // The adapter removal already happened in onClick() for instant visual feedback
         if (transfer instanceof UIBittorrentDownload) {
             ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
         } else {
             transfer.remove(deleteData);
-        }
-
-        // Post UI update back to UI thread after removal initiates
-        // This ensures onTime() is called from the UI thread and provides immediate feedback
-        if (context instanceof Activity) {
-            ((Activity) context).runOnUiThread(() -> {
-                if (context instanceof TimerObserver) {
-                    // Call onTime(true) to FORCE immediate update, bypassing TaskThrottle
-                    // User sees: transfer pauses → then disappears (as files delete in background)
-                    Object timerObserver = context;
-                    if (timerObserver instanceof TransfersFragment) {
-                        ((TransfersFragment) timerObserver).onTime(true);
-                    } else {
-                        // Fallback for other implementations
-                        ((TimerObserver) timerObserver).onTime();
-                    }
-                }
-            });
         }
     }
 
@@ -117,14 +110,17 @@ public final class CancelMenuAction extends MenuAction {
         private static Transfer transfer;
         private static boolean deleteData;
         private static boolean deleteTorrent;
+        private static MenuAction menuAction;
 
 
         public static CancelMenuActionDialog newInstance(Transfer t,
                                                          boolean delete_data,
-                                                         boolean delete_torrent) {
+                                                         boolean delete_torrent,
+                                                         MenuAction action) {
             transfer = t;
             deleteData = delete_data;
             deleteTorrent = delete_torrent;
+            menuAction = action;
             return new CancelMenuActionDialog();
         }
 
@@ -154,7 +150,7 @@ public final class CancelMenuAction extends MenuAction {
             yesButton.setText(android.R.string.ok);
 
             noButton.setOnClickListener(new NegativeButtonOnClickListener(dlg));
-            yesButton.setOnClickListener(new PositiveButtonOnClickListener(transfer, deleteTorrent, deleteData, dlg));
+            yesButton.setOnClickListener(new PositiveButtonOnClickListener(transfer, deleteTorrent, deleteData, dlg, menuAction));
         }
     }
 
@@ -179,26 +175,80 @@ public final class CancelMenuAction extends MenuAction {
         private final boolean deleteTorrent;
         private final boolean deleteData;
         private final Dialog dlg;
+        private final MenuAction menuAction;
 
         PositiveButtonOnClickListener(Transfer transfer,
                                       boolean deleteTorrent,
                                       boolean deleteData,
-                                      Dialog dialog) {
+                                      Dialog dialog,
+                                      MenuAction action) {
             this.transfer = transfer;
             this.deleteTorrent = deleteTorrent;
             this.deleteData = deleteData;
             this.dlg = dialog;
+            this.menuAction = action;
         }
 
         @Override
         public void onClick(View view) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> removeTransfer(dlg.getContext(), transfer, deleteTorrent, deleteData));
+            // Get TransfersFragment reference on UI thread (where it's safe)
+            TimerObserver timerObserver = null;
+            if (menuAction != null && menuAction.getAppCompatActivity() instanceof MainActivity) {
+                MainActivity activity = (MainActivity) menuAction.getAppCompatActivity();
+                if (activity != null) {
+                    // Access the activity's direct reference to TransfersFragment
+                    try {
+                        // Try to get the transfers field directly from MainActivity
+                        // This is the safest way to access the fragment from the UI thread
+                        java.lang.reflect.Field transfersField = MainActivity.class.getDeclaredField("transfers");
+                        transfersField.setAccessible(true);
+                        Object transfersObj = transfersField.get(activity);
+                        if (transfersObj instanceof TransfersFragment) {
+                            timerObserver = (TransfersFragment) transfersObj;
+                        }
+                    } catch (Throwable ignored) {
+                        // Fallback: try finding by fragment ID
+                        try {
+                            Object fragmentObj = activity.getSupportFragmentManager()
+                                    .findFragmentById(R.id.activity_main_fragment_transfers);
+                            if (fragmentObj instanceof TransfersFragment) {
+                                timerObserver = (TransfersFragment) fragmentObj;
+                            }
+                        } catch (Throwable ignored2) {
+                        }
+                    }
+                }
+            }
+
+            // CRITICAL: Remove from adapter IMMEDIATELY on UI thread for instant visual feedback
+            // This happens before background removal, so user sees it disappear right away
+            try {
+                if (menuAction != null && menuAction.getAppCompatActivity() instanceof MainActivity) {
+                    MainActivity activity = (MainActivity) menuAction.getAppCompatActivity();
+                    if (activity != null) {
+                        java.lang.reflect.Field transfersField = MainActivity.class.getDeclaredField("transfers");
+                        transfersField.setAccessible(true);
+                        Object transfersObj = transfersField.get(activity);
+                        if (transfersObj instanceof TransfersFragment) {
+                            java.lang.reflect.Field adapterField = TransfersFragment.class.getDeclaredField("adapter");
+                            adapterField.setAccessible(true);
+                            Object adapterObj = adapterField.get(transfersObj);
+                            if (adapterObj instanceof TransferListAdapter) {
+                                ((TransferListAdapter) adapterObj).removeTransferItem(transfer);
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable e) {
+                LOG.error("Failed to remove transfer from adapter", e);
+            }
+
+            // Now remove from manager on background thread (synchronous, fast operation)
+            // This must happen quickly before onTime() checks for the transfer
+            TimerObserver finalTimerObserver = timerObserver;
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> removeTransfer(dlg.getContext(), transfer, deleteTorrent, deleteData, finalTimerObserver));
             dlg.dismiss();
-            // Note: onTime() is now called from within removeTransfer() on the UI thread,
-            // after removal and file deletion complete. This avoids:
-            // 1. Calling startActivity() from a background thread (which was silent failing)
-            // 2. Race condition where UI updates before file deletion finishes
-            // 3. onTime() being called before transfer is actually removed from list
         }
     }
 }

@@ -157,6 +157,32 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     public void updateList(List<Transfer> newList) {
+        updateList(newList, false);
+    }
+
+    public void updateList(List<Transfer> newList, boolean forceImmediate) {
+        // For forced updates (like user cancelling a transfer), use notifyDataSetChanged()
+        // for instant feedback, bypassing DiffUtil calculation which can take several seconds
+        if (forceImmediate) {
+            pendingUpdate = null;  // Clear any queued updates
+            updateInProgress = true;
+            try {
+                list.clear();
+                list.addAll(newList == null ? Collections.emptyList() : newList);
+                previousUiStates.clear();
+                notifyDataSetChanged();  // Instant refresh, no DiffUtil calculation
+            } finally {
+                updateInProgress = false;
+                // Process any pending update that came in while we were updating
+                if (pendingUpdate != null) {
+                    List<Transfer> next = pendingUpdate;
+                    pendingUpdate = null;
+                    prepareUpdateOnBackgroundThread(next);
+                }
+            }
+            return;
+        }
+
         // If update is already in progress, queue the pending update instead of trying
         // to dispatch immediately. This prevents concurrent modifications during animations,
         // which causes the "Tmp detached view should be removed from RecyclerView" crash.
@@ -833,6 +859,30 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             }
         }
         return null;
+    }
+
+    /**
+     * Removes a transfer item from the adapter immediately and notifies observers.
+     * This is called when the user confirms removal to provide instant visual feedback.
+     * Must be called from the UI thread.
+     */
+    public void removeTransferItem(Transfer transfer) {
+        if (transfer == null || list == null) {
+            return;
+        }
+
+        int position = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) == transfer) {
+                position = i;
+                break;
+            }
+        }
+
+        if (position >= 0) {
+            list.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     /**
