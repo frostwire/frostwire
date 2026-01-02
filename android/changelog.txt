@@ -3,7 +3,7 @@ FrostWire 3.0.15 build 769 JAN/02/2026
  - fix:Transfers list UI responsiveness improved for stop/cancel/delete operations - adapter updates now use targeted item removal instead of full list rebuilds
  - fix:HexHiveView rendering now responsive - added dedicated 2-threaded executor to prevent blocking sequential handler queue when drawing large hexagon grids
  - improvement:Parallel execution for independent background tasks - file I/O, icon loading, and search operations now run concurrently instead of sequentially
-
+ - com.chaquo.python:gradle:17.0.0
 
 FrostWire 3.0.14 build 768 DEC/30/2025
  - crash:Race condition in BTEngine initialization - ConfigurationManager wasn't fully initialized before BTEngineInitializer read port preferences, causing port 0 binding failures
@@ -19,7 +19,6 @@ FrostWire 3.0.14 build 768 DEC/30/2025
  - maintenance:Updated androidx.exifinterface:exifinterface to 1.4.2
  - maintenance:Updated androidx.swiperefreshlayout:swiperefreshlayout to 1.2.0
  - maintenance:Updated com.google.firebase:firebase-bom to 34.7.0
-
 
 FrostWire 3.0.12 build 766 DEC/02/2025
  - new:Powered by jlibtorrent 2.0.12.7 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
