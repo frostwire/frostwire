@@ -83,3 +83,4 @@ desktop/lib/jars/frostwire.jar
 telluride/.vscode/
 telluride/telluride.build/
 telluride/telluride.dist/
+.grok/
