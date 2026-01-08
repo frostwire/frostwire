@@ -37,6 +37,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
+
 import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -96,6 +98,16 @@ import java.util.Set;
  */
 public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapter.ViewHolder> {
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
+    // Dedicated executor for DiffUtil calculations to avoid blocking sequential handler queues
+    private static java.util.concurrent.ExecutorService transferDiffExecutor;
+
+    private static java.util.concurrent.ExecutorService getTransferDiffExecutor() {
+        if (transferDiffExecutor == null || transferDiffExecutor.isShutdown()) {
+            transferDiffExecutor = ExecutorsHelper.newFixedSizeThreadPool(2, "TransferDiff");
+        }
+        return transferDiffExecutor;
+    }
+
     private final WeakReference<Context> contextRef;
 
     private final ViewOnClickListener viewOnClickListener;
@@ -161,6 +173,10 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     @Override
     public int getItemCount() {
         return list == null ? 0 : list.size();
+    }
+
+    public List<Transfer> getList() {
+        return list != null ? new ArrayList<>(list) : Collections.emptyList();
     }
 
     public void updateList(List<Transfer> newList) {
@@ -231,23 +247,39 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
 
         final List<Transfer> finalSafeNewList = (filteredList == list) ? new ArrayList<>(filteredList) : filteredList;
 
-        // Do expensive work on background thread
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-            try {
-                // Capture UI states on background thread to avoid blocking JNI calls
-                final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
-                // Calculate diff on background thread
-                final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
+        // Do expensive work on background thread using parallel executor
+        try {
+            getTransferDiffExecutor().execute(() -> {
+                try {
+                    // Capture UI states on background thread to avoid blocking JNI calls
+                    final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
+                    // Calculate diff on background thread
+                    final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
 
-                // Post result back to main thread for UI update
-                // Pass filtered list (for display) and original list (for cleanup decision)
-                if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
-                    ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult, originalList));
+                    // Post result back to main thread for UI update
+                    // Pass filtered list (for display) and original list (for cleanup decision)
+                    if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
+                        ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult, originalList));
+                    }
+                } catch (Throwable e) {
+                    LOG.error("Error preparing adapter update on background thread", e);
                 }
-            } catch (Throwable e) {
-                LOG.error("Error preparing adapter update on background thread", e);
-            }
-        });
+            });
+        } catch (java.util.concurrent.RejectedExecutionException e) {
+            // Executor queue full, fall back to handler
+            LOG.warn("TransferDiff executor queue full, using fallback handler: " + e.getMessage());
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+                try {
+                    final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
+                    final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
+                    if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
+                        ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult, originalList));
+                    }
+                } catch (Throwable e2) {
+                    LOG.error("Error in fallback handler", e2);
+                }
+            });
+        }
     }
 
     /**
@@ -941,6 +973,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         // Track this transfer ID as removed to prevent re-adding
         String transferId = resolveTransferId(transfer);
         removedTransferIds.add(transferId);
+
+        // Clear any pending updates to prevent re-adding this transfer
+        pendingUpdate = null;
 
         // Remove from underlying data structures
         list.remove(transfer);

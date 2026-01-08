@@ -234,7 +234,10 @@ public final class CancelMenuAction extends MenuAction {
                             adapterField.setAccessible(true);
                             Object adapterObj = adapterField.get(transfersObj);
                             if (adapterObj instanceof TransferListAdapter) {
-                                ((TransferListAdapter) adapterObj).removeTransferItem(transfer);
+                                TransferListAdapter adapter = (TransferListAdapter) adapterObj;
+                                adapter.removeTransferItem(transfer);
+                                // Force immediate filtered refresh to prevent lingering transfers if onTime() refresh in progress
+                                adapter.updateList(adapter.getList(), true);
                             }
                         }
                     }

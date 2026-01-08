@@ -56,6 +56,7 @@ import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.TransferUpdateExecutor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
@@ -109,6 +110,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private final Handler vpnRichToastHandler;
+    private TransferUpdateExecutor transferUpdateExecutor;
     private boolean showTorrentSettingsOnClick;
     private TransfersNoSeedsView transfersNoSeedsView;
     private HeaderBanner headerBanner;
@@ -148,6 +150,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        transferUpdateExecutor = new TransferUpdateExecutor();
+        transferUpdateExecutor.initialize();
         initTimerServiceSubscription();
     }
 
@@ -289,6 +293,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (subscription != null) {
             subscription.unsubscribe();
         }
+        if (transferUpdateExecutor != null) {
+            transferUpdateExecutor.shutdown();
+        }
         adapter = null;
         HeaderBanner.destroy(headerBanner);
         if (supportBanner != null) {
@@ -366,7 +373,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (forceUpdate || TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 android.util.Log.d("TransfersFragment.onTime", "Starting background work, forceUpdate=" + forceUpdate);
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+                    transferUpdateExecutor.execute(
                         () -> {
                             long bgStart = System.currentTimeMillis();
                             android.util.Log.d("TransfersFragment.onTime", "Background thread started");
@@ -428,13 +436,77 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             }
 
                         });
+                } else {
+                    LOG.warn("Transfer executor not available, using fallback postToHandler");
+                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                        () -> {
+                            long bgStart = System.currentTimeMillis();
+                            android.util.Log.d("TransfersFragment.onTime", "Background thread started");
+                            if (!Ref.alive(contextRef)) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            TransfersHolder transfersHolder;
+                            try {
+                                long sortStart = System.currentTimeMillis();
+                                transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                                long sortEnd = System.currentTimeMillis();
+                                android.util.Log.d("TransfersFragment.onTime", "sortSelectedStatusTransfersInBackground took " + (sortEnd - sortStart) + "ms");
+                            } catch (Throwable t) {
+                                LOG.error("onTime() " + t.getMessage(), t);
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            if (!Ref.alive(contextRef)) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            final TransfersHolder tfCopy = transfersHolder;
+
+                            if (contextRef.get().getActivity() == null) {
+                                return;
+                            }
+
+                            try {
+                                long menuStart = System.currentTimeMillis();
+                                contextRef.get().updateMenuItemVisibilityCache(tfCopy.allTransfers);
+                                long menuEnd = System.currentTimeMillis();
+                                android.util.Log.d("TransfersFragment.onTime", "updateMenuItemVisibilityCache took " + (menuEnd - menuStart) + "ms");
+                            } catch (Throwable t) {
+                                LOG.error("onTime() failed to update menu cache " + t.getMessage(), t);
+                            }
+
+                            FragmentActivity activity = contextRef.get().getActivity();
+                            if (activity != null) {
+                                android.util.Log.d("TransfersFragment.onTime", "Posting UI update to main thread, forceUpdate=" + forceUpdate);
+                                activity.runOnUiThread(() -> {
+                                    long uiStart = System.currentTimeMillis();
+                                    android.util.Log.d("TransfersFragment.onTime", "UI thread executing updateTransferList, elapsed=" + (uiStart - onTimeStart) + "ms");
+                                    if (!Ref.alive(contextRef)) {
+                                        Ref.free(contextRef);
+                                        return;
+                                    }
+                                    try {
+                                        long updateStart = System.currentTimeMillis();
+                                        contextRef.get().updateTransferList(tfCopy, forceUpdate);
+                                        long updateEnd = System.currentTimeMillis();
+                                        android.util.Log.d("TransfersFragment.onTime", "updateTransferList completed in " + (updateEnd - updateStart) + "ms, total=" + (updateEnd - onTimeStart) + "ms");
+                                    } catch (Throwable t) {
+                                        LOG.error("onTime() " + t.getMessage(), t);
+                                        Ref.free(contextRef);
+                                    }
+                                });
+                            }
+                        });
+                }
             } else {
                 LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
             }
         } else if (this.getActivity() != null) {
             // Initialize adapter on background thread to avoid blocking JNI calls in captureUiStates()
             WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+            if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+                transferUpdateExecutor.execute(
                     () -> {
                         if (!Ref.alive(contextRef)) {
                             Ref.free(contextRef);
@@ -479,6 +551,52 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             Ref.free(contextRef);
                         }
                     });
+            } else {
+                LOG.warn("Transfer executor not available for adapter init, using fallback postToHandler");
+                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                    () -> {
+                        if (!Ref.alive(contextRef)) {
+                            Ref.free(contextRef);
+                            return;
+                        }
+                        TransfersFragment fragment = contextRef.get();
+                        if (fragment == null || fragment.getActivity() == null) {
+                            Ref.free(contextRef);
+                            return;
+                        }
+                        try {
+                            List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), fragment.selectedStatus);
+                            transfers.sort(fragment.transferComparator);
+
+                            FragmentActivity adapterActivity = fragment.getActivity();
+                            if (adapterActivity == null) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            TransferListAdapter newAdapter = new TransferListAdapter(adapterActivity, transfers);
+
+                            adapterActivity.runOnUiThread(() -> {
+                                if (!Ref.alive(contextRef)) {
+                                    Ref.free(contextRef);
+                                    return;
+                                }
+                                try {
+                                    if (contextRef.get().adapter == null && contextRef.get().list != null) {
+                                        contextRef.get().list.setLayoutManager(contextRef.get().recyclerViewLayoutManager);
+                                        contextRef.get().list.setAdapter(newAdapter);
+                                        contextRef.get().adapter = newAdapter;
+                                    }
+                                } catch (Throwable t) {
+                                    LOG.error("Failed to setup adapter: " + t.getMessage(), t);
+                                    Ref.free(contextRef);
+                                }
+                            });
+                        } catch (Throwable t) {
+                            LOG.error("Failed to prepare adapter data: " + t.getMessage(), t);
+                            Ref.free(contextRef);
+                        }
+                    });
+            }
         }
         // mark the selected tab
         int i = 0;
@@ -519,10 +637,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
         if (BTEngine.ctx != null) {
             if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-                    StatusBarData statusBarData = getStatusBarDataBackground();
-                    SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
-                });
+                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+                    transferUpdateExecutor.execute(() -> {
+                        StatusBarData statusBarData = getStatusBarDataBackground();
+                        SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
+                    });
+                } else {
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+                        StatusBarData statusBarData = getStatusBarDataBackground();
+                        SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
+                    });
+                }
             }
             // Refresh network state on background thread to detect VPN/WiFi protection violations
             // Only refresh if protections are enabled to avoid expensive network interface enumeration
@@ -535,8 +660,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
             // Update DHT cache on background thread to avoid blocking JNI calls
             if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::checkDHTBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
-                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                        () -> updateDHTCache());
+                if (transferUpdateExecutor != null && transferUpdateExecutor.isAvailable()) {
+                    transferUpdateExecutor.execute(() -> updateDHTCache());
+                } else {
+                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                            () -> updateDHTCache());
+                }
             }
             // Update UI with cached DHT state
             onCheckDHT();
@@ -672,9 +801,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         selectedStatus = status;
         // Provide instant visual feedback by filtering the current list immediately on main thread
         // Then trigger background refresh for proper sorting and state capture
-        if (adapter != null && list != null && !list.isEmpty()) {
-            List<Transfer> filtered = filter(list, status);
-            adapter.updateList(filtered, true);  // forceImmediate=true for instant update
+        if (adapter != null) {
+            List<Transfer> currentList = adapter.getList();
+            if (!currentList.isEmpty()) {
+                List<Transfer> filtered = filter(currentList, status);
+                adapter.updateList(filtered, true);  // forceImmediate=true for instant update
+            }
         }
         // Trigger background refresh to ensure proper sorting and complete state
         onTime();
