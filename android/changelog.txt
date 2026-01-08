@@ -1,3 +1,8 @@
+FrostWire 3.0.16 build 770 JAN/08/2026
+ - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
+ - fix:Removed transfers reappearing after deletion - track removed transfer IDs and filter from every update until confirmed gone from TransferManager
+ - maintenance:Added .grok/ directory to .gitignore
+
 FrostWire 3.0.15 build 769 JAN/02/2026
  - fix:Transfer removal now disappears immediately from UI without reappearing - removed from adapter instantly and manager synchronously before refresh cycle can re-add it
  - fix:Transfers list UI responsiveness improved for stop/cancel/delete operations - adapter updates now use targeted item removal instead of full list rebuilds
