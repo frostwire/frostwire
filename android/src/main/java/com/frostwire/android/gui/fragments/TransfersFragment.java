@@ -670,6 +670,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     public void selectStatusTab(TransferStatus status) {
         selectedStatus = status;
+        // Provide instant visual feedback by filtering the current list immediately on main thread
+        // Then trigger background refresh for proper sorting and state capture
+        if (adapter != null && list != null && !list.isEmpty()) {
+            List<Transfer> filtered = filter(list, status);
+            adapter.updateList(filtered, true);  // forceImmediate=true for instant update
+        }
+        // Trigger background refresh to ensure proper sorting and complete state
         onTime();
     }
 
