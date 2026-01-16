@@ -261,7 +261,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    implementation 'androigit dx.media2:media2-session:1.3.0'
+    implementation 'androidx.media2:media2-session:1.3.0'
     implementation 'androidx.media2:media2-widget:1.3.0'
     implementation 'androidx.media2:media2-player:1.3.0'
 
