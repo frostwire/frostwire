@@ -28,6 +28,16 @@ final class Finalizer {
      * necessary cleanups.
      */
     static void shutdown() {
+        shutdown(null);
+    }
+
+    /**
+     * Exits the virtual machine with optional command to execute after shutdown.
+     * This allows for application restart functionality.
+     *
+     * @param toExecute Command to execute after shutdown, or null for normal shutdown
+     */
+    static void shutdown(final String toExecute) {
         GUIMediator.applyWindowSettings();
         GUIMediator.setAppVisible(false);
         ShutdownWindow window = new ShutdownWindow();
@@ -48,7 +58,7 @@ final class Finalizer {
                     //LOG.info("MediaPlayer stopping...");
                     // Media player instance removed
                     //LOG.info("Shutting down [updateCommand=" + toExecute + "]");
-                    LimeWireCore.instance().getLifecycleManager().shutdown(null);
+                    LimeWireCore.instance().getLifecycleManager().shutdown(toExecute);
                     LOG.info("System exit");
                     System.exit(0);
                 } catch (Throwable t) {

@@ -43,6 +43,7 @@ final class FileMenu extends AbstractMenu {
         if (!OSUtils.isMacOSX()) {
             MENU.addSeparator();
             MENU.add(createMenuItem(new FileMenuActions.CloseAction()));
+            MENU.add(createMenuItem(new FileMenuActions.RestartAction()));
             MENU.add(createMenuItem(new FileMenuActions.ExitAction()));
         }
     }

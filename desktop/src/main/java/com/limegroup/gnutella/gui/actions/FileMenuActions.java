@@ -265,6 +265,17 @@ public final class FileMenuActions {
         }
     }
 
+    public static class RestartAction extends AbstractAction {
+        public RestartAction() {
+            super(I18n.tr("&Restart"));
+            putValue(Action.LONG_DESCRIPTION, I18n.tr("Restart the program"));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            GUIMediator.restart();
+        }
+    }
+
     public static class CreateTorrentAction extends AbstractAction {
         public CreateTorrentAction() {
             super(I18n.tr("Create New Torrent"));

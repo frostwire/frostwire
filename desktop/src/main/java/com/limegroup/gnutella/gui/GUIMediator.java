@@ -498,6 +498,63 @@ public final class GUIMediator {
     }
 
     /**
+     * Restart the program cleanly.
+     */
+    public static void restart() {
+        instance().timer.stopTimer(); // TODO: refactor this singleton pattern
+        String restartCommand = buildRestartCommand();
+        Finalizer.shutdown(restartCommand);
+    }
+
+    /**
+     * Builds the command to restart the application.
+     * Uses Java system properties to reconstruct the java command with classpath and JVM arguments.
+     *
+     * @return The restart command string, or null if it cannot be built
+     */
+    private static String buildRestartCommand() {
+        try {
+            // Get java executable path
+            String javaHome = System.getProperty("java.home");
+            String javaBin = javaHome + File.separator + "bin" + File.separator + 
+                            (OSUtils.isWindows() ? "java.exe" : "java");
+            
+            // Get classpath
+            String classpath = System.getProperty("java.class.path");
+            
+            // Get JVM arguments
+            java.lang.management.RuntimeMXBean runtimeMxBean = 
+                java.lang.management.ManagementFactory.getRuntimeMXBean();
+            java.util.List<String> jvmArgs = runtimeMxBean.getInputArguments();
+            
+            // Build the command
+            StringBuilder cmd = new StringBuilder();
+            cmd.append("\"").append(javaBin).append("\"");
+            
+            // Add JVM arguments
+            for (String arg : jvmArgs) {
+                // Skip debug arguments that might cause issues on restart
+                if (!arg.startsWith("-agentlib:jdwp") && 
+                    !arg.startsWith("-Xrunjdwp") &&
+                    !arg.startsWith("-javaagent")) {
+                    cmd.append(" ").append(arg);
+                }
+            }
+            
+            // Add classpath
+            cmd.append(" -cp \"").append(classpath).append("\"");
+            
+            // Add main class
+            cmd.append(" com.limegroup.gnutella.gui.Main");
+            
+            return cmd.toString();
+        } catch (Exception e) {
+            com.frostwire.util.Logger.getLogger(GUIMediator.class).error("Failed to build restart command", e);
+            return null;
+        }
+    }
+
+    /**
      * Shows the "About" menu with more information about the program.
      */
     public static void showAboutWindow() {
