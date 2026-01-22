@@ -40,10 +40,10 @@ final class FileMenu extends AbstractMenu {
         MENU.addSeparator();
         MENU.add(createMenuItem(new FileMenuActions.OpenMagnetTorrentVideoUrlAction()));
         MENU.add(createMenuItem(new FileMenuActions.CreateTorrentAction()));
+        MENU.addSeparator();
+        MENU.add(createMenuItem(new FileMenuActions.RestartAction()));
         if (!OSUtils.isMacOSX()) {
-            MENU.addSeparator();
             MENU.add(createMenuItem(new FileMenuActions.CloseAction()));
-            MENU.add(createMenuItem(new FileMenuActions.RestartAction()));
             MENU.add(createMenuItem(new FileMenuActions.ExitAction()));
         }
     }
