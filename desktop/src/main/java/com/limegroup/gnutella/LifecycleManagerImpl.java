@@ -155,10 +155,18 @@ public class LifecycleManagerImpl implements LifecycleManager {
         shutdown();
         if (toExecute != null) {
             try {
-                String cmd = parseCommand(toExecute).trim();
-                String params = toExecute.substring(cmd.length()).trim();
-                new ProcessBuilder(cmd, params).start();
-            } catch (IOException ignored) {
+                // Parse toExecute as a shell command with arguments
+                // Split by spaces, but respect quoted strings
+                java.util.List<String> commandList = new java.util.ArrayList<>();
+                java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(toExecute);
+                while (matcher.find()) {
+                    commandList.add(matcher.group(1).replace("\"", ""));
+                }
+                if (!commandList.isEmpty()) {
+                    new ProcessBuilder(commandList).start();
+                }
+            } catch (IOException e) {
+                LOG.error("Failed to execute command after shutdown: " + toExecute, e);
             }
         }
     }
