@@ -1,4 +1,4 @@
-FrostWire 3.0.16 build 770 JAN/08/2026
+FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
  - fix:Removed transfers reappearing after deletion - track removed transfer IDs and filter from every update until confirmed gone from TransferManager
  - maintenance:Added .grok/ directory to .gitignore
@@ -6,6 +6,7 @@ FrostWire 3.0.16 build 770 JAN/08/2026
  - Update Gradle wrapper from 8.14.3 to 9.1.0
  - Replace groovy-all with groovy-swing dependency
  - Add Gradle 9 compatibility flags to gradle.properties
+ - com.google.firebase:firebase-bom:34.8.0
 
 FrostWire 3.0.15 build 769 JAN/02/2026
  - fix:Transfer removal now disappears immediately from UI without reappearing - removed from adapter instantly and manager synchronously before refresh cycle can re-add it

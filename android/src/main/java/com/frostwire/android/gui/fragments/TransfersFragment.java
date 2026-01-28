@@ -212,7 +212,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void updateMenuItemVisibilityCache(final List<Transfer> transfers) {
-        if (transfers.size() > 0) {
+        if (!transfers.isEmpty()) {
             cachedHasCompleteOrErrored = someTransfersComplete(transfers) || someTransfersErrored(transfers);
             cachedHasActive = someTransfersActive(transfers);
             cachedHasInactive = someTransfersInactive(transfers);
