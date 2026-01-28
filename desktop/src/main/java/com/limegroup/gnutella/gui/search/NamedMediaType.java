@@ -23,9 +23,9 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.IconAndNameHolder;
+import org.limewire.collection.FixedsizeForgetfulHashMap;
 
 import javax.swing.*;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -44,8 +44,10 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
     /**
      * The cached mapping of description -> media type,
      * for easy looking up from incoming results.
+     * Limited to 100 entries to prevent unbounded growth (though in practice,
+     * the number of media types is naturally bounded by file extensions).
      */
-    private static final Map<String, NamedMediaType> CACHED_TYPES = new HashMap<>();
+    private static final Map<String, NamedMediaType> CACHED_TYPES = new FixedsizeForgetfulHashMap<>(100);
     /**
      * The MediaType this is describing.
      */
@@ -82,9 +84,11 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      * type.
      */
     public static NamedMediaType getFromDescription(String description) {
-        NamedMediaType type = CACHED_TYPES.get(description);
-        if (type != null)
-            return type;
+        synchronized (CACHED_TYPES) {
+            NamedMediaType type = CACHED_TYPES.get(description);
+            if (type != null)
+                return type;
+        }
         MediaType mt = MediaType.getMediaTypeForSchema(description);
         return getFromMediaType(mt);
     }
@@ -108,12 +112,14 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      */
     public static NamedMediaType getFromMediaType(MediaType media) {
         String description = media.getMimeType();
-        NamedMediaType type = CACHED_TYPES.get(description);
-        if (type != null)
+        synchronized (CACHED_TYPES) {
+            NamedMediaType type = CACHED_TYPES.get(description);
+            if (type != null)
+                return type;
+            type = new NamedMediaType(media);
+            CACHED_TYPES.put(description, type);
             return type;
-        type = new NamedMediaType(media);
-        CACHED_TYPES.put(description, type);
-        return type;
+        }
     }
 
     /**

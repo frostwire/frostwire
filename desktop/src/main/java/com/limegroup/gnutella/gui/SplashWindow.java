@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import org.limewire.collection.FixedsizeForgetfulHashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,7 +28,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,9 +52,10 @@ public final class SplashWindow {
      */
     private volatile JWindow splashWindow;
     /**
-     * Cache for OS icons to avoid file I/O during painting
+     * Cache for OS icons to avoid file I/O during painting.
+     * Limited to 20 entries to prevent unbounded growth.
      */
-    private final ConcurrentHashMap<String, BufferedImage> osIconCache = new ConcurrentHashMap<>();
+    private final Map<String, BufferedImage> osIconCache = new FixedsizeForgetfulHashMap<>(20);
 
     /**
      * Returns the single instance of the SplashWindow.
@@ -140,17 +141,21 @@ public final class SplashWindow {
         String suffix = "_desktop_splash.png";
         String on_off = on ? "on" : "off";
         String cacheKey = osName + "_" + on_off;
-        osIconCache.computeIfAbsent(cacheKey, k -> {
-            try {
-                URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
-                if (iconURL != null) {
-                    return ImageIO.read(iconURL);
+        synchronized (osIconCache) {
+            if (!osIconCache.containsKey(cacheKey)) {
+                try {
+                    URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
+                    if (iconURL != null) {
+                        BufferedImage img = ImageIO.read(iconURL);
+                        if (img != null) {
+                            osIconCache.put(cacheKey, img);
+                        }
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
-            } catch (Throwable t) {
-                t.printStackTrace();
             }
-            return null;
-        });
+        }
     }
 
     private void paintOSIcons(Graphics g) {
@@ -167,7 +172,10 @@ public final class SplashWindow {
     private void paintOSIcon(String osName, boolean on, int x, @SuppressWarnings("SameParameterValue") int y, Graphics g) {
         String on_off = on ? "on" : "off";
         String cacheKey = osName + "_" + on_off;
-        BufferedImage img = osIconCache.get(cacheKey);
+        BufferedImage img;
+        synchronized (osIconCache) {
+            img = osIconCache.get(cacheKey);
+        }
         if (img != null) {
             g.drawImage(img, x, y, null);
         }
