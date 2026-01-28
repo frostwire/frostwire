@@ -1,3 +1,8 @@
+frostwire (7.0.3) stable; urgency=high (UNRELEASED)
+ * Bound unbounded image/icon caches to prevent memory leaks
+
+ -- FrostWire Team <contact@frostwire.com> Wed, 28 Jan 2025 14:41:00 -0600
+
 frostwire (7.0.2) stable; urgency=high
  * Fixes bug where seed counts disappeared from torrent search results wrapped in FileSearchResultUIWrapper
  * Improves search result sorting prioritizing keywords, then seeds/popularity and avoiding irrelevant results on top
