@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.frostwire.util.OSUtils;
+import org.limewire.collection.FixedsizeForgetfulHashMap;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -55,9 +55,11 @@ public final class ResourceManager {
      */
     private static final String IMAGES_PATH = GUI_PATH + "images/";
     /**
-     * Cache of theme images (name as String -> image as ImageIcon)
+     * Cache of theme images (name as String -> image as ImageIcon).
+     * Limited to 200 entries to prevent unbounded growth.
+     * Uses LRU eviction policy via FixedsizeForgetfulHashMap.
      */
-    private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
+    private static final Map<String, ImageIcon> THEME_IMAGES = new FixedsizeForgetfulHashMap<>(200);
     /**
      * Instance of this `ResourceManager`, following singleton.
      */
@@ -140,14 +142,18 @@ public final class ResourceManager {
         if (name == null)
             throw new NullPointerException("null image name");
         ImageIcon icon;
-        // First try to get theme image from cache
-        icon = THEME_IMAGES.get(name);
-        if (icon != null)
-            return icon;
+        // First try to get theme image from cache (thread-safe access)
+        synchronized (THEME_IMAGES) {
+            icon = THEME_IMAGES.get(name);
+            if (icon != null)
+                return icon;
+        }
         // Then try to get from org/limewire/gui/images resources
         icon = getImageFromURL(IMAGES_PATH + name, false);
         if (icon != null && icon.getImage() != null) {
-            THEME_IMAGES.put(name, icon);
+            synchronized (THEME_IMAGES) {
+                THEME_IMAGES.put(name, icon);
+            }
             return icon;
         }
         // no resource? error.
