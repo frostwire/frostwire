@@ -547,7 +547,9 @@ public final class GUIMediator {
             // Add main class
             cmd.append(" com.limegroup.gnutella.gui.Main");
             
-            return cmd.toString();
+            String restartCommand = cmd.toString();
+            com.frostwire.util.Logger.getLogger(GUIMediator.class).info("Built restart command: " + restartCommand);
+            return restartCommand;
         } catch (Exception e) {
             com.frostwire.util.Logger.getLogger(GUIMediator.class).error("Failed to build restart command", e);
             return null;

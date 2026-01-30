@@ -163,7 +163,20 @@ public class LifecycleManagerImpl implements LifecycleManager {
                     commandList.add(matcher.group(1).replace("\"", ""));
                 }
                 if (!commandList.isEmpty()) {
-                    new ProcessBuilder(commandList).start();
+                    LOG.info("Starting restart process: " + commandList);
+                    ProcessBuilder pb = new ProcessBuilder(commandList);
+                    // Inherit the current working directory
+                    pb.directory(new java.io.File(System.getProperty("user.dir")));
+                    // Start the process
+                    Process process = pb.start();
+                    // Give the new process a moment to start before we exit
+                    // This helps ensure the child process detaches properly
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ie) {
+                        // Ignore interruption
+                    }
+                    LOG.info("Restart process started successfully");
                 }
             } catch (IOException e) {
                 LOG.error("Failed to execute command after shutdown: " + toExecute, e);
