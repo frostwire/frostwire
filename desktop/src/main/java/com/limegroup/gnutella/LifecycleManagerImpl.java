@@ -164,15 +164,41 @@ public class LifecycleManagerImpl implements LifecycleManager {
                 }
                 if (!commandList.isEmpty()) {
                     LOG.info("Starting restart process: " + commandList);
-                    ProcessBuilder pb = new ProcessBuilder(commandList);
+                    
+                    // Check if running from IDE/Gradle
+                    String ideFlag = System.getProperty("fw.running.from.ide");
+                    boolean isIDE = "true".equals(ideFlag);
+                    
+                    ProcessBuilder pb;
+                    if (isIDE && !com.frostwire.util.OSUtils.isWindows()) {
+                        // On Unix systems when running from IDE/Gradle, use nohup to detach
+                        // This helps the process survive when Gradle exits
+                        java.util.List<String> nohupCommand = new java.util.ArrayList<>();
+                        nohupCommand.add("nohup");
+                        nohupCommand.addAll(commandList);
+                        nohupCommand.add("&");
+                        
+                        // Use sh -c to execute the command with nohup
+                        pb = new ProcessBuilder("sh", "-c", String.join(" ", nohupCommand));
+                        LOG.info("Using nohup wrapper for IDE restart: " + nohupCommand);
+                    } else {
+                        pb = new ProcessBuilder(commandList);
+                    }
+                    
                     // Inherit the current working directory
                     pb.directory(new java.io.File(System.getProperty("user.dir")));
+                    
+                    // Redirect output to avoid blocking
+                    pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+                    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+                    
                     // Start the process
                     Process process = pb.start();
+                    
                     // Give the new process a moment to start before we exit
                     // This helps ensure the child process detaches properly
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(1000); // Increased delay for IDE scenarios
                     } catch (InterruptedException ie) {
                         // Ignore interruption
                     }

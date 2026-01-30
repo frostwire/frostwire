@@ -502,6 +502,27 @@ public final class GUIMediator {
      */
     public static void restart() {
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
+        
+        // Check if running from IDE/Gradle - restart may not work in this environment
+        String ideFlag = System.getProperty("fw.running.from.ide");
+        if ("true".equals(ideFlag)) {
+            // Show warning dialog
+            int result = JOptionPane.showConfirmDialog(
+                getAppFrame(),
+                I18n.tr("Restart may not work when running from IDE or Gradle.\n" +
+                       "The application will attempt to restart, but you may need to\n" +
+                       "manually restart if it doesn't work.\n\n" +
+                       "Continue with restart?"),
+                I18n.tr("Restart Warning"),
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (result != JOptionPane.YES_OPTION) {
+                return; // User cancelled
+            }
+        }
+        
         String restartCommand = buildRestartCommand();
         Finalizer.shutdown(restartCommand);
     }
