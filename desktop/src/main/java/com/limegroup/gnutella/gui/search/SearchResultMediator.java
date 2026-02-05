@@ -530,6 +530,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             scrollPaneSearchOptions = createSearchOptionsPanel();
             scrollPaneSearchOptions.setVisible(false); // put this in a configuration
             tablePane.add(scrollPaneSearchOptions);
+            if (FILTER != null) {
+                updateFiltersPanel();
+            }
             tablePane.revalidate();
             tablePane.repaint();
         });
