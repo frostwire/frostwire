@@ -68,8 +68,9 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     void updateFiltersPanel() {
-        // Here we set all the delegate filters in the composed filter
-        generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
+        if (generalFilter == null) {
+            generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
+        }
         updateCheckboxes(SearchEngine.getEngines());
         resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
         resultPanel.filterChanged(generalFilter, 1);
@@ -89,6 +90,7 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     void resetFilters() {
+        generalFilter = null;
         sliderSeeds.setMinimum(0);
         sliderSeeds.setMaximum(1000);
         sliderSeeds.setLowerValue(0);
@@ -102,6 +104,7 @@ final class SearchOptionsPanel extends JPanel {
         sliderSize.getMinimumValueLabel().setText("0");
         sliderSize.getMaximumValueLabel().setText(I18n.tr("Max"));
         textFieldKeywords.setText("");
+        generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
     }
 
     private JComponent createSearchEnginesFilter() {
