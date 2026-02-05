@@ -127,9 +127,9 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             case UPLOADED_COLUMN_ID:
                 return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
-                return (double) peer.downSpeed();
+                return (double) peer.downSpeed() / 1024;
             case UP_SPEED_COLUMN_ID:
-                return (double) peer.upSpeed();
+                return (double) peer.upSpeed() / 1024;
         }
         return null;
     }
