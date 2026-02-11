@@ -133,7 +133,7 @@ public final class FaenumSearchPatternTest {
                     failedTests.add("Result: getLicense is null (expected public domain)");
                 }
 
-                if (failedTests.size() > 0) {
+                if (!failedTests.isEmpty()) {
                     return;
                 }
             }
