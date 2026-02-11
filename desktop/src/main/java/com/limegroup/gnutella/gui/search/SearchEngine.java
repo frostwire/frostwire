@@ -39,6 +39,7 @@ import com.frostwire.search.one337x.One337xCrawlingStrategy;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
+import com.frostwire.search.faenum.FaenumSearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
@@ -72,7 +73,8 @@ public abstract class SearchEngine {
         TELLURIDE_ID,
         YT_ID,
         TORRENTSCSV_ID,
-        KNABEN_ID
+        KNABEN_ID,
+        FAENUM_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -286,6 +288,21 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine FAENUM = new SearchEngine(SearchEngineID.FAENUM_ID, "Faenum", SearchEnginesSettings.FAENUM_SEARCH_ENABLED, "faenum.com") {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture for public domain image search
+            // Faenum provides AI-powered text-to-image search
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new FaenumSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
+        }
+    };
+
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -312,6 +329,7 @@ public abstract class SearchEngine {
         return Arrays.asList(
                 YT,
                 INTERNET_ARCHIVE,
+                FAENUM,
                 GLOTORRENTS,
                 IDOPE,
                 KNABEN,

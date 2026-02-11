@@ -45,6 +45,7 @@ import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
+import com.frostwire.search.faenum.FaenumSearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
@@ -399,6 +400,21 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine FAENUM = new SearchEngine("Faenum", Constants.PREF_KEY_SEARCH_USE_FAENUM) {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: Using new flat architecture for public domain image search
+            // Faenum provides AI-powered text-to-image search
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new FaenumSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
             YT,
             MAGNETDL,
@@ -409,6 +425,7 @@ public abstract class SearchEngine {
             TPB,
             SOUNCLOUD,
             ARCHIVE,
+            FAENUM,
             NYAA,
             GLOTORRENTS,
             TORRENTSCSV,
