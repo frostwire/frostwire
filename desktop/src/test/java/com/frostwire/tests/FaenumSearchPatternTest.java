@@ -74,7 +74,7 @@ public final class FaenumSearchPatternTest {
             return;
         }
 
-        if (listener.failedTests.size() > 0) {
+        if (!listener.failedTests.isEmpty()) {
             LOG.error("Search validation failed: " + listener.getFailedMessages());
             // Don't fail the test - just log warnings
             LOG.warn("Faenum search test had validation issues: " + listener.getFailedMessages());
@@ -88,7 +88,7 @@ public final class FaenumSearchPatternTest {
 
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
-            if (results == null || results.size() == 0) {
+            if (results == null || results.isEmpty()) {
                 LOG.warn("FaenumSearchListener.onResults: No search results returned (site may be down or API changed)");
                 return;
             }
@@ -151,7 +151,7 @@ public final class FaenumSearchPatternTest {
         }
 
         public String getFailedMessages() {
-            if (failedTests.size() == 0) {
+            if (failedTests.isEmpty()) {
                 return "";
             }
             StringBuilder buffer = new StringBuilder();
