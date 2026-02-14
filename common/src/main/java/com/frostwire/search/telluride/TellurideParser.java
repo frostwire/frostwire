@@ -90,15 +90,20 @@ public final class TellurideParser {
         if (metaOnly) {
             String JSON = sb.toString();
             if (JSON != null && JSON.length() > 0) {
-                // try catch here and report error
+                int jsonStart = JSON.indexOf("{");
+                if (jsonStart == -1) {
+                    LOG.error("TellurideParser.done() no JSON object found in telluride output");
+                    processListener.onError("Could not find downloadable media at the given URL");
+                    return;
+                }
                 try {
-                    processListener.onMeta(JSON.substring(JSON.indexOf("{")));
+                    processListener.onMeta(JSON.substring(jsonStart));
                 } catch (Throwable t) {
-                    LOG.error("TellurideParser.done(JSON=\"" + JSON + "\") error", t);
-                    processListener.onError(t.getMessage());
+                    LOG.error("TellurideParser.done() error parsing JSON", t);
+                    processListener.onError("Could not find downloadable media at the given URL");
                 }
             } else {
-                processListener.onError("No metadata returned by telluride");
+                processListener.onError("Could not find downloadable media at the given URL");
             }
         }
     }
