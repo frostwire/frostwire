@@ -107,6 +107,7 @@ public final class Ssl {
                 "cloudflaressl.com",
                 "dl.frostwire.com",
                 "edgestatic.com",
+                "faenum.com",
                 "fbcdn.net",
                 "frostclick.com",
                 "frostwire.com",
