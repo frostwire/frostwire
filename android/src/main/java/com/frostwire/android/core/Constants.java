@@ -60,6 +60,16 @@ public final class Constants {
     public static final String PREF_KEY_NETWORK_USE_WIFI_ONLY = "frostwire.prefs.network.use_wifi_only";
     public static final String PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY = "frostwire.prefs.network.bittorrent_on_vpn_only";
 
+    // I2P Configuration
+    public static final String PREF_KEY_NETWORK_I2P_ENABLED = "frostwire.prefs.network.i2p_enabled";
+    public static final String PREF_KEY_NETWORK_I2P_HOSTNAME = "frostwire.prefs.network.i2p_hostname";
+    public static final String PREF_KEY_NETWORK_I2P_PORT = "frostwire.prefs.network.i2p_port";
+    public static final String PREF_KEY_NETWORK_I2P_ALLOW_MIXED = "frostwire.prefs.network.i2p_allow_mixed";
+    public static final String PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY = "frostwire.prefs.network.i2p_inbound_quantity";
+    public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY = "frostwire.prefs.network.i2p_outbound_quantity";
+    public static final String PREF_KEY_NETWORK_I2P_INBOUND_LENGTH = "frostwire.prefs.network.i2p_inbound_length";
+    public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH = "frostwire.prefs.network.i2p_outbound_length";
+
     public static final String PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_download_for_torrent_deep_scan";
     public static final String PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_rounds_for_torrent_deep_scan";
     public static final String PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.interval_ms_for_torrent_deep_scan";
