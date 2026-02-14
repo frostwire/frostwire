@@ -245,6 +245,15 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             ctx.retries = port1 - port0;
 
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+            // I2P Configuration
+            ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
+            ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
+            ctx.i2pPort = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_PORT);
+            ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
+            ctx.i2pInboundQuantity = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY);
+            ctx.i2pOutboundQuantity = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY);
+            ctx.i2pInboundLength = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH);
+            ctx.i2pOutboundLength = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH);
             String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
             ctx.version[0] = Integer.parseInt(vStrArray[0]);
             ctx.version[1] = Integer.parseInt(vStrArray[1]);
