@@ -34,6 +34,71 @@
             android:title="@string/delete_started_torrents"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/i2p_settings">
+        <CheckBoxPreference
+            android:key="frostwire.prefs.network.i2p_enabled"
+            android:summary="@string/enable_i2p_summary"
+            android:title="@string/enable_i2p"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_hostname"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="127.0.0.1"
+            android:summary="@string/i2p_sam_hostname_summary"
+            android:title="@string/i2p_sam_hostname"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_port"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="7656"
+            android:inputType="number"
+            android:summary="@string/i2p_sam_port_summary"
+            android:title="@string/i2p_sam_port"/>
+        
+        <CheckBoxPreference
+            android:key="frostwire.prefs.network.i2p_allow_mixed"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:summary="@string/i2p_allow_mixed_summary"
+            android:title="@string/i2p_allow_mixed"/>
+        
+        <Preference
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:title="@string/i2p_advanced_settings"
+            android:enabled="false"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_inbound_quantity"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="3"
+            android:inputType="number"
+            android:summary="@string/i2p_inbound_quantity_summary"
+            android:title="@string/i2p_inbound_quantity"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_outbound_quantity"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="3"
+            android:inputType="number"
+            android:summary="@string/i2p_outbound_quantity_summary"
+            android:title="@string/i2p_outbound_quantity"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_inbound_length"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="3"
+            android:inputType="number"
+            android:summary="@string/i2p_inbound_length_summary"
+            android:title="@string/i2p_inbound_length"/>
+        
+        <EditTextPreference
+            android:key="frostwire.prefs.network.i2p_outbound_length"
+            android:dependency="frostwire.prefs.network.i2p_enabled"
+            android:defaultValue="3"
+            android:inputType="number"
+            android:summary="@string/i2p_outbound_length_summary"
+            android:title="@string/i2p_outbound_length"/>
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/bandwidth_usage_settings">
         <SwitchPreference
             android:key="froswire.prefs.network.enable_dht"
