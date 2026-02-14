@@ -1,5 +1,13 @@
 frostwire (7.0.3) stable; urgency=high (UNRELEASED)
  * Bound unbounded image/icon caches to prevent memory leaks
+ * Fix crash when pasting non-video URL into search bar
+ * Fix tray icon issues on Linux KDE Plasma (#845)
+ * Add I2P configuration infrastructure with UI settings panel support
+ * Register I2P settings panel in options dialog
+ * Fix I2PPaneItem return value for applyOptions
+ * Fix bug with Search Tools filter not working
+ * Fix search filter logic to make all filters work independently
+ * Fix wrong speed shown in peers tab by converting bytes/s to KB/s
 
  -- FrostWire Team <contact@frostwire.com> Wed, 28 Jan 2025 14:41:00 -0600
 
