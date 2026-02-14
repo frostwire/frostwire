@@ -50,6 +50,17 @@ public class Main {
      */
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
+        // On Linux/KDE, set the AWT application class name to "FrostWire" so that
+        // KDE Plasma shows "FrostWire" instead of "JavaEmbeddedFrame" in the system tray.
+        if (OSUtils.isLinux()) {
+            try {
+                var toolkit = Toolkit.getDefaultToolkit();
+                var field = toolkit.getClass().getDeclaredField("awtAppClassName");
+                field.setAccessible(true);
+                field.set(toolkit, "FrostWire");
+            } catch (Exception ignored) {
+            }
+        }
         String arch = System.getProperty("os.arch").toLowerCase();
         boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");	
 
