@@ -172,6 +172,23 @@ public final class BTEngine extends SessionManager {
         LOG.info("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
         LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
 
+        // I2P Configuration
+        if (ctx.i2pEnabled && ctx.i2pHostname != null && !ctx.i2pHostname.isEmpty()) {
+            sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), ctx.i2pHostname);
+            sp.set_int(settings_pack.int_types.i2p_port.swigValue(), ctx.i2pPort);
+            sp.set_bool(settings_pack.bool_types.allow_i2p_mixed.swigValue(), ctx.i2pAllowMixed);
+            sp.set_int(settings_pack.int_types.i2p_inbound_quantity.swigValue(), ctx.i2pInboundQuantity);
+            sp.set_int(settings_pack.int_types.i2p_outbound_quantity.swigValue(), ctx.i2pOutboundQuantity);
+            sp.set_int(settings_pack.int_types.i2p_inbound_length.swigValue(), ctx.i2pInboundLength);
+            sp.set_int(settings_pack.int_types.i2p_outbound_length.swigValue(), ctx.i2pOutboundLength);
+            LOG.info("I2P enabled: SAM bridge at " + ctx.i2pHostname + ":" + ctx.i2pPort +
+                    " (mixed mode: " + ctx.i2pAllowMixed + ")");
+        } else {
+            // Ensure I2P is disabled by setting empty hostname
+            sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), "");
+            LOG.info("I2P disabled");
+        }
+
         try {
             super.start(params);
         } catch (Throwable t) {

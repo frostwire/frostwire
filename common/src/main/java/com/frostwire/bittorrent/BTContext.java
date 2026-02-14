@@ -36,4 +36,15 @@ public final class BTContext {
      * Indicates if the engine starts with the DHT enable.
      */
     public boolean enableDht = true;
+    /**
+     * I2P Configuration
+     */
+    public boolean i2pEnabled = false;
+    public String i2pHostname = "127.0.0.1";
+    public int i2pPort = 7656;
+    public boolean i2pAllowMixed = false;
+    public int i2pInboundQuantity = 3;
+    public int i2pOutboundQuantity = 3;
+    public int i2pInboundLength = 3;
+    public int i2pOutboundLength = 3;
 }

@@ -84,6 +84,26 @@ public final class ConnectionSettings extends LimeProps {
      */
     public static final BooleanSetting VPN_DROP_PROTECTION = FACTORY.createBooleanSetting("VPN_DROP_PROTECTION", false);
 
+    /**
+     * I2P Configuration Settings
+     */
+    public static final BooleanSetting I2P_ENABLED =
+            FACTORY.createBooleanSetting("I2P_ENABLED", false);
+    public static final StringSetting I2P_HOSTNAME =
+            FACTORY.createStringSetting("I2P_HOSTNAME", "127.0.0.1");
+    public static final IntSetting I2P_PORT =
+            FACTORY.createIntSetting("I2P_PORT", 7656);
+    public static final BooleanSetting I2P_ALLOW_MIXED =
+            FACTORY.createBooleanSetting("I2P_ALLOW_MIXED", false);
+    public static final IntSetting I2P_INBOUND_QUANTITY =
+            FACTORY.createIntSetting("I2P_INBOUND_QUANTITY", 3);
+    public static final IntSetting I2P_OUTBOUND_QUANTITY =
+            FACTORY.createIntSetting("I2P_OUTBOUND_QUANTITY", 3);
+    public static final IntSetting I2P_INBOUND_LENGTH =
+            FACTORY.createIntSetting("I2P_INBOUND_LENGTH", 3);
+    public static final IntSetting I2P_OUTBOUND_LENGTH =
+            FACTORY.createIntSetting("I2P_OUTBOUND_LENGTH", 3);
+
     private ConnectionSettings() {
     }
 }

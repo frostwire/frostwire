@@ -426,6 +426,15 @@ final class Initializer {
         ctx.interfaces = iface;
         ctx.retries = 10;
         ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
+        // I2P Configuration
+        ctx.i2pEnabled = ConnectionSettings.I2P_ENABLED.getValue();
+        ctx.i2pHostname = ConnectionSettings.I2P_HOSTNAME.getValue();
+        ctx.i2pPort = ConnectionSettings.I2P_PORT.getValue();
+        ctx.i2pAllowMixed = ConnectionSettings.I2P_ALLOW_MIXED.getValue();
+        ctx.i2pInboundQuantity = ConnectionSettings.I2P_INBOUND_QUANTITY.getValue();
+        ctx.i2pOutboundQuantity = ConnectionSettings.I2P_OUTBOUND_QUANTITY.getValue();
+        ctx.i2pInboundLength = ConnectionSettings.I2P_INBOUND_LENGTH.getValue();
+        ctx.i2pOutboundLength = ConnectionSettings.I2P_OUTBOUND_LENGTH.getValue();
         FrostWireUtils.getFrostWireVersionBuild(ctx.version);
         BTEngine.ctx = ctx;
         BTEngine.onCtxSetupComplete();
