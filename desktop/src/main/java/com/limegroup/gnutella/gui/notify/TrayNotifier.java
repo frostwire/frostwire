@@ -40,8 +40,8 @@ public final class TrayNotifier implements NotifyUser {
                 GUIMediator.getTrayMenu());
         _icon.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
                     GUIMediator.restoreView();
                 }
             }
