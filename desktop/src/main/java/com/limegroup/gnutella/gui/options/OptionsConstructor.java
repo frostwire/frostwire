@@ -73,6 +73,7 @@ public final class OptionsConstructor {
     private static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
     private static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
     private static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
+    private static final String I2P_KEY = "OPTIONS_I2P_MAIN_TITLE";
     private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
     private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
     /**
@@ -207,6 +208,7 @@ public final class OptionsConstructor {
         addOption(ADVANCED_KEY, EXPERIMENTAL_KEY, I18n.tr("Experimental"), ExperimentalFeaturesPaneItem.class);
         addOption(ADVANCED_KEY, FIREWALL_KEY, I18n.tr("Firewall"), RouterConfigurationPaneItem.class);
         addOption(ADVANCED_KEY, PROXY_KEY, I18n.tr("Proxy"), ProxyPaneItem.class, ProxyLoginPaneItem.class);
+        addOption(ADVANCED_KEY, I2P_KEY, I18n.tr("I2P"), I2PPaneItem.class);
         addOption(ADVANCED_KEY, NETWORK_INTERFACE_KEY, I18n.tr("Network Interface"), NetworkInterfacePaneItem.class);
         if (FrostAssociations.anyAssociationsSupported()) {
             addOption(ADVANCED_KEY, ASSOCIATIONS_KEY, I18n.tr("File Associations"), AssociationPreferencePaneItem.class);
