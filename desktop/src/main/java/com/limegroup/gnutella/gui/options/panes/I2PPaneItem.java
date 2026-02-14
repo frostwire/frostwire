@@ -180,7 +180,7 @@ public final class I2PPaneItem extends AbstractPaneItem {
         }
         BTEngine.getInstance().applySettings(settings);
         
-        return false;
+        return true; // Settings applied successfully
     }
 
     public boolean isDirty() {
