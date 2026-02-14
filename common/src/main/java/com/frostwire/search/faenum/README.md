@@ -18,8 +18,18 @@ The actual Faenum API endpoint needs to be verified and adjusted. The current im
 
 1. **API Endpoint**: `https://www.faenum.com/api/search?q={keywords}&limit={max_results}`
    - This is a common REST API pattern but needs verification
+   - **NOTE**: If you're getting "Empty response body" errors, the API endpoint is likely incorrect
 
-2. **Response Format**: Expected JSON structure:
+2. **How to Find the Correct API Endpoint**:
+   - Open https://www.faenum.com/ in a browser
+   - Open browser Developer Tools (F12)
+   - Go to the "Network" tab
+   - Perform a search on the website
+   - Look for XHR/Fetch requests that contain the search results
+   - Note the actual endpoint URL and request method (GET/POST)
+   - Update `FaenumSearchPattern.getSearchUrl()` with the correct URL
+
+3. **Response Format**: Expected JSON structure:
    ```json
    {
      "results": [

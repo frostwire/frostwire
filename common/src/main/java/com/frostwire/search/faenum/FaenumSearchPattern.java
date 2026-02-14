@@ -45,7 +45,9 @@ public class FaenumSearchPattern implements SearchPattern {
     public String getSearchUrl(String encodedKeywords) {
         // Faenum API endpoint - will need to be verified/adjusted based on actual API
         // Common patterns: /api/search, /search/api, /api/v1/search
-        return "https://www." + DOMAIN + "/api/search?q=" + encodedKeywords + "&limit=" + MAX_RESULTS;
+        String url = "https://www." + DOMAIN + "/api/search?q=" + encodedKeywords + "&limit=" + MAX_RESULTS;
+        LOG.info("Faenum: Search URL: " + url);
+        return url;
     }
 
     @Override
@@ -53,15 +55,22 @@ public class FaenumSearchPattern implements SearchPattern {
         List<FileSearchResult> results = new ArrayList<>();
 
         if (responseBody == null || responseBody.isEmpty()) {
-            LOG.warn("Faenum: Empty response body");
+            LOG.warn("Faenum: Empty response body - the API endpoint may be incorrect or the site may not have an API");
+            LOG.warn("Faenum: Please verify the API endpoint by visiting https://www.faenum.com and checking browser developer tools");
             return results;
         }
+
+        // Log first 500 chars of response for debugging
+        String preview = responseBody.length() > 500 ? responseBody.substring(0, 500) + "..." : responseBody;
+        LOG.info("Faenum: Response preview: " + preview);
 
         try {
             // Try to parse as JSON response
             FaenumResponse response = JsonUtils.toObject(responseBody, FaenumResponse.class);
             if (response == null || response.results == null) {
-                LOG.warn("Faenum: Invalid response format");
+                LOG.warn("Faenum: Invalid response format - response does not match expected JSON structure");
+                LOG.warn("Faenum: Expected format: {\"results\": [...], \"total\": N, \"page\": N}");
+                LOG.warn("Faenum: Actual response: " + preview);
                 return results;
             }
 
