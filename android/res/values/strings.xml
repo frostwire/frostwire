@@ -310,6 +310,25 @@
     <string name="issue_with_tip_donation_uri">There\'s something wrong with the Tip/Donation web address</string>
     <string name="enable_dht">Enable DHT</string>
     <string name="enable_dht_summary">Use the Distributed Hash Table to announce/search torrent peers</string>
+    <string name="i2p_settings">I2P Settings</string>
+    <string name="enable_i2p">Enable I2P Support</string>
+    <string name="enable_i2p_summary">Anonymous torrenting through I2P network (requires I2P router running)</string>
+    <string name="i2p_sam_bridge">SAM Bridge</string>
+    <string name="i2p_sam_hostname">SAM Hostname</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM bridge address</string>
+    <string name="i2p_sam_port">SAM Port</string>
+    <string name="i2p_sam_port_summary">I2P SAM bridge port (usually 7656)</string>
+    <string name="i2p_allow_mixed">Allow Mixed Mode</string>
+    <string name="i2p_allow_mixed_summary">Allow I2P torrents to connect to both I2P and regular peers (less anonymous)</string>
+    <string name="i2p_advanced_settings">Advanced Tunnel Settings</string>
+    <string name="i2p_inbound_quantity">Inbound Tunnels</string>
+    <string name="i2p_inbound_quantity_summary">Number of inbound tunnels [1-16] (higher = more anonymity, slower)</string>
+    <string name="i2p_outbound_quantity">Outbound Tunnels</string>
+    <string name="i2p_outbound_quantity_summary">Number of outbound tunnels [1-16] (higher = more anonymity, slower)</string>
+    <string name="i2p_inbound_length">Inbound Hops</string>
+    <string name="i2p_inbound_length_summary">Hop count for inbound tunnels [0-7] (higher = more anonymity, slower)</string>
+    <string name="i2p_outbound_length">Outbound Hops</string>
+    <string name="i2p_outbound_length_summary">Hop count for outbound tunnels [0-7] (higher = more anonymity, slower)</string>
     <string name="dummy_build" translatable="false">[build number]</string>
     <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
     <string name="basic" translatable="false">Basic</string>
