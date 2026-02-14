@@ -1,3 +1,8 @@
+FrostWire 3.0.17 build 771 <UNRELEASED>
+ - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
+ - new:I2P network integration for anonymous proxy support
+ - Update com.google.firebase:firebase-bom to 34.8.0
+
 FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
  - fix:Removed transfers reappearing after deletion - track removed transfer IDs and filter from every update until confirmed gone from TransferManager
