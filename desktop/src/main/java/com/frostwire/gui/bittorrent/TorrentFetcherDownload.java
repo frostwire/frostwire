@@ -59,9 +59,10 @@ public class TorrentFetcherDownload implements BTDownload {
     private final String relativePath;
     private final String hash;
     private final Date dateCreated;
+    private final File saveDir;
     private TransferState state;
 
-    private TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath) {
+    private TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath, File saveDir) {
         this.uri = uri;
         if (uri.startsWith("magnet")) {
             hash = PerformersHelper.parseInfoHash(uri);
@@ -77,6 +78,7 @@ public class TorrentFetcherDownload implements BTDownload {
         } else {
             this.relativePath = null;
         }
+        this.saveDir = saveDir;
         this.dateCreated = new Date();
         state = TransferState.DOWNLOADING_TORRENT;
         Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + uri);
@@ -84,8 +86,16 @@ public class TorrentFetcherDownload implements BTDownload {
         t.start();
     }
 
+    public TorrentFetcherDownload(String uri, String referrer, String displayName, boolean partial, String relativePath, File saveDir) {
+        this(uri, referrer, null, displayName, partial, relativePath, saveDir);
+    }
+
     public TorrentFetcherDownload(String uri, String referrer, String displayName, boolean partial, String relativePath) {
-        this(uri, referrer, null, displayName, partial, relativePath);
+        this(uri, referrer, null, displayName, partial, relativePath, null);
+    }
+
+    public TorrentFetcherDownload(String uri, String referrer, String displayName, boolean partial, File saveDir) {
+        this(uri, referrer, null, displayName, partial, null, saveDir);
     }
 
     public TorrentFetcherDownload(String uri, String referrer, String displayName, boolean partial) {
@@ -267,7 +277,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 try {
                     TorrentInfo ti = TorrentInfo.bdecode(data);
                     boolean[] selection = calculateSelection(ti, relativePath);
-                    BTEngine.getInstance().download(ti, null, selection, peers, true);
+                    BTEngine.getInstance().download(ti, saveDir, selection, peers, true);
                 } catch (Throwable e) {
                     LOG.error("Error downloading torrent", e);
                 }
@@ -288,7 +298,7 @@ public class TorrentFetcherDownload implements BTDownload {
                         boolean[] finalSelection = selection;
                         BackgroundQueuedExecutorService.schedule(() -> {
                             try {
-                                BTEngine.getInstance().download(ti, null, finalSelection, peers, true);
+                                BTEngine.getInstance().download(ti, saveDir, finalSelection, peers, true);
                             } catch (Throwable e) {
                                 LOG.error("Error downloading torrent", e);
                             }
