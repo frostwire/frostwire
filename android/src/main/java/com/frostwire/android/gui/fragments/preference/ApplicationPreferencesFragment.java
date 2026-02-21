@@ -20,6 +20,8 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
@@ -39,6 +41,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.android.gui.views.preference.SaveLocationPreference;
 import com.frostwire.android.offers.SupportOffer;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -76,6 +79,18 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             initComponents();
         });
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SaveLocationPreference.REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            SaveLocationPreference pref = findPreference("frostwire.prefs.storage.path");
+            if (pref instanceof SaveLocationPreference) {
+                ((SaveLocationPreference) pref).onLocationSelected(uri);
+            }
+        }
     }
 
     private void setupDataSaving() {
@@ -200,31 +215,14 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     }
 
     private void setupStorageOption() {
-        // intentional repetition of preference value here
-        String kitkatKey = "frostwire.prefs.storage.path";
-        String lollipopKey = "frostwire.prefs.storage.path_asf";
-
-        PreferenceCategory category = findPreference("frostwire.prefs.general");
-
-        if (AndroidPlatform.saf()) {
-            // make sure this won't be saved for kitkat
-            Preference p = findPreference(kitkatKey);
-            if (p != null) {
-                category.removePreference(p);
-            }
-            p = findPreference(lollipopKey);
-            if (p != null) {
-                p.setOnPreferenceChangeListener((preference, newValue) -> {
-                    updateStorageOptionSummary(newValue.toString());
-                    return true;
-                });
-                updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
-            }
-        } else {
-            Preference p = findPreference(lollipopKey);
-            if (p != null) {
-                category.removePreference(p);
-            }
+        SaveLocationPreference pref = findPreference("frostwire.prefs.storage.path");
+        if (pref != null) {
+            pref.setOnPreferenceClickListener(p -> {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                startActivityForResult(intent, SaveLocationPreference.REQUEST_CODE);
+                return true;
+            });
         }
     }
 
@@ -246,17 +244,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     private void disconnect() {
         Engine.instance().stopServices(true); // internally this is an async call in libtorrent
         updateConnectSwitchStatus();
-    }
-
-    private void updateStorageOptionSummary(String newPath) {
-        // intentional repetition of preference value here
-        String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (AndroidPlatform.saf()) {
-            Preference p = findPreference(lollipopKey);
-            if (p != null) {
-                p.setSummary(newPath);
-            }
-        }
     }
 
     private void setupSupportPreference() {

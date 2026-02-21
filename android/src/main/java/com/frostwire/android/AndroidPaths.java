@@ -22,6 +22,7 @@ package com.frostwire.android;
 import android.app.Application;
 import android.os.Environment;
 
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
@@ -99,12 +100,26 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     /**
+     * Check user-configured save location first (via SAF), then fall back to defaults.
      * Environment.getExternalStoragePublicDirectory() + "/Downloads/FrostWire" (This path won't work on android 10 even with legacy flag on)
      * /storage/emulated/0/Download/FrostWire/
      * <p>
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
      */
     private static File storage(Application app) {
+        String configuredPath = ConfigurationManager.instance().getStoragePath();
+        if (configuredPath != null && !configuredPath.isEmpty()) {
+            // If it's not a URI, try using it as a File path
+            if (!configuredPath.startsWith("content://")) {
+                File userPath = new File(configuredPath);
+                if (userPath.exists() && userPath.isDirectory() && userPath.canWrite()) {
+                    return userPath;
+                }
+            }
+            // If it's a URI or File path is not accessible, it's stored for SAF operations only
+            // Fall through to default storage for backward compatibility
+        }
+
         if (SystemUtils.hasAndroid10OrNewer()) {
             if (SystemUtils.hasAndroid10()) {
                 return app.getExternalFilesDir(null);
