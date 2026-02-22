@@ -242,7 +242,14 @@ public final class ConfigurationManager {
     }
 
     public void setStoragePath(String path) {
-        if (path != null && path.length() > 0) { // minor verifications
+        if (path == null || path.isEmpty()) {
+            // Clear to use default storage
+            try {
+                preferences.edit().remove(Constants.PREF_KEY_STORAGE_PATH).apply();
+            } catch (Throwable ignore) {
+                LOG.warn("setStoragePath(null/empty) failed to remove preference", ignore);
+            }
+        } else {
             setString(Constants.PREF_KEY_STORAGE_PATH, path);
         }
     }

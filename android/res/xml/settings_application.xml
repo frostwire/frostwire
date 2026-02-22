@@ -26,6 +26,9 @@
                 android:layout="@layout/view_preference_support"
                 android:summary="@string/support_offer_default_message"
                 android:title="@string/support_offer_default_title" />
+        <com.frostwire.android.gui.views.preference.SaveLocationPreference
+                android:key="frostwire.prefs.storage.path"
+                android:title="@string/download_location" />
         <SwitchPreference
                 android:key="frostwire.prefs.internal.connect_disconnect"
                 android:summary="@string/bittorrent_network_summary"

@@ -50,7 +50,6 @@
             style="@style/WizardText.Sub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:key="frostwire.prefs.storage.path_asf"
             android:text="/storage/emulated/0" />
 
         <TextView
