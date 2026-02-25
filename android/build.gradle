@@ -1,5 +1,6 @@
 import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
+import org.apache.tools.ant.taskdefs.condition.Os
 
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
@@ -117,15 +118,29 @@ android {
         }
 
         python {
-            chaquopy {
-                defaultConfig {
-                    version "3.11"
-                }
-            }
+            version "3.11"
+
             pip {
                 install "yt_dlp[default]==2025.12.08"
                 // helps a lot with debugging
                 //options "--verbose"
+            }
+
+            // 1. Try to get path from local.properties
+            // 2. Fallback to just "python3.11" (which works in terminal)
+            def localProps = new Properties()
+            def localPropertiesFile = project.rootProject.file('local.properties')
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.withInputStream { localProps.load(it) }
+            }
+
+            def pyPath = localProps.getProperty("python.path")
+            // on my mac my local.properties has -> python.path=/usr/local/bin/python3.11
+            if (pyPath != null) {
+                // This is where your /usr/local/bin/python3.11 will be injected
+                buildPython pyPath
+            } else {
+                buildPython(Os.isFamily(Os.FAMILY_WINDOWS) ? "python.exe" : "python3.11")
             }
         }
     }
