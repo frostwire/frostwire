@@ -64,27 +64,54 @@ public final class SaveLocationPreference extends Preference {
     }
 
     /**
-     * Called when user selects folder via SAF. Validates folder is under Downloads.
+     * Called when user selects folder via SAF. Checks if it's under Downloads and shows
+     * a warning if it's on external storage (SD card, etc.).
      */
     public void onFolderSelected(String selectedPath) {
         LOG.info("SaveLocationPreference.onFolderSelected(): selectedPath=" + selectedPath);
-        if (selectedPath != null && isUnderDownloads(selectedPath)) {
-            ConfigurationManager.instance().setStoragePath(selectedPath);
-            String verifyPath = ConfigurationManager.instance().getStoragePath();
-            LOG.info("SaveLocationPreference: Saved path=" + selectedPath + ", verified read=" + verifyPath);
-            // Update BTEngine in background thread to avoid StrictMode violation
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::updateBTEngineDataDir);
-            updateDisplay();
-            notifyChanged();
-        } else {
-            LOG.error("SaveLocationPreference: Selected path is not under Downloads: " + selectedPath);
-            new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                    .setTitle(R.string.invalid_save_location)
-                    .setMessage(R.string.save_location_must_be_under_downloads)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create()
-                    .show();
+
+        if (selectedPath == null) {
+            LOG.error("SaveLocationPreference: Selected path is null");
+            return;
         }
+
+        boolean isDownloads = isUnderDownloads(selectedPath);
+
+        if (!isDownloads) {
+            // Show warning for external storage (SD card, etc.)
+            showExternalStorageWarning(selectedPath);
+        } else {
+            // Safe location - save immediately
+            saveDownloadPath(selectedPath);
+        }
+    }
+
+    /**
+     * Shows warning dialog for external storage locations with limitations.
+     */
+    private void showExternalStorageWarning(String selectedPath) {
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle(R.string.external_storage_warning_title)
+                .setMessage(R.string.external_storage_warning_message)
+                .setPositiveButton(R.string.external_storage_warning_proceed, (dialog, which) -> {
+                    saveDownloadPath(selectedPath);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+                .show();
+    }
+
+    /**
+     * Saves the download path to preferences and updates BTEngine.
+     */
+    private void saveDownloadPath(String selectedPath) {
+        ConfigurationManager.instance().setStoragePath(selectedPath);
+        String verifyPath = ConfigurationManager.instance().getStoragePath();
+        LOG.info("SaveLocationPreference: Saved path=" + selectedPath + ", verified read=" + verifyPath);
+        // Update BTEngine in background thread to avoid StrictMode violation
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::updateBTEngineDataDir);
+        updateDisplay();
+        notifyChanged();
     }
 
     /**
