@@ -324,16 +324,18 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             // When last activity stops, clear cache to free memory
             if (activityCount == 0) {
                 LOG.info("App going to background, clearing FWImageLoader cache");
-                try {
-                    // Get the instance without recreating it
-                    FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
-                    if (fwImageLoader != null) {
-                        // Clear cache to free memory
-                        fwImageLoader.clear();
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    try {
+                        // Get the instance without recreating it
+                        FWImageLoader fwImageLoader = FWImageLoader.getInstanceIfExists();
+                        if (fwImageLoader != null) {
+                            // Clear cache to free memory (disk I/O must not run on main thread)
+                            fwImageLoader.clear();
+                        }
+                    } catch (Throwable t) {
+                        LOG.error("Error clearing FWImageLoader cache on app background", t);
                     }
-                } catch (Throwable t) {
-                    LOG.error("Error clearing FWImageLoader cache on app background", t);
-                }
+                });
             }
         }
 
