@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import java.io.File;
@@ -47,29 +46,14 @@ public final class GUIConstants {
      */
     static final int OUTER_MARGIN = 6;
     static final String INSTAGRAM_FROSTWIRE_URL = "https://instagram.com/frostwire";
-    // Continuous Integration
-
-    enum State {
-        ALPHA, // alpha features are DISABLED by default in Experimental settings. User can enable ALPHA features.
-        BETA   // beta features are ENABLED by default in Experimental settings. User can disable BETA features.
-    }
-    // alpha and beta features are always enabled when running from source.
 
     public enum Feature {
-        VPN_DROP_GUARD(State.BETA);
-        private final State status;
-
-        Feature(State status) {
-            this.status = status;
-        }
+        VPN_DROP_GUARD;
 
         public boolean enabled() {
             // All features are enabled if running from source.
-            boolean enabled =
-                    (status == State.ALPHA && UISettings.ALPHA_FEATURES_ENABLED.getValue()) ||
-                            (status == State.BETA && UISettings.BETA_FEATURES_ENABLED.getValue()) ||
-                            (FrostWireUtils.isIsRunningFromSource());
-            System.out.println("INFO: " + status.name() + " Feature." + this.name() + " enabled: " + enabled);
+            boolean enabled = FrostWireUtils.isIsRunningFromSource();
+            System.out.println("INFO: Feature." + this.name() + " enabled: " + enabled);
             return enabled;
         }
     }
