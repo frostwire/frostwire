@@ -48,11 +48,13 @@ public class UIHttpDownload extends HttpDownload {
     public UIHttpDownload(TransferManager manager, HttpSearchResult sr) {
         super(convert(sr));
         this.manager = manager;
+        LOG.info("UIHttpDownload created: filename=" + getDisplayName() + ", savePath=" + getSavePath() + ", size=" + getSize());
     }
 
     public UIHttpDownload(TransferManager manager, Slide slide) {
         super(convert(slide));
         this.manager = manager;
+        LOG.info("UIHttpDownload created from Slide: filename=" + getDisplayName() + ", savePath=" + getSavePath() + ", size=" + getSize());
     }
 
     @Override

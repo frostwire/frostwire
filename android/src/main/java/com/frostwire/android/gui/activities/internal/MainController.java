@@ -18,9 +18,12 @@
 
 package com.frostwire.android.gui.activities.internal;
 
+import android.app.Activity;
 import android.app.DownloadManager;
-import androidx.fragment.app.Fragment;
 import android.content.Intent;
+import android.net.Uri;
+
+import androidx.fragment.app.Fragment;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -31,9 +34,11 @@ import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
@@ -112,16 +117,38 @@ public final class MainController {
         if (!Ref.alive(activityRef)) {
             return;
         }
-        // This opens com.google.android.apps.docs but not on the given folder
+        Activity activity = activityRef.get();
+
+        // Get the actual save location (configured or default)
+        String downloadPath = ConfigurationManager.instance().getStoragePath();
+        if (downloadPath == null || downloadPath.isEmpty()) {
+            // Use default path if not configured
+            downloadPath = com.frostwire.platform.Platforms.get().systemPaths().data().getAbsolutePath();
+        }
+
+        // Try to open the folder using file URI (works with most file managers)
+        try {
+            File folder = new File(downloadPath);
+            if (folder.exists() && folder.isDirectory()) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.fromFile(folder);
+                intent.setData(uri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activity.startActivity(intent);
+                return;
+            }
+        } catch (Throwable e) {
+            LOG.warn("Could not open folder with file URI: " + downloadPath, e);
+        }
+
+        // Fallback to system Downloads action
         Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try {
-            activityRef.get().startActivity(intent);
+            activity.startActivity(intent);
         } catch (Throwable e) {
-            // No activity can handle the intent.
-            // You can show a user-friendly message or perhaps attempt to open another activity.
-            String errorMessage = activityRef.get().getString(R.string.error_cannot_open_downloads_folder);
-            UIUtils.showShortMessage(activityRef.get(), errorMessage);
+            String errorMessage = activity.getString(R.string.error_cannot_open_downloads_folder);
+            UIUtils.showShortMessage(activity, errorMessage);
         }
     }
 

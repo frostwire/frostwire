@@ -22,6 +22,7 @@ package com.frostwire.android;
 import android.app.Application;
 import android.os.Environment;
 
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
@@ -99,12 +100,21 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     /**
-     * Environment.getExternalStoragePublicDirectory() + "/Downloads/FrostWire" (This path won't work on android 10 even with legacy flag on)
-     * /storage/emulated/0/Download/FrostWire/
+     * Check user-configured download folder first (must be under Downloads for MediaStore compatibility).
+     * Falls back to system defaults if not configured.
+     * /storage/emulated/0/Downloads/FrostWire/
      * <p>
-     * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
+     * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/ (Android 10)
      */
     private static File storage(Application app) {
+        String configuredPath = ConfigurationManager.instance().getStoragePath();
+        if (configuredPath != null && !configuredPath.isEmpty()) {
+            File userPath = new File(configuredPath);
+            if (userPath.exists() && userPath.isDirectory() && userPath.canWrite()) {
+                return userPath;
+            }
+        }
+
         if (SystemUtils.hasAndroid10OrNewer()) {
             if (SystemUtils.hasAndroid10()) {
                 return app.getExternalFilesDir(null);

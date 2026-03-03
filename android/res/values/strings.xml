@@ -217,6 +217,11 @@
     <string name="support_frostwire">Support FrostWire</string>
     <string name="storage_preference_title">Select Storage Location</string>
     <string name="storage_preference_summary">The default storage location where files will be saved.</string>
+    <string name="download_location">Download location</string>
+    <string name="downloads_folder_default">Downloads folder (default)</string>
+    <string name="external_storage_warning_title">External Storage Location</string>
+    <string name="external_storage_warning_message">You selected a folder outside the Downloads directory (possibly on an SD card or external storage).\n\nLimitations:\n• Files will NOT appear in the media library or search\n• Torrents will NOT automatically seed\n• Files may become inaccessible if the storage is unmounted\n\nProceed only if you understand these limitations.</string>
+    <string name="external_storage_warning_proceed">Yes, use this location</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
     <string name="bittorrent_network_summary">Connection status</string>
     <string name="loading">Loading</string>

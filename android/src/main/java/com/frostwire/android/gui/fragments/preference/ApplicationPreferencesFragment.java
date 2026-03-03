@@ -20,6 +20,9 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 
 import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
@@ -39,6 +42,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.android.gui.views.preference.SaveLocationPreference;
 import com.frostwire.android.offers.SupportOffer;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -200,31 +204,14 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     }
 
     private void setupStorageOption() {
-        // intentional repetition of preference value here
-        String kitkatKey = "frostwire.prefs.storage.path";
-        String lollipopKey = "frostwire.prefs.storage.path_asf";
-
-        PreferenceCategory category = findPreference("frostwire.prefs.general");
-
-        if (AndroidPlatform.saf()) {
-            // make sure this won't be saved for kitkat
-            Preference p = findPreference(kitkatKey);
-            if (p != null) {
-                category.removePreference(p);
-            }
-            p = findPreference(lollipopKey);
-            if (p != null) {
-                p.setOnPreferenceChangeListener((preference, newValue) -> {
-                    updateStorageOptionSummary(newValue.toString());
-                    return true;
-                });
-                updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
-            }
-        } else {
-            Preference p = findPreference(lollipopKey);
-            if (p != null) {
-                category.removePreference(p);
-            }
+        SaveLocationPreference pref = findPreference("frostwire.prefs.storage.path");
+        if (pref != null) {
+            pref.setOnPreferenceClickListener(p -> {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                startActivityForResult(intent, SaveLocationPreference.REQUEST_CODE);
+                return true;
+            });
         }
     }
 
@@ -248,15 +235,73 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         updateConnectSwitchStatus();
     }
 
-    private void updateStorageOptionSummary(String newPath) {
-        // intentional repetition of preference value here
-        String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (AndroidPlatform.saf()) {
-            Preference p = findPreference(lollipopKey);
-            if (p != null) {
-                p.setSummary(newPath);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LOG.info("onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode + ", data=" + (data != null ? "present" : "null"));
+        if (requestCode == SaveLocationPreference.REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            LOG.info("onActivityResult: uri=" + uri);
+            String path = extractPathFromUri(uri);
+            LOG.info("onActivityResult: extracted path=" + path);
+            if (path != null) {
+                SaveLocationPreference pref = findPreference("frostwire.prefs.storage.path");
+                if (pref instanceof SaveLocationPreference) {
+                    LOG.info("onActivityResult: calling onFolderSelected with path=" + path);
+                    ((SaveLocationPreference) pref).onFolderSelected(path);
+                } else {
+                    LOG.warn("onActivityResult: preference not found or wrong type");
+                }
+            } else {
+                LOG.warn("onActivityResult: path extraction returned null");
             }
+        } else {
+            LOG.warn("onActivityResult: REQUEST_CODE mismatch or result not OK or data null");
         }
+    }
+
+    private String extractPathFromUri(Uri uri) {
+        if (uri == null) {
+            LOG.warn("extractPathFromUri: uri is null");
+            return null;
+        }
+        LOG.info("extractPathFromUri: uri=" + uri);
+        // For SAF URIs like "content://com.android.externalstorage.documents/tree/primary:Downloads%2FFrostWire"
+        // Extract path and build full filesystem path
+        String uriPath = uri.getPath();
+        LOG.info("extractPathFromUri: uriPath=" + uriPath);
+        if (uriPath != null && uriPath.contains("primary:")) {
+            try {
+                String relativePath = uriPath.substring(uriPath.indexOf("primary:") + 8);
+                relativePath = java.net.URLDecoder.decode(relativePath, "UTF-8");
+                LOG.info("extractPathFromUri: extracted relativePath=" + relativePath);
+
+                // The relativePath may be "Download/SubFolder", "Downloads/SubFolder", or just ""
+                // Handle both "Download" and "Downloads" (varies by device/Android version)
+                String storageRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+                String fullPath;
+
+                if (relativePath.isEmpty() || relativePath.equals("/")) {
+                    // User selected the primary storage root, use default Downloads/FrostWire
+                    fullPath = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/FrostWire";
+                } else if (relativePath.startsWith("Download") || relativePath.startsWith("Downloads")) {
+                    // Path already includes Download(s), combine directly with storage root
+                    fullPath = storageRoot + "/" + relativePath;
+                } else {
+                    // Path doesn't include Download(s), append to Downloads directory
+                    fullPath = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + relativePath;
+                }
+                LOG.info("extractPathFromUri: storageRoot=" + storageRoot + ", relativePath=" + relativePath + ", fullPath=" + fullPath);
+                return fullPath;
+            } catch (Exception e) {
+                LOG.warn("Could not extract path from URI: " + uri, e);
+            }
+        } else {
+            LOG.warn("extractPathFromUri: uriPath doesn't contain 'primary:', returning null");
+        }
+        return null;
     }
 
     private void setupSupportPreference() {
