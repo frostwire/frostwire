@@ -206,10 +206,8 @@ public final class BugManager {
         for (String classpath : classpaths) {
             classPath.append("  ").append(classpath).append("\n");
         }
-        // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
-        detail = detail + "\nCLASSPATH:\n" + classPath + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
-                "    ALPHA FEATURES: " + UISettings.ALPHA_FEATURES_ENABLED.getValue() + "\n" +
-                "    BETA FEATURES: " + UISettings.BETA_FEATURES_ENABLED.getValue() + "\n";
+        // Add CLASSPATH to the report
+        detail = detail + "\nCLASSPATH:\n" + classPath + "\n";
         bug.printStackTrace();
         // Build the LocalClientInfo out of the info ...
         final LocalClientInfo info = localClientInfoFactory.createLocalClientInfo(bug, threadName, detail, false);
