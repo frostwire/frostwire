@@ -648,9 +648,33 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public void openTorrentURI(final String uri, final boolean partialDownload) {
         SwingUtilities.invokeLater(() -> {
-            BTDownload downloader = new TorrentFetcherDownload(uri, partialDownload);
-            add(downloader);
+            try {
+                File saveDir = promptForSaveLocation(GUIMediator.getAppFrame());
+                BTDownload downloader = new TorrentFetcherDownload(uri, null, getDownloadNameFromURI(uri), partialDownload, saveDir);
+                add(downloader);
+            } catch (java.util.concurrent.CancellationException e) {
+                // User cancelled - abort the torrent addition
+            }
         });
+    }
+
+    private static String getDownloadNameFromURI(String uri) {
+        if (uri == null) {
+            return "Unknown";
+        }
+        if (uri.startsWith("magnet:")) {
+            String displayName = uri;
+            int dnStart = uri.indexOf("dn=");
+            if (dnStart > -1) {
+                int andIndex = uri.indexOf('&', dnStart);
+                displayName = (andIndex > -1) ?
+                        uri.substring(dnStart + 3, andIndex) :
+                        uri.substring(dnStart + 3);
+                displayName = UrlUtils.decode(displayName);
+            }
+            return displayName;
+        }
+        return uri;
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
@@ -745,6 +769,19 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         saveDir = torrentFile.getParentFile();
                     }
 
+                    // Prompt for save location if setting is enabled (only if not seeding)
+                    if (saveDir == null) {
+                        try {
+                            File promptedDir = promptForSaveLocation(GUIMediator.getAppFrame());
+                            if (promptedDir != null) {
+                                saveDir = promptedDir;
+                            }
+                        } catch (java.util.concurrent.CancellationException e) {
+                            // User cancelled - abort the torrent addition
+                            return;
+                        }
+                    }
+
                     // Ensure the .torrent exists under the configured Torrents directory
                     File torrentToUse = torrentFile;
                     try {
@@ -795,14 +832,19 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return;
         }
         GUIMediator.safeInvokeLater(() -> {
-            TorrentFetcherDownload d;
-            if (!partialDownload && sr instanceof TorrentItemSearchResult) {
-                String relativePath = ((TorrentItemSearchResult) sr).getFilePath();
-                d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), false, relativePath);
-            } else {
-                d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload);
+            try {
+                File saveDir = promptForSaveLocation(GUIMediator.getAppFrame());
+                TorrentFetcherDownload d;
+                if (!partialDownload && sr instanceof TorrentItemSearchResult) {
+                    String relativePath = ((TorrentItemSearchResult) sr).getFilePath();
+                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), false, relativePath, saveDir);
+                } else {
+                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload, saveDir);
+                }
+                add(d);
+            } catch (java.util.concurrent.CancellationException e) {
+                // User cancelled - abort the torrent addition
             }
-            add(d);
         });
     }
 
@@ -1078,5 +1120,26 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         void update(String searchKeywords) {
             this.searchKeywords = searchKeywords;
         }
+    }
+
+    /**
+     * Prompts the user to select a save location for a torrent if the setting is enabled.
+     * Returns the selected directory or null if the setting is disabled.
+     * If the user cancels the dialog, throws an exception to abort the operation.
+     * 
+     * @param parentComponent The parent component for the file chooser dialog (can be null)
+     * @return The selected directory or null if the setting is disabled
+     * @throws java.util.concurrent.CancellationException if user cancels the dialog when prompting is enabled
+     */
+    private File promptForSaveLocation(Component parentComponent) throws java.util.concurrent.CancellationException {
+        if (!BittorrentSettings.PROMPT_FOR_SAVE_LOCATION_ON_TORRENT_ADD.getValue()) {
+            return null;
+        }
+        File selectedDir = com.limegroup.gnutella.gui.FileChooserHandler.getInputDirectory(parentComponent);
+        if (selectedDir == null) {
+            // User cancelled the dialog
+            throw new java.util.concurrent.CancellationException("User cancelled save location selection");
+        }
+        return selectedDir;
     }
 }

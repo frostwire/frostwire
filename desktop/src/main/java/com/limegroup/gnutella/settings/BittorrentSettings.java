@@ -36,6 +36,13 @@ public final class BittorrentSettings extends LimeProps {
      */
     public static final IntSetting BTMEDIATOR_COLUMN_SORT_INDEX = FACTORY.createIntSetting("BTMEDIATOR_COLUMN_SORT_INDEX", -1);
 
+    /**
+     * Whether to prompt for save location when adding torrents.
+     * If true, shows a directory chooser dialog for each torrent.
+     * If false, uses the default download folder from SharingSettings.TORRENT_DATA_DIR_SETTING.
+     */
+    public static final BooleanSetting PROMPT_FOR_SAVE_LOCATION_ON_TORRENT_ADD = FACTORY.createBooleanSetting("PROMPT_FOR_SAVE_LOCATION_ON_TORRENT_ADD", false);
+
     private BittorrentSettings() {
     }
 }
