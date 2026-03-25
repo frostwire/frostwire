@@ -1,4 +1,4 @@
-frostwire (7.0.3) stable; urgency=high (UNRELEASED)
+frostwire (7.0.3) stable; urgency=high
  * Bound unbounded image/icon caches to prevent memory leaks
  * Fix crash when pasting non-video URL into search bar
  * Fix tray icon issues on Linux KDE Plasma (#845)
@@ -8,8 +8,10 @@ frostwire (7.0.3) stable; urgency=high (UNRELEASED)
  * Fix bug with Search Tools filter not working
  * Fix search filter logic to make all filters work independently
  * Fix wrong speed shown in peers tab by converting bytes/s to KB/s
+ * JDK 26 bundled
+ * Telluride build 44
 
- -- FrostWire Team <contact@frostwire.com> Wed, 28 Jan 2025 14:41:00 -0600
+ -- FrostWire Team <contact@frostwire.com> Wed, 25 Mar 2026 13:45:00 -0600
 
 frostwire (7.0.2) stable; urgency=high
  * Fixes bug where seed counts disappeared from torrent search results wrapped in FileSearchResultUIWrapper
