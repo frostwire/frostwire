@@ -2968,11 +2968,12 @@ public class MusicPlaybackService extends Service {
                     // /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData/...
                     try {
                         File f = new File(UrlUtils.decode(path));
-                        FileInputStream fis = new FileInputStream(f);
-                        player.setDataSource(fis.getFD());
-                    } catch (Throwable t) {
-                        LOG.info("MusicPlaybackService.setDataSource player.setDataSource(fileInputStream.getFD() failed -> " + t.getMessage(), true);
-                        player.setDataSource(path);
+                        try (FileInputStream fis = new FileInputStream(f)) {
+                            player.setDataSource(fis.getFD());
+                            } catch (Throwable t) {
+                            LOG.info("MusicPlaybackService.setDataSource player.setDataSource(fileInputStream.getFD() failed -> " + t.getMessage(), true);
+                            player.setDataSource(path);
+                        }
                     }
 
                 }
