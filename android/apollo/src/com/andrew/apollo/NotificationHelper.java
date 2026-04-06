@@ -22,6 +22,7 @@ import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER
 
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.Service;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -134,27 +135,24 @@ public class NotificationHelper {
         //  Save this for debugging
         PendingIntent pendingintent = pendingIntent();
 
-        // Notification Builder
-        Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(notificationIcon())
-                .setContentIntent(pendingintent)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContent(mNotificationTemplate)
-                .build();
-
-        // Control playback from the notification
-        initPlaybackActions(isPlaying);
-
         // Expanded notification style
         mExpandedView = new RemoteViews(mService.getPackageName(),
                 R.layout.notification_template_expanded_base);
 
-        aNotification.bigContentView = mExpandedView;
-
         // Control playback from the notification
+        initPlaybackActions(isPlaying);
         initExpandedPlaybackActions(isPlaying);
         // Set up the expanded content view
         initExpandedLayout(trackName, albumName, artistName, albumArt);
+
+        // Notification Builder — set both collapsed and expanded views via compat API
+        Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(notificationIcon())
+                .setContentIntent(pendingintent)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setCustomContentView(mNotificationTemplate)
+                .setCustomBigContentView(mExpandedView)
+                .build();
 
         mNotification = aNotification;
         createNotificationChannel();
@@ -215,7 +213,7 @@ public class NotificationHelper {
             synchronized (NOTIFICATION_LOCK) {
                 mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
             }
-            mService.stopForeground(true);
+            mService.stopForeground(Service.STOP_FOREGROUND_REMOVE);
             mNotification = null;
         }
     }

@@ -1041,14 +1041,9 @@ public class MusicPlaybackService extends Service {
         boolean isStopped = isStopped();
         if (removeNotification) {
             updateRemoteControlClient(PLAYSTATE_STOPPED);
-            stopForeground(true);
-
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
-                    Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
-                stopService(new Intent(this, MusicPlaybackService.class));
-            }
+            stopForeground(Service.STOP_FOREGROUND_REMOVE);
         } else {
-            stopForeground(isStopped);
+            stopForeground(isStopped ? Service.STOP_FOREGROUND_REMOVE : Service.STOP_FOREGROUND_DETACH);
         }
     }
 
@@ -1442,10 +1437,10 @@ public class MusicPlaybackService extends Service {
         intent.putExtra("track", trackName);
         intent.putExtra("playing", isPlaying);
         intent.putExtra("isfavorite", favorite);
-        musicPlaybackService.sendStickyBroadcast(intent);
+        musicPlaybackService.sendBroadcast(intent);
         final Intent musicIntent = new Intent(intent);
         musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
-        musicPlaybackService.sendStickyBroadcast(musicIntent);
+        musicPlaybackService.sendBroadcast(musicIntent);
         if (META_CHANGED.equals(change)) {
             // Increase the play count for favorite songs.
             if (musicPlaybackService.mFavoritesCache != null && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
@@ -1491,7 +1486,7 @@ public class MusicPlaybackService extends Service {
 
         final Intent intent = new Intent(SIMPLE_PLAYSTATE_STOPPED);
         intent.putExtra("path", path);
-        sendStickyBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     /**
