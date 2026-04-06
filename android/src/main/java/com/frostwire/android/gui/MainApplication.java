@@ -189,6 +189,7 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     }
 
     @Override
+    @SuppressWarnings("deprecation") // TRIM_MEMORY_MODERATE deprecated API 35; value unchanged
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         if (level >= TRIM_MEMORY_MODERATE) {
