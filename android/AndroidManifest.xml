@@ -313,7 +313,11 @@
         <service
                 android:name="com.andrew.apollo.MusicPlaybackService"
                 android:foregroundServiceType="mediaPlayback"
-                android:exported="true" />
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </service>
 
         <!-- receivers -->
 

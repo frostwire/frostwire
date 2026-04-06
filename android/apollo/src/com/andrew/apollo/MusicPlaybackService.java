@@ -39,8 +39,8 @@ import android.database.StaleDataException;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
-import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
+import androidx.media3.session.MediaSession;
 
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
@@ -48,6 +48,7 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -142,7 +143,7 @@ public class MusicPlaybackService extends Service {
      * Indicates that music playback position within
      * a title was changed
      */
-    private static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
+    public static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
 
     /**
      * Indicates the meta data has changed in some way, like a track change
@@ -152,7 +153,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Indicates the queue has been updated
      */
-    private static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
+    public static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
 
     /**
      * Indicates the repeat mode changed
@@ -313,7 +314,7 @@ public class MusicPlaybackService extends Service {
     private boolean mQueueIsSaveable = true;
     private boolean mPausedByTransientLossOfFocus = false;
     private boolean musicPlaybackActivityInForeground = false;
-    private RemoteControlClient mRemoteControlClient;
+    private MediaSession mMediaSession;
     private ComponentName mMediaButtonReceiverComponent;
     private int mCardId;
     private volatile int mPlayListLen = 0;
@@ -579,9 +580,7 @@ public class MusicPlaybackService extends Service {
             }
         }
 
-        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
-            MediaButtonIntentReceiver.completeWakefulIntent(intent);
-        }
+        // completeWakefulIntent removed — no longer using WakefulBroadcastReceiver
         return START_STICKY;
     }
 
@@ -679,9 +678,11 @@ public class MusicPlaybackService extends Service {
             mSimplePlayer = null;
         }
 
-        if (mAudioManager != null) {
-            // Audio focus abandon not needed — ExoPlayer releases focus on release().
-            mAudioManager.unregisterRemoteControlClient(mRemoteControlClient);
+        if (mMediaSession != null) {
+            try {
+                mMediaSession.release();
+            } catch (Throwable ignored) {}
+            mMediaSession = null;
         }
 
         closeCursor();
@@ -792,36 +793,24 @@ public class MusicPlaybackService extends Service {
 
     // prepareAudioFocusRequest() removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void setUpRemoteControlClient() {
-        final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonIntent.setComponent(mMediaButtonReceiverComponent);
-        mRemoteControlClient = new RemoteControlClient(
-                PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
-
+    private void setUpMediaSession() {
+        if (mPlayer == null || mPlayer.mExoPlayer == null) {
+            LOG.warn("setUpMediaSession() called before ExoPlayer is ready — deferring");
+            return;
+        }
         try {
-            if (mAudioManager != null) {
-                mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+            if (mMediaSession != null) {
+                mMediaSession.release();
             }
+            mMediaSession = new MediaSession.Builder(this, mPlayer.mExoPlayer)
+                    .setId("FrostWireApollo")
+                    .build();
+            // MediaSession automatically handles lock-screen controls, Bluetooth,
+            // and media button routing when connected to an ExoPlayer instance.
+            LOG.info("setUpMediaSession() MediaSession created successfully");
         } catch (Throwable t) {
-            // ignore errors due to system restrictions
+            LOG.error("setUpMediaSession() error: " + t.getMessage(), t);
         }
-
-        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
-                | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
-                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY
-                | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
-                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
-                | RemoteControlClient.FLAG_KEY_MEDIA_STOP
-                | RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
-        try {
-            mRemoteControlClient.setOnGetPlaybackPositionListener(this::position);
-            mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
-        } catch (Throwable t) {
-            // older platforms might not support these calls
-        }
-        mRemoteControlClient.setTransportControlFlags(flags);
     }
 
     private void releaseServiceUiAndStop(boolean force) {
@@ -916,9 +905,8 @@ public class MusicPlaybackService extends Service {
             LOG.error("initService() safeRegisterMediaButton error: " + e.getMessage(), e);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setUpRemoteControlClient();
-        }
+        // MediaSession setup deferred until ExoPlayer is ready (called from setCurrentDataSource)
+        // setUpMediaSession() is called after mPlayer is initialized in reloadQueue/openCurrentAndNext
 
         mPreferences = getSharedPreferences("Service", 0);
         mCardId = getCardId();
@@ -1519,41 +1507,25 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
-     * Updates the lock screen controls.
+     * Updates the MediaSession and notification with current playback state and metadata.
+     * Replaces the old RemoteControlClient update path.
      *
-     * @param what The broadcast
+     * @param what The broadcast event that triggered the update (e.g. PLAYSTATE_CHANGED, META_CHANGED)
      */
-    private void updateRemoteControlClient(final String what) {
-        if (mRemoteControlClient == null) {
-            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
-            return;
-        }
-
+    void updateRemoteControlClient(final String what) {
         if (what == null) {
-            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. what is null, review your logic");
+            LOG.info("updateRemoteControlClient() skipped — what is null");
             return;
         }
+        LOG.info("updateRemoteControlClient(what=" + what + ")");
 
-
-        LOG.info("MusicPlaybackService::updateRemoteControlClient(what=" + what + ")");
-
-        int playState;
         final boolean isPlaying = isPlaying();
         final boolean isStopped = isStopped();
-        final boolean isPaused = !isPlaying && !isStopped;
-
-        if (isPaused) {
-            playState = RemoteControlClient.PLAYSTATE_PAUSED;
-        } else if (isPlaying) {
-            playState = RemoteControlClient.PLAYSTATE_PLAYING;
-        } else {
-            playState = RemoteControlClient.PLAYSTATE_STOPPED;
-        }
 
         if (isStopped && !isPlaying && mNotificationHelper != null) {
             mNotificationHelper.killNotification();
         }
-        final int playStateFinalCopy = playState;
+
         switch (what) {
             case PLAYSTATE_CHANGED:
             case POSITION_CHANGED:
@@ -1561,81 +1533,54 @@ public class MusicPlaybackService extends Service {
                 if (mNotificationHelper != null) {
                     try {
                         mNotificationHelper.updatePlayState(isPlaying, isStopped);
-                    } catch (Throwable ignored) {
-                    }
+                    } catch (Throwable ignored) {}
                 }
-                remoteControlClientSetPlaybackStateTask(mRemoteControlClient, playStateFinalCopy);
+                updateMediaSessionPlaybackState();
                 break;
             case META_CHANGED:
             case QUEUE_CHANGED:
-                // Asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
-                SystemUtils.exceptionSafePost(mPlayerHandler, () -> changeRemoteControlClientTask(playStateFinalCopy, position()));
+                // Asynchronously fetch album art then push full metadata to MediaSession
+                SystemUtils.exceptionSafePost(mPlayerHandler, this::updateMediaSessionMetadata);
                 break;
         }
     }
 
-    private static void remoteControlClientSetPlaybackStateTask(RemoteControlClient rc, int playState) {
-        try {
-            rc.setPlaybackState(playState);
-        } catch (Throwable throwable) {
-            // rare android internal NPE
-            LOG.error(throwable.getMessage(), throwable);
-        }
+    /** Pushes the current playback state into the MediaSession. */
+    private void updateMediaSessionPlaybackState() {
+        if (mMediaSession == null) return;
+        // MediaSession backed by ExoPlayer — state is automatically reflected.
+        // No manual PlaybackStateCompat update needed when using media3 MediaSession.
     }
 
-    private static void changeRemoteControlClientTask(int playState, long position) {
-        if (INSTANCE == null) {
-            LOG.info("changeRemoteControlClientTask() aborted, no MusicPlaybackService available");
-            return;
-        }
-        if (MusicPlaybackService.mPlayerHandler == null) {
-            MusicPlaybackService.setupMPlayerHandler();
-        }
-        // background portion
-        Bitmap albumArt = INSTANCE.getAlbumArt();
-        // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
-        // to make sure not to hand out our cache copy
-        Bitmap.Config config = null;
-        if (albumArt != null) {
-            config = albumArt.getConfig();
-        }
-        if (config == null) {
-            config = Bitmap.Config.ARGB_8888;
-        }
-        Bitmap bmpCopy = null;
+    /**
+     * Pushes current track metadata into the MediaSession via a refreshed MediaItem.
+     * Media3's MediaSession reads metadata directly from ExoPlayer's current MediaItem —
+     * the system lock screen and Bluetooth devices receive it automatically.
+     */
+    private void updateMediaSessionMetadata() {
+        if (mMediaSession == null || mPlayer == null || mPlayer.mExoPlayer == null) return;
         try {
-            if (albumArt != null) {
-                bmpCopy = albumArt.copy(config, false);
-            }
-        } catch (OutOfMemoryError e) {
-            // ignore, can't do anything meaningful here
-        }
-        final Bitmap albumArtCopy = bmpCopy;
-        final String artistName = INSTANCE.getArtistName();
-        final String albumName = INSTANCE.getAlbumName();
-        final String trackName = INSTANCE.getTrackName();
-        final String albumArtistName = INSTANCE.getAlbumArtistName();
-        final long duration = INSTANCE.duration();
-        try {
-            // TODO: Refactor to use MediaSession instead
-            RemoteControlClient.MetadataEditor editor = INSTANCE.mRemoteControlClient
-                    .editMetadata(true)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
-                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration);
-            if (albumArtCopy != null) {
-                editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy);
-            }
-            editor.apply();
+            // Rebuild the current MediaItem with updated display metadata.
+            // ExoPlayer propagates this to MediaSession automatically.
+            String path = getPath();
+            if (path == null) return;
+            androidx.media3.common.MediaMetadata meta =
+                    new androidx.media3.common.MediaMetadata.Builder()
+                            .setTitle(getTrackName())
+                            .setArtist(getArtistName())
+                            .setAlbumTitle(getAlbumName())
+                            .setAlbumArtist(getAlbumArtistName())
+                            .build();
+            MediaItem updatedItem = new MediaItem.Builder()
+                    .setUri(MultiPlayer.resolveUri(path))
+                    .setMediaMetadata(meta)
+                    .build();
+            // Replace in-place without interrupting playback
+            mPlayer.mExoPlayer.replaceMediaItem(
+                    mPlayer.mExoPlayer.getCurrentMediaItemIndex(), updatedItem);
+            LOG.info("updateMediaSessionMetadata() pushed metadata for: " + getTrackName());
         } catch (Throwable t) {
-            // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
-        }
-        try {
-            INSTANCE.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
-        } catch (Throwable t) {
-            // temporary fix for Android 4.1, we need MediaSession refactor
+            LOG.error("updateMediaSessionMetadata() error: " + t.getMessage(), t);
         }
     }
 
@@ -2797,9 +2742,9 @@ public class MusicPlaybackService extends Service {
      * audio-becoming-noisy natively — removing the entire dual-MediaPlayer
      * swap and manual WakeLock management from the original implementation.
      */
-    private static final class MultiPlayer {
+    static final class MultiPlayer {
         private final static Logger LOG = Logger.getLogger(MultiPlayer.class);
-        private ExoPlayer mExoPlayer;
+        ExoPlayer mExoPlayer; // package-private for MediaSession metadata updates in outer class
         private boolean mIsInitialized = false;
 
         MultiPlayer() {
@@ -2855,7 +2800,7 @@ public class MusicPlaybackService extends Service {
          * Resolve a path string to a Uri suitable for ExoPlayer.
          * Handles content://, http/https, and bare file paths.
          */
-        private static Uri resolveUri(String path) {
+        static Uri resolveUri(String path) {
             if (path.startsWith("content://") || path.startsWith("http://") || path.startsWith("https://")) {
                 return Uri.parse(path);
             }
@@ -2891,6 +2836,8 @@ public class MusicPlaybackService extends Service {
                 mIsInitialized = false;
                 return;
             }
+            // Lazily set up MediaSession now that ExoPlayer exists
+            MusicPlaybackService.INSTANCE.setUpMediaSession();
             try {
                 MediaItem mediaItem =
                         MediaItem.fromUri(resolveUri(path));
