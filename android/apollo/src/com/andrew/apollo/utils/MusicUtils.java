@@ -96,7 +96,12 @@ public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);
 
-    private static MusicPlaybackService musicPlaybackService = null;
+    private static java.lang.ref.WeakReference<MusicPlaybackService> musicPlaybackServiceRef = null;
+
+    /** Returns the live service instance, or null if it has been GC'd or disconnected. */
+    private static MusicPlaybackService getService() {
+        return musicPlaybackServiceRef != null ? musicPlaybackServiceRef.get() : null;
+    }
 
     private static int sForegroundActivities = 0;
 
@@ -202,7 +207,7 @@ public final class MusicUtils {
 
     public static MusicPlaybackService getMusicPlaybackService() {
         synchronized (getStartMusicPlaybackServiceLock) {
-            return musicPlaybackService;
+            return getService();
         }
     }
 
@@ -360,15 +365,16 @@ public final class MusicUtils {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            musicPlaybackService = MusicPlaybackService.getInstance();//IApolloService.Stub.asInterface(service);
-            if (musicPlaybackService == null) {
-                RuntimeException t = new RuntimeException("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, musicPlaybackService is null, we're calling this too early - check your logic)");
+            MusicPlaybackService instance = MusicPlaybackService.getInstance();
+            musicPlaybackServiceRef = instance != null ? new java.lang.ref.WeakReference<>(instance) : null;
+            if (instance == null) {
+                RuntimeException t = new RuntimeException("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, getService() is null, we're calling this too early - check your logic)");
                 LOG.error(t.getMessage(), t);
                 throw t;
             }
             try {
                 LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
-                musicPlaybackService.updateNotification();
+                instance.updateNotification();
             } catch (Throwable e) {
                 LOG.error("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
@@ -390,7 +396,7 @@ public final class MusicUtils {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             LOG.info("onServiceDisconnected() invoked!");
-            musicPlaybackService = null; // Clear the static reference to prevent stale references
+            musicPlaybackServiceRef = null; // Clear the weak reference to prevent stale references
             callback = null;
             bound.set(false);
         }
@@ -445,9 +451,9 @@ public final class MusicUtils {
 
     public static void next() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.stopPlayer();
-                musicPlaybackService.gotoNext(true);
+            if (getService() != null) {
+                getService().stopPlayer();
+                getService().gotoNext(true);
             }
         } catch (final Throwable ignored) {
         }
@@ -456,8 +462,8 @@ public final class MusicUtils {
 
     public static void previous() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.gotoPrev();
+            if (getService() != null) {
+                getService().gotoPrev();
             }
         } catch (final Throwable ignored) {
         }
@@ -469,18 +475,18 @@ public final class MusicUtils {
 
     public static void playPauseOrResume() {
         try {
-            if (musicPlaybackService != null) {
+            if (getService() != null) {
                 // PAUSED
-                if (!musicPlaybackService.isPlaying() && !musicPlaybackService.isStopped()) {
-                    musicPlaybackService.resume();
+                if (!getService().isPlaying() && !getService().isStopped()) {
+                    getService().resume();
                 }
                 // STOPPED or UNSTARTED
-                else if (musicPlaybackService.isStopped()) {
-                    musicPlaybackService.play();
+                else if (getService().isStopped()) {
+                    getService().play();
                 }
                 // PLAYING
-                else if (musicPlaybackService.isPlaying()) {
-                    musicPlaybackService.pause();
+                else if (getService().isPlaying()) {
+                    getService().pause();
                 }
             }
         } catch (final Exception ignored) {
@@ -492,9 +498,9 @@ public final class MusicUtils {
      */
 
     public static void play() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                musicPlaybackService.play();
+                getService().play();
             } catch (Throwable ignored) {
             }
         }
@@ -502,9 +508,9 @@ public final class MusicUtils {
 
 
     public static void pause() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                musicPlaybackService.pause();
+                getService().pause();
             } catch (Throwable ignored) {
 
             }
@@ -517,16 +523,16 @@ public final class MusicUtils {
 
     public static void cycleRepeat() {
         try {
-            if (musicPlaybackService != null) {
-                switch (musicPlaybackService.getRepeatMode()) {
+            if (getService() != null) {
+                switch (getService().getRepeatMode()) {
                     case MusicPlaybackService.REPEAT_NONE:
-                        musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_ALL);
+                        getService().setRepeatMode(MusicPlaybackService.REPEAT_ALL);
                         break;
                     case MusicPlaybackService.REPEAT_ALL:
-                        musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_CURRENT);
+                        getService().setRepeatMode(MusicPlaybackService.REPEAT_CURRENT);
                         break;
                     default:
-                        musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_NONE);
+                        getService().setRepeatMode(MusicPlaybackService.REPEAT_NONE);
                         break;
                 }
             }
@@ -539,9 +545,9 @@ public final class MusicUtils {
      */
 
     public static void cycleShuffle() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                musicPlaybackService.enableShuffle(!isShuffleEnabled());
+                getService().enableShuffle(!isShuffleEnabled());
             } catch (Throwable ignored) {
             }
         }
@@ -552,9 +558,9 @@ public final class MusicUtils {
      */
 
     public static boolean isPlaying() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.isPlaying();
+                return getService().isPlaying();
             } catch (final Throwable ignored) {
             }
         }
@@ -563,9 +569,9 @@ public final class MusicUtils {
 
 
     public static boolean isStopped() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.isStopped();
+                return getService().isStopped();
             } catch (final Throwable ignored) {
             }
         }
@@ -577,9 +583,9 @@ public final class MusicUtils {
      */
 
     public static boolean isShuffleEnabled() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.isShuffleEnabled();
+                return getService().isShuffleEnabled();
             } catch (final Throwable ignored) {
             }
         }
@@ -591,9 +597,9 @@ public final class MusicUtils {
      */
 
     public static int getRepeatMode() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getRepeatMode();
+                return getService().getRepeatMode();
             } catch (final Throwable ignored) {
             }
         }
@@ -605,9 +611,9 @@ public final class MusicUtils {
      */
 
     public static String getTrackName() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getTrackName();
+                return getService().getTrackName();
             } catch (final Throwable ignored) {
             }
         }
@@ -619,9 +625,9 @@ public final class MusicUtils {
      */
 
     public static String getArtistName() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getArtistName();
+                return getService().getArtistName();
             } catch (final Throwable ignored) {
             }
         }
@@ -633,9 +639,9 @@ public final class MusicUtils {
      */
 
     public static String getAlbumName() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getAlbumName();
+                return getService().getAlbumName();
             } catch (final Throwable ignored) {
             }
         }
@@ -647,9 +653,9 @@ public final class MusicUtils {
      */
 
     public static long getCurrentAlbumId() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getAlbumId();
+                return getService().getAlbumId();
             } catch (final Throwable ignored) {
             }
         }
@@ -661,9 +667,9 @@ public final class MusicUtils {
      */
 
     public static long getCurrentAudioId() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getAudioId();
+                return getService().getAudioId();
             } catch (final Throwable ignored) {
             }
         }
@@ -675,9 +681,9 @@ public final class MusicUtils {
      */
 
     public static long getCurrentSimplePlayerAudioId() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getCurrentSimplePlayerAudioId();
+                return getService().getCurrentSimplePlayerAudioId();
             } catch (final Throwable ignored) {
             }
         }
@@ -688,9 +694,9 @@ public final class MusicUtils {
      * @return The current artist Id.
      */
     public static long getCurrentArtistId() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getArtistId();
+                return getService().getArtistId();
             } catch (final Throwable ignored) {
             }
         }
@@ -702,9 +708,9 @@ public final class MusicUtils {
      */
 
     static int getAudioSessionId() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.getAudioSessionId();
+                return getService().getAudioSessionId();
             } catch (final Throwable ignored) {
             }
         }
@@ -717,8 +723,8 @@ public final class MusicUtils {
 
     public static long[] getQueue() {
         try {
-            if (musicPlaybackService != null) {
-                return musicPlaybackService.getQueue();
+            if (getService() != null) {
+                return getService().getQueue();
             }
         } catch (final Throwable ignored) {
         }
@@ -732,8 +738,8 @@ public final class MusicUtils {
 
     public static int removeTrack(final long id) {
         try {
-            if (musicPlaybackService != null) {
-                return musicPlaybackService.removeTrack(id);
+            if (getService() != null) {
+                return getService().removeTrack(id);
             }
         } catch (final Throwable ignored) {
         }
@@ -746,8 +752,8 @@ public final class MusicUtils {
 
     private static int getQueuePosition() {
         try {
-            if (musicPlaybackService != null) {
-                return musicPlaybackService.getQueuePosition();
+            if (getService() != null) {
+                return getService().getQueuePosition();
             }
         } catch (final Throwable ignored) {
         }
@@ -1012,7 +1018,7 @@ public final class MusicUtils {
      */
 
     public static boolean playFileFromUri(final Uri uri) {
-        if (uri == null || musicPlaybackService == null) {
+        if (uri == null || getService() == null) {
             return false;
         }
 
@@ -1045,13 +1051,13 @@ public final class MusicUtils {
      */
     private static boolean playFileFromUriOnHandlerThread(String filename) {
         try {
-            musicPlaybackService.stopPlayer();
-            long fileId = musicPlaybackService.openFile(filename);
+            getService().stopPlayer();
+            long fileId = getService().openFile(filename);
             if (fileId == -1) {
                 return false;
             }
-            musicPlaybackService.open(new long[]{fileId}, 0);
-            musicPlaybackService.play();
+            getService().open(new long[]{fileId}, 0);
+            getService().play();
 
             return true;
         } catch (final Throwable t) {
@@ -1075,8 +1081,8 @@ public final class MusicUtils {
             LOG.info("playFDs() aborted, empty song list");
             return;
         }
-        if (musicPlaybackService == null) {
-            LOG.info("playFDs() aborted, musicPlaybackService is null");
+        if (getService() == null) {
+            LOG.info("playFDs() aborted, getService() is null");
             return;
         }
         
@@ -1097,8 +1103,8 @@ public final class MusicUtils {
      */
     private static void playFDsOnHandlerThread(final long[] list, int position, final boolean forceShuffle) {
         try {
-            musicPlaybackService.enableShuffle(forceShuffle);
-            final long currentId = musicPlaybackService.getAudioId();
+            getService().enableShuffle(forceShuffle);
+            final long currentId = getService().getAudioId();
             final int currentQueuePosition = getQueuePosition();
             if (continuedPlayingCurrentQueue(list, position, currentId, currentQueuePosition)) {
                 return;
@@ -1106,10 +1112,10 @@ public final class MusicUtils {
             if (position < 0) {
                 position = 0;
             }
-            musicPlaybackService.open(list, position);
-            musicPlaybackService.play();
+            getService().open(list, position);
+            getService().play();
         } catch (NullPointerException e) {
-            // we are getting this error because musicPlaybackService is
+            // we are getting this error because getService() is
             // a global static mutable variable, we can't do anything
             // until a full refactor in player
             LOG.error("playAll() Review code logic", e);
@@ -1124,7 +1130,7 @@ public final class MusicUtils {
             final long[] playlist = getQueue();
             if (Arrays.equals(list, playlist)) {
                 try {
-                    musicPlaybackService.play();
+                    getService().play();
                 } catch (Throwable t) {
                     t.printStackTrace();
                     return false;
@@ -1140,11 +1146,11 @@ public final class MusicUtils {
      */
 
     public static void playNext(final long[] list) {
-        if (musicPlaybackService == null || list == null) {
+        if (getService() == null || list == null) {
             return;
         }
         try {
-            musicPlaybackService.enqueue(list, MusicPlaybackService.NEXT);
+            getService().enqueue(list, MusicPlaybackService.NEXT);
         } catch (final Throwable ignored) {
         }
     }
@@ -1157,19 +1163,19 @@ public final class MusicUtils {
         Cursor cursor = new SongLoader(context).makeCursor(context);
         final long[] mTrackList = getSongListForCursor(cursor);
         final int position = 0;
-        if (mTrackList.length == 0 || musicPlaybackService == null) {
+        if (mTrackList.length == 0 || getService() == null) {
             return;
         }
         try {
-            musicPlaybackService.enableShuffle(true);
-            final long mCurrentId = musicPlaybackService.getAudioId();
+            getService().enableShuffle(true);
+            final long mCurrentId = getService().getAudioId();
             final int mCurrentQueuePosition = getQueuePosition();
 
             if (continuedPlayingCurrentQueue(mTrackList, position, mCurrentId, mCurrentQueuePosition)) {
                 return;
             }
-            musicPlaybackService.open(mTrackList, -1);
-            musicPlaybackService.play();
+            getService().open(mTrackList, -1);
+            getService().play();
             cursor.close();
         } catch (final Throwable ignored) {
         }
@@ -1513,11 +1519,11 @@ public final class MusicUtils {
      * @param list    The list to enqueue.
      */
     public static void addToQueue(final Context context, final long[] list) {
-        if (context == null || musicPlaybackService == null || list == null) {
+        if (context == null || getService() == null || list == null) {
             return;
         }
         try {
-            musicPlaybackService.enqueue(list, MusicPlaybackService.LAST);
+            getService().enqueue(list, MusicPlaybackService.LAST);
             final String message = makeLabel(context, R.plurals.NNNtrackstoqueue, list.length);
             AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
         } catch (final Throwable ignored) {
@@ -1627,8 +1633,8 @@ public final class MusicUtils {
      */
     public static String getFilePath() {
         try {
-            if (musicPlaybackService != null) {
-                return musicPlaybackService.getPath();
+            if (getService() != null) {
+                return getService().getPath();
             }
         } catch (final Throwable ignored) {
         }
@@ -1641,8 +1647,8 @@ public final class MusicUtils {
      */
     public static void moveQueueItem(final int from, final int to) {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.moveQueueItem(from, to);
+            if (getService() != null) {
+                getService().moveQueueItem(from, to);
             }
         } catch (final Throwable ignored) {
         }
@@ -1653,8 +1659,8 @@ public final class MusicUtils {
      */
     public static void toggleFavorite() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.toggleFavorite();
+            if (getService() != null) {
+                getService().toggleFavorite();
             }
         } catch (final Throwable ignored) {
         }
@@ -1665,8 +1671,8 @@ public final class MusicUtils {
      */
     public static boolean isFavorite() {
         try {
-            if (musicPlaybackService != null) {
-                return musicPlaybackService.isFavorite();
+            if (getService() != null) {
+                return getService().isFavorite();
             }
         } catch (final Throwable ignored) {
         }
@@ -1843,8 +1849,8 @@ public final class MusicUtils {
      */
     public static void refresh() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.refresh();
+            if (getService() != null) {
+                getService().refresh();
             }
         } catch (final Throwable ignored) {
         }
@@ -1871,9 +1877,9 @@ public final class MusicUtils {
      * @param position The position to seek to
      */
     public static void seek(final long position) {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                musicPlaybackService.seek(position);
+                getService().seek(position);
             } catch (final Throwable ignored) {
             }
         }
@@ -1883,9 +1889,9 @@ public final class MusicUtils {
      * @return The current position time of the track
      */
     public static long position() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.position();
+                return getService().position();
             } catch (final Throwable ignored) {
             }
         }
@@ -1896,9 +1902,9 @@ public final class MusicUtils {
      * @return The total length of the current track
      */
     public static long duration() {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                return musicPlaybackService.duration();
+                return getService().duration();
             } catch (final Throwable ignored) {
             }
         }
@@ -1909,9 +1915,9 @@ public final class MusicUtils {
      * @param position The position to move the queue to
      */
     public static void setQueuePosition(final int position) {
-        if (musicPlaybackService != null) {
+        if (getService() != null) {
             try {
-                musicPlaybackService.setQueuePosition(position);
+                getService().setQueuePosition(position);
             } catch (final Throwable ignored) {
             }
         }
@@ -1922,8 +1928,8 @@ public final class MusicUtils {
      */
     public static void clearQueue() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.removeTracks(0, Integer.MAX_VALUE);
+            if (getService() != null) {
+                getService().removeTracks(0, Integer.MAX_VALUE);
             }
         } catch (final Throwable ignored) {
         }
@@ -2104,8 +2110,8 @@ public final class MusicUtils {
 
     public static void playSimple(String path) {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.playSimple(path);
+            if (getService() != null) {
+                getService().playSimple(path);
             }
         } catch (Throwable ignored) {
         }
@@ -2113,8 +2119,8 @@ public final class MusicUtils {
 
     public static void stopSimplePlayer() {
         try {
-            if (musicPlaybackService != null) {
-                musicPlaybackService.stopSimplePlayer();
+            if (getService() != null) {
+                getService().stopSimplePlayer();
             }
         } catch (Throwable ignored) {
         }
