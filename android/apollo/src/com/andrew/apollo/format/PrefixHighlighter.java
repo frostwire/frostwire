@@ -22,6 +22,7 @@ import com.frostwire.android.R;
 /**
  * Highlights the text in a text field.
  */
+@SuppressWarnings("deprecation")
 public class PrefixHighlighter {
 
     /* Color used when highlighting the prefixes */

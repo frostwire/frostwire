@@ -37,6 +37,7 @@ import com.frostwire.android.R;
  * 
  * @author heycosmo
  */
+@SuppressWarnings("deprecation")
 public class DragSortListView extends ListView {
 
     /**
