@@ -462,9 +462,25 @@ public final class UIUtils {
         }
     }
 
+    @SuppressWarnings("deprecation") // toggleSoftInput fallback for no-focus case on API < 30
     public static void forceShowKeyboard(Context context) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
+        if (imm == null) return;
+        // Prefer showSoftInput on the focused view if available.
+        View focusedView = (context instanceof Activity) ? ((Activity) context).getCurrentFocus() : null;
+        if (focusedView != null) {
+            imm.showSoftInput(focusedView, InputMethodManager.SHOW_FORCED);
+        } else {
+            // No focused view — use WindowInsetsController when possible, otherwise
+            // fall back to the deprecated toggleSoftInput (harmless on older paths).
+            if (context instanceof Activity && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                android.view.Window window = ((Activity) context).getWindow();
+                if (window != null) {
+                    window.getInsetsController().show(android.view.WindowInsets.Type.ime());
+                    return;
+                }
+            }
+            //noinspection deprecation
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         }
     }
@@ -496,7 +512,12 @@ public final class UIUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         activity.startActivity(intent);
         activity.finish();
-        activity.overridePendingTransition(0, 0);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_CLOSE, 0, 0);
+        } else {
+            //noinspection deprecation
+            activity.overridePendingTransition(0, 0);
+        }
     }
 
     /**
@@ -571,9 +592,22 @@ public final class UIUtils {
         return PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
     }
 
+    @SuppressWarnings("deprecation") // Display.getMetrics fallback for API < 30
     public static double getScreenInches(Activity activity) {
         DisplayMetrics dm = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.util.DisplayMetrics wm = activity.getWindowManager()
+                    .getCurrentWindowMetrics().getBounds() != null ? null : null;
+            // Use WindowMetrics bounds + display density for accurate physial size
+            android.graphics.Rect bounds = activity.getWindowManager()
+                    .getCurrentWindowMetrics().getBounds();
+            dm.widthPixels = bounds.width();
+            dm.heightPixels = bounds.height();
+            dm.xdpi = activity.getResources().getDisplayMetrics().xdpi;
+            dm.ydpi = activity.getResources().getDisplayMetrics().ydpi;
+        } else {
+            activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        }
         double x_sq = Math.pow(dm.widthPixels / dm.xdpi, 2);
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
         // Thank you Pitagoras
