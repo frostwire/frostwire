@@ -23,6 +23,7 @@ import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -210,7 +211,7 @@ public class NotificationHelper {
             synchronized (NOTIFICATION_LOCK) {
                 mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
             }
-            mService.stopForeground(true);
+            mService.stopForeground(Service.STOP_FOREGROUND_REMOVE);
             mNotification = null;
         }
     }

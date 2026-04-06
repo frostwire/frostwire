@@ -1081,14 +1081,9 @@ public class MusicPlaybackService extends Service {
         boolean isStopped = isStopped();
         if (removeNotification) {
             updateRemoteControlClient(PLAYSTATE_STOPPED);
-            stopForeground(true);
-
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
-                    Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
-                stopService(new Intent(this, MusicPlaybackService.class));
-            }
+            stopForeground(STOP_FOREGROUND_REMOVE);
         } else {
-            stopForeground(isStopped);
+            stopForeground(isStopped ? STOP_FOREGROUND_REMOVE : STOP_FOREGROUND_DETACH);
         }
     }
 
