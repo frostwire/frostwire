@@ -44,6 +44,7 @@ import java.lang.ref.WeakReference;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  */
+@SuppressWarnings("deprecation")
 public class RenamePlaylist extends BasePlaylistDialog {
 
     private static Logger LOG = Logger.getLogger(RenamePlaylist.class);

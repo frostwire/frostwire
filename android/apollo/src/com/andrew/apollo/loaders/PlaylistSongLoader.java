@@ -34,6 +34,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public class PlaylistSongLoader extends SongLoader {
     /**
      * The Id of the playlist the songs belong to.

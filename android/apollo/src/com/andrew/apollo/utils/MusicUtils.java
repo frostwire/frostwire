@@ -92,6 +92,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);

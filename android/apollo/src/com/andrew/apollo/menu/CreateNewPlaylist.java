@@ -35,6 +35,7 @@ import com.frostwire.android.R;
  *         actions, but it really needs to work either way. As in, capitalized
  *         or not.
  */
+@SuppressWarnings("deprecation")
 public final class CreateNewPlaylist extends BasePlaylistDialog {
 
     // The playlist list
