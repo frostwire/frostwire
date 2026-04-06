@@ -43,6 +43,7 @@ import java.util.TreeSet;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public final class Debug {
 
     private Debug() {

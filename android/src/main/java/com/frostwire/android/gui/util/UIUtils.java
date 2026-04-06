@@ -505,6 +505,7 @@ public final class UIUtils {
         }
     }
 
+    @SuppressWarnings("deprecation") // overridePendingTransition fallback for API < 34
     public static void goToFrostWireMainActivity(Activity activity) {
         final Intent intent = new Intent(activity, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
