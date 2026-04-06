@@ -76,6 +76,7 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Jose Molina (@votaguz)
  */
+@SuppressWarnings("deprecation")
 public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         extends Fragment implements
         LoaderManager.LoaderCallbacks<List<I>>,

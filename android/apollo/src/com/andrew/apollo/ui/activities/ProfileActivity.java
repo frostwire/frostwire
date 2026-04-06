@@ -69,6 +69,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public final class ProfileActivity extends BaseActivity implements OnPageChangeListener, Listener {
 
     /**
