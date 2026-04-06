@@ -55,6 +55,7 @@ import java.util.List;
  * @author marcelinkaaa
  */
 
+@SuppressWarnings("deprecation")
 public class TransferDetailDetailsFragment extends AbstractTransferDetailFragment {
     private TextView storagePath;
     private ImageView sequentialDividerLine;

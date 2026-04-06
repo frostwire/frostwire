@@ -48,6 +48,7 @@ import java.text.MessageFormat;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public final class ApplicationPreferencesFragment extends AbstractPreferenceFragment implements AbstractDialog.OnDialogClickListener {
 
     private static final Logger LOG = Logger.getLogger(ApplicationPreferencesFragment.class);

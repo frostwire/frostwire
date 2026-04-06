@@ -88,6 +88,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";

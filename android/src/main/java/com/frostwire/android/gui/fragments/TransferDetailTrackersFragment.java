@@ -51,6 +51,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * @author marcelinkaaa
  */
 
+@SuppressWarnings("deprecation")
 public class TransferDetailTrackersFragment extends AbstractTransferDetailFragment {
     public TransferDetailTrackersFragment() {
         super(R.layout.fragment_transfer_detail_trackers);

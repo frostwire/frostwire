@@ -51,6 +51,7 @@ import java.util.List;
  * @author aldenml
  * @author marcelinkaaa
  */
+@SuppressWarnings("deprecation")
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     //private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private final List<Slide> slides;
