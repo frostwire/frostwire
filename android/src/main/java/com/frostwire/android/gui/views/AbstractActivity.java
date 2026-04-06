@@ -50,6 +50,7 @@ import androidx.appcompat.widget.Toolbar;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractActivity extends AppCompatActivity {
 
     private final int layoutResId;
@@ -65,6 +66,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         this.paused = false;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
