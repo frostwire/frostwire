@@ -66,6 +66,7 @@ import com.frostwire.util.Logger;
  * {@sample frameworks/support/samples/Support4Demos/src/main/res/layout/fragment_pager_list.xml
  *      complete}
  */
+@SuppressWarnings("deprecation")
 public abstract class FragmentPagerAdapter extends PagerAdapter {
     private static final Logger LOG = Logger.getLogger(FragmentPagerAdapter.class);
     private static final String TAG = "FragmentPagerAdapter";

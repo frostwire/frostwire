@@ -37,6 +37,7 @@ import com.frostwire.android.gui.views.preference.CustomSeekBarPreference.Custom
 import com.frostwire.android.gui.views.preference.PortRangePreference;
 import com.frostwire.bittorrent.BTEngine;
 
+@SuppressWarnings("deprecation")
 public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
     public TorrentPreferenceFragment() {

@@ -45,6 +45,7 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public final class ShortcutActivity extends AppCompatActivity {
 
     /**

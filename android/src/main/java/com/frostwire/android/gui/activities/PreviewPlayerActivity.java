@@ -297,11 +297,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
 
+    @SuppressWarnings("deprecation") // FLAG_FULLSCREEN: no WindowInsetsController equivalent in this context
     private void toggleFullScreen(TextureView v) {
         videoSizeSetupDone = false;
-        DisplayMetrics metrics = new DisplayMetrics();
-        final Display defaultDisplay = getWindowManager().getDefaultDisplay();
-        defaultDisplay.getMetrics(metrics);
+        DisplayMetrics metrics = getDisplayMetricsCompat();
 
         final FrameLayout frameLayout = findView(R.id.activity_preview_player_framelayout);
         LinearLayout.LayoutParams frameLayoutParams = (LinearLayout.LayoutParams) frameLayout.getLayoutParams();
@@ -369,9 +368,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         int videoWidth = androidMediaPlayer.getVideoWidth();
         int videoHeight = androidMediaPlayer.getVideoHeight();
         final TextureView v = findView(R.id.activity_preview_player_videoview);
-        DisplayMetrics metrics = new DisplayMetrics();
-        final Display defaultDisplay = getWindowManager().getDefaultDisplay();
-        defaultDisplay.getMetrics(metrics);
+        DisplayMetrics metrics = getDisplayMetricsCompat();
 
         final android.widget.FrameLayout.LayoutParams params = (android.widget.FrameLayout.LayoutParams) v.getLayoutParams();
 
@@ -414,6 +411,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
+    @SuppressWarnings("deprecation") // abandonAudioFocus(listener) fallback for API < 26
     private void releaseMediaPlayer() {
         if (androidMediaPlayer != null) {
             androidMediaPlayer.stop();
@@ -427,7 +425,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
             AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
             if (audioManager != null) {
-                audioManager.abandonAudioFocus(this);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && mAudioFocusRequest != null) {
+                    audioManager.abandonAudioFocusRequest(mAudioFocusRequest);
+                } else {
+                    //noinspection deprecation
+                    audioManager.abandonAudioFocus(this);
+                }
             }
         }
     }
@@ -457,7 +460,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 androidMediaPlayer.setOnPreparedListener(contextRef.get());
                 androidMediaPlayer.setOnVideoSizeChangedListener(contextRef.get());
                 androidMediaPlayer.setOnInfoListener(contextRef.get());
-                androidMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                androidMediaPlayer.setAudioAttributes(
+                        new android.media.AudioAttributes.Builder()
+                                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
+                                .build());
                 androidMediaPlayer.prepare();
                 androidMediaPlayer.start();
                 if (MusicUtils.isPlaying()) {
@@ -519,11 +526,25 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         finish();
     }
 
+    private android.media.AudioFocusRequest mAudioFocusRequest;
+
     @Override
+    @SuppressWarnings("deprecation") // requestAudioFocus(listener) fallback for API < 26
     public void onPrepared(MediaPlayer mp) {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (am != null) {
-            am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                mAudioFocusRequest = new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                        .setAudioAttributes(new android.media.AudioAttributes.Builder()
+                                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
+                                .build())
+                        .build();
+                am.requestAudioFocus(mAudioFocusRequest);
+            } else {
+                //noinspection deprecation
+                am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            }
         }
 
         final ImageView img = findView(R.id.activity_preview_player_thumbnail);
@@ -629,6 +650,21 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     protected void onStop() {
         super.onStop();
         changedActionBarTitleToNonBuffering = false;
+    }
+
+    @SuppressWarnings("deprecation")
+    private DisplayMetrics getDisplayMetricsCompat() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.graphics.Rect bounds = getWindowManager().getCurrentWindowMetrics().getBounds();
+            metrics.widthPixels = bounds.width();
+            metrics.heightPixels = bounds.height();
+            metrics.xdpi = getResources().getDisplayMetrics().xdpi;
+            metrics.ydpi = getResources().getDisplayMetrics().ydpi;
+        } else {
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        }
+        return metrics;
     }
 
     @Override

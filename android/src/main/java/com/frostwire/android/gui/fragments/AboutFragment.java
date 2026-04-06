@@ -50,6 +50,7 @@ import static com.frostwire.android.gui.util.UIUtils.setupClickUrl;
  * @author aldenml
  * @author marcelinkaaa
  */
+@SuppressWarnings("deprecation")
 public final class AboutFragment extends AbstractFragment {
 
     public AboutFragment() {
@@ -108,7 +109,10 @@ public final class AboutFragment extends AbstractFragment {
         setupClickUrl(contactUs, Constants.CONTACT_US_URL);
 
         TextView content = findView(rootView, R.id.fragment_about_content);
-        content.setText(Html.fromHtml(getAboutText()));
+        String aboutHtml = getAboutText();
+        content.setText(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
+                ? Html.fromHtml(aboutHtml, android.text.Html.FROM_HTML_MODE_LEGACY)
+                : android.text.Html.fromHtml(aboutHtml));
         content.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {

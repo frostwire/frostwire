@@ -26,6 +26,7 @@ import android.content.DialogInterface;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public class MenuBuilder implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
 
     private final MenuAdapter adapter;
@@ -56,6 +57,7 @@ public class MenuBuilder implements DialogInterface.OnClickListener, DialogInter
 
         //builder.setTitle(adapter.getTabTitle());
         builder.setAdapter(adapter, this);
+        //noinspection deprecation — setInverseBackgroundForced has no replacement
         builder.setInverseBackgroundForced(true);
 
         dialog = builder.create();

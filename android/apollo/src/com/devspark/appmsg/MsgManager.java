@@ -35,6 +35,7 @@ import java.util.Queue;
  * @author Evgeny Shishkin
  * @author Angel Leon
  */
+@SuppressWarnings("deprecation")
 class MsgManager extends Handler {
 
     private static final int MESSAGE_DISPLAY = 0xc2007;

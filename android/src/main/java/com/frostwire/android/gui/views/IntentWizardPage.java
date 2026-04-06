@@ -39,6 +39,7 @@ import com.frostwire.android.gui.util.UIUtils;
  * @author aldenml
  * 
  */
+@SuppressWarnings("deprecation")
 public class IntentWizardPage extends RelativeLayout implements WizardPageView {
     private final CheckAcceptListener checkAcceptListener;
     private CheckBox checkCopyrightAccept;
@@ -91,7 +92,10 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
         TextView tosTextView = findViewById(R.id.view_intent_wizard_page_text_tos);
         tosTextView.setMovementMethod(LinkMovementMethod.getInstance());
         final String tou = r.getString(R.string.terms_of_use);
-        tosTextView.setText(Html.fromHtml("<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>"));
+        String tosHtml = "<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>";
+        tosTextView.setText(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
+                ? android.text.Html.fromHtml(tosHtml, android.text.Html.FROM_HTML_MODE_LEGACY)
+                : android.text.Html.fromHtml(tosHtml));
     }
 
     protected void onComplete(boolean complete) {

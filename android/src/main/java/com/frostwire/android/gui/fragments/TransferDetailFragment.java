@@ -46,6 +46,7 @@ import com.frostwire.transfers.TransferState;
  * @author aldenml
  * @author marcelinkaaa
  */
+@SuppressWarnings("deprecation")
 public final class TransferDetailFragment extends AbstractFragment {
 
     private UIBittorrentDownload uiBittorrentDownload;

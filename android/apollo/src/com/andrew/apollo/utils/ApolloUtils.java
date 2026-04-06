@@ -47,6 +47,7 @@ import java.lang.ref.WeakReference;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public final class ApolloUtils {
 
     /* This class is never initiated */

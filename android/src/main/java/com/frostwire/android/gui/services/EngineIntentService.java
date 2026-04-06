@@ -56,6 +56,7 @@ import okhttp3.ConnectionPool;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public class EngineIntentService extends JobIntentService implements IEngineService {
     // members:
     private static final Logger LOG = Logger.getLogger(EngineIntentService.class);
@@ -206,14 +207,16 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
             PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification notification = new NotificationCompat.Builder(context, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+             NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setWhen(System.currentTimeMillis())
                     .setContentText(getString(R.string.download_finished))
                     .setContentTitle(getString(R.string.download_finished))
                     .setSmallIcon(getNotificationIcon())
-                    .setContentIntent(pi)
-                    .build();
-            notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
+                    .setContentIntent(pi);
+            if (ConfigurationManager.instance().vibrateOnFinishedDownload()) {
+                notifBuilder.setVibrate(VENEZUELAN_VIBE);
+            }
+            Notification notification = notifBuilder.build();
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             if (manager != null) {

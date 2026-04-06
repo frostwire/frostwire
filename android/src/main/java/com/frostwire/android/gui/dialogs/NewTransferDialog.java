@@ -71,11 +71,18 @@ public class NewTransferDialog extends AbstractDialog {
     }
 
     @Override
+    @SuppressWarnings("deprecation") // android.R.string.yes/no deprecated API 35; no app-defined equivalent
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
 
         Bundle args = getArguments();
 
-        SearchResultData data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
+        SearchResultData data;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            data = args.getSerializable(SEARCH_RESULT_DATA_KEY, SearchResultData.class);
+        } else {
+            //noinspection deprecation
+            data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
+        }
         boolean hideCheckShow = args.getBoolean(HIDE_CHECK_SHOW_KEY);
 
         dlg.setContentView(R.layout.dialog_default_checkbox);

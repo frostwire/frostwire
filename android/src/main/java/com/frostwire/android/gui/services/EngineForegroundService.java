@@ -289,7 +289,7 @@ public class EngineForegroundService extends Service implements IEngineService {
             notificationUpdateDaemon.stop();
         }
         stopServices(false);
-        stopForeground(true);
+        stopForeground(Service.STOP_FOREGROUND_REMOVE);
         stopSelf();
     }
 

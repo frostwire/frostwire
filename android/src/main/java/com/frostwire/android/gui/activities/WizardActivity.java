@@ -122,6 +122,7 @@ public class WizardActivity extends AbstractActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
         final View view = viewFlipper.getCurrentView();

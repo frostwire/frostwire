@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
     public static final int FAVORITE_PLAYLIST_ID = -1;
     public static final int LAST_ADDED_PLAYLIST_ID = -2;

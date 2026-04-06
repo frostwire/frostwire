@@ -61,7 +61,7 @@ public abstract class ImageWorker {
         Resources mResources = mContext.getResources();
         BitmapDrawable mDefaultArtwork;
         if (mResources != null) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) mResources.getDrawable(R.drawable.default_artwork);
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) androidx.core.content.ContextCompat.getDrawable(mContext, R.drawable.default_artwork);
             if (bitmapDrawable != null) {
                 mDefault = bitmapDrawable.getBitmap();
                 mDefaultArtwork = new BitmapDrawable(mResources, mDefault);

@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public final class TimerSubscription {
 
     private static final Logger LOG = Logger.getLogger(TimerSubscription.class);

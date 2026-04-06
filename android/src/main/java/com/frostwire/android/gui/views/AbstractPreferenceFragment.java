@@ -38,6 +38,7 @@ import androidx.preference.TwoStatePreference;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompat {
 
     protected static final String DIALOG_FRAGMENT_TAG =

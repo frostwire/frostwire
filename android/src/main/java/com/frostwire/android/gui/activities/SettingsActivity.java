@@ -39,6 +39,7 @@ import androidx.preference.PreferenceFragment;
  * @author aldenml
  * @author grzesiekrzaca
  */
+@SuppressWarnings("deprecation")
 public final class SettingsActivity extends AbstractActivity
         implements PreferenceFragment.OnPreferenceStartFragmentCallback {
 

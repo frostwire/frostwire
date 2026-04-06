@@ -35,6 +35,7 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 class StopListener implements View.OnLongClickListener {
     private WeakReference<Activity> activityRef;
     private final boolean finishOnStop;

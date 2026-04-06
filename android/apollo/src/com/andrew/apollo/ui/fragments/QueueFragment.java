@@ -51,6 +51,7 @@ import java.util.List;
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
  */
+@SuppressWarnings("deprecation")
 public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
         implements DropListener, RemoveListener, DragScrollProfile {
 

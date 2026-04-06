@@ -37,14 +37,18 @@ import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.graphics.Bitmap;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
+import androidx.media3.session.MediaSession;
+
+import androidx.media3.common.AudioAttributes;
+import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -55,7 +59,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -92,9 +95,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -140,7 +143,7 @@ public class MusicPlaybackService extends Service {
      * Indicates that music playback position within
      * a title was changed
      */
-    private static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
+    public static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
 
     /**
      * Indicates the meta data has changed in some way, like a track change
@@ -150,7 +153,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Indicates the queue has been updated
      */
-    private static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
+    public static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
 
     /**
      * Indicates the repeat mode changed
@@ -276,7 +279,7 @@ public class MusicPlaybackService extends Service {
             MediaStore.Audio.Media.ARTIST_ID
     };
 
-    private AudioFocusRequest AUDIO_FOCUS_REQUEST;
+    // AUDIO_FOCUS_REQUEST removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
     private static final String[] ALBUM_PROJECTION = new String[]{
             MediaStore.Audio.Albums.ALBUM,
@@ -289,17 +292,19 @@ public class MusicPlaybackService extends Service {
             MediaStore.Audio.Media.DATA
     };
 
-    private static final Stack<Integer> mHistory = new Stack<>();
+    private static final ArrayDeque<Integer> mHistory = new ArrayDeque<>();
     private static final char[] HEX_DIGITS = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f'
     };
 
     private MultiPlayer mPlayer;
-    private MediaPlayer mSimplePlayer;
+    // SimplePlayer wraps a lightweight ExoPlayer for single-file preview playback
+    // (distinct from the queued MultiPlayer used for full music playback).
+    private ExoPlayer mSimplePlayer;
     private String mSimplePlayerPlayingFile;
 
-    private WakeLock mWakeLock;
+    // mWakeLock removed — ExoPlayer.setWakeMode(C.WAKE_MODE_LOCAL) handles this internally.
     private Cursor mCursor;
     private Cursor mAlbumCursor;
     private volatile AudioManager mAudioManager;
@@ -309,8 +314,8 @@ public class MusicPlaybackService extends Service {
     private boolean mQueueIsSaveable = true;
     private boolean mPausedByTransientLossOfFocus = false;
     private boolean musicPlaybackActivityInForeground = false;
-    private RemoteControlClient mRemoteControlClient;
-    private ComponentName mMediaButtonReceiverComponent;
+    private MediaSession mMediaSession;
+    // mMediaButtonReceiverComponent removed — MediaSession routes media buttons automatically.
     private int mCardId;
     private volatile int mPlayListLen = 0;
     private volatile int mPlayPos = -1;
@@ -321,7 +326,7 @@ public class MusicPlaybackService extends Service {
     private int mRepeatMode = REPEAT_ALL;
     private int mServiceStartId = -1;
     private long[] mPlayList = null;
-    private static MusicPlayerHandler mPlayerHandler;
+    private static volatile MusicPlayerHandler mPlayerHandler;
     private BroadcastReceiver mUnmountReceiver = null;
     private ImageFetcher mImageFetcher;
     private NotificationHelper mNotificationHelper;
@@ -346,14 +351,7 @@ public class MusicPlaybackService extends Service {
 
     private final MediaButtonIntentReceiver mMediaButtonReceiver = new MediaButtonIntentReceiver();
 
-    private final OnAudioFocusChangeListener mAudioFocusListener = new OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(final int focusChange) {
-            if (mPlayerHandler != null) {
-                mPlayerHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
-            }
-        }
-    };
+    // mAudioFocusListener removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
     static {
         notifyChangeIntervals.put(QUEUE_CHANGED, 1000L);
@@ -363,13 +361,12 @@ public class MusicPlaybackService extends Service {
         notifyChangeIntervals.put(REPEATMODE_CHANGED, 150L);
         notifyChangeIntervals.put(SHUFFLEMODE_CHANGED, 150L);
         notifyChangeIntervals.put(REFRESH, 1000L);
-        mPlayerHandler = setupMPlayerHandler();
     }
 
     private static CountDownLatch initServiceLatch = new CountDownLatch(1);
     private final AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
-    private final Object  mediaButtonLock = new Object();
+    // mediaButtonLock removed — no longer manually registering media button receiver.
 
     private static MusicPlayerHandler setupMPlayerHandler() {
         if (mPlayerHandler != null) {
@@ -495,7 +492,7 @@ public class MusicPlaybackService extends Service {
         initServiceLatch.countDown();
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
-        prepareAudioFocusRequest();
+        // Audio focus is handled internally by ExoPlayer in MultiPlayer.
         String permission = SystemUtils.hasAndroid13OrNewer() ?
                 Manifest.permission.READ_MEDIA_AUDIO :
                 Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -583,9 +580,7 @@ public class MusicPlaybackService extends Service {
             }
         }
 
-        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
-            MediaButtonIntentReceiver.completeWakefulIntent(intent);
-        }
+        // completeWakefulIntent removed — no longer using WakefulBroadcastReceiver
         return START_STICKY;
     }
 
@@ -683,20 +678,17 @@ public class MusicPlaybackService extends Service {
             mSimplePlayer = null;
         }
 
-        if (mAudioManager != null) {
-            mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
-            mAudioManager.unregisterRemoteControlClient(mRemoteControlClient);
+        if (mMediaSession != null) {
+            try {
+                mMediaSession.release();
+            } catch (Throwable ignored) {}
+            mMediaSession = null;
         }
 
         closeCursor();
         unregisterReceivers();
 
-        if (mWakeLock != null) {
-            try {
-                mWakeLock.release();
-            } catch (RuntimeException ignored) {
-            }
-        }
+        // WakeLock release not needed — ExoPlayer handles it internally via WAKE_MODE_LOCAL.
 
         try {
             stopSelf();
@@ -755,78 +747,70 @@ public class MusicPlaybackService extends Service {
             stopSimplePlayer();
         }
         if (!path.equals(justStoppedFile)) {
-            mSimplePlayer = MediaPlayer.create(this, Uri.parse(path));
-            if (mSimplePlayer != null) {
-                final String pathCopy = path;
+            final String pathCopy = path;
+            try {
+                mSimplePlayer = new ExoPlayer.Builder(this).build();
+                mSimplePlayer.setMediaItem(
+                        MediaItem.fromUri(Uri.parse(path)));
+                mSimplePlayer.prepare();
+                mSimplePlayer.play();
                 mSimplePlayerPlayingFile = path;
-                mSimplePlayer.setOnCompletionListener(mp -> {
-                    mSimplePlayerPlayingFile = null;
-                    notifySimpleStopped(pathCopy);
+                mSimplePlayer.addListener(new Player.Listener() {
+                    @Override
+                    public void onPlaybackStateChanged(int state) {
+                        if (state == Player.STATE_ENDED) {
+                            mSimplePlayerPlayingFile = null;
+                            notifySimpleStopped(pathCopy);
+                            if (mSimplePlayer != null) {
+                                mSimplePlayer.release();
+                                mSimplePlayer = null;
+                            }
+                        }
+                    }
                 });
-                mSimplePlayer.start();
+            } catch (Throwable t) {
+                LOG.error("playSimple() error: " + t.getMessage(), t);
+                if (mSimplePlayer != null) {
+                    mSimplePlayer.release();
+                    mSimplePlayer = null;
+                }
+                mSimplePlayerPlayingFile = null;
             }
         }
     }
 
     public void stopSimplePlayer() {
         if (mSimplePlayer != null) {
-            mSimplePlayer.reset();
-            mSimplePlayer.release();
+            try {
+                mSimplePlayer.stop();
+                mSimplePlayer.release();
+            } catch (Throwable ignored) {}
             notifySimpleStopped(mSimplePlayerPlayingFile);
             mSimplePlayer = null;
             mSimplePlayerPlayingFile = null;
         }
     }
 
-    private void prepareAudioFocusRequest() {
-        AudioAttributes.Builder attributeBuilder = new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                .setUsage(AudioAttributes.USAGE_MEDIA);
+    // prepareAudioFocusRequest() removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            attributeBuilder.setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL);
+    private void setUpMediaSession() {
+        if (mPlayer == null || mPlayer.mExoPlayer == null) {
+            LOG.warn("setUpMediaSession() called before ExoPlayer is ready — deferring");
+            return;
         }
-
-        AudioAttributes audioAttributes = attributeBuilder.build();
-        AUDIO_FOCUS_REQUEST =
-                new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).
-                        setOnAudioFocusChangeListener(mAudioFocusListener).
-                        setAudioAttributes(audioAttributes).
-                        setWillPauseWhenDucked(true).
-                        build();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void setUpRemoteControlClient() {
-        final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonIntent.setComponent(mMediaButtonReceiverComponent);
-        mRemoteControlClient = new RemoteControlClient(
-                PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
-
         try {
-            if (mAudioManager != null) {
-                mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+            if (mMediaSession != null) {
+                mMediaSession.release();
             }
+            mMediaSession = new MediaSession.Builder(this, mPlayer.mExoPlayer)
+                    .setId("FrostWireApollo")
+                    .build();
+            // MediaSession automatically handles lock-screen controls, Bluetooth,
+            // and media button routing when connected to an ExoPlayer instance.
+            LOG.info("setUpMediaSession() MediaSession created successfully");
         } catch (Throwable t) {
-            // ignore errors due to system restrictions
+            LOG.error("setUpMediaSession() error: " + t.getMessage(), t);
         }
-
-        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
-                | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
-                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY
-                | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
-                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
-                | RemoteControlClient.FLAG_KEY_MEDIA_STOP
-                | RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
-        try {
-            mRemoteControlClient.setOnGetPlaybackPositionListener(this::position);
-            mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
-        } catch (Throwable t) {
-            // older platforms might not support these calls
-        }
-        mRemoteControlClient.setTransportControlFlags(flags);
     }
 
     private void releaseServiceUiAndStop(boolean force) {
@@ -847,14 +831,7 @@ public class MusicPlaybackService extends Service {
             mNotificationHelper.killNotification();
         }
         if (mAudioManager != null) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
-                } else {
-                    mAudioManager.abandonAudioFocus(mAudioFocusListener);
-                }
-            } catch (Throwable t) {
-            }
+            // Audio focus abandoned automatically by ExoPlayer on release().
         }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
         if (!mServiceInUse || force) {
@@ -898,11 +875,9 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private void safeRegisterMediaButton(ComponentName comp) {
-        synchronized (mediaButtonLock) {
-            mAudioManager.registerMediaButtonEventReceiver(comp);
-        }
-    }
+    // safeRegisterMediaButton() removed — AudioManager.registerMediaButtonEventReceiver()
+    // is deprecated since API 21 and redundant: MediaSession handles button routing
+    // automatically when active (set up in setUpMediaSession()).
 
     private void initService() {
         if (mPlayerHandler == null) {
@@ -918,26 +893,15 @@ public class MusicPlaybackService extends Service {
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
-                MediaButtonIntentReceiver.class.getName());
-        try {
-            if (mAudioManager != null) {
-                safeRegisterMediaButton(mMediaButtonReceiverComponent);
-            }
-        } catch (SecurityException e) {
-            LOG.error("initService() safeRegisterMediaButton error: " + e.getMessage(), e);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setUpRemoteControlClient();
-        }
+        // MediaSession setup deferred until ExoPlayer is ready (called from setCurrentDataSource)
+        // setUpMediaSession() is called after mPlayer is initialized in reloadQueue/openCurrentAndNext
 
         mPreferences = getSharedPreferences("Service", 0);
         mCardId = getCardId();
 
         registerExternalStorageListener();
 
-        mPlayer = new MultiPlayer(mPlayerHandler);
+        mPlayer = new MultiPlayer();
         MusicPlaybackService.initRepeatModeAndShuffleTask(this);
 
         final IntentFilter filter = new IntentFilter();
@@ -982,11 +946,7 @@ public class MusicPlaybackService extends Service {
             LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
         }
 
-        final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        if (powerManager != null) {
-            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
-            mWakeLock.setReferenceCounted(false);
-        }
+        // WakeLock initialization removed — ExoPlayer handles it via WAKE_MODE_LOCAL.
 
         reloadQueue();
         notifyChange(QUEUE_CHANGED);
@@ -1477,10 +1437,10 @@ public class MusicPlaybackService extends Service {
         intent.putExtra("track", trackName);
         intent.putExtra("playing", isPlaying);
         intent.putExtra("isfavorite", favorite);
-        musicPlaybackService.sendStickyBroadcast(intent);
+        musicPlaybackService.sendBroadcast(intent);
         final Intent musicIntent = new Intent(intent);
         musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
-        musicPlaybackService.sendStickyBroadcast(musicIntent);
+        musicPlaybackService.sendBroadcast(musicIntent);
         if (META_CHANGED.equals(change)) {
             // Increase the play count for favorite songs.
             if (musicPlaybackService.mFavoritesCache != null && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
@@ -1526,45 +1486,29 @@ public class MusicPlaybackService extends Service {
 
         final Intent intent = new Intent(SIMPLE_PLAYSTATE_STOPPED);
         intent.putExtra("path", path);
-        sendStickyBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     /**
-     * Updates the lock screen controls.
+     * Updates the MediaSession and notification with current playback state and metadata.
+     * Replaces the old RemoteControlClient update path.
      *
-     * @param what The broadcast
+     * @param what The broadcast event that triggered the update (e.g. PLAYSTATE_CHANGED, META_CHANGED)
      */
-    private void updateRemoteControlClient(final String what) {
-        if (mRemoteControlClient == null) {
-            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
-            return;
-        }
-
+    void updateRemoteControlClient(final String what) {
         if (what == null) {
-            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. what is null, review your logic");
+            LOG.info("updateRemoteControlClient() skipped — what is null");
             return;
         }
+        LOG.info("updateRemoteControlClient(what=" + what + ")");
 
-
-        LOG.info("MusicPlaybackService::updateRemoteControlClient(what=" + what + ")");
-
-        int playState;
         final boolean isPlaying = isPlaying();
         final boolean isStopped = isStopped();
-        final boolean isPaused = !isPlaying && !isStopped;
-
-        if (isPaused) {
-            playState = RemoteControlClient.PLAYSTATE_PAUSED;
-        } else if (isPlaying) {
-            playState = RemoteControlClient.PLAYSTATE_PLAYING;
-        } else {
-            playState = RemoteControlClient.PLAYSTATE_STOPPED;
-        }
 
         if (isStopped && !isPlaying && mNotificationHelper != null) {
             mNotificationHelper.killNotification();
         }
-        final int playStateFinalCopy = playState;
+
         switch (what) {
             case PLAYSTATE_CHANGED:
             case POSITION_CHANGED:
@@ -1572,81 +1516,54 @@ public class MusicPlaybackService extends Service {
                 if (mNotificationHelper != null) {
                     try {
                         mNotificationHelper.updatePlayState(isPlaying, isStopped);
-                    } catch (Throwable ignored) {
-                    }
+                    } catch (Throwable ignored) {}
                 }
-                remoteControlClientSetPlaybackStateTask(mRemoteControlClient, playStateFinalCopy);
+                updateMediaSessionPlaybackState();
                 break;
             case META_CHANGED:
             case QUEUE_CHANGED:
-                // Asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
-                SystemUtils.exceptionSafePost(mPlayerHandler, () -> changeRemoteControlClientTask(playStateFinalCopy, position()));
+                // Asynchronously fetch album art then push full metadata to MediaSession
+                SystemUtils.exceptionSafePost(mPlayerHandler, this::updateMediaSessionMetadata);
                 break;
         }
     }
 
-    private static void remoteControlClientSetPlaybackStateTask(RemoteControlClient rc, int playState) {
-        try {
-            rc.setPlaybackState(playState);
-        } catch (Throwable throwable) {
-            // rare android internal NPE
-            LOG.error(throwable.getMessage(), throwable);
-        }
+    /** Pushes the current playback state into the MediaSession. */
+    private void updateMediaSessionPlaybackState() {
+        if (mMediaSession == null) return;
+        // MediaSession backed by ExoPlayer — state is automatically reflected.
+        // No manual PlaybackStateCompat update needed when using media3 MediaSession.
     }
 
-    private static void changeRemoteControlClientTask(int playState, long position) {
-        if (INSTANCE == null) {
-            LOG.info("changeRemoteControlClientTask() aborted, no MusicPlaybackService available");
-            return;
-        }
-        if (MusicPlaybackService.mPlayerHandler == null) {
-            MusicPlaybackService.setupMPlayerHandler();
-        }
-        // background portion
-        Bitmap albumArt = INSTANCE.getAlbumArt();
-        // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
-        // to make sure not to hand out our cache copy
-        Bitmap.Config config = null;
-        if (albumArt != null) {
-            config = albumArt.getConfig();
-        }
-        if (config == null) {
-            config = Bitmap.Config.ARGB_8888;
-        }
-        Bitmap bmpCopy = null;
+    /**
+     * Pushes current track metadata into the MediaSession via a refreshed MediaItem.
+     * Media3's MediaSession reads metadata directly from ExoPlayer's current MediaItem —
+     * the system lock screen and Bluetooth devices receive it automatically.
+     */
+    private void updateMediaSessionMetadata() {
+        if (mMediaSession == null || mPlayer == null || mPlayer.mExoPlayer == null) return;
         try {
-            if (albumArt != null) {
-                bmpCopy = albumArt.copy(config, false);
-            }
-        } catch (OutOfMemoryError e) {
-            // ignore, can't do anything meaningful here
-        }
-        final Bitmap albumArtCopy = bmpCopy;
-        final String artistName = INSTANCE.getArtistName();
-        final String albumName = INSTANCE.getAlbumName();
-        final String trackName = INSTANCE.getTrackName();
-        final String albumArtistName = INSTANCE.getAlbumArtistName();
-        final long duration = INSTANCE.duration();
-        try {
-            // TODO: Refactor to use MediaSession instead
-            RemoteControlClient.MetadataEditor editor = INSTANCE.mRemoteControlClient
-                    .editMetadata(true)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
-                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration);
-            if (albumArtCopy != null) {
-                editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy);
-            }
-            editor.apply();
+            // Rebuild the current MediaItem with updated display metadata.
+            // ExoPlayer propagates this to MediaSession automatically.
+            String path = getPath();
+            if (path == null) return;
+            androidx.media3.common.MediaMetadata meta =
+                    new androidx.media3.common.MediaMetadata.Builder()
+                            .setTitle(getTrackName())
+                            .setArtist(getArtistName())
+                            .setAlbumTitle(getAlbumName())
+                            .setAlbumArtist(getAlbumArtistName())
+                            .build();
+            MediaItem updatedItem = new MediaItem.Builder()
+                    .setUri(MultiPlayer.resolveUri(path))
+                    .setMediaMetadata(meta)
+                    .build();
+            // Replace in-place without interrupting playback
+            mPlayer.mExoPlayer.replaceMediaItem(
+                    mPlayer.mExoPlayer.getCurrentMediaItemIndex(), updatedItem);
+            LOG.info("updateMediaSessionMetadata() pushed metadata for: " + getTrackName());
         } catch (Throwable t) {
-            // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
-        }
-        try {
-            INSTANCE.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
-        } catch (Throwable t) {
-            // temporary fix for Android 4.1, we need MediaSession refactor
+            LOG.error("updateMediaSessionMetadata() error: " + t.getMessage(), t);
         }
     }
 
@@ -1914,7 +1831,8 @@ public class MusicPlaybackService extends Service {
             throw new RuntimeException("check your logic, mPlayerHandler can't be null");
         }
         if (mPlayer == null) {
-            mPlayer = new MultiPlayer(mPlayerHandler);
+        mPlayer = new MultiPlayer();
+
         }
         mPlayer.setCurrentDataSource(path);
         if (mPlayer != null && mPlayer.isInitialized()) {
@@ -2302,7 +2220,7 @@ public class MusicPlaybackService extends Service {
      * @return True if there's no track loaded.
      */
     public boolean isStopped() {
-        return mPlayer == null || (!mPlayer.isInitialized() && mPlayer.mCurrentMediaPlayer == null && mPlayer.mNextMediaPlayer == null);
+        return mPlayer == null || (!mPlayer.isInitialized() && !mPlayer.isPlaying());
         //return mCursor == null || mCursor.isClosed();
     }
 
@@ -2350,7 +2268,9 @@ public class MusicPlaybackService extends Service {
         if (position >= 0) {
             mPlayPos = position;
         }
-        mHistory.clear();
+        synchronized (mHistory) {
+            mHistory.clear();
+        }
         if (openCurrentAndNext() && oldId != getAudioId()) {
             play();
             notifyChange(META_CHANGED);
@@ -2368,34 +2288,14 @@ public class MusicPlaybackService extends Service {
      * Starts playback.
      */
     public void play() {
-        if (mAudioManager == null) {
-            LOG.info("play() aborted, mAudioManager is null");
-            return;
-        }
         stopSimplePlayer();
-        int status;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            status = mAudioManager.requestAudioFocus(AUDIO_FOCUS_REQUEST);
-        } else {
-            status = mAudioManager.requestAudioFocus(mAudioFocusListener,
-                    AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        }
-        if (D) {
-            LOG.info("play(): Starting playback: audio focus request status = " + status);
-        }
-        if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            return;
-        }
-        try {
-            safeRegisterMediaButton(new ComponentName(getPackageName(), MediaButtonIntentReceiver.class.getName()));
-        } catch (SecurityException e) {
-            LOG.error("play() " + e.getMessage(), e);
-            // see explanation in initService
-        }
+        // Audio focus and media button routing handled by ExoPlayer + MediaSession.
         if (mPlayer != null && mPlayer.isInitialized()) {
             setNextTrack();
-            if (mShuffleEnabled && (mHistory.empty() || mHistory.peek() != mPlayPos)) {
-                mHistory.push(mPlayPos);
+            synchronized (mHistory) {
+                if (mShuffleEnabled && (mHistory.isEmpty() || mHistory.peek() != mPlayPos)) {
+                    mHistory.push(mPlayPos);
+                }
             }
             // it may happen that the service is destroyed between the NPE check above and the following
             // block, so we'll ask again, and make sure we don't assign mPlayer to null when we try to
@@ -2520,10 +2420,12 @@ public class MusicPlaybackService extends Service {
                     mPlayPos = mPlayListLen - 1;
                 }
             } else {
-                if (!mHistory.empty()) {
-                    mHistory.pop();
-                    if (!mHistory.empty()) {
-                        mPlayPos = mHistory.peek();
+                synchronized (mHistory) {
+                    if (!mHistory.isEmpty()) {
+                        mHistory.pop();
+                        if (!mHistory.isEmpty()) {
+                            mPlayPos = mHistory.peek();
+                        }
                     }
                 }
             }
@@ -2726,37 +2628,8 @@ public class MusicPlaybackService extends Service {
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 
-    enum MediaPlayerAction {
-        START,
-        RELEASE,
-        RESET
-    }
-
-    private static void mediaPlayerAction(MediaPlayer mediaPlayer, MediaPlayerAction action) {
-        try {
-            switch (action) {
-                case START:
-                    mediaPlayer.start();
-                    return;
-                case RELEASE:
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                    }
-                    mediaPlayer.release(); //after a release, it's gone and you can end up in Illegal states
-                    return;
-                case RESET:
-                    mediaPlayer.reset();
-            }
-        } catch (Throwable ignored) {
-        }
-    }
-
-    private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer,
-                                               MediaPlayerAction action) {
-        if (mediaPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-            SystemUtils.exceptionSafePost(mPlayerHandler, () -> MusicPlaybackService.mediaPlayerAction(mediaPlayer, action));
-        }
-    }
+    // MediaPlayerAction, mediaPlayerAction, and mediaPlayerAsyncAction removed —
+    // ExoPlayer in MultiPlayer manages its own lifecycle.
 
 
     public static final class MusicPlayerHandler extends Handler {
@@ -2832,536 +2705,251 @@ public class MusicPlaybackService extends Service {
                         service.gotoNext(false);
                     }
                     break;
-                case RELEASE_WAKELOCK:
-                    service.mWakeLock.release();
-                    break;
-                case FOCUS_CHANGE:
-                    if (D) LOG.info("Received audio focus change event " + msg.arg1);
-                    switch (msg.arg1) {
-                        case AudioManager.AUDIOFOCUS_LOSS:
-                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                            if (service.isPlaying()) {
-                                service.mPausedByTransientLossOfFocus =
-                                        msg.arg1 == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
-                            }
-                            service.pause();
-                            break;
-                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                            removeMessages(FADE_UP);
-                            sendEmptyMessage(FADE_DOWN);
-                            break;
-                        case AudioManager.AUDIOFOCUS_GAIN:
-                            if (!service.isPlaying()
-                                    && service.mPausedByTransientLossOfFocus) {
-                                service.mPausedByTransientLossOfFocus = false;
-                                mCurrentVolume = 0f;
-                                service.mPlayer.setVolume(mCurrentVolume);
-                                service.play();
-                            } else {
-                                removeMessages(FADE_DOWN);
-                                sendEmptyMessage(FADE_UP);
-                            }
-                            break;
-                        default:
-                    }
-                    break;
+                // RELEASE_WAKELOCK and FOCUS_CHANGE removed —
+                // ExoPlayer handles wake lock and audio focus internally.
                 default:
                     break;
             }
         }
     }
 
-    private static final class MultiPlayer implements MediaPlayer.OnErrorListener,
-            MediaPlayer.OnCompletionListener {
+    /**
+     * MultiPlayer wraps a single ExoPlayer instance.
+     * ExoPlayer handles gapless playback, audio focus, wake mode, and
+     * audio-becoming-noisy natively — removing the entire dual-MediaPlayer
+     * swap and manual WakeLock management from the original implementation.
+     */
+    static final class MultiPlayer {
         private final static Logger LOG = Logger.getLogger(MultiPlayer.class);
-        private MediaPlayer mCurrentMediaPlayer;
-        private MediaPlayer mNextMediaPlayer;
+        ExoPlayer mExoPlayer; // package-private for MediaSession metadata updates in outer class
         private boolean mIsInitialized = false;
 
-        enum TargetPlayer {
-            CURRENT,
-            NEXT
+        MultiPlayer() {
+            // ExoPlayer is built lazily on first setCurrentDataSource call
+            // so that MusicPlaybackService.INSTANCE is guaranteed non-null.
         }
 
-        MultiPlayer(MusicPlayerHandler mPlayerHandler) {
-            initCurrentMediaPlayer();
-            initNextMediaPlayer();
-        }
+        private void ensurePlayer() {
+            if (mExoPlayer != null) return;
+            if (MusicPlaybackService.INSTANCE == null) return;
+            mExoPlayer = new ExoPlayer.Builder(MusicPlaybackService.INSTANCE)
+                    .setHandleAudioBecomingNoisy(true)
+                    .setWakeMode(C.WAKE_MODE_LOCAL)
+                    .build();
+            mExoPlayer.setAudioAttributes(
+                    new AudioAttributes.Builder()
+                            .setUsage(C.USAGE_MEDIA)
+                            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                            .build(),
+                    true /* handleAudioFocus — ExoPlayer manages focus internally */);
+            mExoPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onPlaybackStateChanged(int state) {
+                    if (state == Player.STATE_ENDED) {
+                        LOG.info("MultiPlayer: onPlaybackStateChanged STATE_ENDED — track complete");
+                        if (MusicPlaybackService.mPlayerHandler != null) {
+                            MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_ENDED);
+                        }
+                    }
+                }
 
-        private interface OnPlayerPrepareCallback {
-            void onPrepared(boolean result);
+                @Override
+                public void onIsPlayingChanged(boolean isPlaying) {
+                    MusicPlaybackService svc = MusicPlaybackService.getInstance();
+                    if (svc != null) {
+                        svc.notifyChange(PLAYSTATE_CHANGED);
+                    }
+                }
+
+                @Override
+                public void onPlayerError(@NonNull PlaybackException error) {
+                    LOG.error("MultiPlayer: onPlayerError: " + error.getMessage(), error);
+                    mIsInitialized = false;
+                    if (MusicPlaybackService.mPlayerHandler != null) {
+                        MusicPlaybackService.mPlayerHandler.sendMessageDelayed(
+                                MusicPlaybackService.mPlayerHandler.obtainMessage(SERVER_DIED), 2000);
+                    }
+                }
+            });
         }
 
         /**
-         * @param path The path of the file, or the http/rtsp URL of the stream
-         *             you want to play
+         * Resolve a path string to a Uri suitable for ExoPlayer.
+         * Handles content://, http/https, and bare file paths.
+         */
+        static Uri resolveUri(String path) {
+            if (path.startsWith("content://") || path.startsWith("http://") || path.startsWith("https://")) {
+                return Uri.parse(path);
+            }
+            // Bare file path — may be URL-encoded
+            try {
+                String decoded = UrlUtils.decode(path);
+                return Uri.fromFile(new File(decoded));
+            } catch (Throwable t) {
+                return Uri.parse(path);
+            }
+        }
+
+        /**
+         * Opens the given path as the current track and prepares for playback.
          */
         void setCurrentDataSource(final String path) {
-            if (mCurrentMediaPlayer == null) {
-                initCurrentMediaPlayer();
-            }
-            mIsInitialized = setDataSource(TargetPlayer.CURRENT, path);
-        }
-
-        /**
-         * Set the MediaPlayer to start when this MediaPlayer finishes playback.
-         *
-         * @param path The path of the file, or the http/rtsp URL of the stream
-         *             you want to play
-         */
-        void setNextDataSource(final String path) {
-            releaseNextMediaPlayer();
-            if (path == null) {
-                return;
-            }
-            if (!initNextMediaPlayer()) {
-                return;
-            }
-            if (setDataSource(TargetPlayer.NEXT, path)) {
-                try {
-                    mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
-                    LOG.info("MusicPlaybackService.setNextDataSource() set next media player successfully");
-                } catch (Throwable e) {
-                    LOG.error("MusicPlaybackService.setNextDataSource() Media player fatal error: " + e.getMessage(), e);
-                }
-            } else {
-                releaseNextMediaPlayer();
-                initNextMediaPlayer();
-            }
-        }
-
-        private boolean setDataSource(TargetPlayer designatedPlayer, String path) {
             if (MusicPlaybackService.INSTANCE == null) {
-                LOG.warn("MusicPlaybackService::MultiPlayer::setDataSourceTask() aborted, no MusicPlaybackService available");
-                return false;
+                LOG.warn("MultiPlayer::setCurrentDataSource() aborted, INSTANCE is null");
+                mIsInitialized = false;
+                return;
             }
             String permission = SystemUtils.hasAndroid13OrNewer() ?
                     Manifest.permission.READ_MEDIA_AUDIO :
                     Manifest.permission.READ_EXTERNAL_STORAGE;
-            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, permission)) {
-                LOG.error("MusicPlaybackService::MultiPlayer::setDataSource failed, " + permission + " not granted");
-                return false;
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(
+                    MusicPlaybackService.INSTANCE, permission)) {
+                LOG.error("MultiPlayer::setCurrentDataSource failed, " + permission + " not granted");
+                mIsInitialized = false;
+                return;
             }
-            MediaPlayer player = mCurrentMediaPlayer;
-            if (designatedPlayer == TargetPlayer.NEXT) {
-                player = mNextMediaPlayer;
+            ensurePlayer();
+            if (mExoPlayer == null) {
+                mIsInitialized = false;
+                return;
             }
+            // Lazily set up MediaSession now that ExoPlayer exists
+            MusicPlaybackService.INSTANCE.setUpMediaSession();
             try {
-                player.reset();
-                player.setOnCompletionListener(this);
-                player.setOnErrorListener(this);
+                MediaItem mediaItem =
+                        MediaItem.fromUri(resolveUri(path));
+                mExoPlayer.setMediaItem(mediaItem);
+                mExoPlayer.prepare();
+                mIsInitialized = true;
+                // Launch AudioPlayerActivity when the player is ready if requested
                 if (MusicPlaybackService.INSTANCE.launchPlayerActivity) {
-                    player.setOnPreparedListener(new AudioOnPreparedListener(Ref.weak(MusicPlaybackService.INSTANCE)));
+                    MusicPlaybackService.INSTANCE.launchPlayerActivity = false;
+                    LOG.info("MultiPlayer::setCurrentDataSource() launching AudioPlayerActivity");
+                    Intent i = new Intent(MusicPlaybackService.INSTANCE, AudioPlayerActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    MusicPlaybackService.INSTANCE.startActivity(i);
                 }
-                if (path.startsWith("content://")) {
-                    final Uri pathUri = Uri.parse(path);
-                    if (!trySettingDataSourceManyWays(player, pathUri)) {
-                        player.release();
-                        return false;
-                    }
-                } else {
-                    // /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData/...
-                    try {
-                        File f = new File(UrlUtils.decode(path));
-                        FileInputStream fis = new FileInputStream(f);
-                        player.setDataSource(fis.getFD());
-                    } catch (Throwable t) {
-                        LOG.info("MusicPlaybackService.setDataSource player.setDataSource(fileInputStream.getFD() failed -> " + t.getMessage(), true);
-                        player.setDataSource(path);
-                    }
-
-                }
-                player.prepare();
             } catch (Throwable e) {
-                LOG.error(e.getMessage(), e);
-                return false;
-            }
-            return true;
-        }
-
-        private boolean trySettingDataSourceManyWays(final MediaPlayer player,
-                                                     final Uri pathUri) {
-            if (pathUri == null) {
-                return false;
-            }
-            String path = pathUri.toString();
-            if (path.startsWith("content://media/external")) {
-                if (!setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri)) {
-                    if (!setDataSourceUsingContentPathURI(player, pathUri)) {
-                        return setDataSourceUsingAFileDescriptor(player, pathUri);
-                    }
-                }
-            } else if (path.startsWith("content://com.android.providers.downloads.documents")) {
-                if (!setDataSourceUsingFilePathFromComAndroidProvidersDownloadsDocumentsPath(player, pathUri)) {
-                    return setDataSourceUsingAFileDescriptor(player, pathUri);
-                }
-            }
-            return setDataSourceUsingAFileDescriptor(player, pathUri);
-        }
-
-        private boolean setDataSourceUsingFilePathFromComAndroidProvidersDownloadsDocumentsPath(final MediaPlayer player,
-                                                                                                final Uri pathUri) {
-            String dirtyPath = pathUri.toString();
-            String cleanPath = MusicUtils.getFilePathFromComAndroidProvidersDownloadsDocumentsPath(MusicPlaybackService.INSTANCE, dirtyPath);
-            Uri cleanUri = Uri.parse(cleanPath);
-            try {
-                player.reset();
-                player.setDataSource(MusicPlaybackService.INSTANCE, cleanUri);
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        private boolean setDataSourceUsingContentPathURI(
-                final MediaPlayer player,
-                final Uri pathUri) {
-            try {
-                player.reset();
-                LOG.info("setDataSourceUsingContentPathURI: pathUri = " + pathUri);
-                player.setDataSource(MusicPlaybackService.INSTANCE, pathUri);
-                return true;
-            } catch (Throwable e2) {
-                LOG.error("setDataSourceUsingContentPathURI: " + e2.getMessage());
-                LOG.error("setDataSourceUsingContentPathURI: failed with pathUri = " + pathUri);
-            }
-            return false;
-        }
-
-        private boolean setDatasourceUsingDataPathFromMediaStoreContentURI(
-                final MediaPlayer player,
-                final Uri pathUri) {
-            try {
-                String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, pathUri);
-                if (dataPath != null) {
-                    LOG.info("setDatasourceUsingDataPathFromMediaStoreContentURI: dataPath = " + dataPath);
-                    Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);
-                    LOG.info("setDatasourceUsingDataPathFromMediaStoreContentURI: dataPathUri = " + dataPathUri);
-                    player.setDataSource(MusicPlaybackService.INSTANCE, dataPathUri);
-                }
-            } catch (Throwable e3) {
-                LOG.error("setDatasourceUsingDataPathFromMediaStoreContentURI: " + e3.getMessage(), e3);
-                return false;
-            }
-            return true;
-        }
-
-        private boolean setDataSourceUsingAFileDescriptor(
-                final MediaPlayer player,
-                final Uri pathUri) {
-            try {
-                LOG.info("setDataSourceUsingAFileDescriptor: try getting file descriptor from pathUri = " + pathUri);
-                ParcelFileDescriptor pfd = MusicPlaybackService.INSTANCE.getContentResolver().openFileDescriptor(pathUri, "r");
-                FileDescriptor fd = pfd.getFileDescriptor();
-                LOG.info("setDataSourceUsingAFileDescriptor: is file descriptor valid? " + fd.valid());
-                player.reset();
-                player.setDataSource(fd);
-                LOG.info("setDataSourceUsingAFileDescriptor: success with file descriptor");
-                return true;
-            } catch (Throwable e) {
-                LOG.error("setDataSourceUsingAFileDescriptor: failure with file descriptor -> " + e.getMessage());
-                return false;
-            }
-        }
-
-        private void initCurrentMediaPlayer() {
-            if (mCurrentMediaPlayer != null) {
-                releaseCurrentMediaPlayer();
-            }
-            mCurrentMediaPlayer = new MediaPlayer();
-            initMediaPlayer(mCurrentMediaPlayer);
-        }
-
-        private boolean initNextMediaPlayer() {
-            if (mNextMediaPlayer != null) {
-                releaseNextMediaPlayer();
-            }
-            mNextMediaPlayer = new MediaPlayer();
-            return initMediaPlayer(mNextMediaPlayer);
-        }
-
-        private boolean initMediaPlayer(@NonNull MediaPlayer mediaPlayer) {
-            if (MusicPlaybackService.instanceReady()) {
-                try {
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.setWakeMode(MusicPlaybackService.getInstance(), PowerManager.PARTIAL_WAKE_LOCK);
-                    mediaPlayer.setAudioSessionId(getAudioSessionId());
-                    return true;
-                } catch (Throwable e) {
-                    LOG.error("Media player Illegal State exception", e);
-                }
-            }
-            return false;
-        }
-
-        void releaseMediaPlayer(MediaPlayer mediaPlayer) {
-            if (mediaPlayer != null) {
-                mediaPlayerAction(mediaPlayer, MediaPlayerAction.RELEASE);
-            }
-        }
-
-        private void releaseCurrentMediaPlayer() {
-            try {
-                releaseMediaPlayer(mCurrentMediaPlayer);
-                mCurrentMediaPlayer = null;
-                LOG.info("mCurrentMediaPlayer released and nullified");
-            } catch (Throwable t) {
-                LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", t);
-            }
-        }
-
-        private void releaseNextMediaPlayer() {
-            try {
-                releaseMediaPlayer(mNextMediaPlayer);
-                mNextMediaPlayer = null;
-                LOG.info("mNextMediaPlayer released and nullified");
-            } catch (Throwable t) {
-                LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", t);
+                LOG.error("MultiPlayer::setCurrentDataSource() error: " + e.getMessage(), e);
+                mIsInitialized = false;
             }
         }
 
         /**
-         * @return True if the player is ready to go, false otherwise
+         * Enqueues the next track for gapless playback.
+         * ExoPlayer's built-in queue handles the seamless transition.
          */
+        void setNextDataSource(final String path) {
+            if (mExoPlayer == null) return;
+            try {
+                // Remove any previously queued next item beyond the current one
+                int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
+                int itemCount = mExoPlayer.getMediaItemCount();
+                if (itemCount > currentIdx + 1) {
+                    mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
+                }
+                if (path == null) return;
+                mExoPlayer.addMediaItem(
+                        MediaItem.fromUri(resolveUri(path)));
+                LOG.info("MultiPlayer::setNextDataSource() queued next track successfully");
+            } catch (Throwable e) {
+                LOG.error("MultiPlayer::setNextDataSource() error: " + e.getMessage(), e);
+            }
+        }
+
+        /** @return True if the player is ready to go, false otherwise */
         boolean isInitialized() {
             return mIsInitialized;
         }
 
-        /**
-         * Starts or resumes playback.
-         */
+        /** Starts or resumes playback. */
         public void start() {
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.START);
-                } catch (Throwable ignored) {
-                }
+            if (mExoPlayer != null) {
+                try { mExoPlayer.play(); } catch (Throwable ignored) {}
             }
         }
 
-        /**
-         * Resets the MediaPlayer to its uninitialized state.
-         */
+        /** Stops playback and resets the player to an uninitialized state. */
         public void stop() {
-            if (mCurrentMediaPlayer != null) {
+            if (mExoPlayer != null) {
                 try {
-                    // First, ensure any currently playing media stops immediately
-                    if (mCurrentMediaPlayer.isPlaying()) {
-                        mCurrentMediaPlayer.stop();
-                    }
-                    if (mNextMediaPlayer != null && mNextMediaPlayer.isPlaying()) {
-                        mNextMediaPlayer.stop();
-                    }
-                    
-                    // Reset both players
-                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RESET);
-                    mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RESET);
-                    releaseCurrentMediaPlayer();
-                    releaseNextMediaPlayer();
+                    mExoPlayer.stop();
+                    mExoPlayer.clearMediaItems();
                     mIsInitialized = false;
-                } catch (Throwable t) {
-                    // recover from possible IllegalStateException caused by native _reset() method.
-                }
+                } catch (Throwable ignored) {}
             }
         }
 
-        /**
-         * Releases resources associated with this MediaPlayer object.
-         */
+        /** Releases all ExoPlayer resources. */
         public void release() {
-            if (mCurrentMediaPlayer != null) {
+            if (mExoPlayer != null) {
                 try {
-                    releaseCurrentMediaPlayer();
-                    releaseNextMediaPlayer();
-                } catch (Throwable ignored) {
-                }
+                    mExoPlayer.release();
+                } catch (Throwable ignored) {}
+                mExoPlayer = null;
+                mIsInitialized = false;
             }
         }
 
-        /**
-         * Pauses playback. Call start() to resume.
-         */
+        /** Pauses playback. Call start() to resume. */
         public void pause() {
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    mCurrentMediaPlayer.pause();
-                } catch (Throwable ignored) {
-                }
+            if (mExoPlayer != null) {
+                try { mExoPlayer.pause(); } catch (Throwable ignored) {}
             }
         }
 
-        /**
-         * NOTE: This method can take a long time, do not use on the main thread
-         * Gets the duration of the file.
-         *
-         * @return The duration in milliseconds
-         */
+        /** @return The duration of the current track in milliseconds, or -1. */
         public long duration() {
-            if (mCurrentMediaPlayer != null) {
+            if (mExoPlayer != null) {
                 try {
-                    return mCurrentMediaPlayer.getDuration();
-                } catch (Throwable t) {
-                    return -1;
-                }
+                    long d = mExoPlayer.getDuration();
+                    return d == C.TIME_UNSET ? -1 : d;
+                } catch (Throwable t) { return -1; }
             }
             return -1;
         }
 
-        /**
-         * Gets the current playback position.
-         *
-         * @return The current position in milliseconds
-         */
+        /** @return The current playback position in milliseconds. */
         public long position() {
-            long result = 0;
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    result = mCurrentMediaPlayer.getCurrentPosition();
-                } catch (Throwable ignored) {
-                }
+            if (mExoPlayer != null) {
+                try { return mExoPlayer.getCurrentPosition(); } catch (Throwable ignored) {}
             }
-            return result;
+            return 0;
         }
 
-        /**
-         * Gets the current playback position.
-         *
-         * @param whereto The offset in milliseconds from the start to seek to
-         * @return The offset in milliseconds from the start to seek to
-         */
+        /** Seeks to the given position in milliseconds. */
         long seek(final long whereto) {
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    mCurrentMediaPlayer.seekTo((int) whereto);
-                } catch (Throwable ignored) {
-                }
+            if (mExoPlayer != null) {
+                try { mExoPlayer.seekTo(whereto); } catch (Throwable ignored) {}
             }
             return whereto;
         }
 
-        /**
-         * Sets the volume on this player.
-         *
-         * @param vol Left and right volume scalar
-         */
+        /** Sets the playback volume (0.0–1.0). */
         public void setVolume(final float vol) {
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    mCurrentMediaPlayer.setVolume(vol, vol);
-                } catch (Throwable t) {
-                    // possible native IllegalStateException.
-                }
+            if (mExoPlayer != null) {
+                try { mExoPlayer.setVolume(vol); } catch (Throwable ignored) {}
             }
         }
 
-        /**
-         * Sets the audio session ID.
-         *
-         * @param sessionId The audio session ID
-         */
-        public void setAudioSessionId(final int sessionId) {
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    mCurrentMediaPlayer.setAudioSessionId(sessionId);
-                } catch (Throwable ignored) {
-                }
-            }
+        /** @return True if the player is currently playing. */
+        public boolean isPlaying() {
+            return mExoPlayer != null && mExoPlayer.isPlaying();
         }
 
         /**
-         * Returns the audio session ID.
-         *
-         * @return The current audio session ID.
+         * Returns the audio session ID for equalizer / AudioEffect integration.
          */
         int getAudioSessionId() {
-            int result = 0;
-            if (mCurrentMediaPlayer != null) {
-                try {
-                    result = mCurrentMediaPlayer.getAudioSessionId();
-                } catch (Throwable ignored) {
-                }
+            if (mExoPlayer != null) {
+                try { return mExoPlayer.getAudioSessionId(); } catch (Throwable ignored) {}
             }
-            return result;
+            return 0;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean onError(final MediaPlayer mp, final int what, final int extra) {
-            if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-                try {
-                    mIsInitialized = false;
-                    releaseCurrentMediaPlayer();
-                    initCurrentMediaPlayer();
-                    MusicPlaybackService.mPlayerHandler.sendMessageDelayed(MusicPlaybackService.mPlayerHandler.obtainMessage(SERVER_DIED), 2000);
-                } catch (Throwable ignored) {
-                }
-                return true;
-            }
-            return false;
+        /** No-op stubs kept for call-site compatibility during transition. */
+        public void setAudioSessionId(final int sessionId) {
+            // ExoPlayer manages its own audio session; this is a no-op.
         }
-
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void onCompletion(final MediaPlayer mp) {
-            if (MusicPlaybackService.getInstance() == null) {
-                LOG.info("onCompletion() aborted, no MusicPlayBackService available");
-                return;
-            }
-            if (mp != mCurrentMediaPlayer) {
-                LOG.info("onCompletion() aborted, mp is not the current player");
-                return;
-            }
-            if (mNextMediaPlayer == null) {
-                LOG.info("onCompletion() aborted, no mNextMediaPlayer available to play the next song");
-                return;
-            }
-            try {
-                LOG.info("onCompletion() invoked");
-                if (MusicPlaybackService.getInstance() != null &&
-                        mp == mCurrentMediaPlayer &&
-                        mNextMediaPlayer != null) {
-                    releaseCurrentMediaPlayer();
-                    mCurrentMediaPlayer = mNextMediaPlayer;
-                    MusicPlaybackService.getInstance().mWakeLock.acquire(30000);
-                    if (MusicPlaybackService.mPlayerHandler != null) {
-                        MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_ENDED);
-                        MusicPlaybackService.mPlayerHandler.sendEmptyMessage(RELEASE_WAKELOCK);
-                        LOG.info("onCompletion() finished successfully");
-                    }
-                }
-            } catch (Throwable t) {
-                LOG.error("onCompletion() error: " + t.getMessage(), t);
-            }
-        }
-    }
-
-    private static final class AudioOnPreparedListener implements MediaPlayer.OnPreparedListener {
-
-        private final WeakReference<MusicPlaybackService> serviceRef;
-
-        AudioOnPreparedListener(WeakReference<MusicPlaybackService> serviceRef) {
-            this.serviceRef = serviceRef;
-        }
-
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            if (Ref.alive(serviceRef)) {
-                MusicPlaybackService service = serviceRef.get();
-                if (service != null && service.launchPlayerActivity) {
-                    service.launchPlayerActivity = false; // Clear flag immediately to prevent multiple launches
-                    LOG.info("AudioOnPreparedListener.onPrepared() launching AudioPlayerActivity");
-                    Intent i = new Intent(service, AudioPlayerActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    service.startActivity(i);
-                }
-            }
-        }
-
     }
 }

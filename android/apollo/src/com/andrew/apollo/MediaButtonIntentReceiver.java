@@ -11,6 +11,7 @@
 
 package com.andrew.apollo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -19,8 +20,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.view.KeyEvent;
-
-import androidx.legacy.content.WakefulBroadcastReceiver;
 
 import com.andrew.apollo.ui.activities.HomeActivity;
 import com.andrew.apollo.utils.MusicUtils;
@@ -33,7 +32,7 @@ import com.frostwire.util.Logger;
  *   Triple press: previous track
  *   Long press: voice search
  */
-public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
+public class MediaButtonIntentReceiver extends BroadcastReceiver {
     private static final Logger LOG = Logger.getLogger(MediaButtonIntentReceiver.class);
     private static final boolean DEBUG = false;
     private static final String TAG = "MBIntentReceiver";
@@ -49,9 +48,11 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
     private static long mLastClickTime = 0;
     private static boolean mDown = false;
     private static boolean mLaunched = false;
-    private static MBIReceiverHandler mbiReceiverHandler = new MBIReceiverHandler();
+    private static MBIReceiverHandler mbiReceiverHandler = new MBIReceiverHandler(
+            android.os.Looper.getMainLooper());
 
     private static class MBIReceiverHandler extends Handler {
+        MBIReceiverHandler(android.os.Looper looper) { super(looper); }
         private static final String TAG = "MBIReceiverHandler";
 
         /**
@@ -104,7 +105,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intentAction)) {
             sendCommandToMusicPlaybackService(context, MusicPlaybackService.CMDPAUSE);
         } else if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-            final KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            final KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent.class);
             if (event == null) {
                 return;
             }

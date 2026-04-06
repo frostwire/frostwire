@@ -165,9 +165,11 @@ public final class SystemUtils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void ensureUIThreadOrCrash(String classAndMethodNames) {
         if (!isUIThread()) {
             Thread t = Thread.currentThread();
+            //noinspection deprecation — Thread.getId() deprecated in Java 19 but always works on Android
             throw new RuntimeException("ensureUIThreadOrCrash: " + classAndMethodNames + " should be on main thread. Invoked from tid=" + t.getId() + ":" + t.getName());
         }
     }

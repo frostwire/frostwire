@@ -121,6 +121,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
         Intent newIntent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -149,10 +150,10 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         return fromHtml(getString(resId));
     }
 
-    // once we get to API 24, we can replace the method for the new one
-    @SuppressWarnings("deprecated")
+    @SuppressWarnings({"deprecated", "deprecation"}) // Html.fromHtml(String) deprecated API 24; flag version used on API 24+
     private static Spanned fromHtml(String html) {
-        //noinspection deprecation
-        return Html.fromHtml(html);
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
+                ? Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
+                : Html.fromHtml(html);
     }
 }

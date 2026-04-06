@@ -861,7 +861,8 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             }
             final PaymentOptions paymentOptions = download.getPaymentOptions();
             final Resources r = resourcesRef.get();
-            Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);
+            Drawable tipDrawable = androidx.core.content.ContextCompat.getDrawable(itemView.getContext(),
+                    paymentOptions.bitcoin != null ? R.drawable.contextmenu_icon_donation_bitcoin : R.drawable.contextmenu_icon_donation_fiat);
             if (tipDrawable != null) {
                 final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
                 //noinspection SuspiciousNameCombination

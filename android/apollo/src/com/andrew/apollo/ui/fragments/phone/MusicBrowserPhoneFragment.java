@@ -57,6 +57,7 @@ import java.util.Objects;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public final class MusicBrowserPhoneFragment extends Fragment {
 
     /**

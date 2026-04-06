@@ -70,6 +70,7 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Marcelina Knitter (@marcelinkaaa)
  */
+@SuppressWarnings("deprecation")
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
 
     private boolean playlistLoaderFinished;

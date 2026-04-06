@@ -58,6 +58,7 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Jose Molina (@votaguz)
  */
+@SuppressWarnings("deprecation")
 public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
 
     public PlaylistSongFragment() {

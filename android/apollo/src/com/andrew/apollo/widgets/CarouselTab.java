@@ -37,6 +37,7 @@ import com.frostwire.android.util.FWImageLoader;
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+@SuppressWarnings("deprecation")
 public class CarouselTab extends FrameLayoutWithOverlay {
 
     private ImageView mPhoto;
