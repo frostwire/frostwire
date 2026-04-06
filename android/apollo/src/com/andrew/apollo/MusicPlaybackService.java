@@ -315,7 +315,7 @@ public class MusicPlaybackService extends Service {
     private boolean mPausedByTransientLossOfFocus = false;
     private boolean musicPlaybackActivityInForeground = false;
     private MediaSession mMediaSession;
-    private ComponentName mMediaButtonReceiverComponent;
+    // mMediaButtonReceiverComponent removed — MediaSession routes media buttons automatically.
     private int mCardId;
     private volatile int mPlayListLen = 0;
     private volatile int mPlayPos = -1;
@@ -366,7 +366,7 @@ public class MusicPlaybackService extends Service {
     private static CountDownLatch initServiceLatch = new CountDownLatch(1);
     private final AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
-    private final Object  mediaButtonLock = new Object();
+    // mediaButtonLock removed — no longer manually registering media button receiver.
 
     private static MusicPlayerHandler setupMPlayerHandler() {
         if (mPlayerHandler != null) {
@@ -875,11 +875,9 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private void safeRegisterMediaButton(ComponentName comp) {
-        synchronized (mediaButtonLock) {
-            mAudioManager.registerMediaButtonEventReceiver(comp);
-        }
-    }
+    // safeRegisterMediaButton() removed — AudioManager.registerMediaButtonEventReceiver()
+    // is deprecated since API 21 and redundant: MediaSession handles button routing
+    // automatically when active (set up in setUpMediaSession()).
 
     private void initService() {
         if (mPlayerHandler == null) {
@@ -894,16 +892,6 @@ public class MusicPlaybackService extends Service {
         mImageFetcher.setImageCache(ImageCache.getInstance(this));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
-                MediaButtonIntentReceiver.class.getName());
-        try {
-            if (mAudioManager != null) {
-                safeRegisterMediaButton(mMediaButtonReceiverComponent);
-            }
-        } catch (SecurityException e) {
-            LOG.error("initService() safeRegisterMediaButton error: " + e.getMessage(), e);
-        }
 
         // MediaSession setup deferred until ExoPlayer is ready (called from setCurrentDataSource)
         // setUpMediaSession() is called after mPlayer is initialized in reloadQueue/openCurrentAndNext
@@ -2306,13 +2294,7 @@ public class MusicPlaybackService extends Service {
      */
     public void play() {
         stopSimplePlayer();
-        // Audio focus is managed internally by ExoPlayer — no manual requestAudioFocus needed.
-        try {
-            safeRegisterMediaButton(new ComponentName(getPackageName(), MediaButtonIntentReceiver.class.getName()));
-        } catch (SecurityException e) {
-            LOG.error("play() " + e.getMessage(), e);
-            // see explanation in initService
-        }
+        // Audio focus and media button routing handled by ExoPlayer + MediaSession.
         if (mPlayer != null && mPlayer.isInitialized()) {
             setNextTrack();
             synchronized (mHistory) {
