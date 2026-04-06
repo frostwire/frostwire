@@ -48,9 +48,11 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
     private static long mLastClickTime = 0;
     private static boolean mDown = false;
     private static boolean mLaunched = false;
-    private static MBIReceiverHandler mbiReceiverHandler = new MBIReceiverHandler();
+    private static MBIReceiverHandler mbiReceiverHandler = new MBIReceiverHandler(
+            android.os.Looper.getMainLooper());
 
     private static class MBIReceiverHandler extends Handler {
+        MBIReceiverHandler(android.os.Looper looper) { super(looper); }
         private static final String TAG = "MBIReceiverHandler";
 
         /**
@@ -103,7 +105,7 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intentAction)) {
             sendCommandToMusicPlaybackService(context, MusicPlaybackService.CMDPAUSE);
         } else if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-            final KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            final KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent.class);
             if (event == null) {
                 return;
             }
