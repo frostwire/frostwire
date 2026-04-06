@@ -83,6 +83,7 @@ class SuggestionsCursor extends AbstractCursor {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public String getString(int column) {
         if (column == 1) {
             try {

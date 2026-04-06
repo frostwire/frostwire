@@ -165,6 +165,7 @@ public final class SystemUtils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void ensureUIThreadOrCrash(String classAndMethodNames) {
         if (!isUIThread()) {
             Thread t = Thread.currentThread();
