@@ -250,6 +250,7 @@ public final class UIUtils {
      * Opens the given file with the default Android activity for that File and
      * mime type.
      */
+    @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             File file = new File(filePath);
