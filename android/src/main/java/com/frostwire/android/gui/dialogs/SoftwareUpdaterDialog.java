@@ -66,7 +66,13 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
+        HashMap<String, String> updateMessages;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            updateMessages = args.getSerializable("updateMessages", HashMap.class);
+        } else {
+            //noinspection unchecked,deprecation
+            updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
+        }
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
         String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));
@@ -82,7 +88,10 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         if (changelog != null) {
             String[] values = new String[changelog.size()];
             for (int i = 0; i < values.length; i++) {
-                values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
+                String html = "&#8226; " + changelog.get(i);
+                values[i] = String.valueOf(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
+                        ? Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
+                        : Html.fromHtml(html));
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                     R.layout.dialog_update_bullet,
