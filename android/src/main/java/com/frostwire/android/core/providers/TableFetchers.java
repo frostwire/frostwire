@@ -62,6 +62,7 @@ import static android.provider.MediaStore.Audio.AudioColumns._ID;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("deprecation")
 public final class TableFetchers {
 
     private static final Logger LOG = Logger.getLogger(TableFetchers.class);
