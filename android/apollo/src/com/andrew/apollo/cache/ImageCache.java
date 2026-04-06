@@ -20,8 +20,8 @@ package com.andrew.apollo.cache;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import android.content.ComponentCallbacks2;
 import android.content.ContentUris;
 import android.content.Context;
@@ -210,8 +210,9 @@ public final class ImageCache {
         // Release some memory as needed
         context.registerComponentCallbacks(new ComponentCallbacks2() {
             @Override
+            @SuppressWarnings("deprecation") // TRIM_MEMORY_MODERATE/TRIM_MEMORY_BACKGROUND deprecated API 35; values unchanged
             public void onTrimMemory(final int level) {
-                if (level >= TRIM_MEMORY_MODERATE) {
+                if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
                     evictAll();
                 } else if (level >= TRIM_MEMORY_BACKGROUND) {
                     mLruCache.trimToSize(mLruCache.size() / 2);
@@ -219,6 +220,7 @@ public final class ImageCache {
             }
 
             @Override
+            @SuppressWarnings("deprecation") // onLowMemory deprecated API 35; kept for compatibility
             public void onLowMemory() {
                 // Nothing to do
             }
@@ -242,7 +244,7 @@ public final class ImageCache {
     public static ImageCache findOrCreateCache(final Activity activity) {
         // Search for, or create an instance of the non-UI RetainFragment
         final RetainFragment retainFragment = findOrCreateRetainFragment(
-                activity.getFragmentManager());
+                ((androidx.fragment.app.FragmentActivity) activity).getSupportFragmentManager());
         // See if we already have an ImageCache stored in RetainFragment
         ImageCache cache = (ImageCache) retainFragment.getObject();
         // No existing ImageCache, create one and store it in RetainFragment
@@ -648,9 +650,13 @@ public final class ImageCache {
          * {@inheritDoc}
          */
         @Override
+        @SuppressWarnings("deprecation")
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            // Make sure this Fragment is retained over a configuration change
+            // Retain this headless fragment over configuration changes.
+            // setRetainInstance is deprecated in favour of ViewModel, but this
+            // non-UI cache-holder pattern is simpler to keep as-is until a full
+            // ViewModel refactor is warranted.
             setRetainInstance(true);
         }
 
