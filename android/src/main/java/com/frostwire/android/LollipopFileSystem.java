@@ -541,9 +541,10 @@ public final class LollipopFileSystem implements FileSystem {
         return null;
     }
 
+    @SuppressWarnings("deprecation") // ContextCompat.getExternalFilesDirs deprecated API 35; use context.getExternalFilesDirs directly
     private static String[] getExtSdCardPaths(Context context) {
         List<String> paths = new ArrayList<>();
-        File[] externals = ContextCompat.getExternalFilesDirs(context, "external");
+        File[] externals = context.getExternalFilesDirs("external");
         File external = context.getExternalFilesDir("external");
         for (File file : externals) {
             if (file != null && !file.equals(external)) {
