@@ -73,6 +73,7 @@ public class YesNoDialog extends AbstractDialog {
     }
 
     @Override
+    @SuppressWarnings("deprecation") // android.R.string.yes/no deprecated API 35; no app-defined equivalent
     protected void initComponents(final Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
 
