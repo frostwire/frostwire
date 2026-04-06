@@ -69,7 +69,7 @@ public class NotificationHelper {
     private Notification mNotification = null;
 
     /**
-     * API 16+ bigContentView
+     * Expanded notification layout (set via setCustomBigContentView)
      */
     private RemoteViews mExpandedView;
 
@@ -124,37 +124,32 @@ public class NotificationHelper {
                            final Bitmap albumArt,
                            final boolean isPlaying) {
 
-        // Default notification layout
+        // Default notification layout (collapsed)
         mNotificationTemplate = new RemoteViews(mService.getPackageName(),
                 R.layout.notification_template_base);
 
-        // Set up the content view
-        initCollapsedLayout(trackName, artistName, albumArt);
+        // Expanded notification layout
+        mExpandedView = new RemoteViews(mService.getPackageName(),
+                R.layout.notification_template_expanded_base);
 
-        //  Save this for debugging
+        // Set up the collapsed and expanded content views before building
+        initCollapsedLayout(trackName, artistName, albumArt);
+        initPlaybackActions(isPlaying);
+        initExpandedPlaybackActions(isPlaying);
+        initExpandedLayout(trackName, albumName, artistName, albumArt);
+
         PendingIntent pendingintent = pendingIntent();
 
-        // Notification Builder
+        // Use setCustomContentView / setCustomBigContentView (NotificationCompat compat API)
+        // instead of the deprecated .setContent() and direct aNotification.bigContentView assignment,
+        // which stopped working reliably on Android 12+ (API 31+).
         Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(notificationIcon())
                 .setContentIntent(pendingintent)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContent(mNotificationTemplate)
+                .setCustomContentView(mNotificationTemplate)
+                .setCustomBigContentView(mExpandedView)
                 .build();
-
-        // Control playback from the notification
-        initPlaybackActions(isPlaying);
-
-        // Expanded notification style
-        mExpandedView = new RemoteViews(mService.getPackageName(),
-                R.layout.notification_template_expanded_base);
-
-        aNotification.bigContentView = mExpandedView;
-
-        // Control playback from the notification
-        initExpandedPlaybackActions(isPlaying);
-        // Set up the expanded content view
-        initExpandedLayout(trackName, albumName, artistName, albumArt);
 
         mNotification = aNotification;
         createNotificationChannel();
