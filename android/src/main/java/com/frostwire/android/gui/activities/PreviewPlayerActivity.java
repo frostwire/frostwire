@@ -411,6 +411,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
+    @SuppressWarnings("deprecation") // abandonAudioFocus(listener) fallback for API < 26
     private void releaseMediaPlayer() {
         if (androidMediaPlayer != null) {
             androidMediaPlayer.stop();
@@ -528,6 +529,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private android.media.AudioFocusRequest mAudioFocusRequest;
 
     @Override
+    @SuppressWarnings("deprecation") // requestAudioFocus(listener) fallback for API < 26
     public void onPrepared(MediaPlayer mp) {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (am != null) {
