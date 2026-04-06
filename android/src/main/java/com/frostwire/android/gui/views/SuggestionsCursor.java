@@ -60,6 +60,7 @@ class SuggestionsCursor extends AbstractCursor {
     }
 
     @Override
+    @SuppressWarnings("deprecation") // mPos is the correct direct field access in AbstractCursor subclasses
     public int getInt(int column) {
         if (column == 0) {
             return mPos;
@@ -68,6 +69,7 @@ class SuggestionsCursor extends AbstractCursor {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public long getLong(int column) {
         if (column == 0) {
             return mPos;
