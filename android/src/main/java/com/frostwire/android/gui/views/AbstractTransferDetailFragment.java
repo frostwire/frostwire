@@ -52,7 +52,6 @@ import java.util.List;
  * @author marcelinkaaa
  * Created on 10/10/17.
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private String infinity;
@@ -73,7 +72,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
-        setHasOptionsMenu(true);
     }
 
     protected abstract int getTabTitleStringId();
