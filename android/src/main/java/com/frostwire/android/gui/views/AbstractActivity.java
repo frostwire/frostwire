@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -50,7 +51,6 @@ import androidx.appcompat.widget.Toolbar;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractActivity extends AppCompatActivity {
 
     private final int layoutResId;
@@ -64,16 +64,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
         this.layoutResId = layoutResId;
         this.fragmentTags = new ArrayList<>();
         this.paused = false;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-        String tag = fragment.getTag();
-        if (tag != null && !fragmentTags.contains(tag)) {
-            fragmentTags.add(tag);
-        }
     }
 
     @Override
@@ -131,6 +121,15 @@ public abstract class AbstractActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment fragment, @NonNull Context context) {
+                String tag = fragment.getTag();
+                if (tag != null && !fragmentTags.contains(tag)) {
+                    fragmentTags.add(tag);
+                }
+            }
+        }, false);
         setContentView(layoutResId);
         initComponents(savedInstanceState);
         setToolbar();
