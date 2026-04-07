@@ -411,7 +411,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
-    @SuppressWarnings("deprecation") // abandonAudioFocus(listener) fallback for API < 26
     private void releaseMediaPlayer() {
         if (androidMediaPlayer != null) {
             androidMediaPlayer.stop();
@@ -423,14 +422,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             }
             androidMediaPlayer = null;
 
+            // minSdk=26 == API 26 (O): abandonAudioFocusRequest is always available; no fallback needed
             AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-            if (audioManager != null) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && mAudioFocusRequest != null) {
-                    audioManager.abandonAudioFocusRequest(mAudioFocusRequest);
-                } else {
-                    //noinspection deprecation
-                    audioManager.abandonAudioFocus(this);
-                }
+            if (audioManager != null && mAudioFocusRequest != null) {
+                audioManager.abandonAudioFocusRequest(mAudioFocusRequest);
             }
         }
     }
@@ -529,22 +524,18 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private android.media.AudioFocusRequest mAudioFocusRequest;
 
     @Override
-    @SuppressWarnings("deprecation") // requestAudioFocus(listener) fallback for API < 26
     public void onPrepared(MediaPlayer mp) {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (am != null) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                mAudioFocusRequest = new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                        .setAudioAttributes(new android.media.AudioAttributes.Builder()
-                                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
-                                .build())
-                        .build();
-                am.requestAudioFocus(mAudioFocusRequest);
-            } else {
-                //noinspection deprecation
-                am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-            }
+            // minSdk=26 == API 26 (O): AudioFocusRequest is always available; no fallback needed
+            mAudioFocusRequest = new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(new android.media.AudioAttributes.Builder()
+                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build())
+                    .setOnAudioFocusChangeListener(this)
+                    .build();
+            am.requestAudioFocus(mAudioFocusRequest);
         }
 
         final ImageView img = findView(R.id.activity_preview_player_thumbnail);

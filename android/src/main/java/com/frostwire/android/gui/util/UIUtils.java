@@ -598,9 +598,7 @@ public final class UIUtils {
     public static double getScreenInches(Activity activity) {
         DisplayMetrics dm = new DisplayMetrics();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            android.util.DisplayMetrics wm = activity.getWindowManager()
-                    .getCurrentWindowMetrics().getBounds() != null ? null : null;
-            // Use WindowMetrics bounds + display density for accurate physial size
+            // Use WindowMetrics bounds + display density for accurate physical size
             android.graphics.Rect bounds = activity.getWindowManager()
                     .getCurrentWindowMetrics().getBounds();
             dm.widthPixels = bounds.width();
