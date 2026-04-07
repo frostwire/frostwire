@@ -149,125 +149,119 @@ public final class MusicBrowserPhoneFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_player_shuffle:
-                        // Shuffle all the songs
-                        MusicUtils.shuffleAll(getActivity());
-                        return true;
-                    case R.id.menu_player_favorite:
-                        // Toggle the current track as a favorite and update the menu item
-                        MusicUtils.toggleFavorite();
-                        requireActivity().invalidateOptionsMenu();
-                        return true;
-                    case R.id.menu_player_sort_by_az:
-                        if (isArtistPage()) {
-                            mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_A_Z);
-                            getArtistFragment().refresh();
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_A_Z);
-                            getAlbumFragment().refresh();
-                        } else if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_A_Z);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_za:
-                        if (isArtistPage()) {
-                            mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_Z_A);
-                            getArtistFragment().refresh();
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_Z_A);
-                            getAlbumFragment().refresh();
-                        } else if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_Z_A);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_artist:
-                        if (isAlbumPage()) {
-                            mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_ARTIST);
-                            getAlbumFragment().refresh();
-                        } else if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ARTIST);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_album:
-                        if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ALBUM);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_year:
-                        if (isAlbumPage()) {
-                            mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_YEAR);
-                            getAlbumFragment().refresh();
-                        } else if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_YEAR);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_duration:
-                        if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_DURATION);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_number_of_songs:
-                        if (isArtistPage()) {
-                            mPreferences
-                                    .setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_SONGS);
-                            getArtistFragment().refresh();
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_NUMBER_OF_SONGS);
-                            getAlbumFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_number_of_albums:
-                        if (isArtistPage()) {
-                            mPreferences
-                                    .setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_ALBUMS);
-                            getArtistFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_sort_by_filename:
-                        if (isSongPage()) {
-                            mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_FILENAME);
-                            getSongFragment().refresh();
-                        }
-                        return true;
-                    case R.id.menu_player_view_as_simple:
-                        if (isRecentPage()) {
-                            mPreferences.setRecentLayout("simple");
-                        } else if (isArtistPage()) {
-                            mPreferences.setArtistLayout("simple");
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumLayout("simple");
-                        }
-                        NavUtils.goHome(getActivity());
-                        return true;
-                    case R.id.menu_player_view_as_detailed:
-                        if (isRecentPage()) {
-                            mPreferences.setRecentLayout("detailed");
-                        } else if (isArtistPage()) {
-                            mPreferences.setArtistLayout("detailed");
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumLayout("detailed");
-                        }
-                        NavUtils.goHome(getActivity());
-                        return true;
-                    case R.id.menu_player_view_as_grid:
-                        if (isRecentPage()) {
-                            mPreferences.setRecentLayout("grid");
-                        } else if (isArtistPage()) {
-                            mPreferences.setArtistLayout("grid");
-                        } else if (isAlbumPage()) {
-                            mPreferences.setAlbumLayout("grid");
-                        }
-                        NavUtils.goHome(getActivity());
-                        return true;
-                    default:
-                        break;
+                int itemId = menuItem.getItemId();
+                if (itemId == R.id.menu_player_shuffle) {
+                    MusicUtils.shuffleAll(getActivity());
+                    return true;
+                } else if (itemId == R.id.menu_player_favorite) {
+                    MusicUtils.toggleFavorite();
+                    requireActivity().invalidateOptionsMenu();
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_az) {
+                    if (isArtistPage()) {
+                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_A_Z);
+                        getArtistFragment().refresh();
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_A_Z);
+                        getAlbumFragment().refresh();
+                    } else if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_A_Z);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_za) {
+                    if (isArtistPage()) {
+                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_Z_A);
+                        getArtistFragment().refresh();
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_Z_A);
+                        getAlbumFragment().refresh();
+                    } else if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_Z_A);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_artist) {
+                    if (isAlbumPage()) {
+                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_ARTIST);
+                        getAlbumFragment().refresh();
+                    } else if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ARTIST);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_album) {
+                    if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ALBUM);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_year) {
+                    if (isAlbumPage()) {
+                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_YEAR);
+                        getAlbumFragment().refresh();
+                    } else if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_YEAR);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_duration) {
+                    if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_DURATION);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_number_of_songs) {
+                    if (isArtistPage()) {
+                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_SONGS);
+                        getArtistFragment().refresh();
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_NUMBER_OF_SONGS);
+                        getAlbumFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_number_of_albums) {
+                    if (isArtistPage()) {
+                        mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_ALBUMS);
+                        getArtistFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_sort_by_filename) {
+                    if (isSongPage()) {
+                        mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_FILENAME);
+                        getSongFragment().refresh();
+                    }
+                    return true;
+                } else if (itemId == R.id.menu_player_view_as_simple) {
+                    if (isRecentPage()) {
+                        mPreferences.setRecentLayout("simple");
+                    } else if (isArtistPage()) {
+                        mPreferences.setArtistLayout("simple");
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumLayout("simple");
+                    }
+                    NavUtils.goHome(getActivity());
+                    return true;
+                } else if (itemId == R.id.menu_player_view_as_detailed) {
+                    if (isRecentPage()) {
+                        mPreferences.setRecentLayout("detailed");
+                    } else if (isArtistPage()) {
+                        mPreferences.setArtistLayout("detailed");
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumLayout("detailed");
+                    }
+                    NavUtils.goHome(getActivity());
+                    return true;
+                } else if (itemId == R.id.menu_player_view_as_grid) {
+                    if (isRecentPage()) {
+                        mPreferences.setRecentLayout("grid");
+                    } else if (isArtistPage()) {
+                        mPreferences.setArtistLayout("grid");
+                    } else if (isAlbumPage()) {
+                        mPreferences.setAlbumLayout("grid");
+                    }
+                    NavUtils.goHome(getActivity());
+                    return true;
                 }
                 return false;
             }
