@@ -70,7 +70,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-@SuppressWarnings("deprecation")
 public final class ProfileActivity extends BaseActivity implements OnPageChangeListener, Listener {
 
     /**
@@ -207,7 +206,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // Offscreen limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         // Attach the page change listener
-        mViewPager.setOnPageChangeListener(this);
+        mViewPager.addOnPageChangeListener(this);
         // Attach the carousel listener
         mTabCarousel.setListener(this);
 
