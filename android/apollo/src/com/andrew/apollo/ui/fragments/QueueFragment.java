@@ -84,22 +84,20 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_player_save_queue:
-                        NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
-                                .makeQueueCursor(getActivity());
-                        CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
-                                getParentFragmentManager(), "CreatePlaylist");
-                        queue.close();
-                        return true;
-                    case R.id.menu_player_clear_queue:
-                        long currentAudioId = MusicUtils.getCurrentAudioId();
-                        MusicUtils.clearQueue();
-                        MusicUtils.playFDs(new long[] { currentAudioId }, 0, MusicUtils.isShuffleEnabled() );
-                        refreshQueue();
-                        return true;
-                    default:
-                        break;
+                int itemId = menuItem.getItemId();
+                if (itemId == R.id.menu_player_save_queue) {
+                    NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
+                            .makeQueueCursor(getActivity());
+                    CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
+                            getParentFragmentManager(), "CreatePlaylist");
+                    queue.close();
+                    return true;
+                } else if (itemId == R.id.menu_player_clear_queue) {
+                    long currentAudioId = MusicUtils.getCurrentAudioId();
+                    MusicUtils.clearQueue();
+                    MusicUtils.playFDs(new long[] { currentAudioId }, 0, MusicUtils.isShuffleEnabled());
+                    refreshQueue();
+                    return true;
                 }
                 return false;
             }
