@@ -22,7 +22,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
-import androidx.multidex.MultiDexApplication;
+import android.app.Application;
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
 
@@ -57,7 +57,7 @@ import dalvik.system.ZipPathValidator;
  * @author gubatron
  * @author aldenml
  */
-public class MainApplication extends MultiDexApplication implements Configuration.Provider {
+public class MainApplication extends Application implements Configuration.Provider {
 
     private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
