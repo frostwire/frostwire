@@ -42,7 +42,6 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public final class SoftwareUpdaterDialog extends AbstractDialog {
 
     public SoftwareUpdaterDialog() {

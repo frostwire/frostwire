@@ -50,7 +50,6 @@ import static com.frostwire.android.gui.util.UIUtils.setupClickUrl;
  * @author aldenml
  * @author marcelinkaaa
  */
-@SuppressWarnings("deprecation")
 public final class AboutFragment extends AbstractFragment {
 
     public AboutFragment() {
