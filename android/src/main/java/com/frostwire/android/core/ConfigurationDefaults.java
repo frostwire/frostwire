@@ -95,15 +95,20 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);
 
-        // I2P Configuration - disabled by default for privacy/security
+        // I2P Configuration - disabled by default for privacy/security.
+        // Port and quantity/length values are stored as Strings because they are
+        // bound to EditTextPreference in settings_torrent.xml, which calls
+        // getPersistedString() / putString() internally. Storing them as Integer
+        // would cause a ClassCastException on inflation (Integer cannot be cast to String).
+        // MainApplication reads these back with Integer.parseInt(cm.getString(...)).
         defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_ENABLED, false);
         defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME, "127.0.0.1");
-        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_PORT, 7656);
+        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_PORT, "7656");
         defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED, false);
-        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY, 3);
-        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY, 3);
-        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH, 3);
-        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH, 3);
+        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY, "3");
+        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY, "3");
+        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH, "3");
+        defaultValues.put(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH, "3");
 
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, true);
