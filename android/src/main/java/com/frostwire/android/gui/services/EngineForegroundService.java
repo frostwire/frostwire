@@ -229,7 +229,7 @@ public class EngineForegroundService extends Service implements IEngineService {
 
             Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.frostwire_notification_flat)
-                    .setContent(remoteViews)
+                    .setCustomContentView(remoteViews)
                     .setContentIntent(showFrostWireIntent)
                     .setOngoing(true)
                     .build();
@@ -469,9 +469,9 @@ public class EngineForegroundService extends Service implements IEngineService {
                     .setContentTitle(getString(R.string.download_finished))
                     .setSmallIcon(getNotificationIcon())
                     .setContentIntent(pi)
+                    .setNumber(TransferManager.instance().getDownloadsToReview())
+                    .setAutoCancel(true)
                     .build();
-            notification.number = TransferManager.instance().getDownloadsToReview();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
             if (manager != null) {
                 NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
                 channel.setSound(null, null);

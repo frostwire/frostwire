@@ -212,13 +212,13 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
                     .setContentText(getString(R.string.download_finished))
                     .setContentTitle(getString(R.string.download_finished))
                     .setSmallIcon(getNotificationIcon())
-                    .setContentIntent(pi);
+                    .setContentIntent(pi)
+                    .setNumber(TransferManager.instance().getDownloadsToReview())
+                    .setAutoCancel(true);
             if (ConfigurationManager.instance().vibrateOnFinishedDownload()) {
                 notifBuilder.setVibrate(VENEZUELAN_VIBE);
             }
             Notification notification = notifBuilder.build();
-            notification.number = TransferManager.instance().getDownloadsToReview();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
             if (manager != null) {
                 NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
                 channel.setSound(null, null);
