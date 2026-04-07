@@ -106,7 +106,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public final class SearchFragment extends AbstractFragment implements MainFragment, OnDialogClickListener, SearchProgressView.CurrentQueryReporter, PromotionDownloader {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     @SuppressLint("StaticFieldLeak")
@@ -192,7 +191,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         return header;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onResume() {
         super.onResume();
@@ -596,7 +594,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                         tellurideSearchResultDownloadDialogAdapter.getFullList()
                 );
 
-                FragmentManager fragmentManager = getFragmentManager();
+                FragmentManager fragmentManager = getParentFragmentManager();
 
                 if (fragmentManager == null && getActivity() != null) {
                     fragmentManager = getActivity().getSupportFragmentManager();
