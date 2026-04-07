@@ -20,9 +20,14 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -46,7 +51,6 @@ import com.frostwire.transfers.TransferState;
  * @author aldenml
  * @author marcelinkaaa
  */
-@SuppressWarnings("deprecation")
 public final class TransferDetailFragment extends AbstractFragment {
 
     private UIBittorrentDownload uiBittorrentDownload;
@@ -54,7 +58,6 @@ public final class TransferDetailFragment extends AbstractFragment {
 
     public TransferDetailFragment() {
         super(R.layout.fragment_transfer_detail);
-        setHasOptionsMenu(true);
     }
 
     public void setUiBittorrentDownload(UIBittorrentDownload uiBittorrentDownload) {
@@ -62,10 +65,75 @@ public final class TransferDetailFragment extends AbstractFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_transfer_detail_menu, menu);
-        pauseResumeMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_pause_resume_seed);
-        super.onCreateOptionsMenu(menu, inflater);
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.fragment_transfer_detail_menu, menu);
+                pauseResumeMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_pause_resume_seed);
+            }
+
+            @Override
+            public void onPrepareMenu(@NonNull Menu menu) {
+                if (uiBittorrentDownload == null) {
+                    return;
+                }
+                updatePauseResumeSeedMenuAction();
+                MenuItem fiatMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_fiat);
+                MenuItem bitcoinMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_bitcoin);
+                if (!uiBittorrentDownload.hasPaymentOptions()) {
+                    fiatMenuItem.setVisible(false);
+                    bitcoinMenuItem.setVisible(false);
+                } else {
+                    PaymentOptions po = uiBittorrentDownload.getPaymentOptions();
+                    fiatMenuItem.setVisible(po.paypalUrl != null);
+                    bitcoinMenuItem.setVisible(po.bitcoin != null);
+                }
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem item) {
+                Activity activity = getActivity();
+                int itemId = item.getItemId();
+                PaymentOptions paymentOptions = uiBittorrentDownload.getPaymentOptions();
+                if (itemId == R.id.fragment_transfer_detail_menu_delete) {
+                    new CancelMenuAction(activity, uiBittorrentDownload, true, true).onClick(activity);
+                } else if (itemId == R.id.fragment_transfer_detail_menu_pause_resume_seed) {
+                    if (isPausable()) {
+                        new PauseDownloadMenuAction(activity, uiBittorrentDownload).onClick(activity);
+                    } else if (isSeedable()) {
+                        new SeedAction(activity, uiBittorrentDownload).onClick(activity);
+                    } else if (isResumable()) {
+                        new ResumeDownloadMenuAction(activity, uiBittorrentDownload, R.string.resume_torrent_menu_action).onClick(activity);
+                    }
+                    updatePauseResumeSeedMenuAction();
+                } else if (itemId == R.id.fragment_transfer_detail_menu_clear) {
+                    new CancelMenuAction(activity, uiBittorrentDownload, false, false).onClick(activity);
+                } else if (itemId == R.id.fragment_transfer_detail_menu_copy_magnet) {
+                    new CopyToClipboardMenuAction(activity,
+                            R.drawable.contextmenu_icon_magnet,
+                            R.string.transfers_context_menu_copy_magnet,
+                            R.string.transfers_context_menu_copy_magnet_copied,
+                            uiBittorrentDownload.magnetUri() + BTEngine.getInstance().magnetPeers()
+                    ).onClick(activity);
+                } else if (itemId == R.id.fragment_transfer_detail_menu_copy_infohash) {
+                    new CopyToClipboardMenuAction(activity,
+                            R.drawable.contextmenu_icon_copy,
+                            R.string.transfers_context_menu_copy_infohash,
+                            R.string.transfers_context_menu_copy_infohash_copied,
+                            uiBittorrentDownload.getInfoHash()
+                    ).onClick(activity);
+                } else if (itemId == R.id.fragment_transfer_detail_menu_donate_fiat) {
+                    new SendFiatTipAction(activity, paymentOptions.paypalUrl).onClick(activity);
+                } else if (itemId == R.id.fragment_transfer_detail_menu_donate_bitcoin) {
+                    new SendBitcoinTipAction(activity, paymentOptions.bitcoin).onClick(activity);
+                } else {
+                    return false;
+                }
+                return true;
+            }
+        }, getViewLifecycleOwner());
     }
 
     private boolean isPausable() {
@@ -85,25 +153,6 @@ public final class TransferDetailFragment extends AbstractFragment {
         return uiBittorrentDownload != null && uiBittorrentDownload.getState() == TransferState.FINISHED;
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        if (uiBittorrentDownload == null) {
-            return;
-        }
-        updatePauseResumeSeedMenuAction();
-        MenuItem fiatMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_fiat);
-        MenuItem bitcoinMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_bitcoin);
-        if (!uiBittorrentDownload.hasPaymentOptions()) {
-            fiatMenuItem.setVisible(false);
-            bitcoinMenuItem.setVisible(false);
-        } else {
-            PaymentOptions po = uiBittorrentDownload.getPaymentOptions();
-            fiatMenuItem.setVisible(po.paypalUrl != null);
-            bitcoinMenuItem.setVisible(po.bitcoin != null);
-        }
-        super.onPrepareOptionsMenu(menu);
-    }
-
     public void updatePauseResumeSeedMenuAction() {
         if (pauseResumeMenuItem == null) {
             return;
@@ -119,53 +168,4 @@ public final class TransferDetailFragment extends AbstractFragment {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Activity activity = getActivity();
-        int itemId = item.getItemId();
-        PaymentOptions paymentOptions = uiBittorrentDownload.getPaymentOptions();
-        switch (itemId) {
-            // TODO: Add a force re-announce action
-            case R.id.fragment_transfer_detail_menu_delete:
-                // TODO: add an action listener and pass to dialog
-                new CancelMenuAction(activity, uiBittorrentDownload, true, true).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_pause_resume_seed:
-                if (isPausable()) {
-                    new PauseDownloadMenuAction(activity, uiBittorrentDownload).onClick(activity);
-                } else if (isSeedable()) {
-                    new SeedAction(activity, uiBittorrentDownload).onClick(activity);
-                } else if (isResumable()) {
-                    new ResumeDownloadMenuAction(activity, uiBittorrentDownload, R.string.resume_torrent_menu_action).onClick(activity);
-                }
-                updatePauseResumeSeedMenuAction();
-                break;
-            case R.id.fragment_transfer_detail_menu_clear:
-                new CancelMenuAction(activity, uiBittorrentDownload, false, false).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_copy_magnet:
-                new CopyToClipboardMenuAction(activity,
-                        R.drawable.contextmenu_icon_magnet,
-                        R.string.transfers_context_menu_copy_magnet,
-                        R.string.transfers_context_menu_copy_magnet_copied,
-                        uiBittorrentDownload.magnetUri() + BTEngine.getInstance().magnetPeers()
-                ).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_copy_infohash:
-                new CopyToClipboardMenuAction(activity,
-                        R.drawable.contextmenu_icon_copy,
-                        R.string.transfers_context_menu_copy_infohash,
-                        R.string.transfers_context_menu_copy_infohash_copied,
-                        uiBittorrentDownload.getInfoHash()
-                ).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_donate_fiat:
-                new SendFiatTipAction(activity, paymentOptions.paypalUrl).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_donate_bitcoin:
-                new SendBitcoinTipAction(activity, paymentOptions.bitcoin).onClick(activity);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }
