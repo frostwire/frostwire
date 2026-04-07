@@ -27,17 +27,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
+
 import com.frostwire.android.R;
 import com.frostwire.android.util.FWImageLoader;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-@SuppressWarnings("deprecation")
 public class CarouselTab extends FrameLayoutWithOverlay {
 
     private ImageView mPhoto;
@@ -208,7 +210,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      * @param context The {@link Context} to use.
      */
     public void setDefault(final Context context) {
-        mPhoto.setImageDrawable(context.getResources().getDrawable(R.drawable.header_temp));
+        mPhoto.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.header_temp));
     }
 
     /**

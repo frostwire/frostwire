@@ -30,6 +30,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 
 /**
@@ -37,7 +39,6 @@ import com.frostwire.android.R;
  * 
  * @author heycosmo
  */
-@SuppressWarnings("deprecation")
 public class DragSortListView extends ListView {
 
     /**
@@ -382,7 +383,7 @@ public class DragSortListView extends ListView {
         mController.setSortEnabled(true);
         /* Transparent holo light blue */
         mController
-                .setBackgroundColor(getResources().getColor(R.color.holo_blue_light_transparent));
+                .setBackgroundColor(ContextCompat.getColor(getContext(), R.color.holo_blue_light_transparent));
 
         mFloatViewManager = mController;
         setOnTouchListener(mController);

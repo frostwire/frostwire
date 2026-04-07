@@ -17,12 +17,13 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 
 /**
  * Highlights the text in a text field.
  */
-@SuppressWarnings("deprecation")
 public class PrefixHighlighter {
 
     /* Color used when highlighting the prefixes */
@@ -34,7 +35,7 @@ public class PrefixHighlighter {
      * @param prefixHighlightColor The color used to highlight the prefixes.
      */
     public PrefixHighlighter(final Context context) {
-        mPrefixHighlightColor = context.getResources().getColor(R.color.app_text_highlight);
+        mPrefixHighlightColor = ContextCompat.getColor(context, R.color.app_text_highlight);
     }
 
     /**
