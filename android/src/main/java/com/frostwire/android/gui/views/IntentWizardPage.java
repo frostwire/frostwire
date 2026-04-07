@@ -39,7 +39,6 @@ import com.frostwire.android.gui.util.UIUtils;
  * @author aldenml
  * 
  */
-@SuppressWarnings("deprecation")
 public class IntentWizardPage extends RelativeLayout implements WizardPageView {
     private final CheckAcceptListener checkAcceptListener;
     private CheckBox checkCopyrightAccept;
