@@ -21,8 +21,6 @@ package com.frostwire.android.gui.activities;
 
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -94,28 +92,22 @@ public final class SettingsActivity extends AbstractActivity
 
     @Override
     public boolean onPreferenceStartFragment(PreferenceFragment caller, Preference pref) {
-        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitle(), null, 0);
+        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitle());
         return true;
     }
 
-    private void startPreferencePanel(String fragmentClass, Bundle args, CharSequence title,
-                                      Fragment resultTo, int resultRequestCode) {
+    private void startPreferencePanel(String fragmentClass, Bundle args, CharSequence title) {
         if (singlePane) {
-            startWithFragment(fragmentClass, args, title, resultTo, resultRequestCode);
+            startWithFragment(fragmentClass, args, title);
         } else {
             // check singlePane comment
             throw new UnsupportedOperationException("Not implemented");
         }
     }
 
-    private void startWithFragment(String fragmentName, Bundle args, CharSequence title,
-                                   Fragment resultTo, int resultRequestCode) {
+    private void startWithFragment(String fragmentName, Bundle args, CharSequence title) {
         Intent intent = buildStartFragmentIntent(fragmentName, args, title);
-        if (resultTo == null) {
-            startActivity(intent);
-        } else {
-            resultTo.startActivityForResult(intent, resultRequestCode);
-        }
+        startActivity(intent);
     }
 
     private Intent buildStartFragmentIntent(String fragmentName, Bundle args, CharSequence title) {
