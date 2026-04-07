@@ -182,17 +182,15 @@ public abstract class BaseActivity extends AbstractActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        return switch (item.getItemId()) {
-            case android.R.id.home -> {
-                getBackHome();
-                yield true;
-            }
-            case R.id.menu_player_new_playlist -> {
-                onOptionsItemNewPlaylistSelected();
-                yield true;
-            }
-            default -> super.onOptionsItemSelected(item);
-        };
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            getBackHome();
+            return true;
+        } else if (id == R.id.menu_player_new_playlist) {
+            onOptionsItemNewPlaylistSelected();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onOptionsItemNewPlaylistSelected() {
