@@ -76,7 +76,6 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Jose Molina (@votaguz)
  */
-@SuppressWarnings("deprecation")
 public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         extends Fragment implements
         LoaderManager.LoaderCallbacks<List<I>>,
@@ -166,8 +165,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@NonNull final Context context) {
+        super.onAttach(context);
+        final Activity activity = (Activity) context;
         mProfileTabCarousel = activity.findViewById(R.id.activity_profile_base_tab_carousel);
         if (activity instanceof BaseActivity) {
             // Register the music status listener
