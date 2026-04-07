@@ -18,8 +18,10 @@
 
 package com.andrew.apollo.ui.activities;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -45,7 +47,6 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-@SuppressWarnings("deprecation")
 public final class ShortcutActivity extends AppCompatActivity {
 
     /**
@@ -85,7 +86,12 @@ public final class ShortcutActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Fade it in
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, android.R.anim.fade_out);
+        } else {
+            //noinspection deprecation
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
 
         // Bind Apollo's service
         //mToken = MusicUtils.bindToService(this, this);
