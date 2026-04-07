@@ -111,15 +111,24 @@ public final class ConfigurationManager {
             LOG.error("getString(key=" + key + ", defValue=" + defValue + ") preferences == null");
             throw new IllegalStateException("getString(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
+        return getStringFromPrefs(preferences, key, defValue);
+    }
+
+    /**
+     * Package-private for testing: isolated migration logic.
+     * If the key was stored as an Integer (pre-3.0.17 installs), catches
+     * ClassCastException, reads the int, migrates the key to a String, and returns it.
+     */
+    static String getStringFromPrefs(SharedPreferences prefs, String key, String defValue) {
         try {
-            return preferences.getString(key, defValue);
+            return prefs.getString(key, defValue);
         } catch (ClassCastException e) {
             // Old installs may have stored this key as an Integer (pre-3.0.17).
             // Read it as int, migrate it to a String in-place, and return it.
             LOG.warn("getString(key=" + key + "): stored as Integer, migrating to String");
-            int intValue = preferences.getInt(key, 0);
+            int intValue = prefs.getInt(key, 0);
             String strValue = String.valueOf(intValue);
-            preferences.edit().remove(key).putString(key, strValue).apply();
+            prefs.edit().remove(key).putString(key, strValue).apply();
             return strValue;
         }
     }
