@@ -38,7 +38,6 @@ import com.frostwire.android.gui.views.preference.PortRangePreference;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 
-@SuppressWarnings("deprecation")
 public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
     public TorrentPreferenceFragment() {
@@ -123,14 +122,10 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
         if (preference instanceof CustomSeekBarPreference) {
-            DialogFragment fragment;
-            fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
-            fragment.setTargetFragment(this, 0);
+            DialogFragment fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
             fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else if (preference instanceof PortRangePreference) {
-            DialogFragment fragment;
-            fragment = PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
-            fragment.setTargetFragment(this, 0);
+            DialogFragment fragment = PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
             fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else {
             super.onDisplayPreferenceDialog(preference);

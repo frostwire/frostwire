@@ -34,11 +34,12 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
 
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompat {
 
     protected static final String DIALOG_FRAGMENT_TAG =
@@ -59,15 +60,8 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
         initComponents();
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Fragment fragmentByTag = getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
-        // this is necessary to avoid a crash with double rotation of the screen
-        if (fragmentByTag != null) {
-            fragmentByTag.setTargetFragment(this, 0);
-        }
-    }
+    // onAttach no longer needed for setTargetFragment — PreferenceDialogFragment.getPreference()
+    // now resolves the parent fragment via getParentFragmentManager() instead.
 
     protected void initComponents() {
     }
@@ -101,6 +95,32 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
 
     public static abstract class PreferenceDialogFragment
             extends androidx.preference.PreferenceDialogFragmentCompat {
+
+        /**
+         * Returns the {@link DialogPreference} associated with this dialog by locating the
+         * parent {@link PreferenceFragmentCompat} via {@link #getParentFragmentManager()} instead
+         * of the deprecated {@link Fragment#getTargetFragment()}.
+         */
+        @Override
+        public DialogPreference getPreference() {
+            final Bundle args = getArguments();
+            if (args == null) {
+                throw new IllegalStateException("PreferenceDialogFragment: missing arguments");
+            }
+            final String key = args.getString(ARG_KEY);
+            // Walk the fragment manager to find the parent PreferenceFragmentCompat.
+            List<Fragment> fragments = getParentFragmentManager().getFragments();
+            for (Fragment f : fragments) {
+                if (f instanceof PreferenceFragmentCompat) {
+                    DialogPreference pref = ((PreferenceFragmentCompat) f).findPreference(key);
+                    if (pref != null) {
+                        return pref;
+                    }
+                }
+            }
+            throw new IllegalStateException(
+                    "PreferenceDialogFragment: could not find preference with key=" + key);
+        }
 
         @NonNull
         @Override
