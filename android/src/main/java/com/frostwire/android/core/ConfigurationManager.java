@@ -111,7 +111,17 @@ public final class ConfigurationManager {
             LOG.error("getString(key=" + key + ", defValue=" + defValue + ") preferences == null");
             throw new IllegalStateException("getString(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
-        return preferences.getString(key, defValue);
+        try {
+            return preferences.getString(key, defValue);
+        } catch (ClassCastException e) {
+            // Old installs may have stored this key as an Integer (pre-3.0.17).
+            // Read it as int, migrate it to a String in-place, and return it.
+            LOG.warn("getString(key=" + key + "): stored as Integer, migrating to String");
+            int intValue = preferences.getInt(key, 0);
+            String strValue = String.valueOf(intValue);
+            preferences.edit().remove(key).putString(key, strValue).apply();
+            return strValue;
+        }
     }
 
     public String getString(String key) {
