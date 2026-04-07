@@ -246,15 +246,17 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             ctx.retries = port1 - port0;
 
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-            // I2P Configuration
+            // I2P Configuration.
+            // Port and tunnel params are stored as Strings (EditTextPreference requires this).
+            // Parse them back to int with safe fallbacks.
             ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
             ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
-            ctx.i2pPort = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_PORT);
+            ctx.i2pPort = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_PORT), 7656);
             ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
-            ctx.i2pInboundQuantity = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY);
-            ctx.i2pOutboundQuantity = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY);
-            ctx.i2pInboundLength = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH);
-            ctx.i2pOutboundLength = cm.getInt(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH);
+            ctx.i2pInboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY), 3);
+            ctx.i2pOutboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY), 3);
+            ctx.i2pInboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
+            ctx.i2pOutboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
             String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
             ctx.version[0] = Integer.parseInt(vStrArray[0]);
             ctx.version[1] = Integer.parseInt(vStrArray[1]);
@@ -264,6 +266,22 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
             BTEngine.getInstance().start();
+        }
+    }
+
+    /**
+     * Parses an I2P integer preference that is stored as a String in SharedPreferences
+     * (because EditTextPreference always reads/writes strings). Returns the fallback
+     * value if the stored string is null, empty, or not a valid integer.
+     */
+    private static int parseI2PInt(String value, int fallback) {
+        if (value == null || value.isEmpty()) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return fallback;
         }
     }
 
