@@ -18,6 +18,8 @@
 
 package com.andrew.apollo.ui.fragments;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
 import androidx.loader.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -51,7 +53,6 @@ import java.util.List;
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
  */
-@SuppressWarnings("deprecation")
 public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
         implements DropListener, RemoveListener, DragScrollProfile {
 
@@ -73,33 +74,36 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-        if (inflater != null) {
-            inflater.inflate(R.menu.player_queue, menu);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.player_queue, menu);
+            }
 
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_player_save_queue:
-                NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
-                        .makeQueueCursor(getActivity());
-                CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
-                        getFragmentManager(), "CreatePlaylist");
-                queue.close();
-                return true;
-            case R.id.menu_player_clear_queue:
-                long currentAudioId = MusicUtils.getCurrentAudioId();
-                MusicUtils.clearQueue();
-                MusicUtils.playFDs(new long[] { currentAudioId }, 0, MusicUtils.isShuffleEnabled() );
-                refreshQueue();
-                return true;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_player_save_queue:
+                        NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
+                                .makeQueueCursor(getActivity());
+                        CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
+                                getParentFragmentManager(), "CreatePlaylist");
+                        queue.close();
+                        return true;
+                    case R.id.menu_player_clear_queue:
+                        long currentAudioId = MusicUtils.getCurrentAudioId();
+                        MusicUtils.clearQueue();
+                        MusicUtils.playFDs(new long[] { currentAudioId }, 0, MusicUtils.isShuffleEnabled() );
+                        refreshQueue();
+                        return true;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner());
     }
 
     @Override
