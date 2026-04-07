@@ -126,14 +126,12 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
             DialogFragment fragment;
             fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
             fragment.setTargetFragment(this, 0);
-            assert getFragmentManager() != null;
-            fragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+            fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else if (preference instanceof PortRangePreference) {
             DialogFragment fragment;
             fragment = PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
             fragment.setTargetFragment(this, 0);
-            assert getFragmentManager() != null;
-            fragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+            fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else {
             super.onDisplayPreferenceDialog(preference);
         }
