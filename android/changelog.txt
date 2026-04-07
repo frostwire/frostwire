@@ -5,6 +5,13 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:Updated Chaquopy to 17.0.0 with Python 3.13 - dropped 32-bit ABIs (armeabi-v7a, x86) incompatible with Python 3.13+; Python 3.14 blocked by missing brotli/pycryptodomex wheels in Chaquopy mirror
  - maintenance:Dropped jlibtorrent-android-arm and jlibtorrent-android-x86 dependencies (32-bit ABIs no longer targeted)
  - maintenance:Updated CI workflow to use Python 3.13
+ - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
+ - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
+ - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
+ - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
+ - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
+ - improvement:Added visual status indicators in transfers screen when protections pause downloads
 
 FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
@@ -100,6 +107,16 @@ FrostWire 3.0.12 build 766 DEC/02/2025
  - freeze:ANR in MusicPlaybackService.playFDs
  - freeze:in playFDs
  - freeze:in MusicPlaybackService.setDataSource
+ - crash:NPE in ImageFetcher.loadCurrentArtwork()
+ - improvement:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+ - improvement:Optimize stackBlur() with array pooling to reduce allocations
+ - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
+ - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
+ - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
+ - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
+ - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
+ - improvement:Added visual status indicators in transfers screen when protections pause downloads
  - maintenance:Guard favorites toast when fragment detached
  - maintenance:ProGuard now uses proguard-android-optimize.txt for better code optimization and APK size reduction
  - maintenance:Updated gradle plugin to 8.13.1
