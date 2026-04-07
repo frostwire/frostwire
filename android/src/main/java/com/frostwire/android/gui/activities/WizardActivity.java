@@ -24,6 +24,8 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ViewFlipper;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -78,6 +80,19 @@ public class WizardActivity extends AbstractActivity {
         }
 
         setupViewPage();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                final View view = viewFlipper.getCurrentView();
+                if (view instanceof WizardPageView && !((WizardPageView) view).hasPrevious()) {
+                    UIUtils.sendShutdownIntent(WizardActivity.this);
+                    finish();
+                } else {
+                    previousPage();
+                }
+            }
+        });
     }
 
     private void previousPage() {
@@ -122,15 +137,4 @@ public class WizardActivity extends AbstractActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onBackPressed() {
-        final View view = viewFlipper.getCurrentView();
-        if (view instanceof WizardPageView && !((WizardPageView) view).hasPrevious()) {
-            UIUtils.sendShutdownIntent(this);
-            finish();
-        } else {
-            previousPage();
-        }
-    }
 }

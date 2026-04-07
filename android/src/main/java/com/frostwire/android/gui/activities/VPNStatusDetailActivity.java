@@ -30,6 +30,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -102,6 +104,22 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         headerIcon.setOnClickListener(new LearnVPNLink());
         headerStatus.setOnClickListener(new LearnVPNLink());
         learnVPNText.setOnClickListener(new LearnVPNLink());
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent newIntent = new Intent(VPNStatusDetailActivity.this, MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                // if we came from Transfers, have MainActivity show the transfer fragment
+                Intent i = getIntent();
+                if (i != null && i.getExtras() != null &&
+                        i.getExtras().getString("from", "").equals("transfers")) {
+                    newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+                }
+                startActivity(newIntent);
+                finish();
+            }
+        });
     }
 
     private final class LearnVPNLink implements View.OnClickListener {
@@ -114,29 +132,10 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                getOnBackPressedDispatcher().onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onBackPressed() {
-        Intent newIntent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // if we came from Transfers, make sure to go have the transfer fragment shown by MainActivity.
-        Intent i = getIntent();
-        if (i != null && i.getExtras() != null &&
-                i.getExtras().getString("from", "").equals("transfers")) {
-            newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
-        }
-
-        startActivity(newIntent);
-        try {
-            super.onBackPressed();
-        } catch (Throwable ignored) {
         }
     }
 

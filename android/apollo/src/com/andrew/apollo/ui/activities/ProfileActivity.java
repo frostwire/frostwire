@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -209,6 +210,13 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         mViewPager.setOnPageChangeListener(this);
         // Attach the carousel listener
         mTabCarousel.setListener(this);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                goBack();
+            }
+        });
     }
 
     @Override
@@ -415,12 +423,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     protected void onSaveInstanceState(@NonNull  final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putAll(mArguments);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        goBack();
     }
 
     @Override
