@@ -549,7 +549,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      * otherwise.
      */
     private boolean isPlaylist() {
-        return mType.equals(MediaStore.Audio.Playlists.CONTENT_TYPE);
+        // MediaStore.Audio.Playlists deprecated API 29; use the literal MIME type string directly
+        return mType.equals("vnd.android.cursor.dir/playlist");
     }
 
     /**

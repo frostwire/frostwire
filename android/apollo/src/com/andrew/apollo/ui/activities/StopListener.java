@@ -23,6 +23,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
+import androidx.activity.ComponentActivity;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
@@ -50,8 +52,8 @@ class StopListener implements View.OnLongClickListener {
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
                 Activity activity = activityRef.get();
-                if (activity != null) {
-                    activity.getOnBackPressedDispatcher().onBackPressed();
+                if (activity instanceof ComponentActivity) {
+                    ((ComponentActivity) activity).getOnBackPressedDispatcher().onBackPressed();
                 }
             }
         } else {
