@@ -35,7 +35,6 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 class StopListener implements View.OnLongClickListener {
     private WeakReference<Activity> activityRef;
     private final boolean finishOnStop;
@@ -50,7 +49,10 @@ class StopListener implements View.OnLongClickListener {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> stopMusicTask(v));
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
-                activityRef.get().onBackPressed();
+                Activity activity = activityRef.get();
+                if (activity != null) {
+                    activity.getOnBackPressedDispatcher().onBackPressed();
+                }
             }
         } else {
             Ref.free(activityRef);
