@@ -21,9 +21,13 @@ package com.andrew.apollo.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -47,7 +51,6 @@ import java.lang.ref.WeakReference;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-@SuppressWarnings("deprecation")
 public final class ApolloUtils {
 
     /* This class is never initiated */
@@ -89,16 +92,18 @@ public final class ApolloUtils {
         final Toast cheatSheet = Toast.makeText(context, view.getContentDescription(),
                 Toast.LENGTH_SHORT);
         final boolean showBelow = screenPos[1] < estimatedToastHeight;
-        if (showBelow) {
-            // Show below
-            // Offsets are after decorations (e.g. status bar) are factored in
-            cheatSheet.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, viewCenterX
-                    - screenWidth / 2, screenPos[1] - displayFrame.top + viewHeight);
-        } else {
-            // Show above
-            // Offsets are after decorations (e.g. status bar) are factored in
-            cheatSheet.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, viewCenterX
-                    - screenWidth / 2, displayFrame.bottom - screenPos[1]);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (showBelow) {
+                // Show below
+                // Offsets are after decorations (e.g. status bar) are factored in
+                cheatSheet.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, viewCenterX
+                        - screenWidth / 2, screenPos[1] - displayFrame.top + viewHeight);
+            } else {
+                // Show above
+                // Offsets are after decorations (e.g. status bar) are factored in
+                cheatSheet.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, viewCenterX
+                        - screenWidth / 2, displayFrame.bottom - screenPos[1]);
+            }
         }
         cheatSheet.show();
     }
@@ -170,15 +175,22 @@ public final class ApolloUtils {
                     shortcutIntent.putExtra(Config.NAME, displayName);
                     shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
 
-                    // Intent that actually sets the shortcut
-                    final Intent intent = new Intent();
-                    if (bitmap != null) {
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                    // Pin shortcut using ShortcutManager (API 26+)
+                    final ShortcutManager shortcutManager =
+                            context.get().getSystemService(ShortcutManager.class);
+                    if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported()) {
+                        final Bitmap iconBitmap = bitmap != null
+                                ? BitmapUtils.resizeAndCropCenter(bitmap, 96)
+                                : fetcher.getDefaultArtwork();
+                        final Icon icon = Icon.createWithBitmap(iconBitmap);
+                        final String shortcutId = mimeType + "_" + id;
+                        final ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(context.get(), shortcutId)
+                                .setShortLabel(displayName)
+                                .setIcon(icon)
+                                .setIntent(shortcutIntent)
+                                .build();
+                        shortcutManager.requestPinShortcut(shortcutInfo, null);
                     }
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
-                    intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-                    context.get().sendBroadcast(intent);
                 }
             } catch (Exception e) {
                 Log.e("ApolloUtils", "createShortcutIntent", e);
