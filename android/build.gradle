@@ -33,7 +33,7 @@ buildscript {
         maven { url = "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.0.0'
+        classpath 'com.android.tools.build:gradle:9.0.1'
         //classpath 'org.codehaus.groovy:groovy-all:3.0.25'
         classpath "org.apache.groovy:groovy-swing:5.0.3"
 
@@ -113,13 +113,17 @@ android {
         multiDexEnabled true
 
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            abiFilters "arm64-v8a", "x86_64"
         }
 
         python {
+            def brewPython = "/opt/homebrew/bin/python3.13"
+            if (new File(brewPython).exists()) {
+                buildPython brewPython
+            }
             chaquopy {
                 defaultConfig {
-                    version "3.11"
+                    version "3.13"
                 }
             }
             pip {
@@ -278,9 +282,7 @@ dependencies {
 
     def jlibtorrent_version = '2.0.12.7'
     implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
-    implementation 'com.frostwire:jlibtorrent-android-arm:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
-    implementation 'com.frostwire:jlibtorrent-android-x86:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
 
     testImplementation 'junit:junit:4.13.2'

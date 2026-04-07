@@ -2,6 +2,9 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
  - new:I2P network integration for anonymous proxy support
  - Update com.google.firebase:firebase-bom to 34.8.0
+ - maintenance:Updated Chaquopy to 17.0.0 with Python 3.13 - dropped 32-bit ABIs (armeabi-v7a, x86) incompatible with Python 3.13+; Python 3.14 blocked by missing brotli/pycryptodomex wheels in Chaquopy mirror
+ - maintenance:Dropped jlibtorrent-android-arm and jlibtorrent-android-x86 dependencies (32-bit ABIs no longer targeted)
+ - maintenance:Updated CI workflow to use Python 3.13
 
 FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
