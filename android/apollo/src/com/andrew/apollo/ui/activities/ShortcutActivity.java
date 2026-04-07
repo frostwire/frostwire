@@ -89,8 +89,9 @@ public final class ShortcutActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, android.R.anim.fade_out);
         } else {
-            //noinspection deprecation
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            @SuppressWarnings("deprecation")
+            Runnable fadeTransition = () -> overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            fadeTransition.run();
         }
 
         // Bind Apollo's service
