@@ -51,7 +51,6 @@ import java.util.List;
  * @author aldenml
  * @author marcelinkaaa
  */
-@SuppressWarnings("deprecation")
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     //private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private final List<Slide> slides;
@@ -142,7 +141,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(videoURL));
-        ((MainActivity) getContext()).startActivityForResult(i, MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE);
+        ((MainActivity) getContext()).launchPromoVideoPreview(i);
     }
 
     private void startPromotionDownload(Slide theSlide) {

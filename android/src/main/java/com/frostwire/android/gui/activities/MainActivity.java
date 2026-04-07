@@ -39,6 +39,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -115,6 +117,9 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     private static MainActivity lastInstance = null;
 
     private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
+
+    // Launcher registered in onCreate() for promo video preview (replaces startActivityForResult)
+    private ActivityResultLauncher<Intent> promoVideoPreviewLauncher;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -384,6 +389,12 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_FrostWire);
+        // Must be registered before super.onCreate() per Activity Result API contract
+        promoVideoPreviewLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // Promo video preview result — no action required on return
+                });
         super.onCreate(savedInstanceState);
         lastInstance = this;
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -392,6 +403,14 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
                 MainActivity.this.handleOnBackPressed();
             }
         });
+    }
+
+    /**
+     * Launches a promo video preview intent via the Activity Result API.
+     * Called by {@link com.frostwire.android.gui.adapters.PromotionsAdapter}.
+     */
+    public void launchPromoVideoPreview(Intent intent) {
+        promoVideoPreviewLauncher.launch(intent);
     }
 
     private void checkExternalStoragePermissions() {
