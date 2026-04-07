@@ -43,17 +43,21 @@ class SuggestionsAdapter extends SimpleCursorAdapter {
     private static final String SUGGESTIONS_URL = buildSuggestionsUrl();
     private static final int HTTP_QUERY_TIMEOUT = 1000;
 
-    private final HttpClient client;
+    // Initialized lazily on first use in runQueryOnBackgroundThread (a background thread),
+    // so that OkHttpClient's SSL trust-root index is never built on the main thread.
+    private HttpClient client;
 
     private boolean discardLastResult;
 
     public SuggestionsAdapter(Context context) {
         super(context, R.layout.view_suggestion_item, null, new String[]{SuggestionsCursor.COLUMN_SUGGESTION}, new int[]{R.id.view_suggestion_item_text}, 0);
-        this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
     }
 
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+        if (client == null) {
+            client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+        }
         try {
             String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint.toString(), StandardCharsets.UTF_8.name()));
 
