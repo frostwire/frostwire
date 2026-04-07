@@ -19,12 +19,9 @@ import groovy.xml.Namespace
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.chaquo.python'
-apply plugin: 'org.jetbrains.kotlin.android'
-
+// groovy-swing is required at build-script evaluation time for SignatureRequester (SwingBuilder).
+// It cannot be declared in the plugins {} block (not a Gradle plugin), so it stays here.
+// Note: buildscript {} must precede plugins {} per Gradle rules.
 buildscript {
     repositories {
         google()
@@ -33,19 +30,16 @@ buildscript {
         maven { url = "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.0.1'
-        //classpath 'org.codehaus.groovy:groovy-all:3.0.25'
         classpath "org.apache.groovy:groovy-swing:5.0.3"
-
-        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
-
-        classpath 'com.google.gms:google-services:4.4.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
-
-        classpath 'com.chaquo.python:gradle:17.0.0'
-
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.21'
     }
+}
+
+plugins {
+    id 'com.android.application' version '9.0.1'
+    id 'com.google.gms.google-services' version '4.4.4'
+    id 'com.google.firebase.crashlytics' version '3.0.6'
+    id 'com.chaquo.python' version '17.0.0'
+    // org.jetbrains.kotlin.android is no longer needed: AGP 9.0+ has built-in Kotlin support.
 }
 
 repositories {
@@ -76,24 +70,7 @@ def manifestVersionName() {
     return xml.attributes()[ns.versionName].toString()
 }
 
-def changeApkOutput(variant) {
-    def flavor = 'plus'
-    def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
-    def name = "frostwire-android-" + variant.buildType.name + '-' + suffix
-
-    variant.outputs.all { output ->
-        outputFileName = name + '.apk'
-    }
-    variant.getAssembleProvider().configure() {
-        it.doLast {
-            assemble ->
-                copy {
-                    from variant.outputs*.outputFile
-                    into "${project.getLayout().getBuildDirectory().getAsFile().get()}"
-                }
-        }
-    }
-}
+// APK output renaming is wired up via androidComponents.onVariants after android {} block.
 
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
@@ -144,8 +121,8 @@ android {
         options.compilerArgs << "-Xlint:unchecked"
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        jvmToolchain(17)
     }
 
     sourceSets {
@@ -229,10 +206,6 @@ android {
         }
     }
 
-    applicationVariants.configureEach { variant ->
-        changeApkOutput(variant)
-    }
-
     configurations {
         configureEach {
             exclude group: "com.google.android.gms.common", module: "play-services-measurement"
@@ -242,6 +215,19 @@ android {
     buildFeatures {
         aidl true
         buildConfig true
+    }
+}
+
+// Replaces the old applicationVariants.configureEach { changeApkOutput(variant) } call.
+// AGP new DSL: use androidComponents.onVariants to rename APK output.
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        def flavor = 'plus'
+        def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
+        def apkName = "frostwire-android-" + variant.buildType + '-' + suffix + '.apk'
+        variant.outputs.each { output ->
+            output.outputFileName.set(apkName)
+        }
     }
 }
 
@@ -293,8 +279,9 @@ dependencies {
 }
 
 afterEvaluate {
-    tasks.named('uploadCrashlyticsMappingFilePlus1Release').configure {
-        dependsOn ':processPlus1ReleaseGoogleServices'
+    def uploadTask = tasks.findByName('uploadCrashlyticsMappingFilePlus1Release')
+    if (uploadTask != null) {
+        uploadTask.dependsOn ':processPlus1ReleaseGoogleServices'
     }
 }
 
