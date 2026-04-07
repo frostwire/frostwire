@@ -36,7 +36,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,7 +90,6 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
@@ -129,7 +130,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
         this.transferComparator = new TransferComparator();
-        setHasOptionsMenu(true);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler(android.os.Looper.getMainLooper());
         tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
@@ -154,6 +154,65 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         transferUpdateExecutor = new TransferUpdateExecutor();
         transferUpdateExecutor.initialize();
         initTimerServiceSubscription();
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.fragment_transfers_menu, menu);
+            }
+
+            @Override
+            public void onPrepareMenu(@NonNull Menu menu) {
+                menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
+                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
+                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
+                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
+                updateMenuItemVisibilityFromCache(menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem item) {
+                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+                setupAdapter(getActivity());
+                int itemId = item.getItemId();
+                if (itemId == R.id.fragment_transfers_menu_add_transfer) {
+                    toggleAddTransferControls();
+                    getActivity().invalidateOptionsMenu();
+                    return true;
+                } else if (itemId == R.id.fragment_transfers_menu_clear_all) {
+                    TransferManager.instance().clearComplete();
+                    getActivity().invalidateOptionsMenu();
+                    onTime(true);
+                    return true;
+                } else if (itemId == R.id.fragment_transfers_menu_pause_stop_all) {
+                    TransferManager.instance().stopHttpTransfers();
+                    TransferManager.instance().pauseTorrents();
+                    onTime(true);
+                    return true;
+                } else if (itemId == R.id.fragment_transfers_menu_resume_all) {
+                    if (bittorrentDisconnected) {
+                        UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+                    } else {
+                        if (NetworkManager.instance().isInternetDataConnectionUp()) {
+                            TransferManager.instance().resumeResumableTransfers();
+                            onTime(true);
+                        } else {
+                            UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                        }
+                    }
+                    return true;
+                } else if (itemId == R.id.fragment_transfers_menu_seed_all) {
+                    new SeedAction(getActivity()).onClick();
+                    onTime(true);
+                    return true;
+                } else if (itemId == R.id.fragment_transfers_menu_stop_seeding_all) {
+                    TransferManager.instance().stopSeedingTorrents();
+                    onTime(true);
+                    return true;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner());
     }
 
     private void tryTimerServiceUnsubscribe() {
@@ -169,23 +228,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else {
             subscription = TimerService.subscribe(this, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_transfers_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
-        menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
-        menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
-        menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
-        menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
-        updateMenuItemVisibilityFromCache(menu);
-        super.onPrepareOptionsMenu(menu);
     }
 
     private void updateMenuItemVisibilityFromCache(Menu menu) {
@@ -226,50 +268,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             cachedHasSeeding = false;
             cachedHasComplete = false;
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
-        // Handle item selection
-        setupAdapter(getActivity());
-        int itemId = item.getItemId();
-        if (itemId == R.id.fragment_transfers_menu_add_transfer) {
-            toggleAddTransferControls();
-            getActivity().invalidateOptionsMenu();
-            return true;
-        } else if (itemId == R.id.fragment_transfers_menu_clear_all) {
-            TransferManager.instance().clearComplete();
-            getActivity().invalidateOptionsMenu();
-            onTime(true);  // Force immediate UI update after clearing
-            return true;
-        } else if (itemId == R.id.fragment_transfers_menu_pause_stop_all) {
-            TransferManager.instance().stopHttpTransfers();
-            TransferManager.instance().pauseTorrents();
-            onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
-            return true;
-        } else if (itemId == R.id.fragment_transfers_menu_resume_all) {
-            if (bittorrentDisconnected) {
-                UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
-            } else {
-                if (NetworkManager.instance().isInternetDataConnectionUp()) {
-                    TransferManager.instance().resumeResumableTransfers();
-                    onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
-                } else {
-                    UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
-                }
-            }
-            return true;
-        } else if (itemId == R.id.fragment_transfers_menu_seed_all) {
-            new SeedAction(getActivity()).onClick();
-            onTime(true);  // Force immediate UI update after seeding
-            return true;
-        } else if (itemId == R.id.fragment_transfers_menu_stop_seeding_all) {
-            TransferManager.instance().stopSeedingTorrents();
-            onTime(true);  // Force immediate UI update (don't wait for 2-second timer)
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
