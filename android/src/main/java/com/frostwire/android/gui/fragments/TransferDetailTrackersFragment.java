@@ -51,7 +51,6 @@ import androidx.recyclerview.widget.RecyclerView;
  * @author marcelinkaaa
  */
 
-@SuppressWarnings("deprecation")
 public class TransferDetailTrackersFragment extends AbstractTransferDetailFragment {
     public TransferDetailTrackersFragment() {
         super(R.layout.fragment_transfer_detail_trackers);
@@ -72,7 +71,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             return;
         }
         if (adapter == null && isAdded()) {
-            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload, getFragmentManager());
+            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload, getParentFragmentManager());
         }
         //ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
