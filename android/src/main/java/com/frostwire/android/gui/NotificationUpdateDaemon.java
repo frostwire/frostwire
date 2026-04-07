@@ -162,11 +162,9 @@ public final class NotificationUpdateDaemon {
             Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.frostwire_notification_flat)
                     .setContentIntent(showFrostWireIntent)
-                    .setContent(remoteViews)
-                    .setOngoing(true) // Makes the notification persistent
+                    .setCustomContentView(remoteViews)
+                    .setOngoing(true) // Makes the notification persistent; FLAG_NO_CLEAR is implied
                     .build();
-
-            notification.flags |= Notification.FLAG_NO_CLEAR;
 
             notificationViews = remoteViews;
             notificationObject = notification;
@@ -180,11 +178,9 @@ public final class NotificationUpdateDaemon {
                         .setContentTitle("FrostWire")
                         .setContentText("FrostWire is running")
                         .setContentIntent(showFrostWireIntent)
-                        .setOngoing(true)
+                        .setOngoing(true) // FLAG_NO_CLEAR is implied by setOngoing(true)
                         .setPriority(NotificationCompat.PRIORITY_LOW)
                         .build();
-
-                notification.flags |= Notification.FLAG_NO_CLEAR;
 
                 notificationViews = null; // Signal that we're using fallback
                 notificationObject = notification;
@@ -307,11 +303,9 @@ public final class NotificationUpdateDaemon {
                         .setContentTitle("FrostWire is running")
                         .setContentText(contentText)
                         .setContentIntent(showFrostWireIntent)
-                        .setOngoing(true)
+                        .setOngoing(true) // FLAG_NO_CLEAR is implied by setOngoing(true)
                         .setPriority(NotificationCompat.PRIORITY_LOW)
                         .build();
-
-                notification.flags |= Notification.FLAG_NO_CLEAR;
                 notificationObject = notification;
             } catch (Throwable e) {
                 LOG.error("Failed to update fallback notification", e);
