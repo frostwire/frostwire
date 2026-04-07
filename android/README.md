@@ -104,6 +104,8 @@ To run tests:
 ./gradlew test
 ```
 
+See the [Running Tests](#running-tests) section below for details on how to run specific test suites.
+
 To clean build artifacts:
 
 ```bash
@@ -155,6 +157,62 @@ org.gradle.jvmargs=-Xmx2560m -XX:+UseParallelGC --enable-native-access=ALL-UNNAM
 ### Python/Chaquo build errors
 
 FrostWire Android uses Chaquo for Python integration. Ensure you have Python 3 installed on your system.
+
+# Running Tests
+
+## Test variants
+
+| Task | What it runs |
+|---|---|
+| `./gradlew testPlus1DebugUnitTest` | All JVM unit tests (pure JVM + Robolectric) |
+| `./gradlew test` | Unit tests for all variants |
+| `./gradlew connectedPlus1DebugAndroidTest` | Instrumentation tests on a connected device/emulator |
+
+## Run all unit tests
+
+```bash
+./gradlew testPlus1DebugUnitTest
+```
+
+## Run only the fast pure-JVM tests (~1 second, no device needed)
+
+These tests cover structural regressions from the deprecation migration sprint and require no Android SDK or Robolectric downloads:
+
+```bash
+./gradlew testPlus1DebugUnitTest \
+  --tests "com.frostwire.android.gui.services.EngineIntentServiceMigrationTest" \
+  --tests "com.frostwire.android.gui.DeprecationMigrationStructureTest" \
+  --tests "com.frostwire.android.core.ConfigurationManagerGetStringTest"
+```
+
+## Run a single test class
+
+```bash
+./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.core.ConfigurationManagerGetStringTest"
+```
+
+## Run tests matching a package
+
+```bash
+./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.*"
+./gradlew testPlus1DebugUnitTest --tests "com.andrew.apollo.*"
+```
+
+## Test results
+
+After a run, results are available at:
+
+- **HTML report**: `build/reports/tests/testPlus1DebugUnitTest/index.html`
+- **XML results**: `build/test-results/testPlus1DebugUnitTest/`
+
+## Notes on Robolectric tests
+
+Tests annotated with `@RunWith(RobolectricTestRunner.class)` (e.g. `ShuffleHistoryTest`,
+`MusicPlaybackServiceStateTest`, `MediaButtonIntentReceiverTest`) will download the Android SDK
+JAR (~100 MB) on the first run. After that initial download the JAR is cached in `~/.m2` and
+subsequent runs take only a few seconds.
+
+---
 
 # Code Organization
 
