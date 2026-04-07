@@ -20,10 +20,11 @@ package com.frostwire.android.util;
 
 import android.app.Application;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Paint;
 import android.view.View;
+
+import androidx.fragment.app.Fragment;
 
 import com.frostwire.android.BuildConfig;
 
@@ -43,7 +44,6 @@ import java.util.TreeSet;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public final class Debug {
 
     private Debug() {
