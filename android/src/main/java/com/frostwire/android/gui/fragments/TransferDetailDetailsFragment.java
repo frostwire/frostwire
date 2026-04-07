@@ -462,15 +462,13 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         @Override
         public void onClick(View v) {
             SpeedLimitDialog.Direction direction = SpeedLimitDialog.Direction.Upload;
-            switch (v.getId()) {
-                case R.id.fragment_transfer_detail_details_speed_limit_download:
-                case R.id.fragment_transfer_detail_details_speed_limit_download_arrow:
-                    direction = SpeedLimitDialog.Direction.Download;
-                    break;
-                case R.id.fragment_transfer_detail_details_speed_limit_upload:
-                case R.id.fragment_transfer_detail_details_speed_limit_upload_arrow:
-                    direction = SpeedLimitDialog.Direction.Upload;
-                    break;
+            int vId = v.getId();
+            if (vId == R.id.fragment_transfer_detail_details_speed_limit_download ||
+                    vId == R.id.fragment_transfer_detail_details_speed_limit_download_arrow) {
+                direction = SpeedLimitDialog.Direction.Download;
+            } else if (vId == R.id.fragment_transfer_detail_details_speed_limit_upload ||
+                    vId == R.id.fragment_transfer_detail_details_speed_limit_upload_arrow) {
+                direction = SpeedLimitDialog.Direction.Upload;
             }
 
             SpeedLimitDialog dialog = SpeedLimitDialog.newInstance(uiBittorrentDownload, direction, fragmentRef);
