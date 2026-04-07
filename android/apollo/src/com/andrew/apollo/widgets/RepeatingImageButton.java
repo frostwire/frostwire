@@ -69,14 +69,11 @@ public final class RepeatingImageButton extends androidx.appcompat.widget.AppCom
 
     @Override
     public void onClick(final View view) {
-        switch (view.getId()) {
-            case R.id.action_button_previous:
-                MusicUtils.previous();
-                break;
-            case R.id.action_button_next:
-                MusicUtils.next();
-            default:
-                break;
+        int id = view.getId();
+        if (id == R.id.action_button_previous) {
+            MusicUtils.previous();
+        } else if (id == R.id.action_button_next) {
+            MusicUtils.next();
         }
     }
 
@@ -172,15 +169,11 @@ public final class RepeatingImageButton extends androidx.appcompat.widget.AppCom
         if (isInEditMode()) {
             return;
         }
-        switch (getId()) {
-            case R.id.action_button_next:
-                setImageResource(nextDrawable);
-                break;
-            case R.id.action_button_previous:
-                setImageResource(previousDrawable);
-                break;
-            default:
-                break;
+        int id = getId();
+        if (id == R.id.action_button_next) {
+            setImageResource(nextDrawable);
+        } else if (id == R.id.action_button_previous) {
+            setImageResource(previousDrawable);
         }
     }
 
