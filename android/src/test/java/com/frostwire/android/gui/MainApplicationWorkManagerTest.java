@@ -1,73 +1,62 @@
+/*
+ *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+ *
+ *     Licensed under GPL v3. See LICENSE file.
+ */
+
 package com.frostwire.android.gui;
 
 import androidx.work.Configuration;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Unit test for MainApplication WorkManager configuration to ensure
- * the JobScheduler alarm limit fix is properly implemented.
+ * Structural tests for MainApplication WorkManager configuration.
+ *
+ * Verifies class structure without instantiating MainApplication or calling
+ * getWorkManagerConfiguration() — both of which require Looper/Android runtime.
+ *
+ * Pure JVM — no Robolectric, no Android framework.
  */
 public class MainApplicationWorkManagerTest {
 
     @Test
-    public void testWorkManagerConfiguration() {
-        // Create a mock MainApplication to test configuration
-        MainApplication app = new MainApplication() {
-            // Override to avoid Android dependencies in unit test
-        };
-        
-        Configuration config = app.getWorkManagerConfiguration();
-        
-        // Verify that the scheduler limit is set to our reduced value
-        assertNotNull("WorkManager configuration should not be null", config);
-        
-        // Note: Configuration.getMaxSchedulerLimit() is not publicly accessible,
-        // but we can verify the configuration was created with our builder pattern
-        // The actual limit verification would need to be done in an integration test
-        
-        // Verify that the configuration is properly built
-        assertTrue("Configuration should be built with custom values", config != null);
-    }
-    
-    @Test
-    public void testWorkManagerInitialization() {
-        MainApplication app = new MainApplication() {
-            private boolean initializeCalled = false;
-            
-            // Mock the initialization method to verify it's called
-            void initializeWorkManager() {
-                initializeCalled = true;
-                // Don't call super to avoid Android dependencies
+    public void mainApplication_implementsConfigurationProvider() {
+        boolean implementsProvider = false;
+        for (Class<?> iface : MainApplication.class.getInterfaces()) {
+            if (iface.getName().equals("androidx.work.Configuration$Provider")) {
+                implementsProvider = true;
+                break;
             }
-            
-            public boolean wasInitializeCalled() {
-                return initializeCalled;
-            }
-        };
-        
-        // In a real test, we would verify that initializeWorkManager is called
-        // during onCreate(), but that requires Android test framework
-        
-        // This is a placeholder to demonstrate the test structure
-        assertTrue("Test structure is valid", true);
+        }
+        assertTrue("MainApplication must implement WorkManager Configuration.Provider",
+                implementsProvider);
     }
-    
-    /**
-     * Integration test placeholder - would require Android test environment
-     */
+
     @Test
-    public void testSchedulerLimitEnforcement() {
-        // This test would verify that:
-        // 1. WorkManager respects the 20 job limit
-        // 2. Jobs are properly cancelled when services shut down
-        // 3. Throttling prevents rapid job scheduling
-        // 4. No duplicate NotificationUpdateDaemon instances are created
-        
-        // For now, this is a documentation of what should be tested
-        // in an actual Android instrumentation test
-        
-        assertTrue("Integration test placeholder", true);
+    public void mainApplication_hasGetWorkManagerConfigurationMethod() throws Exception {
+        Method m = MainApplication.class.getDeclaredMethod("getWorkManagerConfiguration");
+        assertNotNull(m);
+        assertTrue("getWorkManagerConfiguration must be public",
+                Modifier.isPublic(m.getModifiers()));
+        assertTrue("getWorkManagerConfiguration must return Configuration",
+                Configuration.class.isAssignableFrom(m.getReturnType()));
+    }
+
+    @Test
+    public void mainApplication_doesNotExtendMultiDexApplication() {
+        Class<?> cls = MainApplication.class.getSuperclass();
+        while (cls != null && cls != Object.class) {
+            assertTrue("MainApplication must NOT extend MultiDexApplication (minSdk=26)",
+                    !cls.getName().equals("androidx.multidex.MultiDexApplication"));
+            cls = cls.getSuperclass();
+        }
     }
 }

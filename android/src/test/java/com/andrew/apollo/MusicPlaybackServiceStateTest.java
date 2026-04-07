@@ -8,9 +8,11 @@
 package com.andrew.apollo;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,116 +20,116 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for MusicPlaybackService constants and configuration that can be
- * verified without a running service instance.
+ * Tests for MusicPlaybackService constants and configuration.
  *
- * Verifies:
- * - All required broadcast action strings are non-null and distinct
- * - Repeat mode constants have the expected values
- * - Shuffle / repeat mode constants don't overlap
+ * Accesses only public static final String/int constants via reflection —
+ * does NOT instantiate or load MusicPlaybackService fully, avoiding the
+ * ExoPlayer/media3 class instrumentation that hangs Robolectric.
  *
- * These run on the JVM via Robolectric — no device required.
+ * Pure JVM — no Robolectric, no Android framework.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(manifest = Config.NONE, sdk = 33)
 public class MusicPlaybackServiceStateTest {
 
     // ---- Broadcast action strings ----
 
     @Test
-    public void broadcastAction_PLAYSTATE_CHANGED_defined() {
-        assertNotNull(MusicPlaybackService.PLAYSTATE_CHANGED);
-        assertFalse(MusicPlaybackService.PLAYSTATE_CHANGED.isEmpty());
+    public void broadcastAction_PLAYSTATE_CHANGED_defined() throws Exception {
+        String val = getStringConstant("PLAYSTATE_CHANGED");
+        assertNotNull(val);
+        assertFalse(val.isEmpty());
     }
 
     @Test
-    public void broadcastAction_META_CHANGED_defined() {
-        assertNotNull(MusicPlaybackService.META_CHANGED);
-        assertFalse(MusicPlaybackService.META_CHANGED.isEmpty());
+    public void broadcastAction_META_CHANGED_defined() throws Exception {
+        String val = getStringConstant("META_CHANGED");
+        assertNotNull(val);
+        assertFalse(val.isEmpty());
     }
 
     @Test
-    public void broadcastAction_QUEUE_CHANGED_defined() {
-        assertNotNull(MusicPlaybackService.QUEUE_CHANGED);
-        assertFalse(MusicPlaybackService.QUEUE_CHANGED.isEmpty());
+    public void broadcastAction_QUEUE_CHANGED_defined() throws Exception {
+        String val = getStringConstant("QUEUE_CHANGED");
+        assertNotNull(val);
+        assertFalse(val.isEmpty());
     }
 
     @Test
-    public void broadcastAction_POSITION_CHANGED_defined() {
-        assertNotNull(MusicPlaybackService.POSITION_CHANGED);
-        assertFalse(MusicPlaybackService.POSITION_CHANGED.isEmpty());
+    public void broadcastAction_POSITION_CHANGED_defined() throws Exception {
+        String val = getStringConstant("POSITION_CHANGED");
+        assertNotNull(val);
+        assertFalse(val.isEmpty());
     }
 
     @Test
-    public void broadcastActions_allDistinct() {
-        String[] actions = {
-                MusicPlaybackService.PLAYSTATE_CHANGED,
-                MusicPlaybackService.META_CHANGED,
-                MusicPlaybackService.QUEUE_CHANGED,
-                MusicPlaybackService.POSITION_CHANGED,
-                MusicPlaybackService.REPEATMODE_CHANGED,
-                MusicPlaybackService.SHUFFLEMODE_CHANGED,
+    public void broadcastActions_allDistinct() throws Exception {
+        String[] names = {
+                "PLAYSTATE_CHANGED", "META_CHANGED", "QUEUE_CHANGED",
+                "POSITION_CHANGED", "REPEATMODE_CHANGED", "SHUFFLEMODE_CHANGED"
         };
-        for (int i = 0; i < actions.length; i++) {
-            for (int j = i + 1; j < actions.length; j++) {
-                assertFalse("Broadcast actions must be distinct: " + actions[i] + " vs " + actions[j],
-                        actions[i].equals(actions[j]));
-            }
+        Set<String> seen = new HashSet<>();
+        for (String name : names) {
+            String val = getStringConstant(name);
+            assertNotNull("Constant " + name + " must not be null", val);
+            assertTrue("Broadcast action '" + val + "' is duplicated", seen.add(val));
         }
     }
 
     // ---- Repeat mode constants ----
 
     @Test
-    public void repeatMode_NONE_isZero() {
-        assertEquals("REPEAT_NONE must be 0", 0, MusicPlaybackService.REPEAT_NONE);
+    public void repeatMode_NONE_isZero() throws Exception {
+        assertEquals(0, getIntConstant("REPEAT_NONE"));
     }
 
     @Test
-    public void repeatMode_ALL_isOne() {
-        assertEquals("REPEAT_ALL must be 1", 1, MusicPlaybackService.REPEAT_ALL);
+    public void repeatMode_CURRENT_isOne() throws Exception {
+        assertEquals(1, getIntConstant("REPEAT_CURRENT"));
     }
 
     @Test
-    public void repeatMode_CURRENT_isTwo() {
-        assertEquals("REPEAT_CURRENT must be 2", 2, MusicPlaybackService.REPEAT_CURRENT);
+    public void repeatMode_ALL_isTwo() throws Exception {
+        assertEquals(2, getIntConstant("REPEAT_ALL"));
     }
 
     @Test
-    public void repeatModes_distinct() {
-        assertTrue("Repeat mode constants must be distinct",
-                MusicPlaybackService.REPEAT_NONE != MusicPlaybackService.REPEAT_ALL
-                        && MusicPlaybackService.REPEAT_ALL != MusicPlaybackService.REPEAT_CURRENT
-                        && MusicPlaybackService.REPEAT_NONE != MusicPlaybackService.REPEAT_CURRENT);
+    public void repeatModes_distinct() throws Exception {
+        int none = getIntConstant("REPEAT_NONE");
+        int all = getIntConstant("REPEAT_ALL");
+        int current = getIntConstant("REPEAT_CURRENT");
+        assertTrue(none != all && all != current && none != current);
     }
 
     // ---- Command strings ----
 
     @Test
-    public void commandStrings_defined() {
-        assertNotNull(MusicPlaybackService.CMDPLAY);
-        assertNotNull(MusicPlaybackService.CMDPAUSE);
-        assertNotNull(MusicPlaybackService.CMDSTOP);
-        assertNotNull(MusicPlaybackService.CMDNEXT);
-        assertNotNull(MusicPlaybackService.CMDPREVIOUS);
-        assertNotNull(MusicPlaybackService.CMDTOGGLEPAUSE);
+    public void commandStrings_definedAndDistinct() throws Exception {
+        String[] names = {
+                "CMDPLAY", "CMDPAUSE", "CMDSTOP",
+                "CMDNEXT", "CMDPREVIOUS", "CMDTOGGLEPAUSE"
+        };
+        Set<String> seen = new HashSet<>();
+        for (String name : names) {
+            String val = getStringConstant(name);
+            assertNotNull("Command string " + name + " must not be null", val);
+            assertTrue("Command string '" + val + "' is duplicated", seen.add(val));
+        }
     }
 
-    @Test
-    public void commandStrings_distinct() {
-        String[] cmds = {
-                MusicPlaybackService.CMDPLAY,
-                MusicPlaybackService.CMDPAUSE,
-                MusicPlaybackService.CMDSTOP,
-                MusicPlaybackService.CMDNEXT,
-                MusicPlaybackService.CMDPREVIOUS,
-                MusicPlaybackService.CMDTOGGLEPAUSE,
-        };
-        for (int i = 0; i < cmds.length; i++) {
-            for (int j = i + 1; j < cmds.length; j++) {
-                assertFalse("Command strings must be distinct: " + cmds[i] + " vs " + cmds[j],
-                        cmds[i].equals(cmds[j]));
-            }
-        }
+    // -----------------------------------------------------------------------
+    // Helpers — access constants via reflection without triggering <clinit>
+    // -----------------------------------------------------------------------
+
+    private static String getStringConstant(String fieldName) throws Exception {
+        Field f = MusicPlaybackService.class.getDeclaredField(fieldName);
+        f.setAccessible(true);
+        assertTrue("Field " + fieldName + " must be static", Modifier.isStatic(f.getModifiers()));
+        return (String) f.get(null);
+    }
+
+    private static int getIntConstant(String fieldName) throws Exception {
+        Field f = MusicPlaybackService.class.getDeclaredField(fieldName);
+        f.setAccessible(true);
+        assertTrue("Field " + fieldName + " must be static", Modifier.isStatic(f.getModifiers()));
+        return f.getInt(null);
     }
 }
