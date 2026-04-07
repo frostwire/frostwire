@@ -35,6 +35,7 @@ import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference.CustomSeekBarPreferenceDialog;
 import com.frostwire.android.gui.views.preference.PortRangePreference;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 
 @SuppressWarnings("deprecation")
@@ -57,12 +58,11 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
         if (preferenceSeeding != null) {
             preferenceSeeding.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean newVal = (Boolean) newValue;
-
                 if (!newVal) { // not seeding at all
-                    TransferManager.instance().stopSeedingTorrents();
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> TransferManager.instance().stopSeedingTorrents());
                     UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
                 }
-
                 if (preferenceSeedingWifiOnly != null) {
                     preferenceSeedingWifiOnly.setEnabled(newVal);
                 }
@@ -74,7 +74,8 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
             preferenceSeedingWifiOnly.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean newVal = (Boolean) newValue;
                 if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
-                    TransferManager.instance().stopSeedingTorrents();
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> TransferManager.instance().stopSeedingTorrents());
                     UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
                 }
                 return true;
@@ -91,11 +92,13 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
         if (prefEnableDHT != null) {
             prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean newStatus = (boolean) newValue;
-                if (newStatus) {
-                    BTEngine.getInstance().startDht();
-                } else {
-                    BTEngine.getInstance().stopDht();
-                }
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    if (newStatus) {
+                        BTEngine.getInstance().startDht();
+                    } else {
+                        BTEngine.getInstance().stopDht();
+                    }
+                });
                 return true;
             });
         }
@@ -140,10 +143,14 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
             pickerPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                 if (btEngine != null) {
                     int newVal = (int) newValue;
-                    executeBTEngineAction(key, btEngine, newVal);
-                    return checkBTEngineActionResult(key, btEngine, newVal);
+                    // BTEngine calls go to libtorrent via JNI — off the main thread.
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> executeBTEngineAction(key, btEngine, newVal));
                 }
-                return false;
+                // Always return true: the preference value is valid (constrained by the
+                // seekbar) and we want the framework to persist it regardless of whether
+                // the async BTEngine call has run yet.
+                return true;
             });
         }
     }
@@ -169,23 +176,5 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
                 btEngine.maxPeers(value);
                 break;
         }
-    }
-
-    private boolean checkBTEngineActionResult(final String key, final BTEngine btEngine, final int value) {
-        switch (key) {
-            case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
-                return btEngine.downloadRateLimit() == value;
-            case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
-                return btEngine.uploadRateLimit() == value;
-            case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
-                return btEngine.maxActiveDownloads() == value;
-            case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
-                return btEngine.maxActiveSeeds() == value;
-            case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
-                return btEngine.maxConnections() == value;
-            case Constants.PREF_KEY_TORRENT_MAX_PEERS:
-                return btEngine.maxPeers() == value;
-        }
-        return false;
     }
 }
