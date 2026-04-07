@@ -22,15 +22,14 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 
 import com.frostwire.android.R;
@@ -56,8 +55,7 @@ import okhttp3.ConnectionPool;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
-public class EngineIntentService extends JobIntentService implements IEngineService {
+public class EngineIntentService extends Service implements IEngineService {
     // members:
     private static final Logger LOG = Logger.getLogger(EngineIntentService.class);
     private static final long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
@@ -243,18 +241,6 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
         public EngineIntentService getService() {
             return EngineIntentService.this;
         }
-    }
-
-    @Override
-    protected void onHandleWork(@NonNull Intent intent) {
-        LOG.info("EngineService::onHandleWork() - intent: " + intent);
-        onStartCommand(intent, 0, 1);
-    }
-
-    @Override
-    public boolean onStopCurrentWork() {
-        //shutdown();
-        return true;
     }
 
     public void updateState(byte newState) {
