@@ -150,10 +150,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         return fromHtml(getString(resId));
     }
 
-    @SuppressWarnings({"deprecated", "deprecation"}) // Html.fromHtml(String) deprecated API 24; flag version used on API 24+
     private static Spanned fromHtml(String html) {
-        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
-                ? Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
-                : Html.fromHtml(html);
+        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
 }

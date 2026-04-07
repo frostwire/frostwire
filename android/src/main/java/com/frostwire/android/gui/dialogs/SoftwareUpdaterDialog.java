@@ -90,9 +90,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
             String[] values = new String[changelog.size()];
             for (int i = 0; i < values.length; i++) {
                 String html = "&#8226; " + changelog.get(i);
-                values[i] = String.valueOf(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
-                        ? Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
-                        : Html.fromHtml(html));
+                values[i] = String.valueOf(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY));
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                     R.layout.dialog_update_bullet,

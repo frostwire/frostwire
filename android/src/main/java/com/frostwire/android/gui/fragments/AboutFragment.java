@@ -19,7 +19,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -110,9 +109,7 @@ public final class AboutFragment extends AbstractFragment {
 
         TextView content = findView(rootView, R.id.fragment_about_content);
         String aboutHtml = getAboutText();
-        content.setText(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
-                ? Html.fromHtml(aboutHtml, android.text.Html.FROM_HTML_MODE_LEGACY)
-                : android.text.Html.fromHtml(aboutHtml));
+        content.setText(Html.fromHtml(aboutHtml, Html.FROM_HTML_MODE_LEGACY));
         content.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {

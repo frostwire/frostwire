@@ -93,9 +93,7 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
         tosTextView.setMovementMethod(LinkMovementMethod.getInstance());
         final String tou = r.getString(R.string.terms_of_use);
         String tosHtml = "<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>";
-        tosTextView.setText(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N
-                ? android.text.Html.fromHtml(tosHtml, android.text.Html.FROM_HTML_MODE_LEGACY)
-                : android.text.Html.fromHtml(tosHtml));
+        tosTextView.setText(Html.fromHtml(tosHtml, Html.FROM_HTML_MODE_LEGACY));
     }
 
     protected void onComplete(boolean complete) {

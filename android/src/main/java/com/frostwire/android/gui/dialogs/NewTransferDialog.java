@@ -27,6 +27,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.core.os.BundleCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -76,13 +78,7 @@ public class NewTransferDialog extends AbstractDialog {
 
         Bundle args = getArguments();
 
-        SearchResultData data;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            data = args.getSerializable(SEARCH_RESULT_DATA_KEY, SearchResultData.class);
-        } else {
-            //noinspection deprecation
-            data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
-        }
+        SearchResultData data = BundleCompat.getSerializable(args, SEARCH_RESULT_DATA_KEY, SearchResultData.class);
         boolean hideCheckShow = args.getBoolean(HIDE_CHECK_SHOW_KEY);
 
         dlg.setContentView(R.layout.dialog_default_checkbox);
