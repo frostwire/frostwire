@@ -96,7 +96,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
                     );
                     dlg.setTargetFragment(ApplicationPreferencesFragment.this, 0);
-                    dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
+                    dlg.show(getParentFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
                     return false;
                 }
