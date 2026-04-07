@@ -19,6 +19,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
