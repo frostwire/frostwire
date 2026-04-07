@@ -18,8 +18,9 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.Fragment;
 import android.view.View;
+
+import androidx.fragment.app.Fragment;
 
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -30,7 +31,6 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public final class TimerSubscription {
 
     private static final Logger LOG = Logger.getLogger(TimerSubscription.class);
