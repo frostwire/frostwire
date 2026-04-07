@@ -55,7 +55,6 @@ import java.util.List;
  * @author marcelinkaaa
  */
 
-@SuppressWarnings("deprecation")
 public class TransferDetailDetailsFragment extends AbstractTransferDetailFragment {
     private TextView storagePath;
     private ImageView sequentialDividerLine;
@@ -148,7 +147,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 }
             }
             if (onRateLimitClickListener == null) {
-                onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, this, getFragmentManager());
+                onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, this, getParentFragmentManager());
                 downloadSpeedLimit.setOnClickListener(onRateLimitClickListener);
                 downloadSpeedLimitArrow.setOnClickListener(onRateLimitClickListener);
                 uploadSpeedLimit.setOnClickListener(onRateLimitClickListener);
