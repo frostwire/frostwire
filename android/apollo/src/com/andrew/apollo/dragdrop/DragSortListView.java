@@ -16,6 +16,7 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
@@ -572,7 +573,7 @@ public class DragSortListView extends ListView {
             canvas.translate(mFloatViewLeft, mFloatViewTop);
             canvas.clipRect(0, 0, w, h);
 
-            canvas.saveLayerAlpha(0, 0, w, h, alpha, 0);
+            canvas.saveLayerAlpha(new RectF(0, 0, w, h), alpha);
             mFloatView.draw(canvas);
             canvas.restore();
             canvas.restore();
