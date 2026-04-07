@@ -28,6 +28,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.android.util.TorrentUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
@@ -35,6 +36,7 @@ import com.frostwire.util.MimeDetector;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * @author aldenml
@@ -87,7 +89,9 @@ public class UIHttpDownload extends HttpDownload {
     }
 
     private static Info convert(HttpSearchResult sr) {
-        return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize());
+        Map<String, String> headers = (sr instanceof TellurideSearchResult) ?
+                ((TellurideSearchResult) sr).getHttpHeaders() : null;
+        return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize(), headers);
     }
 
     private static Info convert(Slide slide) {

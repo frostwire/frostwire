@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -178,7 +179,8 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                     format.url,
                     result.thumbnail,
                     format.filesize,
-                    result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date)));
+                    result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
+                    format.http_headers));
         }
 
         return results;
@@ -296,6 +298,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         public String vcodec;
         public int height;
         public int width;
+        public Map<String, String> http_headers;
     }
 
     private static class TellurideProcessListener extends TellurideAbstractListener {

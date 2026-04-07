@@ -171,12 +171,22 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public void save(String url, File file, boolean resume, Map<String, String> extraHeaders) throws IOException {
+        save(url, file, resume, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT, null, extraHeaders);
+    }
+
+    @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException {
         save(url, file, resume, timeout, userAgent, null);
     }
 
     @Override
-    abstract public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
+    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
+        save(url, file, resume, timeout, userAgent, referrer, null);
+    }
+
+    @Override
+    abstract public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException;
 
     @Override
     abstract public String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException;

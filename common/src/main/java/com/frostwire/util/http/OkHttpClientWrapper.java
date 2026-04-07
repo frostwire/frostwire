@@ -176,7 +176,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     }
 
     @Override
-    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
+    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException {
         FileOutputStream fos;
         BufferedOutputStream bos = null;
         long rangeStart;
@@ -195,22 +195,36 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
                 .writeTimeout(timeout, TimeUnit.MILLISECONDS)
                 .build();
         final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, null);
+        addCustomHeaders(extraHeaders, builder);
         addRangeHeader(rangeStart, -1, builder);
         final Response response = getSyncResponse(client, builder);
+        LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + url);
+        if (!response.isSuccessful()) {
+            closeQuietly(bos);
+            closeQuietly(fos);
+            closeQuietly(response.body());
+            if (!resume) {
+                file.delete(); // remove the 0-byte file created by FileOutputStream before the request
+            }
+            throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + url);
+        }
         final Headers headers = response.headers();
         onHeaders(headers);
         final InputStream in = response.body().byteStream();
         byte[] b = new byte[32768]; // 32 KiB buffer
         int n;
+        long totalBytesWritten = 0;
         while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
             if (!canceled) {
                 bos.write(b, 0, n);
+                totalBytesWritten += n;
                 onData(b, 0, n);
             }
         }
         closeQuietly(bos);
         closeQuietly(fos);
         closeQuietly(response.body());
+        LOG.info("OkHttpClientWrapper::save - finished, totalBytesWritten=" + totalBytesWritten + " file=" + file.getAbsolutePath());
         if (canceled) {
             onCancel();
         } else {

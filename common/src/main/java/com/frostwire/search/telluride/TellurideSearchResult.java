@@ -23,6 +23,8 @@ import com.frostwire.search.HttpSearchResult;
 import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import java.util.Map;
+
 public class TellurideSearchResult implements HttpSearchResult {
     private final String id;
     private final String title;
@@ -33,6 +35,7 @@ public class TellurideSearchResult implements HttpSearchResult {
     private final String thumbnail;
     private final long fileSize;
     private final long creationTime;
+    private final Map<String, String> httpHeaders;
 
     public TellurideSearchResult(
             String _id,
@@ -43,7 +46,8 @@ public class TellurideSearchResult implements HttpSearchResult {
             String _downloadUrl,
             String _thumbnail,
             long _fileSize,
-            long _creationTime) {
+            long _creationTime,
+            Map<String, String> _httpHeaders) {
         id = _id;
         title = StringUtils.removeDoubleSpaces(StringUtils.removeUnicodeCharacters(_title));
         filename = FilenameUtils.sanitizeFilename(_filename);
@@ -53,6 +57,7 @@ public class TellurideSearchResult implements HttpSearchResult {
         fileSize = _fileSize;
         thumbnail = _thumbnail;
         creationTime = _creationTime;
+        httpHeaders = _httpHeaders;
     }
 
     public String getId() {
@@ -102,5 +107,9 @@ public class TellurideSearchResult implements HttpSearchResult {
     @Override
     public long getSize() {
         return fileSize;
+    }
+
+    public Map<String, String> getHttpHeaders() {
+        return httpHeaders;
     }
 }

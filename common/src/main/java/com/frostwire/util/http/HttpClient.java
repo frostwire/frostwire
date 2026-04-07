@@ -71,9 +71,13 @@ public interface HttpClient {
 
     void save(String url, File file, boolean resume) throws IOException;
 
+    void save(String url, File file, boolean resume, Map<String, String> extraHeaders) throws IOException;
+
     void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
 
     void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
+
+    void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException;
 
     String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException;
 

@@ -28,7 +28,7 @@ public class HttpDownload extends BaseHttpDownload {
     }
 
     public void start() {
-        super.start(info.url(), tempPath, false);
+        super.start(info.url(), tempPath, false, info.httpHeaders());
     }
 
     @Override

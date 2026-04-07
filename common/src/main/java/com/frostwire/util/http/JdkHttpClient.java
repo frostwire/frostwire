@@ -94,6 +94,11 @@ public final class  JdkHttpClient extends AbstractHttpClient {
 
     @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
+        save(url, file, resume, timeout, userAgent, referrer, null);
+    }
+
+    @Override
+    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer, Map<String, String> extraHeaders) throws IOException {
         FileOutputStream fos = null;
         long rangeStart;
         try {

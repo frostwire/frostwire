@@ -218,6 +218,10 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     protected void start(final String url, final File temp, final boolean resume) {
+        start(url, temp, resume, null);
+    }
+
+    protected void start(final String url, final File temp, final boolean resume, final Map<String, String> httpHeaders) {
         if (complete) {
             return;
         }
@@ -230,7 +234,7 @@ public abstract class BaseHttpDownload implements Transfer {
                     state = TransferState.DOWNLOADING;
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     client.setListener(new DownloadListener());
-                    client.save(url, temp, resume);
+                    client.save(url, temp, resume, httpHeaders);
                 } catch (Throwable e) {
                     error(e);
                 }
@@ -286,9 +290,20 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     protected void moveAndComplete(File src, File dst) {
-        LOG.info("BaseHttpDownload::moveAndComplete from " + src.getAbsolutePath() + " to " + dst.getAbsolutePath());
+        boolean srcExists = src.exists();
+        long srcSize = src.length();
+        LOG.info("BaseHttpDownload::moveAndComplete src=" + src.getAbsolutePath()
+                + " exists=" + srcExists + " size=" + srcSize
+                + " -> dst=" + dst.getAbsolutePath());
+        if (srcExists && srcSize == 0) {
+            LOG.warn("BaseHttpDownload::moveAndComplete SUSPECT: source temp file is 0 bytes — HTTP download likely returned empty response");
+        }
         FileSystem fs = Platforms.fileSystem();
-        if (fs.copy(src, dst)) {
+        boolean copied = fs.copy(src, dst);
+        LOG.info("BaseHttpDownload::moveAndComplete fs.copy result=" + copied
+                + " fileSystem=" + fs.getClass().getSimpleName()
+                + " dstSize=" + dst.length());
+        if (copied) {
             if (!fs.delete(src)) {
                 LOG.warn("Error deleting source file while moving: " + src);
             }
@@ -314,12 +329,18 @@ public abstract class BaseHttpDownload implements Transfer {
         private final String filename;
         private final String displayName;
         private final double size;
+        private final Map<String, String> httpHeaders;
 
         public Info(String url, String filename, String displayName, double size) {
+            this(url, filename, displayName, size, null);
+        }
+
+        public Info(String url, String filename, String displayName, double size, Map<String, String> httpHeaders) {
             this.url = url;
             this.filename = filename;
             this.displayName = displayName;
             this.size = size;
+            this.httpHeaders = httpHeaders;
         }
 
         public String url() {
@@ -336,6 +357,10 @@ public abstract class BaseHttpDownload implements Transfer {
 
         public double size() {
             return size;
+        }
+
+        public Map<String, String> httpHeaders() {
+            return httpHeaders;
         }
 
         @Override
