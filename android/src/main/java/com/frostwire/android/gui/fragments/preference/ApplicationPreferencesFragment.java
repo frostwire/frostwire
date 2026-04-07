@@ -21,7 +21,6 @@ package com.frostwire.android.gui.fragments.preference;
 import android.app.Activity;
 import android.app.Dialog;
 
-import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -48,7 +47,6 @@ import java.text.MessageFormat;
  * @author gubatron
  * @author aldenml
  */
-@SuppressWarnings("deprecation")
 public final class ApplicationPreferencesFragment extends AbstractPreferenceFragment implements AbstractDialog.OnDialogClickListener {
 
     private static final Logger LOG = Logger.getLogger(ApplicationPreferencesFragment.class);
@@ -95,7 +93,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                             R.string.data_saving_kill_http_warning,
                             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
                     );
-                    dlg.setTargetFragment(ApplicationPreferencesFragment.this, 0);
+                    dlg.setOnDialogClickListener(ApplicationPreferencesFragment.this);
                     dlg.show(getParentFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
                     return false;
