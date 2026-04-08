@@ -22,6 +22,7 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -48,7 +49,9 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.DefaultMediaNotificationProvider;
 import androidx.media3.session.MediaSession;
+import androidx.media3.session.MediaSessionService;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -65,7 +68,9 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -109,7 +114,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * TODO:
  * - assertInMusicPlayerHandlerThread()
  */
-public class MusicPlaybackService extends Service {
+public class MusicPlaybackService extends MediaSessionService {
     private final Object cursorLock = new Object();
 
     public static void safePost(Runnable runnable) {
@@ -314,7 +319,7 @@ public class MusicPlaybackService extends Service {
     private boolean mQueueIsSaveable = true;
     private boolean mPausedByTransientLossOfFocus = false;
     private boolean musicPlaybackActivityInForeground = false;
-    private MediaSession mMediaSession;
+    MediaSession mMediaSession;
     // mMediaButtonReceiverComponent removed — MediaSession routes media buttons automatically.
     private int mCardId;
     private volatile int mPlayListLen = 0;
@@ -329,7 +334,6 @@ public class MusicPlaybackService extends Service {
     private static volatile MusicPlayerHandler mPlayerHandler;
     private BroadcastReceiver mUnmountReceiver = null;
     private ImageFetcher mImageFetcher;
-    private NotificationHelper mNotificationHelper;
     private RecentStore mRecentsCache;
     private FavoritesStore mFavoritesCache;
     private boolean launchPlayerActivity;
@@ -445,9 +449,15 @@ public class MusicPlaybackService extends Service {
 
     @Override
     public IBinder onBind(@NonNull Intent intent) {
-        updateNotification();
         mServiceInUse = true;
-        return binder;
+        IBinder mediaBinder = super.onBind(intent);
+        return mediaBinder != null ? mediaBinder : binder;
+    }
+
+    @Nullable
+    @Override
+    public MediaSession onGetSession(@NonNull MediaSession.ControllerInfo controllerInfo) {
+        return mMediaSession;
     }
 
     @Override
@@ -455,35 +465,6 @@ public class MusicPlaybackService extends Service {
         INSTANCE = this;
         initServiceLatch.countDown();
         mServiceInUse = true;
-    }
-
-    public void onNotificationCreated(Notification notification) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (notification != null) {
-                LOG.info("MusicPlaybackService::onNotificationCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)");
-                try {
-                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
-                } catch (Throwable t) {
-                    LOG.error("MusicPlaybackService:: error onNotificationCreated(SDK > Q) " + t.getMessage(), t);
-                }
-            } else {
-                LOG.error("MusicPlaybackService::MusicPlaybackService:: error onNotificationCreated() received null notification");
-            }
-        } else {
-            if (notification != null) {
-                LOG.info("onNotificationCreated() invoking startForeground()");
-                try {
-                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
-                } catch (Throwable t) {
-                    LOG.error("error onNotificationCreated(SDK < Q) " + t.getMessage(), t);
-                }
-            } else {
-                LOG.error("error onNotificationCreated() received null notification");
-            }
-        }
     }
 
     @Override
@@ -516,15 +497,23 @@ public class MusicPlaybackService extends Service {
         }
 
         if (mediaReadPermissionsGranted) {
-            mNotificationHelper = new NotificationHelper(this);
-            // let's send a dummy notification asap to not get shutdown for not sending startForeground in time
+            createNotificationChannel();
+            DefaultMediaNotificationProvider notificationProvider =
+                    new DefaultMediaNotificationProvider.Builder(this)
+                            .setNotificationId(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE)
+                            .setChannelId(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                            .build();
+            setMediaNotificationProvider(notificationProvider);
+
             if (postNotificationsPermissionGranted) {
-                Notification tempNotification = mNotificationHelper.buildBasicNotification(
-                        this,
-                        "Loading...",
-                        "Preparing music player.",
-                        Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
                 try {
+                    Notification tempNotification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                            .setContentTitle("FrostWire")
+                            .setContentText("Preparing music player...")
+                            .setSmallIcon(R.drawable.frostwire_notification_flat)
+                            .setPriority(NotificationCompat.PRIORITY_LOW)
+                            .setOngoing(true)
+                            .build();
                     startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
                 } catch (Throwable t) {
                     LOG.error("MusicPlaybackService::onCreate() error calling startForeground() " + t.getMessage(), t);
@@ -701,31 +690,20 @@ public class MusicPlaybackService extends Service {
     }
 
     public void updateNotification() {
-        if (mNotificationHelper == null) {
-            LOG.error("MusicPlaybackService::updateNotification() failed, mNotificationHelper == null");
-            return;
-        }
+        updateRemoteControlClient(META_CHANGED);
+    }
 
-        if (isPlaying()) {
-            if (TaskThrottle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
-                SystemUtils.exceptionSafePost(mPlayerHandler, () -> {
-                    Bitmap albumArt = getAlbumArt();
-                    SystemUtils.postToUIThread(() -> {
-                        try {
-                            buildNotificationWithAlbumArtPost(albumArt);
-                        } catch (Throwable t) {
-                            LOG.error("MusicPlaybackService::updateNotification() error " + t.getMessage(), t, true);
-                        }
-                    });
-                });
-            }
-        }
-
-        if (musicPlaybackActivityInForeground) {
-            if (!isPlaying() && isStopped()) {
-                updateRemoteControlClient(PLAYSTATE_STOPPED);
-            } else if (!isPlaying() && !isStopped()) {
-                updateRemoteControlClient(PLAYSTATE_CHANGED);
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel channel = nm.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+            if (channel == null) {
+                channel = new NotificationChannel(
+                        Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
+                        "FrostWire Player",
+                        NotificationManager.IMPORTANCE_LOW);
+                channel.setSound(null, null);
+                nm.createNotificationChannel(channel);
             }
         }
     }
@@ -827,12 +805,6 @@ public class MusicPlaybackService extends Service {
             stopPlayer();
         }
         if (D) LOG.info("Nothing is playing anymore, releasing notification");
-        if (mNotificationHelper != null) {
-            mNotificationHelper.killNotification();
-        }
-        if (mAudioManager != null) {
-            // Audio focus abandoned automatically by ExoPlayer on release().
-        }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
         if (!mServiceInUse || force) {
             unregisterReceivers();
@@ -862,20 +834,6 @@ public class MusicPlaybackService extends Service {
             mUnmountReceiver = null;
         }
     }
-
-    private void buildNotificationWithAlbumArtPost(final Bitmap bitmap) {
-        SystemUtils.ensureUIThreadOrCrash("MusicPlaybackService::buildNotificationWithAlbumArtPost");
-        mNotificationHelper.buildNotification(
-                getAlbumName(),
-                getArtistName(),
-                getTrackName(),
-                bitmap,
-                isPlaying());
-    }
-
-    // safeRegisterMediaButton() removed — AudioManager.registerMediaButtonEventReceiver()
-    // is deprecated since API 21 and redundant: MediaSession handles button routing
-    // automatically when active (set up in setUpMediaSession()).
 
     private void initService() {
         if (mPlayerHandler == null) {
@@ -1454,11 +1412,6 @@ public class MusicPlaybackService extends Service {
         } else {
             musicPlaybackService.saveQueue(false);
         }
-
-        // PLAYSTATE_CHANGED = PLAYING or PAUSED (not stopped)
-        if (PLAYSTATE_CHANGED.equals(change) && musicPlaybackService.mNotificationHelper != null) {
-            musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying, isStopped);
-        }
     }
 
     private static void recentsStoreAddSongIdTask(MusicPlaybackService musicPlaybackService) {
@@ -1503,19 +1456,14 @@ public class MusicPlaybackService extends Service {
         final boolean isPlaying = isPlaying();
         final boolean isStopped = isStopped();
 
-        if (isStopped && !isPlaying && mNotificationHelper != null) {
-            mNotificationHelper.killNotification();
+        if (isStopped && !isPlaying) {
+            stopForeground(STOP_FOREGROUND_REMOVE);
         }
 
         switch (what) {
             case PLAYSTATE_CHANGED:
             case POSITION_CHANGED:
             case PLAYSTATE_STOPPED:
-                if (mNotificationHelper != null) {
-                    try {
-                        mNotificationHelper.updatePlayState(isPlaying, isStopped);
-                    } catch (Throwable ignored) {}
-                }
                 updateMediaSessionPlaybackState();
                 break;
             case META_CHANGED:
@@ -2330,11 +2278,7 @@ public class MusicPlaybackService extends Service {
         if (mIsSupposedToBePlaying && mPlayer != null) {
             mPlayer.pause();
             mIsSupposedToBePlaying = false;
-            if (musicPlaybackActivityInForeground) { // this isn't working as it should.
-                updateRemoteControlClient(PLAYSTATE_CHANGED);
-            } else {
-                notifyChange(PLAYSTATE_CHANGED);
-            }
+            notifyChange(PLAYSTATE_CHANGED);
         }
         //}
     }

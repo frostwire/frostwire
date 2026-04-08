@@ -416,7 +416,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         super.onResume();
 
         Intent intentFromFileExplorer = getIntent();
-        if (intentFromFileExplorer != null) {
+        boolean hasPlaybackData = intentFromFileExplorer != null
+                && intentFromFileExplorer.getData() != null
+                && !intentFromFileExplorer.getData().toString().isEmpty();
+        if (hasPlaybackData) {
             if (MusicUtils.getMusicPlaybackService() == null) {
                 MusicUtils.startMusicPlaybackService(getApplicationContext(),
                         MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
@@ -426,14 +429,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
         } else {
             waitingToInitAlbumArtBanner.set(false);
-            // Set the playback drawables
-            initPlaybackControls();
             updatePlaybackControls();
-            // Current info
             updateNowPlayingInfo();
-            // Refresh the queue
             ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-            initPlaybackControls();
             loadCurrentAlbumArt();
         }
     }
@@ -1407,10 +1405,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     break;
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
                     LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.PLAYSTATE_CHANGED)");
-                    // Set the play and pause image
-                    if (activity.mPlayPauseButton != null) {
-                        activity.mPlayPauseButton.updateState();
-                    }
+                    activity.runOnUiThread(() -> {
+                        if (activity.mPlayPauseButton != null) {
+                            activity.mPlayPauseButton.updateState();
+                        }
+                        activity.updatePlaybackControls();
+                        long next = activity.refreshCurrentTime(true);
+                        activity.queueNextRefresh(next);
+                    });
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:

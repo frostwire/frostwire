@@ -28,7 +28,7 @@ import androidx.activity.ComponentActivity;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.util.SystemUtils;
+
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -48,7 +48,7 @@ class StopListener implements View.OnLongClickListener {
 
     @Override
     public boolean onLongClick(View v) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> stopMusicTask(v));
+        stopMusic(v);
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
                 Activity activity = activityRef.get();
@@ -62,7 +62,7 @@ class StopListener implements View.OnLongClickListener {
         return true;
     }
 
-    private static void stopMusicTask(View v) {
+    private void stopMusic(View v) {
         try {
             MusicPlaybackService musicPlaybackService = MusicUtils.getMusicPlaybackService();
             if (musicPlaybackService != null) {
@@ -71,6 +71,9 @@ class StopListener implements View.OnLongClickListener {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
+        try {
+            v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
+        } catch (Throwable ignored) {
+        }
     }
 }
