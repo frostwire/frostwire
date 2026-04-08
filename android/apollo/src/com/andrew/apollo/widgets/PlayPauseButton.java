@@ -30,7 +30,6 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.util.SystemUtils;
 
 /**
  * A custom {@link AppCompatImageButton} that represents the "play and pause" button.
@@ -88,10 +87,14 @@ public final class PlayPauseButton extends AppCompatImageButton
      * Sets the correct drawable for playback.
      */
     public void updateState() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            boolean isPlaying = MusicUtils.isPlaying();
-            SystemUtils.postToUIThread(() -> updateStatePost(isPlaying));
-        });
+        boolean isPlaying = MusicUtils.isPlaying();
+        if (isPlaying) {
+            setContentDescription(getResources().getString(R.string.accessibility_pause));
+            setImageResource(pauseDrawable);
+        } else {
+            setContentDescription(getResources().getString(R.string.accessibility_play));
+            setImageResource(playDrawable);
+        }
     }
 
     public void setOnLongClickListener(OnLongClickListener l) {
@@ -103,13 +106,4 @@ public final class PlayPauseButton extends AppCompatImageButton
         return hasLongClickListener;
     }
 
-    private void updateStatePost(Boolean isPlaying) {
-        if (isPlaying) {
-            setContentDescription(getResources().getString(R.string.accessibility_pause));
-            setImageResource(pauseDrawable);
-        } else {
-            setContentDescription(getResources().getString(R.string.accessibility_play));
-            setImageResource(playDrawable);
-        }
-    }
 }

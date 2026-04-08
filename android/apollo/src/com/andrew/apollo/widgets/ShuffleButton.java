@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -73,24 +72,16 @@ public final class ShuffleButton extends AppCompatImageButton
      * Sets the correct drawable and tint for the shuffle state.
      */
     public void updateShuffleState() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            final boolean isShuffling = MusicUtils.isShuffleEnabled();
-            SystemUtils.postToUIThread(() -> isShuffleEnabledPost(isShuffling));
-        });
-    }
-
-    private void isShuffleEnabledPost(Boolean shuffleEnabled) {
-        int iconResId = R.drawable.btn_playback_shuffle; // Use the same icon for both states
+        boolean isShuffling = MusicUtils.isShuffleEnabled();
+        int iconResId = R.drawable.btn_playback_shuffle;
         setImageResource(iconResId);
 
-        if (shuffleEnabled) {
-            // When shuffle is enabled, set the tint color to blue
+        if (isShuffling) {
             setImageTintList(ColorStateList.valueOf(getShuffleEnabledColor(getContext())));
         } else {
-            // When shuffle is disabled, apply the default tint color
             setImageTintList(ColorStateList.valueOf(getShuffleDisabledTintColor(getContext())));
         }
-        setContentDescription(getResources().getString(shuffleEnabled ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
+        setContentDescription(getResources().getString(isShuffling ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
     }
 
     // Method to retrieve the tint color when shuffle is disabled

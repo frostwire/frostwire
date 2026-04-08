@@ -34,25 +34,14 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 
-/**
- * A custom {@link ImageButton} that represents the "repeat" button.
- *
- * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (@gubatron)
- */
 public final class RepeatButton extends AppCompatImageButton
         implements OnClickListener {
 
     private Runnable onClickedCallback;
 
-    /**
-     * @param context The {@link Context} to use
-     * @param attrs   The attributes of the XML tag that is inflating the view.
-     */
     public RepeatButton(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         setBackgroundResource(R.drawable.holo_background_selector);
-        // Control playback (cycle repeat modes)
         setOnClickListener(this);
     }
 
@@ -67,23 +56,13 @@ public final class RepeatButton extends AppCompatImageButton
         if (onClickedCallback != null) {
             try {
                 onClickedCallback.run();
-            } catch (Throwable t) {
-                // Handle exception if necessary
+            } catch (Throwable ignored) {
             }
         }
     }
 
-    /**
-     * Sets the correct drawable and tint for the repeat state.
-     */
     public void updateRepeatState() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            int repeatMode = MusicUtils.getRepeatMode();
-            SystemUtils.postToUIThread(() -> getRepeatModePost(repeatMode));
-        });
-    }
-
-    private void getRepeatModePost(Integer repeatMode) {
+        int repeatMode = MusicUtils.getRepeatMode();
         int iconResId;
         int tintColor;
 
@@ -110,13 +89,11 @@ public final class RepeatButton extends AppCompatImageButton
         setImageTintList(ColorStateList.valueOf(tintColor));
     }
 
-    // Method to retrieve the tint color when repeat is disabled
     private static int getRepeatDisabledColor(Context context) {
         return UIUtils.getAppIconPrimaryColor(context);
     }
 
-    // Method to retrieve the tint color when repeat is enabled
     private static int getRepeatEnabledColor(Context context) {
-        return ContextCompat.getColor(context, R.color.basic_blue_highlight); // Define in resources
+        return ContextCompat.getColor(context, R.color.basic_blue_highlight);
     }
 }
