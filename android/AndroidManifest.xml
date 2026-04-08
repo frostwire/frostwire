@@ -330,15 +330,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-                android:name="com.andrew.apollo.MediaButtonIntentReceiver"
-                android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
-            </intent-filter>
-        </receiver>
-
         <!-- providers -->
         <provider
                 android:name="androidx.core.content.FileProvider"

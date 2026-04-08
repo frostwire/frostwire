@@ -177,8 +177,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private static final String MUSIC_PACKAGE_NAME = "com.android.music";
 
     /**
-     * Called to indicate a general service command. Used in
-     * {@link MediaButtonIntentReceiver}
+     * Called to indicate a general service command.
      */
     public static final String SERVICECMD = "com.andrew.apollo.musicservicecommand";
 
@@ -319,7 +318,6 @@ public class MusicPlaybackService extends MediaSessionService {
     private boolean mPausedByTransientLossOfFocus = false;
     private boolean musicPlaybackActivityInForeground = false;
     MediaSession mMediaSession;
-    // mMediaButtonReceiverComponent removed — MediaSession routes media buttons automatically.
     private int mCardId;
     private volatile int mPlayListLen = 0;
     private volatile int mPlayPos = -1;
@@ -351,8 +349,6 @@ public class MusicPlaybackService extends MediaSessionService {
             }
         }
     };
-
-    private final MediaButtonIntentReceiver mMediaButtonReceiver = new MediaButtonIntentReceiver();
 
     // mAudioFocusListener removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
@@ -673,7 +669,7 @@ public class MusicPlaybackService extends MediaSessionService {
     }
 
     public void updateNotification() {
-        updateRemoteControlClient(META_CHANGED);
+        updateMediaSessionState(META_CHANGED);
     }
 
     private void createNotificationChannel() {
@@ -788,7 +784,7 @@ public class MusicPlaybackService extends MediaSessionService {
             stopPlayer();
         }
         if (D) LOG.info("Nothing is playing anymore, releasing notification");
-        updateRemoteControlClient(PLAYSTATE_STOPPED);
+        updateMediaSessionState(PLAYSTATE_STOPPED);
         if (!mServiceInUse || force) {
             unregisterReceivers();
             saveQueue(true);
@@ -858,23 +854,6 @@ public class MusicPlaybackService extends MediaSessionService {
                 registerReceiver(mIntentReceiver, filter, Context.RECEIVER_EXPORTED);
             } else {
                 registerReceiver(mIntentReceiver, filter);
-            }
-        } catch (Throwable t) {
-            // this can happen if the service got destroyed and didn't have a chance to
-            // register the receiver, current workarounds are extending receiver classes
-            // to track if they've been registered, or using a static map<Receiver,boolean>
-            // for now will just catch the exception and check the code on how this service
-            // is getting destroyed and making sure the unregisterReceiver code is invoked.
-            LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
-        }
-
-        IntentFilter filterMediaButton = new IntentFilter();
-        filterMediaButton.addAction(Intent.ACTION_MEDIA_BUTTON);
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(mMediaButtonReceiver, filter, Context.RECEIVER_EXPORTED);
-            } else {
-                registerReceiver(mMediaButtonReceiver, filterMediaButton);
             }
         } catch (Throwable t) {
             // this can happen if the service got destroyed and didn't have a chance to
@@ -979,7 +958,7 @@ public class MusicPlaybackService extends MediaSessionService {
         closeCursor();
         boolean isStopped = isStopped();
         if (removeNotification) {
-            updateRemoteControlClient(PLAYSTATE_STOPPED);
+            updateMediaSessionState(PLAYSTATE_STOPPED);
             stopForeground(STOP_FOREGROUND_REMOVE);
         } else {
             stopForeground(isStopped ? STOP_FOREGROUND_REMOVE : STOP_FOREGROUND_DETACH);
@@ -1352,7 +1331,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private static void notifyChangeTask(MusicPlaybackService musicPlaybackService, String change) {
         LOG.info("notifyChangeTask(" + change + ")!");
         // Update the lock screen controls
-        musicPlaybackService.updateRemoteControlClient(change);
+        musicPlaybackService.updateMediaSessionState(change);
         if (POSITION_CHANGED.equals(change) && musicPlaybackService.position() != 0) {
             return;
         }
@@ -1424,17 +1403,16 @@ public class MusicPlaybackService extends MediaSessionService {
     }
 
     /**
-     * Updates the MediaSession and notification with current playback state and metadata.
-     * Replaces the old RemoteControlClient update path.
+     * Updates the MediaSession playback state and metadata.
      *
      * @param what The broadcast event that triggered the update (e.g. PLAYSTATE_CHANGED, META_CHANGED)
      */
-    void updateRemoteControlClient(final String what) {
+    void updateMediaSessionState(final String what) {
         if (what == null) {
-            LOG.info("updateRemoteControlClient() skipped — what is null");
+            LOG.info("updateMediaSessionState() skipped — what is null");
             return;
         }
-        LOG.info("updateRemoteControlClient(what=" + what + ")");
+        LOG.info("updateMediaSessionState(what=" + what + ")");
 
         final boolean isPlaying = isPlaying();
         final boolean isStopped = isStopped();
@@ -2272,7 +2250,7 @@ public class MusicPlaybackService extends MediaSessionService {
         if (mPlayer != null) {
             mPlayer.start();
             mIsSupposedToBePlaying = true;
-            updateRemoteControlClient(PLAYSTATE_CHANGED);
+            updateMediaSessionState(PLAYSTATE_CHANGED);
             notifyChange(PLAYSTATE_CHANGED);
         }
     }

@@ -8,9 +8,7 @@
 package com.frostwire.android.gui;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 
-import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.gui.services.EngineIntentService;
 import com.frostwire.android.gui.services.IEngineService;
 
@@ -21,7 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,56 +46,6 @@ public class DeprecationMigrationStructureTest {
     public void engineIntentService_superclassChain_includesService() {
         assertTrue("EngineIntentService must be a Service",
                 Service.class.isAssignableFrom(EngineIntentService.class));
-    }
-
-    // -------------------------------------------------------------------------
-    // Q13: MediaButtonIntentReceiver — must be BroadcastReceiver, NOT WakefulBroadcastReceiver
-    // -------------------------------------------------------------------------
-
-    @Test
-    public void mediaButtonIntentReceiver_isBroadcastReceiver() {
-        assertTrue("MediaButtonIntentReceiver must be a BroadcastReceiver",
-                BroadcastReceiver.class.isAssignableFrom(MediaButtonIntentReceiver.class));
-    }
-
-    @Test
-    public void mediaButtonIntentReceiver_superclassChain_neverIncludesWakefulBroadcastReceiver() {
-        assertNoDeprecatedAncestor(MediaButtonIntentReceiver.class,
-                "androidx.legacy.content.WakefulBroadcastReceiver",
-                "MediaButtonIntentReceiver must NOT extend deprecated WakefulBroadcastReceiver");
-        assertNoDeprecatedAncestor(MediaButtonIntentReceiver.class,
-                "androidx.core.content.WakefulBroadcastReceiver",
-                "MediaButtonIntentReceiver must NOT extend deprecated WakefulBroadcastReceiver");
-    }
-
-    // -------------------------------------------------------------------------
-    // Q12: No no-arg Handler instantiation — MBIReceiverHandler uses Looper ctor
-    // -------------------------------------------------------------------------
-
-    @Test
-    public void mediaButtonIntentReceiver_mbiReceiverHandler_usesLooperConstructor() throws Exception {
-        // MBIReceiverHandler is a private static inner class — find it by name
-        Class<?> handlerClass = null;
-        for (Class<?> inner : MediaButtonIntentReceiver.class.getDeclaredClasses()) {
-            if (inner.getSimpleName().equals("MBIReceiverHandler")) {
-                handlerClass = inner;
-                break;
-            }
-        }
-        if (handlerClass == null) {
-            // Class may have been inlined or renamed — not a failure if it doesn't exist
-            return;
-        }
-        // Verify it does NOT have a no-arg constructor (which would use deprecated Handler())
-        boolean hasNoArgCtor = false;
-        for (java.lang.reflect.Constructor<?> ctor : handlerClass.getDeclaredConstructors()) {
-            if (ctor.getParameterCount() == 0) {
-                hasNoArgCtor = true;
-                break;
-            }
-        }
-        assertFalse("MBIReceiverHandler must NOT have a no-arg constructor (deprecated Handler())",
-                hasNoArgCtor);
     }
 
     // -------------------------------------------------------------------------
@@ -175,7 +122,6 @@ public class DeprecationMigrationStructureTest {
         try {
             cls = Class.forName(className);
         } catch (ClassNotFoundException e) {
-            // Class not on classpath in unit test environment — skip
             return;
         }
         for (Method m : cls.getDeclaredMethods()) {
