@@ -865,14 +865,12 @@ public class MusicPlaybackService extends Service {
 
     private void buildNotificationWithAlbumArtPost(final Bitmap bitmap) {
         SystemUtils.ensureUIThreadOrCrash("MusicPlaybackService::buildNotificationWithAlbumArtPost");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            mNotificationHelper.buildNotification(
-                    getAlbumName(),
-                    getArtistName(),
-                    getTrackName(),
-                    bitmap,
-                    isPlaying());
-        }
+        mNotificationHelper.buildNotification(
+                getAlbumName(),
+                getArtistName(),
+                getTrackName(),
+                bitmap,
+                isPlaying());
     }
 
     // safeRegisterMediaButton() removed — AudioManager.registerMediaButtonEventReceiver()
@@ -2718,11 +2716,34 @@ public class MusicPlaybackService extends Service {
      * ExoPlayer handles gapless playback, audio focus, wake mode, and
      * audio-becoming-noisy natively — removing the entire dual-MediaPlayer
      * swap and manual WakeLock management from the original implementation.
+     *
+     * Threading: ExoPlayer is built on mPlayerHandler (HandlerThread) and must only be
+     * called from that thread. All state-changing calls are posted to mPlayerHandler.
+     * Reads (position, duration, isPlaying) use volatile cached fields updated from
+     * the HandlerThread via Player.Listener callbacks and a periodic position poller.
      */
     static final class MultiPlayer {
         private final static Logger LOG = Logger.getLogger(MultiPlayer.class);
         ExoPlayer mExoPlayer; // package-private for MediaSession metadata updates in outer class
         private boolean mIsInitialized = false;
+
+        // Volatile caches so position/duration/isPlaying can be read from any thread safely.
+        volatile long mCachedPosition = 0;
+        volatile long mCachedDuration = -1;
+        volatile boolean mCachedIsPlaying = false;
+
+        // Polls getCurrentPosition() on the HandlerThread every 500 ms while playing.
+        private final Runnable mPositionPoller = new Runnable() {
+            @Override
+            public void run() {
+                if (mExoPlayer != null && mCachedIsPlaying) {
+                    mCachedPosition = mExoPlayer.getCurrentPosition();
+                    if (MusicPlaybackService.mPlayerHandler != null) {
+                        MusicPlaybackService.mPlayerHandler.postDelayed(mPositionPoller, 500);
+                    }
+                }
+            }
+        };
 
         MultiPlayer() {
             // ExoPlayer is built lazily on first setCurrentDataSource call
@@ -2747,14 +2768,29 @@ public class MusicPlaybackService extends Service {
                 public void onPlaybackStateChanged(int state) {
                     if (state == Player.STATE_ENDED) {
                         LOG.info("MultiPlayer: onPlaybackStateChanged STATE_ENDED — track complete");
+                        mCachedIsPlaying = false;
                         if (MusicPlaybackService.mPlayerHandler != null) {
+                            MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
                             MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_ENDED);
+                        }
+                    } else if (state == Player.STATE_READY) {
+                        long d = mExoPlayer.getDuration();
+                        mCachedDuration = (d == C.TIME_UNSET) ? -1 : d;
+                        // Start position polling on the HandlerThread.
+                        if (MusicPlaybackService.mPlayerHandler != null) {
+                            MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
+                            MusicPlaybackService.mPlayerHandler.post(mPositionPoller);
                         }
                     }
                 }
 
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
+                    mCachedIsPlaying = isPlaying;
+                    if (isPlaying && MusicPlaybackService.mPlayerHandler != null) {
+                        MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
+                        MusicPlaybackService.mPlayerHandler.post(mPositionPoller);
+                    }
                     MusicPlaybackService svc = MusicPlaybackService.getInstance();
                     if (svc != null) {
                         svc.notifyChange(PLAYSTATE_CHANGED);
@@ -2765,7 +2801,9 @@ public class MusicPlaybackService extends Service {
                 public void onPlayerError(@NonNull PlaybackException error) {
                     LOG.error("MultiPlayer: onPlayerError: " + error.getMessage(), error);
                     mIsInitialized = false;
+                    mCachedIsPlaying = false;
                     if (MusicPlaybackService.mPlayerHandler != null) {
+                        MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
                         MusicPlaybackService.mPlayerHandler.sendMessageDelayed(
                                 MusicPlaybackService.mPlayerHandler.obtainMessage(SERVER_DIED), 2000);
                     }
@@ -2838,23 +2876,27 @@ public class MusicPlaybackService extends Service {
         /**
          * Enqueues the next track for gapless playback.
          * ExoPlayer's built-in queue handles the seamless transition.
+         * Posted to mPlayerHandler to ensure ExoPlayer is called on its application thread.
          */
         void setNextDataSource(final String path) {
-            if (mExoPlayer == null) return;
-            try {
-                // Remove any previously queued next item beyond the current one
-                int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
-                int itemCount = mExoPlayer.getMediaItemCount();
-                if (itemCount > currentIdx + 1) {
-                    mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
+            if (mExoPlayer == null || MusicPlaybackService.mPlayerHandler == null) return;
+            MusicPlaybackService.mPlayerHandler.post(() -> {
+                if (mExoPlayer == null) return;
+                try {
+                    // Remove any previously queued next item beyond the current one
+                    int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
+                    int itemCount = mExoPlayer.getMediaItemCount();
+                    if (itemCount > currentIdx + 1) {
+                        mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
+                    }
+                    if (path == null) return;
+                    mExoPlayer.addMediaItem(
+                            MediaItem.fromUri(resolveUri(path)));
+                    LOG.info("MultiPlayer::setNextDataSource() queued next track successfully");
+                } catch (Throwable e) {
+                    LOG.error("MultiPlayer::setNextDataSource() error: " + e.getMessage(), e);
                 }
-                if (path == null) return;
-                mExoPlayer.addMediaItem(
-                        MediaItem.fromUri(resolveUri(path)));
-                LOG.info("MultiPlayer::setNextDataSource() queued next track successfully");
-            } catch (Throwable e) {
-                LOG.error("MultiPlayer::setNextDataSource() error: " + e.getMessage(), e);
-            }
+            });
         }
 
         /** @return True if the player is ready to go, false otherwise */
@@ -2862,79 +2904,107 @@ public class MusicPlaybackService extends Service {
             return mIsInitialized;
         }
 
-        /** Starts or resumes playback. */
+        /** Starts or resumes playback (posted to HandlerThread for ExoPlayer thread safety). */
         public void start() {
-            if (mExoPlayer != null) {
-                try { mExoPlayer.play(); } catch (Throwable ignored) {}
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.play(); } catch (Throwable ignored) {}
+                    }
+                });
             }
         }
 
         /** Stops playback and resets the player to an uninitialized state. */
         public void stop() {
-            if (mExoPlayer != null) {
-                try {
-                    mExoPlayer.stop();
-                    mExoPlayer.clearMediaItems();
-                    mIsInitialized = false;
-                } catch (Throwable ignored) {}
+            mIsInitialized = false;
+            mCachedIsPlaying = false;
+            if (MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
+            }
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try {
+                            mExoPlayer.stop();
+                            mExoPlayer.clearMediaItems();
+                        } catch (Throwable ignored) {}
+                    }
+                });
             }
         }
 
         /** Releases all ExoPlayer resources. */
         public void release() {
-            if (mExoPlayer != null) {
-                try {
-                    mExoPlayer.release();
-                } catch (Throwable ignored) {}
-                mExoPlayer = null;
-                mIsInitialized = false;
+            ExoPlayer playerToRelease = mExoPlayer;
+            mExoPlayer = null;
+            mIsInitialized = false;
+            mCachedIsPlaying = false;
+            if (MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
+            }
+            if (playerToRelease != null) {
+                if (MusicPlaybackService.mPlayerHandler != null) {
+                    MusicPlaybackService.mPlayerHandler.post(() -> {
+                        try { playerToRelease.release(); } catch (Throwable ignored) {}
+                    });
+                } else {
+                    try { playerToRelease.release(); } catch (Throwable ignored) {}
+                }
             }
         }
 
-        /** Pauses playback. Call start() to resume. */
+        /** Pauses playback (posted to HandlerThread for ExoPlayer thread safety). */
         public void pause() {
-            if (mExoPlayer != null) {
-                try { mExoPlayer.pause(); } catch (Throwable ignored) {}
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.pause(); } catch (Throwable ignored) {}
+                    }
+                });
             }
         }
 
         /** @return The duration of the current track in milliseconds, or -1. */
         public long duration() {
-            if (mExoPlayer != null) {
-                try {
-                    long d = mExoPlayer.getDuration();
-                    return d == C.TIME_UNSET ? -1 : d;
-                } catch (Throwable t) { return -1; }
-            }
-            return -1;
+            return mCachedDuration;
         }
 
         /** @return The current playback position in milliseconds. */
         public long position() {
-            if (mExoPlayer != null) {
-                try { return mExoPlayer.getCurrentPosition(); } catch (Throwable ignored) {}
-            }
-            return 0;
+            return mCachedPosition;
         }
 
-        /** Seeks to the given position in milliseconds. */
+        /**
+         * Seeks to the given position in milliseconds.
+         * The seek is posted to the HandlerThread; the target position is returned immediately.
+         */
         long seek(final long whereto) {
-            if (mExoPlayer != null) {
-                try { mExoPlayer.seekTo(whereto); } catch (Throwable ignored) {}
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                mCachedPosition = whereto;
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.seekTo(whereto); } catch (Throwable ignored) {}
+                    }
+                });
             }
             return whereto;
         }
 
-        /** Sets the playback volume (0.0–1.0). */
+        /** Sets the playback volume (0.0–1.0), posted to HandlerThread. */
         public void setVolume(final float vol) {
-            if (mExoPlayer != null) {
-                try { mExoPlayer.setVolume(vol); } catch (Throwable ignored) {}
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.setVolume(vol); } catch (Throwable ignored) {}
+                    }
+                });
             }
         }
 
-        /** @return True if the player is currently playing. */
+        /** @return True if the player is currently playing. Uses cached value for thread safety. */
         public boolean isPlaying() {
-            return mExoPlayer != null && mExoPlayer.isPlaying();
+            return mCachedIsPlaying;
         }
 
         /**

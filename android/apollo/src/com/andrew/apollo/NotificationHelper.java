@@ -33,7 +33,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.widget.RemoteViews;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.frostwire.android.R;
@@ -119,7 +118,6 @@ public class NotificationHelper {
     /**
      * Call this to build the {@link Notification}.
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     void buildNotification(final String albumName,
                            final String artistName,
                            final String trackName,
@@ -225,7 +223,6 @@ public class NotificationHelper {
     /**
      * Open to the now playing screen
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     private PendingIntent pendingIntent() {
         return PendingIntent.getActivity(mService, 0, new Intent(INTENT_AUDIO_PLAYER)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE);
@@ -235,7 +232,6 @@ public class NotificationHelper {
      * Lets the buttons in the remote view control playback in the expanded
      * layout
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     private void initExpandedPlaybackActions(boolean isPlaying) {
         // Play and pause
         mExpandedView.setOnClickPendingIntent(R.id.notification_expanded_base_play,
@@ -261,7 +257,6 @@ public class NotificationHelper {
     /**
      * Lets the buttons in the remote view control playback in the normal layout
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     private void initPlaybackActions(boolean isPlaying) {
         // Play and pause
         mNotificationTemplate.setOnClickPendingIntent(R.id.notification_base_play,
@@ -288,7 +283,6 @@ public class NotificationHelper {
      * @param which Which {@link PendingIntent} to return
      * @return A {@link PendingIntent} ready to control playback
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     private PendingIntent retrievePlaybackActions(final int which) {
         Intent action;
         final ComponentName serviceName = new ComponentName(mService, MusicPlaybackService.class);
@@ -313,7 +307,12 @@ public class NotificationHelper {
                 return null;
         }
         action.setComponent(serviceName);
-        return PendingIntent.getService(mService, which, action, PendingIntent.FLAG_MUTABLE);
+        // FLAG_MUTABLE is required on API 31+ to allow the PendingIntent to be modified;
+        // on older APIs PendingIntents are mutable by default so flag value 0 is correct.
+        int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                ? PendingIntent.FLAG_MUTABLE
+                : 0;
+        return PendingIntent.getService(mService, which, action, flags);
     }
 
     /**
