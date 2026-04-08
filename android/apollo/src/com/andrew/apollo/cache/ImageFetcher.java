@@ -62,11 +62,23 @@ public class ImageFetcher extends ImageWorker {
                                final String albumName,
                                final long albumId,
                                final ImageView imageView) {
+        loadAlbumImage(artistName, albumName, albumId, imageView, null);
+    }
+
+    /**
+     * Used to fetch album images with an optional file path fallback.
+     */
+    public void loadAlbumImage(final String artistName,
+                               final String albumName,
+                               final long albumId,
+                               final ImageView imageView,
+                               final String filePath) {
         loadImage(generateAlbumCacheKey(albumName, artistName),
                 artistName,
                 albumId,
                 imageView,
-                ImageType.ALBUM);
+                ImageType.ALBUM,
+                filePath);
     }
 
     /**
@@ -87,7 +99,8 @@ public class ImageFetcher extends ImageWorker {
         }
 
         String albumCacheKey = generateAlbumCacheKey(albumName, artistName);
-        loadImage(albumCacheKey, artistName, currentAlbumId, imageView, ImageType.ALBUM);
+        String filePath = MusicUtils.getFilePath();
+        loadImage(albumCacheKey, artistName, currentAlbumId, imageView, ImageType.ALBUM, filePath);
     }
 
     /**

@@ -114,6 +114,24 @@ public abstract class ImageWorker {
      */
     void loadImage(final String key, final String artistName,
             final long albumId, final ImageView imageView, final ImageType imageType) {
+        loadImage(key, artistName, albumId, imageView, imageType, null);
+    }
+
+    /**
+     * Called to fetch the artist or album art with an optional file path fallback.
+     *
+     * @param key The unique identifier for the image.
+     * @param artistName The artist name for the Last.fm API.
+     * @param albumId The album art index, to check for missing artwork.
+     * @param imageView The {@link ImageView} used to set the cached
+     *            {@link Bitmap}.
+     * @param imageType The type of image URL to fetch for.
+     * @param filePath Optional file path used as fallback to extract embedded
+     *            album art via MediaMetadataRetriever when the content URI fails.
+     */
+    void loadImage(final String key, final String artistName,
+            final long albumId, final ImageView imageView, final ImageType imageType,
+            final String filePath) {
         if (key == null || mImageCache == null || imageView == null) {
             return;
         }
@@ -121,7 +139,7 @@ public abstract class ImageWorker {
         final FWImageLoader loader = FWImageLoader.getInstance(mContext.getApplicationContext());
         if (ImageType.ALBUM.equals(imageType)) {
             final Uri albumArtUri = FWImageLoader.getAlbumArtUri(albumId);
-            loader.load(albumArtUri, imageView, R.drawable.default_artwork);
+            loader.load(albumArtUri, imageView, R.drawable.default_artwork, filePath);
         } else if (ImageType.ARTIST.equals(imageType)) {
             final Uri artistArtUri = FWImageLoader.getArtistArtUri(artistName);
             loader.load(artistArtUri, imageView, R.drawable.default_artwork);

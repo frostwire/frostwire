@@ -244,9 +244,14 @@ public final class FWImageLoader {
     }
 
     public void load(Uri uri, ImageView target, int placeholderResId) {
+        load(uri, target, placeholderResId, null);
+    }
+
+    public void load(Uri uri, ImageView target, int placeholderResId, String fallbackFilePath) {
         Params p = new Params();
         p.placeholderResId = placeholderResId;
         p.noFade = true;
+        p.fallbackFilePath = fallbackFilePath;
         load(uri, target, p);
     }
 
@@ -436,7 +441,7 @@ public final class FWImageLoader {
                                                        @org.jetbrains.annotations.NotNull ErrorResult result) {
                                         LOG.warn("FWImageLoader: Image load failed: " + result.getThrowable().getMessage());
                                         if (uri != null && uri.toString().contains("albumart")) {
-                                            loadAlbumArtFallback(target, uri);
+                                            loadAlbumArtFallback(target, uri, p.fallbackFilePath);
                                         }
                                         if (callback != null) {
                                             callback.onError(result.getThrowable());
@@ -467,7 +472,7 @@ public final class FWImageLoader {
         }
     }
 
-    private static void loadAlbumArtFallback(ImageView target, Uri albumArtUri) {
+    private static void loadAlbumArtFallback(ImageView target, Uri albumArtUri, String fallbackFilePath) {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 long albumId = ContentUris.parseId(albumArtUri);
@@ -486,17 +491,20 @@ public final class FWImageLoader {
                 }
                 Bitmap bitmap = null;
                 if (albumArtPath != null) {
-                    bitmap = android.graphics.BitmapFactory.decodeFile(albumArtPath);
+                    bitmap = BitmapFactory.decodeFile(albumArtPath);
                 }
-                if (bitmap == null && target.getTag() instanceof String) {
-                    String filePath = (String) target.getTag();
+                if (bitmap == null) {
+                    String filePath = fallbackFilePath;
+                    if (filePath == null) {
+                        filePath = findAnyAudioFilePathForAlbum(target.getContext(), albumId);
+                    }
                     if (filePath != null) {
                         android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
                         try {
                             mmr.setDataSource(filePath);
                             byte[] embeddedPic = mmr.getEmbeddedPicture();
                             if (embeddedPic != null) {
-                                bitmap = android.graphics.BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
+                                bitmap = BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
                             }
                         } finally {
                             mmr.release();
@@ -511,6 +519,30 @@ public final class FWImageLoader {
                 LOG.warn("loadAlbumArtFallback() failed: " + t.getMessage());
             }
         });
+    }
+
+    private static String findAnyAudioFilePathForAlbum(Context context, long albumId) {
+        if (albumId < 0) return null;
+        try {
+            android.database.Cursor cursor = context.getContentResolver().query(
+                    android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{android.provider.MediaStore.Audio.Media.DATA},
+                    android.provider.MediaStore.Audio.Media.ALBUM_ID + "=?",
+                    new String[]{String.valueOf(albumId)},
+                    null);
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        return cursor.getString(0);
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+        } catch (Throwable t) {
+            LOG.warn("findAnyAudioFilePathForAlbum() failed: " + t.getMessage());
+        }
+        return null;
     }
 
     public Bitmap get(Uri uri) {
@@ -619,6 +651,7 @@ public final class FWImageLoader {
         public boolean noCache = false;
         public Filter filter = null;
         public Callback callback = null;
+        public String fallbackFilePath = null;
     }
 
     public interface Callback {
