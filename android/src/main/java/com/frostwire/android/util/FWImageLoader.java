@@ -21,6 +21,7 @@ package com.frostwire.android.util;
 import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -433,7 +434,10 @@ public final class FWImageLoader {
                                     @Override
                                     public void onError(@org.jetbrains.annotations.NotNull ImageRequest request, 
                                                        @org.jetbrains.annotations.NotNull ErrorResult result) {
-                                        LOG.error("FWImageLoader: Image load failed: " + result.getThrowable().getMessage(), result.getThrowable());
+                                        LOG.warn("FWImageLoader: Image load failed: " + result.getThrowable().getMessage());
+                                        if (uri != null && uri.toString().contains("albumart")) {
+                                            loadAlbumArtFallback(target, uri);
+                                        }
                                         if (callback != null) {
                                             callback.onError(result.getThrowable());
                                         }
@@ -461,6 +465,52 @@ public final class FWImageLoader {
                         }
                     });
         }
+    }
+
+    private static void loadAlbumArtFallback(ImageView target, Uri albumArtUri) {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                long albumId = ContentUris.parseId(albumArtUri);
+                android.database.Cursor cursor = target.getContext().getContentResolver().query(
+                        android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                        new String[]{android.provider.MediaStore.Audio.Albums.ALBUM_ART},
+                        android.provider.MediaStore.Audio.Albums._ID + "=?",
+                        new String[]{String.valueOf(albumId)},
+                        null);
+                String albumArtPath = null;
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        albumArtPath = cursor.getString(0);
+                    }
+                    cursor.close();
+                }
+                Bitmap bitmap = null;
+                if (albumArtPath != null) {
+                    bitmap = android.graphics.BitmapFactory.decodeFile(albumArtPath);
+                }
+                if (bitmap == null && target.getTag() instanceof String) {
+                    String filePath = (String) target.getTag();
+                    if (filePath != null) {
+                        android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
+                        try {
+                            mmr.setDataSource(filePath);
+                            byte[] embeddedPic = mmr.getEmbeddedPicture();
+                            if (embeddedPic != null) {
+                                bitmap = android.graphics.BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
+                            }
+                        } finally {
+                            mmr.release();
+                        }
+                    }
+                }
+                if (bitmap != null) {
+                    final Bitmap finalBitmap = bitmap;
+                    SystemUtils.postToUIThread(() -> target.setImageBitmap(finalBitmap));
+                }
+            } catch (Throwable t) {
+                LOG.warn("loadAlbumArtFallback() failed: " + t.getMessage());
+            }
+        });
     }
 
     public Bitmap get(Uri uri) {

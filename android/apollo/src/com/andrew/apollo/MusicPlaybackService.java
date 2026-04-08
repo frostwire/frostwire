@@ -29,6 +29,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -70,7 +71,6 @@ import android.provider.MediaStore.Audio.AudioColumns;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -84,7 +84,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -457,6 +456,9 @@ public class MusicPlaybackService extends MediaSessionService {
     @Nullable
     @Override
     public MediaSession onGetSession(@NonNull MediaSession.ControllerInfo controllerInfo) {
+        if (mMediaSession == null && mPlayer != null && mPlayer.mExoPlayer != null) {
+            setUpMediaSession();
+        }
         return mMediaSession;
     }
 
@@ -505,21 +507,6 @@ public class MusicPlaybackService extends MediaSessionService {
                             .build();
             setMediaNotificationProvider(notificationProvider);
 
-            if (postNotificationsPermissionGranted) {
-                try {
-                    Notification tempNotification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                            .setContentTitle("FrostWire")
-                            .setContentText("Preparing music player...")
-                            .setSmallIcon(R.drawable.frostwire_notification_flat)
-                            .setPriority(NotificationCompat.PRIORITY_LOW)
-                            .setOngoing(true)
-                            .build();
-                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
-                } catch (Throwable t) {
-                    LOG.error("MusicPlaybackService::onCreate() error calling startForeground() " + t.getMessage(), t);
-                }
-            }
-
             mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
         } else {
@@ -543,10 +530,6 @@ public class MusicPlaybackService extends MediaSessionService {
             if (!canStartForeground) {
                 LOG.warn("onStartCommand: Cannot start foreground service - app not in foreground and no media intent. Will skip temp notification.");
             }
-        }
-        
-        if (canStartForeground) {
-            NotificationUpdateDaemon.showTempNotification(this);
         }
         LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
         mServiceStartId = startId;
@@ -1489,22 +1472,24 @@ public class MusicPlaybackService extends MediaSessionService {
     private void updateMediaSessionMetadata() {
         if (mMediaSession == null || mPlayer == null || mPlayer.mExoPlayer == null) return;
         try {
-            // Rebuild the current MediaItem with updated display metadata.
-            // ExoPlayer propagates this to MediaSession automatically.
             String path = getPath();
             if (path == null) return;
-            androidx.media3.common.MediaMetadata meta =
+            long albumId = getAlbumId();
+            androidx.media3.common.MediaMetadata.Builder metaBuilder =
                     new androidx.media3.common.MediaMetadata.Builder()
                             .setTitle(getTrackName())
                             .setArtist(getArtistName())
                             .setAlbumTitle(getAlbumName())
-                            .setAlbumArtist(getAlbumArtistName())
-                            .build();
+                            .setAlbumArtist(getAlbumArtistName());
+            if (albumId > 0) {
+                Uri artworkUri = ContentUris.withAppendedId(
+                        Uri.parse("content://media/external/audio/albumart"), albumId);
+                metaBuilder.setArtworkUri(artworkUri);
+            }
             MediaItem updatedItem = new MediaItem.Builder()
                     .setUri(MultiPlayer.resolveUri(path))
-                    .setMediaMetadata(meta)
+                    .setMediaMetadata(metaBuilder.build())
                     .build();
-            // Replace in-place without interrupting playback
             mPlayer.mExoPlayer.replaceMediaItem(
                     mPlayer.mExoPlayer.getCurrentMediaItemIndex(), updatedItem);
             LOG.info("updateMediaSessionMetadata() pushed metadata for: " + getTrackName());

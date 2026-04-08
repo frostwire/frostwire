@@ -750,41 +750,32 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Sets the track name, album name, and album art.
      */
     private void updateNowPlayingInfo() {
-        LOG.info("updateNowPlayingInfo() invoked", true);
-        updateLastKnown(MusicServiceRequestType.TRACK_ID, true);
-        updateLastKnown(MusicServiceRequestType.TRACK_NAME, true);
-        updateLastKnown(MusicServiceRequestType.DURATION, true);
-        updateLastKnown(MusicServiceRequestType.POSITION, true);
-        updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES, true);
-        updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
+        lastTrackId = MusicUtils.getCurrentAudioId();
+        lastTrackName = MusicUtils.getTrackName();
+        lastKnownDuration = MusicUtils.duration();
+        lastKnownPosition = MusicUtils.position();
+        lastArtistName = MusicUtils.getArtistName();
+        lastAlbumName = MusicUtils.getAlbumName();
+        lastArtistAndAlbumNames = getArtistAndAlbumName(lastArtistName, lastAlbumName);
+        lastKnownIsPlaying = MusicUtils.isPlaying();
 
-        // Update the current time
+        loadCurrentAlbumArt();
+
+        if (mTrackName == null || mArtistName == null || mTotalTime == null) {
+            initPlaybackControls();
+        }
+        if (mTrackName != null && lastTrackName != null) {
+            mTrackName.setText(lastTrackName);
+        }
+        if (mArtistName != null && lastArtistAndAlbumNames != null) {
+            mArtistName.setText(lastArtistAndAlbumNames);
+        }
+        if (mTotalTime != null) {
+            mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration / 1000));
+        }
+
+        updateQueueFragmentCurrentSong();
         queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
-    }
-
-    private void onLastKnownUpdatePostTask() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            loadCurrentAlbumArt();
-            runOnUiThread(() -> {
-                if (mTrackName == null || mArtistName == null || mTotalTime == null) {
-                    initPlaybackControls();
-                }
-                if (mTrackName != null && lastTrackName != null) {
-                    // Set the track name
-                    mTrackName.setText(lastTrackName);
-                }
-                if (mArtistName != null && lastArtistAndAlbumNames != null) {
-                    // Set the artist name
-                    mArtistName.setText(lastArtistAndAlbumNames);
-                }
-                if (mTotalTime != null) {
-                    // Set the total time
-                    mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
-                }
-
-                updateQueueFragmentCurrentSong();
-            });
-        });
     }
 
     private void loadCurrentAlbumArt() {
@@ -1054,14 +1045,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private void updateLastKnown(MusicServiceRequestType requestType, boolean callOnLastKnownUpdatePostTaskAfter) {
+    private void updateLastKnown(MusicServiceRequestType requestType, boolean callUpdateAfter) {
         if (TaskThrottle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                musicServiceRequestTask(this, requestType);
-                if (callOnLastKnownUpdatePostTaskAfter) {
-                    onLastKnownUpdatePostTask();
-                }
-            });
+            musicServiceRequestTask(this, requestType);
+            if (callUpdateAfter) {
+                updateNowPlayingInfo();
+            }
         }
     }
 
