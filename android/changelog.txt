@@ -1,4 +1,45 @@
 FrostWire 3.0.17 build 771 <UNRELEASED>
+ - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
+ - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
+ - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
+ - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
+ - improvement:Music player migrated from deprecated RemoteControlClient to MediaSession API (L1)
+ - improvement:Music player migrated from deprecated MediaPlayer to ExoPlayer/Media3 (L3) - fixes race conditions in audio playback
+ - fix:EngineIntentService migrated from deprecated JobIntentService to plain Service (L2)
+ - fix:Music player notification widget no longer lost on Android 12+
+ - fix:apollo: MediaButtonIntentReceiver - replaced deprecated Handler(), getParcelableExtra, and registerMediaButtonEventReceiver
+ - fix:apollo: ApolloUtils - replaced deprecated EXTRA_SHORTCUT broadcast with ShortcutManager.requestPinShortcut(); Toast.setGravity guarded for API < 30
+ - fix:apollo: replaced deprecated setOnPageChangeListener with addOnPageChangeListener in ProfileActivity
+ - fix:apollo: stopForeground(boolean) replaced with stopForeground(STOP_FOREGROUND_REMOVE) across MusicPlaybackService and EngineForegroundService
+ - fix:apollo: TOCTOU hazard in MusicUtils.getService() fixed - result stored in local variable before use
+ - fix:TransfersFragment and TransferDetailFragment migrated from deprecated Fragment menu callbacks to MenuProvider API
+ - fix:QueueFragment and MusicBrowserPhoneFragment migrated to MenuProvider API
+ - fix:AbstractActivity replaced deprecated onAttachFragment with FragmentLifecycleCallbacks
+ - fix:ApolloFragment.onAttach(Activity) replaced with onAttach(Context)
+ - fix:All getFragmentManager() calls replaced with getParentFragmentManager() (SearchFragment, ApplicationPreferencesFragment, TorrentPreferenceFragment, TransferDetailDetailsFragment, TransferDetailTrackersFragment)
+ - fix:startActivityForResult replaced with ActivityResultLauncher in SettingsActivity and PromotionsAdapter/MainActivity
+ - fix:setTargetFragment replaced with FragmentResultListener in ApplicationPreferencesFragment and TorrentPreferenceFragment
+ - fix:android.app.Fragment replaced with androidx.fragment.app.Fragment in TimerSubscription, Debug, ImageCache
+ - fix:onBackPressed() replaced with OnBackPressedDispatcher in StopListener
+ - fix:Html.fromHtml(String) replaced with Html.fromHtml(String, flag) on API 24+ across AboutFragment, IntentWizardPage, SoftwareUpdaterDialog, VPNStatusDetailActivity
+ - fix:Resources.getColor(int) replaced with ContextCompat.getColor; Resources.getDrawable(int) replaced with ContextCompat.getDrawable across UIUtils, TransferListAdapter, ImageWorker, RichNotificationActionLink
+ - fix:UIUtils.getDefaultDisplay/getMetrics replaced with WindowMetrics (API 30+), toggleSoftInput and overridePendingTransition deprecated fallbacks guarded
+ - fix:Canvas.saveLayerAlpha ALL_SAVE_FLAG replaced with 0 in DragSortListView
+ - fix:getSerializable() replaced with typed API 33+ variant in SoftwareUpdaterDialog and dialogs
+ - fix:EngineIntentService Notification.vibrate field replaced with NotificationCompat.Builder.setVibrate()
+ - fix:LollipopFileSystem replaced deprecated ContextCompat.getExternalFilesDirs with context.getExternalFilesDirs
+ - fix:PreviewPlayerActivity - fixed deprecated MediaPlayer, AudioManager, and Display APIs
+ - fix:StrictMode DiskRead violation in TorrentPreferenceFragment resolved
+ - fix:StrictMode CustomViolation in SuggestionsAdapter resolved - OkHttpClient now lazily initialized
+ - fix:I2P config type mismatch crash - port and tunnel values now stored as Strings
+ - fix:ConfigurationManager.getString() now catches ClassCastException for Integer prefs stored by pre-3.0.17 builds
+ - fix:switch(case R.*) replaced with if/else chains in MusicBrowserPhoneFragment, ProfileActivity, BaseActivity, TransferDetailDetailsFragment, QueueFragment, RepeatingImageButton to allow nonFinalResIds=true
+ - maintenance:Removed multidex library and MultiDexApplication - minSdk=26 has built-in multidex support
+ - maintenance:build.gradle migrated from apply plugin to plugins DSL block; removed builtInKotlin and newDsl flags
+ - maintenance:Removed 5 deprecated AGP gradle.properties flags now that all blockers are resolved
+ - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
+ - maintenance:Added structural regression tests for deprecation migrations (DeprecationMigrationStructureTest, EngineIntentServiceMigrationTest, ConfigurationManagerGetStringTest, MediaButtonIntentReceiverTest)
+ - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
  - new:I2P network integration for anonymous proxy support
  - Update com.google.firebase:firebase-bom to 34.8.0
