@@ -1,13 +1,23 @@
 FrostWire 3.0.17 build 771 <UNRELEASED>
+ - improvement:Music player migrated from deprecated MediaPlayer to ExoPlayer/Media3 (Jetpack Media3 1.10.0) - fixes race conditions, adds standard media notification with output device selector
+ - improvement:Music player migrated from deprecated RemoteControlClient to MediaSession API via MediaSessionService
+ - improvement:Music player uses standard YouTube Music/Spotify-style notification with output device selector (Cast, Bluetooth)
+ - improvement:AudioPlayerActivity UI now updates immediately - eliminated 6 async handler roundtrips that caused visible lag on song title, controls, and playback state
+ - improvement:Play/Pause, Repeat, and Shuffle buttons now update synchronously on UI thread - no more MISC→UI handler roundtrip delay
+ - fix:Freshly downloaded audio files play instantly instead of waiting 45+ seconds for MediaStore indexer - direct file path fallback bypasses MediaStore query
+ - fix:Album art fallback uses MediaMetadataRetriever when MediaStore thumbnail is unavailable (e.g. freshly downloaded files)
+ - fix:StrictMode DiskReadViolation when opening files - all file I/O moved off UI thread
+ - fix:AudioPlayerActivity metadata not loading - getIntent() is never null, now checks intent.getData() to distinguish file-intent vs show-player intent
+ - fix:Play/pause button UI not reacting - MusicPlaybackService.pause() now always broadcasts PLAYSTATE_CHANGED
+ - fix:Long-press stop on play/pause button now works - calls stop synchronously before finishing activity
+ - fix:Music player notification lost on Android 12+ - replaced custom RemoteViews notification with MediaSessionService auto-managed notification
  - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
  - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
- - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
- - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
- - improvement:Music player migrated from deprecated RemoteControlClient to MediaSession API (L1)
- - improvement:Music player migrated from deprecated MediaPlayer to ExoPlayer/Media3 (L3) - fixes race conditions in audio playback
+ - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
+ - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
+ - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
+ - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
  - fix:EngineIntentService migrated from deprecated JobIntentService to plain Service (L2)
- - fix:Music player notification widget no longer lost on Android 12+
- - fix:apollo: MediaButtonIntentReceiver - replaced deprecated Handler(), getParcelableExtra, and registerMediaButtonEventReceiver
  - fix:apollo: ApolloUtils - replaced deprecated EXTRA_SHORTCUT broadcast with ShortcutManager.requestPinShortcut(); Toast.setGravity guarded for API < 30
  - fix:apollo: replaced deprecated setOnPageChangeListener with addOnPageChangeListener in ProfileActivity
  - fix:apollo: stopForeground(boolean) replaced with stopForeground(STOP_FOREGROUND_REMOVE) across MusicPlaybackService and EngineForegroundService
@@ -34,6 +44,14 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:I2P config type mismatch crash - port and tunnel values now stored as Strings
  - fix:ConfigurationManager.getString() now catches ClassCastException for Integer prefs stored by pre-3.0.17 builds
  - fix:switch(case R.*) replaced with if/else chains in MusicBrowserPhoneFragment, ProfileActivity, BaseActivity, TransferDetailDetailsFragment, QueueFragment, RepeatingImageButton to allow nonFinalResIds=true
+ - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
+ - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
+ - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
+ - improvement:Added visual status indicators in transfers screen when protections pause downloads
+ - maintenance:Removed MediaButtonIntentReceiver - Media3 MediaSession handles media button routing automatically
+ - maintenance:Removed custom RemoteViews notification layouts (notification_template_base.xml, notification_template_expanded_base.xml)
+ - maintenance:Removed NotificationHelper - replaced by Media3 DefaultMediaNotificationProvider
+ - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
  - maintenance:Removed multidex library and MultiDexApplication - minSdk=26 has built-in multidex support
  - maintenance:build.gradle migrated from apply plugin to plugins DSL block; removed builtInKotlin and newDsl flags
  - maintenance:Removed 5 deprecated AGP gradle.properties flags now that all blockers are resolved
@@ -46,13 +64,6 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:Updated Chaquopy to 17.0.0 with Python 3.13 - dropped 32-bit ABIs (armeabi-v7a, x86) incompatible with Python 3.13+; Python 3.14 blocked by missing brotli/pycryptodomex wheels in Chaquopy mirror
  - maintenance:Dropped jlibtorrent-android-arm and jlibtorrent-android-x86 dependencies (32-bit ABIs no longer targeted)
  - maintenance:Updated CI workflow to use Python 3.13
- - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
- - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
- - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
- - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
- - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
- - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
- - improvement:Added visual status indicators in transfers screen when protections pause downloads
 
 FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready
