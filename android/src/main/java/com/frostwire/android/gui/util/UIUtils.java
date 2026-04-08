@@ -252,18 +252,21 @@ public final class UIUtils {
      */
     @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> openFileBackground(context, filePath, mime, useFileProvider));
+        return true;
+    }
+
+    private static void openFileBackground(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             File file = new File(filePath);
 
             if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
-                // Try using the
                 filePath = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(file).getAbsolutePath();
             }
             if (filePath != null && !openAudioInternal(context, filePath)) {
                 Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ?
                         Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
 
-                // The mime type makes it match AudioPlayerActivity see AndroidManifest.xml
                 LOG.info("UIUtils.openFile(filePath=" + filePath + ", mime=" + mime + ")", false);
                 Uri fileUri = getFileUri(context, filePath, useFileProvider);
                 LOG.info("UIUtils.openFile(...) -> fileUri=" + fileUri.toString(), false);
@@ -278,11 +281,9 @@ public final class UIUtils {
                 }
                 context.startActivity(i);
             }
-            return true;
         } catch (Throwable e) {
-            UIUtils.showShortMessage(context, R.string.cant_open_file);
+            SystemUtils.postToUIThread(() -> UIUtils.showShortMessage(context, R.string.cant_open_file));
             LOG.error("Failed to open file: " + filePath, e);
-            return false;
         }
     }
 
@@ -441,13 +442,40 @@ public final class UIUtils {
             if (!fds.isEmpty() && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
                 return true;
-            } else {
-                return false;
             }
         } catch (Throwable e) {
-            LOG.error("UIUtils::openAudioInternal() Failed to open audio file: " + filePath, e);
-            return false;
+            LOG.error("UIUtils::openAudioInternal() MediaStore query failed: " + filePath, e);
         }
+
+        if (isAudioFile(filePath)) {
+            File file = new File(filePath);
+            if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
+                try {
+                    file = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(new File(filePath));
+                } catch (Throwable ignored) {}
+            }
+            if (file.exists()) {
+                FWFileDescriptor fd = new FWFileDescriptor();
+                fd.id = -1;
+                fd.filePath = file.getAbsolutePath();
+                fd.fileType = Constants.FILE_TYPE_AUDIO;
+                fd.mime = getMimeType(file.getAbsolutePath());
+                fd.fileSize = file.length();
+                fd.dateAdded = file.lastModified() / 1000;
+                fd.dateModified = file.lastModified() / 1000;
+                fd.deletable = true;
+                playEphemeralPlaylist(context, fd);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean isAudioFile(String filePath) {
+        if (filePath == null) return false;
+        String mime = getMimeType(filePath);
+        return mime != null && mime.startsWith("audio/");
     }
 
     /**

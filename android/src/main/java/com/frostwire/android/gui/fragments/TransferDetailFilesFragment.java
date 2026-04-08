@@ -338,20 +338,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     path = previewFile((BTDownloadItem) item);
                 }
                 if (path != null) {
-                    if (path.exists()) {
-                        UIUtils.openFile(ctx, path);
-                    } else {
-                        UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
-                    }
+                    UIUtils.openFile(ctx, path);
                 }
             } else if (tag instanceof File) {
-                File path = (File) tag;
-                System.out.println(path);
-                if (path.exists()) {
-                    UIUtils.openFile(ctx, path);
-                } else {
-                    UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
-                }
+                UIUtils.openFile(ctx, (File) tag);
             }
         }
     }
