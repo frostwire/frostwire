@@ -217,6 +217,8 @@ public abstract class BaseHttpDownload implements Transfer {
         }
     }
 
+    private static final int MAX_RETRIES_ON_CONNECTION_RESET = 3;
+
     protected void start(final String url, final File temp, final boolean resume) {
         start(url, temp, resume, null);
     }
@@ -227,16 +229,44 @@ public abstract class BaseHttpDownload implements Transfer {
         }
         THREAD_POOL.execute(new Thread(getDisplayName()) {
             public void run() {
-                try {
-                    if (complete) {
+                int attempt = 0;
+                boolean resumeAttempt = resume;
+                while (attempt <= MAX_RETRIES_ON_CONNECTION_RESET) {
+                    try {
+                        if (complete) {
+                            return;
+                        }
+                        state = TransferState.DOWNLOADING;
+                        HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+                        client.setListener(new DownloadListener());
+                        client.save(url, temp, resumeAttempt, httpHeaders);
+                        return; // success
+                    } catch (SocketException e) {
+                        if (complete) {
+                            return;
+                        }
+                        boolean isConnectionReset = e.getMessage() != null && e.getMessage().contains("Connection reset");
+                        if (isConnectionReset && attempt < MAX_RETRIES_ON_CONNECTION_RESET) {
+                            attempt++;
+                            long delayMs = (1L << attempt) * 1000; // 2s, 4s, 8s
+                            LOG.warn("Connection reset on download attempt " + attempt + "/" + MAX_RETRIES_ON_CONNECTION_RESET
+                                    + ", resuming in " + (delayMs / 1000) + "s — " + url);
+                            try {
+                                Thread.sleep(delayMs);
+                            } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                                error(e);
+                                return;
+                            }
+                            resumeAttempt = temp.exists() && temp.length() > 0; // resume from partial data if available
+                        } else {
+                            error(e);
+                            return;
+                        }
+                    } catch (Throwable e) {
+                        error(e);
                         return;
                     }
-                    state = TransferState.DOWNLOADING;
-                    HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
-                    client.setListener(new DownloadListener());
-                    client.save(url, temp, resume, httpHeaders);
-                } catch (Throwable e) {
-                    error(e);
                 }
             }
         });

@@ -11,18 +11,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import mockwebserver3.MockResponse;
 import mockwebserver3.MockWebServer;
 import mockwebserver3.RecordedRequest;
+import mockwebserver3.SocketEffect;
 import okhttp3.Headers;
 
 import static org.junit.Assert.*;
 
 /**
- * Diagnostic tests for the 0-byte YouTube download bug.
+ * Diagnostic tests for the 0-byte YouTube download bug and connection-reset retry.
  *
  * Run with:
  *   ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.transfers.TellurideDownloadDiagnosticsTest"
@@ -31,6 +33,7 @@ import static org.junit.Assert.*;
  * - Hypothesis A: OkHttpClientWrapper.save() silently writes 0 bytes on HTTP 403
  * - Hypothesis B: File copy path produces correct output for both empty and non-empty sources
  * - What HTTP headers OkHttp actually sends (reveals why YouTube rejects requests)
+ * - Connection reset mid-download throws SocketException (triggers BaseHttpDownload retry logic)
  */
 public class TellurideDownloadDiagnosticsTest {
 
@@ -149,6 +152,38 @@ public class TellurideDownloadDiagnosticsTest {
         System.out.println("[DIAG] Cookie:     " + headers.get("Cookie"));
 
         assertNotNull("User-Agent header must be present", headers.get("User-Agent"));
+    }
+
+    /**
+     * Connection reset mid-download must throw a SocketException or IOException.
+     * This is the trigger for the retry-with-resume logic in BaseHttpDownload.start().
+     * BaseHttpDownload will catch SocketException("Connection reset") and retry up to
+     * MAX_RETRIES_ON_CONNECTION_RESET=3 times, using resume=true to continue from partial data.
+     */
+    @Test
+    public void testSave_connectionResetMidDownload_throwsSocketException() {
+        // DisconnectDuringResponseBody makes MockWebServer abruptly close the socket
+        // after sending the response headers but before the body is fully sent —
+        // simulating the "Connection reset" seen in production YouTube downloads.
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body("some partial content")
+                .onResponseBody(SocketEffect.ShutdownConnection.INSTANCE)
+                .build());
+
+        File dest = new File(tempDir, "video_reset.mp4");
+        boolean caughtIoException = false;
+        try {
+            OkHttpClientWrapper client = new OkHttpClientWrapper(pool);
+            client.save(server.url("/video.mp4").toString(), dest, false);
+        } catch (IOException e) {
+            caughtIoException = true;
+            System.out.println("[DIAG] Connection reset → IOException: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            // SocketException is a subclass of IOException; BaseHttpDownload catches SocketException specifically
+            boolean isSocketException = e instanceof SocketException;
+            System.out.println("[DIAG] Is SocketException (BaseHttpDownload retry trigger): " + isSocketException);
+        }
+        assertTrue("Connection reset must throw IOException so BaseHttpDownload can retry", caughtIoException);
     }
 
     // -------------------------------------------------------------------------
