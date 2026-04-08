@@ -2753,9 +2753,11 @@ public class MusicPlaybackService extends Service {
         private void ensurePlayer() {
             if (mExoPlayer != null) return;
             if (MusicPlaybackService.INSTANCE == null) return;
+            if (MusicPlaybackService.mPlayerHandler == null) return;
             mExoPlayer = new ExoPlayer.Builder(MusicPlaybackService.INSTANCE)
                     .setHandleAudioBecomingNoisy(true)
                     .setWakeMode(C.WAKE_MODE_LOCAL)
+                    .setLooper(MusicPlaybackService.mPlayerHandler.getLooper())
                     .build();
             mExoPlayer.setAudioAttributes(
                     new AudioAttributes.Builder()
@@ -2830,6 +2832,9 @@ public class MusicPlaybackService extends Service {
 
         /**
          * Opens the given path as the current track and prepares for playback.
+         * The setMediaItem/prepare calls are posted to mPlayerHandler so they are
+         * always enqueued AFTER any previously posted stop()/clearMediaItems() calls,
+         * preventing the race condition where stop() wipes a newly loaded track.
          */
         void setCurrentDataSource(final String path) {
             if (MusicPlaybackService.INSTANCE == null) {
@@ -2847,30 +2852,35 @@ public class MusicPlaybackService extends Service {
                 return;
             }
             ensurePlayer();
-            if (mExoPlayer == null) {
+            if (mExoPlayer == null || MusicPlaybackService.mPlayerHandler == null) {
                 mIsInitialized = false;
                 return;
             }
             // Lazily set up MediaSession now that ExoPlayer exists
             MusicPlaybackService.INSTANCE.setUpMediaSession();
-            try {
-                MediaItem mediaItem =
-                        MediaItem.fromUri(resolveUri(path));
-                mExoPlayer.setMediaItem(mediaItem);
-                mExoPlayer.prepare();
-                mIsInitialized = true;
-                // Launch AudioPlayerActivity when the player is ready if requested
-                if (MusicPlaybackService.INSTANCE.launchPlayerActivity) {
-                    MusicPlaybackService.INSTANCE.launchPlayerActivity = false;
-                    LOG.info("MultiPlayer::setCurrentDataSource() launching AudioPlayerActivity");
-                    Intent i = new Intent(MusicPlaybackService.INSTANCE, AudioPlayerActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    MusicPlaybackService.INSTANCE.startActivity(i);
+            // Mark initialized optimistically; reset to false on error in the posted task
+            mIsInitialized = true;
+            // Post setMediaItem/prepare to the HandlerThread so they execute after any
+            // previously posted stop()/clearMediaItems() calls in the queue.
+            final MediaItem mediaItem = MediaItem.fromUri(resolveUri(path));
+            MusicPlaybackService.mPlayerHandler.post(() -> {
+                if (mExoPlayer == null) return;
+                try {
+                    mExoPlayer.setMediaItem(mediaItem);
+                    mExoPlayer.prepare();
+                    // Launch AudioPlayerActivity when the player is ready if requested
+                    if (MusicPlaybackService.INSTANCE != null && MusicPlaybackService.INSTANCE.launchPlayerActivity) {
+                        MusicPlaybackService.INSTANCE.launchPlayerActivity = false;
+                        LOG.info("MultiPlayer::setCurrentDataSource() launching AudioPlayerActivity");
+                        Intent i = new Intent(MusicPlaybackService.INSTANCE, AudioPlayerActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        MusicPlaybackService.INSTANCE.startActivity(i);
+                    }
+                } catch (Throwable e) {
+                    LOG.error("MultiPlayer::setCurrentDataSource() error: " + e.getMessage(), e);
+                    mIsInitialized = false;
                 }
-            } catch (Throwable e) {
-                LOG.error("MultiPlayer::setCurrentDataSource() error: " + e.getMessage(), e);
-                mIsInitialized = false;
-            }
+            });
         }
 
         /**

@@ -657,7 +657,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        updateLastKnown(MusicServiceRequestType.TRACK_ID, false); // throttled async call
+        // Synchronously fetch lastTrackId so the check below is accurate —
+        // the async updateLastKnown(TRACK_ID) would not have completed yet.
+        if (MusicUtils.getMusicPlaybackService() != null) {
+            lastTrackId = MusicUtils.getCurrentAudioId();
+        }
 
         if (lastTrackId == -1) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, lastTrackId=-1");
@@ -754,6 +758,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         updateLastKnown(MusicServiceRequestType.DURATION, true);
         updateLastKnown(MusicServiceRequestType.POSITION, true);
         updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES, true);
+        updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
 
         // Update the current time
         queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
