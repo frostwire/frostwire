@@ -309,6 +309,9 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         if (!StringUtils.isNullOrEmpty(userAgent)) {
             builder.header("User-Agent", userAgent);
         }
+        builder.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        builder.header("Accept-Language", "en-us,en;q=0.5");
+        builder.header("Sec-Fetch-Mode", "navigate");
         if (!StringUtils.isNullOrEmpty(referrer)) {
             try {
                 builder.header("Referer", referrer); // [sic - typo in HTTP protocol]

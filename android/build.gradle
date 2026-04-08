@@ -104,7 +104,7 @@ android {
                 }
             }
             pip {
-                install "yt_dlp[default]==2025.12.08"
+                install "yt_dlp[default]==2026.3.17"
                 // helps a lot with debugging
                 //options "--verbose"
             }
