@@ -11,39 +11,21 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:Play/pause button UI not reacting - MusicPlaybackService.pause() now always broadcasts PLAYSTATE_CHANGED
  - fix:Long-press stop on play/pause button now works - calls stop synchronously before finishing activity
  - fix:Music player notification lost on Android 12+ - replaced custom RemoteViews notification with MediaSessionService auto-managed notification
- - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
- - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
  - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
  - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
  - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
+ - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
  - fix:EngineIntentService migrated from deprecated JobIntentService to plain Service (L2)
- - fix:apollo: ApolloUtils - replaced deprecated EXTRA_SHORTCUT broadcast with ShortcutManager.requestPinShortcut(); Toast.setGravity guarded for API < 30
- - fix:apollo: replaced deprecated setOnPageChangeListener with addOnPageChangeListener in ProfileActivity
- - fix:apollo: stopForeground(boolean) replaced with stopForeground(STOP_FOREGROUND_REMOVE) across MusicPlaybackService and EngineForegroundService
- - fix:apollo: TOCTOU hazard in MusicUtils.getService() fixed - result stored in local variable before use
- - fix:TransfersFragment and TransferDetailFragment migrated from deprecated Fragment menu callbacks to MenuProvider API
- - fix:QueueFragment and MusicBrowserPhoneFragment migrated to MenuProvider API
- - fix:AbstractActivity replaced deprecated onAttachFragment with FragmentLifecycleCallbacks
- - fix:ApolloFragment.onAttach(Activity) replaced with onAttach(Context)
- - fix:All getFragmentManager() calls replaced with getParentFragmentManager() (SearchFragment, ApplicationPreferencesFragment, TorrentPreferenceFragment, TransferDetailDetailsFragment, TransferDetailTrackersFragment)
- - fix:startActivityForResult replaced with ActivityResultLauncher in SettingsActivity and PromotionsAdapter/MainActivity
- - fix:setTargetFragment replaced with FragmentResultListener in ApplicationPreferencesFragment and TorrentPreferenceFragment
- - fix:android.app.Fragment replaced with androidx.fragment.app.Fragment in TimerSubscription, Debug, ImageCache
- - fix:onBackPressed() replaced with OnBackPressedDispatcher in StopListener
- - fix:Html.fromHtml(String) replaced with Html.fromHtml(String, flag) on API 24+ across AboutFragment, IntentWizardPage, SoftwareUpdaterDialog, VPNStatusDetailActivity
- - fix:Resources.getColor(int) replaced with ContextCompat.getColor; Resources.getDrawable(int) replaced with ContextCompat.getDrawable across UIUtils, TransferListAdapter, ImageWorker, RichNotificationActionLink
- - fix:UIUtils.getDefaultDisplay/getMetrics replaced with WindowMetrics (API 30+), toggleSoftInput and overridePendingTransition deprecated fallbacks guarded
- - fix:Canvas.saveLayerAlpha ALL_SAVE_FLAG replaced with 0 in DragSortListView
- - fix:getSerializable() replaced with typed API 33+ variant in SoftwareUpdaterDialog and dialogs
- - fix:EngineIntentService Notification.vibrate field replaced with NotificationCompat.Builder.setVibrate()
- - fix:LollipopFileSystem replaced deprecated ContextCompat.getExternalFilesDirs with context.getExternalFilesDirs
- - fix:PreviewPlayerActivity - fixed deprecated MediaPlayer, AudioManager, and Display APIs
- - fix:StrictMode DiskRead violation in TorrentPreferenceFragment resolved
- - fix:StrictMode CustomViolation in SuggestionsAdapter resolved - OkHttpClient now lazily initialized
  - fix:I2P config type mismatch crash - port and tunnel values now stored as Strings
  - fix:ConfigurationManager.getString() now catches ClassCastException for Integer prefs stored by pre-3.0.17 builds
- - fix:switch(case R.*) replaced with if/else chains in MusicBrowserPhoneFragment, ProfileActivity, BaseActivity, TransferDetailDetailsFragment, QueueFragment, RepeatingImageButton to allow nonFinalResIds=true
+ - fix:StrictMode DiskRead violation in TorrentPreferenceFragment resolved
+ - fix:StrictMode CustomViolation in SuggestionsAdapter resolved - OkHttpClient now lazily initialized
+ - fix:switch(case R.*) replaced with if/else chains to allow nonFinalResIds=true
+ - fix:All deprecated Fragment API migrations (onAttachFragment→FragmentLifecycleCallbacks, onAttach(Activity)→onAttach(Context), getFragmentManager→getParentFragmentManager, startActivityForResult→ActivityResultLauncher, setTargetFragment→FragmentResultListener, android.app.Fragment→androidx.fragment.app.Fragment, onBackPressed→OnBackPressedDispatcher)
+ - fix:All deprecated View/API migrations (Html.fromHtml(String)→fromHtml(String,flag), Resources.getColor→ContextCompat.getColor, Resources.getDrawable→ContextCompat.getDrawable, getDefaultDisplay→WindowMetrics, Canvas.ALL_SAVE_FLAG→0, getSerializable→typed API 33+ variant, Notification.vibrate→NotificationCompat.Builder.setVibrate, setOnPageChangeListener→addOnPageChangeListener, EXTRA_SHORTCUT→ShortcutManager.requestPinShortcut, stopForeground(boolean)→stopForeground(STOP_FOREGROUND_REMOVE))
+ - fix:TransfersFragment, TransferDetailFragment, QueueFragment, MusicBrowserPhoneFragment migrated from deprecated Fragment menu callbacks to MenuProvider API
  - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
  - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
  - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
