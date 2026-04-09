@@ -254,6 +254,7 @@ dependencies {
     implementation 'io.coil-kt.coil3:coil-network-okhttp:3.3.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21'
     implementation 'androidx.work:work-runtime-ktx:2.11.0'
+    implementation 'androidx.datastore:datastore-preferences:1.1.4'
 
     // Firebase Crashlytics
     implementation platform('com.google.firebase:firebase-bom:34.8.0')

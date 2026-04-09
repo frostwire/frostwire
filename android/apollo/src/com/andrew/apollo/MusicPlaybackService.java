@@ -33,7 +33,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 import android.database.Cursor;
@@ -68,6 +67,9 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
+import androidx.datastore.core.DataStore;
+import androidx.datastore.preferences.core.Preferences;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -84,6 +86,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.DataStoreManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -311,7 +314,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private Cursor mCursor;
     private Cursor mAlbumCursor;
     private volatile AudioManager mAudioManager;
-    private SharedPreferences mPreferences;
+    private DataStore<Preferences> serviceDataStore;
     private boolean mServiceInUse = false;
     private boolean mIsSupposedToBePlaying = false;
     private boolean mQueueIsSaveable = true;
@@ -792,7 +795,7 @@ public class MusicPlaybackService extends MediaSessionService {
             stop(false);
         }
         if (force) {
-            mPreferences.edit().putInt("curpos", -1).apply();
+            DataStoreManager.putInt(serviceDataStore, "curpos", -1);
         }
         if (mPlayerHandler != null) {
             mPlayerHandler.removeCallbacksAndMessages(null);
@@ -831,7 +834,7 @@ public class MusicPlaybackService extends MediaSessionService {
         // MediaSession setup deferred until ExoPlayer is ready (called from setCurrentDataSource)
         // setUpMediaSession() is called after mPlayer is initialized in reloadQueue/openCurrentAndNext
 
-        mPreferences = getSharedPreferences("Service", 0);
+        serviceDataStore = DataStoreManager.getServiceDataStore();
         mCardId = getCardId();
 
         registerExternalStorageListener();
@@ -1482,11 +1485,10 @@ public class MusicPlaybackService extends MediaSessionService {
      * @param full True if the queue is full
      */
     private void saveQueue(final boolean full) {
-        if (!mQueueIsSaveable || mPreferences == null) {
+        if (!mQueueIsSaveable || serviceDataStore == null) {
             return;
         }
 
-        final SharedPreferences.Editor editor = mPreferences.edit();
         if (full) {
             final StringBuilder q = new StringBuilder();
             int len = mPlayListLen;
@@ -1503,23 +1505,19 @@ public class MusicPlaybackService extends MediaSessionService {
                     q.append(";");
                 }
             }
-            editor.putString("queue", q.toString());
-            editor.putInt("cardid", mCardId);
+            DataStoreManager.putString(serviceDataStore, "queue", q.toString());
+            DataStoreManager.putInt(serviceDataStore, "cardid", mCardId);
         }
-        editor.putInt("curpos", mPlayPos);
+        DataStoreManager.putInt(serviceDataStore, "curpos", mPlayPos);
         if (mPlayer != null && mPlayer.isInitialized()) {
             try {
                 final long pos = mPlayer.position();
-                editor.putLong("seekpos", pos);
+                DataStoreManager.putLong(serviceDataStore, "seekpos", pos);
             } catch (Throwable e) {
-                // usually an IllegalStateException coming
-                // from com.andrew.apollo.MusicPlaybackService$MultiPlayer.position
-                // which comes from a native call to MediaPlayer.getCurrentPosition()
             }
         }
-        editor.putInt("repeatmode", mRepeatMode);
-        editor.putBoolean("shufflemode", mShuffleEnabled);
-        editor.apply();
+        DataStoreManager.putInt(serviceDataStore, "repeatmode", mRepeatMode);
+        DataStoreManager.putBoolean(serviceDataStore, "shufflemode", mShuffleEnabled);
     }
 
     /**
@@ -1529,11 +1527,11 @@ public class MusicPlaybackService extends MediaSessionService {
     private void reloadQueue() {
         String q = null;
         int id = mCardId;
-        if (mPreferences.contains("cardid")) {
-            id = mPreferences.getInt("cardid", ~mCardId);
+        if (DataStoreManager.containsKey(serviceDataStore, "cardid")) {
+            id = DataStoreManager.getInt(serviceDataStore, "cardid", ~mCardId);
         }
         if (id == mCardId) {
-            q = mPreferences.getString("queue", "");
+            q = DataStoreManager.getString(serviceDataStore, "queue", "");
         }
         int qlen = q != null ? q.length() : 0;
         if (qlen > 1) {
@@ -1561,7 +1559,7 @@ public class MusicPlaybackService extends MediaSessionService {
                 }
             }
             mPlayListLen = plen;
-            final int pos = mPreferences.getInt("curpos", 0);
+            final int pos = DataStoreManager.getInt(serviceDataStore, "curpos", 0);
             if (pos < 0 || pos >= mPlayListLen) {
                 mPlayListLen = 0;
                 return;
@@ -1571,14 +1569,8 @@ public class MusicPlaybackService extends MediaSessionService {
             if (mCursor == null) {
                 SystemClock.sleep(3000);
                 try {
-                    // TODO: well, this is garbage, since
-                    // there is a 3 seconds sleep, all sort
-                    // of things could happen to the mutable
-                    // variable mPlayPos, including set it to -1
-                    // this need to be recoded
                     updateCursor(mPlayList[mPlayPos]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    // ignore and return
                     return;
                 }
             }
@@ -1591,7 +1583,7 @@ public class MusicPlaybackService extends MediaSessionService {
                 return;
             }
 
-            final long seekpos = mPreferences.getLong("seekpos", 0);
+            final long seekpos = DataStoreManager.getLong(serviceDataStore, "seekpos", 0);
             seek(seekpos >= 0 && seekpos < duration() ? seekpos : 0);
 
             if (D) {
@@ -1600,7 +1592,7 @@ public class MusicPlaybackService extends MediaSessionService {
                         + " (requested " + seekpos + ")");
             }
 
-            int repmode = mPreferences.getInt("repeatmode", REPEAT_NONE);
+            int repmode = DataStoreManager.getInt(serviceDataStore, "repeatmode", REPEAT_NONE);
             if (repmode != REPEAT_ALL && repmode != REPEAT_CURRENT) {
                 repmode = REPEAT_NONE;
             }

@@ -19,10 +19,11 @@
 package com.frostwire.android.gui.services;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
-import androidx.preference.PreferenceManager;
+import androidx.datastore.core.DataStore;
+import androidx.datastore.preferences.core.Preferences;
 
+import com.frostwire.android.core.DataStoreManager;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.bloom_filter_256;
@@ -34,23 +35,20 @@ public final class NotifiedStorage {
 
     private static final com.frostwire.util.Logger LOG = com.frostwire.util.Logger.getLogger(NotifiedStorage.class);
 
-    // this is a preference key to be used only by this class
     private static final String PREF_KEY_NOTIFIED_HASHES = "frostwire.prefs.gui.notified_hashes";
 
-    // not using ConfigurationManager to avoid setup/startup timing issues
-    private final SharedPreferences preferences;
+    private final DataStore<Preferences> preferences;
     private final bloom_filter_256 hashes;
 
     NotifiedStorage(Context context) {
         SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::Constructor");
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences = DataStoreManager.getNotifiedDataStore();
         hashes = new bloom_filter_256();
         loadHashes();
     }
 
     public boolean contains(String infoHash) {
         if (infoHash == null || infoHash.length() != 40) {
-            // not a valid info hash
             return false;
         }
 
@@ -69,7 +67,6 @@ public final class NotifiedStorage {
 
     public void add(String infoHash) {
         if (infoHash == null || infoHash.length() != 40) {
-            // not a valid info hash
             return;
         }
 
@@ -83,9 +80,7 @@ public final class NotifiedStorage {
             arr = Vectors.byte_vector2bytes(v);
             String s = Hex.encode(arr);
 
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(PREF_KEY_NOTIFIED_HASHES, s);
-            editor.apply();
+            DataStoreManager.putString(preferences, PREF_KEY_NOTIFIED_HASHES, s);
 
         } catch (Throwable e) {
             LOG.warn("Error adding info hash to notified storage", e);
@@ -94,7 +89,7 @@ public final class NotifiedStorage {
 
     private void loadHashes() {
         SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::loadHashes");
-        String s = preferences.getString(PREF_KEY_NOTIFIED_HASHES, null);
+        String s = DataStoreManager.getString(preferences, PREF_KEY_NOTIFIED_HASHES, null);
         if (s != null) {
             try {
                 byte[] arr = Hex.decode(s);

@@ -31,6 +31,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.DataStoreManager;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -111,6 +112,7 @@ public class MainApplication extends Application implements Configuration.Provid
         LOG.info("MainApplication::initializeInBackground starting...");
 
         // Initialize configuration manager (reads SharedPreferences - can be slow)
+        DataStoreManager.INSTANCE.initialize(this);
         ConfigurationManager.create(this);
 
         // CRITICAL: Wait for ConfigurationManager to be fully initialized before using it
