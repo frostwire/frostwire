@@ -328,12 +328,12 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
 
     private void addCustomHeaders(Map<String, String> customHeaders, Request.Builder builder) {
         if (customHeaders != null && customHeaders.size() > 0) {
-            try {
-                for (Map.Entry<String, String> header : customHeaders.entrySet()) {
+            for (Map.Entry<String, String> header : customHeaders.entrySet()) {
+                try {
                     builder.header(header.getKey(), header.getValue());
+                } catch (Throwable e) {
+                    LOG.warn("addCustomHeaders: skipping header '" + header.getKey() + "': " + e.getMessage(), e);
                 }
-            } catch (Throwable e) {
-                LOG.warn(e.getMessage(), e);
             }
         }
     }

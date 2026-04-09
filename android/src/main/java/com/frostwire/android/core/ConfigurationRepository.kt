@@ -16,7 +16,10 @@ import com.andrew.apollo.MusicPlaybackService
 import com.frostwire.util.Hex
 import com.frostwire.util.JsonUtils
 import com.frostwire.util.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -214,8 +217,8 @@ object ConfigurationRepository {
     }
 
     private fun persistAsync(key: String, value: Any?) {
-        try {
-            runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
                 dataStore.edit { prefs ->
                     when (value) {
                         is String -> prefs[stringPreferencesKey(key)] = value
@@ -229,9 +232,9 @@ object ConfigurationRepository {
                         null -> prefs.remove(stringPreferencesKey(key))
                     }
                 }
+            } catch (e: Throwable) {
+                LOG.warn("persistAsync(key=$key) failed", e)
             }
-        } catch (e: Throwable) {
-            LOG.warn("persistAsync(key=$key) failed", e)
         }
     }
 

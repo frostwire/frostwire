@@ -1525,6 +1525,9 @@ public class MusicPlaybackService extends MediaSessionService {
      * Apollo
      */
     private void reloadQueue() {
+        if (serviceDataStore == null) {
+            return;
+        }
         String q = null;
         int id = mCardId;
         if (DataStoreManager.containsKey(serviceDataStore, "cardid")) {
