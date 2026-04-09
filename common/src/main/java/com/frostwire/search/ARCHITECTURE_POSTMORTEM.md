@@ -489,7 +489,7 @@ The UI layer didn't need to change. Implementing `SearchResult` interface meant 
 ## Future Optimizations (In the Pipeline)
 
 ### High Priority (Next PR)
-1. **Static Pattern Initialization Across All Patterns** - Apply same static final approach to One337x, Torrentz2, BTDigg, GloTorrents (1 hour effort)
+1. **Static Pattern Initialization Across All Patterns** - Apply same static final approach to One337x, Torrentz2, BTDigg (1 hour effort)
 2. **ArrayList Pre-allocation in parseResults()** - Use `new ArrayList<>(expectedSize)` to reduce resize operations (1 hour)
 
 ### Medium Priority

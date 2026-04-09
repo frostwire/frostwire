@@ -45,7 +45,6 @@
     <string name="dummy_content_description">[описание заглушки]</string>
     <string name="bittorrent">BitTorrent</string>
     <string name="use_magnetdl">Использовать MagnetDL</string>
-    <string name="use_glotorrents">Использовать GloTorrents</string>
     <string name="dummy_author">[Автор]</string>
     <string name="dummy_build">[номер сборки]</string>
     <string name="yt_dlp_dummy_build">[yt_dlp номер сборки]</string>

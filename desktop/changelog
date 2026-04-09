@@ -1,3 +1,8 @@
+frostwire (7.0.4) stable; urgency=high
+ * Removed GloTorrents search engine (domain gtso.cc is parked and no longer functional)
+
+ -- FrostWire Team <contact@frostwire.com> Thu, 09 Apr 2026 13:31:47 -0600
+
 frostwire (7.0.3) stable; urgency=high
  * Bound unbounded image/icon caches to prevent memory leaks
  * Fix crash when pasting non-video URL into search bar

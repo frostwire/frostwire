@@ -36,7 +36,6 @@ import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.one337x.One337xCrawlingStrategy;
-import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.HttpClientFactory;
@@ -68,7 +67,6 @@ public abstract class SearchEngine {
         NYAA_ID,
         TORRENTZ2_ID,
         MAGNETDL_ID,
-        GLOTORRENTS_ID,
         TELLURIDE_ID,
         YT_ID,
         TORRENTSCSV_ID,
@@ -218,19 +216,6 @@ public abstract class SearchEngine {
             );
         }
     };
-    private static final SearchEngine GLOTORRENTS = new SearchEngine(SearchEngineID.GLOTORRENTS_ID, "glotorrents", SearchEnginesSettings.GLOTORRENTS_ENABLED, "gtso.cc") {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed - GloTorrents provides complete data)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new GloTorrentsSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
 
     private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", SearchEnginesSettings.TELLURIDE_ENABLED, "*") {
         @Override
@@ -312,7 +297,6 @@ public abstract class SearchEngine {
         return Arrays.asList(
                 YT,
                 INTERNET_ARCHIVE,
-                GLOTORRENTS,
                 IDOPE,
                 KNABEN,
                 MAGNETDL,

@@ -42,7 +42,6 @@ import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
-import com.frostwire.search.glotorrents.GloTorrentsSearchPattern;
 import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.HttpClientFactory;
@@ -324,20 +323,6 @@ public abstract class SearchEngine {
     };
 
 
-    public static final SearchEngine GLOTORRENTS = new SearchEngine("glotorrents", Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS) {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed - GloTorrents provides complete data)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new GloTorrentsSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
-
     public static final SearchEngine TORRENTSCSV = new SearchEngine("TorrentsCSV", Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
@@ -410,7 +395,6 @@ public abstract class SearchEngine {
             SOUNCLOUD,
             ARCHIVE,
             NYAA,
-            GLOTORRENTS,
             TORRENTSCSV,
             KNABEN);
 }

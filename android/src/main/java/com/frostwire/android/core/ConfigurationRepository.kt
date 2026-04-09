@@ -372,7 +372,6 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_SEARCH_USE_MAGNETDL] = true
         m[Constants.PREF_KEY_SEARCH_USE_ONE337X] = true
         m[Constants.PREF_KEY_SEARCH_USE_IDOPE] = true
-        m[Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS] = true
         m[Constants.PREF_KEY_SEARCH_USE_YT] = (Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
         m[Constants.PREF_KEY_SEARCH_USE_KNABEN] = true
         m[Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV] = true
