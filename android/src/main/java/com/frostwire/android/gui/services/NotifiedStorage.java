@@ -19,9 +19,11 @@
 package com.frostwire.android.gui.services;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.datastore.core.DataStore;
 import androidx.datastore.preferences.core.Preferences;
+import androidx.preference.PreferenceManager;
 
 import com.frostwire.android.core.DataStoreManager;
 import com.frostwire.android.util.SystemUtils;
@@ -44,6 +46,7 @@ public final class NotifiedStorage {
         SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::Constructor");
         preferences = DataStoreManager.getNotifiedDataStore();
         hashes = new bloom_filter_256();
+        migrateFromSharedPreferences(context);
         loadHashes();
     }
 
@@ -84,6 +87,23 @@ public final class NotifiedStorage {
 
         } catch (Throwable e) {
             LOG.warn("Error adding info hash to notified storage", e);
+        }
+    }
+
+    private void migrateFromSharedPreferences(Context context) {
+        // One-time migration guard: skip if DataStore already has the hashes key
+        if (DataStoreManager.containsKey(preferences, PREF_KEY_NOTIFIED_HASHES)) {
+            return;
+        }
+        try {
+            SharedPreferences oldPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+            String s = oldPrefs.getString(PREF_KEY_NOTIFIED_HASHES, null);
+            if (s != null) {
+                DataStoreManager.putString(preferences, PREF_KEY_NOTIFIED_HASHES, s);
+                LOG.info("NotifiedStorage: migrated bloom filter from SharedPreferences to DataStore");
+            }
+        } catch (Throwable e) {
+            LOG.warn("NotifiedStorage: migration from SharedPreferences failed, starting fresh", e);
         }
     }
 

@@ -95,7 +95,6 @@ import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.UrlUtils;
 import com.google.android.gms.common.internal.Asserts;
 
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -2627,7 +2626,7 @@ public class MusicPlaybackService extends MediaSessionService {
     static final class MultiPlayer {
         private final static Logger LOG = Logger.getLogger(MultiPlayer.class);
         ExoPlayer mExoPlayer; // package-private for MediaSession metadata updates in outer class
-        private boolean mIsInitialized = false;
+        private volatile boolean mIsInitialized = false;
 
         // Volatile caches so position/duration/isPlaying can be read from any thread safely.
         volatile long mCachedPosition = 0;
@@ -2720,16 +2719,7 @@ public class MusicPlaybackService extends MediaSessionService {
          * Handles content://, http/https, and bare file paths.
          */
         static Uri resolveUri(String path) {
-            if (path.startsWith("content://") || path.startsWith("http://") || path.startsWith("https://")) {
-                return Uri.parse(path);
-            }
-            // Bare file path — may be URL-encoded
-            try {
-                String decoded = UrlUtils.decode(path);
-                return Uri.fromFile(new File(decoded));
-            } catch (Throwable t) {
-                return Uri.parse(path);
-            }
+            return Uri.parse(MusicUriUtils.resolveUriString(path));
         }
 
         /**
