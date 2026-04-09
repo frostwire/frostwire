@@ -493,6 +493,12 @@ public final class FWImageLoader {
                         mmr.release();
                     }
                 }
+                if (bitmap == null && filePath != null) {
+                    File sidecar = new File(new File(filePath).getParent(), "." + new File(filePath).getName() + ".art");
+                    if (sidecar.exists()) {
+                        bitmap = BitmapFactory.decodeFile(sidecar.getAbsolutePath());
+                    }
+                }
                 if (bitmap != null) {
                     final Bitmap finalBitmap = bitmap;
                     SystemUtils.postToUIThread(() -> target.setImageBitmap(finalBitmap));

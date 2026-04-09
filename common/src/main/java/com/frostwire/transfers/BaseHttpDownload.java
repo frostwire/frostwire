@@ -360,17 +360,23 @@ public abstract class BaseHttpDownload implements Transfer {
         private final String displayName;
         private final double size;
         private final Map<String, String> httpHeaders;
+        private final String thumbnailUrl;
 
         public Info(String url, String filename, String displayName, double size) {
-            this(url, filename, displayName, size, null);
+            this(url, filename, displayName, size, null, null);
         }
 
         public Info(String url, String filename, String displayName, double size, Map<String, String> httpHeaders) {
+            this(url, filename, displayName, size, httpHeaders, null);
+        }
+
+        public Info(String url, String filename, String displayName, double size, Map<String, String> httpHeaders, String thumbnailUrl) {
             this.url = url;
             this.filename = filename;
             this.displayName = displayName;
             this.size = size;
             this.httpHeaders = httpHeaders;
+            this.thumbnailUrl = thumbnailUrl;
         }
 
         public String url() {
@@ -391,6 +397,10 @@ public abstract class BaseHttpDownload implements Transfer {
 
         public Map<String, String> httpHeaders() {
             return httpHeaders;
+        }
+
+        public String thumbnailUrl() {
+            return thumbnailUrl;
         }
 
         @Override

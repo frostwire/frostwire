@@ -86,12 +86,51 @@ public class UIHttpDownload extends HttpDownload {
                     new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
                     (path, uri) -> LOG.info("UIHttpDownload::moveAndComplete() -> mediaScan complete on " + dst));
         }
+        downloadThumbnailSidecar(dst);
+    }
+
+    private void downloadThumbnailSidecar(File audioFile) {
+        String thumbUrl = info.thumbnailUrl();
+        if (thumbUrl == null || thumbUrl.isEmpty()) {
+            return;
+        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                File artFile = new File(audioFile.getParent(), "." + audioFile.getName() + ".art");
+                if (artFile.exists()) {
+                    return;
+                }
+                java.io.InputStream in = null;
+                java.io.FileOutputStream out = null;
+                try {
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(thumbUrl).openConnection();
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(10000);
+                    conn.setRequestProperty("User-Agent", "FrostWire");
+                    in = conn.getInputStream();
+                    out = new java.io.FileOutputStream(artFile);
+                    byte[] buf = new byte[4096];
+                    int n;
+                    while ((n = in.read(buf)) != -1) {
+                        out.write(buf, 0, n);
+                    }
+                    out.flush();
+                    LOG.info("downloadThumbnailSidecar: saved " + artFile.getAbsolutePath());
+                } finally {
+                    if (in != null) try { in.close(); } catch (Exception ignored) {}
+                    if (out != null) try { out.close(); } catch (Exception ignored) {}
+                }
+            } catch (Throwable t) {
+                LOG.warn("downloadThumbnailSidecar failed for " + audioFile.getName() + ": " + t.getMessage());
+            }
+        });
     }
 
     private static Info convert(HttpSearchResult sr) {
         Map<String, String> headers = (sr instanceof TellurideSearchResult) ?
                 ((TellurideSearchResult) sr).getHttpHeaders() : null;
-        return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize(), headers);
+        String thumbnailUrl = sr.getThumbnailUrl();
+        return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize(), headers, thumbnailUrl);
     }
 
     private static Info convert(Slide slide) {
