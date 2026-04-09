@@ -476,39 +476,21 @@ public final class FWImageLoader {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 long albumId = ContentUris.parseId(albumArtUri);
-                android.database.Cursor cursor = target.getContext().getContentResolver().query(
-                        android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                        new String[]{android.provider.MediaStore.Audio.Albums.ALBUM_ART},
-                        android.provider.MediaStore.Audio.Albums._ID + "=?",
-                        new String[]{String.valueOf(albumId)},
-                        null);
-                String albumArtPath = null;
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        albumArtPath = cursor.getString(0);
-                    }
-                    cursor.close();
-                }
                 Bitmap bitmap = null;
-                if (albumArtPath != null) {
-                    bitmap = BitmapFactory.decodeFile(albumArtPath);
+                String filePath = fallbackFilePath;
+                if (filePath == null) {
+                    filePath = findAnyAudioFilePathForAlbum(target.getContext(), albumId);
                 }
-                if (bitmap == null) {
-                    String filePath = fallbackFilePath;
-                    if (filePath == null) {
-                        filePath = findAnyAudioFilePathForAlbum(target.getContext(), albumId);
-                    }
-                    if (filePath != null) {
-                        android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
-                        try {
-                            mmr.setDataSource(filePath);
-                            byte[] embeddedPic = mmr.getEmbeddedPicture();
-                            if (embeddedPic != null) {
-                                bitmap = BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
-                            }
-                        } finally {
-                            mmr.release();
+                if (filePath != null) {
+                    android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
+                    try {
+                        mmr.setDataSource(filePath);
+                        byte[] embeddedPic = mmr.getEmbeddedPicture();
+                        if (embeddedPic != null) {
+                            bitmap = BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
                         }
+                    } finally {
+                        mmr.release();
                     }
                 }
                 if (bitmap != null) {

@@ -112,7 +112,7 @@ public class MainApplication extends Application implements Configuration.Provid
     private void initializeInBackground() {
         LOG.info("MainApplication::initializeInBackground starting...");
 
-        // Initialize configuration manager (reads SharedPreferences - can be slow)
+        // Initialize DataStore + ConfigurationRepository (reads preferences from DataStore)
         DataStoreManager.INSTANCE.initialize(this);
         ConfigurationManager.create(this);
 
@@ -273,7 +273,7 @@ public class MainApplication extends Application implements Configuration.Provid
     }
 
     /**
-     * Parses an I2P integer preference that is stored as a String in SharedPreferences
+     * Parses an I2P integer preference that is stored as a String
      * (because EditTextPreference always reads/writes strings). Returns the fallback
      * value if the stored string is null, empty, or not a valid integer.
      */
