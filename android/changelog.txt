@@ -19,6 +19,9 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
  - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
+ - fix:SoundCloud search restored - SoundCloudConfigFetcher now validates fetched credentials against the API before caching; falls back to built-in defaults when update server returns stale/expired client_id (prevents 401 errors and empty search results)
+ - fix:SoundCloud search results restored - isValidSearchResult() no longer requires downloadable=true; SoundCloud API now returns downloadable=false for virtually all tracks even when they have streamable progressive URLs; updated to only require a progressive stream URL
+ - fix:Desktop compilation restored - SearchMediator.java passes tsr.getHttpHeaders() as the required 10th argument to TellurideSearchResult constructor; was missing after httpHeaders param was added to the YouTube headers pipeline, breaking all desktop builds
  - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
  - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
  - fix:Music service no longer crashes on OS-initiated restarts - reloadQueue() now guards against null serviceDataStore, matching the existing null check in saveQueue()
@@ -50,6 +53,7 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:build.gradle migrated from apply plugin to plugins DSL block; removed builtInKotlin and newDsl flags
  - maintenance:Removed 5 deprecated AGP gradle.properties flags now that all blockers are resolved
  - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
+ - maintenance:GloTorrentsSearchPatternTest disabled - gtso.cc domain is parked by ParkLogic, making the live integration test always fail
  - maintenance:Extracted resolveUri() string logic to MusicUriUtils.resolveUriString() (pure Java, no Android deps) - production MultiPlayer delegates to it; MultiPlayerResolveUriTest now tests real production code instead of a local copy
  - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
  - maintenance:Removed unused java.io.File import from MusicPlaybackService
