@@ -32,6 +32,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.DataStoreManager;
+import com.frostwire.android.core.FrostwirePreferences;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;

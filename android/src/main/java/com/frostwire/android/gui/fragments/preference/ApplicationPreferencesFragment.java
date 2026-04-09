@@ -180,11 +180,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                 UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
             } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
                 NetworkManager networkManager = NetworkManager.instance();
-                if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
+                if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                         !networkManager.isTunnelUp()) {
                     UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
                     return false;
-                } else if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false) &&
+                } else if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY) &&
                         networkManager.isDataMobileUp()) {
                     UIUtils.showShortMessage(getView(), R.string.wifi_network_unavailable);
                     return false;

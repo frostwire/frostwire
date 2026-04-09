@@ -31,8 +31,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceDataStore;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
+
+import com.frostwire.android.core.FrostwirePreferenceDataStore;
 
 import java.util.List;
 
@@ -56,6 +59,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        getPreferenceManager().setPreferenceDataStore(new FrostwirePreferenceDataStore());
         addPreferencesFromResource(preferencesResId);
         initComponents();
     }

@@ -28,6 +28,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
 
@@ -35,8 +36,6 @@ import androidx.annotation.NonNull;
 import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
-
-import java.util.Objects;
 
 /**
  * Support version of a custom dialog preference
@@ -203,7 +202,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
             mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
 
-            int previousValue = (int) Objects.requireNonNull(getPreference().getSharedPreferences()).getLong(getKey(), mDefault);
+            int previousValue = (int) ConfigurationManager.instance().getLong(getKey(), mDefault);
             if (getArguments() != null) {
                 int curVal = getArguments().getInt(CURRENT_VALUE);
                 if (curVal != -1) {

@@ -20,12 +20,12 @@ package com.frostwire.android.gui.transfers;
 
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.StatFs;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.ConfigurationRepository;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
@@ -74,7 +74,7 @@ public final class TransferManager {
     private final Object downloadsListMonitor = new Object();
     private final Object downloadsMapMonitor = new Object();
     private static final Object instanceLock = new Object();
-    private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
+    private final ConfigurationRepository.OnPreferenceChangeListener onPreferenceChangeListener;
     private volatile static TransferManager instance;
 
 
@@ -88,7 +88,7 @@ public final class TransferManager {
     }
 
     private TransferManager() {
-        onSharedPreferenceChangeListener = (sharedPreferences, key) -> onPreferenceChanged(key);
+        onPreferenceChangeListener = key -> onPreferenceChanged(key);
         registerPreferencesChangeListener();
         this.httpDownloads = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsList = new CopyOnWriteArrayList<>();
@@ -613,18 +613,18 @@ public final class TransferManager {
 
     private void registerPreferencesChangeListener() {
         if (SystemUtils.isUIThread()) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().registerOnPreferenceChange(onPreferenceChangeListener));
         } else {
-            ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener);
+            ConfigurationManager.instance().registerOnPreferenceChange(onPreferenceChangeListener);
         }
     }
 
     private void unregisterPreferencesChangeListener() {
         if (SystemUtils.isUIThread()) {
-            postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
+            postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onPreferenceChangeListener));
 
         } else {
-            ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener);
+            ConfigurationManager.instance().unregisterOnPreferenceChange(onPreferenceChangeListener);
         }
     }
 
