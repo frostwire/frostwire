@@ -45,7 +45,7 @@ public class SoundcloudSearchPattern implements SearchPattern {
     private final String appVersion;
 
     public SoundcloudSearchPattern(String clientId, String appVersion) {
-        this.clientId = clientId != null ? clientId : "rUGz4MgnGsIwaLTaWXvGkjJMk4pViiPA";
+        this.clientId = clientId != null ? clientId : "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
         this.appVersion = appVersion != null ? appVersion : "1713906596";
     }
 
@@ -103,8 +103,9 @@ public class SoundcloudSearchPattern implements SearchPattern {
         if (item == null) {
             return false;
         }
-        // Only include downloadable tracks that have progressive format (streamable)
-        boolean hasDownload = item.downloadable && hasProgressiveFormat(item);
+        // Accept any track with a progressive stream URL (downloadable flag is unreliable
+        // in the SoundCloud API — nearly all tracks return downloadable=false even when streamable)
+        boolean hasDownload = hasProgressiveFormat(item);
         boolean hasUrl = !StringUtils.isNullOrEmpty(item.permalink_url);
         return hasDownload && hasUrl;
     }

@@ -27,6 +27,7 @@ import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public final class GloTorrentsSearchPatternTest {
     private static final Logger LOG = Logger.getLogger(GloTorrentsSearchPatternTest.class);
 
+    @Disabled("gtso.cc domain is parked by ParkLogic — GloTorrents is unavailable")
     @Test
     public void gloTorrentsSearchTest() {
         String searchTerm = "ubuntu";

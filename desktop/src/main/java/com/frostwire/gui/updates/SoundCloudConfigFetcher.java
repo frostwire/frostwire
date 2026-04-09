@@ -36,7 +36,7 @@ public final class SoundCloudConfigFetcher {
     private static final int TIMEOUT = 10000; // 10 seconds
 
     // Fallback constants - these are the single source of truth for default credentials
-    public static final String DEFAULT_CLIENT_ID = "dH1Xed1fpITYonugor6sw39jvdq58M3h";
+    public static final String DEFAULT_CLIENT_ID = "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
     public static final String DEFAULT_APP_VERSION = "1766155513";
 
     // In-memory cache
@@ -53,6 +53,8 @@ public final class SoundCloudConfigFetcher {
     /**
      * Fetches the SoundCloud configuration from the remote server.
      * Uses in-memory caching to avoid excessive network requests.
+     * Validates fetched credentials against the API before caching them;
+     * falls back to defaults if the server credentials are stale/expired.
      *
      * @return true if fetch was successful or cache is still valid, false otherwise
      */
@@ -73,10 +75,17 @@ public final class SoundCloudConfigFetcher {
             if (responseBytes != null) {
                 RemoteConfig config = JsonUtils.toObject(new String(responseBytes), RemoteConfig.class);
                 if (config != null && config.sc_client_id != null && config.sc_app_version != null) {
-                    cachedClientId = config.sc_client_id;
-                    cachedAppVersion = config.sc_app_version;
+                    // Validate the fetched credentials; fall back to defaults if they're stale/expired
+                    if (validateCredentials(config.sc_client_id)) {
+                        cachedClientId = config.sc_client_id;
+                        cachedAppVersion = config.sc_app_version;
+                        LOG.info("SoundCloudConfigFetcher: Successfully updated SoundCloud config");
+                    } else {
+                        LOG.warn("SoundCloudConfigFetcher: Remote credentials invalid (API rejected them), keeping defaults");
+                        cachedClientId = DEFAULT_CLIENT_ID;
+                        cachedAppVersion = DEFAULT_APP_VERSION;
+                    }
                     lastFetchTime = now;
-                    LOG.info("SoundCloudConfigFetcher: Successfully updated SoundCloud config");
                     LOG.info("SoundCloudConfigFetcher: client_id=" + cachedClientId + ", app_version=" + cachedAppVersion);
                     return true;
                 } else {
@@ -89,6 +98,26 @@ public final class SoundCloudConfigFetcher {
             }
         } catch (Throwable e) {
             LOG.error("SoundCloudConfigFetcher: Failed to fetch SoundCloud config: " + e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Validates SoundCloud credentials by making a minimal API probe.
+     * Returns true if the credentials are accepted by the API (HTTP 200), false otherwise.
+     */
+    private static boolean validateCredentials(String clientId) {
+        try {
+            HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+            String url = "https://api-v2.soundcloud.com/search/tracks?q=test&limit=1&client_id=" + clientId;
+            byte[] bytes = httpClient.getBytes(url, 5000, null, null);
+            boolean valid = bytes != null && bytes.length > 10;
+            if (!valid) {
+                LOG.warn("SoundCloudConfigFetcher: Credential validation failed for client_id=" + clientId);
+            }
+            return valid;
+        } catch (Throwable e) {
+            LOG.warn("SoundCloudConfigFetcher: Could not validate credentials: " + e.getMessage());
             return false;
         }
     }

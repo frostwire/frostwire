@@ -255,7 +255,8 @@ public final class SearchMediator {
                             tsr.getDownloadUrl(),
                             tsr.getThumbnailUrl(),
                             tsr.getSize(),
-                            tsr.getCreationTime());
+                            tsr.getCreationTime(),
+                            tsr.getHttpHeaders());
                     UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
                     result.add(ui2);
                 }
