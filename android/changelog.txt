@@ -20,6 +20,10 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
  - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
  - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
+ - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
+ - fix:Music service no longer crashes on OS-initiated restarts - reloadQueue() now guards against null serviceDataStore, matching the existing null check in saveQueue()
+ - fix:YouTube downloads no longer silently drop headers after a malformed value - addCustomHeaders() try/catch moved inside the loop so bad headers are skipped individually instead of aborting all remaining headers (prevents 403 errors caused by missing User-Agent/Referer)
+ - fix:Torrent notification deduplication now survives app reinstalls - NotifiedStorage performs a one-time migration of the bloom filter from DefaultSharedPreferences to DataStore on first run
  - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
  - fix:EngineIntentService migrated from deprecated JobIntentService to plain Service (L2)
  - fix:I2P config type mismatch crash - port and tunnel values now stored as Strings
@@ -46,6 +50,9 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:build.gradle migrated from apply plugin to plugins DSL block; removed builtInKotlin and newDsl flags
  - maintenance:Removed 5 deprecated AGP gradle.properties flags now that all blockers are resolved
  - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
+ - maintenance:Extracted resolveUri() string logic to MusicUriUtils.resolveUriString() (pure Java, no Android deps) - production MultiPlayer delegates to it; MultiPlayerResolveUriTest now tests real production code instead of a local copy
+ - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
+ - maintenance:Removed unused java.io.File import from MusicPlaybackService
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
  - new:I2P network integration for anonymous proxy support
