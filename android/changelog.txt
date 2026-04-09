@@ -1,9 +1,13 @@
 FrostWire 3.0.17 build 771 <UNRELEASED>
+ - improvement:All app preferences migrated from deprecated SharedPreferences to Jetpack DataStore with in-memory ConcurrentHashMap cache - eliminates data corruption risk, provides atomic writes, and enables reactive observation
  - improvement:Music player migrated from deprecated MediaPlayer to ExoPlayer/Media3 (Jetpack Media3 1.10.0) - fixes race conditions, adds standard media notification with output device selector
  - improvement:Music player migrated from deprecated RemoteControlClient to MediaSession API via MediaSessionService
  - improvement:Music player uses standard YouTube Music/Spotify-style notification with output device selector (Cast, Bluetooth)
  - improvement:AudioPlayerActivity UI now updates immediately - eliminated 6 async handler roundtrips that caused visible lag on song title, controls, and playback state
  - improvement:Play/Pause, Repeat, and Shuffle buttons now update synchronously on UI thread - no more MISC→UI handler roundtrip delay
+ - improvement:PreferenceFragmentCompat settings screens now use custom PreferenceDataStore bridge (FrostwirePreferenceDataStore) instead of SharedPreferences
+ - improvement:ConfigurationRepository provides single source of truth for all ~50 preference defaults, volatile key resets, and ClassCastException-safe migration from pre-3.0.17 installs
+ - improvement:TransferManager preference observation uses ConfigurationRepository.OnPreferenceChangeListener callback instead of SharedPreferences.OnSharedPreferenceChangeListener
  - fix:Freshly downloaded audio files play instantly instead of waiting 45+ seconds for MediaStore indexer - direct file path fallback bypasses MediaStore query
  - fix:Album art fallback uses MediaMetadataRetriever when MediaStore thumbnail is unavailable (e.g. freshly downloaded files)
  - fix:StrictMode DiskReadViolation when opening files - all file I/O moved off UI thread
@@ -33,12 +37,15 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:Removed MediaButtonIntentReceiver - Media3 MediaSession handles media button routing automatically
  - maintenance:Removed custom RemoteViews notification layouts (notification_template_base.xml, notification_template_expanded_base.xml)
  - maintenance:Removed NotificationHelper - replaced by Media3 DefaultMediaNotificationProvider
+ - maintenance:Removed ConfigurationDefaults.java - defaults consolidated into ConfigurationRepository.kt single source of truth
+ - maintenance:Removed ConfigurationManagerGetStringTest - migration logic now handled by ConfigurationRepository.migrateFromSharedPreferences()
+ - maintenance:Removed unused settingsDataStore from DataStoreManager (replaced by FrostwirePreferences)
+ - maintenance:CustomSeekBarPreference and ApplicationPreferencesFragment no longer call getSharedPreferences() directly - use ConfigurationManager instead
  - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
  - maintenance:Removed multidex library and MultiDexApplication - minSdk=26 has built-in multidex support
  - maintenance:build.gradle migrated from apply plugin to plugins DSL block; removed builtInKotlin and newDsl flags
  - maintenance:Removed 5 deprecated AGP gradle.properties flags now that all blockers are resolved
  - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
- - maintenance:Added structural regression tests for deprecation migrations (DeprecationMigrationStructureTest, EngineIntentServiceMigrationTest, ConfigurationManagerGetStringTest, MediaButtonIntentReceiverTest)
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
  - new:I2P network integration for anonymous proxy support
