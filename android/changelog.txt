@@ -12,6 +12,8 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
  - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
  - improvement:Added visual status indicators in transfers screen when protections pause downloads
+ - fix:YouTube downloaded audio files now show album art - thumbnail URL saved as sidecar art file next to the audio and used as fallback when no embedded ID3 artwork exists
+ - fix:Album art fallback uses MediaMetadataRetriever directly instead of deprecated ALBUM_ART column (always null on Android 10+)
  - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
  - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
@@ -61,7 +63,7 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:CustomSeekBarPreference and ApplicationPreferencesFragment no longer call getSharedPreferences() directly - use ConfigurationManager instead
  - maintenance:Extracted resolveUri() string logic to MusicUriUtils.resolveUriString() (pure Java, no Android deps) - production MultiPlayer delegates to it; MultiPlayerResolveUriTest now tests real production code instead of a local copy
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
- - maintenance:GloTorrentsSearchPatternTest disabled - gtso.cc domain is parked by ParkLogic, making the live integration test always fail
+ - maintenance:Removed GloTorrents search engine - domain gtso.cc is parked and no longer functional
  - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
  - maintenance:Removed unused java.io.File import from MusicPlaybackService
 
