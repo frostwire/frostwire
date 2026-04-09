@@ -26,15 +26,10 @@ object DataStoreManager {
     fun initialize(context: Context) {
         if (initialized) return
         val appContext = context.applicationContext
-        dataStores["settings_prefs"] = createDataStore(appContext, "settings_prefs")
         dataStores["service_prefs"] = createDataStore(appContext, "service_prefs")
         dataStores["notified_prefs"] = createDataStore(appContext, "notified_prefs")
         initialized = true
     }
-
-    @get:JvmStatic
-    val settingsDataStore: DataStore<Preferences>?
-        get() = dataStores["settings_prefs"]
 
     @get:JvmStatic
     val serviceDataStore: DataStore<Preferences>?
