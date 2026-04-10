@@ -22,9 +22,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 
 import com.andrew.apollo.provider.RecentStore;
+import com.frostwire.util.Logger;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Used to query {@link RecentStore} and return the last listened to albums.
@@ -33,6 +40,8 @@ import com.andrew.apollo.provider.RecentStore;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class RecentLoader extends SongLoader {
+
+    private static final Logger LOG = Logger.getLogger(RecentLoader.class);
 
     /**
      * Constructor of <code>RecentLoader</code>
@@ -65,6 +74,8 @@ public class RecentLoader extends SongLoader {
             return null;
         }
 
+        removeOrphanedEntries(context, recentStore);
+
         String durationColumn = "duration";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             durationColumn = AudioColumns.DURATION;
@@ -82,5 +93,74 @@ public class RecentLoader extends SongLoader {
                         }, null, null, null, null,
                         RecentStore.RecentStoreColumns.LAST_TIME_PLAYED + " DESC");
 
+    }
+
+    private static void removeOrphanedEntries(Context context, RecentStore recentStore) {
+        Cursor cursor = null;
+        try {
+            cursor = recentStore.getReadableDatabase().query(
+                    RecentStore.TABLE_NAME,
+                    new String[]{BaseColumns._ID},
+                    null, null, null, null, null);
+            if (cursor == null) {
+                return;
+            }
+            List<Long> recentIds = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                recentIds.add(cursor.getLong(0));
+            }
+            cursor.close();
+            cursor = null;
+
+            if (recentIds.isEmpty()) {
+                return;
+            }
+
+            StringBuilder selection = new StringBuilder(BaseColumns._ID + " IN (");
+            for (int i = 0; i < recentIds.size(); i++) {
+                if (i > 0) {
+                    selection.append(",");
+                }
+                selection.append(recentIds.get(i));
+            }
+            selection.append(")");
+
+            Set<Long> validIds = new HashSet<>();
+            Cursor mediaCursor = null;
+            try {
+                mediaCursor = context.getContentResolver().query(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        new String[]{BaseColumns._ID},
+                        selection.toString(), null, null);
+                if (mediaCursor != null) {
+                    while (mediaCursor.moveToNext()) {
+                        validIds.add(mediaCursor.getLong(0));
+                    }
+                }
+            } catch (Throwable t) {
+                LOG.error("removeOrphanedEntries: MediaStore query failed", t);
+            } finally {
+                if (mediaCursor != null) {
+                    mediaCursor.close();
+                }
+            }
+
+            int removed = 0;
+            for (Long id : recentIds) {
+                if (!validIds.contains(id)) {
+                    recentStore.removeItem(id);
+                    removed++;
+                }
+            }
+            if (removed > 0) {
+                LOG.info("removeOrphanedEntries: removed " + removed + " orphaned entries from RecentStore");
+            }
+        } catch (Throwable t) {
+            LOG.error("removeOrphanedEntries: failed", t);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

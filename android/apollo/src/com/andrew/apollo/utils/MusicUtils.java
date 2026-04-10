@@ -2064,20 +2064,8 @@ public final class MusicUtils {
             // as from the album art cache
             c.moveToFirst();
             while (!c.isAfterLast()) {
-                // Remove from current playlist.
                 final long id = c.getLong(0);
                 removeTrack(id);
-                // Remove from the favorites playlist.
-                FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
-                if (favoritesStore != null) {
-                    favoritesStore.removeItem(id);
-                }
-                // Remove any items in the recent's database
-                RecentStore recentStore = RecentStore.getInstance(context);
-                if (recentStore != null) {
-                    recentStore.removeItem(id);
-                }
-                // Remove from all remaining playlists.
                 removeSongFromAllPlaylists(context, id);
                 c.moveToNext();
             }
@@ -2103,6 +2091,19 @@ public final class MusicUtils {
                 }
             }
             c.close();
+        }
+
+        // Always clean up RecentStore and FavoritesStore for ALL given IDs,
+        // even if they weren't found in MediaStore (e.g., 0-byte broken downloads)
+        RecentStore recentStore = RecentStore.getInstance(context);
+        FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+        for (long id : list) {
+            if (recentStore != null) {
+                recentStore.removeItem(id);
+            }
+            if (favoritesStore != null) {
+                favoritesStore.removeItem(id);
+            }
         }
 
         if (showNotification) {
