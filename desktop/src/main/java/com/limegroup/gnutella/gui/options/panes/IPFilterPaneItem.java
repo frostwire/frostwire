@@ -19,6 +19,8 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.swig.address;
+import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.ip_filter;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
@@ -169,7 +171,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO: Clear actual IP Filter from BTEngine
+        BTEngine engine = BTEngine.getInstance();
+        if (engine != null) {
+            ip_filter freshFilter = new ip_filter();
+            engine.swig().set_ip_filter(freshFilter);
+        }
         enableImportControls(true);
     }
 
@@ -216,22 +222,38 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
                 IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
                 final String importingString = I18n.tr("Importing");
+                BTEngine engine = BTEngine.getInstance();
+                ip_filter currentFilter = null;
+                if (engine != null) {
+                    currentFilter = engine.swig().get_ip_filter();
+                }
                 while (ipFilterReader.available() > 0) {
                     IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
                         try {
                             ipRange.writeObjectTo(fos);
                             dataModel.add(ipRange, dataModel.getRowCount());
-                            // every few imported ipRanges, let's do an UI update
+                            if (currentFilter != null) {
+                                error_code ec = new error_code();
+                                address addrStart = address.from_string(ipRange.startAddress(), ec);
+                                if (!ec.failed()) {
+                                    address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                                    if (!ec.failed()) {
+                                        currentFilter.add_rule(addrStart, addrEnd, 0);
+                                    }
+                                }
+                            }
                             if (dataModel.getRowCount() % 100 == 0) {
                                 GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)), importingString));
                             }
-                            // TODO: add to actual ip block filter
                         } catch (Throwable t) {
                             LOG.warn(t.getMessage(), t);
                             // just keep going
                         }
                     }
+                }
+                if (engine != null && currentFilter != null) {
+                    engine.swig().set_ip_filter(currentFilter);
                 }
                 GUIMediator.safeInvokeLater(() -> {
                     updateProgressBar(100, "");
@@ -316,15 +338,34 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             final FileInputStream fis = new FileInputStream(ipFilterDBFile);
             int ranges = 0;
             final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+            BTEngine engine = BTEngine.getInstance();
+            ip_filter currentFilter = null;
+            if (engine != null) {
+                currentFilter = engine.swig().get_ip_filter();
+            }
             while (fis.available() > 0) {
                 try {
-                    dataModel.add(IPRange.readObjectFrom(fis), dataModel.getRowCount());
+                    IPRange ipRange = IPRange.readObjectFrom(fis);
+                    dataModel.add(ipRange, dataModel.getRowCount());
+                    if (currentFilter != null) {
+                        error_code ec = new error_code();
+                        address addrStart = address.from_string(ipRange.startAddress(), ec);
+                        if (!ec.failed()) {
+                            address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                            if (!ec.failed()) {
+                                currentFilter.add_rule(addrStart, addrEnd, 0);
+                            }
+                        }
+                    }
                     ranges++;
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (IllegalArgumentException e2) {
                     LOG.error("Invalid IPRange entry detected", e2);
                 }
+            }
+            if (engine != null && currentFilter != null) {
+                engine.swig().set_ip_filter(currentFilter);
             }
             long end = System.currentTimeMillis();
             fis.close();
@@ -438,6 +479,21 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     public void onRangeManuallyAdded(IPRange ipRange) {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
+        ipFilterTable.getDataModel().add(ipRange, ipFilterTable.getDataModel().getRowCount());
+        ipFilterTable.refresh();
+        BTEngine engine = BTEngine.getInstance();
+        if (engine != null) {
+            ip_filter currentFilter = engine.swig().get_ip_filter();
+            error_code ec = new error_code();
+            address addrStart = address.from_string(ipRange.startAddress(), ec);
+            if (!ec.failed()) {
+                address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                if (!ec.failed()) {
+                    currentFilter.add_rule(addrStart, addrEnd, 0);
+                    engine.swig().set_ip_filter(currentFilter);
+                }
+            }
+        }
     }
 
     enum IPFilterFormat {

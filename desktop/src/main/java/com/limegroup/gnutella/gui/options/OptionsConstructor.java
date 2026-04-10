@@ -65,6 +65,7 @@ public final class OptionsConstructor {
     private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
     private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
     private static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
+    private static final String IP_FILTER_KEY = "OPTIONS_IP_FILTER_MAIN_TITLE";
     private static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
     private static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
     private static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
@@ -198,8 +199,7 @@ public final class OptionsConstructor {
         }
         // filter options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, FILTERS_KEY, I18n.tr("Filters"));
-        //TODO: bring back to build when ready, currently only UI working
-        //addOption(FILTERS_KEY, IP_FILTER_KEY, I18n.tr("IP Filter"), IPFilterPaneItem.class);
+        addOption(FILTERS_KEY, IP_FILTER_KEY, I18n.tr("IP Filter"), IPFilterPaneItem.class);
         addOption(FILTERS_KEY, RESULTS_KEY, I18n.tr("Keywords"), IgnoreResultsPaneItem.class);
         // advanced options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ADVANCED_KEY, I18n.tr("Advanced"));
