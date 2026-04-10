@@ -23,7 +23,6 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 
 import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -249,11 +248,10 @@ public abstract class SearchEngine {
         }
 
         protected void postInitWork() {
-            // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
                 domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBMirrors.getMirrors(), 6000, 6);
-            });
+            }).start();
         }
 
         @Override

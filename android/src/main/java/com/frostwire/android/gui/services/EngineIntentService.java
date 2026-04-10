@@ -90,7 +90,12 @@ public class EngineIntentService extends Service implements IEngineService {
         LOG.info("EngineService::onStartCommand() - intent: " + intent + " flags: " + flags + " startId: " + startId);
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shutdownSupport());
+            new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
+                @Override
+                public void run() {
+                    shutdownSupport();
+                }
+            }.start();
             return START_NOT_STICKY;
         }
 

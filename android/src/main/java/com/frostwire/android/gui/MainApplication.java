@@ -133,7 +133,7 @@ public class MainApplication extends Application implements Configuration.Provid
 
         // Start BitTorrent engine on dedicated thread
         // Now safe to start since ConfigurationManager is fully initialized
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, new BTEngineInitializer());
+        new Thread(new BTEngineInitializer()).start();
 
         // Load theme asynchronously
         ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);

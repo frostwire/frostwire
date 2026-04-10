@@ -131,7 +131,12 @@ public class EngineForegroundService extends Service implements IEngineService {
 
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shutdownSupport());
+            new Thread("EngineForegroundService::onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
+                @Override
+                public void run() {
+                    shutdownSupport();
+                }
+            }.start();
             return START_NOT_STICKY;
         }
 

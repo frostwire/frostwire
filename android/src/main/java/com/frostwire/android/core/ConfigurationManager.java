@@ -23,7 +23,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
@@ -44,6 +43,7 @@ public final class ConfigurationManager {
     private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
 
     private static ConfigurationManager instance;
+    private static Thread creatorThread;
 
     static {
         creationLatch = new CountDownLatch(1);
@@ -53,11 +53,14 @@ public final class ConfigurationManager {
         if (instance != null) {
             throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        creatorThread = new Thread(() -> {
             ConfigurationRepository.initialize(context);
             instance = new ConfigurationManager();
             creationLatch.countDown();
         });
+        creatorThread.setName("ConfigurationManager::creator");
+        creatorThread.setPriority(Thread.MAX_PRIORITY);
+        creatorThread.start();
     }
 
     public static ConfigurationManager instance() {
@@ -80,7 +83,9 @@ public final class ConfigurationManager {
 
     private static void waitForCreatorThread() {
         try {
-            creationLatch.await(5, TimeUnit.SECONDS);
+            if (creatorThread != null && creatorThread.isAlive()) {
+                creatorThread.join(5000);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
