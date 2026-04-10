@@ -343,16 +343,29 @@ final class BTDownloadActions {
         @Override
         public void actionPerformed(ActionEvent e) {
             File file = BTDownloadMediator.instance().getSelectedDownloaders()[0].getSaveLocation();
-            if (file.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(file)) {
-                try {
-                    file = Objects.requireNonNull(file.listFiles())[0];
-                } catch (Throwable t) {
-                    file = null;
+            final File finalFile = file;
+            com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService.schedule(() -> {
+                File playFile = finalFile;
+                if (playFile != null && playFile.isDirectory()) {
+                    File[] children = playFile.listFiles();
+                    if (children != null && children.length == 1 && PlaybackUtil.isPlayableFile(children[0])) {
+                        playFile = children[0];
+                    } else if (LibraryUtils.directoryContainsPlayableExtensions(playFile)) {
+                        if (children != null) {
+                            for (File child : children) {
+                                if (PlaybackUtil.isPlayableFile(child)) {
+                                    playFile = child;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-            }
-            if (file != null && PlaybackUtil.isPlayableFile(file)) {
-                GUIMediator.instance().playInOS(new MediaSource(file));
-            }
+                if (playFile != null && PlaybackUtil.isPlayableFile(playFile)) {
+                    final File toPlay = playFile;
+                    GUIMediator.safeInvokeLater(() -> GUIMediator.instance().playInOS(new MediaSource(toPlay)));
+                }
+            });
         }
     }
 
