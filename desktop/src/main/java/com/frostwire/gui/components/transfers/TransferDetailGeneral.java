@@ -30,6 +30,7 @@ import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.IconButton;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -67,6 +68,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private final JLabel commentLabel;
     private ActionListener copyInfoHashActionListener;
     private ActionListener copyMagnetURLActionListener;
+    private BTDownload btDownload;
 
     TransferDetailGeneral() {
         //MigLayout Notes:
@@ -137,9 +139,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(downloadedLabel = new JLabel(), "gapright 50");
         midPanel.add(new JGrayLabel(I18n.tr("Seeds") + ":"), "split 2, gapright 10");
         midPanel.add(seedsLabel = new JLabel(), "gapright 50");
-        midPanel.add(new JGrayLabel(I18n.tr("Download limit") + ":"), "split 2, gapright 10");
-        midPanel.add(downloadSpeedLimitLabel = new JLabel(), "gapright 50, wrap");
-        // TODO: Add settings_gray button and dialog to adjust download speed limit
+        midPanel.add(new JGrayLabel(I18n.tr("Download limit") + ":"), "split 3, gapright 10");
+        midPanel.add(downloadSpeedLimitLabel = new JLabel(), "gapright 5");
+        IconButton downloadSpeedLimitButton = new IconButton("SPEED_LIMIT_SETTINGS", 20, 20);
+        downloadSpeedLimitButton.setToolTipText(I18n.tr("Adjust download speed limit"));
+        downloadSpeedLimitButton.addActionListener(e -> onAdjustDownloadSpeedLimit());
+        midPanel.add(downloadSpeedLimitButton, "gapright 50, wrap");
         // Uploaded, peers, upload speed
         midPanel.add(new JGrayLabel(I18n.tr("Uploaded") + ":"), "split 2, gapright 10");
         midPanel.add(uploadedLabel = new JLabel(), "gapright 50");
@@ -152,9 +157,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(totalSizeLabel = new JLabel(), "gapright 50");
         midPanel.add(new JGrayLabel(I18n.tr("Share ratio")), "split 2, gapright 10");
         midPanel.add(shareRatioLabel = new JLabel(), "gapright 50");
-        midPanel.add(new JGrayLabel(I18n.tr("Upload limit") + ":"), "split 2, gapright 10");
-        midPanel.add(uploadSpeedLimitLabel = new JLabel(), "gapright 50, wrap");
-        // TODO: Add settings_gray button and dialog to adjust upload speed limit
+        midPanel.add(new JGrayLabel(I18n.tr("Upload limit") + ":"), "split 3, gapright 10");
+        midPanel.add(uploadSpeedLimitLabel = new JLabel(), "gapright 5");
+        IconButton uploadSpeedLimitButton = new IconButton("SPEED_LIMIT_SETTINGS", 20, 20);
+        uploadSpeedLimitButton.setToolTipText(I18n.tr("Adjust upload speed limit"));
+        uploadSpeedLimitButton.addActionListener(e -> onAdjustUploadSpeedLimit());
+        midPanel.add(uploadSpeedLimitButton, "gapright 50, wrap");
         // 3rd Section, "GENERAL"
         // Save location
         // InfoHash
@@ -214,6 +222,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
             return;
         }
         BTDownload btDownload = guiBtDownload.getDl();
+        this.btDownload = btDownload;
         TorrentHandle torrentHandle = btDownload.getTorrentHandle();
         if (!torrentHandle.isValid()) {
             return;
@@ -289,6 +298,56 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         SwingUtilities.invokeLater(() -> {
             commentLabel.setText("<html><body><p style='width: 600px;'>" + comment + "</p></body></html>");
         });
+    }
+
+    private void onAdjustDownloadSpeedLimit() {
+        if (btDownload == null) {
+            return;
+        }
+        int currentKBps = btDownload.getDownloadRateLimit() / 1024;
+        String input = (String) JOptionPane.showInputDialog(
+                this,
+                I18n.tr("Enter download speed limit in KB/s (0 = unlimited):"),
+                I18n.tr("Download Speed Limit"),
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                currentKBps);
+        if (input != null) {
+            try {
+                int kbps = Integer.parseInt(input.trim());
+                if (kbps < 0) {
+                    kbps = 0;
+                }
+                btDownload.setDownloadRateLimit(kbps * 1024);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+    }
+
+    private void onAdjustUploadSpeedLimit() {
+        if (btDownload == null) {
+            return;
+        }
+        int currentKBps = btDownload.getUploadRateLimit() / 1024;
+        String input = (String) JOptionPane.showInputDialog(
+                this,
+                I18n.tr("Enter upload speed limit in KB/s (0 = unlimited):"),
+                I18n.tr("Upload Speed Limit"),
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                currentKBps);
+        if (input != null) {
+            try {
+                int kbps = Integer.parseInt(input.trim());
+                if (kbps < 0) {
+                    kbps = 0;
+                }
+                btDownload.setUploadRateLimit(kbps * 1024);
+            } catch (NumberFormatException ignored) {
+            }
+        }
     }
 
     /**
