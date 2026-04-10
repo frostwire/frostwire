@@ -379,7 +379,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             setPreferredSize(dim);
             setResizable(false);
             setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            setModalityType(ModalityType.APPLICATION_MODAL);
+            setModalityType(ModalityType.MODELESS);
             GUIUtils.addHideAction((JComponent) getContentPane());
             JPanel panel = new JPanel();
             panel.setLayout(new MigLayout("", "[grow]", //columns

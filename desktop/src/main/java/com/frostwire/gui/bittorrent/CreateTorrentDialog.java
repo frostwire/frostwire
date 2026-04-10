@@ -170,7 +170,7 @@ public class CreateTorrentDialog extends JDialog {
         setPreferredSize(MINIMUM_DIALOG_DIMENSIONS);
         //setMaximumSize(MINIMUM_DIALOG_DIMENSIONS);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.MODELESS);
         GUIUtils.addHideAction((JComponent) container);
     }
 

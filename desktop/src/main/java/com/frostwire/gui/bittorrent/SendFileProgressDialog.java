@@ -76,7 +76,7 @@ public class SendFileProgressDialog extends JDialog {
             }
         });
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.MODELESS);
         GUIUtils.addHideAction((JComponent) getContentPane());
         _container = getContentPane();
         _container.setLayout(new GridBagLayout());
