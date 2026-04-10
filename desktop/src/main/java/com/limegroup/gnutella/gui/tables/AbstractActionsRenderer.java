@@ -166,6 +166,5 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        updatePlayButton();
     }
 }
