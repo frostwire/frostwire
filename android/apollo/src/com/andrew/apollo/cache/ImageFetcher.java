@@ -90,7 +90,7 @@ public class ImageFetcher extends ImageWorker {
         long currentAlbumId = MusicUtils.getCurrentAlbumId();
         String filePath = MusicUtils.getFilePath();
 
-        if (currentAlbumId == 0) {
+        if (currentAlbumId <= 0) {
             // No MediaStore album ID — try loading art directly from the file path
             // (covers YouTube downloads and other files not yet indexed by MediaStore)
             if (filePath != null) {
@@ -182,8 +182,14 @@ public class ImageFetcher extends ImageWorker {
      * @param artistName The artist name the cache key needs to be generated.
      */
     public static String generateAlbumCacheKey(final String albumName, final String artistName) {
-        if (albumName == null || artistName == null) {
-            return null;
+        if (albumName == null && artistName == null) {
+            return "unknown_" + Config.ALBUM_ART_SUFFIX;
+        }
+        if (albumName == null) {
+            return artistName + "_" + Config.ALBUM_ART_SUFFIX;
+        }
+        if (artistName == null) {
+            return albumName + "_" + Config.ALBUM_ART_SUFFIX;
         }
         return albumName +
                 "_" +

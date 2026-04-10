@@ -33,13 +33,11 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import coil3.ComponentRegistry;
 import coil3.ImageLoader;
 import coil3.disk.DiskCache;
 import coil3.memory.MemoryCache;
@@ -50,12 +48,8 @@ import coil3.request.ImageRequest;
 import coil3.request.SuccessResult;
 import coil3.target.ImageViewTarget;
 import coil3.util.DebugLogger;
-import coil3.network.okhttp.OkHttpNetworkFetcher;
-import okhttp3.OkHttpClient;
 import okio.Path;
 import static okio.FileSystem.SYSTEM;
-import kotlin.jvm.internal.Reflection;
-import kotlin.reflect.KClass;
 
 /**
  * FrostWire Image Loader - Wrapper around Coil image loading library.
@@ -157,13 +151,6 @@ public final class FWImageLoader {
         // Build Coil ImageLoader with simplified configuration
         try {
             coil3.ImageLoader.Builder coilBuilder = new coil3.ImageLoader.Builder(appContext);
-
-            final OkHttpClient okHttpClient = createHttpClient(appContext);
-            ComponentRegistry.Builder componentRegistryBuilder = new ComponentRegistry.Builder();
-            @SuppressWarnings("unchecked")
-            KClass<coil3.Uri> uriKClass = (KClass<coil3.Uri>) (KClass<?>) Reflection.getOrCreateKotlinClass(coil3.Uri.class);
-            componentRegistryBuilder.add(OkHttpNetworkFetcher.factory(okHttpClient), uriKClass);
-            coilBuilder.components(componentRegistryBuilder.build());
             
             // Configure memory cache
             MemoryCache memCache = new MemoryCache.Builder()
@@ -475,10 +462,10 @@ public final class FWImageLoader {
     private static void loadAlbumArtFallback(ImageView target, Uri albumArtUri, String fallbackFilePath) {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
-                long albumId = ContentUris.parseId(albumArtUri);
                 Bitmap bitmap = null;
                 String filePath = fallbackFilePath;
-                if (filePath == null) {
+                if (filePath == null && albumArtUri != null) {
+                    long albumId = ContentUris.parseId(albumArtUri);
                     filePath = findAnyAudioFilePathForAlbum(target.getContext(), albumId);
                 }
                 if (filePath != null) {
@@ -703,13 +690,6 @@ public final class FWImageLoader {
 
     // Removed custom RequestHandler; not used by current call sites and Picasso 3 API changed.
 
-
-    private static OkHttpClient createHttpClient(Context context) {
-        // Coil manages its own disk cache, so we don't need to set up OkHttp cache here
-        OkHttpClient.Builder b = new OkHttpClient.Builder();
-        OkHttpClient.Builder nullSslBuilder = OkHttpClientWrapper.configNullSsl(b);
-        return nullSslBuilder.build();
-    }
 
     // Cache configuration for Coil image loading
 

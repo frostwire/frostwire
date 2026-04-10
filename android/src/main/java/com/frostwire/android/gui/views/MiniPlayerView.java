@@ -55,7 +55,7 @@ public class MiniPlayerView extends LinearLayout {
     private ImageView coverImage;
     private ImageView playPauseButton;
     private boolean isPlaying = false;
-    private long currentAlbumId;
+    private long currentAlbumId = -1;
     private final TimerObserver refresher;
 
     public MiniPlayerView(Context context, AttributeSet set) {
@@ -146,9 +146,9 @@ public class MiniPlayerView extends LinearLayout {
             return;
         }
 
-        if (currentAlbumId != -1) {
+        if (currentAlbumId > 0) {
             Uri albumUri = FWImageLoader.getAlbumArtUri(currentAlbumId);
-            FWImageLoader.getInstance(getContext()).load(albumUri, coverImage);
+            FWImageLoader.getInstance(getContext()).load(albumUri, coverImage, R.drawable.default_artwork, MusicUtils.getFilePath());
         } else if (coverImage != null) {
             coverImage.setBackgroundResource(R.drawable.default_artwork);
         }
