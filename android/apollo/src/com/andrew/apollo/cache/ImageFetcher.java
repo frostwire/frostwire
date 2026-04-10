@@ -88,18 +88,25 @@ public class ImageFetcher extends ImageWorker {
         String albumName = MusicUtils.getAlbumName();
         String artistName = MusicUtils.getArtistName();
         long currentAlbumId = MusicUtils.getCurrentAlbumId();
+        String filePath = MusicUtils.getFilePath();
 
         if (currentAlbumId == 0) {
-            Context context = imageView.getContext();
-            Bitmap defaultArtwork = ImageFetcher.getInstance(context).getDefaultArtwork();
-            if (defaultArtwork != null) {
-                imageView.setImageBitmap(defaultArtwork);
+            // No MediaStore album ID — try loading art directly from the file path
+            // (covers YouTube downloads and other files not yet indexed by MediaStore)
+            if (filePath != null) {
+                loadImage(generateAlbumCacheKey(albumName, artistName), artistName,
+                        -1L, imageView, ImageType.ALBUM, filePath);
+            } else {
+                Context context = imageView.getContext();
+                Bitmap defaultArtwork = ImageFetcher.getInstance(context).getDefaultArtwork();
+                if (defaultArtwork != null) {
+                    imageView.setImageBitmap(defaultArtwork);
+                }
             }
             return;
         }
 
         String albumCacheKey = generateAlbumCacheKey(albumName, artistName);
-        String filePath = MusicUtils.getFilePath();
         loadImage(albumCacheKey, artistName, currentAlbumId, imageView, ImageType.ALBUM, filePath);
     }
 

@@ -437,16 +437,9 @@ public final class UIUtils {
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
-        try {
-            List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, false);
-            if (!fds.isEmpty() && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
-                playEphemeralPlaylist(context, fds.get(0));
-                return true;
-            }
-        } catch (Throwable e) {
-            LOG.error("UIUtils::openAudioInternal() MediaStore query failed: " + filePath, e);
-        }
-
+        // Fast path: if file exists on disk as audio, play directly without MediaStore scan.
+        // The LIKE '%...%' MediaStore query can take seconds on large libraries, and
+        // freshly downloaded files aren't indexed yet anyway.
         if (isAudioFile(filePath)) {
             File file = new File(filePath);
             if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
@@ -475,7 +468,15 @@ public final class UIUtils {
     private static boolean isAudioFile(String filePath) {
         if (filePath == null) return false;
         String mime = getMimeType(filePath);
-        return mime != null && mime.startsWith("audio/");
+        if (mime != null && mime.startsWith("audio/")) {
+            return true;
+        }
+        // YouTube audio downloads are often .mp4, .webm, .opus, or .m4a containers
+        // whose MIME type resolves to video/* or is unknown. ExoPlayer handles all of these.
+        String lowerPath = filePath.toLowerCase();
+        return lowerPath.endsWith(".mp4") || lowerPath.endsWith(".m4a")
+                || lowerPath.endsWith(".webm") || lowerPath.endsWith(".opus")
+                || lowerPath.endsWith(".3gp") || lowerPath.endsWith(".3gpp");
     }
 
     /**

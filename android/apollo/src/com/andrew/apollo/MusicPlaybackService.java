@@ -312,6 +312,8 @@ public class MusicPlaybackService extends MediaSessionService {
     // mWakeLock removed — ExoPlayer.setWakeMode(C.WAKE_MODE_LOCAL) handles this internally.
     private Cursor mCursor;
     private Cursor mAlbumCursor;
+    // File path for tracks opened directly from /storage (mCursor is null for these)
+    private volatile String mCurrentFilePath;
     private volatile AudioManager mAudioManager;
     private DataStore<Preferences> serviceDataStore;
     private boolean mServiceInUse = false;
@@ -1694,6 +1696,7 @@ public class MusicPlaybackService extends MediaSessionService {
                 path = UrlUtils.decode(path);
                 LOG.info("MusicPlaybackService.openFile decoded path -> " + path);
             }
+            mCurrentFilePath = path;
             mPlayer.setCurrentDataSource(path);
             ensurePlayListCapacity(1);
             if (mPlayer != null && mPlayer.isInitialized()) {
@@ -1846,10 +1849,12 @@ public class MusicPlaybackService extends MediaSessionService {
      */
     public String getPath() {
         synchronized (this) {
-            if (mCursor == null || mCursor.isClosed()) {
-                return null;
+            if (mCursor != null && !mCursor.isClosed()) {
+                return mCursor.getString(mCursor.getColumnIndexOrThrow(AudioColumns.DATA));
             }
-            return mCursor.getString(mCursor.getColumnIndexOrThrow(AudioColumns.DATA));
+            // For tracks opened directly from /storage (e.g. fresh YouTube downloads
+            // not yet indexed by MediaStore), return the stored file path
+            return mCurrentFilePath;
         }
     }
 

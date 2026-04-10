@@ -155,11 +155,19 @@ public final class MusicUtils {
         }
         try {
             synchronized (startMusicPlaybackServiceLock) {
-                serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
+                if (serviceConnectionListener == null || !serviceConnectionListener.isBound() && !context.getApplicationContext().bindService(intent, serviceConnectionListener, 0)) {
+                    // No existing listener or it's no longer bound — create a fresh one
+                    serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
+                    LOG.info("MusicUtils::startMusicPlaybackService() let's bind the ServiceConnectionListener...");
+                    context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
+                    LOG.info("MusicUtils::startMusicPlaybackService() ServiceConnectionListener bound");
+                } else {
+                    // Service is already being connected — just add our callback to the existing listener
+                    // so it fires when the service is ready without overwriting others
+                    LOG.info("MusicUtils::startMusicPlaybackService() appending callback to existing ServiceConnectionListener");
+                    serviceConnectionListener.addCallback(onServiceBoundCallback);
+                }
             }
-            LOG.info("MusicUtils::startMusicPlaybackService() let's bind the ServiceConnectionListener...");
-            context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
-            LOG.info("MusicUtils::startMusicPlaybackService() ServiceConnectionListener bound");
         } catch (Throwable t) {
             LOG.error("MusicUtils::startMusicPlaybackService() error, ServiceConnectionListener not bound " + t.getMessage(), t);
         }
@@ -356,22 +364,30 @@ public final class MusicUtils {
 
     private static class ServiceConnectionListener implements ServiceConnection {
         private static final Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
-        private Runnable callback;
+        // Use a list so multiple callers (e.g. playEphemeralPlaylistTask + AudioPlayerActivity)
+        // can each register a callback without overwriting each other.
+        private final java.util.List<Runnable> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
         private final AtomicBoolean bound = new AtomicBoolean(false);
 
-        public ServiceConnectionListener(Runnable callback_) {
-            callback = callback_;
+        public ServiceConnectionListener(Runnable callback) {
+            if (callback != null) {
+                callbacks.add(callback);
+            }
         }
 
+        public void addCallback(Runnable callback) {
+            if (callback != null) {
+                callbacks.add(callback);
+            }
+        }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicPlaybackService instance = MusicPlaybackService.getInstance();
             musicPlaybackServiceRef = instance != null ? new java.lang.ref.WeakReference<>(instance) : null;
             if (instance == null) {
-                RuntimeException t = new RuntimeException("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, getService() is null, we're calling this too early - check your logic)");
-                LOG.error(t.getMessage(), t);
-                throw t;
+                LOG.error("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, getService() is null");
+                return;
             }
             try {
                 LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
@@ -380,25 +396,23 @@ public final class MusicUtils {
                 LOG.error("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
-            if (callback != null) {
+            for (Runnable cb : callbacks) {
                 try {
                     LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected() posting callback...");
-                    MusicPlaybackService.safePost(callback);
+                    MusicPlaybackService.safePost(cb);
                 } catch (Throwable t) {
-                    LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
+                    LOG.warn("MusicUtils::ServiceConnectionListener::onServiceConnected() callback threw: " + t.getMessage());
                 }
             }
-
-            // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
-            callback = null;
+            callbacks.clear();
             bound.set(true);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             LOG.info("onServiceDisconnected() invoked!");
-            musicPlaybackServiceRef = null; // Clear the weak reference to prevent stale references
-            callback = null;
+            musicPlaybackServiceRef = null;
+            callbacks.clear();
             bound.set(false);
         }
 
@@ -409,7 +423,7 @@ public final class MusicUtils {
         @Override
         public void onNullBinding(ComponentName name) {
             LOG.warn("onNullBinding(componentName=" + name + ")");
-            callback = null;
+            callbacks.clear();
         }
     }
 
