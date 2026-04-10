@@ -134,8 +134,10 @@ public class LifecycleManagerImpl implements LifecycleManager {
         if (!startBegin.get() || shutdownBegin.getAndSet(true))
             return;
         try {
-            // TODO: should we have a time limit on how long we wait?
-            startLatch.await(); // wait for starting to finish...
+            boolean started = startLatch.await(30, java.util.concurrent.TimeUnit.SECONDS);
+            if (!started) {
+                LOG.warn("Timed out waiting for startup to finish, proceeding with shutdown anyway");
+            }
         } catch (InterruptedException ie) {
             LOG.error("Interrupted while waiting to finish starting", ie);
             return;
