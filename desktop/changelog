@@ -17,6 +17,7 @@ frostwire (7.0.4) stable; urgency=high
  * Performance: Remove 3 redundant stat() syscalls per file in AbstractDirectoryHolder.isFileVisible()
  * Cleanup: Remove dead EDT-blocking code from BTDownloadMediator (selectionHasMP4s, selectionIsSingleFile, selectionHasMediaFiles)
  * Cleanup: Remove unused directoryContainsASinglePlayableFile from LibraryUtils
+ * Update: JUnit 5.9.0 -> 5.12.2
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
