@@ -1,7 +1,12 @@
 frostwire (7.0.4) stable; urgency=high
  * Removed GloTorrents search engine (domain gtso.cc is parked and no longer functional)
+ * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
+ * EDT freeze: Add pack() before setVisible(true) in SendFileProgressDialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in EditTrackerDialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in Options dialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in About dialog to prevent macOS awtLock contention
 
- -- FrostWire Team <contact@frostwire.com> Thu, 09 Apr 2026 13:31:47 -0600
+ -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
 frostwire (7.0.3) stable; urgency=high
  * Bound unbounded image/icon caches to prevent memory leaks
