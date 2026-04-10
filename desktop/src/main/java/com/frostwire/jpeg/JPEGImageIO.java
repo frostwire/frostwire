@@ -59,63 +59,37 @@ public class JPEGImageIO {
      * RGB color space.
      */
     public static BufferedImage read(InputStream in) throws IOException {
-        return read(in, true);
-    }
-
-    @SuppressWarnings("unused")
-    public static BufferedImage read(InputStream in, boolean inverseYCCKColors) throws IOException {
-        // Read the stream into a byte array
-        // --------------------------------------
-        // We do this, because we need to perform multiple passes over the
-        // stream in order to decode it.
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         byte[] b = new byte[512];
         for (int count = in.read(b); count != -1; count = in.read(b)) {
             buf.write(b, 0, count);
         }
         byte[] byteArray = buf.toByteArray();
-        // Extract metadata from the JFIF stream.
-        // --------------------------------------
-        // In particular, we are interested into the following fields:
         int numberOfComponentsInFrame = 0;
         int app14AdobeColorTransform = 0;
         ByteArrayOutputStream app2ICCProfile = new ByteArrayOutputStream();
-        // Browse for marker segments, and extract data from those
-        // which are of interest.
         JFIFInputStream fifi = new JFIFInputStream(new ByteArrayInputStream(byteArray));
         for (JFIFInputStream.Segment seg = fifi.getNextSegment(); seg != null; seg = fifi.getNextSegment()) {
             if (0xffc0 <= seg.marker && seg.marker <= 0xffc3 ||
                     0xffc5 <= seg.marker && seg.marker <= 0xffc7 ||
                     0xffc9 <= seg.marker && seg.marker <= 0xffcb ||
                     0xffcd <= seg.marker && seg.marker <= 0xffcf) {
-                // SOF0 - SOF15: Start of Frame Header marker segment
                 DataInputStream dis = new DataInputStream(fifi);
                 numberOfComponentsInFrame = dis.readUnsignedByte();
-                // ...the rest of SOF header is not important to us.
-                // In fact, by encounterint a SOF header, we have reached
-                // the end of the metadata section we are interested in.
-                // Thus we can abort here.
                 break;
             } else if (seg.marker == 0xffe2) {
-                // APP2: Application-specific marker segment
                 if (seg.length >= 26) {
                     DataInputStream dis = new DataInputStream(fifi);
-                    // Check for 12-bytes containing the null-terminated string: "ICC_PROFILE".
                     if (dis.readLong() == 0x4943435f50524f46L && dis.readInt() == 0x494c4500) {
-                        // Skip 2 bytes
                         dis.skipBytes(2);
-                        // Read Adobe ICC_PROFILE int buffer. The profile is split up over
-                        // multiple APP2 marker segments.
                         for (int count = dis.read(b); count != -1; count = dis.read(b)) {
                             app2ICCProfile.write(b, 0, count);
                         }
                     }
                 }
             } else if (seg.marker == 0xffee) {
-                // APP14: Application-specific marker segment
                 if (seg.length == 12) {
                     DataInputStream dis = new DataInputStream(fifi);
-                    // Check for 6-bytes containing the null-terminated string: "Adobe".
                     if (dis.readInt() == 0x41646f62L && dis.readUnsignedShort() == 0x6500) {
                         int version = dis.readUnsignedByte();
                         int app14Flags0 = dis.readUnsignedShort();
@@ -125,44 +99,30 @@ public class JPEGImageIO {
                 }
             }
         }
-        // fifi.close(); Do not close input stream
-        // Read the image data
         BufferedImage img = null;
         if (numberOfComponentsInFrame != 4) {
-            // Read image with YUV color encoding.
             img = readImageFromYUVorGray(new ByteArrayInputStream(byteArray));
         } else if (numberOfComponentsInFrame == 4) {
-            // Try to instantiate an ICC_Profile from the app2ICCProfile
             ICC_Profile profile = null;
             if (app2ICCProfile.size() > 0) {
                 try {
                     profile = ICC_Profile.getInstance(new ByteArrayInputStream(app2ICCProfile.toByteArray()));
                 } catch (Throwable ex) {
-                    // icc profile is corrupt
                     ex.printStackTrace();
                 }
             }
-            // In case of failure, use a Generic CMYK profile
             if (profile == null) {
                 profile = ICC_Profile.getInstance(JPEGImageIO.class.getResourceAsStream("Generic CMYK Profile.icc"));
             }
             switch (app14AdobeColorTransform) {
                 case 0:
                 default:
-                    // Read image with CMYK color encoding.
                     img = readRGBImageFromCMYK(new ByteArrayInputStream(byteArray), profile);
                     break;
                 case 1:
                     throw new IOException("YCbCr not supported");
                 case 2:
-                    // Read image with inverted YCCK color encoding.
-                    // FIXME - How do we determine from the JFIF file whether
-                    // YCCK colors are inverted?
-                    if (inverseYCCKColors) {
-                        img = readRGBImageFromInvertedYCCK(new ByteArrayInputStream(byteArray), profile);
-                    } else {
-                        img = readRGBImageFromYCCK(new ByteArrayInputStream(byteArray), profile);
-                    }
+                    img = readRGBImageFromYCCK(new ByteArrayInputStream(byteArray), profile);
                     break;
             }
         }
@@ -234,31 +194,6 @@ public class JPEGImageIO {
     }
 
     /**
-     * Reads an inverted-YCCK JPEG image from the provided InputStream, converting the
-     * colors to RGB using the provided CMYK ICC_Profile. The image data must
-     * be in the inverted-YCCK color space.
-     * <p>
-     * Use this method, if you have already determined that the input stream
-     * contains an inverted-YCCK JPEG image.
-     *
-     * @param in          An InputStream, preferably an ImageInputStream, in the JPEG
-     *                    File Interchange Format (JFIF).
-     * @param cmykProfile An ICC_Profile for conversion from the CMYK color space
-     *                    to the RGB color space. If this parameter is null, a default profile is used.
-     * @return a BufferedImage containing the decoded image converted into the
-     * RGB color space.
-     */
-    private static BufferedImage readRGBImageFromInvertedYCCK(InputStream in, ICC_Profile cmykProfile) throws IOException {
-        ImageInputStream inputStream;
-        ImageReader reader = ImageIO.getImageReadersByFormatName("JPEG").next();
-        inputStream = (in instanceof ImageInputStream) ? (ImageInputStream) in : ImageIO.createImageInputStream(in);
-        reader.setInput(inputStream);
-        Raster raster = reader.readRaster(0, null);
-        raster = convertInvertedYCCKToCMYK(raster);
-        return createRGBImageFromCMYK(raster, cmykProfile);
-    }
-
-    /**
      * Creates a buffered image from a raster in the YCCK color space, converting
      * the colors to RGB using the provided CMYK ICC_Profile.
      *
@@ -281,7 +216,7 @@ public class JPEGImageIO {
             int[] K = ycckRaster.getSamples(0, 0, w, h, 3, (int[]) null);
             float vr, vg, vb;
             for (int i = 0, imax = Y.length; i < imax; i++) {
-                float k = K[i], y = Y[i], cb = Cb[i], cr = Cr[i];
+                float k = K[i], y = Y[i], cb = 255 - Cb[i], cr = 255 - Cr[i];
                 vr = y + 1.402f * (cr - 128) - k;
                 vg = y - 0.34414f * (cb - 128) - 0.71414f * (cr - 128) - k;
                 vb = y + 1.772f * (cb - 128) - k;
@@ -366,42 +301,6 @@ public class JPEGImageIO {
         }
     }
 
-    /*
-     * Adobe-style YCCK->CMYK conversion.
-     * We convert YCbCr to R=1-C, G=1-M, and B=1-Y using the same
-     * conversion as above, while passing K (black) unchanged.
-     * We assume build_ycc_rgb_table has been called.
-     */
-    private static Raster convertInvertedYCCKToCMYK(Raster ycckRaster) {
-        buildYCCtoRGBtable();
-        int w = ycckRaster.getWidth(), h = ycckRaster.getHeight();
-        int[] ycckY = ycckRaster.getSamples(0, 0, w, h, 0, (int[]) null);
-        int[] ycckCb = ycckRaster.getSamples(0, 0, w, h, 1, (int[]) null);
-        int[] ycckCr = ycckRaster.getSamples(0, 0, w, h, 2, (int[]) null);
-        int[] ycckK = ycckRaster.getSamples(0, 0, w, h, 3, (int[]) null);
-        int[] cmyk = new int[ycckY.length];
-        for (int i = 0; i < ycckY.length; i++) {
-            int y = 255 - ycckY[i];
-            int cb = 255 - ycckCb[i];
-            int cr = 255 - ycckCr[i];
-            int cmykC, cmykM, cmykY;
-            // Range-limiting is essential due to noise introduced by DCT losses. 
-            cmykC = MAXJSAMPLE - (y + Cr_r_tab[cr]);    // red
-            cmykM = MAXJSAMPLE - (y + // green 
-                    (Cb_g_tab[cb] + Cr_g_tab[cr] >>
-                            SCALEBITS));
-            cmykY = MAXJSAMPLE - (y + Cb_b_tab[cb]);    // blue
-            /* K passes through unchanged */
-            cmyk[i] = (cmykC < 0 ? 0 : Math.min(cmykC, 255)) << 24 |
-                    (cmykM < 0 ? 0 : Math.min(cmykM, 255)) << 16 |
-                    (cmykY < 0 ? 0 : Math.min(cmykY, 255)) << 8 |
-                    255 - ycckK[i];
-        }
-        return Raster.createPackedRaster(
-                new DataBufferInt(cmyk, cmyk.length),
-                w, h, w, new int[]{0xff000000, 0xff0000, 0xff00, 0xff}, null);
-    }
-
     private static Raster convertYCCKtoCMYK(Raster ycckRaster) {
         buildYCCtoRGBtable();
         int w = ycckRaster.getWidth(), h = ycckRaster.getHeight();
@@ -412,16 +311,14 @@ public class JPEGImageIO {
         int[] cmyk = new int[ycckY.length];
         for (int i = 0; i < ycckY.length; i++) {
             int y = ycckY[i];
-            int cb = ycckCb[i];
-            int cr = ycckCr[i];
+            int cb = 255 - ycckCb[i];
+            int cr = 255 - ycckCr[i];
             int cmykC, cmykM, cmykY;
-            // Range-limiting is essential due to noise introduced by DCT losses. 
             cmykC = MAXJSAMPLE - (y + Cr_r_tab[cr]);    // red
-            cmykM = MAXJSAMPLE - (y + // green 
+            cmykM = MAXJSAMPLE - (y + // green
                     (Cb_g_tab[cb] + Cr_g_tab[cr] >>
                             SCALEBITS));
             cmykY = MAXJSAMPLE - (y + Cb_b_tab[cb]);    // blue
-            /* K passes through unchanged */
             cmyk[i] = (cmykC < 0 ? 0 : Math.min(cmykC, 255)) << 24 |
                     (cmykM < 0 ? 0 : Math.min(cmykM, 255)) << 16 |
                     (cmykY < 0 ? 0 : Math.min(cmykY, 255)) << 8 |
