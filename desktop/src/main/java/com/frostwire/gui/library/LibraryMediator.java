@@ -194,11 +194,15 @@ public class LibraryMediator {
             return;
         }
         idScanned.add(hashCode);
+        com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService.schedule(() -> scanInternal(hashCode, location));
+    }
+
+    private void scanInternal(int hashCode, File location) {
         if (location.isDirectory()) {
             final File[] files = location.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    scan(hashCode, file);
+                    scanInternal(hashCode, file);
                 }
             }
         } else {
