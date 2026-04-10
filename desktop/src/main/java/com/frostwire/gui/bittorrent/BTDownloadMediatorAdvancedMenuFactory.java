@@ -367,6 +367,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             super(frame);
             this.dm = dm;
             setupUI();
+            pack();
             setLocationRelativeTo(frame);
         }
 
