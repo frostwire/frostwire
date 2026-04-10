@@ -755,20 +755,19 @@ public class MusicPlaybackService extends MediaSessionService {
     // prepareAudioFocusRequest() removed — ExoPlayer in MultiPlayer handles audio focus internally.
 
     private void setUpMediaSession() {
+        if (mMediaSession != null) {
+            return;
+        }
         if (mPlayer == null || mPlayer.mExoPlayer == null) {
             LOG.warn("setUpMediaSession() called before ExoPlayer is ready — deferring");
             return;
         }
         try {
-            if (mMediaSession != null) {
-                mMediaSession.release();
-            }
             mMediaSession = new MediaSession.Builder(this, mPlayer.mExoPlayer)
                     .setId("FrostWireApollo")
                     .build();
-            // MediaSession automatically handles lock-screen controls, Bluetooth,
-            // and media button routing when connected to an ExoPlayer instance.
-            LOG.info("setUpMediaSession() MediaSession created successfully");
+            addSession(mMediaSession);
+            LOG.info("setUpMediaSession() MediaSession created and added to service");
         } catch (Throwable t) {
             LOG.error("setUpMediaSession() error: " + t.getMessage(), t);
         }
@@ -960,13 +959,6 @@ public class MusicPlaybackService extends MediaSessionService {
         if (D) LOG.info("Stopping playback, removeNotification = " + removeNotification);
         stopPlayer();
         closeCursor();
-        boolean isStopped = isStopped();
-        if (removeNotification) {
-            updateMediaSessionState(PLAYSTATE_STOPPED);
-            stopForeground(STOP_FOREGROUND_REMOVE);
-        } else {
-            stopForeground(isStopped ? STOP_FOREGROUND_REMOVE : STOP_FOREGROUND_DETACH);
-        }
     }
 
     /**
@@ -1417,13 +1409,6 @@ public class MusicPlaybackService extends MediaSessionService {
             return;
         }
         LOG.info("updateMediaSessionState(what=" + what + ")");
-
-        final boolean isPlaying = isPlaying();
-        final boolean isStopped = isStopped();
-
-        if (isStopped && !isPlaying) {
-            stopForeground(STOP_FOREGROUND_REMOVE);
-        }
 
         switch (what) {
             case PLAYSTATE_CHANGED:
