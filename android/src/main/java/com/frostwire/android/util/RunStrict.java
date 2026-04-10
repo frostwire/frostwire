@@ -46,10 +46,9 @@ public interface RunStrict<R> {
         LOG.info("RunStrict.setStrictPolicy(" + enable + ") Debug.isEnabled()=" + Debug.isEnabled());
         if (!Debug.isEnabled()) {
             LOG.info("StrictMode is disabled, this is a DEBUG build");
-            return; // no debug mode, do nothing
+            return;
         }
 
-        // by default, the LAX policy
         StrictMode.ThreadPolicy threadPolicy = StrictMode.ThreadPolicy.LAX;
         StrictMode.VmPolicy vmPolicy = StrictMode.VmPolicy.LAX;
 
@@ -57,12 +56,12 @@ public interface RunStrict<R> {
             threadPolicy = new StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
-                    .penaltyDeath()
+                    .permitCustomSlowCalls()
+                    .permitUnbufferedIo()
                     .build();
             vmPolicy = new StrictMode.VmPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
-                    .penaltyDeath()
                     .setClassInstanceLimit(Engine.class, 1)
                     .build();
         }
