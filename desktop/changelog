@@ -11,6 +11,7 @@ frostwire (7.0.4) stable; urgency=high
  * Performance: Cache PlayableCell objects in LibraryFilesTableDataLine.getValueAt() to reduce GC pressure
  * Performance: Use BILINEAR instead of BICUBIC interpolation in LibraryCoverArtPanel for faster cover art scaling
  * Performance: Remove redundant updatePlayButton() from AbstractActionsRenderer.paintComponent()
+ * Performance: Remove 3 redundant stat() syscalls per file in AbstractDirectoryHolder.isFileVisible()
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
