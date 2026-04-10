@@ -1189,11 +1189,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mQueueSwitch.setVisibility(View.VISIBLE);
         }
         if (mPageContainer != null) {
-            // Fade out the pager container
             fade(mPageContainer, 0f);
         }
         if (mAlbumArt != null) {
-            // Fade in the album art
             fade(mAlbumArt, 1f);
         }
     }
@@ -1203,8 +1201,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void hideAlbumArt() {
         mPageContainer.setVisibility(View.VISIBLE);
-        mQueueSwitch.setVisibility(View.GONE);
-        mAlbumArtSmall.setVisibility(View.VISIBLE);
+        mAlbumArtSmall.setVisibility(View.GONE);
         // Fade out the artwork
         fade(mAlbumArt, 0f);
         // Fade in the pager container
