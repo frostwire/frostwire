@@ -22,6 +22,8 @@ import android.widget.AbsListView;
 
 import androidx.annotation.NonNull;
 
+import com.frostwire.android.util.SystemUtils;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -82,7 +84,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
         if (threadPool != null) {
             threadPool.execute(r);
         } else {
-            new Thread(r).start();
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, r);
         }
     }
 

@@ -118,10 +118,10 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     private void initializeNotifiedStorage() {
         LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initializing in background thread");
-        new Thread(() -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             notifiedStorage = new NotifiedStorage(this);
             LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initialization complete");
-        }).start();
+        });
     }
 
     @Override
@@ -131,12 +131,7 @@ public class EngineForegroundService extends Service implements IEngineService {
 
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
-            new Thread("EngineForegroundService::onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
-                @Override
-                public void run() {
-                    shutdownSupport();
-                }
-            }.start();
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shutdownSupport());
             return START_NOT_STICKY;
         }
 
