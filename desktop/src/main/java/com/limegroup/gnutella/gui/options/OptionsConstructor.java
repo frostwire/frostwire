@@ -288,6 +288,8 @@ public final class OptionsConstructor {
             OptionsMediator.instance().disposeOptions();
         } else {
             GUIUtils.centerOnScreen(DIALOG);
+            DIALOG.pack();
+            DIALOG.setSize(UISettings.UI_OPTIONS_DIALOG_WIDTH.getValue(), UISettings.UI_OPTIONS_DIALOG_HEIGHT.getValue());
             //  initial tree selection
             if (key == null) {
                 TREE_MANAGER.setSelection(ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.getValue());
