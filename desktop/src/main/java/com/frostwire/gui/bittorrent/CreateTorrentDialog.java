@@ -111,7 +111,7 @@ public class CreateTorrentDialog extends JDialog {
         pack();
     }
 
-    // TODO: Add this fix to Entry.fromMap() on jlibtorrent and delete this.
+    // Note: This dedup fix should be upstreamed to Entry.fromMap() in jlibtorrent.
     private static Entry entryFromMap(Map<?, ?> map) {
         entry e = new entry(entry.data_type.dictionary_t);
         string_entry_map d = e.dict();

@@ -60,7 +60,7 @@ public class HttpDownload extends HttpBTDownload {
     private int md5CheckingProgress;
     private boolean isResumable;
 
-    HttpDownload(String theURL, String theTitle, String saveFileAs, double fileSize, String md5hash, boolean shouldResume, boolean deleteFileWhenTransferCancelled) {
+    HttpDownload(String theURL, String theTitle, String saveFileAs, long fileSize, String md5hash, boolean shouldResume, boolean deleteFileWhenTransferCancelled) {
         super(saveFileAs, fileSize);
         url = theURL;
         title = theTitle;

@@ -35,7 +35,7 @@ public interface UISearchResult {
     /**
      * Gets the size of this SearchResult.
      */
-    double getSize();
+    long getSize();
 
     /**
      * @return milliseconds since January 01, 1970 the artifact of t

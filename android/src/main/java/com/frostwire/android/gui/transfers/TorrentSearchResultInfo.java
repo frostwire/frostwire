@@ -56,7 +56,7 @@ class TorrentSearchResultInfo implements TorrentDownloadInfo {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return sr.getSize();
     }
 

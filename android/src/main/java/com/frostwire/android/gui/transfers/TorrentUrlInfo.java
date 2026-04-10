@@ -55,7 +55,7 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return -1;
     }
 

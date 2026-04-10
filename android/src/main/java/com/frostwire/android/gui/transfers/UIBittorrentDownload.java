@@ -52,7 +52,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private final BTDownload dl;
 
     private String displayName;
-    private double size;
+    private long size;
     private volatile List<TransferItem> items;
 
     private boolean noSpaceAvailableInCurrentMount;
@@ -240,7 +240,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return size;
     }
 
@@ -317,8 +317,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         items = null;
     }
 
-    private double calculateSize(BTDownload dl) {
-        double size = dl.getSize();
+    private long calculateSize(BTDownload dl) {
+        long size = dl.getSize();
 
         boolean partial = dl.isPartial();
         if (partial) {

@@ -35,7 +35,7 @@ public interface Transfer {
 
     File previewFile();
 
-    double getSize();
+    long getSize();
 
     Date getCreated();
 

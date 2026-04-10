@@ -65,7 +65,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             seedsNeedUpdate = true;
         }
         boolean sizeNeedUpdate = false;
-        double size = node.getSize();
+        long size = node.getSize();
         if (size < _minResultsSize) {
             _minResultsSize = size >= 0 ? size : 0;
             sizeNeedUpdate = true;

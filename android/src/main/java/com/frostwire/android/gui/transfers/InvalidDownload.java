@@ -64,7 +64,7 @@ public class InvalidDownload implements Transfer, InvalidTransfer {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return 0;
     }
 

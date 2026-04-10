@@ -119,8 +119,7 @@ public final class BTDownload implements BittorrentDownload {
         return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
-    public double getSize() {
-        // TODO: jlibtorrent's TorrentInfo is returning a long, should be a double (int_64)
+    public long getSize() {
         TorrentInfo ti = th.torrentFile();
         return ti != null ? ti.totalSize() : 0;
     }

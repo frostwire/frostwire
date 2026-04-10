@@ -136,8 +136,7 @@ public final class PerformersHelper {
         int numFiles = ti.numFiles();
         FileStorage fs = ti.files();
         for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
-            // TODO: Check for the hidden attribute
-            if (fs.padFileAt(i)) {
+            if (fs.padFileAt(i) || fs.fileFlags(i).and_(FileStorage.FLAG_HIDDEN).nonZero()) {
                 continue;
             }
             list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.filePath(i), fs.fileSize(i)));

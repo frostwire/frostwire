@@ -144,7 +144,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Variable for the size of the download.
      */
-    private double size = -1;
+    private long size = -1;
     /**
      * Variable for the speed of the download.
      */

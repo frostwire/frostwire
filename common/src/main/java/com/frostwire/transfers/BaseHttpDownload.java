@@ -141,7 +141,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return info.size();
     }
 
@@ -358,19 +358,19 @@ public abstract class BaseHttpDownload implements Transfer {
         private final String url;
         private final String filename;
         private final String displayName;
-        private final double size;
+        private final long size;
         private final Map<String, String> httpHeaders;
         private final String thumbnailUrl;
 
-        public Info(String url, String filename, String displayName, double size) {
+        public Info(String url, String filename, String displayName, long size) {
             this(url, filename, displayName, size, null, null);
         }
 
-        public Info(String url, String filename, String displayName, double size, Map<String, String> httpHeaders) {
+        public Info(String url, String filename, String displayName, long size, Map<String, String> httpHeaders) {
             this(url, filename, displayName, size, httpHeaders, null);
         }
 
-        public Info(String url, String filename, String displayName, double size, Map<String, String> httpHeaders, String thumbnailUrl) {
+        public Info(String url, String filename, String displayName, long size, Map<String, String> httpHeaders, String thumbnailUrl) {
             this.url = url;
             this.filename = filename;
             this.displayName = displayName;
@@ -391,7 +391,7 @@ public abstract class BaseHttpDownload implements Transfer {
             return displayName;
         }
 
-        public double size() {
+        public long size() {
             return size;
         }
 

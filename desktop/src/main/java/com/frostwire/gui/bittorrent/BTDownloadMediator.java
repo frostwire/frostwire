@@ -949,7 +949,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         });
     }
 
-    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize, boolean extractAudio) {
+    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final long fileSize, boolean extractAudio) {
         GUIMediator.safeInvokeLater(() -> {
             final HttpDownload downloader = new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true) {
                 @Override
