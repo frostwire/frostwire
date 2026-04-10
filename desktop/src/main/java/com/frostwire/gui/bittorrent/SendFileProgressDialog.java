@@ -50,6 +50,7 @@ public class SendFileProgressDialog extends JDialog {
     public SendFileProgressDialog(JFrame frame) {
         super(frame);
         setupUI();
+        pack();
         setLocationRelativeTo(frame);
         torrentMakerListener = new TorrentMakerListener();
     }
