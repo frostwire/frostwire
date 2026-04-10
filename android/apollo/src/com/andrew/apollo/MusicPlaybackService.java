@@ -1569,9 +1569,11 @@ public class MusicPlaybackService extends MediaSessionService {
             mPlayPos = pos;
             updateCursor(mPlayList[mPlayPos]);
             if (mCursor == null) {
-                SystemClock.sleep(3000);
                 try {
+                    Thread.sleep(500);
                     updateCursor(mPlayList[mPlayPos]);
+                } catch (InterruptedException e) {
+                    return;
                 } catch (ArrayIndexOutOfBoundsException e) {
                     return;
                 }

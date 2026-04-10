@@ -516,17 +516,12 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
-            final List<FWFileDescriptor> files = Librarian.instance().getFilesInAndroidMediaStore(context, download.getSavePath().getAbsolutePath(), true);
-            boolean singleFile = files != null && files.size() == 1;
-
-            if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
-                items.add(new SeedAction(context, files.get(0), download));
+            File savePath = download.getSavePath();
+            if (!AndroidPlatform.saf(savePath)) {
+                items.add(new SeedAction(context));
             }
-            if (singleFile && files.get(0).fileType == Constants.FILE_TYPE_PICTURES) {
-                items.add(new OpenMenuAction(context, download.getDisplayName(), files.get(0)));
-            } else {
-                items.add(new OpenMenuAction(context, download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
-            }
+            String mime = extractMime(download);
+            items.add(new OpenMenuAction(context, download.getDisplayName(), savePath.getAbsolutePath(), mime));
         }
         items.add(new CancelMenuAction(context, download, !finishedSuccessfully));
         return title;
