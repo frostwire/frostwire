@@ -93,7 +93,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 imageView.postDelayed(() -> {
                     // Double-check the tag hasn't changed (view wasn't recycled)
                     if (imageUrl.equals(imageView.getTag(R.id.view_promotions_item_image))) {
-                        imageLoader.load(Uri.parse(imageUrl), imageView, promoWidth, promoHeight);
+                        imageLoader.load(Uri.parse(imageUrl), imageView, promoWidth, promoHeight, R.drawable.default_artwork);
                     }
                 }, 100); // 100ms delay
             }

@@ -145,7 +145,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
         ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
         final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
         if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
-            FWImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView);
+            FWImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView, R.drawable.default_artwork);
         }
 
         final int itemThumbnailResourceId = getItemThumbnailResourceId(item);

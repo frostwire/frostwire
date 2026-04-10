@@ -35,7 +35,6 @@ import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.R;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 
@@ -80,7 +79,7 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         }
         if (mImageFetcher != null && dataHolder != null && Ref.alive(musicViewHolder.mImage)) {
             if (dataHolder.mParentId == -1) {
-                mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
+                mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, -1, musicViewHolder.mImage.get());
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,() ->{
                     updateDataHolderAlbumId(getContext(), dataHolder, musicViewHolder, mImageFetcher);
                     SystemUtils.postToUIThread(() -> updateAlbumImage(getContext(), dataHolder, musicViewHolder, mImageFetcher));

@@ -150,7 +150,8 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                     FWImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
                     filter,
                     mPhoto,
-                    true);
+                    true,
+                    R.drawable.default_artwork);
     }
 
     /**

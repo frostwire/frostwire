@@ -132,7 +132,11 @@ public abstract class ImageWorker {
     void loadImage(final String key, final String artistName,
             final long albumId, final ImageView imageView, final ImageType imageType,
             final String filePath) {
-        if (key == null || mImageCache == null || imageView == null) {
+        if (imageView == null) {
+            return;
+        }
+        if (key == null || mImageCache == null) {
+            imageView.setImageResource(R.drawable.default_artwork);
             return;
         }
 

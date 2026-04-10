@@ -191,6 +191,10 @@ public final class FWImageLoader {
     }
 
     public void load(Uri primaryUri, Uri secondaryUri, Filter filter, ImageView target, boolean noCache) {
+        load(primaryUri, secondaryUri, filter, target, noCache, 0);
+    }
+
+    public void load(Uri primaryUri, Uri secondaryUri, Filter filter, ImageView target, boolean noCache, int placeholderResId) {
         if (Debug.hasContext(filter)) {
             throw new RuntimeException("Possible context leak");
         }
@@ -198,6 +202,7 @@ public final class FWImageLoader {
         Params p = new Params();
         p.noCache = noCache;
         p.filter = filter;
+        p.placeholderResId = placeholderResId;
 
         if (secondaryUri != null) {
             p.callback = new RetryCallback(this, secondaryUri, target, p);
@@ -295,10 +300,16 @@ public final class FWImageLoader {
     private void load(int resourceId, Uri uri, ImageView target, Params p) {
         if (shutdown) {
             LOG.info("FWImageLoader is shutdown, skipping load request");
+            if (target != null && p != null && p.placeholderResId != 0) {
+                target.setImageResource(p.placeholderResId);
+            }
             return;
         }
         if (coilImageLoader == null) {
             LOG.warn("Coil ImageLoader instance is null, cannot load image");
+            if (target != null && p != null && p.placeholderResId != 0) {
+                target.setImageResource(p.placeholderResId);
+            }
             return;
         }
         String requestKey = (uri != null ? uri.toString() : String.valueOf(resourceId));
