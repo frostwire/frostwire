@@ -37,6 +37,8 @@ import com.frostwire.util.Ref;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 import coil3.ImageLoader;
 import coil3.disk.DiskCache;
@@ -71,6 +73,8 @@ public final class FWImageLoader {
     private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content://media/external/audio/artists");
 
     private static final boolean DEBUG_ERRORS = false;
+
+    private static final Map<ImageView, String> pendingRequests = new HashMap<>();
 
     private coil3.ImageLoader coilImageLoader;
 
@@ -297,6 +301,14 @@ public final class FWImageLoader {
             LOG.warn("Coil ImageLoader instance is null, cannot load image");
             return;
         }
+        String requestKey = (uri != null ? uri.toString() : String.valueOf(resourceId));
+        synchronized (pendingRequests) {
+            String existing = pendingRequests.get(target);
+            if (requestKey.equals(existing)) {
+                return;
+            }
+            pendingRequests.put(target, requestKey);
+        }
         AsyncLoader asyncLoader = new AsyncLoader(
                 resourceId,
                 uri,
@@ -385,15 +397,24 @@ public final class FWImageLoader {
                             }
                             
                             // Set target ImageView using ImageViewTarget
-                            requestBuilder.target(new ImageViewTarget(target));
-                            
-                            // Configure request based on params
-                            if (p.targetWidth != 0 && p.targetHeight != 0) {
-                                requestBuilder.size(p.targetWidth, p.targetHeight);
-                            }
-                            // Show placeholder immediately so the ImageView is never blank
                             if (p.placeholderResId != 0) {
                                 target.setImageResource(p.placeholderResId);
+                                requestBuilder.target(new ImageViewTarget(target) {
+                                    @Override
+                                    public void onError(@org.jetbrains.annotations.NotNull coil3.Image error) {
+                                        if (p.placeholderResId != 0) {
+                                            target.setImageResource(p.placeholderResId);
+                                        } else {
+                                            super.onError(error);
+                                        }
+                                    }
+                                });
+                            } else {
+                                requestBuilder.target(new ImageViewTarget(target));
+                            }
+
+                            if (p.targetWidth != 0 && p.targetHeight != 0) {
+                                requestBuilder.size(p.targetWidth, p.targetHeight);
                             }
                             
                             if (p.noCache) {
@@ -414,6 +435,7 @@ public final class FWImageLoader {
                                     public void onSuccess(@org.jetbrains.annotations.NotNull ImageRequest request, 
                                                          @org.jetbrains.annotations.NotNull SuccessResult result) {
                                         LOG.info("FWImageLoader: Image loaded successfully");
+                                        synchronized (pendingRequests) { pendingRequests.remove(target); }
                                         if (callback != null) {
                                             callback.onSuccess();
                                         }
@@ -423,6 +445,7 @@ public final class FWImageLoader {
                                     public void onError(@org.jetbrains.annotations.NotNull ImageRequest request, 
                                                        @org.jetbrains.annotations.NotNull ErrorResult result) {
                                         LOG.warn("FWImageLoader: Image load failed: " + result.getThrowable().getMessage());
+                                        synchronized (pendingRequests) { pendingRequests.remove(target); }
                                         if (uri != null && uri.toString().contains("albumart")) {
                                             loadAlbumArtFallback(target, uri, p.fallbackFilePath);
                                         }
@@ -459,22 +482,45 @@ public final class FWImageLoader {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 Bitmap bitmap = null;
+                Context context = target.getContext();
                 String filePath = fallbackFilePath;
                 if (filePath == null && albumArtUri != null) {
                     long albumId = ContentUris.parseId(albumArtUri);
-                    filePath = findAnyAudioFilePathForAlbum(target.getContext(), albumId);
+                    filePath = findAnyAudioFilePathForAlbum(context, albumId);
                 }
-                if (filePath != null) {
-                    android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
-                    try {
-                        mmr.setDataSource(filePath);
+                android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
+                try {
+                    if (filePath != null) {
+                        try {
+                            mmr.setDataSource(filePath);
+                        } catch (Exception e) {
+                            android.content.ContentResolver cr = context.getContentResolver();
+                            android.database.Cursor cursor = cr.query(
+                                    android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                    new String[]{android.provider.MediaStore.Audio.Media._ID},
+                                    android.provider.MediaStore.Audio.Media.ALBUM_ID + "=?",
+                                    new String[]{String.valueOf(ContentUris.parseId(albumArtUri))},
+                                    "LIMIT 1");
+                            if (cursor != null) {
+                                try {
+                                    if (cursor.moveToFirst()) {
+                                        long audioId = cursor.getLong(0);
+                                        Uri audioUri = ContentUris.withAppendedId(
+                                                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
+                                        mmr.setDataSource(context, audioUri);
+                                    }
+                                } finally {
+                                    cursor.close();
+                                }
+                            }
+                        }
                         byte[] embeddedPic = mmr.getEmbeddedPicture();
                         if (embeddedPic != null) {
                             bitmap = BitmapFactory.decodeByteArray(embeddedPic, 0, embeddedPic.length);
                         }
-                    } finally {
-                        mmr.release();
                     }
+                } finally {
+                    mmr.release();
                 }
                 if (bitmap == null && filePath != null) {
                     File sidecar = new File(new File(filePath).getParent(), "." + new File(filePath).getName() + ".art");
