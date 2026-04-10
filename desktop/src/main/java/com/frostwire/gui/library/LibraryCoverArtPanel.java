@@ -116,7 +116,7 @@ public final class LibraryCoverArtPanel extends JPanel {
             coverArtImage = defaultCoverArt;
         }
         Graphics2D g2 = background.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2.setBackground(new Color(255, 255, 255, 0));
         g2.clearRect(0, 0, getWidth(), getHeight());
         g2.drawImage(coverArtImage, 0, 0, getWidth(), getHeight(), null);
