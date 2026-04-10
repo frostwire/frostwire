@@ -278,10 +278,8 @@ public abstract class BaseActivity extends AbstractActivity {
      * Initializes the items in the bottom action bar.
      */
     private void initBottomActionBar() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            boolean isStopped = MusicUtils.isStopped();
-            SystemUtils.postToUIThread(() -> initBottomActionBarPost(isStopped));
-        });
+        boolean isStopped = MusicUtils.isStopped();
+        initBottomActionBarPost(isStopped);
     }
 
     private void initBottomActionBarPost(Boolean isStopped) {
@@ -374,15 +372,17 @@ public abstract class BaseActivity extends AbstractActivity {
         public void onClick(final View v) {
             long currentAlbumId = MusicUtils.getCurrentAudioId();
             if (currentAlbumId != -1) {
+                String albumName = MusicUtils.getAlbumName();
+                String artistName = MusicUtils.getArtistName();
+                long albumId = MusicUtils.getCurrentAlbumId();
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
                     () -> NavUtils.openAlbumProfile(BaseActivity.this,
-                        MusicUtils.getAlbumName(),
-                        MusicUtils.getArtistName(),
-                        MusicUtils.getCurrentAlbumId(),
+                        albumName,
+                        artistName,
+                        albumId,
                         MusicUtils.getSongListForAlbum(BaseActivity.this, currentAlbumId)));
             } else {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                    () -> MusicUtils.shuffleAll(BaseActivity.this));
+                MusicUtils.shuffleAll(BaseActivity.this);
             }
             if (BaseActivity.this instanceof ProfileActivity) {
                 finish();

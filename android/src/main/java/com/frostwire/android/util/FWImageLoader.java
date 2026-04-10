@@ -74,7 +74,7 @@ public final class FWImageLoader {
 
     private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
-    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/artists");
+    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content://media/external/audio/artists");
 
     private static final boolean DEBUG_ERRORS = false;
 

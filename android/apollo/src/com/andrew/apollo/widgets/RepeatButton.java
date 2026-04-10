@@ -32,7 +32,6 @@ import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.SystemUtils;
 
 public final class RepeatButton extends AppCompatImageButton
         implements OnClickListener {
@@ -51,7 +50,7 @@ public final class RepeatButton extends AppCompatImageButton
 
     @Override
     public void onClick(final View v) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MusicUtils::cycleRepeat);
+        MusicUtils.cycleRepeat();
         updateRepeatState();
         if (onClickedCallback != null) {
             try {

@@ -71,6 +71,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private String magnetUri;
     private long torrentFetcherDownloadTokenId;
     private boolean openTransfersOnCancel;
+    private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
     private static final String BUNDLE_KEY_TORRENT_INFO_PATH = "torrentInfoPath";
     private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
     private static final String BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID = "torrentFetcherDownloadTokenId";
@@ -111,13 +112,16 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         String infoHash = tinfo.infoHashType().has_v2() ?
                 tinfo.infoHashV2().toString() : tinfo.infoHashV1().toString();
         File cacheFile = new File(ctx.getCacheDir(), "torrent_" + infoHash);
-        try {
-            FileOutputStream fos = new FileOutputStream(cacheFile);
-            fos.write(tinfo.bencode());
-            fos.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write torrent metadata to cache", e);
-        }
+        final byte[] bencodeData = tinfo.bencode();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                FileOutputStream fos = new FileOutputStream(cacheFile);
+                fos.write(bencodeData);
+                fos.close();
+            } catch (IOException e) {
+                LOG.error("Failed to write torrent metadata to cache", e);
+            }
+        });
 
         if (arguments != null) {
             arguments.putString(BUNDLE_KEY_TORRENT_INFO_PATH, cacheFile.getAbsolutePath());
@@ -179,26 +183,35 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
-        byte[] torrentInfoData = null;
         if (arguments != null) {
             String path = arguments.getString(BUNDLE_KEY_TORRENT_INFO_PATH);
             if (path != null) {
                 File cacheFile = new File(path);
-                if (cacheFile.exists()) {
-                    try (FileInputStream fis = new FileInputStream(cacheFile);
-                         ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                        byte[] buf = new byte[8192];
-                        int read;
-                        while ((read = fis.read(buf)) != -1) {
-                            bos.write(buf, 0, read);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    byte[] torrentInfoData = null;
+                    if (cacheFile.exists()) {
+                        try (FileInputStream fis = new FileInputStream(cacheFile);
+                             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                            byte[] buf = new byte[8192];
+                            int read;
+                            while ((read = fis.read(buf)) != -1) {
+                                bos.write(buf, 0, read);
+                            }
+                            torrentInfoData = bos.toByteArray();
+                        } catch (IOException ignored) {
                         }
-                        torrentInfoData = bos.toByteArray();
-                    } catch (IOException ignored) {
+                        cacheFile.delete();
                     }
-                    cacheFile.delete();
-                }
+                    byte[] data = torrentInfoData;
+                    SystemUtils.postToUIThread(() -> finishInitComponents(dlg, savedInstanceState, arguments, data));
+                });
+                return;
             }
         }
+        finishInitComponents(dlg, savedInstanceState, arguments, null);
+    }
+
+    private void finishInitComponents(Dialog dlg, Bundle savedInstanceState, Bundle arguments, byte[] torrentInfoData) {
         if (this.torrentInfo == null && torrentInfoData != null) {
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
             magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
@@ -209,7 +222,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             }
             setOnYesListener(new OnStartDownloadsClickListener(dlg.getContext(), this));
         }
-
         super.initComponents(dlg, savedInstanceState);
     }
 

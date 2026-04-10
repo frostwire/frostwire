@@ -155,6 +155,10 @@ public final class Librarian {
     }
 
     public String renameFile(final Context context, FWFileDescriptor fd, String newFileName) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> renameFile(context, fd, newFileName));
+            return null;
+        }
         try {
             String filePath = fd.filePath;
             File oldFile = new File(filePath);

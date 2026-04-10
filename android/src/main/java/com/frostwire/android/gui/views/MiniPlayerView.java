@@ -166,20 +166,21 @@ public class MiniPlayerView extends LinearLayout {
 
     public void refresherOnTime() {
         if (!MusicUtils.isMusicPlaybackServiceRunning()) {
-            // rest :)
             return;
         }
+        boolean isPlaying = MusicUtils.isPlaying();
+        long albumId = MusicUtils.getCurrentAlbumId();
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            FWFileDescriptor fd = refreshOnTimerResultTask(this);
+            FWFileDescriptor fd = refreshOnTimerResultTask(this, isPlaying, albumId);
             SystemUtils.postToUIThread(() -> refreshOnTimerPostTask(this, fd));
         });
     }
 
-    private static FWFileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer) {
+    private static FWFileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer, boolean isPlaying, long albumId) {
         CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
         if (mp != null) {
-            miniPlayer.isPlaying = MusicUtils.isPlaying();
-            miniPlayer.currentAlbumId = MusicUtils.getCurrentAlbumId();
+            miniPlayer.isPlaying = isPlaying;
+            miniPlayer.currentAlbumId = albumId;
             return mp.getCurrentFD(miniPlayer.getContext());
         }
         return null;

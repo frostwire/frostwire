@@ -26,6 +26,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 
@@ -59,10 +60,15 @@ public final class AddToPlaylistMenuAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
-        MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(getContext(),
-                R.string.add_to_playlist,
-                getMenuActions()));
-        menuBuilder.show();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            List<MenuAction> actions = getMenuActions();
+            SystemUtils.postToUIThread(() -> {
+                MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(getContext(),
+                        R.string.add_to_playlist,
+                        actions));
+                menuBuilder.show();
+            });
+        });
     }
 
     private void setFileIdList(List<FWFileDescriptor> fdList) {

@@ -193,10 +193,11 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                     MusicUtils.getIdForAlbum(context, lastAlbum, artist), mPhoto);
             // Play the album
             mPhoto.setOnClickListener(v -> {
+                boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
                     final long[] albumList = MusicUtils.getSongListForAlbum(v.getContext(),
                             MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                    MusicUtils.playFDs(albumList, 0, MusicUtils.isShuffleEnabled());
+                    MusicUtils.playFDs(albumList, 0, shuffleEnabled);
                 });
             });
         } else {

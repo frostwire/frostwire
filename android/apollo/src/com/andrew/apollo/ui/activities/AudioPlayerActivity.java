@@ -360,8 +360,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     public boolean onOptionsItemSelected(final MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_player_shuffle) {// Shuffle all the songs
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                () -> MusicUtils.shuffleAll(this));
+            MusicUtils.shuffleAll(this);
             // Refresh the queue
             ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
             return true;
@@ -1288,11 +1287,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressWarnings("CatchMayIgnoreException")
     private final OnClickListener mOpenAlbumProfile = v -> {
         long albumId = MusicUtils.getCurrentAlbumId();
+        String albumName = MusicUtils.getAlbumName();
+        String artistName = MusicUtils.getArtistName();
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 NavUtils.openAlbumProfile(AudioPlayerActivity.this,
-                        MusicUtils.getAlbumName(),
-                        MusicUtils.getArtistName(),
+                        albumName,
+                        artistName,
                         albumId,
                         MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
             } catch (Throwable ignored) {

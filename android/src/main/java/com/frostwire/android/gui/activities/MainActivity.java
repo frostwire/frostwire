@@ -317,10 +317,12 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
                 if (uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https") || uri.startsWith("magnet")) {
                     TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                 } else if (uri.startsWith("content")) {
-                    String newUri = saveViewContent(this, Uri.parse(uri));
-                    if (newUri != null) {
-                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
-                    }
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        String newUri = saveViewContent(MainActivity.this, Uri.parse(uri));
+                        if (newUri != null) {
+                            TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(MainActivity.this, false));
+                        }
+                    });
                 }
             } else {
                 LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");

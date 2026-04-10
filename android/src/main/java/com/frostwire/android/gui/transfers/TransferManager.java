@@ -379,7 +379,14 @@ public final class TransferManager {
                 if (scheme != null && scheme.equalsIgnoreCase("file")) {
                     // download an existing transfer from a .torrent in My Files (partial download)
                     // See com.frostwire.android.gui.adapters.menu.OpenMenuAction::onClick()
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(Objects.requireNonNull(u.getPath()))), null, new Random(System.currentTimeMillis()).nextLong());
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        try {
+                            byte[] data = FileUtils.readFileToByteArray(new File(Objects.requireNonNull(u.getPath())));
+                            fetcherListener.onTorrentInfoFetched(data, null, new Random(System.currentTimeMillis()).nextLong());
+                        } catch (Throwable e) {
+                            LOG.warn("Error reading torrent file", e);
+                        }
+                    });
                 } else if (scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet"))) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
