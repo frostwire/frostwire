@@ -115,7 +115,6 @@ public class TorrentFetcherDownload implements BTDownload {
         if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
             return Collections.emptyList();
         }
-        // TODO: replace this with the public API
         error_code ec = new error_code();
         add_torrent_params params = add_torrent_params.parse_magnet_uri(magnet, ec);
         tcp_endpoint_vector v = params.get_peers();
@@ -131,7 +130,7 @@ public class TorrentFetcherDownload implements BTDownload {
         return uri;
     }
 
-    public double getSize() {
+    public long getSize() {
         return -1;
     }
 
