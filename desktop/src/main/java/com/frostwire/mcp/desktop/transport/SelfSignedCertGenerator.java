@@ -1,4 +1,4 @@
-package com.frostwire.mcp.transport;
+package com.frostwire.mcp.desktop.transport;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;

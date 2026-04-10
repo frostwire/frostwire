@@ -1,4 +1,4 @@
-package com.frostwire.mcp.transport;
+package com.frostwire.mcp.desktop.transport;
 
 public class TlsConfig {
     private boolean enabled;
