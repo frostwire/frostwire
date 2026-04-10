@@ -311,17 +311,18 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             setMediaType(MediaType.getAnyTypeMediaType());
         }
         clearTable();
-        List<List<File>> partitionedFiles = split(Arrays.asList(dirHolder.getFiles()));
-        for (List<File> partition : partitionedFiles) {
-            final List<File> fPartition = partition;
-            DesktopParallelExecutor.execute(() -> {
+        BackgroundQueuedExecutorService.schedule(() -> {
+            final File[] files = dirHolder.getFiles();
+            List<List<File>> partitionedFiles = split(Arrays.asList(files));
+            for (List<File> partition : partitionedFiles) {
+                final List<File> fPartition = partition;
                 for (final File file : fPartition) {
                     GUIMediator.safeInvokeLater(() -> addUnsorted(file));
                 }
                 GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().getLibrarySearch().addResults(fPartition.size()));
-            });
-        }
-        forceResort();
+            }
+            GUIMediator.safeInvokeLater(this::forceResort);
+        });
     }
 
     /**
