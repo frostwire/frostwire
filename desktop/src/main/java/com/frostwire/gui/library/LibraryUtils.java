@@ -103,14 +103,6 @@ public class LibraryUtils {
         return directoryContainsAudio(directory);
     }
 
-    public static boolean directoryContainsASinglePlayableFile(File directory) {
-        if (EventQueue.isDispatchThread()) {
-            return false;
-        }
-        final File[] files = directory.listFiles();
-        return directoryContainsPlayableExtensions(directory) && (files != null && files.length == 1);
-    }
-
     public static boolean directoryContainsAudio(File directory) {
         if (EventQueue.isDispatchThread()) {
             return false;
