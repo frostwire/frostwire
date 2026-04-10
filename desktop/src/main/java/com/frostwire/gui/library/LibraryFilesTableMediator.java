@@ -690,20 +690,22 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         @Override
         public void actionPerformed(ActionEvent arg0) {
             File selectedFile = DATA_MODEL.getFile(TABLE.getSelectedRow());
-            //can't create torrents out of empty folders.
-            //noinspection ConstantConditions
-            if (selectedFile.isDirectory() && selectedFile.listFiles().length == 0) {
-                JOptionPane.showMessageDialog(null, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            //can't create torrents if the folder/file can't be read
-            if (!selectedFile.canRead()) {
-                JOptionPane.showMessageDialog(null, I18n.tr("Error: You can't read on that file/folder."), I18n.tr("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            CreateTorrentDialog dlg = new CreateTorrentDialog(GUIMediator.getAppFrame());
-            dlg.setChosenContent(selectedFile, selectedFile.isFile() ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY);
-            dlg.setVisible(true);
+            BackgroundQueuedExecutorService.schedule(() -> {
+                if (selectedFile.isDirectory() && selectedFile.listFiles() != null && selectedFile.listFiles().length == 0) {
+                    GUIMediator.safeInvokeLater(() -> JOptionPane.showMessageDialog(null, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE));
+                    return;
+                }
+                if (!selectedFile.canRead()) {
+                    GUIMediator.safeInvokeLater(() -> JOptionPane.showMessageDialog(null, I18n.tr("Error: You can't read on that file/folder."), I18n.tr("Error"), JOptionPane.ERROR_MESSAGE));
+                    return;
+                }
+                int fileSelectionMode = selectedFile.isFile() ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY;
+                GUIMediator.safeInvokeLater(() -> {
+                    CreateTorrentDialog dlg = new CreateTorrentDialog(GUIMediator.getAppFrame());
+                    dlg.setChosenContent(selectedFile, fileSelectionMode);
+                    dlg.setVisible(true);
+                });
+            });
         }
     }
 

@@ -48,7 +48,16 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
  - maintenance:Updated Chaquopy to 17.0.0 with Python 3.13 - dropped 32-bit ABIs (armeabi-v7a, x86) incompatible with Python 3.13+; Python 3.14 blocked by missing brotli/pycryptodomex wheels in Chaquopy mirror
  - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
- - maintenance:Update com.google.firebase:firebase-bom to 34.8.0
+ - maintenance:Updated com.google.firebase:firebase-bom 34.8.0 → 34.12.0
+ - maintenance:Updated io.coil-kt.coil3:coil 3.3.0 → 3.4.0
+ - maintenance:Updated androidx.core:core 1.17.0 → 1.18.0
+ - maintenance:Updated androidx.browser:browser 1.9.0 → 1.10.0
+ - maintenance:Updated androidx.datastore:datastore-preferences 1.1.4 → 1.2.1
+ - maintenance:Updated androidx.work:work-runtime-ktx 2.11.0 → 2.11.2
+ - maintenance:Updated org.jetbrains:annotations 26.0.2-1 → 26.1.0
+ - maintenance:Updated com.google.firebase:firebase-crashlytics plugin 3.0.6 → 3.0.7
+ - maintenance:Updated org.apache.groovy:groovy-swing 5.0.3 → 5.0.5
+ - maintenance:Updated test dependencies: robolectric 4.13 → 4.16.1, androidx.test:core 1.6.1 → 1.7.0, androidx.test.ext:junit 1.2.1 → 1.3.0
  - maintenance:Removed multidex library and MultiDexApplication - minSdk=26 has built-in multidex support
  - maintenance:Dropped jlibtorrent-android-arm and jlibtorrent-android-x86 dependencies (32-bit ABIs no longer targeted)
  - maintenance:Updated CI workflow to use Python 3.13
@@ -63,6 +72,15 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:CustomSeekBarPreference and ApplicationPreferencesFragment no longer call getSharedPreferences() directly - use ConfigurationManager instead
  - maintenance:Extracted resolveUri() string logic to MusicUriUtils.resolveUriString() (pure Java, no Android deps) - production MultiPlayer delegates to it; MultiPlayerResolveUriTest now tests real production code instead of a local copy
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
+ - fix:YouTube audio downloads now play in FrostWire player instead of launching a third-party app - .mp4/.webm/.opus files were incorrectly identified as non-audio by MIME type check
+ - fix:YouTube audio playback now starts immediately instead of 30-second delay - removed slow LIKE '%filename%' MediaStore full-table scan and fixed ServiceConnectionListener race condition that silently dropped the play callback
+ - fix:Album art ImageView no longer shows blank during load - placeholder drawable is now set immediately before Coil request is enqueued
+ - fix:Album art now loads for YouTube downloads with no MediaStore album ID - loadCurrentArtwork() attempts MediaMetadataRetriever+sidecar fallback when albumId==0 but file path is available
+ - fix:getPath() in MusicPlaybackService now returns file path for tracks opened directly from storage (e.g. fresh YouTube downloads not yet indexed by MediaStore)
+ - fix:Eliminated 38 ContentResolver.query() calls from UI thread across MusicUtils, adapters, fragments, activities - prevents ANRs
+ - fix:Eliminated 12 disk I/O operations from UI thread - file.exists/mkdirs/renameTo, FileOutputStream/FileInputStream, readFileToByteArray all posted to MISC handler
+ - fix:Eliminated 9 unnecessary async roundtrips for in-memory reads - isStopped/isPlaying/getAlbumName posted to MISC handler when reading volatile cached values
+ - fix:ARTIST_THUMBNAILS_URI typo fixed - content//: corrected to content:// (artist art was silently failing)
  - maintenance:Removed GloTorrents search engine - domain gtso.cc is parked and no longer functional
  - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
  - maintenance:Removed unused java.io.File import from MusicPlaybackService
