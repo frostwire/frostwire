@@ -507,21 +507,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         return saveLocation != null && saveLocation.isFile();
     }
 
+    @SuppressWarnings("unused")
     private boolean selectionHasMediaFiles(BTDownload d) {
         if (d instanceof SoundcloudDownload) {
             return true;
         }
-        File saveLocation = d.getSaveLocation();
-        //in case it's a single picked .torrent/magnet download
-        if (saveLocation != null && saveLocation.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(saveLocation)) {
-            try {
-                //noinspection ConstantConditions
-                saveLocation = saveLocation.listFiles()[0];
-            } catch (Throwable t) {
-                saveLocation = null;
-            }
-        }
-        return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation) || (saveLocation.isFile() && PlaybackUtil.isPlayableFile(saveLocation)));
+        return false;
     }
 
     private boolean isHttpTransfer(BTDownload d) {
