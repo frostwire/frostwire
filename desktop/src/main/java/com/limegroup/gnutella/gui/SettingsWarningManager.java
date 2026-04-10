@@ -28,12 +28,11 @@ public class SettingsWarningManager {
      * Warn about load/save problems
      */
     public static void checkSettingsLoadSaveFailure() {
-        // TODO: implement actual UI notification
         if (FrostWireUtils.hasSettingsLoadSaveFailures()) {
-            //msg = I18n.tr("FrostWire has encountered problems in managing your settings.  Your settings changes may not be saved on shutdown.");
+            GUIMediator.showMessage(I18n.tr("FrostWire has encountered problems in managing your settings.  Your settings changes may not be saved on shutdown."));
             FrostWireUtils.resetSettingsLoadSaveFailures();
         } else if (ResourceManager.hasLoadFailure()) {
-            //msg = I18n.tr("FrostWire has encountered problems in loading your settings.  FrostWire will attempt to use the default values; however, may behave unexpectedly.");
+            GUIMediator.showMessage(I18n.tr("FrostWire has encountered problems in loading your settings.  FrostWire will attempt to use the default values; however, may behave unexpectedly."));
             ResourceManager.resetLoadFailure();
         }
     }
