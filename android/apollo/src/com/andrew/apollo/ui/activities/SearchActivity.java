@@ -286,16 +286,22 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
 
         // If it's an artist, open the artist profile
         if ("artist".equals(mimeType)) {
-            NavUtils.openArtistProfile(this,
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)), null);
+            final String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
+            com.frostwire.android.util.SystemUtils.postToHandler(
+                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                () -> NavUtils.openArtistProfile(this, artistName, null));
         } else if ("album".equals(mimeType)) {
-            // If it's an album, open the album profile
-            int albumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
-            NavUtils.openAlbumProfile(this,
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)),
-                    cursor.getLong(albumId),
-                    MusicUtils.getSongListForAlbum(this, albumId));
+            int albumIdCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
+            final String albumName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM));
+            final String artistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST));
+            final long albumIdValue = cursor.getLong(albumIdCol);
+            com.frostwire.android.util.SystemUtils.postToHandler(
+                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                () -> NavUtils.openAlbumProfile(this,
+                    albumName,
+                    artistName,
+                    albumIdValue,
+                    MusicUtils.getSongListForAlbum(this, albumIdValue)));
         } else if (position >= 0 && id >= 0) {
             // If it's a song, play it and leave
             final long[] list = new long[]{

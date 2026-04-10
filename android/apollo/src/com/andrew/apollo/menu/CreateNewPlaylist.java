@@ -28,6 +28,7 @@ import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com) TODO - The playlist names are
@@ -61,10 +62,25 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
     @Override
     public void initObjects(final Bundle savedInstanceState) {
         mPlaylistList = getArguments().getLongArray("playlist_list");
-        mDefaultname = savedInstanceState != null ? savedInstanceState.getString("defaultname")
-                : makePlaylistName();
-        if (mDefaultname == null && getDialog() != null) {
-            getDialog().dismiss();
+        if (savedInstanceState != null) {
+            mDefaultname = savedInstanceState.getString("defaultname");
+            if (mDefaultname == null && getDialog() != null) {
+                getDialog().dismiss();
+            }
+        } else {
+            mDefaultname = "";
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                final String name = makePlaylistName();
+                SystemUtils.postToUIThread(() -> {
+                    mDefaultname = name;
+                    if (mDefaultname == null && getDialog() != null) {
+                        getDialog().dismiss();
+                    } else if (mPlaylist != null) {
+                        mPlaylist.setText(mDefaultname);
+                        mPlaylist.setSelection(mDefaultname.length());
+                    }
+                });
+            });
         }
     }
 
@@ -75,6 +91,11 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
         }
         final String playlistName = mPlaylist.getText().toString();
         if (playlistName.length() > 0) {
+            if (SystemUtils.isUIThread()) {
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                        () -> onSaveClick());
+                return;
+            }
             final int playlistId = (int) MusicUtils.getIdForPlaylist(getActivity(),
                     playlistName);
             if (playlistId >= 0) {
@@ -88,13 +109,17 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
             int added;
             if (mPlaylistList != null && (added = mPlaylistList.length) > 0) {
                 final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
-                AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
+                SystemUtils.postToUIThread(() ->
+                        AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
             }
-            getDialog().dismiss();
+            SystemUtils.postToUIThread(() -> getDialog().dismiss());
         }
     }
 
     private String makePlaylistName() {
+        if (SystemUtils.isUIThread()) {
+            return null;
+        }
         final String template = getString(R.string.new_playlist_name_template);
         int num = 1;
         final String[] projection = new String[]{

@@ -311,25 +311,27 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             return true;
         } else if (itemId == R.id.menu_player_shuffle) {
             final long id = mArguments.getLong(Config.ID);
-            long[] list = null;
-            if (isArtist()) {
-                list = MusicUtils.getSongListForArtist(this, id);
-            } else if (isAlbum()) {
-                list = MusicUtils.getSongListForAlbum(this, id);
-            } else if (isGenre()) {
-                list = MusicUtils.getSongListForGenre(this, id);
-            }
-            if (isPlaylist()) {
-                MusicUtils.playPlaylist(this, id);
-            } else if (isFavorites()) {
-                MusicUtils.playFavorites(this);
-            } else if (isLastAdded()) {
-                MusicUtils.playLastAdded(this);
-            } else {
-                if (list != null && list.length > 0) {
-                    MusicUtils.playFDs(list, 0, true);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                long[] list = null;
+                if (isArtist()) {
+                    list = MusicUtils.getSongListForArtist(this, id);
+                } else if (isAlbum()) {
+                    list = MusicUtils.getSongListForAlbum(this, id);
+                } else if (isGenre()) {
+                    list = MusicUtils.getSongListForGenre(this, id);
                 }
-            }
+                if (isPlaylist()) {
+                    MusicUtils.playPlaylist(this, id);
+                } else if (isFavorites()) {
+                    MusicUtils.playFavorites(this);
+                } else if (isLastAdded()) {
+                    MusicUtils.playLastAdded(this);
+                } else {
+                    if (list != null && list.length > 0) {
+                        MusicUtils.playFDs(list, 0, true);
+                    }
+                }
+            });
             return true;
         } else if (itemId == R.id.menu_player_sort_by_az) {
             if (isArtistSongPage()) {

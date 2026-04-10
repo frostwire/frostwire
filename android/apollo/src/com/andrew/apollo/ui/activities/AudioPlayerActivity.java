@@ -360,7 +360,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     public boolean onOptionsItemSelected(final MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_player_shuffle) {// Shuffle all the songs
-            MusicUtils.shuffleAll(this);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                () -> MusicUtils.shuffleAll(this));
             // Refresh the queue
             ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
             return true;
@@ -1287,15 +1288,17 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressWarnings("CatchMayIgnoreException")
     private final OnClickListener mOpenAlbumProfile = v -> {
         long albumId = MusicUtils.getCurrentAlbumId();
-        try {
-            NavUtils.openAlbumProfile(AudioPlayerActivity.this,
-                    MusicUtils.getAlbumName(),
-                    MusicUtils.getArtistName(),
-                    albumId,
-                    MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
-        } catch (Throwable ignored) {
-            LOG.error("AudioPlayerActivity::mOpenAlbumProfile onClick listener", ignored);
-        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                        MusicUtils.getAlbumName(),
+                        MusicUtils.getArtistName(),
+                        albumId,
+                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+            } catch (Throwable ignored) {
+                LOG.error("AudioPlayerActivity::mOpenAlbumProfile onClick listener", ignored);
+            }
+        });
     };
 
     /**

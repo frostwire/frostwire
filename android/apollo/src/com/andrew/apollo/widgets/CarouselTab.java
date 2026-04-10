@@ -36,6 +36,7 @@ import com.andrew.apollo.utils.MusicUtils;
 
 import com.frostwire.android.R;
 import com.frostwire.android.util.FWImageLoader;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -138,6 +139,11 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      *            artist image is missing.
      */
     public void blurPhoto(final Activity context, final String artist, final String album) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> blurPhoto(context, artist, album));
+            return;
+        }
         final FWImageLoader loader = FWImageLoader.getInstance(context.getApplicationContext());
         FWImageLoader.Filter filter = new BlurFilter();
         loader.load(FWImageLoader.getArtistArtUri(artist),
@@ -154,6 +160,11 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      * @param album The name of the album in the profile the user is viewing.
      */
     public void setAlbumPhoto(final Activity context, final String album, final String artist) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> setAlbumPhoto(context, album, artist));
+            return;
+        }
         if (!TextUtils.isEmpty(album)) {
             mAlbumArt.setVisibility(View.VISIBLE);
             mFetcher.loadAlbumImage(artist, album,
@@ -170,6 +181,11 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      * @param artist The name of the artist in the profile the user is viewing.
      */
     public void setArtistAlbumPhoto(final Activity context, final String artist) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> setArtistAlbumPhoto(context, artist));
+            return;
+        }
         final String lastAlbum = MusicUtils.getLastAlbumForArtist(context, artist);
         if (!TextUtils.isEmpty(lastAlbum)) {
             // Set the last album the artist played
@@ -177,9 +193,11 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                     MusicUtils.getIdForAlbum(context, lastAlbum, artist), mPhoto);
             // Play the album
             mPhoto.setOnClickListener(v -> {
-                final long[] albumList = MusicUtils.getSongListForAlbum(getContext(),
-                        MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                MusicUtils.playFDs(albumList, 0, MusicUtils.isShuffleEnabled());
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    final long[] albumList = MusicUtils.getSongListForAlbum(v.getContext(),
+                            MusicUtils.getIdForAlbum(context, lastAlbum, artist));
+                    MusicUtils.playFDs(albumList, 0, MusicUtils.isShuffleEnabled());
+                });
             });
         } else {
             setDefault(context);

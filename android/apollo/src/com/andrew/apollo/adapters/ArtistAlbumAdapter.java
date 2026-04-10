@@ -157,8 +157,12 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
                 @Override
                 public void onClick(final View v) {
                     final long id = getItem(pos).mAlbumId;
-                    final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                    MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                    com.frostwire.android.util.SystemUtils.postToHandler(
+                        com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                        () -> {
+                            final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
+                            MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                        });
                 }
             });
         }

@@ -130,8 +130,12 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         if (album != null) {
             album.setOnClickListener(v -> {
                 final long id = getItemId(position);
-                final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                com.frostwire.android.util.SystemUtils.postToHandler(
+                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                    () -> {
+                        final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
+                        MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                    });
             });
         }
     }

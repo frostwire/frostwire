@@ -374,13 +374,15 @@ public abstract class BaseActivity extends AbstractActivity {
         public void onClick(final View v) {
             long currentAlbumId = MusicUtils.getCurrentAudioId();
             if (currentAlbumId != -1) {
-                NavUtils.openAlbumProfile(BaseActivity.this,
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> NavUtils.openAlbumProfile(BaseActivity.this,
                         MusicUtils.getAlbumName(),
                         MusicUtils.getArtistName(),
                         MusicUtils.getCurrentAlbumId(),
-                        MusicUtils.getSongListForAlbum(BaseActivity.this, currentAlbumId));
+                        MusicUtils.getSongListForAlbum(BaseActivity.this, currentAlbumId)));
             } else {
-                MusicUtils.shuffleAll(BaseActivity.this);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> MusicUtils.shuffleAll(BaseActivity.this));
             }
             if (BaseActivity.this instanceof ProfileActivity) {
                 finish();

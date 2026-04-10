@@ -79,11 +79,25 @@ public class RenamePlaylist extends BasePlaylistDialog {
     public void initObjects(final Bundle savedInstanceState) {
         mRenameId = savedInstanceState != null ? savedInstanceState.getLong("rename")
                 : getArguments().getLong("rename", -1);
-        String mOriginalName = getPlaylistNameFromId(mRenameId);
-        mDefaultname = savedInstanceState != null ? savedInstanceState.getString("defaultname")
-                : mOriginalName;
-        if (mRenameId < 0 || mOriginalName == null || mDefaultname == null) {
-            getDialog().dismiss();
+        if (savedInstanceState != null) {
+            mDefaultname = savedInstanceState.getString("defaultname");
+            if (mRenameId < 0 || mDefaultname == null) {
+                getDialog().dismiss();
+            }
+        } else {
+            mDefaultname = "";
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                final String originalName = getPlaylistNameFromId(mRenameId);
+                SystemUtils.postToUIThread(() -> {
+                    mDefaultname = originalName;
+                    if (mRenameId < 0 || originalName == null || mDefaultname == null) {
+                        getDialog().dismiss();
+                    } else if (mPlaylist != null) {
+                        mPlaylist.setText(mDefaultname);
+                        mPlaylist.setSelection(mDefaultname.length());
+                    }
+                });
+            });
         }
     }
 
@@ -148,6 +162,9 @@ public class RenamePlaylist extends BasePlaylistDialog {
      * @return The name of the playlist
      */
     private String getPlaylistNameFromId(final long id) {
+        if (SystemUtils.isUIThread()) {
+            return null;
+        }
         Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
         Cursor cursor = getActivity().getContentResolver().query(
                 playlistContentUri, new String[]{

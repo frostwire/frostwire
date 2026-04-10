@@ -66,13 +66,8 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        HashMap<String, String> updateMessages;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            updateMessages = args.getSerializable("updateMessages", HashMap.class);
-        } else {
-            //noinspection unchecked,deprecation
-            updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
-        }
+        //noinspection unchecked
+        HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages", HashMap.class);
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
         String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));

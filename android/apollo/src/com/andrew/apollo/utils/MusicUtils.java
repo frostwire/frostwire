@@ -838,6 +838,10 @@ public final class MusicUtils {
      * @return The song list for an artist.
      */
     public static long[] getSongListForArtist(final Context context, final long id) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForArtist(context, id));
+            return sEmptyList;
+        }
         try {
             final String[] projection = new String[]{BaseColumns._ID};
             final String selection = AudioColumns.ARTIST_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
@@ -986,6 +990,10 @@ public final class MusicUtils {
      * @return The song list for an album.
      */
     public static long[] getSongListForAlbum(final Context context, final long id) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForAlbum(context, id));
+            return sEmptyList;
+        }
         final String[] projection = new String[]{BaseColumns._ID};
         final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, AudioColumns.TRACK + ", " + MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
@@ -1018,6 +1026,10 @@ public final class MusicUtils {
      * @return The song list for an genre.
      */
     public static long[] getSongListForGenre(final Context context, final long id) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForGenre(context, id));
+            return sEmptyList;
+        }
         final String[] projection = new String[]{BaseColumns._ID};
         final Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
         String selection = AudioColumns.IS_MUSIC + "=1" + " AND " + MediaColumns.TITLE + "!=''";
@@ -1187,6 +1199,10 @@ public final class MusicUtils {
      * @param context The {@link Context} to use.
      */
     public static void shuffleAll(final Context context) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shuffleAll(context));
+            return;
+        }
         // TODO: Check for PHONE_STATE Permissions here.
         Cursor cursor = new SongLoader(context).makeCursor(context);
         final long[] mTrackList = getSongListForCursor(cursor);
@@ -1219,6 +1235,10 @@ public final class MusicUtils {
      * @return The ID for a playlist.
      */
     public static long getIdForPlaylist(final Context context, final String name) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getIdForPlaylist(context, name));
+            return -1;
+        }
         if (context == null) {
             return -1;
         }
@@ -1235,6 +1255,10 @@ public final class MusicUtils {
      * @return The ID for an artist.
      */
     public static long getIdForArtist(final Context context, final String name) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getIdForArtist(context, name));
+            return -1;
+        }
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, new String[]{BaseColumns._ID}, ArtistColumns.ARTIST + "=?", new String[]{name}, ArtistColumns.ARTIST);
         return getFirstId(cursor, -1);
     }
@@ -1248,6 +1272,10 @@ public final class MusicUtils {
      * @return The ID for an album.
      */
     public static long getIdForAlbum(final Context context, final String albumName, final String artistName) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getIdForAlbum(context, albumName, artistName));
+            return -1;
+        }
         Cursor cursor;
         try {
             cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{BaseColumns._ID}, AlbumColumns.ALBUM + "=? AND " + AlbumColumns.ARTIST + "=?", new String[]{albumName, artistName}, AlbumColumns.ALBUM);
@@ -1345,6 +1373,10 @@ public final class MusicUtils {
      * @return A new playlist ID.
      */
     public static long createPlaylist(final Context context, final String name, boolean fixingOwnerlessPlaylist) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> createPlaylist(context, name, fixingOwnerlessPlaylist));
+            return 0;
+        }
         long result = -1;
         if (context != null && name != null && !name.isEmpty()) {
             final ContentResolver resolver = context.getContentResolver();
@@ -1567,6 +1599,10 @@ public final class MusicUtils {
      * @param fileType media file type id
      */
     public static void setRingtone(final Context context, final long id, byte fileType) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> setRingtone(context, id, fileType));
+            return;
+        }
         if (context == null) {
             LOG.warn("context was null, not setting ringtone.");
             return;
@@ -1612,6 +1648,10 @@ public final class MusicUtils {
      * @return The song count for an album.
      */
     public static String getSongCountForAlbum(final Context context, final long id) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongCountForAlbum(context, id));
+            return null;
+        }
         if (context == null || id == -1) {
             return null;
         }
@@ -1645,6 +1685,10 @@ public final class MusicUtils {
      * @return The release date for an album.
      */
     static String getReleaseDateForAlbum(final Context context, final long id) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getReleaseDateForAlbum(context, id));
+            return null;
+        }
         if (context == null || id == -1) {
             return null;
         }
@@ -1983,6 +2027,10 @@ public final class MusicUtils {
      * @param list    The item(s) to delete.
      */
     public static void deleteTracks(final Context context, final long[] list, boolean showNotification) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> deleteTracks(context, list, showNotification));
+            return;
+        }
         if (list == null) {
             return;
         }

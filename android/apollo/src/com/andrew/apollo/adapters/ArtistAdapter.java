@@ -163,8 +163,12 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             @Override
             public void onClick(final View v) {
                 final long id = getItem(position).mArtistId;
-                final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
-                MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                com.frostwire.android.util.SystemUtils.postToHandler(
+                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                    () -> {
+                        final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
+                        MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
+                    });
             }
         });
     }

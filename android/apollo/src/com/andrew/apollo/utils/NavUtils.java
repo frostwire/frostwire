@@ -54,6 +54,13 @@ public final class NavUtils {
             return;
         }
 
+        if (com.frostwire.android.util.SystemUtils.isUIThread()) {
+            com.frostwire.android.util.SystemUtils.postToHandler(
+                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                    () -> openArtistProfile(context, artistName, songs));
+            return;
+        }
+
         // Create a new bundle to transfer the artist info
         final Bundle bundle = new Bundle();
         bundle.putLong(Config.ID, MusicUtils.getIdForArtist(context, artistName));
@@ -80,6 +87,13 @@ public final class NavUtils {
      */
     public static void openAlbumProfile(final Activity context,
             final String albumName, final String artistName, final long albumId, final long[] songs) {
+
+        if (com.frostwire.android.util.SystemUtils.isUIThread()) {
+            com.frostwire.android.util.SystemUtils.postToHandler(
+                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                    () -> openAlbumProfile(context, albumName, artistName, albumId, songs));
+            return;
+        }
 
         // Create a new bundle to transfer the album info
         final Bundle bundle = new Bundle();

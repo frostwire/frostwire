@@ -43,6 +43,7 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.List;
 
@@ -86,11 +87,23 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.menu_player_save_queue) {
-                    NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
-                            .makeQueueCursor(getActivity());
-                    CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
-                            getParentFragmentManager(), "CreatePlaylist");
-                    queue.close();
+                    if (SystemUtils.isUIThread()) {
+                        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                            NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
+                                    .makeQueueCursor(getActivity());
+                            long[] songList = MusicUtils.getSongListForCursor(queue);
+                            queue.close();
+                            SystemUtils.postToUIThread(() ->
+                                    CreateNewPlaylist.getInstance(songList).show(
+                                            getParentFragmentManager(), "CreatePlaylist"));
+                        });
+                    } else {
+                        NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
+                                .makeQueueCursor(getActivity());
+                        CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
+                                getParentFragmentManager(), "CreatePlaylist");
+                        queue.close();
+                    }
                     return true;
                 } else if (itemId == R.id.menu_player_clear_queue) {
                     long currentAudioId = MusicUtils.getCurrentAudioId();

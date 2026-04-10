@@ -32,6 +32,7 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * Alert dialog used to delete tracks.
@@ -138,7 +139,8 @@ public final class DeleteDialog extends DialogFragment {
                 mFetcher.removeFromCache(key);
             }
             // Delete the selected item(s)
-            MusicUtils.deleteTracks(getActivity(), mItemList);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> MusicUtils.deleteTracks(getActivity(), mItemList));
 
             if (getActivity() instanceof DeleteDialogCallback) {
                 ((DeleteDialogCallback) getActivity()).onDelete(mItemList);

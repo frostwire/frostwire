@@ -155,23 +155,42 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
                     if (info.position == 0) {
-                        MusicUtils.playFavorites(getActivity());
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> MusicUtils.playFavorites(getActivity()));
                     } else if (info.position == 1) {
-                        MusicUtils.playLastAdded(getActivity());
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> MusicUtils.playLastAdded(getActivity()));
                     } else {
-                        MusicUtils.playPlaylist(getActivity(), mItem.mPlaylistId);
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> MusicUtils.playPlaylist(getActivity(), mItem.mPlaylistId));
                     }
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
-                    long[] list;
                     if (info.position == 0) {
-                        list = MusicUtils.getSongListForFavorites(getActivity());
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> {
+                                long[] list = MusicUtils.getSongListForFavorites(getActivity());
+                                MusicUtils.addToQueue(getActivity(), list);
+                            });
                     } else if (info.position == 1) {
-                        list = MusicUtils.getSongListForLastAdded(getActivity());
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> {
+                                long[] list = MusicUtils.getSongListForLastAdded(getActivity());
+                                MusicUtils.addToQueue(getActivity(), list);
+                            });
                     } else {
-                        list = MusicUtils.getSongListForPlaylist(getActivity(), mItem.mPlaylistId);
+                        com.frostwire.android.util.SystemUtils.postToHandler(
+                            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                            () -> {
+                                long[] list = MusicUtils.getSongListForPlaylist(getActivity(), mItem.mPlaylistId);
+                                MusicUtils.addToQueue(getActivity(), list);
+                            });
                     }
-                    MusicUtils.addToQueue(getActivity(), list);
                     return true;
                 case FragmentMenuItems.RENAME_PLAYLIST:
                     RenamePlaylist.getInstance(mItem.mPlaylistId).show(getFragmentManager(), "RenameDialog");

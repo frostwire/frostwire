@@ -168,7 +168,8 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
             return false;
         }
 
-        MusicUtils.setRingtone(handlerActivity, AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK, FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+            () -> MusicUtils.setRingtone(handlerActivity, AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK, FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK));
         AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
         FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
         return true;

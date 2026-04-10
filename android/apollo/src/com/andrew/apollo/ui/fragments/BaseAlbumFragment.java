@@ -42,11 +42,13 @@ public abstract class BaseAlbumFragment extends ApolloFragment<AlbumAdapter, Alb
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
         mItem = mAdapter.getItem(position);
-        NavUtils.openAlbumProfile(getActivity(),
+        com.frostwire.android.util.SystemUtils.postToHandler(
+            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+            () -> NavUtils.openAlbumProfile(getActivity(),
                 mItem.mAlbumName,
                 mItem.mArtistName,
                 mItem.mAlbumId,
-                MusicUtils.getSongListForAlbum(getActivity(), mItem.mAlbumId));
+                MusicUtils.getSongListForAlbum(getActivity(), mItem.mAlbumId)));
     }
 
     protected boolean isSimpleLayout() {

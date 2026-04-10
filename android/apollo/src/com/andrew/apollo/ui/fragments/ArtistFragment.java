@@ -75,8 +75,12 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
         mItem = mAdapter.getItem(position);
-        long[] tracks = MusicUtils.getSongListForArtist(getActivity(), mItem.mArtistId);
-        NavUtils.openArtistProfile(getActivity(), mItem.mArtistName, tracks);
+        com.frostwire.android.util.SystemUtils.postToHandler(
+            com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+            () -> {
+                long[] tracks = MusicUtils.getSongListForArtist(getActivity(), mItem.mArtistId);
+                NavUtils.openArtistProfile(getActivity(), mItem.mArtistName, tracks);
+            });
     }
 
     @Override

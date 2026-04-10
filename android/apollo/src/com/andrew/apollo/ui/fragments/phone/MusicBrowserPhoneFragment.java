@@ -151,7 +151,9 @@ public final class MusicBrowserPhoneFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.menu_player_shuffle) {
-                    MusicUtils.shuffleAll(getActivity());
+                    com.frostwire.android.util.SystemUtils.postToHandler(
+                        com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                        () -> MusicUtils.shuffleAll(getActivity()));
                     return true;
                 } else if (itemId == R.id.menu_player_favorite) {
                     MusicUtils.toggleFavorite();
