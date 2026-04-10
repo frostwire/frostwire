@@ -133,7 +133,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         String _name = initializer.getName();
         _type = "";
         if (!file.isDirectory()) {
-            //_isDirectory = false;
             int index = _name.lastIndexOf(".");
             int index2 = fullPath.lastIndexOf(File.separator);
             _path = fullPath.substring(0, index2);
@@ -143,45 +142,61 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             }
         } else {
             _path = fullPath;
-            //_isDirectory = true;
         }
-        // only load file sizes, do nothing for directories
-        // directories implicitly set SizeHolder to null and display nothing
-        if (initializer.isFile()) {
-            long _size = initializer.length();
-            _sizeHolder = new SizeHolder(_size);
-        } else {
-            _sizeHolder = ZERO_SIZED_HOLDER;
-        }
-        this.lastModified = new Date(initializer.lastModified());
+        _sizeHolder = ZERO_SIZED_HOLDER;
+        lastModified = new Date(0);
         this.actionsHolder = new LibraryActionsHolder(this, false);
-        this.nameCell = new NameHolder(_name);
-        if (initializer != null &&
-                initializer.isFile() &&
-                FilenameUtils.getExtension(initializer.getName()) != null &&
-                FilenameUtils.getExtension(initializer.getName()).toLowerCase().endsWith("torrent")) {
-            BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
-            try {
-                additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(initializer, initializer.getName());
-            } catch (Throwable t) {
-                System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + initializer.getAbsolutePath());
-                t.printStackTrace();
-            }
-            boolean hasLicense = additionalMetadataHolder != null && additionalMetadataHolder.getLicenseBroker() != null;
-            boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
-            if (hasLicense) {
-                license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
-            }
-            if (license == null) {
-                license = "";
-            }
-            if (hasPaymentOptions) {
-                paymentOptions = additionalMetadataHolder.getPaymentOptions();
+        final String displayName = _name;
+        this.nameCell = new NameHolder(displayName);
+        license = "";
+        paymentOptions = new PaymentOptions(null, null);
+        BackgroundQueuedExecutorService.schedule(() -> {
+            SizeHolder sizeHolder;
+            Date modTime;
+            if (file.isFile()) {
+                sizeHolder = new SizeHolder(file.length());
             } else {
-                paymentOptions = new PaymentOptions(null, null);
+                sizeHolder = ZERO_SIZED_HOLDER;
             }
-            paymentOptions.setItemName(_name);
-        }
+            modTime = new Date(file.lastModified());
+            String ext = FilenameUtils.getExtension(file.getName());
+            final String finalLicense;
+            final PaymentOptions finalPaymentOptions;
+            if (file.isFile() && ext != null && ext.toLowerCase().endsWith("torrent")) {
+                BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
+                try {
+                    additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(file, file.getName());
+                } catch (Throwable t) {
+                    System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + file.getAbsolutePath());
+                    t.printStackTrace();
+                }
+                boolean hasLicense = additionalMetadataHolder != null && additionalMetadataHolder.getLicenseBroker() != null;
+                boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
+                String l = "";
+                PaymentOptions po = new PaymentOptions(null, null);
+                if (hasLicense) {
+                    l = additionalMetadataHolder.getLicenseBroker().getLicenseName();
+                }
+                if (hasPaymentOptions) {
+                    po = additionalMetadataHolder.getPaymentOptions();
+                }
+                po.setItemName(displayName);
+                finalLicense = l;
+                finalPaymentOptions = po;
+            } else {
+                finalLicense = license;
+                finalPaymentOptions = paymentOptions;
+            }
+            final SizeHolder finalSizeHolder = sizeHolder;
+            final Date finalModTime = modTime;
+            GUIMediator.safeInvokeLater(() -> {
+                _sizeHolder = finalSizeHolder;
+                lastModified = finalModTime;
+                license = finalLicense;
+                paymentOptions = finalPaymentOptions;
+                _model.refresh();
+            });
+        });
     }
 
     /**
