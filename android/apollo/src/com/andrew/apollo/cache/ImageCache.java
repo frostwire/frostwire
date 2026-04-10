@@ -139,29 +139,16 @@ public final class ImageCache {
      * @param context The {@link Context} to use
      */
     private void init(final Context context) {
-        InitDiskCacheAsyncTask initDiskCacheAsyncTask = new InitDiskCacheAsyncTask(this, context);
-        Engine.instance().getThreadPool().execute(initDiskCacheAsyncTask::doInBackground);
+        WeakReference<Context> contextRef = Ref.weak(context);
+        Engine.instance().getThreadPool().execute(() -> {
+            if (Ref.alive(contextRef)) {
+                initDiskCache(contextRef.get());
+            }
+            Ref.free(contextRef);
+        });
 
         // Set up the memory cache
         initLruCache(context);
-    }
-
-    private final static class InitDiskCacheAsyncTask {
-        private ImageCache imageCache;
-        private WeakReference<Context> contextRef;
-
-        InitDiskCacheAsyncTask(ImageCache imageCache, Context context) {
-            this.imageCache = imageCache;
-            contextRef = Ref.weak(context);
-        }
-
-        void doInBackground() {
-            // Initialize the disk cache in a background thread
-            if (Ref.alive(contextRef)) {
-                imageCache.initDiskCache(contextRef.get());
-            }
-            Ref.free(contextRef);
-        }
     }
 
     /**
