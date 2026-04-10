@@ -499,22 +499,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         return menu;
     }
 
-    private boolean selectionHasMP4s(File saveLocation) {
-        return saveLocation != null && (LibraryUtils.directoryContainsExtension(saveLocation, "mp4") || (saveLocation.isFile() && FileUtils.hasExtension(saveLocation.getAbsolutePath(), "mp4")));
-    }
-
-    private boolean selectionIsSingleFile(File saveLocation) {
-        return saveLocation != null && saveLocation.isFile();
-    }
-
-    @SuppressWarnings("unused")
-    private boolean selectionHasMediaFiles(BTDownload d) {
-        if (d instanceof SoundcloudDownload) {
-            return true;
-        }
-        return false;
-    }
-
     private boolean isHttpTransfer(BTDownload d) {
         return d instanceof SoundcloudDownload || d instanceof HttpDownload;
     }
