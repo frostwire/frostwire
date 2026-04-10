@@ -57,6 +57,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -391,31 +392,30 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             return;
         }
 
-        Future<RemoveElementsResults> removeElementsResultsFuture = backgroundRemoveElements(listPanel, removeOptions, option);
-        try {
-            RemoveElementsResults removeElementsResults = removeElementsResultsFuture.get();
-
-            clearSelection();
-            if (removeElementsResults.somethingWasRemoved) {
-                LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
+        CompletableFuture.runAsync(() -> {
+            try {
+                RemoveElementsResults removeElementsResults = backgroundRemoveElements(listPanel, removeOptions, option).get();
+                GUIMediator.safeInvokeLater(() -> {
+                    clearSelection();
+                    if (removeElementsResults.somethingWasRemoved) {
+                        LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
+                    }
+                    if (removeElementsResults.undeletedFileNames.isEmpty()) {
+                        return;
+                    }
+                    Object[] msg = new Object[]{
+                            new MultiLineLabel(
+                                    I18n.tr("The following files could not be deleted. They may be in use by another application or are currently being downloaded to."),
+                                    400),
+                            Box.createVerticalStrut(ButtonRow.BUTTON_SEP),
+                            new JScrollPane(createFileList(removeElementsResults.undeletedFileNames))};
+                    JOptionPane.showMessageDialog(MessageService.getParentComponent(), msg, I18n.tr("Error"), JOptionPane.ERROR_MESSAGE);
+                    LibraryFilesTableMediator.super.removeSelection();
+                });
+            } catch (InterruptedException | ExecutionException e) {
+                LOG.error(e.getMessage(), e);
             }
-            if (removeElementsResults.undeletedFileNames.isEmpty()) {
-                return;
-            }
-
-            // display list of files that could not be deleted
-            message = new Object[]{
-                    new MultiLineLabel(
-                            I18n.tr("The following files could not be deleted. They may be in use by another application or are currently being downloaded to."),
-                            400),
-                    Box.createVerticalStrut(ButtonRow.BUTTON_SEP),
-                    new JScrollPane(createFileList(removeElementsResults.undeletedFileNames))};
-            JOptionPane.showMessageDialog(MessageService.getParentComponent(), message, I18n.tr("Error"), JOptionPane.ERROR_MESSAGE);
-            super.removeSelection();
-
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error(e.getMessage(), e);
-        }
+        });
     }
 
     private Future<RemoveElementsResults> backgroundRemoveElements(
