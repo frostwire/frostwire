@@ -108,6 +108,10 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     private PaymentOptions paymentOptions;
     private LibraryActionsHolder actionsHolder;
     private NameHolder nameCell;
+    private PlayableCell cachedSizeCell;
+    private PlayableCell cachedTypeCell;
+    private PlayableCell cachedPathCell;
+    private PlayableCell cachedModTimeCell;
 
     LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
         super();
@@ -224,13 +228,25 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                 case NAME_IDX:
                     return nameCell;
                 case SIZE_IDX:
-                    return new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), false, idx);
+                    if (cachedSizeCell == null) {
+                        cachedSizeCell = new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), false, idx);
+                    }
+                    return cachedSizeCell;
                 case TYPE_IDX:
-                    return new PlayableCell(this, _type, false, idx);
+                    if (cachedTypeCell == null) {
+                        cachedTypeCell = new PlayableCell(this, _type, false, idx);
+                    }
+                    return cachedTypeCell;
                 case PATH_IDX:
-                    return new PlayableCell(this, _path, false, idx);
+                    if (cachedPathCell == null) {
+                        cachedPathCell = new PlayableCell(this, _path, false, idx);
+                    }
+                    return cachedPathCell;
                 case MODIFICATION_TIME_IDX:
-                    return new PlayableCell(this, lastModified, lastModified.toString(), false, idx);
+                    if (cachedModTimeCell == null) {
+                        cachedModTimeCell = new PlayableCell(this, lastModified, lastModified.toString(), false, idx);
+                    }
+                    return cachedModTimeCell;
                 case PAYMENT_OPTIONS_IDX:
                     return paymentOptions;
                 case LICENSE_IDX:
