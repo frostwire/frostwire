@@ -170,10 +170,6 @@ public class DNDUtils {
         for (File file : files) {
             if (PlaybackUtil.isPlayableFile(file)) {
                 return true;
-            } else if (file.isDirectory()) {
-                if (com.frostwire.gui.library.LibraryUtils.directoryContainsAudio(file)) {
-                    return true;
-                }
             }
         }
         return false;
