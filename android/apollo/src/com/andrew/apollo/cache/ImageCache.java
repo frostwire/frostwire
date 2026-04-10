@@ -26,9 +26,12 @@ import android.content.ComponentCallbacks2;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -439,7 +442,67 @@ public final class ImageCache {
                 }
             }
         }
+        if (artwork == null) {
+            artwork = getArtworkFallback(context, albumId);
+        }
         return artwork;
+    }
+
+    private Bitmap getArtworkFallback(final Context context, final long albumId) {
+        String filePath = null;
+        Uri mediaUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        if (SystemUtils.hasAndroid10OrNewer()) {
+            mediaUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        }
+        String[] projection = { MediaStore.Audio.Media.DATA };
+        try (Cursor cursor = context.getContentResolver().query(mediaUri, projection,
+                MediaStore.Audio.Media.ALBUM_ID + "=?", new String[]{String.valueOf(albumId)},
+                null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                filePath = cursor.getString(0);
+            }
+        } catch (Exception ignored) {}
+
+        if (filePath == null) return null;
+
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        try {
+            mmr.setDataSource(filePath);
+            byte[] art = mmr.getEmbeddedPicture();
+            if (art != null) {
+                return decodeSampledBitmap(art, TARGET_IMAGE_WIDTH, TARGET_IMAGE_HEIGHT);
+            }
+        } catch (Exception ignored) {
+        } finally {
+            try { mmr.release(); } catch (Exception ignored) {}
+        }
+
+        File artFile = new File(filePath.substring(0, filePath.lastIndexOf('.')) + ".art");
+        if (artFile.exists()) {
+            try {
+                return decodeSampledBitmapFromFile(artFile.getAbsolutePath(), TARGET_IMAGE_WIDTH, TARGET_IMAGE_HEIGHT);
+            } catch (Exception ignored) {}
+        }
+
+        return null;
+    }
+
+    private static Bitmap decodeSampledBitmap(final byte[] data, final int reqWidth, final int reqHeight) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(data, 0, data.length, options);
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeByteArray(data, 0, data.length, options);
+    }
+
+    private static Bitmap decodeSampledBitmapFromFile(final String path, final int reqWidth, final int reqHeight) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path, options);
     }
 
     /**

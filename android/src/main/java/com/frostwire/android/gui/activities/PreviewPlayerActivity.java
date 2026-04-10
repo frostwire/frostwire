@@ -25,11 +25,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -48,6 +45,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.common.VideoSize;
+import androidx.media3.exoplayer.ExoPlayer;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -61,6 +63,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.FWImageLoader;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -76,18 +79,14 @@ import java.net.URL;
 public final class PreviewPlayerActivity extends AbstractActivity implements
         AbstractDialog.OnDialogClickListener,
         TextureView.SurfaceTextureListener,
-        MediaPlayer.OnBufferingUpdateListener,
-        MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnVideoSizeChangedListener,
-        MediaPlayer.OnInfoListener,
+        Player.Listener,
         AudioManager.OnAudioFocusChangeListener {
 
     private static final Logger LOG = Logger.getLogger(PreviewPlayerActivity.class);
     public static WeakReference<FileSearchResult> srRef;
     private static String definitiveStreamUrl;
 
-    private MediaPlayer androidMediaPlayer;
+    private ExoPlayer exoPlayer;
     private Surface surface;
     private String displayName;
     private String source;
@@ -100,6 +99,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private boolean changedActionBarTitleToNonBuffering = false;
     private FWBannerView fwBannerView;
     private boolean isVertical;
+    private android.media.AudioFocusRequest mAudioFocusRequest;
 
     public PreviewPlayerActivity() {
         super(R.layout.activity_preview_player);
@@ -222,8 +222,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             outState.putBoolean("hasVideo", hasVideo);
             outState.putBoolean("audio", audio);
             outState.putBoolean("isFullScreen", isFullScreen);
-            if (androidMediaPlayer != null && androidMediaPlayer.isPlaying()) {
-                outState.putInt("currentPosition", androidMediaPlayer.getCurrentPosition());
+            if (exoPlayer != null && exoPlayer.isPlaying()) {
+                outState.putInt("currentPosition", (int) exoPlayer.getCurrentPosition());
             }
         }
     }
@@ -362,11 +362,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void changeVideoSize() {
-        if (androidMediaPlayer == null) {
+        if (exoPlayer == null) {
             return;
         }
-        int videoWidth = androidMediaPlayer.getVideoWidth();
-        int videoHeight = androidMediaPlayer.getVideoHeight();
+        VideoSize vs = exoPlayer.getVideoSize();
+        int videoWidth = vs.width;
+        int videoHeight = vs.height;
         final TextureView v = findView(R.id.activity_preview_player_videoview);
         DisplayMetrics metrics = getDisplayMetricsCompat();
 
@@ -412,17 +413,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void releaseMediaPlayer() {
-        if (androidMediaPlayer != null) {
-            androidMediaPlayer.stop();
-            androidMediaPlayer.setSurface(null);
-            try {
-                androidMediaPlayer.release();
-            } catch (Throwable t) {
-                //there could be a runtime exception thrown inside stayAwake()
-            }
-            androidMediaPlayer = null;
-
-            // minSdk=26 == API 26 (O): abandonAudioFocusRequest is always available; no fallback needed
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+            exoPlayer.setVideoSurface(null);
+            exoPlayer.removeListener(this);
+            exoPlayer.release();
+            exoPlayer = null;
             AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
             if (audioManager != null && mAudioFocusRequest != null) {
                 audioManager.abandonAudioFocusRequest(mAudioFocusRequest);
@@ -431,7 +427,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private static void onConnectionDroppedError(final WeakReference<PreviewPlayerActivity> contextRef) {
-        new Handler(Looper.getMainLooper()).post(() -> {
+        SystemUtils.postToUIThread(() -> {
             if (Ref.alive(contextRef)) {
                 contextRef.get().finish();
                 UIUtils.showLongMessage(contextRef.get(), R.string.check_internet_connection);
@@ -440,33 +436,28 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private static void launchPlayerWithFinalStreamUrl(final WeakReference<PreviewPlayerActivity> contextRef, final Uri uri) {
-        new Handler(Looper.getMainLooper()).post(() -> {
+        SystemUtils.postToUIThread(() -> {
             if (!Ref.alive(contextRef)) {
                 return;
             }
-            contextRef.get().androidMediaPlayer = new MediaPlayer();
-            Surface surface = (!contextRef.get().audio ? contextRef.get().surface : null);
-            MediaPlayer androidMediaPlayer = contextRef.get().androidMediaPlayer;
-            try {
-                androidMediaPlayer.setDataSource(contextRef.get(), uri);
-                androidMediaPlayer.setSurface(surface);
-                androidMediaPlayer.setOnBufferingUpdateListener(contextRef.get());
-                androidMediaPlayer.setOnCompletionListener(contextRef.get());
-                androidMediaPlayer.setOnPreparedListener(contextRef.get());
-                androidMediaPlayer.setOnVideoSizeChangedListener(contextRef.get());
-                androidMediaPlayer.setOnInfoListener(contextRef.get());
-                androidMediaPlayer.setAudioAttributes(
-                        new android.media.AudioAttributes.Builder()
-                                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
-                                .build());
-                androidMediaPlayer.prepare();
-                androidMediaPlayer.start();
-                if (MusicUtils.isPlaying()) {
-                    MusicUtils.playPauseOrResume();
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
+            PreviewPlayerActivity activity = contextRef.get();
+            if (activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+            ExoPlayer.Builder builder = new ExoPlayer.Builder(activity);
+            activity.exoPlayer = builder.build();
+            activity.exoPlayer.addListener(activity);
+            if (!activity.audio && activity.surface != null) {
+                activity.exoPlayer.setVideoSurface(activity.surface);
+            }
+            MediaItem mediaItem = new MediaItem.Builder()
+                    .setUri(uri)
+                    .build();
+            activity.exoPlayer.setMediaItem(mediaItem);
+            activity.exoPlayer.prepare();
+            activity.exoPlayer.play();
+            if (MusicUtils.isPlaying()) {
+                MusicUtils.playPauseOrResume();
             }
         });
     }
@@ -489,19 +480,19 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int width, int height) {
-        if (androidMediaPlayer != null) {
+        if (exoPlayer != null) {
             if (surface != null) {
                 surface.release();
                 surface = new Surface(surfaceTexture);
             }
-            androidMediaPlayer.setSurface(!audio ? surface : null);
+            exoPlayer.setVideoSurface(!audio ? surface : null);
         }
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
-        if (androidMediaPlayer != null) {
-            androidMediaPlayer.setSurface(null);
+        if (exoPlayer != null) {
+            exoPlayer.setVideoSurface(null);
             this.surface.release();
             this.surface = null;
         }
@@ -513,77 +504,47 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onBufferingUpdate(MediaPlayer mp, int percent) {
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        finish();
-    }
-
-    private android.media.AudioFocusRequest mAudioFocusRequest;
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if (am != null) {
-            // minSdk=26 == API 26 (O): AudioFocusRequest is always available; no fallback needed
-            mAudioFocusRequest = new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(new android.media.AudioAttributes.Builder()
-                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build())
-                    .setOnAudioFocusChangeListener(this)
-                    .build();
-            am.requestAudioFocus(mAudioFocusRequest);
+    public void onPlaybackStateChanged(int playbackState) {
+        if (playbackState == Player.STATE_READY) {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (am != null) {
+                mAudioFocusRequest = new android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                        .setAudioAttributes(new android.media.AudioAttributes.Builder()
+                                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .build())
+                        .setOnAudioFocusChangeListener(this)
+                        .build();
+                am.requestAudioFocus(mAudioFocusRequest);
+            }
+            ImageView img = findView(R.id.activity_preview_player_thumbnail);
+            onVideoViewPrepared(img);
+            changeVideoSize();
+        } else if (playbackState == Player.STATE_ENDED) {
+            finish();
         }
+    }
 
-        final ImageView img = findView(R.id.activity_preview_player_thumbnail);
-        onVideoViewPrepared(img);
-        if (mp != null) {
+    @Override
+    public void onVideoSizeChanged(VideoSize videoSize) {
+        if (videoSize.width > 0 && videoSize.height > 0 && !videoSizeSetupDone) {
             changeVideoSize();
         }
     }
 
     @Override
-    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-        if (width > 0 && height > 0 && !videoSizeSetupDone) {
-            changeVideoSize();
-        }
-    }
-
-    @Override
-    public boolean onInfo(MediaPlayer mp, int what, int extra) {
-        boolean startedPlayback = false;
-        switch (what) {
-            case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-                //LOG.warn("Media is too complex to decode it fast enough.");
-                //startedPlayback = true;
-                break;
-            case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                //LOG.warn("Start of media buffering.");
-                //startedPlayback = true;
-                break;
-            case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                //LOG.warn("End of media buffering.");
-                changeVideoSize();
-                startedPlayback = true;
-                break;
-            case MediaPlayer.MEDIA_INFO_UNKNOWN:
-            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-            case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-            default:
-                break;
-        }
-
-        if (startedPlayback && !changedActionBarTitleToNonBuffering) {
+    public void onIsPlayingChanged(boolean isPlaying) {
+        if (isPlaying && !changedActionBarTitleToNonBuffering) {
             int mediaTypeStrId = audio ? R.string.audio : R.string.video;
             setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
             changedActionBarTitleToNonBuffering = true;
         }
+    }
 
-        return false;
+    @Override
+    public void onPlayerError(PlaybackException error) {
+        LOG.error("ExoPlayer error: " + error.getMessage(), error);
+        finish();
     }
 
     public void stopAnyOtherPlayers() {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>frostwire-desktop-desktop</name>
+	<comment>Project desktop created by Buildship.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>main-java</name>
+			<type>2</type>
+			<location>/Users/gubatron/workspace/frostwire/common/src/main/java</location>
+		</link>
+		<link>
+			<name>test-java</name>
+			<type>2</type>
+			<location>/Users/gubatron/workspace/frostwire/common/src/test/java</location>
+		</link>
+		<link>
+			<name>test-resources</name>
+			<type>2</type>
+			<location>/Users/gubatron/workspace/frostwire/common/src/test/resources</location>
+		</link>
+	</linkedResources>
+	<filteredResources>
+		<filter>
+			<id>1775759755096</id>
+			<name></name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.core.resources.regexFilterMatcher</id>
+				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
+</projectDescription>

@@ -95,6 +95,7 @@ import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.UrlUtils;
 import com.google.android.gms.common.internal.Asserts;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -472,7 +473,6 @@ public class MusicPlaybackService extends MediaSessionService {
     @Override
     public void onCreate() {
         INSTANCE = this;
-        initServiceLatch.countDown();
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
         // Audio focus is handled internally by ExoPlayer in MultiPlayer.
@@ -1463,9 +1463,18 @@ public class MusicPlaybackService extends MediaSessionService {
                             .setArtist(getArtistName())
                             .setAlbumTitle(getAlbumName())
                             .setAlbumArtist(getAlbumArtistName());
+            Uri artworkUri = null;
             if (albumId > 0) {
-                Uri artworkUri = ContentUris.withAppendedId(
+                artworkUri = ContentUris.withAppendedId(
                         Uri.parse("content://media/external/audio/albumart"), albumId);
+            }
+            if (artworkUri == null && path != null) {
+                File artFile = new File(path.substring(0, path.lastIndexOf('.')) + ".art");
+                if (artFile.exists()) {
+                    artworkUri = Uri.fromFile(artFile);
+                }
+            }
+            if (artworkUri != null) {
                 metaBuilder.setArtworkUri(artworkUri);
             }
             MediaItem updatedItem = new MediaItem.Builder()
@@ -1847,6 +1856,7 @@ public class MusicPlaybackService extends MediaSessionService {
      *
      * @return The path to the current song
      */
+    @SuppressWarnings("deprecation")
     public String getPath() {
         synchronized (this) {
             if (mCursor != null && !mCursor.isClosed()) {
