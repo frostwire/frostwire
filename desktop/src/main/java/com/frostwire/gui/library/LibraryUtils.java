@@ -97,15 +97,24 @@ public class LibraryUtils {
     }
 
     public static boolean directoryContainsPlayableExtensions(File directory) {
+        if (EventQueue.isDispatchThread()) {
+            return false;
+        }
         return directoryContainsAudio(directory);
     }
 
     public static boolean directoryContainsASinglePlayableFile(File directory) {
+        if (EventQueue.isDispatchThread()) {
+            return false;
+        }
         final File[] files = directory.listFiles();
         return directoryContainsPlayableExtensions(directory) && (files != null && files.length == 1);
     }
 
     public static boolean directoryContainsAudio(File directory) {
+        if (EventQueue.isDispatchThread()) {
+            return false;
+        }
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
         return directoryContainsExtension(directory, 4, ignore, PlaybackUtil.getPlayableExtensions());
     }
