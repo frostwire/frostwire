@@ -168,7 +168,7 @@ public class DNDUtils {
 
     private static boolean containsPlayableFile(File[] files) {
         for (File file : files) {
-            if (PlaybackUtil.isPlayableFile(file)) {
+            if (PlaybackUtil.isPlayableFile(file.getName())) {
                 return true;
             }
         }
