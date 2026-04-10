@@ -248,6 +248,8 @@ final class AboutWindow {
      */
     void showDialog() {
         GUIUtils.centerOnScreen(DIALOG);
+        DIALOG.pack();
+        DIALOG.setSize(new Dimension(800, 600));
         DIALOG.setVisible(true);
     }
 }
