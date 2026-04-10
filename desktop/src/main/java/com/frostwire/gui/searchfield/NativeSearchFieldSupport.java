@@ -5,8 +5,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 
 /**
- * TODO: comment
- *
  * @author Peter Weishapl (petw@gmx.net)
  */
 class NativeSearchFieldSupport {

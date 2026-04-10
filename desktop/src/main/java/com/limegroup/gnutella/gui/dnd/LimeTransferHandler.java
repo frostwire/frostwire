@@ -106,7 +106,6 @@ public class LimeTransferHandler extends TransferHandler {
      * Imports the data into the given component.
      */
     public boolean importData(JComponent c, Transferable t, DropInfo ddi) {
-        // TODO Auto-generated method stub
         return false;
     }
 

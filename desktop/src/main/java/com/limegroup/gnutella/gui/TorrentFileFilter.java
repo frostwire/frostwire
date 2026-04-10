@@ -1,5 +1,7 @@
 package com.limegroup.gnutella.gui;
 
+import com.limegroup.gnutella.gui.I18n;
+
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
@@ -17,7 +19,6 @@ public class TorrentFileFilter extends FileFilter {
      * @see javax.swing.filechooser.FileFilter#getDescription()
      */
     public String getDescription() {
-        // TODO i18nize
-        return "Torrents";
+        return I18n.tr("Torrents");
     }
 }

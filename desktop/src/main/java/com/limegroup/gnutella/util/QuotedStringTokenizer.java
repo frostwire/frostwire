@@ -91,8 +91,10 @@ public class QuotedStringTokenizer {
                     return new Token(token.toString(), i);
                 }
             } else if (c == QUOTE_CHAR) {
-                // TODO add support for escaping of quote characters
                 inQuotes = !inQuotes;
+            } else if (c == '\\' && inQuotes && i < maxIndex && text.charAt(i + 1) == QUOTE_CHAR) {
+                token.append(QUOTE_CHAR);
+                i++;
             } else {
                 token.append(c);
             }

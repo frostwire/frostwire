@@ -225,28 +225,8 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     private SearchResultMediator addResultPanelInternal(SearchResultMediator searchResultMediator, String title) {
         entries.add(searchResultMediator);
-        // XXX: LWC-1214 (hack)
-        try {
-            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), searchResultMediator.getComponent());
-        } catch (ArrayIndexOutOfBoundsException e) {
-            resetTabbedPane();
-            entries.add(searchResultMediator);
-            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), searchResultMediator.getComponent());
-        }
-        // XXX: LWC-1088 (hack)
-        try {
-            tabbedPane.setSelectedIndex(entries.size() - 1);
-        } catch (java.lang.IndexOutOfBoundsException ioobe) {
-            resetTabbedPane();
-            tabbedPane.setSelectedIndex(entries.size() - 1);
-            // This will happen under OS X in apple.laf.CUIAquaTabbedPaneTabState.getIndex().
-            // we grab all the components from the current
-            // tabbed pane, create a new tabbed pane, and dump
-            // the components back into it.
-            //
-            // For steps-to-reproduce, see:
-            // https://www.limewire.org/jira/browse/LWC-1088
-        }
+        tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), searchResultMediator.getComponent());
+        tabbedPane.setSelectedIndex(entries.size() - 1);
         try {
             tabbedPane.setProgressActiveAt(entries.size() - 1, true);
         } catch (Exception e) {
