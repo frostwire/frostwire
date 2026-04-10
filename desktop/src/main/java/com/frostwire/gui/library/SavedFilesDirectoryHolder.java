@@ -27,6 +27,7 @@ import org.limewire.setting.FileSetting;
 import org.limewire.util.FileUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -89,6 +90,9 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
 
     @Override
     public File[] getFiles() {
+        if (EventQueue.isDispatchThread()) {
+            return cache != null && cache.size() > 0 ? cache.toArray(new File[0]) : new File[0];
+        }
         if (cache != null && cache.size() > 0) {
             return cache.toArray(new File[0]);
         }

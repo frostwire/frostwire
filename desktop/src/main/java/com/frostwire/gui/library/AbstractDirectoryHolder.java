@@ -21,6 +21,7 @@ package com.frostwire.gui.library;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.Set;
 
@@ -36,6 +37,9 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
      * {@link #getDirectory}.
      */
     public File[] getFiles() {
+        if (EventQueue.isDispatchThread()) {
+            return new File[0];
+        }
         _hideFiles = TorrentUtil.getIgnorableFiles();
         File[] files = getDirectory().listFiles(this);
         return (files != null) ? files : new File[0];
