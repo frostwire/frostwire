@@ -59,7 +59,7 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
      * Returns true if the given file is visible
      */
     private boolean isFileVisible(File file) {
-        return file != null && file.exists() && file.canRead() && !file.isHidden();
+        return file != null;
     }
 
     public String getName() {
