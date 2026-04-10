@@ -18,6 +18,20 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove dead EDT-blocking code from BTDownloadMediator (selectionHasMP4s, selectionIsSingleFile, selectionHasMediaFiles)
  * Cleanup: Remove unused directoryContainsASinglePlayableFile from LibraryUtils
  * Update: JUnit 5.9.0 -> 5.12.2
+ * Fix: Wire IP Filter UI to BTEngine so clear/import actually updates libtorrent ip_filter
+ * Fix: Enable IP Filter options pane tab in settings (was commented out)
+ * Fix: Implement UI notification in SettingsWarningManager for settings load/save failures
+ * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+ * Fix: Add 30s timeout to LifecycleManager shutdown latch to prevent indefinite hang
+ * Fix: YCCK JPEG color inversion using Adobe APP14 marker Transform field
+ * Fix: BTDownload getSize() return type double->long to prevent precision loss above 2GB
+ * Fix: PerformersHelper now filters hidden files alongside pad files in search results
+ * Fix: SlideDownload.onComplete() now extracts .zip downloads with zip-slip protection
+ * Fix: QuotedStringTokenizer now supports backslash quote escaping
+ * Fix: TorrentFileFilter i18nize 'Torrents' display string
+ * Cleanup: Remove stale TODO comments from LimeTransferHandler, BuddyTextFieldUI, NativeSearchFieldSupport, LibrarySearch
+ * Cleanup: Remove ancient LWC-1214/1088 try/catch hacks from SearchResultDisplayer
+ * Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
