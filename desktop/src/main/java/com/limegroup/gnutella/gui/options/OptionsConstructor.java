@@ -74,6 +74,7 @@ public final class OptionsConstructor {
     private static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
     private static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
     private static final String I2P_KEY = "OPTIONS_I2P_MAIN_TITLE";
+    private static final String MCP_KEY = "OPTIONS_MCP_MAIN_TITLE";
     private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
     private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
     /**
@@ -219,6 +220,8 @@ public final class OptionsConstructor {
         }
         // debug
         addOption(OptionsMediator.ROOT_NODE_KEY, BUGS_KEY, I18n.tr("Bug Reports"), BugsPaneItem.class);
+
+        addOption(OptionsMediator.ROOT_NODE_KEY, MCP_KEY, I18n.tr("MCP Server"), MCPSettingsPaneItem.class);
         OptionsTreeNode node = keysToNodes.get(ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.getValue());
         if (node == null) {
             ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.revertToDefault();
