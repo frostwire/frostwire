@@ -13,6 +13,7 @@ public class MCPServer implements MCPRequestHandler {
     private final MCPToolRegistry registry;
     private MCPTransport transport;
     private volatile boolean initialized;
+    private volatile boolean started;
 
     public MCPServer() {
         this.registry = new MCPToolRegistry();
@@ -35,6 +36,7 @@ public class MCPServer implements MCPRequestHandler {
             throw new IllegalStateException("transport not set");
         }
         transport.start(this::handleRequest);
+        started = true;
     }
 
     public void stop() {
@@ -42,10 +44,15 @@ public class MCPServer implements MCPRequestHandler {
             transport.stop();
         }
         initialized = false;
+        started = false;
     }
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public boolean isStarted() {
+        return started;
     }
 
     public void sendNotification(String method, JsonObject params) {
@@ -81,9 +88,9 @@ public class MCPServer implements MCPRequestHandler {
 
         switch (method) {
             case "initialize":
+                initialized = true;
                 return handleInitialize(request);
             case "notifications/initialized":
-                initialized = true;
                 return null;
             case "tools/list":
                 if (!initialized) {
@@ -189,11 +196,15 @@ public class MCPServer implements MCPRequestHandler {
 
         try {
             JsonObject toolResult = tool.execute(arguments);
-            JsonObject content = new JsonObject();
-            content.add("content", toolResult != null ? toolResult.get("content") : new JsonArray());
-            if (toolResult != null && toolResult.has("isError")) {
-                content.add("isError", toolResult.get("isError"));
+            JsonArray contentArray = new JsonArray();
+            if (toolResult != null) {
+                JsonObject textItem = new JsonObject();
+                textItem.addProperty("type", "text");
+                textItem.addProperty("text", new com.google.gson.Gson().toJson(toolResult));
+                contentArray.add(textItem);
             }
+            JsonObject content = new JsonObject();
+            content.add("content", contentArray);
             return MCPJsonRpc.response(id, content);
         } catch (Exception e) {
             return MCPJsonRpc.response(id, buildToolError("Tool execution failed: " + e.getMessage()));
