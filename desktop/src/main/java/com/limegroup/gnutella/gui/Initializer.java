@@ -129,6 +129,7 @@ final class Initializer {
         initializeEarlyUI();
         startSetupManager(setupManager);
         startBittorrentCore();
+        com.frostwire.mcp.desktop.MCPStartupHook.initialize();
         // Load the UI, system tray & notification handlers,
         // and hide the splash screen & display the UI.
         //System.out.println("Initializer.initialize() load UI");
