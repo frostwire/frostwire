@@ -68,8 +68,30 @@ public final class MCPStartupHook {
     }
 
     public static void restartServer() throws Exception {
+        String host = MCPSettings.MCP_SERVER_HOST.getValue();
+        int port = MCPSettings.MCP_SERVER_PORT.getValue();
         stopServer();
+        waitForPortFree(host, port, 3000);
         startServer();
+    }
+
+    private static void waitForPortFree(String host, int port, int timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            try (java.net.Socket s = new java.net.Socket()) {
+                s.connect(new java.net.InetSocketAddress(host, port), 200);
+            } catch (java.io.IOException e) {
+                LOG.info("Port " + port + " is free");
+                return;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        LOG.warn("Port " + port + " still in use after " + timeoutMs + "ms, proceeding anyway");
     }
 
     public static boolean isRunning() {
