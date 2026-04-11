@@ -1,74 +1,91 @@
 package com.frostwire.mcp.transport;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 public class SelfSignedCertGenerator {
 
+    static {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+
     public static SSLContext createSSLContext(String hostname) {
         try {
-            Path keystorePath = Files.createTempFile("frostwire-mcp-", ".jks");
-            keystorePath.toFile().deleteOnExit();
-            char[] password = "frostwire-mcp".toCharArray();
-
             String cn = (hostname.equals("0.0.0.0") || hostname.equals("127.0.0.1"))
                     ? "localhost" : hostname;
 
-            String keytool = findKeytool();
-            ProcessBuilder pb = new ProcessBuilder(
-                    keytool, "-genkeypair",
-                    "-alias", "frostwire-mcp",
-                    "-keyalg", "RSA",
-                    "-keysize", "2048",
-                    "-validity", "365",
-                    "-keystore", keystorePath.toString(),
-                    "-storepass", new String(password),
-                    "-keypass", new String(password),
-                    "-dname", "CN=" + cn + ",O=FrostWire",
-                    "-deststoretype", "JKS"
-            );
-            pb.redirectErrorStream(true);
-            Process p = pb.start();
-            String output = new String(p.getInputStream().readAllBytes());
-            int exitCode = p.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("keytool failed (exit " + exitCode + "): " + output);
-            }
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(2048);
+            KeyPair keyPair = keyGen.generateKeyPair();
 
+            long now = System.currentTimeMillis();
+            Date notBefore = new Date(now - 60000);
+            Date notAfter = new Date(now + 365L * 24 * 60 * 60 * 1000);
+
+            X500Name issuer = new X500Name("CN=" + cn + ",O=FrostWire");
+            BigInteger serial = BigInteger.valueOf(now);
+
+            JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+                    issuer, serial, notBefore, notAfter, issuer, keyPair.getPublic());
+
+            JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+            certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+                    extUtils.createSubjectKeyIdentifier(keyPair.getPublic()));
+            certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
+                    extUtils.createAuthorityKeyIdentifier(keyPair.getPublic()));
+            certBuilder.addExtension(Extension.basicConstraints, true,
+                    new BasicConstraints(true));
+            certBuilder.addExtension(Extension.keyUsage, false,
+                    new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment | KeyUsage.dataEncipherment | KeyUsage.keyCertSign));
+            certBuilder.addExtension(Extension.extendedKeyUsage, false,
+                    new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
+
+            X509CertificateHolder certHolder = certBuilder.build(
+                    new JcaContentSignerBuilder("SHA256withRSA")
+                            .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                            .build(keyPair.getPrivate()));
+
+            X509Certificate cert = new JcaX509CertificateConverter()
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                    .getCertificate(certHolder);
+
+            char[] password = "frostwire-mcp".toCharArray();
             KeyStore ks = KeyStore.getInstance("JKS");
-            try (FileInputStream fis = new FileInputStream(keystorePath.toFile())) {
-                ks.load(fis, password);
-            }
+            ks.load(null, password);
+            ks.setKeyEntry("frostwire-mcp", keyPair.getPrivate(), password,
+                    new java.security.cert.Certificate[]{cert});
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(ks, password);
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(kmf.getKeyManagers(), null, null);
-
             return sslContext;
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate self-signed certificate: " + e.getMessage(), e);
         }
-    }
-
-    private static String findKeytool() {
-        String javaHome = System.getProperty("java.home");
-        if (javaHome != null) {
-            File bin = new File(javaHome, "bin");
-            File keytool = new File(bin, "keytool");
-            if (!keytool.exists() && File.separatorChar == '\\') {
-                keytool = new File(bin, "keytool.exe");
-            }
-            if (keytool.exists() && keytool.canExecute()) {
-                return keytool.getAbsolutePath();
-            }
-        }
-        return "keytool";
     }
 }
