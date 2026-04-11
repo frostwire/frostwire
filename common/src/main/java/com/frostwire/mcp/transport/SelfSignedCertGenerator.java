@@ -2,7 +2,8 @@ package com.frostwire.mcp.transport;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
@@ -18,8 +19,9 @@ public class SelfSignedCertGenerator {
             String cn = (hostname.equals("0.0.0.0") || hostname.equals("127.0.0.1"))
                     ? "localhost" : hostname;
 
+            String keytool = findKeytool();
             ProcessBuilder pb = new ProcessBuilder(
-                    "keytool", "-genkeypair",
+                    keytool, "-genkeypair",
                     "-alias", "frostwire-mcp",
                     "-keyalg", "RSA",
                     "-keysize", "2048",
@@ -53,5 +55,20 @@ public class SelfSignedCertGenerator {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate self-signed certificate: " + e.getMessage(), e);
         }
+    }
+
+    private static String findKeytool() {
+        String javaHome = System.getProperty("java.home");
+        if (javaHome != null) {
+            File bin = new File(javaHome, "bin");
+            File keytool = new File(bin, "keytool");
+            if (!keytool.exists() && File.separatorChar == '\\') {
+                keytool = new File(bin, "keytool.exe");
+            }
+            if (keytool.exists() && keytool.canExecute()) {
+                return keytool.getAbsolutePath();
+            }
+        }
+        return "keytool";
     }
 }
