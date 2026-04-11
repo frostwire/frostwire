@@ -27,18 +27,20 @@ public class TransfersListTool implements MCPTool {
     public JsonObject inputSchema() {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
+        JsonObject properties = new JsonObject();
         JsonObject filter = new JsonObject();
         filter.addProperty("type", "string");
         filter.addProperty("description", "Filter by state: all, downloading, seeding, completed, paused, error");
-        schema.add("filter", filter);
+        properties.add("filter", filter);
         JsonObject offset = new JsonObject();
         offset.addProperty("type", "integer");
         offset.addProperty("description", "Offset for pagination (default: 0)");
-        schema.add("offset", offset);
+        properties.add("offset", offset);
         JsonObject limit = new JsonObject();
         limit.addProperty("type", "integer");
         limit.addProperty("description", "Maximum number of transfers to return (default: 50)");
-        schema.add("limit", limit);
+        properties.add("limit", limit);
+        schema.add("properties", properties);
         return schema;
     }
 

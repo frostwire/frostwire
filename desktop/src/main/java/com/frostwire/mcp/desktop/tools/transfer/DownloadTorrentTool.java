@@ -8,6 +8,7 @@ import com.frostwire.mcp.desktop.adapters.TransferAdapter;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.settings.SharingSettings;
 
@@ -34,19 +35,24 @@ public class DownloadTorrentTool implements MCPTool {
     public JsonObject inputSchema() {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
+        JsonObject properties = new JsonObject();
         JsonObject source = new JsonObject();
         source.addProperty("type", "string");
         source.addProperty("description", "Source type: magnet, url, or file");
-        schema.add("source", source);
+        properties.add("source", source);
         JsonObject value = new JsonObject();
         value.addProperty("type", "string");
         value.addProperty("description", "Magnet URI, torrent URL, or local file path");
-        schema.add("value", value);
+        properties.add("value", value);
         JsonObject saveDir = new JsonObject();
         saveDir.addProperty("type", "string");
         saveDir.addProperty("description", "Optional save directory path");
-        schema.add("saveDir", saveDir);
-        schema.addProperty("required", true);
+        properties.add("saveDir", saveDir);
+        schema.add("properties", properties);
+        JsonArray required = new JsonArray();
+        required.add("source");
+        required.add("value");
+        schema.add("required", required);
         return schema;
     }
 

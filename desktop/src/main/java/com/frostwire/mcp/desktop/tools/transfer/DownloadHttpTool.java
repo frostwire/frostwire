@@ -5,6 +5,7 @@ import com.frostwire.mcp.desktop.adapters.TransferAdapter;
 import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideListener;
 import com.frostwire.util.Logger;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -31,22 +32,27 @@ public class DownloadHttpTool implements MCPTool {
     public JsonObject inputSchema() {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
+        JsonObject properties = new JsonObject();
         JsonObject url = new JsonObject();
         url.addProperty("type", "string");
         url.addProperty("description", "The HTTP/HTTPS URL to download");
-        schema.add("url", url);
+        properties.add("url", url);
         JsonObject filename = new JsonObject();
         filename.addProperty("type", "string");
         filename.addProperty("description", "Optional output filename");
-        schema.add("filename", filename);
+        properties.add("filename", filename);
         JsonObject saveDir = new JsonObject();
         saveDir.addProperty("type", "string");
         saveDir.addProperty("description", "Optional save directory path");
-        schema.add("saveDir", saveDir);
+        properties.add("saveDir", saveDir);
         JsonObject extractAudio = new JsonObject();
         extractAudio.addProperty("type", "boolean");
         extractAudio.addProperty("description", "Extract audio only if true");
-        schema.add("extractAudio", extractAudio);
+        properties.add("extractAudio", extractAudio);
+        schema.add("properties", properties);
+        JsonArray required = new JsonArray();
+        required.add("url");
+        schema.add("required", required);
         return schema;
     }
 

@@ -26,19 +26,28 @@ public class TransferFilePriorityTool implements MCPTool {
     public JsonObject inputSchema() {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
+        JsonObject properties = new JsonObject();
         JsonObject downloadId = new JsonObject();
         downloadId.addProperty("type", "string");
         downloadId.addProperty("description", "The info hash of the download");
-        schema.add("downloadId", downloadId);
+        properties.add("downloadId", downloadId);
         JsonObject fileIndices = new JsonObject();
         fileIndices.addProperty("type", "array");
         fileIndices.addProperty("description", "Array of file indices to set priority for");
-        fileIndices.addProperty("items", "integer");
-        schema.add("fileIndices", fileIndices);
+        JsonObject itemsObj = new JsonObject();
+        itemsObj.addProperty("type", "integer");
+        fileIndices.add("items", itemsObj);
+        properties.add("fileIndices", fileIndices);
         JsonObject priority = new JsonObject();
         priority.addProperty("type", "string");
         priority.addProperty("description", "Priority level: download, skip, normal, or high");
-        schema.add("priority", priority);
+        properties.add("priority", priority);
+        schema.add("properties", properties);
+        JsonArray required = new JsonArray();
+        required.add("downloadId");
+        required.add("fileIndices");
+        required.add("priority");
+        schema.add("required", required);
         return schema;
     }
 
