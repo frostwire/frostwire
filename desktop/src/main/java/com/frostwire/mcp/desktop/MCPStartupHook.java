@@ -74,7 +74,7 @@ public final class MCPStartupHook {
 
     public static boolean isRunning() {
         MCPServer server = mcpServer;
-        return server != null && server.isInitialized();
+        return server != null && server.isStarted();
     }
 
     public static String getServerUrl() {
