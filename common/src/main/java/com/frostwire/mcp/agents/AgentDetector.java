@@ -20,6 +20,11 @@ public class AgentDetector {
         agents.add(detectWindsurf());
         agents.add(detectCline());
         agents.add(detectClaudeCode());
+        agents.add(detectCopilot());
+        agents.add(detectCodex());
+        agents.add(detectOpenCode());
+        agents.add(detectQwen());
+        agents.add(detectChatGPTDesktop());
         return agents;
     }
 
@@ -112,6 +117,99 @@ public class AgentDetector {
         return new AgentInfo("claude-code", "Claude Code", configPath, "mcpServers", appExists, configured);
     }
 
+    static AgentInfo detectCopilot() {
+        String configPath;
+        if (isMac()) {
+            configPath = getHomeDir() + "/.copilot/mcp-config.json";
+        } else if (isWindows()) {
+            String appData = System.getenv("APPDATA");
+            configPath = appData != null
+                    ? appData + "\\copilot\\mcp-config.json"
+                    : getHomeDir() + "\\AppData\\Roaming\\copilot\\mcp-config.json";
+        } else {
+            configPath = getHomeDir() + "/.copilot/mcp-config.json";
+        }
+        boolean appExists = new File(getHomeDir(), ".copilot").isDirectory()
+                || isCommandInPath("github-copilot-cli");
+        boolean configured = isFrostwireConfigured(configPath, "mcpServers");
+        return new AgentInfo("copilot", "GitHub Copilot", configPath, "mcpServers", appExists, configured);
+    }
+
+    static AgentInfo detectCodex() {
+        String configPath;
+        if (isWindows()) {
+            String appData = System.getenv("APPDATA");
+            configPath = appData != null
+                    ? appData + "\\codex\\config.toml"
+                    : getHomeDir() + "\\AppData\\Roaming\\codex\\config.toml";
+        } else {
+            configPath = getHomeDir() + "/.codex/config.toml";
+        }
+        boolean appExists = isCommandInPath("codex")
+                || new File(getHomeDir(), ".codex").isDirectory();
+        boolean configured = isFrostwireConfiguredToml(configPath, "mcp_servers");
+        return new AgentInfo("codex", "OpenAI Codex", configPath, "mcp_servers", AgentInfo.ConfigFormat.TOML, appExists, configured);
+    }
+
+    static AgentInfo detectOpenCode() {
+        String configPath;
+        if (isWindows()) {
+            String appData = System.getenv("APPDATA");
+            configPath = appData != null
+                    ? appData + "\\opencode\\opencode.json"
+                    : getHomeDir() + "\\AppData\\Roaming\\opencode\\opencode.json";
+        } else {
+            configPath = getHomeDir() + "/.config/opencode/opencode.json";
+        }
+        boolean appExists = isCommandInPath("opencode")
+                || new File(getHomeDir(), ".config/opencode").isDirectory();
+        boolean configured = isFrostwireConfigured(configPath, "mcp");
+        return new AgentInfo("opencode", "OpenCode", configPath, "mcp", appExists, configured);
+    }
+
+    static AgentInfo detectQwen() {
+        String configPath;
+        if (isWindows()) {
+            String appData = System.getenv("APPDATA");
+            configPath = appData != null
+                    ? appData + "\\qwen\\mcp.json"
+                    : getHomeDir() + "\\AppData\\Roaming\\qwen\\mcp.json";
+        } else {
+            configPath = getHomeDir() + "/.qwen/mcp.json";
+        }
+        boolean appExists = isCommandInPath("qwen")
+                || new File(getHomeDir(), ".qwen").isDirectory();
+        boolean configured = isFrostwireConfigured(configPath, "mcpServers");
+        return new AgentInfo("qwen", "Qwen Code", configPath, "mcpServers", appExists, configured);
+    }
+
+    static AgentInfo detectChatGPTDesktop() {
+        String configPath;
+        boolean appExists = false;
+
+        if (isMac()) {
+            configPath = getHomeDir() + "/Library/Application Support/ChatGPT/mcp_servers.json";
+            appExists = new File("/Applications/ChatGPT.app").exists()
+                    || new File(configPath).getParentFile() != null && new File(configPath).getParentFile().exists();
+        } else if (isWindows()) {
+            String appData = System.getenv("APPDATA");
+            configPath = appData != null
+                    ? appData + "\\ChatGPT\\mcp_servers.json"
+                    : getHomeDir() + "\\AppData\\Roaming\\ChatGPT\\mcp_servers.json";
+            String localAppData = System.getenv("LOCALAPPDATA");
+            String exePath = localAppData != null
+                    ? localAppData + "\\ChatGPT\\ChatGPT.exe"
+                    : getHomeDir() + "\\AppData\\Local\\ChatGPT\\ChatGPT.exe";
+            appExists = new File(exePath).exists()
+                    || new File(configPath).getParentFile() != null && new File(configPath).getParentFile().exists();
+        } else {
+            return new AgentInfo("chatgpt-desktop", "ChatGPT Desktop", "", "mcpServers", false, false);
+        }
+
+        boolean configured = isFrostwireConfigured(configPath, "mcpServers");
+        return new AgentInfo("chatgpt-desktop", "ChatGPT Desktop", configPath, "mcpServers", appExists, configured);
+    }
+
     static boolean isFrostwireConfigured(String configFilePath, String configKey) {
         File file = new File(configFilePath);
         if (!file.exists() || !file.canRead()) {
@@ -122,6 +220,25 @@ public class AgentDetector {
             JsonObject container = root.getAsJsonObject(configKey);
             if (container != null && container.has("frostwire")) {
                 return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    static boolean isFrostwireConfiguredToml(String configFilePath, String sectionPrefix) {
+        File file = new File(configFilePath);
+        if (!file.exists() || !file.canRead()) {
+            return false;
+        }
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+            java.io.BufferedReader br = new java.io.BufferedReader(reader);
+            String line;
+            String targetSection = "[" + sectionPrefix + ".frostwire]";
+            while ((line = br.readLine()) != null) {
+                if (line.trim().equals(targetSection)) {
+                    return true;
+                }
             }
         } catch (Exception ignored) {
         }
