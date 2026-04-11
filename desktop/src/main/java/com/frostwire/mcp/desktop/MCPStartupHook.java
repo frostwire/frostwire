@@ -2,11 +2,9 @@ package com.frostwire.mcp.desktop;
 
 import com.frostwire.mcp.MCPServer;
 import com.frostwire.mcp.desktop.notifications.MCPNotificationBridge;
-import com.frostwire.mcp.desktop.transport.TlsConfig;
+import com.frostwire.mcp.transport.TlsConfig;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.MCPSettings;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class MCPStartupHook {
 
@@ -23,11 +21,16 @@ public final class MCPStartupHook {
         if (!enabled && !autoStart) {
             return;
         }
-        startServer();
+        try {
+            startServer();
+        } catch (Exception e) {
+            LOG.error("MCP auto-start failed: " + e.getMessage(), e);
+        }
     }
 
-    public static void startServer() {
+    public static void startServer() throws Exception {
         if (mcpServer != null) {
+            LOG.info("MCP server already running, skipping start");
             return;
         }
 
@@ -36,18 +39,18 @@ public final class MCPStartupHook {
         TlsConfig tlsConfig = new TlsConfig();
         tlsConfig.setEnabled(MCPSettings.MCP_SERVER_TLS_ENABLED.getValue());
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                MCPServer server = FrostWireMCPServerFactory.createServer(host, port, tlsConfig);
-                mcpServer = server;
-                server.start();
-                MCPNotificationBridge.instance().setServer(server);
-                LOG.info("MCP server started on " + host + ":" + port);
-            } catch (Throwable e) {
-                LOG.error("Failed to start MCP server: " + e.getMessage(), e);
-                mcpServer = null;
-            }
-        });
+        LOG.info("Starting MCP server on " + host + ":" + port + " (TLS=" + tlsConfig.isEnabled() + ")");
+        try {
+            MCPServer server = FrostWireMCPServerFactory.createServer(host, port, tlsConfig);
+            mcpServer = server;
+            server.start();
+            MCPNotificationBridge.instance().setServer(server);
+            LOG.info("MCP server started successfully on " + host + ":" + port);
+        } catch (Throwable e) {
+            mcpServer = null;
+            LOG.error("Failed to start MCP server: " + e.getMessage(), e);
+            throw new Exception("Failed to start MCP server: " + e.getMessage(), e);
+        }
     }
 
     public static void stopServer() {
@@ -64,7 +67,7 @@ public final class MCPStartupHook {
         }
     }
 
-    public static void restartServer() {
+    public static void restartServer() throws Exception {
         stopServer();
         startServer();
     }
