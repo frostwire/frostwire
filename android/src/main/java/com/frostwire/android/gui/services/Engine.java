@@ -183,9 +183,14 @@ public final class Engine implements IEngineService {
 
     public static Python getPythonInstance() {
         try {
-            pythonStarterLatch.await();
+            if (!pythonStarterLatch.await(30, java.util.concurrent.TimeUnit.SECONDS)) {
+                LOG.error("Engine::getPythonInstance() timed out after 30s waiting for Python startup");
+                return null;
+            }
         } catch (InterruptedException e) {
-            LOG.error("Engine::getPythonInstance() ", e);
+            LOG.error("Engine::getPythonInstance() interrupted", e);
+            Thread.currentThread().interrupt();
+            return null;
         }
         return pythonInstance;
     }

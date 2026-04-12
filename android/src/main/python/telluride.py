@@ -1,3 +1,11 @@
+import sys
+import types
+
+# Block _posixsubprocess — it calls fork()/posix_spawn() which crashes
+# with SIGSEGV on Android's JVM process. yt_dlp imports subprocess
+# transitively, which tries to import _posixsubprocess at the C level.
+sys.modules['_posixsubprocess'] = types.ModuleType('_posixsubprocess')
+
 import yt_dlp
 import urllib
 import json

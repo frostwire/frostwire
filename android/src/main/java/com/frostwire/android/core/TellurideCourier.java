@@ -42,8 +42,8 @@ import java.util.Queue;
 
 public final class TellurideCourier {
     private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
-    private static Gson gson = null;
-    private static TellurideCourierCallback lastKnownCallback = null;
+    private static volatile Gson gson = null;
+    private static volatile TellurideCourierCallback lastKnownCallback = null;
 
     public static void abortCurrentQuery() {
         if (lastKnownCallback == null) {
@@ -77,13 +77,45 @@ public final class TellurideCourier {
             return;
         }
         LOG.info("TellurideCourier::queryPage - Got Python instance in " + pythonInstanceFetchTime + " ms");
-        PyObject telluride_module = python.getModule("telluride");
+        if (python == null) {
+            LOG.error("TellurideCourier::queryPage could not get Python instance");
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        PyObject telluride_module = null;
+        try {
+            telluride_module = python.getModule("telluride");
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::queryPage failed to get telluride module", t);
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        if (telluride_module == null) {
+            LOG.error("TellurideCourier::queryPage telluride module is null");
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
         if (callback != null && callback.aborted()) {
             lastKnownCallback = null;
             LOG.info("TellurideCourier::queryPage aborted by TellurideCourierCallback (stage 2)");
             return;
         }
-        PyObject query_video_result = telluride_module.callAttr("query_video", url);
+        PyObject query_video_result = null;
+        try {
+            query_video_result = telluride_module.callAttr("query_video", url);
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::queryPage failed to call query_video", t);
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
         if (query_video_result == null && callback != null) {
             callback.onResults(null, true);
             lastKnownCallback = null;
@@ -125,14 +157,33 @@ public final class TellurideCourier {
         if (!Python.isStarted()) {
             Engine.startPython();
         }
-        Python python = Engine.getPythonInstance();//Python.getInstance();
+        Python python = Engine.getPythonInstance();
         if (python == null) {
             LOG.error("TellurideCourier::ytDlpVersion could not get Python instance");
             callback.onVersion("<unavailable>");
             return;
         }
-        PyObject telluride_module = python.getModule("telluride");
-        PyObject ytDlpVersionString = telluride_module.callAttr("yt_dlp_version");
+        PyObject telluride_module = null;
+        try {
+            telluride_module = python.getModule("telluride");
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::ytDlpVersion failed to get telluride module", t);
+            callback.onVersion("<unavailable>");
+            return;
+        }
+        if (telluride_module == null) {
+            LOG.error("TellurideCourier::ytDlpVersion telluride module is null");
+            callback.onVersion("<unavailable>");
+            return;
+        }
+        PyObject ytDlpVersionString = null;
+        try {
+            ytDlpVersionString = telluride_module.callAttr("yt_dlp_version");
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::ytDlpVersion failed to call yt_dlp_version", t);
+            callback.onVersion("<unavailable>");
+            return;
+        }
         if (ytDlpVersionString == null) {
             LOG.error("TellurideCourier::ytDlpVersion could got a null result when invoking telluride.yt_dlp_version() in Pythonland");
             callback.onVersion("<unavailable>");
