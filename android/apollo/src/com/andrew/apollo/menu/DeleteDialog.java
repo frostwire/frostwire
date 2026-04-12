@@ -19,6 +19,7 @@
 package com.andrew.apollo.menu;
 
 import androidx.fragment.app.DialogFragment;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import android.widget.TextView;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.cache.ImageFetcher;
+import com.andrew.apollo.provider.FavoritesStore;
+import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -36,8 +39,6 @@ import com.frostwire.android.util.SystemUtils;
 
 /**
  * Alert dialog used to delete tracks.
- * <p/>
- * TODO: Remove albums from the recents list upon deletion.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
@@ -138,12 +139,26 @@ public final class DeleteDialog extends DialogFragment {
             if (mFetcher != null) {
                 mFetcher.removeFromCache(key);
             }
+            // Clean RecentStore and FavoritesStore synchronously before async deleteTracks
+            final Activity activity = getActivity();
+            if (activity != null) {
+                RecentStore recentStore = RecentStore.getInstance(activity);
+                FavoritesStore favoritesStore = FavoritesStore.getInstance(activity);
+                for (long id : mItemList) {
+                    if (recentStore != null) {
+                        recentStore.removeItem(id);
+                    }
+                    if (favoritesStore != null) {
+                        favoritesStore.removeItem(id);
+                    }
+                }
+            }
             // Delete the selected item(s)
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                    () -> MusicUtils.deleteTracks(getActivity() != null ? getActivity().getApplicationContext() : null, mItemList));
+                    () -> MusicUtils.deleteTracks(activity != null ? activity.getApplicationContext() : null, mItemList));
 
-            if (getActivity() instanceof DeleteDialogCallback) {
-                ((DeleteDialogCallback) getActivity()).onDelete(mItemList);
+            if (activity instanceof DeleteDialogCallback) {
+                ((DeleteDialogCallback) activity).onDelete(mItemList);
             }
 
             if (onDeleteCallback != null) {
