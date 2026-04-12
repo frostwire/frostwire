@@ -1,5 +1,7 @@
 package com.frostwire.mcp.desktop.transport;
 
+import com.frostwire.mcp.transport.MCPTransport;
+import com.frostwire.mcp.transport.MCPTransportHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
