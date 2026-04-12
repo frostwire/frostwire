@@ -146,10 +146,9 @@ public class AgentDetector {
         } else {
             configPath = getHomeDir() + "/.copilot/mcp-config.json";
         }
-        boolean appExists = isCommandInPath("github-copilot-cli");
-        if (!appExists && isMac()) {
-            appExists = new File("/Applications/GitHub Copilot.app").exists();
-        }
+        boolean appExists = isCommandInPath("copilot")
+                || isCommandInPath("gh")
+                || new File(getHomeDir(), ".copilot").isDirectory();
         boolean configured = isFrostwireConfigured(configPath, "mcpServers");
         return new AgentInfo("copilot", "GitHub Copilot", configPath, "mcpServers", appExists, configured);
     }
