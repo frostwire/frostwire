@@ -28,21 +28,13 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
  */
 public class SourceHolder implements Comparable<SourceHolder> {
     private final UISearchResult uiSearchResult;
-    private final String sourceNameHTML;
     private final String sourceName;
     private final String sourceURL;
 
     SourceHolder(UISearchResult uiSearchResult) {
         this.uiSearchResult = uiSearchResult;
         this.sourceName = SafeText.sanitize(uiSearchResult.getSource());
-
-        if (uiSearchResult.getSearchResult().getDetailsUrl() != null) {
-            this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr><a href=\"#\">" + sourceName + "</a></nobr></div></html>";
-            this.sourceURL = uiSearchResult.getSearchResult().getDetailsUrl();
-        } else {
-            this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr>" + sourceName + "</nobr></div></html>";
-            this.sourceURL = null;
-        }
+        this.sourceURL = uiSearchResult.getSearchResult().getDetailsUrl();
     }
 
     @Override
@@ -55,7 +47,7 @@ public class SourceHolder implements Comparable<SourceHolder> {
     }
 
     String getSourceNameHTML() {
-        return sourceNameHTML;
+        return sourceName;
     }
 
     public UISearchResult getUISearchResult() {
