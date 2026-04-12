@@ -263,9 +263,6 @@ public class AgentConfigWriter {
             case "windsurf":
                 entry.addProperty("serverUrl", mcpUrl);
                 break;
-            case "cline":
-                entry.addProperty("url", mcpUrl);
-                break;
             case "claude-code":
                 entry.addProperty("url", mcpUrl);
                 break;
