@@ -2041,11 +2041,11 @@ public final class MusicUtils {
      * @param list    The item(s) to delete.
      */
     public static void deleteTracks(final Context context, final long[] list, boolean showNotification) {
-        if (SystemUtils.isUIThread()) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> deleteTracks(context, list, showNotification));
+        if (context == null || list == null) {
             return;
         }
-        if (list == null) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> deleteTracks(context, list, showNotification));
             return;
         }
         final String[] projection = new String[]{BaseColumns._ID, MediaColumns.DATA, ALBUM_ID};

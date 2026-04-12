@@ -140,7 +140,7 @@ public final class DeleteDialog extends DialogFragment {
             }
             // Delete the selected item(s)
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                    () -> MusicUtils.deleteTracks(getActivity(), mItemList));
+                    () -> MusicUtils.deleteTracks(getActivity() != null ? getActivity().getApplicationContext() : null, mItemList));
 
             if (getActivity() instanceof DeleteDialogCallback) {
                 ((DeleteDialogCallback) getActivity()).onDelete(mItemList);
