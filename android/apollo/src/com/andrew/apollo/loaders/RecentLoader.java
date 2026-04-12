@@ -130,11 +130,15 @@ public class RecentLoader extends SongLoader {
             try {
                 mediaCursor = context.getContentResolver().query(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        new String[]{BaseColumns._ID},
+                        new String[]{BaseColumns._ID, AudioColumns.DURATION},
                         selection.toString(), null, null);
                 if (mediaCursor != null) {
                     while (mediaCursor.moveToNext()) {
-                        validIds.add(mediaCursor.getLong(0));
+                        long id = mediaCursor.getLong(0);
+                        long duration = mediaCursor.isNull(1) ? 0 : mediaCursor.getLong(1);
+                        if (duration > 0) {
+                            validIds.add(id);
+                        }
                     }
                 }
             } catch (Throwable t) {
