@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.LocaleLabel.LocaleString;
+import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 
 import java.util.HashSet;
@@ -38,7 +40,7 @@ final class SearchResultNameHolder extends NameHolder {
 //    }
 
     private static String buildHTMLString(UISearchResult sr) {
-        return "<html><div width=\"1000000px\">" + simpleHighlighter(sr.getQuery(), sr.getDisplayName()) + "</div></html>";
+        return "<html><div width=\"1000000px\">" + simpleHighlighter(SafeText.sanitize(sr.getQuery()), SafeText.sanitize(sr.getDisplayName())) + "</div></html>";
     }
 
     private static String simpleHighlighter(String query, String str) {

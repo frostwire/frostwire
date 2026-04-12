@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import com.frostwire.util.SafeText;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -55,6 +57,7 @@ public final class ActionIconAndNameRenderer extends DefaultTableBevelledCellRen
             icon = in.getIcon();
             name = in.getName();
             if (name != null) {
+                name = SafeText.sanitize(name);
                 String strValue = name;
                 strValue = strValue.replace("<html>", "<html><div width=\"1000000px\">");
                 strValue = strValue.replace("</html>", "</div></html>");

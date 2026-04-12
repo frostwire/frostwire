@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.GUIMediator;
 import net.miginfocom.swing.MigLayout;
 
@@ -80,7 +81,7 @@ final class SearchTabbedPane extends JTabbedPane {
             buttonClose.setBorderPainted(false);
             buttonClose.addActionListener(new CloseActionHandler());
             add(buttonClose, "h 17!, w 23!");
-            labelText = new JLabel(text.trim());
+            labelText = new JLabel(SafeText.sanitize(text.trim()));
             labelText.setOpaque(false);
             labelText.setHorizontalTextPosition(SwingConstants.LEADING);
             labelText.setAlignmentX(SwingConstants.RIGHT);
@@ -89,7 +90,7 @@ final class SearchTabbedPane extends JTabbedPane {
         }
 
         void setTitle(String title) {
-            labelText.setText(title);
+            labelText.setText(SafeText.sanitize(title));
         }
 
         void setProgressActive(boolean active) {

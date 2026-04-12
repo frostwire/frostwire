@@ -35,6 +35,8 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import com.frostwire.util.SafeText;
+
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -229,7 +231,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         }
         TorrentStatus status = torrentHandle.status();
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
-        torrentNameLabel.setText(btDownload.getName());
+        torrentNameLabel.setText(SafeText.sanitize(btDownload.getName()));
         int progress = btDownload.getProgress();
         completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
         completionPercentageProgressbar.setMaximum(100);
@@ -296,7 +298,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
         final String comment = torrentInfo.comment();
         SwingUtilities.invokeLater(() -> {
-            commentLabel.setText("<html><body><p style='width: 600px;'>" + comment + "</p></body></html>");
+            commentLabel.setText("<html><body><p style='width: 600px;'>" + SafeText.sanitize(comment) + "</p></body></html>");
         });
     }
 

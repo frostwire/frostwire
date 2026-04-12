@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import com.frostwire.util.SafeText;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -39,6 +41,9 @@ public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        if (value instanceof String) {
+            value = SafeText.sanitize((String) value);
+        }
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 }

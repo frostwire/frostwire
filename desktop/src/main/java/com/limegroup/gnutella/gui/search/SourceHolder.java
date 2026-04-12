@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 
 /**
@@ -33,7 +34,7 @@ public class SourceHolder implements Comparable<SourceHolder> {
 
     SourceHolder(UISearchResult uiSearchResult) {
         this.uiSearchResult = uiSearchResult;
-        this.sourceName = uiSearchResult.getSource();
+        this.sourceName = SafeText.sanitize(uiSearchResult.getSource());
 
         if (uiSearchResult.getSearchResult().getDetailsUrl() != null) {
             this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr><a href=\"#\">" + sourceName + "</a></nobr></div></html>";

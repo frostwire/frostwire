@@ -20,6 +20,7 @@ package com.frostwire.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.OSUtils;
+import com.frostwire.util.SafeText;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,27 +51,29 @@ public class LocaleLabel extends JLabel {
 
     public static class LocaleString {
         private final String value;
+        private final String displayValue;
         private Boolean canDisplay;
 
         public LocaleString(String value) {
             this.value = value;
+            this.displayValue = SafeText.sanitize(value);
             this.canDisplay = OSUtils.isWindows() ? null : Boolean.TRUE;
         }
 
         String getValue() {
-            return value;
+            return displayValue;
         }
 
         boolean canDisplay() {
             if (canDisplay == null) {
-                canDisplay = getDefaultFont().canDisplayUpTo(value) == -1;
+                canDisplay = getDefaultFont().canDisplayUpTo(displayValue) == -1;
             }
             return canDisplay;
         }
 
         @Override
         public String toString() {
-            return value;
+            return displayValue;
         }
 
         private Font getDefaultFont() {
