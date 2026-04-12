@@ -283,18 +283,22 @@ public class AgentDetector {
     }
 
     static boolean isCommandInPath(String command) {
+        return findCommandPath(command) != null;
+    }
+
+    static String findCommandPath(String command) {
         String pathEnv = System.getenv("PATH");
         if (pathEnv == null) {
-            return false;
+            return null;
         }
         String pathSeparator = isWindows() ? ";" : ":";
         String[] paths = pathEnv.split(pathSeparator);
         for (String dir : paths) {
             File exe = new File(dir, command + (isWindows() ? ".exe" : ""));
             if (exe.exists() && exe.canExecute()) {
-                return true;
+                return exe.getAbsolutePath();
             }
         }
-        return false;
+        return null;
     }
 }

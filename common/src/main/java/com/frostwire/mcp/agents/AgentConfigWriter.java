@@ -251,7 +251,26 @@ public class AgentConfigWriter {
         JsonObject entry = new JsonObject();
         switch (agent.getId()) {
             case "claude-desktop":
-                entry.addProperty("url", mcpUrl);
+                String mcpRemotePath = AgentDetector.findCommandPath("mcp-remote");
+                if (mcpRemotePath != null) {
+                    entry.addProperty("command", mcpRemotePath);
+                    JsonArray args = new JsonArray();
+                    args.add(mcpUrl);
+                    entry.add("args", args);
+                    JsonObject env = new JsonObject();
+                    env.addProperty("NODE_TLS_REJECT_UNAUTHORIZED", "0");
+                    entry.add("env", env);
+                } else {
+                    entry.addProperty("command", "npx");
+                    JsonArray args = new JsonArray();
+                    args.add("-y");
+                    args.add("mcp-remote");
+                    args.add(mcpUrl);
+                    entry.add("args", args);
+                    JsonObject env = new JsonObject();
+                    env.addProperty("NODE_TLS_REJECT_UNAUTHORIZED", "0");
+                    entry.add("env", env);
+                }
                 break;
             case "cursor":
                 entry.addProperty("url", mcpUrl);
