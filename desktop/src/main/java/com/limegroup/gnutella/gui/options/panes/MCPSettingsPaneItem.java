@@ -89,7 +89,7 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
         AGENTS_TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         AGENTS_TABLE.getColumnModel().getColumn(0).setPreferredWidth(150);
         AGENTS_TABLE.getColumnModel().getColumn(1).setPreferredWidth(120);
-        AGENTS_TABLE.getColumnModel().getColumn(2).setPreferredWidth(200);
+        AGENTS_TABLE.getColumnModel().getColumn(2).setPreferredWidth(300);
         AGENTS_TABLE.getColumnModel().getColumn(0).setCellRenderer(new PaddedRenderer());
         AGENTS_TABLE.getColumnModel().getColumn(1).setCellRenderer(new PaddedStatusRenderer());
         AGENTS_TABLE.getColumnModel().getColumn(2).setCellRenderer(new ActionsRenderer());
@@ -273,6 +273,28 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
         });
     }
 
+    private void openConfigFile(AgentInfo agent) {
+        String path = agent.getConfigFilePath();
+        if (path == null || path.isEmpty()) {
+            return;
+        }
+        CompletableFuture.runAsync(() -> {
+            try {
+                java.io.File file = new java.io.File(path);
+                if (!file.exists()) {
+                    java.io.File parent = file.getParentFile();
+                    if (parent != null && !parent.exists()) {
+                        parent.mkdirs();
+                    }
+                    file.createNewFile();
+                }
+                java.awt.Desktop.getDesktop().open(file);
+            } catch (Exception e) {
+                LOG.error("Failed to open config file: " + e.getMessage(), e);
+            }
+        });
+    }
+
     private String getMcpUrl() {
         String scheme = TLS_CHECKBOX.isSelected() ? "https" : "http";
         return scheme + "://" + HOST_FIELD.getText().trim() + ":" + PORT_FIELD.getValue() + "/mcp";
@@ -367,15 +389,19 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
         private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0));
         private final JButton configureBtn = new JButton(I18n.tr("Configure"));
         private final JButton removeBtn = new JButton(I18n.tr("Remove"));
+        private final JButton openConfigBtn = new JButton(I18n.tr("Open Config"));
 
         ActionsRenderer() {
             configureBtn.setMargin(new Insets(0, 4, 0, 4));
             configureBtn.setFocusable(false);
             removeBtn.setMargin(new Insets(0, 4, 0, 4));
             removeBtn.setFocusable(false);
+            openConfigBtn.setMargin(new Insets(0, 4, 0, 4));
+            openConfigBtn.setFocusable(false);
             panel.setOpaque(true);
             panel.add(configureBtn);
             panel.add(removeBtn);
+            panel.add(openConfigBtn);
         }
 
         @Override
@@ -383,6 +409,7 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
             AgentInfo agent = agentsTableModel.getAgent(row);
             configureBtn.setEnabled(agent.isInstalled() && !agent.isConfigured());
             removeBtn.setEnabled(agent.isConfigured());
+            openConfigBtn.setEnabled(!agent.getConfigFilePath().isEmpty());
             if (isSelected) {
                 panel.setBackground(table.getSelectionBackground());
             } else {
@@ -396,14 +423,18 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
         private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0));
         private final JButton configureBtn = new JButton(I18n.tr("Configure"));
         private final JButton removeBtn = new JButton(I18n.tr("Remove"));
+        private final JButton openConfigBtn = new JButton(I18n.tr("Open Config"));
 
         ActionsEditor() {
             configureBtn.setMargin(new Insets(0, 4, 0, 4));
             configureBtn.setFocusable(false);
             removeBtn.setMargin(new Insets(0, 4, 0, 4));
             removeBtn.setFocusable(false);
+            openConfigBtn.setMargin(new Insets(0, 4, 0, 4));
+            openConfigBtn.setFocusable(false);
             panel.add(configureBtn);
             panel.add(removeBtn);
+            panel.add(openConfigBtn);
 
             configureBtn.addActionListener(e -> {
                 int row = AGENTS_TABLE.getEditingRow();
@@ -422,6 +453,15 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
                     fireEditingStopped();
                 }
             });
+
+            openConfigBtn.addActionListener(e -> {
+                int row = AGENTS_TABLE.getEditingRow();
+                if (row >= 0) {
+                    AgentInfo agent = agentsTableModel.getAgent(row);
+                    openConfigFile(agent);
+                    fireEditingStopped();
+                }
+            });
         }
 
         @Override
@@ -429,6 +469,7 @@ public final class MCPSettingsPaneItem extends AbstractPaneItem {
             AgentInfo agent = agentsTableModel.getAgent(row);
             configureBtn.setEnabled(agent.isInstalled() && !agent.isConfigured());
             removeBtn.setEnabled(agent.isConfigured());
+            openConfigBtn.setEnabled(!agent.getConfigFilePath().isEmpty());
             return panel;
         }
 
