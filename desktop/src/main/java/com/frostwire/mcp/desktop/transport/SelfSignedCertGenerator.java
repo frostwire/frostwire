@@ -1,4 +1,4 @@
-package com.frostwire.mcp.transport;
+package com.frostwire.mcp.desktop.transport;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;

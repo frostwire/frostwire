@@ -1,4 +1,4 @@
-package com.frostwire.mcp.transport;
+package com.frostwire.mcp.desktop.transport;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

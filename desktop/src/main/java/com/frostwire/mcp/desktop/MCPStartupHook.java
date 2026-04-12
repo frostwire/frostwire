@@ -2,7 +2,7 @@ package com.frostwire.mcp.desktop;
 
 import com.frostwire.mcp.MCPServer;
 import com.frostwire.mcp.desktop.notifications.MCPNotificationBridge;
-import com.frostwire.mcp.transport.TlsConfig;
+import com.frostwire.mcp.desktop.transport.TlsConfig;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.MCPSettings;
 
