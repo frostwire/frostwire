@@ -36,6 +36,7 @@ Becoming a core collaborator with direct commit access to the upstream repositor
 Pre-requisites:
 
 * **JDK 17 or later** ([OpenJDK](http://openjdk.java.net/) or [Oracle JDK](http://www.oracle.com/technetwork/java/index.html))
+* **Python 3.7+** with `rich` (`pip install rich`) — for the launcher tool
 * **Android SDK** - Minimum API 26 (Android 8.0 Oreo), Target API 34 (Android 14)
 * **Android NDK** (for native library compilation if building from source)
 * **Gradle** (included with the `gradlew` Gradle Wrapper script)
@@ -93,10 +94,18 @@ git rebase master
 To build a debug APK:
 
 ```bash
-./gradlew assembleDebug
+./gradlew assemblePlus1Debug
 ```
 
-The built APK will be located at `build/outputs/apk/debug/`.
+The built APK will be located at `build/outputs/apk/plus1/debug/`.
+
+To install directly on a connected device or emulator:
+
+```bash
+./gradlew installPlus1Debug
+```
+
+The built APK will be located at `build/outputs/apk/plus1/debug/`.
 
 To run tests:
 
@@ -112,12 +121,6 @@ To clean build artifacts:
 ./gradlew clean
 ```
 
-To install and run on a connected device or emulator:
-
-```bash
-./gradlew installDebug
-```
-
 For more build options:
 
 ```bash
@@ -125,6 +128,29 @@ For more build options:
 ```
 
 On Windows, use `gradlew.bat` instead of `./gradlew`.
+
+
+## FrostWire Launcher (TUI)
+
+A command-line launcher with a TUI for building, installing, running and debugging FrostWire without Android Studio.
+
+```bash
+python3 frostwire_launcher.py
+```
+
+Features:
+- **Interactive device picker** — lists all connected physical devices and emulators
+- **AVD management** — create and delete Android Virtual Devices from SDK system images
+- **One-shot build + install + launch** — select a device and the tool handles everything
+- **Live logcat viewer** — streams FrostWire process output (tag-filtered) in the terminal with auto-refresh
+
+Requirements:
+- Python 3.7+
+- `rich` (`pip install rich`)
+- `adb` and `emulator` in PATH
+- Android SDK at `ANDROID_SDK_ROOT` or `ANDROID_HOME`
+
+The tool auto-detects connected devices, available AVDs, SDK system images (API 26–36), and `avdmanager`/`sdkmanager` paths.
 
 Happy coding!
 
@@ -154,9 +180,9 @@ Increase Gradle heap size in `gradle.properties`:
 org.gradle.jvmargs=-Xmx2560m -XX:+UseParallelGC --enable-native-access=ALL-UNNAMED
 ```
 
-### Python/Chaquo build errors
+### Python/Chaquopy build errors
 
-FrostWire Android uses Chaquo for Python integration. Ensure you have Python 3 installed on your system.
+FrostWire Android uses Chaquopy for Python integration. Ensure you have Python 3 installed on your system.
 
 # Running Tests
 
@@ -216,14 +242,19 @@ subsequent runs take only a few seconds.
 
 # Code Organization
 
+The Android app consists of multiple Gradle modules:
+
 | Location        | Contains    |
 | ------------- |:-------------:|
-| **src/main/java/com/frostwire/**     | Core FrostWire functionality (search, downloads, media management). |
-| **src/main/java/com/limegroup/**      | Legacy code from LimeWire origins. |
-| **res/** | Android resources (layouts, strings, drawables, etc). |
-| **apollo/** | Apollo music player library integration. |
-| **build.gradle** | Project dependencies and build configuration. |
-| **proguard-rules.pro** | ProGuard/R8 obfuscation rules for release builds. |
+| **src/main/java/com/frostwire/android/** | Android FrostWire (core, gui, transfers, services) |
+| **src/main/java/com/frostwire/android/gui/** | UI layer (activities, fragments, adapters, dialogs) |
+| **src/main/java/com/andrew/apollo/** | Apollo music player integration |
+| **src/main/java/com/limegroup/** | Legacy LimeWire code |
+| **apollo/** | Apollo Android resources |
+| **common/** | Cross-platform code shared with desktop (search, bittorrent, transfers) |
+| **desktop/** | Desktop-specific code (MCP, platform integrations) |
+| **res/** | Android resources (layouts, strings, drawables) |
+| **build.gradle** | Project dependencies and build configuration | |
 
 # Download
 
