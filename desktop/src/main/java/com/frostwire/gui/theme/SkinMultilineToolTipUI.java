@@ -18,6 +18,8 @@
 
 package com.frostwire.gui.theme;
 
+import com.frostwire.util.SafeText;
+
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextAreaUI;
@@ -67,7 +69,7 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
         if (name.equals("tiptext")) {
             JToolTip tip = (JToolTip) e.getSource();
             String text = tip.getTipText();
-            textArea.setText(text);
+            textArea.setText(SafeText.sanitize(text));
         }
     }
 
@@ -84,7 +86,7 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
     private Dimension calculatePreferredSize(JComponent c) {
         Dimension dimension;
         try {
-            String textAreaText = textArea.getText();
+            String textAreaText = SafeText.sanitize(textArea.getText());
             if (textAreaText == null || textAreaText.isEmpty()) {
                 dimension = new Dimension(0, 0);
             } else {
