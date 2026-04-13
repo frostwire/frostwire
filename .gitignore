@@ -85,3 +85,26 @@ telluride/telluride.build/
 telluride/telluride.dist/
 .grok/
 desktop/MCP_DESIGN_AND_PLAN.md
+
+# Media files (must never enter the repo - copyright liability)
+*.mkv
+*.mp4
+*.webm
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+*.part
+*.ts  # transport stream (may contain media)
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+frostwire_launcher.py  # lives in android/ subdirectory
+
+# Documentation artifacts
+desktop/TECH_DEBT.md
+desktop/mcp-client-config-reference.md
