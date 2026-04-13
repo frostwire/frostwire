@@ -710,6 +710,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         return 0;
     }
 
+    @SuppressWarnings("unchecked")
     private void songClickTask(int position) {
         try {
             final ApolloFragmentAdapter adapter = getAdapter();
