@@ -35,7 +35,7 @@ import java.util.Objects;
 public class TellurideCourierCallback<T extends AbstractListAdapter> {
     private final T adapter;
     private final String url;
-    private final TellurideCourier.SearchPerformer searchPerformer;
+    private final TellurideCourier.SearchPerformer<T> searchPerformer;
     private boolean hasAborted = false;
 
     private static Logger LOG = Logger.getLogger(TellurideCourierCallback.class);
