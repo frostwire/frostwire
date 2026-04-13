@@ -48,6 +48,15 @@ public class TelluridePlaylistPartialUISearchResult extends AbstractUISearchResu
     }
 
     @Override
+    public String getExtension() {
+        // Playlist partial results are YouTube videos — no filename extension is set on the
+        // underlying TellurideSearchResult, so we explicitly report "mp4" so that:
+        //  (a) SchemaBox.updateCounters() increments the Video tab counter, and
+        //  (b) MediaTypeFilter allows the result through when the Video tab is selected.
+        return "mp4";
+    }
+
+    @Override
     public String getHash() {
         return null;
     }
