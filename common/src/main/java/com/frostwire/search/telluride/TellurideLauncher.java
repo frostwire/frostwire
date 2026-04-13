@@ -42,6 +42,7 @@ public final class TellurideLauncher {
                               final File saveDirectory,
                               final boolean audioOnly,
                               final boolean metaOnly,
+                              final boolean playlistOnly,
                               final boolean verboseOutput,
                               TellurideListener processListener) {
         checkExecutable(executable);
@@ -52,6 +53,7 @@ public final class TellurideLauncher {
                         saveDirectory,
                         audioOnly,
                         metaOnly,
+                        playlistOnly,
                         verboseOutput,
                         processListener),
                 "telluride-process-adapter:" + downloadUrl);
@@ -74,6 +76,7 @@ public final class TellurideLauncher {
                                            final File saveDirectory,
                                            final boolean audioOnly,
                                            final boolean metaOnly,
+                                           final boolean playlistOnly,
                                            final boolean verboseOutput,
                                            TellurideListener processListener) {
         return () -> {
@@ -90,6 +93,12 @@ public final class TellurideLauncher {
                         "-m",
                         downloadUrl);
             }
+            if (playlistOnly) {
+                processBuilder = new ProcessBuilder(
+                        executable.getAbsolutePath(),
+                        "-p",
+                        downloadUrl);
+            }
             if (saveDirectory != null && saveDirectory.isDirectory() && saveDirectory.canWrite()) {
                 processBuilder.directory(saveDirectory);
             }
@@ -100,7 +109,7 @@ public final class TellurideLauncher {
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(stdOut));
                 TellurideParser parser = null;
                 if (processListener != null) {
-                    parser = new TellurideParser(processListener, metaOnly);
+                    parser = new TellurideParser(processListener, metaOnly || playlistOnly);
                 }
                 String line;
                 while ((line = reader.readLine()) != null) {

@@ -60,6 +60,25 @@ public class TellurideSearchResult implements HttpSearchResult {
         httpHeaders = _httpHeaders;
     }
 
+    public TellurideSearchResult(
+            String _id,
+            String _title,
+            String _source,
+            String _detailsUrl,
+            String _thumbnail,
+            long _creationTime) {
+        id = _id;
+        title = StringUtils.removeDoubleSpaces(StringUtils.removeUnicodeCharacters(_title));
+        filename = _title;
+        source = _source;
+        detailsUrl = _detailsUrl;
+        downloadUrl = null;
+        fileSize = 0;
+        thumbnail = _thumbnail;
+        creationTime = _creationTime;
+        httpHeaders = null;
+    }
+
     public String getId() {
         return id;
     }

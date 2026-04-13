@@ -53,6 +53,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
     private final File tellurideLauncher;
+    private final boolean playlistMode;
 
     protected boolean stopped;
     private SearchListener listener;
@@ -61,15 +62,23 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                                     String _url,
                                     TellurideSearchPerformerListener _performerListener,
                                     File _tellurideLauncher) {
+        this(token, _url, _performerListener, _tellurideLauncher, false);
+    }
+
+    public TellurideSearchPerformer(long token,
+                                    String _url,
+                                    TellurideSearchPerformerListener _performerListener,
+                                    File _tellurideLauncher,
+                                    boolean _playlistMode) {
         this.token = token;
 
-        // Many of these could turn into a URL fix method.
         if (_url.contains("instagram.com/reel")) {
             _url = _url.replace("reel/", "p/");
         }
         url = _url;
         performerListener = _performerListener;
         tellurideLauncher = _tellurideLauncher;
+        playlistMode = _playlistMode;
 
         performerLatch = new CountDownLatch(1);
         if (gson == null) {
@@ -85,10 +94,11 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         stopped = false;
         TellurideLauncher.launch(tellurideLauncher,
                 url,
-                null, // saveDirectory
-                false, // audioOnly
-                true, // metaOnly
-                false, // verboseOutput
+                null,
+                false,
+                !playlistMode,
+                playlistMode,
+                false,
                 new TellurideProcessListener(this));
         try {
             performerLatch.await();
@@ -186,6 +196,28 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         return results;
     }
 
+public static List<TellurideSearchResult> getValidPlaylistResults(String jsonMeta, Gson gson, TellurideSearchPerformerListener performerListener, long token, String debugUrl) {
+        TellurideJSONPlaylist playlist = gson.fromJson(jsonMeta, TellurideJSONPlaylist.class);
+        ArrayList<TellurideSearchResult> results = new ArrayList<>();
+        if (playlist.entries == null) {
+            LOG.info("getValidPlaylistResults entries are null, no valid search results for " + debugUrl);
+            return results;
+        }
+        for (TellurideJSONPlaylistEntry entry : playlist.entries) {
+            String source = "Cloud:" + playlist.extractor;
+            String detailsUrl = entry.webpage_url != null ? entry.webpage_url : entry.url;
+            long creationTime = entry.upload_date != null ? dateStringToTimestamp(entry.upload_date) : calendar.getTimeInMillis();
+            results.add(new TellurideSearchResult(
+                    entry.id,
+                    entry.title,
+                    source,
+                    detailsUrl,
+                    entry.thumbnail,
+                    creationTime));
+        }
+        return results;
+    }
+
     //20200324
     private static long dateStringToTimestamp(String YYYY_MM_DD) {
         int YEAR = Integer.parseInt(YYYY_MM_DD.substring(0, 4));
@@ -207,9 +239,16 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         if (performerListener != null) {
             performerListener.onSearchResults(getToken(), results);
         }
-        // When a performer ends in the PerformTask, it's stopped (stopped=true) by the SearchManager
-        // as it removes the task.
-        // This latch is released so the PerformTask can finish.
+        performerLatch.countDown();
+    }
+
+    private void onPlaylistMeta(String json) {
+        List<TellurideSearchResult> results = getValidPlaylistResults(json, gson, performerListener, getToken(), url);
+        onResults(results);
+
+        if (performerListener != null) {
+            performerListener.onSearchResults(getToken(), results);
+        }
         performerLatch.countDown();
     }
 
@@ -288,6 +327,25 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         public List<TellurideJSONMediaFormat> formats;
     }
 
+    public static class TellurideJSONPlaylist {
+        public String type;
+        public String title;
+        public String extractor;
+        public List<TellurideJSONPlaylistEntry> entries;
+    }
+
+    public static class TellurideJSONPlaylistEntry {
+        public String id;
+        public String title;
+        public String url;
+        public String webpage_url;
+        public String thumbnail;
+        public long duration;
+        public String upload_date;
+        public long view_count;
+        public String description;
+    }
+
     public static class TellurideJSONMediaFormat {
         @SuppressWarnings("unused")
         public String format_id;
@@ -310,7 +368,11 @@ public class TellurideSearchPerformer implements ISearchPerformer {
 
         @Override
         public void onMeta(String json) {
-            performer.onMeta(json);
+            if (json.contains("\"type\"") && json.contains("\"playlist\"")) {
+                performer.onPlaylistMeta(json);
+            } else {
+                performer.onMeta(json);
+            }
         }
 
         @Override
