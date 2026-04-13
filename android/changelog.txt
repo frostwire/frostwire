@@ -88,6 +88,15 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:Removed GloTorrents search engine - domain gtso.cc is parked and no longer functional
  - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
  - maintenance:Removed unused java.io.File import from MusicPlaybackService
+ - new:YouTube playlist URL search - query_playlist() added to telluride.py, TellurideCourier.queryPlaylist() with full pipeline, TelluridePlaylistPartialUISearchResult displays partial results with play-in-browser and re-resolve on download
+ - new:frostwire_launcher.py TUI - build/install/run FrostWire Android without Android Studio
+ - new:frostwire_launcher.py live logcat viewer - debug app output directly in terminal
+ - fix:StrictMode violation in showTransfersOnDownloadStart - use getApplicationContext() with NEW_TASK flag on background thread
+ - fix:HandpickedTorrentDownloadDialog now appears non-empty - fixed TORRENT_DATA_CACHE and StrictMode dismissDropDown issues
+ - fix:TransfersFragment list height changed from wrap_content to match_parent - prevents dialog appearing empty on open
+ - fix:ApolloFragment.songClickTask unchecked cast suppressed
+ - maintenance:fix unchecked/deprecation warnings in gui/dialogs, fragments, views, and adapters
+ - maintenance:fix generics bounds in TellurideCourier, TellurideCourierCallback, SearchPerformer for playlist result types
 
 FrostWire 3.0.16 build 770 JAN/28/2026
  - crash:RecyclerView IllegalStateException when calling notifyDataSetChanged() during layout/scroll - deferred notifications with retry logic until RecyclerView ready

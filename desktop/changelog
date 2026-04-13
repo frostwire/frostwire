@@ -32,6 +32,8 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove stale TODO comments from LimeTransferHandler, BuddyTextFieldUI, NativeSearchFieldSupport, LibrarySearch
  * Cleanup: Remove ancient LWC-1214/1088 try/catch hacks from SearchResultDisplayer
  * Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
+ * Fix: YouTube playlist URL searches now display results — SearchMediator.skipTokenFilter() was filtering out all results because URL tokens (https, www, youtube, com, @user) don't match video titles
+ * Fix: TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
