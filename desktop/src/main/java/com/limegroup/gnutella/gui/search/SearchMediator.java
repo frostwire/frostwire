@@ -615,7 +615,14 @@ public final class SearchMediator {
         final SearchResultMediator rp = getResultPanelForGUID(token);
         boolean isTellurideSearchResult = results.get(0).getSource().startsWith("Cloud:"); // will be stopped
         if (rp != null && (isTellurideSearchResult || !rp.isStopped())) {
-            @SuppressWarnings("unchecked") List<SearchResult> filtered = filter((List<SearchResult>) results, rp.getSearchTokens());
+            List<SearchResult> filtered;
+            if (isYouTubePlaylistUrl(rp.getQuery())) {
+                @SuppressWarnings("unchecked") List<SearchResult> r = (List<SearchResult>) results;
+                filtered = r;
+            } else {
+                @SuppressWarnings("unchecked") List<SearchResult> f = filter((List<SearchResult>) results, rp.getSearchTokens());
+                filtered = f;
+            }
             if (filtered != null && !filtered.isEmpty()) {
                 SearchEngine se = SearchEngine.getSearchEngineByName(filtered.get(0).getSource());
                 if (se == null) {
