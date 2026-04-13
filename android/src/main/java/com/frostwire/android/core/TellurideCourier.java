@@ -247,7 +247,7 @@ public final class TellurideCourier {
     }
 
 
-    public static class SearchPerformer<T extends AbstractListAdapter> implements ISearchPerformer {
+    public static class SearchPerformer<T extends AbstractListAdapter<? super TellurideSearchResult>> implements ISearchPerformer {
         private final long token;
         private final String pageUrl;
         private final TellurideCourierCallback<T> courierCallback;
