@@ -144,7 +144,9 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
             if (soundcloudTrackURL != null && soundcloudTrackURL.url != null) {
                 return soundcloudTrackURL.url;
             }
+            System.err.println("SoundcloudSearchResult.getDownloadUrl(): got null url from json: " + json);
         } catch (Throwable t) {
+            System.err.println("SoundcloudSearchResult.getDownloadUrl() failed for " + progressiveFormatJSONFetcherURL + ": " + t.getMessage());
             t.printStackTrace();
             return null;
         }

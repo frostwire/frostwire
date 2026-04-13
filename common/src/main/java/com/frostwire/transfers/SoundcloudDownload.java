@@ -78,7 +78,11 @@ public class SoundcloudDownload extends HttpDownload {
     }
 
     private static Info convert(SoundcloudSearchResult sr) {
-        return new Info(sr.getStreamUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize());
+        String url = sr.getStreamUrl();
+        if (url == null) {
+            LOG.error("SoundcloudDownload.convert(): getDownloadUrl() returned null for '" + sr.getDisplayName() + "' - stream URL resolution failed");
+        }
+        return new Info(url, sr.getFilename(), sr.getDisplayName(), sr.getSize());
     }
 
     @Override
