@@ -233,6 +233,7 @@ public final class Mp4Demuxer {
         IsoMedia.write(out, boxes, buf, IsoMedia.OnBoxListener.ALL);
     }
 
+    @SuppressWarnings("unchecked")
     private static <T extends Box> T readNext(final InputChannel ch, final ByteBuffer buf) throws IOException {
         IO.read(ch, 8, buf);
         int size = buf.getInt();
@@ -264,6 +265,7 @@ public final class Mp4Demuxer {
         return (T) b;
     }
 
+    @SuppressWarnings("unchecked")
     private static <T extends Box> T readUntil(final InputChannel ch, int type, final ByteBuffer buf) throws IOException {
         Box b = null;
         try {

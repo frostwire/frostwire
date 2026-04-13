@@ -76,6 +76,7 @@ public class One337xCrawlingStrategy implements CrawlingStrategy {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void crawlResults(List<FileSearchResult> results, SearchListener listener, long token) {
         int crawlCount = 0;
         List<FileSearchResult> crawledResults = new ArrayList<>();

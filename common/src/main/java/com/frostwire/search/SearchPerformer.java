@@ -195,6 +195,7 @@ public class SearchPerformer implements ISearchPerformer {
         return crawlingStrategy != null;
     }
 
+    @SuppressWarnings("unchecked")
     protected void onResults(List<FileSearchResult> results) {
         if (stopped) {
             return;
