@@ -32,7 +32,7 @@ import com.google.gson.GsonBuilder;
 import java.util.List;
 import java.util.Objects;
 
-public class TellurideCourierCallback<T extends AbstractListAdapter<? super SearchResult>> {
+public class TellurideCourierCallback<T extends AbstractListAdapter<? super TellurideSearchResult>> {
     private final T adapter;
     private final String url;
     private final TellurideCourier.SearchPerformer<T> searchPerformer;
