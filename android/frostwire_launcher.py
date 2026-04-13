@@ -21,17 +21,22 @@ import re
 import stat
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import dataclass
 from typing import Optional
 
 from rich.console import Console
+from rich.live import Live
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
 from rich.table import Table
+from rich.text import Text
 from rich import box
 
 console = Console()
+
+FW_PACKAGE = "com.frostwire.android"
 
 
 def run(cmd, capture=True, check=True, env=None):
@@ -324,6 +329,14 @@ def print_devices_table(devices: list[Device], avds: list[str], sdk_images: list
             options.append(("avd_stopped", avd))
             idx += 1
 
+    # Logcat option for each running device
+    for d in devices:
+        if d.state == "device":
+            table.add_row(str(idx), d.serial, "[cyan]logcat[/cyan]", "[dim]--[/dim]",
+                         f"View logcat for {d.model}")
+            options.append(("logcat", d.serial))
+            idx += 1
+
     # AVD creation option
     if sdk_images:
         table.add_row(str(idx), "+new", "[bold green]create AVD[/bold green]", "[dim]--[/dim]",
@@ -388,6 +401,131 @@ def handle_delete_avd(avd_name: str):
     """Delete an AVD after confirmation."""
     if Confirm.ask(f"[bold red]Delete AVD '{avd_name}'? This cannot be undone.[/bold red]", default=False):
         delete_avd(avd_name)
+
+
+class LogcatReader:
+    """Reads adb logcat for a specific package and feeds it to a Rich display."""
+
+    def __init__(self, serial: str, package: str = FW_PACKAGE, buffer_lines: int = 500):
+        self.serial = serial
+        self.package = package
+        self.buffer_lines = buffer_lines
+        self._lines: list[str] = []
+        self._stop_event = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def _filter_tag(self, line: str) -> bool:
+        """Return True if the logcat line is from our package or related system services."""
+        if self.package in line:
+            return True
+        # Also include common FrostWire-related tags
+        related_tags = (
+            "FrostWire",
+            "SystemUtils",
+            "MusicUtils",
+            "TransferManager",
+            "Engine",
+            "Telluride",
+            "AudioPlayer",
+            "SearchPerformer",
+        )
+        for tag in related_tags:
+            if f"/{tag}" in line or f"[{tag}]" in line:
+                return True
+        return False
+
+    def _read_loop(self, process: subprocess.Popen):
+        """Read stdout from the logcat process line by line."""
+        try:
+            for line in iter(process.stdout.readline, ""):
+                if self._stop_event.is_set():
+                    break
+                if not line:
+                    break
+                decoded = line.decode("utf-8", errors="replace").rstrip()
+                if decoded and self._filter_tag(decoded):
+                    self._lines.append(decoded)
+                    if len(self._lines) > self.buffer_lines:
+                        self._lines.pop(0)
+        except Exception:
+            pass
+
+    def start(self) -> "LogcatReader":
+        """Start the logcat reader thread. Returns self for chaining."""
+        # Clear logcat first to get fresh output
+        subprocess.run(["adb", "-s", self.serial, "logcat", "-c"],
+                       capture_output=True, check=False)
+        time.sleep(0.5)
+
+        cmd = [
+            "adb", "-s", self.serial, "logcat",
+            "-v", "threadtime",   # timestamp | pid | tid | tag: message
+            "--pid=" + str(subprocess.run(
+                ["adb", "-s", self.serial, "shell", "pidof", self.package],
+                capture_output=True, text=True, check=False
+            ).stdout.strip() or "0")
+        ]
+
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        self._thread = threading.Thread(target=self._read_loop, args=(proc,), daemon=True)
+        self._thread.start()
+        return self
+
+    def stop(self):
+        """Stop the logcat reader."""
+        self._stop_event.set()
+        if self._thread:
+            self._thread.join(timeout=3)
+        self._thread = None
+
+    def get_lines(self) -> list[str]:
+        """Return the collected log lines."""
+        return list(self._lines)
+
+
+def run_logcat_tui(serial: str):
+    """Interactive TUI showing live FrostWire logcat output."""
+    console.print()
+    console.print(f"[bold cyan]FrostWire Logcat — {serial}[/bold cyan]")
+    console.print("[dim]Press Ctrl+C to stop logging and return to launcher.[/dim]")
+    console.print()
+
+    reader = LogcatReader(serial).start()
+    lines: list[str] = []
+    stopped = threading.Event()
+
+    def refresh_loop():
+        while not stopped.is_set():
+            lines[:] = reader.get_lines()
+            time.sleep(0.5)
+
+    refresh_thread = threading.Thread(target=refresh_loop, daemon=True)
+    refresh_thread.start()
+
+    try:
+        while not stopped.is_set():
+            current_lines = reader.get_lines()
+            if current_lines != lines[:len(current_lines)]:
+                lines[:] = current_lines
+            if lines:
+                console.print("\n".join(f"[dim]{l}[/dim]" for l in lines[-50:]), end="")
+                console.print("", end="\r")
+            time.sleep(0.3)
+    except KeyboardInterrupt:
+        stopped.set()
+        reader.stop()
+        console.print()
+        console.print("[yellow]Logcat stopped.[/yellow]")
+        console.print()
+        prompt = Prompt.ask(
+            "[bold]Select action:[/bold] [r]efresh list  [q]uit",
+            choices=["r", "q"],
+            default="r"
+        )
+        if prompt == "q":
+            console.print("[dim]Exiting.[/dim]")
+            sys.exit(0)
 
 
 def main():
@@ -475,6 +613,18 @@ def main():
 
     console.print()
     console.print(f"[bold green]Done! FrostWire running on {serial}[/bold green]")
+
+    console.print()
+    console.print("[dim]What would you like to do next?[/dim]")
+    choice = Prompt.ask(
+        "[bold]Action:[/bold]",
+        choices=["l", "q"],
+        default="l"
+    )
+    if choice == "l":
+        run_logcat_tui(serial)
+    else:
+        console.print("[dim]Exiting.[/dim]")
 
 
 if __name__ == "__main__":
