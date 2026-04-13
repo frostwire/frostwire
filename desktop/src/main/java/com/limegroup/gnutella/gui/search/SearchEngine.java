@@ -225,6 +225,15 @@ public abstract class SearchEngine {
                     new TellurideSearchPerformerDesktopListener(),
                     FrostWireUtils.getTellurideLauncherFile());
         }
+
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords, boolean playlistMode) {
+            return new TellurideSearchPerformer(token,
+                    keywords,
+                    new TellurideSearchPerformerDesktopListener(),
+                    FrostWireUtils.getTellurideLauncherFile(),
+                    playlistMode);
+        }
     };
 
     private static final SearchEngine YT = new SearchEngine(SearchEngineID.YT_ID, "YT", SearchEnginesSettings.YT_SEARCH_ENABLED, "www.youtube.com") {
@@ -358,6 +367,10 @@ public abstract class SearchEngine {
     }
 
     public abstract ISearchPerformer getPerformer(long token, String keywords);
+
+    public ISearchPerformer getPerformer(long token, String keywords, boolean playlistMode) {
+        return getPerformer(token, keywords);
+    }
 
     public BooleanSetting getEnabledSetting() {
         return _setting;

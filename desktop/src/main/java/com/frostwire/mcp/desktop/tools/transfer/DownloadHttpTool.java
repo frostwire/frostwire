@@ -75,7 +75,7 @@ public class DownloadHttpTool implements MCPTool {
                     if (executable == null || !executable.exists()) {
                         return TransferAdapter.errorJson("Telluride executable not found");
                     }
-                    TellurideLauncher.launch(executable, url, saveDir, audioOnly, false, false, new TellurideListener() {
+                    TellurideLauncher.launch(executable, url, saveDir, audioOnly, false, false, false, new TellurideListener() {
                         @Override
                         public void onProgress(float completionPercentage, float fileSize, String fileSizeUnits, float downloadSpeed, String downloadSpeedUnits, String ETA) {
                         }

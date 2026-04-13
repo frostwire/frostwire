@@ -99,7 +99,7 @@ public final class CloudDownloadTool implements MCPTool {
                 latch.countDown();
             }
         };
-        TellurideLauncher.launch(executable, url, saveDir, audioOnly, false, false, listener);
+        TellurideLauncher.launch(executable, url, saveDir, audioOnly, false, false, false, listener);
         JsonObject result = new JsonObject();
         result.addProperty("downloadId", downloadId);
         result.addProperty("state", "downloading");

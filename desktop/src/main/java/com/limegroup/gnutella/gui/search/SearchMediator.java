@@ -492,7 +492,8 @@ public final class SearchMediator {
 
         if (query.startsWith("http") && !query.endsWith(".torrent")) {
             manager.perform(SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID).getPerformer(token, query));
-            manager.perform(SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID).getPerformer(token, query));
+            boolean isPlaylist = isYouTubePlaylistUrl(query);
+            manager.perform(SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID).getPerformer(token, query, isPlaylist));
             return;
         }
 
@@ -583,6 +584,21 @@ public final class SearchMediator {
         norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
         norm = norm.toLowerCase(Locale.US);
         return norm;
+    }
+
+    static boolean isYouTubePlaylistUrl(String url) {
+        if (url == null) {
+            return false;
+        }
+        return url.contains("youtube.com/@") ||
+                url.contains("youtube.com/channel/") ||
+                url.contains("youtube.com/c/") ||
+                url.contains("youtube.com/user/") ||
+                url.contains("youtube.com/playlist?list=") ||
+                (url.contains("youtube.com/watch") && url.contains("list=")) ||
+                url.contains("music.youtube.com/playlist?list=") ||
+                url.contains("m.youtube.com/@") ||
+                url.contains("m.youtube.com/channel/");
     }
 
     void stopSearch() {

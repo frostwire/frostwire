@@ -119,6 +119,7 @@ public class TellurideTests {
                 new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
                 false,
+                false,
                 true,
                 tellurideListener);
 
@@ -250,6 +251,7 @@ public class TellurideTests {
                 outputDir,
                 false,
                 false,
+                false,
                 true,
                 tellurideListener);
 
@@ -321,6 +323,7 @@ public class TellurideTests {
                 new File(System.getenv("HOME")+ "/FrostWire/Torrent Data"),
                 false,
                 true,
+                false,
                 true,
                 tellurideListener);
 

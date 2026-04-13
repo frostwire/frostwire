@@ -78,7 +78,7 @@ public final class CloudSearchTool implements MCPTool {
                 latch.countDown();
             }
         };
-        TellurideLauncher.launch(executable, url, null, false, true, false, listener);
+        TellurideLauncher.launch(executable, url, null, false, true, false, false, listener);
         try {
             boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!completed) {
