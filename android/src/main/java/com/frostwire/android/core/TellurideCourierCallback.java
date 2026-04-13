@@ -83,7 +83,7 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
 
     void onResults(String result, boolean isPlaylist) {
         if (result == null) {
-            onResults(null, true);
+            onResults((List<TellurideSearchResult>) null, true);
             return;
         }
         if (gson == null) {
