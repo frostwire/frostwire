@@ -586,7 +586,7 @@ public final class SearchMediator {
         return norm;
     }
 
-    static boolean isYouTubePlaylistUrl(String url) {
+    public static boolean isYouTubePlaylistUrl(String url) {
         if (url == null) {
             return false;
         }
