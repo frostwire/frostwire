@@ -52,6 +52,7 @@ public class TelluridePartialUISearchResult<S extends AbstractFileSearchResult> 
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int getSeeds() {
         return ((S) getSearchResult()).getViewCount();

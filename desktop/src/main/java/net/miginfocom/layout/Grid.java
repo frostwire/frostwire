@@ -1520,7 +1520,7 @@ public final class Grid {
         TreeSet<Integer> primIndexes = isRows ? rowIndexes : colIndexes;
         TreeSet<Integer> secIndexes = isRows ? colIndexes : rowIndexes;
         DimConstraint[] primDCs = (isRows ? rowConstr : colConstr).getConstaints();
-        //noinspection unchecked
+        @SuppressWarnings("unchecked")
         ArrayList<LinkedDimGroup>[] groupLists = new ArrayList[primIndexes.size()];
         int gIx = 0;
         for (int i : primIndexes) {

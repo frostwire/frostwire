@@ -76,6 +76,7 @@ public final class IntSetting extends AbstractNumberSetting<Integer> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Integer getDefaultValue() {
         Object valueObj = super.getDefaultValue();
         try {

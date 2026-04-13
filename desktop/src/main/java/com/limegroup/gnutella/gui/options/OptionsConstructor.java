@@ -252,7 +252,8 @@ public final class OptionsConstructor {
      *
      * @param parentKey the key of the parent node to add the new node to
      */
-    private OptionsTreeNode addOption(final String parentKey, final String childKey, final String label, @SuppressWarnings("unchecked") Class<? extends AbstractPaneItem>... clazzes) {
+    @SafeVarargs
+    private OptionsTreeNode addOption(final String parentKey, final String childKey, final String label, Class<? extends AbstractPaneItem>... clazzes) {
         OptionsTreeNode node = TREE_MANAGER.addNode(parentKey, childKey, label, label + " " + extractLabels(clazzes));
         node.setClasses(clazzes);
         keysToNodes.put(childKey, node);

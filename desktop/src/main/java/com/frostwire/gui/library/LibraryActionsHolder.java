@@ -48,6 +48,7 @@ public final class LibraryActionsHolder extends AbstractActionsHolder {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public File getFile() {
         AbstractLibraryTableDataLine<File> dl = (AbstractLibraryTableDataLine<File>) getDataLine();
         if (dl == null) {
