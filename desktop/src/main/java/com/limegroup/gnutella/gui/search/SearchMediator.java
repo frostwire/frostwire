@@ -510,7 +510,7 @@ public final class SearchMediator {
     private List<SearchResult> filter(List<SearchResult> results, List<String> searchTokens) {
         List<SearchResult> list;
         if (searchTokens == null || searchTokens.isEmpty()) {
-            list = Collections.emptyList();
+            list = new ArrayList<>(results);
         } else {
             list = filter2(results, searchTokens);
         }
