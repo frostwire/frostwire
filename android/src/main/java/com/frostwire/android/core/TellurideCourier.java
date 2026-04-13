@@ -54,7 +54,7 @@ public final class TellurideCourier {
     }
 
     // runs on SEARCH_PERFORMER HandlerThread
-    public static <T extends AbstractListAdapter> void queryPage(String url, TellurideCourierCallback<T> callback) {
+    public static <T extends AbstractListAdapter<? super TellurideSearchResult>> void queryPage(String url, TellurideCourierCallback<T> callback) {
         if (SystemUtils.isUIThread()) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> queryPage(url, callback));
             return;
@@ -144,7 +144,7 @@ public final class TellurideCourier {
         }
     }
 
-    public static <T extends AbstractListAdapter> void queryPlaylist(String url, TellurideCourierCallback<T> callback) {
+    public static <T extends AbstractListAdapter<? super TellurideSearchResult>> void queryPlaylist(String url, TellurideCourierCallback<T> callback) {
         if (SystemUtils.isUIThread()) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> queryPlaylist(url, callback));
             return;
