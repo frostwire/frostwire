@@ -342,6 +342,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
      * From all search results, returns a list with only those that are FileSearchResult
      * (so we can do .getFilename())
      */
+    @SuppressWarnings("unchecked")
     public static List<FileSearchResult> extractFileSearchResults(List<? extends SearchResult> allSearchResults) {
         return (List<FileSearchResult>) allSearchResults.stream().
                 filter(r -> r instanceof FileSearchResult).

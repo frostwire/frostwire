@@ -347,6 +347,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
                 @SuppressWarnings("rawtypes") final AbstractConfirmListDialog dlg = dlgRef.get();

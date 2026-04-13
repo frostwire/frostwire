@@ -210,6 +210,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return super.findViewById(id);
     }
 
+    @SuppressWarnings("unchecked")
     protected final <T extends Fragment> T findFragment(@IdRes int id) {
         return (T) getSupportFragmentManager().findFragmentById(id);
     }
@@ -228,6 +229,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
      * @param <T>   the type of the fragment to lookup
      * @return the first fragment of type T if found.
      */
+    @SuppressWarnings("unchecked")
     public final <T extends Fragment> T findFragment(Class<T> clazz) {
         for (Fragment f : getFragments()) {
             if (clazz.isInstance(f)) {

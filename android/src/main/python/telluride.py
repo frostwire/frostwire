@@ -39,8 +39,13 @@ def query_playlist(page_url):
             'extract_flat': True,
             'playlist_items': '1-50',
         }
+        url = urllib.parse.unquote(page_url)
+        if 'youtube.com/' in url and not any(suffix in url for suffix in ['/videos', '/streams', '/shorts', '/playlist', '/watch']):
+            if url.endswith('/'):
+                url = url[:-1]
+            url += '/videos'
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
+            info_dict = ydl.extract_info(url, download=False)
             playlist_title = info_dict.get('title', '')
             extractor_key = info_dict.get('extractor_key', '') or info_dict.get('extractor', '')
             entries = []

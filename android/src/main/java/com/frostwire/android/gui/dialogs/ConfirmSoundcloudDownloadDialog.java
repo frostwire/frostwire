@@ -96,6 +96,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
             dlgRef = new WeakReference<>(dlg);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
@@ -107,7 +108,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
                         new ArrayList<>();
 
                 if (results.isEmpty()) {
-                    results.addAll(dlg.getChecked());
+                    results.addAll((java.util.Collection<SoundcloudSearchResult>) dlg.getChecked());
                 }
 
                 if (!results.isEmpty()) {
@@ -118,6 +119,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static class SoundcloudPlaylistConfirmListDialogAdapter extends ConfirmListDialogDefaultAdapter<SoundcloudSearchResult> {
         SoundcloudPlaylistConfirmListDialogAdapter(Context context, List list, AbstractConfirmListDialog.SelectionMode selectionMode) {
             super(context, list, selectionMode);

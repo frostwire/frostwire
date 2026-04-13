@@ -215,6 +215,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return position;
     }
 
+    @SuppressWarnings("unchecked")
     public int getViewPosition(View view) {
         T tag = (T) view.getTag();
         if (tag == null) return -1;
@@ -397,6 +398,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     protected void onItemChecked(View v, boolean isChecked) {
         if (v instanceof RadioButton) {
             onRadioButtonItemChecked((RadioButton) v, isChecked);
@@ -409,6 +411,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void onCheckboxItemChecked(View v, boolean isChecked) {
         T item = (T) v.getTag();
         if (item != null) {
@@ -425,6 +428,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         lastSelectedRadioButtonIndex = position;
     }
 
+    @SuppressWarnings("unchecked")
     private void onRadioButtonItemChecked(RadioButton radioButton, boolean isChecked) {
         if (isChecked) {
             T item = (T) radioButton.getTag();
@@ -436,10 +440,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     /**
      * Helper function.
      */
+    @SuppressWarnings("unchecked")
     protected final <TView extends View> TView findView(View view, int id) {
         return (TView) getView(view, getHolder(view), id);
     }
 
+    @SuppressWarnings("unchecked")
     private SparseArray<View> getHolder(View view) {
         SparseArray<View> h = (SparseArray<View>) view.getTag(R.id.abstract_list_adapter_holder_tag_id);
         if (h == null) {
@@ -636,6 +642,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         protected void publishResults(CharSequence constraint, FilterResults results) {
             if (results == null || results.values == null) {
                 return;

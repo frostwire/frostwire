@@ -164,11 +164,12 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         this.dlg = dlg;
         Bundle bundle = getArguments();
         String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
+        String text = bundle.getString(BUNDLE_KEY_DIALOG_TEXT);
 
         TextView dialogTitle = findView(dlg, R.id.dialog_confirm_list_title);
-        dialogTitle.setText(R.string.confirm_download);
+        dialogTitle.setText(title);
         TextView dialogText = findView(dlg, R.id.dialog_confirm_list_text);
-        dialogText.setText(title);
+        dialogText.setText(text);
 
         initListViewAndAdapter(bundle);
         initSelectAllCheckbox();
@@ -346,6 +347,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public List<T> getList() {
         List<T> result = (List<T>) Collections.EMPTY_LIST;
         if (adapter != null) {

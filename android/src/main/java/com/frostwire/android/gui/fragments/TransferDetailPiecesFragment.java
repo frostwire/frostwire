@@ -78,6 +78,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void updateComponents() {
         if (uiBittorrentDownload == null) {
             return;

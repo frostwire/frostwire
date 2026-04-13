@@ -66,7 +66,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        //noinspection unchecked
+        @SuppressWarnings("unchecked")
         HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages", HashMap.class);
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 

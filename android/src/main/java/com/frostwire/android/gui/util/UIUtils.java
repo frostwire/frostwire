@@ -256,6 +256,7 @@ public final class UIUtils {
         return true;
     }
 
+    @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     private static void openFileBackground(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             File file = new File(filePath);

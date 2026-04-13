@@ -126,6 +126,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
     public abstract int getItemThumbnailResourceId(T data);
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void populateView(View view, Object data) {
         T item = (T) data;
         //noinspection ConstantConditions
@@ -158,6 +159,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onItemClicked(View v) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
             final T tag = (T) v.getTag();
