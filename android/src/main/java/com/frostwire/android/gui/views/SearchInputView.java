@@ -171,7 +171,7 @@ public class SearchInputView extends LinearLayout {
     private void startSearch(View v) {
         hideSoftInput(v);
         textInput.setListSelection(-1);
-        textInput.dismissDropDown();
+        post(() -> textInput.dismissDropDown());
         adapter.discardLastResult();
         String query = textInput.getText().trim();
         if (query.length() > 0) {

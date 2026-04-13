@@ -18,8 +18,6 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import static com.frostwire.android.util.SystemUtils.postToHandler;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +30,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
@@ -48,11 +47,6 @@ import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +66,10 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private long torrentFetcherDownloadTokenId;
     private boolean openTransfersOnCancel;
     private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
-    private static final String BUNDLE_KEY_TORRENT_INFO_PATH = "torrentInfoPath";
+    // In-memory cache for bencode bytes — avoids async file write+read that caused empty dialog
+    private static final java.util.concurrent.ConcurrentHashMap<String, byte[]> TORRENT_DATA_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>();
+    private static final String BUNDLE_KEY_TORRENT_INFO_HASH = "torrentInfoHash";
     private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
     private static final String BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID = "torrentFetcherDownloadTokenId";
     private static final String BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL = "openTransfersOnCancel";
@@ -108,23 +105,15 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 JsonUtils.toJson(torrentInfoList),
                 SelectionMode.MULTIPLE_SELECTION);
         final Bundle arguments = dlg.getArguments();
-        // write torrent metadata to a temp file to avoid large Bundles
+
+        // Store bencode bytes in a static cache keyed by info-hash to avoid large Bundles
+        // and avoid the async file write+read round-trip that was causing the empty dialog.
         String infoHash = tinfo.infoHashType().has_v2() ?
                 tinfo.infoHashV2().toString() : tinfo.infoHashV1().toString();
-        File cacheFile = new File(ctx.getCacheDir(), "torrent_" + infoHash);
-        final byte[] bencodeData = tinfo.bencode();
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            try {
-                FileOutputStream fos = new FileOutputStream(cacheFile);
-                fos.write(bencodeData);
-                fos.close();
-            } catch (IOException e) {
-                LOG.error("Failed to write torrent metadata to cache", e);
-            }
-        });
+        TORRENT_DATA_CACHE.put(infoHash, tinfo.bencode());
 
         if (arguments != null) {
-            arguments.putString(BUNDLE_KEY_TORRENT_INFO_PATH, cacheFile.getAbsolutePath());
+            arguments.putString(BUNDLE_KEY_TORRENT_INFO_HASH, infoHash);
             arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
             arguments.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
             arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
@@ -183,32 +172,14 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
+        byte[] torrentInfoData = null;
         if (arguments != null) {
-            String path = arguments.getString(BUNDLE_KEY_TORRENT_INFO_PATH);
-            if (path != null) {
-                File cacheFile = new File(path);
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    byte[] torrentInfoData = null;
-                    if (cacheFile.exists()) {
-                        try (FileInputStream fis = new FileInputStream(cacheFile);
-                             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                            byte[] buf = new byte[8192];
-                            int read;
-                            while ((read = fis.read(buf)) != -1) {
-                                bos.write(buf, 0, read);
-                            }
-                            torrentInfoData = bos.toByteArray();
-                        } catch (IOException ignored) {
-                        }
-                        cacheFile.delete();
-                    }
-                    byte[] data = torrentInfoData;
-                    SystemUtils.postToUIThread(() -> finishInitComponents(dlg, savedInstanceState, arguments, data));
-                });
-                return;
+            String infoHash = arguments.getString(BUNDLE_KEY_TORRENT_INFO_HASH);
+            if (infoHash != null) {
+                torrentInfoData = TORRENT_DATA_CACHE.remove(infoHash);
             }
         }
-        finishInitComponents(dlg, savedInstanceState, arguments, null);
+        finishInitComponents(dlg, savedInstanceState, arguments, torrentInfoData);
     }
 
     private void finishInitComponents(Dialog dlg, Bundle savedInstanceState, Bundle arguments, byte[] torrentInfoData) {
@@ -386,7 +357,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
                     () -> {
                         try {
                             // there is a still a chance of reference getting null, this is in
