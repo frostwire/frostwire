@@ -488,8 +488,8 @@ public final class UIUtils {
         if (ConfigurationManager.instance().showTransfersOnDownloadStart() && context != null) {
             Intent i = new Intent(context, MainActivity.class);
             i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            context.startActivity(i);
+            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.getApplicationContext().startActivity(i);
         }
     }
 
