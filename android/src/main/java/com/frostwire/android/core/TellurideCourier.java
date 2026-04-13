@@ -80,7 +80,7 @@ public final class TellurideCourier {
         if (python == null) {
             LOG.error("TellurideCourier::queryPage could not get Python instance");
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
@@ -90,14 +90,14 @@ public final class TellurideCourier {
         } catch (Throwable t) {
             LOG.error("TellurideCourier::queryPage failed to get telluride module", t);
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
         if (telluride_module == null) {
             LOG.error("TellurideCourier::queryPage telluride module is null");
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
@@ -112,12 +112,12 @@ public final class TellurideCourier {
         } catch (Throwable t) {
             LOG.error("TellurideCourier::queryPage failed to call query_video", t);
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
         if (query_video_result == null && callback != null) {
-            callback.onResults(null, true);
+            callback.onResults((List<TellurideSearchResult>) null, true);
             lastKnownCallback = null;
             return;
         }
@@ -160,7 +160,7 @@ public final class TellurideCourier {
         if (python == null) {
             LOG.error("TellurideCourier::queryPlaylist could not get Python instance");
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
@@ -170,14 +170,14 @@ public final class TellurideCourier {
         } catch (Throwable t) {
             LOG.error("TellurideCourier::queryPlaylist failed to get telluride module", t);
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
         if (telluride_module == null) {
             LOG.error("TellurideCourier::queryPlaylist telluride module is null");
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
@@ -187,7 +187,7 @@ public final class TellurideCourier {
         } catch (Throwable t) {
             LOG.error("TellurideCourier::queryPlaylist failed to call query_playlist", t);
             if (callback != null) {
-                callback.onResults(null, true);
+                callback.onResults((List<TellurideSearchResult>) null, true);
             }
             return;
         }
