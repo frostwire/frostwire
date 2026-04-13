@@ -30,17 +30,34 @@ import java.awt.*;
  * @author aldenml
  */
 public class LocaleLabel extends JLabel {
+    private static final Font SAFE_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
+
     public void setText(LocaleString text) {
-        if (OSUtils.isWindows()) {
-            Font f;
-            if (text.canDisplay()) {
-                f = getParent().getFont();
-            } else {
-                f = ThemeMediator.DIALOG_FONT;
-            }
-            changeFont(f);
+        Font f = getParent() != null ? getParent().getFont() : SAFE_FONT;
+        if (!canDisplaySafely(f, text.getValue())) {
+            f = SAFE_FONT;
         }
+        changeFont(f);
         setText(text.getValue());
+    }
+
+    private boolean canDisplaySafely(Font font, String text) {
+        if (text == null || text.isEmpty()) {
+            return true;
+        }
+        if (font == null) {
+            return false;
+        }
+        try {
+            return font.canDisplayUpTo(text) == -1;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    @Override
+    public void setText(String text) {
+        super.setText(SafeText.sanitize(text));
     }
 
     private void changeFont(Font f) {

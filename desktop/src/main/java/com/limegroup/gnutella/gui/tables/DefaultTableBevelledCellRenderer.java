@@ -25,19 +25,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
-/**
- * So that table cells look beveled, details that make the difference.
- *
- * @author gubatron
- * @author aldenml
- */
 public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
-
-    @Override
-    protected void paintBorder(Graphics g) {
-        super.paintBorder(g);
-        setBorder(new EmptyBorder(3, 3, 3, 3));
-    }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -45,5 +33,14 @@ public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
             value = SafeText.sanitize((String) value);
         }
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    }
+
+    @Override
+    protected void paintBorder(Graphics g) {
+        try {
+            super.paintBorder(g);
+        } catch (Throwable t) {
+        }
+        setBorder(new EmptyBorder(3, 3, 3, 3));
     }
 }
