@@ -313,6 +313,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
 
     private boolean isPreliminaryUI(UISearchResult uiResult) {
         com.frostwire.search.SearchResult sr = uiResult.getSearchResult();
-        return sr.isPreliminary() || (uiResult instanceof TelluridePartialUISearchResult);
+        return sr.isPreliminary() || (uiResult instanceof TelluridePartialUISearchResult) || (uiResult instanceof TelluridePlaylistPartialUISearchResult);
     }
 }

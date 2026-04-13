@@ -242,23 +242,25 @@ public final class SearchMediator {
                 ui = new InternetArchiveUISearchResult((InternetArchiveCrawledSearchResult) sr, engine, query);
             } else if (sr instanceof TellurideSearchResult) {
                 TellurideSearchResult tsr = (TellurideSearchResult) sr;
-                ui = new TellurideUISearchResult(tsr, engine, query, false);
-                /// if the tsr is an mp4 video, we create an extra TellurideUISearchResult with extractAudioAndDeleteOriginal set to true
-                if (FilenameUtils.getExtension(tsr.getFilename()).equals("mp4")) {
-                    //See BTDownloadMediator::extractAudioAndRemoveOriginalVideo
-                    TellurideSearchResult tsr2 = new TellurideSearchResult(
-                            tsr.getId(),
-                            "(Faster audio download) " + tsr.getDisplayName() + " (.m4a)",
-                            ui.getFilename(),
-                            tsr.getSource(),
-                            tsr.getDetailsUrl(),
-                            tsr.getDownloadUrl(),
-                            tsr.getThumbnailUrl(),
-                            tsr.getSize(),
-                            tsr.getCreationTime(),
-                            tsr.getHttpHeaders());
-                    UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
-                    result.add(ui2);
+                if (tsr.getDownloadUrl() == null) {
+                    ui = new TelluridePlaylistPartialUISearchResult(tsr, engine, query);
+                } else {
+                    ui = new TellurideUISearchResult(tsr, engine, query, false);
+                    if (FilenameUtils.getExtension(tsr.getFilename()).equals("mp4")) {
+                        TellurideSearchResult tsr2 = new TellurideSearchResult(
+                                tsr.getId(),
+                                "(Faster audio download) " + tsr.getDisplayName() + " (.m4a)",
+                                ui.getFilename(),
+                                tsr.getSource(),
+                                tsr.getDetailsUrl(),
+                                tsr.getDownloadUrl(),
+                                tsr.getThumbnailUrl(),
+                                tsr.getSize(),
+                                tsr.getCreationTime(),
+                                tsr.getHttpHeaders());
+                        UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
+                        result.add(ui2);
+                    }
                 }
             } else if (sr instanceof CompositeFileSearchResult) {
                 // V2 flat architecture - CompositeFileSearchResult from V2 search patterns
@@ -315,7 +317,7 @@ public final class SearchMediator {
             UISearchResult uiSearchResult = lines[0].getSearchResult();
             SearchResult sr = uiSearchResult.getSearchResult();
             // Only switch to Transfers for direct downloads, not for preliminary results
-            if (!sr.isPreliminary() && !(uiSearchResult instanceof TelluridePartialUISearchResult)) {
+            if (!sr.isPreliminary() && !(uiSearchResult instanceof TelluridePartialUISearchResult) && !(uiSearchResult instanceof TelluridePlaylistPartialUISearchResult)) {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
             }
         }

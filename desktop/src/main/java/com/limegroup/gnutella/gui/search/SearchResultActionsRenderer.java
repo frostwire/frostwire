@@ -162,7 +162,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         SearchResult sr = uiSearchResult.getSearchResult();
 
         // Partial download results (TelluridePartialUISearchResult, YouTube, etc.) are playable
-        if (uiSearchResult instanceof TelluridePartialUISearchResult) {
+        if (uiSearchResult instanceof TelluridePartialUISearchResult || uiSearchResult instanceof TelluridePlaylistPartialUISearchResult) {
             return true;
         }
 
@@ -212,7 +212,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             }
             uiSearchResult.download(isTorrent);
             // Only show Transfers tab for direct downloads, not for preliminary results that trigger secondary searches
-            boolean isPreliminary = sr.isPreliminary() || uiSearchResult instanceof TelluridePartialUISearchResult;
+            boolean isPreliminary = sr.isPreliminary() || uiSearchResult instanceof TelluridePartialUISearchResult || uiSearchResult instanceof TelluridePlaylistPartialUISearchResult;
             if (!isPreliminary) {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }
