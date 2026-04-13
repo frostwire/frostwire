@@ -23,8 +23,11 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +77,20 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
 
             }
         });
+    }
+
+    private static volatile Gson gson = null;
+
+    void onResults(String result, boolean isPlaylist) {
+        if (result == null) {
+            onResults(null, true);
+            return;
+        }
+        if (gson == null) {
+            gson = new GsonBuilder().create();
+        }
+        List<TellurideSearchResult> playlistResults = TellurideSearchPerformer.getValidPlaylistResults(result, gson, null, -1, url);
+        onResults(playlistResults, false);
     }
 
     void onResults(List<TellurideSearchResult> results, boolean errored) {

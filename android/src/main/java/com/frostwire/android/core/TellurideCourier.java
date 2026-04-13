@@ -144,6 +144,60 @@ public final class TellurideCourier {
         }
     }
 
+    public static void queryPlaylist(String url, TellurideCourierCallback callback) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> queryPlaylist(url, callback));
+            return;
+        }
+        if (callback != null) {
+            lastKnownCallback = callback;
+        }
+        SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::queryPlaylist");
+        if (!Python.isStarted()) {
+            Engine.startPython();
+        }
+        Python python = Engine.getPythonInstance();
+        if (python == null) {
+            LOG.error("TellurideCourier::queryPlaylist could not get Python instance");
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        PyObject telluride_module = null;
+        try {
+            telluride_module = python.getModule("telluride");
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::queryPlaylist failed to get telluride module", t);
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        if (telluride_module == null) {
+            LOG.error("TellurideCourier::queryPlaylist telluride module is null");
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        PyObject query_playlist_result = null;
+        try {
+            query_playlist_result = telluride_module.callAttr("query_playlist", url);
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::queryPlaylist failed to call query_playlist", t);
+            if (callback != null) {
+                callback.onResults(null, true);
+            }
+            return;
+        }
+        String result = query_playlist_result.toString();
+        if (callback != null && !callback.aborted()) {
+            callback.onResults(result, true);
+            lastKnownCallback = null;
+        }
+    }
+
     public interface OnYtDlpVersionCallback {
         void onVersion(String version);
     }
