@@ -154,7 +154,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         void updateTransferItem(TransferItem transferItem) {
-            if (fileNameTextView == null) {
+            if (playButtonImageView == null) {
                 initComponents();
             }
             final Bundle bundle = new Bundle();
@@ -179,14 +179,23 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private static void updateTransferDataPost(TransferDetailFilesTransferItemViewHolder holder,
                                                    TransferItem transferItem,
                                                    Bundle bundle) {
-            holder.fileTypeImageView.setImageResource(bundle.getInt("fileTypeIconId"));
-            holder.fileNameTextView.setText(transferItem.getName());
+            if (holder.fileTypeImageView != null) {
+                holder.fileTypeImageView.setImageResource(bundle.getInt("fileTypeIconId"));
+            }
+            if (holder.fileNameTextView != null) {
+                holder.fileNameTextView.setText(transferItem.getName());
+            }
             int progress = bundle.getInt("progress");
-            holder.fileProgressBar.setProgress(progress);
-            holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
-            holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
+            if (holder.fileProgressBar != null) {
+                holder.fileProgressBar.setProgress(progress);
+            }
+            if (holder.fileProgressTextView != null) {
+                holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
+            }
+            if (holder.fileSizeTextView != null) {
+                holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
+            }
             holder.currentTransferItem = transferItem;
-            // Only pass previewFile hint, recalculate to avoid serialization overhead
             boolean isComplete = bundle.getBoolean("isComplete");
             File previewFile = isComplete ? (transferItem instanceof BTDownloadItem ?
                     previewFile((BTDownloadItem) transferItem) : null) : null;
@@ -194,17 +203,21 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         private void initComponents() {
-            // file type icon
             fileTypeImageView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_type_icon);
             fileNameTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_name);
             fileProgressBar = itemView.findViewById(R.id.fragment_transfer_detail_files_file_progressbar);
             fileProgressTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_percentage);
             fileSizeTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_download_size);
             playButtonImageView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_play_icon);
-            playButtonImageView.setOnClickListener(new OpenOnClickListener(this));
+            if (playButtonImageView != null) {
+                playButtonImageView.setOnClickListener(new OpenOnClickListener(this));
+            }
         }
 
         private void updatePlayButtonVisibility(boolean isComplete, File previewFile) {
+            if (playButtonImageView == null) {
+                return;
+            }
             if (isComplete) {
                 playButtonImageView.setVisibility(View.VISIBLE);
             } else {
@@ -280,7 +293,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 }
             }
             viewHolder.currentTransferItem = transferItem;
-            viewHolder.playButtonImageView.setTag(transferItem);
+            viewHolder.initComponents();
+            if (viewHolder.playButtonImageView != null) {
+                viewHolder.playButtonImageView.setTag(transferItem);
+            }
             viewHolder.updateTransferItem(transferItem);
         }
 
