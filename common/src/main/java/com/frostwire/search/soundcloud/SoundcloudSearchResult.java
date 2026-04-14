@@ -26,6 +26,7 @@ import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.util.DateParser;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
+    private static final Logger LOG = Logger.getLogger(SoundcloudSearchResult.class);
     private final String displayName;
     private final String username;
     private final String trackUrl;
@@ -119,6 +121,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     @Override
     public String getDownloadUrl() {
         if (progressiveFormatJSONFetcherURL == null) {
+            LOG.warn("getDownloadUrl(): progressiveFormatJSONFetcherURL is null");
             return null;
         }
         if (downloadUrl != null) {
@@ -138,19 +141,34 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         }
 
         HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+        String json;
         try {
-            String json = client.get(progressiveFormatJSONFetcherURL);
-            SoundcloudTrackURL soundcloudTrackURL = JsonUtils.toObject(json, SoundcloudTrackURL.class);
-            if (soundcloudTrackURL != null && soundcloudTrackURL.url != null) {
-                return soundcloudTrackURL.url;
-            }
-            System.err.println("SoundcloudSearchResult.getDownloadUrl(): got null url from json: " + json);
+            json = client.get(progressiveFormatJSONFetcherURL);
         } catch (Throwable t) {
-            System.err.println("SoundcloudSearchResult.getDownloadUrl() failed for " + progressiveFormatJSONFetcherURL + ": " + t.getMessage());
-            t.printStackTrace();
+            LOG.error("getDownloadUrl(): HTTP request failed for " + progressiveFormatJSONFetcherURL, t);
             return null;
         }
-        return null;
+        if (json == null || json.isEmpty()) {
+            LOG.error("getDownloadUrl(): empty response from " + progressiveFormatJSONFetcherURL);
+            return null;
+        }
+        LOG.info("getDownloadUrl(): response for " + displayName + ": " + json);
+        SoundcloudTrackURL soundcloudTrackURL;
+        try {
+            soundcloudTrackURL = JsonUtils.toObject(json, SoundcloudTrackURL.class);
+        } catch (Throwable t) {
+            LOG.error("getDownloadUrl(): failed to parse JSON for " + displayName + ": " + json, t);
+            return null;
+        }
+        if (soundcloudTrackURL == null) {
+            LOG.error("getDownloadUrl(): SoundcloudTrackURL parsed as null for " + displayName + ", json: " + json);
+            return null;
+        }
+        if (soundcloudTrackURL.url == null) {
+            LOG.error("getDownloadUrl(): SoundcloudTrackURL.url is null for " + displayName + ", json: " + json);
+            return null;
+        }
+        return soundcloudTrackURL.url;
     }
 
     private String buildUsername(SoundcloudItem item) {
