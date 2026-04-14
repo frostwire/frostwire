@@ -27,6 +27,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
@@ -39,13 +44,10 @@ import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.android.util.SystemUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author gubatron
@@ -63,7 +65,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     private RecyclerView recyclerView;
     private Button addTrackerButton;
 
-    private TrackerRecyclerViewAdapter adapter;
+    private TrackerListAdapter adapter;
     private AddTrackerButtonClickListener addTrackerButtonClickListener;
     private static final Pattern validTrackerUrlPattern = Pattern.compile("^(https?|udp)://[-a-zA-Z0-9+&@#/%?=~_|!:,\\.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
@@ -74,7 +76,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             return;
         }
         if (adapter == null && isAdded()) {
-            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload, getParentFragmentManager());
+            adapter = new TrackerListAdapter(uiBittorrentDownload, getParentFragmentManager());
         }
         //ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
@@ -108,11 +110,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             return;
         }
         if (adapter != null) {
-            try {
-                adapter.notifyDataSetChanged();
-            } catch (IllegalStateException e) {
-                LOG.warn("RecyclerView computing layout during updateComponents, skipping notifyDataSetChanged");
-            }
+            adapter.refreshFromTorrentHandle();
         }
         boolean announcingToDht = uiBittorrentDownload.getDl().isAnnouncingToDht();
         boolean announcingToLSD = uiBittorrentDownload.getDl().isAnnouncingToLsd();
@@ -123,10 +121,10 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
     private static final class AddTrackerButtonClickListener implements View.OnClickListener, EditTextDialog.TextViewInputDialogCallback {
         private final TorrentHandle torrentHandle;
-        private final WeakReference<TrackerRecyclerViewAdapter> adapterRef;
+        private final WeakReference<TrackerListAdapter> adapterRef;
         private WeakReference<View> clickedViewRef;
 
-        AddTrackerButtonClickListener(TorrentHandle torrentHandle, TrackerRecyclerViewAdapter adapter) {
+        AddTrackerButtonClickListener(TorrentHandle torrentHandle, TrackerListAdapter adapter) {
             this.torrentHandle = torrentHandle;
             adapterRef = Ref.weak(adapter);
         }
@@ -135,7 +133,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         public void onClick(View v) {
             clickedViewRef = Ref.weak(v);
             if (Ref.alive(adapterRef)) {
-                TrackerRecyclerViewAdapter adapter = adapterRef.get();
+                TrackerListAdapter adapter = adapterRef.get();
                 if (adapter != null && Ref.alive(adapter.fragmentManagerRef)) {
                     FragmentManager fm = adapter.fragmentManagerRef.get();
                     if (fm != null) {
@@ -162,15 +160,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                     torrentHandle.saveResumeData();
                     torrentHandle.forceReannounce();
                     if (Ref.alive(adapterRef)) {
-                        try {
-                            adapterRef.get().notifyDataSetChanged();
-                        } catch (IllegalStateException e) {
-                            SystemUtils.postToUIThread(() -> {
-                                if (Ref.alive(adapterRef)) {
-                                    adapterRef.get().notifyDataSetChanged();
-                                }
-                            });
-                        }
+                        adapterRef.get().refreshFromTorrentHandle();
                     }
                 } else if (Ref.alive(clickedViewRef)) {
                     UIUtils.showShortMessage(clickedViewRef.get(), R.string.invalid_tracker_url);
@@ -181,7 +171,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
 
     private static final class TrackerItemViewHolder extends RecyclerView.ViewHolder {
-        private final WeakReference<TrackerRecyclerViewAdapter> adapterRef; // so we can notify it when we've changed its underlying data
+        private final WeakReference<TrackerListAdapter> adapterRef;
         private final TextView trackerTextView;
         private final ImageView editButton;
         private final ImageView removeButton;
@@ -189,27 +179,20 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         private int trackerOffset;
 
         public TrackerItemViewHolder(final View itemView,
-                                     final TrackerRecyclerViewAdapter adapter,
-                                     final TorrentHandle torrentHandle,
-                                     int trackerOffset) {
+                                     final TrackerListAdapter adapter,
+                                     final TorrentHandle torrentHandle) {
             super(itemView);
             adapterRef = Ref.weak(adapter);
             trackerTextView = itemView.findViewById(R.id.view_transfer_detail_tracker_address);
             editButton = itemView.findViewById(R.id.view_transfer_detail_tracker_edit_button);
             removeButton = itemView.findViewById(R.id.view_transfer_detail_tracker_remove_button);
             this.torrentHandle = torrentHandle;
-            this.trackerOffset = trackerOffset;
             editButton.setOnClickListener(new OnEditTrackerClicked(this));
             removeButton.setOnClickListener(new OnRemoveTrackerClicked(this));
         }
 
-        public void updateData(int trackerOffset) {
-            List<AnnounceEntry> trackers = torrentHandle.trackers();
-            if (trackers == null || trackers.isEmpty() || trackerOffset >= trackers.size()) {
-                return;
-            }
-            AnnounceEntry trackerEntry = trackers.get(trackerOffset);
-            trackerTextView.setText(trackerEntry.url());
+        public void updateData(AnnounceEntry entry, int trackerOffset) {
+            trackerTextView.setText(entry.url());
             this.trackerOffset = trackerOffset;
         }
 
@@ -269,15 +252,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         th.saveResumeData();
                         th.forceReannounce();
                         if (Ref.alive(trackerViewHolder.adapterRef)) {
-                            try {
-                                trackerViewHolder.adapterRef.get().notifyDataSetChanged();
-                            } catch (IllegalStateException e) {
-                                SystemUtils.postToUIThread(() -> {
-                                    if (Ref.alive(trackerViewHolder.adapterRef)) {
-                                        trackerViewHolder.adapterRef.get().notifyDataSetChanged();
-                                    }
-                                });
-                            }
+                            trackerViewHolder.adapterRef.get().refreshFromTorrentHandle();
                         }
                     } else {
                         UIUtils.showShortMessage(vhRef.get().itemView, R.string.invalid_tracker_url);
@@ -326,15 +301,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                                     viewHolder.torrentHandle.saveResumeData();
                                     viewHolder.torrentHandle.forceReannounce();
                                     if (Ref.alive(viewHolder.adapterRef)) {
-                                        try {
-                                            viewHolder.adapterRef.get().notifyDataSetChanged();
-                                        } catch (IllegalStateException e) {
-                                            SystemUtils.postToUIThread(() -> {
-                                                if (Ref.alive(viewHolder.adapterRef)) {
-                                                    viewHolder.adapterRef.get().notifyDataSetChanged();
-                                                }
-                                            });
-                                        }
+                                        viewHolder.adapterRef.get().refreshFromTorrentHandle();
                                     }
                                 }
                             });
@@ -343,35 +310,44 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         }
     }
 
-    private static final class TrackerRecyclerViewAdapter extends RecyclerView.Adapter<TrackerItemViewHolder> {
+    private static final class TrackerListAdapter extends ListAdapter<AnnounceEntry, TrackerItemViewHolder> {
         private final UIBittorrentDownload uiBittorrentDownload;
         private final WeakReference<FragmentManager> fragmentManagerRef;
 
-        public TrackerRecyclerViewAdapter(final UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManger) {
+        public TrackerListAdapter(UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManager) {
+            super(new TrackerItemCallback());
             this.uiBittorrentDownload = uiBittorrentDownload;
-            fragmentManagerRef = Ref.weak(fragmentManger);
+            this.fragmentManagerRef = Ref.weak(fragmentManager);
+        }
+
+        public void refreshFromTorrentHandle() {
+            TorrentHandle th = uiBittorrentDownload.getDl().getTorrentHandle();
+            List<AnnounceEntry> trackers = th != null ? th.trackers() : null;
+            submitList(trackers != null ? new ArrayList<>(trackers) : new ArrayList<>());
         }
 
         @Override
         public TrackerItemViewHolder onCreateViewHolder(ViewGroup parent, int i) {
             View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_tracker_item, parent, false);
-            return new TrackerItemViewHolder(inflatedView, this, uiBittorrentDownload.getDl().getTorrentHandle(), i);
+            return new TrackerItemViewHolder(inflatedView, this, uiBittorrentDownload.getDl().getTorrentHandle());
         }
 
         @Override
         public void onBindViewHolder(TrackerItemViewHolder trackerItemViewHolder, int i) {
-            trackerItemViewHolder.updateData(i);
+            AnnounceEntry entry = getItem(i);
+            trackerItemViewHolder.updateData(entry, i);
+        }
+    }
+
+    private static final class TrackerItemCallback extends DiffUtil.ItemCallback<AnnounceEntry> {
+        @Override
+        public boolean areItemsTheSame(AnnounceEntry oldItem, AnnounceEntry newItem) {
+            return oldItem.url().equals(newItem.url());
         }
 
         @Override
-        public int getItemCount() {
-            if (uiBittorrentDownload == null ||
-                    uiBittorrentDownload.getDl() == null ||
-                    uiBittorrentDownload.getDl().getTorrentHandle() == null) {
-                return 0;
-            }
-            TorrentHandle torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
-            return torrentHandle.trackers() == null ? 0 : torrentHandle.trackers().size();
+        public boolean areContentsTheSame(AnnounceEntry oldItem, AnnounceEntry newItem) {
+            return true;
         }
     }
 }
