@@ -614,17 +614,7 @@ def main():
     console.print()
     console.print(f"[bold green]Done! FrostWire running on {serial}[/bold green]")
 
-    console.print()
-    console.print("[dim]What would you like to do next?[/dim]")
-    choice = Prompt.ask(
-        "[bold]Action:[/bold]",
-        choices=["l", "q"],
-        default="l"
-    )
-    if choice == "l":
-        run_logcat_tui(serial)
-    else:
-        console.print("[dim]Exiting.[/dim]")
+    run_logcat_tui(serial)
 
 
 if __name__ == "__main__":
