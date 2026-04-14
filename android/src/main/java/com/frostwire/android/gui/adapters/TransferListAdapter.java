@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
@@ -96,20 +97,10 @@ import java.util.Set;
  * @author gubatron
  * @author aldenml
  */
-public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapter.ViewHolder> {
+public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapter.ViewHolder> {
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
-    // Dedicated executor for DiffUtil calculations to avoid blocking sequential handler queues
-    private static java.util.concurrent.ExecutorService transferDiffExecutor;
-
-    private static java.util.concurrent.ExecutorService getTransferDiffExecutor() {
-        if (transferDiffExecutor == null || transferDiffExecutor.isShutdown()) {
-            transferDiffExecutor = ExecutorsHelper.newFixedSizeThreadPool(2, "TransferDiff");
-        }
-        return transferDiffExecutor;
-    }
 
     private final WeakReference<Context> contextRef;
-
     private final ViewOnClickListener viewOnClickListener;
     private final ViewOnLongClickListener viewOnLongClickListener;
     private final OpenOnClickListener openOnClickListener;
@@ -119,39 +110,29 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
      * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memory leaks
      */
     private final List<Dialog> dialogs;
-    private final List<TransferUiState> previousUiStates;
-    private List<Transfer> list;
 
     /**
-     * Track whether an update is in progress to prevent concurrent updates during animations.
-     * This prevents the "Tmp detached view should be removed from RecyclerView" crash.
-     */
-    private volatile boolean updateInProgress = false;
-    private volatile List<Transfer> pendingUpdate = null;
-
-    /**
-     * Track IDs of removed transfers to prevent them from being re-added by updateList().
+     * Track IDs of removed transfers to prevent them from being re-added by submitList().
+     * Unlike the old currentList approach, removedTransferIds is only used for filtering
+     * during updateList() — ListAdapter is now the single source of truth for the list.
      */
     private final Set<String> removedTransferIds = Collections.synchronizedSet(new HashSet<>());
 
     public TransferListAdapter(Context context, List<Transfer> list) {
+        super(new TransferItemCallback());
         this.contextRef = new WeakReference<>(context);
         this.dialogs = new ArrayList<>();
-        List<Transfer> initialList = list == null ? Collections.emptyList() : list;
-        this.list = new ArrayList<>(initialList);
-        this.previousUiStates = new ArrayList<>(captureUiStates(this.list));
         viewOnClickListener = new ViewOnClickListener();
         viewOnLongClickListener = new ViewOnLongClickListener();
         openOnClickListener = new OpenOnClickListener(context);
         transferDetailsClickListener = new TransferDetailsClickListener(context);
+        submitList(list == null ? Collections.emptyList() : new ArrayList<>(list));
     }
 
-    // RecyclerView.Adapter methods
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         LinearLayout convertView =
                 (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_list_item, parent, false);
-        // Store context once and check for null before passing to ViewHolder
         Context context = Ref.alive(contextRef) ? contextRef.get() : parent.getContext();
         return new ViewHolder(this,
                 context,
@@ -164,256 +145,45 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        if (list == null || list.isEmpty()) {
+        Transfer item = getItem(i);
+        if (item == null) {
             return;
         }
-        viewHolder.updateView(i);
-    }
-
-    @Override
-    public int getItemCount() {
-        return list == null ? 0 : list.size();
+        viewHolder.updateView(item);
     }
 
     public List<Transfer> getList() {
-        return list != null ? new ArrayList<>(list) : Collections.emptyList();
+        return new ArrayList<>(getCurrentList());
     }
 
     public void updateList(List<Transfer> newList) {
-        updateList(newList, false);
-    }
-
-    public void updateList(List<Transfer> newList, boolean forceImmediate) {
-        // For forced updates (like user cancelling a transfer), use notifyDataSetChanged()
-        // for instant feedback, bypassing DiffUtil calculation which can take several seconds
-        if (forceImmediate) {
-            pendingUpdate = null;  // Clear any queued updates
-            updateInProgress = true;
-            try {
-                list.clear();
-                list.addAll(newList == null ? Collections.emptyList() : newList);
-                previousUiStates.clear();
-                // Try to notify immediately, but if RecyclerView is computing layout, defer it
-                try {
-                    notifyDataSetChanged();  // Instant refresh, no DiffUtil calculation
-                } catch (IllegalStateException e) {
-                    // RecyclerView is computing layout or scrolling, defer the notification
-                    LOG.warn("RecyclerView computing layout during forceImmediate, deferring notifyDataSetChanged: " + e.getMessage());
-                    deferNotifyDataSetChanged();
-                }
-            } finally {
-                updateInProgress = false;
-                // Process any pending update that came in while we were updating
-                if (pendingUpdate != null) {
-                    List<Transfer> next = pendingUpdate;
-                    pendingUpdate = null;
-                    prepareUpdateOnBackgroundThread(next);
-                }
-            }
-            return;
-        }
-
-        // If update is already in progress, queue the pending update instead of trying
-        // to dispatch immediately. This prevents concurrent modifications during animations,
-        // which causes the "Tmp detached view should be removed from RecyclerView" crash.
-        if (updateInProgress) {
-            pendingUpdate = newList;
-            return;
-        }
-
-        // Prepare diff calculation on background thread to avoid blocking JNI calls
-        prepareUpdateOnBackgroundThread(newList);
-    }
-
-    /**
-     * Prepares the adapter update on background thread to avoid blocking JNI calls
-     * when capturing UI states. Once done, posts result back to main thread.
-     * Filters out any transfers that have been explicitly removed.
-     */
-    private void prepareUpdateOnBackgroundThread(List<Transfer> newList) {
         if (newList == null) {
             newList = Collections.emptyList();
         }
-
-        // Keep original unfiltered list to check against for cleanup
-        final List<Transfer> originalList = new ArrayList<>(newList);
-
-        // Filter out any transfers that have been marked as removed
-        // This prevents removed transfers from being re-added by stale data
-        final List<Transfer> filteredList = new ArrayList<>(newList);
         if (!removedTransferIds.isEmpty()) {
-            filteredList.removeIf(t -> removedTransferIds.contains(resolveTransferId(t)));
+            newList = new ArrayList<>(newList);
+            newList.removeIf(t -> removedTransferIds.contains(resolveTransferId(t)));
         }
-
-        final List<Transfer> finalSafeNewList = (filteredList == list) ? new ArrayList<>(filteredList) : filteredList;
-
-        // Do expensive work on background thread using parallel executor
-        try {
-            getTransferDiffExecutor().execute(() -> {
-                try {
-                    // Capture UI states on background thread to avoid blocking JNI calls
-                    final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
-                    // Calculate diff on background thread
-                    final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
-
-                    // Post result back to main thread for UI update
-                    // Pass filtered list (for display) and original list (for cleanup decision)
-                    if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
-                        ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult, originalList));
-                    }
-                } catch (Throwable e) {
-                    LOG.error("Error preparing adapter update on background thread", e);
-                }
-            });
-        } catch (java.util.concurrent.RejectedExecutionException e) {
-            // Executor queue full, fall back to handler
-            LOG.warn("TransferDiff executor queue full, using fallback handler: " + e.getMessage());
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-                try {
-                    final List<TransferUiState> newUiStates = captureUiStates(finalSafeNewList);
-                    final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TransferDiffCallback(previousUiStates, newUiStates), false);
-                    if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
-                        ((android.app.Activity) contextRef.get()).runOnUiThread(() -> applyDiffResult(finalSafeNewList, newUiStates, diffResult, originalList));
-                    }
-                } catch (Throwable e2) {
-                    LOG.error("Error in fallback handler", e2);
-                }
-            });
-        }
+        submitList(newList);
     }
 
     /**
-     * Applies the diff result on main thread (safe for RecyclerView updates).
-     * @param newTransferList the filtered list (removed transfers excluded)
-     * @param originalList the unfiltered list from TransferManager (for cleanup decisions)
+     * DiffUtil.ItemCallback for Transfer objects.
+     * ListAdapter uses this to compute diffs on a background thread and dispatch
+     * granular updates to RecyclerView on the main thread — no manual notifyXxx() needed.
      */
-    private void applyDiffResult(List<Transfer> newTransferList, List<TransferUiState> newUiStates, DiffUtil.DiffResult diffResult, List<Transfer> originalList) {
-        updateInProgress = true;
-        try {
-            list.clear();
-            list.addAll(newTransferList);
-            previousUiStates.clear();
-            previousUiStates.addAll(newUiStates);
-
-            // Clean up removedTransferIds: keep only transfers that are STILL in TransferManager
-            // (not yet deleted). Remove tracking for transfers that are confirmed gone.
-            // Use originalList (unfiltered) to check what's really in TransferManager
-            if (!removedTransferIds.isEmpty()) {
-                Set<String> originalIds = new HashSet<>();
-                for (Transfer t : originalList) {
-                    originalIds.add(resolveTransferId(t));
-                }
-                // Keep tracking only for transfers still in TransferManager
-                removedTransferIds.retainAll(originalIds);
-            }
-
-            try {
-                diffResult.dispatchUpdatesTo(this);
-            } catch (IllegalStateException e) {
-                // RecyclerView is computing layout or scrolling, cannot apply diff.
-                // Fall back to full refresh, deferred until RecyclerView is safe.
-                LOG.warn("RecyclerView computing layout, deferring full refresh: " + e.getMessage());
-                deferNotifyDataSetChanged();
-            }
-        } finally {
-            updateInProgress = false;
-
-            // If a new update was queued while this one was in progress, process it now
-            if (pendingUpdate != null) {
-                List<Transfer> next = pendingUpdate;
-                pendingUpdate = null;
-                prepareUpdateOnBackgroundThread(next);
-            }
-        }
-    }
-
-    /**
-     * Safely defers notifyDataSetChanged() to a time when RecyclerView is not computing layout.
-     * Retries with a small delay if it's still computing layout.
-     */
-    private void deferNotifyDataSetChanged() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-            if (Ref.alive(contextRef) && contextRef.get() instanceof android.app.Activity) {
-                ((android.app.Activity) contextRef.get()).runOnUiThread(() -> {
-                    try {
-                        notifyDataSetChanged();
-                    } catch (IllegalStateException e) {
-                        // Still computing layout, try again later with a small delay
-                        LOG.warn("RecyclerView still computing layout, retrying notifyDataSetChanged");
-                        // Retry after a small delay to avoid busy-waiting
-                        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException ignored) {
-                            }
-                            deferNotifyDataSetChanged();
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    /**
-     * Performs the actual update, applying DiffUtil and dispatching changes.
-     * Called from updateList() when safe, or from dispatchUpdatesTo listener when previous update completes.
-     */
-    private void performUpdate(List<Transfer> newList) {
-        prepareUpdateOnBackgroundThread(newList);
-    }
-
-    /**
-     * DiffUtil.Callback for calculating differences between old and new Transfer lists.
-     * This enables RecyclerView to use granular notifications instead of notifyDataSetChanged().
-     *
-     * Performance impact:
-     * - Before: notifyDataSetChanged() rebinds ALL items (~50-100ms for 20 transfers)
-     * - After: Only changed items rebind (~5-10ms for typical updates)
-     * - Bonus: Smooth item animations (fade, move) visible to user
-     */
-    private static class TransferDiffCallback extends DiffUtil.Callback {
-        private final List<TransferUiState> oldList;
-        private final List<TransferUiState> newList;
-
-        TransferDiffCallback(List<TransferUiState> oldList, List<TransferUiState> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
+    private static class TransferItemCallback extends DiffUtil.ItemCallback<Transfer> {
+        @Override
+        public boolean areItemsTheSame(Transfer oldItem, Transfer newItem) {
+            return resolveTransferId(oldItem).equals(resolveTransferId(newItem));
         }
 
         @Override
-        public int getOldListSize() {
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            TransferUiState oldState = oldList.get(oldItemPosition);
-            TransferUiState newState = newList.get(newItemPosition);
-            return oldState.id.equals(newState.id);
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            TransferUiState oldState = oldList.get(oldItemPosition);
-            TransferUiState newState = newList.get(newItemPosition);
+        public boolean areContentsTheSame(Transfer oldItem, Transfer newItem) {
+            TransferUiState oldState = new TransferUiState(oldItem);
+            TransferUiState newState = new TransferUiState(newItem);
             return oldState.hasSameContent(newState);
         }
-    }
-
-    private static List<TransferUiState> captureUiStates(List<Transfer> transfers) {
-        if (transfers == null || transfers.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<TransferUiState> snapshot = new ArrayList<>(transfers.size());
-        for (Transfer transfer : transfers) {
-            snapshot.add(new TransferUiState(transfer));
-        }
-        return snapshot;
     }
 
     private static String resolveTransferId(Transfer transfer) {
@@ -662,29 +432,26 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             this.transferStateStrings = TransferStateStrings.getInstance(context);
         }
 
-        public void updateView(int position) {
-            if (Ref.alive(adapterRef)) {
-                TransferListAdapter transferListAdapter = adapterRef.get();
-                if (transferListAdapter.list != null && !transferListAdapter.list.isEmpty()) {
-                    Transfer transfer = transferListAdapter.list.get(position);
-                    LinearLayout listItemLinearLayoutHolder = (LinearLayout) itemView;
-                    listItemLinearLayoutHolder.setOnClickListener(viewOnClickListener);
-                    listItemLinearLayoutHolder.setOnLongClickListener(viewOnLongClickListener);
-                    listItemLinearLayoutHolder.setClickable(true);
-                    listItemLinearLayoutHolder.setLongClickable(true);
-                    listItemLinearLayoutHolder.setTag(transfer);
-                    try {
-                        if (transfer instanceof BittorrentDownload) {
-                            populateBittorrentDownload(listItemLinearLayoutHolder, (BittorrentDownload) transfer);
-                        } else if (transfer instanceof SoundcloudDownload) {
-                            populateCloudDownload(listItemLinearLayoutHolder, transfer);
-                        } else if (transfer instanceof HttpDownload) {
-                            populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
-                        }
-                    } catch (Throwable e) {
-                        LOG.error("Not able to populate group view in expandable list:" + e.getMessage());
-                    }
+        public void updateView(Transfer transfer) {
+            if (transfer == null) {
+                return;
+            }
+            LinearLayout listItemLinearLayoutHolder = (LinearLayout) itemView;
+            listItemLinearLayoutHolder.setOnClickListener(viewOnClickListener);
+            listItemLinearLayoutHolder.setOnLongClickListener(viewOnLongClickListener);
+            listItemLinearLayoutHolder.setClickable(true);
+            listItemLinearLayoutHolder.setLongClickable(true);
+            listItemLinearLayoutHolder.setTag(transfer);
+            try {
+                if (transfer instanceof BittorrentDownload) {
+                    populateBittorrentDownload(listItemLinearLayoutHolder, (BittorrentDownload) transfer);
+                } else if (transfer instanceof SoundcloudDownload) {
+                    populateCloudDownload(listItemLinearLayoutHolder, transfer);
+                } else if (transfer instanceof HttpDownload) {
+                    populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
                 }
+            } catch (Throwable e) {
+                LOG.error("Not able to populate group view in expandable list:" + e.getMessage());
             }
         }
 
@@ -944,36 +711,26 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     /**
-     * Removes a transfer item from the adapter immediately and notifies observers.
-     * Marks the transfer ID as removed to prevent it from being re-added by updateList() calls.
-     * Must be called from the UI thread.
+     * Removes a transfer item from the adapter.
+     * Marks the transfer ID as removed to prevent it from being re-added by updateList()/submitList().
+     * Uses submitList() to let ListAdapter compute the diff and dispatch granular notifications
+     * (no more manual notifyItemRemoved() which caused IndexOutOfBoundsException crashes).
      */
     public void removeTransferItem(Transfer transfer) {
-        if (transfer == null || list == null) {
+        if (transfer == null) {
             return;
         }
-
-        // Track this transfer ID as removed to prevent re-adding
         String transferId = resolveTransferId(transfer);
         removedTransferIds.add(transferId);
-
-        // Clear any pending updates to prevent re-adding this transfer
-        pendingUpdate = null;
-
-        // Remove from underlying data structures
-        list.remove(transfer);
-
-        // Clear UI state cache to prevent this transfer from being restored
-        previousUiStates.clear();
-
-        // Notify the UI
-        try {
-            notifyDataSetChanged();
-        } catch (IllegalStateException e) {
-            // RecyclerView is computing layout or scrolling, defer the notification
-            LOG.warn("RecyclerView computing layout during removeTransferItem, deferring refresh: " + e.getMessage());
-            deferNotifyDataSetChanged();
+        List<Transfer> current = getCurrentList();
+        if (current.isEmpty()) {
+            return;
         }
+        List<Transfer> updated = new ArrayList<>(current);
+        if (!updated.remove(transfer)) {
+            return;
+        }
+        submitList(updated);
     }
 
     /**
