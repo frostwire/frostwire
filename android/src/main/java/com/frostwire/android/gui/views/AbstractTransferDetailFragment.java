@@ -53,7 +53,7 @@ import java.util.List;
  * Created on 10/10/17.
  */
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-    private Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+    private static final Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private String infinity;
     private TransferStateStrings transferStateStrings;
 
@@ -310,7 +310,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (freshItems != null && !freshItems.isEmpty()) {
             if (items.isEmpty()) {
                 items.addAll(freshItems);
-                adapter.notifyDataSetChanged();
+                safeNotifyDataSetChanged(adapter);
             } else {
                 // Update existing items
                 int maxSize = Math.min(items.size(), freshItems.size());
@@ -339,7 +339,16 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             }
         } else {
             items.clear();
+            safeNotifyDataSetChanged(adapter);
+        }
+    }
+
+    private static void safeNotifyDataSetChanged(RecyclerView.Adapter<?> adapter) {
+        try {
             adapter.notifyDataSetChanged();
+        } catch (IllegalStateException e) {
+            LOG.warn("RecyclerView computing layout during updateAdapterItems, deferring notifyDataSetChanged");
+            SystemUtils.postToUIThread(adapter::notifyDataSetChanged);
         }
     }
 }

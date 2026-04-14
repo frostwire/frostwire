@@ -37,6 +37,7 @@ import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -52,6 +53,7 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 
 public class TransferDetailTrackersFragment extends AbstractTransferDetailFragment {
+    private static final Logger LOG = Logger.getLogger(TransferDetailTrackersFragment.class);
     public TransferDetailTrackersFragment() {
         super(R.layout.fragment_transfer_detail_trackers);
     }
@@ -105,7 +107,11 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             return;
         }
         if (adapter != null) {
-            adapter.notifyDataSetChanged();
+            try {
+                adapter.notifyDataSetChanged();
+            } catch (IllegalStateException e) {
+                LOG.warn("RecyclerView computing layout during updateComponents, skipping notifyDataSetChanged");
+            }
         }
         boolean announcingToDht = uiBittorrentDownload.getDl().isAnnouncingToDht();
         boolean announcingToLSD = uiBittorrentDownload.getDl().isAnnouncingToLsd();
