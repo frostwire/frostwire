@@ -31,7 +31,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
@@ -215,9 +217,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
     }
 
-    private final static class TransferDetailFilesRecyclerViewAdapter extends RecyclerView.Adapter<TransferDetailFilesTransferItemViewHolder> {
+    private final static class TransferDetailFilesRecyclerViewAdapter extends ListAdapter<TransferItem, TransferDetailFilesTransferItemViewHolder> {
 
-        private final List<TransferItem> items;
+        private final List<TransferItem> combinedItems;
         private final int pageSize;
         private int currentPage = 0;
         private List<TransferItem> allItems;
@@ -225,43 +227,34 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private Runnable pendingLoadMoreRunnable;
 
         TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items, int pageSize) {
+            super(new TransferItemDiffCallback());
             this.allItems = new LinkedList<>(items);
             this.pageSize = pageSize;
-            this.items = new LinkedList<>();
+            this.combinedItems = new LinkedList<>();
             loadNextPage();
         }
 
-        /**
-         * Loads the next page of items. For large lists (1000+), only loads PAGE_SIZE items at a time.
-         */
         private void loadNextPage() {
             if (allItems == null || allItems.isEmpty()) {
                 return;
             }
             int startIndex = currentPage * pageSize;
             int endIndex = Math.min(startIndex + pageSize, allItems.size());
-
             if (startIndex < allItems.size()) {
-                items.addAll(allItems.subList(startIndex, endIndex));
+                combinedItems.addAll(allItems.subList(startIndex, endIndex));
                 currentPage++;
             }
         }
 
-        /**
-         * Checks if more pages are available to load.
-         */
         boolean hasMorePages() {
             return allItems != null && (currentPage * pageSize) < allItems.size();
         }
 
-        /**
-         * Loads more pages when user scrolls near the end.
-         */
         void loadMorePages() {
-            if (hasMorePages()) {
-                int startIndex = items.size();
+            if (hasMorePages() && pendingLoadMoreRunnable == null) {
+                int startIndex = combinedItems.size();
                 loadNextPage();
-                notifyItemRangeInserted(startIndex, items.size() - startIndex);
+                submitList(new LinkedList<>(combinedItems));
             }
         }
 
@@ -273,12 +266,11 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         @Override
         public void onBindViewHolder(@NonNull TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
-            if (items.isEmpty()) {
+            TransferItem transferItem = getItem(i);
+            if (transferItem == null) {
                 return;
             }
-            // Load more pages when user is near the end (within 100 items)
-            // Defer the load to prevent calling notify methods during layout computation
-            if (hasMorePages() && (i >= items.size() - 100)) {
+            if (hasMorePages() && (i >= combinedItems.size() - 100)) {
                 if (pendingLoadMoreRunnable == null) {
                     pendingLoadMoreRunnable = () -> {
                         loadMorePages();
@@ -287,64 +279,41 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     mainHandler.post(pendingLoadMoreRunnable);
                 }
             }
-
-            TransferItem transferItem = items.get(i);
-            if (transferItem != null) {
-                // Set TransferItem on holder IMMEDIATELY so the play button click
-                // listener has it available before the async background task completes.
-                viewHolder.currentTransferItem = transferItem;
-                viewHolder.playButtonImageView.setTag(transferItem);
-                viewHolder.updateTransferItem(transferItem);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return items.isEmpty() ? 0 : items.size();
+            viewHolder.currentTransferItem = transferItem;
+            viewHolder.playButtonImageView.setTag(transferItem);
+            viewHolder.updateTransferItem(transferItem);
         }
 
         void updateTransferItems(List<TransferItem> freshItems) {
+            if (freshItems == null) {
+                return;
+            }
+            List<TransferItem> sortedFresh = new LinkedList<>(freshItems);
             try {
-                if (items != null && items.size() > 1) {
-                    Collections.sort(items, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                if (sortedFresh.size() > 1) {
+                    Collections.sort(sortedFresh, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
                 }
             } catch (Throwable ignored) {
-                //Fatal Exception: java.lang.IllegalArgumentException
-                //Comparison method violates its general contract!
             }
-            try {
-                if (freshItems != null && freshItems.size() > 1) {
-                    Collections.sort(freshItems, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
-                }
-            } catch (Throwable ignored) {
-                //Fatal Exception: java.lang.IllegalArgumentException
-                //Comparison method violates its general contract!
-            }
-            // For paginated lists, update allItems but only refresh current page items
-            if (freshItems != null) {
-                allItems = new LinkedList<>(freshItems);
-                // Reset pagination when items are refreshed
-                if (items.size() > 0) {
-                    currentPage = 0;
-                    items.clear();
-                    loadNextPage();
-                    safeNotifyDataSetChanged();
-                }
-            }
+            allItems = sortedFresh;
+            currentPage = 0;
+            combinedItems.clear();
+            loadNextPage();
+            submitList(new LinkedList<>(combinedItems));
+        }
+    }
+
+    private static final class TransferItemDiffCallback extends DiffUtil.ItemCallback<TransferItem> {
+        @Override
+        public boolean areItemsTheSame(TransferItem oldItem, TransferItem newItem) {
+            return oldItem.getFile() != null && newItem.getFile() != null &&
+                    oldItem.getFile().getAbsolutePath().equals(newItem.getFile().getAbsolutePath());
         }
 
-        private void safeNotifyDataSetChanged() {
-            try {
-                notifyDataSetChanged();
-            } catch (IllegalStateException e) {
-                LOG.warn("RecyclerView computing layout during updateTransferItems, deferring notifyDataSetChanged");
-                mainHandler.postDelayed(() -> {
-                    try {
-                        notifyDataSetChanged();
-                    } catch (IllegalStateException ignored) {
-                    }
-                }, 100);
-            }
+        @Override
+        public boolean areContentsTheSame(TransferItem oldItem, TransferItem newItem) {
+            return oldItem.getProgress() == newItem.getProgress() &&
+                    oldItem.isComplete() == newItem.isComplete();
         }
     }
 
