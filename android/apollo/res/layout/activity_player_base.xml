@@ -121,7 +121,7 @@
                     app:showRemoveAdsTextView="true"
                     android:id="@+id/audio_player_320x50_banner_view"
                     android:layout_width="match_parent"
-                    android:layout_marginBottom="-125dp"
+                    android:layout_marginBottom="-135dp"
                     android:layout_height="150dp"
                     android:layout_alignBottom="@+id/audio_player_album_art"
                     android:layout_gravity="center_horizontal"
