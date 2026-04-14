@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.51.3.0'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.83'
 
     def jlibtorrent_version = '2.0.12.7'
 
