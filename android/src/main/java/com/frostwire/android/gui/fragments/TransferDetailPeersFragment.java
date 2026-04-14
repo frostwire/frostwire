@@ -25,7 +25,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
@@ -60,8 +62,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             return;
         }
         if (adapter == null && isAdded()) {
-            List<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
-            adapter = new PeersAdapter(peerInfos);
+            adapter = new PeersAdapter();
         }
         updateComponents();
     }
@@ -194,27 +195,23 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
         }
     }
 
-    private static final class PeersAdapter extends RecyclerView.Adapter<PeerItemViewHolder> {
+    private static final class PeersAdapter extends ListAdapter<PeerInfo, PeerItemViewHolder> {
 
-        private final ArrayList<PeerInfo> peers;
-
-        public PeersAdapter(List<PeerInfo> peerInfos) {
-            this.peers = new ArrayList<>(0);
-            updatePeers(peerInfos);
+        public PeersAdapter() {
+            super(new PeerInfoItemCallback());
         }
 
         public void updatePeers(List<PeerInfo> peerInfos) {
-            Collections.sort(peers, (o1, o2) ->
+            if (peerInfos == null) {
+                peerInfos = Collections.emptyList();
+            }
+            List<PeerInfo> sorted = new ArrayList<>(peerInfos);
+            Collections.sort(sorted, (o1, o2) ->
                     -Long.compare(
                             o1.totalDownload() + o1.totalUpload(),
                             o2.totalDownload() + o2.totalUpload())
             );
-            Collections.sort(peerInfos, (o1, o2) ->
-                    -Long.compare(
-                            o1.totalDownload() + o1.totalUpload(),
-                            o2.totalDownload() + o2.totalUpload())
-            );
-            AbstractTransferDetailFragment.updateAdapterItems(this, peers, peerInfos);
+            submitList(sorted);
         }
 
         @Override
@@ -225,14 +222,27 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
 
         @Override
         public void onBindViewHolder(PeerItemViewHolder peerItemViewHolder, int i) {
-            if (peers != null && peers.size() > 0 && i >= 0) {
-                peerItemViewHolder.updateData(peers.get(i), i);
+            PeerInfo peer = getItem(i);
+            if (peer != null) {
+                peerItemViewHolder.updateData(peer, i);
             }
+        }
+    }
+
+    private static final class PeerInfoItemCallback extends DiffUtil.ItemCallback<PeerInfo> {
+        @Override
+        public boolean areItemsTheSame(PeerInfo oldItem, PeerInfo newItem) {
+            return oldItem.ip().equals(newItem.ip());
         }
 
         @Override
-        public int getItemCount() {
-            return peers.size();
+        public boolean areContentsTheSame(PeerInfo oldItem, PeerInfo newItem) {
+            return oldItem.downSpeed() == newItem.downSpeed() &&
+                    oldItem.upSpeed() == newItem.upSpeed() &&
+                    oldItem.totalDownload() == newItem.totalDownload() &&
+                    oldItem.totalUpload() == newItem.totalUpload() &&
+                    oldItem.client().equals(newItem.client()) &&
+                    oldItem.source() == newItem.source();
         }
     }
 }
