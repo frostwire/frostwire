@@ -46,6 +46,7 @@ import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.util.Logger;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -62,6 +63,7 @@ import java.util.List;
  */
 
 public class TransferDetailFilesFragment extends AbstractTransferDetailFragment {
+    private static final Logger LOG = Logger.getLogger(TransferDetailFilesFragment.class);
     private static final int PAGE_SIZE = 500;  // Load 500 files at a time to prevent ANR
     private static final int LARGE_FILE_LIST_THRESHOLD = 1000;  // Trigger pagination for 1000+ files
 
@@ -326,8 +328,22 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     currentPage = 0;
                     items.clear();
                     loadNextPage();
-                    notifyDataSetChanged();
+                    safeNotifyDataSetChanged();
                 }
+            }
+        }
+
+        private void safeNotifyDataSetChanged() {
+            try {
+                notifyDataSetChanged();
+            } catch (IllegalStateException e) {
+                LOG.warn("RecyclerView computing layout during updateTransferItems, deferring notifyDataSetChanged");
+                mainHandler.postDelayed(() -> {
+                    try {
+                        notifyDataSetChanged();
+                    } catch (IllegalStateException ignored) {
+                    }
+                }, 100);
             }
         }
     }
