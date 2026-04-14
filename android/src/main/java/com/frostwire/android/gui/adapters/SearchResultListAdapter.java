@@ -307,7 +307,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                 }
                 this.visualList.addAll(mediaTypeFiltered);
             }
-            notifyDataSetChanged();
+            safeNotifyDataSetChanged();
         } catch (Throwable t) {
             t.printStackTrace();
         }

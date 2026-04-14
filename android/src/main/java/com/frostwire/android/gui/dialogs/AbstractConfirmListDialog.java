@@ -274,7 +274,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         if (adapter != null && bundle.containsKey(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX)) {
             int index = bundle.getInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX);
             adapter.setLastSelectedRadioButton(index);
-            adapter.notifyDataSetChanged();
+            adapter.safeNotifyDataSetChanged();
         }
     }
 

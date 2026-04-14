@@ -58,8 +58,8 @@ import java.util.Set;
  * @author aldenml
  */
 public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filterable {
-    // Immutable
     private static final Logger LOG = Logger.getLogger(AbstractListAdapter.class);
+    // Immutable
     private final Context context;
     private final int viewItemId;
     private final OnClickListener viewOnClickListener;
@@ -172,7 +172,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         if (visualList != null) {
             checked.addAll(visualList);
         }
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     public Context getContext() {
@@ -245,8 +245,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             visualList.addAll(l);
             fullList.addAll(l);
         }
-
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     public void addToFullList(List<T> l) {
@@ -269,7 +268,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 visualList.add(item);
             }
         }
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     /**
@@ -282,7 +281,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             fullList.remove(item);
             checked.remove(item);
         }
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     public void clear() {
@@ -297,7 +296,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 checked.clear();
             }
         }
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     /**
@@ -355,7 +354,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     public void setCheckboxesVisibility(boolean checkboxesVisibility) {
         this.checkboxesVisibility = checkboxesVisibility;
-        notifyDataSetChanged();
+        safeNotifyDataSetChanged();
     }
 
     public boolean getShowMenuOnClick() {
@@ -649,7 +648,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             }
             adapter.visualList.clear();
             adapter.visualList.addAll((List<T>) results.values);
-            adapter.notifyDataSetChanged();
+            adapter.safeNotifyDataSetChanged();
         }
     }
 
@@ -681,5 +680,22 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     public int getLastSelectedRadioButtonIndex() {
         return lastSelectedRadioButtonIndex;
+    }
+
+    private void deferSafeNotifyDataSetChanged() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            if (context instanceof android.app.Activity) {
+                ((android.app.Activity) context).runOnUiThread(this::safeNotifyDataSetChanged);
+            }
+        });
+    }
+
+    private void safeNotifyDataSetChanged() {
+        try {
+            notifyDataSetChanged();
+        } catch (IllegalStateException e) {
+            LOG.warn("RecyclerView computing layout, deferring notifyDataSetChanged: " + e.getMessage());
+            deferSafeNotifyDataSetChanged();
+        }
     }
 }

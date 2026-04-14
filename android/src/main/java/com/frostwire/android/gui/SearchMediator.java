@@ -169,7 +169,7 @@ public final class SearchMediator {
     public void markOpened(SearchResult sr, SearchResultListAdapter adapter) {
         opened.add(getSearchResultUID(sr));
         if (adapter != null) {
-            adapter.notifyDataSetChanged();
+            adapter.safeNotifyDataSetChanged();
         }
     }
 
