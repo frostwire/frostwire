@@ -143,6 +143,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private TextView fileProgressTextView;
         private TextView fileSizeTextView;
         private ImageButton playButtonImageView;
+        private TransferItem currentTransferItem;
 
         TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
             super(itemView);
@@ -180,7 +181,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             holder.fileProgressBar.setProgress(progress);
             holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
             holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
-            holder.playButtonImageView.setTag(transferItem);
+            holder.currentTransferItem = transferItem;
             // Only pass previewFile hint, recalculate to avoid serialization overhead
             boolean isComplete = bundle.getBoolean("isComplete");
             File previewFile = isComplete ? (transferItem instanceof BTDownloadItem ?
@@ -196,7 +197,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             fileProgressTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_percentage);
             fileSizeTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_download_size);
             playButtonImageView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_play_icon);
-            playButtonImageView.setOnClickListener(new OpenOnClickListener(itemView.getContext()));
+            playButtonImageView.setOnClickListener(new OpenOnClickListener(this));
         }
 
         private void updatePlayButtonVisibility(boolean isComplete, File previewFile) {
@@ -205,6 +206,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             } else {
                 playButtonImageView.setVisibility(previewFile != null ? View.VISIBLE : View.GONE);
             }
+        }
+
+        TransferItem getCurrentTransferItem() {
+            return currentTransferItem;
         }
     }
 
@@ -283,6 +288,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
             TransferItem transferItem = items.get(i);
             if (transferItem != null) {
+                // Set TransferItem on holder IMMEDIATELY so the play button click
+                // listener has it available before the async background task completes.
+                viewHolder.currentTransferItem = transferItem;
+                viewHolder.playButtonImageView.setTag(transferItem);
                 viewHolder.updateTransferItem(transferItem);
             }
         }
@@ -324,15 +333,16 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     }
 
     private static final class OpenOnClickListener extends ClickAdapter<Context> {
+        private final TransferDetailFilesTransferItemViewHolder holderRef;
 
-        OpenOnClickListener(Context ctx) {
-            super(ctx);
+        OpenOnClickListener(TransferDetailFilesTransferItemViewHolder holder) {
+            super(holder.itemView.getContext());
+            this.holderRef = holder;
         }
 
         public void onClick(Context ctx, View v) {
-            Object tag = v.getTag();
-            if (tag instanceof TransferItem) {
-                TransferItem item = (TransferItem) tag;
+            TransferItem item = holderRef.getCurrentTransferItem();
+            if (item != null) {
                 File path = item.isComplete() ? item.getFile() : null;
                 if (path == null && item instanceof BTDownloadItem) {
                     path = previewFile((BTDownloadItem) item);
@@ -340,8 +350,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 if (path != null) {
                     UIUtils.openFile(ctx, path);
                 }
-            } else if (tag instanceof File) {
-                UIUtils.openFile(ctx, (File) tag);
             }
         }
     }
