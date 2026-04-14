@@ -343,8 +343,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void updateTransferList(TransfersHolder transfersHolder, boolean forceUpdate) {
         if (isVisible() && isAdded()) {
             if (adapter != null) {
-                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers, forceUpdate);
-                android.util.Log.d("TransfersFragment.updateTransferList", "updateList called with forceUpdate=" + forceUpdate);
+                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers);
+                android.util.Log.d("TransfersFragment.updateTransferList", "updateList called");
             }
             if (selectedStatus == TransferStatus.SEEDING) {
                 TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersHolder.allTransfers);
@@ -805,7 +805,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             List<Transfer> currentList = adapter.getList();
             if (!currentList.isEmpty()) {
                 List<Transfer> filtered = filter(currentList, status);
-                adapter.updateList(filtered, true);  // forceImmediate=true for instant update
+                adapter.updateList(filtered);
             }
         }
         // Trigger background refresh to ensure proper sorting and complete state

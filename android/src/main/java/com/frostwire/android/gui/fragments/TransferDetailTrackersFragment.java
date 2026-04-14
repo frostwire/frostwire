@@ -39,6 +39,7 @@ import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.android.util.SystemUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -161,7 +162,15 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                     torrentHandle.saveResumeData();
                     torrentHandle.forceReannounce();
                     if (Ref.alive(adapterRef)) {
-                        adapterRef.get().notifyDataSetChanged();
+                        try {
+                            adapterRef.get().notifyDataSetChanged();
+                        } catch (IllegalStateException e) {
+                            SystemUtils.postToUIThread(() -> {
+                                if (Ref.alive(adapterRef)) {
+                                    adapterRef.get().notifyDataSetChanged();
+                                }
+                            });
+                        }
                     }
                 } else if (Ref.alive(clickedViewRef)) {
                     UIUtils.showShortMessage(clickedViewRef.get(), R.string.invalid_tracker_url);
@@ -260,7 +269,15 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         th.saveResumeData();
                         th.forceReannounce();
                         if (Ref.alive(trackerViewHolder.adapterRef)) {
-                            trackerViewHolder.adapterRef.get().notifyDataSetChanged();
+                            try {
+                                trackerViewHolder.adapterRef.get().notifyDataSetChanged();
+                            } catch (IllegalStateException e) {
+                                SystemUtils.postToUIThread(() -> {
+                                    if (Ref.alive(trackerViewHolder.adapterRef)) {
+                                        trackerViewHolder.adapterRef.get().notifyDataSetChanged();
+                                    }
+                                });
+                            }
                         }
                     } else {
                         UIUtils.showShortMessage(vhRef.get().itemView, R.string.invalid_tracker_url);
@@ -309,7 +326,15 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                                     viewHolder.torrentHandle.saveResumeData();
                                     viewHolder.torrentHandle.forceReannounce();
                                     if (Ref.alive(viewHolder.adapterRef)) {
-                                        viewHolder.adapterRef.get().notifyDataSetChanged();
+                                        try {
+                                            viewHolder.adapterRef.get().notifyDataSetChanged();
+                                        } catch (IllegalStateException e) {
+                                            SystemUtils.postToUIThread(() -> {
+                                                if (Ref.alive(viewHolder.adapterRef)) {
+                                                    viewHolder.adapterRef.get().notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             });

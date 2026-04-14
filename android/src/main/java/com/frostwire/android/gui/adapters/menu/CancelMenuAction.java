@@ -236,8 +236,6 @@ public final class CancelMenuAction extends MenuAction {
                             if (adapterObj instanceof TransferListAdapter) {
                                 TransferListAdapter adapter = (TransferListAdapter) adapterObj;
                                 adapter.removeTransferItem(transfer);
-                                // Force immediate filtered refresh to prevent lingering transfers if onTime() refresh in progress
-                                adapter.updateList(adapter.getList(), true);
                             }
                         }
                     }
