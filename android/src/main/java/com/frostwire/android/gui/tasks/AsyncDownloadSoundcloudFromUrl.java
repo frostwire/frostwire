@@ -24,6 +24,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.ConfirmSoundcloudDownloadDialog;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.soundcloud.SoundcloudUtils;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -56,10 +57,12 @@ public final class AsyncDownloadSoundcloudFromUrl {
             if (soundcloudUrl.contains("?in=")) {
                 url = soundcloudUrl.substring(0, url.indexOf("?in="));
             }
-            String resolveURL = SoundcloudUtils.resolveUrl(url);
+            String clientId = SoftwareUpdater.getSoundCloudClientId();
+            String appVersion = SoftwareUpdater.getSoundCloudAppVersion();
+            String resolveURL = SoundcloudUtils.resolveUrl(url, clientId, appVersion);
             HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
             String json = client.get(resolveURL, 10000);
-            results = SoundcloudUtils.fromJson(json, true);
+            results = SoundcloudUtils.fromJson(json, true, clientId, appVersion);
         } catch (Throwable e) {
             LOG.error("AsyncDownloadSoundcloudFromUrl::doInBackground: Error downloading from Soundcloud", e);
         }

@@ -28,7 +28,7 @@ import java.util.LinkedList;
  */
 public final class SoundcloudUtils {
     private static final String DEFAULT_SOUNDCLOUD_CLIENTID = "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
-    private static final String DEFAULT_SOUNDCLOUD_APP_VERSION = "1775730350";
+    private static final String DEFAULT_SOUNDCLOUD_APP_VERSION = "1766155513";
 
     private SoundcloudUtils() {
         // utility class
@@ -38,7 +38,16 @@ public final class SoundcloudUtils {
      * Resolves a Soundcloud URL to the API endpoint for fetching metadata.
      */
     public static String resolveUrl(String url) {
-        return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + DEFAULT_SOUNDCLOUD_CLIENTID + "&app_version=" + DEFAULT_SOUNDCLOUD_APP_VERSION;
+        return resolveUrl(url, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION);
+    }
+
+    /**
+     * Resolves a Soundcloud URL using the provided API credentials.
+     */
+    public static String resolveUrl(String url, String clientId, String appVersion) {
+        String clientIdToUse = clientId != null ? clientId : DEFAULT_SOUNDCLOUD_CLIENTID;
+        String appVersionToUse = appVersion != null ? appVersion : DEFAULT_SOUNDCLOUD_APP_VERSION;
+        return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + clientIdToUse + "&app_version=" + appVersionToUse;
     }
 
     /**
@@ -46,25 +55,35 @@ public final class SoundcloudUtils {
      * Uses default client ID and app version.
      */
     public static LinkedList<SoundcloudSearchResult> fromJson(String json, boolean fromPastedUrl) {
+        return fromJson(json, fromPastedUrl, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION);
+    }
+
+    /**
+     * Parses Soundcloud JSON response and creates SoundcloudSearchResult objects
+     * using the provided API credentials.
+     */
+    public static LinkedList<SoundcloudSearchResult> fromJson(String json, boolean fromPastedUrl, String clientId, String appVersion) {
+        String clientIdToUse = clientId != null ? clientId : DEFAULT_SOUNDCLOUD_CLIENTID;
+        String appVersionToUse = appVersion != null ? appVersion : DEFAULT_SOUNDCLOUD_APP_VERSION;
         LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
         if (json.contains("\"collection\":")) {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
             if (obj != null && obj.collection != null) {
                 obj.collection.stream().
                         filter(SoundcloudItem::isValidSearchResult).
-                        forEach(item -> r.add(new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION)));
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, clientIdToUse, appVersionToUse)));
             }
         } else if (json.contains("\"tracks\":")) {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
             if (obj != null && obj.tracks != null) {
                 obj.tracks.stream().
                         filter(SoundcloudItem::isValidSearchResult).
-                        forEach(item -> r.add(new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION)));
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, clientIdToUse, appVersionToUse)));
             }
         } else { // assume it's a single item
             SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
             if (item != null && item.isValidSearchResult(fromPastedUrl)) {
-                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, DEFAULT_SOUNDCLOUD_CLIENTID, DEFAULT_SOUNDCLOUD_APP_VERSION);
+                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, clientIdToUse, appVersionToUse);
                 r.add(sr);
             }
         }
