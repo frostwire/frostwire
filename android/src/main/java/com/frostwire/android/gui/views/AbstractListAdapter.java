@@ -690,7 +690,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         });
     }
 
-    private void safeNotifyDataSetChanged() {
+    public void safeNotifyDataSetChanged() {
         try {
             notifyDataSetChanged();
         } catch (IllegalStateException e) {
