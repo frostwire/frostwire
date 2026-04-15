@@ -185,7 +185,6 @@ public class SoundcloudDownload extends HttpBTDownload {
                 state = TransferState.FINISHED;
                 if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
-                    // TODO: Rich DHT announcement.
                 }
                 cleanupIncomplete();
             }
