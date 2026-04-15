@@ -493,7 +493,7 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
-        instance().timer.stopTimer(); // TODO: refactor this singleton pattern
+        instance().timer.stopTimer();
         Finalizer.shutdown();
     }
 
