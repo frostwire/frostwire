@@ -1131,9 +1131,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * or null if no such entry exists.
      */
     private TrieEntry<K, V> higherEntry(K key) {
-        // TODO: Cleanup so that we don't actually have to add/remove from the
-        //       tree.  (We do it here because there are other well-defined
-        //       functions to perform the search.)
         int keyLength = length(key);
         if (keyLength == 0) {
             if (!root.isEmpty()) {
@@ -1193,9 +1190,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         // These steps ensure that the returned value is either the
         // entry for the key itself, or the first entry directly after
         // the key.
-        // TODO: Cleanup so that we don't actually have to add/remove from the
-        //       tree.  (We do it here because there are other well-defined
-        //       functions to perform the search.)
         int keyLength = length(key);
         if (keyLength == 0) {
             if (!root.isEmpty())
@@ -1245,9 +1239,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         //
         // These steps ensure that the returned value is always just before
         // the key or null (if there was nothing before it).
-        // TODO: Cleanup so that we don't actually have to add/remove from the
-        //       tree.  (We do it here because there are other well-defined
-        //       functions to perform the search.)
         int keyLength = length(key);
         if (keyLength == 0) {
             return null; // there can never be anything before root.
@@ -1278,9 +1269,6 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * less than or equal to the given key, or null if there is no such key.
      */
     private TrieEntry<K, V> floorEntry(K key) {
-        // TODO: Cleanup so that we don't actually have to add/remove from the
-        //       tree.  (We do it here because there are other well-defined
-        //       functions to perform the search.)
         int keyLength = length(key);
         if (keyLength == 0) {
             if (!root.isEmpty())
