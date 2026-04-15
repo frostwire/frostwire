@@ -87,7 +87,10 @@ public class SoundcloudDownload extends HttpDownload {
 
     @Override
     protected void onFinishing() {
+        LOG.info("SoundcloudDownload.onFinishing() BEGIN for: " + getDisplayName() + " tempPath=" + tempPath);
         downloadAndUpdateCoverArt(sr, tempPath);
+        LOG.info("SoundcloudDownload.onFinishing() calling super.onFinishing() for: " + getDisplayName());
         super.onFinishing();
+        LOG.info("SoundcloudDownload.onFinishing() END for: " + getDisplayName());
     }
 }

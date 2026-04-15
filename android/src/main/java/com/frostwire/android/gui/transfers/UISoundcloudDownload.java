@@ -57,11 +57,14 @@ public class UISoundcloudDownload extends SoundcloudDownload {
 
     @Override
     protected void onComplete() {
+        LOG.info("UISoundcloudDownload.onComplete() BEGIN for: " + getDisplayName());
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
+        LOG.info("UISoundcloudDownload.onComplete() notifyDownloadFinished called for: " + getDisplayName());
         
         // Seed the finished HTTP download if seeding is enabled
         TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_AUDIO, manager);
+        LOG.info("UISoundcloudDownload.onComplete() END for: " + getDisplayName());
     }
 
     @Override

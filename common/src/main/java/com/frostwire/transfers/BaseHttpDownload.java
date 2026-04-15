@@ -276,10 +276,12 @@ public abstract class BaseHttpDownload implements Transfer {
         this.state = state;
         if (!complete) {
             complete = true;
+            LOG.info("BaseHttpDownload.complete(): state=" + state + " for " + getDisplayName());
             if (state == TransferState.COMPLETE) {
                 try {
                     onComplete();
                 } catch (Throwable e) {
+                    LOG.error("BaseHttpDownload.onComplete() threw for " + getDisplayName(), e);
                     error(e);
                 }
             }

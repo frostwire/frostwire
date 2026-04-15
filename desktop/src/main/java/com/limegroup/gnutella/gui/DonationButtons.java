@@ -64,7 +64,6 @@ class DonationButtons extends JPanel {
 
         @Override
         protected void paintComponent(Graphics g) {
-            // TODO Move this code to a UI if necessary, for now KIFSS
             g.setColor(getBackground());
             g.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 2, 2);
             g.setColor(new Color(0xe4e8ea));

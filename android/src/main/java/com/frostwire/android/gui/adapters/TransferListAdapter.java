@@ -160,11 +160,13 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         if (newList == null) {
             newList = Collections.emptyList();
         }
+        newList = new ArrayList<>(newList);
         if (!removedTransferIds.isEmpty()) {
-            newList = new ArrayList<>(newList);
             newList.removeIf(t -> removedTransferIds.contains(resolveTransferId(t)));
         }
+        LOG.debug("updateList() called with " + newList.size() + " transfers");
         submitList(newList);
+        LOG.debug("updateList() submitList called");
     }
 
     /**
@@ -182,26 +184,41 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         public boolean areContentsTheSame(Transfer oldItem, Transfer newItem) {
             TransferUiState oldState = new TransferUiState(oldItem);
             TransferUiState newState = new TransferUiState(newItem);
-            return oldState.hasSameContent(newState);
+            boolean same = oldState.hasSameContent(newState);
+            if (!same) {
+                LOG.debug("areContentsTheSame: CHANGED for " + oldItem.getDisplayName() +
+                    " oldState=(" + oldState.state + ", progress=" + oldState.progress + ", speed=" + oldState.downloadSpeed + ")" +
+                    " newState=(" + newState.state + ", progress=" + newState.progress + ", speed=" + newState.downloadSpeed + ")");
+            }
+            return same;
         }
     }
 
     private static String resolveTransferId(Transfer transfer) {
+        String id;
         if (transfer instanceof BittorrentDownload) {
             String hash = ((BittorrentDownload) transfer).getInfoHash();
             if (hash != null && !hash.isEmpty()) {
-                return "bt:" + hash;
+                id = "bt:" + hash;
+                LOG.debug("resolveTransferId() BT: " + id + " for " + transfer.getDisplayName());
+                return id;
             }
         }
         File savePath = transfer.getSavePath();
         if (savePath != null) {
-            return "path:" + savePath.getAbsolutePath();
+            id = "path:" + savePath.getAbsolutePath();
+            LOG.debug("resolveTransferId() PATH: " + id + " for " + transfer.getDisplayName());
+            return id;
         }
         String displayName = transfer.getDisplayName();
         if (displayName != null && !displayName.isEmpty()) {
-            return "name:" + displayName;
+            id = "name:" + displayName;
+            LOG.debug("resolveTransferId() NAME: " + id + " for " + displayName);
+            return id;
         }
-        return "instance:" + System.identityHashCode(transfer);
+        id = "instance:" + System.identityHashCode(transfer);
+        LOG.debug("resolveTransferId() INSTANCE: " + id + " for " + displayName);
+        return id;
     }
 
     private static final class TransferUiState {

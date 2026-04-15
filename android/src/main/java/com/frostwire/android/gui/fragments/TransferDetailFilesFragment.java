@@ -273,8 +273,10 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         @Override
         public TransferDetailFilesTransferItemViewHolder onCreateViewHolder(ViewGroup parent, int i) {
-            return new TransferDetailFilesTransferItemViewHolder((RelativeLayout) LayoutInflater.from(parent.getContext())
+            TransferDetailFilesTransferItemViewHolder holder = new TransferDetailFilesTransferItemViewHolder((RelativeLayout) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_transfer_detail_files_recyclerview_item, parent, false));
+            holder.initComponents();
+            return holder;
         }
 
         @Override
@@ -293,7 +295,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 }
             }
             viewHolder.currentTransferItem = transferItem;
-            viewHolder.initComponents();
             if (viewHolder.playButtonImageView != null) {
                 viewHolder.playButtonImageView.setTag(transferItem);
             }

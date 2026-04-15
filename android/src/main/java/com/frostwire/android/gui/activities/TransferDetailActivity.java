@@ -24,6 +24,7 @@ import android.util.SparseArray;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.frostwire.android.R;
@@ -42,7 +43,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
-import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -256,7 +256,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         outState.putInt("lastSelectedTabIndex", lastSelectedTabIndex);
     }
 
-    private static class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private static class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         private final AbstractTransferDetailFragment[] detailFragments;
 

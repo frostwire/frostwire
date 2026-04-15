@@ -18,11 +18,15 @@
 
 package com.frostwire.search.soundcloud;
 
+import com.frostwire.util.Logger;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public class SoundcloudItem {
+    private static final Logger LOG = Logger.getLogger(SoundcloudItem.class);
+
     public long id;
     public SoundcloudUser user;
     public String uri;
@@ -54,8 +58,8 @@ public class SoundcloudItem {
             return false;
         }
 
-        for (SoundcloudTranscodings transcodings : media.transcodings) {
-            if ("progressive".equals(transcodings.format.protocol)) {
+        for (SoundcloudTranscodings transcoding : media.transcodings) {
+            if (transcoding.format != null && "progressive".equals(transcoding.format.protocol)) {
                 return true;
             }
         }
@@ -68,12 +72,23 @@ public class SoundcloudItem {
      */
     String getProgressiveFormatJSONFetcherURL() {
         if (media == null) {
+            LOG.info("getProgressiveFormatJSONFetcherURL(): media is null for track id=" + id + ", title=" + title);
             return null;
         }
-        for (SoundcloudTranscodings transcodings : media.transcodings) {
-            if ("progressive".equals(transcodings.format.protocol)) {
-                return transcodings.url;
+        if (media.transcodings == null) {
+            LOG.info("getProgressiveFormatJSONFetcherURL(): media.transcodings is null for track id=" + id + ", title=" + title);
+            return null;
+        }
+        for (SoundcloudTranscodings transcoding : media.transcodings) {
+            if (transcoding.format != null && "progressive".equals(transcoding.format.protocol)) {
+                return transcoding.url;
             }
+        }
+        LOG.info("getProgressiveFormatJSONFetcherURL(): No progressive format found for track id=" + id + ", title=" + title + ". Available transcodings: " + media.transcodings.length);
+        for (SoundcloudTranscodings t : media.transcodings) {
+            String protocol = t.format != null ? t.format.protocol : "null";
+            String mimeType = t.format != null ? t.format.mime_type : "null";
+            LOG.info("  transcoding: protocol=" + protocol + ", mime_type=" + mimeType + ", preset=" + t.preset);
         }
         return null;
     }

@@ -114,7 +114,12 @@ public class SoundcloudSearchPattern implements SearchPattern {
         if (item == null || item.media == null || item.media.transcodings == null) {
             return false;
         }
-        return item.media.transcodings.length > 0;
+        for (SoundcloudTranscodings transcoding : item.media.transcodings) {
+            if (transcoding.format != null && "progressive".equals(transcoding.format.protocol)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
