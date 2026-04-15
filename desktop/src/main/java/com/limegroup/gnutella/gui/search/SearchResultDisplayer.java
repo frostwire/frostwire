@@ -85,8 +85,6 @@ public final class SearchResultDisplayer implements RefreshListener {
     /**
      * The listener to notify about the currently displaying search
      * changing.
-     * <p>
-     * TODO: Allow more than one.
      */
     private ChangeListener _activeSearchListener;
     private MultimediaSlideshowPanel promoSlides;
