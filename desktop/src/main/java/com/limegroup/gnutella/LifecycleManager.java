@@ -22,8 +22,6 @@ public interface LifecycleManager {
 
     /**
      * Shuts down anything that requires shutdown.
-     * <p>
-     * TODO: Make all of these things Shutdown Items.
      */
     void shutdown();
 
@@ -34,10 +32,6 @@ public interface LifecycleManager {
 
     /**
      * Adds something that requires shutting down.
-     * <p>
-     * TODO: Make this take a 'Service' or some such that
-     * has a shutdown method, and run the method in its
-     * own thread.
      */
     void addShutdownItem(Thread t);
 }
