@@ -72,7 +72,6 @@ public class IconManager {
 
     /**
      * Returns the icon associated with the extension.
-     * TODO: Implement better.
      */
     public Icon getIconForExtension(String ext) {
         validate();
