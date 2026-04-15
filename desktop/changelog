@@ -37,6 +37,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
  * Cleanup: Remove stale DHT announcement TODO in SoundcloudDownload — already implemented via makeTorrentAndDownload with dhtTrackedOnly
  * Cleanup: Remove 4 identical PatriciaTrie TODO comments — add/remove search pattern is intentional
+ * Cleanup: Extract mostFrequent() helper in LibraryUtils.suggestPlaylistName — eliminates histogram access duplication
  * Maintenance: Upgrade org.jetbrains:annotations 26.0.2 -> 26.1.0
  * Maintenance: Upgrade com.formdev:flatlaf 3.6 -> 3.7.1
  * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
