@@ -149,6 +149,11 @@ public class LibraryUtils {
         return false;
     }
 
+    private static Entry<String, Integer> mostFrequent(HistoHashMap<String> map) {
+        List<Entry<String, Integer>> h = map.histogram();
+        return h.get(h.size() - 1);
+    }
+
     private static String suggestPlaylistName(File[] mediaFiles) {
         HistoHashMap<String> artistNames = new HistoHashMap<>();
         HistoHashMap<String> artistsAlbums = new HistoHashMap<>();
@@ -163,18 +168,17 @@ public class LibraryUtils {
                 genres.update("(" + mt.getGenre() + ")");
             }
         }
-        // TODO: refactor this
-        List<Entry<String, Integer>> histogramArtistNames = artistNames.histogram();
-        List<Entry<String, Integer>> histogramArtistsAlbums = artistsAlbums.histogram();
-        List<Entry<String, Integer>> histogramAlbumNames = albumNames.histogram();
-        List<Entry<String, Integer>> histogramGenres = genres.histogram();
-        String topArtistName = histogramArtistNames.get(histogramArtistNames.size() - 1).getKey();
-        int topArtistNameCount = histogramArtistNames.get(histogramArtistNames.size() - 1).getValue();
-        String topArtistAlbum = histogramArtistsAlbums.get(histogramArtistsAlbums.size() - 1).getKey();
-        int topArtistAlbumCount = histogramArtistsAlbums.get(histogramArtistsAlbums.size() - 1).getValue();
-        String topAlbumName = histogramAlbumNames.get(histogramAlbumNames.size() - 1).getKey();
-        int topAlbumNameCount = histogramAlbumNames.get(histogramAlbumNames.size() - 1).getValue();
-        String topGenre = histogramGenres.get(histogramGenres.size() - 1).getKey();
+        Entry<String, Integer> topArtist = mostFrequent(artistNames);
+        Entry<String, Integer> topArtistAlbumEntry = mostFrequent(artistsAlbums);
+        Entry<String, Integer> topAlbum = mostFrequent(albumNames);
+        Entry<String, Integer> topGenreEntry = mostFrequent(genres);
+        String topArtistName = topArtist.getKey();
+        int topArtistNameCount = topArtist.getValue();
+        String topArtistAlbum = topArtistAlbumEntry.getKey();
+        int topArtistAlbumCount = topArtistAlbumEntry.getValue();
+        String topAlbumName = topAlbum.getKey();
+        int topAlbumNameCount = topAlbum.getValue();
+        String topGenre = topGenreEntry.getKey();
         String suggestedPlaylistName = topArtistName;
         if (topArtistAlbumCount >= topArtistNameCount) {
             suggestedPlaylistName = topArtistAlbum;
