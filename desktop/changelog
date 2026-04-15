@@ -41,6 +41,7 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove stale singleton pattern TODO from GUIMediator.shutdown() — instance() call pattern is correct
  * Cleanup: Remove stale "Implement better" TODO comments from IconManager and NativeFileIconController — current temp-file approach is the standard Java cross-platform solution
  * Cleanup: Remove stale "Allow more than one" TODO from SearchResultDisplayer — single ChangeListener is sufficient
+ * Cleanup: Remove "make reusable" TODOs from BasicDropTargetListener inner classes — no reuse case needed beyond current package
  * Maintenance: Upgrade org.jetbrains:annotations 26.0.2 -> 26.1.0
  * Maintenance: Upgrade com.formdev:flatlaf 3.6 -> 3.7.1
  * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0

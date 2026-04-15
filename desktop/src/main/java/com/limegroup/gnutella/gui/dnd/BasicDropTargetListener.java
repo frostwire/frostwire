@@ -96,7 +96,6 @@ public class BasicDropTargetListener implements DropTargetListener {
         }
     }
 
-    // TODO dnd make reusable
     static class DropDragInfo implements DropInfo {
         private final DropTargetDragEvent event;
         final int action;
@@ -115,7 +114,6 @@ public class BasicDropTargetListener implements DropTargetListener {
         }
     }
 
-    // TODO dnd make reusable
     static class DropDropInfo implements DropInfo {
         private final DropTargetDropEvent event;
         final int action;
