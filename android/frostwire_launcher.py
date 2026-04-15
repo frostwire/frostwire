@@ -279,14 +279,14 @@ def launch_app(serial: str) -> None:
 
 def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
     console.print(f"[dim]Booting emulator: {avd}[/dim]")
-    cmd = ["emulator", "-avd", avd, "-no-snapshot-load", "-no-audio", "-no-window"]
+    cmd = ["emulator", "-avd", avd, "-no-snapshot-load", "-no-snapshot-save", "-no-audio", "-no-window", "-gpu", "swiftshader_indirect"]
     if wipe_data:
         cmd.append("-wipe-data")
 
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # Wait for boot
-    for _ in range(120):
+    # Wait for boot (up to 3 minutes for cold boot)
+    for _ in range(180):
         devices = get_adb_devices()
         for d in devices:
             if d.is_emulator:
