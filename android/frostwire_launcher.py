@@ -397,10 +397,20 @@ def handle_create_avd(sdk_images: list[AvdImage]):
     create_avd(avd_name, api, abi_choice)
 
 
-def handle_delete_avd(avd_name: str):
-    """Delete an AVD after confirmation."""
-    if Confirm.ask(f"[bold red]Delete AVD '{avd_name}'? This cannot be undone.[/bold red]", default=False):
-        delete_avd(avd_name)
+def handle_avd_options(avd_name: str) -> str:
+    """Show options for a stopped AVD and return the choice."""
+    console.print()
+    prompt = Prompt.ask(
+        f"[bold]AVD '{avd_name}' is stopped. Select action:[/bold]",
+        choices=["l", "d", "c"],
+        default="l"
+    )
+    if prompt == "l":
+        return "launch"
+    elif prompt == "d":
+        return "delete"
+    else:
+        return "cancel"
 
 
 class LogcatReader:
@@ -581,13 +591,21 @@ def main():
         main()  # Restart
         return
 
-    # Handle AVD deletion (if stopped)
+    # Handle AVD options (if stopped)
     if kind == "avd_stopped":
-        handle_delete_avd(ident)
-        console.print()
-        console.print("[dim]Returning to device list...[/dim]")
-        main()  # Restart
-        return
+        action = handle_avd_options(ident)
+        if action == "delete":
+            handle_delete_avd(ident)
+            console.print()
+            console.print("[dim]Returning to device list...[/dim]")
+            main()
+            return
+        elif action == "cancel":
+            console.print()
+            console.print("[dim]Returning to device list...[/dim]")
+            main()
+            return
+        # else action == "launch": proceed to boot the emulator
 
     # Build APK
     apk = build_apk()
