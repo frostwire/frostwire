@@ -424,9 +424,9 @@ def handle_avd_options(avd_name: str) -> str:
     console.print()
     prompt = Prompt.ask(
         f"[bold]AVD '{avd_name}' is stopped. Select action:[/bold]\n"
-        f"  [cyan][l]aunch[/cyan] - Boot the emulator and install the APK\n"
-        f"  [red][d]elete[/red] - Delete this AVD permanently\n"
-        f"  [yellow][c]ancel[/yellow] - Return to device selection",
+        f"  [bright_cyan]\\[l]aunch[/bright_cyan] - Boot the emulator and install the APK\n"
+        f"  [bright_red]\\[d]elete[/bright_red] - Delete this AVD permanently\n"
+        f"  [bright_white]\\[c]ancel[/bright_white] - Return to device selection",
         choices=["l", "d", "c"],
         default="l"
     )
