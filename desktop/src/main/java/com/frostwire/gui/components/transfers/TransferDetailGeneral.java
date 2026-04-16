@@ -251,7 +251,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         String saveLocation = guiBtDownload.getSaveLocation().getAbsolutePath();
         String infoHash = btDownload.getInfoHash();
         String created = btDownload.getCreated().toString();
-        String comment = torrentInfo.comment();
+        String comment = (torrentInfo != null) ? torrentInfo.comment() : "";
         long eta = guiBtDownload.getETA();
         String magnetURI = btDownload.magnetUri();
 
