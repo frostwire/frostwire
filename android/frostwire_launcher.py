@@ -279,7 +279,14 @@ def launch_app(serial: str) -> None:
 
 def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
     console.print(f"[dim]Booting emulator: {avd}[/dim]")
-    cmd = ["emulator", "-avd", avd, "-no-snapshot-load", "-no-snapshot-save", "-no-audio", "-gpu", "swiftshader_indirect"]
+    
+    # Find emulator path - the one in sdk/tools is a wrapper, we need the actual binary
+    sdk_emulator = os.path.expanduser("~/Library/Android/sdk/emulator/emulator")
+    if not os.path.exists(sdk_emulator):
+        # Fall back to PATH
+        sdk_emulator = "emulator"
+    
+    cmd = [sdk_emulator, "-avd", avd, "-no-snapshot-load", "-no-snapshot-save", "-no-audio", "-gpu", "swiftshader_indirect"]
     if wipe_data:
         cmd.append("-wipe-data")
 
