@@ -26,8 +26,9 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:My Music > Recent list ghost entries from 0-byte broken downloads - RecentLoader.removeOrphanedEntries() now rejects MediaStore entries with null/0 duration (0-byte files exist in MediaStore but have no audio); also cleans entries not found in MediaStore at all; deleteTracks() now always cleans RecentStore/FavoritesStore for ALL given IDs even when not found in MediaStore cursor
  - fix:YouTube downloads no longer silently drop headers after a malformed value - addCustomHeaders() try/catch moved inside the loop so bad headers are skipped individually instead of aborting all remaining headers (prevents 403 errors caused by missing User-Agent/Referer)
  - fix:SoundCloud search restored - SoundCloudConfigFetcher now validates fetched credentials against the API before caching; falls back to built-in defaults when update server returns stale/expired client_id (prevents 401 errors and empty search results)
- - fix:SoundCloud search results restored - isValidSearchResult() no longer requires downloadable=true; SoundCloud API now returns downloadable=false for virtually all tracks even when they have streamable progressive URLs; updated to only require a progressive stream URL
- - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
+  - fix:SoundCloud search results restored - isValidSearchResult() no longer requires downloadable=true; SoundCloud API now returns downloadable=false for virtually all tracks even when they have streamable progressive URLs; updated to only require a progressive stream URL
+  - fix:SoundCloud search now excludes tracks not marked as downloadable, so search results only include content SoundCloud explicitly flags as downloadable
+  - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
  - fix:Music player notification lost on Android 12+ - replaced custom RemoteViews notification with MediaSessionService auto-managed notification
  - fix:Music service no longer crashes on OS-initiated restarts - reloadQueue() now guards against null serviceDataStore, matching the existing null check in saveQueue()
  - fix:Freshly downloaded audio files play instantly instead of waiting 45+ seconds for MediaStore indexer - direct file path fallback bypasses MediaStore query
@@ -78,6 +79,9 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
  - fix:YouTube audio downloads now play in FrostWire player instead of launching a third-party app - .mp4/.webm/.opus files were incorrectly identified as non-audio by MIME type check
  - fix:YouTube audio playback now starts immediately instead of 30-second delay - removed slow LIKE '%filename%' MediaStore full-table scan and fixed ServiceConnectionListener race condition that silently dropped the play callback
+ - fix:Transfer Detail > Files now shows the correct torrent file rows immediately instead of briefly showing stale files from a previously opened torrent
+ - fix:Transfers and Transfer Detail > Files audio play buttons now start FrostWire's music player the same way My Music does, including service startup and opening AudioPlayerActivity
+ - fix:frostwire_launcher.py no longer disables emulator audio, so emulator sessions launched from the TUI can play sound
  - fix:Album art ImageView no longer shows blank during load - placeholder drawable is now set immediately before Coil request is enqueued
  - fix:Album art now loads for YouTube downloads with no MediaStore album ID - loadCurrentArtwork() attempts MediaMetadataRetriever+sidecar fallback when albumId==0 but file path is available
  - fix:getPath() in MusicPlaybackService now returns file path for tracks opened directly from storage (e.g. fresh YouTube downloads not yet indexed by MediaStore)

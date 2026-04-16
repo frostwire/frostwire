@@ -20,6 +20,7 @@ package com.andrew.apollo.utils;
 
 import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -101,7 +102,14 @@ public final class MusicUtils {
 
     /** Returns the live service instance, or null if it has been GC'd or disconnected. */
     private static MusicPlaybackService getService() {
-        return musicPlaybackServiceRef != null ? musicPlaybackServiceRef.get() : null;
+        MusicPlaybackService service = musicPlaybackServiceRef != null ? musicPlaybackServiceRef.get() : null;
+        if (service == null) {
+            service = MusicPlaybackService.getInstance();
+            if (service != null) {
+                musicPlaybackServiceRef = new java.lang.ref.WeakReference<>(service);
+            }
+        }
+        return service;
     }
 
     private static int sForegroundActivities = 0;
@@ -1059,6 +1067,60 @@ public final class MusicUtils {
 
     public static boolean playFile(final File file) {
         return playFileFromUri(Uri.fromFile(file));
+    }
+
+    public static void playFileFromUserItemClick(final Context context, final File file) {
+        if (context == null || file == null) {
+            return;
+        }
+        executeWithMusicPlaybackService(context, () -> {
+            long fileId = getMediaStoreAudioIdForFile(context, file);
+            boolean started;
+            if (fileId != -1) {
+                playFDs(new long[]{fileId}, 0, false);
+                started = true;
+            } else {
+                started = playFile(file);
+            }
+            if (started && context instanceof Activity) {
+                Activity activity = (Activity) context;
+                SystemUtils.postToUIThread(() -> NavUtils.openAudioPlayer(activity));
+            }
+        });
+    }
+
+    public static long getMediaStoreAudioIdForFile(final Context context, final File file) {
+        if (context == null || file == null) {
+            return -1;
+        }
+        String path = file.getAbsolutePath();
+        long id = queryAudioIdByPath(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, path);
+        if (id != -1) {
+            return id;
+        }
+        id = queryAudioIdByPath(context, Uri.parse("content://media/external_primary/audio/media/"), path);
+        if (id != -1) {
+            return id;
+        }
+        return queryAudioIdByPath(context, MediaStore.Audio.Media.INTERNAL_CONTENT_URI, path);
+    }
+
+    private static long queryAudioIdByPath(final Context context, final Uri uri, final String path) {
+        String selection = MediaColumns.DATA + " = ?";
+        String[] selectionArgs = {path};
+        String[] projection = {MediaColumns._ID};
+        CursorLoader loader = new CursorLoader(context, uri, projection, selection, selectionArgs, null);
+        Cursor cursor = loader.loadInBackground();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    return cursor.getLong(cursor.getColumnIndexOrThrow(MediaColumns._ID));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return -1;
     }
 
     /**

@@ -389,7 +389,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     // Use MusicUtils.playFile() for audio files - same code path as My Music
                     // This ensures consistent, fast playback without ephemeral playlist delays
                     if (UIUtils.isAudioFile(path.getAbsolutePath())) {
-                        com.andrew.apollo.utils.MusicUtils.playFile(path);
+                        com.andrew.apollo.utils.MusicUtils.playFileFromUserItemClick(ctx, path);
                     } else {
                         UIUtils.openFile(ctx, path);
                     }

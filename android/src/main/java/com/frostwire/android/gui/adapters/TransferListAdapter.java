@@ -777,8 +777,8 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                     // Use MusicUtils.playFile() for audio - same code path as My Music
                     // Avoids UIUtils.openFile() ephemeral playlist delays
                     if (UIUtils.isAudioFile(path.getAbsolutePath())) {
-                        LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFile (audio): " + path.getAbsolutePath());
-                        com.andrew.apollo.utils.MusicUtils.playFile(path);
+                        LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFileFromUserItemClick (audio): " + path.getAbsolutePath());
+                        com.andrew.apollo.utils.MusicUtils.playFileFromUserItemClick(ctx, path);
                     } else {
                         LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile (non-audio): " + path.getAbsolutePath());
                         UIUtils.openFile(ctx, path);
@@ -790,8 +790,8 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                 LOG.info("OpenOnClickListener.onClick() tag is File: " + file.getAbsolutePath());
                 // Use MusicUtils.playFile() for audio - same code path as My Music
                 if (UIUtils.isAudioFile(file.getAbsolutePath())) {
-                    LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFile (audio): " + file.getAbsolutePath());
-                    com.andrew.apollo.utils.MusicUtils.playFile(file);
+                    LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFileFromUserItemClick (audio): " + file.getAbsolutePath());
+                    com.andrew.apollo.utils.MusicUtils.playFileFromUserItemClick(ctx, file);
                 } else {
                     LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile (non-audio): " + file.getAbsolutePath());
                     UIUtils.openFile(ctx, file);
@@ -883,7 +883,6 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         return connectedSeeds + " / " + seedsStr;
     }
 }
-
 
 
 
