@@ -59,6 +59,12 @@ public class IdopeSearchPattern implements SearchPattern {
 
             for (IdopeResult result : apiResults) {
                 try {
+                    if ("No results returned".equals(result.name)) {
+                        continue;
+                    }
+                    if (result.size <= 0) {
+                        continue;
+                    }
                     String magnetUri = "magnet:?xt=urn:btih:" + result.info_hash;
                     CompositeFileSearchResult searchResult = CompositeFileSearchResult.builder()
                             .displayName(result.name)
