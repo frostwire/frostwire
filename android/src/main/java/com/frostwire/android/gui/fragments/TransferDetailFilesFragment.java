@@ -157,6 +157,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private TextView fileSizeTextView;
         private ImageButton playButtonImageView;
         private TransferItem currentTransferItem;
+        private String currentTransferItemKey;
 
         TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
             super(itemView);
@@ -166,10 +167,22 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             if (playButtonImageView == null) {
                 initComponents();
             }
+            currentTransferItem = transferItem;
+            currentTransferItemKey = transferItemKey(transferItem);
+            if (fileNameTextView != null) {
+                fileNameTextView.setText(transferItem.getName());
+            }
+            if (fileTypeImageView != null && transferItem.getFile() != null) {
+                fileTypeImageView.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
+            }
+            if (playButtonImageView != null) {
+                playButtonImageView.setVisibility(View.GONE);
+            }
             final Bundle bundle = new Bundle();
+            final String transferItemKey = currentTransferItemKey;
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
                 updateTransferDataTask(transferItem, bundle);
-                SystemUtils.postToUIThread(() -> updateTransferDataPost(this, transferItem, bundle));
+                SystemUtils.postToUIThread(() -> updateTransferDataPost(this, transferItem, transferItemKey, bundle));
             });
         }
 
@@ -186,8 +199,12 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         private static void updateTransferDataPost(TransferDetailFilesTransferItemViewHolder holder,
-                                                   TransferItem transferItem,
-                                                   Bundle bundle) {
+                                                    TransferItem transferItem,
+                                                    String transferItemKey,
+                                                    Bundle bundle) {
+            if (!holder.isStillBoundTo(transferItem, transferItemKey)) {
+                return;
+            }
             if (holder.fileTypeImageView != null) {
                 holder.fileTypeImageView.setImageResource(bundle.getInt("fileTypeIconId"));
             }
@@ -204,11 +221,14 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             if (holder.fileSizeTextView != null) {
                 holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
             }
-            holder.currentTransferItem = transferItem;
             boolean isComplete = bundle.getBoolean("isComplete");
             File previewFile = isComplete ? (transferItem instanceof BTDownloadItem ?
                     previewFile((BTDownloadItem) transferItem) : null) : null;
             holder.updatePlayButtonVisibility(isComplete, previewFile);
+        }
+
+        private boolean isStillBoundTo(TransferItem transferItem, String transferItemKey) {
+            return currentTransferItem == transferItem || transferItemKey.equals(currentTransferItemKey);
         }
 
         private void initComponents() {
@@ -236,6 +256,14 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         TransferItem getCurrentTransferItem() {
             return currentTransferItem;
+        }
+
+        private static String transferItemKey(TransferItem transferItem) {
+            File file = transferItem.getFile();
+            if (file != null) {
+                return file.getAbsolutePath();
+            }
+            return transferItem.getName() + ":" + transferItem.getSize();
         }
     }
 
@@ -303,7 +331,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     mainHandler.post(pendingLoadMoreRunnable);
                 }
             }
-            viewHolder.currentTransferItem = transferItem;
             if (viewHolder.playButtonImageView != null) {
                 viewHolder.playButtonImageView.setTag(transferItem);
             }
