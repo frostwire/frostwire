@@ -52,6 +52,7 @@ public abstract class BaseHttpDownload implements Transfer {
     protected TransferState state;
     protected SpeedStat stat;
     protected boolean complete;
+    protected final List<TransferStateListener> listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     protected BaseHttpDownload(Info info) {
         this.info = info;
@@ -236,7 +237,9 @@ public abstract class BaseHttpDownload implements Transfer {
                         if (complete) {
                             return;
                         }
+                        TransferState oldState = state;
                         state = TransferState.DOWNLOADING;
+                        notifyStateChanged(oldState, TransferState.DOWNLOADING);
                         HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                         client.setListener(new DownloadListener());
                         client.save(url, temp, resumeAttempt, httpHeaders);
@@ -272,12 +275,14 @@ public abstract class BaseHttpDownload implements Transfer {
         });
     }
 
-    protected final void complete(TransferState state) {
-        this.state = state;
+    protected final void complete(TransferState newState) {
+        TransferState oldState = this.state;
+        this.state = newState;
         if (!complete) {
             complete = true;
-            LOG.info("BaseHttpDownload.complete(): state=" + state + " for " + getDisplayName());
-            if (state == TransferState.COMPLETE) {
+            LOG.info("BaseHttpDownload.complete(): state=" + newState + " for " + getDisplayName());
+            notifyStateChanged(oldState, newState);
+            if (newState == TransferState.COMPLETE) {
                 try {
                     onComplete();
                 } catch (Throwable e) {
@@ -292,7 +297,9 @@ public abstract class BaseHttpDownload implements Transfer {
         if (complete) {
             return;
         }
+        TransferState oldState = state;
         state = TransferState.FINISHING;
+        notifyStateChanged(oldState, TransferState.FINISHING);
         THREAD_POOL.execute(() -> {
             try {
                 if (complete) {
@@ -354,6 +361,39 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     protected void onComplete() {
+    }
+
+    public void addListener(TransferStateListener listener) {
+        if (listener != null && !listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeListener(TransferStateListener listener) {
+        listeners.remove(listener);
+    }
+
+    protected void notifyStateChanged(TransferState oldState, TransferState newState) {
+        if (oldState == newState) {
+            return;
+        }
+        for (TransferStateListener listener : listeners) {
+            try {
+                listener.onTransferStateChanged(this, oldState, newState);
+            } catch (Throwable e) {
+                LOG.error("Error notifying TransferStateListener", e);
+            }
+        }
+    }
+
+    protected void notifyProgressChanged(int progress) {
+        for (TransferStateListener listener : listeners) {
+            try {
+                listener.onTransferProgressChanged(this, progress);
+            } catch (Throwable e) {
+                LOG.error("Error notifying TransferStateListener", e);
+            }
+        }
     }
 
     public static final class Info {
