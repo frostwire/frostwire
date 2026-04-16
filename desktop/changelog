@@ -50,7 +50,9 @@ frostwire (7.0.4) stable; urgency=high
  * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
  * Maintenance: Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
  * Maintenance: Upgrade JUnit 5.12.2 -> 5.13.4
- * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes — changed _model.refresh() to _model.resort() in LibraryFilesTableDataLine.initialize() callback so new downloads appear sorted by date instead of being stuck at wrong positions
+ * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
+ * Fix: Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
+ * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 

@@ -18,6 +18,8 @@
 
 package com.frostwire.util;
 
+import java.text.Normalizer;
+
 public final class SafeText {
 
     private SafeText() {}
@@ -26,13 +28,14 @@ public final class SafeText {
         if (text == null || text.isEmpty()) {
             return text;
         }
-        int len = text.length();
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFC);
+        int len = normalized.length();
         StringBuilder sb = new StringBuilder(len);
         int i = 0;
         while (i < len) {
-            char c1 = text.charAt(i);
+            char c1 = normalized.charAt(i);
             if (Character.isHighSurrogate(c1) && i + 1 < len) {
-                char c2 = text.charAt(i + 1);
+                char c2 = normalized.charAt(i + 1);
                 if (Character.isLowSurrogate(c2)) {
                     int cp = Character.toCodePoint(c1, c2);
                     if (isSafeSupplementary(cp)) {
@@ -55,6 +58,9 @@ public final class SafeText {
         if (c < ' ' && c != '\n' && c != '\t' && c != '\r') {
             return false;
         }
+        if (Character.getType(c) == Character.FORMAT) {
+            return false;
+        }
         if (c == '\uFEFF' || c == '\u200B' || c == '\u200C' || c == '\u200D' || c == '\u2060' || c == '\u180E') {
             return false;
         }
@@ -73,6 +79,9 @@ public final class SafeText {
     }
 
     private static boolean isSafeSupplementary(int cp) {
+        if (Character.getType(cp) == Character.FORMAT) {
+            return false;
+        }
         if (cp >= 0x1F600 && cp <= 0x1F64F) return false;
         if (cp >= 0x1F300 && cp <= 0x1F5FF) return false;
         if (cp >= 0x1F680 && cp <= 0x1F6FF) return false;

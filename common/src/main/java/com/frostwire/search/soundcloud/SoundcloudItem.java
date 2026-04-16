@@ -46,11 +46,7 @@ public class SoundcloudItem {
     }
 
     boolean isValidSearchResult(boolean fromPastedUrl) {
-        if (fromPastedUrl) {
-            return hasProgressiveFormat();
-        }
-        // downloadable flag is unreliable in SoundCloud API; accept any streamable track
-        return hasProgressiveFormat();
+        return downloadable && hasProgressiveFormat();
     }
 
     boolean hasProgressiveFormat() {

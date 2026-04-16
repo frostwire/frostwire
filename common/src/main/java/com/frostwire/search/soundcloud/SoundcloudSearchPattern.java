@@ -103,23 +103,9 @@ public class SoundcloudSearchPattern implements SearchPattern {
         if (item == null) {
             return false;
         }
-        // Accept any track with a progressive stream URL (downloadable flag is unreliable
-        // in the SoundCloud API — nearly all tracks return downloadable=false even when streamable)
-        boolean hasDownload = hasProgressiveFormat(item);
+        boolean hasDownload = item.isValidSearchResult();
         boolean hasUrl = !StringUtils.isNullOrEmpty(item.permalink_url);
         return hasDownload && hasUrl;
-    }
-
-    private boolean hasProgressiveFormat(SoundcloudItem item) {
-        if (item == null || item.media == null || item.media.transcodings == null) {
-            return false;
-        }
-        for (SoundcloudTranscodings transcoding : item.media.transcodings) {
-            if (transcoding.format != null && "progressive".equals(transcoding.format.protocol)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

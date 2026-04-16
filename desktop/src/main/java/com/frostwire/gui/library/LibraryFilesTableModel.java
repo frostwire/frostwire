@@ -18,9 +18,12 @@
 
 package com.frostwire.gui.library;
 
+import com.frostwire.bittorrent.PaymentOptions;
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
+import com.limegroup.gnutella.gui.tables.SizeHolder;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * Library specific DataLineModel.
@@ -90,6 +93,30 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      */
     File getFile(int row) {
         return get(row).getInitializeObject();
+    }
+
+    void updateResolvedFileData(File file,
+                                SizeHolder sizeHolder,
+                                Date lastModified,
+                                String license,
+                                PaymentOptions paymentOptions) {
+        int row;
+        boolean shouldResort;
+
+        synchronized (getListLock()) {
+            row = getRow(file);
+            if (row == -1) {
+                return;
+            }
+
+            get(row).applyResolvedFileData(sizeHolder, lastModified, license, paymentOptions);
+            shouldResort = isSorted() && getSortColumn() == LibraryFilesTableDataLine.MODIFICATION_TIME_IDX;
+        }
+
+        fireTableRowsUpdated(row, row);
+        if (shouldResort) {
+            resort();
+        }
     }
 
     /**

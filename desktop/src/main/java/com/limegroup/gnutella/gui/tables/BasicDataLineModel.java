@@ -80,6 +80,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * at least once.
      */
     private boolean _isSorted = false;
+    private boolean _resortRunning = false;
+    private boolean _resortPending = false;
 
     /*
      * Constructor -- creates the model, tying it to
@@ -137,13 +139,33 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     // Re-sort the list to provide real-time sorting
     public void resort() {
-        if (_isSorted) {
-            ThreadExecutor.startThread(() -> {
-                        doResort();
-                        GUIMediator.safeInvokeLater(this::fireTableDataChanged);
-                    }
-                    , "BasicDataLineModel:resort");
+        if (!_isSorted) {
+            return;
         }
+
+        synchronized (_listLock) {
+            if (_resortRunning) {
+                _resortPending = true;
+                return;
+            }
+            _resortRunning = true;
+        }
+
+        ThreadExecutor.startThread(() -> {
+            while (true) {
+                doResort();
+                GUIMediator.safeInvokeLater(this::fireTableDataChanged);
+
+                synchronized (_listLock) {
+                    if (_resortPending) {
+                        _resortPending = false;
+                    } else {
+                        _resortRunning = false;
+                        break;
+                    }
+                }
+            }
+        }, "BasicDataLineModel:resort");
     }
 
     /**

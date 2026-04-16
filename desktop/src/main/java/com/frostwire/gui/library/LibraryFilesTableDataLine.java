@@ -35,6 +35,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * This class acts as a single line containing all
@@ -199,15 +200,18 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             final SizeHolder finalSizeHolder = sizeHolder;
             final Date finalModTime = modTime;
             GUIMediator.safeInvokeLater(() -> {
-                _sizeHolder = finalSizeHolder;
-                lastModified = finalModTime;
-                cachedSizeCell = null;
-                cachedModTimeCell = null;
-                license = finalLicense;
-                paymentOptions = finalPaymentOptions;
-                _model.resort();
+                _model.updateResolvedFileData(initializer, finalSizeHolder, finalModTime, finalLicense, finalPaymentOptions);
             });
         });
+    }
+
+    void applyResolvedFileData(SizeHolder sizeHolder, Date modTime, String newLicense, PaymentOptions newPaymentOptions) {
+        _sizeHolder = sizeHolder;
+        lastModified = modTime;
+        cachedSizeCell = null;
+        cachedModTimeCell = null;
+        license = newLicense;
+        paymentOptions = newPaymentOptions;
     }
 
     /**
@@ -305,11 +309,15 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> {
-                IconManager.instance().getIconForFile(initializer);
-                _iconLoaded = true;
-                _model.refresh();
-            }));
+            try {
+                DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> {
+                    IconManager.instance().getIconForFile(initializer);
+                    _iconLoaded = true;
+                    _model.refresh();
+                }));
+            } catch (RejectedExecutionException ignored) {
+                _iconScheduledForLoad = false;
+            }
             return null;
         } else if (_iconLoaded || iconAvailable) {
             return IconManager.instance().getIconForFile(initializer);
