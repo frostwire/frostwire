@@ -288,15 +288,18 @@ def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
     # Wait for boot (up to 3 minutes for cold boot)
     for i in range(180):
         devices = get_adb_devices()
+        emulator_found = False
         for d in devices:
             if d.is_emulator:
+                emulator_found = True
                 result = run(["adb", "-s", d.serial, "shell", "getprop", "sys.boot_completed"],
                             capture=True, check=False)
                 if result.returncode == 0 and result.stdout.strip() == "1":
                     console.print(f"[green]Emulator {avd} booted as {d.serial}.[/green]")
                     return d.serial
         if i % 10 == 0:
-            console.print(f"[dim]Waiting for emulator... ({i}s)[/dim]")
+            adb_result = run(["adb", "devices"], capture=True, check=False)
+            console.print(f"[dim]Waiting for emulator... ({i}s) adb devices: {adb_result.stdout.strip()}[/dim]")
         time.sleep(1)
 
     proc.terminate()
@@ -403,7 +406,10 @@ def handle_avd_options(avd_name: str) -> str:
     """Show options for a stopped AVD and return the choice."""
     console.print()
     prompt = Prompt.ask(
-        f"[bold]AVD '{avd_name}' is stopped. Select action:[/bold]",
+        f"[bold]AVD '{avd_name}' is stopped. Select action:[/bold]\n"
+        f"  [cyan][l]aunch[/cyan] - Boot the emulator and install the APK\n"
+        f"  [red][d]elete[/red] - Delete this AVD permanently\n"
+        f"  [yellow][c]ancel[/yellow] - Return to device selection",
         choices=["l", "d", "c"],
         default="l"
     )
