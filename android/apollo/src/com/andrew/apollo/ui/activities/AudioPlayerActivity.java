@@ -178,6 +178,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private long lastProgressBarTouched;
     private long lastKnownPosition = 0;
     private long lastKnownDuration = 0;
+    private long lastDisplayedTotalDuration = -1;
     private boolean lastKnownIsPlaying = false;
     private String lastTrackName;
     private String lastArtistName;
@@ -770,9 +771,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mArtistName != null && lastArtistAndAlbumNames != null) {
             mArtistName.setText(lastArtistAndAlbumNames);
         }
-        if (mTotalTime != null) {
-            mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration / 1000));
-        }
+        refreshTotalTimeText(lastKnownDuration);
 
         updateQueueFragmentCurrentSong();
         queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
@@ -1000,6 +999,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mCurrentTime.setText(MusicUtils.makeTimeString(this, pos / 1000));
     }
 
+    private void refreshTotalTimeText(final long duration) {
+        if (mTotalTime == null || duration == lastDisplayedTotalDuration) {
+            return;
+        }
+        lastDisplayedTotalDuration = duration;
+        mTotalTime.setText(MusicUtils.makeTimeString(this, Math.max(0L, duration) / 1000));
+    }
+
     enum MusicServiceRequestType {
         POSITION,
         DURATION,
@@ -1108,6 +1115,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             // When first starting playback, duration might be 0 temporarily while media is loading
             // Only show progress when we have a valid duration, otherwise wait
             if (duration > 0 && pos >= 0) {
+                runOnUiThread(() -> refreshTotalTimeText(duration));
                 refreshCurrentTimeText(pos);
                 final int progress = (int) (1000 * pos / duration);
 
