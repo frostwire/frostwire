@@ -86,24 +86,22 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     public void updateData(BittorrentDownload btDownload) {
         final boolean sameDownload = (bittorrentDownload == btDownload);
         bittorrentDownload = btDownload;
-        // JNI calls (torrentFile, status, pieces) must not run on the EDT.
-        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
-            hexHivePanelAdapter.updateData(btDownload);
-            final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
-            final String pieceCounts = hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount();
-            final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
-            SwingUtilities.invokeLater(() -> {
-                pieceSizeAlreadySet = sameDownload;
-                updatePieceSizeLabel(pieceSize);
-                updateTotalPiecesLabel(pieceCounts);
-                if (totalHexs >= 0) {
-                    hexHivePanel.updateData(hexHivePanelAdapter);
-                    hexHivePanel.invalidate();
-                }
-                invalidate();
-                repaint();
-            });
-        }, "TransferDetailPieces::updateData");
+        // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
+        hexHivePanelAdapter.updateData(btDownload);
+        final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
+        final String pieceCounts = hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount();
+        final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
+        SwingUtilities.invokeLater(() -> {
+            pieceSizeAlreadySet = sameDownload;
+            updatePieceSizeLabel(pieceSize);
+            updateTotalPiecesLabel(pieceCounts);
+            if (totalHexs >= 0) {
+                hexHivePanel.updateData(hexHivePanelAdapter);
+                hexHivePanel.invalidate();
+            }
+            invalidate();
+            repaint();
+        });
     }
 
     private void updatePieceSizeLabel(String pieceSize) {
