@@ -26,6 +26,7 @@ import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TransferDetailFiles extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -42,29 +43,30 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     @Override
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload != null && btDownload.getDl() != null) {
-            // Move heavy I/O work to background thread to avoid EDT violations
             BackgroundQueuedExecutorService.schedule(() -> {
                 try {
                     List<TransferItem> items = btDownload.getDl().getItems();
-                    if (items != null && items.size() > 0) {
-                        // Update UI on EDT
+                    if (items != null && !items.isEmpty()) {
+                        // Build holders here (background thread) so JNI calls in
+                        // TransferItemHolder constructor (isComplete/getProgress) never touch the EDT.
+                        List<TransferItemHolder> holders = new ArrayList<>(items.size());
+                        int i = 0;
+                        for (TransferItem item : items) {
+                            if (!item.isSkipped()) {
+                                holders.add(new TransferItemHolder(i++, item));
+                            }
+                        }
                         SwingUtilities.invokeLater(() -> {
                             try {
                                 if (this.btDownload != btDownload) {
                                     this.btDownload = btDownload;
                                     tableMediator.clearTable();
-                                    int i = 0;
-                                    for (TransferItem item : items) {
-                                        if (!item.isSkipped()) {
-                                            tableMediator.add(new TransferItemHolder(i++, item));
-                                        }
+                                    for (TransferItemHolder holder : holders) {
+                                        tableMediator.add(holder);
                                     }
                                 } else {
-                                    int i = 0;
-                                    for (TransferItem item : items) {
-                                        if (!item.isSkipped()) {
-                                            tableMediator.update(new TransferItemHolder(i++, item));
-                                        }
+                                    for (TransferItemHolder holder : holders) {
+                                        tableMediator.update(holder);
                                     }
                                 }
                             } catch (Throwable e) {
@@ -88,10 +90,17 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     public static class TransferItemHolder {
         public final TransferItem transferItem;
         final int fileOffset;
+        // Pre-computed on the background thread so renderers never call JNI on the EDT.
+        public final boolean complete;
+        public final int progress;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {
             this.fileOffset = fileOffset;
             this.transferItem = transferItem;
+            // isComplete() / getProgress() call fileProgress() JNI — safe here because
+            // TransferItemHolder is always constructed inside BackgroundQueuedExecutorService.
+            this.complete = transferItem.isComplete();
+            this.progress = this.complete ? 100 : transferItem.getProgress();
         }
 
         @Override

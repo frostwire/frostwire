@@ -105,14 +105,14 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
     }
 
     private void onPlay() {
-        if (!transferItemHolder.transferItem.isComplete()) {
+        if (!transferItemHolder.complete) {
             return;
         }
         new PlayAction(transferItemHolder).actionPerformed(null);
     }
 
     private void onShare() {
-        if (!transferItemHolder.transferItem.isComplete()) {
+        if (!transferItemHolder.complete) {
             return;
         }
         File file = transferItemHolder.transferItem.getFile();
@@ -128,8 +128,8 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         if (transferItemHolder == null) {
             return;
         }
-        playButton.setIcon(transferItemHolder.transferItem.isComplete() ? play_solid : play_transparent);
-        shareButton.setIcon(transferItemHolder.transferItem.isComplete() ? share_solid : share_faded);
+        playButton.setIcon(transferItemHolder.complete ? play_solid : play_transparent);
+        shareButton.setIcon(transferItemHolder.complete ? share_solid : share_faded);
         playButton.invalidate();
         shareButton.invalidate();
     }

@@ -84,7 +84,7 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
             case NAME:
                 return holder.transferItem.getName();
             case PROGRESS:
-                return holder.transferItem.isComplete() ? 100 : holder.transferItem.getProgress();
+                return holder.complete ? 100 : holder.progress;
             case SIZE:
                 return new SizeHolder(holder.transferItem.getSize());
             case TYPE:
