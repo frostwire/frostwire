@@ -74,12 +74,16 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.search.StreamableUtils;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.transfers.UISoundcloudDownload;
+import com.frostwire.transfers.BaseHttpDownload;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.transfers.TransferStateListener;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -97,7 +101,7 @@ import java.util.Set;
  * @author gubatron
  * @author aldenml
  */
-public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapter.ViewHolder> {
+public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapter.ViewHolder> implements TransferStateListener {
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
 
     private final WeakReference<Context> contextRef;
@@ -149,7 +153,63 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         if (item == null) {
             return;
         }
+        // Subscribe to transfer state changes for event-driven updates
+        subscribeToTransfer(item);
         viewHolder.updateView(item);
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+        // Note: We don't unsubscribe here because the same Transfer object might be bound to another ViewHolder
+        // Listeners are cleaned up in updateList() when transfers are removed or when the adapter is destroyed
+    }
+
+    private void subscribeToTransfer(Transfer transfer) {
+        if (transfer instanceof BaseHttpDownload) {
+            ((BaseHttpDownload) transfer).addListener(this);
+        } else if (transfer instanceof UIBittorrentDownload) {
+            ((UIBittorrentDownload) transfer).addListener(this);
+        }
+    }
+
+    private void unsubscribeFromTransfer(Transfer transfer) {
+        if (transfer instanceof BaseHttpDownload) {
+            ((BaseHttpDownload) transfer).removeListener(this);
+        } else if (transfer instanceof UIBittorrentDownload) {
+            ((UIBittorrentDownload) transfer).removeListener(this);
+        }
+    }
+
+    @Override
+    public void onTransferStateChanged(Transfer transfer, TransferState oldState, TransferState newState) {
+        // Called on background thread - post to UI thread
+        android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        mainHandler.post(() -> {
+            int position = getPositionOfTransfer(transfer);
+            if (position >= 0) {
+                LOG.debug("onTransferStateChanged: " + transfer.getDisplayName() + " " + oldState + " -> " + newState + " at position " + position);
+                notifyItemChanged(position);
+            }
+        });
+    }
+
+    @Override
+    public void onTransferProgressChanged(Transfer transfer, int progress) {
+        // Called frequently - only update if progress changed significantly (every 5%)
+        // to avoid excessive updates
+        // Not implemented yet - keeping submitList(null) for progress updates for now
+    }
+
+    private int getPositionOfTransfer(Transfer transfer) {
+        List<Transfer> currentList = getCurrentList();
+        String transferId = resolveTransferId(transfer);
+        for (int i = 0; i < currentList.size(); i++) {
+            if (resolveTransferId(currentList.get(i)).equals(transferId)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public List<Transfer> getList() {
@@ -165,6 +225,19 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             newList.removeIf(t -> removedTransferIds.contains(resolveTransferId(t)));
         }
         LOG.debug("updateList() called with " + newList.size() + " transfers");
+        
+        // Unsubscribe from old transfers that are no longer in the list
+        List<Transfer> oldList = getCurrentList();
+        Set<String> newIds = new HashSet<>();
+        for (Transfer t : newList) {
+            newIds.add(resolveTransferId(t));
+        }
+        for (Transfer oldTransfer : oldList) {
+            if (!newIds.contains(resolveTransferId(oldTransfer))) {
+                unsubscribeFromTransfer(oldTransfer);
+            }
+        }
+        
         submitList(newList);
         LOG.debug("updateList() submitList called");
     }
@@ -272,6 +345,15 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                 LOG.warn("Error dismissing dialog", e);
             }
         }
+    }
+
+    public void cleanup() {
+        // Unsubscribe from all transfers when adapter is destroyed
+        List<Transfer> currentList = getCurrentList();
+        for (Transfer transfer : currentList) {
+            unsubscribeFromTransfer(transfer);
+        }
+        dismissDialogs();
     }
 
     private MenuAdapter getMenuAdapter(View view) {
