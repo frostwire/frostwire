@@ -45,6 +45,7 @@ public class HexHivePanel extends JPanel {
     private int lastHeight;
     private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
     private Color backgroundColor;
+    private GraphicsConfiguration graphicsConfig;
 
     /**
      * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
@@ -72,6 +73,12 @@ public class HexHivePanel extends JPanel {
         this.forceCubes = forceCubes;
         lastWidth = getWidth();
         lastHeight = getHeight();
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        graphicsConfig = getGraphicsConfiguration();
     }
 
     private static float getHexWidth(float sideLength) {
@@ -248,6 +255,7 @@ public class HexHivePanel extends JPanel {
                 synchronized (bitmapLock) {
                     bitmap = backgroundBitmap;
                 }
+                SwingUtilities.invokeLater(this::repaint);
             });
         }
     }
@@ -259,9 +267,14 @@ public class HexHivePanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;  // Better methods to do stuff in Canvas
-        if (drawingProperties != null && bitmap != null) {
-            g2d.drawImage(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), null);
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        BufferedImage snapshot;
+        synchronized (bitmapLock) {
+            snapshot = bitmap;
+        }
+        if (snapshot != null) {
+            g2d.drawImage(snapshot, 0, 0, snapshot.getWidth(), snapshot.getHeight(), null);
         }
     }
 
@@ -285,7 +298,10 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
         boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
-        BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
+        GraphicsConfiguration gc = graphicsConfig;
+        BufferedImage bitmap = (gc != null)
+                ? gc.createCompatibleImage(drawingProperties.width, drawingProperties.height, Transparency.OPAQUE)
+                : new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, drawingProperties.width, drawingProperties.height);
