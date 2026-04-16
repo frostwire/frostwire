@@ -25,6 +25,7 @@ import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -49,31 +50,43 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
         if (tableMediator == null || btDownload == null || btDownload.getDl() == null) {
             return;
         }
-        if (this.btDownload != btDownload) {
-            tableMediator.clearTable();
-        }
         this.btDownload = btDownload;
         try {
+            // Gather JNI data off EDT
             List<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
-            if (items != null && items.size() > 0) {
-                if (tableMediator.getSize() == 0) {
-                    int i = 0;
-                    for (PeerInfo item : items) {
-                        tableMediator.add(new PeerItemHolder(i++, item));
-                    }
-                } else {
-                    int i = 0;
-                    for (PeerInfo item : items) {
-                        try {
-                            tableMediator.update(new PeerItemHolder(i++, item));
-                        } catch (IndexOutOfBoundsException ignored) {
-                            // peer might not be there anymore, reload table from scratch
-                            tableMediator.clearTable();
-                            updateData(btDownload);
+            if (items == null || items.isEmpty()) {
+                return;
+            }
+            // Copy data to plain holders off EDT
+            List<PeerItemHolder> holders = new ArrayList<>();
+            int i = 0;
+            for (PeerInfo item : items) {
+                holders.add(new PeerItemHolder(i++, item));
+            }
+
+            // Update table on EDT
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    if (tableMediator.getSize() == 0) {
+                        for (PeerItemHolder holder : holders) {
+                            tableMediator.add(holder);
+                        }
+                    } else {
+                        for (PeerItemHolder holder : holders) {
+                            try {
+                                tableMediator.update(holder);
+                            } catch (IndexOutOfBoundsException ignored) {
+                                // peer might not be there anymore, reload table from scratch
+                                tableMediator.clearTable();
+                                updateData(btDownload);
+                                return;
+                            }
                         }
                     }
+                } catch (Throwable e) {
+                    LOG.error("Error updating peers table UI: " + e.getMessage());
                 }
-            }
+            });
         } catch (Throwable e) {
             LOG.error("Error updating data: " + e.getMessage());
         }

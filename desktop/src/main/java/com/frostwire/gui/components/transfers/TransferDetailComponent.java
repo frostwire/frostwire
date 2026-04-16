@@ -202,8 +202,18 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     // gets invoked when a transfer is selected and called back by our RefreshListener implementation
     public void updateData(BittorrentDownload btDownload) {
         selectedBittorrentDownload = btDownload;
+        // Offload expensive updateData() call to background thread to avoid EDT blocking
+        // (JNI calls to libtorrent can take >2 seconds on large torrents)
         if (currentComponent != null && isVisible()) {
-            currentComponent.updateData(btDownload);
+            final BittorrentDownload btDownloadToUpdate = btDownload;
+            final TransferDetailPanel panelToUpdate = currentComponent;
+            BackgroundQueuedExecutorService.schedule(() -> {
+                try {
+                    panelToUpdate.updateData(btDownloadToUpdate);
+                } catch (Throwable e) {
+                    System.err.println("Error updating transfer details: " + e.getMessage());
+                }
+            });
         }
     }
 

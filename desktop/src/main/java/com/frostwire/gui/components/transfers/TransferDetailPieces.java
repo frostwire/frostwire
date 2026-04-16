@@ -86,15 +86,18 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     public void updateData(BittorrentDownload btDownload) {
         pieceSizeAlreadySet = (bittorrentDownload == btDownload);
         bittorrentDownload = btDownload;
-        hexHivePanelAdapter.updateData(bittorrentDownload);
-        updatePieceSizeLabel(hexHivePanelAdapter.getPieceSizeInHuman());
-        updateTotalPiecesLabel(hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount());
-        if (hexHivePanelAdapter.getTotalHexagonsCount() >= 0) {
-            hexHivePanel.updateData(hexHivePanelAdapter);
-            hexHivePanel.invalidate();
-        }
-        invalidate();
-        repaint();
+        // Gather JNI data off EDT
+        SwingUtilities.invokeLater(() -> {
+            hexHivePanelAdapter.updateData(bittorrentDownload);
+            updatePieceSizeLabel(hexHivePanelAdapter.getPieceSizeInHuman());
+            updateTotalPiecesLabel(hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount());
+            if (hexHivePanelAdapter.getTotalHexagonsCount() >= 0) {
+                hexHivePanel.updateData(hexHivePanelAdapter);
+                hexHivePanel.invalidate();
+            }
+            invalidate();
+            repaint();
+        });
     }
 
     private void updatePieceSizeLabel(String pieceSize) {

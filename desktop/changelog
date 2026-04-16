@@ -55,6 +55,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
  * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
  * EDT freeze: Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
+ * EDT freeze: Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 

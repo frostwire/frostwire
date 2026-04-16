@@ -27,6 +27,7 @@ import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -51,28 +52,42 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
             return;
         }
         try {
-            tableMediator.clearTable();
             TorrentHandle torrentHandle = btDownload.getDl().getTorrentHandle();
             if (torrentHandle == null) {
                 return;
             }
+            // Gather all JNI data off EDT
             TorrentStatus status = torrentHandle.status();
-            // Let's create the DHT, LSD and PEX TrackerItemHolders
             List<PeerInfo> peerInfos = torrentHandle.peerInfo();
             List<AnnounceEntry> items = torrentHandle.trackers();
+
+            // Build data holders off EDT
+            List<TrackerItemHolder> announceEntries = new ArrayList<>();
             if (items != null && items.size() > 0) {
                 int i = 0;
                 for (AnnounceEntry item : items) {
-                    tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
+                    announceEntries.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
                 }
             }
             TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, status, peerInfos);
             TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, status, peerInfos);
             TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, status, peerInfos);
-            // gotta add them last and in reverse order so they appear at the top by default
-            tableMediator.add(pexTrackerItemHolder);
-            tableMediator.add(lsdTrackerItemHolder);
-            tableMediator.add(dhtTrackerItemHolder);
+
+            // Update table on EDT
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    tableMediator.clearTable();
+                    for (TrackerItemHolder holder : announceEntries) {
+                        tableMediator.add(holder);
+                    }
+                    // gotta add them last and in reverse order so they appear at the top by default
+                    tableMediator.add(pexTrackerItemHolder);
+                    tableMediator.add(lsdTrackerItemHolder);
+                    tableMediator.add(dhtTrackerItemHolder);
+                } catch (Throwable e) {
+                    LOG.error("Error updating trackers table UI: " + e.getMessage());
+                }
+            });
         } catch (Throwable e) {
             LOG.error("Error updating data: " + e.getMessage());
         }
