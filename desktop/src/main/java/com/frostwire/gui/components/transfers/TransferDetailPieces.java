@@ -84,20 +84,26 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        pieceSizeAlreadySet = (bittorrentDownload == btDownload);
+        final boolean sameDownload = (bittorrentDownload == btDownload);
         bittorrentDownload = btDownload;
-        // Gather JNI data off EDT
-        SwingUtilities.invokeLater(() -> {
-            hexHivePanelAdapter.updateData(bittorrentDownload);
-            updatePieceSizeLabel(hexHivePanelAdapter.getPieceSizeInHuman());
-            updateTotalPiecesLabel(hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount());
-            if (hexHivePanelAdapter.getTotalHexagonsCount() >= 0) {
-                hexHivePanel.updateData(hexHivePanelAdapter);
-                hexHivePanel.invalidate();
-            }
-            invalidate();
-            repaint();
-        });
+        // JNI calls (torrentFile, status, pieces) must not run on the EDT.
+        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+            hexHivePanelAdapter.updateData(btDownload);
+            final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
+            final String pieceCounts = hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount();
+            final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
+            SwingUtilities.invokeLater(() -> {
+                pieceSizeAlreadySet = sameDownload;
+                updatePieceSizeLabel(pieceSize);
+                updateTotalPiecesLabel(pieceCounts);
+                if (totalHexs >= 0) {
+                    hexHivePanel.updateData(hexHivePanelAdapter);
+                    hexHivePanel.invalidate();
+                }
+                invalidate();
+                repaint();
+            });
+        }, "TransferDetailPieces::updateData");
     }
 
     private void updatePieceSizeLabel(String pieceSize) {
