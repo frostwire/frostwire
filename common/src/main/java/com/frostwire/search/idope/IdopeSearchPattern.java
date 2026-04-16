@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class IdopeSearchPattern implements SearchPattern {
     private static final Logger LOG = Logger.getLogger(IdopeSearchPattern.class);
-    private static final String DOMAIN = "idope.hair";
+    private static final String DOMAIN = "idope.pics";
 
     @Override
     public String getSearchUrl(String encodedKeywords) {
