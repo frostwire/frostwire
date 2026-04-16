@@ -516,6 +516,27 @@ public class MusicPlaybackService extends MediaSessionService {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
+        mServiceStartId = startId;
+        
+        // CRITICAL: On Android 8+ (API 26+), when started with startForegroundService(),
+        // we MUST call startForeground() within 5 seconds or we get an ANR.
+        // Call it immediately with a temporary notification - MediaSessionService will replace it later.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                createNotificationChannel();
+                Notification tempNotification = new Notification.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                        .setContentTitle("FrostWire")
+                        .setContentText("Loading...")
+                        .setSmallIcon(R.drawable.frostwire_notification_flat)
+                        .build();
+                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+                LOG.info("onStartCommand: Called startForeground() with temporary notification");
+            } catch (Throwable e) {
+                LOG.error("onStartCommand: Failed to call startForeground()", e);
+            }
+        }
+        
         // For Android 14+ (API 34), check if we can legitimately start as foreground service
         boolean canStartForeground = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -531,8 +552,6 @@ public class MusicPlaybackService extends MediaSessionService {
                 LOG.warn("onStartCommand: Cannot start foreground service - app not in foreground and no media intent. Will skip temp notification.");
             }
         }
-        LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
-        mServiceStartId = startId;
 
         if (intent != null) {
             final String action = intent.getAction();

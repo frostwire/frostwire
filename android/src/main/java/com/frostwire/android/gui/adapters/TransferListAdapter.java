@@ -762,19 +762,28 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         }
 
         public void onClick(Context ctx, View v) {
+            LOG.info("OpenOnClickListener.onClick() BEGIN");
             Object tag = v.getTag();
             if (tag instanceof TransferItem) {
+                LOG.info("OpenOnClickListener.onClick() tag is TransferItem");
                 TransferItem item = (TransferItem) tag;
                 File path = item.isComplete() ? item.getFile() : null;
+                LOG.info("OpenOnClickListener.onClick() isComplete=" + item.isComplete() + " path=" + (path != null ? path.getAbsolutePath() : "null"));
                 if (path == null && item instanceof BTDownloadItem) {
                     path = previewFile((BTDownloadItem) item);
+                    LOG.info("OpenOnClickListener.onClick() previewFile path=" + (path != null ? path.getAbsolutePath() : "null"));
                 }
                 if (path != null) {
+                    LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile for: " + path.getAbsolutePath());
                     UIUtils.openFile(ctx, path);
+                    LOG.info("OpenOnClickListener.onClick() UIUtils.openFile returned");
                 }
             } else if (tag instanceof File) {
+                LOG.info("OpenOnClickListener.onClick() tag is File: " + ((File) tag).getAbsolutePath());
                 UIUtils.openFile(ctx, (File) tag);
+                LOG.info("OpenOnClickListener.onClick() UIUtils.openFile returned");
             }
+            LOG.info("OpenOnClickListener.onClick() END");
         }
     }
 
