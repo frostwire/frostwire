@@ -27,11 +27,7 @@ import javax.swing.plaf.synth.ColorType;
 import javax.swing.plaf.synth.SynthContext;
 import javax.swing.plaf.synth.SynthToolTipUI;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineBreakMeasurer;
 import java.beans.PropertyChangeEvent;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
 
 /**
  * @author gubatron
@@ -84,35 +80,17 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
     }
 
     private Dimension calculatePreferredSize(JComponent c) {
-        Dimension dimension;
         try {
-            String textAreaText = SafeText.sanitize(textArea.getText());
-            if (textAreaText == null || textAreaText.isEmpty()) {
-                dimension = new Dimension(0, 0);
-            } else {
-                AttributedString text = new AttributedString(textAreaText);
-                Font font = c.getFont();
-                FontMetrics fm = c.getFontMetrics(font);
-                FontRenderContext frc = fm.getFontRenderContext();
-                AttributedCharacterIterator charIt = text.getIterator();
-                LineBreakMeasurer lineMeasurer = new LineBreakMeasurer(charIt, frc);
-                float formatWidth = (float) (TOOLTIP_WIDTH - 48);
-                lineMeasurer.setPosition(charIt.getBeginIndex());
-                int noLines = 0;
-                while (lineMeasurer.getPosition() < charIt.getEndIndex()) {
-                    lineMeasurer.nextLayout(formatWidth);
-                    noLines++;
-                }
-                if (lineMeasurer.getPosition() < textAreaText.length()) {
-                    noLines++;
-                }
-                int height = fm.getHeight() * noLines + 10;
-                dimension = new Dimension(TOOLTIP_WIDTH, height);
+            String text = SafeText.sanitize(textArea.getText());
+            if (text == null || text.isEmpty()) {
+                return new Dimension(0, 0);
             }
+            textArea.setFont(c.getFont());
+            textArea.setSize(TOOLTIP_WIDTH, Short.MAX_VALUE);
+            Dimension pref = textArea.getPreferredSize();
+            return new Dimension(TOOLTIP_WIDTH, pref.height + 10);
         } catch (Throwable e) {
-            // in case there is a problem with swing
-            dimension = new Dimension(0, 0);
+            return new Dimension(0, 0);
         }
-        return dimension;
     }
 }

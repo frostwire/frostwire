@@ -53,6 +53,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
  * Fix: Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
  * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
+ * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
