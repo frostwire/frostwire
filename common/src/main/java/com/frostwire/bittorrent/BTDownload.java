@@ -451,7 +451,7 @@ public final class BTDownload implements BittorrentDownload {
         th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
         invalidateStatusCache();
-        doResumeData(true);
+        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> doResumeData(true), "BTDownload::pause() saveResumeData");
     }
 
     public void resume() {
@@ -462,7 +462,7 @@ public final class BTDownload implements BittorrentDownload {
         th.setFlags(TorrentFlags.AUTO_MANAGED);
         th.resume();
         invalidateStatusCache();
-        doResumeData(true);
+        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> doResumeData(true), "BTDownload::resume() saveResumeData");
     }
 
     public void remove() {
