@@ -282,17 +282,19 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         }
         copyInfoHashActionListener = e -> GUIMediator.setClipboardContent(btDownload.getInfoHash());
         copyInfoHashButton.addActionListener(copyInfoHashActionListener);
-        String magnetURI = btDownload.magnetUri();
-        if (magnetURI.length() > 50) {
-            magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
-        } else {
-            magnetURLLabel.setText(magnetURI);
-        }
-        if (copyMagnetURLActionListener != null) {
-            copyMagnetURLButton.removeActionListener(copyMagnetURLActionListener);
-        }
-        copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
-        copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
+        // Defer magnet URI generation off EDT — native JNI call (libtorrent.make_magnet_uri)
+        // can block for >2 seconds on large torrents
+        final BTDownload finalBtDownload = btDownload;
+        SwingUtilities.invokeLater(() -> {
+            String magnetURI = finalBtDownload.magnetUri();
+            if (magnetURI.length() > 50) {
+                magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
+            } else {
+                magnetURLLabel.setText(magnetURI);
+            }
+            ActionListener copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
+            copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
+        });
         createdOnLabel.setText(btDownload.getCreated().toString());
         // Defer HTML content to avoid EDT violation
         // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
