@@ -223,106 +223,98 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         if (guiBtDownload == null) {
             return;
         }
-        // Gather all data off the EDT — native JNI calls (status, torrentFile, getName, etc.)
-        // can block for >2 seconds on large torrents
-        SwingUtilities.invokeLater(() -> {
-            BTDownload btDownload = guiBtDownload.getDl();
-            TransferDetailGeneral.this.btDownload = btDownload;
-            TorrentHandle torrentHandle = btDownload.getTorrentHandle();
-            if (!torrentHandle.isValid()) {
-                return;
-            }
-            TorrentStatus status = torrentHandle.status();
-            TorrentInfo torrentInfo = torrentHandle.torrentFile();
-            String name = SafeText.sanitize(btDownload.getName());
-            int progress = btDownload.getProgress();
-            long activeDuration = status.activeDuration() / 1000;
-            TransferState state = btDownload.getState();
-            long downloadSpeed = btDownload.getDownloadSpeed();
-            long totalReceived = btDownload.getTotalBytesReceived();
-            long downloadLimit = btDownload.getDownloadRateLimit();
-            long totalSent = btDownload.getTotalBytesSent();
-            int connectedSeeds = btDownload.getConnectedSeeds();
-            int totalSeeds = btDownload.getTotalSeeds();
-            long uploadSpeed = btDownload.getUploadSpeed();
-            long size = btDownload.getSize();
-            int connectedPeers = btDownload.getConnectedPeers();
-            int totalPeers = btDownload.getTotalPeers();
-            long uploadLimit = btDownload.getUploadRateLimit();
-            String shareRatio = guiBtDownload.getShareRatio();
-            String saveLocation = guiBtDownload.getSaveLocation().getAbsolutePath();
-            String infoHash = btDownload.getInfoHash();
-            String created = btDownload.getCreated().toString();
-            String comment = torrentInfo.comment();
-            long eta = guiBtDownload.getETA();
+        // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
+        BTDownload btDownload = guiBtDownload.getDl();
+        TransferDetailGeneral.this.btDownload = btDownload;
+        TorrentHandle torrentHandle = btDownload.getTorrentHandle();
+        if (!torrentHandle.isValid()) {
+            return;
+        }
+        TorrentStatus status = torrentHandle.status();
+        TorrentInfo torrentInfo = torrentHandle.torrentFile();
+        String name = SafeText.sanitize(btDownload.getName());
+        int progress = btDownload.getProgress();
+        long activeDuration = status.activeDuration() / 1000;
+        TransferState state = btDownload.getState();
+        long downloadSpeed = btDownload.getDownloadSpeed();
+        long totalReceived = btDownload.getTotalBytesReceived();
+        long downloadLimit = btDownload.getDownloadRateLimit();
+        long totalSent = btDownload.getTotalBytesSent();
+        int connectedSeeds = btDownload.getConnectedSeeds();
+        int totalSeeds = btDownload.getTotalSeeds();
+        long uploadSpeed = btDownload.getUploadSpeed();
+        long size = btDownload.getSize();
+        int connectedPeers = btDownload.getConnectedPeers();
+        int totalPeers = btDownload.getTotalPeers();
+        long uploadLimit = btDownload.getUploadRateLimit();
+        String shareRatio = guiBtDownload.getShareRatio();
+        String saveLocation = guiBtDownload.getSaveLocation().getAbsolutePath();
+        String infoHash = btDownload.getInfoHash();
+        String created = btDownload.getCreated().toString();
+        String comment = torrentInfo.comment();
+        long eta = guiBtDownload.getETA();
+        String magnetURI = btDownload.magnetUri();
 
-            GUIMediator.safeInvokeLater(() -> {
-                torrentNameLabel.setText(name);
-                completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
-                completionPercentageProgressbar.setMaximum(100);
-                completionPercentageProgressbar.setValue(progress);
-                timeElapsedLabel.setText(seconds2time(activeDuration));
-                if (state.equals(TransferState.DOWNLOADING)) {
-                    timeLeftLabel.setText(seconds2time(eta));
-                } else {
-                    timeLeftLabel.setText("");
+        GUIMediator.safeInvokeLater(() -> {
+            torrentNameLabel.setText(name);
+            completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
+            completionPercentageProgressbar.setMaximum(100);
+            completionPercentageProgressbar.setValue(progress);
+            timeElapsedLabel.setText(seconds2time(activeDuration));
+            if (state.equals(TransferState.DOWNLOADING)) {
+                timeLeftLabel.setText(seconds2time(eta));
+            } else {
+                timeLeftLabel.setText("");
+            }
+            downloadSpeedLabel.setText(GUIUtils.getBytesInHuman(downloadSpeed));
+            downloadedLabel.setText(GUIUtils.getBytesInHuman(totalReceived));
+            statusLabel.setText(BTDownloadDataLine.TRANSFER_STATE_STRING_MAP.get(state));
+            downloadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(downloadLimit));
+            uploadedLabel.setText(GUIUtils.getBytesInHuman(totalSent));
+            seedsLabel.setText(String.format("%d %s %s %d %s",
+                    connectedSeeds,
+                    I18n.tr("connected"),
+                    I18n.tr("of"),
+                    totalSeeds,
+                    I18n.tr("total")));
+            uploadSpeedLabel.setText(GUIUtils.getBytesInHuman(uploadSpeed));
+            totalSizeLabel.setText(GUIUtils.getBytesInHuman(size));
+            peersLabel.setText(String.format("%d %s %s %d %s",
+                    connectedPeers,
+                    I18n.tr("connected"),
+                    I18n.tr("of"),
+                    totalPeers,
+                    I18n.tr("total")));
+            uploadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(uploadLimit));
+            shareRatioLabel.setText(shareRatio);
+            saveLocationLabel.setText(saveLocation);
+            MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
+            if (mouseListeners != null && mouseListeners.length > 0) {
+                for (MouseListener l : mouseListeners) {
+                    saveLocationGrayLabel.removeMouseListener(l);
                 }
-                downloadSpeedLabel.setText(GUIUtils.getBytesInHuman(downloadSpeed));
-                downloadedLabel.setText(GUIUtils.getBytesInHuman(totalReceived));
-                statusLabel.setText(BTDownloadDataLine.TRANSFER_STATE_STRING_MAP.get(state));
-                downloadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(downloadLimit));
-                uploadedLabel.setText(GUIUtils.getBytesInHuman(totalSent));
-                seedsLabel.setText(String.format("%d %s %s %d %s",
-                        connectedSeeds,
-                        I18n.tr("connected"),
-                        I18n.tr("of"),
-                        totalSeeds,
-                        I18n.tr("total")));
-                uploadSpeedLabel.setText(GUIUtils.getBytesInHuman(uploadSpeed));
-                totalSizeLabel.setText(GUIUtils.getBytesInHuman(size));
-                peersLabel.setText(String.format("%d %s %s %d %s",
-                        connectedPeers,
-                        I18n.tr("connected"),
-                        I18n.tr("of"),
-                        totalPeers,
-                        I18n.tr("total")));
-                uploadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(uploadLimit));
-                shareRatioLabel.setText(shareRatio);
-                saveLocationLabel.setText(saveLocation);
-                MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
-                if (mouseListeners != null && mouseListeners.length > 0) {
-                    for (MouseListener l : mouseListeners) {
-                        saveLocationGrayLabel.removeMouseListener(l);
-                    }
+            }
+            final BittorrentDownload finalGuiBtDownload = guiBtDownload;
+            saveLocationGrayLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    GUIMediator.launchExplorer(new File(finalGuiBtDownload.getDl().getSavePath(), finalGuiBtDownload.getName()));
                 }
-                final BittorrentDownload finalGuiBtDownload = guiBtDownload;
-                saveLocationGrayLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        GUIMediator.launchExplorer(new File(finalGuiBtDownload.getDl().getSavePath(), finalGuiBtDownload.getName()));
-                    }
-                });
-                infoHashLabel.setText(infoHash);
-                if (copyInfoHashActionListener != null) {
-                    copyInfoHashButton.removeActionListener(copyInfoHashActionListener);
-                }
-                final String finalInfoHash = infoHash;
-                copyInfoHashActionListener = e -> GUIMediator.setClipboardContent(finalInfoHash);
-                copyInfoHashButton.addActionListener(copyInfoHashActionListener);
-                final BTDownload finalBtDownload = btDownload;
-                SwingUtilities.invokeLater(() -> {
-                    String magnetURI = finalBtDownload.magnetUri();
-                    if (magnetURI.length() > 50) {
-                        magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
-                    } else {
-                        magnetURLLabel.setText(magnetURI);
-                    }
-                    ActionListener copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
-                    copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
-                });
-                createdOnLabel.setText(created);
-                commentLabel.setText("<html><body><p style='width: 600px;'>" + SafeText.sanitize(comment) + "</p></body></html>");
             });
+            infoHashLabel.setText(infoHash);
+            if (copyInfoHashActionListener != null) {
+                copyInfoHashButton.removeActionListener(copyInfoHashActionListener);
+            }
+            copyInfoHashActionListener = e -> GUIMediator.setClipboardContent(infoHash);
+            copyInfoHashButton.addActionListener(copyInfoHashActionListener);
+            if (magnetURI.length() > 50) {
+                magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
+            } else {
+                magnetURLLabel.setText(magnetURI);
+            }
+            copyMagnetURLButton.addActionListener(e -> GUIMediator.setClipboardContent(magnetURI));
+            createdOnLabel.setText(created);
+            commentLabel.setText("<html><body><p style='width: 600px;'>" + SafeText.sanitize(comment) + "</p></body></html>");
         });
     }
 
