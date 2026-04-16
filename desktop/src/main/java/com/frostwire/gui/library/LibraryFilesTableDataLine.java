@@ -157,12 +157,17 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         BackgroundQueuedExecutorService.schedule(() -> {
             SizeHolder sizeHolder;
             Date modTime;
-            if (file.isFile()) {
-                sizeHolder = new SizeHolder(file.length());
-            } else {
+            try {
+                if (file.isFile()) {
+                    sizeHolder = new SizeHolder(file.length());
+                } else {
+                    sizeHolder = ZERO_SIZED_HOLDER;
+                }
+                modTime = new Date(file.lastModified());
+            } catch (Throwable e) {
                 sizeHolder = ZERO_SIZED_HOLDER;
+                modTime = new Date(0);
             }
-            modTime = new Date(file.lastModified());
             String ext = FilenameUtils.getExtension(file.getName());
             final String finalLicense;
             final PaymentOptions finalPaymentOptions;
@@ -196,6 +201,8 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             GUIMediator.safeInvokeLater(() -> {
                 _sizeHolder = finalSizeHolder;
                 lastModified = finalModTime;
+                cachedSizeCell = null;
+                cachedModTimeCell = null;
                 license = finalLicense;
                 paymentOptions = finalPaymentOptions;
                 _model.refresh();
