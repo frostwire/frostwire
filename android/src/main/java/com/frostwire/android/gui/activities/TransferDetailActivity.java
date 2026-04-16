@@ -210,6 +210,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             detailFragments[lastSelectedTabIndex]=(AbstractTransferDetailFragment) correspondingActiveFragment;
             currentFragment = detailFragments[lastSelectedTabIndex];
         }
+        currentFragment.bindToTransfer(uiBittorrentDownload);
         if (transferDetailFragment != null) {
             transferDetailFragment.updatePauseResumeSeedMenuAction();
         }

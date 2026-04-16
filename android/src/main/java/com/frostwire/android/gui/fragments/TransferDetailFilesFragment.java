@@ -73,6 +73,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     private TextView totalSizeTextView;
     private RecyclerView recyclerView;
     private TransferDetailFilesRecyclerViewAdapter adapter;
+    private String adapterInfoHash;
 
     public TransferDetailFilesFragment() {
         super(R.layout.fragment_transfer_detail_files);
@@ -90,16 +91,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         super.onResume();
         if (uiBittorrentDownload == null) {
             return;
-        }
-
-        List<TransferItem> items = uiBittorrentDownload.getItems();
-        if (items == null) {
-            return;
-        }
-        if (adapter == null) {
-            // Use pagination for large file lists (1000+) to prevent ANR
-            boolean usePagination = items.size() >= LARGE_FILE_LIST_THRESHOLD;
-            adapter = new TransferDetailFilesRecyclerViewAdapter(items, usePagination ? PAGE_SIZE : Integer.MAX_VALUE);
         }
         updateComponents();
     }
@@ -124,12 +115,21 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
     @Override
     protected void updateComponents() {
-        if (uiBittorrentDownload == null || adapter == null) {
+        if (uiBittorrentDownload == null) {
             return;
         }
         List<TransferItem> items = uiBittorrentDownload.getItems();
         if (items == null) {
             return;
+        }
+        String currentInfoHash = uiBittorrentDownload.getInfoHash();
+        if (adapter == null || adapterInfoHash == null || !adapterInfoHash.equals(currentInfoHash)) {
+            boolean usePagination = items.size() >= LARGE_FILE_LIST_THRESHOLD;
+            adapter = new TransferDetailFilesRecyclerViewAdapter(items, usePagination ? PAGE_SIZE : Integer.MAX_VALUE);
+            adapterInfoHash = currentInfoHash;
+            if (recyclerView != null) {
+                recyclerView.setAdapter(adapter);
+            }
         }
         fileNumberTextView.setText(getString(R.string.n_files, items.size()));
         totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
@@ -137,6 +137,15 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             recyclerView.setAdapter(adapter);
         }
         adapter.updateTransferItems(items);
+    }
+
+    @Override
+    protected void onTransferChanged() {
+        adapterInfoHash = null;
+        adapter = null;
+        if (recyclerView != null) {
+            recyclerView.setAdapter(null);
+        }
     }
 
     private final static class TransferDetailFilesTransferItemViewHolder extends RecyclerView.ViewHolder {

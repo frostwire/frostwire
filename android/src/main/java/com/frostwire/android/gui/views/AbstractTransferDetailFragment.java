@@ -36,6 +36,7 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
@@ -86,11 +87,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     public AbstractTransferDetailFragment init(final Activity activity, final SparseArray<String> tabTitles, final UIBittorrentDownload uiBittorrentDownload) {
         this.tabTitle = tabTitles.get(getTabTitleStringId());
-        this.uiBittorrentDownload = uiBittorrentDownload;
+        bindToTransfer(uiBittorrentDownload);
         if (activity != null) {
             onAttach((Context) activity);
         }
-        ensureTorrentHandleAsync();
         return this;
     }
 
@@ -112,6 +112,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     public void onResume() {
         super.onResume();
+        syncTransferFromIntent();
         ensureTorrentHandle(); // Purposefully not async.
         // Populate cache before updating UI
         updateTransferDataCache();
@@ -129,6 +130,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     public void onTime() {
+        syncTransferFromIntent();
         if (uiBittorrentDownload == null) {
             Intent intent = getActivity().getIntent();
             if (intent != null) {
@@ -151,6 +153,23 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         }
         updateCommonComponentsFromCache();
         updateComponents();
+    }
+
+    public final void bindToTransfer(UIBittorrentDownload uiBittorrentDownload) {
+        if (uiBittorrentDownload == null) {
+            return;
+        }
+        boolean transferChanged = this.uiBittorrentDownload == null
+                || !uiBittorrentDownload.getInfoHash().equals(this.uiBittorrentDownload.getInfoHash());
+        this.uiBittorrentDownload = uiBittorrentDownload;
+        if (transferChanged) {
+            torrentHandle = null;
+            onTransferChanged();
+        }
+        ensureTorrentHandleAsync();
+    }
+
+    protected void onTransferChanged() {
     }
 
     // Fragment State serialization = onSaveInstanceState
@@ -228,10 +247,30 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (infoHash != null) {
             BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infoHash);
             if (bittorrentDownload instanceof UIBittorrentDownload) {
-                uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
-                ensureTorrentHandleAsync();
+                bindToTransfer((UIBittorrentDownload) bittorrentDownload);
+            } else if (bittorrentDownload instanceof BTDownload) {
+                bindToTransfer(new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload));
             }
         }
+    }
+
+    private void syncTransferFromIntent() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+        Intent intent = activity.getIntent();
+        if (intent == null) {
+            return;
+        }
+        String infoHash = intent.getStringExtra("infoHash");
+        if (infoHash == null || infoHash.isEmpty()) {
+            return;
+        }
+        if (uiBittorrentDownload != null && infoHash.equals(uiBittorrentDownload.getInfoHash())) {
+            return;
+        }
+        recoverUIBittorrentDownload(infoHash);
     }
 
     protected void ensureTorrentHandleAsync() {
