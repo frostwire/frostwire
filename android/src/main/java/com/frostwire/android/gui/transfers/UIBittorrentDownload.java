@@ -30,6 +30,7 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.transfers.TransferStateListener;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -38,6 +39,7 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author gubatron
@@ -50,6 +52,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     private final TransferManager manager;
     private final BTDownload dl;
+    private final List<TransferStateListener> listeners = new CopyOnWriteArrayList<>();
 
     private String displayName;
     private long size;
@@ -383,5 +386,38 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             return false;
         }
         return getInfoHash().equals(((UIBittorrentDownload) other).getInfoHash());
+    }
+
+    public void addListener(TransferStateListener listener) {
+        if (listener != null && !listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeListener(TransferStateListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyStateChanged(TransferState oldState, TransferState newState) {
+        if (oldState == newState) {
+            return;
+        }
+        for (TransferStateListener listener : listeners) {
+            try {
+                listener.onTransferStateChanged(this, oldState, newState);
+            } catch (Throwable e) {
+                LOG.error("Error notifying TransferStateListener", e);
+            }
+        }
+    }
+
+    private void notifyProgressChanged(int progress) {
+        for (TransferStateListener listener : listeners) {
+            try {
+                listener.onTransferProgressChanged(this, progress);
+            } catch (Throwable e) {
+                LOG.error("Error notifying TransferStateListener", e);
+            }
+        }
     }
 }
