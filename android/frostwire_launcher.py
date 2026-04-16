@@ -727,6 +727,23 @@ def main():
 
 if __name__ == "__main__":
     try:
+        # Quick mode: if "--quick" or "-q" flag, skip menu and use first running emulator
+        if len(sys.argv) > 1 and sys.argv[1] in ["--quick", "-q"]:
+            devices = get_adb_devices()
+            running_emulators = [d for d in devices if d.is_emulator and d.state == "device"]
+            if running_emulators:
+                serial = running_emulators[0].serial
+                console.print(f"[bright_cyan]Quick mode: Using running emulator {serial}[/bright_cyan]")
+                apk = build_apk()
+                if apk and install_apk(apk, serial):
+                    launch_app(serial)
+                    console.print(f"[bold green]Done! FrostWire running on {serial}[/bold green]")
+                    console.print("[dim]Run without --quick flag to view logcat[/dim]")
+                    sys.exit(0)
+            else:
+                console.print("[red]No running emulator found. Run without --quick to select device.[/red]")
+                sys.exit(1)
+        
         main()
     except KeyboardInterrupt:
         console.print()

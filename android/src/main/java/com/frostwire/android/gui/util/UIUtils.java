@@ -252,19 +252,27 @@ public final class UIUtils {
      */
     @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
+        LOG.info("UIUtils.openFile() called - posting to MISC thread: " + filePath);
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> openFileBackground(context, filePath, mime, useFileProvider));
+        LOG.info("UIUtils.openFile() posted to background thread");
         return true;
     }
 
     @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     private static void openFileBackground(Context context, String filePath, String mime, boolean useFileProvider) {
+        LOG.info("UIUtils.openFileBackground() BEGIN: " + filePath);
         try {
             File file = new File(filePath);
 
             if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
                 filePath = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(file).getAbsolutePath();
             }
-            if (filePath != null && !openAudioInternal(context, filePath)) {
+            LOG.info("UIUtils.openFileBackground() calling openAudioInternal: " + filePath);
+            boolean handledByAudioPlayer = openAudioInternal(context, filePath);
+            LOG.info("UIUtils.openFileBackground() openAudioInternal returned: " + handledByAudioPlayer);
+            
+            if (filePath != null && !handledByAudioPlayer) {
+                LOG.info("UIUtils.openFileBackground() audio not handled, using generic Intent");
                 Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ?
                         Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
 
@@ -281,7 +289,9 @@ public final class UIUtils {
                     }
                 }
                 context.startActivity(i);
+                LOG.info("UIUtils.openFileBackground() startActivity called");
             }
+            LOG.info("UIUtils.openFileBackground() END");
         } catch (Throwable e) {
             SystemUtils.postToUIThread(() -> UIUtils.showShortMessage(context, R.string.cant_open_file));
             LOG.error("Failed to open file: " + filePath, e);
@@ -438,10 +448,12 @@ public final class UIUtils {
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
+        LOG.info("openAudioInternal() BEGIN: " + filePath);
         // Fast path: if file exists on disk as audio, play directly without MediaStore scan.
         // The LIKE '%...%' MediaStore query can take seconds on large libraries, and
         // freshly downloaded files aren't indexed yet anyway.
         if (isAudioFile(filePath)) {
+            LOG.info("openAudioInternal() file is audio");
             File file = new File(filePath);
             if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
                 try {
@@ -449,6 +461,7 @@ public final class UIUtils {
                 } catch (Throwable ignored) {}
             }
             if (file.exists()) {
+                LOG.info("openAudioInternal() file exists, building FWFileDescriptor");
                 FWFileDescriptor fd = new FWFileDescriptor();
                 fd.id = -1;
                 fd.filePath = file.getAbsolutePath();
@@ -458,9 +471,15 @@ public final class UIUtils {
                 fd.dateAdded = file.lastModified() / 1000;
                 fd.dateModified = file.lastModified() / 1000;
                 fd.deletable = true;
+                LOG.info("openAudioInternal() calling playEphemeralPlaylist");
                 playEphemeralPlaylist(context, fd);
+                LOG.info("openAudioInternal() playEphemeralPlaylist returned");
                 return true;
+            } else {
+                LOG.warn("openAudioInternal() file does not exist: " + file.getAbsolutePath());
             }
+        } else {
+            LOG.info("openAudioInternal() not an audio file: " + filePath);
         }
 
         return false;
