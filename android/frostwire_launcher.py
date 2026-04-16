@@ -587,12 +587,20 @@ def main():
     table, options = print_devices_table(devices, avds, sdk_images)
     console.print(table)
     console.print()
+    
+    # Default to first running emulator if available
+    running_emulators = [d for d in devices if d.is_emulator and d.state == "device"]
+    default_choice = "1" if running_emulators else "q"
+    
+    if running_emulators:
+        console.print(f"[bright_green]Tip: Select #{default_choice} to use the running emulator (fast rebuild & install)[/bright_green]")
+        console.print()
 
     choices = [str(i + 1) for i in range(len(options))]
     choice = Prompt.ask(
         "[bold]Select device # (or 'q' to quit)[/bold]",
         choices=choices + ["q"],
-        default="q"
+        default=default_choice
     )
 
     if choice == "q":
