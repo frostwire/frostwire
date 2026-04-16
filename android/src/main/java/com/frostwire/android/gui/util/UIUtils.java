@@ -252,9 +252,15 @@ public final class UIUtils {
      */
     @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
-        LOG.info("UIUtils.openFile() called - posting to MISC thread: " + filePath);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> openFileBackground(context, filePath, mime, useFileProvider));
-        LOG.info("UIUtils.openFile() posted to background thread");
+        LOG.info("UIUtils.openFile() called - creating dedicated thread: " + filePath);
+        // Use dedicated thread instead of shared MISC pool for responsive UI
+        // User-facing play actions should not wait for background tasks
+        new Thread("openFile-" + new File(filePath).getName()) {
+            public void run() {
+                openFileBackground(context, filePath, mime, useFileProvider);
+            }
+        }.start();
+        LOG.info("UIUtils.openFile() thread started");
         return true;
     }
 
