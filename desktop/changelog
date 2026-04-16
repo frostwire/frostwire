@@ -33,7 +33,7 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove ancient LWC-1214/1088 try/catch hacks from SearchResultDisplayer
  * Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
  * Cleanup: Remove Thread.sleep(50) hack in TransfersTab.ensureDownloadVisible scroll — use revalidate/repaint chain instead
- * Fix: YouTube playlist URL searches now display results — SearchMediator.skipTokenFilter() was filtering out all results because URL tokens (https, www, youtube, com, @user) don't match video titles
+ * Fix: Library files showing 0.0KB — file.length()/lastModified() wrapped in try-catch to prevent silent background task failure, and size/modtime cached cells invalidated after background load completes so UI repaints with correct values
  * Fix: TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
  * Cleanup: Remove stale DHT announcement TODO in SoundcloudDownload — already implemented via makeTorrentAndDownload with dhtTrackedOnly
  * Cleanup: Remove 4 identical PatriciaTrie TODO comments — add/remove search pattern is intentional
