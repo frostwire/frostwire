@@ -616,32 +616,65 @@ def main():
         main()  # Restart
         return
 
+    # Check if any emulator is already running
+    running_emulators = [d for d in devices if d.is_emulator and d.state == "device"]
+    
     # Handle AVD options (if stopped)
     if kind == "avd_stopped":
-        action = handle_avd_options(ident)
-        if action == "delete":
-            handle_delete_avd(ident)
+        # If an emulator is already running, offer to reuse it
+        if running_emulators:
             console.print()
-            console.print("[dim]Returning to device list...[/dim]")
-            main()
-            return
-        elif action == "cancel":
-            console.print()
-            console.print("[dim]Returning to device list...[/dim]")
-            main()
-            return
-        # else action == "launch": proceed to boot the emulator
+            console.print(f"[yellow]Emulator '{running_emulators[0].serial}' is already running.[/yellow]")
+            reuse = Confirm.ask(
+                f"[bold]Reuse running emulator instead of booting '{ident}'?[/bold]",
+                default=True
+            )
+            if reuse:
+                serial = running_emulators[0].serial
+                console.print(f"[green]Using running emulator: {serial}[/green]")
+                kind = "emulator_reuse"  # Skip boot step
+            else:
+                action = handle_avd_options(ident)
+                if action == "delete":
+                    handle_delete_avd(ident)
+                    console.print()
+                    console.print("[dim]Returning to device list...[/dim]")
+                    main()
+                    return
+                elif action == "cancel":
+                    console.print()
+                    console.print("[dim]Returning to device list...[/dim]")
+                    main()
+                    return
+                # else action == "launch": proceed to boot the emulator
+        else:
+            action = handle_avd_options(ident)
+            if action == "delete":
+                handle_delete_avd(ident)
+                console.print()
+                console.print("[dim]Returning to device list...[/dim]")
+                main()
+                return
+            elif action == "cancel":
+                console.print()
+                console.print("[dim]Returning to device list...[/dim]")
+                main()
+                return
+            # else action == "launch": proceed to boot the emulator
 
     # Build APK
     apk = build_apk()
     if not apk:
         sys.exit(1)
 
-    # Handle AVD boot
+    # Handle AVD boot (only if not reusing)
     if kind == "avd_stopped":
         serial = run_emulator(ident)
         if not serial:
             sys.exit(1)
+    elif kind == "emulator_reuse":
+        # Already have serial from above, just use it
+        pass
     else:
         serial = ident
         d = next((d for d in devices if d.serial == serial), None)
