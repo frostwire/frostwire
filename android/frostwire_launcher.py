@@ -291,7 +291,11 @@ def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
         cmd.append("-wipe-data")
 
     console.print(f"[dim]Running: {' '.join(cmd)}[/dim]")
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Detach emulator process so it survives script exit (Ctrl+C)
+    proc = subprocess.Popen(cmd, 
+                           stdout=subprocess.DEVNULL, 
+                           stderr=subprocess.DEVNULL,
+                           start_new_session=True)
 
     # Wait for boot (up to 3 minutes for cold boot)
     for i in range(180):
@@ -306,21 +310,12 @@ def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
                     console.print(f"[green]Emulator {avd} booted as {d.serial}.[/green]")
                     return d.serial
         if i % 10 == 0:
-            adb_result = run(["adb", "devices"], capture=True, check=False)
-            console.print(f"[dim]Waiting for emulator... ({i}s) adb devices: {adb_result.stdout.strip()}[/dim]")
-            # Check if emulator process is still alive
-            if proc.poll() is not None:
-                stdout, stderr = proc.communicate()
-                console.print(f"[red]Emulator process died![/red]")
-                console.print(f"[dim]stdout: {stdout}[/dim]")
-                console.print(f"[dim]stderr: {stderr}[/dim]")
-                return None
+            console.print(f"[dim]Waiting for emulator... ({i}s)[/dim]")
         time.sleep(1)
 
-    proc.terminate()
-    stdout, stderr = proc.communicate(timeout=5)
-    console.print("[yellow]Emulator boot timeout.[/yellow]")
-    console.print(f"[dim]Emulator stderr: {stderr[:500]}[/dim]")
+    # Emulator continues running in background even after timeout
+    console.print("[yellow]Emulator boot timeout - but emulator continues in background.[/yellow]")
+    console.print("[dim]Run script again to check if emulator has booted.[/dim]")
     return None
 
 
@@ -340,7 +335,10 @@ def print_devices_table(devices: list[Device], avds: list[str], sdk_images: list
         state = "[green]device[/green]" if d.state == "device" else f"[yellow]{d.state}[/yellow]"
         dtype = "[cyan]emulator[/cyan]" if d.is_emulator else "[green]physical[/green]"
         table.add_row(str(idx), d.serial, dtype, state, f"{d.model} / {d.product}")
-        options.append(("device", d.serial))
+        if d.is_emulator and d.state == "device":
+            options.append(("emulator_running", d.serial))
+        else:
+            options.append(("device", d.serial))
         idx += 1
 
     # Available AVDs
@@ -616,6 +614,32 @@ def main():
         main()  # Restart
         return
 
+    # Handle emulator shutdown
+    if kind == "emulator_running":
+        console.print()
+        action = Prompt.ask(
+            f"[bold]Emulator '{ident}' is running. Select action:[/bold]\n"
+            f"  [bright_cyan]\\[u]se[/bright_cyan] - Build APK and install on this emulator\n"
+            f"  [bright_red]\\[s]hutdown[/bright_red] - Kill the emulator process\n"
+            f"  [bright_white]\\[c]ancel[/bright_white] - Return to device selection",
+            choices=["u", "s", "c"],
+            default="u"
+        )
+        if action == "s":
+            console.print(f"[dim]Shutting down emulator {ident}...[/dim]")
+            run(["adb", "-s", ident, "emu", "kill"], capture=True, check=False)
+            console.print(f"[green]Emulator {ident} shutdown.[/green]")
+            console.print()
+            console.print("[dim]Returning to device list...[/dim]")
+            main()
+            return
+        elif action == "c":
+            console.print()
+            console.print("[dim]Returning to device list...[/dim]")
+            main()
+            return
+        # else action == "u": proceed to build and install
+
     # Check if any emulator is already running
     running_emulators = [d for d in devices if d.is_emulator and d.state == "device"]
     
@@ -694,4 +718,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        console.print()
+        console.print("[yellow]Script interrupted. Emulator (if running) continues in background.[/yellow]")
+        sys.exit(0)
