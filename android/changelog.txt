@@ -83,6 +83,7 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:Transfers and Transfer Detail > Files audio play buttons now start FrostWire's music player the same way My Music does, including service startup and opening AudioPlayerActivity
  - fix:frostwire_launcher.py no longer disables emulator audio, so emulator sessions launched from the TUI can play sound
  - fix:FrostWire is now offered more reliably for .torrent files and magnet links from browsers/download managers by broadening torrent MIME-type intent filters
+ - maintenance:Settings > Community now uses the current X branding and links to x.com/frostwire instead of the retired Twitter branding
  - fix:Album art ImageView no longer shows blank during load - placeholder drawable is now set immediately before Coil request is enqueued
  - fix:Album art now loads for YouTube downloads with no MediaStore album ID - loadCurrentArtwork() attempts MediaMetadataRetriever+sidecar fallback when albumId==0 but file path is available
  - fix:getPath() in MusicPlaybackService now returns file path for tracks opened directly from storage (e.g. fresh YouTube downloads not yet indexed by MediaStore)

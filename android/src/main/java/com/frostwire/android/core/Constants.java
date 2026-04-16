@@ -185,7 +185,7 @@ public final class Constants {
      * Social Media official URLS
      */
     public static final String SOCIAL_URL_FACEBOOK_PAGE = "https://www.facebook.com/FrostwireOfficial";
-    public static final String SOCIAL_URL_TWITTER_PAGE = "https://twitter.com/frostwire";
+    public static final String SOCIAL_URL_TWITTER_PAGE = "https://x.com/frostwire";
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
     public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
     public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
