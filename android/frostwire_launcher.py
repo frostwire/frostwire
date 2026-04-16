@@ -283,7 +283,8 @@ def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
     if wipe_data:
         cmd.append("-wipe-data")
 
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    console.print(f"[dim]Running: {' '.join(cmd)}[/dim]")
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     # Wait for boot (up to 3 minutes for cold boot)
     for i in range(180):
@@ -300,10 +301,19 @@ def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
         if i % 10 == 0:
             adb_result = run(["adb", "devices"], capture=True, check=False)
             console.print(f"[dim]Waiting for emulator... ({i}s) adb devices: {adb_result.stdout.strip()}[/dim]")
+            # Check if emulator process is still alive
+            if proc.poll() is not None:
+                stdout, stderr = proc.communicate()
+                console.print(f"[red]Emulator process died![/red]")
+                console.print(f"[dim]stdout: {stdout}[/dim]")
+                console.print(f"[dim]stderr: {stderr}[/dim]")
+                return None
         time.sleep(1)
 
     proc.terminate()
+    stdout, stderr = proc.communicate(timeout=5)
     console.print("[yellow]Emulator boot timeout.[/yellow]")
+    console.print(f"[dim]Emulator stderr: {stderr[:500]}[/dim]")
     return None
 
 
