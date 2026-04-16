@@ -222,15 +222,48 @@ public final class SystemUtils {
         return false;
     }
 
+    /**
+     * HandlerThreadName enum for background task execution strategies.
+     * 
+     * HISTORY: In early 2020s refactor, many `new Thread()` calls were replaced with
+     * `postToHandler(MISC, ...)` for code uniformity. However, this introduced UI lag
+     * because interactive user actions (play button, open file) were queued behind
+     * slow background tasks on the MISC pool.
+     * 
+     * Thread pools (SEARCH_PERFORMER, DOWNLOADER, CONFIG_MANAGER, MISC):
+     * - Tasks are QUEUED and executed sequentially per pool (single-threaded)
+     * - Good for background work where order matters or high concurrency isn't critical
+     * - Can introduce 3-5+ second delays if pool is backed up with slow tasks
+     * - Use for: search indexing, configuration saves, cleanup tasks, non-urgent I/O
+     * 
+     * HIGH_PRIORITY:
+     * - Spawns a DEDICATED thread per task (not queued, immediate execution)
+     * - Use ONLY for interactive user-facing actions that need instant response (<100ms)
+     * - Examples: playing media on tap, opening files, responding to user button clicks
+     * - Never use for bulk operations, loops, or anything that can be delayed
+     * - Trade-off: More threads = more memory, but acceptable for infrequent user actions
+     * 
+     * CRITICAL: Do not refactor HIGH_PRIORITY back to queued execution - it will reintroduce
+     * the 3-5 second UI lag that users perceive as ANR or "app is frozen".
+     */
     public enum HandlerThreadName {
         SEARCH_PERFORMER,
         DOWNLOADER,
         CONFIG_MANAGER,
-        MISC
+        MISC,
+        /** User-facing interactive actions - spawns dedicated thread, never queued */
+        HIGH_PRIORITY
     }
 
     public static void postToHandler(final HandlerThreadName threadName, final Runnable r) {
-        HandlerFactory.postTo(threadName, r);
+        if (threadName == HandlerThreadName.HIGH_PRIORITY) {
+            // HIGH_PRIORITY spawns dedicated thread instead of using queue
+            // This ensures interactive user actions (play, open file) get immediate execution
+            // and don't wait behind slow tasks in MISC/other pools
+            new Thread(r, "HIGH_PRIORITY-" + System.currentTimeMillis()).start();
+        } else {
+            HandlerFactory.postTo(threadName, r);
+        }
     }
 
     @SuppressWarnings("unused")

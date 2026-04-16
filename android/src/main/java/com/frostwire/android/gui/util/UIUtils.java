@@ -252,15 +252,12 @@ public final class UIUtils {
      */
     @SuppressWarnings("deprecation") // Intent.ACTION_INSTALL_PACKAGE deprecated; ACTION_VIEW with APK mime routes to installer correctly
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
-        LOG.info("UIUtils.openFile() called - creating dedicated thread: " + filePath);
-        // Use dedicated thread instead of shared MISC pool for responsive UI
-        // User-facing play actions should not wait for background tasks
-        new Thread("openFile-" + new File(filePath).getName()) {
-            public void run() {
-                openFileBackground(context, filePath, mime, useFileProvider);
-            }
-        }.start();
-        LOG.info("UIUtils.openFile() thread started");
+        LOG.info("UIUtils.openFile() called - posting to HIGH_PRIORITY: " + filePath);
+        // Use HIGH_PRIORITY for instant response to user tap
+        // Do NOT change to MISC - it reintroduces 3-5s delay when pool is backed up
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, 
+            () -> openFileBackground(context, filePath, mime, useFileProvider));
+        LOG.info("UIUtils.openFile() posted to HIGH_PRIORITY");
         return true;
     }
 
@@ -450,7 +447,9 @@ public final class UIUtils {
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
      */
     public static void playEphemeralPlaylist(final Context context, final FWFileDescriptor fd) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> playEphemeralPlaylistTask(context, fd));
+        // Use HIGH_PRIORITY for instant playback response
+        // Note: Often called from already-background thread, but HIGH_PRIORITY is no-op overhead if so
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> playEphemeralPlaylistTask(context, fd));
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
