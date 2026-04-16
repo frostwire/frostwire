@@ -490,7 +490,7 @@ public final class UIUtils {
         return false;
     }
 
-    private static boolean isAudioFile(String filePath) {
+    public static boolean isAudioFile(String filePath) {
         if (filePath == null) return false;
         String mime = getMimeType(filePath);
         if (mime != null && mime.startsWith("audio/")) {

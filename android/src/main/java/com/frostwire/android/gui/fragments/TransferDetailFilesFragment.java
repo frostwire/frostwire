@@ -350,7 +350,13 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                     path = previewFile((BTDownloadItem) item);
                 }
                 if (path != null) {
-                    UIUtils.openFile(ctx, path);
+                    // Use MusicUtils.playFile() for audio files - same code path as My Music
+                    // This ensures consistent, fast playback without ephemeral playlist delays
+                    if (UIUtils.isAudioFile(path.getAbsolutePath())) {
+                        com.andrew.apollo.utils.MusicUtils.playFile(path);
+                    } else {
+                        UIUtils.openFile(ctx, path);
+                    }
                 }
             }
         }

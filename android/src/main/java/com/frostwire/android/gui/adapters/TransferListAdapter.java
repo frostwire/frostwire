@@ -774,14 +774,29 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                     LOG.info("OpenOnClickListener.onClick() previewFile path=" + (path != null ? path.getAbsolutePath() : "null"));
                 }
                 if (path != null) {
-                    LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile for: " + path.getAbsolutePath());
-                    UIUtils.openFile(ctx, path);
-                    LOG.info("OpenOnClickListener.onClick() UIUtils.openFile returned");
+                    // Use MusicUtils.playFile() for audio - same code path as My Music
+                    // Avoids UIUtils.openFile() ephemeral playlist delays
+                    if (UIUtils.isAudioFile(path.getAbsolutePath())) {
+                        LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFile (audio): " + path.getAbsolutePath());
+                        com.andrew.apollo.utils.MusicUtils.playFile(path);
+                    } else {
+                        LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile (non-audio): " + path.getAbsolutePath());
+                        UIUtils.openFile(ctx, path);
+                    }
+                    LOG.info("OpenOnClickListener.onClick() play method returned");
                 }
             } else if (tag instanceof File) {
-                LOG.info("OpenOnClickListener.onClick() tag is File: " + ((File) tag).getAbsolutePath());
-                UIUtils.openFile(ctx, (File) tag);
-                LOG.info("OpenOnClickListener.onClick() UIUtils.openFile returned");
+                File file = (File) tag;
+                LOG.info("OpenOnClickListener.onClick() tag is File: " + file.getAbsolutePath());
+                // Use MusicUtils.playFile() for audio - same code path as My Music
+                if (UIUtils.isAudioFile(file.getAbsolutePath())) {
+                    LOG.info("OpenOnClickListener.onClick() calling MusicUtils.playFile (audio): " + file.getAbsolutePath());
+                    com.andrew.apollo.utils.MusicUtils.playFile(file);
+                } else {
+                    LOG.info("OpenOnClickListener.onClick() calling UIUtils.openFile (non-audio): " + file.getAbsolutePath());
+                    UIUtils.openFile(ctx, file);
+                }
+                LOG.info("OpenOnClickListener.onClick() play method returned");
             }
             LOG.info("OpenOnClickListener.onClick() END");
         }
