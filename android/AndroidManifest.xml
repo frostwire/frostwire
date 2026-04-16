@@ -143,6 +143,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:mimeType="application/x-bittorrent" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-download" />
+                <data android:mimeType="application/download" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:scheme="file" />
