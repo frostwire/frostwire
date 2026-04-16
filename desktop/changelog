@@ -50,6 +50,7 @@ frostwire (7.0.4) stable; urgency=high
  * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
  * Maintenance: Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
  * Maintenance: Upgrade JUnit 5.12.2 -> 5.13.4
+ * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes — changed _model.refresh() to _model.resort() in LibraryFilesTableDataLine.initialize() callback so new downloads appear sorted by date instead of being stuck at wrong positions
 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 

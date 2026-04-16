@@ -205,7 +205,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                 cachedModTimeCell = null;
                 license = finalLicense;
                 paymentOptions = finalPaymentOptions;
-                _model.refresh();
+                _model.resort();
             });
         });
     }
