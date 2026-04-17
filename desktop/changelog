@@ -56,7 +56,12 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
  * EDT freeze: Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
  * EDT freeze: Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
-
+ * EDT freeze: Move BTDownload resume-data generation off EDT in pause()/resume() so libtorrent need_save_resume_data() no longer stalls transfer actions
+ * EDT freeze: Pre-compute TransferDetailFiles completion/progress on a background thread so table painting no longer calls libtorrent file_progress() JNI on the EDT
+ * Fix: TransferDetailGeneral now discards stale async metadata updates when switching transfers quickly, preventing mismatched or stuck detail fields
+ * Fix: TransferDetailPieces/HexHivePanel now use consistent hex tiling math and the fast flat-hex path for large swarms, eliminating overlapping piece cells and improving cached rendering speed
+ * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
+ 
  -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
 
 frostwire (7.0.3) stable; urgency=high
