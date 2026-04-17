@@ -1,5 +1,6 @@
 frostwire (7.0.4) stable; urgency=high
  * Removed GloTorrents search engine (domain gtso.cc is parked and no longer functional)
+ * New: Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
  * EDT freeze: Add pack() before setVisible(true) in SendFileProgressDialog to prevent macOS awtLock contention
  * EDT freeze: Add pack() before setVisible(true) in EditTrackerDialog to prevent macOS awtLock contention
@@ -51,9 +52,12 @@ frostwire (7.0.4) stable; urgency=high
  * Maintenance: Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
  * Maintenance: Upgrade JUnit 5.12.2 -> 5.13.4
  * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
+ * New: YouTube channel and playlist URLs now open Telluride playlist search mode, and playlist partial results now appear correctly in the Video tab
  * Fix: Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
+ * Fix: Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
  * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
  * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
+ * Fix: Idope search integration now uses the new idope.pics domain and filters placeholder “No results returned” API responses when the backend is unavailable
  * EDT freeze: Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
  * EDT freeze: Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
  * EDT freeze: Move BTDownload resume-data generation off EDT in pause()/resume() so libtorrent need_save_resume_data() no longer stalls transfer actions
