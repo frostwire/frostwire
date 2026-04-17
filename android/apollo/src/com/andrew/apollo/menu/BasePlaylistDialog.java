@@ -99,14 +99,17 @@ abstract class BasePlaylistDialog extends DialogFragment {
         // Initialize on background thread - do not block main thread
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             initObjects(savedInstanceState);
-            mPlaylist.setText(mDefaultname);
-            mPlaylist.setSelection(mDefaultname.length());
-            mPlaylist.addTextChangedListener(mTextWatcher);
-            mPlaylist.setOnFocusChangeListener((v, hasFocus) -> {
-                if (hasFocus) {
-                    mPlaylistDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-                mPlaylistDialog.show();
+            final String defaultName = mDefaultname;
+            SystemUtils.postToUIThread(() -> {
+                mPlaylist.setText(defaultName);
+                mPlaylist.setSelection(defaultName.length());
+                mPlaylist.addTextChangedListener(mTextWatcher);
+                mPlaylist.setOnFocusChangeListener((v, hasFocus) -> {
+                    if (hasFocus) {
+                        mPlaylistDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    }
+                    mPlaylistDialog.show();
+                });
             });
         });
 

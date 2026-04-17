@@ -144,14 +144,17 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                     () -> blurPhoto(context, artist, album));
             return;
         }
-        final FWImageLoader loader = FWImageLoader.getInstance(context.getApplicationContext());
+        final long albumId = MusicUtils.getIdForAlbum(context, album, artist);
         FWImageLoader.Filter filter = new BlurFilter();
-        loader.load(FWImageLoader.getArtistArtUri(artist),
-                    FWImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
+        SystemUtils.postToUIThread(() -> {
+            final FWImageLoader loader = FWImageLoader.getInstance(context.getApplicationContext());
+            loader.load(FWImageLoader.getArtistArtUri(artist),
+                    FWImageLoader.getAlbumArtUri(albumId),
                     filter,
                     mPhoto,
                     true,
                     R.drawable.default_artwork);
+        });
     }
 
     /**
@@ -167,11 +170,13 @@ public class CarouselTab extends FrameLayoutWithOverlay {
             return;
         }
         if (!TextUtils.isEmpty(album)) {
-            mAlbumArt.setVisibility(View.VISIBLE);
-            mFetcher.loadAlbumImage(artist, album,
-                    MusicUtils.getIdForAlbum(context, album, artist), mAlbumArt);
+            final long albumId = MusicUtils.getIdForAlbum(context, album, artist);
+            SystemUtils.postToUIThread(() -> {
+                mAlbumArt.setVisibility(View.VISIBLE);
+                mFetcher.loadAlbumImage(artist, album, albumId, mAlbumArt);
+            });
         } else {
-            setDefault(context);
+            SystemUtils.postToUIThread(() -> setDefault(context));
         }
     }
 
@@ -189,20 +194,21 @@ public class CarouselTab extends FrameLayoutWithOverlay {
         }
         final String lastAlbum = MusicUtils.getLastAlbumForArtist(context, artist);
         if (!TextUtils.isEmpty(lastAlbum)) {
-            // Set the last album the artist played
-            mFetcher.loadAlbumImage(artist, lastAlbum,
-                    MusicUtils.getIdForAlbum(context, lastAlbum, artist), mPhoto);
-            // Play the album
-            mPhoto.setOnClickListener(v -> {
-                boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    final long[] albumList = MusicUtils.getSongListForAlbum(v.getContext(),
-                            MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                    MusicUtils.playFDs(albumList, 0, shuffleEnabled);
+            final long albumId = MusicUtils.getIdForAlbum(context, lastAlbum, artist);
+            SystemUtils.postToUIThread(() -> {
+                // Set the last album the artist played
+                mFetcher.loadAlbumImage(artist, lastAlbum, albumId, mPhoto);
+                // Play the album
+                mPhoto.setOnClickListener(v -> {
+                    boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        final long[] albumList = MusicUtils.getSongListForAlbum(v.getContext(), albumId);
+                        MusicUtils.playFDs(albumList, 0, shuffleEnabled);
+                    });
                 });
             });
         } else {
-            setDefault(context);
+            SystemUtils.postToUIThread(() -> setDefault(context));
         }
     }
 

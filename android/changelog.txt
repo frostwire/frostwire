@@ -1,55 +1,80 @@
 FrostWire 3.0.17 build 771 <UNRELEASED>
- - improvement:All app preferences migrated from deprecated SharedPreferences to Jetpack DataStore with in-memory ConcurrentHashMap cache - eliminates data corruption risk, provides atomic writes, and enables reactive observation
+ - new:I2P network integration for anonymous proxy support
+ - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
+ - new:YouTube playlist URL search - query_playlist() added to telluride.py, TellurideCourier.queryPlaylist() with full pipeline, TelluridePlaylistPartialUISearchResult displays partial results with play-in-browser and re-resolve on download
+ - new:frostwire_launcher.py TUI - build/install/run FrostWire Android without Android Studio
+ - new:frostwire_launcher.py live logcat viewer - debug app output directly in terminal
  - improvement:Music player migrated from deprecated MediaPlayer to ExoPlayer/Media3 (Jetpack Media3 1.10.0) - fixes race conditions, adds standard media notification with output device selector
  - improvement:Music player migrated from deprecated RemoteControlClient to MediaSession API via MediaSessionService
  - improvement:Music player uses standard YouTube Music/Spotify-style notification with output device selector (Cast, Bluetooth)
- - improvement:AudioPlayerActivity UI now updates immediately - eliminated 6 async handler roundtrips that caused visible lag on song title, controls, and playback state
- - improvement:Play/Pause, Repeat, and Shuffle buttons now update synchronously on UI thread - no more MISC→UI handler roundtrip delay
+ - improvement:All app preferences migrated from deprecated SharedPreferences to Jetpack DataStore with in-memory ConcurrentHashMap cache - eliminates data corruption risk, provides atomic writes, and enables reactive observation
  - improvement:PreferenceFragmentCompat settings screens now use custom PreferenceDataStore bridge (FrostwirePreferenceDataStore) instead of SharedPreferences
  - improvement:ConfigurationRepository provides single source of truth for all ~50 preference defaults, volatile key resets, and ClassCastException-safe migration from pre-3.0.17 installs
  - improvement:TransferManager preference observation uses ConfigurationRepository.OnPreferenceChangeListener callback instead of SharedPreferences.OnSharedPreferenceChangeListener
- - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
+ - improvement:AudioPlayerActivity UI now updates immediately - eliminated 6 async handler roundtrips that caused visible lag on song title, controls, and playback state
+ - improvement:Play/Pause, Repeat, and Shuffle buttons now update synchronously on UI thread - no more MISC→UI handler roundtrip delay
  - improvement:Added periodic VPN/WiFi protection state monitoring to detect VPN disconnections immediately
- - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
  - improvement:Added visual status indicators in transfers screen when protections pause downloads
+ - improvement:Performance optimized periodic checks run on background thread to keep UI responsive
+ - improvement:OkHttpClientWrapper now sends Accept, Accept-Language, and Sec-Fetch-Mode headers by default - matches what YouTube expects from browser clients
+ - fix:yt-dlp/Chaquopy SIGSEGV crash during app startup - _posixsubprocess (C extension) calls fork()/posix_spawn() which crashes on Android's JVM; now mocked in sys.modules before yt_dlp import; all Chaquopy JNI calls wrapped in try-catch with null-checks; CountDownLatch.await() now has 30s timeout; volatile statics for thread safety
+ - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
+ - fix:YouTube downloads no longer silently drop headers after a malformed value - addCustomHeaders() try/catch moved inside the loop so bad headers are skipped individually instead of aborting all remaining headers (prevents 403 errors caused by missing User-Agent/Referer)
+ - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
+ - fix:SoundCloud search restored - SoundCloudConfigFetcher now validates fetched credentials against the API before caching; falls back to built-in defaults when update server returns stale/expired client_id (prevents 401 errors and empty search results)
+ - fix:SoundCloud search results restored - isValidSearchResult() no longer requires downloadable=true; SoundCloud API now returns downloadable=false for virtually all tracks even when they have streamable progressive URLs; updated to only require a progressive stream URL
+ - fix:SoundCloud search now excludes tracks not marked as downloadable, so search results only include content SoundCloud explicitly flags as downloadable
+ - fix:Music player notification lost on Android 12+ - replaced custom RemoteViews notification with MediaSessionService auto-managed notification
+ - fix:Music service no longer crashes on OS-initiated restarts - reloadQueue() now guards against null serviceDataStore, matching the existing null check in saveQueue()
+ - fix:YouTube audio downloads now play in FrostWire player instead of launching a third-party app - .mp4/.webm/.opus files were incorrectly identified as non-audio by MIME type check
+ - fix:Freshly downloaded audio files play instantly instead of waiting 45+ seconds for MediaStore indexer - direct file path fallback bypasses MediaStore query
+ - fix:YouTube audio playback now starts immediately instead of 30-second delay - removed slow LIKE '%filename%' MediaStore full-table scan and fixed ServiceConnectionListener race condition that silently dropped the play callback
+ - fix:AudioPlayerActivity metadata not loading - getIntent() is never null, now checks intent.getData() to distinguish file-intent vs show-player intent
+ - fix:Play/pause button UI not reacting - MusicPlaybackService.pause() now always broadcasts PLAYSTATE_CHANGED
+ - fix:Long-press stop on play/pause button now works - calls stop synchronously before finishing activity
+ - fix:AudioPlayerActivity now refreshes the total-time label as soon as the first track duration becomes available, avoiding a stale 0:00 on cold-start playback
+ - fix:AudioPlayerActivity now also self-heals on missed auto-advance metadata broadcasts, so album art, track metadata, and queue highlighting follow the song that is actually playing
+ - fix:Automatic track transitions now update MusicPlaybackService queue/cursor state when ExoPlayer advances to the queued next item, so AudioPlayerActivity reflects the new song after natural song endings just like Next/Previous button presses
+ - fix:CarouselTab album-art refresh no longer crashes after YouTube audio downloads finish - MediaStore lookups stay off the UI thread, but ImageView/listener updates are now marshalled back to the main thread
  - fix:YouTube downloaded audio files now show album art - thumbnail URL saved as sidecar art file next to the audio and used as fallback when no embedded ID3 artwork exists
  - fix:Album art fallback uses MediaMetadataRetriever directly instead of deprecated ALBUM_ART column (always null on Android 10+)
+ - fix:Album art fallback uses MediaMetadataRetriever when MediaStore thumbnail is unavailable (e.g. freshly downloaded files)
+ - fix:Album art ImageView no longer shows blank during load - placeholder drawable is now set immediately before Coil request is enqueued
+ - fix:Album art now loads for YouTube downloads with no MediaStore album ID - loadCurrentArtwork() attempts MediaMetadataRetriever+sidecar fallback when albumId==0 but file path is available
+ - fix:getPath() in MusicPlaybackService now returns file path for tracks opened directly from storage (e.g. fresh YouTube downloads not yet indexed by MediaStore)
+ - fix:Transfer Detail > Files now shows the correct torrent file rows immediately instead of briefly showing stale files from a previously opened torrent
+ - fix:Transfers and Transfer Detail > Files audio play buttons now start FrostWire's music player the same way My Music does, including service startup and opening AudioPlayerActivity
+ - fix:Transfers screen rows now rebind on each committed refresh so torrent state, speed, peers, and pause/resume status stay in sync with the live transfer state shown in Transfer Detail
  - fix:WiFi-Only protection and VPN Guard were broken due to deprecated network API changes
  - fix:Migrated network monitoring from deprecated CONNECTIVITY_ACTION broadcasts to modern NetworkCallback API
  - fix:WiFi-Only protection now correctly pauses torrent downloads on mobile data when setting is enabled
  - fix:VPN Guard protection now correctly stops torrents when VPN is required but not connected
- - fix:YouTube download 403 errors resolved - yt-dlp per-format http_headers (User-Agent, Accept, Referer, etc.) are now threaded through the entire download pipeline and sent with every request
- - fix:YouTube downloads no longer produce 0-byte files - OkHttpClientWrapper now throws IOException on non-2xx HTTP responses and deletes the orphaned empty file
- - fix:yt-dlp/Chaquopy SIGSEGV crash during app startup - _posixsubprocess (C extension) calls fork()/posix_spawn() which crashes on Android's JVM; now mocked in sys.modules before yt_dlp import; all Chaquopy JNI calls wrapped in try-catch with null-checks; CountDownLatch.await() now has 30s timeout; volatile statics for thread safety
+ - fix:FrostWire is now offered more reliably for .torrent files and magnet links from browsers/download managers by broadening torrent MIME-type intent filters
+ - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
  - fix:deleteTracks() NPE crash when deleting songs from Recent/Songs list - DeleteDialog.getActivity() returns null after activity destroyed; now uses getApplicationContext() with null guard
  - fix:Deleted songs persisting in Recent/Favorites lists - DeleteDialog cleaned stores asynchronously after UI callback already reloaded the list; now cleans RecentStore/FavoritesStore synchronously before posting async deleteTracks()
  - fix:My Music > Recent list ghost entries from 0-byte broken downloads - RecentLoader.removeOrphanedEntries() now rejects MediaStore entries with null/0 duration (0-byte files exist in MediaStore but have no audio); also cleans entries not found in MediaStore at all; deleteTracks() now always cleans RecentStore/FavoritesStore for ALL given IDs even when not found in MediaStore cursor
- - fix:YouTube downloads no longer silently drop headers after a malformed value - addCustomHeaders() try/catch moved inside the loop so bad headers are skipped individually instead of aborting all remaining headers (prevents 403 errors caused by missing User-Agent/Referer)
- - fix:SoundCloud search restored - SoundCloudConfigFetcher now validates fetched credentials against the API before caching; falls back to built-in defaults when update server returns stale/expired client_id (prevents 401 errors and empty search results)
-  - fix:SoundCloud search results restored - isValidSearchResult() no longer requires downloadable=true; SoundCloud API now returns downloadable=false for virtually all tracks even when they have streamable progressive URLs; updated to only require a progressive stream URL
-  - fix:SoundCloud search now excludes tracks not marked as downloadable, so search results only include content SoundCloud explicitly flags as downloadable
-  - fix:Settings preferences no longer freeze the UI - persistAsync() switched from runBlocking to Dispatchers.IO coroutine, eliminating ANR risk when writing to DataStore on the main thread
- - fix:Music player notification lost on Android 12+ - replaced custom RemoteViews notification with MediaSessionService auto-managed notification
- - fix:Music service no longer crashes on OS-initiated restarts - reloadQueue() now guards against null serviceDataStore, matching the existing null check in saveQueue()
- - fix:Freshly downloaded audio files play instantly instead of waiting 45+ seconds for MediaStore indexer - direct file path fallback bypasses MediaStore query
- - fix:AudioPlayerActivity metadata not loading - getIntent() is never null, now checks intent.getData() to distinguish file-intent vs show-player intent
- - fix:Play/pause button UI not reacting - MusicPlaybackService.pause() now always broadcasts PLAYSTATE_CHANGED
  - fix:Torrent notification deduplication now survives app reinstalls - NotifiedStorage performs a one-time migration of the bloom filter from DefaultSharedPreferences to DataStore on first run
  - fix:ConfigurationManager.getString() now catches ClassCastException for Integer prefs stored by pre-3.0.17 builds
- - fix:Long-press stop on play/pause button now works - calls stop synchronously before finishing activity
- - fix:Album art fallback uses MediaMetadataRetriever when MediaStore thumbnail is unavailable (e.g. freshly downloaded files)
  - fix:I2P config type mismatch crash - port and tunnel values now stored as Strings
  - fix:EngineIntentService migrated from deprecated JobIntentService to plain Service (L2)
  - fix:Desktop compilation restored - SearchMediator.java passes tsr.getHttpHeaders() as the required 10th argument to TellurideSearchResult constructor; was missing after httpHeaders param was added to the YouTube headers pipeline, breaking all desktop builds
+ - fix:Eliminated 38 ContentResolver.query() calls from UI thread across MusicUtils, adapters, fragments, activities - prevents ANRs
+ - fix:Eliminated 12 disk I/O operations from UI thread - file.exists/mkdirs/renameTo, FileOutputStream/FileInputStream, readFileToByteArray all posted to MISC handler
+ - fix:Eliminated 9 unnecessary async roundtrips for in-memory reads - isStopped/isPlaying/getAlbumName posted to MISC handler when reading volatile cached values
  - fix:StrictMode DiskReadViolation when opening files - all file I/O moved off UI thread
  - fix:StrictMode DiskRead violation in TorrentPreferenceFragment resolved
  - fix:StrictMode CustomViolation in SuggestionsAdapter resolved - OkHttpClient now lazily initialized
+ - fix:StrictMode violation in showTransfersOnDownloadStart - use getApplicationContext() with NEW_TASK flag on background thread
+ - fix:HandpickedTorrentDownloadDialog now appears non-empty - fixed TORRENT_DATA_CACHE and StrictMode dismissDropDown issues
+ - fix:TransfersFragment list height changed from wrap_content to match_parent - prevents dialog appearing empty on open
  - fix:All deprecated Fragment API migrations (onAttachFragment→FragmentLifecycleCallbacks, onAttach(Activity)→onAttach(Context), getFragmentManager→getParentFragmentManager, startActivityForResult→ActivityResultLauncher, setTargetFragment→FragmentResultListener, android.app.Fragment→androidx.fragment.app.Fragment, onBackPressed→OnBackPressedDispatcher)
  - fix:All deprecated View/API migrations (Html.fromHtml(String)→fromHtml(String,flag), Resources.getColor→ContextCompat.getColor, Resources.getDrawable→ContextCompat.getDrawable, getDefaultDisplay→WindowMetrics, Canvas.ALL_SAVE_FLAG→0, getSerializable→typed API 33+ variant, Notification.vibrate→NotificationCompat.Builder.setVibrate, setOnPageChangeListener→addOnPageChangeListener, EXTRA_SHORTCUT→ShortcutManager.requestPinShortcut, stopForeground(boolean)→stopForeground(STOP_FOREGROUND_REMOVE))
  - fix:TransfersFragment, TransferDetailFragment, QueueFragment, MusicBrowserPhoneFragment migrated from deprecated Fragment menu callbacks to MenuProvider API
  - fix:switch(case R.*) replaced with if/else chains to allow nonFinalResIds=true
- - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
- - new:I2P network integration for anonymous proxy support
+ - fix:ARTIST_THUMBNAILS_URI typo fixed - content//: corrected to content:// (artist art was silently failing)
+ - fix:frostwire_launcher.py no longer disables emulator audio, so emulator sessions launched from the TUI can play sound
+ - fix:ApolloFragment.songClickTask unchecked cast suppressed
  - maintenance:Updated yt-dlp from 2025.12.08 to 2026.3.17 - eliminates Android-client URL mismatch that caused 403 errors on some videos
  - maintenance:Updated Chaquopy to 17.0.0 with Python 3.13 - dropped 32-bit ABIs (armeabi-v7a, x86) incompatible with Python 3.13+; Python 3.14 blocked by missing brotli/pycryptodomex wheels in Chaquopy mirror
  - maintenance:Added foojay toolchain resolver plugin; AGP updated to 9.0.1
@@ -77,34 +102,10 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - maintenance:CustomSeekBarPreference and ApplicationPreferencesFragment no longer call getSharedPreferences() directly - use ConfigurationManager instead
  - maintenance:Extracted resolveUri() string logic to MusicUriUtils.resolveUriString() (pure Java, no Android deps) - production MultiPlayer delegates to it; MultiPlayerResolveUriTest now tests real production code instead of a local copy
  - maintenance:All Robolectric tests converted to pure JVM tests - eliminates ExoPlayer/Looper hang on static init
- - fix:YouTube audio downloads now play in FrostWire player instead of launching a third-party app - .mp4/.webm/.opus files were incorrectly identified as non-audio by MIME type check
- - fix:AudioPlayerActivity now refreshes the total-time label as soon as the first track duration becomes available, avoiding a stale 0:00 on cold-start playback
- - fix:AudioPlayerActivity now also self-heals on missed auto-advance metadata broadcasts, so album art, track metadata, and queue highlighting follow the song that is actually playing
- - fix:Automatic track transitions now update MusicPlaybackService queue/cursor state when ExoPlayer advances to the queued next item, so AudioPlayerActivity reflects the new song after natural song endings just like Next/Previous button presses
- - fix:YouTube audio playback now starts immediately instead of 30-second delay - removed slow LIKE '%filename%' MediaStore full-table scan and fixed ServiceConnectionListener race condition that silently dropped the play callback
- - fix:Transfer Detail > Files now shows the correct torrent file rows immediately instead of briefly showing stale files from a previously opened torrent
- - fix:Transfers and Transfer Detail > Files audio play buttons now start FrostWire's music player the same way My Music does, including service startup and opening AudioPlayerActivity
- - fix:frostwire_launcher.py no longer disables emulator audio, so emulator sessions launched from the TUI can play sound
- - fix:FrostWire is now offered more reliably for .torrent files and magnet links from browsers/download managers by broadening torrent MIME-type intent filters
- - fix:Transfers screen rows now rebind on each committed refresh so torrent state, speed, peers, and pause/resume status stay in sync with the live transfer state shown in Transfer Detail
- - maintenance:Settings > Community now uses the current X branding and links to x.com/frostwire instead of the retired Twitter branding
- - fix:Album art ImageView no longer shows blank during load - placeholder drawable is now set immediately before Coil request is enqueued
- - fix:Album art now loads for YouTube downloads with no MediaStore album ID - loadCurrentArtwork() attempts MediaMetadataRetriever+sidecar fallback when albumId==0 but file path is available
- - fix:getPath() in MusicPlaybackService now returns file path for tracks opened directly from storage (e.g. fresh YouTube downloads not yet indexed by MediaStore)
- - fix:Eliminated 38 ContentResolver.query() calls from UI thread across MusicUtils, adapters, fragments, activities - prevents ANRs
- - fix:Eliminated 12 disk I/O operations from UI thread - file.exists/mkdirs/renameTo, FileOutputStream/FileInputStream, readFileToByteArray all posted to MISC handler
- - fix:Eliminated 9 unnecessary async roundtrips for in-memory reads - isStopped/isPlaying/getAlbumName posted to MISC handler when reading volatile cached values
- - fix:ARTIST_THUMBNAILS_URI typo fixed - content//: corrected to content:// (artist art was silently failing)
  - maintenance:Removed GloTorrents search engine - domain gtso.cc is parked and no longer functional
  - maintenance:MultiPlayer.mIsInitialized marked volatile for JMM correctness - ensures HandlerThread writes are visible to Binder-thread readers
  - maintenance:Removed unused java.io.File import from MusicPlaybackService
- - new:YouTube playlist URL search - query_playlist() added to telluride.py, TellurideCourier.queryPlaylist() with full pipeline, TelluridePlaylistPartialUISearchResult displays partial results with play-in-browser and re-resolve on download
- - new:frostwire_launcher.py TUI - build/install/run FrostWire Android without Android Studio
- - new:frostwire_launcher.py live logcat viewer - debug app output directly in terminal
- - fix:StrictMode violation in showTransfersOnDownloadStart - use getApplicationContext() with NEW_TASK flag on background thread
- - fix:HandpickedTorrentDownloadDialog now appears non-empty - fixed TORRENT_DATA_CACHE and StrictMode dismissDropDown issues
- - fix:TransfersFragment list height changed from wrap_content to match_parent - prevents dialog appearing empty on open
- - fix:ApolloFragment.songClickTask unchecked cast suppressed
+ - maintenance:Settings > Community now uses the current X branding and links to x.com/frostwire instead of the retired Twitter branding
  - maintenance:fix unchecked/deprecation warnings in gui/dialogs, fragments, views, and adapters
  - maintenance:fix generics bounds in TellurideCourier, TellurideCourierCallback, SearchPerformer for playlist result types
 
