@@ -306,16 +306,22 @@ public class HexHivePanel extends JPanel {
         if (visibleRect.width <= 0 || visibleRect.height <= 0) {
             visibleRect = new Rectangle(0, 0, Math.max(1, getWidth()), Math.max(1, getHeight()));
         }
+        Rectangle priorityBounds = computePriorityRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
         Rectangle targetBounds = computeRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
-        boolean needsRender;
+        boolean needsPriorityRender;
+        boolean needsTargetRender;
         synchronized (bitmapLock) {
-            needsRender = force || bitmap == null ||
-                    !renderedArea.contains(visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height) ||
+            boolean visibleCovered = renderedArea.contains(visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height);
+            needsPriorityRender = force || bitmap == null || !visibleCovered ||
+                    !renderedArea.contains(priorityBounds.x, priorityBounds.y, priorityBounds.width, priorityBounds.height);
+            needsTargetRender = force || bitmap == null ||
                     !renderedArea.contains(targetBounds.x, targetBounds.y, targetBounds.width, targetBounds.height);
         }
         lastVisibleRect = new Rectangle(visibleRect);
-        if (needsRender) {
-            enqueueRender(new RenderRequest(adapter, drawingProperties, targetBounds));
+        if (needsPriorityRender) {
+            enqueueRender(new RenderRequest(adapter, drawingProperties, priorityBounds, true));
+        } else if (needsTargetRender) {
+            enqueueRender(new RenderRequest(adapter, drawingProperties, targetBounds, false));
         }
     }
 
@@ -344,16 +350,19 @@ public class HexHivePanel extends JPanel {
                     return;
                 }
             }
-            renderRegionIntoBackingBitmap(request.adapter, request.drawingProperties, request.renderBounds);
+            renderRegionIntoBackingBitmap(request.adapter, request.drawingProperties, request.renderBounds, request.prioritizeLatency);
         }
     }
 
-    private void renderRegionIntoBackingBitmap(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
+    private void renderRegionIntoBackingBitmap(HexDataAdapter adapter,
+                                               DrawingProperties drawingProperties,
+                                               Rectangle renderBounds,
+                                               boolean prioritizeLatency) {
         int[] rowRange = getRowRangeForBounds(drawingProperties, renderBounds);
         int firstRow = rowRange[0];
         int lastRow = rowRange[1];
         int maxRow = Math.max(0, drawingProperties.getRowIndexForPiece(Math.max(0, drawingProperties.numHexs - 1)));
-        final int rowsPerBatch = 4;
+        final int rowsPerBatch = prioritizeLatency ? 2 : 4;
         for (int row = firstRow; row <= lastRow; row += rowsPerBatch) {
             int batchLastRow = Math.min(lastRow, row + rowsPerBatch - 1);
             int drawFirstRow = Math.max(0, row - 1);
@@ -617,11 +626,16 @@ public class HexHivePanel extends JPanel {
         private final HexDataAdapter adapter;
         private final DrawingProperties drawingProperties;
         private final Rectangle renderBounds;
+        private final boolean prioritizeLatency;
 
-        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
+        private RenderRequest(HexDataAdapter adapter,
+                              DrawingProperties drawingProperties,
+                              Rectangle renderBounds,
+                              boolean prioritizeLatency) {
             this.adapter = adapter;
             this.drawingProperties = drawingProperties;
             this.renderBounds = renderBounds;
+            this.prioritizeLatency = prioritizeLatency;
         }
     }
 
@@ -808,6 +822,28 @@ public class HexHivePanel extends JPanel {
         int verticalMargin = Math.max((int) (visibleRect.height * 0.35f), (int) drawingProperties.hexHeight * 2);
         int horizontalLookAhead = Math.max((int) (visibleRect.width * 0.75f), horizontalMargin);
         int verticalLookAhead = Math.max((int) (visibleRect.height * 0.75f), verticalMargin);
+
+        int leftExtra = dx < 0 ? horizontalLookAhead : horizontalMargin;
+        int rightExtra = dx > 0 ? horizontalLookAhead : horizontalMargin;
+        int topExtra = dy < 0 ? verticalLookAhead : verticalMargin;
+        int bottomExtra = dy > 0 ? verticalLookAhead : verticalMargin;
+
+        int x = Math.max(0, visibleRect.x - leftExtra);
+        int y = Math.max(0, visibleRect.y - topExtra);
+        int maxWidth = Math.max(1, drawingProperties.width - x);
+        int maxHeight = Math.max(1, drawingProperties.height - y);
+        int width = Math.min(maxWidth, visibleRect.width + leftExtra + rightExtra);
+        int height = Math.min(maxHeight, visibleRect.height + topExtra + bottomExtra);
+        return new Rectangle(x, y, Math.max(1, width), Math.max(1, height));
+    }
+
+    private Rectangle computePriorityRenderBounds(DrawingProperties drawingProperties, Rectangle visibleRect, Rectangle previousVisibleRect) {
+        int dx = visibleRect.x - previousVisibleRect.x;
+        int dy = visibleRect.y - previousVisibleRect.y;
+        int horizontalMargin = Math.max((int) (visibleRect.width * 0.12f), (int) drawingProperties.hexWidth);
+        int verticalMargin = Math.max((int) (visibleRect.height * 0.12f), (int) drawingProperties.hexHeight);
+        int horizontalLookAhead = Math.max((int) (visibleRect.width * 0.25f), horizontalMargin);
+        int verticalLookAhead = Math.max((int) (visibleRect.height * 0.25f), verticalMargin);
 
         int leftExtra = dx < 0 ? horizontalLookAhead : horizontalMargin;
         int rightExtra = dx > 0 ? horizontalLookAhead : horizontalMargin;

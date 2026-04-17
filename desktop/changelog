@@ -68,6 +68,7 @@ frostwire (7.0.4) stable; urgency=high
  * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
  * Performance: HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
  * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
+ * Performance: HexHivePanel now prioritizes a smaller visible-band render with directional buffer and shorter row batches before backfilling wider lookahead, reducing transient blank patches while scrolling
  * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
  * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
  * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
