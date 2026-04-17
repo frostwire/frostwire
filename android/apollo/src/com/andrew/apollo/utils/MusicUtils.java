@@ -136,7 +136,6 @@ public final class MusicUtils {
         Intent musicPlaybackServiceIntent = new Intent(context, MusicPlaybackService.class);
         musicPlaybackServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         musicPlaybackServiceIntent.setAction(MusicPlaybackService.SERVICECMD);
-        musicPlaybackServiceIntent.putExtra(MusicPlaybackService.CMDNAME, MusicPlaybackService.CMDPLAY);
         return musicPlaybackServiceIntent;
     }
 

@@ -35,6 +35,7 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:AudioPlayerActivity now refreshes the total-time label as soon as the first track duration becomes available, avoiding a stale 0:00 on cold-start playback
  - fix:AudioPlayerActivity now also self-heals on missed auto-advance metadata broadcasts, so album art, track metadata, and queue highlighting follow the song that is actually playing
  - fix:Automatic track transitions now update MusicPlaybackService queue/cursor state when ExoPlayer advances to the queued next item, so AudioPlayerActivity reflects the new song after natural song endings just like Next/Previous button presses
+ - fix:Cold-start playback no longer restarts the first song a second after launch - MusicPlaybackService startup intents no longer issue an extra implicit play command before the bound playback callback runs
  - fix:CarouselTab album-art refresh no longer crashes after YouTube audio downloads finish - MediaStore lookups stay off the UI thread, but ImageView/listener updates are now marshalled back to the main thread
  - fix:YouTube downloaded audio files now show album art - thumbnail URL saved as sidecar art file next to the audio and used as fallback when no embedded ID3 artwork exists
  - fix:Album art fallback uses MediaMetadataRetriever directly instead of deprecated ALBUM_ART column (always null on Android 10+)
