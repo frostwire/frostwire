@@ -1007,6 +1007,19 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mTotalTime.setText(MusicUtils.makeTimeString(this, Math.max(0L, duration) / 1000));
     }
 
+    private void refreshNowPlayingInfoIfTrackChanged() {
+        if (MusicUtils.getMusicPlaybackService() == null) {
+            return;
+        }
+        final long currentTrackId = MusicUtils.getCurrentAudioId();
+        if (currentTrackId == -1 || currentTrackId == lastTrackId) {
+            return;
+        }
+        updateNowPlayingInfo();
+        invalidateOptionsMenu();
+        deferredInitAlbumArtBanner();
+    }
+
     enum MusicServiceRequestType {
         POSITION,
         DURATION,
@@ -1110,6 +1123,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
 
         try {
+            refreshNowPlayingInfoIfTrackChanged();
             final long pos = mPosOverride < 0 ? lastKnownPosition(blockingMusicServiceRequest) : mPosOverride;
             long duration = lastKnownDuration(blockingMusicServiceRequest);
             // When first starting playback, duration might be 0 temporarily while media is loading
