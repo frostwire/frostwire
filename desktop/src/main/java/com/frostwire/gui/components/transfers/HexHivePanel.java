@@ -26,6 +26,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HexHivePanel extends JPanel {
     private final boolean forceCubes;
@@ -44,6 +45,7 @@ public class HexHivePanel extends JPanel {
     private int lastWidth;
     private int lastHeight;
     private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
+    private final AtomicInteger renderSequence = new AtomicInteger();
     private Color backgroundColor;
     private GraphicsConfiguration graphicsConfig;
 
@@ -232,31 +234,47 @@ public class HexHivePanel extends JPanel {
     void updateData(HexDataAdapter hexDataAdapter) {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
+        DrawingProperties snapshot = null;
         if (canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
+            snapshot = new DrawingProperties(
+                    hexDataAdapter,
+                    hexSideLength,
+                    hexagonBorderPaint.getLineWidth(),
+                    leftPadding,
+                    topPadding,
+                    canvasWidth - rightPadding,
+                    canvasHeight - bottomPadding);
             synchronized (drawingPropertiesLock) {
-                drawingProperties = new DrawingProperties(
-                        hexDataAdapter,
-                        hexSideLength,
-                        hexagonBorderPaint.getLineWidth(),
-                        leftPadding,
-                        topPadding,
-                        canvasWidth - rightPadding,
-                        canvasHeight - bottomPadding);
+                drawingProperties = snapshot;
+                lastHeight = snapshot.height;
+                lastWidth = snapshot.width;
             }
-            lastHeight = drawingProperties.height;
-            lastWidth = getWidth();
         }
-        if (drawingProperties == null) {
+        if (snapshot == null) {
             // not ready yet (perhaps during animation or rotation)
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
+            final DrawingProperties renderProperties = snapshot;
+            final int renderId = renderSequence.incrementAndGet();
             threadPool.execute(() -> {
-                BufferedImage backgroundBitmap = asyncDraw(hexDataAdapter);
+                if (renderSequence.get() != renderId) {
+                    return;
+                }
+                BufferedImage backgroundBitmap = asyncDraw(hexDataAdapter, renderProperties);
+                if (renderSequence.get() != renderId) {
+                    return;
+                }
                 synchronized (bitmapLock) {
                     bitmap = backgroundBitmap;
                 }
-                SwingUtilities.invokeLater(this::repaint);
+                SwingUtilities.invokeLater(() -> {
+                    if (renderSequence.get() != renderId) {
+                        return;
+                    }
+                    revalidate();
+                    repaint();
+                });
             });
         }
     }
@@ -286,7 +304,7 @@ public class HexHivePanel extends JPanel {
         backgroundColor = new Color(bgColor);
     }
 
-    private BufferedImage asyncDraw(HexDataAdapter adapter) {
+    private BufferedImage asyncDraw(HexDataAdapter adapter, DrawingProperties drawingProperties) {
         // with drawingProperties we don't need to think about padding offsets. We just use drawingProperties numbers for our calculations
         drawingProperties.hexCenterBuffer.setLocation(drawingProperties.evenRowOrigin.x, drawingProperties.evenRowOrigin.y);
         boolean evenRow = true;
@@ -317,7 +335,7 @@ public class HexHivePanel extends JPanel {
                 break;
             }
             int nextCenterX = Math.round(drawingProperties.hexCenterBuffer.x + drawingProperties.hexWidth);
-            if (nextCenterX + halfHexWidth > drawingProperties.end.x) {
+            if (nextCenterX + halfHexWidth > drawingProperties.wrapRight) {
                 evenRow = !evenRow;
                 drawingProperties.hexCenterBuffer.x = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
                 drawingProperties.hexCenterBuffer.y = Math.round(drawingProperties.hexCenterBuffer.y + verticalStep);
@@ -426,6 +444,11 @@ public class HexHivePanel extends JPanel {
          */
         private Point end;
         /**
+         * Right/bottom edge of the available drawing viewport; used for wrapping rows.
+         */
+        private int wrapRight;
+        private int wrapBottom;
+        /**
          * Drawing area width
          */
         private int width;
@@ -478,6 +501,8 @@ public class HexHivePanel extends JPanel {
             center.y = (top + bottom) >> 1;
             end.x = right;
             end.y = bottom;
+            wrapRight = right;
+            wrapBottom = bottom;
             width = right - left;
             height = bottom - top;
             if (hexSideLength == -1) {
@@ -497,12 +522,12 @@ public class HexHivePanel extends JPanel {
                 // on how many rows we'll have.
                 Point bufferCenter = new Point(evenRowOrigin.x, evenRowOrigin.y);
                 int consideredHexagons = 0;
-                int lastCenterX = evenRowOrigin.x;
-                int lastRowCenterY = evenRowOrigin.y;
+                int maxCenterX = evenRowOrigin.x;
+                int maxCenterY = evenRowOrigin.y;
                 boolean evenRow = true;
                 while (consideredHexagons < numHexs) {
-                    lastCenterX = bufferCenter.x;
-                    lastRowCenterY = bufferCenter.y;
+                    maxCenterX = Math.max(maxCenterX, bufferCenter.x);
+                    maxCenterY = Math.max(maxCenterY, bufferCenter.y);
                     consideredHexagons++;
                     if (consideredHexagons >= numHexs) {
                         break;
@@ -516,8 +541,8 @@ public class HexHivePanel extends JPanel {
                         bufferCenter.x = nextCenterX;
                     }
                 }
-                end.x = Math.round(lastCenterX + halfHexWidth);
-                end.y = Math.round(lastRowCenterY + halfHexHeight);
+                end.x = Math.round(maxCenterX + halfHexWidth);
+                end.y = Math.round(maxCenterY + halfHexHeight);
                 width = Math.max(1, end.x - left);
                 height = Math.max(1, end.y - top);
             }
