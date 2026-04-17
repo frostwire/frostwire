@@ -62,6 +62,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: TransferDetailPieces/HexHivePanel now use consistent hex tiling math and the fast flat-hex path for large swarms, eliminating overlapping piece cells and improving cached rendering speed
  * Fix: Restore the 3D cube-shaded HexHive look in TransferDetailPieces while keeping the corrected tiling math and off-EDT cached rendering
  * Fix: HexHivePanel now wraps rows against the full viewport width instead of the last occupied row width, and drops stale async bitmaps to prevent missing right-edge cubes and blinking
+ * Fix: HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
  * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
  * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
  * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
