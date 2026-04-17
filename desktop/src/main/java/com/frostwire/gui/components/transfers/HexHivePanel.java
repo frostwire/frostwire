@@ -41,12 +41,15 @@ public class HexHivePanel extends JPanel {
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
     private DrawingProperties drawingProperties;
+    private HexDataAdapter latestAdapter;
     private BufferedImage bitmap;
+    private Rectangle bitmapBounds = new Rectangle();
     private int lastWidth;
     private int lastHeight;
     private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
     private RenderRequest pendingRenderRequest;
     private boolean renderRunning;
+    private Rectangle lastVisibleRect = new Rectangle();
     private Color backgroundColor;
     private GraphicsConfiguration graphicsConfig;
 
@@ -247,6 +250,7 @@ public class HexHivePanel extends JPanel {
                     canvasHeight - bottomPadding);
             synchronized (drawingPropertiesLock) {
                 drawingProperties = snapshot;
+                latestAdapter = hexDataAdapter;
                 lastHeight = snapshot.height;
                 lastWidth = snapshot.width;
             }
@@ -256,22 +260,21 @@ public class HexHivePanel extends JPanel {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            Rectangle visibleRect = getVisibleRect();
-            int previewCanvasWidth = visibleRect.width > 0 ? Math.min(visibleRect.width, canvasWidth) : canvasWidth;
-            int previewCanvasHeight = visibleRect.height > 0 ? Math.min(visibleRect.height, canvasHeight) : canvasHeight;
-            int previewHexCount = countVisibleHexagons(snapshot, previewCanvasWidth, previewCanvasHeight);
-            DrawingProperties previewProperties = null;
-            if (previewHexCount > 0 && previewHexCount < snapshot.numHexs) {
-                previewProperties = new DrawingProperties(
-                        previewHexCount,
-                        hexSideLength,
-                        hexagonBorderPaint.getLineWidth(),
-                        leftPadding,
-                        topPadding,
-                        previewCanvasWidth - rightPadding,
-                        previewCanvasHeight - bottomPadding);
-            }
-            enqueueRender(new RenderRequest(hexDataAdapter, snapshot, previewProperties));
+            requestFocusedRender(snapshot, hexDataAdapter, true);
+        }
+    }
+
+    private void requestFocusedRender(DrawingProperties drawingProperties, HexDataAdapter adapter, boolean force) {
+        Rectangle visibleRect = getVisibleRect();
+        if (visibleRect.width <= 0 || visibleRect.height <= 0) {
+            visibleRect = new Rectangle(0, 0, Math.max(1, getWidth()), Math.max(1, getHeight()));
+        }
+        Rectangle targetBounds = computeRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
+        Rectangle safeBounds = computeSafeBounds(bitmapBounds, visibleRect);
+        boolean needsRender = force || bitmap == null || !safeBounds.contains(visibleRect) || !bitmapBounds.contains(targetBounds);
+        lastVisibleRect = new Rectangle(visibleRect);
+        if (needsRender) {
+            enqueueRender(new RenderRequest(adapter, drawingProperties, targetBounds));
         }
     }
 
@@ -300,18 +303,15 @@ public class HexHivePanel extends JPanel {
                     return;
                 }
             }
-            if (request.previewDrawingProperties != null) {
-                BufferedImage previewBitmap = asyncDraw(request.adapter, request.previewDrawingProperties);
-                publishBitmap(previewBitmap);
-            }
-            BufferedImage backgroundBitmap = asyncDraw(request.adapter, request.drawingProperties);
-            publishBitmap(backgroundBitmap);
+            BufferedImage backgroundBitmap = asyncDrawRegion(request.adapter, request.drawingProperties, request.renderBounds);
+            publishBitmap(backgroundBitmap, request.renderBounds);
         }
     }
 
-    private void publishBitmap(BufferedImage renderedBitmap) {
+    private void publishBitmap(BufferedImage renderedBitmap, Rectangle renderedBounds) {
         synchronized (bitmapLock) {
             bitmap = renderedBitmap;
+            bitmapBounds = new Rectangle(renderedBounds);
         }
         SwingUtilities.invokeLater(() -> {
             revalidate();
@@ -333,7 +333,20 @@ public class HexHivePanel extends JPanel {
             snapshot = bitmap;
         }
         if (snapshot != null) {
-            g2d.drawImage(snapshot, 0, 0, snapshot.getWidth(), snapshot.getHeight(), null);
+            Rectangle boundsSnapshot;
+            synchronized (bitmapLock) {
+                boundsSnapshot = new Rectangle(bitmapBounds);
+            }
+            g2d.drawImage(snapshot, boundsSnapshot.x, boundsSnapshot.y, null);
+        }
+        DrawingProperties snapshotProperties;
+        HexDataAdapter adapterSnapshot;
+        synchronized (drawingPropertiesLock) {
+            snapshotProperties = drawingProperties;
+            adapterSnapshot = latestAdapter;
+        }
+        if (snapshotProperties != null && adapterSnapshot != null) {
+            requestFocusedRender(snapshotProperties, adapterSnapshot, false);
         }
     }
 
@@ -344,43 +357,49 @@ public class HexHivePanel extends JPanel {
         backgroundColor = new Color(bgColor);
     }
 
-    private BufferedImage asyncDraw(HexDataAdapter adapter, DrawingProperties drawingProperties) {
-        // with drawingProperties we don't need to think about padding offsets. We just use drawingProperties numbers for our calculations
-        drawingProperties.hexCenterBuffer.setLocation(drawingProperties.evenRowOrigin.x, drawingProperties.evenRowOrigin.y);
-        boolean evenRow = true;
-        int pieceIndex = 0;
+    private BufferedImage asyncDrawRegion(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
         float halfHexWidth = drawingProperties.hexWidth / 2f;
+        float halfHexHeight = drawingProperties.hexHeight / 2f;
         float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
-        // if we have just one piece to draw, we'll draw it in the center
-        if (drawingProperties.numHexs == 1) {
-            drawingProperties.hexCenterBuffer.x = drawingProperties.center.x;
-            drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
-        }
         boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
         GraphicsConfiguration gc = graphicsConfig;
         BufferedImage bitmap = (gc != null)
-                ? gc.createCompatibleImage(drawingProperties.width, drawingProperties.height, Transparency.OPAQUE)
-                : new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
+                ? gc.createCompatibleImage(renderBounds.width, renderBounds.height, Transparency.OPAQUE)
+                : new BufferedImage(renderBounds.width, renderBounds.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
-        graphics.fillRect(0, 0, drawingProperties.width, drawingProperties.height);
+        graphics.fillRect(0, 0, renderBounds.width, renderBounds.height);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 drawCubes ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
                 drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
-        while (pieceIndex < drawingProperties.numHexs) {
-            drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
-            pieceIndex++;
-            if (pieceIndex >= drawingProperties.numHexs) {
-                break;
+        graphics.translate(-renderBounds.x, -renderBounds.y);
+
+        int firstRow = Math.max(0, (int) Math.floor((renderBounds.y - drawingProperties.evenRowOrigin.y - halfHexHeight) / verticalStep) - 1);
+        int lastRow = Math.max(firstRow, (int) Math.ceil((renderBounds.y + renderBounds.height - drawingProperties.evenRowOrigin.y + halfHexHeight) / verticalStep) + 1);
+
+        for (int row = firstRow; row <= lastRow; row++) {
+            int rowStartIndex = drawingProperties.getRowStartIndex(row);
+            int rowHexCount = drawingProperties.getRowHexCount(row);
+            if (rowHexCount <= 0 || rowStartIndex >= drawingProperties.numHexs) {
+                continue;
             }
-            int nextCenterX = Math.round(drawingProperties.hexCenterBuffer.x + drawingProperties.hexWidth);
-            if (nextCenterX + halfHexWidth > drawingProperties.wrapRight) {
-                evenRow = !evenRow;
-                drawingProperties.hexCenterBuffer.x = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
-                drawingProperties.hexCenterBuffer.y = Math.round(drawingProperties.hexCenterBuffer.y + verticalStep);
-            } else {
-                drawingProperties.hexCenterBuffer.x = nextCenterX;
+            boolean evenRow = (row % 2) == 0;
+            int rowOriginX = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+            int centerY = Math.round(drawingProperties.evenRowOrigin.y + (row * verticalStep));
+            int firstCol = Math.max(0, (int) Math.floor((renderBounds.x - (rowOriginX - halfHexWidth)) / drawingProperties.hexWidth) - 1);
+            int lastCol = Math.min(rowHexCount - 1,
+                    (int) Math.ceil((renderBounds.x + renderBounds.width - (rowOriginX - halfHexWidth)) / drawingProperties.hexWidth));
+            for (int col = firstCol; col <= lastCol; col++) {
+                int pieceIndex = rowStartIndex + col;
+                if (pieceIndex >= drawingProperties.numHexs) {
+                    break;
+                }
+                drawingProperties.hexCenterBuffer.x = Math.round(rowOriginX + (col * drawingProperties.hexWidth));
+                drawingProperties.hexCenterBuffer.y = centerY;
+                drawHexagon(drawingProperties, graphics, hexagonBorderPaint,
+                        adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint,
+                        drawCubes);
             }
         }
         graphics.dispose();
@@ -451,12 +470,12 @@ public class HexHivePanel extends JPanel {
     private static final class RenderRequest {
         private final HexDataAdapter adapter;
         private final DrawingProperties drawingProperties;
-        private final DrawingProperties previewDrawingProperties;
+        private final Rectangle renderBounds;
 
-        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties, DrawingProperties previewDrawingProperties) {
+        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
             this.adapter = adapter;
             this.drawingProperties = drawingProperties;
-            this.previewDrawingProperties = previewDrawingProperties;
+            this.renderBounds = renderBounds;
         }
     }
 
@@ -528,6 +547,8 @@ public class HexHivePanel extends JPanel {
          * Hexagon border stroke width, has to be converted to pixels depending on screen density
          */
         private float hexBorderStrokeWidth;
+        private int evenRowHexCount;
+        private int oddRowHexCount;
 
         DrawingProperties(HexDataAdapter adapter, int hexSideLen, float hexBorderWidth, int left, int top, int right, int bottom) {
             if (adapter == null) {
@@ -542,18 +563,6 @@ public class HexHivePanel extends JPanel {
             evenRowOrigin = new Point(0, 0);
             oddRowOrigin = new Point(0, 0);
             numHexs = adapter.getTotalHexagonsCount();
-            hexSideLength = hexSideLen;
-            update(left, top, right, bottom);
-        }
-
-        DrawingProperties(int numHexs, int hexSideLen, float hexBorderWidth, int left, int top, int right, int bottom) {
-            hexBorderStrokeWidth = hexBorderWidth;
-            origin = new Point(0, 0);
-            center = new Point(0, 0);
-            end = new Point(0, 0);
-            evenRowOrigin = new Point(0, 0);
-            oddRowOrigin = new Point(0, 0);
-            this.numHexs = numHexs;
             hexSideLength = hexSideLen;
             update(left, top, right, bottom);
         }
@@ -581,67 +590,104 @@ public class HexHivePanel extends JPanel {
             evenRowOrigin.y = Math.round(origin.y + halfHexHeight);
             oddRowOrigin.x = Math.round(evenRowOrigin.x + halfHexWidth);
             oddRowOrigin.y = Math.round(evenRowOrigin.y + verticalStep);
+            evenRowHexCount = computeRowHexCount(evenRowOrigin.x, halfHexWidth, right);
+            oddRowHexCount = computeRowHexCount(oddRowOrigin.x, halfHexWidth, right);
             if (hexSideLength != -1) {
                 // we need to calculate the end.y and the new drawing total height depending
                 // on how many rows we'll have.
-                Point bufferCenter = new Point(evenRowOrigin.x, evenRowOrigin.y);
-                int consideredHexagons = 0;
-                int maxCenterX = evenRowOrigin.x;
-                int maxCenterY = evenRowOrigin.y;
-                boolean evenRow = true;
-                while (consideredHexagons < numHexs) {
-                    maxCenterX = Math.max(maxCenterX, bufferCenter.x);
-                    maxCenterY = Math.max(maxCenterY, bufferCenter.y);
-                    consideredHexagons++;
-                    if (consideredHexagons >= numHexs) {
-                        break;
-                    }
-                    int nextCenterX = Math.round(bufferCenter.x + hexWidth);
-                    if (nextCenterX + halfHexWidth > right) {
-                        evenRow = !evenRow;
-                        bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
-                        bufferCenter.y = Math.round(bufferCenter.y + verticalStep);
-                    } else {
-                        bufferCenter.x = nextCenterX;
-                    }
-                }
-                end.x = Math.round(maxCenterX + halfHexWidth);
-                end.y = Math.round(maxCenterY + halfHexHeight);
+                int lastRow = getRowIndexForPiece(numHexs - 1);
+                int lastRowHexCount = getRowHexCount(lastRow);
+                int lastRowStartIndex = getRowStartIndex(lastRow);
+                int lastCol = Math.max(0, Math.min(lastRowHexCount - 1, (numHexs - 1) - lastRowStartIndex));
+                boolean lastRowEven = (lastRow % 2) == 0;
+                int lastRowOriginX = lastRowEven ? evenRowOrigin.x : oddRowOrigin.x;
+                int lastCenterX = Math.round(lastRowOriginX + (lastCol * hexWidth));
+                int lastCenterY = Math.round(evenRowOrigin.y + (lastRow * verticalStep));
+                int widestRowCenterX = evenRowHexCount >= oddRowHexCount
+                        ? Math.round(evenRowOrigin.x + Math.max(0, evenRowHexCount - 1) * hexWidth)
+                        : Math.round(oddRowOrigin.x + Math.max(0, oddRowHexCount - 1) * hexWidth);
+                end.x = Math.round(Math.max(widestRowCenterX, lastCenterX) + halfHexWidth);
+                end.y = Math.round(lastCenterY + halfHexHeight);
                 width = Math.max(1, end.x - left);
                 height = Math.max(1, end.y - top);
             }
         }
+
+        private int computeRowHexCount(int rowOriginX, float halfHexWidth, int right) {
+            if (hexWidth <= 0) {
+                return 1;
+            }
+            return Math.max(1, (int) Math.floor((right - halfHexWidth - rowOriginX) / hexWidth) + 1);
+        }
+
+        int getRowHexCount(int rowIndex) {
+            int rowStartIndex = getRowStartIndex(rowIndex);
+            if (rowStartIndex >= numHexs) {
+                return 0;
+            }
+            int maxRowCount = (rowIndex % 2) == 0 ? evenRowHexCount : oddRowHexCount;
+            return Math.min(maxRowCount, numHexs - rowStartIndex);
+        }
+
+        int getRowStartIndex(int rowIndex) {
+            if (rowIndex <= 0) {
+                return 0;
+            }
+            int fullPairs = rowIndex / 2;
+            int startIndex = fullPairs * (evenRowHexCount + oddRowHexCount);
+            if ((rowIndex % 2) != 0) {
+                startIndex += evenRowHexCount;
+            }
+            return startIndex;
+        }
+
+        int getRowIndexForPiece(int pieceIndex) {
+            if (pieceIndex <= 0) {
+                return 0;
+            }
+            int pairSize = evenRowHexCount + oddRowHexCount;
+            int fullPairs = pieceIndex / pairSize;
+            int remainder = pieceIndex % pairSize;
+            if (remainder < evenRowHexCount) {
+                return fullPairs * 2;
+            }
+            return fullPairs * 2 + 1;
+        }
     }
 
-    private int countVisibleHexagons(DrawingProperties drawingProperties, int visibleWidth, int visibleHeight) {
-        if (visibleWidth <= 0 || visibleHeight <= 0) {
-            return 0;
-        }
-        int previewRight = Math.max(leftPadding + 1, visibleWidth - rightPadding);
-        int previewBottom = Math.max(topPadding + 1, visibleHeight - bottomPadding);
-        float halfHexWidth = drawingProperties.hexWidth / 2f;
-        float halfHexHeight = drawingProperties.hexHeight / 2f;
-        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
-        int centerX = drawingProperties.evenRowOrigin.x;
-        int centerY = drawingProperties.evenRowOrigin.y;
-        boolean evenRow = true;
-        int visibleHexagons = 0;
+    private Rectangle computeRenderBounds(DrawingProperties drawingProperties, Rectangle visibleRect, Rectangle previousVisibleRect) {
+        int dx = visibleRect.x - previousVisibleRect.x;
+        int dy = visibleRect.y - previousVisibleRect.y;
+        int horizontalMargin = Math.max((int) (visibleRect.width * 0.35f), (int) drawingProperties.hexWidth * 2);
+        int verticalMargin = Math.max((int) (visibleRect.height * 0.35f), (int) drawingProperties.hexHeight * 2);
+        int horizontalLookAhead = Math.max((int) (visibleRect.width * 0.75f), horizontalMargin);
+        int verticalLookAhead = Math.max((int) (visibleRect.height * 0.75f), verticalMargin);
 
-        while (visibleHexagons < drawingProperties.numHexs) {
-            if (centerY + halfHexHeight > previewBottom) {
-                break;
-            }
-            visibleHexagons++;
-            int nextCenterX = Math.round(centerX + drawingProperties.hexWidth);
-            if (nextCenterX + halfHexWidth > previewRight) {
-                evenRow = !evenRow;
-                centerX = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
-                centerY = Math.round(centerY + verticalStep);
-            } else {
-                centerX = nextCenterX;
-            }
-        }
+        int leftExtra = dx < 0 ? horizontalLookAhead : horizontalMargin;
+        int rightExtra = dx > 0 ? horizontalLookAhead : horizontalMargin;
+        int topExtra = dy < 0 ? verticalLookAhead : verticalMargin;
+        int bottomExtra = dy > 0 ? verticalLookAhead : verticalMargin;
 
-        return visibleHexagons;
+        int x = Math.max(0, visibleRect.x - leftExtra);
+        int y = Math.max(0, visibleRect.y - topExtra);
+        int maxWidth = Math.max(1, drawingProperties.width - x);
+        int maxHeight = Math.max(1, drawingProperties.height - y);
+        int width = Math.min(maxWidth, visibleRect.width + leftExtra + rightExtra);
+        int height = Math.min(maxHeight, visibleRect.height + topExtra + bottomExtra);
+        return new Rectangle(x, y, Math.max(1, width), Math.max(1, height));
+    }
+
+    private Rectangle computeSafeBounds(Rectangle currentBitmapBounds, Rectangle visibleRect) {
+        if (currentBitmapBounds.width <= 0 || currentBitmapBounds.height <= 0) {
+            return new Rectangle();
+        }
+        int shrinkX = Math.min(currentBitmapBounds.width / 4, Math.max(visibleRect.width / 6, 1));
+        int shrinkY = Math.min(currentBitmapBounds.height / 4, Math.max(visibleRect.height / 6, 1));
+        return new Rectangle(
+                currentBitmapBounds.x + shrinkX,
+                currentBitmapBounds.y + shrinkY,
+                Math.max(1, currentBitmapBounds.width - (2 * shrinkX)),
+                Math.max(1, currentBitmapBounds.height - (2 * shrinkY))
+        );
     }
 }
