@@ -258,9 +258,6 @@ public class HexHivePanel extends JPanel {
             final DrawingProperties renderProperties = snapshot;
             final int renderId = renderSequence.incrementAndGet();
             threadPool.execute(() -> {
-                if (renderSequence.get() != renderId) {
-                    return;
-                }
                 BufferedImage backgroundBitmap = asyncDraw(hexDataAdapter, renderProperties);
                 if (renderSequence.get() != renderId) {
                     return;
