@@ -54,7 +54,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 0,
                 0,
                 5,
-                true);
+                false);
         hexHivePanelAdapter = new HexHiveAdapter();
         // Create labels without HTML content to avoid EDT violation
         pieceSizeLabel = new JLabel();
@@ -91,15 +91,19 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
         final String pieceCounts = hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount();
         final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
+        final BittorrentDownload expectedDownload = btDownload;
         SwingUtilities.invokeLater(() -> {
+            if (bittorrentDownload != expectedDownload) {
+                return;
+            }
             pieceSizeAlreadySet = sameDownload;
             updatePieceSizeLabel(pieceSize);
             updateTotalPiecesLabel(pieceCounts);
             if (totalHexs >= 0) {
                 hexHivePanel.updateData(hexHivePanelAdapter);
-                hexHivePanel.invalidate();
+                hexHivePanel.revalidate();
             }
-            invalidate();
+            revalidate();
             repaint();
         });
     }

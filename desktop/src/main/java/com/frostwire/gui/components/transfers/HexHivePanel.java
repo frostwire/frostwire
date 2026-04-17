@@ -122,7 +122,7 @@ public class HexHivePanel extends JPanel {
                                     final CubePaint fillPaint, final boolean drawCube) {
         // Create outer shape for Hexagon
         drawingProperties.hexagonBorderPath.reset();
-        for (int i = 0; i <= 7; i++) {
+        for (int i = 0; i < 6; i++) {
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, i, drawingProperties.hexSideLength);
             if (i == 0) {
                 drawingProperties.hexagonBorderPath.moveTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
@@ -130,6 +130,7 @@ public class HexHivePanel extends JPanel {
                 drawingProperties.hexagonBorderPath.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
             }
         }
+        drawingProperties.hexagonBorderPath.closePath();
         // Fill hexagon with base color
         graphics.setPaint(fillPaint.getBaseColor());
         graphics.fill(drawingProperties.hexagonBorderPath);
@@ -290,8 +291,8 @@ public class HexHivePanel extends JPanel {
         drawingProperties.hexCenterBuffer.setLocation(drawingProperties.evenRowOrigin.x, drawingProperties.evenRowOrigin.y);
         boolean evenRow = true;
         int pieceIndex = 0;
-        float heightQuarter = drawingProperties.hexHeight / 4;
-        float threeQuarters = heightQuarter * 3;
+        float halfHexWidth = drawingProperties.hexWidth / 2f;
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
         // if we have just one piece to draw, we'll draw it in the center
         if (drawingProperties.numHexs == 1) {
             drawingProperties.hexCenterBuffer.x = drawingProperties.center.x;
@@ -305,18 +306,26 @@ public class HexHivePanel extends JPanel {
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, drawingProperties.width, drawingProperties.height);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                drawCubes ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+        graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+                drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - 2;
-            float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2);
-            if (rightSide >= drawingProperties.end.x) {
+            if (pieceIndex >= drawingProperties.numHexs) {
+                break;
+            }
+            int nextCenterX = Math.round(drawingProperties.hexCenterBuffer.x + drawingProperties.hexWidth);
+            if (nextCenterX + halfHexWidth > drawingProperties.end.x) {
                 evenRow = !evenRow;
-                drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : (int) (drawingProperties.oddRowOrigin.x - hexagonBorderPaint.getLineWidth());
-                drawingProperties.hexCenterBuffer.y += threeQuarters;
+                drawingProperties.hexCenterBuffer.x = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+                drawingProperties.hexCenterBuffer.y = Math.round(drawingProperties.hexCenterBuffer.y + verticalStep);
+            } else {
+                drawingProperties.hexCenterBuffer.x = nextCenterX;
             }
         }
+        graphics.dispose();
         return bitmap;
     }
 
@@ -474,40 +483,43 @@ public class HexHivePanel extends JPanel {
             if (hexSideLength == -1) {
                 hexSideLength = getHexagonSideLength(width, height, numHexs);
             }
-            hexHeight = getHexHeight(hexSideLength) + (2 * hexBorderStrokeWidth);
-            hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
-            evenRowOrigin.x = (int) (origin.x + (hexWidth / 2) + hexBorderStrokeWidth);
-            evenRowOrigin.y = (int) (origin.y + (hexHeight / 2) + hexBorderStrokeWidth);
-            // calculate number of hexagons in an even row
-            oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2) + hexBorderStrokeWidth);
-            oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight + hexBorderStrokeWidth);
+            hexHeight = getHexHeight(hexSideLength);
+            hexWidth = getHexWidth(hexSideLength);
+            float halfHexWidth = hexWidth / 2f;
+            float halfHexHeight = hexHeight / 2f;
+            float verticalStep = (hexHeight * 3f) / 4f;
+            evenRowOrigin.x = Math.round(origin.x + halfHexWidth);
+            evenRowOrigin.y = Math.round(origin.y + halfHexHeight);
+            oddRowOrigin.x = Math.round(evenRowOrigin.x + halfHexWidth);
+            oddRowOrigin.y = Math.round(evenRowOrigin.y + verticalStep);
             if (hexSideLength != -1) {
                 // we need to calculate the end.y and the new drawing total height depending
                 // on how many rows we'll have.
                 Point bufferCenter = new Point(evenRowOrigin.x, evenRowOrigin.y);
-                int consideredHexagons = 1;
+                int consideredHexagons = 0;
                 int lastCenterX = evenRowOrigin.x;
                 int lastRowCenterY = evenRowOrigin.y;
                 boolean evenRow = true;
-                float heightQuarter = hexHeight / 4;
-                float threeQuarters = heightQuarter * 3;
-                while (consideredHexagons <= numHexs) {
-                    while ((bufferCenter.x + (hexWidth / 2) + 2 * hexBorderStrokeWidth) <= right) {
-                        lastCenterX = bufferCenter.x;
-                        bufferCenter.x += hexWidth + (2 * hexBorderStrokeWidth);
-                        consideredHexagons++;
-                    }
-                    // go down one row
-                    bufferCenter.y += threeQuarters + (2 * hexBorderStrokeWidth);
+                while (consideredHexagons < numHexs) {
+                    lastCenterX = bufferCenter.x;
                     lastRowCenterY = bufferCenter.y;
-                    // reset x center depending on the row (even or odd)
-                    bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
-                    evenRow = !evenRow;
+                    consideredHexagons++;
+                    if (consideredHexagons >= numHexs) {
+                        break;
+                    }
+                    int nextCenterX = Math.round(bufferCenter.x + hexWidth);
+                    if (nextCenterX + halfHexWidth > right) {
+                        evenRow = !evenRow;
+                        bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
+                        bufferCenter.y = Math.round(bufferCenter.y + verticalStep);
+                    } else {
+                        bufferCenter.x = nextCenterX;
+                    }
                 }
-                end.x = (int) (lastCenterX + (hexWidth / 2) + hexBorderStrokeWidth);
-                end.y = (int) (lastRowCenterY + hexSideLength + 2 * hexBorderStrokeWidth);
-                width = end.x - left;
-                height = end.y - top;
+                end.x = Math.round(lastCenterX + halfHexWidth);
+                end.y = Math.round(lastRowCenterY + halfHexHeight);
+                width = Math.max(1, end.x - left);
+                height = Math.max(1, end.y - top);
             }
         }
     }
