@@ -256,7 +256,22 @@ public class HexHivePanel extends JPanel {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            enqueueRender(new RenderRequest(hexDataAdapter, snapshot));
+            Rectangle visibleRect = getVisibleRect();
+            int previewCanvasWidth = visibleRect.width > 0 ? Math.min(visibleRect.width, canvasWidth) : canvasWidth;
+            int previewCanvasHeight = visibleRect.height > 0 ? Math.min(visibleRect.height, canvasHeight) : canvasHeight;
+            int previewHexCount = countVisibleHexagons(snapshot, previewCanvasWidth, previewCanvasHeight);
+            DrawingProperties previewProperties = null;
+            if (previewHexCount > 0 && previewHexCount < snapshot.numHexs) {
+                previewProperties = new DrawingProperties(
+                        previewHexCount,
+                        hexSideLength,
+                        hexagonBorderPaint.getLineWidth(),
+                        leftPadding,
+                        topPadding,
+                        previewCanvasWidth - rightPadding,
+                        previewCanvasHeight - bottomPadding);
+            }
+            enqueueRender(new RenderRequest(hexDataAdapter, snapshot, previewProperties));
         }
     }
 
@@ -285,15 +300,23 @@ public class HexHivePanel extends JPanel {
                     return;
                 }
             }
-            BufferedImage backgroundBitmap = asyncDraw(request.adapter, request.drawingProperties);
-            synchronized (bitmapLock) {
-                bitmap = backgroundBitmap;
+            if (request.previewDrawingProperties != null) {
+                BufferedImage previewBitmap = asyncDraw(request.adapter, request.previewDrawingProperties);
+                publishBitmap(previewBitmap);
             }
-            SwingUtilities.invokeLater(() -> {
-                revalidate();
-                repaint();
-            });
+            BufferedImage backgroundBitmap = asyncDraw(request.adapter, request.drawingProperties);
+            publishBitmap(backgroundBitmap);
         }
+    }
+
+    private void publishBitmap(BufferedImage renderedBitmap) {
+        synchronized (bitmapLock) {
+            bitmap = renderedBitmap;
+        }
+        SwingUtilities.invokeLater(() -> {
+            revalidate();
+            repaint();
+        });
     }
 
     @Override
@@ -428,10 +451,12 @@ public class HexHivePanel extends JPanel {
     private static final class RenderRequest {
         private final HexDataAdapter adapter;
         private final DrawingProperties drawingProperties;
+        private final DrawingProperties previewDrawingProperties;
 
-        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties) {
+        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties, DrawingProperties previewDrawingProperties) {
             this.adapter = adapter;
             this.drawingProperties = drawingProperties;
+            this.previewDrawingProperties = previewDrawingProperties;
         }
     }
 
@@ -521,6 +546,18 @@ public class HexHivePanel extends JPanel {
             update(left, top, right, bottom);
         }
 
+        DrawingProperties(int numHexs, int hexSideLen, float hexBorderWidth, int left, int top, int right, int bottom) {
+            hexBorderStrokeWidth = hexBorderWidth;
+            origin = new Point(0, 0);
+            center = new Point(0, 0);
+            end = new Point(0, 0);
+            evenRowOrigin = new Point(0, 0);
+            oddRowOrigin = new Point(0, 0);
+            this.numHexs = numHexs;
+            hexSideLength = hexSideLen;
+            update(left, top, right, bottom);
+        }
+
         void update(int left, int top, int right, int bottom) {
             origin.x = left;
             origin.y = top;
@@ -574,5 +611,37 @@ public class HexHivePanel extends JPanel {
                 height = Math.max(1, end.y - top);
             }
         }
+    }
+
+    private int countVisibleHexagons(DrawingProperties drawingProperties, int visibleWidth, int visibleHeight) {
+        if (visibleWidth <= 0 || visibleHeight <= 0) {
+            return 0;
+        }
+        int previewRight = Math.max(leftPadding + 1, visibleWidth - rightPadding);
+        int previewBottom = Math.max(topPadding + 1, visibleHeight - bottomPadding);
+        float halfHexWidth = drawingProperties.hexWidth / 2f;
+        float halfHexHeight = drawingProperties.hexHeight / 2f;
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+        int centerX = drawingProperties.evenRowOrigin.x;
+        int centerY = drawingProperties.evenRowOrigin.y;
+        boolean evenRow = true;
+        int visibleHexagons = 0;
+
+        while (visibleHexagons < drawingProperties.numHexs) {
+            if (centerY + halfHexHeight > previewBottom) {
+                break;
+            }
+            visibleHexagons++;
+            int nextCenterX = Math.round(centerX + drawingProperties.hexWidth);
+            if (nextCenterX + halfHexWidth > previewRight) {
+                evenRow = !evenRow;
+                centerX = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+                centerY = Math.round(centerY + verticalStep);
+            } else {
+                centerX = nextCenterX;
+            }
+        }
+
+        return visibleHexagons;
     }
 }
