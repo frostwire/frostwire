@@ -82,13 +82,13 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
             case NUMBER:
                 return holder.fileOffset + 1; // humans...
             case NAME:
-                return holder.transferItem.getName();
+                return holder.displayName;
             case PROGRESS:
                 return holder.complete ? 100 : holder.progress;
             case SIZE:
                 return new SizeHolder(holder.transferItem.getSize());
             case TYPE:
-                return holder.transferItem.getName().substring(holder.transferItem.getName().lastIndexOf(".") + 1);
+                return holder.fileType;
             case ACTIONS:
                 // See TransferDetailFilesActionsRenderer for action's code
                 return holder;

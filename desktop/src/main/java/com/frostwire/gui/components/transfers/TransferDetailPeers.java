@@ -22,6 +22,7 @@ package com.frostwire.gui.components.transfers;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.PeerInfo;
 import com.frostwire.util.Logger;
+import com.frostwire.util.SafeText;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -95,10 +96,21 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
     public class PeerItemHolder {
         final int peerOffset;
         final PeerInfo peerItem;
+        final String address;
+        final String client;
+        final String flags;
+        final String source;
+        final String progress;
 
         PeerItemHolder(int peerOffset, PeerInfo peerItem) {
             this.peerOffset = peerOffset;
             this.peerItem = peerItem;
+            this.address = SafeText.sanitize(TransferDetailPeersDataLine.getBittorrentAddress(peerItem));
+            String clientName = peerItem.client();
+            this.client = SafeText.sanitize((clientName == null || clientName.isEmpty()) ? "Unknown" : clientName);
+            this.flags = SafeText.sanitize(TransferDetailPeersDataLine.getFlagsAsString(peerItem.flags(), peerItem.source()));
+            this.source = SafeText.sanitize(TransferDetailPeersDataLine.getSourceAsString(peerItem.source()));
+            this.progress = SafeText.sanitize((100 * peerItem.progress()) + "%");
         }
 
         @Override

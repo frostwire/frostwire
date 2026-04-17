@@ -22,6 +22,7 @@ package com.frostwire.gui.components.transfers;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
+import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
@@ -93,6 +94,8 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
         // Pre-computed on the background thread so renderers never call JNI on the EDT.
         public final boolean complete;
         public final int progress;
+        final String displayName;
+        final String fileType;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {
             this.fileOffset = fileOffset;
@@ -101,6 +104,12 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
             // TransferItemHolder is always constructed inside BackgroundQueuedExecutorService.
             this.complete = transferItem.isComplete();
             this.progress = this.complete ? 100 : transferItem.getProgress();
+            String fileName = SafeText.sanitize(transferItem.getName());
+            this.displayName = fileName;
+            int extensionSeparator = fileName.lastIndexOf('.');
+            this.fileType = extensionSeparator >= 0 && extensionSeparator + 1 < fileName.length()
+                    ? fileName.substring(extensionSeparator + 1)
+                    : "";
         }
 
         @Override

@@ -109,21 +109,17 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         PeerInfo peer = holder.peerItem;
         switch (col) {
             case IP_COLUMN_ID:
-                return getBittorrentAddress(peer);
+                return holder.address;
             case CLIENT_COLUMN_ID:
-                String client = holder.peerItem.client();
-                if (client == null || client.isEmpty()) {
-                    client = I18n.tr("Unknown");
-                }
-                return client;
+                return holder.client;
             case FLAGS_COLUMN_ID:
-                return getFlagsAsString(peer.flags(), peer.source());
+                return holder.flags;
             case SOURCE_COLUMN_ID:
-                return getSourceAsString(peer.source());
+                return holder.source;
             case DOWNLOADED_COLUMN_ID:
                 return new SizeHolder(holder.peerItem.totalDownload());
             case PROGRESS_COLUMN_ID:
-                return 100 * peer.progress() + "%";
+                return holder.progress;
             case UPLOADED_COLUMN_ID:
                 return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
@@ -142,7 +138,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
      * resume_data = 4_bit
      * incoming = 5_bit
      */
-    private String getSourceAsString(byte source) {
+    static String getSourceAsString(byte source) {
         StringBuilder sb = new StringBuilder();
         if ((source & tracker) == tracker) {
             sb.append("Tracker "); // purposefully not-translatable
@@ -208,7 +204,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
      * rc4_encrypted = 19_bit
      * plaintext_encrypted = 20_bit
      */
-    private String getFlagsAsString(int flags, int sourceFlags) {
+    static String getFlagsAsString(int flags, int sourceFlags) {
         StringBuilder sb = new StringBuilder();
         //D = Currently downloading (interested and not choked)
         if ((flags & interesting) == interesting && (flags & remote_choked) == 0) {

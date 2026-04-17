@@ -24,6 +24,7 @@ import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.swig.announce_endpoint;
 import com.frostwire.jlibtorrent.swig.announce_infohash;
 import com.frostwire.util.Logger;
+import com.frostwire.util.SafeText;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -173,7 +174,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
             this.seeds = seeds;
             this.peers = peers;
             this.downloaded = downloaded;
-            this.url = url;
+            this.url = SafeText.sanitize(url);
         }
 
         TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
@@ -207,7 +208,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
             }
             this.trackerOffset = trackerOffset;
-            this.url = announceEntry.url();
+            this.url = SafeText.sanitize(announceEntry.url());
             this.seeds = s;
             this.peers = p;
             this.downloaded = d;
