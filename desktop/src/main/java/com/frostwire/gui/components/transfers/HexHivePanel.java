@@ -352,26 +352,30 @@ public class HexHivePanel extends JPanel {
         int[] rowRange = getRowRangeForBounds(drawingProperties, renderBounds);
         int firstRow = rowRange[0];
         int lastRow = rowRange[1];
+        int maxRow = Math.max(0, drawingProperties.getRowIndexForPiece(Math.max(0, drawingProperties.numHexs - 1)));
         final int rowsPerBatch = 4;
         for (int row = firstRow; row <= lastRow; row += rowsPerBatch) {
             int batchLastRow = Math.min(lastRow, row + rowsPerBatch - 1);
-            Rectangle batchBounds = computeBatchBounds(drawingProperties, renderBounds, row, batchLastRow);
-            if (batchBounds.width <= 0 || batchBounds.height <= 0) {
+            int drawFirstRow = Math.max(0, row - 1);
+            int drawLastRow = Math.min(maxRow, batchLastRow + 1);
+            Rectangle drawBounds = computeBatchBounds(drawingProperties, renderBounds, drawFirstRow, drawLastRow);
+            Rectangle mergeBounds = computeMergeBounds(drawingProperties, renderBounds, row, batchLastRow, maxRow);
+            if (drawBounds.width <= 0 || drawBounds.height <= 0 || mergeBounds.width <= 0 || mergeBounds.height <= 0) {
                 continue;
             }
-            BufferedImage batchBitmap = createBatchBitmap(batchBounds);
+            BufferedImage batchBitmap = createBatchBitmap(drawBounds);
             Graphics2D graphics = batchBitmap.createGraphics();
             graphics.setPaint(backgroundColor);
-            graphics.fillRect(0, 0, batchBounds.width, batchBounds.height);
+            graphics.fillRect(0, 0, drawBounds.width, drawBounds.height);
             boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     drawCubes ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
             graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
                     drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
-            graphics.translate(-batchBounds.x, -batchBounds.y);
-            drawRowsToGraphics(drawingProperties, adapter, graphics, batchBounds, row, batchLastRow, drawCubes);
+            graphics.translate(-drawBounds.x, -drawBounds.y);
+            drawRowsToGraphics(drawingProperties, adapter, graphics, drawBounds, drawFirstRow, drawLastRow, drawCubes);
             graphics.dispose();
-            mergeBatchBitmap(batchBitmap, batchBounds);
+            mergeBatchBitmap(batchBitmap, drawBounds, mergeBounds);
         }
     }
 
@@ -453,6 +457,30 @@ public class HexHivePanel extends JPanel {
         return batch;
     }
 
+    private Rectangle computeMergeBounds(DrawingProperties drawingProperties,
+                                         Rectangle targetBounds,
+                                         int firstRow,
+                                         int lastRow,
+                                         int maxRow) {
+        Rectangle batch = computeBatchBounds(drawingProperties, targetBounds, firstRow, lastRow);
+        if (batch.width <= 0 || batch.height <= 0) {
+            return batch;
+        }
+        float halfHexHeight = drawingProperties.hexHeight / 2f;
+        int topEdge = firstRow <= 0
+                ? Math.round(getRowCenterY(drawingProperties, firstRow) - halfHexHeight)
+                : Math.round((getRowCenterY(drawingProperties, firstRow - 1) + getRowCenterY(drawingProperties, firstRow)) / 2f);
+        int bottomEdge = lastRow >= maxRow
+                ? Math.round(getRowCenterY(drawingProperties, lastRow) + halfHexHeight)
+                : Math.round((getRowCenterY(drawingProperties, lastRow) + getRowCenterY(drawingProperties, lastRow + 1)) / 2f);
+        int mergeTop = Math.max(batch.y, Math.max(targetBounds.y, topEdge));
+        int mergeBottom = Math.min(batch.y + batch.height, Math.min(targetBounds.y + targetBounds.height, bottomEdge));
+        if (mergeBottom <= mergeTop) {
+            return new Rectangle(batch.x, batch.y, batch.width, batch.height);
+        }
+        return new Rectangle(batch.x, mergeTop, batch.width, mergeBottom - mergeTop);
+    }
+
     private int[] getRowRangeForBounds(DrawingProperties drawingProperties, Rectangle renderBounds) {
         float halfHexHeight = drawingProperties.hexHeight / 2f;
         float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
@@ -463,15 +491,33 @@ public class HexHivePanel extends JPanel {
         return new int[]{firstRow, lastRow};
     }
 
-    private void mergeBatchBitmap(BufferedImage renderedBitmap, Rectangle renderedBounds) {
+    private int getRowCenterY(DrawingProperties drawingProperties, int row) {
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+        return Math.round(drawingProperties.evenRowOrigin.y + (row * verticalStep));
+    }
+
+    private void mergeBatchBitmap(BufferedImage renderedBitmap, Rectangle sourceBounds, Rectangle mergeBounds) {
+        int sourceX1 = mergeBounds.x - sourceBounds.x;
+        int sourceY1 = mergeBounds.y - sourceBounds.y;
+        int sourceX2 = sourceX1 + mergeBounds.width;
+        int sourceY2 = sourceY1 + mergeBounds.height;
         synchronized (bitmapLock) {
             Graphics2D graphics = bitmap.createGraphics();
-            graphics.drawImage(renderedBitmap, renderedBounds.x, renderedBounds.y, null);
+            graphics.drawImage(renderedBitmap,
+                    mergeBounds.x,
+                    mergeBounds.y,
+                    mergeBounds.x + mergeBounds.width,
+                    mergeBounds.y + mergeBounds.height,
+                    sourceX1,
+                    sourceY1,
+                    sourceX2,
+                    sourceY2,
+                    null);
             graphics.dispose();
-            renderedArea.add(new Area(renderedBounds));
+            renderedArea.add(new Area(mergeBounds));
         }
         SwingUtilities.invokeLater(() ->
-                repaint(renderedBounds.x, renderedBounds.y, renderedBounds.width, renderedBounds.height));
+                repaint(mergeBounds.x, mergeBounds.y, mergeBounds.width, mergeBounds.height));
     }
 
     @Override
@@ -483,12 +529,10 @@ public class HexHivePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        BufferedImage snapshot;
         synchronized (bitmapLock) {
-            snapshot = bitmap;
-        }
-        if (snapshot != null) {
-            g2d.drawImage(snapshot, 0, 0, null);
+            if (bitmap != null) {
+                g2d.drawImage(bitmap, 0, 0, null);
+            }
         }
         DrawingProperties snapshotProperties;
         HexDataAdapter adapterSnapshot;
