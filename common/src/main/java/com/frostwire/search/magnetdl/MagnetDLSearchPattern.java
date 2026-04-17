@@ -17,6 +17,9 @@
  */
 
 package com.frostwire.search.magnetdl;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.search.FileSearchResult;
@@ -28,6 +31,7 @@ import com.frostwire.util.UrlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * V2 pattern-based search for MagnetDL torrent search.
@@ -75,8 +79,7 @@ public class MagnetDLSearchPattern implements SearchPattern {
         try {
             LOG.debug("MagnetDL: Parsing JSON response, length: " + responseBody.length());
 
-            // Parse JSON array of results directly (MagnetDL returns a JSON array)
-            Result[] searchResults = JsonUtils.toObject(responseBody, Result[].class);
+            Result[] searchResults = parseSearchResults(responseBody);
 
             if (searchResults == null || searchResults.length == 0) {
                 LOG.debug("MagnetDL: No results in JSON response");
@@ -138,5 +141,50 @@ public class MagnetDLSearchPattern implements SearchPattern {
         }
 
         return results;
+    }
+
+    private Result[] parseSearchResults(String responseBody) {
+        String normalizedBody = responseBody == null ? "" : responseBody.trim();
+        if (normalizedBody.isEmpty()) {
+            return new Result[0];
+        }
+
+        JsonElement root = JsonParser.parseString(normalizedBody);
+        return parseSearchResults(root, 0);
+    }
+
+    private Result[] parseSearchResults(JsonElement element, int depth) {
+        if (element == null || element.isJsonNull()) {
+            return new Result[0];
+        }
+        if (depth > 4) {
+            throw new IllegalStateException("MagnetDL response nesting too deep");
+        }
+        if (element.isJsonArray()) {
+            return JsonUtils.toObject(element.toString(), Result[].class);
+        }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+            String nestedJson = element.getAsString();
+            if (StringUtils.isNullOrEmpty(nestedJson)) {
+                return new Result[0];
+            }
+            return parseSearchResults(JsonParser.parseString(nestedJson.trim()), depth + 1);
+        }
+        if (element.isJsonObject()) {
+            JsonObject object = element.getAsJsonObject();
+            String[] candidateFields = {"results", "data", "items", "response", "payload"};
+            for (String field : candidateFields) {
+                if (object.has(field)) {
+                    return parseSearchResults(object.get(field), depth + 1);
+                }
+            }
+            if (object.entrySet().size() == 1) {
+                for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                    return parseSearchResults(entry.getValue(), depth + 1);
+                }
+            }
+        }
+
+        throw new IllegalStateException("Unexpected MagnetDL JSON shape: " + element);
     }
 }

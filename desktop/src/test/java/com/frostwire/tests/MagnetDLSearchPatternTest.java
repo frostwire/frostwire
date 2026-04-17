@@ -24,6 +24,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
 import com.frostwire.search.CompositeFileSearchResult;
+import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
@@ -32,6 +33,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -76,6 +79,19 @@ public final class MagnetDLSearchPatternTest {
         }
 
         LOG.info("MagnetDLSearchPatternTest: PASSED");
+    }
+
+    @Test
+    public void parseQuotedJsonArrayResponse() {
+        MagnetDLSearchPattern pattern = new MagnetDLSearchPattern();
+        String responseBody = "\"[{\\\"id\\\":\\\"59191690\\\",\\\"name\\\":\\\"Ubuntu 22.04 LTS\\\",\\\"info_hash\\\":\\\"2C6B6858D61DA9543D4231A71DB4B1C9264B0685\\\",\\\"seeders\\\":\\\"31\\\",\\\"size\\\":\\\"3654957056\\\",\\\"added\\\":\\\"1652877231\\\"}]\"";
+
+        List<FileSearchResult> results = pattern.parseResults(responseBody);
+
+        assertFalse(results.isEmpty(), "Quoted MagnetDL JSON payload should still parse");
+        CompositeFileSearchResult result = (CompositeFileSearchResult) results.get(0);
+        assertEquals("Ubuntu 22.04 LTS", result.getDisplayName());
+        assertEquals("magnetdl", result.getSource());
     }
 
     static class MagnetDLSearchListener implements SearchListener {
