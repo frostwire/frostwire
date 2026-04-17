@@ -187,6 +187,9 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
                 final TransferDetailPanel panelToUpdate = currentComponent;
                 BackgroundQueuedExecutorService.schedule(() -> {
                     try {
+                        if (selectedBittorrentDownload != btDownloadToUpdate || currentComponent != panelToUpdate) {
+                            return;
+                        }
                         panelToUpdate.updateData(btDownloadToUpdate);
                     } catch (Throwable e) {
                         // Log but don't crash if there's an issue updating details
@@ -209,6 +212,9 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
             final TransferDetailPanel panelToUpdate = currentComponent;
             BackgroundQueuedExecutorService.schedule(() -> {
                 try {
+                    if (selectedBittorrentDownload != btDownloadToUpdate || currentComponent != panelToUpdate) {
+                        return;
+                    }
                     panelToUpdate.updateData(btDownloadToUpdate);
                 } catch (Throwable e) {
                     System.err.println("Error updating transfer details: " + e.getMessage());

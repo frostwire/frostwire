@@ -223,16 +223,26 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         if (guiBtDownload == null) {
             return;
         }
-        // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
         BTDownload btDownload = guiBtDownload.getDl();
         TransferDetailGeneral.this.btDownload = btDownload;
-        TorrentHandle torrentHandle = btDownload.getTorrentHandle();
-        if (!torrentHandle.isValid()) {
+        if (btDownload == null) {
             return;
         }
+        String name = SafeText.sanitize(btDownload.getName());
+        TorrentHandle torrentHandle = btDownload.getTorrentHandle();
+        if (!torrentHandle.isValid()) {
+            final BTDownload expectedBtDownload = btDownload;
+            GUIMediator.safeInvokeLater(() -> {
+                if (TransferDetailGeneral.this.btDownload != expectedBtDownload) {
+                    return;
+                }
+                clearMetadataLabels(name);
+            });
+            return;
+        }
+        // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
         TorrentStatus status = torrentHandle.status();
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
-        String name = SafeText.sanitize(btDownload.getName());
         int progress = btDownload.getProgress();
         long activeDuration = status.activeDuration() / 1000;
         TransferState state = btDownload.getState();
@@ -254,8 +264,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         String comment = (torrentInfo != null) ? torrentInfo.comment() : "";
         long eta = guiBtDownload.getETA();
         String magnetURI = btDownload.magnetUri();
+        final BTDownload expectedBtDownload = btDownload;
 
         GUIMediator.safeInvokeLater(() -> {
+            if (TransferDetailGeneral.this.btDownload != expectedBtDownload) {
+                return;
+            }
             torrentNameLabel.setText(name);
             completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
             completionPercentageProgressbar.setMaximum(100);
@@ -307,15 +321,58 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
             }
             copyInfoHashActionListener = e -> GUIMediator.setClipboardContent(infoHash);
             copyInfoHashButton.addActionListener(copyInfoHashActionListener);
+            if (copyMagnetURLActionListener != null) {
+                copyMagnetURLButton.removeActionListener(copyMagnetURLActionListener);
+            }
             if (magnetURI.length() > 50) {
                 magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
             } else {
                 magnetURLLabel.setText(magnetURI);
             }
-            copyMagnetURLButton.addActionListener(e -> GUIMediator.setClipboardContent(magnetURI));
+            copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
+            copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
             createdOnLabel.setText(created);
             commentLabel.setText("<html><body><p style='width: 600px;'>" + SafeText.sanitize(comment) + "</p></body></html>");
         });
+    }
+
+    private void clearMetadataLabels(String name) {
+        torrentNameLabel.setText(name);
+        completionPercentageLabel.setText("<html><b>0%</b></html>");
+        completionPercentageProgressbar.setMaximum(100);
+        completionPercentageProgressbar.setValue(0);
+        timeElapsedLabel.setText("");
+        timeLeftLabel.setText("");
+        downloadSpeedLabel.setText("");
+        downloadedLabel.setText("");
+        statusLabel.setText("");
+        downloadSpeedLimitLabel.setText("");
+        uploadedLabel.setText("");
+        seedsLabel.setText("");
+        uploadSpeedLabel.setText("");
+        totalSizeLabel.setText("");
+        peersLabel.setText("");
+        uploadSpeedLimitLabel.setText("");
+        shareRatioLabel.setText("");
+        saveLocationLabel.setText("");
+        MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
+        if (mouseListeners != null && mouseListeners.length > 0) {
+            for (MouseListener l : mouseListeners) {
+                saveLocationGrayLabel.removeMouseListener(l);
+            }
+        }
+        infoHashLabel.setText("");
+        if (copyInfoHashActionListener != null) {
+            copyInfoHashButton.removeActionListener(copyInfoHashActionListener);
+            copyInfoHashActionListener = null;
+        }
+        magnetURLLabel.setText("");
+        if (copyMagnetURLActionListener != null) {
+            copyMagnetURLButton.removeActionListener(copyMagnetURLActionListener);
+            copyMagnetURLActionListener = null;
+        }
+        createdOnLabel.setText("");
+        commentLabel.setText("");
     }
 
     private void onAdjustDownloadSpeedLimit() {
