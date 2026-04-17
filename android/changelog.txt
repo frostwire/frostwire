@@ -80,6 +80,7 @@ FrostWire 3.0.17 build 771 <UNRELEASED>
  - fix:YouTube audio downloads now play in FrostWire player instead of launching a third-party app - .mp4/.webm/.opus files were incorrectly identified as non-audio by MIME type check
  - fix:AudioPlayerActivity now refreshes the total-time label as soon as the first track duration becomes available, avoiding a stale 0:00 on cold-start playback
  - fix:AudioPlayerActivity now also self-heals on missed auto-advance metadata broadcasts, so album art, track metadata, and queue highlighting follow the song that is actually playing
+ - fix:Automatic track transitions now update MusicPlaybackService queue/cursor state when ExoPlayer advances to the queued next item, so AudioPlayerActivity reflects the new song after natural song endings just like Next/Previous button presses
  - fix:YouTube audio playback now starts immediately instead of 30-second delay - removed slow LIKE '%filename%' MediaStore full-table scan and fixed ServiceConnectionListener race condition that silently dropped the play callback
  - fix:Transfer Detail > Files now shows the correct torrent file rows immediately instead of briefly showing stale files from a previously opened torrent
  - fix:Transfers and Transfer Detail > Files audio play buttons now start FrostWire's music player the same way My Music does, including service startup and opening AudioPlayerActivity

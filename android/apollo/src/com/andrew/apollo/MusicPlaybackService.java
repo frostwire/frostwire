@@ -2709,6 +2709,18 @@ public class MusicPlaybackService extends MediaSessionService {
                 }
 
                 @Override
+                public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                        LOG.info("MultiPlayer: onMediaItemTransition AUTO — advancing service state");
+                        mCachedPosition = 0;
+                        mCachedDuration = -1;
+                        if (MusicPlaybackService.mPlayerHandler != null) {
+                            MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
+                        }
+                    }
+                }
+
+                @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
                     mCachedIsPlaying = isPlaying;
                     if (isPlaying && MusicPlaybackService.mPlayerHandler != null) {
@@ -2806,8 +2818,12 @@ public class MusicPlaybackService extends MediaSessionService {
             MusicPlaybackService.mPlayerHandler.post(() -> {
                 if (mExoPlayer == null) return;
                 try {
-                    // Remove any previously queued next item beyond the current one
                     int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
+                    if (currentIdx > 0) {
+                        mExoPlayer.removeMediaItems(0, currentIdx);
+                        currentIdx = 0;
+                    }
+                    // Remove any previously queued next item beyond the current one
                     int itemCount = mExoPlayer.getMediaItemCount();
                     if (itemCount > currentIdx + 1) {
                         mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
