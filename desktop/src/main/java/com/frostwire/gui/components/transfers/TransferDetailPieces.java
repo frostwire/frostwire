@@ -54,7 +54,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 0,
                 0,
                 5,
-                false);
+                true);
         hexHivePanelAdapter = new HexHiveAdapter();
         // Create labels without HTML content to avoid EDT violation
         pieceSizeLabel = new JLabel();
