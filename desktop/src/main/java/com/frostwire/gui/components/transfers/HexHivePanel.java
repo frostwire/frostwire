@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +44,7 @@ public class HexHivePanel extends JPanel {
     private DrawingProperties drawingProperties;
     private HexDataAdapter latestAdapter;
     private BufferedImage bitmap;
-    private Rectangle bitmapBounds = new Rectangle();
+    private final Area renderedArea = new Area();
     private int lastWidth;
     private int lastHeight;
     private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
@@ -85,6 +86,17 @@ public class HexHivePanel extends JPanel {
     public void addNotify() {
         super.addNotify();
         graphicsConfig = getGraphicsConfiguration();
+    }
+
+    void clearRenderCache() {
+        synchronized (bitmapLock) {
+            bitmap = null;
+            renderedArea.reset();
+        }
+        synchronized (renderLock) {
+            pendingRenderRequest = null;
+        }
+        lastVisibleRect = new Rectangle();
     }
 
     private static float getHexWidth(float sideLength) {
@@ -259,8 +271,33 @@ public class HexHivePanel extends JPanel {
             // not ready yet (perhaps during animation or rotation)
             return;
         }
+        ensureBackingBitmap(snapshot);
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
             requestFocusedRender(snapshot, hexDataAdapter, true);
+        }
+    }
+
+    private void ensureBackingBitmap(DrawingProperties snapshot) {
+        boolean changed = false;
+        synchronized (bitmapLock) {
+            if (bitmap == null || bitmap.getWidth() != snapshot.width || bitmap.getHeight() != snapshot.height) {
+                GraphicsConfiguration gc = graphicsConfig;
+                bitmap = (gc != null)
+                        ? gc.createCompatibleImage(snapshot.width, snapshot.height, Transparency.OPAQUE)
+                        : new BufferedImage(snapshot.width, snapshot.height, BufferedImage.TYPE_INT_RGB);
+                Graphics2D graphics = bitmap.createGraphics();
+                graphics.setPaint(backgroundColor);
+                graphics.fillRect(0, 0, snapshot.width, snapshot.height);
+                graphics.dispose();
+                renderedArea.reset();
+                changed = true;
+            }
+        }
+        if (changed) {
+            SwingUtilities.invokeLater(() -> {
+                revalidate();
+                repaint();
+            });
         }
     }
 
@@ -270,8 +307,12 @@ public class HexHivePanel extends JPanel {
             visibleRect = new Rectangle(0, 0, Math.max(1, getWidth()), Math.max(1, getHeight()));
         }
         Rectangle targetBounds = computeRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
-        Rectangle safeBounds = computeSafeBounds(bitmapBounds, visibleRect);
-        boolean needsRender = force || bitmap == null || !safeBounds.contains(visibleRect) || !bitmapBounds.contains(targetBounds);
+        boolean needsRender;
+        synchronized (bitmapLock) {
+            needsRender = force || bitmap == null ||
+                    !renderedArea.contains(visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height) ||
+                    !renderedArea.contains(targetBounds.x, targetBounds.y, targetBounds.width, targetBounds.height);
+        }
         lastVisibleRect = new Rectangle(visibleRect);
         if (needsRender) {
             enqueueRender(new RenderRequest(adapter, drawingProperties, targetBounds));
@@ -303,81 +344,53 @@ public class HexHivePanel extends JPanel {
                     return;
                 }
             }
-            BufferedImage backgroundBitmap = asyncDrawRegion(request.adapter, request.drawingProperties, request.renderBounds);
-            publishBitmap(backgroundBitmap, request.renderBounds);
+            renderRegionIntoBackingBitmap(request.adapter, request.drawingProperties, request.renderBounds);
         }
     }
 
-    private void publishBitmap(BufferedImage renderedBitmap, Rectangle renderedBounds) {
-        synchronized (bitmapLock) {
-            bitmap = renderedBitmap;
-            bitmapBounds = new Rectangle(renderedBounds);
-        }
-        SwingUtilities.invokeLater(() -> {
-            revalidate();
-            repaint();
-        });
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(lastWidth, lastHeight);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        BufferedImage snapshot;
-        synchronized (bitmapLock) {
-            snapshot = bitmap;
-        }
-        if (snapshot != null) {
-            Rectangle boundsSnapshot;
-            synchronized (bitmapLock) {
-                boundsSnapshot = new Rectangle(bitmapBounds);
+    private void renderRegionIntoBackingBitmap(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
+        int[] rowRange = getRowRangeForBounds(drawingProperties, renderBounds);
+        int firstRow = rowRange[0];
+        int lastRow = rowRange[1];
+        final int rowsPerBatch = 4;
+        for (int row = firstRow; row <= lastRow; row += rowsPerBatch) {
+            int batchLastRow = Math.min(lastRow, row + rowsPerBatch - 1);
+            Rectangle batchBounds = computeBatchBounds(drawingProperties, renderBounds, row, batchLastRow);
+            if (batchBounds.width <= 0 || batchBounds.height <= 0) {
+                continue;
             }
-            g2d.drawImage(snapshot, boundsSnapshot.x, boundsSnapshot.y, null);
-        }
-        DrawingProperties snapshotProperties;
-        HexDataAdapter adapterSnapshot;
-        synchronized (drawingPropertiesLock) {
-            snapshotProperties = drawingProperties;
-            adapterSnapshot = latestAdapter;
-        }
-        if (snapshotProperties != null && adapterSnapshot != null) {
-            requestFocusedRender(snapshotProperties, adapterSnapshot, false);
+            BufferedImage batchBitmap = createBatchBitmap(batchBounds);
+            Graphics2D graphics = batchBitmap.createGraphics();
+            graphics.setPaint(backgroundColor);
+            graphics.fillRect(0, 0, batchBounds.width, batchBounds.height);
+            boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    drawCubes ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+            graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+                    drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
+            graphics.translate(-batchBounds.x, -batchBounds.y);
+            drawRowsToGraphics(drawingProperties, adapter, graphics, batchBounds, row, batchLastRow, drawCubes);
+            graphics.dispose();
+            mergeBatchBitmap(batchBitmap, batchBounds);
         }
     }
 
-    private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor, int bgColor) {
-        hexagonBorderPaint = new ColoredStroke(0.5f, new Color(numBorderColor, false));
-        emptyHexPaint = new CubePaint(numEmptyColor, 10);
-        fullHexPaint = new CubePaint(numFullColor, 30);
-        backgroundColor = new Color(bgColor);
-    }
-
-    private BufferedImage asyncDrawRegion(HexDataAdapter adapter, DrawingProperties drawingProperties, Rectangle renderBounds) {
-        float halfHexWidth = drawingProperties.hexWidth / 2f;
-        float halfHexHeight = drawingProperties.hexHeight / 2f;
-        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
-        boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
+    private BufferedImage createBatchBitmap(Rectangle batchBounds) {
         GraphicsConfiguration gc = graphicsConfig;
-        BufferedImage bitmap = (gc != null)
-                ? gc.createCompatibleImage(renderBounds.width, renderBounds.height, Transparency.OPAQUE)
-                : new BufferedImage(renderBounds.width, renderBounds.height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = bitmap.createGraphics();
-        graphics.setPaint(backgroundColor);
-        graphics.fillRect(0, 0, renderBounds.width, renderBounds.height);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                drawCubes ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-        graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-                drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
-        graphics.translate(-renderBounds.x, -renderBounds.y);
+        return (gc != null)
+                ? gc.createCompatibleImage(batchBounds.width, batchBounds.height, Transparency.OPAQUE)
+                : new BufferedImage(batchBounds.width, batchBounds.height, BufferedImage.TYPE_INT_RGB);
+    }
 
-        int firstRow = Math.max(0, (int) Math.floor((renderBounds.y - drawingProperties.evenRowOrigin.y - halfHexHeight) / verticalStep) - 1);
-        int lastRow = Math.max(firstRow, (int) Math.ceil((renderBounds.y + renderBounds.height - drawingProperties.evenRowOrigin.y + halfHexHeight) / verticalStep) + 1);
-
+    private void drawRowsToGraphics(DrawingProperties drawingProperties,
+                                    HexDataAdapter adapter,
+                                    Graphics2D graphics,
+                                    Rectangle renderBounds,
+                                    int firstRow,
+                                    int lastRow,
+                                    boolean drawCubes) {
+        float halfHexWidth = drawingProperties.hexWidth / 2f;
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
         for (int row = firstRow; row <= lastRow; row++) {
             int rowStartIndex = drawingProperties.getRowStartIndex(row);
             int rowHexCount = drawingProperties.getRowHexCount(row);
@@ -402,8 +415,97 @@ public class HexHivePanel extends JPanel {
                         drawCubes);
             }
         }
-        graphics.dispose();
-        return bitmap;
+    }
+
+    private Rectangle computeBatchBounds(DrawingProperties drawingProperties, Rectangle targetBounds, int firstRow, int lastRow) {
+        float halfHexWidth = drawingProperties.hexWidth / 2f;
+        float halfHexHeight = drawingProperties.hexHeight / 2f;
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        for (int row = firstRow; row <= lastRow; row++) {
+            int rowHexCount = drawingProperties.getRowHexCount(row);
+            if (rowHexCount <= 0) {
+                continue;
+            }
+            boolean evenRow = (row % 2) == 0;
+            int rowOriginX = evenRow ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+            int rowMinX = Math.round(rowOriginX - halfHexWidth);
+            int rowMaxX = Math.round(rowOriginX + ((rowHexCount - 1) * drawingProperties.hexWidth) + halfHexWidth);
+            minX = Math.min(minX, rowMinX);
+            maxX = Math.max(maxX, rowMaxX);
+        }
+        if (minX == Integer.MAX_VALUE) {
+            return new Rectangle();
+        }
+        int minY = Math.round(drawingProperties.evenRowOrigin.y + (firstRow * verticalStep) - halfHexHeight);
+        int maxY = Math.round(drawingProperties.evenRowOrigin.y + (lastRow * verticalStep) + halfHexHeight);
+        Rectangle batch = new Rectangle(
+                Math.max(0, Math.max(targetBounds.x, minX)),
+                Math.max(0, Math.max(targetBounds.y, minY)),
+                1,
+                1
+        );
+        int batchRight = Math.min(drawingProperties.width, Math.min(targetBounds.x + targetBounds.width, maxX));
+        int batchBottom = Math.min(drawingProperties.height, Math.min(targetBounds.y + targetBounds.height, maxY));
+        batch.width = Math.max(1, batchRight - batch.x);
+        batch.height = Math.max(1, batchBottom - batch.y);
+        return batch;
+    }
+
+    private int[] getRowRangeForBounds(DrawingProperties drawingProperties, Rectangle renderBounds) {
+        float halfHexHeight = drawingProperties.hexHeight / 2f;
+        float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+        int firstRow = Math.max(0, (int) Math.floor((renderBounds.y - drawingProperties.evenRowOrigin.y - halfHexHeight) / verticalStep) - 1);
+        int maxRows = Math.max(0, drawingProperties.getRowIndexForPiece(Math.max(0, drawingProperties.numHexs - 1)));
+        int lastRow = Math.min(maxRows,
+                Math.max(firstRow, (int) Math.ceil((renderBounds.y + renderBounds.height - drawingProperties.evenRowOrigin.y + halfHexHeight) / verticalStep) + 1));
+        return new int[]{firstRow, lastRow};
+    }
+
+    private void mergeBatchBitmap(BufferedImage renderedBitmap, Rectangle renderedBounds) {
+        synchronized (bitmapLock) {
+            Graphics2D graphics = bitmap.createGraphics();
+            graphics.drawImage(renderedBitmap, renderedBounds.x, renderedBounds.y, null);
+            graphics.dispose();
+            renderedArea.add(new Area(renderedBounds));
+        }
+        SwingUtilities.invokeLater(() ->
+                repaint(renderedBounds.x, renderedBounds.y, renderedBounds.width, renderedBounds.height));
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(lastWidth, lastHeight);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        BufferedImage snapshot;
+        synchronized (bitmapLock) {
+            snapshot = bitmap;
+        }
+        if (snapshot != null) {
+            g2d.drawImage(snapshot, 0, 0, null);
+        }
+        DrawingProperties snapshotProperties;
+        HexDataAdapter adapterSnapshot;
+        synchronized (drawingPropertiesLock) {
+            snapshotProperties = drawingProperties;
+            adapterSnapshot = latestAdapter;
+        }
+        if (snapshotProperties != null && adapterSnapshot != null) {
+            requestFocusedRender(snapshotProperties, adapterSnapshot, false);
+        }
+    }
+
+    private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor, int bgColor) {
+        hexagonBorderPaint = new ColoredStroke(0.5f, new Color(numBorderColor, false));
+        emptyHexPaint = new CubePaint(numEmptyColor, 10);
+        fullHexPaint = new CubePaint(numFullColor, 30);
+        backgroundColor = new Color(bgColor);
     }
 
     // Drawing/Geometry functions
@@ -677,17 +779,4 @@ public class HexHivePanel extends JPanel {
         return new Rectangle(x, y, Math.max(1, width), Math.max(1, height));
     }
 
-    private Rectangle computeSafeBounds(Rectangle currentBitmapBounds, Rectangle visibleRect) {
-        if (currentBitmapBounds.width <= 0 || currentBitmapBounds.height <= 0) {
-            return new Rectangle();
-        }
-        int shrinkX = Math.min(currentBitmapBounds.width / 4, Math.max(visibleRect.width / 6, 1));
-        int shrinkY = Math.min(currentBitmapBounds.height / 4, Math.max(visibleRect.height / 6, 1));
-        return new Rectangle(
-                currentBitmapBounds.x + shrinkX,
-                currentBitmapBounds.y + shrinkY,
-                Math.max(1, currentBitmapBounds.width - (2 * shrinkX)),
-                Math.max(1, currentBitmapBounds.height - (2 * shrinkY))
-        );
-    }
 }

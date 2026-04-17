@@ -100,6 +100,9 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             updatePieceSizeLabel(pieceSize);
             updateTotalPiecesLabel(pieceCounts);
             if (totalHexs >= 0) {
+                if (!sameDownload) {
+                    hexHivePanel.clearRenderCache();
+                }
                 hexHivePanel.updateData(hexHivePanelAdapter);
                 hexHivePanel.revalidate();
             }
