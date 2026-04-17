@@ -238,7 +238,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             }
         }
         
-        submitList(newList);
+        submitList(newList, this::notifyDataSetChanged);
         LOG.debug("updateList() submitList called");
     }
 
@@ -883,6 +883,5 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         return connectedSeeds + " / " + seedsStr;
     }
 }
-
 
 
