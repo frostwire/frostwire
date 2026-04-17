@@ -26,12 +26,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class HexHivePanel extends JPanel {
     private final boolean forceCubes;
     private final Object drawingPropertiesLock = new Object();
     private final Object bitmapLock = new Object();
+    private final Object renderLock = new Object();
     private final int topPadding;
     private final int rightPadding;
     private final int bottomPadding;
@@ -45,7 +45,8 @@ public class HexHivePanel extends JPanel {
     private int lastWidth;
     private int lastHeight;
     private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
-    private final AtomicInteger renderSequence = new AtomicInteger();
+    private RenderRequest pendingRenderRequest;
+    private boolean renderRunning;
     private Color backgroundColor;
     private GraphicsConfiguration graphicsConfig;
 
@@ -255,23 +256,42 @@ public class HexHivePanel extends JPanel {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            final DrawingProperties renderProperties = snapshot;
-            final int renderId = renderSequence.incrementAndGet();
-            threadPool.execute(() -> {
-                BufferedImage backgroundBitmap = asyncDraw(hexDataAdapter, renderProperties);
-                if (renderSequence.get() != renderId) {
+            enqueueRender(new RenderRequest(hexDataAdapter, snapshot));
+        }
+    }
+
+    private void enqueueRender(RenderRequest request) {
+        boolean shouldStartWorker = false;
+        synchronized (renderLock) {
+            pendingRenderRequest = request;
+            if (!renderRunning) {
+                renderRunning = true;
+                shouldStartWorker = true;
+            }
+        }
+        if (shouldStartWorker) {
+            threadPool.execute(this::processPendingRenders);
+        }
+    }
+
+    private void processPendingRenders() {
+        while (true) {
+            final RenderRequest request;
+            synchronized (renderLock) {
+                request = pendingRenderRequest;
+                pendingRenderRequest = null;
+                if (request == null) {
+                    renderRunning = false;
                     return;
                 }
-                synchronized (bitmapLock) {
-                    bitmap = backgroundBitmap;
-                }
-                SwingUtilities.invokeLater(() -> {
-                    if (renderSequence.get() != renderId) {
-                        return;
-                    }
-                    revalidate();
-                    repaint();
-                });
+            }
+            BufferedImage backgroundBitmap = asyncDraw(request.adapter, request.drawingProperties);
+            synchronized (bitmapLock) {
+                bitmap = backgroundBitmap;
+            }
+            SwingUtilities.invokeLater(() -> {
+                revalidate();
+                repaint();
             });
         }
     }
@@ -402,6 +422,16 @@ public class HexHivePanel extends JPanel {
 
         Color getLightColor() {
             return lightColor;
+        }
+    }
+
+    private static final class RenderRequest {
+        private final HexDataAdapter adapter;
+        private final DrawingProperties drawingProperties;
+
+        private RenderRequest(HexDataAdapter adapter, DrawingProperties drawingProperties) {
+            this.adapter = adapter;
+            this.drawingProperties = drawingProperties;
         }
     }
 
