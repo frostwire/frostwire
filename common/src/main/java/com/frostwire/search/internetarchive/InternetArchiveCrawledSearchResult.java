@@ -40,7 +40,7 @@ public class InternetArchiveCrawledSearchResult extends AbstractCrawledSearchRes
         super(sr);
         this.filename = FilenameUtils.getName(file.filename);
         this.displayName = FilenameUtils.getBaseName(filename) + " (" + sr.getDisplayName() + ")";
-        this.downloadUrl = String.format(Locale.US, DOWNLOAD_URL, sr.getDomainName(), sr.getIdentifier(), UrlUtils.encode(file.filename));
+        this.downloadUrl = buildDownloadUrl(sr.getDomainName(), sr.getIdentifier(), file.filename);
         this.size = calcSize(file);
     }
 
@@ -70,5 +70,25 @@ public class InternetArchiveCrawledSearchResult extends AbstractCrawledSearchRes
         } catch (Throwable e) {
             return -1;
         }
+    }
+
+    static String buildDownloadUrl(String domainName, String identifier, String filename) {
+        return String.format(Locale.US, DOWNLOAD_URL, domainName, identifier, encodeArchivePath(filename));
+    }
+
+    private static String encodeArchivePath(String filename) {
+        if (filename == null || filename.isEmpty()) {
+            return "";
+        }
+
+        String[] segments = filename.split("/", -1);
+        StringBuilder encoded = new StringBuilder(filename.length());
+        for (int i = 0; i < segments.length; i++) {
+            if (i > 0) {
+                encoded.append('/');
+            }
+            encoded.append(UrlUtils.encode(segments[i]));
+        }
+        return encoded.toString();
     }
 }

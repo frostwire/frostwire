@@ -172,7 +172,7 @@ public class InternetArchiveCrawlingStrategy implements CrawlingStrategy {
         try {
             String filename = FilenameUtils.getName(file.filename);
             String displayName = FilenameUtils.getBaseName(filename) + " (" + preliminaryResult.getDisplayName() + ")";
-            String downloadUrl = String.format(Locale.US, DOWNLOAD_URL, DOMAIN, identifier, UrlUtils.encode(file.filename));
+            String downloadUrl = InternetArchiveCrawledSearchResult.buildDownloadUrl(DOMAIN, identifier, file.filename);
             long fileSize = calcSize(file);
 
             // Determine result type based on file
@@ -185,6 +185,7 @@ public class InternetArchiveCrawlingStrategy implements CrawlingStrategy {
                         .detailsUrl(preliminaryResult.getDetailsUrl())
                         .source(preliminaryResult.getSource())
                         .creationTime(preliminaryResult.getCreationTime())
+                        .download(downloadUrl)
                         .streaming(downloadUrl)  // Mark as streamable
                         .preliminary(false)  // Complete after crawling
                         .build();
@@ -209,6 +210,7 @@ public class InternetArchiveCrawlingStrategy implements CrawlingStrategy {
                         .detailsUrl(preliminaryResult.getDetailsUrl())
                         .source(preliminaryResult.getSource())
                         .creationTime(preliminaryResult.getCreationTime())
+                        .download(downloadUrl)
                         // No torrent, streaming, or crawlable metadata - just HTTP download
                         .preliminary(false)  // Complete after crawling
                         .build();

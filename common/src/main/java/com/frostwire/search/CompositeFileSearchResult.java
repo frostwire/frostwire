@@ -47,6 +47,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
     // Optional metadata composed into the result
     private final Optional<Integer> viewCount;
     private final Optional<TorrentMetadata> torrent;
+    private final Optional<String> httpDownloadUrl;
     private final Optional<StreamingCapability> streaming;
     private final Optional<CrawlableCapability> crawlable;
 
@@ -62,6 +63,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
             boolean preliminary,
             Optional<Integer> viewCount,
             Optional<TorrentMetadata> torrent,
+            Optional<String> httpDownloadUrl,
             Optional<StreamingCapability> streaming,
             Optional<CrawlableCapability> crawlable) {
         this.displayName = displayName;
@@ -75,6 +77,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
         this.preliminary = preliminary;
         this.viewCount = viewCount;
         this.torrent = torrent;
+        this.httpDownloadUrl = httpDownloadUrl;
         this.streaming = streaming;
         this.crawlable = crawlable;
     }
@@ -147,6 +150,14 @@ public class CompositeFileSearchResult implements FileSearchResult {
         return torrent.isPresent();
     }
 
+    public Optional<String> getHttpDownloadUrl() {
+        return httpDownloadUrl;
+    }
+
+    public boolean isHttpDownloadable() {
+        return httpDownloadUrl.isPresent();
+    }
+
     // Streaming-specific accessors
     public Optional<String> getStreamUrl() {
         return streaming.map(StreamingCapability::getUrl);
@@ -197,6 +208,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
         private boolean preliminary = false;  // Default: not preliminary
         private Integer viewCount;  // Optional view count
         private TorrentMetadata torrent;
+        private String httpDownloadUrl;
         private StreamingCapability streaming;
         private CrawlableCapability crawlable;
 
@@ -255,6 +267,11 @@ public class CompositeFileSearchResult implements FileSearchResult {
             return this;
         }
 
+        public Builder download(String url) {
+            this.httpDownloadUrl = url;
+            return this;
+        }
+
         public Builder streaming(StreamingCapability streaming) {
             this.streaming = streaming;
             return this;
@@ -293,6 +310,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
                     preliminary,
                     Optional.ofNullable(viewCount),
                     Optional.ofNullable(torrent),
+                    Optional.ofNullable(httpDownloadUrl),
                     Optional.ofNullable(streaming),
                     Optional.ofNullable(crawlable)
             );

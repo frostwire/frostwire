@@ -214,6 +214,11 @@ public final class TransferManager {
             transfer = newSoundcloudDownload((SoundcloudSearchResult) sr);
         } else if (sr instanceof HttpSearchResult) {
             transfer = newHttpDownload((HttpSearchResult) sr);
+        } else if (sr instanceof com.frostwire.search.CompositeFileSearchResult) {
+            com.frostwire.search.CompositeFileSearchResult csr = (com.frostwire.search.CompositeFileSearchResult) sr;
+            if (csr.isHttpDownloadable()) {
+                transfer = newHttpDownload(csr);
+            }
         }
 
         return transfer;
@@ -458,6 +463,15 @@ public final class TransferManager {
     }
 
     private Transfer newHttpDownload(HttpSearchResult sr) {
+        HttpDownload download = new UIHttpDownload(this, sr);
+
+        httpDownloads.add(download);
+        download.start();
+
+        return download;
+    }
+
+    private Transfer newHttpDownload(com.frostwire.search.CompositeFileSearchResult sr) {
         HttpDownload download = new UIHttpDownload(this, sr);
 
         httpDownloads.add(download);

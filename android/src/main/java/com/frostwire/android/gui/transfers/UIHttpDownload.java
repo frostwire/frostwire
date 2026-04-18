@@ -26,6 +26,7 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.android.util.TorrentUtils;
+import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
@@ -48,6 +49,11 @@ public class UIHttpDownload extends HttpDownload {
     private final Logger LOG = Logger.getLogger(UIHttpDownload.class);
 
     public UIHttpDownload(TransferManager manager, HttpSearchResult sr) {
+        super(convert(sr));
+        this.manager = manager;
+    }
+
+    public UIHttpDownload(TransferManager manager, CompositeFileSearchResult sr) {
         super(convert(sr));
         this.manager = manager;
     }
@@ -131,6 +137,11 @@ public class UIHttpDownload extends HttpDownload {
                 ((TellurideSearchResult) sr).getHttpHeaders() : null;
         String thumbnailUrl = sr.getThumbnailUrl();
         return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize(), headers, thumbnailUrl);
+    }
+
+    private static Info convert(CompositeFileSearchResult sr) {
+        String downloadUrl = sr.getHttpDownloadUrl().orElse(null);
+        return new Info(downloadUrl, sr.getFilename(), sr.getDisplayName(), sr.getSize(), null, sr.getThumbnailUrl());
     }
 
     private static Info convert(Slide slide) {
