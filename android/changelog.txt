@@ -1,4 +1,4 @@
-FrostWire 3.0.17 build 771 APR/18/2026
+FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
  - new:YouTube playlist URL search - query_playlist() added to telluride.py, TellurideCourier.queryPlaylist() with full pipeline, TelluridePlaylistPartialUISearchResult displays partial results with play-in-browser and re-resolve on download
