@@ -411,6 +411,12 @@ public final class MusicUtils {
                     LOG.warn("MusicUtils::ServiceConnectionListener::onServiceConnected() callback threw: " + t.getMessage());
                 }
             }
+            try {
+                LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected() posting notification resync after callbacks");
+                MusicPlaybackService.safePost(instance::updateNotification);
+            } catch (Throwable t) {
+                LOG.warn("MusicUtils::ServiceConnectionListener::onServiceConnected() notification resync threw: " + t.getMessage());
+            }
             callbacks.clear();
             bound.set(true);
         }
@@ -1162,15 +1168,7 @@ public final class MusicUtils {
         try {
             MusicPlaybackService svc = getService();
             if (svc == null) { return false; }
-            svc.stopPlayer();
-            long fileId = svc.openFile(filename);
-            if (fileId == -1) {
-                return false;
-            }
-            svc.open(new long[]{fileId}, 0);
-            svc.play();
-
-            return true;
+            return svc.playTransientFile(filename);
         } catch (final Throwable t) {
             LOG.error(t.getMessage(), t);
             return false;

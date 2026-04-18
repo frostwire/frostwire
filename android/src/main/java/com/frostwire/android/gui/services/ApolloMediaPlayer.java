@@ -24,9 +24,19 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     @Override
     public void play(Playlist playlist) {
         List<PlaylistItem> items = playlist.getItems();
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        if (items.size() == 1) {
+            FWFileDescriptor onlyItem = items.get(0).getFD();
+            if (onlyItem != null && onlyItem.id <= 0 && onlyItem.filePath != null) {
+                MusicUtils.playFile(new File(onlyItem.filePath));
+                return;
+            }
+        }
 
         idMap.clear();
-        File[] files = new File[items.size()];
         long[] list = new long[items.size()];
         int position = 0;
 
