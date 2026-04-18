@@ -211,6 +211,13 @@ public final class Constants {
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
     public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://blog.frostwire.com/2016/12/05/how-to-create-playlists-on-frostwire-for-android/";
 
+    public static int[] engineOwnedNotificationIds() {
+        return new int[] {
+                NOTIFICATION_FROSTWIRE_STATUS,
+                NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED
+        };
+    }
+
     private Constants() {
     }
 }

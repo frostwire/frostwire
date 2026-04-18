@@ -350,7 +350,9 @@ public class EngineIntentService extends Service implements IEngineService {
         try {
             NotificationManager notificationManager = (NotificationManager) engineIntentService.getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
-                notificationManager.cancelAll();
+                for (int notificationId : Constants.engineOwnedNotificationIds()) {
+                    notificationManager.cancel(notificationId);
+                }
             } else {
                 LOG.warn("EngineService::cancelAllNotificationsTask(EngineService) notificationManager is null");
             }

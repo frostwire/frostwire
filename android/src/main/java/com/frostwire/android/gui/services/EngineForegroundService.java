@@ -348,7 +348,9 @@ public class EngineForegroundService extends Service implements IEngineService {
         try {
             NotificationManager notificationManager = (NotificationManager) engineForegroundService.getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
-                notificationManager.cancelAll();
+                for (int notificationId : Constants.engineOwnedNotificationIds()) {
+                    notificationManager.cancel(notificationId);
+                }
             } else {
                 LOG.warn("EngineForegroundService::cancelAllNotificationsTask(EngineForegroundService) notificationManager is null");
             }
