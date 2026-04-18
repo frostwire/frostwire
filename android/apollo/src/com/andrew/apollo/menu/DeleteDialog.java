@@ -154,16 +154,20 @@ public final class DeleteDialog extends DialogFragment {
                 }
             }
             // Delete the selected item(s)
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                    () -> MusicUtils.deleteTracks(activity != null ? activity.getApplicationContext() : null, mItemList));
+            final Activity activityRef = activity;
+            final long[] deletedIds = mItemList;
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                MusicUtils.deleteTracks(activityRef != null ? activityRef.getApplicationContext() : null, deletedIds);
+                SystemUtils.postToUIThread(() -> {
+                    if (activityRef instanceof DeleteDialogCallback) {
+                        ((DeleteDialogCallback) activityRef).onDelete(deletedIds);
+                    }
 
-            if (activity instanceof DeleteDialogCallback) {
-                ((DeleteDialogCallback) activity).onDelete(mItemList);
-            }
-
-            if (onDeleteCallback != null) {
-                onDeleteCallback.onDelete(mItemList);
-            }
+                    if (onDeleteCallback != null) {
+                        onDeleteCallback.onDelete(deletedIds);
+                    }
+                });
+            });
 
             dismiss();
         }
