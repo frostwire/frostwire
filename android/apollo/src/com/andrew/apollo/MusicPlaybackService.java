@@ -270,6 +270,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private static final int FOCUS_CHANGE = 5;
     private static final int FADE_DOWN = 6;
     private static final int FADE_UP = 7;
+    private static final int TRACK_WENT_TO_PREVIOUS = 8;
     private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
 
     private static final String AUDIO_ID_COLUMN_NAME = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? "_id" : "audio._id AS _id";
@@ -339,6 +340,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private RecentStore mRecentsCache;
     private FavoritesStore mFavoritesCache;
     private boolean launchPlayerActivity;
+    private boolean mForegroundNotificationStarted;
     private final Random r = new Random();
 
     private final static HashMap<String, Long> notifyChangeIntervals = new HashMap<>();
@@ -518,25 +520,7 @@ public class MusicPlaybackService extends MediaSessionService {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
         mServiceStartId = startId;
-        
-        // CRITICAL: On Android 8+ (API 26+), when started with startForegroundService(),
-        // we MUST call startForeground() within 5 seconds or we get an ANR.
-        // Call it immediately with a temporary notification - MediaSessionService will replace it later.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                createNotificationChannel();
-                Notification tempNotification = new Notification.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                        .setContentTitle("FrostWire")
-                        .setContentText("Loading...")
-                        .setSmallIcon(R.drawable.frostwire_notification_flat)
-                        .build();
-                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
-                LOG.info("onStartCommand: Called startForeground() with temporary notification");
-            } catch (Throwable e) {
-                LOG.error("onStartCommand: Failed to call startForeground()", e);
-            }
-        }
-        
+
         // For Android 14+ (API 34), check if we can legitimately start as foreground service
         boolean canStartForeground = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -552,6 +536,8 @@ public class MusicPlaybackService extends MediaSessionService {
                 LOG.warn("onStartCommand: Cannot start foreground service - app not in foreground and no media intent. Will skip temp notification.");
             }
         }
+
+        maybeStartTemporaryForegroundNotification(canStartForeground);
 
         if (intent != null) {
             final String action = intent.getAction();
@@ -573,6 +559,31 @@ public class MusicPlaybackService extends MediaSessionService {
 
         // completeWakefulIntent removed — no longer using WakefulBroadcastReceiver
         return START_STICKY;
+    }
+
+    private void maybeStartTemporaryForegroundNotification(boolean canStartForeground) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !canStartForeground) {
+            return;
+        }
+        if (mForegroundNotificationStarted) {
+            LOG.info("onStartCommand: Skipping temporary foreground notification because service is already in foreground");
+            return;
+        }
+        try {
+            createNotificationChannel();
+            Notification tempNotification = new Notification.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setContentTitle("FrostWire")
+                    .setContentText("Loading playback controls...")
+                    .setSmallIcon(R.drawable.frostwire_notification_flat)
+                    .setCategory(Notification.CATEGORY_TRANSPORT)
+                    .setOnlyAlertOnce(true)
+                    .build();
+            startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+            mForegroundNotificationStarted = true;
+            LOG.info("onStartCommand: Called startForeground() with temporary notification");
+        } catch (Throwable e) {
+            LOG.error("onStartCommand: Failed to call startForeground()", e);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -644,6 +655,7 @@ public class MusicPlaybackService extends MediaSessionService {
     public void onDestroy() {
         LOG.info("onDestroy() destroying MusicPlaybackService");
         super.onDestroy();
+        mForegroundNotificationStarted = false;
 
         try {
             final Intent audioEffectsIntent = new Intent(
@@ -692,6 +704,7 @@ public class MusicPlaybackService extends MediaSessionService {
     }
 
     public void updateNotification() {
+        updateMediaSessionState(PLAYSTATE_CHANGED);
         updateMediaSessionState(META_CHANGED);
     }
 
@@ -1183,7 +1196,6 @@ public class MusicPlaybackService extends MediaSessionService {
         if (mPlayListLen == 0 || mPlayList == null) {
             return false;
         }
-        stopPlayer();
 
         long trackId;
         synchronized (mPlayList) {
@@ -1196,6 +1208,10 @@ public class MusicPlaybackService extends MediaSessionService {
                 return false;
             }
         }
+        LOG.info("openCurrentAndMaybeNext(openNext=" + openNext + ") playPos=" + mPlayPos
+                + " queueLen=" + mPlayListLen
+                + " trackId=" + trackId
+                + " isSupposedToBePlaying=" + mIsSupposedToBePlaying);
         updateCursor(trackId);
 
         boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
@@ -2244,6 +2260,38 @@ public class MusicPlaybackService extends MediaSessionService {
         }
     }
 
+    public boolean playTransientFile(String path) {
+        if (path == null) {
+            return false;
+        }
+
+        stopPlayer();
+        closeCursor();
+        synchronized (this) {
+            ensurePlayListCapacity(1);
+            mPlayListLen = 1;
+            mPlayPos = 0;
+            mPlayList[0] = -1;
+        }
+        synchronized (mHistory) {
+            mHistory.clear();
+        }
+
+        long fileId = openFile(path);
+        if (mPlayer == null || !mPlayer.isInitialized()) {
+            return false;
+        }
+
+        if (fileId != -1) {
+            open(new long[]{fileId}, 0);
+            return true;
+        }
+
+        notifyChange(META_CHANGED);
+        play();
+        return true;
+    }
+
     /**
      * Temporarily pauses playback.
      */
@@ -2289,6 +2337,18 @@ public class MusicPlaybackService extends MediaSessionService {
         }
         final int pos = getNextPosition(force, isShuffleEnabled());
         if (invalidPosition(pos)) return;
+        mNextPlayPos = pos;
+        LOG.info("gotoNext(force=" + force + ") currentPos=" + mPlayPos
+                + " nextPos=" + mNextPlayPos
+                + " hasNextInTimeline=" + (mPlayer != null && mPlayer.hasNextInTimeline())
+                + " queueLen=" + mPlayListLen);
+        if (mPlayer != null && mPlayer.hasNextInTimeline()) {
+            mPlayer.seekToNextInTimeline();
+            if (force) {
+                setRepeatMode(currentRepeatMode);
+            }
+            return;
+        }
         mPlayPos = pos;
         if (openCurrentAndNext()) {
             play();
@@ -2302,8 +2362,14 @@ public class MusicPlaybackService extends MediaSessionService {
 
     public void gotoPrev() {
         long position = position();
+        LOG.info("gotoPrev() position=" + position
+                + " currentPos=" + mPlayPos
+                + " hasPreviousInTimeline=" + (mPlayer != null && mPlayer.hasPreviousInTimeline()));
         if (position < REWIND_INSTEAD_PREVIOUS_THRESHOLD) {
-            stop(false);
+            if (mPlayer != null && mPlayer.hasPreviousInTimeline()) {
+                mPlayer.seekToPreviousInTimeline();
+                return;
+            }
             prev();
         } else {
             seek(0);
@@ -2603,6 +2669,9 @@ public class MusicPlaybackService extends MediaSessionService {
                     }
                     break;
                 case TRACK_WENT_TO_NEXT:
+                    LOG.info("MusicPlayerHandler: TRACK_WENT_TO_NEXT currentPos=" + service.mPlayPos
+                            + " nextPlayPos=" + service.mNextPlayPos
+                            + " queueLen=" + service.mPlayListLen);
                     if (service.mNextPlayPos == -1) {
                         service.mNextPlayPos = 0;
                     }
@@ -2611,7 +2680,35 @@ public class MusicPlaybackService extends MediaSessionService {
                         service.mCursor.close();
                     }
 
-                    if (service.mPlayPos < service.mPlayList.length) {
+                    if (service.mPlayPos < service.mPlayListLen) {
+                        service.updateCursor(service.mPlayList[service.mPlayPos]);
+                        service.notifyChange(META_CHANGED);
+                        service.updateNotification();
+                        service.setNextTrack();
+                    }
+                    break;
+                case TRACK_WENT_TO_PREVIOUS:
+                    LOG.info("MusicPlayerHandler: TRACK_WENT_TO_PREVIOUS currentPos=" + service.mPlayPos
+                            + " queueLen=" + service.mPlayListLen);
+                    if (service.mCursor != null) {
+                        service.mCursor.close();
+                    }
+                    if (service.mShuffleEnabled) {
+                        synchronized (mHistory) {
+                            if (!mHistory.isEmpty()) {
+                                mHistory.pop();
+                            }
+                            if (!mHistory.isEmpty()) {
+                                service.mPlayPos = mHistory.peek();
+                            }
+                        }
+                    } else if (service.mPlayPos > 0) {
+                        service.mPlayPos--;
+                    } else {
+                        service.mPlayPos = 0;
+                    }
+
+                    if (service.mPlayPos >= 0 && service.mPlayPos < service.mPlayListLen) {
                         service.updateCursor(service.mPlayList[service.mPlayPos]);
                         service.notifyChange(META_CHANGED);
                         service.updateNotification();
@@ -2619,6 +2716,8 @@ public class MusicPlaybackService extends MediaSessionService {
                     }
                     break;
                 case TRACK_ENDED:
+                    LOG.info("MusicPlayerHandler: TRACK_ENDED currentPos=" + service.mPlayPos
+                            + " queueLen=" + service.mPlayListLen);
                     if (service.mRepeatMode == REPEAT_CURRENT) {
                         service.seek(1);
                     } else {
@@ -2653,6 +2752,8 @@ public class MusicPlaybackService extends MediaSessionService {
         volatile long mCachedPosition = 0;
         volatile long mCachedDuration = -1;
         volatile boolean mCachedIsPlaying = false;
+        volatile int mCachedCurrentMediaItemIndex = 0;
+        volatile int mCachedMediaItemCount = 0;
 
         // Polls getCurrentPosition() on the HandlerThread every 500 ms while playing.
         private final Runnable mPositionPoller = new Runnable() {
@@ -2690,6 +2791,10 @@ public class MusicPlaybackService extends MediaSessionService {
             mExoPlayer.addListener(new Player.Listener() {
                 @Override
                 public void onPlaybackStateChanged(int state) {
+                    LOG.info("MultiPlayer: onPlaybackStateChanged state=" + state
+                            + " currentIndex=" + mCachedCurrentMediaItemIndex
+                            + " itemCount=" + mCachedMediaItemCount
+                            + " cachedIsPlaying=" + mCachedIsPlaying);
                     if (state == Player.STATE_ENDED) {
                         LOG.info("MultiPlayer: onPlaybackStateChanged STATE_ENDED — track complete");
                         mCachedIsPlaying = false;
@@ -2700,28 +2805,56 @@ public class MusicPlaybackService extends MediaSessionService {
                     } else if (state == Player.STATE_READY) {
                         long d = mExoPlayer.getDuration();
                         mCachedDuration = (d == C.TIME_UNSET) ? -1 : d;
+                        refreshTimelineCache();
                         // Start position polling on the HandlerThread.
                         if (MusicPlaybackService.mPlayerHandler != null) {
                             MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
                             MusicPlaybackService.mPlayerHandler.post(mPositionPoller);
+                        }
+                        MusicPlaybackService svc = MusicPlaybackService.getInstance();
+                        if (svc != null) {
+                            svc.updateNotification();
                         }
                     }
                 }
 
                 @Override
                 public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
-                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                        LOG.info("MultiPlayer: onMediaItemTransition AUTO — advancing service state");
+                    int previousIndex = mCachedCurrentMediaItemIndex;
+                    refreshTimelineCache();
+                    int currentIndex = mCachedCurrentMediaItemIndex;
+                    LOG.info("MultiPlayer: onMediaItemTransition reason=" + reason
+                            + " previousIndex=" + previousIndex
+                            + " currentIndex=" + currentIndex
+                            + " itemCount=" + mCachedMediaItemCount
+                            + " mediaItem=" + mediaItem);
+                    boolean movedToQueuedNext =
+                            reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
+                                    || (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && currentIndex > previousIndex);
+                    boolean movedToQueuedPrevious =
+                            reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && currentIndex < previousIndex;
+                    if (movedToQueuedNext) {
+                        LOG.info("MultiPlayer: onMediaItemTransition reason=" + reason + " currentIndex=" + currentIndex + " previousIndex=" + previousIndex + " — advancing service state");
                         mCachedPosition = 0;
                         mCachedDuration = -1;
                         if (MusicPlaybackService.mPlayerHandler != null) {
                             MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
+                        }
+                    } else if (movedToQueuedPrevious) {
+                        LOG.info("MultiPlayer: onMediaItemTransition reason=" + reason + " currentIndex=" + currentIndex + " previousIndex=" + previousIndex + " — rewinding service state");
+                        mCachedPosition = 0;
+                        mCachedDuration = -1;
+                        if (MusicPlaybackService.mPlayerHandler != null) {
+                            MusicPlaybackService.mPlayerHandler.sendEmptyMessage(TRACK_WENT_TO_PREVIOUS);
                         }
                     }
                 }
 
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
+                    LOG.info("MultiPlayer: onIsPlayingChanged isPlaying=" + isPlaying
+                            + " currentIndex=" + mCachedCurrentMediaItemIndex
+                            + " itemCount=" + mCachedMediaItemCount);
                     mCachedIsPlaying = isPlaying;
                     if (isPlaying && MusicPlaybackService.mPlayerHandler != null) {
                         MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
@@ -2730,6 +2863,9 @@ public class MusicPlaybackService extends MediaSessionService {
                     MusicPlaybackService svc = MusicPlaybackService.getInstance();
                     if (svc != null) {
                         svc.notifyChange(PLAYSTATE_CHANGED);
+                        if (isPlaying) {
+                            svc.updateNotification();
+                        }
                     }
                 }
 
@@ -2791,7 +2927,10 @@ public class MusicPlaybackService extends MediaSessionService {
             MusicPlaybackService.mPlayerHandler.post(() -> {
                 if (mExoPlayer == null) return;
                 try {
+                    LOG.info("MultiPlayer::setCurrentDataSource() path=" + path);
                     mExoPlayer.setMediaItem(mediaItem);
+                    mCachedCurrentMediaItemIndex = 0;
+                    mCachedMediaItemCount = 1;
                     mExoPlayer.prepare();
                     // Launch AudioPlayerActivity when the player is ready if requested
                     if (MusicPlaybackService.INSTANCE != null && MusicPlaybackService.INSTANCE.launchPlayerActivity) {
@@ -2819,19 +2958,28 @@ public class MusicPlaybackService extends MediaSessionService {
                 if (mExoPlayer == null) return;
                 try {
                     int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
-                    if (currentIdx > 0) {
-                        mExoPlayer.removeMediaItems(0, currentIdx);
-                        currentIdx = 0;
+                    int originalItemCount = mExoPlayer.getMediaItemCount();
+                    if (currentIdx > 1) {
+                        // Keep one previous item in the timeline so Android's system
+                        // transport controls can still enable "previous" after the
+                        // queue has advanced at least once.
+                        mExoPlayer.removeMediaItems(0, currentIdx - 1);
+                        currentIdx = 1;
                     }
                     // Remove any previously queued next item beyond the current one
                     int itemCount = mExoPlayer.getMediaItemCount();
                     if (itemCount > currentIdx + 1) {
                         mExoPlayer.removeMediaItems(currentIdx + 1, itemCount);
                     }
-                    if (path == null) return;
-                    mExoPlayer.addMediaItem(
-                            MediaItem.fromUri(resolveUri(path)));
-                    LOG.info("MultiPlayer::setNextDataSource() queued next track successfully");
+                    if (path != null) {
+                        mExoPlayer.addMediaItem(
+                                MediaItem.fromUri(resolveUri(path)));
+                        LOG.info("MultiPlayer::setNextDataSource() queued next track successfully path=" + path
+                                + " previousIndex=" + currentIdx
+                                + " originalItemCount=" + originalItemCount
+                                + " newItemCount=" + mExoPlayer.getMediaItemCount());
+                    }
+                    refreshTimelineCache();
                 } catch (Throwable e) {
                     LOG.error("MultiPlayer::setNextDataSource() error: " + e.getMessage(), e);
                 }
@@ -2858,6 +3006,9 @@ public class MusicPlaybackService extends MediaSessionService {
         public void stop() {
             mIsInitialized = false;
             mCachedIsPlaying = false;
+            mCachedCurrentMediaItemIndex = 0;
+            mCachedMediaItemCount = 0;
+            LOG.info("MultiPlayer::stop() clearing current timeline");
             if (MusicPlaybackService.mPlayerHandler != null) {
                 MusicPlaybackService.mPlayerHandler.removeCallbacks(mPositionPoller);
             }
@@ -2944,6 +3095,47 @@ public class MusicPlaybackService extends MediaSessionService {
         /** @return True if the player is currently playing. Uses cached value for thread safety. */
         public boolean isPlaying() {
             return mCachedIsPlaying;
+        }
+
+        boolean hasNextInTimeline() {
+            return mCachedMediaItemCount > mCachedCurrentMediaItemIndex + 1;
+        }
+
+        boolean hasPreviousInTimeline() {
+            return mCachedCurrentMediaItemIndex > 0;
+        }
+
+        void seekToNextInTimeline() {
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.seekToNextMediaItem(); } catch (Throwable ignored) {}
+                    }
+                });
+            }
+        }
+
+        void seekToPreviousInTimeline() {
+            if (mExoPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
+                MusicPlaybackService.mPlayerHandler.post(() -> {
+                    if (mExoPlayer != null) {
+                        try { mExoPlayer.seekToPreviousMediaItem(); } catch (Throwable ignored) {}
+                    }
+                });
+            }
+        }
+
+        private void refreshTimelineCache() {
+            if (mExoPlayer == null) {
+                mCachedCurrentMediaItemIndex = 0;
+                mCachedMediaItemCount = 0;
+                return;
+            }
+            try {
+                mCachedCurrentMediaItemIndex = Math.max(mExoPlayer.getCurrentMediaItemIndex(), 0);
+                mCachedMediaItemCount = Math.max(mExoPlayer.getMediaItemCount(), 0);
+            } catch (Throwable ignored) {
+            }
         }
 
         /**
