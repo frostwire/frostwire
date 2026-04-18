@@ -77,7 +77,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
  * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
 
- -- FrostWire Team <contact@frostwire.com> Thu, 10 Apr 2026 10:00:00 -0600
+ -- FrostWire Team <contact@frostwire.com> Thu, 16 Apr 2026 20:45:00 -0600
 
 frostwire (7.0.3) stable; urgency=high
  * Bound unbounded image/icon caches to prevent memory leaks
