@@ -2959,13 +2959,6 @@ public class MusicPlaybackService extends MediaSessionService {
                 try {
                     int currentIdx = mExoPlayer.getCurrentMediaItemIndex();
                     int originalItemCount = mExoPlayer.getMediaItemCount();
-                    if (currentIdx > 1) {
-                        // Keep one previous item in the timeline so Android's system
-                        // transport controls can still enable "previous" after the
-                        // queue has advanced at least once.
-                        mExoPlayer.removeMediaItems(0, currentIdx - 1);
-                        currentIdx = 1;
-                    }
                     // Remove any previously queued next item beyond the current one
                     int itemCount = mExoPlayer.getMediaItemCount();
                     if (itemCount > currentIdx + 1) {
