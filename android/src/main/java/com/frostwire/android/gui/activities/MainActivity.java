@@ -510,7 +510,7 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     }
 
     private void onLastDialogButtonPositive() {
-        finish();
+        moveTaskToBack(true);
     }
 
     private void onShutdownDialogButtonPositive() {
