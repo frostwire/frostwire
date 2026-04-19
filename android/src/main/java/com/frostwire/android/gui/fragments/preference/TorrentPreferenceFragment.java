@@ -123,13 +123,20 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     public void onDisplayPreferenceDialog(Preference preference) {
         if (preference instanceof CustomSeekBarPreference) {
             DialogFragment fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
-            fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
+            showPreferenceDialog(fragment);
         } else if (preference instanceof PortRangePreference) {
             DialogFragment fragment = PortRangePreference.PortRangePreferenceDialog.newInstance(preference.getKey());
-            fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
+            showPreferenceDialog(fragment);
         } else {
             super.onDisplayPreferenceDialog(preference);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void showPreferenceDialog(DialogFragment fragment) {
+        // PreferenceDialogFragmentCompat still validates its target fragment in onCreate().
+        fragment.setTargetFragment(this, 0);
+        fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
     }
 
     private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
