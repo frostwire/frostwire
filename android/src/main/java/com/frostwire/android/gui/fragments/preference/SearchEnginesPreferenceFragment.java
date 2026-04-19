@@ -32,6 +32,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,11 +48,13 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
     public static final String PREF_KEY_SEARCH_SELECT_ALL = "frostwire.prefs.search.preference_category.select_all";
 
     private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
+    private final Map<String, CheckBoxPreference> visibleSearchEnginePreferences;
 
     public SearchEnginesPreferenceFragment() {
         // See settings_search_engines.xml if you're looking for the layout that has all the checkboxes
         super(R.xml.settings_search_engines);
         activeSearchEnginePreferences = new HashMap<>();
+        visibleSearchEnginePreferences = new LinkedHashMap<>();
     }
 
     @Override
@@ -71,7 +74,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
 
             if (!cb.isChecked()) {
                 setChecked(selectAllCheckbox, false, false);
-                if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
+                if (areAllEnginesChecked(false)) {
                     cb.setChecked(true); // always keep one checked
                     UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                 }
@@ -87,7 +90,9 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
             getPreferenceScreen().removePreference(preference);
         }
 
-        for (CheckBoxPreference preference : activeSearchEnginePreferences.keySet()) {
+        collectVisibleSearchEnginePreferences();
+
+        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
             preference.setOnPreferenceClickListener(searchEngineClickListener);
         }
 
@@ -102,7 +107,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
 
     private void updateSelectAllCheckBox() {
         CheckBoxPreference cb = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
-        boolean allChecked = areAllEnginesChecked(activeSearchEnginePreferences, true);
+        boolean allChecked = areAllEnginesChecked(true);
         setChecked(cb, allChecked, false);
         cb.setTitle(allChecked ? R.string.deselect_all : R.string.select_all);
     }
@@ -134,23 +139,45 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         return true;
     }
 
-    private void checkAllEngines(boolean checked) {
-        CheckBoxPreference archivePreference = null;
-
-        for (CheckBoxPreference preference : activeSearchEnginePreferences.keySet()) {
-            if (preference != null) { //it could already have been removed due to remote config value.
-                setChecked(preference, checked, false);
-
-                if (activeSearchEnginePreferences.get(preference).getName().equals("Archive.org")) {
-                    archivePreference = preference;
-                }
+    private boolean areAllEnginesChecked(boolean checked) {
+        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+            if (checked != preference.isChecked()) {
+                return false;
             }
+        }
+        return true;
+    }
+
+    private void checkAllEngines(boolean checked) {
+        CheckBoxPreference archivePreference = visibleSearchEnginePreferences.get(com.frostwire.android.core.Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG);
+
+        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+            setChecked(preference, checked, false);
         }
 
         // always leave one checked.
         if (!checked && archivePreference != null) {
             setChecked(archivePreference, true, false);
             UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
+        }
+    }
+
+    private void collectVisibleSearchEnginePreferences() {
+        visibleSearchEnginePreferences.clear();
+        PreferenceScreen preferenceScreen = getPreferenceScreen();
+        if (preferenceScreen == null) {
+            return;
+        }
+
+        for (int i = 0; i < preferenceScreen.getPreferenceCount(); i++) {
+            Preference preference = preferenceScreen.getPreference(i);
+            if (!(preference instanceof CheckBoxPreference)) {
+                continue;
+            }
+            if (PREF_KEY_SEARCH_SELECT_ALL.equals(preference.getKey())) {
+                continue;
+            }
+            visibleSearchEnginePreferences.put(preference.getKey(), (CheckBoxPreference) preference);
         }
     }
 
