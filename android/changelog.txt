@@ -1,3 +1,9 @@
+FrostWire 3.1.1 build 772 UNRELEASED
+
+ - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
+ - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
+ - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
+
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
  - new:I2P configuration and UI settings - users can now configure I2P preferences in Settings > Advanced
