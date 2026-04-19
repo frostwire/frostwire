@@ -27,6 +27,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.preference.DialogPreference;
@@ -64,9 +65,6 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
         initComponents();
     }
 
-    // onAttach no longer needed for setTargetFragment — PreferenceDialogFragment.getPreference()
-    // now resolves the parent fragment via getParentFragmentManager() instead.
-
     protected void initComponents() {
     }
 
@@ -95,6 +93,13 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
             preference.setChecked(checked);
             preference.setOnPreferenceChangeListener(l);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    protected final void showPreferenceDialog(DialogFragment fragment) {
+        // PreferenceDialogFragmentCompat still validates its target fragment in onCreate().
+        fragment.setTargetFragment(this, 0);
+        fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
     }
 
     public static abstract class PreferenceDialogFragment

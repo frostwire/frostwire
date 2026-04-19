@@ -132,13 +132,6 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private void showPreferenceDialog(DialogFragment fragment) {
-        // PreferenceDialogFragmentCompat still validates its target fragment in onCreate().
-        fragment.setTargetFragment(this, 0);
-        fragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
-    }
-
     private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
         final CustomSeekBarPreference pickerPreference = findPreference(key);
         if (pickerPreference != null) {
