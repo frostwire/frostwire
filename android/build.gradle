@@ -75,6 +75,7 @@ def manifestVersionName() {
 
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
+def plusReleaseApkName = "frostwire-android-release-${project.ext.versionName}-b${project.ext.versionCode}-plus.apk"
 
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 boolean isRootAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease")
@@ -274,11 +275,15 @@ android {
 // AGP new DSL: use androidComponents.onVariants to rename APK output.
 androidComponents {
     onVariants(selector().all()) { variant ->
-        def flavor = 'plus'
-        def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
-        def apkName = "frostwire-android-" + variant.buildType + '-' + suffix + '.apk'
         variant.outputs.each { output ->
-            output.outputFileName.set(apkName)
+            if (variant.buildType == "release") {
+                output.outputFileName.set(plusReleaseApkName)
+            } else {
+                def flavor = 'plus'
+                def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
+                def apkName = "frostwire-android-" + variant.buildType + '-' + suffix + '.apk'
+                output.outputFileName.set(apkName)
+            }
         }
     }
 }
@@ -364,6 +369,16 @@ tasks.matching {
             (it.name.contains("Plus1Release") && it.name.toLowerCase().contains("lint"))
 }.configureEach {
     dependsOn(ensurePythonProguardRules)
+}
+
+def copyPlus1ReleaseApkToWorkspaceBuild = tasks.register("copyPlus1ReleaseApkToWorkspaceBuild", Copy) {
+    dependsOn(tasks.named("assemblePlus1Release"))
+    from(layout.buildDirectory.file("outputs/apk/plus1/release/${plusReleaseApkName}"))
+    into(file("../../android/build"))
+}
+
+tasks.matching { it.name in ["assembleRelease", "assemblePlus1Release"] }.configureEach {
+    finalizedBy(copyPlus1ReleaseApkToWorkspaceBuild)
 }
 
 class SignatureRequester {
