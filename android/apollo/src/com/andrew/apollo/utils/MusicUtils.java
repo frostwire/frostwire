@@ -181,7 +181,7 @@ public final class MusicUtils {
     }
 
     public static void executeWithMusicPlaybackService(Context context, Runnable runnable) {
-        if (MusicPlaybackService.getInstance() == null) {
+        if (!MusicPlaybackService.instanceReady() || MusicPlaybackService.getMusicPlayerHandler() == null) {
             MusicUtils.startMusicPlaybackService(context, MusicUtils.buildStartMusicPlaybackServiceIntent(context), runnable);
         } else {
             MusicPlaybackService.safePost(runnable);

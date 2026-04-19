@@ -118,13 +118,46 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MusicPlaybackService extends MediaSessionService {
     private final Object cursorLock = new Object();
+    private static final Object safePostLock = new Object();
+    private static final ArrayDeque<Runnable> pendingSafePosts = new ArrayDeque<>();
+    private static final int MAX_PENDING_SAFE_POSTS = 64;
 
     public static void safePost(Runnable runnable) {
-        if (MusicPlaybackService.mPlayerHandler == null) {
-            LOG.error("Check your logic, trying to safePost and mPlayerHandler hasn't yet been created");
-            throw new RuntimeException("MusicPlaybackService.safePost can't post without a mPlayerHandler instance");
+        if (runnable == null) {
+            return;
         }
-        SystemUtils.exceptionSafePost(MusicPlaybackService.mPlayerHandler, runnable);
+        if (MusicPlaybackService.mPlayerHandler != null) {
+            SystemUtils.exceptionSafePost(MusicPlaybackService.mPlayerHandler, runnable);
+            return;
+        }
+        synchronized (safePostLock) {
+            if (MusicPlaybackService.mPlayerHandler != null) {
+                SystemUtils.exceptionSafePost(MusicPlaybackService.mPlayerHandler, runnable);
+                return;
+            }
+            if (MusicPlaybackService.INSTANCE != null) {
+                if (pendingSafePosts.size() >= MAX_PENDING_SAFE_POSTS) {
+                    pendingSafePosts.removeFirst();
+                    LOG.warn("MusicPlaybackService.safePost dropped oldest queued task while waiting for mPlayerHandler");
+                }
+                pendingSafePosts.addLast(runnable);
+                LOG.warn("MusicPlaybackService.safePost queued task until mPlayerHandler is ready");
+                return;
+            }
+        }
+        LOG.warn("MusicPlaybackService.safePost ignored because the service is not running yet");
+    }
+
+    private static void flushPendingSafePosts() {
+        MusicPlayerHandler handler = MusicPlaybackService.mPlayerHandler;
+        if (handler == null) {
+            return;
+        }
+        synchronized (safePostLock) {
+            while (!pendingSafePosts.isEmpty()) {
+                SystemUtils.exceptionSafePost(handler, pendingSafePosts.removeFirst());
+            }
+        }
     }
 
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
@@ -699,6 +732,9 @@ public class MusicPlaybackService extends MediaSessionService {
             serviceInitialized.set(false);
         } catch (Throwable ignored) {
         }
+        synchronized (safePostLock) {
+            pendingSafePosts.clear();
+        }
         INSTANCE = null;
         mServiceInUse = false;
     }
@@ -908,6 +944,7 @@ public class MusicPlaybackService extends MediaSessionService {
         updateNotification();
         serviceInitialized.set(true);
         initServiceLatch.countDown();
+        flushPendingSafePosts();
     }
 
     /**
