@@ -77,6 +77,50 @@ project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
+boolean isRootAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease")
+
+def firstNonBlank(Object... values) {
+    for (Object value : values) {
+        if (value == null) {
+            continue
+        }
+        String text = value.toString().trim()
+        if (!text.isEmpty()) {
+            return text
+        }
+    }
+    return ""
+}
+
+def loadAndroidSigningProperties() {
+    Properties properties = new Properties()
+    File propertiesFile = file("../../frostwire-tools/certs/android.keystore/build.properties")
+    if (propertiesFile.exists()) {
+        propertiesFile.withInputStream { properties.load(it) }
+    }
+    return properties
+}
+
+def androidSigningProperties = loadAndroidSigningProperties()
+def androidSigningEnvKeyPassword = firstNonBlank(System.getenv("FROSTWIRE_ANDROID_KEY_PASSWORD"))
+def androidSigningKeyAlias = firstNonBlank(
+        project.findProperty("frostwireAndroidKeyAlias"),
+        System.getenv("FROSTWIRE_ANDROID_KEY_ALIAS"),
+        androidSigningProperties.getProperty("key.alias", "")
+)
+def androidSigningKeyPassword = firstNonBlank(
+        project.findProperty("frostwireAndroidKeyPassword"),
+        androidSigningEnvKeyPassword
+)
+
+if (isRootAssembleRelease && !androidSigningEnvKeyPassword) {
+    throw new GradleException(
+            "assembleRelease requires FROSTWIRE_ANDROID_KEY_PASSWORD to be set in the environment.\n" +
+                    "Example:\n" +
+                    "  export FROSTWIRE_ANDROID_KEY_PASSWORD='your-keystore-password'\n" +
+                    "  ./gradlew clean assembleRelease"
+    )
+}
 
 android {
     namespace "com.frostwire.android"
@@ -154,8 +198,14 @@ android {
         release {
             if (isAssembleRelease) {
                 storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
-                def sigRequester = new SignatureRequester()
+                def sigRequester = new SignatureRequester(androidSigningKeyAlias, androidSigningKeyPassword)
                 sigRequester.ask()
+                if (!sigRequester.keyAlias()) {
+                    throw new GradleException("Android signing key alias is empty. Check ../../frostwire-tools/certs/android.keystore/build.properties.")
+                }
+                if (!sigRequester.keyPassword()) {
+                    throw new GradleException("Android signing key password is empty.")
+                }
                 storePassword sigRequester.keyPassword()
                 keyAlias sigRequester.keyAlias()
                 keyPassword sigRequester.keyPassword()
@@ -256,6 +306,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21'
     implementation 'androidx.work:work-runtime-ktx:2.11.2'
     implementation 'androidx.datastore:datastore-preferences:1.2.1'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
 
     // Firebase Crashlytics
     implementation platform('com.google.firebase:firebase-bom:34.12.0')
@@ -289,43 +340,96 @@ afterEvaluate {
     }
 }
 
+def pythonProguardRulesFile = layout.buildDirectory.file("python/proguard-rules.pro")
+
+def ensurePythonProguardRules = tasks.register("ensurePythonProguardRules") {
+    outputs.file(pythonProguardRulesFile)
+    doLast {
+        File proguardFile = pythonProguardRulesFile.get().asFile
+        if (!proguardFile.parentFile.exists()) {
+            proguardFile.parentFile.mkdirs()
+        }
+        if (!proguardFile.exists()) {
+            proguardFile.text = "# Placeholder file for Chaquopy/R8 integration on release builds.\n"
+        }
+    }
+}
+
+ensurePythonProguardRules.configure {
+    mustRunAfter(tasks.named("clean"))
+}
+
+tasks.matching {
+    it.name == "minifyPlus1ReleaseWithR8" ||
+            (it.name.contains("Plus1Release") && it.name.toLowerCase().contains("lint"))
+}.configureEach {
+    dependsOn(ensurePythonProguardRules)
+}
+
 class SignatureRequester {
+    private final String defaultKeyAlias
+    private final String providedKeyPassword
     String myKeyAlias = ""
     String myKeyPassword = ""
 
+    SignatureRequester(String defaultKeyAlias = "", String providedKeyPassword = "") {
+        this.defaultKeyAlias = defaultKeyAlias != null ? defaultKeyAlias.trim() : ""
+        this.providedKeyPassword = providedKeyPassword != null ? providedKeyPassword : ""
+    }
+
     void ask() {
+        this.myKeyAlias = defaultKeyAlias
+        this.myKeyPassword = providedKeyPassword
+        if (this.myKeyPassword) {
+            return
+        }
+
+        def console = System.console()
+        System.out.println("System.console()=" + console)
+
+        if (console != null) {
+            def aliasPrompt = defaultKeyAlias ? "\nKey Alias [${defaultKeyAlias}]: " : "\nKey Alias: "
+            def aliasInput = console.readLine(aliasPrompt)
+            char[] passwordInput = console.readPassword("\nKey Password: ")
+            this.myKeyAlias = aliasInput != null && aliasInput.trim() ? aliasInput.trim() : defaultKeyAlias
+            this.myKeyPassword = passwordInput != null ? new String(passwordInput) : ""
+            if (!this.myKeyPassword) {
+                def visiblePassword = console.readLine("Key Password (visible input): ")
+                this.myKeyPassword = visiblePassword != null ? visiblePassword : ""
+            }
+            return
+        }
+
         System.setProperty('java.awt.headless', 'false')
-        boolean useSwingDialog = true  // Force use of Swing dialog
+        def swing = new SwingBuilder()
+        swing.edt {
+            def dialogRef
+            def inputAlias
+            def inputPassword
 
-        System.out.println("System.console()=" + System.console())
-
-        if (useSwingDialog || System.console() == null) {
-            // Force the Swing dialog to be used by always setting useSwingDialog to true
-            new SwingBuilder().edt {
-                dialog(modal: true,
-                        title: 'Enter keystore data',
-                        alwaysOnTop: true,
-                        resizable: true,
-                        locationRelativeTo: null,
-                        show: true,
-                        size: [215, 147]
-                ) {
-                    vbox {
-                        label(text: "Key Alias:")
-                        inputAlias = textField()
-                        label(text: "Key Password:")
-                        inputPassword = passwordField()
-                        button(defaultButton: true, text: 'OK', actionPerformed: {
-                            this.myKeyAlias = inputAlias.text
-                            this.myKeyPassword = new String(inputPassword.password)
-                            dispose()
-                        })
-                    }
+            dialogRef = swing.dialog(
+                    modal: true,
+                    title: 'Enter keystore data',
+                    alwaysOnTop: true,
+                    resizable: true,
+                    locationRelativeTo: null,
+                    size: [215, 147]
+            ) {
+                vbox {
+                    label(text: "Key Alias:")
+                    inputAlias = textField(text: defaultKeyAlias)
+                    label(text: "Key Password:")
+                    inputPassword = passwordField()
+                    button(defaultButton: true, text: 'OK', actionPerformed: {
+                        this.myKeyAlias = inputAlias.text != null && inputAlias.text.trim() ? inputAlias.text.trim() : defaultKeyAlias
+                        this.myKeyPassword = new String(inputPassword.password)
+                        dialogRef.dispose()
+                    })
                 }
             }
-        } else {
-            this.myKeyAlias = new String(System.console().readPassword("\nKey Alias: "))
-            this.myKeyPassword = new String(System.console().readPassword("\nKey Password: "))
+            dialogRef.pack()
+            dialogRef.setLocationRelativeTo(null)
+            dialogRef.visible = true
         }
     }
 

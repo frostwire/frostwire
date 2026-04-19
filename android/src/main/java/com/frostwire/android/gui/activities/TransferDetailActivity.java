@@ -23,9 +23,8 @@ import android.os.Bundle;
 import android.util.SparseArray;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -50,6 +49,7 @@ import com.frostwire.android.offers.HeaderBanner;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.transfers.BittorrentDownload;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.List;
 
@@ -62,6 +62,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     private TransferDetailFragment transferDetailFragment;
     private int lastSelectedTabIndex;
     private HeaderBanner headerBanner;
+    private TabLayoutMediator tabLayoutMediator;
 
     public TransferDetailActivity() {
         super(R.layout.activity_transfer_detail);
@@ -90,18 +91,21 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         } else {
             lastSelectedTabIndex = ConfigurationManager.instance().getInt(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX);
         }
-        OnPageChangeListener onPageChangeListener = new OnPageChangeListener(this);
-        SectionsPagerAdapter mSectionsPagerAdapter =
-                new SectionsPagerAdapter(getSupportFragmentManager(), detailFragments);
-        ViewPager viewPager = findViewById(R.id.transfer_detail_viewpager);
+        OnPageChangeCallback onPageChangeCallback = new OnPageChangeCallback(this);
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, detailFragments);
+        ViewPager2 viewPager = findViewById(R.id.transfer_detail_viewpager);
 
         if (viewPager != null) {
-            viewPager.clearOnPageChangeListeners();
             viewPager.setAdapter(mSectionsPagerAdapter);
-            viewPager.setCurrentItem(lastSelectedTabIndex == -1 ? 0 : lastSelectedTabIndex);
-            viewPager.addOnPageChangeListener(onPageChangeListener);
+            viewPager.setCurrentItem(lastSelectedTabIndex == -1 ? 0 : lastSelectedTabIndex, false);
+            viewPager.registerOnPageChangeCallback(onPageChangeCallback);
             TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
-            tabLayout.setupWithViewPager(viewPager);
+            if (tabLayoutMediator != null) {
+                tabLayoutMediator.detach();
+            }
+            tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager,
+                    (tab, position) -> tab.setText(mSectionsPagerAdapter.getPageTitle(position)));
+            tabLayoutMediator.attach();
         } else {
             throw new RuntimeException("initComponents() Could not get viewPager");
         }
@@ -175,6 +179,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (tabLayoutMediator != null) {
+            tabLayoutMediator.detach();
+            tabLayoutMediator = null;
+        }
         HeaderBanner.destroy(headerBanner);
     }
 
@@ -257,41 +265,36 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         outState.putInt("lastSelectedTabIndex", lastSelectedTabIndex);
     }
 
-    private static class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    private static class SectionsPagerAdapter extends FragmentStateAdapter {
 
         private final AbstractTransferDetailFragment[] detailFragments;
 
-        SectionsPagerAdapter(FragmentManager fm,
+        SectionsPagerAdapter(TransferDetailActivity activity,
                              AbstractTransferDetailFragment[] detailFragments) {
-            super(fm);
+            super(activity);
             this.detailFragments = detailFragments;
         }
 
         @Override
-        public AbstractFragment getItem(int position) {
+        public AbstractFragment createFragment(int position) {
             return detailFragments[position];
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return detailFragments.length;
         }
 
-        @Override
         public CharSequence getPageTitle(int position) {
             return detailFragments[position].getTabTitle().toUpperCase();
         }
     }
 
-    private static final class OnPageChangeListener implements ViewPager.OnPageChangeListener {
+    private static final class OnPageChangeCallback extends ViewPager2.OnPageChangeCallback {
         private final TransferDetailActivity activity;
 
-        OnPageChangeListener(TransferDetailActivity activity) {
+        OnPageChangeCallback(TransferDetailActivity activity) {
             this.activity = activity;
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         }
 
         @Override
@@ -302,10 +305,6 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             } catch (Throwable t) {
                 t.printStackTrace();
             }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
         }
     }
 }

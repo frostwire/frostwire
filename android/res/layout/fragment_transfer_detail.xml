@@ -32,8 +32,7 @@
         android:background="@color/basic_color"
         app:tabMode="scrollable" />
 
-    <!--Extends androidx.viewpager.widget.ViewPager-->
-    <com.frostwire.android.gui.views.NonSmoothViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/transfer_detail_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
