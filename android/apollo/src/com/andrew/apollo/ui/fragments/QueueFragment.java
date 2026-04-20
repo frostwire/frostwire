@@ -18,8 +18,10 @@
 
 package com.andrew.apollo.ui.fragments;
 
+import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.core.view.MenuProvider;
+import androidx.fragment.app.FragmentManager;
 import androidx.loader.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -89,20 +91,11 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
                 if (itemId == R.id.menu_player_save_queue) {
                     if (SystemUtils.isUIThread()) {
                         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                            NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
-                                    .makeQueueCursor(getActivity());
-                            long[] songList = MusicUtils.getSongListForCursor(queue);
-                            queue.close();
-                            SystemUtils.postToUIThread(() ->
-                                    CreateNewPlaylist.getInstance(songList).show(
-                                            getParentFragmentManager(), "CreatePlaylist"));
+                            long[] songList = loadQueuedSongList();
+                            SystemUtils.postToUIThread(() -> showCreatePlaylistDialog(songList));
                         });
                     } else {
-                        NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
-                                .makeQueueCursor(getActivity());
-                        CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
-                                getParentFragmentManager(), "CreatePlaylist");
-                        queue.close();
+                        showCreatePlaylistDialog(loadQueuedSongList());
                     }
                     return true;
                 } else if (itemId == R.id.menu_player_clear_queue) {
@@ -115,6 +108,33 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
                 return false;
             }
         }, getViewLifecycleOwner());
+    }
+
+    private long[] loadQueuedSongList() {
+        final Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return MusicUtils.getSongListForCursor(null);
+        }
+        NowPlayingCursor queue = null;
+        try {
+            queue = (NowPlayingCursor) QueueLoader.makeQueueCursor(activity);
+            return MusicUtils.getSongListForCursor(queue);
+        } finally {
+            if (queue != null) {
+                queue.close();
+            }
+        }
+    }
+
+    private void showCreatePlaylistDialog(long[] songList) {
+        if (!isAdded()) {
+            return;
+        }
+        FragmentManager fragmentManager = getParentFragmentManager();
+        if (fragmentManager.isStateSaved()) {
+            return;
+        }
+        CreateNewPlaylist.getInstance(songList).show(fragmentManager, "CreatePlaylist");
     }
 
     @Override
