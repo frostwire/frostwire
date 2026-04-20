@@ -768,11 +768,11 @@ public class HexHivePanel extends JPanel {
                         : Math.round(oddRowOrigin.x + Math.max(0, oddRowHexCount - 1) * hexWidth);
                 end.x = Math.round(Math.max(widestRowCenterX, lastCenterX) + halfHexWidth);
                 end.y = Math.round(lastCenterY + halfHexHeight);
-                width = Math.max(1, end.x);
-                height = Math.max(1, end.y);
+                width = Math.max(1, end.x + 1);
+                height = Math.max(1, end.y + 1);
             } else {
-                width = Math.max(1, end.x);
-                height = Math.max(1, end.y);
+                width = Math.max(1, end.x + 1);
+                height = Math.max(1, end.y + 1);
             }
         }
 
