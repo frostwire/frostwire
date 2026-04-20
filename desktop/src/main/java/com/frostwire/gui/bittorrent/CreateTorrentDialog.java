@@ -302,6 +302,36 @@ public class CreateTorrentDialog extends JDialog {
         labelTrackers.setForeground(useDHT ? Color.GRAY : Color.BLACK);
     }
 
+    private void recommendPieceSizeForSelectedContent() {
+        try {
+            File contentFile = create_from_dir ? new File(directoryPath) : new File(singlePath);
+            long totalSize = calculateTotalSize(contentFile);
+            PieceSize recommended = PieceSize.recommendForSize(totalSize);
+            if (recommended != PieceSize.AUTO_DETECT) {
+                pieceSizeComboBox.setSelectedItem(recommended);
+                pieceSize = recommended.bytes();
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to recommend piece size: " + e.getMessage());
+        }
+    }
+
+    private long calculateTotalSize(File file) {
+        if (file.isFile()) {
+            return file.length();
+        } else if (file.isDirectory()) {
+            long total = 0;
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    total += calculateTotalSize(f);
+                }
+            }
+            return total;
+        }
+        return 0;
+    }
+
     private void onButtonClose(ActionEvent e) {
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
@@ -373,6 +403,7 @@ public class CreateTorrentDialog extends JDialog {
                 directoryPath = chosenFile.getAbsolutePath();
                 singlePath = null;
             }
+            recommendPieceSizeForSelectedContent();
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -727,7 +758,12 @@ public class CreateTorrentDialog extends JDialog {
         _512KB(512),
         _1024KB(1024),
         _2048KB(2048),
-        _4096KB(4096);
+        _4096KB(4096),
+        _8192KB(8192),
+        _16384KB(16384),
+        _32768KB(32768),
+        _65536KB(65536),
+        _131072KB(131072);
         private final int kb;
         private final String humanRep;
 
@@ -737,7 +773,7 @@ public class CreateTorrentDialog extends JDialog {
         }
 
         PieceSize(int k) {
-            this(k, k + " kB");
+            this(k, k >= 1024 ? (k / 1024) + " MB" : k + " kB");
         }
 
         int bytes() {
@@ -747,6 +783,25 @@ public class CreateTorrentDialog extends JDialog {
         @Override
         public String toString() {
             return humanRep;
+        }
+
+        static PieceSize recommendForSize(long totalBytes) {
+            long minPieces = 1000;
+            long maxPieces = 3000;
+            long targetPieces = Math.max(minPieces, Math.min(maxPieces, totalBytes / (1024 * 1024)));
+            long targetPieceBytes = totalBytes / targetPieces;
+            long targetKB = Math.max(16, targetPieceBytes / 1024);
+            
+            PieceSize best = AUTO_DETECT;
+            for (PieceSize size : values()) {
+                if (size == AUTO_DETECT) continue;
+                if (size.kb <= targetKB) {
+                    best = size;
+                } else {
+                    break;
+                }
+            }
+            return best;
         }
     }
 

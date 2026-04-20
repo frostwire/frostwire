@@ -76,6 +76,7 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
  * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
  * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
+ * New: Torrent Creation Dialog now supports piece sizes up to 128 MB with auto-recommendation based on content size — reduces RAM usage when seeding large files like 4K Linux ISOs (#1287)
 
  -- FrostWire Team <contact@frostwire.com> Thu, 16 Apr 2026 20:45:00 -0600
 
