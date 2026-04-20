@@ -161,6 +161,8 @@ public class CreateTorrentDialog extends JDialog {
         initTorrentContents();
         initTorrentTracking();
         buildListeners();
+        pack();
+        setMinimumSize(getSize());
     }
 
     private void initDialogSettings() {
