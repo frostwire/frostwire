@@ -1,5 +1,13 @@
 FrostWire 3.1.1 build 772 UNRELEASED
 
+ - fix:Torrent JNI/libtorrent startup failures no longer crash transfer notification updates or bandwidth polling - the app now records torrent native init failure once, falls back to HTTP download bandwidth when needed, and keeps notification workers alive instead of dying on NoClassDefFoundError
+ - fix:About screen no longer crashes when jlibtorrent is unavailable - it now shows fallback version text instead of crashing on native library initialization failure
+ - fix:Add to Playlist menus no longer crash if the host activity is already closing - delayed menu dialogs now validate the activity before showing
+ - fix:Queue Save Queue no longer crashes after leaving the player screen - the playlist dialog is only shown while the fragment is still attached and its state is not already saved
+ - fix:Tracker edit/remove actions no longer crash on stale tracker positions - tracker rows now re-resolve the selected tracker against the latest list before mutating it
+ - fix:Malformed Apollo profile launches no longer crash - ProfileActivity now validates extras and MIME type before opening and fails closed on unsupported launches
+ - fix:Artist/profile navigation no longer crashes from detached Apollo fragments - artist lookups now use stable app context and only navigate if the host activity is still alive
+ - fix:Apollo context menus no longer depend on MusicPlaybackService startup for non-playback actions - song list prefetching, playlist mutations, and More by Artist now run on the MISC handler with detached-host guards
  - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
  - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
  - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
