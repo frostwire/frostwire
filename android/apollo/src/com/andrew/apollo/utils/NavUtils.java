@@ -21,10 +21,12 @@ package com.andrew.apollo.utils;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
@@ -50,31 +52,33 @@ public final class NavUtils {
      * @param artistName The name of the artist
      */
     public static void openArtistProfile(final Activity context, final String artistName, final long[] songs) {
-        if (artistName == null || artistName.isEmpty()) {
+        if (!isActivityAlive(context) || TextUtils.isEmpty(artistName)) {
             return;
         }
+        final Context appContext = context.getApplicationContext() != null
+                ? context.getApplicationContext()
+                : context;
+        com.frostwire.android.util.SystemUtils.postToHandler(
+                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                    final Bundle bundle = new Bundle();
+                    bundle.putLong(Config.ID, MusicUtils.getIdForArtist(appContext, artistName));
+                    bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Artists.CONTENT_TYPE);
+                    bundle.putString(Config.ARTIST_NAME, artistName);
 
-        if (com.frostwire.android.util.SystemUtils.isUIThread()) {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                    () -> openArtistProfile(context, artistName, songs));
-            return;
-        }
+                    if (songs != null && songs.length > 0) {
+                        bundle.putLongArray(Config.TRACKS, songs);
+                    }
 
-        // Create a new bundle to transfer the artist info
-        final Bundle bundle = new Bundle();
-        bundle.putLong(Config.ID, MusicUtils.getIdForArtist(context, artistName));
-        bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Artists.CONTENT_TYPE);
-        bundle.putString(Config.ARTIST_NAME, artistName);
-
-        if (songs != null && songs.length > 0) {
-            bundle.putLongArray(Config.TRACKS, songs);
-        }
-
-        // Create the intent to launch the profile activity
-        final Intent intent = new Intent(context, ProfileActivity.class);
-        intent.putExtras(bundle);
-        context.startActivity(intent);
+                    com.frostwire.android.util.SystemUtils.postToUIThread(() -> {
+                        if (!isActivityAlive(context)) {
+                            return;
+                        }
+                        final Intent intent = new Intent(context, ProfileActivity.class);
+                        intent.putExtras(bundle);
+                        context.startActivity(intent);
+                    });
+                });
     }
 
     /**
@@ -87,30 +91,35 @@ public final class NavUtils {
      */
     public static void openAlbumProfile(final Activity context,
             final String albumName, final String artistName, final long albumId, final long[] songs) {
-
-        if (com.frostwire.android.util.SystemUtils.isUIThread()) {
-            com.frostwire.android.util.SystemUtils.postToHandler(
-                    com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                    () -> openAlbumProfile(context, albumName, artistName, albumId, songs));
+        if (!isActivityAlive(context)) {
             return;
         }
+        final Context appContext = context.getApplicationContext() != null
+                ? context.getApplicationContext()
+                : context;
+        com.frostwire.android.util.SystemUtils.postToHandler(
+                com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                    final Bundle bundle = new Bundle();
+                    bundle.putString(Config.ALBUM_YEAR, MusicUtils.getReleaseDateForAlbum(appContext, albumId));
+                    bundle.putString(Config.ARTIST_NAME, artistName);
+                    bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Albums.CONTENT_TYPE);
+                    bundle.putLong(Config.ID, albumId);
+                    bundle.putString(Config.NAME, albumName);
 
-        // Create a new bundle to transfer the album info
-        final Bundle bundle = new Bundle();
-        bundle.putString(Config.ALBUM_YEAR, MusicUtils.getReleaseDateForAlbum(context, albumId));
-        bundle.putString(Config.ARTIST_NAME, artistName);
-        bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Albums.CONTENT_TYPE);
-        bundle.putLong(Config.ID, albumId);
-        bundle.putString(Config.NAME, albumName);
+                    if (songs != null && songs.length > 0) {
+                        bundle.putLongArray(Config.TRACKS, songs);
+                    }
 
-        if (songs != null && songs.length > 0) {
-            bundle.putLongArray(Config.TRACKS, songs);
-        }
-
-        // Create the intent to launch the profile activity
-        final Intent intent = new Intent(context, ProfileActivity.class);
-        intent.putExtras(bundle);
-        context.startActivity(intent);
+                    com.frostwire.android.util.SystemUtils.postToUIThread(() -> {
+                        if (!isActivityAlive(context)) {
+                            return;
+                        }
+                        final Intent intent = new Intent(context, ProfileActivity.class);
+                        intent.putExtras(bundle);
+                        context.startActivity(intent);
+                    });
+                });
     }
 
     /**
@@ -167,5 +176,9 @@ public final class NavUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
         activity.finish();
+    }
+
+    private static boolean isActivityAlive(Activity activity) {
+        return activity != null && !activity.isFinishing() && !activity.isDestroyed();
     }
 }

@@ -869,6 +869,9 @@ public final class MusicUtils {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForArtist(context, id));
             return sEmptyList;
         }
+        if (context == null) {
+            return sEmptyList;
+        }
         try {
             final String[] projection = new String[]{BaseColumns._ID};
             final String selection = AudioColumns.ARTIST_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
@@ -1021,13 +1024,20 @@ public final class MusicUtils {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForAlbum(context, id));
             return sEmptyList;
         }
-        final String[] projection = new String[]{BaseColumns._ID};
-        final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, AudioColumns.TRACK + ", " + MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        if (cursor != null) {
-            final long[] mList = getSongListForCursor(cursor);
-            cursor.close();
-            return mList;
+        if (context == null) {
+            return sEmptyList;
+        }
+        try {
+            final String[] projection = new String[]{BaseColumns._ID};
+            final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
+            Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, AudioColumns.TRACK + ", " + MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+            if (cursor != null) {
+                final long[] mList = getSongListForCursor(cursor);
+                cursor.close();
+                return mList;
+            }
+        } catch (Throwable t) {
+            return sEmptyList;
         }
         return sEmptyList;
     }
@@ -1057,14 +1067,21 @@ public final class MusicUtils {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getSongListForGenre(context, id));
             return sEmptyList;
         }
-        final String[] projection = new String[]{BaseColumns._ID};
-        final Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
-        String selection = AudioColumns.IS_MUSIC + "=1" + " AND " + MediaColumns.TITLE + "!=''";
-        Cursor cursor = context.getContentResolver().query(uri, projection, selection, null, null);
-        if (cursor != null) {
-            final long[] mList = getSongListForCursor(cursor);
-            cursor.close();
-            return mList;
+        if (context == null) {
+            return sEmptyList;
+        }
+        try {
+            final String[] projection = new String[]{BaseColumns._ID};
+            final Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
+            String selection = AudioColumns.IS_MUSIC + "=1" + " AND " + MediaColumns.TITLE + "!=''";
+            Cursor cursor = context.getContentResolver().query(uri, projection, selection, null, null);
+            if (cursor != null) {
+                final long[] mList = getSongListForCursor(cursor);
+                cursor.close();
+                return mList;
+            }
+        } catch (Throwable t) {
+            return sEmptyList;
         }
         return sEmptyList;
     }
@@ -1332,8 +1349,15 @@ public final class MusicUtils {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getIdForArtist(context, name));
             return -1;
         }
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, new String[]{BaseColumns._ID}, ArtistColumns.ARTIST + "=?", new String[]{name}, ArtistColumns.ARTIST);
-        return getFirstId(cursor, -1);
+        if (context == null || name == null) {
+            return -1;
+        }
+        try {
+            Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, new String[]{BaseColumns._ID}, ArtistColumns.ARTIST + "=?", new String[]{name}, ArtistColumns.ARTIST);
+            return getFirstId(cursor, -1);
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 
     /**
@@ -1899,6 +1923,9 @@ public final class MusicUtils {
      * @return The song list from our favorites database
      */
     public static long[] getSongListForFavorites(final Context context) {
+        if (context == null) {
+            return sEmptyList;
+        }
         Cursor cursor = FavoritesLoader.makeFavoritesCursor(context);
         if (cursor != null) {
             final long[] list = getSongListForFavoritesCursor(cursor);
@@ -1922,6 +1949,9 @@ public final class MusicUtils {
      * @return The song list for the last added playlist
      */
     public static long[] getSongListForLastAdded(final Context context) {
+        if (context == null) {
+            return sEmptyList;
+        }
         final Cursor cursor = LastAddedLoader.makeLastAddedCursor(context);
         if (cursor != null) {
             final int count = cursor.getCount();

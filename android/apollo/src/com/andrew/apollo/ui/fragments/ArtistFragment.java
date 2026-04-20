@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.ui.fragments;
 
+import android.app.Activity;
 import androidx.fragment.app.Fragment;
 import androidx.loader.content.Loader;
 import android.os.Bundle;
@@ -74,12 +75,25 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
-        mItem = mAdapter.getItem(position);
+        final Artist artist = mAdapter.getItem(position);
+        final Activity activity = getActivity();
+        if (artist == null || activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        final android.content.Context appContext = activity.getApplicationContext() != null
+                ? activity.getApplicationContext()
+                : activity;
         com.frostwire.android.util.SystemUtils.postToHandler(
             com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
             () -> {
-                long[] tracks = MusicUtils.getSongListForArtist(getActivity(), mItem.mArtistId);
-                NavUtils.openArtistProfile(getActivity(), mItem.mArtistName, tracks);
+                long[] tracks = MusicUtils.getSongListForArtist(appContext, artist.mArtistId);
+                com.frostwire.android.util.SystemUtils.postToUIThread(() -> {
+                    Activity uiActivity = getActivity();
+                    if (!isAdded() || uiActivity == null || uiActivity.isFinishing() || uiActivity.isDestroyed()) {
+                        return;
+                    }
+                    NavUtils.openArtistProfile(uiActivity, artist.mArtistName, tracks);
+                });
             });
     }
 
