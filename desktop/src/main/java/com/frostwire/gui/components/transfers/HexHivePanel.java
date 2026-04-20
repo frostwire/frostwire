@@ -736,10 +736,10 @@ public class HexHivePanel extends JPanel {
             end.y = bottom;
             wrapRight = right;
             wrapBottom = bottom;
-            width = right - left;
-            height = bottom - top;
+            int availableWidth = right - left;
+            int availableHeight = bottom - top;
             if (hexSideLength == -1) {
-                hexSideLength = getHexagonSideLength(width, height, numHexs);
+                hexSideLength = getHexagonSideLength(availableWidth, availableHeight, numHexs);
             }
             hexHeight = getHexHeight(hexSideLength);
             hexWidth = getHexWidth(hexSideLength);
@@ -768,8 +768,11 @@ public class HexHivePanel extends JPanel {
                         : Math.round(oddRowOrigin.x + Math.max(0, oddRowHexCount - 1) * hexWidth);
                 end.x = Math.round(Math.max(widestRowCenterX, lastCenterX) + halfHexWidth);
                 end.y = Math.round(lastCenterY + halfHexHeight);
-                width = Math.max(1, end.x - left);
-                height = Math.max(1, end.y - top);
+                width = Math.max(1, end.x);
+                height = Math.max(1, end.y);
+            } else {
+                width = Math.max(1, end.x);
+                height = Math.max(1, end.y);
             }
         }
 
