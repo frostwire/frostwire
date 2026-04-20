@@ -66,6 +66,7 @@ public class MainApplication extends Application implements Configuration.Provid
     private static final Object appContextLock = new Object();
 
     private static Context appContext;
+    private static volatile Throwable btEngineInitializationFailure;
 
     @Override
     public void onCreate() {
@@ -182,6 +183,18 @@ public class MainApplication extends Application implements Configuration.Provid
         return appContext;
     }
 
+    public static boolean hasBTEngineInitializationFailure() {
+        return btEngineInitializationFailure != null;
+    }
+
+    public static void recordBTEngineInitializationFailure(Throwable failure) {
+        if (failure == null || btEngineInitializationFailure != null) {
+            return;
+        }
+        btEngineInitializationFailure = failure;
+        LOG.error("BitTorrent engine initialization failed", failure);
+    }
+
     @Override
     public void onLowMemory() {
         ImageCache.getInstance(this).evictAll();
@@ -213,62 +226,66 @@ public class MainApplication extends Application implements Configuration.Provid
         }
 
         public void run() {
-            SystemPaths paths = Platforms.get().systemPaths();
+            try {
+                SystemPaths paths = Platforms.get().systemPaths();
 
-            BTContext ctx = new BTContext();
-            ctx.homeDir = paths.libtorrent();
-            ctx.torrentsDir = paths.torrents();
-            ctx.dataDir = paths.data();
-            ctx.optimizeMemory = true;
+                BTContext ctx = new BTContext();
+                ctx.homeDir = paths.libtorrent();
+                ctx.torrentsDir = paths.torrents();
+                ctx.dataDir = paths.data();
+                ctx.optimizeMemory = true;
 
-            // Get configured port range or use default range [1024, 57000]
-            ConfigurationManager cm = ConfigurationManager.instance();
-            int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
-            int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
+                // Get configured port range or use default range [1024, 57000]
+                ConfigurationManager cm = ConfigurationManager.instance();
+                int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
+                int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
 
-            int port0, port1;
-            if (configuredStartPort == 1024 && configuredEndPort == 57000) {
-                // Use default port range [37000, 57000] when user hasn't configured specific ports
-                port0 = 37000 + new Random().nextInt(20000);
-                port1 = port0 + 10; // 10 retries
-            } else {
-                // Use user-configured port range
-                if (configuredStartPort == configuredEndPort) {
-                    // Single port specified
-                    port0 = configuredStartPort;
-                    port1 = port0 + 1; // Just try the single port
+                int port0, port1;
+                if (configuredStartPort == 1024 && configuredEndPort == 57000) {
+                    // Use default port range [37000, 57000] when user hasn't configured specific ports
+                    port0 = 37000 + new Random().nextInt(20000);
+                    port1 = port0 + 10; // 10 retries
                 } else {
-                    // Port range specified
-                    port0 = configuredStartPort;
-                    port1 = configuredEndPort;
+                    // Use user-configured port range
+                    if (configuredStartPort == configuredEndPort) {
+                        // Single port specified
+                        port0 = configuredStartPort;
+                        port1 = port0 + 1; // Just try the single port
+                    } else {
+                        // Port range specified
+                        port0 = configuredStartPort;
+                        port1 = configuredEndPort;
+                    }
                 }
+
+                String iface = "0.0.0.0:%1$d,[::]:%1$d";
+                ctx.interfaces = String.format(Locale.US, iface, port0);
+                ctx.retries = port1 - port0;
+
+                ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+                // I2P Configuration.
+                // Port and tunnel params are stored as Strings (EditTextPreference requires this).
+                // Parse them back to int with safe fallbacks.
+                ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
+                ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
+                ctx.i2pPort = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_PORT), 7656);
+                ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
+                ctx.i2pInboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY), 3);
+                ctx.i2pOutboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY), 3);
+                ctx.i2pInboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
+                ctx.i2pOutboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
+                String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
+                ctx.version[0] = Integer.parseInt(vStrArray[0]);
+                ctx.version[1] = Integer.parseInt(vStrArray[1]);
+                ctx.version[2] = Integer.parseInt(vStrArray[2]);
+                ctx.version[3] = BuildConfig.VERSION_CODE;
+
+                BTEngine.ctx = ctx;
+                BTEngine.onCtxSetupComplete();
+                BTEngine.getInstance().start();
+            } catch (Throwable t) {
+                MainApplication.recordBTEngineInitializationFailure(t);
             }
-
-            String iface = "0.0.0.0:%1$d,[::]:%1$d";
-            ctx.interfaces = String.format(Locale.US, iface, port0);
-            ctx.retries = port1 - port0;
-
-            ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-            // I2P Configuration.
-            // Port and tunnel params are stored as Strings (EditTextPreference requires this).
-            // Parse them back to int with safe fallbacks.
-            ctx.i2pEnabled = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ENABLED);
-            ctx.i2pHostname = cm.getString(Constants.PREF_KEY_NETWORK_I2P_HOSTNAME);
-            ctx.i2pPort = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_PORT), 7656);
-            ctx.i2pAllowMixed = cm.getBoolean(Constants.PREF_KEY_NETWORK_I2P_ALLOW_MIXED);
-            ctx.i2pInboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY), 3);
-            ctx.i2pOutboundQuantity = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY), 3);
-            ctx.i2pInboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
-            ctx.i2pOutboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
-            String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
-            ctx.version[0] = Integer.parseInt(vStrArray[0]);
-            ctx.version[1] = Integer.parseInt(vStrArray[1]);
-            ctx.version[2] = Integer.parseInt(vStrArray[2]);
-            ctx.version[3] = BuildConfig.VERSION_CODE;
-
-            BTEngine.ctx = ctx;
-            BTEngine.onCtxSetupComplete();
-            BTEngine.getInstance().start();
         }
     }
 

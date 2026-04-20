@@ -249,7 +249,7 @@ public final class NotificationUpdateDaemon {
             long delay = IDLE_UPDATE_INTERVAL_MS;
             try {
                 delay = updateNotification();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOG.error("Failed to update notification", e);
             }
 

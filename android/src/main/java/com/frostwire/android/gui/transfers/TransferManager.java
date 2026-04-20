@@ -27,6 +27,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.ConfigurationRepository;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
@@ -274,24 +275,38 @@ public final class TransferManager {
     }
 
     public long getDownloadsBandwidth() {
-        if (BTEngine.ctx == null) {
-            // too early
-            return 0;
-        }
-        long torrentDownloadsBandwidth = BTEngine.getInstance().downloadRate();
         long peerDownloadsBandwidth = 0;
         for (Transfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
         }
-        return torrentDownloadsBandwidth + peerDownloadsBandwidth;
+        if (MainApplication.hasBTEngineInitializationFailure()) {
+            return peerDownloadsBandwidth;
+        }
+        try {
+            if (BTEngine.ctx == null) {
+                return peerDownloadsBandwidth;
+            }
+            long torrentDownloadsBandwidth = BTEngine.getInstance().downloadRate();
+            return torrentDownloadsBandwidth + peerDownloadsBandwidth;
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            return peerDownloadsBandwidth;
+        }
     }
 
     public double getUploadsBandwidth() {
-        if (BTEngine.ctx == null) {
-            // too early
+        if (MainApplication.hasBTEngineInitializationFailure()) {
             return 0;
         }
-        return BTEngine.getInstance().uploadRate();
+        try {
+            if (BTEngine.ctx == null) {
+                return 0;
+            }
+            return BTEngine.getInstance().uploadRate();
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            return 0;
+        }
     }
 
     public int getDownloadsToReview() {

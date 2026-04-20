@@ -87,7 +87,7 @@ public class NotificationWorker extends Worker {
             }
             
             return Result.success();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("NotificationWorker:doWork() failed", e);
             return Result.failure();
         }
