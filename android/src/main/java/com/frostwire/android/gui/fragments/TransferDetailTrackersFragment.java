@@ -177,6 +177,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         private final ImageView removeButton;
         private final TorrentHandle torrentHandle;
         private int trackerOffset;
+        private String trackerUrl;
 
         public TrackerItemViewHolder(final View itemView,
                                      final TrackerListAdapter adapter,
@@ -194,6 +195,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         public void updateData(AnnounceEntry entry, int trackerOffset) {
             trackerTextView.setText(entry.url());
             this.trackerOffset = trackerOffset;
+            this.trackerUrl = entry.url();
         }
 
         public FragmentManager getFragmentManager() {
@@ -247,7 +249,11 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         AnnounceEntry newTracker = new AnnounceEntry(value);
                         TorrentHandle th = trackerViewHolder.torrentHandle;
                         List<AnnounceEntry> originalTrackers = th.trackers();
-                        originalTrackers.set(trackerViewHolder.trackerOffset, newTracker);
+                        int trackerIndex = trackerViewHolder.findCurrentTrackerIndex();
+                        if (trackerIndex < 0 || trackerIndex >= originalTrackers.size()) {
+                            return;
+                        }
+                        originalTrackers.set(trackerIndex, newTracker);
                         th.replaceTrackers(originalTrackers);
                         th.saveResumeData();
                         th.forceReannounce();
@@ -265,9 +271,10 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                     return null;
                 }
                 TrackerItemViewHolder viewHolder = vhRef.get();
-                int trackerOffset = viewHolder.trackerOffset;
-                List<AnnounceEntry> trackers = viewHolder.torrentHandle.trackers();
-                AnnounceEntry selectedTracker = trackers.get(trackerOffset);
+                AnnounceEntry selectedTracker = viewHolder.getSelectedTracker();
+                if (selectedTracker == null) {
+                    return null;
+                }
                 return selectedTracker.url();
             }
         }
@@ -285,28 +292,59 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 if (!Ref.alive(vhRef) || (fm = vhRef.get().getFragmentManager()) == null) {
                     return;
                 }
-                int trackerOffset = vhRef.get().trackerOffset;
-                List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
-                if (!trackers.isEmpty()) {
-                    AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
+                TrackerItemViewHolder viewHolder = vhRef.get();
+                AnnounceEntry trackerToRemove = viewHolder.getSelectedTracker();
+                if (trackerToRemove != null) {
                     UIUtils.showYesNoDialog(fm,
                             trackerToRemove.url(),
                             R.string.remove_tracker,
                             (dialog, which) -> {
                                 if (Ref.alive(vhRef)) {
-                                    TrackerItemViewHolder viewHolder = vhRef.get();
-                                    List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
-                                    trackers1.remove(viewHolder.trackerOffset);
-                                    viewHolder.torrentHandle.replaceTrackers(trackers1);
-                                    viewHolder.torrentHandle.saveResumeData();
-                                    viewHolder.torrentHandle.forceReannounce();
-                                    if (Ref.alive(viewHolder.adapterRef)) {
-                                        viewHolder.adapterRef.get().refreshFromTorrentHandle();
+                                    TrackerItemViewHolder latestViewHolder = vhRef.get();
+                                    List<AnnounceEntry> trackers1 = latestViewHolder.torrentHandle.trackers();
+                                    int trackerIndex = latestViewHolder.findCurrentTrackerIndex();
+                                    if (trackerIndex < 0 || trackerIndex >= trackers1.size()) {
+                                        return;
+                                    }
+                                    trackers1.remove(trackerIndex);
+                                    latestViewHolder.torrentHandle.replaceTrackers(trackers1);
+                                    latestViewHolder.torrentHandle.saveResumeData();
+                                    latestViewHolder.torrentHandle.forceReannounce();
+                                    if (Ref.alive(latestViewHolder.adapterRef)) {
+                                        latestViewHolder.adapterRef.get().refreshFromTorrentHandle();
                                     }
                                 }
                             });
                 }
             }
+        }
+
+        private AnnounceEntry getSelectedTracker() {
+            List<AnnounceEntry> trackers = torrentHandle.trackers();
+            int trackerIndex = findCurrentTrackerIndex(trackers);
+            if (trackerIndex < 0 || trackerIndex >= trackers.size()) {
+                return null;
+            }
+            return trackers.get(trackerIndex);
+        }
+
+        private int findCurrentTrackerIndex() {
+            return findCurrentTrackerIndex(torrentHandle.trackers());
+        }
+
+        private int findCurrentTrackerIndex(List<AnnounceEntry> trackers) {
+            if (trackers == null || trackers.isEmpty()) {
+                return -1;
+            }
+            if (trackerUrl != null) {
+                for (int i = 0; i < trackers.size(); i++) {
+                    AnnounceEntry entry = trackers.get(i);
+                    if (trackerUrl.equals(entry.url())) {
+                        return i;
+                    }
+                }
+            }
+            return trackerOffset >= 0 && trackerOffset < trackers.size() ? trackerOffset : -1;
         }
     }
 
