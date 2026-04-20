@@ -18,9 +18,14 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Context;
+import android.content.ContextWrapper;
+
+import com.frostwire.util.Logger;
 
 /**
  * @author gubatron
@@ -28,6 +33,7 @@ import android.content.DialogInterface;
  */
 @SuppressWarnings("deprecation")
 public class MenuBuilder implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+    private static final Logger LOG = Logger.getLogger(MenuBuilder.class);
 
     private final MenuAdapter adapter;
 
@@ -38,7 +44,12 @@ public class MenuBuilder implements DialogInterface.OnClickListener, DialogInter
     }
 
     public AlertDialog show() {
-        createDialog().show();
+        createDialog();
+        if (!canShowDialog(adapter.getContext())) {
+            LOG.warn("Skipping menu dialog show because the host activity is no longer valid");
+            return dialog;
+        }
+        dialog.show();
         return dialog;
     }
 
@@ -65,6 +76,21 @@ public class MenuBuilder implements DialogInterface.OnClickListener, DialogInter
         dialog.setCanceledOnTouchOutside(true);
 
         return dialog;
+    }
+
+    private static boolean canShowDialog(Context context) {
+        Activity activity = findActivity(context);
+        return activity != null && !activity.isFinishing() && !activity.isDestroyed();
+    }
+
+    private static Activity findActivity(Context context) {
+        Context current = context;
+        int depth = 0;
+        while (current instanceof ContextWrapper && !(current instanceof Activity) && depth < 10) {
+            current = ((ContextWrapper) current).getBaseContext();
+            depth++;
+        }
+        return current instanceof Activity ? (Activity) current : null;
     }
 
     private void cleanup() {

@@ -60,10 +60,11 @@ public final class AddToPlaylistMenuAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
+        final Context actionContext = context;
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            List<MenuAction> actions = getMenuActions();
+            List<MenuAction> actions = getMenuActions(actionContext);
             SystemUtils.postToUIThread(() -> {
-                MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(getContext(),
+                MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(actionContext,
                         R.string.add_to_playlist,
                         actions));
                 menuBuilder.show();
@@ -78,17 +79,17 @@ public final class AddToPlaylistMenuAction extends MenuAction {
         }
     }
 
-    private List<MenuAction> getMenuActions() {
+    private List<MenuAction> getMenuActions(Context context) {
         List<MenuAction> actions = new ArrayList<>();
 
         // Create new Playlist
-        actions.add(new CreateNewPlaylistMenuAction(getContext(), fds));
+        actions.add(new CreateNewPlaylistMenuAction(context, fds));
 
         // Add to Playlist[s] available
-        List<Playlist> playlists = MusicUtils.getPlaylists(getContext());
+        List<Playlist> playlists = MusicUtils.getPlaylists(context);
         for (int i = 0; i < playlists.size(); i++) {
             final Playlist playlist = playlists.get(i);
-            actions.add(new AddToThisPlaylistMenuAction(getContext(), playlist.mPlaylistId, playlist.mPlaylistName, fds));
+            actions.add(new AddToThisPlaylistMenuAction(context, playlist.mPlaylistId, playlist.mPlaylistName, fds));
         }
 
         return actions;
