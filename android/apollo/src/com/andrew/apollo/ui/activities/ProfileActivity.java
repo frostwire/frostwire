@@ -58,6 +58,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -71,6 +72,7 @@ import java.util.concurrent.TimeUnit;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class ProfileActivity extends BaseActivity implements OnPageChangeListener, Listener {
+    private static final Logger LOG = Logger.getLogger(ProfileActivity.class);
 
     /**
      * The Bundle to pass into the Fragments
@@ -128,17 +130,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // Initialize the image fetcher
         mImageFetcher = ApolloUtils.getImageFetcher(this);
 
-        // Initialize the Bundle
-        mArguments = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
-        // Get the MIME type
-        mType = mArguments.getString(Config.MIME_TYPE);
-
-        // Get the profile title
-        mProfileName = mArguments.getString(Config.NAME);
-        // Get the artist name
-        if (isArtist() || isAlbum()) {
-            mArtistName = mArguments.getString(Config.ARTIST_NAME);
+        if (!initializeArguments(savedInstanceState)) {
+            finishInvalidLaunch("Missing or invalid profile arguments");
+            return;
         }
+
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
         // Initialize the carousel
@@ -151,7 +147,9 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         }
 
         /* Set up the artist profile */
+        boolean profileHandled = false;
         if (isArtist()) {
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setArtistProfileHeader(this, mArtistName);
             // Artist profile fragments
@@ -161,6 +159,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             setTitle(mArtistName);
 
         } else if (isAlbum()) { // Set up the album profile
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setAlbumProfileHeader(this, mProfileName, mArtistName);
             // Album profile fragments
@@ -170,6 +169,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Action bar subtitle = year released
             setSubtitle(mArguments.getString(Config.ALBUM_YEAR));
         } else if (isFavorites()) { // Set up the favorites profile
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
             // Favorite fragment
@@ -177,6 +177,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Action bar title = Favorites
             setTitle(mProfileName);
         } else if (isLastAdded()) { // Set up the last added profile
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
             // Last added fragment
@@ -184,6 +185,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Action bar title = Last added
             setTitle(mProfileName);
         } else if (isPlaylist()) { // Set up the user playlist profile
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
             // Playlist profile fragments
@@ -191,12 +193,18 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Action bar title = playlist name
             setTitle(mProfileName);
         } else if (isGenre()) { // Set up the genre profile
+            profileHandled = true;
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
             // Genre profile fragments
             mPagerAdapter.add(GenreSongFragment.class, mArguments);
             // Action bar title = playlist name
             setTitle(mProfileName);
+        }
+
+        if (!profileHandled) {
+            finishInvalidLaunch("Unsupported profile MIME type: " + mType);
+            return;
         }
 
         // Initialize the ViewPager
@@ -407,7 +415,9 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     protected void onSaveInstanceState(@NonNull  final Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putAll(mArguments);
+        if (mArguments != null) {
+            outState.putAll(mArguments);
+        }
     }
 
     @Override
@@ -511,7 +521,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      * otherwise.
      */
     private boolean isArtist() {
-        return mType.equals(MediaStore.Audio.Artists.CONTENT_TYPE);
+        return TextUtils.equals(mType, MediaStore.Audio.Artists.CONTENT_TYPE);
     }
 
     /**
@@ -519,7 +529,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      * otherwise.
      */
     private boolean isAlbum() {
-        return mType.equals(MediaStore.Audio.Albums.CONTENT_TYPE);
+        return TextUtils.equals(mType, MediaStore.Audio.Albums.CONTENT_TYPE);
     }
 
     /**
@@ -527,7 +537,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      * otherwise.
      */
     private boolean isGenre() {
-        return mType.equals(MediaStore.Audio.Genres.CONTENT_TYPE);
+        return TextUtils.equals(mType, MediaStore.Audio.Genres.CONTENT_TYPE);
     }
 
     /**
@@ -536,7 +546,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      */
     private boolean isPlaylist() {
         // MediaStore.Audio.Playlists deprecated API 29; use the literal MIME type string directly
-        return mType.equals("vnd.android.cursor.dir/playlist");
+        return TextUtils.equals(mType, "vnd.android.cursor.dir/playlist");
     }
 
     /**
@@ -560,14 +570,39 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
      * @return True if the MIME type is "Favorites", false otherwise.
      */
     private boolean isFavorites() {
-        return mType.equals(getString(R.string.playlist_favorites));
+        return TextUtils.equals(mType, getString(R.string.playlist_favorites));
     }
 
     /**
      * @return True if the MIME type is "LastAdded", false otherwise.
      */
     private boolean isLastAdded() {
-        return mType.equals(getString(R.string.playlist_last_added));
+        return TextUtils.equals(mType, getString(R.string.playlist_last_added));
+    }
+
+    private boolean initializeArguments(Bundle savedInstanceState) {
+        Bundle launchArguments = savedInstanceState;
+        if (launchArguments == null && getIntent() != null) {
+            launchArguments = getIntent().getExtras();
+        }
+        if (launchArguments == null) {
+            return false;
+        }
+        mArguments = new Bundle(launchArguments);
+        mType = mArguments.getString(Config.MIME_TYPE);
+        if (TextUtils.isEmpty(mType)) {
+            return false;
+        }
+        mProfileName = mArguments.getString(Config.NAME);
+        if (isArtist() || isAlbum()) {
+            mArtistName = mArguments.getString(Config.ARTIST_NAME);
+        }
+        return true;
+    }
+
+    private void finishInvalidLaunch(String reason) {
+        LOG.warn("ProfileActivity finishing invalid launch: " + reason);
+        finish();
     }
 
     private boolean isArtistSongPage() {
