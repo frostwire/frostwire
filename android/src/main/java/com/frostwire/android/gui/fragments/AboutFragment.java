@@ -33,6 +33,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.util.SystemUtils;
@@ -129,13 +130,18 @@ public final class AboutFragment extends AbstractFragment {
     }
 
     private static String jlibtorrentVersion() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("jlibtorrent v").append(LibTorrent.jlibtorrentVersion());
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("jlibtorrent v").append(LibTorrent.jlibtorrentVersion());
 
-        if (LibTorrent.hasArmNeonSupport()) {
-            sb.append("(arm neon)");
+            if (LibTorrent.hasArmNeonSupport()) {
+                sb.append("(arm neon)");
+            }
+
+            return sb.toString();
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            return "jlibtorrent unavailable";
         }
-
-        return sb.toString();
     }
 }
