@@ -700,6 +700,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             SwingUtilities.invokeLater(() -> {
                 try {
                     boolean[] filesSelection = null;
+                    File saveDirFromDialog = null;
                     if (partialDownload) {
                         PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
                         dlg.setVisible(true);
@@ -707,6 +708,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         if (filesSelection == null) {
                             return;
                         }
+                        saveDirFromDialog = dlg.getSaveFolder();
                     }
                     if (onOpenRunnableForUIThread != null) {
                         onOpenRunnableForUIThread.run();
@@ -747,7 +749,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     }
 
                     if (saveDir == null) {
-                        BTEngine.getInstance().download(torrentToUse, null, filesSelection);
+                        BTEngine.getInstance().download(torrentToUse, saveDirFromDialog, filesSelection);
                     } else {
                         GUIMediator.instance().openTorrentForSeed(torrentToUse, saveDir);
                     }

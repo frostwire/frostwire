@@ -24,6 +24,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
+import com.limegroup.gnutella.settings.SharingSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.StringUtils;
 
@@ -58,6 +59,11 @@ class PartialFilesDialog extends JDialog {
      * Index of the last clicked row for Shift+Click range selection
      */
     private int lastClickedRow = -1;
+    private File saveFolder;
+    private JLabel saveFolderLabel;
+    private JButton buttonChangeFolder;
+    private JButton buttonResetFolder;
+    private final File defaultSaveFolder = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
 
     PartialFilesDialog(JFrame frame, File torrentFile) {
         this(frame, new TorrentInfo(torrentFile), torrentFile.getName());
@@ -98,6 +104,8 @@ class PartialFilesDialog extends JDialog {
         setupToggleAllSelectionCheckbox();
         // table
         setupTable();
+        // save folder
+        setupSaveFolder();
         // ok button
         setupOkButton();
         // cancel button
@@ -119,7 +127,7 @@ class PartialFilesDialog extends JDialog {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.EAST;
         c.ipadx = 18;
-        c.gridy = 4;
+        c.gridy = 5;
         panel.add(_buttonCancel, c);
     }
 
@@ -134,8 +142,84 @@ class PartialFilesDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         c.ipadx = 20;
         c.weightx = 1.0;
-        c.gridy = 4;
+        c.gridy = 5;
         panel.add(buttonOK, c);
+    }
+
+    private void setupSaveFolder() {
+        GridBagConstraints c;
+        saveFolder = defaultSaveFolder;
+
+        JPanel saveFolderPanel = new JPanel(new GridBagLayout());
+
+        JLabel labelSaveTo = new JLabel(I18n.tr("Save to:"));
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(0, 0, 0, 5);
+        saveFolderPanel.add(labelSaveTo, c);
+
+        saveFolderLabel = new JLabel(defaultSaveFolder.getAbsolutePath());
+        saveFolderLabel.setToolTipText(defaultSaveFolder.getAbsolutePath());
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.insets = new Insets(0, 0, 0, 5);
+        saveFolderPanel.add(saveFolderLabel, c);
+
+        buttonChangeFolder = new JButton(I18n.tr("Change..."));
+        buttonChangeFolder.addActionListener(e -> onChangeFolder());
+        c = new GridBagConstraints();
+        c.gridx = 2;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 0, 0, 3);
+        saveFolderPanel.add(buttonChangeFolder, c);
+
+        buttonResetFolder = new JButton(I18n.tr("Reset to Default"));
+        buttonResetFolder.addActionListener(e -> onResetFolder());
+        buttonResetFolder.setVisible(false);
+        c = new GridBagConstraints();
+        c.gridx = 3;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.EAST;
+        saveFolderPanel.add(buttonResetFolder, c);
+
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 4;
+        c.gridwidth = 2;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.insets = new Insets(5, 5, 5, 5);
+        panel.add(saveFolderPanel, c);
+    }
+
+    private void onChangeFolder() {
+        JFileChooser chooser = new JFileChooser(saveFolder);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setDialogTitle(I18n.tr("Select Download Folder"));
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File selected = chooser.getSelectedFile();
+            saveFolder = selected;
+            saveFolderLabel.setText(selected.getAbsolutePath());
+            saveFolderLabel.setToolTipText(selected.getAbsolutePath());
+            buttonResetFolder.setVisible(!saveFolder.equals(defaultSaveFolder));
+        }
+    }
+
+    private void onResetFolder() {
+        saveFolder = defaultSaveFolder;
+        saveFolderLabel.setText(defaultSaveFolder.getAbsolutePath());
+        saveFolderLabel.setToolTipText(defaultSaveFolder.getAbsolutePath());
+        buttonResetFolder.setVisible(false);
+    }
+
+    File getSaveFolder() {
+        return saveFolder;
     }
 
     private void setupTable() {

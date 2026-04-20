@@ -77,6 +77,8 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
  * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
  * New: Torrent Creation Dialog now supports piece sizes up to 128 MB with auto-recommendation based on content size — reduces RAM usage when seeding large files like 4K Linux ISOs (#1287)
+ * New: Partial file selection dialog now shows current save folder with "Change..." and "Reset to Default" buttons, allowing per-torrent download location selection (#1256)
+ * Fix: CreateTorrentDialog bottom buttons now visible on first open without requiring manual resize
 
  -- FrostWire Team <contact@frostwire.com> Thu, 16 Apr 2026 20:45:00 -0600
 

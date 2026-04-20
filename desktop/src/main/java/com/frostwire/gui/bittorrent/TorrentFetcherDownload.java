@@ -274,6 +274,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 GUIMediator.safeInvokeLater(() -> {
                     try {
                         boolean[] selection = null;
+                        File saveFolder = null;
                         if (partial) {
                             PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), data, displayName);
                             dlg.setVisible(true);
@@ -281,13 +282,15 @@ public class TorrentFetcherDownload implements BTDownload {
                             if (selection == null) {
                                 return;
                             }
+                            saveFolder = dlg.getSaveFolder();
                         }
                         // Decode on EDT (fast), then offload expensive download() to background
                         TorrentInfo ti = TorrentInfo.bdecode(data);
                         boolean[] finalSelection = selection;
+                        File finalSaveFolder = saveFolder;
                         BackgroundQueuedExecutorService.schedule(() -> {
                             try {
-                                BTEngine.getInstance().download(ti, null, finalSelection, peers, true);
+                                BTEngine.getInstance().download(ti, finalSaveFolder, finalSelection, peers, true);
                             } catch (Throwable e) {
                                 LOG.error("Error downloading torrent", e);
                             }
