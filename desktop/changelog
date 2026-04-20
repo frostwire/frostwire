@@ -1,44 +1,76 @@
 frostwire (7.0.4) stable; urgency=high
- * Removed GloTorrents search engine (domain gtso.cc is parked and no longer functional)
  * New: Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
- * EDT freeze: Add pack() before setVisible(true) in SendFileProgressDialog to prevent macOS awtLock contention
- * EDT freeze: Add pack() before setVisible(true) in EditTrackerDialog to prevent macOS awtLock contention
- * EDT freeze: Add pack() before setVisible(true) in Options dialog to prevent macOS awtLock contention
- * EDT freeze: Add pack() before setVisible(true) in About dialog to prevent macOS awtLock contention
+ * EDT freeze: Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
+ * Fix: Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
+ * Fix: Add 30s timeout to LifecycleManager shutdown latch to prevent indefinite hang
+ * Fix: BTDownload getSize() return type double->long to prevent precision loss above 2GB
+ * Fix: Library files showing 0.0KB — file.length()/lastModified() wrapped in try-catch to prevent silent background task failure, and size/modtime cached cells invalidated after background load completes so UI repaints with correct values
+ * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
+ * Fix: TransferDetailGeneral now discards stale async metadata updates when switching transfers quickly, preventing mismatched or stuck detail fields
+ * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
+ * Fix: Wire IP Filter UI to BTEngine so clear/import actually updates libtorrent ip_filter
+ * Fix: Enable IP Filter options pane tab in settings (was commented out)
+ * Fix: SlideDownload.onComplete() now extracts .zip downloads with zip-slip protection
+ * Fix: YCCK JPEG color inversion using Adobe APP14 marker Transform field
+ * Fix: CreateTorrentDialog bottom buttons now visible on first open without requiring manual resize
+ * EDT freeze: Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
+ * EDT freeze: Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
+ * EDT freeze: Move BTDownload resume-data generation off EDT in pause()/resume() so libtorrent need_save_resume_data() no longer stalls transfer actions
+ * EDT freeze: Pre-compute TransferDetailFiles completion/progress on a background thread so table painting no longer calls libtorrent file_progress() JNI on the EDT
  * EDT freeze: Defer file I/O and torrent parsing off EDT in LibraryFilesTableDataLine.initialize()
  * EDT freeze: Run directory scanning off EDT in LibraryFilesTableMediator.updateTableFiles()
  * EDT freeze: Don't block EDT on Future.get() in LibraryFilesTableMediator.removeSelection()
  * EDT freeze: Add EDT guards to DirectoryHolder.getFiles() to prevent recursive I/O on EDT
  * EDT freeze: Fix DNDUtils.containsPlayableFile using extension-only check to avoid file.exists() syscall on EDT during drag-and-drop
- * EDT freeze: Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
+ * EDT freeze: Add pack() before setVisible(true) in SendFileProgressDialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in EditTrackerDialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in Options dialog to prevent macOS awtLock contention
+ * EDT freeze: Add pack() before setVisible(true) in About dialog to prevent macOS awtLock contention
+ * Fix: Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
+ * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
+ * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
+ * Fix: Implement UI notification in SettingsWarningManager for settings load/save failures
+ * Fix: PerformersHelper now filters hidden files alongside pad files in search results
+ * Fix: QuotedStringTokenizer now supports backslash quote escaping
+ * Fix: TorrentFileFilter i18nize 'Torrents' display string
+ * Fix: TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
+ * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
+ * Fix: Idope search integration now uses the new idope.pics domain and filters placeholder "No results returned" API responses when the backend is unavailable
+ * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
+ * Fix: TransferDetailPieces/HexHivePanel now use consistent hex tiling math and the fast flat-hex path for large swarms, eliminating overlapping piece cells and improving cached rendering speed
+ * Fix: Restore the 3D cube-shaded HexHive look in TransferDetailPieces while keeping the corrected tiling math and off-EDT cached rendering
+ * Fix: HexHivePanel now wraps rows against the full viewport width instead of the last occupied row width, and drops stale async bitmaps to prevent missing right-edge cubes and blinking
+ * Fix: HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
+ * Fix: HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
+ * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
+ * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+ * Performance: HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
+ * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
+ * Performance: HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
+ * Performance: HexHivePanel now prioritizes a smaller visible-band render with directional buffer and shorter row batches before backfilling wider lookahead, reducing transient blank patches while scrolling
  * Performance: Cache PlayableCell objects in LibraryFilesTableDataLine.getValueAt() to reduce GC pressure
  * Performance: Use BILINEAR instead of BICUBIC interpolation in LibraryCoverArtPanel for faster cover art scaling
  * Performance: Remove redundant updatePlayButton() from AbstractActionsRenderer.paintComponent()
  * Performance: Remove 3 redundant stat() syscalls per file in AbstractDirectoryHolder.isFileVisible()
+ * New: YouTube channel and playlist URLs now open Telluride playlist search mode, and playlist partial results now appear correctly in the Video tab
+ * New: Torrent Creation Dialog now supports piece sizes up to 128 MB with auto-recommendation based on content size — reduces RAM usage when seeding large files like 4K Linux ISOs (#1287)
+ * New: Partial file selection dialog now shows current save folder with "Change..." and "Reset to Default" buttons, allowing per-torrent download location selection (#1256)
+ * Removed GloTorrents search engine (domain gtso.cc is parked and no longer functional)
+ * Maintenance: Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
+ * Maintenance: Upgrade com.formdev:flatlaf 3.6 -> 3.7.1
+ * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
+ * Maintenance: Upgrade org.jetbrains:annotations 26.0.2 -> 26.1.0
+ * Maintenance: Upgrade JUnit 5.12.2 -> 5.13.4
  * Cleanup: Remove dead EDT-blocking code from BTDownloadMediator (selectionHasMP4s, selectionIsSingleFile, selectionHasMediaFiles)
  * Cleanup: Remove unused directoryContainsASinglePlayableFile from LibraryUtils
- * Update: JUnit 5.9.0 -> 5.12.2
- * Fix: Wire IP Filter UI to BTEngine so clear/import actually updates libtorrent ip_filter
- * Fix: Enable IP Filter options pane tab in settings (was commented out)
- * Fix: Implement UI notification in SettingsWarningManager for settings load/save failures
- * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
- * Fix: Add 30s timeout to LifecycleManager shutdown latch to prevent indefinite hang
- * Fix: YCCK JPEG color inversion using Adobe APP14 marker Transform field
- * Fix: BTDownload getSize() return type double->long to prevent precision loss above 2GB
- * Fix: PerformersHelper now filters hidden files alongside pad files in search results
- * Fix: SlideDownload.onComplete() now extracts .zip downloads with zip-slip protection
- * Fix: QuotedStringTokenizer now supports backslash quote escaping
- * Fix: TorrentFileFilter i18nize 'Torrents' display string
- * Cleanup: Remove stale TODO comments from LimeTransferHandler, BuddyTextFieldUI, NativeSearchFieldSupport, LibrarySearch
  * Cleanup: Remove ancient LWC-1214/1088 try/catch hacks from SearchResultDisplayer
- * Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
  * Cleanup: Remove Thread.sleep(50) hack in TransfersTab.ensureDownloadVisible scroll — use revalidate/repaint chain instead
- * Fix: Library files showing 0.0KB — file.length()/lastModified() wrapped in try-catch to prevent silent background task failure, and size/modtime cached cells invalidated after background load completes so UI repaints with correct values
- * Fix: TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
+ * Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
+ * Cleanup: Extract mostFrequent() helper in LibraryUtils.suggestPlaylistName — eliminates histogram access duplication
+ * Cleanup: Remove stale TODO comments from LimeTransferHandler, BuddyTextFieldUI, NativeSearchFieldSupport, LibrarySearch
  * Cleanup: Remove stale DHT announcement TODO in SoundcloudDownload — already implemented via makeTorrentAndDownload with dhtTrackedOnly
  * Cleanup: Remove 4 identical PatriciaTrie TODO comments — add/remove search pattern is intentional
- * Cleanup: Extract mostFrequent() helper in LibraryUtils.suggestPlaylistName — eliminates histogram access duplication
  * Cleanup: Remove stale singleton pattern TODO from GUIMediator.shutdown() — instance() call pattern is correct
  * Cleanup: Remove stale "Implement better" TODO comments from IconManager and NativeFileIconController — current temp-file approach is the standard Java cross-platform solution
  * Cleanup: Remove stale "Allow more than one" TODO from SearchResultDisplayer — single ChangeListener is sufficient
@@ -46,39 +78,6 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove stale LifecycleManager TODOs — current shutdown infrastructure works correctly
  * Cleanup: Remove stale StringSetSetting TODO — DRY refactoring not worth the risk for working settings code
  * Cleanup: Remove stale paintComponent TODO from DonationButtons — current KIFSS approach is sufficient
- * Maintenance: Upgrade org.jetbrains:annotations 26.0.2 -> 26.1.0
- * Maintenance: Upgrade com.formdev:flatlaf 3.6 -> 3.7.1
- * Maintenance: Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
- * Maintenance: Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
- * Maintenance: Upgrade JUnit 5.12.2 -> 5.13.4
- * Fix: Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
- * New: YouTube channel and playlist URLs now open Telluride playlist search mode, and playlist partial results now appear correctly in the Video tab
- * Fix: Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
- * Fix: Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
- * Fix: SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
- * Fix: Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
- * Fix: Idope search integration now uses the new idope.pics domain and filters placeholder “No results returned” API responses when the backend is unavailable
- * EDT freeze: Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
- * EDT freeze: Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
- * EDT freeze: Move BTDownload resume-data generation off EDT in pause()/resume() so libtorrent need_save_resume_data() no longer stalls transfer actions
- * EDT freeze: Pre-compute TransferDetailFiles completion/progress on a background thread so table painting no longer calls libtorrent file_progress() JNI on the EDT
- * Fix: TransferDetailGeneral now discards stale async metadata updates when switching transfers quickly, preventing mismatched or stuck detail fields
- * Fix: TransferDetailPieces/HexHivePanel now use consistent hex tiling math and the fast flat-hex path for large swarms, eliminating overlapping piece cells and improving cached rendering speed
- * Fix: Restore the 3D cube-shaded HexHive look in TransferDetailPieces while keeping the corrected tiling math and off-EDT cached rendering
- * Fix: HexHivePanel now wraps rows against the full viewport width instead of the last occupied row width, and drops stale async bitmaps to prevent missing right-edge cubes and blinking
- * Fix: HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
- * Fix: HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
- * Performance: HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
- * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
- * Performance: HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
- * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
- * Performance: HexHivePanel now prioritizes a smaller visible-band render with directional buffer and shorter row batches before backfilling wider lookahead, reducing transient blank patches while scrolling
- * Fix: TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
- * Fix: Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
- * Fix: MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
- * New: Torrent Creation Dialog now supports piece sizes up to 128 MB with auto-recommendation based on content size — reduces RAM usage when seeding large files like 4K Linux ISOs (#1287)
- * New: Partial file selection dialog now shows current save folder with "Change..." and "Reset to Default" buttons, allowing per-torrent download location selection (#1256)
- * Fix: CreateTorrentDialog bottom buttons now visible on first open without requiring manual resize
 
  -- FrostWire Team <contact@frostwire.com> Thu, 16 Apr 2026 20:45:00 -0600
 
