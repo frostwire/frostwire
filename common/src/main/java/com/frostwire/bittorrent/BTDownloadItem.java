@@ -112,4 +112,10 @@ public class BTDownloadItem implements TransferItem {
     public long getSequentialDownloaded() {
         return piecesTracker != null ? piecesTracker.getSequentialDownloadedBytes(index) : 0;
     }
+
+    public void setPriority(Priority priority) {
+        if (th != null && th.isValid()) {
+            th.filePriority(index, priority);
+        }
+    }
 }

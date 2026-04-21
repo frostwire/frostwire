@@ -27,6 +27,8 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,27 @@ public class TransferDetailFilesTableMediator extends
         TABLE = new LimeJTable(DATA_MODEL);
         TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         DATA_MODEL.sort(1); // by file #
+
+        // Dim skipped files in the Name column so they appear visually distinct
+        DefaultTableCellRenderer skippedRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected && row >= 0 && row < DATA_MODEL.getRowCount()) {
+                    TransferDetailFilesDataLine line = DATA_MODEL.get(row);
+                    if (line != null) {
+                        TransferDetailFiles.TransferItemHolder holder = line.getInitializeObject();
+                        if (holder != null && holder.skipped) {
+                            c.setForeground(Color.GRAY);
+                        } else {
+                            c.setForeground(table.getForeground());
+                        }
+                    }
+                }
+                return c;
+            }
+        };
+        TABLE.getColumnModel().getColumn(2).setCellRenderer(skippedRenderer); // Name column
     }
 
     @Override
@@ -64,9 +87,13 @@ public class TransferDetailFilesTableMediator extends
         TransferDetailFilesDataLine transferDetailFilesDataLine = dataModel.get(TABLE.getSelectedRow());
         TransferDetailFiles.TransferItemHolder transferItemHolder = transferDetailFilesDataLine.getInitializeObject();
         JPopupMenu menu = new SkinPopupMenu();
-        menu.add(new TransferDetailFilesActionsRenderer.OpenInFolderAction(transferItemHolder));
-        if (transferItemHolder.transferItem.isComplete()) {
-            menu.add(new TransferDetailFilesActionsRenderer.PlayAction(transferItemHolder));
+        if (transferItemHolder.skipped) {
+            menu.add(new TransferDetailFilesActionsRenderer.DownloadAction(transferItemHolder));
+        } else {
+            menu.add(new TransferDetailFilesActionsRenderer.OpenInFolderAction(transferItemHolder));
+            if (transferItemHolder.complete) {
+                menu.add(new TransferDetailFilesActionsRenderer.PlayAction(transferItemHolder));
+            }
         }
         return menu;
     }
@@ -82,6 +109,4 @@ public class TransferDetailFilesTableMediator extends
         TABLE.setDragEnabled(true);
         TABLE.setTransferHandler(new TransferDetailFilesTableTransferHandler(this));
     }
-
-
 }

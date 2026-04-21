@@ -19,17 +19,22 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.MediaSource;
 import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,6 +47,7 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
     private static ImageIcon share_solid;
     private static AlphaIcon share_faded;
     private static volatile boolean iconsLoaded = false;
+    private static Runnable onDownloadStartedCallback;
 
     /**
      * Lazy load icons on first access to avoid EDT blocking during class loading
@@ -61,14 +67,19 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         }
     }
 
+    public static void setOnDownloadStartedCallback(Runnable callback) {
+        onDownloadStartedCallback = callback;
+    }
+
     private final JLabel playButton;
     private final JLabel shareButton;
+    private final JLabel downloadButton;
     private TransferDetailFiles.TransferItemHolder transferItemHolder;
 
     public TransferDetailFilesActionsRenderer() {
         ensureIconsLoaded(); // Ensure icons are loaded on first use
         setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-        setLayout(new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!]"));
+        setLayout(new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!][80px!]"));
         playButton = new JLabel(play_transparent);
         playButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -87,8 +98,20 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
                 }
             }
         });
+        downloadButton = new JLabel(I18n.tr("Download"));
+        downloadButton.setForeground(new Color(0, 102, 204));
+        downloadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        downloadButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    onDownload();
+                }
+            }
+        });
         add(playButton, "width 20px!, growx 0, aligny top, push");
         add(shareButton, "width 20px!, growx 0, aligny top, push");
+        add(downloadButton, "width 80px!, growx 0, aligny top, push");
     }
 
     @Override
@@ -124,14 +147,43 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         }
     }
 
+    private void onDownload() {
+        if (transferItemHolder == null || !transferItemHolder.skipped) {
+            return;
+        }
+        startDownload(transferItemHolder.transferItem);
+    }
+
+    private static void startDownload(TransferItem item) {
+        if (!(item instanceof BTDownloadItem)) {
+            return;
+        }
+        BTDownloadItem btItem = (BTDownloadItem) item;
+        BackgroundQueuedExecutorService.schedule(() -> {
+            btItem.setPriority(Priority.NORMAL);
+            GUIMediator.safeInvokeLater(() -> {
+                if (onDownloadStartedCallback != null) {
+                    onDownloadStartedCallback.run();
+                }
+            });
+        });
+    }
+
     private void updateButtons() {
         if (transferItemHolder == null) {
             return;
         }
-        playButton.setIcon(transferItemHolder.complete ? play_solid : play_transparent);
-        shareButton.setIcon(transferItemHolder.complete ? share_solid : share_faded);
+        boolean skipped = transferItemHolder.skipped;
+        playButton.setVisible(!skipped);
+        shareButton.setVisible(!skipped);
+        downloadButton.setVisible(skipped);
+        if (!skipped) {
+            playButton.setIcon(transferItemHolder.complete ? play_solid : play_transparent);
+            shareButton.setIcon(transferItemHolder.complete ? share_solid : share_faded);
+        }
         playButton.invalidate();
         shareButton.invalidate();
+        downloadButton.invalidate();
     }
 
     public final static class OpenInFolderAction extends AbstractAction {
@@ -170,6 +222,22 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
             } else {
                 GUIMediator.launchFile(file);
             }
+        }
+    }
+
+    public final static class DownloadAction extends AbstractAction {
+        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+        public DownloadAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+            transferItemHolder = itemHolder;
+            putValue(Action.NAME, I18n.tr("Download"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Download"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Start downloading this file"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            startDownload(transferItemHolder.transferItem);
         }
     }
 }
