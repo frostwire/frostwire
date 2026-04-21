@@ -104,8 +104,13 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                                         tableMediator.add(holder);
                                     }
                                 } else {
+                                    // TransferItemHolder has immutable pre-computed values (progress, skipped, priority).
+                                    // tableMediator.update(holder) only fires a repaint but cannot change the data
+                                    // because TransferDetailFilesDataLine.update() is empty and the holder reference
+                                    // in the data line is never replaced. Always clear+rebuild to show fresh data.
+                                    tableMediator.clearTable();
                                     for (TransferItemHolder holder : holders) {
-                                        tableMediator.update(holder);
+                                        tableMediator.add(holder);
                                     }
                                 }
                             } catch (Throwable e) {
