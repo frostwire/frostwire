@@ -28,6 +28,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 /**
  * @author gubatron
@@ -60,6 +62,10 @@ final class DesktopVPNMonitor implements VPNMonitor {
     }
 
     private static String readProcessOutput(String command, String arguments) {
+        return readProcessOutput(command, arguments, true);
+    }
+
+    private static String readProcessOutput(String command, String arguments, boolean logErrors) {
         String result = "";
         ProcessBuilder pb = new ProcessBuilder(command, arguments);
         pb.redirectErrorStream(true);
@@ -75,13 +81,17 @@ final class DesktopVPNMonitor implements VPNMonitor {
                 }
                 result = sb.toString();
             } catch (Throwable e) {
-                LOG.error("Error reading routing table command output", e);
+                if (logErrors) {
+                    LOG.error("Error reading routing table command output", e);
+                }
             } finally {
                 IOUtils.closeQuietly(brstdout);
                 IOUtils.closeQuietly(stdout);
             }
         } catch (Throwable e) {
-            LOG.error("Error executing routing table command", e);
+            if (logErrors) {
+                LOG.error("Error executing routing table command", e);
+            }
         }
         return result;
     }
@@ -128,8 +138,33 @@ final class DesktopVPNMonitor implements VPNMonitor {
      * @return true if it finds a line that starts with "0" and contains "tun" in the output of "netstat -nr"
      */
     private boolean isPosixVPNActive() {
+        // First try pure Java network interface enumeration (works without external commands)
+        if (isVPNActiveViaNetworkInterfaces()) {
+            return true;
+        }
+
+        // On Linux, try modern 'ip route' command before falling back to netstat
+        if (OSUtils.isLinux()) {
+            try {
+                String[] output = readProcessOutput("ip", "route", false).split("\r\n");
+                for (String line : output) {
+                    if (line.contains("default") &&
+                            (line.contains("tun") || line.contains("tap") || line.contains("wg"))) {
+                        return true;
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+
+        // Fallback to netstat for macOS and legacy Linux
+        String netstat = netstatCmd();
+        if (netstat.contains(File.separator) && !new File(netstat).exists()) {
+            return false;
+        }
+
         try {
-            String[] output = readProcessOutput(netstatCmd(), "-nr").split("\r\n");
+            String[] output = readProcessOutput(netstat, "-nr", false).split("\r\n");
             for (String line : output) {
                 boolean _0_0_0_0_tunnel_check = line.startsWith("0") && line.contains("tun");
                 boolean default_ipsec0_check = line.startsWith("default") && line.contains("ipsec");
@@ -138,7 +173,30 @@ final class DesktopVPNMonitor implements VPNMonitor {
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error detecting VPN", e);
+            LOG.error("Error detecting VPN via netstat", e);
+        }
+        return false;
+    }
+
+    private static boolean isVPNActiveViaNetworkInterfaces() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            if (interfaces != null) {
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface ni = interfaces.nextElement();
+                    String name = ni.getName();
+                    if (name != null) {
+                        String lower = name.toLowerCase();
+                        if (lower.contains("tun") || lower.contains("tap") ||
+                                lower.contains("wg") || lower.contains("utun") ||
+                                lower.contains("ppp") || lower.contains("ipsec")) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            // ignore - important, but no need to crash
         }
         return false;
     }

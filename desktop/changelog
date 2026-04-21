@@ -47,7 +47,8 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
  * Fix: HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
  * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
- * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+  * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+  * Fix: VPN detection now properly detects Private Internet Access (PIA) on Linux
  * Performance: HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
  * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
  * Performance: HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
