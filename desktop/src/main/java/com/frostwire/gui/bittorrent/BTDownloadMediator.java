@@ -783,7 +783,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         });
     }
 
-    BTDownload[] getSelectedDownloaders() {
+    public BTDownload[] getSelectedDownloaders() {
         int[] sel = TABLE.getSelectedRows();
         ArrayList<BTDownload> downloaders = new ArrayList<>(sel.length);
         for (int aSel : sel) {

@@ -107,6 +107,11 @@ public final class TransfersTab extends AbstractTab {
         }
         setTransfersFilterModeListener(downloadMediator);
         downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
+        // If a torrent is already selected when the tab opens, show its details immediately
+        BTDownload[] preSelected = downloadMediator.getSelectedDownloaders();
+        if (preSelected.length == 1 && preSelected[0] instanceof BittorrentDownload bittorrentDownload) {
+            showTransferDetailsComponent(bittorrentDownload);
+        }
     }
 
     private void hideTransferDetailsComponent() {

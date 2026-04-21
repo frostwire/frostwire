@@ -130,7 +130,6 @@ public class TransferDetailFilesTableMediator extends
             JMenuItem item = new SkinMenuItem(label);
             if (holder.priority == p) {
                 item.setEnabled(false);
-                item.setText("✓ " + label);
             }
             final int targetPriority = pair[1];
             item.addActionListener(e -> setFilePriority(holder, targetPriority));

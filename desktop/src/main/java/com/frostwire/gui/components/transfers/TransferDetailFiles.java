@@ -88,15 +88,18 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                         SwingUtilities.invokeLater(() -> {
                             try {
                                 showSkippedCheckbox.setVisible(isPartial);
-                                if (!isPartial) {
-                                    showSkippedCheckbox.setSelected(false);
-                                } else {
-                                    showSkippedCheckbox.setSelected(showSkipped);
-                                }
                                 boolean shouldClear = this.btDownload != btDownload || forceRefresh;
                                 forceRefresh = false;
                                 if (shouldClear) {
                                     this.btDownload = btDownload;
+                                    // Only set checkbox state when switching to a new transfer.
+                                    // The user manages the checkbox state; refreshing the table
+                                    // should not fight with the user's click.
+                                    if (!isPartial) {
+                                        showSkippedCheckbox.setSelected(false);
+                                    } else {
+                                        showSkippedCheckbox.setSelected(showSkipped);
+                                    }
                                     tableMediator.clearTable();
                                     for (TransferItemHolder holder : holders) {
                                         tableMediator.add(holder);
