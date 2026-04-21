@@ -95,10 +95,13 @@ public class ExecutorsHelper {
      * @param factory the factory used for creating a new processing thread
      */
     static ExecutorService newThreadPool(@SuppressWarnings("SameParameterValue") ThreadFactory factory) {
+        // Use LinkedBlockingQueue instead of SynchronousQueue to prevent
+        // RejectedExecutionException when all 64 threads are busy.
+        // Tasks will queue up instead of being rejected.
         return Executors.unconfigurableExecutorService(
-                new ThreadPoolExecutor(0, 64,
+                new ThreadPoolExecutor(0, 256,
                         5L, TimeUnit.SECONDS,
-                        new SynchronousQueue<>(),
+                        new LinkedBlockingQueue<>(),
                         factory));
     }
 
