@@ -7,12 +7,13 @@ FrostWire 3.1.1 build 772 UNRELEASED
  - fix:Malformed Apollo profile launches no longer crash - ProfileActivity now validates extras and MIME type before opening and fails closed on unsupported launches
  - fix:Artist/profile navigation no longer crashes from detached Apollo fragments - artist lookups now use stable app context and only navigate if the host activity is still alive
  - fix:Apollo context menus no longer depend on MusicPlaybackService startup for non-playback actions - song list prefetching, playlist mutations, and More by Artist now run on the MISC handler with detached-host guards
- - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
- - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
- - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
+  - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
+  - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
+  - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
   - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
   - fix:ANR in Transfers list - BTDownload state is now cached on a background thread instead of calling blocking JNI (pthread_cond_wait) from RecyclerView onBindViewHolder on the UI thread
   - fix:ANR in Transfer Detail > Files - file list sorting by progress now runs on a background thread instead of calling blocking JNI (torrent_handle::file_progress) from Collections.sort() on the UI thread
+  - fix:ANR in Transfer Detail > Files - fragment no longer triggers blocking JNI (torrent_handle::have_piece) from getItems() on the UI thread; items are loaded asynchronously via peekItems() with background fallback
   - fix:ANR in Transfers list - UIBittorrentDownload cached getters (getState, getProgress, getConnectedPeers, getTotalPeers, getConnectedSeeds, getTotalSeeds) no longer fall back to blocking JNI calls when cache is null; they return safe defaults instead
 
 FrostWire 3.1.0 build 771 APR/18/2026
