@@ -15,6 +15,11 @@ FrostWire 3.1.1 build 772 UNRELEASED
   - fix:ANR in Transfer Detail > Files - file list sorting by progress now runs on a background thread instead of calling blocking JNI (torrent_handle::file_progress) from Collections.sort() on the UI thread
   - fix:ANR in Transfer Detail > Files - fragment no longer triggers blocking JNI (torrent_handle::have_piece) from getItems() on the UI thread; items are loaded asynchronously via peekItems() with background fallback
   - fix:ANR in Transfers list - UIBittorrentDownload cached getters (getState, getProgress, getConnectedPeers, getTotalPeers, getConnectedSeeds, getTotalSeeds) no longer fall back to blocking JNI calls when cache is null; they return safe defaults instead
+  - fix:Crash MusicPlaybackService.onTaskRemoved - ExoPlayer is now accessed on the dedicated MusicPlayerHandler thread instead of the calling thread (e.g., EngineThreadPool)
+  - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
+  - fix:Crash RejectedExecutionException - ThreadExecutor pool expanded from 64 to 256 threads and switched from SynchronousQueue to LinkedBlockingQueue so tasks queue instead of being rejected
+  - fix:Crash IllegalStateException - SearchFragment.startTellurideDownloadDialog now guards against detached fragments with isAdded() check and try/catch around getParentFragmentManager()
+  - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
 
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
