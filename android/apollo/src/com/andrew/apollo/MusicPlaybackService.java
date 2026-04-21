@@ -619,6 +619,51 @@ public class MusicPlaybackService extends MediaSessionService {
         }
     }
 
+    /**
+     * Override onTaskRemoved to prevent ExoPlayer from being accessed on the wrong thread.
+     * MediaSessionService.onTaskRemoved() calls isAnySessionPlaying() which accesses ExoPlayer,
+     * but this can be called on any thread (e.g., EngineThreadPool). We post to mPlayerHandler
+     * to ensure ExoPlayer is only accessed on its dedicated thread.
+     */
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        if (mPlayerHandler != null) {
+            mPlayerHandler.post(() -> {
+                try {
+                    MusicPlaybackService.super.onTaskRemoved(rootIntent);
+                } catch (Throwable e) {
+                    LOG.error("MusicPlaybackService.onTaskRemoved: Error in super call", e);
+                }
+            });
+        } else {
+            // Service not fully initialized yet, just call super directly
+            try {
+                super.onTaskRemoved(rootIntent);
+            } catch (Throwable e) {
+                LOG.error("MusicPlaybackService.onTaskRemoved: Error calling super", e);
+            }
+        }
+    }
+
+    /**
+     * Override onUpdateNotification to catch ForegroundServiceStartNotAllowedException
+     * on Android 12+ (API 31+). Media3's notification manager may try to call
+     * startForeground() when the app is in the background, which is not allowed.
+     */
+    @Override
+    public void onUpdateNotification(MediaSession session, boolean startInForegroundRequired) {
+        try {
+            super.onUpdateNotification(session, startInForegroundRequired);
+        } catch (Exception e) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                e instanceof android.app.ForegroundServiceStartNotAllowedException) {
+                LOG.warn("MusicPlaybackService.onUpdateNotification: Cannot start foreground from background on Android 12+");
+            } else {
+                LOG.error("MusicPlaybackService.onUpdateNotification: Error updating notification", e);
+            }
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void handleCommandIntent(Intent intent) {
         if (SystemUtils.isUIThread()) {
