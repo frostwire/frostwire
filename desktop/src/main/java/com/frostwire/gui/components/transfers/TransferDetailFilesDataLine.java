@@ -33,14 +33,16 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
     // -> The button only shows when the file is complete
     // -> A custom cell renderer for that column that displays a button and it's action listener
     static LimeTableColumn ACTIONS_COLUMN;
+    static LimeTableColumn PRIORITY_COLUMN;
     private static final LimeTableColumn[] columns = new LimeTableColumn[]{
             // See TransferDetailFilesActionsRenderer for action's code
             ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 80, true, true, true, TransferDetailFiles.TransferItemHolder.class),
             new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
-            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 400, true, true, true, String.class),
-            new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 150, true, ProgressBarHolder.class),
+            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 350, true, true, true, String.class),
+            new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 120, true, ProgressBarHolder.class),
             new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 80, true, true, true, SizeHolder.class),
             new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 80, true, true, true, String.class),
+            PRIORITY_COLUMN = new LimeTableColumn(6, "PRIORITY", I18n.tr("Priority"), 100, true, true, true, String.class),
     };
 
     public TransferDetailFilesDataLine() {
@@ -78,6 +80,7 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
         final int PROGRESS = 3;
         final int SIZE = 4;
         final int TYPE = 5;
+        final int PRIORITY = 6;
         switch (col) {
             case NUMBER:
                 return holder.fileOffset + 1; // humans...
@@ -89,11 +92,27 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
                 return new SizeHolder(holder.transferItem.getSize());
             case TYPE:
                 return holder.fileType;
+            case PRIORITY:
+                return priorityToString(holder.priority);
             case ACTIONS:
                 // See TransferDetailFilesActionsRenderer for action's code
                 return holder;
         }
         return null;
+    }
+
+    public static String priorityToString(int priority) {
+        switch (priority) {
+            case 0: return I18n.tr("Don't Download");
+            case 1: return I18n.tr("Normal");
+            case 2: return I18n.tr("Low");
+            case 3: return I18n.tr("Low+");
+            case 4: return I18n.tr("Below Normal");
+            case 5: return I18n.tr("Above Normal");
+            case 6: return I18n.tr("High");
+            case 7: return I18n.tr("Maximum");
+            default: return I18n.tr("Unknown");
+        }
     }
 
     public TransferItem getTransferItem() {

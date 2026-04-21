@@ -53,12 +53,14 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
             }
         });
 
-        TransferDetailFilesActionsRenderer.setOnDownloadStartedCallback(() -> {
+        Runnable refreshCallback = () -> {
             if (btDownload != null) {
                 forceRefresh = true;
                 updateData(btDownload);
             }
-        });
+        };
+        TransferDetailFilesActionsRenderer.setOnDownloadStartedCallback(refreshCallback);
+        tableMediator.setOnPriorityChangedCallback(refreshCallback);
 
         setLayout(new MigLayout("fillx, insets 0 0 0 0, wrap 1"));
         add(showSkippedCheckbox, "growx, gapleft 5, gaptop 5");
@@ -129,17 +131,19 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
         public final boolean complete;
         public final int progress;
         public final boolean skipped;
+        public final int priority;
         final String displayName;
         final String fileType;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {
             this.fileOffset = fileOffset;
             this.transferItem = transferItem;
-            // isComplete() / getProgress() / isSkipped() call JNI — safe here because
+            // isComplete() / getProgress() / isSkipped() / getPriority() call JNI — safe here because
             // TransferItemHolder is always constructed inside BackgroundQueuedExecutorService.
             this.complete = transferItem.isComplete();
             this.progress = this.complete ? 100 : transferItem.getProgress();
             this.skipped = transferItem.isSkipped();
+            this.priority = transferItem.getPriority();
             String fileName = SafeText.sanitize(transferItem.getName());
             this.displayName = fileName;
             int extensionSeparator = fileName.lastIndexOf('.');

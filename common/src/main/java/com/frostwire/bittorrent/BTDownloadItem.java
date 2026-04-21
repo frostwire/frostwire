@@ -118,4 +118,12 @@ public class BTDownloadItem implements TransferItem {
             th.filePriority(index, priority);
         }
     }
+
+    @Override
+    public int getPriority() {
+        if (th != null && th.isValid()) {
+            return th.filePriority(index).swig();
+        }
+        return Priority.IGNORE.swig();
+    }
 }

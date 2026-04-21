@@ -52,4 +52,6 @@ public interface TransferItem {
     int getProgress();
 
     boolean isComplete();
+
+    int getPriority();
 }
