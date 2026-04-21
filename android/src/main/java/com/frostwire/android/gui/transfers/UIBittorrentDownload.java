@@ -130,25 +130,29 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public int getConnectedPeers() {
         // Return cached value to avoid blocking JNI call on UI thread
-        return cachedState != null ? cachedConnectedPeers : dl.getConnectedPeers();
+        // NEVER fall back to dl.getConnectedPeers() - it calls blocking th.status()
+        return cachedConnectedPeers;
     }
 
     @Override
     public int getTotalPeers() {
         // Return cached value to avoid blocking JNI call on UI thread
-        return cachedState != null ? cachedTotalPeers : dl.getTotalPeers();
+        // NEVER fall back to dl.getTotalPeers() - it calls blocking th.status()
+        return cachedTotalPeers;
     }
 
     @Override
     public int getConnectedSeeds() {
         // Return cached value to avoid blocking JNI call on UI thread
-        return cachedState != null ? cachedConnectedSeeds : dl.getConnectedSeeds();
+        // NEVER fall back to dl.getConnectedSeeds() - it calls blocking th.status()
+        return cachedConnectedSeeds;
     }
 
     @Override
     public int getTotalSeeds() {
         // Return cached value to avoid blocking JNI call on UI thread
-        return cachedState != null ? cachedTotalSeeds : dl.getTotalSeeds();
+        // NEVER fall back to dl.getTotalSeeds() - it calls blocking th.status()
+        return cachedTotalSeeds;
     }
 
     @Override
@@ -260,8 +264,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             return TransferState.ERROR_DISK_FULL;
         }
         // Return cached state to avoid blocking JNI call on UI thread (ANR fix)
+        // NEVER fall back to dl.getState() - it calls blocking th.status()
         // Cached value is updated asynchronously via updateCachedState()
-        return cachedState != null ? cachedState : dl.getState();
+        return cachedState != null ? cachedState : TransferState.DOWNLOADING;
     }
 
     @Override
@@ -273,7 +278,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             LOG.error("Error checking sequential download");
         }
         // Return cached progress to avoid blocking JNI call on UI thread
-        return cachedState != null ? cachedProgress : dl.getProgress();
+        // NEVER fall back to dl.getProgress() - it calls blocking th.status()
+        return cachedProgress;
     }
 
     @Override
