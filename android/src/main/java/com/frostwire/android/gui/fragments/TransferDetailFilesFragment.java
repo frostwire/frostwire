@@ -341,18 +341,25 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             if (freshItems == null) {
                 return;
             }
-            List<TransferItem> sortedFresh = new LinkedList<>(freshItems);
-            try {
-                if (sortedFresh.size() > 1) {
-                    Collections.sort(sortedFresh, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+            // Sort calls getProgress() which does blocking JNI (fileProgress).
+            // Move sort to background thread to avoid ANR on UI thread.
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                List<TransferItem> sortedFresh = new LinkedList<>(freshItems);
+                try {
+                    if (sortedFresh.size() > 1) {
+                        Collections.sort(sortedFresh, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                    }
+                } catch (Throwable ignored) {
                 }
-            } catch (Throwable ignored) {
-            }
-            allItems = sortedFresh;
-            currentPage = 0;
-            combinedItems.clear();
-            loadNextPage();
-            submitList(new LinkedList<>(combinedItems));
+                final List<TransferItem> finalSorted = sortedFresh;
+                SystemUtils.postToUIThread(() -> {
+                    allItems = finalSorted;
+                    currentPage = 0;
+                    combinedItems.clear();
+                    loadNextPage();
+                    submitList(new LinkedList<>(combinedItems));
+                });
+            });
         }
     }
 
