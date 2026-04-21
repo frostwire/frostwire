@@ -588,13 +588,23 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
             // Return to the UI thread to display the dialog
             SystemUtils.postToUIThread(() -> {
+                // Guard against fragment being detached before the callback runs
+                if (!isAdded()) {
+                    LOG.warn("SearchFragment.startTellurideDownloadDialog: Fragment detached before dialog could be shown");
+                    return;
+                }
                 Context ctx = getContext() != null ? getContext() : getApplicationContext();
                 TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(
                         ctx,
                         tellurideSearchResultDownloadDialogAdapter.getFullList()
                 );
 
-                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentManager fragmentManager = null;
+                try {
+                    fragmentManager = getParentFragmentManager();
+                } catch (IllegalStateException e) {
+                    LOG.warn("SearchFragment.startTellurideDownloadDialog: getParentFragmentManager() failed, trying activity");
+                }
 
                 if (fragmentManager == null && getActivity() != null) {
                     fragmentManager = getActivity().getSupportFragmentManager();
