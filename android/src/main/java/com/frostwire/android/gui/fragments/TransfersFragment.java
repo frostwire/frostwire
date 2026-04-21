@@ -59,6 +59,7 @@ import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferUpdateExecutor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -382,7 +383,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 Ref.free(contextRef);
                                 return;
                             }
-                            TransfersHolder transfersHolder;
+                             TransfersHolder transfersHolder;
                             try {
                                 long sortStart = System.currentTimeMillis();
                                 transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
@@ -393,6 +394,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 Ref.free(contextRef);
                                 return;
                             }
+
+                            // Update cached state for all BT downloads on background thread
+                            // to avoid blocking JNI calls on UI thread (ANR fix)
+                            if (transfersHolder != null && transfersHolder.allTransfers != null) {
+                                long cacheStart = System.currentTimeMillis();
+                                for (Transfer t : transfersHolder.allTransfers) {
+                                    if (t instanceof UIBittorrentDownload) {
+                                        ((UIBittorrentDownload) t).updateCachedState();
+                                    }
+                                }
+                                android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                            }
+
                             if (!Ref.alive(contextRef)) {
                                 Ref.free(contextRef);
                                 return;
@@ -457,6 +471,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 Ref.free(contextRef);
                                 return;
                             }
+
+                            // Update cached state for all BT downloads on background thread
+                            // to avoid blocking JNI calls on UI thread (ANR fix)
+                            if (transfersHolder != null && transfersHolder.allTransfers != null) {
+                                long cacheStart = System.currentTimeMillis();
+                                for (Transfer t : transfersHolder.allTransfers) {
+                                    if (t instanceof UIBittorrentDownload) {
+                                        ((UIBittorrentDownload) t).updateCachedState();
+                                    }
+                                }
+                                android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                            }
+
                             if (!Ref.alive(contextRef)) {
                                 Ref.free(contextRef);
                                 return;

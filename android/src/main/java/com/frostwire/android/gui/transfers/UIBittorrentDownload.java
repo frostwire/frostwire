@@ -60,6 +60,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     private boolean noSpaceAvailableInCurrentMount;
 
+    // Cached values to avoid blocking JNI calls on UI thread (ANR fix)
+    // These are updated asynchronously via updateCachedState()
+    private volatile TransferState cachedState;
+    private volatile int cachedProgress;
+    private volatile int cachedConnectedSeeds;
+    private volatile int cachedTotalSeeds;
+    private volatile int cachedConnectedPeers;
+    private volatile int cachedTotalPeers;
+
     public UIBittorrentDownload(TransferManager manager, BTDownload dl) {
         this.manager = manager;
         this.dl = dl;
@@ -82,7 +91,26 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
         } catch (Throwable ignored) {
         }
-        checkSequentialDownload();
+
+        // Initialize cached state (may block briefly, but only during construction)
+        updateCachedState();
+    }
+
+    /**
+     * Updates cached values by reading from BTDownload.
+     * MUST be called from background thread, never UI thread.
+     */
+    public void updateCachedState() {
+        try {
+            cachedState = dl.getState();
+            cachedProgress = dl.getProgress();
+            cachedConnectedSeeds = dl.getConnectedSeeds();
+            cachedTotalSeeds = dl.getTotalSeeds();
+            cachedConnectedPeers = dl.getConnectedPeers();
+            cachedTotalPeers = dl.getTotalPeers();
+        } catch (Throwable e) {
+            LOG.error("Error updating cached state", e);
+        }
     }
 
     public BTDownload getDl() {
@@ -101,22 +129,26 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public int getConnectedPeers() {
-        return dl.getConnectedPeers();
+        // Return cached value to avoid blocking JNI call on UI thread
+        return cachedState != null ? cachedConnectedPeers : dl.getConnectedPeers();
     }
 
     @Override
     public int getTotalPeers() {
-        return dl.getTotalPeers();
+        // Return cached value to avoid blocking JNI call on UI thread
+        return cachedState != null ? cachedTotalPeers : dl.getTotalPeers();
     }
 
     @Override
     public int getConnectedSeeds() {
-        return dl.getConnectedSeeds();
+        // Return cached value to avoid blocking JNI call on UI thread
+        return cachedState != null ? cachedConnectedSeeds : dl.getConnectedSeeds();
     }
 
     @Override
     public int getTotalSeeds() {
-        return dl.getTotalSeeds();
+        // Return cached value to avoid blocking JNI call on UI thread
+        return cachedState != null ? cachedTotalSeeds : dl.getTotalSeeds();
     }
 
     @Override
@@ -227,7 +259,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         if (noSpaceAvailableInCurrentMount) {
             return TransferState.ERROR_DISK_FULL;
         }
-        return dl.getState();
+        // Return cached state to avoid blocking JNI call on UI thread (ANR fix)
+        // Cached value is updated asynchronously via updateCachedState()
+        return cachedState != null ? cachedState : dl.getState();
     }
 
     @Override
@@ -238,8 +272,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.error("Error checking sequential download");
         }
-
-        return dl.getProgress();
+        // Return cached progress to avoid blocking JNI call on UI thread
+        return cachedState != null ? cachedProgress : dl.getProgress();
     }
 
     @Override
