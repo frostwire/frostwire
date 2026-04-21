@@ -129,6 +129,13 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("EngineForegroundService::onStartCommand() - Starting foreground service");
         LOG.info("EngineForegroundService::onStartCommand() - intent: " + intent + " flags: " + flags + " startId: " + startId);
 
+        // ALWAYS call startForeground first before any early return to satisfy
+        // Android 8+ (API 26+) foreground service requirements. If the service
+        // is restarted by the system with a null intent, we must still start
+        // foreground or the app will crash with RemoteServiceException.
+        Notification notification = createPersistentNotification();
+        showPersistentNotification(notification);
+
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
             new Thread("EngineForegroundService::onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
@@ -148,10 +155,6 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent);
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
-
-        // Create and display persistent notification
-        Notification notification = createPersistentNotification();
-        showPersistentNotification(notification);
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> startPermanentNotificationUpdatesTask(this));
 
