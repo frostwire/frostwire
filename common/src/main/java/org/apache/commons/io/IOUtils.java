@@ -902,8 +902,9 @@ public class IOUtils {
      * @since 2.3
      */
     public static List<String> readLines(InputStream input, Charset encoding) throws IOException {
-        InputStreamReader reader = new InputStreamReader(input, Charsets.toCharset(encoding));
-        return readLines(reader);
+        try (InputStreamReader reader = new InputStreamReader(input, Charsets.toCharset(encoding))) {
+            return readLines(reader);
+        }
     }
 
     /**
