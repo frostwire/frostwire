@@ -322,6 +322,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return dl.isComplete();
     }
 
+    /**
+     * Returns items without triggering lazy loading.
+     * Safe to call on UI thread - never does blocking JNI.
+     * Returns null if items haven't been loaded yet.
+     */
+    public List<TransferItem> peekItems() {
+        return items;
+    }
+
     @Override
     public List<TransferItem> getItems() {
         // Lazy-load items to prevent excessive memory retention and Bundle serialization

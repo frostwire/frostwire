@@ -118,8 +118,24 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (uiBittorrentDownload == null) {
             return;
         }
-        List<TransferItem> items = uiBittorrentDownload.getItems();
+        // Use peekItems() to avoid blocking JNI on UI thread.
+        // getItems() triggers calculateItems() -> dl.getItems() -> havePiece() which blocks.
+        List<TransferItem> items = uiBittorrentDownload.peekItems();
         if (items == null) {
+            // Items not loaded yet - trigger background load and update UI when ready
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                final List<TransferItem> loadedItems = uiBittorrentDownload.getItems();
+                if (loadedItems != null) {
+                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(loadedItems));
+                }
+            });
+            return;
+        }
+        updateComponentsWithItems(items);
+    }
+
+    private void updateComponentsWithItems(List<TransferItem> items) {
+        if (uiBittorrentDownload == null || items == null) {
             return;
         }
         String currentInfoHash = uiBittorrentDownload.getInfoHash();
