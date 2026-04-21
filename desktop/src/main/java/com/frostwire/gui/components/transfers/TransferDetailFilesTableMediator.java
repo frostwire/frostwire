@@ -21,6 +21,8 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.gui.bittorrent.TransferDetailFilesActionsRenderer;
+import com.frostwire.gui.theme.SkinMenu;
+import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.jlibtorrent.Priority;
 import com.limegroup.gnutella.gui.I18n;
@@ -125,7 +127,7 @@ public class TransferDetailFilesTableMediator extends
         for (int[] pair : priorities) {
             int p = pair[0];
             String label = TransferDetailFilesDataLine.priorityToString(p);
-            JMenuItem item = new JMenuItem(label);
+            JMenuItem item = new SkinMenuItem(label);
             if (holder.priority == p) {
                 item.setEnabled(false);
                 item.setText("✓ " + label);
@@ -166,7 +168,7 @@ public class TransferDetailFilesTableMediator extends
         }
         // Also add priority submenu
         menu.addSeparator();
-        JMenu priorityMenu = new JMenu(I18n.tr("Set Priority"));
+        JMenu priorityMenu = new SkinMenu(I18n.tr("Set Priority"));
         int[][] priorities = {
             {0, Priority.IGNORE.swig()},
             {1, Priority.NORMAL.swig()},
@@ -180,7 +182,7 @@ public class TransferDetailFilesTableMediator extends
         for (int[] pair : priorities) {
             int p = pair[0];
             String label = TransferDetailFilesDataLine.priorityToString(p);
-            JMenuItem item = new JMenuItem(label);
+            JMenuItem item = new SkinMenuItem(label);
             if (transferItemHolder.priority == p) {
                 item.setEnabled(false);
             }

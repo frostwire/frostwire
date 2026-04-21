@@ -106,10 +106,27 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
             cardPanelMap.put(PIECES_CARD, piecesComponent);
             cardPanelMap.put(TRACKERS_CARD, trackersComponent);
             cardPanelMap.put(PEERS_CARD, peersComponent);
-            // Auto click on the last shown JPanel button selector
+            // Restore last selected tab
             String lastTransferSelected = UISettings.LAST_SELECTED_TRANSFER_DETAIL_JPANEL.getValue();
-            if (cardButtonMap.containsKey(lastTransferSelected)) {
-                cardButtonMap.get(lastTransferSelected).doClick();
+            JToggleButton buttonToSelect = cardButtonMap.get(lastTransferSelected);
+            if (buttonToSelect != null) {
+                buttonToSelect.setSelected(true);
+                showDetailComponent(lastTransferSelected);
+            } else {
+                generalButton.setSelected(true);
+                showDetailComponent(GENERAL_CARD);
+            }
+            // If a transfer was already selected before we finished initializing, update now
+            if (selectedBittorrentDownload != null && currentComponent != null) {
+                final BittorrentDownload btDownload = selectedBittorrentDownload;
+                final TransferDetailPanel panel = currentComponent;
+                BackgroundQueuedExecutorService.schedule(() -> {
+                    try {
+                        panel.updateData(btDownload);
+                    } catch (Throwable e) {
+                        System.err.println("Error updating transfer details: " + e.getMessage());
+                    }
+                });
             }
             detailComponentHolder.revalidate();
             detailComponentHolder.repaint();
