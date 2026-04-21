@@ -6,7 +6,7 @@ FrostWire 3.1.1 build 772 UNRELEASED
  - fix:Tracker edit/remove actions no longer crash on stale tracker positions - tracker rows now re-resolve the selected tracker against the latest list before mutating it
  - fix:Malformed Apollo profile launches no longer crash - ProfileActivity now validates extras and MIME type before opening and fails closed on unsupported launches
  - fix:Artist/profile navigation no longer crashes from detached Apollo fragments - artist lookups now use stable app context and only navigate if the host activity is still alive
- - fix:Apollo context menus no longer depend on MusicPlaybackService startup for non-playback actions - song list prefetching, playlist mutations, and More by Artist now run on the MISC handler with detached-host guards
+  - fix:Apollo context menus no longer depend on MusicPlaybackService startup for non-playback actions - song list prefetching, playlist mutations, and More by Artist now run on the MISC handler with detached-host guards
   - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
   - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
   - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
@@ -20,6 +20,7 @@ FrostWire 3.1.1 build 772 UNRELEASED
   - fix:Crash RejectedExecutionException - ThreadExecutor pool expanded from 64 to 256 threads and switched from SynchronousQueue to LinkedBlockingQueue so tasks queue instead of being rejected
   - fix:Crash IllegalStateException - SearchFragment.startTellurideDownloadDialog now guards against detached fragments with isAdded() check and try/catch around getParentFragmentManager()
   - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
+  - fix:Crash IllegalStateException - TransferDetailFilesFragment.updateComponentsWithItems now guards against detached fragments with isAdded() check; item loading now uses HIGH_PRIORITY dedicated thread for faster response
 
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
