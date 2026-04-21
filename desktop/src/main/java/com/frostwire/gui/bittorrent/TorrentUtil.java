@@ -320,13 +320,14 @@ public final class TorrentUtil {
     private static @NotNull create_torrent getCreateTorrent(boolean dhtTrackedOnly, file_storage fs, TorrentType torrentType) {
         create_torrent torrentCreator = createTorrentWithType(fs, torrentType);
         if (!dhtTrackedOnly) {
-            torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80", 0);
-            torrentCreator.add_tracker("udp://tracker.publicbt.com:80", 0);
-            torrentCreator.add_tracker("udp://open.demonii.com:1337", 0);
-            torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969", 0);
-            torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969", 0);
-            torrentCreator.add_tracker("udp://exodus.desync.com:6969", 0);
-            torrentCreator.add_tracker("udp://tracker.pomf.se", 0);
+            torrentCreator.add_tracker("udp://tracker.opentrackr.org:1337/announce", 0);
+            torrentCreator.add_tracker("udp://tracker.openbittorrent.com:6969/announce", 0);
+            torrentCreator.add_tracker("udp://open.stealth.si:80/announce", 0);
+            torrentCreator.add_tracker("udp://exodus.desync.com:6969/announce", 0);
+            torrentCreator.add_tracker("udp://tracker.torrent.eu.org:451/announce", 0);
+            torrentCreator.add_tracker("udp://tracker.moeking.me:6969/announce", 0);
+            torrentCreator.add_tracker("udp://explodie.org:6969/announce", 0);
+            torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969/announce", 0);
         }
         torrentCreator.set_priv(false);
         torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
