@@ -122,8 +122,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         // getItems() triggers calculateItems() -> dl.getItems() -> havePiece() which blocks.
         List<TransferItem> items = uiBittorrentDownload.peekItems();
         if (items == null) {
-            // Items not loaded yet - trigger background load and update UI when ready
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            // Items not loaded yet - trigger background load on a dedicated thread.
+            // HIGH_PRIORITY spawns a new thread instead of queuing on the single-threaded MISC handler.
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
                 final List<TransferItem> loadedItems = uiBittorrentDownload.getItems();
                 if (loadedItems != null) {
                     SystemUtils.postToUIThread(() -> updateComponentsWithItems(loadedItems));
@@ -135,7 +136,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     }
 
     private void updateComponentsWithItems(List<TransferItem> items) {
-        if (uiBittorrentDownload == null || items == null) {
+        if (uiBittorrentDownload == null || items == null || !isAdded()) {
             return;
         }
         String currentInfoHash = uiBittorrentDownload.getInfoHash();
@@ -161,6 +162,16 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         adapter = null;
         if (recyclerView != null) {
             recyclerView.setAdapter(null);
+        }
+        // Eagerly load items on a dedicated thread when a new transfer is bound.
+        // This prevents the UI from showing empty while waiting for the MISC handler.
+        if (uiBittorrentDownload != null) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
+                final List<TransferItem> loadedItems = uiBittorrentDownload.getItems();
+                if (loadedItems != null) {
+                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(loadedItems));
+                }
+            });
         }
     }
 
