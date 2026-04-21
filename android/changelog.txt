@@ -13,6 +13,7 @@ FrostWire 3.1.1 build 772 UNRELEASED
   - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
   - fix:ANR in Transfers list - BTDownload state is now cached on a background thread instead of calling blocking JNI (pthread_cond_wait) from RecyclerView onBindViewHolder on the UI thread
   - fix:ANR in Transfer Detail > Files - file list sorting by progress now runs on a background thread instead of calling blocking JNI (torrent_handle::file_progress) from Collections.sort() on the UI thread
+  - fix:ANR in Transfers list - UIBittorrentDownload cached getters (getState, getProgress, getConnectedPeers, getTotalPeers, getConnectedSeeds, getTotalSeeds) no longer fall back to blocking JNI calls when cache is null; they return safe defaults instead
 
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
