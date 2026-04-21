@@ -98,7 +98,7 @@ final class ViewMenu extends AbstractMenu {
         @Override
         public void actionPerformed(ActionEvent e) {
             super.actionPerformed(e);
-            GUIMediator.showMessage(I18n.tr("This preference will take effect next time you restart FrostWire"));
+            GUIMediator.showRestartDialog(I18n.tr("This preference will take effect next time you restart FrostWire"));
         }
     }
 }

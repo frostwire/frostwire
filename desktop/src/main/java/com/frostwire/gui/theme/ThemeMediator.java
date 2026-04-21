@@ -194,14 +194,10 @@ public final class ThemeMediator {
             }
         });
 
-        // Inform the user that a restart is needed for a 100% clean switch,
-        // but do not actually restart the JVM
+        // Inform the user that a restart is needed for a 100% clean switch
         if (old != theme) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    I18n.tr("The new theme has been applied partially.\nFor the full theme to load please restart FrostWire."),
-                    I18n.tr("Theme Change"),
-                    JOptionPane.INFORMATION_MESSAGE
+            GUIMediator.showRestartDialog(
+                    I18n.tr("The new theme has been applied partially.\nFor the full theme to load please restart FrostWire.")
             );
         }
     }

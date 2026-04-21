@@ -117,7 +117,7 @@ public final class OptionsPaneManager {
             restartRequired |= op.applyOptions();
         }
         if (restartRequired) {
-            GUIMediator.showMessage(I18n.tr("One or more options will take effect the next time FrostWire is restarted."));
+            GUIMediator.showRestartDialog(I18n.tr("One or more options will take effect the next time FrostWire is restarted."));
         }
         SettingsWarningManager.checkSettingsLoadSaveFailure();
     }

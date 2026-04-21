@@ -59,6 +59,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -495,6 +497,68 @@ public final class GUIMediator {
     public static void shutdown() {
         instance().timer.stopTimer();
         Finalizer.shutdown();
+    }
+
+    /**
+     * Restarts the application by spawning a new JVM process with the same
+     * classpath, main class, and JVM arguments, then shuts down the current
+     * instance.
+     */
+    public static void restart() {
+        try {
+            List<String> command = buildRestartCommand();
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.inheritIO();
+            pb.start();
+            shutdown();
+        } catch (IOException e) {
+            showError(I18n.tr("Failed to restart FrostWire: ") + e.getMessage());
+        }
+    }
+
+    /**
+     * Shows a dialog informing the user that a restart is required and offers
+     * a "Restart Now" button.
+     */
+    public static void showRestartDialog(String message) {
+        String[] options = {I18n.tr("Restart Now"), I18n.tr("Restart Later")};
+        int choice = JOptionPane.showOptionDialog(
+                getAppFrame(),
+                message,
+                I18n.tr("Restart Required"),
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[1]
+        );
+        if (choice == 0) {
+            restart();
+        }
+    }
+
+    private static List<String> buildRestartCommand() {
+        List<String> command = new ArrayList<>();
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        if (OSUtils.isWindows()) {
+            javaBin += ".exe";
+        }
+        command.add(javaBin);
+
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        for (String arg : runtimeMXBean.getInputArguments()) {
+            // Skip debugging/agent arguments that shouldn't be passed to child
+            if (arg.startsWith("-agentlib") || arg.startsWith("-Xrunjdwp") || arg.startsWith("-javaagent")) {
+                continue;
+            }
+            command.add(arg);
+        }
+
+        command.add("-cp");
+        command.add(System.getProperty("java.class.path"));
+        command.add("com.limegroup.gnutella.gui.Main");
+        return command;
     }
 
     /**
