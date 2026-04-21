@@ -95,9 +95,8 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                                     // Only set checkbox state when switching to a new transfer.
                                     // The user manages the checkbox state; refreshing the table
                                     // should not fight with the user's click.
-                                    if (!isPartial) {
-                                        showSkippedCheckbox.setSelected(false);
-                                    } else {
+                                    // Hiding/showing the checkbox must not change the saved state.
+                                    if (isPartial) {
                                         showSkippedCheckbox.setSelected(showSkipped);
                                     }
                                     tableMediator.clearTable();

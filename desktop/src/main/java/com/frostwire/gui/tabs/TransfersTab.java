@@ -107,11 +107,17 @@ public final class TransfersTab extends AbstractTab {
         }
         setTransfersFilterModeListener(downloadMediator);
         downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
-        // If a torrent is already selected when the tab opens, show its details immediately
-        BTDownload[] preSelected = downloadMediator.getSelectedDownloaders();
-        if (preSelected.length == 1 && preSelected[0] instanceof BittorrentDownload bittorrentDownload) {
-            showTransferDetailsComponent(bittorrentDownload);
-        }
+        // Detect when the Transfers tab becomes visible and show details for any pre-selected torrent.
+        // The selection listener above only fires on selection CHANGES. If a torrent was auto-selected
+        // while another tab was active, no event ever reached us. We must re-check when this tab shows.
+        mainComponent.addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && mainComponent.isShowing()) {
+                BTDownload[] preSelected = downloadMediator.getSelectedDownloaders();
+                if (preSelected.length == 1 && preSelected[0] instanceof BittorrentDownload bittorrentDownload) {
+                    showTransferDetailsComponent(bittorrentDownload);
+                }
+            }
+        });
     }
 
     private void hideTransferDetailsComponent() {
