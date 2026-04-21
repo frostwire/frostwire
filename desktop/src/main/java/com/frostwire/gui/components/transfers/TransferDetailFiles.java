@@ -25,6 +25,7 @@ import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
@@ -37,15 +38,15 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     private final TransferDetailFilesTableMediator tableMediator;
     private final JCheckBox showSkippedCheckbox;
     private BittorrentDownload btDownload;
-    private boolean showSkipped = false;
     private volatile boolean forceRefresh = false;
 
     TransferDetailFiles() {
         tableMediator = new TransferDetailFilesTableMediator();
         showSkippedCheckbox = new JCheckBox(I18n.tr("Show skipped files"));
+        showSkippedCheckbox.setSelected(BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue());
         showSkippedCheckbox.setVisible(false);
         showSkippedCheckbox.addItemListener(e -> {
-            showSkipped = showSkippedCheckbox.isSelected();
+            BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.setValue(showSkippedCheckbox.isSelected());
             forceRefresh = true;
             if (btDownload != null) {
                 updateData(btDownload);
@@ -68,6 +69,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload != null && btDownload.getDl() != null) {
             final boolean isPartial = btDownload.getDl().isPartial();
+            final boolean showSkipped = BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue();
             BackgroundQueuedExecutorService.schedule(() -> {
                 try {
                     List<TransferItem> items = btDownload.getDl().getItems();
@@ -86,7 +88,8 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                                 showSkippedCheckbox.setVisible(isPartial);
                                 if (!isPartial) {
                                     showSkippedCheckbox.setSelected(false);
-                                    showSkipped = false;
+                                } else {
+                                    showSkippedCheckbox.setSelected(showSkipped);
                                 }
                                 boolean shouldClear = this.btDownload != btDownload || forceRefresh;
                                 forceRefresh = false;

@@ -35,6 +35,10 @@ public final class BittorrentSettings extends LimeProps {
      * Records what was the last column you used to sort the transfers table.
      */
     public static final IntSetting BTMEDIATOR_COLUMN_SORT_INDEX = FACTORY.createIntSetting("BTMEDIATOR_COLUMN_SORT_INDEX", -1);
+    /**
+     * Whether to show skipped files in the transfer detail Files tab.
+     */
+    public static final BooleanSetting SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL = FACTORY.createBooleanSetting("SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL", true);
 
     private BittorrentSettings() {
     }
