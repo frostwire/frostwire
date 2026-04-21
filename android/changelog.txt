@@ -1,26 +1,26 @@
 FrostWire 3.1.1 build 772 UNRELEASED
- - fix:Torrent JNI/libtorrent startup failures no longer crash transfer notification updates or bandwidth polling - the app now records torrent native init failure once, falls back to HTTP download bandwidth when needed, and keeps notification workers alive instead of dying on NoClassDefFoundError
- - fix:About screen no longer crashes when jlibtorrent is unavailable - it now shows fallback version text instead of crashing on native library initialization failure
- - fix:Add to Playlist menus no longer crash if the host activity is already closing - delayed menu dialogs now validate the activity before showing
- - fix:Queue Save Queue no longer crashes after leaving the player screen - the playlist dialog is only shown while the fragment is still attached and its state is not already saved
- - fix:Tracker edit/remove actions no longer crash on stale tracker positions - tracker rows now re-resolve the selected tracker against the latest list before mutating it
- - fix:Malformed Apollo profile launches no longer crash - ProfileActivity now validates extras and MIME type before opening and fails closed on unsupported launches
- - fix:Artist/profile navigation no longer crashes from detached Apollo fragments - artist lookups now use stable app context and only navigate if the host activity is still alive
+  - fix:ANR in Transfers list - BTDownload state is now cached on a background thread instead of calling blocking JNI (pthread_cond_wait) from RecyclerView onBindViewHolder on the UI thread
+  - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
+  - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
+  - fix:Crash MusicPlaybackService.onTaskRemoved - ExoPlayer is now accessed on the dedicated MusicPlayerHandler thread instead of the calling thread (e.g., EngineThreadPool)
+  - fix:Crash RejectedExecutionException - ThreadExecutor pool expanded from 64 to 256 threads and switched from SynchronousQueue to LinkedBlockingQueue so tasks queue instead of being rejected
+  - fix:Crash IllegalStateException - TransferDetailFilesFragment.updateComponentsWithItems now guards against detached fragments with isAdded() check; item loading now uses HIGH_PRIORITY dedicated thread for faster response
+  - fix:Crash IllegalStateException - SearchFragment.startTellurideDownloadDialog now guards against detached fragments with isAdded() check and try/catch around getParentFragmentManager()
+  - fix:ANR in Transfer Detail > Files - fragment no longer triggers blocking JNI (torrent_handle::have_piece) from getItems() on the UI thread; items are loaded asynchronously via peekItems() with background fallback
+  - fix:ANR in Transfer Detail > Files - file list sorting by progress now runs on a background thread instead of calling blocking JNI (torrent_handle::file_progress) from Collections.sort() on the UI thread
+  - fix:ANR in Transfers list - UIBittorrentDownload cached getters (getState, getProgress, getConnectedPeers, getTotalPeers, getConnectedSeeds, getTotalSeeds) no longer fall back to blocking JNI calls when cache is null; they return safe defaults instead
+  - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
+  - fix:Torrent JNI/libtorrent startup failures no longer crash transfer notification updates or bandwidth polling - the app now records torrent native init failure once, falls back to HTTP download bandwidth when needed, and keeps notification workers alive instead of dying on NoClassDefFoundError
+  - fix:About screen no longer crashes when jlibtorrent is unavailable - it now shows fallback version text instead of crashing on native library initialization failure
+  - fix:Artist/profile navigation no longer crashes from detached Apollo fragments - artist lookups now use stable app context and only navigate if the host activity is still alive
+  - fix:Tracker edit/remove actions no longer crash on stale tracker positions - tracker rows now re-resolve the selected tracker against the latest list before mutating it
+  - fix:Add to Playlist menus no longer crash if the host activity is already closing - delayed menu dialogs now validate the activity before showing
+  - fix:Queue Save Queue no longer crashes after leaving the player screen - the playlist dialog is only shown while the fragment is still attached and its state is not already saved
+  - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
+  - fix:Malformed Apollo profile launches no longer crash - ProfileActivity now validates extras and MIME type before opening and fails closed on unsupported launches
   - fix:Apollo context menus no longer depend on MusicPlaybackService startup for non-playback actions - song list prefetching, playlist mutations, and More by Artist now run on the MISC handler with detached-host guards
   - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
-  - fix:Torrent Settings custom dialogs no longer crash on open - custom preference dialogs now restore the target fragment contract required by PreferenceDialogFragmentCompat before showing seekbar and port-range dialogs
-  - fix:Transfers/Library audio taps no longer crash during MusicPlaybackService startup - music commands now wait for the player handler to exist, and early handler posts are queued until service initialization completes instead of throwing
   - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
-  - fix:ANR in Transfers list - BTDownload state is now cached on a background thread instead of calling blocking JNI (pthread_cond_wait) from RecyclerView onBindViewHolder on the UI thread
-  - fix:ANR in Transfer Detail > Files - file list sorting by progress now runs on a background thread instead of calling blocking JNI (torrent_handle::file_progress) from Collections.sort() on the UI thread
-  - fix:ANR in Transfer Detail > Files - fragment no longer triggers blocking JNI (torrent_handle::have_piece) from getItems() on the UI thread; items are loaded asynchronously via peekItems() with background fallback
-  - fix:ANR in Transfers list - UIBittorrentDownload cached getters (getState, getProgress, getConnectedPeers, getTotalPeers, getConnectedSeeds, getTotalSeeds) no longer fall back to blocking JNI calls when cache is null; they return safe defaults instead
-  - fix:Crash MusicPlaybackService.onTaskRemoved - ExoPlayer is now accessed on the dedicated MusicPlayerHandler thread instead of the calling thread (e.g., EngineThreadPool)
-  - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
-  - fix:Crash RejectedExecutionException - ThreadExecutor pool expanded from 64 to 256 threads and switched from SynchronousQueue to LinkedBlockingQueue so tasks queue instead of being rejected
-  - fix:Crash IllegalStateException - SearchFragment.startTellurideDownloadDialog now guards against detached fragments with isAdded() check and try/catch around getParentFragmentManager()
-  - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
-  - fix:Crash IllegalStateException - TransferDetailFilesFragment.updateComponentsWithItems now guards against detached fragments with isAdded() check; item loading now uses HIGH_PRIORITY dedicated thread for faster response
 
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support
