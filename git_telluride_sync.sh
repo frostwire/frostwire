@@ -13,13 +13,14 @@ if ! git rev-parse --show-toplevel >/dev/null 2>&1; then
     exit 1
 fi
 
-if [[ ! -d "${SUBMODULE_PATH}" ]]; then
-    echo "telluride submodule not found. Initializing..."
+# Check if submodule is actually initialized (directory exists and has .git)
+if [[ ! -e "${SUBMODULE_PATH}/.git" ]]; then
+    echo "telluride submodule not initialized. Initializing..."
     git submodule update --init --recursive telluride
 fi
 
-if [[ ! -d "${SUBMODULE_PATH}" ]]; then
-    echo "Error: telluride submodule directory not found at ${SUBMODULE_PATH}."
+if [[ ! -e "${SUBMODULE_PATH}/.git" ]]; then
+    echo "Error: telluride submodule failed to initialize at ${SUBMODULE_PATH}."
     exit 1
 fi
 
