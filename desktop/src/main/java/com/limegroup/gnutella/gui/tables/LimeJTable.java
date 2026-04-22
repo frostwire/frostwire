@@ -116,6 +116,9 @@ public class LimeJTable extends JTable implements JSortTable {
      * Sets the given row to be the only one selected.
      */
     public void setSelectedRow(int row) {
+        if (row < 0 || row >= getRowCount()) {
+            return;
+        }
         clearSelection();
         addRowSelectionInterval(row, row);
     }
