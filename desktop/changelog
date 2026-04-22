@@ -5,8 +5,9 @@ frostwire (7.0.4) stable; urgency=high
   * New: Per-torrent file priority control — transfer detail Files tab now includes a Priority column with an 8-level popup menu (from libtorrent's IGNORE to SEVEN), allowing users to adjust bandwidth allocation per file within a torrent
   * Fix: Transfer detail Files tab now refreshes correctly after priority changes — file progress no longer shows stale 0% after adjusting priority
   * Fix: Transfer detail priority popup menu now uses FrostWire's themed SkinMenuItem/SkinMenu components for consistent dark theme rendering
-  * Fix: Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
-  * Fix: Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
+   * Fix: Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
+   * Fix: Transfer detail Files tab "Show skipped files" checkbox now responds instantly — checkbox clicks run on ForkJoinPool.commonPool() instead of the shared single-threaded BackgroundQueuedExecutorService queue, eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag
+   * Fix: Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
   * Fix: Transfer detail panel now populates correctly on first view — added HierarchyListener to detect when the Transfers tab becomes visible and trigger an initial selection update, fixing the empty detail panel on first open
  * Update: Refresh default tracker lists across desktop torrent creation, magnet URLs, and CreateTorrentDialog with current reliable public trackers (opentrackr, openbittorrent, stealth.si, exodus, torrent.eu.org, moeking, explodie, coppersurfer)
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
