@@ -346,28 +346,28 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         public void run() {
             try {
                 GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().clearLibraryTable());
-                final List<File> cache = new ArrayList<>(_mtsfdh.getCache());
-                if (cache.size() == 0) {
-                    File torrentDataDirFile = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
-                    Set<File> ignore = TorrentUtil.getIgnorableFiles();
-                    Set<File> directories = new HashSet<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
-                    // Ensure torrent data dir is always searched even if DIRECTORIES_TO_INCLUDE is empty
-                    if (directories.isEmpty() && torrentDataDirFile != null && torrentDataDirFile.exists()) {
-                        directories.add(torrentDataDirFile);
+                // Always search the disk — do not skip just because the cache has entries.
+                // The cache may only contain files from recently finished torrents (scanInternal)
+                // and miss files that were on disk before startup or in directories not covered
+                // by scan(). Searching the disk ensures the library tree shows a complete view.
+                // Duplicate adds are harmless because HashBasedDataLineModel deduplicates by File key.
+                File torrentDataDirFile = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
+                Set<File> ignore = TorrentUtil.getIgnorableFiles();
+                Set<File> directories = new HashSet<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+                // Ensure torrent data dir is always searched even if DIRECTORIES_TO_INCLUDE is empty
+                if (directories.isEmpty() && torrentDataDirFile != null && torrentDataDirFile.exists()) {
+                    directories.add(torrentDataDirFile);
+                }
+                directories.removeAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                for (File dir : directories) {
+                    if (dir == null) {
+                        continue;
                     }
-                    directories.removeAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
-                    for (File dir : directories) {
-                        if (dir == null) {
-                            continue;
-                        }
-                        if (dir.equals(torrentDataDirFile)) {
-                            search(dir, ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
-                        } else if (!dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) || _mtsfdh.getMediaType().equals(MediaType.getAudioMediaType())) {
-                            search(dir, new HashSet<>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
-                        }
+                    if (dir.equals(torrentDataDirFile)) {
+                        search(dir, ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                    } else if (!dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) || _mtsfdh.getMediaType().equals(MediaType.getAudioMediaType())) {
+                        search(dir, new HashSet<>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                     }
-                } else {
-                    GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addFilesToLibraryTable(cache));
                 }
                 LibraryExplorer.this.executePendingRunnables();
             } catch (Throwable e) {

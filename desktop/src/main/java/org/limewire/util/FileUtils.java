@@ -288,7 +288,9 @@ public class FileUtils {
         try {
             dir = Files.newDirectoryStream(directoryFile.toPath());
             for (Path child : dir) {
-                files.add(child.toFile());
+                // Ensure absolute paths so downstream code (library table model,
+                // cache deduplication, canonical path resolution) works correctly.
+                files.add(child.toAbsolutePath().toFile());
             }
         } catch (IOException e) {
             e.printStackTrace();
