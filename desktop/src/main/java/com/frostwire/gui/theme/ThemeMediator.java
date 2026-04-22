@@ -202,6 +202,38 @@ public final class ThemeMediator {
         }
     }
 
+    /**
+     * Loads the theme during application startup on the current thread.
+     * This avoids blocking the EDT since no Swing components exist yet.
+     */
+    public static void loadThemeAtStartup(ThemeEnum theme) {
+        try {
+            if (theme == ThemeEnum.DEFAULT) {
+                UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+                    @Override
+                    public UIDefaults getDefaults() {
+                        return modifyNimbusDefaults(super.getDefaults());
+                    }
+                });
+                applySkinSettings();
+                setupGlobalKeyManager();
+            } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
+                purgeSynthOverrides();
+                FlatDarkLaf.setup();
+                installFlatDarkLafDefaults();
+            } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
+                purgeSynthOverrides();
+                FlatLightLaf.setup();
+                installFlatLightLafDefaults();
+            }
+            currentTheme = theme;
+            UISettings.UI_THEME.setValue(theme.name());
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unable to load theme at startup", e);
+        }
+    }
+
     public static void loadDefaultTheme() {
         Runnable themeChanger = new Runnable() {
             public void run() {

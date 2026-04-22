@@ -92,7 +92,7 @@ final class Initializer {
             UISettings.UI_THEME.setValue(saved.name());
         }
         System.out.println("Initializer.initialize() applying theme: " + saved);
-        ThemeMediator.switchTheme(saved);
+        ThemeMediator.loadThemeAtStartup(saved);
         // Various startup tasks...
         //System.out.println("Initializer.initialize() setup callbacks and listeners");
         setupCallbacksAndListeners();
