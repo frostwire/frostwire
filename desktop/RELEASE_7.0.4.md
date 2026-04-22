@@ -93,6 +93,7 @@ We've hardened the app against macOS Java 21 font-layout JNI crashes caused by m
 ### Other Critical Fixes
 
 - **Audio extraction crash**: After extracting audio from a video download, selecting the newly added file in the library table could crash with `IllegalArgumentException: Row index out of range` if the file hadn't been scanned yet. Added a bounds check to `LimeJTable.setSelectedRow()` to prevent this race condition.
+- **Library Audio/Video nodes empty**: Clicking Audio or Video in the library tree showed no files even though the Default Save Folder displayed downloads correctly. Fixed three root causes: `MediaTypeSavedFilesDirectoryHolder.getFiles()` was hardcoded to return an empty array instead of the cached files; `LibraryMediator.scanInternal()` refused to add newly downloaded files to empty caches; and `SearchByMediaTypeRunnable` didn't fall back to the torrent data directory when `DIRECTORIES_TO_INCLUDE` was empty.
 - **Shutdown hang**: Added 30s timeout to `LifecycleManager` shutdown latch to prevent indefinite hangs
 - **File size precision**: `BTDownload.getSize()` return type changed from `double` to `long` — no more precision loss above 2GB
 - **Library showing 0.0KB**: File metadata loading now wrapped in try-catch with proper cell invalidation after background load
