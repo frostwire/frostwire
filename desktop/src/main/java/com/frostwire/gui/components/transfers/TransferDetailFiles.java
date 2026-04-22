@@ -30,6 +30,7 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class TransferDetailFiles extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -37,7 +38,13 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     private final TransferDetailFilesTableMediator tableMediator;
     private final JCheckBox showSkippedCheckbox;
     private BittorrentDownload btDownload;
-    private volatile boolean forceRefresh = false;
+    /**
+     * Cached full holder list (includes skipped files) for the current torrent.
+     * Rebuilt from JNI only when the transfer data changes (new pieces, priority changes).
+     * Checkbox clicks merely filter this cached list on the EDT — zero JNI, instant response.
+     */
+    private List<TransferItemHolder> allHolders = Collections.emptyList();
+    private boolean cachedIsPartial = false;
 
     TransferDetailFiles() {
         tableMediator = new TransferDetailFilesTableMediator();
@@ -46,16 +53,13 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
         showSkippedCheckbox.setVisible(false);
         showSkippedCheckbox.addItemListener(e -> {
             BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.setValue(showSkippedCheckbox.isSelected());
-            forceRefresh = true;
-            if (btDownload != null) {
-                updateData(btDownload);
-            }
+            // Checkbox click = instant filter of cached holders. No background thread, no JNI.
+            applyFilterOnEdt();
         });
 
         Runnable refreshCallback = () -> {
             if (btDownload != null) {
-                forceRefresh = true;
-                updateData(btDownload);
+                rebuildHolders(btDownload);
             }
         };
         TransferDetailFilesActionsRenderer.setOnDownloadStartedCallback(refreshCallback);
@@ -66,72 +70,91 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
         add(tableMediator.getComponent(), "gap 0 0 0 0, growx, growy");
     }
 
+    /**
+     * Filters the cached {@link #allHolders} based on the current "Show skipped files"
+     * setting and updates the table — entirely on the EDT, zero JNI calls.
+     */
+    private void applyFilterOnEdt() {
+        boolean showSkipped = BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue();
+        showSkippedCheckbox.setVisible(cachedIsPartial);
+
+        if (allHolders.isEmpty()) {
+            tableMediator.setHolders(Collections.emptyList());
+            return;
+        }
+
+        int visibleCount = 0;
+        for (TransferItemHolder h : allHolders) {
+            if (!h.skipped || showSkipped) {
+                visibleCount++;
+            }
+        }
+        List<TransferItemHolder> visible = new ArrayList<>(visibleCount);
+        for (TransferItemHolder h : allHolders) {
+            if (!h.skipped || showSkipped) {
+                visible.add(h);
+            }
+        }
+        tableMediator.setHolders(visible);
+    }
+
     @Override
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload == null || btDownload.getDl() == null) {
             return;
         }
-        final boolean isPartial = btDownload.getDl().isPartial();
-        final boolean showSkipped = BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue();
+        // If this is the same torrent and we already have cached holders, the
+        // refresh loop is just telling us to repaint with current data. The
+        // cached holders are already up-to-date (or will be refreshed by the
+        // priority-changed / download-started callbacks). Just re-apply filter.
+        if (this.btDownload == btDownload && !allHolders.isEmpty()) {
+            SwingUtilities.invokeLater(this::applyFilterOnEdt);
+            return;
+        }
+        // New torrent or first view — rebuild from JNI in background.
+        rebuildHolders(btDownload);
+    }
 
-        Runnable backgroundTask = () -> {
+    private void rebuildHolders(BittorrentDownload target) {
+        Runnable task = () -> {
             try {
-                List<TransferItem> items = btDownload.getDl().getItems();
+                // All JNI calls happen here, off the EDT.
+                boolean newIsPartial = target.getDl().isPartial();
+                List<TransferItem> items = target.getDl().getItems();
+                List<TransferItemHolder> holders = Collections.emptyList();
                 if (items != null && !items.isEmpty()) {
-                    // Build holders here (background thread) so JNI calls in
-                    // TransferItemHolder constructor (isComplete/getProgress/isSkipped) never touch the EDT.
-                    List<TransferItemHolder> holders = new ArrayList<>(items.size());
+                    holders = new ArrayList<>(items.size());
                     int i = 0;
                     for (TransferItem item : items) {
-                        if (!item.isSkipped() || showSkipped) {
-                            holders.add(new TransferItemHolder(i++, item));
-                        }
+                        holders.add(new TransferItemHolder(i++, item));
                     }
-                    SwingUtilities.invokeLater(() -> {
-                        try {
-                            // If the setting changed while we were building holders,
-                            // a newer update (e.g. a subsequent checkbox click) is in
-                            // flight and will refresh the UI. Skip this stale frame.
-                            if (BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue() != showSkipped) {
-                                return;
-                            }
-                            showSkippedCheckbox.setVisible(isPartial);
-                            boolean switchingTorrent = this.btDownload != btDownload;
-                            forceRefresh = false;
-                            if (switchingTorrent) {
-                                this.btDownload = btDownload;
-                                // Only sync checkbox state when switching to a new transfer.
-                                // The user manages the checkbox state; refreshing the table
-                                // should not fight with the user's click.
-                                // Hiding/showing the checkbox must not change the saved state.
-                                if (isPartial) {
-                                    showSkippedCheckbox.setSelected(showSkipped);
-                                }
-                            }
-                            // Batch-replace the entire table in one shot to avoid the per-row
-                            // fireTableRowsInserted storm that freezes the EDT for seconds
-                            // on torrents with thousands of files.
-                            tableMediator.setHolders(holders);
-                        } catch (Throwable e) {
-                            LOG.error("Error updating transfer files details UI", e);
-                        }
-                    });
                 }
+                final boolean finalIsPartial = newIsPartial;
+                final List<TransferItemHolder> finalHolders = holders;
+                SwingUtilities.invokeLater(() -> {
+                    // Guard against race: user may have selected a different
+                    // torrent while we were building holders.
+                    if (target != btDownload && btDownload != null) {
+                        return;
+                    }
+                    this.btDownload = target;
+                    this.cachedIsPartial = finalIsPartial;
+                    this.allHolders = finalHolders;
+                    showSkippedCheckbox.setVisible(finalIsPartial);
+                    applyFilterOnEdt();
+                });
             } catch (Throwable e) {
-                LOG.error("Error fetching transfer files details", e);
+                LOG.error("Error rebuilding transfer file holders", e);
             }
         };
 
         if (SwingUtilities.isEventDispatchThread()) {
-            // Checkbox clicks and other EDT callbacks must not block the EDT.
-            // Use a dedicated thread (Android HIGH_PRIORITY pattern) instead of any
-            // shared pool so the task starts immediately and never waits behind
-            // queued background work.
-            new Thread(backgroundTask, "TransferDetailFiles-UI-" + System.currentTimeMillis()).start();
+            // Spawns a dedicated thread (Android HIGH_PRIORITY pattern) so the
+            // task starts immediately and never waits behind queued background work.
+            new Thread(task, "TransferDetailFiles-Rebuild-" + System.currentTimeMillis()).start();
         } else {
-            // Called from TransferDetailComponent's background refresh loop;
-            // already off-EDT, so run directly to avoid double-queueing.
-            backgroundTask.run();
+            // Called from TransferDetailComponent's background refresh loop.
+            task.run();
         }
     }
 
@@ -156,7 +179,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
             this.fileOffset = fileOffset;
             this.transferItem = transferItem;
             // isComplete() / getProgress() / isSkipped() / getPriority() call JNI — safe here because
-            // TransferItemHolder is always constructed inside BackgroundQueuedExecutorService.
+            // TransferItemHolder is always constructed inside a background thread.
             this.complete = transferItem.isComplete();
             this.progress = this.complete ? 100 : transferItem.getProgress();
             this.skipped = transferItem.isSkipped();

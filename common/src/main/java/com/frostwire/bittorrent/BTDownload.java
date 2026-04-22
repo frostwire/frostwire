@@ -58,6 +58,7 @@ public final class BTDownload implements BittorrentDownload {
     private final File savePath;
     private final Date created;
     private final PiecesTracker piecesTracker;
+    private volatile boolean piecesTrackerInitialized;
     private final File parts;
     private final Map<String, String> extra;
     private final PaymentOptions paymentOptions;
@@ -700,14 +701,16 @@ public final class BTDownload implements BittorrentDownload {
                     BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker, savePath);
                     items.add(item);
                 }
-                if (piecesTracker != null) {
+                if (piecesTracker != null && !piecesTrackerInitialized) {
                     int numPieces = ti.numPieces();
-                    // perform piece complete check
+                    // One-time initialization: sync piecesTracker with already-completed
+                    // pieces. After this, pieceFinished() alerts keep it up-to-date.
                     for (int i = 0; i < numPieces; i++) {
                         if (th.havePiece(i)) {
                             piecesTracker.setComplete(i, true);
                         }
                     }
+                    piecesTrackerInitialized = true;
                 }
             }
         }
