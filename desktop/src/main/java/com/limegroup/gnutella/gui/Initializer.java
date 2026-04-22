@@ -298,6 +298,8 @@ final class Initializer {
         // Pre-load locales to avoid EDT violations when locales are later accessed on the EDT.
         // This must be done before SetupManager creates the LanguagePanel
         LanguageUtils.preloadLocales();
+        // Pre-load flag images for all locales to avoid blocking the EDT during combo box layout
+        LanguageFlagFactory.preloadFlags(LanguageUtils.getLocales(null));
         
         // Load up the HTML engine.
         GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));

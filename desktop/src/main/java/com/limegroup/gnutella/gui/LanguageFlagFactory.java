@@ -177,6 +177,16 @@ public class LanguageFlagFactory {
     }
 
     /**
+     * Pre-loads flag images for the given locales to warm up the ResourceManager cache.
+     * This avoids blocking the EDT when the combo box renderer later requests flags during layout.
+     */
+    public static void preloadFlags(Locale[] locales) {
+        for (Locale locale : locales) {
+            getFlag(locale.getCountry(), locale.getLanguage());
+        }
+    }
+
+    /**
      * Returns a ListCellRenderer that can be used for showing flags in a JList or JComboBox.
      * The Renderer expects the object in the list to be a LanguageInfo object.
      */
