@@ -67,7 +67,7 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
     }
 
     public File[] getFiles() {
-        return new File[0];
+        return cache.toArray(new File[0]);
     }
 
     public int size() {

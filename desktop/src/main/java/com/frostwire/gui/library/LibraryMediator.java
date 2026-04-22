@@ -208,9 +208,8 @@ public class LibraryMediator {
         } else {
             List<MediaTypeSavedFilesDirectoryHolder> holders = getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
             for (MediaTypeSavedFilesDirectoryHolder holder : holders) {
-                Set<File> cache = holder.getCache();
-                if (holder.accept(location) && !cache.isEmpty()) {
-                    cache.add(location);
+                if (holder.accept(location)) {
+                    holder.getCache().add(location);
                 }
             }
         }

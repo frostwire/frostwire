@@ -351,6 +351,10 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                     File torrentDataDirFile = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
                     Set<File> ignore = TorrentUtil.getIgnorableFiles();
                     Set<File> directories = new HashSet<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+                    // Ensure torrent data dir is always searched even if DIRECTORIES_TO_INCLUDE is empty
+                    if (directories.isEmpty() && torrentDataDirFile != null && torrentDataDirFile.exists()) {
+                        directories.add(torrentDataDirFile);
+                    }
                     directories.removeAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                     for (File dir : directories) {
                         if (dir == null) {
