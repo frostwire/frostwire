@@ -11,6 +11,7 @@ frostwire (7.0.4) stable; urgency=high
  * Update: Refresh default tracker lists across desktop torrent creation, magnet URLs, and CreateTorrentDialog with current reliable public trackers (opentrackr, openbittorrent, stealth.si, exodus, torrent.eu.org, moeking, explodie, coppersurfer)
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
  * EDT freeze: Preload language flag images before showing the setup wizard so JComboBox layout no longer blocks the EDT with MediaTracker.waitForID() on startup
+ * EDT freeze: Load UI theme off-EDT during startup — Nimbus/FlatLaf initialization moved to the main thread before any Swing components exist, eliminating a >2 second EDT block on every launch
  * EDT freeze: Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
  * Fix: Race condition crash after audio extraction — selecting library table row 0 before the file is scanned no longer throws IllegalArgumentException; bounds check added to LimeJTable.setSelectedRow()
  * Fix: Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
