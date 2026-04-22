@@ -51,7 +51,7 @@ The IP Filter settings pane is now fully wired to BTEngine — the clear and imp
 
 ## No More UI Freezes
 
-This release tackles the root cause of UI freezes across FrostWire. We identified and fixed **20 EDT (Event Dispatch Thread) violations** that were blocking the UI during file I/O, torrent parsing, JNI calls, and dialog creation.
+This release tackles the root cause of UI freezes across FrostWire. We identified and fixed **21 EDT (Event Dispatch Thread) violations** that were blocking the UI during file I/O, torrent parsing, JNI calls, and dialog creation.
 
 ### macOS Deadlock Fixes
 
@@ -63,6 +63,7 @@ This release tackles the root cause of UI freezes across FrostWire. We identifie
 
 The following operations now run on background threads instead of blocking the UI:
 
+- **Theme loading at startup** — Nimbus and FlatLaf Look-and-Feel initialization is now performed on the main thread before any Swing components exist, eliminating a consistent >2 second EDT freeze on every launch
 - **Language flag image preloading** — all locale flag icons are loaded into the ResourceManager cache before the setup wizard opens, so JComboBox layout no longer triggers `MediaTracker.waitForID()` on the EDT during startup
 - **Transfer detail panels** (General, Trackers, Peers, Pieces) — all JNI data gathering is now off-EDT
 - **Native magnet URI generation** — no longer blocks >2 seconds on large torrents
