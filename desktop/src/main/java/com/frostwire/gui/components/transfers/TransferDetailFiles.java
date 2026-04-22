@@ -26,7 +26,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.BittorrentSettings;
-import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -69,59 +68,79 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        if (btDownload != null && btDownload.getDl() != null) {
-            final boolean isPartial = btDownload.getDl().isPartial();
-            final boolean showSkipped = BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue();
-            BackgroundQueuedExecutorService.schedule(() -> {
-                try {
-                    List<TransferItem> items = btDownload.getDl().getItems();
-                    if (items != null && !items.isEmpty()) {
-                        // Build holders here (background thread) so JNI calls in
-                        // TransferItemHolder constructor (isComplete/getProgress/isSkipped) never touch the EDT.
-                        List<TransferItemHolder> holders = new ArrayList<>(items.size());
-                        int i = 0;
-                        for (TransferItem item : items) {
-                            if (!item.isSkipped() || showSkipped) {
-                                holders.add(new TransferItemHolder(i++, item));
-                            }
+        if (btDownload == null || btDownload.getDl() == null) {
+            return;
+        }
+        final boolean isPartial = btDownload.getDl().isPartial();
+        final boolean showSkipped = BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue();
+
+        Runnable backgroundTask = () -> {
+            try {
+                List<TransferItem> items = btDownload.getDl().getItems();
+                if (items != null && !items.isEmpty()) {
+                    // Build holders here (background thread) so JNI calls in
+                    // TransferItemHolder constructor (isComplete/getProgress/isSkipped) never touch the EDT.
+                    List<TransferItemHolder> holders = new ArrayList<>(items.size());
+                    int i = 0;
+                    for (TransferItem item : items) {
+                        if (!item.isSkipped() || showSkipped) {
+                            holders.add(new TransferItemHolder(i++, item));
                         }
-                        SwingUtilities.invokeLater(() -> {
-                            try {
-                                showSkippedCheckbox.setVisible(isPartial);
-                                boolean shouldClear = this.btDownload != btDownload || forceRefresh;
-                                forceRefresh = false;
-                                if (shouldClear) {
-                                    this.btDownload = btDownload;
-                                    // Only set checkbox state when switching to a new transfer.
-                                    // The user manages the checkbox state; refreshing the table
-                                    // should not fight with the user's click.
-                                    // Hiding/showing the checkbox must not change the saved state.
-                                    if (isPartial) {
-                                        showSkippedCheckbox.setSelected(showSkipped);
-                                    }
-                                    tableMediator.clearTable();
-                                    for (TransferItemHolder holder : holders) {
-                                        tableMediator.add(holder);
-                                    }
-                                } else {
-                                    // TransferItemHolder has immutable pre-computed values (progress, skipped, priority).
-                                    // tableMediator.update(holder) only fires a repaint but cannot change the data
-                                    // because TransferDetailFilesDataLine.update() is empty and the holder reference
-                                    // in the data line is never replaced. Always clear+rebuild to show fresh data.
-                                    tableMediator.clearTable();
-                                    for (TransferItemHolder holder : holders) {
-                                        tableMediator.add(holder);
-                                    }
-                                }
-                            } catch (Throwable e) {
-                                LOG.error("Error updating transfer files details UI", e);
-                            }
-                        });
                     }
-                } catch (Throwable e) {
-                    LOG.error("Error fetching transfer files details", e);
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            // If the setting changed while we were building holders,
+                            // a newer update (e.g. a subsequent checkbox click) is in
+                            // flight and will refresh the UI. Skip this stale frame.
+                            if (BittorrentSettings.SHOW_SKIPPED_FILES_IN_TRANSFER_DETAIL.getValue() != showSkipped) {
+                                return;
+                            }
+                            showSkippedCheckbox.setVisible(isPartial);
+                            boolean switchingTorrent = this.btDownload != btDownload;
+                            boolean shouldClear = switchingTorrent || forceRefresh;
+                            forceRefresh = false;
+                            if (shouldClear) {
+                                this.btDownload = btDownload;
+                                // Only sync checkbox state when switching to a new transfer.
+                                // The user manages the checkbox state; refreshing the table
+                                // should not fight with the user's click.
+                                // Hiding/showing the checkbox must not change the saved state.
+                                if (isPartial && switchingTorrent) {
+                                    showSkippedCheckbox.setSelected(showSkipped);
+                                }
+                                tableMediator.clearTable();
+                                for (TransferItemHolder holder : holders) {
+                                    tableMediator.add(holder);
+                                }
+                            } else {
+                                // TransferItemHolder has immutable pre-computed values (progress, skipped, priority).
+                                // tableMediator.update(holder) only fires a repaint but cannot change the data
+                                // because TransferDetailFilesDataLine.update() is empty and the holder reference
+                                // in the data line is never replaced. Always clear+rebuild to show fresh data.
+                                tableMediator.clearTable();
+                                for (TransferItemHolder holder : holders) {
+                                    tableMediator.add(holder);
+                                }
+                            }
+                        } catch (Throwable e) {
+                            LOG.error("Error updating transfer files details UI", e);
+                        }
+                    });
                 }
-            });
+            } catch (Throwable e) {
+                LOG.error("Error fetching transfer files details", e);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            // Checkbox clicks and other EDT callbacks must not block the EDT.
+            // Use the common fork-join pool instead of the shared single-threaded
+            // BackgroundQueuedExecutorService so the UI stays responsive.
+            java.util.concurrent.ForkJoinPool.commonPool().execute(backgroundTask);
+        } else {
+            // Called from TransferDetailComponent's background refresh loop;
+            // already off-EDT, so run directly to avoid double-queueing.
+            backgroundTask.run();
         }
     }
 
