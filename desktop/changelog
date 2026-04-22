@@ -1,7 +1,13 @@
 frostwire (7.0.4) stable; urgency=high
  * New: Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
  * New: Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
- * New: Per-torrent file download control — transfer detail Files tab now shows a "Show skipped files" checkbox for partial downloads; skipped files appear dimmed with a Download button to resume them individually
+  * New: Per-torrent file download control — transfer detail Files tab now shows a "Show skipped files" checkbox (persisted globally, default ON) for partial downloads; skipped files appear dimmed in gray with a Download button to resume them individually
+  * New: Per-torrent file priority control — transfer detail Files tab now includes a Priority column with an 8-level popup menu (from libtorrent's IGNORE to SEVEN), allowing users to adjust bandwidth allocation per file within a torrent
+  * Fix: Transfer detail Files tab now refreshes correctly after priority changes — file progress no longer shows stale 0% after adjusting priority
+  * Fix: Transfer detail priority popup menu now uses FrostWire's themed SkinMenuItem/SkinMenu components for consistent dark theme rendering
+  * Fix: Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
+  * Fix: Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
+  * Fix: Transfer detail panel now populates correctly on first view — added HierarchyListener to detect when the Transfers tab becomes visible and trigger an initial selection update, fixing the empty detail panel on first open
  * Update: Refresh default tracker lists across desktop torrent creation, magnet URLs, and CreateTorrentDialog with current reliable public trackers (opentrackr, openbittorrent, stealth.si, exodus, torrent.eu.org, moeking, explodie, coppersurfer)
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
  * EDT freeze: Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
@@ -48,6 +54,10 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
  * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
   * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+  * Fix: Tip of the Day "Show Tips at Startup" checkbox now saves immediately when toggled, so the setting survives force-quit or IDE stop before the normal exit save path runs
+  * Fix: Setup wizard now saves its completion state synchronously instead of asynchronously — prevents infinite setup wizard loops when the JVM is force-killed (e.g., IDE red button) before the background save task executes
+  * Fix: Setup wizard no longer unconditionally resets "Show Tips at Startup" to true on every run — it only resets tips on actual version updates, not when the wizard appears for other reasons (intent window, associations, etc.)
+  * Fix: Add -Dsun.java2d.fontlayout=0 JVM argument to suppress JDK 21 SunLayoutEngine JNI warning spam during SynthComboBoxUI font layout on startup
   * Fix: VPN detection now properly detects Private Internet Access (PIA) on Linux
  * Performance: HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
  * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
