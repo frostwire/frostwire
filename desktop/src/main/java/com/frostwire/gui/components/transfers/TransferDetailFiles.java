@@ -97,31 +97,21 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                             }
                             showSkippedCheckbox.setVisible(isPartial);
                             boolean switchingTorrent = this.btDownload != btDownload;
-                            boolean shouldClear = switchingTorrent || forceRefresh;
                             forceRefresh = false;
-                            if (shouldClear) {
+                            if (switchingTorrent) {
                                 this.btDownload = btDownload;
                                 // Only sync checkbox state when switching to a new transfer.
                                 // The user manages the checkbox state; refreshing the table
                                 // should not fight with the user's click.
                                 // Hiding/showing the checkbox must not change the saved state.
-                                if (isPartial && switchingTorrent) {
+                                if (isPartial) {
                                     showSkippedCheckbox.setSelected(showSkipped);
                                 }
-                                tableMediator.clearTable();
-                                for (TransferItemHolder holder : holders) {
-                                    tableMediator.add(holder);
-                                }
-                            } else {
-                                // TransferItemHolder has immutable pre-computed values (progress, skipped, priority).
-                                // tableMediator.update(holder) only fires a repaint but cannot change the data
-                                // because TransferDetailFilesDataLine.update() is empty and the holder reference
-                                // in the data line is never replaced. Always clear+rebuild to show fresh data.
-                                tableMediator.clearTable();
-                                for (TransferItemHolder holder : holders) {
-                                    tableMediator.add(holder);
-                                }
                             }
+                            // Batch-replace the entire table in one shot to avoid the per-row
+                            // fireTableRowsInserted storm that freezes the EDT for seconds
+                            // on torrents with thousands of files.
+                            tableMediator.setHolders(holders);
                         } catch (Throwable e) {
                             LOG.error("Error updating transfer files details UI", e);
                         }
@@ -134,9 +124,10 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
 
         if (SwingUtilities.isEventDispatchThread()) {
             // Checkbox clicks and other EDT callbacks must not block the EDT.
-            // Use the common fork-join pool instead of the shared single-threaded
-            // BackgroundQueuedExecutorService so the UI stays responsive.
-            java.util.concurrent.ForkJoinPool.commonPool().execute(backgroundTask);
+            // Use a dedicated thread (Android HIGH_PRIORITY pattern) instead of any
+            // shared pool so the task starts immediately and never waits behind
+            // queued background work.
+            new Thread(backgroundTask, "TransferDetailFiles-UI-" + System.currentTimeMillis()).start();
         } else {
             // Called from TransferDetailComponent's background refresh loop;
             // already off-EDT, so run directly to avoid double-queueing.

@@ -21,6 +21,8 @@ package com.frostwire.gui.components.transfers;
 
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
+import java.util.List;
+
 final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
     TransferDetailFilesModel() {
         super(TransferDetailFilesDataLine.class);
@@ -29,5 +31,26 @@ final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFi
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == TransferDetailFilesDataLine.ACTIONS_COLUMN.getModelIndex();
+    }
+
+    /**
+     * Replaces the entire model contents in one shot, avoiding the per-row
+     * {@code fireTableRowsInserted} storm that blocks the EDT for seconds
+     * when a torrent has thousands of files.
+     */
+    void setHolders(List<TransferDetailFiles.TransferItemHolder> holders) {
+        synchronized (getListLock()) {
+            cleanup();
+            _list.clear();
+            for (TransferDetailFiles.TransferItemHolder holder : holders) {
+                TransferDetailFilesDataLine dl = createDataLine();
+                dl.initialize(holder);
+                _list.add(dl);
+            }
+            if (isSorted()) {
+                _list.sort(this);
+            }
+        }
+        fireTableDataChanged();
     }
 }

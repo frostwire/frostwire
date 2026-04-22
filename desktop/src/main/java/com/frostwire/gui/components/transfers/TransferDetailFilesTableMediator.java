@@ -53,6 +53,14 @@ public class TransferDetailFilesTableMediator extends
         this.onPriorityChangedCallback = callback;
     }
 
+    void setHolders(List<TransferDetailFiles.TransferItemHolder> holders) {
+        if (TABLE.isEditing()) {
+            TABLE.getCellEditor().cancelCellEditing();
+        }
+        DATA_MODEL.setHolders(holders);
+        TABLE.clearSelection();
+    }
+
     @Override
     protected void updateSplashScreen() {
     }
