@@ -109,8 +109,11 @@ We've hardened the app against macOS Java 21 font-layout JNI crashes caused by m
 - **Speed limit controls**: Added download/upload speed limit adjustment buttons to `TransferDetailGeneral`
 - **First-view detail panel**: The transfer detail panel now populates correctly on first view. A `HierarchyListener` detects when the Transfers tab becomes visible and triggers an initial selection update, fixing the empty detail panel bug on first open.
 - **Checkbox flicker eliminated**: The "Show skipped files" checkbox no longer flickers or corrupts its saved setting when toggled. Fixed a race condition between the 1-second refresh timer and user-initiated clicks.
-- **Checkbox lag fixed**: The "Show skipped files" checkbox now responds instantly. Checkbox-initiated updates moved from the shared single-threaded `BackgroundQueuedExecutorService` queue to `ForkJoinPool.commonPool()`, eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag on busy transfers.
+- **Checkbox lag fixed**: The "Show skipped files" checkbox now responds instantly. Checkbox-initiated updates moved from the shared single-threaded `BackgroundQueuedExecutorService` queue to a dedicated thread (matching Android's `HIGH_PRIORITY` pattern), eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag on busy transfers.
 - **Table refresh fixed**: The Files tab now rebuilds its table with fresh data on every refresh instead of calling `tableMediator.update()`, which was a no-op for immutable pre-computed holder objects.
+- **Large torrent table freeze fixed**: Replaced the per-row `fireTableRowsInserted` storm with a single bulk model replacement (`setHolders`) that fires `fireTableDataChanged` once. The EDT no longer freezes for seconds when updating a torrent with thousands of files.
+- **Library tree missing files fixed**: `SearchByMediaTypeRunnable` no longer skips disk search when the cache is non-empty. Files that existed on disk before startup (or in directories not covered by `scanInternal`) now appear correctly in Audio/Video tree nodes.
+- **Library path consistency fixed**: `FileUtils.listFiles()` now returns absolute paths, ensuring cache deduplication and canonical path resolution work correctly across platforms.
 - **Priority popup themed**: The priority popup menu now uses FrostWire's themed `SkinMenuItem`/`SkinMenu` components for consistent dark theme rendering.
 - **File progress refresh**: File progress percentages now update correctly after priority changes — no more stale 0% displays.
 
