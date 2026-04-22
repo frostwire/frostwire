@@ -15,6 +15,9 @@ frostwire (7.0.4) stable; urgency=high
  * EDT freeze: Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
  * Fix: Race condition crash after audio extraction — selecting library table row 0 before the file is scanned no longer throws IllegalArgumentException; bounds check added to LimeJTable.setSelectedRow()
  * Fix: Library Audio/Video tree nodes now show files — MediaTypeSavedFilesDirectoryHolder.getFiles() was returning empty array instead of cached files; also fixed scanInternal to add new downloads to empty caches and added torrent data dir fallback when DIRECTORIES_TO_INCLUDE is empty
+ * EDT freeze: Preload ApplicationHeader button background images on the main thread before MainFrame construction to avoid MediaTracker.waitForID() blocking the EDT during startup
+ * EDT freeze: Move IconManager.instance() initialization from EDT to the main thread in Initializer.loadLateTasksForUI()
+ * Fix: Desktop.open() no longer blocks the EDT when opening files — Launcher.launchFile() now delegates to DesktopParallelExecutor to prevent Linux X11 Desktop integration stalls during playback
  * Fix: Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
  * Fix: Add 30s timeout to LifecycleManager shutdown latch to prevent indefinite hang
  * Fix: BTDownload getSize() return type double->long to prevent precision loss above 2GB
