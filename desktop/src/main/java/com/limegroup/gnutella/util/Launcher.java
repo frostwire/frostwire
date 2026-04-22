@@ -114,11 +114,17 @@ public final class Launcher {
             throw new SecurityException();
         }
 
-        try {
-            Desktop.getDesktop().open(file);
-        } catch (UnsupportedOperationException e) {
-            System.err.println("Attempted to open an unsupported file!");
-        }
+        // Defer Desktop.open() to a background thread to avoid blocking the EDT,
+        // especially on Linux where X11 Desktop integration can stall for 100-500ms
+        com.limegroup.gnutella.gui.util.DesktopParallelExecutor.execute(() -> {
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Attempted to open an unsupported file!");
+            } catch (IOException e) {
+                System.err.println("Failed to open file: " + e.getMessage());
+            }
+        });
 
         return null;
     }
