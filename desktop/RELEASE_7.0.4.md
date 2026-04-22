@@ -91,6 +91,7 @@ We've hardened the app against macOS Java 21 font-layout JNI crashes caused by m
 
 ### Other Critical Fixes
 
+- **Audio extraction crash**: After extracting audio from a video download, selecting the newly added file in the library table could crash with `IllegalArgumentException: Row index out of range` if the file hadn't been scanned yet. Added a bounds check to `LimeJTable.setSelectedRow()` to prevent this race condition.
 - **Shutdown hang**: Added 30s timeout to `LifecycleManager` shutdown latch to prevent indefinite hangs
 - **File size precision**: `BTDownload.getSize()` return type changed from `double` to `long` — no more precision loss above 2GB
 - **Library showing 0.0KB**: File metadata loading now wrapped in try-catch with proper cell invalidation after background load
