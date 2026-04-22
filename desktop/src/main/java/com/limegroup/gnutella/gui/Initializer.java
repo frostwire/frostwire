@@ -300,6 +300,8 @@ final class Initializer {
         LanguageUtils.preloadLocales();
         // Pre-load flag images for all locales to avoid blocking the EDT during combo box layout
         LanguageFlagFactory.preloadFlags(LanguageUtils.getLocales(null));
+        // Pre-load header button background images to avoid MediaTracker blocking the EDT during MainFrame construction
+        ApplicationHeader.preloadImages();
         
         // Load up the HTML engine.
         GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
@@ -377,14 +379,14 @@ final class Initializer {
      * Runs any late UI tasks, such as initializing Icons, I18n support.
      */
     private void loadLateTasksForUI() {
-        // Initialize IconManager.
-        //GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
+        // Initialize IconManager on the main thread to avoid EDT blocking.
+        // IconManager constructor is lightweight (creates BasicFileIconController
+        // and defers native icon loading via invokeLater).
+        GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
+        IconManager.instance();
         GUIMediator.safeInvokeAndWait(() -> {
-            GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
-            IconManager.instance();
+            GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));
         });
-        // Touch the I18N stuff to ensure it loads properly.
-        GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));
         I18NConvert.instance();
     }
 

@@ -459,6 +459,19 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         }
     }
 
+    /**
+     * Preloads header button background images on the main thread before UI construction.
+     * Call this before creating MainFrame to avoid MediaTracker.waitForID() blocking the EDT.
+     */
+    public static void preloadImages() {
+        try {
+            GUIMediator.getThemeImage("selected_header_button_background");
+            GUIMediator.getThemeImage("unselected_header_button_background");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class SchemaListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             SearchSettings.MAX_QUERY_LENGTH.revertToDefault();
