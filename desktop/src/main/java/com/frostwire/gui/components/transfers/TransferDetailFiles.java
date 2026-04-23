@@ -45,6 +45,12 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      */
     private List<TransferItemHolder> allHolders = Collections.emptyList();
     private boolean cachedIsPartial = false;
+    /**
+     * Monotonically-increasing sequence number for rebuildHolders calls.
+     * Each invokeLater checks whether a newer rebuild has superseded it,
+     * preventing stale updates from out-of-order background completions.
+     */
+    private volatile long rebuildSequence = 0;
 
     TransferDetailFiles() {
         tableMediator = new TransferDetailFilesTableMediator();
@@ -116,6 +122,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
     }
 
     private void rebuildHolders(BittorrentDownload target) {
+        final long mySequence = ++rebuildSequence;
         Runnable task = () -> {
             try {
                 // All JNI calls happen here, off the EDT.
@@ -132,9 +139,9 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
                 final boolean finalIsPartial = newIsPartial;
                 final List<TransferItemHolder> finalHolders = holders;
                 SwingUtilities.invokeLater(() -> {
-                    // Guard against race: user may have selected a different
-                    // torrent while we were building holders.
-                    if (target != btDownload && btDownload != null) {
+                    // If a newer rebuild has started (higher sequence number),
+                    // this update is stale and should be skipped.
+                    if (mySequence != rebuildSequence) {
                         return;
                     }
                     this.btDownload = target;
