@@ -1,20 +1,20 @@
 frostwire (7.0.4) stable; urgency=high
  * New: Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
  * New: Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
-  * New: Per-torrent file download control — transfer detail Files tab now shows a "Show skipped files" checkbox (persisted globally, default ON) for partial downloads; skipped files appear dimmed in gray with a Download button to resume them individually
-  * New: Per-torrent file priority control — transfer detail Files tab now includes a Priority column with an 8-level popup menu (from libtorrent's IGNORE to SEVEN), allowing users to adjust bandwidth allocation per file within a torrent
-  * Fix: Transfer detail Files tab now refreshes correctly after priority changes — file progress no longer shows stale 0% after adjusting priority
-  * Fix: Transfer detail priority popup menu now uses FrostWire's themed SkinMenuItem/SkinMenu components for consistent dark theme rendering
-   * Fix: Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
-    * Fix: Transfer detail Files tab "Show skipped files" checkbox now responds instantly — checkbox clicks spawn a dedicated thread (matching Android's HIGH_PRIORITY pattern) instead of queuing on any shared pool, eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag
-    * Fix: Transfer detail Files tab "Show skipped files" checkbox is now truly instant — cached holder list means checkbox click is a pure-EDT filter with zero JNI calls; previously it re-fetched all file metadata from libtorrent on every click
-    * Fix: Transfer detail Files tab table rebuild no longer blocks the EDT for seconds on large torrents — replaced per-row fireTableRowsInserted storm with a single bulk model replacement (setHolders) that fires fireTableDataChanged once
-    * Fix: BTDownload.getItems() no longer performs redundant 10,000-piece JNI loop on every call — piecesTracker initialization now happens once, eliminating thousands of th.havePiece() JNI calls per refresh for large torrents
-    * Fix: Transfer detail Files tab now correctly switches content when selecting a different torrent — replaced broken target-vs-btDownload guard with a monotonic sequence counter so stale background completions are skipped without blocking legitimate torrent switches
-    * Fix: Library Audio/Video tree nodes now show all files on disk — SearchByMediaTypeRunnable no longer skips disk search when the cache is non-empty, preventing missing files that were on disk before startup or in directories not covered by scanInternal()
-    * Fix: FileUtils.listFiles() now returns absolute paths so library file discovery, cache deduplication, and canonical path resolution work correctly across all platforms
-    * Fix: Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
-  * Fix: Transfer detail panel now populates correctly on first view — added HierarchyListener to detect when the Transfers tab becomes visible and trigger an initial selection update, fixing the empty detail panel on first open
+ * New: Per-torrent file download control — transfer detail Files tab now shows a "Show skipped files" checkbox (persisted globally, default ON) for partial downloads; skipped files appear dimmed in gray with a Download button to resume them individually
+ * New: Per-torrent file priority control — transfer detail Files tab now includes a Priority column with an 8-level popup menu (from libtorrent's IGNORE to SEVEN), allowing users to adjust bandwidth allocation per file within a torrent
+ * Fix: Transfer detail Files tab now refreshes correctly after priority changes — file progress no longer shows stale 0% after adjusting priority
+ * Fix: Transfer detail priority popup menu now uses FrostWire's themed SkinMenuItem/SkinMenu components for consistent dark theme rendering
+ * Fix: Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
+ * Fix: Transfer detail Files tab "Show skipped files" checkbox now responds instantly — checkbox clicks spawn a dedicated thread (matching Android's HIGH_PRIORITY pattern) instead of queuing on any shared pool, eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag
+ * Fix: Transfer detail Files tab "Show skipped files" checkbox is now truly instant — cached holder list means checkbox click is a pure-EDT filter with zero JNI calls; previously it re-fetched all file metadata from libtorrent on every click
+ * Fix: Transfer detail Files tab table rebuild no longer blocks the EDT for seconds on large torrents — replaced per-row fireTableRowsInserted storm with a single bulk model replacement (setHolders) that fires fireTableDataChanged once
+ * Fix: BTDownload.getItems() no longer performs redundant 10,000-piece JNI loop on every call — piecesTracker initialization now happens once, eliminating thousands of th.havePiece() JNI calls per refresh for large torrents
+ * Fix: Transfer detail Files tab now correctly switches content when selecting a different torrent — replaced broken target-vs-btDownload guard with a monotonic sequence counter so stale background completions are skipped without blocking legitimate torrent switches
+ * Fix: Library Audio/Video tree nodes now show all files on disk — SearchByMediaTypeRunnable no longer skips disk search when the cache is non-empty, preventing missing files that were on disk before startup or in directories not covered by scanInternal()
+ * Fix: FileUtils.listFiles() now returns absolute paths so library file discovery, cache deduplication, and canonical path resolution work correctly across all platforms
+ * Fix: Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
+ * Fix: Transfer detail panel now populates correctly on first view — added HierarchyListener to detect when the Transfers tab becomes visible and trigger an initial selection update, fixing the empty detail panel on first open
  * Update: Refresh default tracker lists across desktop torrent creation, magnet URLs, and CreateTorrentDialog with current reliable public trackers (opentrackr, openbittorrent, stealth.si, exodus, torrent.eu.org, moeking, explodie, coppersurfer)
  * EDT freeze: Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
  * EDT freeze: Preload language flag images before showing the setup wizard so JComboBox layout no longer blocks the EDT with MediaTracker.waitForID() on startup
@@ -107,7 +107,7 @@ frostwire (7.0.4) stable; urgency=high
  * Cleanup: Remove stale StringSetSetting TODO — DRY refactoring not worth the risk for working settings code
  * Cleanup: Remove stale paintComponent TODO from DonationButtons — current KIFSS approach is sufficient
 
- -- FrostWire Team <contact@frostwire.com> Thu, 16 Apr 2026 20:45:00 -0600
+ -- FrostWire Team <contact@frostwire.com> Wed, 22 Apr 2026 21:19:00 -0600
 
 frostwire (7.0.3) stable; urgency=high
  * Bound unbounded image/icon caches to prevent memory leaks
