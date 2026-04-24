@@ -89,7 +89,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -191,18 +190,7 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
 
     @Override
     public void finish() {
-        finishAndRemoveTaskViaReflection();
-    }
-
-    private void finishAndRemoveTaskViaReflection() {
-        final Class<? extends MainActivity> clazz = getClass();
-        try {
-            final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
-            finishAndRemoveTaskMethod.invoke(this);
-        } catch (Throwable e) {
-            LOG.error("MainActivity.finishAndRemoveTaskViaReflection()", e);
-            super.finish();
-        }
+        super.finishAndRemoveTask();
     }
 
     private boolean isShutdown() {
