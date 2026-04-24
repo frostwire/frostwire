@@ -74,6 +74,8 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     private RecyclerView recyclerView;
     private TransferDetailFilesRecyclerViewAdapter adapter;
     private String adapterInfoHash;
+    // Avoid re-sorting the same list reference every timer tick.
+    private List<TransferItem> lastSortedItems;
 
     public TransferDetailFilesFragment() {
         super(R.layout.fragment_transfer_detail_files);
@@ -119,31 +121,35 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             return;
         }
         // Use peekItems() to avoid blocking JNI on UI thread.
-        // getItems() triggers calculateItems() -> dl.getItems() -> havePiece() which blocks.
+        // getItems() triggers calculateItems() -> dl.getItems() which blocks.
         List<TransferItem> items = uiBittorrentDownload.peekItems();
         if (items == null) {
-            // Items not loaded yet - trigger background load on a dedicated thread.
-            // HIGH_PRIORITY spawns a new thread instead of queuing on the single-threaded MISC handler.
+            // Load and sort in one background pass so the initial render does not
+            // wait on two sequential tasks.
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
                 final List<TransferItem> loadedItems = uiBittorrentDownload.getItems();
                 if (loadedItems != null) {
-                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(loadedItems));
+                    final List<TransferItem> sortedItems =
+                            TransferDetailFilesRecyclerViewAdapter.sortByProgress(loadedItems);
+                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(sortedItems, true));
                 }
             });
             return;
         }
-        updateComponentsWithItems(items);
+        updateComponentsWithItems(items, false);
     }
 
-    private void updateComponentsWithItems(List<TransferItem> items) {
+    private void updateComponentsWithItems(List<TransferItem> items, boolean alreadySorted) {
         if (uiBittorrentDownload == null || items == null || !isAdded()) {
             return;
         }
         String currentInfoHash = uiBittorrentDownload.getInfoHash();
-        if (adapter == null || adapterInfoHash == null || !adapterInfoHash.equals(currentInfoHash)) {
+        boolean transferChanged = adapter == null || adapterInfoHash == null || !adapterInfoHash.equals(currentInfoHash);
+        if (transferChanged) {
             boolean usePagination = items.size() >= LARGE_FILE_LIST_THRESHOLD;
             adapter = new TransferDetailFilesRecyclerViewAdapter(items, usePagination ? PAGE_SIZE : Integer.MAX_VALUE);
             adapterInfoHash = currentInfoHash;
+            lastSortedItems = items;
             if (recyclerView != null) {
                 recyclerView.setAdapter(adapter);
             }
@@ -153,23 +159,34 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
         }
-        adapter.updateTransferItems(items);
+        if (transferChanged) {
+            if (alreadySorted) {
+                adapter.setPreSortedItems(items);
+            } else {
+                adapter.updateTransferItems(items);
+            }
+        } else if (lastSortedItems != items) {
+            lastSortedItems = items;
+            adapter.updateTransferItems(items);
+        }
     }
 
     @Override
     protected void onTransferChanged() {
         adapterInfoHash = null;
+        lastSortedItems = null;
         adapter = null;
         if (recyclerView != null) {
             recyclerView.setAdapter(null);
         }
-        // Eagerly load items on a dedicated thread when a new transfer is bound.
-        // This prevents the UI from showing empty while waiting for the MISC handler.
+        // Eagerly load and sort on a dedicated thread when a new transfer is bound.
         if (uiBittorrentDownload != null) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
                 final List<TransferItem> loadedItems = uiBittorrentDownload.getItems();
                 if (loadedItems != null) {
-                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(loadedItems));
+                    final List<TransferItem> sortedItems =
+                            TransferDetailFilesRecyclerViewAdapter.sortByProgress(loadedItems);
+                    SystemUtils.postToUIThread(() -> updateComponentsWithItems(sortedItems, true));
                 }
             });
         }
@@ -207,7 +224,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             }
             final Bundle bundle = new Bundle();
             final String transferItemKey = currentTransferItemKey;
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
                 updateTransferDataTask(transferItem, bundle);
                 SystemUtils.postToUIThread(() -> updateTransferDataPost(this, transferItem, transferItemKey, bundle));
             });
@@ -369,24 +386,42 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 return;
             }
             // Sort calls getProgress() which does blocking JNI (fileProgress).
-            // Move sort to background thread to avoid ANR on UI thread.
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                List<TransferItem> sortedFresh = new LinkedList<>(freshItems);
-                try {
-                    if (sortedFresh.size() > 1) {
-                        Collections.sort(sortedFresh, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
-                    }
-                } catch (Throwable ignored) {
-                }
-                final List<TransferItem> finalSorted = sortedFresh;
-                SystemUtils.postToUIThread(() -> {
-                    allItems = finalSorted;
-                    currentPage = 0;
-                    combinedItems.clear();
-                    loadNextPage();
-                    submitList(new LinkedList<>(combinedItems));
-                });
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
+                List<TransferItem> sortedFresh = sortByProgress(freshItems);
+                SystemUtils.postToUIThread(() -> setSortedItems(sortedFresh));
             });
+        }
+
+        void setPreSortedItems(List<TransferItem> sortedItems) {
+            if (sortedItems == null) {
+                return;
+            }
+            setSortedItems(sortedItems);
+        }
+
+        private void setSortedItems(List<TransferItem> sortedItems) {
+            allItems = sortedItems;
+            currentPage = 0;
+            combinedItems.clear();
+            loadNextPage();
+            submitList(new LinkedList<>(combinedItems));
+        }
+
+        private static List<TransferItem> sortByProgress(List<TransferItem> items) {
+            List<TransferItem> sorted = new LinkedList<>(items);
+            try {
+                if (sorted.size() > 1) {
+                    java.util.HashMap<TransferItem, Integer> progressCache =
+                            new java.util.HashMap<>(sorted.size());
+                    for (TransferItem item : sorted) {
+                        progressCache.put(item, item.getProgress());
+                    }
+                    Collections.sort(sorted, (o1, o2) ->
+                            -Integer.compare(progressCache.get(o1), progressCache.get(o2)));
+                }
+            } catch (Throwable ignored) {
+            }
+            return sorted;
         }
     }
 

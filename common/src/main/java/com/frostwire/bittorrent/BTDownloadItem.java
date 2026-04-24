@@ -91,14 +91,11 @@ public class BTDownloadItem implements TransferItem {
         if (!th.isValid() || size == 0) { // edge cases
             return 0;
         }
-        int progress;
         long downloaded = getDownloaded();
         if (downloaded == size) {
-            progress = 100;
-        } else {
-            progress = (int) ((float) (getDownloaded() * 100) / (float) size);
+            return 100;
         }
-        return progress;
+        return (int) ((float) (downloaded * 100) / (float) size);
     }
 
     @Override

@@ -395,16 +395,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 return;
                             }
 
-                            // Update cached state for all BT downloads on background thread
-                            // to avoid blocking JNI calls on UI thread (ANR fix)
+                            // Refresh cached BT state asynchronously so it does not delay
+                            // sorting and UI updates on the critical path.
                             if (transfersHolder != null && transfersHolder.allTransfers != null) {
-                                long cacheStart = System.currentTimeMillis();
-                                for (Transfer t : transfersHolder.allTransfers) {
-                                    if (t instanceof UIBittorrentDownload) {
-                                        ((UIBittorrentDownload) t).updateCachedState();
+                                final List<Transfer> transfersToCache = transfersHolder.allTransfers;
+                                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                                    long cacheStart = System.currentTimeMillis();
+                                    for (Transfer t : transfersToCache) {
+                                        if (t instanceof UIBittorrentDownload) {
+                                            ((UIBittorrentDownload) t).updateCachedState();
+                                        }
                                     }
-                                }
-                                android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                                    android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                                });
                             }
 
                             if (!Ref.alive(contextRef)) {
@@ -472,16 +475,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 return;
                             }
 
-                            // Update cached state for all BT downloads on background thread
-                            // to avoid blocking JNI calls on UI thread (ANR fix)
+                            // Refresh cached BT state asynchronously so it does not delay
+                            // sorting and UI updates on the critical path.
                             if (transfersHolder != null && transfersHolder.allTransfers != null) {
-                                long cacheStart = System.currentTimeMillis();
-                                for (Transfer t : transfersHolder.allTransfers) {
-                                    if (t instanceof UIBittorrentDownload) {
-                                        ((UIBittorrentDownload) t).updateCachedState();
+                                final List<Transfer> transfersToCache = transfersHolder.allTransfers;
+                                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                                    long cacheStart = System.currentTimeMillis();
+                                    for (Transfer t : transfersToCache) {
+                                        if (t instanceof UIBittorrentDownload) {
+                                            ((UIBittorrentDownload) t).updateCachedState();
+                                        }
                                     }
-                                }
-                                android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                                    android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
+                                });
                             }
 
                             if (!Ref.alive(contextRef)) {

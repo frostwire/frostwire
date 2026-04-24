@@ -705,10 +705,18 @@ public final class BTDownload implements BittorrentDownload {
                     int numPieces = ti.numPieces();
                     // One-time initialization: sync piecesTracker with already-completed
                     // pieces. After this, pieceFinished() alerts keep it up-to-date.
-                    for (int i = 0; i < numPieces; i++) {
-                        if (th.havePiece(i)) {
-                            piecesTracker.setComplete(i, true);
+                    // Fetch the full piece bitfield in one JNI call instead of
+                    // calling havePiece(i) once per piece.
+                    try {
+                        TorrentStatus status = th.status(TorrentHandle.QUERY_PIECES);
+                        PieceIndexBitfield pieces = status.pieces();
+                        for (int i = 0; i < numPieces; i++) {
+                            if (pieces.getBit(i)) {
+                                piecesTracker.setComplete(i, true);
+                            }
                         }
+                    } catch (Throwable e) {
+                        LOG.warn("Error fetching piece status in getItems()", e);
                     }
                     piecesTrackerInitialized = true;
                 }
