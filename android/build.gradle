@@ -371,10 +371,28 @@ tasks.matching {
     dependsOn(ensurePythonProguardRules)
 }
 
-def copyPlus1ReleaseApkToWorkspaceBuild = tasks.register("copyPlus1ReleaseApkToWorkspaceBuild", Copy) {
+def plusWorkspaceReleaseApkFile = layout.buildDirectory.file(plusReleaseApkName)
+
+def copyPlus1ReleaseApkToWorkspaceBuild = tasks.register("copyPlus1ReleaseApkToWorkspaceBuild") {
     dependsOn(tasks.named("assemblePlus1Release"))
-    from(layout.buildDirectory.file("outputs/apk/plus1/release/${plusReleaseApkName}"))
-    into(layout.buildDirectory)
+    def sourceApk = layout.buildDirectory.file("outputs/apk/plus1/release/${plusReleaseApkName}")
+    inputs.file(sourceApk)
+    outputs.file(plusWorkspaceReleaseApkFile)
+    doLast {
+        File src = sourceApk.get().asFile
+        File dest = plusWorkspaceReleaseApkFile.get().asFile
+        if (!src.exists()) {
+            throw new GradleException("Expected release APK not found: ${src}")
+        }
+        if (!dest.parentFile.exists()) {
+            dest.parentFile.mkdirs()
+        }
+        copy {
+            from(src)
+            into(dest.parentFile)
+            rename { plusReleaseApkName }
+        }
+    }
 }
 
 tasks.matching { it.name in ["assembleRelease", "assemblePlus1Release"] }.configureEach {
