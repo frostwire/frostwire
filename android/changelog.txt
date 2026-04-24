@@ -23,6 +23,7 @@ FrostWire 3.1.1 build 772 UNRELEASED
   - fix:Shutdown no longer trips StrictMode on MainActivity finish - the app now calls Activity.finishAndRemoveTask() directly instead of using reflective invocation on every shutdown/finish path
   - fix:VPN status/promotional screen now promotes only Private Internet Access, and all VPN call-to-action links open the new FrostWire PIA landing page
   - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
+  - maintenance:assembleRelease now copies the final plus APK into android/build/ instead of an incorrect sibling workspace path
 
 FrostWire 3.1.0 build 771 APR/18/2026
  - new:I2P network integration for anonymous proxy support

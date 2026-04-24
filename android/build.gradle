@@ -374,7 +374,7 @@ tasks.matching {
 def copyPlus1ReleaseApkToWorkspaceBuild = tasks.register("copyPlus1ReleaseApkToWorkspaceBuild", Copy) {
     dependsOn(tasks.named("assemblePlus1Release"))
     from(layout.buildDirectory.file("outputs/apk/plus1/release/${plusReleaseApkName}"))
-    into(file("../../android/build"))
+    into(layout.buildDirectory)
 }
 
 tasks.matching { it.name in ["assembleRelease", "assemblePlus1Release"] }.configureEach {
