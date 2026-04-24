@@ -88,6 +88,8 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:background="@drawable/vpn_suggestion_button_background_selector"
+                    android:drawableTop="@drawable/pia"
+                    android:drawablePadding="6dp"
                     android:paddingTop="12dp"
                     android:paddingBottom="12dp"
                     android:paddingStart="14dp"

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Created by Angel Leon (@gubatron), Alden Torres (aldenml), and
+    Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <path
+        android:fillColor="#4DBB49"
+        android:pathData="M40,46
+            C40,22 58,8 100,8
+            C142,8 160,22 160,46
+            L160,70
+            L176,70
+            C184,70 190,76 190,84
+            L190,142
+            C190,150 184,156 176,156
+            L166,156
+            L166,186
+            L121,186
+            L106,171
+            L94,171
+            L79,186
+            L34,186
+            L34,156
+            L24,156
+            C16,156 10,150 10,142
+            L10,84
+            C10,76 16,70 24,70
+            L40,70
+            Z" />
+
+    <path
+        android:fillColor="#16911A"
+        android:pathData="M38,78 L44,78 L44,156 L38,156 Z" />
+
+    <path
+        android:fillColor="#16911A"
+        android:pathData="M156,78 L162,78 L162,156 L156,156 Z" />
+
+    <path
+        android:fillColor="#F8F8F8"
+        android:pathData="M55,38
+            C55,22 67,14 100,14
+            C133,14 145,22 145,38
+            L145,64
+            L55,64
+            Z" />
+
+    <path
+        android:fillColor="#000000"
+        android:pathData="M73,42
+            m-8,0
+            a8,8 0 1,0 16,0
+            a8,8 0 1,0 -16,0" />
+
+    <path
+        android:fillColor="#000000"
+        android:pathData="M114,42
+            m-8,0
+            a8,8 0 1,0 16,0
+            a8,8 0 1,0 -16,0" />
+
+    <path
+        android:fillColor="#1B1B1B"
+        android:pathData="M83,54 L117,54 L117,60 L83,60 Z" />
+
+    <path
+        android:fillColor="#7FD47B"
+        android:pathData="M48,88
+            C56,80 72,76 100,76
+            C128,76 144,80 152,88
+            C144,96 128,100 100,100
+            C72,100 56,96 48,88
+            Z"
+        android:fillAlpha="0.65" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M91,120
+            C91,110 99,103 109,103
+            C119,103 127,110 127,120
+            L121,120
+            C121,113 116,109 109,109
+            C102,109 97,113 97,120
+            Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M88,120 L130,120 L130,148 L88,148 Z" />
+</vector>
