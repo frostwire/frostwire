@@ -21,6 +21,7 @@ FrostWire 3.1.1 build 772 UNRELEASED
   - fix:Torrent search settings Select All now toggles every visible engine checkbox, including legacy BTDigg and TorrentDownloads entries; Deselect All still preserves Archive.org so at least one engine remains enabled
   - fix:MainActivity no longer re-triggers external storage/media permission requests from onResume on Android 13+ - permission checks now use the correct READ_MEDIA_* permissions, only auto-request once per activity instance, and stop treating shouldShowRequestPermissionRationale() as “request again now”
   - fix:Shutdown no longer trips StrictMode on MainActivity finish - the app now calls Activity.finishAndRemoveTask() directly instead of using reflective invocation on every shutdown/finish path
+  - fix:VPN status/promotional screen now promotes only Private Internet Access, and all VPN call-to-action links open the new FrostWire PIA landing page
   - maintenance:AbstractPreferenceFragment now centralizes safe custom preference dialog showing - prevents future regressions where custom PreferenceDialogFragmentCompat dialogs are shown without the required target fragment
 
 FrostWire 3.1.0 build 771 APR/18/2026

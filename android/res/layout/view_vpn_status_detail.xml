@@ -75,61 +75,25 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="horizontal">
 
-                <!-- issue-709.  PIA VPN deactivated
                 <Button
                     android:id="@+id/view_vpn_status_pia"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="4dp"
-                    android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/pia"
-                    android:padding="3dp"
-                    android:text="@string/vpn_suggestion_pia"/>
-                -->
-
-                <Button
-                    android:id="@+id/view_vpn_status_expressvpn"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginEnd="4dp"
                     android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/expressvpn"
-                    android:paddingBottom="17dp"
-                    android:paddingTop="15dp"
-                    android:paddingEnd="10dp"
-                    android:paddingStart="10dp"
-                    android:text="@string/vpn_suggestion_expressvpn"
-                    android:textSize="@dimen/text_small"/>
-
-                <Button
-                    android:id="@+id/view_vpn_status_nordvpn"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="2dp"
-                    android:textAllCaps="false"
-                    android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/nordvpn"
-                    android:paddingBottom="8dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="10dp"
-                    android:paddingStart="10dp"
-                    android:text="@string/vpn_suggestion_nordvpn"
-                    android:textSize="@dimen/text_small"/>
-
-
+                    android:drawableTop="@drawable/pia"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="@string/vpn_suggestion_pia"/>
             </LinearLayout>
 
             <!-- Protected connection button -->

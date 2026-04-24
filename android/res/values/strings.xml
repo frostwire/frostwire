@@ -523,6 +523,7 @@
     <string name="downloaded_n">Downloaded %1$s / </string>
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
     <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Free 7-day trial</string>
     <string name="vpn_find_out_more">Find out more</string>

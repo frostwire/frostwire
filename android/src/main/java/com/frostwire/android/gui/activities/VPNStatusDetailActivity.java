@@ -52,20 +52,10 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerStatus = findView(R.id.view_vpn_status_header);
         final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
-
-
         final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
         vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
-
-
         final TextView learnVPNText = findView(R.id.view_vpn_status_learn_more_textview);
-
-        /*
-        issue-709
-            final Button piaVPNButton = findView(R.id.view_vpn_status_pia);
-         */
-        final Button expressVPNButton = findView(R.id.view_vpn_status_expressvpn);
-        final Button nordVPNButton = findView(R.id.view_vpn_status_nordvpn);
+        final Button piaVPNButton = findView(R.id.view_vpn_status_pia);
 
         boolean isProtectedConnection = isProtectedConnection();
         // By default the layout has icon and title set to unprotected.
@@ -91,15 +81,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         }
 
         learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
-
-        /*
-        issue-709
-            piaVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
-        */
-
-        expressVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_URL));
-
-        nordVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.NORDVPN_URL));
+        piaVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
 
         headerIcon.setOnClickListener(new LearnVPNLink());
         headerStatus.setOnClickListener(new LearnVPNLink());
