@@ -1,4 +1,5 @@
 FrostWire 3.1.1 build 772 UNRELEASED
+  - fix:Previous-session torrents now reliably reappear on the main Transfers screen after cold app launch - TransferManager retries restoreDownloads() until the BitTorrent engine is fully started instead of silently missing session restore when the first load runs too early
   - fix:Transfer Detail > Files now loads much faster for large torrents - initial file loading and progress sorting run in one HIGH_PRIORITY task, redundant timer re-sorts are skipped when the file list instance is unchanged, sort comparisons cache progress values instead of repeatedly calling JNI, BTDownload.getItems() initializes piece completion from status(QUERY_PIECES) in one bulk call, and BTDownloadItem.getProgress() no longer fetches downloaded bytes twice
   - fix:ANR in Transfers list - BTDownload state is now cached on a background thread instead of calling blocking JNI (pthread_cond_wait) from RecyclerView onBindViewHolder on the UI thread
   - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent

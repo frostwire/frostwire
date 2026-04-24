@@ -65,6 +65,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class TransferManager {
 
     private static final Logger LOG = Logger.getLogger(TransferManager.class);
+    private static final int LOAD_TORRENTS_MAX_RETRIES = 20;
+    private static final long LOAD_TORRENTS_RETRY_DELAY_MS = 500L;
 
     private final List<Transfer> httpDownloads;
     private final List<BittorrentDownload> bittorrentDownloadsList;
@@ -95,13 +97,13 @@ public final class TransferManager {
         this.bittorrentDownloadsList = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsMap = new HashMap<>(0);
         this.downloadsToReview = 0;
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::loadTorrentsTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> loadTorrentsTask(0));
     }
 
     public void reset() {
         registerPreferencesChangeListener();
         clearTransfers();
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::loadTorrentsTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> loadTorrentsTask(0));
 
     }
 
@@ -693,7 +695,22 @@ public final class TransferManager {
 
     }
 
-    private void loadTorrentsTask() {
+    private void loadTorrentsTask(int retryCount) {
+        if (MainApplication.hasBTEngineInitializationFailure()) {
+            LOG.warn("Skipping torrent restore because BTEngine initialization already failed");
+            return;
+        }
+        if (!Engine.instance().isStarted()) {
+            if (retryCount >= LOAD_TORRENTS_MAX_RETRIES) {
+                LOG.warn("Timed out waiting for engine startup before restoring previous-session torrents");
+                return;
+            }
+            SystemUtils.postToHandlerDelayed(
+                    SystemUtils.HandlerThreadName.DOWNLOADER,
+                    () -> loadTorrentsTask(retryCount + 1),
+                    LOAD_TORRENTS_RETRY_DELAY_MS);
+            return;
+        }
         synchronized (downloadsListMonitor) {
             bittorrentDownloadsList.clear();
         }
