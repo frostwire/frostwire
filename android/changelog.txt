@@ -1,4 +1,4 @@
-FrostWire 3.1.1 build 772 UNRELEASED
+FrostWire 3.1.1 build 772 APR/24/2026
   - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
   - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
   - fix:Crash MusicPlaybackService.onTaskRemoved - ExoPlayer is now accessed on the dedicated MusicPlayerHandler thread instead of the calling thread (e.g., EngineThreadPool)
