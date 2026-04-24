@@ -107,39 +107,72 @@ public final class Engine implements IEngineService {
         return mediaPlayer;
     }
 
+    private synchronized EngineForegroundService getForegroundService() {
+        EngineForegroundService liveService = EngineForegroundService.getInstance();
+        if (liveService != null) {
+            engineForegroundService = liveService;
+        }
+        return engineForegroundService;
+    }
+
+    synchronized void onForegroundServiceCreated(EngineForegroundService service) {
+        engineForegroundService = service;
+        if (pendingStartServices && service != null) {
+            boolean restartAfterShutdown = wasShutdown;
+            pendingStartServices = false;
+            wasShutdown = false;
+            service.startServices(restartAfterShutdown);
+        }
+    }
+
+    synchronized void onForegroundServiceDestroyed(EngineForegroundService service) {
+        if (engineForegroundService == service) {
+            engineForegroundService = null;
+        }
+    }
+
     public byte getState() {
-        return engineForegroundService != null ? engineForegroundService.getState() : IEngineService.STATE_INVALID;
+        EngineForegroundService service = getForegroundService();
+        return service != null ? service.getState() : IEngineService.STATE_INVALID;
     }
 
     public boolean isStarted() {
-        return engineForegroundService != null && engineForegroundService.isStarted();
+        EngineForegroundService service = getForegroundService();
+        return service != null && service.isStarted();
     }
 
     public boolean isStarting() {
-        return engineForegroundService != null && engineForegroundService.isStarting();
+        EngineForegroundService service = getForegroundService();
+        return service != null && service.isStarting();
     }
 
     public boolean isStopped() {
-        return engineForegroundService != null && engineForegroundService.isStopped();
+        EngineForegroundService service = getForegroundService();
+        return service != null && service.isStopped();
     }
 
     public boolean isStopping() {
-        return engineForegroundService != null && engineForegroundService.isStopping();
+        EngineForegroundService service = getForegroundService();
+        return service != null && service.isStopping();
     }
 
     public boolean isDisconnected() {
-        return engineForegroundService != null && engineForegroundService.isDisconnected();
+        EngineForegroundService service = getForegroundService();
+        return service != null && service.isDisconnected();
     }
 
     @Override
-    public void startServices() {
+    public synchronized void startServices() {
         LOG.info("Engine::startServices(): Requesting startServices from EngineForegroundService");
-        if (wasShutdown) {
-            LOG.info("Extract string resource Restarting EngineForegroundService after shutdown...");
-            startEngineService(getApplication());
+        EngineForegroundService service = getForegroundService();
+        if (service != null) {
+            boolean restartAfterShutdown = wasShutdown;
+            pendingStartServices = false;
             wasShutdown = false;
+            service.startServices(restartAfterShutdown);
         } else {
             pendingStartServices = true;
+            startEngineService(getApplication());
         }
     }
 
@@ -242,8 +275,9 @@ public final class Engine implements IEngineService {
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void notifyDownloadFinished(String displayName, File file, String optionalInfoHash) {
-        if (engineForegroundService != null) {
-            engineForegroundService.notifyDownloadFinished(displayName, file, optionalInfoHash);
+        EngineForegroundService service = getForegroundService();
+        if (service != null) {
+            service.notifyDownloadFinished(displayName, file, optionalInfoHash);
         }
     }
 

@@ -1,4 +1,5 @@
 FrostWire 3.1.1 build 772 UNRELEASED
+  - fix:Previous-session torrent transfers now restore reliably on launch - Engine now binds pending start requests to the real foreground service instance, starts BTEngine when the service is live but the session is still null, and TransferManager waits for the actual libtorrent session before calling restoreDownloads()
   - fix:Audio Player clocks and seekbar now populate immediately when playback metadata refreshes - the player now refreshes elapsed time/progress synchronously whenever track info changes instead of waiting for a later broadcast/timer tick
   - fix:MainActivity no longer re-triggers external storage/media permission requests from onResume on Android 13+ - permission checks now use the correct READ_MEDIA_* permissions, only auto-request once per activity instance, and stop treating shouldShowRequestPermissionRationale() as “request again now”
   - fix:Shutdown no longer trips StrictMode on MainActivity finish - the app now calls Activity.finishAndRemoveTask() directly instead of using reflective invocation on every shutdown/finish path

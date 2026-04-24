@@ -700,9 +700,10 @@ public final class TransferManager {
             LOG.warn("Skipping torrent restore because BTEngine initialization already failed");
             return;
         }
-        if (!Engine.instance().isStarted()) {
+        final BTEngine btEngine = BTEngine.getInstance();
+        if (!Engine.instance().isStarted() || btEngine.swig() == null) {
             if (retryCount >= LOAD_TORRENTS_MAX_RETRIES) {
-                LOG.warn("Timed out waiting for engine startup before restoring previous-session torrents");
+                LOG.warn("Timed out waiting for engine startup/session before restoring previous-session torrents");
                 return;
             }
             SystemUtils.postToHandlerDelayed(
@@ -720,7 +721,6 @@ public final class TransferManager {
 
         UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
 
-        final BTEngine btEngine = BTEngine.getInstance();
         btEngine.setListener(new BTEngineAdapter() {
             @Override
             public void downloadAdded(BTEngine engine, BTDownload dl) {

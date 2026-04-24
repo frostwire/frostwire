@@ -79,13 +79,15 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
         engineForegroundService.updateState(STATE_STARTING);
         BTEngine btEngine = BTEngine.getInstance();
-        if (!wasShutdown) {
-            btEngine.resume();
-            TransferManager.instance().forceReannounceTorrents();
-        } else {
+        if (wasShutdown || btEngine.swig() == null) {
             btEngine.start();
+        }
+        if (wasShutdown) {
             TransferManager.instance().reset();
-            btEngine.resume();
+        }
+        btEngine.resume();
+        if (!wasShutdown) {
+            TransferManager.instance().forceReannounceTorrents();
         }
         engineForegroundService.updateState(STATE_STARTED);
         LOG.info("resumeBTEngineTask(): Engine started", true);
@@ -98,6 +100,7 @@ public class EngineForegroundService extends Service implements IEngineService {
         synchronized (instanceLock) {
             instance = this;
         }
+        Engine.instance().onForegroundServiceCreated(this);
 
         LOG.info("EngineForegroundService::onCreate() - Initializing service");
 
@@ -172,6 +175,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Engine.instance().onForegroundServiceDestroyed(this);
         LOG.info("EngineForegroundService::onDestroy() - Stopping service and cleaning up WorkManager jobs");
         
         // Cancel all WorkManager jobs to prevent alarm limit issues
