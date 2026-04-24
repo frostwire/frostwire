@@ -408,6 +408,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         lastInstance = this;
+        if (MusicUtils.handleDeleteTracksActivityResult(this, requestCode, resultCode)) {
+            return;
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 

@@ -30,12 +30,9 @@ import android.widget.TextView;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.cache.ImageFetcher;
-import com.andrew.apollo.provider.FavoritesStore;
-import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.util.SystemUtils;
 
 /**
  * Alert dialog used to delete tracks.
@@ -139,35 +136,22 @@ public final class DeleteDialog extends DialogFragment {
             if (mFetcher != null) {
                 mFetcher.removeFromCache(key);
             }
-            // Clean RecentStore and FavoritesStore synchronously before async deleteTracks
             final Activity activity = getActivity();
-            if (activity != null) {
-                RecentStore recentStore = RecentStore.getInstance(activity);
-                FavoritesStore favoritesStore = FavoritesStore.getInstance(activity);
-                for (long id : mItemList) {
-                    if (recentStore != null) {
-                        recentStore.removeItem(id);
-                    }
-                    if (favoritesStore != null) {
-                        favoritesStore.removeItem(id);
-                    }
-                }
-            }
-            // Delete the selected item(s)
             final Activity activityRef = activity;
             final long[] deletedIds = mItemList;
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                MusicUtils.deleteTracks(activityRef != null ? activityRef.getApplicationContext() : null, deletedIds);
-                SystemUtils.postToUIThread(() -> {
-                    if (activityRef instanceof DeleteDialogCallback) {
-                        ((DeleteDialogCallback) activityRef).onDelete(deletedIds);
-                    }
-
-                    if (onDeleteCallback != null) {
-                        onDeleteCallback.onDelete(deletedIds);
-                    }
-                });
-            });
+            final Runnable onDeleted = () -> {
+                if (activityRef instanceof DeleteDialogCallback) {
+                    ((DeleteDialogCallback) activityRef).onDelete(deletedIds);
+                }
+                if (onDeleteCallback != null) {
+                    onDeleteCallback.onDelete(deletedIds);
+                }
+            };
+            if (activityRef != null) {
+                MusicUtils.deleteTracks(activityRef, deletedIds, onDeleted);
+            } else {
+                MusicUtils.deleteTracks(getContext(), deletedIds);
+            }
 
             dismiss();
         }

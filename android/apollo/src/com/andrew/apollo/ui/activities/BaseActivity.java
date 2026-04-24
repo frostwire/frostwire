@@ -214,6 +214,14 @@ public abstract class BaseActivity extends AbstractActivity {
         updateBottomActionBarInfo();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (MusicUtils.handleDeleteTracksActivityResult(this, requestCode, resultCode)) {
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onStart() {

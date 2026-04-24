@@ -97,8 +97,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);
+    private static final int DELETE_TRACKS_REQUEST_CODE = 0x4155;
+    private static final Object pendingTrackDeleteLock = new Object();
 
     private static java.lang.ref.WeakReference<MusicPlaybackService> musicPlaybackServiceRef = null;
+    private static PendingTrackDelete pendingTrackDelete;
 
     /** Returns the live service instance, or null if it has been GC'd or disconnected. */
     private static MusicPlaybackService getService() {
@@ -123,6 +126,21 @@ public final class MusicUtils {
     private static final Object startMusicPlaybackServiceLock = new Object();
 
     private static final Object getStartMusicPlaybackServiceLock = new Object();
+
+    private static final class PendingTrackDelete {
+        private final Context context;
+        private final long[] trackIds;
+        private final boolean showNotification;
+        private final Runnable onDeleted;
+
+        private PendingTrackDelete(Context context, long[] trackIds, boolean showNotification, Runnable onDeleted) {
+            Context appContext = context.getApplicationContext();
+            this.context = appContext != null ? appContext : context;
+            this.trackIds = trackIds;
+            this.showNotification = showNotification;
+            this.onDeleted = onDeleted;
+        }
+    }
 
     static {
         sEmptyList = new long[0];
@@ -2129,6 +2147,72 @@ public final class MusicUtils {
      * @param context The {@link Context} to use.
      * @param list    The item(s) to delete.
      */
+    public static void deleteTracks(final Activity activity, final long[] list, final Runnable onDeleted) {
+        deleteTracks(activity, list, false, onDeleted);
+    }
+
+    public static void deleteTracks(final Activity activity, final long[] list, boolean showNotification, final Runnable onDeleted) {
+        if (activity == null || list == null || list.length == 0) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            final ArrayList<Uri> deleteUris = buildTrackDeleteUris(activity, list);
+            if (!deleteUris.isEmpty()) {
+                try {
+                    synchronized (pendingTrackDeleteLock) {
+                        pendingTrackDelete = new PendingTrackDelete(activity, Arrays.copyOf(list, list.length), showNotification, onDeleted);
+                    }
+                    activity.startIntentSenderForResult(
+                            MediaStore.createDeleteRequest(activity.getContentResolver(), deleteUris).getIntentSender(),
+                            DELETE_TRACKS_REQUEST_CODE,
+                            null,
+                            0,
+                            0,
+                            0
+                    );
+                    return;
+                } catch (Throwable t) {
+                    synchronized (pendingTrackDeleteLock) {
+                        pendingTrackDelete = null;
+                    }
+                    LOG.error("deleteTracks: failed to launch MediaStore delete request", t);
+                }
+            }
+        }
+        final Context appContext = activity.getApplicationContext() != null ? activity.getApplicationContext() : activity;
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            deleteTracks(appContext, list, showNotification);
+            if (onDeleted != null) {
+                SystemUtils.postToUIThread(onDeleted);
+            }
+        });
+    }
+
+    public static boolean handleDeleteTracksActivityResult(final Activity activity, int requestCode, int resultCode) {
+        if (requestCode != DELETE_TRACKS_REQUEST_CODE) {
+            return false;
+        }
+        final PendingTrackDelete pendingDelete;
+        synchronized (pendingTrackDeleteLock) {
+            pendingDelete = pendingTrackDelete;
+            pendingTrackDelete = null;
+        }
+        if (pendingDelete == null) {
+            return true;
+        }
+        if (resultCode != Activity.RESULT_OK) {
+            LOG.info("deleteTracks: MediaStore delete request cancelled");
+            return true;
+        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            cleanupDeletedTracks(pendingDelete.context, pendingDelete.trackIds, pendingDelete.showNotification);
+            if (pendingDelete.onDeleted != null) {
+                SystemUtils.postToUIThread(pendingDelete.onDeleted);
+            }
+        });
+        return true;
+    }
+
     public static void deleteTracks(final Context context, final long[] list, boolean showNotification) {
         if (context == null || list == null) {
             return;
@@ -2138,8 +2222,62 @@ public final class MusicUtils {
             return;
         }
         final String[] projection = new String[]{BaseColumns._ID, MediaColumns.DATA, ALBUM_ID};
+        final String selection = buildTrackIdSelection(list);
+        final Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, null);
+        if (c != null) {
+            try {
+                context.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, selection, null);
+                FileSystem fs = Platforms.fileSystem();
+                if (c.moveToFirst()) {
+                    do {
+                        final String name = c.getString(1);
+                        try {
+                            final File f = new File(name);
+                            if (!fs.delete(f)) {
+                                Log.e("MusicUtils", "Failed to delete file " + name);
+                            }
+                        } catch (final Throwable ex) {
+                            LOG.debug("deleteTracks: file delete failed for " + name + ": " + ex.getMessage());
+                        }
+                    } while (c.moveToNext());
+                }
+            } finally {
+                c.close();
+            }
+        }
+
+        cleanupDeletedTracks(context, list, showNotification);
+    }
+
+    private static ArrayList<Uri> buildTrackDeleteUris(final Context context, final long[] list) {
+        final ArrayList<Uri> deleteUris = new ArrayList<>(list.length);
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{BaseColumns._ID},
+                    buildTrackIdSelection(list),
+                    null,
+                    null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    deleteUris.add(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursor.getLong(0)));
+                } while (cursor.moveToNext());
+            }
+        } catch (Throwable t) {
+            LOG.error("deleteTracks: failed to query track URIs", t);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return deleteUris;
+    }
+
+    private static String buildTrackIdSelection(final long[] list) {
         final StringBuilder selection = new StringBuilder();
-        selection.append(BaseColumns._ID + " IN (");
+        selection.append(BaseColumns._ID).append(" IN (");
         for (int i = 0; i < list.length; i++) {
             selection.append(list[i]);
             if (i < list.length - 1) {
@@ -2147,43 +2285,18 @@ public final class MusicUtils {
             }
         }
         selection.append(")");
-        final Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection.toString(), null, null);
-        if (c != null) {
-            // Step 1: Remove selected tracks from the current playlist, as well
-            // as from the album art cache
-            c.moveToFirst();
-            while (!c.isAfterLast()) {
-                final long id = c.getLong(0);
-                removeTrack(id);
-                removeSongFromAllPlaylists(context, id);
-                c.moveToNext();
-            }
+        return selection.toString();
+    }
 
-            // Step 2: Remove selected tracks from the database
-            context.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, selection.toString(), null);
-
-            // Step 3: Remove files from card
-            FileSystem fs = Platforms.fileSystem();
-            c.moveToFirst();
-            while (!c.isAfterLast()) {
-                final String name = c.getString(1);
-                try { // File.delete can throw a security exception
-                    final File f = new File(name);
-                    if (!fs.delete(f)) {
-                        // I'm not sure if we'd ever get here (deletion would
-                        // have to fail, but no exception thrown)
-                        Log.e("MusicUtils", "Failed to delete file " + name);
-                    }
-                    c.moveToNext();
-                } catch (final Throwable ex) {
-                    c.moveToNext();
-                }
-            }
-            c.close();
+    private static void cleanupDeletedTracks(final Context context, final long[] list, boolean showNotification) {
+        if (context == null || list == null) {
+            return;
+        }
+        for (long id : list) {
+            removeTrack(id);
+            removeSongFromAllPlaylists(context, id);
         }
 
-        // Always clean up RecentStore and FavoritesStore for ALL given IDs,
-        // even if they weren't found in MediaStore (e.g., 0-byte broken downloads)
         RecentStore recentStore = RecentStore.getInstance(context);
         FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
         for (long id : list) {
@@ -2203,11 +2316,7 @@ public final class MusicUtils {
             }
         }
 
-        // We deleted a number of tracks, which could affect any number of
-        // things
-        // in the media content domain, so update everything.
         context.getContentResolver().notifyChange(Uri.parse("content://media"), null);
-        // Notify the lists to update
         refresh();
     }
 
