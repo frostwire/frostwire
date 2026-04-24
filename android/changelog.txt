@@ -1,4 +1,5 @@
 FrostWire 3.1.1 build 772 UNRELEASED
+  - fix:MainActivity no longer re-triggers external storage/media permission requests from onResume on Android 13+ - permission checks now use the correct READ_MEDIA_* permissions, only auto-request once per activity instance, and stop treating shouldShowRequestPermissionRationale() as “request again now”
   - fix:Shutdown no longer trips StrictMode on MainActivity finish - the app now calls Activity.finishAndRemoveTask() directly instead of using reflective invocation on every shutdown/finish path
   - fix:My Music and Now Playing song deletion work again on Android 11+ - Apollo now launches the system MediaStore delete request from the host activity, waits for user confirmation, then refreshes all music tabs and cleans queue/Recent/Favorites state after the delete actually succeeds
   - fix:Previous-session torrents now reliably reappear on the main Transfers screen after cold app launch - TransferManager retries restoreDownloads() until the BitTorrent engine is fully started instead of silently missing session restore when the first load runs too early

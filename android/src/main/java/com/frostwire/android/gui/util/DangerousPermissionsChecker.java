@@ -82,25 +82,10 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
             return;
         }
         Activity activity = activityRef.get();
-        String[] permissions = null;
-        if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
-            if (SystemUtils.hasAndroid13OrNewer()) {
-                // As of Android13 the geniuses at Android decided yet another change
-                // on how to ask for permissions, now we have to be more granular about it
-                permissions = new String[]{Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES};
-            } else if (SystemUtils.hasAndroid11OrNewer()) {
-                // no more need for WRITE_EXTERNAL_STORAGE permission on Android 11,
-                // android:requestLegacyExternalStorage does nothing for android11 and up
-                // and it's ok because they finally let you use File API on the public downloads folders
-                permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-            } else {
-                // Android 10 (29) + android:requestLegacyExternalStorage should make it work
-                permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-            }
-        } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
-            permissions = new String[]{Manifest.permission.POST_NOTIFICATIONS};
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
         }
-
+        String[] permissions = getRequestedPermissions();
         if (permissions != null) {
             ActivityCompat.requestPermissions(activity, permissions, requestCode);
         }
@@ -141,16 +126,41 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
         return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccessInternal();
     }
 
+    public boolean shouldShowExternalStorageAccessRationale() {
+        if (requestCode != EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE || !Ref.alive(activityRef)) {
+            return false;
+        }
+        Activity activity = activityRef.get();
+        if (activity == null) {
+            return false;
+        }
+        String[] permissions = getRequestedPermissions();
+        if (permissions == null) {
+            return false;
+        }
+        for (String permission : permissions) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean noExternalStorageAccessInternal() {
         if (!Ref.alive(activityRef)) {
             return true;
         }
         Activity activity = activityRef.get();
-        if (SystemUtils.hasAndroid10OrNewer()) {
-            return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        String[] permissions = getRequestedPermissions();
+        if (activity == null || permissions == null || permissions.length == 0) {
+            return true;
         }
-        return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_DENIED) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity) {
@@ -202,16 +212,37 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
         final Activity activity = activityRef.get();
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                if (permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i])) {
                     AlertDialog alertDialog = getAlertDialogStoragePermissionsRationale(activity);
                     alertDialog.show();
-                    return false;
                 }
+                return false;
             }
         }
 
-        LOG.info("onExternalStoragePermissionsResult() " + Manifest.permission.READ_EXTERNAL_STORAGE + " granted");
+        LOG.info("onExternalStoragePermissionsResult() external storage/media permissions granted");
         return true;
+    }
+
+    private String[] getRequestedPermissions() {
+        if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
+            if (SystemUtils.hasAndroid13OrNewer()) {
+                // As of Android13 the geniuses at Android decided yet another change
+                // on how to ask for permissions, now we have to be more granular about it
+                return new String[]{Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES};
+            } else if (SystemUtils.hasAndroid11OrNewer()) {
+                // no more need for WRITE_EXTERNAL_STORAGE permission on Android 11,
+                // android:requestLegacyExternalStorage does nothing for android11 and up
+                // and it's ok because they finally let you use File API on the public downloads folders
+                return new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+            } else {
+                // Android 10 (29) + android:requestLegacyExternalStorage should make it work
+                return new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            }
+        } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
+            return new String[]{Manifest.permission.POST_NOTIFICATIONS};
+        }
+        return null;
     }
 
     private AlertDialog getAlertDialogStoragePermissionsRationale(Activity activity) {

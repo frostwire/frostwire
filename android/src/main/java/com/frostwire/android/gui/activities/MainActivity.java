@@ -19,7 +19,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -405,8 +404,7 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
 
     private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker<MainActivity> checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        boolean shouldShowRequestPermissionRationaleForReadExternal = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noExternalStorageAccess())) {
+        if (!externalStoragePermissionsRequested && checker != null && checker.noExternalStorageAccess() && !checker.shouldShowExternalStorageAccessRationale()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         }
