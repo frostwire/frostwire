@@ -765,7 +765,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         loadCurrentAlbumArt();
 
-        if (mTrackName == null || mArtistName == null || mTotalTime == null) {
+        if (mTrackName == null || mArtistName == null || mTotalTime == null || mCurrentTime == null || mProgress == null) {
             initPlaybackControls();
         }
         if (mTrackName != null && lastTrackName != null) {
@@ -777,7 +777,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         refreshTotalTimeText(lastKnownDuration);
 
         updateQueueFragmentCurrentSong();
-        queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
+        queueNextRefresh(refreshCurrentTime(true));
     }
 
     private void loadCurrentAlbumArt() {
