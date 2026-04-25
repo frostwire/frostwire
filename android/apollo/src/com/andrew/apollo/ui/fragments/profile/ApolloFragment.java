@@ -357,6 +357,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
 
         DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(id -> {
+            if (!isAdded()) {
+                return;
+            }
             restartLoader(true);
             refresh();
         }).show(getParentFragmentManager(), "DeleteDialog");
@@ -631,8 +634,15 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000 && isAdded()) {
             lastRestartLoader = System.currentTimeMillis();
             try {
-                getActivity().runOnUiThread(() -> {
+                Activity activity = getLiveActivity();
+                if (activity == null || !isAdded()) {
+                    return;
+                }
+                activity.runOnUiThread(() -> {
                     try {
+                        if (!isAdded()) {
+                            return;
+                        }
                         LoaderManager.getInstance(this).restartLoader(LOADER_ID, getArguments(), this);
                         LOG.info("ApolloFragment::restartLoader: restarted (" + LOADER_ID + ")");
                     } catch (Throwable t) {

@@ -18,6 +18,8 @@
 
 package com.andrew.apollo.ui.fragments.phone;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -151,9 +153,10 @@ public final class MusicBrowserPhoneFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.menu_player_shuffle) {
-                    com.frostwire.android.util.SystemUtils.postToHandler(
-                        com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
-                        () -> MusicUtils.shuffleAll(getActivity()));
+                    Context context = getStableAppContext();
+                    if (context != null) {
+                        MusicUtils.shuffleAll(context);
+                    }
                     return true;
                 } else if (itemId == R.id.menu_player_favorite) {
                     MusicUtils.toggleFavorite();
@@ -315,5 +318,14 @@ public final class MusicBrowserPhoneFragment extends Fragment {
 
     private boolean isPlaylistPage() {
         return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
+    }
+
+    private Context getStableAppContext() {
+        Activity activity = getActivity();
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return null;
+        }
+        Context appContext = activity.getApplicationContext();
+        return appContext != null ? appContext : activity;
     }
 }

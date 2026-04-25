@@ -115,6 +115,14 @@ public final class MusicUtils {
         return service;
     }
 
+    private static Context getStableAppContext(Context context) {
+        if (context == null) {
+            return MainApplication.context();
+        }
+        Context appContext = context.getApplicationContext();
+        return appContext != null ? appContext : context;
+    }
+
     private static int sForegroundActivities = 0;
 
     private static final long[] sEmptyList;
@@ -130,16 +138,22 @@ public final class MusicUtils {
     private static final class PendingTrackDelete {
         private final Context context;
         private final long[] trackIds;
+        private final ArrayList<String> filePaths;
         private final boolean showNotification;
         private final Runnable onDeleted;
 
-        private PendingTrackDelete(Context context, long[] trackIds, boolean showNotification, Runnable onDeleted) {
-            Context appContext = context.getApplicationContext();
-            this.context = appContext != null ? appContext : context;
+        private PendingTrackDelete(Context context, long[] trackIds, ArrayList<String> filePaths, boolean showNotification, Runnable onDeleted) {
+            this.context = getStableAppContext(context);
             this.trackIds = trackIds;
+            this.filePaths = filePaths;
             this.showNotification = showNotification;
             this.onDeleted = onDeleted;
         }
+    }
+
+    private static final class TrackDeleteRequest {
+        private final ArrayList<Uri> uris = new ArrayList<>();
+        private final ArrayList<String> filePaths = new ArrayList<>();
     }
 
     static {
@@ -1307,18 +1321,23 @@ public final class MusicUtils {
      * @param context The {@link Context} to use.
      */
     public static void shuffleAll(final Context context) {
+        final Context appContext = getStableAppContext(context);
+        if (appContext == null) {
+            return;
+        }
         if (SystemUtils.isUIThread()) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shuffleAll(context));
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> shuffleAll(appContext));
             return;
         }
         // TODO: Check for PHONE_STATE Permissions here.
-        Cursor cursor = new SongLoader(context).makeCursor(context);
-        final long[] mTrackList = getSongListForCursor(cursor);
-        final int position = 0;
-        if (mTrackList.length == 0 || getService() == null) {
-            return;
-        }
+        Cursor cursor = null;
         try {
+            cursor = new SongLoader(appContext).makeCursor(appContext);
+            final long[] mTrackList = getSongListForCursor(cursor);
+            final int position = 0;
+            if (mTrackList.length == 0 || getService() == null) {
+                return;
+            }
             MusicPlaybackService svc = getService();
             if (svc == null) { return; }
             svc.enableShuffle(true);
@@ -1330,8 +1349,11 @@ public final class MusicUtils {
             }
             svc.open(mTrackList, -1);
             svc.play();
-            cursor.close();
         } catch (final Throwable ignored) {
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -2155,15 +2177,19 @@ public final class MusicUtils {
         if (activity == null || list == null || list.length == 0) {
             return;
         }
+        final Context appContext = getStableAppContext(activity);
+        if (appContext == null) {
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            final ArrayList<Uri> deleteUris = buildTrackDeleteUris(activity, list);
-            if (!deleteUris.isEmpty()) {
+            final TrackDeleteRequest deleteRequest = buildTrackDeleteRequest(appContext, list);
+            if (!deleteRequest.uris.isEmpty()) {
                 try {
                     synchronized (pendingTrackDeleteLock) {
-                        pendingTrackDelete = new PendingTrackDelete(activity, Arrays.copyOf(list, list.length), showNotification, onDeleted);
+                        pendingTrackDelete = new PendingTrackDelete(appContext, Arrays.copyOf(list, list.length), deleteRequest.filePaths, showNotification, onDeleted);
                     }
                     activity.startIntentSenderForResult(
-                            MediaStore.createDeleteRequest(activity.getContentResolver(), deleteUris).getIntentSender(),
+                            MediaStore.createDeleteRequest(activity.getContentResolver(), deleteRequest.uris).getIntentSender(),
                             DELETE_TRACKS_REQUEST_CODE,
                             null,
                             0,
@@ -2179,7 +2205,6 @@ public final class MusicUtils {
                 }
             }
         }
-        final Context appContext = activity.getApplicationContext() != null ? activity.getApplicationContext() : activity;
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             deleteTracks(appContext, list, showNotification);
             if (onDeleted != null) {
@@ -2205,6 +2230,7 @@ public final class MusicUtils {
             return true;
         }
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            deleteRemainingTrackFiles(pendingDelete.filePaths);
             cleanupDeletedTracks(pendingDelete.context, pendingDelete.trackIds, pendingDelete.showNotification);
             if (pendingDelete.onDeleted != null) {
                 SystemUtils.postToUIThread(pendingDelete.onDeleted);
@@ -2214,19 +2240,20 @@ public final class MusicUtils {
     }
 
     public static void deleteTracks(final Context context, final long[] list, boolean showNotification) {
-        if (context == null || list == null) {
+        final Context appContext = getStableAppContext(context);
+        if (appContext == null || list == null) {
             return;
         }
         if (SystemUtils.isUIThread()) {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> deleteTracks(context, list, showNotification));
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> deleteTracks(appContext, list, showNotification));
             return;
         }
         final String[] projection = new String[]{BaseColumns._ID, MediaColumns.DATA, ALBUM_ID};
         final String selection = buildTrackIdSelection(list);
-        final Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, null);
+        final Cursor c = appContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null, null);
         if (c != null) {
             try {
-                context.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, selection, null);
+                appContext.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, selection, null);
                 FileSystem fs = Platforms.fileSystem();
                 if (c.moveToFirst()) {
                     do {
@@ -2246,23 +2273,27 @@ public final class MusicUtils {
             }
         }
 
-        cleanupDeletedTracks(context, list, showNotification);
+        cleanupDeletedTracks(appContext, list, showNotification);
     }
 
-    private static ArrayList<Uri> buildTrackDeleteUris(final Context context, final long[] list) {
-        final ArrayList<Uri> deleteUris = new ArrayList<>(list.length);
+    private static TrackDeleteRequest buildTrackDeleteRequest(final Context context, final long[] list) {
+        final TrackDeleteRequest deleteRequest = new TrackDeleteRequest();
         Cursor cursor = null;
         try {
             cursor = context.getContentResolver().query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{BaseColumns._ID},
+                    new String[]{BaseColumns._ID, MediaColumns.DATA},
                     buildTrackIdSelection(list),
                     null,
                     null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    deleteUris.add(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursor.getLong(0)));
+                    deleteRequest.uris.add(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursor.getLong(0)));
+                    String filePath = cursor.getString(1);
+                    if (filePath != null) {
+                        deleteRequest.filePaths.add(filePath);
+                    }
                 } while (cursor.moveToNext());
             }
         } catch (Throwable t) {
@@ -2272,7 +2303,27 @@ public final class MusicUtils {
                 cursor.close();
             }
         }
-        return deleteUris;
+        return deleteRequest;
+    }
+
+    private static void deleteRemainingTrackFiles(final ArrayList<String> filePaths) {
+        if (filePaths == null || filePaths.isEmpty()) {
+            return;
+        }
+        FileSystem fs = Platforms.fileSystem();
+        for (String filePath : filePaths) {
+            if (filePath == null) {
+                continue;
+            }
+            try {
+                File file = new File(filePath);
+                if (file.exists() && !fs.delete(file)) {
+                    LOG.debug("deleteTracks: remaining file delete failed for " + filePath);
+                }
+            } catch (Throwable t) {
+                LOG.debug("deleteTracks: remaining file delete failed for " + filePath + ": " + t.getMessage());
+            }
+        }
     }
 
     private static String buildTrackIdSelection(final long[] list) {

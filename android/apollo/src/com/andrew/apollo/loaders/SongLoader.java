@@ -26,6 +26,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -46,7 +47,15 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * @param context The {@link Context} to use
      */
     public SongLoader(final Context context) {
-        super(context);
+        super(resolveContext(context));
+    }
+
+    private static Context resolveContext(final Context context) {
+        if (context != null) {
+            Context appContext = context.getApplicationContext();
+            return appContext != null ? appContext : context;
+        }
+        return MainApplication.context();
     }
 
     /**
