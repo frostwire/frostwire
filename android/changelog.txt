@@ -1,3 +1,6 @@
+FrostWire 3.1.3 build 774 UNRELEASED
+  - fix:MusicPlaybackService now uses an Apollo-owned synchronous media notification provider plus cached NotificationManager refreshes, eliminating Android 12+ Media3 foreground self-start crashes during background playback notification updates
+
 FrostWire 3.1.2 build 773 APR/25/2026
   - fix:Android 12+ music notification updates no longer crash when Media3 tries to promote MusicPlaybackService to foreground while the app is backgrounded; Apollo now falls back to a non-foreground notification update when foreground start is not allowed
   - fix:Invalid libtorrent handles no longer crash transfer removal or file-list loading; torrent item priority checks now fail closed and TransferManager skips restore safely when BTEngine native initialization is unavailable

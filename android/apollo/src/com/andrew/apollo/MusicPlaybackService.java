@@ -34,22 +34,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.audiofx.AudioEffect;
-import androidx.media3.session.MediaSession;
-
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.session.DefaultMediaNotificationProvider;
+import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 import android.net.Uri;
@@ -375,6 +372,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private FavoritesStore mFavoritesCache;
     private boolean launchPlayerActivity;
     private boolean mForegroundNotificationStarted;
+    private RememberingMediaNotificationProvider mNotificationProvider;
     private final Random r = new Random();
 
     private final static HashMap<String, Long> notifyChangeIntervals = new HashMap<>();
@@ -536,12 +534,9 @@ public class MusicPlaybackService extends MediaSessionService {
 
         if (mediaReadPermissionsGranted) {
             createNotificationChannel();
-            DefaultMediaNotificationProvider notificationProvider =
-                    new DefaultMediaNotificationProvider.Builder(this)
-                            .setNotificationId(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE)
-                            .setChannelId(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                            .build();
-            setMediaNotificationProvider(notificationProvider);
+            mNotificationProvider =
+                    new RememberingMediaNotificationProvider(new ApolloMediaNotificationProvider(this));
+            setMediaNotificationProvider(mNotificationProvider);
 
             mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
@@ -579,7 +574,6 @@ public class MusicPlaybackService extends MediaSessionService {
             if (intent.hasExtra(NOW_IN_FOREGROUND)) {
                 musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
                 updateNotification();
-                // We'll start foreground in onNotificationCreated callback once notification is ready.
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -647,15 +641,40 @@ public class MusicPlaybackService extends MediaSessionService {
     }
 
     /**
-     * Override onUpdateNotification to catch ForegroundServiceStartNotAllowedException
-     * on Android 12+ (API 31+). Media3's notification manager may try to call
-     * startForeground() when the app is in the background, which is not allowed.
+     * Override onUpdateNotification to keep Media3 away from foreground promotion while the app is
+     * backgrounded on Android 12+. We let Media3 manage visible-app promotion and normal
+     * foreground teardown, but background updates are posted from the cached notification instead
+     * of letting Media3 call ContextCompat.startForegroundService() again.
      */
     @Override
     public void onUpdateNotification(MediaSession session, boolean startInForegroundRequired) {
-        boolean startInForeground = startInForegroundRequired && canStartPlaybackForegroundNotification();
-        if (startInForegroundRequired && !startInForeground) {
-            LOG.warn("MusicPlaybackService.onUpdateNotification: foreground promotion blocked while app is backgrounded; updating notification without starting foreground");
+        MusicForegroundNotificationPolicy.Action action = MusicForegroundNotificationPolicy.resolve(
+                Build.VERSION.SDK_INT,
+                startInForegroundRequired,
+                isNotificationPromotionAllowed());
+
+        if (action == MusicForegroundNotificationPolicy.Action.UPDATE_VIA_NOTIFICATION_MANAGER) {
+            if (updateNotificationFromCache(session)) {
+                LOG.info("MusicPlaybackService.onUpdateNotification: updated notification through NotificationManager to avoid Media3 foreground self-start");
+                return;
+            }
+            if (isMedia3StartedInForeground()) {
+                LOG.warn("MusicPlaybackService.onUpdateNotification: cached notification unavailable; keeping existing foreground notification unchanged");
+                return;
+            }
+            LOG.warn("MusicPlaybackService.onUpdateNotification: cached notification unavailable while app is backgrounded; falling back to Media3 background update");
+            try {
+                super.onUpdateNotification(session, false);
+                mForegroundNotificationStarted = false;
+            } catch (Exception e) {
+                LOG.error("MusicPlaybackService.onUpdateNotification: Error updating notification without foreground", e);
+            }
+            return;
+        }
+
+        boolean startInForeground = action == MusicForegroundNotificationPolicy.Action.PROMOTE_WITH_MEDIA3;
+        if (action == MusicForegroundNotificationPolicy.Action.UPDATE_WITH_MEDIA3) {
+            LOG.info("MusicPlaybackService.onUpdateNotification: updating notification via Media3 without foreground promotion");
         }
         try {
             super.onUpdateNotification(session, startInForeground);
@@ -664,6 +683,10 @@ public class MusicPlaybackService extends MediaSessionService {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 e instanceof android.app.ForegroundServiceStartNotAllowedException) {
                 LOG.warn("MusicPlaybackService.onUpdateNotification: Cannot start foreground from background on Android 12+");
+                if (updateNotificationFromCache(session)) {
+                    mForegroundNotificationStarted = isMedia3StartedInForeground();
+                    return;
+                }
                 try {
                     super.onUpdateNotification(session, false);
                     mForegroundNotificationStarted = false;
@@ -676,18 +699,53 @@ public class MusicPlaybackService extends MediaSessionService {
         }
     }
 
-    private boolean canStartPlaybackForegroundNotification() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+    private boolean isNotificationPromotionAllowed() {
+        return isAppProcessInForeground() || musicPlaybackActivityInForeground;
+    }
+
+    private boolean isAppProcessInForeground() {
+        try {
+            return SystemUtils.isAppInForeground(this);
+        } catch (Throwable t) {
+            LOG.warn("MusicPlaybackService.isAppProcessInForeground failed: " + t.getMessage());
+        }
+        return false;
+    }
+
+    private boolean updateNotificationFromCache(MediaSession session) {
+        if (mNotificationProvider == null) {
+            return false;
+        }
+
+        MediaNotification cachedNotification = mNotificationProvider.getCachedNotification(session);
+        if (cachedNotification == null) {
+            return false;
+        }
+
+        try {
+            createNotificationChannel();
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) {
+                return false;
+            }
+            notificationManager.notify(
+                    cachedNotification.notificationId,
+                    cachedNotification.notification);
+            return true;
+        } catch (Throwable t) {
+            LOG.error("MusicPlaybackService.updateNotificationFromCache: failed to post cached notification", t);
+            return false;
+        }
+    }
+
+    private boolean isMedia3StartedInForeground() {
+        if (mForegroundNotificationStarted) {
             return true;
         }
         try {
-            if (isPlaybackOngoing()) {
-                return true;
-            }
+            return isPlaybackOngoing();
         } catch (Throwable ignored) {
-        }
-        if (mForegroundNotificationStarted || musicPlaybackActivityInForeground) {
-            return true;
         }
         return false;
     }
@@ -762,6 +820,10 @@ public class MusicPlaybackService extends MediaSessionService {
         LOG.info("onDestroy() destroying MusicPlaybackService");
         super.onDestroy();
         mForegroundNotificationStarted = false;
+        if (mNotificationProvider != null) {
+            mNotificationProvider.clear();
+            mNotificationProvider = null;
+        }
 
         try {
             final Intent audioEffectsIntent = new Intent(
