@@ -700,16 +700,23 @@ public final class TransferManager {
             LOG.warn("Skipping torrent restore because BTEngine initialization already failed");
             return;
         }
-        final BTEngine btEngine = BTEngine.getInstance();
-        if (!Engine.instance().isStarted() || btEngine.swig() == null) {
-            if (retryCount >= LOAD_TORRENTS_MAX_RETRIES) {
-                LOG.warn("Timed out waiting for engine startup/session before restoring previous-session torrents");
+        final BTEngine btEngine;
+        try {
+            btEngine = BTEngine.getInstance();
+            if (!Engine.instance().isStarted() || btEngine.swig() == null) {
+                if (retryCount >= LOAD_TORRENTS_MAX_RETRIES) {
+                    LOG.warn("Timed out waiting for engine startup/session before restoring previous-session torrents");
+                    return;
+                }
+                SystemUtils.postToHandlerDelayed(
+                        SystemUtils.HandlerThreadName.DOWNLOADER,
+                        () -> loadTorrentsTask(retryCount + 1),
+                        LOAD_TORRENTS_RETRY_DELAY_MS);
                 return;
             }
-            SystemUtils.postToHandlerDelayed(
-                    SystemUtils.HandlerThreadName.DOWNLOADER,
-                    () -> loadTorrentsTask(retryCount + 1),
-                    LOAD_TORRENTS_RETRY_DELAY_MS);
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            LOG.warn("Skipping torrent restore because BTEngine is unavailable", t);
             return;
         }
         synchronized (downloadsListMonitor) {
@@ -721,58 +728,63 @@ public final class TransferManager {
 
         UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
 
-        btEngine.setListener(new BTEngineAdapter() {
-            @Override
-            public void downloadAdded(BTEngine engine, BTDownload dl) {
-                if (dl.getInfoHash() == null) {
-                    LOG.error("BTEngineAdapter.downloadAdded()@TransferManager::loadTorrentsTask: Check your logic, BTDownload's infoHash is null");
-                    return;
-                }
-                String name = dl.getName();
-                if (name != null && name.contains("fetch_magnet")) {
-                    return;
-                }
-                File savePath = dl.getSavePath();
-                if (savePath != null && savePath.toString().contains("fetch_magnet")) {
-                    return;
-                }
-                if (dl.getListener() == null) {
-                    dl.setListener(new UIBTDownloadListener());
-                }
-                UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
-                synchronized (downloadsListMonitor) {
-                    if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
-                        bittorrentDownloadsList.add(uiBittorrentDownload);
-                    }
-                }
-                synchronized (downloadsMapMonitor) {
-                    if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
-                        bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
-                    }
-                }
-            }
-
-            @Override
-            public void downloadUpdate(BTEngine engine, BTDownload dl) {
-                try {
+        try {
+            btEngine.setListener(new BTEngineAdapter() {
+                @Override
+                public void downloadAdded(BTEngine engine, BTDownload dl) {
                     if (dl.getInfoHash() == null) {
-                        LOG.error("BTEngineAdapter.downloadUpdate()@TransferManager::loadTorrentsTask: Check your logic, cannot update BTDownload with null infoHash");
+                        LOG.error("BTEngineAdapter.downloadAdded()@TransferManager::loadTorrentsTask: Check your logic, BTDownload's infoHash is null");
+                        return;
+                    }
+                    String name = dl.getName();
+                    if (name != null && name.contains("fetch_magnet")) {
+                        return;
+                    }
+                    File savePath = dl.getSavePath();
+                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                         return;
                     }
                     if (dl.getListener() == null) {
                         dl.setListener(new UIBTDownloadListener());
                     }
-
-                    BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
-                    if (bittorrentDownload instanceof UIBittorrentDownload) {
-                        UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
-                        bt.updateUI(dl);
+                    UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
+                    synchronized (downloadsListMonitor) {
+                        if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
+                            bittorrentDownloadsList.add(uiBittorrentDownload);
+                        }
                     }
-                } catch (Throwable e) {
-                    LOG.error("Error updating bittorrent download", e);
+                    synchronized (downloadsMapMonitor) {
+                        if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
+                            bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                        }
+                    }
                 }
-            }
-        });
-        btEngine.restoreDownloads();
+
+                @Override
+                public void downloadUpdate(BTEngine engine, BTDownload dl) {
+                    try {
+                        if (dl.getInfoHash() == null) {
+                            LOG.error("BTEngineAdapter.downloadUpdate()@TransferManager::loadTorrentsTask: Check your logic, cannot update BTDownload with null infoHash");
+                            return;
+                        }
+                        if (dl.getListener() == null) {
+                            dl.setListener(new UIBTDownloadListener());
+                        }
+
+                        BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
+                        if (bittorrentDownload instanceof UIBittorrentDownload) {
+                            UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
+                            bt.updateUI(dl);
+                        }
+                    } catch (Throwable e) {
+                        LOG.error("Error updating bittorrent download", e);
+                    }
+                }
+            });
+            btEngine.restoreDownloads();
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            LOG.warn("Could not restore previous-session torrents", t);
+        }
     }
 }

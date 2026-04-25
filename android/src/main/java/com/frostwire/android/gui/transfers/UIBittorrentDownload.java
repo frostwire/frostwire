@@ -370,16 +370,38 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     private long calculateSize(BTDownload dl) {
-        long size = dl.getSize();
+        long size = 0;
+        try {
+            size = dl.getSize();
+        } catch (Throwable t) {
+            LOG.warn("Could not calculate torrent size", t);
+            return 0;
+        }
 
-        boolean partial = dl.isPartial();
+        boolean partial;
+        try {
+            partial = dl.isPartial();
+        } catch (Throwable t) {
+            LOG.warn("Could not determine partial torrent state", t);
+            return size;
+        }
         if (partial) {
-            List<com.frostwire.transfers.TransferItem> items = dl.getItems();
+            List<com.frostwire.transfers.TransferItem> items;
+            try {
+                items = dl.getItems();
+            } catch (Throwable t) {
+                LOG.warn("Could not calculate partial torrent size", t);
+                return size;
+            }
 
             long totalSize = 0;
             for (com.frostwire.transfers.TransferItem item : items) {
-                if (!item.isSkipped()) {
-                    totalSize += item.getSize();
+                try {
+                    if (!item.isSkipped()) {
+                        totalSize += item.getSize();
+                    }
+                } catch (Throwable t) {
+                    LOG.warn("Skipping torrent item while calculating size", t);
                 }
             }
 
@@ -394,10 +416,18 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private List<TransferItem> calculateItems(BTDownload dl) {
         List<TransferItem> l = new LinkedList<>();
 
-        for (TransferItem item : dl.getItems()) {
-            if (!item.isSkipped()) {
-                l.add(item);
+        try {
+            for (TransferItem item : dl.getItems()) {
+                try {
+                    if (!item.isSkipped()) {
+                        l.add(item);
+                    }
+                } catch (Throwable t) {
+                    LOG.warn("Skipping torrent item with unavailable native handle", t);
+                }
             }
+        } catch (Throwable t) {
+            LOG.warn("Could not calculate torrent items", t);
         }
 
         return l;

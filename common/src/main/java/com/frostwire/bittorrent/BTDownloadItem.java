@@ -58,7 +58,14 @@ public class BTDownloadItem implements TransferItem {
 
     @Override
     public boolean isSkipped() {
-        return th.filePriority(index) == Priority.IGNORE;
+        if (th == null || !th.isValid()) {
+            return true;
+        }
+        try {
+            return th.filePriority(index) == Priority.IGNORE;
+        } catch (Throwable e) {
+            return true;
+        }
     }
 
     @Override
@@ -111,15 +118,21 @@ public class BTDownloadItem implements TransferItem {
     }
 
     public void setPriority(Priority priority) {
-        if (th != null && th.isValid()) {
-            th.filePriority(index, priority);
+        try {
+            if (th != null && th.isValid()) {
+                th.filePriority(index, priority);
+            }
+        } catch (Throwable ignored) {
         }
     }
 
     @Override
     public int getPriority() {
-        if (th != null && th.isValid()) {
-            return th.filePriority(index).swig();
+        try {
+            if (th != null && th.isValid()) {
+                return th.filePriority(index).swig();
+            }
+        } catch (Throwable ignored) {
         }
         return Priority.IGNORE.swig();
     }
