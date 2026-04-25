@@ -47,18 +47,19 @@ public class SafeDrawerLayout extends DrawerLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = View.getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        int height = View.getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         } catch (IllegalStateException e) {
-            // DrawerLayout.onMeasure() didn't call setMeasuredDimension()
-            LOG.error("DrawerLayout.onMeasure() did not set measured dimension; using fallback", e);
-            int width = View.getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-            int height = View.getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-            setMeasuredDimension(width, height);
+            LOG.error("DrawerLayout.onMeasure() failed; using fallback measure specs", e);
         } catch (Exception e) {
             LOG.error("DrawerLayout.onMeasure() threw exception; falling back to imposed measure specs", e);
-            int width = View.getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-            int height = View.getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        } finally {
+            // Android verifies after onMeasure() returns that this method called
+            // setMeasuredDimension(). Do it explicitly even when DrawerLayout
+            // returns without throwing on newer framework versions.
             setMeasuredDimension(width, height);
         }
     }
