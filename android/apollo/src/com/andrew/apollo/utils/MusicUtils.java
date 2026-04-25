@@ -510,25 +510,29 @@ public final class MusicUtils {
      */
 
     public static void next() {
-        try {
-            MusicPlaybackService svc = getService();
-            if (svc != null) {
-                svc.stopPlayer();
-                svc.gotoNext(true);
+        MusicPlaybackService.safePost(() -> {
+            try {
+                MusicPlaybackService svc = getService();
+                if (svc != null) {
+                    svc.stopPlayer();
+                    svc.gotoNext(true);
+                }
+            } catch (final Throwable ignored) {
             }
-        } catch (final Throwable ignored) {
-        }
+        });
     }
 
 
     public static void previous() {
-        try {
-            MusicPlaybackService svc = getService();
-            if (svc != null) {
-                svc.gotoPrev();
+        MusicPlaybackService.safePost(() -> {
+            try {
+                MusicPlaybackService svc = getService();
+                if (svc != null) {
+                    svc.gotoPrev();
+                }
+            } catch (final Throwable ignored) {
             }
-        } catch (final Throwable ignored) {
-        }
+        });
     }
 
     /**
@@ -536,24 +540,26 @@ public final class MusicUtils {
      */
 
     public static void playPauseOrResume() {
-        try {
-            MusicPlaybackService svc = getService();
-            if (svc != null) {
-                // PAUSED
-                if (!svc.isPlaying() && !svc.isStopped()) {
-                    svc.resume();
+        MusicPlaybackService.safePost(() -> {
+            try {
+                MusicPlaybackService svc = getService();
+                if (svc != null) {
+                    // PAUSED
+                    if (!svc.isPlaying() && !svc.isStopped()) {
+                        svc.resume();
+                    }
+                    // STOPPED or UNSTARTED
+                    else if (svc.isStopped()) {
+                        svc.play();
+                    }
+                    // PLAYING
+                    else if (svc.isPlaying()) {
+                        svc.pause();
+                    }
                 }
-                // STOPPED or UNSTARTED
-                else if (svc.isStopped()) {
-                    svc.play();
-                }
-                // PLAYING
-                else if (svc.isPlaying()) {
-                    svc.pause();
-                }
+            } catch (final Exception ignored) {
             }
-        } catch (final Exception ignored) {
-        }
+        });
     }
 
     /**
@@ -561,24 +567,28 @@ public final class MusicUtils {
      */
 
     public static void play() {
-        MusicPlaybackService svc = getService();
-        if (svc != null) {
+        MusicPlaybackService.safePost(() -> {
             try {
-                svc.play();
+                MusicPlaybackService svc = getService();
+                if (svc != null) {
+                    svc.play();
+                }
             } catch (Throwable ignored) {
             }
-        }
+        });
     }
 
 
     public static void pause() {
-        MusicPlaybackService svc = getService();
-        if (svc != null) {
+        MusicPlaybackService.safePost(() -> {
             try {
-                svc.pause();
+                MusicPlaybackService svc = getService();
+                if (svc != null) {
+                    svc.pause();
+                }
             } catch (Throwable ignored) {
             }
-        }
+        });
     }
 
     /**

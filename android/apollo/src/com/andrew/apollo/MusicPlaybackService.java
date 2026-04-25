@@ -362,6 +362,7 @@ public class MusicPlaybackService extends MediaSessionService {
     private volatile int mPlayPos = -1;
     private int mNextPlayPos = -1;
     private int mOpenFailedCounter = 0;
+    private int mNearEndAutoAdvanceDepth = 0;
     private int mMediaMountedCount = 0;
     private boolean mShuffleEnabled = false;
     private int mRepeatMode = REPEAT_ALL;
@@ -2355,7 +2356,17 @@ public class MusicPlaybackService extends MediaSessionService {
                 if (mRepeatMode != REPEAT_CURRENT &&
                         duration > 2000 &&
                         mPlayer.position() >= duration - 2000) {
-                    gotoNext(true);
+                    if (mNearEndAutoAdvanceDepth < 3) {
+                        mNearEndAutoAdvanceDepth++;
+                        try {
+                            gotoNext(true);
+                        } finally {
+                            mNearEndAutoAdvanceDepth--;
+                        }
+                    } else {
+                        LOG.warn("MusicPlaybackService.play: near-end auto-advance recursion limit reached");
+                    }
+                    return;
                 }
                 mPlayer.start();
             }
