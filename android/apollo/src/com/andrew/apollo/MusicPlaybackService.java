@@ -652,16 +652,43 @@ public class MusicPlaybackService extends MediaSessionService {
      */
     @Override
     public void onUpdateNotification(MediaSession session, boolean startInForegroundRequired) {
+        boolean startInForeground = startInForegroundRequired && canStartPlaybackForegroundNotification();
+        if (startInForegroundRequired && !startInForeground) {
+            LOG.warn("MusicPlaybackService.onUpdateNotification: foreground promotion blocked while app is backgrounded; updating notification without starting foreground");
+        }
         try {
-            super.onUpdateNotification(session, startInForegroundRequired);
+            super.onUpdateNotification(session, startInForeground);
+            mForegroundNotificationStarted = startInForeground;
         } catch (Exception e) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 e instanceof android.app.ForegroundServiceStartNotAllowedException) {
                 LOG.warn("MusicPlaybackService.onUpdateNotification: Cannot start foreground from background on Android 12+");
+                try {
+                    super.onUpdateNotification(session, false);
+                    mForegroundNotificationStarted = false;
+                } catch (Exception retryError) {
+                    LOG.error("MusicPlaybackService.onUpdateNotification: Error updating notification after foreground start was denied", retryError);
+                }
             } else {
                 LOG.error("MusicPlaybackService.onUpdateNotification: Error updating notification", e);
             }
         }
+    }
+
+    private boolean canStartPlaybackForegroundNotification() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return true;
+        }
+        try {
+            if (isPlaybackOngoing()) {
+                return true;
+            }
+        } catch (Throwable ignored) {
+        }
+        if (mForegroundNotificationStarted || musicPlaybackActivityInForeground) {
+            return true;
+        }
+        return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
