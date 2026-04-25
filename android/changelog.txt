@@ -1,8 +1,9 @@
-FrostWire 3.1.2 build 772 UNRELEASED
+FrostWire 3.1.2 build 773 APR/25/2026
   - fix:Android 12+ music notification updates no longer crash when Media3 tries to promote MusicPlaybackService to foreground while the app is backgrounded; Apollo now falls back to a non-foreground notification update when foreground start is not allowed
   - fix:Invalid libtorrent handles no longer crash transfer removal or file-list loading; torrent item priority checks now fail closed and TransferManager skips restore safely when BTEngine native initialization is unavailable
   - fix:SafeDrawerLayout always sets measured dimensions after DrawerLayout measurement, preventing Android 16 foldable layout crashes during onMeasure()
   - fix:My Music shuffle and delete actions now use stable application context, refresh detached-safe, and clean remaining audio files after confirmed Android 11+ MediaStore deletes
+  - fix:Library-side audio deletions now reuse the Apollo delete flow once, so Android 11+ MediaStore confirmation works consistently and completed song deletes are not followed by a second manual delete pass
   - fix:Transfers list and transfer detail screens no longer ANR from UI-thread libtorrent metadata calls; torrent magnet URI, file extension, file count, comment, rate limits, speeds, and state are cached from background refreshes before UI binding
   - fix:Transfer context menus no longer build magnet links or load file lists through JNI on the main thread; menus use cached torrent data and skip unavailable magnet actions until metadata is ready
   - fix:Mini-player next/previous/play/pause actions now run through the MusicPlaybackService handler, preventing UI-thread MediaStore queries and recursive next/play loops from blocking the main thread

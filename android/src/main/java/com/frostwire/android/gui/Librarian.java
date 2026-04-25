@@ -19,6 +19,7 @@
 
 package com.frostwire.android.gui;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -213,9 +214,15 @@ public final class Librarian {
                 songsArray[i++] = l;
             }
             try {
+                if (context instanceof Activity) {
+                    MusicUtils.deleteTracks((Activity) context, songsArray, false, null);
+                    return;
+                }
                 MusicUtils.deleteTracks(context, songsArray, false);
+                return;
             } catch (Throwable t) {
-                t.printStackTrace();
+                LOG.error("Failed to delete audio files", t);
+                return;
             }
         } else {
             for (FWFileDescriptor fd : fds) {
