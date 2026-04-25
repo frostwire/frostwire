@@ -1,4 +1,8 @@
 FrostWire 3.1.1 build 772 APR/24/2026
+  - fix:Android 12+ music notification updates no longer crash when Media3 tries to promote MusicPlaybackService to foreground while the app is backgrounded; Apollo now falls back to a non-foreground notification update when foreground start is not allowed
+  - fix:Invalid libtorrent handles no longer crash transfer removal or file-list loading; torrent item priority checks now fail closed and TransferManager skips restore safely when BTEngine native initialization is unavailable
+  - fix:SafeDrawerLayout always sets measured dimensions after DrawerLayout measurement, preventing Android 16 foldable layout crashes during onMeasure()
+  - fix:My Music shuffle and delete actions now use stable application context, refresh detached-safe, and clean remaining audio files after confirmed Android 11+ MediaStore deletes
   - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
   - fix:Crash ForegroundServiceStartNotAllowedException - MusicPlaybackService.onUpdateNotification now catches the exception on Android 12+ when the app tries to start foreground from background
   - fix:Crash MusicPlaybackService.onTaskRemoved - ExoPlayer is now accessed on the dedicated MusicPlayerHandler thread instead of the calling thread (e.g., EngineThreadPool)
