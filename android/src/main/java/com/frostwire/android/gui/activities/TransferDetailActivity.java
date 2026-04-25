@@ -124,9 +124,6 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
                 uiBittorrentDownload = new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload);
             }
         }
-        if (uiBittorrentDownload != null) {
-            uiBittorrentDownload.checkSequentialDownload();
-        }
         return uiBittorrentDownload != null;
     }
 

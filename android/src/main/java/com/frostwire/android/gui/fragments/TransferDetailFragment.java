@@ -42,7 +42,6 @@ import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.transfers.TransferState;
 
@@ -111,11 +110,15 @@ public final class TransferDetailFragment extends AbstractFragment {
                 } else if (itemId == R.id.fragment_transfer_detail_menu_clear) {
                     new CancelMenuAction(activity, uiBittorrentDownload, false, false).onClick(activity);
                 } else if (itemId == R.id.fragment_transfer_detail_menu_copy_magnet) {
+                    String magnetUri = uiBittorrentDownload.getCachedMagnetUri();
+                    if (magnetUri == null || "".equals(magnetUri)) {
+                        return true;
+                    }
                     new CopyToClipboardMenuAction(activity,
                             R.drawable.contextmenu_icon_magnet,
                             R.string.transfers_context_menu_copy_magnet,
                             R.string.transfers_context_menu_copy_magnet_copied,
-                            uiBittorrentDownload.magnetUri() + BTEngine.getInstance().magnetPeers()
+                            magnetUri
                     ).onClick(activity);
                 } else if (itemId == R.id.fragment_transfer_detail_menu_copy_infohash) {
                     new CopyToClipboardMenuAction(activity,

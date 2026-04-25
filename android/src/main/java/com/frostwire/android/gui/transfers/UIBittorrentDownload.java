@@ -27,6 +27,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -68,6 +69,20 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private volatile int cachedTotalSeeds;
     private volatile int cachedConnectedPeers;
     private volatile int cachedTotalPeers;
+    private volatile long cachedDownloadSpeed;
+    private volatile long cachedUploadSpeed;
+    private volatile long cachedEta;
+    private volatile boolean cachedSeeding;
+    private volatile boolean cachedPaused;
+    private volatile boolean cachedFinished;
+    private volatile boolean cachedComplete;
+    private volatile String cachedMagnetUri;
+    private volatile String cachedPredominantFileExtension = "torrent";
+    private volatile String cachedTorrentComment;
+    private volatile int cachedFileCount = -1;
+    private volatile boolean cachedSequentialDownload;
+    private volatile int cachedDownloadRateLimit;
+    private volatile int cachedUploadRateLimit;
 
     public UIBittorrentDownload(TransferManager manager, BTDownload dl) {
         this.manager = manager;
@@ -108,8 +123,51 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             cachedTotalSeeds = dl.getTotalSeeds();
             cachedConnectedPeers = dl.getConnectedPeers();
             cachedTotalPeers = dl.getTotalPeers();
+            cachedDownloadSpeed = dl.getDownloadSpeed();
+            cachedUploadSpeed = dl.getUploadSpeed();
+            cachedEta = dl.getETA();
+            cachedSeeding = dl.isSeeding();
+            cachedPaused = dl.isPaused();
+            cachedFinished = dl.isFinished();
+            cachedComplete = dl.isComplete();
+            cachedSequentialDownload = dl.isSequentialDownload();
+            cachedDownloadRateLimit = dl.getDownloadRateLimit();
+            cachedUploadRateLimit = dl.getUploadRateLimit();
+            updateCachedStaticMetadata();
         } catch (Throwable e) {
             LOG.error("Error updating cached state", e);
+        }
+    }
+
+    private void updateCachedStaticMetadata() {
+        if (cachedMagnetUri == null) {
+            try {
+                cachedMagnetUri = dl.magnetUri();
+            } catch (Throwable t) {
+                LOG.warn("Could not cache torrent magnet URI", t);
+            }
+        }
+        if ("torrent".equals(cachedPredominantFileExtension)) {
+            try {
+                String ext = dl.getPredominantFileExtension();
+                if (ext != null && !"".equals(ext)) {
+                    cachedPredominantFileExtension = ext;
+                }
+            } catch (Throwable t) {
+                LOG.warn("Could not cache torrent file extension", t);
+            }
+        }
+        if (cachedFileCount < 0 || cachedTorrentComment == null) {
+            try {
+                TorrentInfo torrentInfo = dl.getTorrentHandle().torrentFile();
+                if (torrentInfo != null && torrentInfo.isValid()) {
+                    cachedFileCount = torrentInfo.numFiles();
+                    String comment = torrentInfo.comment();
+                    cachedTorrentComment = comment != null ? comment : "";
+                }
+            } catch (Throwable t) {
+                LOG.warn("Could not cache torrent metadata", t);
+            }
         }
     }
 
@@ -119,7 +177,31 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public String magnetUri() {
-        return dl.magnetUri();
+        return cachedMagnetUri;
+    }
+
+    public String getCachedMagnetUri() {
+        return cachedMagnetUri;
+    }
+
+    public int getCachedFileCount() {
+        return cachedFileCount;
+    }
+
+    public boolean isSequentialDownloadCached() {
+        return cachedSequentialDownload;
+    }
+
+    public String getCachedTorrentComment() {
+        return cachedTorrentComment;
+    }
+
+    public int getCachedDownloadRateLimit() {
+        return cachedDownloadRateLimit;
+    }
+
+    public int getCachedUploadRateLimit() {
+        return cachedUploadRateLimit;
     }
 
     @Override
@@ -157,17 +239,17 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public boolean isSeeding() {
-        return dl.isSeeding();
+        return cachedSeeding;
     }
 
     @Override
     public boolean isPaused() {
-        return dl.isPaused();
+        return cachedPaused;
     }
 
     @Override
     public boolean isFinished() {
-        return dl.isFinished();
+        return cachedFinished;
     }
 
     public boolean hasPaymentOptions() {
@@ -200,7 +282,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public boolean isDownloading() {
-        return dl.getDownloadSpeed() > 0;
+        return cachedDownloadSpeed > 0;
     }
 
     @Override
@@ -215,7 +297,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public String getPredominantFileExtension() {
-        return getDl() == null ? "torrent" : getDl().getPredominantFileExtension();
+        return cachedPredominantFileExtension;
     }
 
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
@@ -304,22 +386,22 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public long getDownloadSpeed() {
-        return dl.getDownloadSpeed();
+        return cachedDownloadSpeed;
     }
 
     @Override
     public long getUploadSpeed() {
-        return dl.getUploadSpeed();
+        return cachedUploadSpeed;
     }
 
     @Override
     public long getETA() {
-        return dl.getETA();
+        return cachedEta;
     }
 
     @Override
     public boolean isComplete() {
-        return dl.isComplete();
+        return cachedComplete;
     }
 
     /**

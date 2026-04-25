@@ -42,12 +42,9 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.bittorrent.BTDownload;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 /**
  * @author gubatron
@@ -98,11 +95,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     protected void updateComponents() {
         if (uiBittorrentDownload != null) {
-            //ensureComponentsReferenced();
-            uiBittorrentDownload.checkSequentialDownload();
-            final BTDownload btDL = uiBittorrentDownload.getDl();
-
-            if (btDL.isSequentialDownload()) {
+            if (uiBittorrentDownload.isSequentialDownloadCached()) {
                 sequentialDividerLine.setVisibility(View.VISIBLE);
                 sequentialDownloadLinearLayout.setVisibility(View.VISIBLE);
             }
@@ -118,8 +111,10 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 totalSize.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
             }
             if ("".equals(numberOfFiles.getText())) {
-                List<TransferItem> items = uiBittorrentDownload.getItems();
-                int fileCount = items == null ? 0 : items.size();
+                int fileCount = uiBittorrentDownload.getCachedFileCount();
+                if (fileCount < 0) {
+                    fileCount = 0;
+                }
                 numberOfFiles.setText(fileCount + "");
             }
             if ("".equals(hash.getText())) {
@@ -128,16 +123,18 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 hashCopyButton.setOnClickListener(onCopyToClipboardListener);
             }
             if ("".equals(magnet.getText())) {
-                magnet.setText(uiBittorrentDownload.magnetUri());
-                magnet.setOnClickListener(onCopyToClipboardListener);
-                magnetCopyButton.setOnClickListener(onCopyToClipboardListener);
+                String magnetUri = uiBittorrentDownload.getCachedMagnetUri();
+                if (magnetUri != null && !"".equals(magnetUri)) {
+                    magnet.setText(magnetUri);
+                    magnet.setOnClickListener(onCopyToClipboardListener);
+                    magnetCopyButton.setOnClickListener(onCopyToClipboardListener);
+                }
             }
             if ("".equals(createdOn.getText())) {
                 createdOn.setText(DateUtils.formatDateTime(getActivity(), uiBittorrentDownload.getCreated().getTime(), DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
             }
             if ("".equals(comment.getText())) {
-                TorrentInfo torrentInfo = uiBittorrentDownload.getDl().getTorrentHandle().torrentFile();
-                String torrentComment = torrentInfo.comment();
+                String torrentComment = uiBittorrentDownload.getCachedTorrentComment();
                 if (torrentComment != null && !"".equals(torrentComment)) {
                     comment.setText(torrentComment);
                 } else {
@@ -153,8 +150,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 uploadSpeedLimit.setOnClickListener(onRateLimitClickListener);
                 uploadSpeedLimitArrow.setOnClickListener(onRateLimitClickListener);
             }
-            int downloadRateLimit = btDL.getDownloadRateLimit();
-            int uploadRateLimit = btDL.getUploadRateLimit();
+            int downloadRateLimit = uiBittorrentDownload.getCachedDownloadRateLimit();
+            int uploadRateLimit = uiBittorrentDownload.getCachedUploadRateLimit();
             if (downloadRateLimit > 0) {
                 downloadSpeedLimit.setText(UIUtils.getBytesInHuman(downloadRateLimit) + "/s");
             } else if (downloadRateLimit == DOWNLOAD_UNLIMITED_VALUE || downloadRateLimit == -1) {
@@ -218,7 +215,10 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 drawableId = R.drawable.contextmenu_icon_magnet;
                 actionNameId = R.string.transfers_context_menu_copy_magnet;
                 messageId = R.string.transfers_context_menu_copy_magnet_copied;
-                data = uiBittorrentDownload.magnetUri();
+                data = uiBittorrentDownload.getCachedMagnetUri();
+                if (data == null) {
+                    return;
+                }
             }
             CopyToClipboardMenuAction action =
                     new CopyToClipboardMenuAction(v.getContext(),

@@ -71,10 +71,8 @@ import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownloadItem;
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.search.StreamableUtils;
-import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.transfers.UISoundcloudDownload;
 import com.frostwire.transfers.BaseHttpDownload;
 import com.frostwire.transfers.BittorrentDownload;
@@ -404,8 +402,10 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         String title;
         title = bittorrentDownload.getDisplayName();
         //If it's a torrent download with a single file, we should be able to open it.
-        if (bittorrentDownload.isComplete() && bittorrentDownload.getItems().size() > 0) {
-            TransferItem transferItem = bittorrentDownload.getItems().get(0);
+        List<TransferItem> cachedItems = bittorrentDownload instanceof UIBittorrentDownload ?
+                ((UIBittorrentDownload) bittorrentDownload).peekItems() : bittorrentDownload.getItems();
+        if (bittorrentDownload.isComplete() && cachedItems != null && cachedItems.size() > 0) {
+            TransferItem transferItem = cachedItems.get(0);
             String path = transferItem.getFile().getAbsolutePath();
             String mimeType = UIUtils.getMimeType(path);
             items.add(new OpenMenuAction(context, path, mimeType));
@@ -430,12 +430,16 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             items.add(new StopSeedingAction(context, bittorrentDownload));
         }
         items.add(new CancelMenuAction(context, bittorrentDownload, !bittorrentDownload.isComplete()));
-        items.add(new CopyToClipboardMenuAction(context,
-                R.drawable.contextmenu_icon_magnet,
-                R.string.transfers_context_menu_copy_magnet,
-                R.string.transfers_context_menu_copy_magnet_copied,
-                bittorrentDownload.magnetUri() + BTEngine.getInstance().magnetPeers()
-        ));
+        String magnetUri = bittorrentDownload instanceof UIBittorrentDownload ?
+                ((UIBittorrentDownload) bittorrentDownload).getCachedMagnetUri() : bittorrentDownload.magnetUri();
+        if (magnetUri != null && !"".equals(magnetUri)) {
+            items.add(new CopyToClipboardMenuAction(context,
+                    R.drawable.contextmenu_icon_magnet,
+                    R.string.transfers_context_menu_copy_magnet,
+                    R.string.transfers_context_menu_copy_magnet_copied,
+                    magnetUri
+            ));
+        }
         items.add(new CopyToClipboardMenuAction(context,
                 R.drawable.contextmenu_icon_copy,
                 R.string.transfers_context_menu_copy_infohash,
@@ -650,7 +654,6 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                 buttonDetails.setTag(download);
                 buttonDetails.setVisibility(View.VISIBLE);
                 buttonDetails.setOnClickListener(transferDetailsClickListener);
-                ((UIBittorrentDownload) download).checkSequentialDownload();
             } else {
                 buttonDetails.setVisibility(View.GONE);
                 buttonDetails.setOnClickListener(null);
@@ -883,5 +886,4 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         return connectedSeeds + " / " + seedsStr;
     }
 }
-
 
