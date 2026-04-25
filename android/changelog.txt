@@ -3,6 +3,9 @@ FrostWire 3.1.2 build 772 UNRELEASED
   - fix:Invalid libtorrent handles no longer crash transfer removal or file-list loading; torrent item priority checks now fail closed and TransferManager skips restore safely when BTEngine native initialization is unavailable
   - fix:SafeDrawerLayout always sets measured dimensions after DrawerLayout measurement, preventing Android 16 foldable layout crashes during onMeasure()
   - fix:My Music shuffle and delete actions now use stable application context, refresh detached-safe, and clean remaining audio files after confirmed Android 11+ MediaStore deletes
+  - fix:Transfers list and transfer detail screens no longer ANR from UI-thread libtorrent metadata calls; torrent magnet URI, file extension, file count, comment, rate limits, speeds, and state are cached from background refreshes before UI binding
+  - fix:Transfer context menus no longer build magnet links or load file lists through JNI on the main thread; menus use cached torrent data and skip unavailable magnet actions until metadata is ready
+  - fix:Mini-player next/previous/play/pause actions now run through the MusicPlaybackService handler, preventing UI-thread MediaStore queries and recursive next/play loops from blocking the main thread
 
 FrostWire 3.1.1 build 772 APR/24/2026
   - fix:Crash RemoteServiceException - EngineForegroundService now always calls startForeground() before any early return, preventing crashes when the system restarts the service with a null intent
