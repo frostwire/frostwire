@@ -669,7 +669,20 @@ public final class TransferManager {
     private void onPreferenceChanged(String key) {
         //LOG.info("onPreferenceChanged(key="+key+")");
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
-            BTEngine e = BTEngine.getInstance();
+            if (MainApplication.hasBTEngineInitializationFailure()) {
+                LOG.warn("Skipping torrent preference change because BTEngine initialization already failed");
+                return;
+            }
+
+            final BTEngine e;
+            try {
+                e = BTEngine.getInstance();
+            } catch (Throwable t) {
+                MainApplication.recordBTEngineInitializationFailure(t);
+                LOG.warn("Skipping torrent preference change because BTEngine is unavailable", t);
+                return;
+            }
+
             ConfigurationManager CM = ConfigurationManager.instance();
             switch (key) {
                 case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:

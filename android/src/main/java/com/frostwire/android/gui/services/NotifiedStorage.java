@@ -24,6 +24,7 @@ import androidx.datastore.core.DataStore;
 import androidx.datastore.preferences.core.Preferences;
 
 import com.frostwire.android.core.DataStoreManager;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.bloom_filter_256;
@@ -38,17 +39,28 @@ public final class NotifiedStorage {
     private static final String PREF_KEY_NOTIFIED_HASHES = "frostwire.prefs.gui.notified_hashes";
 
     private final DataStore<Preferences> preferences;
-    private final bloom_filter_256 hashes;
+    private bloom_filter_256 hashes;
 
     NotifiedStorage(Context context) {
         SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::Constructor");
         preferences = DataStoreManager.getNotifiedDataStore();
-        hashes = new bloom_filter_256();
-        loadHashes();
+        if (MainApplication.hasBTEngineInitializationFailure()) {
+            LOG.warn("Skipping NotifiedStorage native setup because BTEngine initialization already failed");
+            return;
+        }
+
+        try {
+            hashes = new bloom_filter_256();
+            loadHashes();
+        } catch (Throwable t) {
+            MainApplication.recordBTEngineInitializationFailure(t);
+            LOG.warn("Disabling NotifiedStorage because native bloom filter setup failed", t);
+            hashes = null;
+        }
     }
 
     public boolean contains(String infoHash) {
-        if (infoHash == null || infoHash.length() != 40) {
+        if (hashes == null || infoHash == null || infoHash.length() != 40) {
             return false;
         }
 
@@ -66,7 +78,7 @@ public final class NotifiedStorage {
     }
 
     public void add(String infoHash) {
-        if (infoHash == null || infoHash.length() != 40) {
+        if (hashes == null || infoHash == null || infoHash.length() != 40) {
             return;
         }
 
@@ -89,6 +101,9 @@ public final class NotifiedStorage {
 
     private void loadHashes() {
         SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::loadHashes");
+        if (hashes == null) {
+            return;
+        }
         String s = DataStoreManager.getString(preferences, PREF_KEY_NOTIFIED_HASHES, null);
         if (s != null) {
             try {
