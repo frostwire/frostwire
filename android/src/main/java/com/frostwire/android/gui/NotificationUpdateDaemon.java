@@ -38,6 +38,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.services.EngineStatusNotificationStylePolicy;
 import com.frostwire.util.Logger;
 
 /**
@@ -152,6 +153,13 @@ public final class NotificationUpdateDaemon {
         PendingIntent showFrostWireIntent = createShowFrostWireIntent();
         PendingIntent shutdownIntent = createShutdownIntent();
 
+        if (EngineStatusNotificationStylePolicy.resolve(Build.VERSION.SDK_INT)
+                == EngineStatusNotificationStylePolicy.Style.SIMPLE_NOTIFICATION) {
+            setupSimpleNotification(showFrostWireIntent, "FrostWire is running");
+            LOG.info("setupNotification() using simple notification policy");
+            return;
+        }
+
         try {
             RemoteViews remoteViews = new RemoteViews(mParentContext.getPackageName(),
                     R.layout.view_permanent_status_notification);
@@ -171,25 +179,7 @@ public final class NotificationUpdateDaemon {
             LOG.info("setupNotification() completed successfully with RemoteViews");
         } catch (Throwable e) {
             LOG.error("Failed to create notification with RemoteViews, falling back to simple notification", e);
-            // Fallback to a simple notification without custom layout
-            try {
-                Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                        .setSmallIcon(R.drawable.frostwire_notification_flat)
-                        .setContentTitle("FrostWire")
-                        .setContentText("FrostWire is running")
-                        .setContentIntent(showFrostWireIntent)
-                        .setOngoing(true) // FLAG_NO_CLEAR is implied by setOngoing(true)
-                        .setPriority(NotificationCompat.PRIORITY_LOW)
-                        .build();
-
-                notificationViews = null; // Signal that we're using fallback
-                notificationObject = notification;
-                LOG.info("setupNotification() completed with fallback notification");
-            } catch (Throwable fallbackError) {
-                LOG.error("Failed to create fallback notification", fallbackError);
-                notificationViews = null;
-                notificationObject = null;
-            }
+            setupSimpleNotification(showFrostWireIntent, "FrostWire is running");
         }
     }
 
@@ -228,11 +218,11 @@ public final class NotificationUpdateDaemon {
             return false;
         }
 
-        if (notificationViews == null || notificationObject == null) {
+        if (notificationObject == null) {
             setupNotification();
         }
 
-        return notificationViews != null && notificationObject != null;
+        return notificationObject != null;
     }
 
     private void ensureHandlerLocked() {
@@ -297,16 +287,7 @@ public final class NotificationUpdateDaemon {
             try {
                 PendingIntent showFrostWireIntent = createShowFrostWireIntent();
                 String contentText = "↓ " + downloads + " @ " + sDown + ", ↑ " + uploads + " @ " + sUp;
-
-                Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                        .setSmallIcon(R.drawable.frostwire_notification_flat)
-                        .setContentTitle("FrostWire is running")
-                        .setContentText(contentText)
-                        .setContentIntent(showFrostWireIntent)
-                        .setOngoing(true) // FLAG_NO_CLEAR is implied by setOngoing(true)
-                        .setPriority(NotificationCompat.PRIORITY_LOW)
-                        .build();
-                notificationObject = notification;
+                setupSimpleNotification(showFrostWireIntent, contentText);
             } catch (Throwable e) {
                 LOG.error("Failed to update fallback notification", e);
                 return IDLE_UPDATE_INTERVAL_MS;
@@ -329,5 +310,26 @@ public final class NotificationUpdateDaemon {
         }
 
         return (downloads > 0 || uploads > 0) ? ACTIVE_UPDATE_INTERVAL_MS : IDLE_UPDATE_INTERVAL_MS;
+    }
+
+    private void setupSimpleNotification(PendingIntent showFrostWireIntent, String contentText) {
+        try {
+            Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.frostwire_notification_flat)
+                    .setContentTitle("FrostWire")
+                    .setContentText(contentText)
+                    .setContentIntent(showFrostWireIntent)
+                    .setOngoing(true) // FLAG_NO_CLEAR is implied by setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .build();
+
+            notificationViews = null;
+            notificationObject = notification;
+            LOG.info("setupSimpleNotification() completed successfully");
+        } catch (Throwable fallbackError) {
+            LOG.error("Failed to create fallback notification", fallbackError);
+            notificationViews = null;
+            notificationObject = null;
+        }
     }
 }

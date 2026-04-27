@@ -1,4 +1,5 @@
 FrostWire 3.1.3 build 774 UNRELEASED
+  - fix:Engine permanent notifications now fall back to simple notifications on Android 14+ and keep fallback updates alive even without RemoteViews, preventing BadForegroundServiceNotificationException crashes when the system rejects custom engine notification layouts
   - fix:CreateNewPlaylist no longer crashes when the dialog detaches during background default-name generation; playlist suggestions now use application context off the UI thread and only update the dialog if the fragment is still attached
   - fix:EngineForegroundService no longer crashes on Android 12+ sticky background restarts; null-intent background restarts now fail closed instead of calling startForeground() illegally, while foreground and explicit starts keep the persistent engine notification behavior
   - fix:MusicPlaybackService now uses an Apollo-owned synchronous media notification provider plus cached NotificationManager refreshes, eliminating Android 12+ Media3 foreground self-start crashes during background playback notification updates
