@@ -96,6 +96,10 @@ public class MainApplication extends Application implements Configuration.Provid
         }
         LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
 
+        // NetworkManager is queried during early activity resume paths, so its singleton
+        // must exist before deferred background initialization starts.
+        NetworkManager.create(this);
+
         // DEFERRED INITIALIZATION: Move heavy work off UI thread
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::initializeInBackground);
 
@@ -124,8 +128,7 @@ public class MainApplication extends Application implements Configuration.Provid
         // Set menu icons visible
         AbstractActivity.setMenuIconsVisible(true);
 
-        // Initialize network manager
-        NetworkManager.create(this);
+        // Initialize network state refresh
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
                 () -> NetworkManager.queryNetworkStatusBackground(NetworkManager.instance()));
 

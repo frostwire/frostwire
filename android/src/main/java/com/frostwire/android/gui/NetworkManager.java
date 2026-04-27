@@ -77,10 +77,21 @@ public final class NetworkManager {
     }
 
     public static NetworkManager instance() {
-        if (instance == null) {
-            throw new RuntimeException("NetworkManager not created");
+        NetworkManager networkManager = instance;
+        if (networkManager != null) {
+            return networkManager;
         }
-        return instance;
+
+        synchronized (NetworkManager.class) {
+            if (instance == null) {
+                Context appContext = MainApplication.context();
+                if (appContext == null) {
+                    throw new RuntimeException("NetworkManager not created");
+                }
+                instance = new NetworkManager(appContext);
+            }
+            return instance;
+        }
     }
 
     private NetworkManager(Context context) {
