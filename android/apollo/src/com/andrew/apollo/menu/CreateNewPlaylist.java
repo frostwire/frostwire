@@ -96,34 +96,49 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
 
     @Override
     public void onSaveClick() {
-        if (mPlaylist.getText() == null) {
+        if (mPlaylist == null || mPlaylist.getText() == null) {
             return;
         }
         final String playlistName = mPlaylist.getText().toString();
-        if (playlistName.length() > 0) {
-            if (SystemUtils.isUIThread()) {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                        () -> onSaveClick());
-                return;
-            }
-            final int playlistId = (int) MusicUtils.getIdForPlaylist(getActivity(),
-                    playlistName);
-            if (playlistId >= 0) {
-                MusicUtils.clearPlaylist(getActivity(), playlistId);
-                MusicUtils.addToPlaylist(getActivity(), mPlaylistList, playlistId);
-            } else {
-                final long newId = MusicUtils.createPlaylist(getActivity(),
-                        Capitalize.capitalize(playlistName));
-                MusicUtils.addToPlaylist(getActivity(), mPlaylistList, newId);
-            }
-            int added;
-            if (mPlaylistList != null && (added = mPlaylistList.length) > 0) {
-                final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
-                SystemUtils.postToUIThread(() ->
-                        AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
-            }
-            SystemUtils.postToUIThread(() -> getDialog().dismiss());
+        if (playlistName.length() == 0) {
+            return;
         }
+        final Context appContext = SystemUtils.getApplicationContext();
+        if (appContext == null) {
+            return;
+        }
+        final long[] playlistList = mPlaylistList;
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                    () -> savePlaylist(appContext, playlistName, playlistList));
+            return;
+        }
+        savePlaylist(appContext, playlistName, playlistList);
+    }
+
+    private void savePlaylist(Context appContext, String playlistName, long[] playlistList) {
+        final int playlistId = (int) MusicUtils.getIdForPlaylist(appContext, playlistName);
+        if (playlistId >= 0) {
+            MusicUtils.clearPlaylist(appContext, playlistId);
+            MusicUtils.addToPlaylistSilently(appContext, playlistList, playlistId);
+        } else {
+            final long newId = MusicUtils.createPlaylist(appContext, Capitalize.capitalize(playlistName));
+            MusicUtils.addToPlaylistSilently(appContext, playlistList, newId);
+        }
+        final int added = playlistList != null ? playlistList.length : 0;
+        final String message = added > 0
+                ? appContext.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added)
+                : null;
+        SystemUtils.postToUIThread(() -> {
+            if (message != null && isAdded() && getActivity() != null) {
+                AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
+            }
+            if (isAdded()) {
+                dismissAllowingStateLoss();
+            } else if (getDialog() != null) {
+                getDialog().dismiss();
+            }
+        });
     }
 
     private String makePlaylistName(Context context, String template) {

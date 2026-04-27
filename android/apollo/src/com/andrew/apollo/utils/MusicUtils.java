@@ -1608,6 +1608,17 @@ public final class MusicUtils {
      * @param playlistid The id of the playlist being added to.
      */
     public static void addToPlaylist(final Context context, final long[] ids, final long playlistid) {
+        addToPlaylistInternal(context, ids, playlistid, true);
+    }
+
+    public static void addToPlaylistSilently(final Context context, final long[] ids, final long playlistid) {
+        addToPlaylistInternal(context, ids, playlistid, false);
+    }
+
+    private static void addToPlaylistInternal(final Context context,
+                                              final long[] ids,
+                                              final long playlistid,
+                                              final boolean showConfirmationMessage) {
         if (context == null) {
             LOG.warn("context was null, not adding anything to playlist.");
             return;
@@ -1624,7 +1635,7 @@ public final class MusicUtils {
         }
 
         if (MusicPlaybackService.getMusicPlayerHandler() != null && MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
-            MusicPlaybackService.safePost(() -> addToPlaylist(context, ids, playlistid));
+            MusicPlaybackService.safePost(() -> addToPlaylistInternal(context, ids, playlistid, showConfirmationMessage));
             return;
         }
 
@@ -1664,7 +1675,9 @@ public final class MusicUtils {
             final String message = context.getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
 
             SystemUtils.postToUIThread(() -> {
-                AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+                if (showConfirmationMessage) {
+                    AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+                }
                 refresh();
             });
         } else {
