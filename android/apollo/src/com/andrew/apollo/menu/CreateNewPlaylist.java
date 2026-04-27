@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.menu;
 
+import android.content.Context;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -69,13 +70,22 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
             }
         } else {
             mDefaultname = "";
+            final Context appContext = SystemUtils.getApplicationContext();
+            final String template = appContext != null
+                    ? appContext.getString(R.string.new_playlist_name_template)
+                    : null;
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                final String name = makePlaylistName();
+                final String name = makePlaylistName(appContext, template);
                 SystemUtils.postToUIThread(() -> {
+                    if (!isAdded() || mPlaylist == null) {
+                        return;
+                    }
                     mDefaultname = name;
-                    if (mDefaultname == null && getDialog() != null) {
-                        getDialog().dismiss();
-                    } else if (mPlaylist != null) {
+                    if (mDefaultname == null) {
+                        if (getDialog() != null) {
+                            getDialog().dismiss();
+                        }
+                    } else {
                         mPlaylist.setText(mDefaultname);
                         mPlaylist.setSelection(mDefaultname.length());
                     }
@@ -116,16 +126,15 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
         }
     }
 
-    private String makePlaylistName() {
-        if (SystemUtils.isUIThread()) {
+    private String makePlaylistName(Context context, String template) {
+        if (SystemUtils.isUIThread() || context == null || template == null) {
             return null;
         }
-        final String template = getString(R.string.new_playlist_name_template);
         int num = 1;
         final String[] projection = new String[]{
                 MediaStore.Audio.Playlists.NAME
         };
-        final ContentResolver resolver = getActivity().getContentResolver();
+        final ContentResolver resolver = context.getContentResolver();
         final String selection = MediaStore.Audio.Playlists.NAME + " != ''";
 
         Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
