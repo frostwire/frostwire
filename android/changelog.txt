@@ -1,4 +1,5 @@
 FrostWire 3.1.3 build 774 UNRELEASED
+  - fix:Transfer Detail > Pieces now loads torrent piece status and torrent info off the UI thread and skips stale handles safely, preventing invalid torrent-handle crashes and status-related ANRs from piece-grid rendering
   - fix:CreateNewPlaylist save actions now capture stable inputs on the UI thread, write playlists through application context in the background, and only show confirmation or dismiss the dialog if the fragment is still attached, preventing detached-fragment save crashes
   - fix:jlibtorrent native initialization failures now fail closed in torrent preference updates and notified-hash storage, preventing follow-on crashes after native SWIG class loading has already failed
   - fix:NetworkManager now initializes before early activity resume paths and also lazy-creates safely from app context, preventing "NetworkManager not created" crashes when MainActivity resumes before deferred app startup work finishes

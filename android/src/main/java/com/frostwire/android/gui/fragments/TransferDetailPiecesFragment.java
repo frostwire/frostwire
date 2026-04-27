@@ -26,6 +26,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -85,38 +86,86 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         }
 
         ensureTorrentHandleAsync();
-        if (torrentHandle == null) {
+        final String infoHash = uiBittorrentDownload.getInfoHash();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY,
+                () -> loadPiecesData(infoHash));
+    }
+
+    private void loadPiecesData(String expectedInfoHash) {
+        SystemUtils.ensureBackgroundThreadOrCrash("TransferDetailPiecesFragment::loadPiecesData");
+        if (uiBittorrentDownload == null || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
             return;
         }
 
-        TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
-        TorrentInfo torrentInfo = torrentHandle.torrentFile();
-
-        if (pieceSizeString == null && torrentInfo != null) {
-            pieceSizeString = UIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
+        final TorrentHandle currentTorrentHandle =
+                torrentHandle != null ? torrentHandle : uiBittorrentDownload.getDl().getTorrentHandle();
+        if (currentTorrentHandle == null) {
+            return;
         }
 
-        if (totalPieces == -1 && torrentInfo != null) {
-            totalPieces = torrentInfo.numPieces();
-            piecesNumberTextView.setText(String.valueOf(totalPieces));
-            hexHiveView.setVisibility(View.VISIBLE);
+        final TorrentStatus status;
+        final TorrentInfo torrentInfo;
+        try {
+            status = currentTorrentHandle.status(TorrentHandle.QUERY_PIECES);
+            torrentInfo = currentTorrentHandle.torrentFile();
+        } catch (Throwable t) {
+            LOG.warn("Skipping pieces update because torrent status is unavailable", t);
+            return;
         }
 
-        PieceIndexBitfield pieces = status.pieces();
-        long piecesCount = pieces.count();
-        if (isAdded()) {
-            // I do this color look-up only once and pass it down to the view holder
-            // otherwise it has to be done thousands of times.
+        final PieceIndexBitfield pieces = status != null ? status.pieces() : null;
+        final long piecesCount = pieces != null ? pieces.count() : -1;
+        final int totalPiecesValue = torrentInfo != null ? torrentInfo.numPieces() : totalPieces;
+        final String pieceSizeValue = torrentInfo != null
+                ? UIUtils.getBytesInHuman(torrentInfo.pieceSize(0))
+                : pieceSizeString;
+
+        SystemUtils.postToUIThread(() ->
+                applyPiecesData(expectedInfoHash, pieces, piecesCount, totalPiecesValue, pieceSizeValue));
+    }
+
+    private void applyPiecesData(String expectedInfoHash,
+                                 PieceIndexBitfield pieces,
+                                 long piecesCount,
+                                 int totalPiecesValue,
+                                 String pieceSizeValue) {
+        if (!isAdded() || uiBittorrentDownload == null || !expectedInfoHash.equals(uiBittorrentDownload.getInfoHash())) {
+            return;
+        }
+
+        if (pieceSizeString == null && pieceSizeValue != null) {
+            pieceSizeString = pieceSizeValue;
+        }
+
+        if (totalPieces == -1 && totalPiecesValue >= 0) {
+            totalPieces = totalPiecesValue;
+        }
+
+        if (pieceSizeTextView != null && pieceSizeString != null) {
             pieceSizeTextView.setText(pieceSizeString);
-            hexDataAdapter = new PieceAdapter(totalPieces, pieces);
+        }
+        if (piecesNumberTextView != null && totalPieces >= 0) {
+            piecesNumberTextView.setText(String.valueOf(totalPieces));
+        }
+        if (hexHiveView != null && totalPieces >= 0) {
             hexHiveView.setVisibility(View.VISIBLE);
         }
-        if (hexDataAdapter != null) {
-            if (piecesCount >= 0) {
-                hexDataAdapter.updateData(pieces);
-            }
+
+        if (pieces == null || totalPieces < 0) {
+            return;
+        }
+
+        if (hexDataAdapter == null) {
+            hexDataAdapter = new PieceAdapter(totalPieces, pieces);
+        } else if (piecesCount >= 0) {
+            hexDataAdapter.updateData(pieces);
+        }
+
+        if (hexHiveView != null && hexDataAdapter != null) {
             //noinspection unchecked
             hexHiveView.updateData(hexDataAdapter);
+        }
+        if (piecesNumberTextView != null && piecesCount >= 0) {
             piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
         }
     }
