@@ -42,6 +42,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
+import com.frostwire.android.gui.views.NavigationViewSafety;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.SupportOffer;
 import com.frostwire.android.util.SystemUtils;
@@ -111,6 +112,7 @@ public final class NavigationMenu {
         NavigationView resultNavView = navView;
         if (navView == null) {
             resultNavView = activity.findViewById(R.id.activity_main_nav_view);
+            NavigationViewSafety.installInsetListenerGuard(resultNavView);
             resultNavView.setNavigationItemSelectedListener(
                     menuItem -> {
                         onMenuItemSelected(menuItem);
