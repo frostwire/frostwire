@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.services;
 
+import android.app.ForegroundServiceStartNotAllowedException;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -132,12 +133,23 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("EngineForegroundService::onStartCommand() - Starting foreground service");
         LOG.info("EngineForegroundService::onStartCommand() - intent: " + intent + " flags: " + flags + " startId: " + startId);
 
-        // ALWAYS call startForeground first before any early return to satisfy
-        // Android 8+ (API 26+) foreground service requirements. If the service
-        // is restarted by the system with a null intent, we must still start
-        // foreground or the app will crash with RemoteServiceException.
+        boolean isNullIntentRestart = intent == null;
+        boolean isAppInForeground = SystemUtils.isAppInForeground(this);
+        EngineForegroundStartPolicy.Action startAction = EngineForegroundStartPolicy.resolve(
+                Build.VERSION.SDK_INT,
+                isNullIntentRestart,
+                isAppInForeground);
+
+        if (startAction == EngineForegroundStartPolicy.Action.STOP_BACKGROUND_RESTART) {
+            LOG.warn("EngineForegroundService::onStartCommand() - Skipping foreground promotion for background sticky restart");
+            stopSelfResult(startId);
+            return START_NOT_STICKY;
+        }
+
         Notification notification = createPersistentNotification();
-        showPersistentNotification(notification);
+        if (!tryShowPersistentNotification(notification, startId, isNullIntentRestart, isAppInForeground)) {
+            return START_NOT_STICKY;
+        }
 
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
@@ -162,6 +174,26 @@ public class EngineForegroundService extends Service implements IEngineService {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> startPermanentNotificationUpdatesTask(this));
 
         return START_STICKY;
+    }
+
+    private boolean tryShowPersistentNotification(Notification notification,
+                                                  int startId,
+                                                  boolean isNullIntentRestart,
+                                                  boolean isAppInForeground) {
+        try {
+            showPersistentNotification(notification);
+            return true;
+        } catch (RuntimeException e) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                    && e instanceof ForegroundServiceStartNotAllowedException) {
+                LOG.warn("EngineForegroundService::tryShowPersistentNotification() - Foreground promotion not allowed. " +
+                                "nullIntentRestart=" + isNullIntentRestart +
+                                " appInForeground=" + isAppInForeground, e);
+                stopSelfResult(startId);
+                return false;
+            }
+            throw e;
+        }
     }
 
     private void showPersistentNotification(Notification notification) {
