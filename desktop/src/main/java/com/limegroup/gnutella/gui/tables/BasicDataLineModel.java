@@ -257,7 +257,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     protected T createDataLine() {
         try {
-            return _dataLineClass.getDeclaredConstructor().newInstance();
+            var ctor = _dataLineClass.getDeclaredConstructor();
+            ctor.setAccessible(true);
+            return ctor.newInstance();
         } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);

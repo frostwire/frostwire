@@ -2,6 +2,7 @@ frostwire (7.0.5) stable; urgency=high
 
   * Fix: IP Filter options pane now visible on Java 26 (#1291) — made IPFilterPaneItem constructor package-private and added setAccessible(true) in OptionsPaneFactory to prevent IllegalAccessException when creating pane items via reflection
   * Fix: IP Filter pane duplicate settings key crash (#1291) — made IPFilterTableMediator.getInstance() thread-safe (synchronized+volatile), guarded IPFilterPaneItem.initOptions() against mediator creation failures with ipFilterTable null check, and made OptionsPaneManager.show() cache panes before initOptions to prevent infinite re-creation loops
+  * Fix: IP Filter DataLine creation on Java 26 (#1291) — added setAccessible(true) in BasicDataLineModel.createDataLine() to allow reflection access to DataLine constructors across package boundaries
 
  -- FrostWire Team <contact@frostwire.com> UNRELEASED
 
