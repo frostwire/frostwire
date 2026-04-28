@@ -1,5 +1,7 @@
 frostwire (7.0.5) stable; urgency=high
 
+  * Fix: IP Filter options pane now visible on Java 26 (#1291) — made IPFilterPaneItem constructor package-private and added setAccessible(true) in OptionsPaneFactory to prevent IllegalAccessException when creating pane items via reflection
+
  -- FrostWire Team <contact@frostwire.com> UNRELEASED
 
 frostwire (7.0.4) stable; urgency=high
