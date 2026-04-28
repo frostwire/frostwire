@@ -51,7 +51,9 @@ class OptionsPaneFactory {
             final OptionsPane pane = new OptionsPaneImpl(node.getTitleKey());
             for (Class<? extends AbstractPaneItem> clazz : clazzes) {
                 try {
-                    pane.add(clazz.getDeclaredConstructor().newInstance());
+                    var ctor = clazz.getDeclaredConstructor();
+                    ctor.setAccessible(true);
+                    pane.add(ctor.newInstance());
                 } catch (Exception e) {
                     ErrorService.error(e);
                 }

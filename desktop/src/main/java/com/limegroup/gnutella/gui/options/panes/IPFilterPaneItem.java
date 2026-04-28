@@ -69,7 +69,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private boolean initialized;
     private int lastPercentage = -1;
     private long lastPercentageUpdateTimestamp;
-    private IPFilterPaneItem() {
+    IPFilterPaneItem() {
         super(TITLE, LABEL);
         ipFilterTable = null;
         httpExecutor = ExecutorsHelper.newProcessingQueue("IPFilterPanelItem-http");

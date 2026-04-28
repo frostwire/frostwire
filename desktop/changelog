@@ -1,3 +1,7 @@
+frostwire (7.0.5) stable; urgency=high
+
+ -- FrostWire Team <contact@frostwire.com> UNRELEASED
+
 frostwire (7.0.4) stable; urgency=high
  * New: Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
  * New: Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
@@ -67,12 +71,12 @@ frostwire (7.0.4) stable; urgency=high
  * Fix: HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
  * Fix: HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
  * Fix: HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
-  * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
-  * Fix: Tip of the Day "Show Tips at Startup" checkbox now saves immediately when toggled, so the setting survives force-quit or IDE stop before the normal exit save path runs
-  * Fix: Setup wizard now saves its completion state synchronously instead of asynchronously — prevents infinite setup wizard loops when the JVM is force-killed (e.g., IDE red button) before the background save task executes
-  * Fix: Setup wizard no longer unconditionally resets "Show Tips at Startup" to true on every run — it only resets tips on actual version updates, not when the wizard appears for other reasons (intent window, associations, etc.)
-  * Fix: Add -Dsun.java2d.fontlayout=0 JVM argument to suppress JDK 21 SunLayoutEngine JNI warning spam during SynthComboBoxUI font layout on startup
-  * Fix: VPN detection now properly detects Private Internet Access (PIA) on Linux
+ * Fix: Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+ * Fix: Tip of the Day "Show Tips at Startup" checkbox now saves immediately when toggled, so the setting survives force-quit or IDE stop before the normal exit save path runs
+ * Fix: Setup wizard now saves its completion state synchronously instead of asynchronously — prevents infinite setup wizard loops when the JVM is force-killed (e.g., IDE red button) before the background save task executes
+ * Fix: Setup wizard no longer unconditionally resets "Show Tips at Startup" to true on every run — it only resets tips on actual version updates, not when the wizard appears for other reasons (intent window, associations, etc.)
+ * Fix: Add -Dsun.java2d.fontlayout=0 JVM argument to suppress JDK 21 SunLayoutEngine JNI warning spam during SynthComboBoxUI font layout on startup
+ * Fix: VPN detection now properly detects Private Internet Access (PIA) on Linux
  * Performance: HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
  * Performance: HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
  * Performance: HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
