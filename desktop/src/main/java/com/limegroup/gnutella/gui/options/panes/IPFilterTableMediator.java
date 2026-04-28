@@ -26,20 +26,15 @@ import com.limegroup.gnutella.gui.tables.*;
 import javax.swing.*;
 
 public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMediator.IPFilterModel, IPFilterTableMediator.IPFilterDataLine, IPRange> {
-    private static IPFilterTableMediator INSTANCE = null;
+    private static volatile IPFilterTableMediator INSTANCE = null;
 
-    // AbstractTableMediator instances are meant to be singleton, otherwise issues with duplicate settings are raised upon the
-    // second instantiations.
     private IPFilterTableMediator() {
         super("IP_FILTER_TABLE_MEDIATOR_ID");
     }
 
-    public static IPFilterTableMediator getInstance() {
+    public static synchronized IPFilterTableMediator getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new IPFilterTableMediator();
-        }
-        if (INSTANCE == null) {
-            throw new RuntimeException("Check your logic, IPFilterTableMediator instance being nullified by some thread");
         }
         return INSTANCE;
     }

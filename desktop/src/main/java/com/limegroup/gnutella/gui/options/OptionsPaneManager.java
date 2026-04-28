@@ -80,9 +80,13 @@ public final class OptionsPaneManager {
     public final void show(final OptionsTreeNode node) {
         if (!panesByKey.containsKey(node.getTitleKey())) {
             OptionsPane pane = FACTORY.createOptionsPane(node);
-            pane.initOptions();
-            addPane(pane);
             panesByKey.put(node.getTitleKey(), pane);
+            try {
+                pane.initOptions();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            addPane(pane);
             // If this was the 'SAVED' key, then also load shared,
             // since setting save stuff requires that sharing be updated also.
             if (node.getTitleKey().equals(OptionsConstructor.SAVE_BASIC_KEY) && !panesByKey.containsKey(OptionsConstructor.SHARED_BASIC_KEY)) {

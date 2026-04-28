@@ -66,7 +66,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private JButton clearFilterButton;
     private JButton addRangeManuallyButton;
     private IconButton fileChooserIcon;
-    private boolean initialized;
     private int lastPercentage = -1;
     private long lastPercentageUpdateTimestamp;
     IPFilterPaneItem() {
@@ -84,10 +83,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     @Override
     public void initOptions() {
-        if (initialized) {
+        if (ipFilterTable != null) {
             return;
         }
-        initialized = true;
         BTEngine engine;
         ip_filter ipFilter = null;
         if ((engine = BTEngine.getInstance()) != null) {
@@ -96,9 +94,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         if (ipFilter == null) {
             throw new RuntimeException("Check your logic. No BTEngine ip_filter instance available");
         }
-        // ipFilterTableModel should be loaded in separate thread
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
-        ipFilterTable = IPFilterTableMediator.getInstance();
+        try {
+            ipFilterTable = IPFilterTableMediator.getInstance();
+        } catch (Exception e) {
+            LOG.error("Failed to initialize IPFilterTableMediator", e);
+            return;
+        }
         DesktopParallelExecutor.execute(this::loadSerializedIPFilter);
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP Filter list (p2p format only supported)")), "pad 0 5px, span, wrap");
