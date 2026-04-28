@@ -33,8 +33,13 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterHttpListener;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.CidrFilterInputStreamReader;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.DatFilterInputStreamReader;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.HostsFilterInputStreamReader;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterFormat;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.P2PIPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import net.miginfocom.swing.MigLayout;
@@ -49,6 +54,8 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
@@ -75,10 +82,21 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private static boolean isGZipped(File f) throws IOException {
-        byte[] signature = new byte[2];
-        FileInputStream fis = new FileInputStream(f);
-        fis.read(signature);
-        return signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            byte[] signature = new byte[2];
+            int read = fis.read(signature);
+            if (read < 2) return false;
+            return signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b;
+        }
+    }
+
+    private static boolean isZipped(File f) throws IOException {
+        try (FileInputStream fis = new FileInputStream(f)) {
+            byte[] signature = new byte[2];
+            int read = fis.read(signature);
+            if (read < 2) return false;
+            return signature[0] == (byte) 0x50 && signature[1] == (byte) 0x4b; // PK magic bytes
+        }
     }
 
     @Override
@@ -103,7 +121,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
         DesktopParallelExecutor.execute(this::loadSerializedIPFilter);
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
-        panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP Filter list (p2p format only supported)")), "pad 0 5px, span, wrap");
+        panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or Hosts format)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
         fixKeyStrokes(fileUrlTextField);
         panel.add(fileUrlTextField, "span 6, growx");
@@ -194,6 +212,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     if (removeInputFileWhenDone) {
                         potentialGunzipFile.delete();
                     }
+                } else if (isZipped(potentialGunzipFile)) {
+                    decompressedFile = unzipFile(potentialGunzipFile,
+                            new File(CommonUtils.getUserSettingsDir(), "unzipped_blocklist.temp"));
+                    if (removeInputFileWhenDone) {
+                        potentialGunzipFile.delete();
+                    }
                 } else {
                     decompressedFile = potentialGunzipFile;
                 }
@@ -208,13 +232,27 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 LOG.error("importFromStreamAsync(): IPFilterFormat could not be determined");
                 fileUrlTextField.selectAll();
                 enableImportControls(true);
-                GUIMediator.showError(I18n.tr("Invalid IP Filter file format, only P2P (PeerGuardian) format supported"));
+                GUIMediator.showError(I18n.tr("Invalid IP Filter file format. Supported: P2P, DAT, CIDR, Hosts"));
                 return;
             }
             final long decompressedFileSize = decompressedFile.length();
-            final IPFilterInputStreamReader ipFilterReader = (format == IPFilterFormat.P2P) ? new P2PIPFilterInputStreamReader(decompressedFile) : null;
+            final IPFilterInputStreamReader ipFilterReader;
+            switch (format) {
+                case P2P:
+                case DAT:
+                    ipFilterReader = new P2PIPFilterInputStreamReader(decompressedFile);
+                    break;
+                case CIDR:
+                    ipFilterReader = new CidrFilterInputStreamReader(decompressedFile);
+                    break;
+                case HOSTS:
+                    ipFilterReader = new HostsFilterInputStreamReader(decompressedFile);
+                    break;
+                default:
+                    ipFilterReader = null;
+            }
             if (ipFilterReader == null) {
-                LOG.error("importFromStreamAsync(): Invalid IP Filter file format, only p2p format supported");
+                LOG.error("importFromStreamAsync(): Invalid IP Filter file format");
                 fileUrlTextField.selectAll();
                 enableImportControls(true);
                 return;
@@ -267,7 +305,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 if (removeInputFileWhenDone) {
                     potentialGunzipFile.delete();
                 }
-                if (decompressedFile.getAbsolutePath().contains("gunzipped_blocklist.temp")) {
+                if (decompressedFile.getAbsolutePath().contains("gunzipped_blocklist.temp") ||
+                    decompressedFile.getAbsolutePath().contains("unzipped_blocklist.temp")) {
                     decompressedFile.delete();
                 }
             } catch (IOException ioe) {
@@ -281,18 +320,42 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private IPFilterFormat getIPFilterFileFormat(File decompressedFile) {
-        byte[] sample = new byte[1024];
-        try {
-            FileInputStream fis = new FileInputStream(decompressedFile);
+        byte[] sample = new byte[4096];
+        try (FileInputStream fis = new FileInputStream(decompressedFile)) {
             fis.read(sample);
-            fis.close();
         } catch (IOException e) {
             return null;
         }
-        Matcher matcher = P2P_LINE_PATTERN.matcher(new String(sample, StandardCharsets.UTF_8));
-        if (matcher.find() && matcher.find() && matcher.find()) { // no coincidences
+        String sampleStr = new String(sample, StandardCharsets.UTF_8);
+
+        // Try P2P/DAT detection first (pattern: name:low-high)
+        Matcher matcher = P2P_LINE_PATTERN.matcher(sampleStr);
+        if (matcher.find() && matcher.find() && matcher.find()) {
             return IPFilterFormat.P2P;
         }
+
+        // Try CIDR detection (pattern: ip/prefix)
+        Pattern cidrPattern = Pattern.compile("(?m)^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}");
+        Matcher cidrMatcher = cidrPattern.matcher(sampleStr);
+        int cidrMatches = 0;
+        while (cidrMatcher.find() && cidrMatches < 3) {
+            cidrMatches++;
+        }
+        if (cidrMatches >= 3) {
+            return IPFilterFormat.CIDR;
+        }
+
+        // Try HOSTS detection (pattern: 0.0.0.0 domain or 127.0.0.1 domain)
+        Pattern hostsPattern = Pattern.compile("(?m)^(0\\.0\\.0\\.0|127\\.0\\.0\\.1|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+\\S+");
+        Matcher hostsMatcher = hostsPattern.matcher(sampleStr);
+        int hostsMatches = 0;
+        while (hostsMatcher.find() && hostsMatches < 3) {
+            hostsMatches++;
+        }
+        if (hostsMatches >= 3) {
+            return IPFilterFormat.HOSTS;
+        }
+
         return null;
     }
 
@@ -301,7 +364,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void onFileChooserIconAction() {
-        final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (P2P/PeerGuardian format only supported)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
+        final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (P2P, DAT, CIDR, or Hosts format)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.isFile();
@@ -479,6 +542,45 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return new File(gunzipped.getAbsolutePath());
     }
 
+    private File unzipFile(File zipped, File unzipped) {
+        if (unzipped.exists()) {
+            unzipped.delete();
+            try {
+                unzipped.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        try (FileInputStream fis = new FileInputStream(zipped);
+             ZipInputStream zis = new ZipInputStream(fis);
+             FileOutputStream fos = new FileOutputStream(unzipped, false)) {
+            ZipEntry entry = zis.getNextEntry();
+            if (entry == null) {
+                LOG.error("unzipFile(): No entries found in zip file");
+                return null;
+            }
+            byte[] buffer = new byte[32768];
+            int totalUnzipped = 0;
+            long estimatedSize = entry.getSize() > 0 ? entry.getSize() : zipped.length() * 3; // rough estimate
+            int read;
+            while ((read = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, read);
+                totalUnzipped += read;
+                if (estimatedSize > 0) {
+                    onGunzipProgress((int) ((totalUnzipped * 100.0f / estimatedSize)));
+                }
+            }
+            onGunzipProgress(100);
+            fos.flush();
+        } catch (Throwable t) {
+            LOG.error("unzipFile(): " + t.getMessage(), t);
+            unzipped.delete();
+            return null;
+        }
+        return new File(unzipped.getAbsolutePath());
+    }
+
     public void onRangeManuallyAdded(IPRange ipRange) {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
         ipFilterTable.getDataModel().add(ipRange, ipFilterTable.getDataModel().getRowCount());
@@ -498,69 +600,4 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
     }
 
-    enum IPFilterFormat {
-        P2P
-    }
-
-    private static class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
-        private final BufferedReader br;
-        private InputStream is;
-        private int bytesRead;
-
-        P2PIPFilterInputStreamReader(File uncompressedFile) {
-            try {
-                this.is = new FileInputStream(uncompressedFile);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            br = new BufferedReader(new InputStreamReader(is));
-            bytesRead = 0;
-        }
-
-        @Override
-        public IPRange readLine() {
-            try {
-                if (is.available() > 0) {
-                    String line = br.readLine();
-                    bytesRead += line.length();
-                    while (line.startsWith("#") && is.available() > 0) {
-                        line = br.readLine();
-                        bytesRead += line.length();
-                    }
-                    Matcher matcher = P2P_LINE_PATTERN.matcher(line);
-                    if (matcher.find()) {
-                        return new IPRange(matcher.group(1), matcher.group(2), matcher.group(3));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        public int bytesRead() {
-            return bytesRead;
-        }
-
-        @Override
-        public int available() {
-            try {
-                return is.available();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return -1;
-            }
-        }
-
-        @Override
-        public void close() {
-            try {
-                is.close();
-                br.close();
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
 }
