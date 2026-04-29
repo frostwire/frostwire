@@ -29,6 +29,7 @@ import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.JdkHttpClient;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.HTMLLabel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
@@ -138,7 +139,15 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         panel.add(addRangeManuallyButton);
         clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
         clearFilterButton.addActionListener((e) -> onClearFilterAction());
-        panel.add(clearFilterButton);
+        panel.add(clearFilterButton, "wrap");
+        String linksHtml = "<html><p style='color: #666; margin-top: 8px;'>" +
+                I18n.tr("Find free IP block lists at:") + "</p>" +
+                "<p style='margin-left: 12px;'>" +
+                "<a href='https://www.iblocklist.com/lists'>iblocklist.com</a> - " +
+                I18n.tr("Community-maintained P2P, DAT, CIDR lists") +
+                "</p></html>";
+        HTMLLabel linksLabel = new HTMLLabel(linksHtml);
+        panel.add(linksLabel, "span, wrap");
         add(panel);
         fileChooserIcon.addActionListener((e) -> onFileChooserIconAction());
         importButton.addActionListener((e) -> onImportButtonAction());
@@ -163,9 +172,17 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                                 LOG.info("http.get() -> " + uri.toURL().toString());
                                 http.get(uri.toURL().toString());
                             } catch (IOException e) {
-                                e.printStackTrace();
-                                enableImportControls(true);
-                                fileUrlTextField.selectAll();
+                                LOG.error("Failed to download block list from " + uri, e);
+                                String errorMsg = e.getMessage();
+                                if (errorMsg == null || errorMsg.isEmpty()) {
+                                    errorMsg = e.getClass().getSimpleName();
+                                }
+                                final String finalMsg = errorMsg;
+                                GUIMediator.safeInvokeLater(() -> {
+                                    GUIMediator.showError(I18n.tr("Failed to download block list: {0}", finalMsg));
+                                    enableImportControls(true);
+                                    fileUrlTextField.selectAll();
+                                });
                             }
                         }
                 );
