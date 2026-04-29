@@ -40,10 +40,8 @@ import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterFormat;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.P2PIPFilterInputStreamReader;
-import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import net.miginfocom.swing.MigLayout;
-import org.apache.commons.io.IOUtils;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.CommonUtils;
 
@@ -120,7 +118,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             return;
         }
         ipFilterTable.setPaneItem(this);
-        DesktopParallelExecutor.execute(this::loadSerializedIPFilter);
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or Hosts format)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
@@ -185,13 +182,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private void onClearFilterAction() {
         enableImportControls(false);
         ipFilterTable.clearTable();
-        File ipFilterDBFile = getIPFilterDBFile();
-        ipFilterDBFile.delete();
-        try {
-            ipFilterDBFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         BTEngine engine = BTEngine.getInstance();
         if (engine != null) {
             ip_filter freshFilter = new ip_filter();
@@ -258,9 +248,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 enableImportControls(true);
                 return;
             }
-            FileOutputStream fos = null;
             try {
-                fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
                 IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
                 final String importingString = I18n.tr("Importing");
                 BTEngine engine = BTEngine.getInstance();
@@ -272,7 +260,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
                         try {
-                            ipRange.writeObjectTo(fos);
                             dataModel.add(ipRange, dataModel.getRowCount());
                             if (currentFilter != null) {
                                 error_code ec = new error_code();
@@ -289,7 +276,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                             }
                         } catch (Throwable t) {
                             LOG.warn(t.getMessage(), t);
-                            // just keep going
                         }
                     }
                 }
@@ -310,10 +296,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     decompressedFile.getAbsolutePath().contains("unzipped_blocklist.temp")) {
                     decompressedFile.delete();
                 }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
+            } catch (Throwable t) {
+                LOG.error("importFromStreamAsync(): " + t.getMessage(), t);
             } finally {
-                IOUtils.closeQuietly(fos);
                 ipFilterReader.close();
                 enableImportControls(true);
             }
@@ -379,72 +364,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         if (selectedFile != null) {
             fileUrlTextField.setText(selectedFile.getAbsolutePath());
         }
-    }
-
-    private void loadSerializedIPFilter() {
-        LOG.info("loadSerializedIPFilter() invoked - " + hashCode());
-        File ipFilterDBFile = getIPFilterDBFile();
-        if (!ipFilterDBFile.exists()) {
-            try {
-                ipFilterDBFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-            LOG.info("loadSerializedIPFilter(): done, initialized empty ip filter file");
-            return;
-        }
-        if (ipFilterDBFile.length() == 0) {
-            LOG.info("loadSerializedIPFilter(): done, ip filter file existed but it was empty");
-            return;
-        }
-        try {
-            long start = System.currentTimeMillis();
-            LOG.info("loadSerializedIPFilter(): loading " + ipFilterDBFile.length() + "  bytes from ip filter file");
-            final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
-            dataModel.clear();
-            final FileInputStream fis = new FileInputStream(ipFilterDBFile);
-            int ranges = 0;
-            BTEngine engine = BTEngine.getInstance();
-            ip_filter currentFilter = null;
-            if (engine != null) {
-                currentFilter = engine.swig().get_ip_filter();
-            }
-            while (fis.available() > 0) {
-                try {
-                    IPRange ipRange = IPRange.readObjectFrom(fis);
-                    dataModel.add(ipRange, dataModel.getRowCount());
-                    if (currentFilter != null) {
-                        error_code ec = new error_code();
-                        address addrStart = address.from_string(ipRange.startAddress(), ec);
-                        if (!ec.failed()) {
-                            address addrEnd = address.from_string(ipRange.endAddress(), ec);
-                            if (!ec.failed()) {
-                                currentFilter.add_rule(addrStart, addrEnd, 0);
-                            }
-                        }
-                    }
-                    ranges++;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e2) {
-                    LOG.error("Invalid IPRange entry detected", e2);
-                }
-            }
-            if (engine != null && currentFilter != null) {
-                engine.swig().set_ip_filter(currentFilter);
-            }
-            long end = System.currentTimeMillis();
-            fis.close();
-            long delta = end - start;
-            LOG.info("loadSerializedIPFilter(): loaded " + ranges + " ip filter ranges in " + delta + "ms");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private File getIPFilterDBFile() {
-        return new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
     }
 
     public void updateProgressBar(int percentage, String status) {
@@ -587,20 +506,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
         ipFilterTable.getDataModel().add(ipRange, ipFilterTable.getDataModel().getRowCount());
         ipFilterTable.refresh();
-        BTEngine engine = BTEngine.getInstance();
-        if (engine != null) {
-            ip_filter currentFilter = engine.swig().get_ip_filter();
-            error_code ec = new error_code();
-            address addrStart = address.from_string(ipRange.startAddress(), ec);
-            if (!ec.failed()) {
-                address addrEnd = address.from_string(ipRange.endAddress(), ec);
-                if (!ec.failed()) {
-                    currentFilter.add_rule(addrStart, addrEnd, 0);
-                    engine.swig().set_ip_filter(currentFilter);
-                }
-            }
-        }
-        rebuildIPFilter();
+        rebuildBTEngineIPFilter();
     }
 
     public void onRangeEdited(IPRange oldRange, IPRange newRange) {
@@ -608,52 +514,39 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         ipFilterTable.getDataModel().remove(oldRange);
         ipFilterTable.getDataModel().add(newRange, ipFilterTable.getDataModel().getRowCount());
         ipFilterTable.refresh();
-        rebuildIPFilter();
+        rebuildBTEngineIPFilter();
     }
 
     public void onRangeRemoved(IPRange range) {
         LOG.info("onRangeRemoved() - " + range);
         ipFilterTable.getDataModel().remove(range);
         ipFilterTable.refresh();
-        rebuildIPFilter();
+        rebuildBTEngineIPFilter();
     }
 
-    private void rebuildIPFilter() {
+    private void rebuildBTEngineIPFilter() {
         BTEngine engine = BTEngine.getInstance();
         if (engine == null) {
             return;
         }
         ip_filter freshFilter = new ip_filter();
         IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(getIPFilterDBFile());
-            int rowCount = dataModel.getRowCount();
-            for (int i = 0; i < rowCount; i++) {
-                IPFilterTableMediator.IPFilterDataLine dataLine = dataModel.get(i);
-                if (dataLine == null) continue;
-                IPRange ipRange = dataLine.getInitializeObject();
-                if (ipRange == null) continue;
-                try {
-                    ipRange.writeObjectTo(fos);
-                } catch (IOException e) {
-                    LOG.warn("rebuildIPFilter: failed to write range: " + e.getMessage());
-                }
-                error_code ec = new error_code();
-                address addrStart = address.from_string(ipRange.startAddress(), ec);
+        int rowCount = dataModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            IPFilterTableMediator.IPFilterDataLine dataLine = dataModel.get(i);
+            if (dataLine == null) continue;
+            IPRange ipRange = dataLine.getInitializeObject();
+            if (ipRange == null) continue;
+            error_code ec = new error_code();
+            address addrStart = address.from_string(ipRange.startAddress(), ec);
+            if (!ec.failed()) {
+                address addrEnd = address.from_string(ipRange.endAddress(), ec);
                 if (!ec.failed()) {
-                    address addrEnd = address.from_string(ipRange.endAddress(), ec);
-                    if (!ec.failed()) {
-                        freshFilter.add_rule(addrStart, addrEnd, 0);
-                    }
+                    freshFilter.add_rule(addrStart, addrEnd, 0);
                 }
             }
-            engine.swig().set_ip_filter(freshFilter);
-        } catch (IOException e) {
-            LOG.error("rebuildIPFilter: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(fos);
         }
+        engine.swig().set_ip_filter(freshFilter);
     }
 
 }
