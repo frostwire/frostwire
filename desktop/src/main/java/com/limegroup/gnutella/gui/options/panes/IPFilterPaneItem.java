@@ -29,7 +29,6 @@ import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.JdkHttpClient;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.HTMLLabel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
@@ -140,13 +139,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
         clearFilterButton.addActionListener((e) -> onClearFilterAction());
         panel.add(clearFilterButton, "wrap");
-        String linksHtml = "<html><p style='color: #666; margin-top: 8px;'>" +
+        JLabel linksLabel = new JLabel("<html><p style='color: #666; margin-top: 8px;'>" +
                 I18n.tr("Find free IP block lists at:") + "</p>" +
                 "<p style='margin-left: 12px;'>" +
                 "<a href='https://www.iblocklist.com/lists'>iblocklist.com</a> - " +
                 I18n.tr("Community-maintained P2P, DAT, CIDR lists") +
-                "</p></html>";
-        HTMLLabel linksLabel = new HTMLLabel(linksHtml);
+                "</p></html>");
+        linksLabel.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        linksLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                GUIMediator.openURL("https://www.iblocklist.com/lists");
+            }
+        });
         panel.add(linksLabel, "span, wrap");
         add(panel);
         fileChooserIcon.addActionListener((e) -> onFileChooserIconAction());
