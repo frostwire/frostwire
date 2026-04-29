@@ -50,6 +50,8 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -182,12 +184,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private void onClearFilterAction() {
         enableImportControls(false);
         ipFilterTable.clearTable();
-        BTEngine engine = BTEngine.getInstance();
-        if (engine != null) {
-            ip_filter freshFilter = new ip_filter();
-            engine.swig().set_ip_filter(freshFilter);
-        }
-        enableImportControls(true);
+        DesktopParallelExecutor.execute(() -> {
+            BTEngine engine = BTEngine.getInstance();
+            if (engine != null) {
+                engine.swig().set_ip_filter(new ip_filter());
+            }
+            GUIMediator.safeInvokeLater(() -> enableImportControls(true));
+        });
     }
 
     public void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
@@ -214,15 +217,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 }
             } catch (IOException e) {
                 LOG.error("importFromIPBlockFileAsync(): " + e.getMessage(), e);
-                fileUrlTextField.selectAll();
-                enableImportControls(true);
+                GUIMediator.safeInvokeLater(() -> {
+                    fileUrlTextField.selectAll();
+                    enableImportControls(true);
+                });
                 return;
             }
             final IPFilterFormat format = getIPFilterFileFormat(decompressedFile);
             if (format == null) {
                 LOG.error("importFromStreamAsync(): IPFilterFormat could not be determined");
-                fileUrlTextField.selectAll();
-                enableImportControls(true);
+                GUIMediator.safeInvokeLater(() -> {
+                    fileUrlTextField.selectAll();
+                    enableImportControls(true);
+                });
                 GUIMediator.showError(I18n.tr("Invalid IP Filter file format. Supported: P2P, DAT, CIDR, Hosts"));
                 return;
             }
@@ -244,8 +251,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
             if (ipFilterReader == null) {
                 LOG.error("importFromStreamAsync(): Invalid IP Filter file format");
-                fileUrlTextField.selectAll();
-                enableImportControls(true);
+                GUIMediator.safeInvokeLater(() -> {
+                    fileUrlTextField.selectAll();
+                    enableImportControls(true);
+                });
                 return;
             }
             try {
@@ -525,28 +534,34 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void rebuildBTEngineIPFilter() {
-        BTEngine engine = BTEngine.getInstance();
-        if (engine == null) {
-            return;
-        }
-        ip_filter freshFilter = new ip_filter();
+        List<IPRange> ranges = new ArrayList<>();
         IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
         int rowCount = dataModel.getRowCount();
         for (int i = 0; i < rowCount; i++) {
             IPFilterTableMediator.IPFilterDataLine dataLine = dataModel.get(i);
             if (dataLine == null) continue;
             IPRange ipRange = dataLine.getInitializeObject();
-            if (ipRange == null) continue;
-            error_code ec = new error_code();
-            address addrStart = address.from_string(ipRange.startAddress(), ec);
-            if (!ec.failed()) {
-                address addrEnd = address.from_string(ipRange.endAddress(), ec);
-                if (!ec.failed()) {
-                    freshFilter.add_rule(addrStart, addrEnd, 0);
-                }
+            if (ipRange != null) {
+                ranges.add(ipRange);
             }
         }
-        engine.swig().set_ip_filter(freshFilter);
+        DesktopParallelExecutor.execute(() -> {
+            ip_filter freshFilter = new ip_filter();
+            for (IPRange ipRange : ranges) {
+                error_code ec = new error_code();
+                address addrStart = address.from_string(ipRange.startAddress(), ec);
+                if (!ec.failed()) {
+                    address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                    if (!ec.failed()) {
+                        freshFilter.add_rule(addrStart, addrEnd, 0);
+                    }
+                }
+            }
+            BTEngine engine = BTEngine.getInstance();
+            if (engine != null) {
+                engine.swig().set_ip_filter(freshFilter);
+            }
+        });
     }
 
 }
