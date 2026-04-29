@@ -285,7 +285,10 @@ public final class TipOfTheDayMediator {
         navigation.add(buttonPanel, BorderLayout.EAST);
         showTips.addActionListener(new ShowTipListener());
         next.addActionListener(new NextTipListener());
-        close.addActionListener(GUIUtils.getDisposeAction());
+        close.addActionListener(e -> {
+            dialog.dispose();
+            SettingsGroupManager.instance().save();
+        });
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         // construct content pane
         JPanel contentPanel = new JPanel(new BorderLayout());
@@ -310,6 +313,17 @@ public final class TipOfTheDayMediator {
             JCheckBox source = (JCheckBox) e.getSource();
             StartupSettings.SHOW_TOTD.setValue(source.isSelected());
             SettingsGroupManager.instance().save();
+            // Force flush to disk so the setting survives force-quit/IDE stop
+            try {
+                java.io.File f = new java.io.File(
+                    org.limewire.util.CommonUtils.getUserSettingsDir(), "frostwire.props");
+                if (f.exists()) {
+                    java.io.RandomAccessFile raf = new java.io.RandomAccessFile(f, "rw");
+                    raf.getFD().sync();
+                    raf.close();
+                }
+            } catch (Exception ignored) {
+            }
         }
     }
 
