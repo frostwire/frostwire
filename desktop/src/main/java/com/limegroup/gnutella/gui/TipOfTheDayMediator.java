@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.settings.StartupSettings;
+import org.limewire.setting.SettingsGroupManager;
 import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
@@ -308,6 +309,7 @@ public final class TipOfTheDayMediator {
         public void actionPerformed(ActionEvent e) {
             JCheckBox source = (JCheckBox) e.getSource();
             StartupSettings.SHOW_TOTD.setValue(source.isSelected());
+            SettingsGroupManager.instance().save();
         }
     }
 
