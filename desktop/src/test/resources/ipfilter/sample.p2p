@@ -1,0 +1,6 @@
+# This is a comment
+BadActor:192.168.1.100-192.168.1.200
+CopyrightTroll:10.0.0.1-10.0.0.255
+VPNProvider:172.16.0.1-172.16.0.50
+# Another comment
+SingleIP:8.8.8.8-8.8.8.8

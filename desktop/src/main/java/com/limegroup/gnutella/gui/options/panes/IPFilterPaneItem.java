@@ -319,7 +319,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         });
     }
 
-    private IPFilterFormat getIPFilterFileFormat(File decompressedFile) {
+    public static IPFilterFormat getIPFilterFileFormat(File decompressedFile) {
         byte[] sample = new byte[4096];
         try (FileInputStream fis = new FileInputStream(decompressedFile)) {
             fis.read(sample);

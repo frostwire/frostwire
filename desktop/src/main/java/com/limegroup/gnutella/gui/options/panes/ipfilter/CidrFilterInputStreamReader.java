@@ -87,8 +87,18 @@ public class CidrFilterInputStreamReader implements IPFilterInputStreamReader {
                 try {
                     InetAddress inet = InetAddress.getByName(ipAddress);
                     int ip = ByteBuffer.wrap(inet.getAddress()).getInt();
-                    int network = ip & (0xFFFFFFFF << (32 - prefixLength));
-                    int broadcast = network | (0xFFFFFFFF >>> prefixLength);
+                    int network;
+                    int broadcast;
+                    if (prefixLength == 0) {
+                        network = 0;
+                        broadcast = -1; // 0xFFFFFFFF = 255.255.255.255
+                    } else if (prefixLength == 32) {
+                        network = ip;
+                        broadcast = ip;
+                    } else {
+                        network = ip & (0xFFFFFFFF << (32 - prefixLength));
+                        broadcast = network | (0xFFFFFFFF >>> prefixLength);
+                    }
                     String startIP = InetAddress.getByAddress(
                             ByteBuffer.allocate(4).putInt(network).array()
                     ).getHostAddress();

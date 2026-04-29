@@ -48,12 +48,12 @@ public class DatFilterInputStreamReader implements IPFilterInputStreamReader {
     @Override
     public IPRange readLine() {
         try {
-            if (is.available() > 0) {
-                String line = br.readLine();
+            String line;
+            while ((line = br.readLine()) != null) {
                 bytesRead += line.length();
-                while (line.startsWith("#") && is.available() > 0) {
-                    line = br.readLine();
-                    bytesRead += line.length();
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
                 }
                 Matcher matcher = P2P_LINE_PATTERN.matcher(line);
                 if (matcher.find()) {

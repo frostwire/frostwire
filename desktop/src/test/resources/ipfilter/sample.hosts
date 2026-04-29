@@ -1,0 +1,5 @@
+# Hosts format block list
+0.0.0.0 ad.tracker.com
+0.0.0.0 tracking.example.com
+127.0.0.1 popup.ads.net
+0.0.0.0 malware.evil.org
