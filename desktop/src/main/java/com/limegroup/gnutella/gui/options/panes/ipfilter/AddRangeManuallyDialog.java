@@ -37,11 +37,18 @@ public class AddRangeManuallyDialog extends JDialog {
     private final JTextField descriptionTextField;
     private final JTextField rangeStartTextField;
     private final JTextField rangeEndTextField;
+    private final IPRange editOldRange;
 
     public AddRangeManuallyDialog(IPFilterPaneItem dialogListener) {
+        this(dialogListener, null);
+    }
+
+    public AddRangeManuallyDialog(IPFilterPaneItem dialogListener, IPRange existingRange) {
         super(getParentDialog(dialogListener), true);
-        final String addIPRangeManuallyString = I18n.tr("Add IP Range Manually");
-        setTitle(addIPRangeManuallyString);
+        this.editOldRange = existingRange;
+        final boolean isEdit = existingRange != null;
+        final String title = isEdit ? I18n.tr("Edit IP Range") : I18n.tr("Add IP Range Manually");
+        setTitle(title);
         this.dialogListener = dialogListener;
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid"));
         panel.add(new JLabel(I18n.tr("Description")), "wrap");
@@ -57,12 +64,17 @@ public class AddRangeManuallyDialog extends JDialog {
                 "</i></html>"), "growx ,wrap");
         rangeEndTextField = new JTextField();
         panel.add(rangeEndTextField, "w 250px, gapbottom 10px, wrap");
+        if (isEdit) {
+            descriptionTextField.setText(existingRange.description());
+            rangeStartTextField.setText(existingRange.startAddress());
+            rangeEndTextField.setText(existingRange.endAddress());
+        }
         fixKeyStrokes(descriptionTextField);
         fixKeyStrokes(rangeStartTextField);
         fixKeyStrokes(rangeEndTextField);
-        JButton addRangeButton = new JButton(addIPRangeManuallyString);
+        JButton addRangeButton = new JButton(isEdit ? I18n.tr("Update") : title);
         panel.add(addRangeButton, "growx");
-        addRangeButton.addActionListener((e) -> onAddRangeButtonClicked());
+        addRangeButton.addActionListener((e) -> onButtonClicked());
         JButton cancelButton = new JButton(I18n.tr("Cancel"));
         cancelButton.addActionListener((e) -> dispose());
         panel.add(cancelButton, "growx");
@@ -81,16 +93,20 @@ public class AddRangeManuallyDialog extends JDialog {
         return (JDialog) result;
     }
 
-    private void onAddRangeButtonClicked() {
+    private void onButtonClicked() {
         if (!validateInput()) {
             return;
         }
         dispose();
-        dialogListener.onRangeManuallyAdded(
-                new IPRange(
-                        descriptionTextField.getText(),
-                        rangeStartTextField.getText(),
-                        rangeEndTextField.getText()));
+        IPRange newRange = new IPRange(
+                descriptionTextField.getText(),
+                rangeStartTextField.getText(),
+                rangeEndTextField.getText());
+        if (editOldRange != null) {
+            dialogListener.onRangeEdited(editOldRange, newRange);
+        } else {
+            dialogListener.onRangeManuallyAdded(newRange);
+        }
     }
 
     private boolean validateInput() {

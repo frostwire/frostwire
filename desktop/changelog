@@ -4,6 +4,8 @@ frostwire (7.0.5) stable; urgency=high
   * Fix: IP Filter pane duplicate settings key crash (#1291) — made IPFilterTableMediator.getInstance() thread-safe (synchronized+volatile), guarded IPFilterPaneItem.initOptions() against mediator creation failures with ipFilterTable null check, and made OptionsPaneManager.show() cache panes before initOptions to prevent infinite re-creation loops
   * Fix: IP Filter DataLine creation on Java 26 (#1291) — added setAccessible(true) in BasicDataLineModel.createDataLine() to allow reflection access to DataLine constructors across package boundaries
   * New: IP Filter now supports multiple block list formats — P2P, DAT, CIDR, and Hosts formats are auto-detected and parsed. ZIP archives are now supported alongside existing GZIP decompression. Extracted format readers into separate classes (P2PIPFilterInputStreamReader, DatFilterInputStreamReader, CidrFilterInputStreamReader, HostsFilterInputStreamReader) with shared IPFilterFormat enum
+  * New: IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
+  * New: IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
 
  -- FrostWire Team <contact@frostwire.com> UNRELEASED
 

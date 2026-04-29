@@ -61,7 +61,7 @@ import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
 public class IPFilterPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("IP Filter");
-    private final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
+    private final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL (.p2p, .dat, .cidr, .hosts — compressed as .gz or .zip)");
     private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     private final String decompressingString = I18n.tr("Decompressing");
@@ -119,6 +119,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             LOG.error("Failed to initialize IPFilterTableMediator", e);
             return;
         }
+        ipFilterTable.setPaneItem(this);
         DesktopParallelExecutor.execute(this::loadSerializedIPFilter);
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or Hosts format)")), "pad 0 5px, span, wrap");
@@ -597,6 +598,59 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     engine.swig().set_ip_filter(currentFilter);
                 }
             }
+        }
+    }
+
+    public void onRangeEdited(IPRange oldRange, IPRange newRange) {
+        LOG.info("onRangeEdited() - " + oldRange + " -> " + newRange);
+        ipFilterTable.getDataModel().remove(oldRange);
+        ipFilterTable.getDataModel().add(newRange, ipFilterTable.getDataModel().getRowCount());
+        ipFilterTable.refresh();
+        rebuildIPFilter();
+    }
+
+    public void onRangeRemoved(IPRange range) {
+        LOG.info("onRangeRemoved() - " + range);
+        ipFilterTable.getDataModel().remove(range);
+        ipFilterTable.refresh();
+        rebuildIPFilter();
+    }
+
+    private void rebuildIPFilter() {
+        BTEngine engine = BTEngine.getInstance();
+        if (engine == null) {
+            return;
+        }
+        ip_filter freshFilter = new ip_filter();
+        IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(getIPFilterDBFile());
+            int rowCount = dataModel.getRowCount();
+            for (int i = 0; i < rowCount; i++) {
+                IPFilterTableMediator.IPFilterDataLine dataLine = dataModel.get(i);
+                if (dataLine == null) continue;
+                IPRange ipRange = dataLine.getInitializeObject();
+                if (ipRange == null) continue;
+                try {
+                    ipRange.writeObjectTo(fos);
+                } catch (IOException e) {
+                    LOG.warn("rebuildIPFilter: failed to write range: " + e.getMessage());
+                }
+                error_code ec = new error_code();
+                address addrStart = address.from_string(ipRange.startAddress(), ec);
+                if (!ec.failed()) {
+                    address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                    if (!ec.failed()) {
+                        freshFilter.add_rule(addrStart, addrEnd, 0);
+                    }
+                }
+            }
+            engine.swig().set_ip_filter(freshFilter);
+        } catch (IOException e) {
+            LOG.error("rebuildIPFilter: " + e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(fos);
         }
     }
 

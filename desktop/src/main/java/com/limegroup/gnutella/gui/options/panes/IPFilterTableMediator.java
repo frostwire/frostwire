@@ -20,13 +20,16 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.tables.*;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMediator.IPFilterModel, IPFilterTableMediator.IPFilterDataLine, IPRange> {
     private static volatile IPFilterTableMediator INSTANCE = null;
+    private IPFilterPaneItem paneItem;
 
     private IPFilterTableMediator() {
         super("IP_FILTER_TABLE_MEDIATOR_ID");
@@ -37,6 +40,10 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
             INSTANCE = new IPFilterTableMediator();
         }
         return INSTANCE;
+    }
+
+    public void setPaneItem(IPFilterPaneItem paneItem) {
+        this.paneItem = paneItem;
     }
 
     @Override
@@ -53,7 +60,35 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
 
     @Override
     protected JPopupMenu createPopupMenu() {
-        return null;
+        if (TABLE.getSelectionModel().isSelectionEmpty() || paneItem == null) {
+            return null;
+        }
+        int selectedRow = TABLE.getSelectedRow();
+        if (selectedRow < 0) {
+            return null;
+        }
+        IPFilterDataLine dataLine = DATA_MODEL.get(selectedRow);
+        if (dataLine == null) {
+            return null;
+        }
+        IPRange selectedRange = dataLine.getInitializeObject();
+        if (selectedRange == null) {
+            return null;
+        }
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(new JMenuItem(new AbstractAction(I18n.tr("Edit")) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AddRangeManuallyDialog(paneItem, selectedRange).setVisible(true);
+            }
+        }));
+        menu.add(new JMenuItem(new AbstractAction(I18n.tr("Remove")) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                paneItem.onRangeRemoved(selectedRange);
+            }
+        }));
+        return menu;
     }
 
     public static class IPFilterDataLine extends AbstractDataLine<IPRange> {
