@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
@@ -75,7 +76,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         if (selectedRange == null) {
             return null;
         }
-        JPopupMenu menu = new JPopupMenu();
+        JPopupMenu menu = new SkinPopupMenu();
         menu.add(new JMenuItem(new AbstractAction(I18n.tr("Edit")) {
             @Override
             public void actionPerformed(ActionEvent e) {

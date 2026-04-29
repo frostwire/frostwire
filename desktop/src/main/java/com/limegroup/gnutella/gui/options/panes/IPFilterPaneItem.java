@@ -401,9 +401,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         try {
             long start = System.currentTimeMillis();
             LOG.info("loadSerializedIPFilter(): loading " + ipFilterDBFile.length() + "  bytes from ip filter file");
+            final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+            dataModel.clear();
             final FileInputStream fis = new FileInputStream(ipFilterDBFile);
             int ranges = 0;
-            final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
             BTEngine engine = BTEngine.getInstance();
             ip_filter currentFilter = null;
             if (engine != null) {
@@ -599,6 +600,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 }
             }
         }
+        rebuildIPFilter();
     }
 
     public void onRangeEdited(IPRange oldRange, IPRange newRange) {
