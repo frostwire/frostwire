@@ -7,6 +7,8 @@ frostwire (7.0.5) stable; urgency=high
   * New: IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
   * New: IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
 
+  * Fix: Tip of the Day "Show Tips at Startup" checkbox now saves immediately when toggled — setting persists across force-quit and IDE stop, fixing checkbox persistence issue
+
  -- FrostWire Team <contact@frostwire.com> UNRELEASED
 
 frostwire (7.0.4) stable; urgency=high
