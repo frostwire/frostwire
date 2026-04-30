@@ -208,8 +208,14 @@ public final class TellurideCourier {
             return;
         }
         SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::ytDlpVersion");
-        if (!Python.isStarted()) {
-            Engine.startPython();
+        try {
+            if (!Python.isStarted()) {
+                Engine.startPython();
+            }
+        } catch (Throwable t) {
+            LOG.error("TellurideCourier::ytDlpVersion failed to start Python", t);
+            callback.onVersion("<unavailable>");
+            return;
         }
         Python python = Engine.getPythonInstance();
         if (python == null) {
