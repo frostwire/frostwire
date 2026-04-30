@@ -114,13 +114,6 @@ public final class SetupManager {
             return;
         }
 
-        // Only reset Tips of the Day on a version update, not when the setup
-        // wizard runs for other reasons (intent window, associations, etc.).
-        if (saveDirectoryStatus == SaveStatus.NEEDS &&
-            ApplicationSettings.INSTALLED.getValue()) {
-            StartupSettings.SHOW_TOTD.setValue(true);
-        }
-
         // If the INSTALLED value is set, that means that a previous
         // installer has already been run.
         boolean partial = ApplicationSettings.INSTALLED.getValue();
