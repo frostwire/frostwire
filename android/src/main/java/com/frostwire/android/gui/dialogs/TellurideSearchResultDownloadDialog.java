@@ -82,7 +82,10 @@ public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDial
     @Override
     public List<TellurideSearchResult> deserializeData(String listDataInJSON) {
         TellurideSearchResultDownloadDialog.TellurideSearchResultList srList = JsonUtils.toObject(listDataInJSON, TellurideSearchResultDownloadDialog.TellurideSearchResultList.class);
-        return srList.listData;
+        if (srList == null || srList.listData == null) {
+            LOG.warn("TellurideSearchResultDownloadDialog::deserializeData - deserialized listData is null");
+        }
+        return srList != null ? srList.listData : null;
     }
 
     @Override
