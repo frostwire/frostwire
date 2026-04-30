@@ -124,6 +124,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
                 applyPiecesData(expectedInfoHash, pieces, piecesCount, totalPiecesValue, pieceSizeValue));
     }
 
+    @SuppressWarnings("unchecked")
     private void applyPiecesData(String expectedInfoHash,
                                  PieceIndexBitfield pieces,
                                  long piecesCount,
@@ -162,7 +163,6 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         }
 
         if (hexHiveView != null && hexDataAdapter != null) {
-            //noinspection unchecked
             hexHiveView.updateData(hexDataAdapter);
         }
         if (piecesNumberTextView != null && piecesCount >= 0) {
