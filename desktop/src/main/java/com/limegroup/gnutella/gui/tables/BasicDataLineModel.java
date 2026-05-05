@@ -227,7 +227,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
             end = _list.size();
             for (T t : _list) t.update();
         }
-        fireTableRowsUpdated(0, end);
+        if (end > 0) {
+            fireTableRowsUpdated(0, end - 1);
+        }
         return null;
     }
 

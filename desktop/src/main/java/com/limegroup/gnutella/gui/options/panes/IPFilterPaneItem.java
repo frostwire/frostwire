@@ -592,14 +592,15 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     public void onRangeEdited(IPRange oldRange, IPRange newRange) {
-        int beforeRemove = ipFilterTable.getDataModel().getRowCount();
-        LOG.info("onRangeEdited() - beforeRemove=" + beforeRemove + ", oldRange=" + oldRange + ", newRange=" + newRange);
-        ipFilterTable.getDataModel().remove(oldRange);
-        int afterRemove = ipFilterTable.getDataModel().getRowCount();
-        LOG.info("onRangeEdited() - afterRemove=" + afterRemove + " (removed=" + (beforeRemove - afterRemove) + ")");
-        ipFilterTable.getDataModel().add(newRange, ipFilterTable.getDataModel().getRowCount());
-        int afterAdd = ipFilterTable.getDataModel().getRowCount();
-        LOG.info("onRangeEdited() - afterAdd=" + afterAdd + " (added=" + (afterAdd - afterRemove) + ")");
+        int row = ipFilterTable.getDataModel().getRow(oldRange);
+        LOG.info("onRangeEdited() - row=" + row + ", oldRange=" + oldRange + ", newRange=" + newRange);
+        if (row != -1) {
+            ipFilterTable.getDataModel().remove(row);
+            ipFilterTable.getDataModel().add(newRange, row);
+        } else {
+            LOG.warn("onRangeEdited() - oldRange not found in model, appending newRange");
+            ipFilterTable.getDataModel().add(newRange, ipFilterTable.getDataModel().getRowCount());
+        }
         ipFilterTable.refresh();
         rebuildIPFilter();
     }

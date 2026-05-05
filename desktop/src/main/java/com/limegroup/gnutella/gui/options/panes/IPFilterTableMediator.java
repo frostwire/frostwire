@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
@@ -81,27 +82,19 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
             return null;
         }
         LOG.info("createPopupMenu() - selectedRow=" + selectedRow + ", selectedRange=" + selectedRange + ", modelSize=" + DATA_MODEL.getRowCount());
-        JPopupMenu menu = new JPopupMenu();
-        java.awt.Color bg = javax.swing.UIManager.getColor("Panel.background");
-        if (bg != null) {
-            menu.setBackground(bg);
-        }
-        JMenuItem editItem = new JMenuItem(new AbstractAction(I18n.tr("Edit")) {
+        JPopupMenu menu = new SkinPopupMenu();
+        menu.add(new SkinMenuItem(new AbstractAction(I18n.tr("Edit")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AddRangeManuallyDialog(paneItem, selectedRange).setVisible(true);
             }
-        });
-        if (bg != null) editItem.setBackground(bg);
-        menu.add(editItem);
-        JMenuItem removeItem = new JMenuItem(new AbstractAction(I18n.tr("Remove")) {
+        }));
+        menu.add(new SkinMenuItem(new AbstractAction(I18n.tr("Remove")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 paneItem.onRangeRemoved(selectedRange);
             }
-        });
-        if (bg != null) removeItem.setBackground(bg);
-        menu.add(removeItem);
+        }));
         return menu;
     }
 
