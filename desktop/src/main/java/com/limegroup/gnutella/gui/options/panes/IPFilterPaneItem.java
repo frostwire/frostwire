@@ -47,6 +47,8 @@ import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URI;
@@ -126,10 +128,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or Hosts format)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
         fixKeyStrokes(fileUrlTextField);
+        fileUrlTextField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { updateImportButtonState(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { updateImportButtonState(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { updateImportButtonState(); }
+        });
         panel.add(fileUrlTextField, "span 6, growx");
         fileChooserIcon = new IconButton("OPEN_IP_FILTER_FILE", 24, 24);
         panel.add(fileChooserIcon, "span 1");
         importButton = new JButton(I18n.tr("Import"));
+        importButton.setEnabled(false);
         panel.add(importButton, "span 1, wrap");
         progressBar = new JProgressBar(0, 100);
         progressBar.setStringPainted(true);
@@ -436,7 +447,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             fileUrlTextField.setEnabled(enable);
             fileChooserIcon.setEnabled(enable);
             importButton.setText(enable ? I18n.tr("Import") : I18n.tr("Importing..."));
-            importButton.setEnabled(enable);
+            if (enable) {
+                updateImportButtonState();
+            } else {
+                importButton.setEnabled(false);
+            }
             clearFilterButton.setEnabled(enable);
             addRangeManuallyButton.setEnabled(enable);
             lastPercentageUpdateTimestamp = -1;
@@ -448,6 +463,14 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 updateProgressBar(0, "");
             }
         });
+    }
+
+    private void updateImportButtonState() {
+        if (fileUrlTextField == null || importButton == null) {
+            return;
+        }
+        boolean hasText = !fileUrlTextField.getText().trim().isEmpty();
+        importButton.setEnabled(hasText);
     }
 
     @Override
@@ -641,7 +664,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             if (engine != null) {
                 currentFilter = engine.swig().get_ip_filter();
             }
-            while (fis.available() > 0) {
+            while (true) {
                 try {
                     IPRange ipRange = IPRange.readObjectFrom(fis);
                     dataModel.add(ipRange, dataModel.getRowCount());
@@ -656,8 +679,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                         }
                     }
                     ranges++;
+                } catch (EOFException e) {
+                    break; // normal end of file
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOG.error("Error reading IP filter entry", e);
+                    break;
                 } catch (IllegalArgumentException e2) {
                     LOG.error("Invalid IPRange entry detected", e2);
                 }

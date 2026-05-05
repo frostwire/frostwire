@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.options.panes.ipfilter;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,31 +46,50 @@ public class IPRange {
         this.endAddress = endAddress;
     }
 
+    private static int readByteOrEof(InputStream is) throws EOFException, IOException {
+        int b = is.read();
+        if (b < 0) {
+            throw new EOFException();
+        }
+        return b;
+    }
+
+    private static void readFully(InputStream is, byte[] buf) throws EOFException, IOException {
+        int total = 0;
+        while (total < buf.length) {
+            int read = is.read(buf, total, buf.length - total);
+            if (read < 0) {
+                throw new EOFException();
+            }
+            total += read;
+        }
+    }
+
     public static IPRange readObjectFrom(InputStream is) throws IOException {
-        int descriptionLength = is.read(); // DESCRIPTION LENGTH
+        int descriptionLength = readByteOrEof(is);
         byte[] descBuffer = new byte[descriptionLength];
-        is.read(descBuffer); // DESCRIPTION
+        readFully(is, descBuffer);
         String description = new String(descBuffer, StandardCharsets.UTF_8);
         String startAddress = null;
-        int ipVersionType = is.read(); // START RANGE IP VERSION TYPE <4 | 6>
+        int ipVersionType = readByteOrEof(is);
         if (ipVersionType == 4) {
             byte[] address = new byte[4];
-            is.read(address); // START RANGE IP <4 bytes (32bits)>
+            readFully(is, address);
             startAddress = InetAddress.getByAddress(address).getHostAddress();
         } else if (ipVersionType == 6) {
             byte[] address = new byte[16];
-            is.read(address); // START RANGE IP <16 bytes (128bits)>
+            readFully(is, address);
             startAddress = InetAddress.getByAddress(address).getHostAddress();
         }
         String endAddress = null;
-        ipVersionType = is.read(); // END RANGE IP VERSION TYPE <4 | 6>
+        ipVersionType = readByteOrEof(is);
         if (ipVersionType == 4) {
             byte[] address = new byte[4];
-            is.read(address); // END RANGE IP <4 bytes (32bits)>
+            readFully(is, address);
             endAddress = InetAddress.getByAddress(address).getHostAddress();
         } else if (ipVersionType == 6) {
             byte[] address = new byte[16];
-            is.read(address); // END RANGE IP <16 bytes (128bits)>
+            readFully(is, address);
             endAddress = InetAddress.getByAddress(address).getHostAddress();
         }
         return new IPRange(description, startAddress, endAddress);
