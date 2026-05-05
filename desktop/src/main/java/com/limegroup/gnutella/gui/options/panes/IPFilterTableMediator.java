@@ -57,6 +57,8 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         DATA_MODEL = new IPFilterTableMediator.IPFilterModel();
         TABLE = new LimeJTable(DATA_MODEL);
         TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        // Disable tooltips to prevent macOS Input Method freeze on EDT (STRICT-EDT violation)
+        javax.swing.ToolTipManager.sharedInstance().unregisterComponent(TABLE);
     }
 
     @Override
