@@ -152,6 +152,10 @@
 - Use try-with-resources for all streams, readers, and closeables.
 - Clean up temp files after use (`gunzipped_blocklist.temp`, `unzipped_blocklist.temp`, etc.).
 
+### Logging
+- **Always use `com.frostwire.util.Logger`** — never `org.apache.commons.logging`, `java.util.logging`, or other frameworks.
+- Example: `private static final Logger LOG = Logger.getLogger(MyClass.class);`
+
 ### Null Safety
 - Null-check deserialized objects, especially when parsing external data.
 - Guard against NPEs at API boundaries (intents, bundles, JSON, network responses).
