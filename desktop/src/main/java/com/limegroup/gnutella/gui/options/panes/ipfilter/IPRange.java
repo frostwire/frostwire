@@ -80,6 +80,8 @@ public class IPRange {
             byte[] address = new byte[16];
             readFully(is, address);
             startAddress = InetAddress.getByAddress(address).getHostAddress();
+        } else {
+            throw new EOFException("Corrupted ip_filter.db: invalid start ipVersionType=" + ipVersionType);
         }
         String endAddress = null;
         ipVersionType = readByteOrEof(is);
@@ -91,6 +93,11 @@ public class IPRange {
             byte[] address = new byte[16];
             readFully(is, address);
             endAddress = InetAddress.getByAddress(address).getHostAddress();
+        } else {
+            throw new EOFException("Corrupted ip_filter.db: invalid end ipVersionType=" + ipVersionType);
+        }
+        if (startAddress == null || endAddress == null) {
+            throw new EOFException("Corrupted ip_filter.db: null address after read");
         }
         return new IPRange(description, startAddress, endAddress);
     }
@@ -108,8 +115,9 @@ public class IPRange {
     }
 
     public void writeObjectTo(OutputStream os) throws IOException {
-        os.write(description.length());     // DESCRIPTION LENGTH
-        os.write(description.getBytes(StandardCharsets.UTF_8)); // DESCRIPTION
+        String safeDesc = description.length() > 255 ? description.substring(0, 255) : description;
+        os.write(safeDesc.length());        // DESCRIPTION LENGTH (max 255)
+        os.write(safeDesc.getBytes(StandardCharsets.UTF_8)); // DESCRIPTION
         InetAddress bufferRange = InetAddress.getByName(startAddress);
         boolean isIPv4 = bufferRange instanceof Inet4Address;
         os.write(isIPv4 ? 4 : 6);           // START RANGE IP VERSION TYPE <4 | 6>

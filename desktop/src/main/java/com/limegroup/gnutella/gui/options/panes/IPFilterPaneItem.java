@@ -669,23 +669,28 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     IPRange ipRange = IPRange.readObjectFrom(fis);
                     dataModel.add(ipRange, dataModel.getRowCount());
                     if (currentFilter != null) {
-                        error_code ec = new error_code();
-                        address addrStart = address.from_string(ipRange.startAddress(), ec);
-                        if (!ec.failed()) {
-                            address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                        try {
+                            error_code ec = new error_code();
+                            address addrStart = address.from_string(ipRange.startAddress(), ec);
                             if (!ec.failed()) {
-                                currentFilter.add_rule(addrStart, addrEnd, 0);
+                                address addrEnd = address.from_string(ipRange.endAddress(), ec);
+                                if (!ec.failed()) {
+                                    currentFilter.add_rule(addrStart, addrEnd, 0);
+                                }
                             }
+                        } catch (RuntimeException t) {
+                            LOG.warn("Skipping invalid IP range for filter: " + ipRange + " - " + t.getMessage());
                         }
                     }
                     ranges++;
                 } catch (EOFException e) {
-                    break; // normal end of file
+                    break; // normal end of file or corruption
                 } catch (IOException e) {
-                    LOG.error("Error reading IP filter entry", e);
+                    LOG.error("Error reading IP filter entry, stopping load", e);
                     break;
-                } catch (IllegalArgumentException e2) {
-                    LOG.error("Invalid IPRange entry detected", e2);
+                } catch (RuntimeException e2) {
+                    LOG.error("Invalid IPRange entry detected, stopping load (db likely corrupted)", e2);
+                    break;
                 }
             }
             if (engine != null && currentFilter != null) {
