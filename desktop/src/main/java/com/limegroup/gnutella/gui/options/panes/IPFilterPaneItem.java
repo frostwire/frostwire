@@ -592,9 +592,14 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     public void onRangeEdited(IPRange oldRange, IPRange newRange) {
-        LOG.info("onRangeEdited() - " + oldRange + " -> " + newRange);
+        int beforeRemove = ipFilterTable.getDataModel().getRowCount();
+        LOG.info("onRangeEdited() - beforeRemove=" + beforeRemove + ", oldRange=" + oldRange + ", newRange=" + newRange);
         ipFilterTable.getDataModel().remove(oldRange);
+        int afterRemove = ipFilterTable.getDataModel().getRowCount();
+        LOG.info("onRangeEdited() - afterRemove=" + afterRemove + " (removed=" + (beforeRemove - afterRemove) + ")");
         ipFilterTable.getDataModel().add(newRange, ipFilterTable.getDataModel().getRowCount());
+        int afterAdd = ipFilterTable.getDataModel().getRowCount();
+        LOG.info("onRangeEdited() - afterAdd=" + afterAdd + " (added=" + (afterAdd - afterRemove) + ")");
         ipFilterTable.refresh();
         rebuildIPFilter();
     }

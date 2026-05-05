@@ -23,12 +23,14 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.tables.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMediator.IPFilterModel, IPFilterTableMediator.IPFilterDataLine, IPRange> {
+    private static final Logger LOG = Logger.getLogger(IPFilterTableMediator.class);
     private static volatile IPFilterTableMediator INSTANCE = null;
     private IPFilterPaneItem paneItem;
 
@@ -78,19 +80,28 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         if (selectedRange == null) {
             return null;
         }
-        JPopupMenu menu = new SkinPopupMenu();
-        menu.add(new JMenuItem(new AbstractAction(I18n.tr("Edit")) {
+        LOG.info("createPopupMenu() - selectedRow=" + selectedRow + ", selectedRange=" + selectedRange + ", modelSize=" + DATA_MODEL.getRowCount());
+        JPopupMenu menu = new JPopupMenu();
+        java.awt.Color bg = javax.swing.UIManager.getColor("Panel.background");
+        if (bg != null) {
+            menu.setBackground(bg);
+        }
+        JMenuItem editItem = new JMenuItem(new AbstractAction(I18n.tr("Edit")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AddRangeManuallyDialog(paneItem, selectedRange).setVisible(true);
             }
-        }));
-        menu.add(new JMenuItem(new AbstractAction(I18n.tr("Remove")) {
+        });
+        if (bg != null) editItem.setBackground(bg);
+        menu.add(editItem);
+        JMenuItem removeItem = new JMenuItem(new AbstractAction(I18n.tr("Remove")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 paneItem.onRangeRemoved(selectedRange);
             }
-        }));
+        });
+        if (bg != null) removeItem.setBackground(bg);
+        menu.add(removeItem);
         return menu;
     }
 
