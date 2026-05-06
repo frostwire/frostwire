@@ -83,7 +83,7 @@ public class IPFilterAddTool implements MCPTool {
                 if (!ec.failed()) {
                     address addrEnd = address.from_string(end, ec);
                     if (!ec.failed()) {
-                        currentFilter.add_rule(addrStart, addrEnd, 0);
+                        currentFilter.add_rule(addrStart, addrEnd, ip_filter.access_flags.blocked.swigValue());
                         engine.swig().set_ip_filter(currentFilter);
                     } else {
                         LOG.warn("IPFilterAddTool: Invalid end address: " + end);

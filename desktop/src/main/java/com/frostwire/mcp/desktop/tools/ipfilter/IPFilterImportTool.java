@@ -197,7 +197,7 @@ public class IPFilterImportTool implements MCPTool {
                             if (!ec.failed()) {
                                 address addrEnd = address.from_string(endAddr, ec);
                                 if (!ec.failed()) {
-                                    currentFilter.add_rule(addrStart, addrEnd, 0);
+                                    currentFilter.add_rule(addrStart, addrEnd, ip_filter.access_flags.blocked.swigValue());
                                 }
                             }
                         }

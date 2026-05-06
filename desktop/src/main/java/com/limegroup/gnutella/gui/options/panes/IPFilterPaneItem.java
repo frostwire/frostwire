@@ -325,7 +325,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                                 if (!ec.failed()) {
                                     address addrEnd = address.from_string(ipRange.endAddress(), ec);
                                     if (!ec.failed()) {
-                                        currentFilter.add_rule(addrStart, addrEnd, 0);
+                                        currentFilter.add_rule(addrStart, addrEnd, ip_filter.access_flags.blocked.swigValue());
                                     }
                                 }
                             }
@@ -636,7 +636,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     if (!ec.failed()) {
                         address addrEnd = address.from_string(ipRange.endAddress(), ec);
                         if (!ec.failed()) {
-                            freshFilter.add_rule(addrStart, addrEnd, 0);
+                            freshFilter.add_rule(addrStart, addrEnd, ip_filter.access_flags.blocked.swigValue());
                         }
                     }
                     ipRange.writeObjectTo(fos);
@@ -708,7 +708,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                                     if (!ec.failed()) {
                                         address addrEnd = address.from_string(ipRange.endAddress(), ec);
                                         if (!ec.failed()) {
-                                            currentFilter.add_rule(addrStart, addrEnd, 0);
+                                            currentFilter.add_rule(addrStart, addrEnd, ip_filter.access_flags.blocked.swigValue());
                                         }
                                     }
                                 } catch (RuntimeException t) {
