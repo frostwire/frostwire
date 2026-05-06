@@ -82,16 +82,20 @@ public class RenamePlaylist extends BasePlaylistDialog {
         if (savedInstanceState != null) {
             mDefaultname = savedInstanceState.getString("defaultname");
             if (mRenameId < 0 || mDefaultname == null) {
-                getDialog().dismiss();
+                dismissDialogSafe();
             }
         } else {
             mDefaultname = "";
+            final Context appContext = SystemUtils.getApplicationContext();
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                final String originalName = getPlaylistNameFromId(mRenameId);
+                final String originalName = getPlaylistNameFromId(appContext, mRenameId);
                 SystemUtils.postToUIThread(() -> {
+                    if (!isAdded()) {
+                        return;
+                    }
                     mDefaultname = originalName;
                     if (mRenameId < 0 || originalName == null || mDefaultname == null) {
-                        getDialog().dismiss();
+                        dismissDialogSafe();
                     } else if (mPlaylist != null) {
                         mPlaylist.setText(mDefaultname);
                         mPlaylist.setSelection(mDefaultname.length());
@@ -161,17 +165,27 @@ public class RenamePlaylist extends BasePlaylistDialog {
      * @param id The Id of the playlist
      * @return The name of the playlist
      */
-    private String getPlaylistNameFromId(final long id) {
-        if (SystemUtils.isUIThread()) {
+    private String getPlaylistNameFromId(final Context context, final long id) {
+        if (SystemUtils.isUIThread() || context == null) {
             return null;
         }
         Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
-        Cursor cursor = getActivity().getContentResolver().query(
+        Cursor cursor = context.getContentResolver().query(
                 playlistContentUri, new String[]{
                         MediaStore.Audio.Playlists.NAME
                 }, MediaStore.Audio.Playlists._ID + "=?", new String[]{
                         String.valueOf(id)
                 }, MediaStore.Audio.Playlists.NAME);
         return MusicUtils.getFirstStringResult(cursor, true);
+    }
+
+    private void dismissDialogSafe() {
+        try {
+            if (getDialog() != null) {
+                getDialog().dismiss();
+            }
+        } catch (Throwable t) {
+            LOG.error("RenamePlaylist.dismissDialogSafe() failed", t);
+        }
     }
 }
