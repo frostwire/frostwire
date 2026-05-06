@@ -19,6 +19,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import androidx.loader.content.Loader;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,16 +91,21 @@ public final class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter
                             final int position,
                             final long id) {
         mItem = mAdapter.getItem(position - mAdapter.getOffset());
-        if (mItem != null) {
+        final Activity activity = getActivity();
+        if (mItem != null && activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
             com.frostwire.android.util.SystemUtils.postToHandler(
                 com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC,
                 () -> {
-                    NavUtils.openAlbumProfile(getActivity(),
+                    NavUtils.openAlbumProfile(activity,
                         mItem.mAlbumName,
                         mItem.mArtistName,
                         mItem.mAlbumId,
-                        MusicUtils.getSongListForAlbum(getActivity(), mItem.mAlbumId));
-                    getActivity().finish();
+                        MusicUtils.getSongListForAlbum(activity, mItem.mAlbumId));
+                    com.frostwire.android.util.SystemUtils.postToUIThread(() -> {
+                        if (!activity.isFinishing() && !activity.isDestroyed()) {
+                            activity.finish();
+                        }
+                    });
                 });
         }
     }
