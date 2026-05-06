@@ -1,150 +1,165 @@
----
+schema_version: 1
 name: frostwire-crash-triage
-description: |
-  Triage and fix FrostWire Android crashes and ANRs using Firebase Crashlytics
-  BigQuery plus MentisDB memory. Use when asked to inspect the latest FrostWire
-  Android release health, pick the next unclosed Crashlytics issue, study prior
-  fixes and regressions on the frostwire chain as agent gubatron, patch the
-  Android app, add regression tests, update changelog.txt, commit or push the
-  fix, and track issue closure so fixed issues are not selected again.
-triggers:
-  - frostwire crash
-  - android crash
-  - crash triage
-  - fix crash
-  - ANR
-  - pending crash
-  - release health
-  - 9090774
-  - 9070774
-  - 9060774
----
+description: Triage and fix FrostWire Android crashes and ANRs using Firebase Crashlytics BigQuery plus MentisDB memory. Use when asked to inspect the latest FrostWire Android release health, pick the next unclosed Crashlytics issue, study prior fixes and regressions on the frostwire chain as agent gubatron, patch the Android app, add regression tests, update changelog.txt, commit or push the fix, and track issue closure so fixed issues are not selected again.
 
-# FrostWire Android Crash Triage
+# frostwire-crash-triage
 
-## ⚡ MANDATORY STARTUP
+Triage and fix FrostWire Android crashes and ANRs using Firebase Crashlytics BigQuery plus MentisDB memory. Use when asked to inspect the latest FrostWire Android release health, pick the next unclosed Crashlytics issue, study prior fixes and regressions on the frostwire chain as agent gubatron, patch the Android app, add regression tests, update changelog.txt, commit or push the fix, and track issue closure so fixed issues are not selected again.
 
-1. `MENTISDB_REST_PORT=9472 mentisdb search "" --chain frostwire --limit 20 --url http://192.168.4.36:9472` → load recent context
-2. `MENTISDB_REST_PORT=9472 mentisdb search "crash" --chain frostwire --limit 20 --url http://192.168.4.36:9472` → study prior fixes
-3. Read `changelog.txt` → understand current release state
-4. Read `AndroidManifest.xml` → confirm versionCode/versionName
-5. Search codebase for the specific crash pattern before patching
+# FrostWire Crash Triage
 
-## 🔍 CRASH TRIAGE WORKFLOW
 
-### Step 1: Identify Pending Crashes
-- Search MentisDB frostwire chain for unaddressed crash thoughts
-- Check changelog.txt for "UNRELEASED" or pending fixes
-- Search codebase for:
-  - `getActivity()` without null checks in async callbacks
-  - `requireActivity()`/`requireContext()` in background threads
-  - `runOnUiThread()` without `isAdded()` guards in fragments
-  - Native code (JNI/jlibtorrent) without try/catch
-  - Missing `isAdded()` checks before fragment transactions
-  - Background thread UI mutations
+## Preconditions
 
-### Step 2: Study Prior Fixes
-For each crash class, search MentisDB:
-```bash
-MENTISDB_REST_PORT=9472 mentisdb search "<crash-class-name>" --chain frostwire --limit 10 --url http://192.168.4.36:9472
+- Work in the FrostWire Android repository.
+- Use BigQuery project `frostwire-android-233c6`.
+- Use MentisDB chain `frostwire` as agent `gubatron`.
+- Treat Crashlytics BigQuery as the machine-readable source of truth for new events.
+- Treat Firebase Crashlytics console issue state as the human issue tracker when console access is available.
+- Prioritize the latest app build first unless the user explicitly asks for another version.
+
+## Memory First
+
+Before reading much code, search MentisDB for:
+
+- the `issue_id`
+- exception class names
+- blamed file and symbol
+- suspected regression commits
+- prior close state for the issue
+
+Load recent context. Reuse existing lessons and decisions. Write back any corrected assumption, non-obvious root cause, or reusable Android framework trap.
+
+## Identify the Latest Build
+
+Run:
+
+```sql
+SELECT
+  application.build_version AS build_version,
+  application.display_version AS display_version,
+  COUNT(*) AS events,
+  COUNTIF(is_fatal) AS fatal_events,
+  COUNTIF(error_type = "ANR") AS anr_events,
+  MAX(event_timestamp) AS last_seen
+FROM `frostwire-android-233c6.firebase_crashlytics.com_frostwire_android_ANDROID`
+WHERE event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY)
+GROUP BY 1, 2
+ORDER BY last_seen DESC, fatal_events DESC
+LIMIT 20
 ```
 
-Look for:
-- Root cause patterns (e.g., detached fragments, wrong-thread ExoPlayer access)
-- Fix strategies (e.g., WeakReference, isAdded() guards, background posting)
-- Regressions caused by prior fixes
-- Test patterns for the crash class
+Ignore stale noise from old builds unless the user asks for historical cleanup.
 
-### Step 3: Patch the Code
-**Fix principles (per AGENTS.md):**
-- **Fail closed, not crashed** — wrap native code in try/catch
-- **Off the main thread** — move JNI/I/O/parsing to background threads
-- **Scope to the minimum** — capture values locally before async posts
-- **Detached-safe** — check `isAdded()` / `Ref.alive()` before UI updates
-- **Self-explanatory code** — well-named methods over comments
+## Pick the Next Unclosed Issue
 
-Common fixes:
-| Crash Pattern | Fix |
-|--------------|-----|
-| `IllegalStateException: Fragment not attached` | Add `isAdded()` guard before `getActivity()`/`getContext()` |
-| `NullPointerException: getActivity() returned null` | Capture `getActivity()` into `WeakReference` before async post |
-| `ForegroundServiceStartNotAllowedException` | Catch in `onUpdateNotification()` or service lifecycle |
-| `RemoteServiceException: startForeground not called` | Always call `startForeground()` before any early return |
-| `ExoPlayer wrong thread` | Post to `mPlayerHandler` instead of direct access |
-| `RejectedExecutionException` | Switch `SynchronousQueue` → `LinkedBlockingQueue`, increase pool size |
-| `DeadSystemException` | Guard `WindowManager`/`NavigationView` inset listeners, swallow gracefully |
-| `NoClassDefFoundError` after JNI init failure | Broaden catch to `Throwable`/`LinkageError`, add fallback flags |
-| `IllegalStateException: Can not perform this action after onSaveInstanceState` | Check `getParentFragmentManager().isStateSaved()` before `show()` |
+If a local or external open/closed queue exists, respect it. If none exists yet:
 
-### Step 4: Add Regression Tests
-If the project has tests:
-- Add a test proving the crash scenario no longer crashes
-- Test edge cases: null input, detached state, thread-safety
-- Run `./gradlew test` or `./gradlew compilePlus1DebugJavaWithJavac`
+1. scope to the latest `application.build_version`
+2. group by `issue_id`
+3. rank by `events DESC, last_seen DESC`
+4. prefer `FATAL` before `ANR` when counts are comparable
+5. skip issues already marked fixed in MentisDB for the current branch or newer unreleased code
+6. skip issues already known closed in the Crashlytics console for the relevant release line
 
-### Step 5: Update Changelog
-Add to `changelog.txt` under the UNRELEASED section:
-```
-FrostWire X.Y.Z build NNN MONTH/DAY/YEAR
-  - fix:Short imperative description of crash fix
+Use:
+
+```sql
+SELECT
+  issue_id,
+  error_type,
+  issue_title,
+  issue_subtitle,
+  blame_frame.file AS blame_file,
+  blame_frame.symbol AS blame_symbol,
+  COUNT(*) AS events,
+  COUNT(DISTINCT installation_uuid) AS installations,
+  MIN(event_timestamp) AS first_seen,
+  MAX(event_timestamp) AS last_seen
+FROM `frostwire-android-233c6.firebase_crashlytics.com_frostwire_android_ANDROID`
+WHERE application.build_version = "9090773"
+GROUP BY 1, 2, 3, 4, 5, 6
+ORDER BY events DESC, last_seen DESC
+LIMIT 25
 ```
 
-Follow the format from existing entries.
+Replace the build number with the latest result from the previous query.
 
-### Step 6: Commit and Push
-Granular, focused commits per AGENTS.md:
+## Pull Issue Detail
+
+For the chosen `issue_id`, inspect recent examples:
+
+```sql
+SELECT
+  event_timestamp,
+  application.build_version AS build_version,
+  application.display_version AS display_version,
+  device.manufacturer AS manufacturer,
+  device.model AS model,
+  device.architecture AS architecture,
+  operating_system.display_version AS os_display_version,
+  process_state,
+  issue_title,
+  issue_subtitle,
+  blame_frame,
+  exceptions,
+  errors,
+  threads
+FROM `frostwire-android-233c6.firebase_crashlytics.com_frostwire_android_ANDROID`
+WHERE application.build_version = "9090773"
+  AND issue_id = "REPLACE_ISSUE_ID"
+ORDER BY event_timestamp DESC
+LIMIT 5
 ```
-[android] Fix <crash-name>: <short description>
-```
 
-One logical change per commit. Never merge master into feature branch — rebase.
+Focus on the repeated frames and the triggering thread, not just the headline exception.
 
-### Step 7: Track in MentisDB
-After each fix, append a `LessonLearned` or `TaskComplete` thought to the frostwire chain:
-```bash
-MENTISDB_REST_PORT=9472 mentisdb add "Fixed <crash>: <root-cause> → <fix>" \
-  --type LessonLearned --chain frostwire --url http://192.168.4.36:9472 \
-  --tag "android,crash-fix,<crash-class>"
-```
+## Research Before Editing
 
-## 📋 CRASH CATEGORIES
+- Search MentisDB for the issue fingerprint and adjacent symptoms.
+- Check `git log` for previous attempts touching the blamed files or same exception family.
+- Read the current code path from the top crash frame outward.
+- If it is a regression, identify what changed in behavior, not only what changed in lines.
 
-### Fragment Lifecycle
-- Detached fragment access in `runOnUiThread` / `Handler.post`
-- `getParentFragmentManager()` after `onSaveInstanceState`
-- `requireActivity()` / `requireContext()` in background threads
+## Fix Standard
 
-### Service Lifecycle
-- `startForeground()` not called before early return
-- Null intent in `onStartCommand()` sticky restarts
-- `ForegroundServiceStartNotAllowedException` from background
+- Prefer the narrowest fix that removes the failure mode without inventing a new control path.
+- Reproduce locally when feasible.
+- Add or adjust a regression test whenever the failure can be expressed in unit, integration, or instrumentation form.
+- If no meaningful automated test is possible, state the limiting factor in the commit summary or final report.
+- Update the current `UNRELEASED` section of `changelog.txt`.
+- Commit granularly.
+- Push only when the user asked for it or the workflow explicitly requires it.
 
-### Native / JNI
-- `NoClassDefFoundError` after jlibtorrent init failure
-- Invalid torrent handle access
-- SWIG object disposal on wrong thread
+## Close State
 
-### Threading / ANR
-- JNI calls on UI thread
-- `ContentResolver.query()` on UI thread
-- File I/O on UI thread
-- `CountDownLatch.await()` on UI thread
+After a fix is verified and committed:
 
-### Notification
-- `BadForegroundServiceNotificationException` on Android 14+
-- Custom `RemoteViews` rejected by system
-- `Media3` foreground self-start from background
+1. close the issue in the Firebase Crashlytics console when direct console access is available
+2. record the closure in MentisDB with the `issue_id`, affected build, commit SHA, verification command, and whether console closure is confirmed or pending
+3. if console closure cannot be performed in the current environment, treat MentisDB as the local queue state so the issue is not selected again until console closure is confirmed
+4. if Crashlytics later reopens a closed issue as a regression, treat that as a new work item and update the prior closure memory rather than creating a duplicate trail
 
-## 🧪 VERIFICATION
+Do not rely on BigQuery alone for close state; BigQuery is event data, not the issue workflow.
 
-Before claiming complete:
-- `./gradlew compilePlus1DebugJavaWithJavac` must pass
-- `./gradlew assembleDebug` must pass
-- If tests exist, `./gradlew test` must pass
-- No new compiler warnings introduced
-- Changelog updated with new entry
+Use MentisDB as the fallback ledger with:
 
-## 🎯 AGENT IDENTITY
+- `entity_type: CrashlyticsIssue`
+- tags:
+  - `issue:<issue_id>`
+  - `build:<build_version>`
+  - `status:open|fixed|closed-local|closed-console|regressed`
+  - `error_type:FATAL|ANR|NON_FATAL`
 
-Always operate as **gubatron** on the **frostwire** chain.
-If agent identity is unclear, list agents and reuse `gubatron`.
+Search the latest thought for `issue:<issue_id>` before selecting work. Treat the newest matching thought as the local source of truth when console closure is unavailable.
+
+## Memory Writes
+
+Write to MentisDB during the work:
+
+- `Summary` with `role: Checkpoint` before a substantial implementation wave
+- `LessonLearned` for Android, Media3, libtorrent, storage-model, or Crashlytics workflow traps
+- `Decision` when choosing a ranking rule, queue rule, or architectural fix
+- `TaskComplete` when the issue is fixed durably, including close state
+
+Always record why a prior assumption failed if the issue was a regression or a failed earlier fix.
