@@ -1,3 +1,7 @@
+FrostWire 3.1.4 build 775 UNRELEASED
+  - fix:RenamePlaylist no longer crashes from background-thread getActivity() NPE when the dialog fragment detaches before MISC handler queries the playlist name; initObjects now passes application context and UI callbacks guard isAdded()/getDialog() null
+  - fix:ArtistAlbumFragment onItemClick no longer crashes with NPE or races when calling getActivity().finish() from the MISC handler; activity is captured locally before the async post and finish() is marshalled back to the UI thread with lifecycle guards
+
 FrostWire 3.1.3 build 774 APR/29/2026
   - fix:Main drawer navigation now guards Material NavigationView's private inset global-layout listener so DeadSystemException from WindowManager window-metrics queries fails closed instead of crashing the app
   - fix:Transfer Detail > Pieces now loads torrent piece status and torrent info off the UI thread and skips stale handles safely, preventing invalid torrent-handle crashes and status-related ANRs from piece-grid rendering
