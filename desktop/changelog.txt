@@ -1,0 +1,2140 @@
+FrostWire 7.0.5
+  - fix:IP Filter options pane now visible on Java 26 (#1291) — made IPFilterPaneItem constructor package-private and added setAccessible(true) in OptionsPaneFactory to prevent IllegalAccessException when creating pane items via reflection
+  - fix:IP Filter pane duplicate settings key crash (#1291) — made IPFilterTableMediator.getInstance() thread-safe (synchronized+volatile), guarded IPFilterPaneItem.initOptions() against mediator creation failures with ipFilterTable null check, and made OptionsPaneManager.show() cache panes before initOptions to prevent infinite re-creation loops
+  - fix:IP Filter DataLine creation on Java 26 (#1291) — added setAccessible(true) in BasicDataLineModel.createDataLine() to allow reflection access to DataLine constructors across package boundaries
+  - new:IP Filter now supports multiple block list formats — P2P, DAT, CIDR, and Hosts formats are auto-detected and parsed. ZIP archives are now supported alongside existing GZIP decompression. Extracted format readers into separate classes (P2PIPFilterInputStreamReader, DatFilterInputStreamReader, CidrFilterInputStreamReader, HostsFilterInputStreamReader) with shared IPFilterFormat enum
+  - new:IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
+  - new:IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
+
+FrostWire 7.0.4 APR/22/2026
+  - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
+  - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
+  - new:Per-torrent file download control — transfer detail Files tab now shows a "Show skipped files" checkbox (persisted globally, default ON) for partial downloads; skipped files appear dimmed in gray with a Download button to resume them individually
+  - new:Per-torrent file priority control — transfer detail Files tab now includes a Priority column with an 8-level popup menu (from libtorrent's IGNORE to SEVEN), allowing users to adjust bandwidth allocation per file within a torrent
+  - fix:Transfer detail Files tab now refreshes correctly after priority changes — file progress no longer shows stale 0% after adjusting priority
+  - fix:Transfer detail priority popup menu now uses FrostWire's themed SkinMenuItem/SkinMenu components for consistent dark theme rendering
+  - fix:Transfer detail Files tab no longer flickers or corrupts saved settings when the user toggles the "Show skipped files" checkbox — eliminated race condition between the 1-second refresh timer and user-initiated checkbox clicks
+  - fix:Transfer detail Files tab "Show skipped files" checkbox now responds instantly — checkbox clicks spawn a dedicated thread (matching Android's HIGH_PRIORITY pattern) instead of queuing on any shared pool, eliminating double-queueing with the 1-second refresh timer that caused multi-second UI lag
+  - fix:Transfer detail Files tab "Show skipped files" checkbox is now truly instant — cached holder list means checkbox click is a pure-EDT filter with zero JNI calls; previously it re-fetched all file metadata from libtorrent on every click
+  - fix:Transfer detail Files tab table rebuild no longer blocks the EDT for seconds on large torrents — replaced per-row fireTableRowsInserted storm with a single bulk model replacement (setHolders) that fires fireTableDataChanged once
+  - fix:BTDownload.getItems() no longer performs redundant 10,000-piece JNI loop on every call — piecesTracker initialization now happens once, eliminating thousands of th.havePiece() JNI calls per refresh for large torrents
+  - fix:Transfer detail Files tab now correctly switches content when selecting a different torrent — replaced broken target-vs-btDownload guard with a monotonic sequence counter so stale background completions are skipped without blocking legitimate torrent switches
+  - fix:Library Audio/Video tree nodes now show all files on disk — SearchByMediaTypeRunnable no longer skips disk search when the cache is non-empty, preventing missing files that were on disk before startup or in directories not covered by scanInternal()
+  - fix:FileUtils.listFiles() now returns absolute paths so library file discovery, cache deduplication, and canonical path resolution work correctly across all platforms
+  - fix:Transfer detail Files tab now rebuilds the table with fresh data on every refresh instead of calling tableMediator.update() which was a no-op for immutable pre-computed holder objects
+  - fix:Transfer detail panel now populates correctly on first view — added HierarchyListener to detect when the Transfers tab becomes visible and trigger an initial selection update, fixing the empty detail panel on first open
+  - update:Refresh default tracker lists across desktop torrent creation, magnet URLs, and CreateTorrentDialog with current reliable public trackers (opentrackr, openbittorrent, stealth.si, exodus, torrent.eu.org, moeking, explodie, coppersurfer)
+  - fix:Fix macOS EDT deadlock in FramedDialog where AppKit held awtLock during modal JDialog creation while EDT needed it for text rendering
+  - fix:Preload language flag images before showing the setup wizard so JComboBox layout no longer blocks the EDT with MediaTracker.waitForID() on startup
+  - fix:Load UI theme off-EDT during startup — Nimbus/FlatLaf initialization moved to the main thread before any Swing components exist, eliminating a >2 second EDT block on every launch
+  - fix:Change APPLICATION_MODAL to MODELESS in CreateTorrentDialog, SendFileProgressDialog, and EditTrackerDialog to prevent nested modal dialog deadlocks
+  - fix:Race condition crash after audio extraction — selecting library table row 0 before the file is scanned no longer throws IllegalArgumentException; bounds check added to LimeJTable.setSelectedRow()
+  - fix:Library Audio/Video tree nodes now show files — MediaTypeSavedFilesDirectoryHolder.getFiles() was returning empty array instead of cached files; also fixed scanInternal to add new downloads to empty caches and added torrent data dir fallback when DIRECTORIES_TO_INCLUDE is empty
+  - fix:Preload ApplicationHeader button background images on the main thread before MainFrame construction to avoid MediaTracker.waitForID() blocking the EDT during startup
+  - fix:Move IconManager.instance() initialization from EDT to the main thread in Initializer.loadLateTasksForUI()
+  - fix:Desktop.open() no longer blocks the EDT when opening files — Launcher.launchFile() now delegates to DesktopParallelExecutor to prevent Linux X11 Desktop integration stalls during playback
+  - fix:Sanitize and de-HTML external text across search results, transfer names, locale labels, tooltips, and renderers to prevent broader macOS Java 21 SunLayoutEngine JNI crashes from malformed Unicode content
+  - fix:Add 30s timeout to LifecycleManager shutdown latch to prevent indefinite hang
+  - fix:BTDownload getSize() return type double->long to prevent precision loss above 2GB
+  - fix:Library files showing 0.0KB — file.length()/lastModified() wrapped in try-catch to prevent silent background task failure, and size/modtime cached cells invalidated after background load completes so UI repaints with correct values
+  - fix:Library refresh (F5) now properly re-sorts files after async lastModified load completes without flooding the resort executor — resolved file metadata updates now synchronize with the table model and coalesce resort requests so new downloads appear by date without RejectedExecutionException or comparator contract failures
+  - fix:TransferDetailGeneral now discards stale async metadata updates when switching transfers quickly, preventing mismatched or stuck detail fields
+  - fix:TransferDetailPieces now ignores late selection updates so piece counts and the cached hive image stay in sync with the currently selected transfer
+  - fix:Wire IP Filter UI to BTEngine so clear/import actually updates libtorrent ip_filter
+  - fix:Enable IP Filter options pane tab in settings (was commented out)
+  - fix:SlideDownload.onComplete() now extracts .zip downloads with zip-slip protection
+  - fix:YCCK JPEG color inversion using Adobe APP14 marker Transform field
+  - fix:CreateTorrentDialog bottom buttons now visible on first open without requiring manual resize
+  - fix:Defer native libtorrent.make_magnet_uri() call off EDT in TransferDetailGeneral — JNI magnet URI generation can block >2 seconds on large torrents
+  - fix:Offload TransferDetailComponent.updateData() to background thread — all transfer detail panels (General, Trackers, Peers, Pieces) now gather JNI data off EDT and update UI on EDT
+  - fix:Move BTDownload resume-data generation off EDT in pause()/resume() so libtorrent need_save_resume_data() no longer stalls transfer actions
+  - fix:Pre-compute TransferDetailFiles completion/progress on a background thread so table painting no longer calls libtorrent file_progress() JNI on the EDT
+  - fix:Defer file I/O and torrent parsing off EDT in LibraryFilesTableDataLine.initialize()
+  - fix:Run directory scanning off EDT in LibraryFilesTableMediator.updateTableFiles()
+  - fix:Don't block EDT on Future.get() in LibraryFilesTableMediator.removeSelection()
+  - fix:Add EDT guards to DirectoryHolder.getFiles() to prevent recursive I/O on EDT
+  - fix:Fix DNDUtils.containsPlayableFile using extension-only check to avoid file.exists() syscall on EDT during drag-and-drop
+  - fix:Add pack() before setVisible(true) in SendFileProgressDialog to prevent macOS awtLock contention
+  - fix:Add pack() before setVisible(true) in EditTrackerDialog to prevent macOS awtLock contention
+  - fix:Add pack() before setVisible(true) in Options dialog to prevent macOS awtLock contention
+  - fix:Add pack() before setVisible(true) in About dialog to prevent macOS awtLock contention
+  - fix:Normalize and sanitize library text before Swing/Nimbus measures it, stripping Unicode format/control glyphs that could trigger macOS Java 21 font-layout JNI warnings when switching to the library
+  - fix:Replace LineBreakMeasurer with JTextArea preferred-size calculation in SkinMultilineToolTipUI to avoid JNI font-layout warnings during torrent search tooltips
+  - fix:Sanitize transfer detail table strings (Files, Peers, Trackers) before Swing paints them, preventing macOS Java 21 font-layout JNI warnings from malformed torrent or peer text
+  - fix:Implement UI notification in SettingsWarningManager for settings load/save failures
+  - fix:PerformersHelper now filters hidden files alongside pad files in search results
+  - fix:QuotedStringTokenizer now supports backslash quote escaping
+  - fix:TorrentFileFilter i18nize 'Torrents' display string
+  - fix:TelluridePlaylistPartialUISearchResult now reports mp4 extension so Video tab shows YouTube playlist results — getExtension() override returns "mp4" to fix null NamedMediaType that blocked both tab counter and media type filter
+  - fix:SoundCloud search now excludes tracks not marked as downloadable, so common search results only expose content the platform explicitly allows for download
+  - fix:Idope search integration now uses the new idope.pics domain and filters placeholder "No results returned" API responses when the backend is unavailable
+  - fix:MagnetDL search parser now accepts both raw JSON arrays and quoted JSON-array payloads, preventing CI/live failures when the API response is wrapped as a JSON string
+  - fix:TransferDetailPieces/HexHivePanel now use consistent hex tiling math and the fast flat-hex path for large swarms, eliminating overlapping piece cells and improving cached rendering speed
+  - fix:Restore the 3D cube-shaded HexHive look in TransferDetailPieces while keeping the corrected tiling math and off-EDT cached rendering
+  - fix:HexHivePanel now wraps rows against the full viewport width instead of the last occupied row width, and drops stale async bitmaps to prevent missing right-edge cubes and blinking
+  - fix:HexHivePanel no longer cancels queued renders before rasterization starts, preventing refresh starvation where the Pieces panel could stay completely blank
+  - fix:HexHivePanel now coalesces rapid refresh requests through a single background render loop so 1-second detail updates no longer invalidate cube rendering before any bitmap reaches the screen
+  - fix:HexHivePanel now merges retained viewport batches using non-overlapping seam bands plus neighbor-row context, preventing moving white gaps between groups of rendered cube rows
+  - fix:Add download/upload speed limit adjustment buttons to TransferDetailGeneral
+  - fix:Tip of the Day "Show Tips at Startup" checkbox now saves immediately when toggled, so the setting survives force-quit or IDE stop before the normal exit save path runs
+  - fix:Setup wizard now saves its completion state synchronously instead of asynchronously — prevents infinite setup wizard loops when the JVM is force-killed (e.g., IDE red button) before the background save task executes
+  - fix:Setup wizard no longer unconditionally resets "Show Tips at Startup" to true on every run — it only resets tips on actual version updates, not when the wizard appears for other reasons (intent window, associations, etc.)
+  - fix:Add -Dsun.java2d.fontlayout=0 JVM argument to suppress JDK 21 SunLayoutEngine JNI warning spam during SynthComboBoxUI font layout on startup
+  - fix:VPN detection now properly detects Private Internet Access (PIA) on Linux
+  - improvement:HexHivePanel now renders and publishes the visible viewport cubes first, so the Pieces tab paints quickly before the full scrollable bitmap finishes in the background
+  - improvement:HexHivePanel now tracks viewport movement and resizes, rendering only the visible region plus directional lookahead margins instead of repainting off-screen thousands of cubes
+  - improvement:HexHivePanel now keeps a retained full-size backing bitmap and incrementally patches newly needed viewport batches into it, so previously drawn cubes remain visible when scrolling back
+  - improvement:HexHivePanel now prioritizes a smaller visible-band render with directional buffer and shorter row batches before backfilling wider lookahead, reducing transient blank patches while scrolling
+  - improvement:Cache PlayableCell objects in LibraryFilesTableDataLine.getValueAt() to reduce GC pressure
+  - improvement:Use BILINEAR instead of BICUBIC interpolation in LibraryCoverArtPanel for faster cover art scaling
+  - improvement:Remove redundant updatePlayButton() from AbstractActionsRenderer.paintComponent()
+  - improvement:Remove 3 redundant stat() syscalls per file in AbstractDirectoryHolder.isFileVisible()
+  - new:YouTube channel and playlist URLs now open Telluride playlist search mode, and playlist partial results now appear correctly in the Video tab
+  - new:Torrent Creation Dialog now supports piece sizes up to 128 MB with auto-recommendation based on content size — reduces RAM usage when seeding large files like 4K Linux ISOs (#1287)
+  - new:Partial file selection dialog now shows current save folder with "Change..." and "Reset to Default" buttons, allowing per-torrent download location selection (#1256)
+  - removed:GloTorrents search engine (domain gtso.cc is parked and no longer functional)
+  - maintenance:Upgrade org.bouncycastle:bcpkix-jdk18on 1.80 -> 1.83
+  - maintenance:Upgrade com.formdev:flatlaf 3.6 -> 3.7.1
+  - maintenance:Upgrade org.xerial:sqlite-jdbc 3.50.3.0 -> 3.51.3.0
+  - maintenance:Upgrade org.jetbrains:annotations 26.0.2 -> 26.1.0
+  - maintenance:Upgrade JUnit 5.12.2 -> 5.13.4
+  - fix:Cleanup: Remove dead EDT-blocking code from BTDownloadMediator (selectionHasMP4s, selectionIsSingleFile, selectionHasMediaFiles)
+  - fix:Cleanup: Remove unused directoryContainsASinglePlayableFile from LibraryUtils
+  - fix:Cleanup: Remove ancient LWC-1214/1088 try/catch hacks from SearchResultDisplayer
+  - fix:Cleanup: Remove Thread.sleep(50) hack in TransfersTab.ensureDownloadVisible scroll — use revalidate/repaint chain instead
+  - fix:Cleanup: LibrarySearch uses FocusAdapter instead of FocusListener with empty focusLost
+  - fix:Cleanup: Extract mostFrequent() helper in LibraryUtils.suggestPlaylistName — eliminates histogram access duplication
+  - fix:Cleanup: Remove stale TODO comments from LimeTransferHandler, BuddyTextFieldUI, NativeSearchFieldSupport, LibrarySearch
+  - fix:Cleanup: Remove stale DHT announcement TODO in SoundcloudDownload — already implemented via makeTorrentAndDownload with dhtTrackedOnly
+  - fix:Cleanup: Remove 4 identical PatriciaTrie TODO comments — add/remove search pattern is intentional
+  - fix:Cleanup: Remove stale singleton pattern TODO from GUIMediator.shutdown() — instance() call pattern is correct
+  - fix:Cleanup: Remove stale "Implement better" TODO comments from IconManager and NativeFileIconController — current temp-file approach is the standard Java cross-platform solution
+  - fix:Cleanup: Remove stale "Allow more than one" TODO from SearchResultDisplayer — single ChangeListener is sufficient
+  - fix:Cleanup: Remove "make reusable" TODOs from BasicDropTargetListener inner classes — no reuse case needed beyond current package
+  - fix:Cleanup: Remove stale LifecycleManager TODOs — current shutdown infrastructure works correctly
+  - fix:Cleanup: Remove stale StringSetSetting TODO — DRY refactoring not worth the risk for working settings code
+  - fix:Cleanup: Remove stale paintComponent TODO from DonationButtons — current KIFSS approach is sufficient
+
+FrostWire 7.0.3 MAR/25/2026
+  - fix:Bound unbounded image/icon caches to prevent memory leaks
+  - fix:Fix crash when pasting non-video URL into search bar
+  - fix:Fix tray icon issues on Linux KDE Plasma (#845)
+  - fix:Add I2P configuration infrastructure with UI settings panel support
+  - fix:Register I2P settings panel in options dialog
+  - fix:Fix I2PPaneItem return value for applyOptions
+  - fix:Fix bug with Search Tools filter not working
+  - fix:Fix search filter logic to make all filters work independently
+  - fix:Fix wrong speed shown in peers tab by converting bytes/s to KB/s
+  - fix:JDK 26 bundled
+  - fix:Telluride build 44
+
+FrostWire 7.0.2 DEC/28/2025
+  - fix:Fixes bug where seed counts disappeared from torrent search results wrapped in FileSearchResultUIWrapper
+  - fix:Improves search result sorting prioritizing keywords, then seeds/popularity and avoiding irrelevant results on top
+  - fix:Add VPN-Drop protection checkbox to status bar for quick toggle of BitTorrent pause when VPN is disconnected
+  - fix:VPN-Drop protection setting changes and dialog dismissals now properly update status bar checkbox state
+  - fix:Extract VPN-Drop protection logic to VPNDropGuard.applyVPNDropProtection() to avoid code duplication
+  - fix:Cache VPN status in VPNDropGuard to avoid expensive VPNs.isVPNActive() system calls on setting changes
+  - fix:All VPN-Drop protection operations use BackgroundQueuedExecutor to prevent EDT blocking
+  - fix:VPN-Drop protection checkbox now compact with smaller font and clickable "VPN" link to info page
+  - fix:Add VPN-Drop protection check when starting new torrent transfers from search results (button, context menu, and batch download)
+  - fix:Ensure VPN-Drop guard dialog appears when attempting to start new torrent transfers without active VPN
+  - fix:Add VPN-Drop protection check when opening torrent files (.torrent files and magnet links from pasted URLs)
+  - fix:VPN-Drop guard dialog now properly appears when attempting to download torrents from search results
+  - fix:Compact UI layout: VPN status indicator and VPN-Drop protection checkbox now use minimal spacing for cleaner appearance
+  - fix:Ultra-compact VPN icon: Remove button margins for minimal horizontal space usage in status bar
+
+FrostWire 7.0.1 DEC/6/2025
+  - fix:Fixes bug where .torrent files were not saved in the user's torrent folder when starting a download from a search result
+  - fix:Installer now removes old FrostWire 6 installation if present
+  - fix:LanguageUtils.getLocales()
+  - fix:Cache overlay background to eliminate EDT blocking in SlideControlsOverlay
+
+FrostWire 7.0.0 NOV/17/2025
+  - fix:Comprehensive startup performance overhaul - defer heavy class loading and I/O to prevent EDT blocking during initialization (19 EDT violations fixed)
+  - fix:ResourceManager uses deferred image loading instead of synchronous MediaTracker to avoid blocking on image I/O
+  - fix:LibraryCoverArtPanel defers component listener initialization with SwingUtilities.invokeLater()
+  - fix:SearchMediator uses lazy singleton pattern with deferred SearchResultDisplayer creation
+  - fix:MPlayerInstance.runCommand() moved to background thread to avoid Process.waitFor() blocking EDT
+  - fix:SearchResultDisplayer creation deferred with placeholder component to avoid class loading file I/O during tab initialization
+  - fix:SplashWindow preloads OS icons during initialization to avoid file I/O during paint operations
+  - fix:StatusLine defers bandwidth label icon loading to background EDT cycle using SwingUtilities.invokeLater()
+  - fix:ApplicationHeader defers MediaPlayerComponent creation with placeholder panel to prevent class loading during startup
+  - fix:MainFrame defers expensive minimum size calculations to background thread - prevents 2+ second EDT blocking from cascading layout calculations
+  - fix:AbstractTab implements lazy icon loading to defer tab icon loading via SwingUtilities.invokeLater() on first getIcon() call
+  - fix:SearchResultActionsRenderer defers 5 action button icons (play, download, details, speaker) via lazy static initialization with ensureIconsLoaded()
+  - fix:AbstractActionsRenderer defers 3 action button icons (play, download, share) via lazy static initialization with ensureIconsLoaded()
+  - fix:SourceRenderer defers 7 source icons (soundcloud, archive.org, tpb, zooqle, magnetdl, default, 1337x) via lazy static initialization with ensureIconsLoaded()
+  - fix:TransferActionsRenderer defers 2 action button icons (play, share) via lazy static initialization with ensureIconsLoaded()
+  - fix:TransferSeedingRenderer defers 2 seeding icons (seed, loading) via lazy static initialization with ensureIconsLoaded()
+  - fix:TransferDetailFilesActionsRenderer defers 2 file action icons (play, share) via lazy static initialization with ensureIconsLoaded()
+  - fix:PaymentOptionsRenderer defers 4 payment method icons (bitcoin_enabled, bitcoin_disabled, paypal_enabled, paypal_disabled) via lazy static initialization
+  - fix:LogoPanel defers logo_header icon loading via SwingUtilities.invokeLater() with placeholder label
+  - fix:MediaButton defers button icon loading (up and down icons) via SwingUtilities.invokeLater() in loadIcons() method
+  - fix:LimeJFrame defers window icon loading via SwingUtilities.invokeLater() in loadWindowIcon() method
+  - improvement:These EDT fixes significantly improve startup time and responsiveness, especially on resource-constrained systems and older hardware
+  - improvement:Search architecture optimizations - 25-50% reduction in memory allocations
+  - improvement:SizeParser utility consolidates duplicate implementations, 200+ lines of code eliminated
+  - improvement:SearchMatcher memory optimization reduces garbage collection pressure by 25%
+  - improvement:YT pattern static initialization and string operation optimization
+  - maintenance:SearchTimeoutException provides better diagnostics with performer and domain context
+  - maintenance:Search package hierarchy flattened, V2 package consolidated
+  - removed:TorrentDownloads search performer (site offline permanently)
+  - removed:BTDigg search performer (protected by Cloudflare, unable to reliably parse search results)
+  - new:Dynamic SoundCloud client ID and app version fetching from remote server for uninterrupted service
+  - new:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
+  - new:TorrentCSV search performer
+  - new:Knaben Database Search Performer
+  - new:Partial selection file dialog now allows shift-click to select ranges of files in torrents
+  - new:Settings panel to pick location for .torrent files
+  - new:FlatLaf light theme
+  - new:Header bar rearranged, search bar goes to the center, nav buttons on the left, FW Logo first
+  - new:Torrent Transfer > Advanced > Check local data feature. If a file belonging to a torrent is now on disk it can be force checked
+  - maintenance:Mplayer not available in linux warning can now not be shown ever again
+  - removed:Torlock search performer (old site is down, new site is malicious)
+  - removed:LimeTorrents search performer
+  - maintenance:MacEventHandler is now compatible with JDK 23 and JDK 24
+  - maintenance:Archive.org search
+  - maintenance:GloTorrents search
+  - maintenance:Idope search
+  - maintenance:MagnetDL search
+  - fix:Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
+  - new:Strict EDT Mode to catch long running tasks stalling event dispatch thread
+  - removed:FrostWire Media Player custom built-in audio/video player (fwplayer binaries for Windows/macOS/Linux)
+  - removed:MPlayer integration code and process management for audio playback
+  - removed:Player settings panel and configuration options
+  - removed:Playback state tracking and speaker icon indicators in UI components (TransferActionsRenderer, LibraryFilesTableDataLine, SearchResultActionsRenderer, etc.)
+  - removed:Speaker icon assets (speaker.png, speaker_light.png)
+  - new:Audio and video playback now uses the operating system's default media player instead of custom player infrastructure
+  - fix:Moved media checks off EDT; coalesce selection; add EDT I/O guard
+  - fix:Fix in TransferDetailFiles by moving heavy I/O to background thread, would stall app when opening large torrents on startup
+  - fix:Cleanup:removed all remnants of azureus source code
+  - fix:Optimization:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+  - fix:Fixed:logic bug in PerformersHelper.countMatchedTokens()
+  - fix:Cleanup:apple libdispatch removal
+  - fix:Cleanup:deprecated iTunes integration removed after cleanups. Users can manage their own playlists on Apple Music
+  - new:Libtorrent::set_piece_hashes_posix_disk_io to avoid SIGSEGV/SIGBUS leaks to macos when creating torrents
+  - fix:Crash:don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
+  - fix:Crash:StatusLine seedingStatusButton.getText()
+  - fix:Crash:ConcurrentModificationException in Ssl$FWHostnameVerifier
+  - fix:Cleanup:Remove unused sun.awt.X11 classes (linux)
+  - maintenance:Fix javadoc errors, javadoc cleanup
+  - maintenance:All license headers are consistent with GPL 3.0
+  - maintenance:Simplified donations buttons in status bar to a single 'Donate' button
+  - maintenance:Added don't show me again for linux warning when mplayer isn't found
+  - maintenance:Fwplayer_osx.arm64 rebuilt with OpenSSL 3.5.3 support
+  - fix:Speed-up:reuse OkHttpClient instances to unlock connection pooling and reduce GC pressure
+  - fix:Speed-up:Cache torrent-search date parsers to eliminate per-result SimpleDateFormat allocations
+  - fix:Speed-up:Use buffered I/O for large transfers in OkHttpClientWrapper.save and ZipUtils.unzip. Up to 96% CPU savings in sys write calls, 30-50% reduction in CPU during I/O operations, search results should come out a lot faster
+  - fix:Speed-up:Optimize Levenshtein distance allocation footprint in PerformersHelper fuzzy matching
+  - fix:Speed-up:Optimize hot paths for string sanitizers - eliminate regex compilation overhead in search and scrapes (UrlUtils and StringUtils)
+  - fix:Speed-up:Optimize hot paths for Logger, ThreadPool, and collection sizing
+  - fix:Speed-up:Refactor SearchManager tasks to Runnable and remove Thread.yield() from hot path
+  - fix:Fixed:thread leak and data race in UrlUtils.getFastestMirrorDomain
+  - fix:Comprehensive fix for EDT violations in transfers UI with multiple optimization layers
+  - fix:Move BTDownloadModel.refresh() to background thread to prevent EDT blocking during model updates
+  - fix:Add debouncing to BTDownloadDataLine.update() to prevent rapid successive JNI calls
+  - fix:Throttle TransferActionsRenderer state checks to 200ms intervals during table rendering
+  - fix:Move clearable downloads check to background thread in BTDownloadMediator.doRefresh()
+  - fix:Add count caching to BTDownloadModel with background updates every 500ms
+  - fix:Cache active uploads for hidden downloads in BTDownloadRowFilteredModel
+  - fix:Use cached transfer state instead of expensive JNI calls in button state updates
+  - fix:Jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
+  - fix:Jlibtorrent:g++-9 upgraded to g++-11 for linux build
+  - fix:Jlibtorrent:new Sha256Hash::swig()
+  - fix:Jlibtorrent:new SessionManager::find(Sha256Hash) and SessionManager::find(TorrentInfo) methods
+  - fix:Jlibtorrent:built with android NDK r28c with 16K page size support
+  - fix:Android 64-bit binaries are compiled to have 16KB max-page-size
+  - fix:Jlibtorrent:New com.frostwire:jlibtorrent- maven packages for easier integration with gradle/maven
+  - fix:Jlibtorrent:new torrent_handle::get_resume_data() : add_torrent_params
+  - fix:Jlibtorrent:new torrent_handle::get_resume_data(resume_data_flags_t flags) : add_torrent_params
+  - fix:Jlibtorrent:new settings_pack.int_types i2p_inbound_length_variance
+  - fix:Jlibtorrent:new settings_pack.int_types i2p_outbound_length_variance
+  - fix:Jlibtorrent:Jar built with JDK 17 - JAVA_17 compatibility
+  - fix:JlibtorrentBoost 1.88.0 upgrade
+  - fix:Jlibtorrent:OpenSSL 3.5.2 upgrade (from 1.1.1t)
+  - fix:Jlibtorrent:Upgraded SWIG to 4.3.1
+  - fix:Jlibtorrent:Gradle 9.0.0
+  - fix:Dev:junit upgraded from 4.13.1 -> 4.13.2
+  - fix:Lt:add option to send host header in HTTP proxy CONNECT command
+  - fix:Lt:cache DNS failures for a shorter time
+  - fix:Lt:file_renamed_alert is always posted, regardless of alert mask
+  - fix:Lt:add feature to request resume data synchronously
+  - fix:Lt:don't leak file descriptors to child processes (O_CLOEXEC)
+  - fix:Lt:optimize the utp resend
+  - fix:Lt:optimize tracker announcements
+  - fix:Lt:fix handling of invalid filenames
+  - fix:Lt:add support for I2CP inbound.lengthVariance and outbound.lengthVariance tunnel settings
+  - fix:Lt:validate add_torrent_params::save_path at run-time
+  - fix:Lt:use stricter rules for what filenames are valid on Android
+  - fix:Lt:fix applying IP filter to DHT traffic (HanabishiRecca)
+  - fix:Lt:fix race condition when cancelling requests after becoming a seed
+  - fix:Lt:fix performance bug in the file pool, evicting MRU instead of LRU (HanabishiRecca)
+  - fix:Lt:fix bug where file_progress could sometimes be reported as >100%
+  - fix:Jlibtorrent:BDecodeNode: hasList, hasDict, hasString, hasInt, getList, getDict, getString, getInt
+  - fix:Lt:limit piece size in torrent creator
+  - fix:Lt:don't hint FADV_RANDOM on posix systems. May improve seeding performance
+  - fix:Lt:allow boost connect while checking resume data if no_verify_files flag is set
+  - fix:Lt:fix BEP-40 peer priority for IPv6
+  - fix:Lt:fix file pre-allocation when changing file priority (HanabishiRecca)
+  - fix:Jlibtorrent:SWIG interface files have been modularized for better maintainability and readability
+  - fix:Jlibtorrent:Added missing alert types
+  - fix:Jlibtorrent:Introduced typed_bitfield template
+  - fix:Jlibtorrent:Operator renaming for Java compatibility
+  - fix:Jlibtorrent:Included boost_system_error_code.i
+  - fix:Jlibtorrent:Added prepare-macos.sh script
+  - fix:Jlibtorrent:Updated run-swig.sh script
+  - fix:Jlibtorrent:Set TORRENT_ABI_VERSION=4
+  - fix:Jlibtorrent:Libtorrent updated to RC_2_0 (rev:2ab8fedabb7716947edc77958da6d0b5e1040df9)
+  - fix:Jlibtorrent:Android NDK r26d (LTS) upgrade (from r25c)
+  - fix:Jlibtorrent:Added `--swig-only` and `--build-only` options to swig/build scripts
+  - fix:Jlibtorrent:Added `prepare-macos.sh` script for macOS build setup
+  - fix:Jlibtorrent:Updated `run-swig.sh` script for improved SWIG processing
+  - fix:Jlibtorrent:Enhanced exception handling in SWIG interfaces
+  - fix:Jlibtorrent:Fixed issues in file_storage.hpp and ip_filter.hpp
+  - fix:Jlibtorrent:Adjusted build flags and macros for Boost and libtorrent compatibility
+  - fix:Jlibtorrent:Enabled SWIG directors for specific classes
+  - fix:Lt:fix uTP issue where closing the connection could corrupt the payload
+  - fix:Lt:apply DSCP/TOS to sockets before initiating the TCP connection
+  - fix:Lt:assume copy_file_range() exists on linux (unless old glibc)
+  - fix:Lt:fix issue where set_piece_deadline() did not correctly post read_piece_alert
+  - fix:Lt:fix integer overflow in piece picker
+  - fix:Lt:torrent_status::num_pieces counts pieces passed hash check, as documented
+  - fix:Lt:check settings_pack::max_out_request_queue before performance alert
+  - fix:Lt:allow on_unknown_torrent method in the absence of active torrents (new plugin feature added)
+  - fix:Lt:add feature to async_move_storage() to not move files
+  - fix:Lt:fix reject resume data if it contains mismatching info hashes
+  - fix:Lt:fix clear the candidate_cache when clear peer_list
+  - fix:Lt:fix missing python converter for dht::announce_flags_t
+  - fix:Lt:fix issue with web seed connections when they close and re-open
+  - fix:Lt:fallocate() not supported is not a fatal error
+  - fix:Lt:fix proxying of IPv6 connections via IPv4 proxy
+  - fix:Lt:treat CGNAT address range as local IPs
+  - fix:Lt:add stricter checking of piece layers when loading torrents
+  - fix:Lt:add stricter checking of v1 and v2 hashes being consistent
+  - fix:Lt:cache failed DNS lookups as well as successful ones
+  - fix:Lt:add an i2p torrent state to control interactions with clear swarms
+  - fix:Lt:fix i2p SAM protocol parsing of quoted messages
+  - fix:Lt:expose i2p peer destination in peer_info
+  - fix:Lt:fix i2p tracker announces
+  - fix:Lt:fix issue with read_piece() stopping torrent on pieces not yet downloaded
+  - fix:Lt:improve handling of allow_i2p_mixed setting to work for magnet links
+  - fix:Lt:fix web seed request for renamed single-file torrents
+  - fix:Lt:fix issue where web seeds could disappear from resume data
+  - fix:Lt:extend save_resume with additional conditional flags
+  - fix:Lt:fix issue with retrying trackers in tiers > 0
+  - fix:Lt:fix last_upload and last_download resume data fields to use posix time
+  - fix:Lt:improve error messages for no_connect_privileged_ports, by untangle it from the port filter
+  - fix:Lt:fix I2P issue introduced in 2.0.0
+  - fix:Lt:add async tracker status query, post_trackers()
+  - fix:Lt:add async torrent status query, post_status()
+  - fix:Lt:support loading version 2 of resume data format
+  - fix:Lt:fix issue with odd piece sizes
+  - fix:Lt:add async piece availability query, post_piece_availability()
+  - fix:Lt:add async download queue query, post_download_queue()
+  - fix:Lt:add async file_progress query, post_file_progress()
+  - fix:Lt:add async peer_info query, post_peer_info()
+  - fix:Lt:fix uTP streams timing out instead of closing cleanly
+  - fix:Lt:add write_torrent_file_buf() overload for generating .torrent files
+  - fix:Lt:add create_torrent::generate_buf() function to generate into a buffer
+  - fix:Lt:fix copy_file when the file ends with a sparse region
+  - fix:Lt:uTP performance, fix packet loss when sending is stalled
+  - fix:Lt:fix trackers being stuck after session pause/resume
+  - fix:Lt:fix bug in hash_picker with empty files
+  - fix:Lt:uTP performance, prevent premature timeouts/resends
+  - fix:Lt:add option to not memory map files below a certain size
+  - fix:Lt:settings_pack now returns default values when queried for missing settings
+  - fix:Lt:fix copy_file fall-back when SEEK_HOL/SEEK_DATA is not supported
+  - fix:Lt:improve error reporting from file copy and move
+  - fix:Lt:tweak pad file placement to match reference implementation (tail-padding)
+  - fix:Lt:uTP performance, more lenient nagle's algorithm to always allow one outstanding undersized packet
+  - fix:Lt:uTP performance, piggy-back held back undersized packet with ACKs
+  - fix:Lt:uTP performance, don't send redundant deferred ACKs
+  - fix:Lt:support incoming SOCKS5 packets with hostnames as source address, for UDP trackers
+  - fix:Lt:ignore duplicate network interface change notifications on linux
+  - fix:Lt:fix total_want/want accounting when forcing a recheck
+  - fix:Lt:fix merging metadata with magnet links added on top of existing torrents
+  - fix:Lt:add torrent_flag to default all file priorities to dont_download
+  - fix:Lt:fix &so= feature in magnet links
+  - fix:Lt:improve compatibility of SOCKS5 UDP ASSOCIATE
+  - fix:Lt:fix madvise range for flushing cache in mmap_storage
+  - fix:Lt:open files with no_cache set in O_SYNC mode~
+  - fix:Lt:fix issue in use of copy_file_range() on linux
+  - fix:Lt:avoid open-file race in the file_view_pool
+  - fix:Lt:fix issue where stop-when-ready would not close files
+  - fix:Lt:fix issue with duplicate hybrid torrent via separate v1 and v2 magnet links
+  - fix:Lt:added new function to load torrent files, load_torrent_*()
+  - fix:Lt:support sync_file_range() on linux
+  - fix:Lt:fix issue in write_torrent_file() when file size is exactly piece size
+  - fix:Lt:fix file_num_blocks() and file_num_pieces() for empty files
+  - fix:Lt:add new overload to make_magnet_uri()
+  - fix:Lt:add missing protocol version to tracker_reply_alert and tracker_error_alert
+  - fix:Lt:fix privilege issue with SetFileValidData()
+  - fix:Lt:add asynchronous overload of torrent_handle::add_piece()
+  - fix:Lt:default to a single hashing thread, for full checks
+  - fix:Lt:Fix bug when checking files and the first piece is invalid
+  - fix:Lt:fix issue creating a v2 torrent from torrent_info containing an empty file
+  - fix:Lt:make recheck files also update which files use partfile
+  - fix:Lt:add write_through disk_io_write_mode, which flushes pieces to disk immediately
+  - fix:Lt:improve copy file function to preserve sparse regions (when supported)
+  - fix:Lt:add function to truncate over-sized files part of a torrent
+  - fix:Lt:fix directory creation on windows shared folders
+  - fix:Lt:add flag to make add_files() not record file attributes
+  - fix:Lt:deprecate (unused) allow_partial_disk_writes settings
+  - fix:Lt:fix disk-full error reporting in mmap_disk_io
+  - fix:Lt:fixed similar-torrents feature for v2 torrents
+  - fix:Lt:fix potential unbounded recursion in add_completed_job, in disk I/O
+  - fix:Lt:deprecated (unused) volatile_read_cache setting
+  - fix:Lt:fix part files being marked as hidden on window
+  - fix:Lt:on windows, explicitly flush memory mapped files periodically
+  - fix:Lt:fix build with WolfSSL
+  - fix:Lt:fix issue where incoming uTP connections were not accepted over SOCKS5
+  - fix:Lt:fix several issues in handling of checking files of v2 torrents, esp. from magnet links
+  - fix:Lt:make the token limit when parsing metadata from magnet files configurable
+  - fix:Lt:fix issue with stalled pieces on disk full errors
+  - fix:Lt:fix missing python binding for file_progress_flags
+  - fix:Lt:fix torrent_file_with_hashes() to fail when we don't have the piece layers
+  - fix:Lt:restore path character encoding conversion for non UTF-8 locales on linux
+  - fix:Lt:fix use-after-free bug in make_magnet_uri
+  - fix:Lt:add write_torrent_file() to produce a .torrent file from add_torrent_params
+  - fix:Lt:allow loading v2 .torrent files without piece layer
+  - fix:Lt:fix issue with adding v2 torrents with invalid file root hash
+  - fix:Lt:fix piece picker bug causing double-picks with prefer-contiguous enabled
+  - fix:Lt:expose session_params in python bindings
+  - fix:Lt:fix (deprecated) use of add_torrent_params::info_hash
+  - fix:Lt:fix issue creating and loading v2 torrents with empty files. Improves conformance to BEP52 reference implementation
+  - fix:Lt:add new torrent_file_with_hashes() which includes piece layers for creating .torrent files
+  - fix:Lt:add file_prio_alert, posted when file priorities are updated
+  - fix:Lt:fix issue where set_piece_hashes() would not propagate file errors
+  - fix:Lt:add missing python binding for event_t
+  - fix:Lt:add work-around for systems without fseeko() (such as Android)
+  - fix:Lt:add convenience header libtorrent/libtorrent.hpp
+  - fix:Lt:increase default max_allowed_in_request_queue
+  - fix:Lt:fix loading non-ascii filenames on windows with torrent_info constructor (2.0 regression)
+  - fix:Lt:add std::hash<> specialization for info_hash_t
+  - fix:Lt:fix integer overflow in hash_picker and properly restrict max file sizes in torrents
+  - fix:Lt:strengthen SSRF mitigation for web seeds
+  - fix:Lt:add v1() and v2() functions to torrent_info
+  - fix:Lt:fix piece_layers() to work for single-piece files
+  - fix:Lt:fix python binding regression in session constructor flags
+  - fix:Lt:fix unaligned piece requests in mmap_storage
+  - fix:Lt:improve client_data_t ergonomics
+  - fix:Lt:fix issue with concurrent access to part files
+  - fix:Lt:fix attribute in single-file v2 torrent creation
+  - fix:Lt:fix padding for empty files in v2 torrent creation
+  - fix:Lt:add function to ask a file_storage whether it's v2 or not
+  - fix:Lt:fix mtime field when creating single-file v2 torrents
+  - fix:Lt:fix performance regression in checking files
+  - fix:Lt:disable use of SetFileValidData() by default (windows). A new setting allows enabling it
+  - fix:Lt:dropped dependency on iconv
+  - fix:Lt:deprecate set_file_hash() in torrent creator, as it's superceded by v2 torrents
+  - fix:Lt:deprecate mutable access to info_section in torrent_info
+  - fix:Lt:removed deprecated lazy_entry/lazy_bdecode
+  - fix:Lt:stats_alert deprecated
+  - fix:Lt:remove bittyrant choking algorithm
+  - fix:Lt:update userdata in add_torrent_params to be type-safe and add to torrent_handle
+  - fix:Lt:add ip_filter to session_params
+  - fix:Lt:added support for wolfSSL for SHA-1 hash and HTTPS (no Torrents over SSL)
+  - fix:Lt:requires OpenSSL minimum version 1.0.0 with SNI support
+  - fix:Lt:deprecated save_state() and load_state() on session in favour of new
+  - fix:Lt:write_session_params() and read_session_params()
+  - fix:Lt:added support for BitTorrent v2 (see docs/upgrade_to_2.0.html)
+  - fix:Lt:create_torrent() pad_file_limit parameter removed
+  - fix:Lt:create_torrent() merkle- and optimize-alignment flags removed
+  - fix:Lt:merkle_tree removed from add_torrent_params
+  - fix:Lt:announce_entry expose information per v1 and v2 info-hash announces
+  - fix:Lt:deprecated sha1_hash info_hash members on torrent_removed_alert,
+  - fix:Lt:torrent_deleted_alert, torrent_delete_failed_alert and add_torrent_params
+  - fix:Lt:undeprecate error_file_metadata for torrent errors related to its metadata
+  - fix:Lt:remove support for adding a torrent under a UUID (used for previous RSS support)
+  - fix:Lt:remove deprecated feature to add torrents by file:// URL
+  - fix:Lt:remove deprecated feature to download .torrent file from URL
+  - fix:Lt:requires boost >= 1.66 to build
+  - fix:Lt:update networking API to networking TS compatible boost.asio
+  - fix:Lt:overhauled disk I/O subsystem to use memory mapped files (where available)
+  - fix:Lt:libtorrent now requires C++14 to build
+  - fix:Lt:added support for GnuTLS for HTTPS and torrents over SSL
+  - fix:Lt:fix issue where stop-when-ready would not close files
+  - fix:Lt:uTP performance, fix packet loss when sending is stalled
+  - fix:Lt:uTP performance, prevent premature timeouts/resends
+  - fix:Lt:uTP performance, more lenient nagle's algorithm to always allow one outstanding undersized packet
+  - fix:Lt:uTP performance, piggy-back held back undersized packet with ACKs
+  - fix:Lt:uTP performance, don't send redundant deferred ACKs
+  - fix:Lt:fix wanted_done/done accounting when force-rechecking
+  - fix:Lt:expose userdata via torrent_handle (back-port from 2.0)
+  - fix:Lt:fix renaming of filenames that are too long for the filesystem
+  - fix:Lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
+
+FrostWire 6.14.0 MAY/13/2025
+  - fix:Telluride Video Downloader build 38
+  - fix:Filter out search results with no keyword matches, considers fuzzy matches
+  - fix:New app_splash image
+  - fix:FrostWire 6.14.0 build 326
+  - fix:Make download button on slide panel transparent
+  - fix:Black background behind author on slide controls overlay
+  - fix:Don't paint search tabbed pane background on default theme either
+  - fix:Settings button on status bar (StatusLine) now looks good
+  - fix:Dark theme fixes for delete files dialog
+  - fix:Dark theme for search tab headers, refactor checking what theme is on
+  - fix:Robust runtime theme switch & readable dialogs in FlatLaf dark mode
+  - fix:Ignore some exceptions while updating window hierarchy on theme change
+  - fix:General UI cleanup
+  - fix:Background color for main searchboxes fixed when focused
+  - fix:Refine dark theme UI, panel and textfield backgrounds darker
+  - fix:Icon brightening support and clean-up sweep
+  - fix:LibraryExplorer Tree background is darker for dark theme, speaker icon is brightened
+  - fix:TransferDetailGeneral: support dark theme backgrounds and text
+  - fix:Make transfer-detail pieces & tables use dark theme background
+  - fix:Dark theme: unify table, panel and toggle-button backgrounds
+  - fix:Actions for transfers, library and search had icons brightened in dark mode
+  - fix:Transfer seeding renderer icon brightened for dark mode
+  - fix:Enhanced icon repainting capabilities for dark mode
+  - fix:ThemeMediator: Improved handling of table row alternate colors
+  - fix:DefaultTableBevelledCellRenderer: Don't paint border when not selected, removed useless isSelected property
+  - fix:Source renderer fix
+  - fix:Fix progress bar renderer to preserve row striping and selection highlights
+  - fix:FWAbstractJPanelTableCellRenderer: Don't paint beveled border
+  - fix:LibraryFilesTableMediator cleanup
+  - fix:LibraryFilesTableDataLine cleanup
+  - fix:MediaPlayerComponent cleanup, layout uses all vertical space available
+  - fix:Dark theme polish: transparent media panels, dynamic separators, dark result background
+  - fix:Add dark mode gradient colors for application header
+  - fix:Dark-theme table polish – dynamic striping & renderer fixes
+  - fix:ThemeMediator.loadDarkTheme(): define UIManager "Table.alternateRowColor" (15% darker than background)
+  - fix:FWAbstractJPanelTableCellRenderer: use Look-and-Feel selection/alternate colours instead of hard-coded white; keep foreground in sync
+  - fix:SourceRenderer: make cell opaque and apply same dynamic row / selection colours
+  - fix:Basic theme switching working
+  - fix:Updated changelog file
+  - fix:Added script to open test reports
+
+FrostWire 6.13.5 NOV/24/2024
+  - fix:Telluride Video Downloader build 36
+
+FrostWire 6.13.4 OCT/13/2024
+  - fix:Fix flickering and empty label issue in seeding status indicator
+  - fix:Telluride Video Downloader build 35
+
+FrostWire 6.13.3 AUG/21/2024
+  - fix:Java Runtime Environment 22.0.2 update
+  - fix:Telluride Video Downloader build 33
+  - fix:Enhance SSL/TLS Validation with Improved Domain and Certificate Handling
+  - fix:Refactor Image Loading to Use HttpClient for Better Handling
+  - fix:YT search fixed
+
+FrostWire 6.13.2 APR/24/2024
+  - fix:SC search fixed
+  - fix:EZTV search removed
+  - fix:Telluride Video Downloader build 31 with Python 3.12.1
+  - fix:Fixes X Video Download issue where video file names were too long
+  - fix:Java Runtime Environment 22 update
+  - fix:Updated TPB search engine with new domain and HTML parsing
+  - fix:Improved file name handling to truncate names exceeding 255 characters
+  - fix:Updated User-Agent list with more recent agents
+  - fix:Updated Ssl pinned domains
+
+FrostWire 6.13.1 OCT/17/2023
+  - fix:Java Runtime Environment 21 update
+  - fix:Org.xerial:sqlite-jdbc:3.43.0.0 update
+  - fix:Telluride Video Downloader build 29 with Python 3.12.0
+
+FrostWire 6.12.1 MAY/29/2023
+  - fix:Jlibtorrent 1.2.19.0
+
+FrostWire 6.12.0 MAY/25/2023
+  - fix:Telluride Video Search works in Spanish, German, Italian, French countries
+  - fix:Faster app startup
+  - fix:Java Runtime Environment 20.0.1
+  - fix:Deprecation fix: URL(s) -> URI(s).toURL()
+  - fix:Telluride build 26 with Python 3.11.3, faster web video searches
+
+FrostWire 6.11.0 MAR/27/2023
+  - fix:Telluride Video Search
+  - fix:Java Runtime Environment 19.0.2 for Linux binaries
+
+FrostWire 6.10.0 MAR/3/2023
+  - fix:Faster search results
+  - fix:Telluride build 25 with Python 3.11, faster web video searches
+  - fix:New BTDigg search engine
+  - fix:Search results cache now works with sqlite database
+  - fix:MPlayer 1.5.0 with FFmpeg snapshot and OpenSSL 1.1.1s
+  - fix:SoundCloud search fixed
+  - fix:Torrentz2 search fixed
+  - fix:New button on status line right corner to open settings screen
+  - fix:Old buttons to access settings screen from search results and library gone
+  - fix:SearchManager now has 2 executors, one for crawlers another for one off requests
+  - fix:Default audio/video player setting for Linux is mplayer
+  - fix:Misc screen bugfix for Linux
+  - removed:Defunct Zooqle
+  - removed:Audio player playlists along with H2 database dependency
+  - fix:Less threads, less memory usage, more thread pool reusage for background UI related tasks
+  - fix:Express VPN detection fixed for Windows
+  - fix:DEV: New SearchPerformer.isDDOSProtectionActive() logic used in unit tests
+  - fix:CI: jdk19 tests
+  - fix:CI: telluride tests do not run in CI
+  - fix:CI: all search performers have tests
+
+FrostWire 6.9.10 OCT/18/2022
+  - fix:Java Runtime Environment 19.0.1
+  - fix:Telluride build 23
+  - fix:Supports TikTok, IG Reels, YT Stories backups
+  - fix:Com.google.re2j:re2j:1.7
+  - fix:Com.google.code.gson:gson:2.9.0
+  - fix:Com.squareup.okhttp:4.10.0
+  - fix:Dev: org.junit.jupiter:junit-jupiter:5.9.0
+
+FrostWire 6.9.9 SEP/11/2022
+  - fix:Jlibtorrent 1.2.17.0 (boost 1.80, openssl 1.1.1q)
+  - fix:Dev: gradle 7.5.1 upgrade
+  - fix:Jlibtorrent: libtorrent update to RC_1_2 b5873f23b40ef9054b2bd6a4db2a2d327a56d4b1
+  - fix:Lt:fix wanted_done/done accounting when force-rechecking
+  - fix:Lt:expose userdata via torrent_handle (back-port from 2.0)
+  - fix:Lt:fix renaming of filenames that are too long for the filesystem
+  - fix:Lt:made UPnP and LSD code avoid using select_reactor
+  - fix:Lt:fixed tracker connections spinning when hostname lookups stall
+  - fix:Lt:fixed error in pkg-config file generation in Jamfile
+  - fix:Lt:improve backwards compatibility with loading magnet link resume files
+  - fix:Lt:fix bind-to-device for tracker announces and UPnP
+  - fix:Lt:rename peer_tos setting to peer_dscp
+  - fix:Lt:fix bdecode support for large strings (>= 100 MB)
+
+FrostWire 6.9.8 APR/25/2022
+  - fix:Java Runtime Environment 18.0.1 update
+  - fix:TorLock search fixed
+  - removed:Torrent-paradise.ml, moved to IPFS, no longer works with JSON api
+  - fix:Telluride Build 22
+  - fix:Com.squareup.okhttp3:okhttp:4.9.3
+  - fix:Org.junit.jupiter:junit-jupiter:5.8.2
+  - fix:Jlibtorrent 1.2.16.0 (boost 1.79, openssl 1.1.1n)
+  - fix:Lt:upgrade to boost 1.79
+  - fix:Lt:openssl 1.1.1n upgrade
+  - fix:Lt:fix bdecode support for large strings (>= 100 MB)
+  - fix:Lt:send User-Agent field in anonymous mode
+  - fix:Lt:fix python binding for settings_pack conversion
+  - fix:Lt:fix DHT announce timer issue
+  - fix:Lt:use DSCP_TRAFFIC_TYPE socket option on windows
+  - fix:Lt:update default ToS setting according to RFC 8622
+  - fix:Lt:keep trying to announce to trackers even when all fail
+  - fix:Lt:don't disable announcing from local endpoints because of temporary failures
+  - fix:Lt:fix issue in parsing UPnP XML response with multiple forwarding services
+
+FrostWire 6.9.7 JAN/12/2022
+  - fix:New mplayer 12.0.5/ffmpeg 4.2.1 build
+  - fix:MacOS arm64 and x86_64 fwplayer builds
+  - fix:Telluride Cloud Video Downloader build 21 (new macOS arm64 builds)
+  - fix:Faster telluride URL search results
+  - fix:Jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
+  - fix:Lt:don't disable announcing from local endpoints because of temporary failures
+  - fix:Lt:fix issue in parsing UPnP XML response with multiple forwarding services
+  - fix:Lt:cache DNS lookups for SOCKS5 proxy
+  - fix:Lt:fix stalled pieces on disk-full errors
+  - fix:Lt:fix build configuration issue on NetBSD, OpenBSD and DragonFly
+  - fix:Lt:make UTF-8 sanitization a bit stricter. This will re-write invalid UTF-8 code points encoding surrogate pairs
+  - fix:Lt:fix restoring last_seen_complete from resume data
+  - fix:Lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+  - fix:Lt:make remove_torrent flags be treated as flags (instead of an enum)
+
+FrostWire 6.9.6 NOV/20/2021
+  - fix:Option to turn off auto-pasting URLs and magnets in the clipboard to search textbox
+  - fix:JDK 17 compatibility update
+  - fix:Includes JDK 17 runtime
+  - fix:Linux installers now include JDK runtime. No more Java not found issues for Linux users
+  - fix:Com.google.re2j:re2j:1.6
+  - fix:Com.google.code.gson:gson:2.8.8
+  - fix:Com.squareup.okhttp3:okhttp:4.9.2
+  - fix:Org.junit.jupiter:junit-jupiter:5.8.1
+  - fix:Telluride Cloud Video Downloader build 18
+
+FrostWire 6.9.5 SEP/02/2021
+  - fix:Telluride Cloud Video Downloader build 17
+  - fix:SC search fixed
+  - fix:Jlibtorrent-1.2.14.0 update
+  - fix:Dev: common java source code now has Java 11 support. cleanups
+  - fix:Lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+  - fix:Lt:make remove_torrent flags be treated as flags (instead of an enum)
+  - fix:Lt:improve handling of seed flag in PEX messages
+  - fix:Lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
+  - fix:Lt:fix bug in parsing chunked encoding
+  - fix:Lt:fix incorrect reporting of active_duration when entering graceful-pause
+
+FrostWire 6.9.4 JUN/14/2021
+  - fix:Torrent search results when double clicked or downloaded in bulk by default show partial download dialog
+  - fix:Torrentz2 search fixed
+  - fix:SoundCloud search fixed
+  - fix:Files in the transfer detail panel can be dragged out of FrostWire into OS file explorer for copying
+  - fix:Telluride build 16
+  - fix:Recompiled mplayer on macos 11.2.3
+  - fix:Telluride first search waits for Telluride server to fully launch, no more connection refused error
+  - fix:Auto-pasted urls are not deleted from the clipboard. Only auto pasted once
+
+FrostWire 6.9.3 APR/6/2021
+  - fix:Telluride Cloud Video Downloader build 15
+  - fix:Jlibtorrent-1.2.13.0 update
+  - fix:Telluride searches are much faster, telluride runs as an RPC server in background
+  - fix:Openssl 1.1.1j upgrade
+  - fix:Lt:fix incoming TCP connections when using tracker-only proxy
+  - fix:Lt:fix issue with paths starting with ./
+  - fix:Lt:fix integer overflow when setting a high DHT upload rate limit
+  - fix:Lt:improve Path MTU discovery logic in uTP
+  - fix:Lt:fix overflow issue when rlimit_nofile is set to infinity
+  - fix:Lt:Fix cxxflags and linkflags injection via environment variables
+
+FrostWire 6.9.2 FEB/12/2021
+  - fix:Telluride Cloud Video Downloader build 10
+  - fix:Jlibtorrent-1.2.12.0 rebuild to fix linux compatibility issues
+
+FrostWire 6.9.1 JAN/14/2021
+  - fix:Jlibtorrent-1.2.12.0 update
+  - fix:Detects MozillaVPN
+  - fix:Soundcloud search fixed
+  - fix:Lt:fix loading of DHT node ID from previous session on startup
+  - fix:Lt:use getrandom(), when available, and fall back to /dev/urandom
+  - fix:Lt:fix uTP issue acking FIN packets
+  - fix:Lt:validate HTTPS certificates by default (trackers and web seeds)
+  - fix:Lt:load SSL certificates from windows system certificate store, to authenticate trackers
+  - fix:Lt:introduce mitigation for Server Side Request Forgery in tracker and web seed URLs
+  - fix:Lt:fix error handling for pool allocation failure
+  - fix:Windows build reverts to jdk-14
+
+FrostWire 6.8.10 DEC/28/2020
+  - fix:Jlibtorrent-1.2.11.0 update
+  - fix:Jaudiotagger 2.2.5 to 2.2.6 update
+  - fix:Telluride Cloud Video Downloader build 8
+  - fix:Lt: upgraded to openssl 1.1.1l
+  - fix:Fixes issue with Telluride results and emojis in filenames
+  - fix:Fixes bug where transfer file detail actions would go blank when left clicked. (74291c004)
+  - fix:New File Transfer details popup menus: FIles > Explore, Play
+  - fix:Lt: fix issue with moving the session object
+  - fix:Lt: deprecate torrent_status::allocating. This state is no longer used
+  - fix:Lt: fix bug creating torrents with symbolic links
+  - fix:Lt: remove special case to save metadata in resume data unconditionally when added throught magnet link
+  - fix:Lt: fix bugs in mutable-torrent support (reusing identical files from different torrents)
+  - fix:Lt: fix incorrectly inlined move-assignment of file_storage
+  - fix:Lt: add session::paused flag, and the ability to construct a session in paused mode
+  - fix:Lt: fix session-pause causing tracker announces to fail
+  - fix:Lt: fix peer-exchange flags bug
+  - fix:Lt: allow saving resume data before metadata has been downloaded (for magnet links)
+  - fix:Lt: record blocks in the disk queue as downloaded in the resume data
+  - fix:Lt: fix bug in set_piece_deadline() when set in a zero-priority piece
+  - fix:Lt: fix issue in URL parser, causing issues with certain tracker URLs
+  - fix:Lt: use a different error code than host-unreachable, when skipping tracker announces
+
+FrostWire 6.8.9 DEC/08/2020
+  - fix:Soundcloud search fixed
+  - fix:GloTorrents search fixed
+  - fix:Telluride Cloud Video Downloader build 7
+  - fix:Better video format parsing from Telluride extracted metadata
+
+FrostWire 6.8.8 NOV/18/2020
+  - fix:New Telluride build 6 cloud downloader technology
+  - fix:Refreshed welcome screen with search textbox
+  - fix:OpenJDK 15 runtime (Windows, MacOS)
+  - fix:New TorrentParadise search source
+  - fix:New GloTorrents search source
+  - fix:Yify search fixed
+  - fix:Torrentz2 search fixed
+  - fix:MagnetDL search fixed
+  - fix:Soundcloud search fixed
+  - fix:EZTV search fixed
+  - fix:Fixed archive.org broken downloads
+  - fix:Fixes false negative NordLynx/NordVPN detection
+  - fix:All deprecation warnings fixed along with some optimizations
+  - fix:New source renderer icons for 1337x and MagnetDL search sources by Aholicknight
+  - fix:Dev: built with openjdk 15
+  - fix:Dev: gradle-6.7
+
+FrostWire 6.8.7 SEP/15/2020
+  - fix:New jlibtorrent 1.2.10.0 update
+  - fix:OpenJDK 14.0.2 update for Windows and macOS
+  - fix:Lt: improve stat_file() performance on Windows
+  - fix:Lt: fix issue with loading invalid torrents with only 0-sized files
+  - fix:Lt: fix to avoid large stack allocations
+  - fix:Lt: removed deprecated wstring overloads on non-windows systems
+  - fix:Lt: drop dependency on Unicode's ConvertUTF code (which had a license incompatible with Debian)
+  - fix:Lt: fix bugs exposed on big-endian systems
+  - fix:Lt: fix detection of hard-links not being supported by filesystem
+  - fix:Lt: fixed resume data regression for seeds with prio 0 files
+  - fix:Binaries: compiler upgraded from g++-5 to g++-7
+
+FrostWire 6.8.6 AUG/23/2020
+  - fix:New jlibtorrent 1.2.8.0 update
+  - fix:New 1337x search (thanks to @HimanshuSharma789)
+  - fix:New iDope search (thanks to @HimanshuSharma789)
+  - fix:Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
+  - fix:Fixed SC search
+  - fix:Discontinues mplayer video playback, uses os default video player for videos
+  - fix:Com.google.re2j:re2j:1.3 -> 1.4
+  - fix:Com.squareup.okhttp3:okhttp:4.4.1 -> 4.8.1
+  - fix:Com.h2database:h2:1.4.199 -> 200
+  - fix:Lt: validate UTF-8 encoding of client version strings from peers
+  - fix:Lt: don't time out tracker announces as eagerly while resolving hostnames
+  - fix:Lt: fix NAT-PMP shutdown issue
+  - fix:Lt: improve hostname lookup by merging identical lookups
+  - fix:Lt: fix network route enumeration for large routing tables
+  - fix:Lt: fixed issue where pop_alerts() could return old, invalid alerts
+  - fix:Lt: fix issue when receiving have-all message before the metadata
+  - fix:Lt: don't leave lingering part files handles open
+  - fix:Lt: disallow calling add_piece() during checking
+  - fix:Lt: fix incorrect filename truncation at multi-byte character
+  - fix:Lt: always announce listen port 1 when using a proxy
+
+FrostWire 6.8.5 JUN/18/2020
+  - fix:New MagnetDL search provider
+  - fix:Fixed Torrentz2 search
+  - fix:Search improvements
+  - fix:New 'Retry' transfer for failed magnet/torrent downloads with not enough peers
+  - fix:Fixes bug getting source URL from TPB search result
+  - fix:Fixes broken Library local file search
+  - fix:Updated: rej2:1.3, gson:2.8.6, okhttp:4.4.1
+  - fix:New jlibtorrent 1.2.7.0 update
+  - fix:Jlibtorrent upgraded to build with boost 1.73.0
+  - fix:Jlibtorrent upgraded to openssl 1.1.1g
+  - fix:OpenJDK 14 runtime (Windows, Linux), macOS still on OpenJDK 13
+  - fix:Lt: fix incorrect filename truncation at multi-byte character
+  - fix:Lt: always announce listen port 1 when using a proxy
+  - fix:Lt: add set_alert_fd in python binding, to supersede set_alert_notify
+  - fix:Lt: fix bug in part files > 2 GiB
+  - fix:Lt: add function to clear the peer list for a torrent
+  - fix:Lt: fix resume data functions to save/restore more torrent flags
+  - fix:Lt: limit number of concurrent HTTP announces
+  - fix:Lt: fix queue position for force_rechecking a torrent that is not auto-managed
+  - fix:Lt: improve rate-based choker documentation, and minor tweak
+  - fix:Lt: undeprecate upnp_ignore_nonrouters (but refering to devices on our subnet)
+  - fix:Lt: increase default tracker timeout
+  - fix:Lt: retry failed socks5 server connections
+  - fix:Lt: allow UPnP lease duration to be changed after device discovery
+  - fix:Lt: fix IPv6 address change detection on Windows
+  - fix:Lt: fix peer timeout logic
+  - fix:Lt: simplify proxy handling. A proxy now overrides listen_interfaces
+  - fix:Lt: fix issues when configured to use a non-default choking algorithm
+  - fix:Lt: fix issue in reading resume data
+  - fix:Lt: revert NXDOMAIN change from 1.2.4
+  - fix:Lt: don't open any listen sockets if listen_interfaces is empty or misconfigured
+  - fix:Lt: fix bug in auto disk cache size logic
+  - fix:Lt: fix issue with outgoing_interfaces setting, where bind() would be called twice
+  - fix:Lt: add build option to disable share-mode
+  - fix:Lt: support validation of HTTPS trackers
+  - fix:Lt: deprecate strict super seeding mode
+  - fix:Lt: make UPnP port-mapping lease duration configurable
+  - fix:Lt: deprecate the bittyrant choking algorithm
+  - fix:Lt: add build option to disable streaming
+
+FrostWire 6.8.4 JAN/30/2020
+  - fix:OpenJDK 13 runtime (windows,mac)
+  - fix:Soundcloud search and downloads fixed
+  - fix:LimeTorrents search and downloads fixed
+  - fix:New jlibtorrent 1.2.3.0 update
+  - fix:Jlibtorrent updated to boost 1.72.0
+  - fix:Jlibtorrent upgraded openssl to 1.1.1d
+  - fix:Lt:fix erroneous event=completed tracker announce when checking files
+  - fix:Lt:promote errors in parsing listen_interfaces to post listen_failed_alert
+  - fix:Lt:fix bug in protocol encryption/obfuscation
+  - fix:Lt:fix buffer overflow in SOCKS5 UDP logic
+  - fix:Lt:fix issue of rapid calls to file_priority() clobbering each other
+  - fix:Lt:clear tracker errors on success
+  - fix:Lt:optimize setting with unlimited unchoke slots
+  - fix:Lt:fixed restoring of trackers, comment, creation date and created-by in resume data
+  - fix:Lt:fix handling of torrents with too large pieces
+  - fix:Lt:fixed division by zero in anti-leech choker
+  - fix:Lt:fixed bug in torrent_info::swap
+
+FrostWire 6.8.3 DEC/11/2019
+  - fix:Soundcloud search and downloads fixed
+  - fix:Mac: CyberGHost VPN detection false-negative bug fix
+  - fix:Mac, Windows: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
+  - fix:Mac: launcher fixes bug that required legacy Java to be present in the system
+
+FrostWire 6.8.2 AUG/30/2019
+  - fix:Partial downloads now show only the files selected on Transfer details
+  - fix:Archive.org .torrent download errors fixed
+  - fix:TorLock and Torrentz2 search results are magnet based to reduce fetching errors
+  - fix:Mac: All C/C++ source code has been recompiled with MacSDK 10.14
+  - fix:Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
+  - fix:New jlibtorrent 1.2.2.0 update
+  - fix:Jlibtorrent updated to boost 1.71.0
+  - fix:Jlibtorrent upgraded openssl to 1.1.1c
+  - fix:Jlibtorrent compiled with std=c++14 (up from c++11)
+  - fix:Libtorrent:pick contiguous pieces from peers with high download rate
+  - fix:Libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  - fix:Libtorrent:fix integer overflow in http parser
+  - fix:Libtorrent:fix integer overflow in chunked http parser
+  - fix:Libtorrent:factor out and unit test parts of the DHT routing table logic
+  - fix:Libtorrent:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+  - fix:Libtorrent:avoid empty dht routing table buckets
+  - fix:Libtorrent:fix dht_stats_alert routing table stats for multi-homed clients
+  - fix:Libtorrent:fix entry assignment from bdecode_node and lazy_entry
+  - fix:Libtorrent:fix use-after-free issue in socket_type
+  - fix:Libtorrent:fix error code messages when building without deprecated functions
+  - fix:Libtorrent:feature to disable DHT, PEX and LSD per torrent
+  - fix:Libtorrent:fix seeding of random number generator on mingw
+  - fix:Libtorrent:fix issue where trackers from magnet links were not included in create_torrent()
+  - fix:Libtorrent:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+  - fix:Libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  - fix:Libtorrent:don't leak exceptions out of handler callbacks in resolver
+  - fix:Libtorrent:ensure headers build independently
+  - fix:Libtorrent:fix unit template's mutating operators to give them proper ref qualifiers
+
+FrostWire 6.8.1 JUL/23/2019
+  - fix:Time remaining renderer bug fixed
+  - fix:Update system bug fixed
+
+FrostWire 6.8.0 JUL/20/2019
+  - fix:Nyaa search fixed
+  - fix:Soundcloud search and downloads fixed
+  - fix:New Torrentz2 search
+  - fix:OpenJDK 12 runtime (windows)
+  - fix:G+ cleanup
+  - fix:Hundreds of cleanups and fixes to modernize the codebase for Java 12
+  - fix:Jlibtorrent 1.2.1.0
+  - fix:Updated to boost 1.70.0
+  - fix:TPB fallback mirrors support
+  - fix:Libtorrent: make sure session cleanup releases all its references to torrents
+  - fix:Libtorrent: track the mapped port for each NAT mapping transport
+  - fix:Libtorrent: optimize resolve_duplicate_filenames_slow()
+  - fix:Libtorrent: use a more restrictive limit on number of pieces allowed in a torrent
+  - fix:Libtorrent: improve disk I/O logging
+  - fix:Libtorrent: always flush disk I/O job queue before shutdown
+  - fix:Libtorrent: fix typo in validation of reject messages. Make on_choke a bit more defensive
+  - fix:Libtorrent: tighten up validation of dont-have messages
+  - fix:Libtorrent: tighten up validation of reject messages, to ensure consistency of stats counters
+  - fix:Libtorrent: tighten up message size checks
+  - fix:Libtorrent: update symlinks to conform to BEP 47
+  - fix:Libtorrent: source code cleanup, performance and stability
+  - fix:Pixabay search removed
+  - fix:Macos: Rebuilt libSystemUtilities.jnilib shared library for x86_64 arch only
+
+FrostWire 6.7.9 APR/10/2019
+  - fix:Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
+  - fix:Limetorrent search results now have a distinct icon, thanks trollmad3
+  - fix:Archive.org https search
+
+FrostWire 6.7.8 MAR/22/2019
+  - fix:New jlibtorrent 1.2.0.20 with latest libtorrent release
+  - fix:Updated okhttp3 3.12.0 -> 3.14.0
+  - fix:Updated com.h2database 1.4.197 -> 1.4.199
+  - removed:Lucene-core dependency
+  - fix:Library code cleanup
+  - fix:Library playlist search update
+  - fix:Fixes issue detecting the new version of PIA VPN in Windows
+
+FrostWire 6.7.7 JAN/15/2019
+  - fix:New jlibtorrent 1.2.0.19 with latest libtorrent release
+  - fix:Updated okhttp3 3.11.0 to 3.12.0
+  - fix:Updated com.h2database 1.4.193 to 1.4.197
+
+FrostWire 6.7.6 DEC/12/2018
+  - fix:Search: New Nyaa search
+  - fix:Performance upgrades and fixes
+
+FrostWire 6.7.5 NOV/26/2018
+  - fix:Translation updates: Swedish
+  - fix:EZ search fixed
+  - fix:Cleanup and optimizations
+  - fix:Com.google.code.gson:gson 2.8.4 -> 2.8.5 update
+
+FrostWire 6.7.4 SEP/24/2018
+  - fix:New jlibtorrent 1.2.0.18
+  - fix:Translation updates: Croatian
+  - fix:YT search removed
+
+FrostWire 6.7.3 SEP/08/2018
+  - fix:Search: YT fixes
+  - fix:New jlibtorrent 1.2.0.18-RC12
+  - fix:Fixes bug in library playlist rendering when a song had no track number
+
+FrostWire 6.7.2 AUG/22/2018
+  - fix:New jlibtorrent 1.2.0.18-RC11
+  - fix:Library updates: openssl-1.1.1-pre9
+  - fix:New user agent and peer finger print for tracker announcement
+  - fix:Search: YT, Archive.org fixes
+  - fix:UX: Torrent Transfer Detail General > Save Location can be clicked to open
+  - fix:Fixes bug in macOS handling opened files
+  - fix:Translations updated (Ukranian, Norwegian, Turkish)
+
+FrostWire 6.7.1 JUL/24/2018
+  - fix:UX: Torrent Transfer Tracker viewer now tracks DHT, LSD and PEX information
+  - fix:UX: Added border at the top of the global status bar at the bottom of the screen
+  - fix:UX: Transfer tab title, search filter box and filter buttons in the same row
+  - fix:UX: better resizing of transfer detail components
+  - fix:UX: transfer detail component rendering optimizations
+  - fix:UX: fixes bug in search result rendering
+  - fix:UX: window resizing fixes for Transfers tab, Library explorer
+  - fix:Windscribe VPN false-negative detection in Windows fixed
+  - fix:Translations updated
+  - fix:Search fixes
+  - fix:Crash fixed when translating tooltips
+  - fix:Crashes and optimizations
+
+FrostWire 6.7.0 JUL/13/2018
+  - fix:New Torrent Transfer Details components
+  - fix:New Torrent Transfer General viewer
+  - fix:New Torrent Transfer Piece viewer
+  - fix:New Torrent Transfer Files progress viewer
+  - fix:New Torrent Transfer Tracker viewer
+  - fix:New Torrent Transfer Peers viewer
+  - fix:TorrentDownloads search fixed
+  - fix:LimeTorrents search fixed
+  - fix:New jlibtorrent 1.2.0.18-RC9
+  - fix:Italian, French, Portuguese, Spanish translations updated
+  - fix:Crashes and optimizations
+
+FrostWire 6.6.8 JUN/25/2018
+  - fix:Yify search fixed
+  - fix:EZTV search fixed
+  - fix:New jlibtorrent 1.2.0.18-RC7
+
+FrostWire 6.6.7 MAY/22/2018
+  - fix:New Help > Feedback dialog
+  - fix:New jlibtorrent 1.2.0.18-RC5
+
+FrostWire 6.6.6 APR/26/2018
+  - fix:Re2j update to 1.2, search results parsing optimizations
+  - fix:Search filter fixes
+  - fix:New jlibtorrent 1.2.0.18-RC4
+  - fix:Jlibtorrent: updated to boost 1.67.0
+  - fix:Jlibtorrent: updated to OpenSSL 1.1.0h
+  - fix:Jlibtorrent: fix storage initialization
+  - fix:Jlibtorrent: don't perform DNS lookups for the DHT bootstrap unless DHT is enabled
+  - fix:Jlibtorrent: stat files in the disk thread
+  - fix:Jlibtorrent: source code cleanup, performance and stability
+  - fix:Jlibtorrent: issue query block size from torrent before metadata has been received
+  - fix:Jlibtorrent: source code cleanup, performance and stability
+  - fix:Jlibtorrent: honor torrent abort even on file check error
+
+FrostWire 6.6.5 APR/12/2018
+  - fix:Search: Yify fixed
+  - fix:Japanese, Korean translations updated
+
+FrostWire 6.6.4 MAR/20/2018
+  - fix:Fixes Out of memory error trying to clear the search cache database
+  - fix:Avast, IPVanish, CyberGhost, PureVPN, Windscribe VPN detection for Windows
+  - fix:Fixes crash checking VPN status
+  - fix:Fixes possible crash on shutdown
+
+FrostWire 6.6.3 FEB/27/2018
+  - fix:Zooqle search fixes
+  - fix:TorrentDownloads search fixes
+  - fix:LimeTorrents search fixes
+  - fix:Fixes false positive VPN connection detection issue in Windows for PIA and Express VPN
+  - fix:Jlibtorrent 1.0.2.17
+  - fix:Native updates in preparation for Java 9 compatible release
+  - fix:Some VPN detection now being done at the jlibtorrent layer
+  - fix:Cactus VPN, Nord VPN, Avg VPN detection fixed on Windows
+
+FrostWire 6.6.2 JAN/31/2018
+  - fix:New jlibtorrent 1.2.0.16
+  - fix:Fixes SoundCloud search issues
+  - fix:Fixes bug that could cause app startup slowdowns
+  - fix:Windows, Mac: JRE update (1.8.0_121 to 1.8.0_162)
+  - fix:Spanish, Portuguese, Italian and French translation updates
+
+FrostWire 6.6.1 NOV/29/2017
+  - fix:New jlibtorrent 1.2.0.15-RC3
+  - fix:TPB domain update
+
+FrostWire 6.6.0 NOV/1/2017
+  - fix:New jlibtorrent 1.2.0.13-RC14, storage and upnp related crashes fixed
+  - fix:Portuguese translation updated
+
+FrostWire 6.5.9 OCT/25/2017
+  - fix:New VPN Drop Guard feature available in BitTorrent settings
+  - fix:UX: Edit tracker dialog supports basic keyword shortcuts
+  - fix:Networking: fixed issue listening on IPv6 and random port from settings
+  - fix:New jlibtorrent 1.2.0.13-RC10
+  - fix:Fixes 'Send to friend' broken feature, now points to maglnk.xyz domain
+  - fix:Malay translation updated
+
+FrostWire 6.5.8 SEP/22/2017
+  - fix:New jlibtorrent 1.2.0.13-RC4 with improved IPv6 connectivity
+  - fix:Search: New Pixabay image search
+  - fix:Search: YT, SC, EZTV, Torlock, Yify, Zooqle fixed
+  - fix:Networking: Improved SSL compatibility
+
+FrostWire 6.5.7 AUG/10/2017
+  - fix:New jlibtorrent 1.2.0.12-RC1
+  - fix:Fixes issue with SoundCloud audio preview
+
+FrostWire 6.5.6 AUG/10/2017
+  - fix:New jlibtorrent 1.2.0.11-RC5
+  - fix:Search: EZTV, Torlock, Zooqle engines fixed
+  - fix:Search: BTJunkie removed
+  - fix:Download: Yify magnets can now be found in DHT
+  - fix:Fixes OTA update system bug
+
+FrostWire 6.5.4 JUL/25/2017
+  - fix:YT search fixed
+  - fix:Playlist Select-All songs keyboard shortcut bug fixed
+  - fix:Slovenian translation update
+
+FrostWire 6.5.3 JUN/21/2017
+  - fix:New jlibtorrent 1.2.0.11-RC1
+  - fix:Fixed Thread pool max size issue
+  - fix:Serbian, Albanian, Japanese, Korean translations updated
+
+FrostWire 6.5.2 JUN/6/2017
+  - fix:New jlibtorrent 1.2.0.9-RC5
+  - fix:BTJunkie search resurrected
+  - fix:Monova, Torlock search engines fixed
+  - fix:ExtraTorrent search discontinued, RIP
+  - fix:Swedish, Nepalese translations updated
+
+FrostWire 6.5.1 MAY/18/2017
+  - fix:YT search fixed
+  - fix:Javascript parser updates
+  - fix:Romanian, Bulgarian, Bengali, Danish, Greek translations updated
+
+FrostWire 6.5.0 MAY/09/2017
+  - fix:Issue where transfers would dissapear until new transfer was added fixed
+  - fix:Cleanup, optimizations in transfer managment
+  - fix:Swedish translation (thanks Josef Andersson)
+  - fix:Simplified Chinese, Vietnamese, Ukrainian, Tagalog, Thai translations updated
+
+FrostWire 6.4.9 APR/28/2017
+  - fix:YT search fixes
+  - fix:Turkish, Dutch, Russian translations updated
+
+FrostWire 6.4.8 APR/21/2017
+  - fix:New jlibtorrent 1.2.0.9-RC1
+  - fix:New Zooqle search
+  - fix:Monova, TorLock, YT search fixed
+  - fix:Mininova search discontinued
+  - fix:Freeze/Slowdown on shutdown fixed
+
+FrostWire 6.4.7 APR/05/2017
+  - fix:New jlibtorrent 1.2.0.7-RC3
+  - fix:Spanish, Portuguese, French, Italian, German, Dutch translations updated
+  - fix:Windows, Mac: JRE update (1.8.0_102 -> 1.8.0_121)
+  - fix:BitSnoop search removed
+
+FrostWire 6.4.6 MAR/7/2017
+  - fix:New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
+  - fix:New revision of jlibtorrent 1.2.0.6 fixes BitTorrent bugs
+  - fix:New piece size selection on torrent creation dialog
+  - fix:Library > Playlists UI improvements. Support to display lyrics when available
+  - fix:BTJunkie.eu search discontinued
+  - fix:Fixes issues with SoundCloud search
+  - fix:FrostWire wizard is now displayed when a new build number is detected
+  - fix:Jlibtorrent version number available in about window
+  - fix:ALPHA: New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
+
+FrostWire 6.4.5 FEB/13/2017
+  - fix:New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues
+
+FrostWire 6.4.4 JAN/31/2017
+  - fix:New "All Free Downloads" button on welcome screen lets users explore all previous
+  - fix:Fixes issue with YouTube search
+  - fix:Fixes issue with VPN detection for Mac/Linux after PIA/Express VPN updates
+  - fix:Fixes issue with PIA VPN detection in Windows when advanced connection kill-switch enabled
+  - fix:Fixes issue where the FrostWire update message wouldn't be shown until the next session
+
+FrostWire 6.4.3 JAN/12/2017
+  - fix:Fixes issue with YouTube search
+  - fix:Fixes issue with ExtraTorrent search
+  - fix:Fixes issue where trackers would not be saved correctly when creating a torrent
+  - fix:New jlibtorrent 1.2.0.5
+
+FrostWire 6.4.2 DEC/08/2016
+  - fix:Fixes Archive.org, SoundCloud search
+  - fix:Starred playlist moved down to playlist explorer
+  - fix:Playlist explorer right click popups show as least actions as possible
+  - fix:Playlist management bug fixes
+  - fix:H2 database update (1.4.193)
+  - fix:Gson upgraded to 2.8.0
+  - fix:Cleanup, and performance upgrades
+
+FrostWire 6.4.1 NOV/15/2016
+  - fix:New jlibtorrent 1.2.0.4
+  - fix:Fixes YT search
+  - fix:Crash fixes and performance upgrades
+
+FrostWire 6.4.0 SEP/17/2016
+  - fix:New jlibtorrent 1.2.0.0
+  - fix:Fixes media player for macOS Sierra (10.12)
+  - fix:Improved transfer progress calculation
+  - fix:Fixes issue showing active transfers on launch
+  - fix:Crash fixes
+
+FrostWire 6.3.6 SEP/16/2016
+  - fix:New Search Engine: LimeTorrents
+  - fix:New jlibtorrent 1.1.1.38 (based on libtorrent 1.1.1)
+  - fix:Fixes Monova search
+  - fix:Fixes issues opening torrent files with extension names not in lowercase
+  - fix:Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
+  - fix:Send to friend dialog now appears on the same screen as the main
+  - fix:Fixes bug in media player where share button wasn't hidden when playback
+  - fix:Support for build number based updates (not just version numbers)
+
+FrostWire 6.3.5 AUG/18/2016
+  - fix:New jlibtorrent 1.1.0.37
+  - fix:Fixes download issues with BitSnoop search results
+  - fix:KAT search removed
+  - fix:Updated Java Runtime Environment (1.8-b102)
+  - fix:Codebase cleanup
+  - fix:Search result table cells have more padding for readability
+  - fix:Clicking on the status bar speed indicator shows active transfers
+  - fix:Fixed internal magnet downloads showing up in transfers (windows only)
+
+FrostWire 6.3.4 JUL/18/2016
+  - fix:Fixes YT search issues
+  - fix:New media player based on mplayer 1.3.0 and ffmpeg 3.0 fixes
+
+FrostWire 6.3.3 JUL/05/2016
+  - fix:Fixes freeze issue
+  - fix:Fixes YT search issues
+
+FrostWire 6.3.2 JUN/25/2016
+  - fix:Fixes YT search issues
+  - fix:New jlibtorrent 1.1.0.35
+  - fix:Crash fixes
+
+FrostWire 6.3.1 JUN/16/2016
+  - new:"View > Search/Transfers split screen" option
+  - fix:New jlibtorrent 1.1.0.34
+  - fix:Jlibtorrent: fixed crash on invalid input in http_parser
+  - fix:Jlibtorrent: early resume data reset when fatal_disk_error
+  - fix:Jlibtorrent: optimize allow-fast logic
+  - fix:Jlibtorrent: fixed inverted priority of incoming piece suggestions
+  - fix:Jlibtorrent: fixed bug related to flag_merge_resume_http_seeds flag
+  - fix:Jlibtorrent: don't add peers from url if add_torrent_impl returns invalid handle
+  - fix:HTTP client improvements
+  - fix:EZTV fixes
+  - fix:New icon for TorrentDownloads search results
+
+FrostWire 6.3.0 JUN/02/2016
+  - fix:Greatly improved seeding connectivity. Seed and share magnets!
+  - fix:New transfers tab, allows you to filter transfers by state and keywords
+  - fix:Finished cloud transfers are seedeable
+  - fix:If seeding setting is active, finished cloud transfers are seeded
+  - fix:Improved 'Search for Keywords' suggestions for episodic queries
+  - fix:New jlibtorrent 1.1.0.31
+  - fix:Spanish, Portuguese translations updated
+  - fix:Fixes Torlock search
+  - fix:EZTV no longer returns irrelevant results
+  - fix:New Search Engine: TorrentDownloads.me
+
+FrostWire 6.2.4 APR/15/2016
+  - fix:Fixes Monova search
+  - fix:Fixes EZTV search
+  - fix:Fixes YouTube search
+  - fix:Fixes bug opening certain YT preview URLs
+  - fix:New jlibtorrent 1.1.0.24 with SSL security updates
+  - fix:Jlibtorrent: multithreaded disk i/o and hashing
+  - fix:Jlibtorrent: more efficient alert allocation
+  - fix:Jlibtorrent: experimental support for mutable torrents (BEP 38)
+  - fix:Jlibtorrent: 5x faster torrent bcoder/bdecoder
+  - fix:Jlibtorrent: improved shutdown
+  - fix:Jlibtorrent: SSL over uTP supported
+  - fix:Jlibtorrent: countless scalability updates, seed tens of thousands of
+
+FrostWire 6.2.3 MAR/31/2016
+  - fix:New share action in Library. Create, seed and share DHT-based torrent
+  - fix:New jlibtorrent 1.1.0.22
+  - fix:Fix preparing YT m4a's author field
+  - fix:Jlibtorrent: fix issue in checking outgoing interfaces
+  - fix:Jlibtorrent: optimize enumeration of network interfaces on windows
+  - fix:Jlibtorrent: improve reliability of binding listen sockets
+  - fix:Jlibtorrent: support SNI in https web seeds and trackers
+  - fix:Jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet
+  - fix:Dropped rxjava library. KISS
+
+FrostWire 6.2.2 FEB/12/2016
+  - fix:YT search fixes
+  - fix:New jlibtorrent 1.1.0.20
+  - fix:Player playback loop modes working as expected again
+  - fix:Portuguese translation update. Thanks Alejandro
+
+FrostWire 6.2.1 JAN/13/2016
+  - fix:Fixes issue where a corrupted .torrent inside the libtorrent folder
+  - fix:Fixes issue where partial downloads from search results would download
+  - fix:Fixes bug on search results display where action cell would dissapear
+  - fix:New jlibtorrent 1.1.0.19
+  - fix:New playlists now sort songs by track number if track number available
+
+FrostWire 6.2.0 JAN/05/2016
+  - fix:New jlibtorrent 1.1.0.16
+  - fix:Updated okhttp to 2.7.1
+  - fix:TPB fixed
+  - fix:YT fixed
+
+FrostWire 6.1.9 DEC/21/2015
+  - fix:Fixes Youtube search issues
+  - fix:New jlibtorrent 1.1.0.15
+  - fix:Shared maglnk url shortening not done with Bit.ly anymore
+  - fix:Library now remembers your last media type selection for the next session
+  - fix:Fixes event handling bug on "Create New Playlist" dialog for MacOSX
+  - fix:New FrostWireInputDialog
+
+FrostWire 6.1.8 DEC/06/2015
+  - fix:New status/control transfer buttons to Seed and Share transfers
+  - fix:New 'Close All Tabs' action for search result tabs
+  - fix:Youtube search updates
+  - fix:Fixes issues with playlists in Library
+  - fix:Minor user interface adjustments on Library tab
+  - fix:Jlibtorrent library updates
+
+FrostWire 6.1.7 NOV/11/2015
+  - fix:Youtube audio search fixed
+  - fix:New 'Close Tab' action for search result tabs
+  - fix:New 'Close Other Tabs' action for search result tabs
+  - fix:New 'Close Tabs to the Right' action for search result tabs
+
+FrostWire 6.1.6 NOV/04/2015
+  - fix:Fixes drag and drop freezes introduced by new Java Runtime Environment 1.8.0_60
+  - fix:Fixes SoundCloud search
+  - fix:Fixes TPB search
+  - fix:Fixes BTJunkie search
+  - fix:Fixes TorLock search
+  - fix:Updates to Spanish and Romanian translations
+  - fix:Chat button on header moved to Tools menu. More space for search bar
+
+FrostWire 6.1.5 SEP/25/2015
+  - fix:New http engine based on okhttp, uses pooled connections, less threads,
+  - fix:Libtorrent/jlibtorrent core update (v 1.1.0.9)
+  - fix:Fixes KAT search
+  - fix:Fixes Bitsnoop search
+  - fix:Fixes EZTV search
+  - fix:Removes Radio functionality from Library
+  - fix:When the search options are opened, the keyword textfield is autofocused
+  - fix:Java Runtime upgrade to v1.8.0_60
+  - fix:Codebase cleanup and refactors
+
+FrostWire 6.1.4 AUG/14/2015
+  - fix:Libtorrent/jlibtorrent core update (v 1.1.0.5)
+  - fix:Torrent settings issues fixed
+  - fix:Fixes TorLock search
+  - fix:Considerably faster search source processing (new regex engine)
+  - fix:Fixes YouTube search
+
+FrostWire 6.1.3 JUL/29/2015
+  - fix:Libtorrent/jlibtorrent core update
+  - fix:Archive.org downloads are pausable/resumable
+  - fix:Soundcloud search & download API update
+  - fix:Hungarian translation update
+  - fix:Simplified seeding settings. No more need to treat handpicked/partial
+  - fix:Fixes crash when setting default save folder to the root
+
+FrostWire 6.1.2 JUN/24/2015
+  - fix:Search performance improvements. New RxJava-based implementation
+  - fix:Search box suggestions improved
+  - fix:New Check/uncheck all search engines checkbox
+  - fix:TorLock search fixed
+  - fix:Added SSL (https) support for torrent web seeds
+  - fix:Options window remembers last pane opened
+  - fix:Fixes painting issues when searching Starred audio files on the library
+  - fix:Frostwire-jlibtorrent library updates
+  - fix:Library user experience bug fixes
+
+FrostWire 6.1.1 MAY/12/2015
+  - fix:TPB search fixed
+  - fix:KAT search fixed
+  - fix:Monova search fixed
+  - fix:Bitsnoop downloads fixed
+  - fix:BTJunkie downloads fixed
+  - fix:EZTV search engine removed after scammers took over
+  - fix:YouTube search fixes for non-english users
+  - fix:Russian translation update
+
+FrostWire 6.1.0 MAY/7/2015
+  - fix:YouTube search fixes
+  - fix:Domain alias manager removed
+
+FrostWire 6.0.9 MAY/5/2015
+  - fix:Jlibtorrent updates
+  - fix:Crash fixes
+
+FrostWire 6.0.8 APR/24/2015
+  - fix:Significant improvements in search result availability
+  - fix:Faster Bitsnoop, Extratorrent and KAT individual file search results
+  - fix:Reduced use of DHT network for search
+  - fix:Faster torrent download start time
+  - fix:Fixes download error on some Archive.org search results
+  - fix:Fixes Yify search
+  - fix:Misc fixes in Library functionality
+  - fix:Crash fixes
+
+FrostWire 6.0.7 APR/08/2015
+  - fix:New feature: Preview while you download
+  - fix:Memory and CPU savings when parsing search results on some search engines
+  - fix:BTJunkie fixed
+  - fix:TPB search fixed
+  - fix:KAT search fixed
+  - fix:Monova search fixed
+  - fix:Fixes bug where soundcloud, archive.org audio downloads would not be automatically
+  - fix:Croatian translation updates
+  - fix:Torrent creation and parsing now done using frostwire-jlibtorrent api. More
+  - fix:Fixes run on startup issue on Windows. Thanks to @win32re
+  - fix:Upgraded java virtual machine to 1.8.0_40 with hundreds of fixes and upgrades
+  - fix:Upgraded H2 database engine
+  - fix:Upgraded frostwire-jlibtorrent to the latest code from libtorrent
+  - fix:UX-improvement: A repeated search will honor active search engines
+
+FrostWire 6.0.6 FEB/17/2015
+  - fix:Fixes bug where default save location for torrents would not be accounted for
+  - new:When changing default save location, any ongoing torrent transfers are
+  - fix:Romanian and Finnish translation updates
+  - new:Option to turn off Bittorrent DHT
+  - fix:YT search upgrades
+  - new:Supports shortened y2u.be url searches
+  - fix:OSX: When shutting down to start the installer for an update
+
+FrostWire 6.0.5 JAN/28/2015
+  - fix:Fixes out of memory crash and freeze when importing lots of songs from the FrostWire
+  - removed:Litecoin and Dogecoin from torrent creation dialog, Bitcoin and payment
+  - fix:Remove Download and Data now enabled for http downloads too
+  - fix:Fixes possible errors for SoundCloud downloads
+  - fix:Updates on Hungarian and Romanian translations
+  - fix:Fixes YT search issues
+  - fix:New mplayer binaries with HTTPS support
+
+FrostWire 6.0.4 JAN/16/2015
+  - fix:Implements torrent loading algorithm to avoid CPU overuse when checking
+  - fix:When transfers are finished they no longer show as 'Paused',
+  - fix:Fixes issues with incomplete files
+  - fix:Fixes issues importing too many songs to iTunes playlist
+  - fix:Fixes issue on which adding a whole torrent after starting a partial
+
+FrostWire 6.0.3 DEC/3/2014
+  - fix:Solves issue getting correct single file location from transfer manager
+  - fix:Improved MD5 verification. Thanks @abderraouf-adjal
+  - fix:Important UI transfer related actions restored for Linux users
+  - fix:Updated frostwire-jlibtorrent libraries,
+  - fix:CPU usage reduced managing transfer items
+  - fix:Croatian, Bulgarian, Polish, translation updates
+  - fix:More cleanups and refactors
+
+FrostWire 6.0.2 NOV/19/2014
+  - fix:Maximum concurrent torrent download settings defaults raised to 10
+  - fix:KAT search fix
+  - fix:Prevents possible out of memory error
+  - fix:Croatian translation update
+  - fix:Minor refactors
+
+FrostWire 6.0.1 NOV/17/2014
+  - fix:Fixes YouTube download Error
+  - fix:Updated splash screen
+  - fix:Misc. bugs
+  - fix:Croatian translation updates. Thanks @win32re, @darthxjanus
+  - fix:Polish translation updates. Thanks @nalesnikld, @paulinka
+  - fix:Spanish translation updates
+
+FrostWire 6.0.0 NOV/10/2014
+  - fix:New BitTorrent engine based on frostwire-jlibtorrent,
+  - fix:Fixes EzTV search, now with https support
+  - fix:Multiple bug fixes
+  - fix:Improved OS event handling in MacOSX
+  - fix:Extensive cleanup
+  - fix:Fixes issues opening .torrents and magnets outside of FrostWire
+  - fix:Icons refreshed
+  - fix:Russian translation updates. Thanks @X-NicON
+  - fix:Croatian translation updates. Thanks @win32re, @darthxjanus
+  - fix:Polish translation updates. Thanks @nalesnikld, @paulinka
+  - fix:Simplified Chinese translation updates. Thanks @eudaemon01
+  - fix:German translation updates. Thanks @paulinka
+
+FrostWire 5.7.7 OCT/01/2014
+  - new:VPN connection status indicator
+  - new:Stop media playback by long pressing play/pause button
+  - fix:Freeze when opening FrostWire from the first time out of
+  - fix:Bug where files couldn't be played with the main player button
+  - fix:Bug where the speaker icon on the library would still show
+  - fix:Bug after 5.7.5 in which the buttons of the Create Torrent
+  - fix:Fixes issue on Linux when player window pixel translucency could
+  - fix:Fixes Null Pointer Exception when trying to shutdown and hide
+  - fix:Fixes issue where user could not create new playlist by dropping
+  - fix:Updated MigLayout source code to version 4.0
+
+FrostWire 5.7.6 AUG/21/2014
+  - new:Filter search results by file extension, source name
+  - fix:UI: Now table rows have a subtle bevel effect
+  - fix:UI: Adds support for full screen mode on Mac OSX. Thanks to Tim Farris
+
+FrostWire 5.7.5 AUG/11/2014
+  - fix:Improved mp4 parser
+  - fix:Improved cloud search results
+  - fix:Now FrostWire runs with Java8 technology
+  - fix:Fixes player control layout issues when resizing the main window
+  - fix:Fixes soundcloud url track/set downloads
+  - fix:Fixes possible cloud download errors
+
+FrostWire 5.7.4
+  - fix:Fixes issues with youtube downloads
+  - fix:Recovered ability to download soundcloud urls
+  - fix:Can download entire soundcloud playlists from playlist url
+  - fix:Fixed broken Torrents.fm search
+  - fix:Updated Gson library, included the sources into our repo
+
+FrostWire 5.7.3 MAY/23/2014
+  - fix:New Yifi search
+  - fix:Added Canonical Peer Priority support. (BEP40)
+  - fix:Fixed broken EZTV search
+  - removed:Apache httpclient and httpcore libraries
+
+FrostWire 5.7.2 APR/11/2014
+  - fix:UTP support enabled
+  - fix:Multiple crash fixes
+  - fix:UX: playable single file torrents now can be played from transfer list
+  - fix:UX: Fixes UI Thread freeze when opening Options > Search
+  - fix:UX: Better error reporting when a torrent can't be fetched from a
+  - fix:Spanish translation update by @dennistobar
+
+FrostWire 5.7.1 MAR/12/2014
+  - fix:Wi-Fi sharing discovery improved considerably with JmDNS
+  - fix:Improvements in .torrent creation window:
+  - fix:Transfers and Library tables now able display Tips/Payment options column
+  - fix:Transfers and Library tables now able display License column
+  - fix:Updated Torrents.fm search engine
+  - removed:Clearbits search engine, service offline for ~2 months now
+
+FrostWire 5.7.0 JAN/17/2014
+  - fix:Updated BitTorrent engine from Azureus/Vuze project
+  - fix:New Torrents.fm meta search integration
+  - fix:Brings back cloud downloads by entering url on search box or open dialog
+  - fix:Chat Tab gone. Chat button now points to http://frostwire.com/chat
+
+FrostWire 5.6.9 DEC/2/2013
+  - fix:Insanely faster cloud search results
+  - fix:Significant memory optimizations on search result parsing and display
+  - removed:JDownloader libraries, less complexity, lighter app
+  - fix:Cloud audio downloads are much smaller, no audio demuxing necessary from
+  - fix:Cloud video DASH download support
+  - fix:Smarter playlist name suggestion algorithm takes into account ID3 tags
+  - fix:Fixes bug where new playlists wouldn't be saved if default name was used
+
+FrostWire 5.6.8 NOV/11/2013
+  - fix:Fixes cloud search issues
+  - fix:Considerable Spanish translation updates by @dennistobar
+
+FrostWire 5.6.7 NOV/4/2013
+  - fix:New Advanced Feature: Edit Trackers
+  - fix:New Advanced Feature: Scrape Trackers
+  - fix:New Advanced Feature: Update Trackers
+  - fix:New BitSnoop meta search
+  - fix:New TorLock meta search
+  - fix:New EZTV meta search
+  - fix:Fixes Monova meta search
+  - fix:Removes ISOHunt meta search
+  - fix:Tips of the day updated
+  - fix:Updated Catalonian flag
+
+FrostWire 5.6.6 OCT/11/2013
+  - fix:Fixes ExtraTorrent meta search
+  - fix:Polish translation updated
+  - fix:New support for anonymous user experience statistics
+
+FrostWire 5.6.5 SEP/25/2013
+  - fix:Upgrades Soundcloud search, download, streaming
+  - fix:Fixes issue when starting downloads made of multiple single files
+  - fix:When opening finished transfers on the library with a double click
+  - fix:Fixes bugs where magnets crawled would leave .torrent files behind
+
+FrostWire 5.6.4 SEP/03/2013
+  - fix:Fixes issues parsing some cloud urls
+  - fix:Fixes issues with soundcloud meta search
+  - fix:Spanish translation updated
+  - fix:French translation updated. Thanks @jeromemorignot
+  - fix:Portuguese translation updated. Thanks @tati110
+  - fix:Brazilian Portuguese translation updated. Thanks @tati110
+  - fix:Arabic translation updated. Thanks @nisrmasr
+  - fix:Turkish translation updated. Thanks @Serrae
+
+FrostWire 5.6.3 AUG/04/2013
+  - fix:New Feature: Preview audio search results from Archive.org
+  - fix:New Feature: Decide wether or not to seed handpicked files
+  - fix:New Hacker Feature: Change the location of FrostWire's settings folder
+  - fix:Fixes bug where the internet search box would be disabled after
+  - fix:Updated shutdown screen lets users know about Android app when they
+
+FrostWire 5.6.2 JUL/04/2013
+  - fix:Improved readability of stream sources in player title
+  - fix:Fixed bug where media source icon for internet streams wouldn't be shown
+  - fix:UX Patch: New 'Search' tab acts also as a search button
+
+FrostWire 5.6.1 JUN/20/2013
+  - fix:New Feature: New simplified, more responsive, faster user interface
+  - fix:New Feature: Audio player can detect Facebook and Twitter urls
+  - fix:Fwplayer.exe improved unicode and HLS (Http Live Streaming) support
+  - fix:New Feature: Change font size with Ctrl/Cmd + '+', Ctrl/Cmd + '-'
+  - fix:New Feature: Close search tabs with Ctrl/Cmd + 'w'
+  - fix:New Feature: Switch search tabs with Ctrl+Tab, Ctrl+Shift+Tab
+  - fix:New Feature: Switch search tabs with Cmd+Shift+[, Cmd+Shift+]
+  - fix:New Feature: Search engines can be disabled in global options
+  - fix:Improved and optimized table rendering for search results and library files
+  - fix:Refreshed presentation of search results
+  - fix:New splash screen format
+  - fix:Fixed issue related to smart search configuration
+  - fix:Fixed NPE that would cause library table rendering issues
+  - fix:Fixed NPE while searching in starred
+  - fix:Fixed popup menu in search result displayer
+  - fix:Fixed DnD between playlists (some inconsistencies with order index)
+  - fix:All FrostWire libraries now come in a single FrostWire.jar file
+  - fix:Major cleanup of the FrostWire code base
+
+FrostWire 5.5.6 APR/22/2013
+  - fix:New Feature: Includes search results from archive.org, which indexes
+  - fix:New Feature: playlist songs can be re-ordered with drag and drop
+  - fix:New Feature: all songs in a playlist can now be exported to a folder
+  - fix:Upgrade: Improved Unicode support for Chinese characters
+  - fix:Upgrade: mplayer update for unicode character file playback support
+  - fix:Upgrade: Search architecture upgrade for much faster search results
+  - fix:Upgrade: Considerably faster mp3,mp4 parsing in the library, creating
+  - fix:Upgrade: New more explicit Wi-Fi sharing icons
+  - fix:Upgrade: Updated radio station database
+  - fix:Upgrade: up to 20% faster listing of files in the Library
+  - fix:Upgrade: Video player upgrades for better experience
+  - fix:Bug fix: screen-saver no longer kicks in during video playback
+  - fix:Bug fix: UPnP Wi-Fi sharing discovery consumes 84% less CPU on
+  - fix:Bug fix: X11 related error fix
+  - fix:Bug fix: Number of files being shared includes the number of torrents
+  - fix:Bug fix: Library search issues related to unicode characters
+  - fix:Bug fix: Multiple null pointer exceptions and crashes fixed
+  - fix:Bug fix: Fixed rendering issue related to wrong parsing of bitrate
+  - fix:Upgrade: (Developers) ant compilation scripts cleanup
+  - fix:Upgrade: (Developers) use of 'frostwire-commons' repository to share
+
+FrostWire 5.5.5 FEB/28/2013
+  - fix:Bug fix: Null pointer exceptions in Media Player
+  - fix:Bug fix: Multiple User Interface thread violations fixed
+  - fix:Bug fix: Setup Wizard painting issues in Linux resolved
+
+FrostWire 5.5.4 FEB/21/2013
+  - fix:New Feature: extract audio (.m4a) from (.mp4) videos on right click
+  - fix:New Core Feature: HTTP resumeable large transfer support
+  - fix:Upgrade: Default save folder for cloud downloads is updated without
+  - fix:Upgrade: 'Repeat song' playback mode now available
+  - fix:Upgrade: Enriched promotion display, now with audio and video previews and
+  - fix:Upgrade: binary compatibility improved for Windows releases
+  - fix:Bug fix: if default save folder is changed it's now part of library scanned
+  - fix:Bug fix: smart search engine wasn't notifying when it was done if there
+  - fix:Bug fix: several crashes and errors fixed
+  - fix:Bug fix: partial download dialog for cloud downloads would sometimes appear
+  - fix:Bug fix: out of memory error by UPnP-cling creating an infinite number
+
+FrostWire 5.5.3 FEB/05/2013
+  - fix:Bug fix: freeze on Windows XP. (Windows release only)
+
+FrostWire 5.5.2 JAN/15/2013
+  - fix:Upgrade: Now 'Movies' or 'My Videos' folder is included by default on new
+  - fix:Upgrade: The Smart Search engine can now be disabled. No torrents will be
+  - fix:UI fix: Video Player Window Title now shows the file name being played
+  - fix:UI fix: Library > "Finished Downloads" renamed to "Default Save Folder"
+  - fix:UI fix: When browsing another device on the Wi-Fi network newest shared
+  - fix:Bug fix: On first installation FrostWire wasn't able to add 'From Devices'
+  - fix:Bug fix: When restoring default settings FrostWire was not restoring
+  - fix:Bug fix: Player remembers volume level from last song played
+  - fix:Bug fix: Sends correct file sizes on HTTP headers for shared files that
+  - fix:Bug fix: Repeat media play setting with only one item
+  - fix:Bug fix: New mime detector based on a bigger table
+  - fix:Bug fix: Video player doesn't skip frames when resuming from pause
+  - fix:Bug fix: Video player doesn't move frames when paused and volume slider
+  - fix:Bug fix: Dropping a .torrent starts a download and doesn't ask to send to
+  - fix:Bug fix: (Windows) can delete files that are being played or seeded
+  - fix:Bug fix: (Mac) compatibility with Mac OSX 10.5.x restored
+  - fix:Bug fix: (Windows) media player can open files with long paths
+  - fix:Bug fix: prevents NPE when opening a .torrent and trying to show icons when
+
+FrostWire 5.5.1 DEC/10/2012
+  - fix:New Clear Inactive button on transfers
+  - fix:New setting to use the default system media player instead of
+  - fix:New Download Cloud URLs, Torrents and Magnets by entering
+  - fix:New toggle full screen video playback with double click
+  - fix:Enhancement: Library file tables now show file modified date field and
+  - fix:Enhancement: Playlist tables now show the track number column and
+  - fix:Enhancement: mime type guessing is faster when sharing files on Wi-Fi
+  - fix:Bug fix: Library was getting confused with file extensions as part of file
+  - fix:Bug fix: sharing/unsharing popup menu behavior while sharing on Wi-Fi
+  - fix:Bug fix: resizing issues on preview download dialogs
+  - fix:Bug fix: filtering on torrent detail dialog was broken
+  - fix:Bug fix: Library continuous playback working from play button
+  - fix:Bug fix: Cloud download error fixed
+  - fix:Bug fix: Media lib unicode issue
+
+FrostWire 5.5.0 NOV/29/2012
+  - fix:New FrostWire video player
+  - fix:New audio preview on cloud based audio search results
+  - fix:New video preview on cloud based video search results
+  - fix:New Wi-Fi sharing between FrostWire for Desktop and Android
+  - fix:New Wi-Fi sharing/announcement/discovery protocol via UPnP standards
+  - fix:New Stream Video/Audio stored shared on Android devices
+  - fix:UX Improvement: Add folders to library with drag and drop on
+  - fix:UX Improvement: cloud audio downloads now have album art
+  - fix:Core Search Performance lowers CPU usage dramatically while indexing
+  - fix:Core Improvement: broader compatibility on cloud demuxed downloads
+  - fix:UI Improvement: partial download/torrent content window now includes
+  - fix:UI Improvement: when opening youtube url, the file selection dialog
+  - fix:UI Improvement: audio player simplified, no stop button
+  - fix:UI Improvement: Transfer manager now has 'Clear Inactive' button
+  - fix:Bug fix: Run on startup for Mac finally works. The BitTorrent network
+
+FrostWire 5.4.0 SEP/17/2012
+  - fix:No more sound distortion with the FrostWire player volume levels
+  - fix:Search engines update
+  - fix:UX Upgrade: Only one file type per search. Users were getting confused
+  - fix:UX Upgrade: Forbid multiple selection on partial file selection dialog
+
+FrostWire 5.3.9 AUG/24/2012
+  - fix:BEP 34 compliant. FrostWire now checks DNS TXT records for tracker
+  - fix:Soundcloud integration (Search, Streaming and Downloads)
+  - fix:Fixes issue with partial download title window not showing the name
+  - fix:UI Improvement: Action hints on top of search results to stream or
+  - fix:UI Improvement: Action hint on top of playable contents in the
+  - fix:UI Improvement: Search result Source now includes the name of the
+  - fix:UI Improvement: Search keywords are bolded in the titles of search
+  - fix:UI Improvement: Creation date for non-torrent search results available
+  - fix:UI Improvement: File size of non-torrent search results available
+  - fix:UI Improvement: Opening 'Configure Options' on the Library takes user
+  - fix:UI Improvement: Right clicking on the title of a search tab now
+  - fix:UI Improvement: A FrostWire update can now be invoked from the 'Tools'
+  - fix:UI Improvement: New Notification update button will be available on
+  - fix:UI Improvement: Added 'Cleanup Playlist' right click menu item in
+  - fix:UX Improvement: When saving a newly created .torrent, FrostWire
+  - fix:Fixes issue with file names downloaded from FrostWire for Android
+  - fix:Fixes issue adding new radio stations to the library
+  - fix:Fix of MP3 ID3 tags unicode parsing
+
+FrostWire 5.3.8 JUL/5/2012
+  - fix:Sends MP4 files (videos) to iTunes
+  - fix:Better language auto-detection on configuration wizard
+  - fix:Fixes Drag and Drop issue with iTunes >= 10.6.3
+  - fix:Fixes issues with Monova search
+
+FrostWire 5.3.7 JUN/14/2012
+  - fix:New Feature: Export playlist to iTunes
+  - fix:Core upgrade: Better support for UTF-8 torrent contents
+  - fix:Faster startup time. No more waiting around 31% on splash screen
+
+FrostWire 5.3.6 MAY/14/2012
+  - fix:Full support for .m4a audio files (thumbnails, seek)
+  - fix:AAC downloads from YouTube
+  - fix:Fixes issue with search suggestions where the popup wouldn't
+  - fix:Chinese, Korean character display fixed for Windows and Linux (Gnome only)
+  - fix:Fixes issue where it was hard to select more than one search result for
+  - fix:Fixes issue with search results from KAT.ph. Now downloads are started
+  - fix:Supports dragging files from transfer manager
+  - fix:Adds links to Facebook and Google Plus pages on status bar
+  - fix:Single file search results now are launched on double click
+
+FrostWire 5.3.5 APR/18/2012
+  - fix:Drag and drop files and folders to your Android device running FrostWire
+  - fix:Fixes glitch where the file explorer would reset the split pane position
+  - fix:Removes flickering on album arts when resizing library explorer
+  - fix:When the FrostWire window is resized to be very small the search
+  - fix:Search box on the Library is now on the upper left and
+  - fix:Search boxes everywhere now have a clear button
+  - fix:Playlists are now sorted alphabetically
+  - fix:Option panes UI upgrades
+  - fix:Better suggestion for a playlist name when a folder is dropped on
+  - fix:German translation updated
+  - fix:French translation updated
+  - fix:Norwegian translation updated
+  - fix:Dutch translation updated
+  - fix:Japanese translation updated
+  - fix:Filipino translation updated
+  - fix:Chinese (Hong Kong) translation updated
+  - fix:Chinese (Taiwan) translation updated
+  - fix:Chinese (Mainland) translation updated
+  - fix:Turkish translation updated
+  - fix:Portuguese (Brazilian) updated
+  - fix:Korean translation updated
+  - fix:Italian translation updated
+  - fix:Hindi translation updated
+
+FrostWire 5.3.4 MAR/26/2012
+  - fix:New frostwire.exe launcher with extended Unicode support now able to
+  - fix:Windows build is Windows 8 compatible
+  - fix:Windows build will prefer Java 7 if not JRE is found
+  - fix:Improvements when sending files on a local area network via magnet link
+  - fix:Bug fix when opening magnets from a website when FrostWire
+  - fix:User experience improvements on the transfer manager
+  - fix:Spanish translation update (93% translated)
+  - fix:YouTube video search and download support
+
+FrostWire 5.3.3 MAR/08/2012
+  - fix:Noticeable improvements in CPU performance
+  - fix:Noticeable improvements in search result quality
+  - fix:Updated TPB search to support magnet link search results
+  - fix:Added UT_METADATA extension to Vuze Core for improved magnet link support
+  - fix:Upgraded Lucene library to v3.5.0
+  - fix:Upgraded H2 to v1.3.164
+  - fix:When browsing FrostWire for Android devices (0.9.6+), date added
+
+FrostWire 5.3.2 FEB/12/2012
+  - fix:Reverted H2 library to v1.3.160
+
+FrostWire 5.3.1 FEB/11/2012
+  - fix:Updated default album cover image with an anti-aliased frostwire sphere
+  - fix:Fixes bug where clicking on the current song would switch to the library
+  - fix:Adds missing icon for "copy magnet" on Send file dialog
+  - fix:Library explorer and Playlist explorer are now divided by a split pane
+  - fix:Hides hints popup when search is triggered with a mouse click
+  - fix:Updated search icon (magnifier)
+  - fix:Fonts are reset when the setup wizard is shown so the wizard can work
+  - fix:New View > Reset Font Sizes action
+  - fix:The first time the Library button is used "Finished Downloads" is
+  - fix:When a new playlist is created, a graphic is shown to hint the user
+  - fix:Updated H2 library to v1.3.164
+
+FrostWire 5.3.0 FEB/10/2012
+  - fix:Search form looks similar to FrostWire 4 but now allows user to search
+  - fix:Improvements in search algorithm
+  - fix:Send file/folder feature more effective between just 2 peers
+  - fix:Simplification of search form interface, looks similar to FrostWire 4
+  - fix:Phone & Tablets tab is gone, integration with Android devices is now
+  - fix:Browses, Streams audio, and downloads files made public by Android devices
+  - fix:When entering a search hints are shown to type less (powered by Google)
+  - fix:Sorts transfers by "Seeds" correctly
+  - fix:Improvements on Library action buttons, now a "Launch" action is available
+  - fix:Fixes bugs where files on a audio playlist could not be dragged out
+  - fix:Fixes bugs where deleted files would still appear on the library
+  - fix:When right clicking on selected finished transfers and copying an infohash
+  - fix:Sharing ratio of a torrent that you stopped and started seeding again
+  - fix:Now when the transfer split pane is dragged up, the pane border is painted
+  - fix:Fixes repainting glitch when moving split pane on top of promotional
+  - fix:Lots of icons have been revamped for a more uniform look
+  - fix:Null Pointer Exception issues #100, #103, #104
+  - fix:Fixes issue #93 chat action causing frostwire crash
+  - fix:Flickering issue on song progress bar resolved
+  - fix:Simplified torrent creation. User now doesn't have to make up her mind
+  - fix:Brought back "Stop" search button
+  - removed:Lingering "Show/Hide player" menu entry on status bar context menu
+  - fix:If seeding transfers are meant to be finished, newly finished transfers
+  - fix:Audio files can be launched using the operating system's default player
+  - removed:BTJunkie search engine
+  - fix:Added KickAssTorrents (kat.ph) search engine
+  - fix:Fixes issue where downloading removing a partial transfer would
+
+FrostWire 5.2.11 NOV/28/2011
+  - fix:Fixes bugs where some BitTorrent configuration settings were reset
+
+FrostWire 5.2.10 NOV/22/2011
+  - fix:Upload ratios will not be enforced to 30% of downloads anymore
+  - fix:Update autodownload now supported for mac
+  - fix:Updates can now be distributed via both BitTorrent and HTTP
+  - fix:HttpFetcher improvements for less resource consumption
+  - fix:HttpFetcher now supports large HTTP file downlods (progressive download)
+  - fix:Improvements to Send File to a friend
+  - fix:Fixes bug where some finished Downloads wouldn't "Show in Library"
+  - fix:Bug report system revised
+
+FrostWire 5.2.9 NOV/9/2011
+  - fix:Enhancement: Lucene full text indexing for Smart Search database to
+  - fix:Enhancement: Lucene full text indexing for Library database allows
+  - fix:Enhancement: Audio player will start playing currently selected audio
+  - fix:Bug Fix: Finished Downloads shows only finished downloads
+
+FrostWire 5.2.8 NOV/7/2011
+  - fix:Smart search updates uses less DHT resources and fixes logic bugs
+  - fix:New Internet Radio functionality on the Library. Play, Add, Remove
+  - fix:Book/Document search now crawls for .cbr, .cbz, .cb7, .cbt and .cba
+  - fix:New "Show in Library" action for finished transfers. It is now the
+  - fix:Clicking on the currently played audio control should always take
+  - fix:Top Library tree nodes re-arranged
+  - fix:When downloading a single partial file, the transfer manager shows
+  - fix:Add partial downloads, and multiple transfers that contain audio files
+  - fix:The library can now be configured to scan any folder the user desires
+  - fix:Files can be added to playlists right out of search results
+  - fix:New explore action button on the Library tab
+  - fix:New send to friend action button on the Library tab
+  - fix:Faster loading of Finished Downloads
+  - fix:Library search behaves as expected for all kinds of searches
+  - fix:A lot of bug fixes
+
+FrostWire 5.2.3 OCT/20/2011
+  - fix:Change the order of an audio file on playlist with drag and drop
+  - fix:Change the order of multiple audio files on a playlist with drag and drop
+  - fix:Drop audio files and folders at a specific position inside a playlist
+  - fix:Remembers the column and order you last set on the transfer manager
+  - fix:Remembers the last file type you searched for after restart
+  - fix:New FrostWire icon compatible with Ubuntu 11.10
+  - fix:Bug fix, now if you're playing a song and you resort the playlist by
+  - fix:Searching inside "Finished Downloads" now yields folder names as search
+  - fix:Fixes lingering popup menu issue
+  - fix:Fixed DNS query issue affecting Linux
+
+FrostWire 5.2.2 OCT/10/2011
+  - fix:Library tables are now cached in memory, searches are done in the cache
+  - fix:Create or add audio files to a playlist right from the Transfer manager
+  - fix:ITunes importing after audio transfers finish turned off by default
+  - fix:Completed transfers that contain at least one audio file can be sent
+  - fix:Audio status component recognizes an Audio Stream, from an Audio file
+  - fix:Fixes issues with download mediator refresh
+  - fix:Fixes out of memory error
+  - fix:Real time UI feedback as audio files are being imported into playlist
+  - fix:F5, Cmd+R or Ctrl+R will refresh the current Library table
+
+FrostWire 5.2.1 OCT/05/2011
+  - fix:Play/Pause player buttons now share the same button depending on state
+  - fix:Mac OSX threading bug when importing .m3u playlist to new playlist fixed
+  - fix:Pressing space bar pauses/resumes currently played audio
+  - fix:Playlist files can be sorted correctly by track number when available
+  - fix:FLAC playback support
+  - fix:When a playlist has finished importing files, it's shown to the user
+  - fix:Transfer manager remembers the position of its JSplitPane
+  - fix:Transfer manager sorts downloads by default based on their creation date
+  - fix:Transfer manager has new column "Started On" showing the date the transfer
+  - fix:Drag and drop issues on playlist component for Mac OSX fixed
+  - fix:Partial download dialog table can adjust column widths, a horizontal
+  - fix:When playing an audio file, if it gets deleted FROM DISK from inside
+  - fix:Files can be dragged to the "Starred" playlist and they will be marked
+  - fix:Files can be deleted from the "Starred" playlist. This will cause the
+  - fix:The tables on the library remember the last position of their scrollbars
+  - fix:Double clicking on a playlist name starts editing the playlist name
+  - fix:Fixes bug where downloading an individual file in a torrent wouldn't
+  - fix:Fixes a memory leak when importing ID3 tags into a playlist
+  - fix:Fixes bug where the duration of an MP3 file wasn't calculated correctly
+  - fix:Fixes bug where it would import torrent skipped files to iTunes
+
+FrostWire 5.2.0 SEP/26/2011
+  - fix:New Library Tab, code named "Alexandria"
+  - fix:New Audio Player controls
+  - fix:New controls to create and manage playlists
+  - fix:Drag and drop files from Finished Downloads, Audio, File explorer
+  - fix:New control on status bar that shows current audio file being played
+  - fix:Export playlists to .m3u
+  - fix:Import .m3u into new or existing playlists
+  - fix:Filter files inside currently selected file type or playlist
+  - fix:Audio player can randomize playback order, or repeat playlist
+  - fix:New icons all over the application
+  - fix:Album art is displayed when an audio file is selected on a playlist
+  - fix:Album art can be scaled in real time with split pane
+  - fix:Songs on playlists can be starred, Starred songs are added to "Starred"
+  - fix:Selected songs on a playlist can be deleted with the Delete key, or
+  - fix:Playlists can be renamed
+  - fix:Playlists can be deleted
+  - fix:When songs that have been deleted from disk are attempted to be played
+  - fix:Right clicking on any song on a playlist > Cleanup removes all songs
+
+FrostWire 5.1.5 SEP/16/2011
+  - fix:Bug fix on setup wizard for some window configurations where controls
+  - fix:Bug fix on keyword search filter, wrong keyboard event was being used
+  - fix:UX adjustement in the way transfers are sorted when the application is
+  - fix:UX upgrade where Search Field on the Library now reacts to the DELETE key
+  - fix:UX upgrade where the FrostWire left hand side components are laid out
+
+FrostWire 5.1.4 AUG/24/2011
+  - fix:Bug fix where it would not index torrents when the
+  - fix:Bug fix when downloading a secondary file from the second torrent
+  - fix:Cleans all empty folders created by a partial download once the download
+  - fix:Fixes issue with transfer manager resetting the order of columns
+
+FrostWire 5.1.3 AUG/18/2011
+  - fix:Search results now arrive under 200ms, aka, Instant Search
+  - fix:New FrostWire "Smart Torrent" search. FrostWire will search inside
+  - fix:Core upgrade, if a .torrent fails to download from its HTTP location
+  - fix:Functionality to see the size of the Search DB and to reset it
+  - fix:UX upgrade, ability to hide/show seeding torrents on transfer manager
+  - fix:UX upgrade, Phone & Tablets desktop explorer asks before deleting files
+  - fix:UX upgrade, New file "Extension" column on search results
+  - fix:UX upgrade, Search tabs now have animated indicator to let user know
+  - fix:UX upgrade, New filter by file type. Filter controls re-arranged
+  - fix:UX fix, search results can now be sorted by file type
+  - fix:TPB has been added to the list of search engines
+  - fix:Mininova is back
+
+FrostWire 5.0.8 JUL/16/2011
+  - fix:Shows torrent details after a download starts to bring traffic back
+  - fix:Shows FrostWire icon for search results to which we can't resolve the
+  - fix:Removes Mininova from search engines
+
+FrostWire 5.0.7 JUL/15/2011
+  - fix:UX upgrade, send file or send folder support when a file or folder
+  - fix:UX upgrade, file choosing dialogs on Mac now also show mounted volumes
+  - fix:UX upgrade, playback support for m4a files
+  - fix:UX upgrade, search result filters re-arranged
+  - fix:UX upgrade, main search button gone, updated search text box to include
+  - fix:UX upgrade, filters re-arranged
+  - fix:UX upgrade, searches can be up to 50 characters long
+  - fix:UX upgrade, either disconnected or turbocharged, no idle state
+  - fix:UX upgrade, search as you type on the library, no more search button
+  - fix:UX bugfix, iTunes options were not visible for Windows users
+  - fix:UX bugfix, fixes possible UI freeze on startup
+  - fix:UI bugfix, sending songs to iTunes on Mac is now done in a single process
+  - fix:Mac OSX Lion compatible
+  - fix:Bugfix, issue where opening a torrent from maglnk.com would result in a
+  - fix:Bugfix, when user didn't start a partial download the torrent wouldn't be
+
+FrostWire 5.0.6 JUN/27/2011
+  - fix:New feature, Send file. Available on File Menu and Transfer Manager
+  - fix:New feature, Send folder. Available on File Menu and Transfer Manager
+  - fix:UX upgrade, we now have a [+] icon next to search result file names to
+  - fix:UX upgrade, when a partial download is cancelled, the entry is removed
+  - fix:UX update on partial download dialog. Includes new text filter
+  - fix:UX fix, Library search now also looks for .torrents on "Torrents" folder
+  - fix:UX fix, Mac OSX file menu does no longer show "Exit" action
+  - fix:Fixes bug, incomplete files are no longer exported to iTunes playlist
+  - fix:UX update, Help Menu now says "Sharing Help". Items rearranged
+  - fix:UX update, rearranged View options into single panel
+  - fix:UX update, torrent seeding settings are now a control of its own with
+  - fix:UX update, the installation wizard now forces the user to decide if
+  - fix:UX update, in Windows and Linux, when the user Xs the window the user is
+  - fix:UX bugfix, font size can now be increased
+
+FrostWire 5.0.4 JUN/24/2011
+  - fix:UI upgrade, Create and seed New Torrents
+  - fix:UI upgrade, Ability to throttle torrent transfer speeds
+  - fix:UI upgrade, Copy info hash from torrent
+  - fix:UI upgrade, Copy magnet link url from torrent
+  - fix:UI upgrade, Searchable library. Searches recursively downloaded
+  - fix:UI upgrade, Search results filterable by Torrent Search Engine
+  - fix:UI upgrade, Search results filterable by file size
+  - fix:UI upgrade, Search results filterable by number of seeds
+  - fix:UI upgrade, Search results filterable by keywords as you type
+  - fix:UI upgrade, Ability to download partial files
+  - fix:UI upgrade, Promotional slides can now be switched by the user
+  - fix:UI upgrade and bug fixes on Phone & Tablets tab
+  - fix:UI upgrade, Ability to rebuild "FrostWire" playlist on iTunes
+  - fix:UI upgrade, Replaced legacy skinning code for "Substance" skinning system
+  - fix:Core update, audio playback is now done using mplayer
+  - fix:Core update, Vuze core integration with transfer manager
+  - fix:Core update, No Gnutella support. Multiple library dependencies gone
+
+FrostWire 4.21.8 JUN/9/2011
+  - fix:Fixes a possible freeze reported by some users when the configuration
+  - fix:Fixes issue when a user changes default Gnutella Save Folder
+  - fix:Now users don�t have to re-start to stop seeding after they�ve changed
+  - fix:Better wording to explain on which networks files are being shared on,
+  - fix:Changed color of "Sharing Options" gear icon to blue, gray
+  - fix:Added "Sharing Options" gear button on Search Tab. It's only visible
+  - fix:Added Help Menu options to learn about how to share/unshare files,
+
+FrostWire 4.21.7 MAY/16/2011
+  - fix:Makes sure cancelling torrents that have finished are not deleted
+  - fix:Folders created by torrents that are cancelled during download are deleted
+  - fix:Fixes a bug when migrating from an older version of FrostWire on which
+  - fix:Fixes a bug on configuration screens that could make the application freeze
+  - fix:Migration wizard will always be shown to make sure users are aware of what
+  - fix:Sharing completed files is always set to off by default on the
+
+FrostWire 4.21.6 MAY/5/2011
+  - fix:Fixes a bug where some Debian systems that didn't support the
+  - fix:Fixes a bug where running FrostWire for the very first time
+  - fix:UX improvement Junk & Block. When marking Junk Results
+  - fix:Policy update, Incomplete files are not shared by default to avoid
+  - fix:Policy update, Finished downloads are not shared by default to
+  - fix:Policy update, .torrent files are not shared by default
+  - fix:UX improvement, better explanation and option to turn on/off
+  - fix:UX improvement, when user turns off Finished Download sharing
+  - fix:UX improvement, File menu now has option to Exit FrostWire completely
+  - fix:UX improvement, File menu now says "Open Torrent/Magnet" instead
+  - fix:Bug Fix: The Torrent Save folder is now considered correctly,
+  - fix:Bug Fix: Slideshow component had an issue where it would not update
+
+FrostWire 4.21.5 MAR/21/2011
+  - fix:Fixes newly introduced bug where it would not recursively share the
+  - fix:Fixes newly introduced bug where it wouldn't correctly display the
+  - fix:Fixes issue where it would not kill torrent uploads until
+  - fix:Fixes NPE on HttpFetcher.fetch()
+
+FrostWire 4.21.4 JAN/21/2011
+  - fix:New setting to turn off automatic installer downloads
+  - fix:New setting to limit the speed of BitTorrent downloads
+  - fix:New Galician flag added
+  - fix:UX improvements when creating new folders on the Phones and Tablets UI
+  - fix:Fixes bug when dropping files on an Android device that hasn't been
+  - fix:UX change. FrostWire will now seed torrents that have not been removed
+  - fix:UX change. Default save location folder in Windows Vista and Windows7 is
+  - fix:UX improvements when showing FrostClick overlays. No more flickering
+  - fix:Fixes bug when copying .apk files from Android device to desktop computer
+  - fix:Fixes bug when saving torrents to it's default Save location if that
+  - fix:Fixes bug on which removed Torrent downloads would reappear
+  - fix:Updated Mojito DHT integration. Mojito DHT is now active
+  - fix:Upgraded anti-spam mechanisms
+  - removed:All remnant code related to LimeWire Store
+  - fix:Cleanup to use a single logging library
+
+FrostWire 4.21.3 DEC/16/2010
+  - fix:New "Phones and Tablets" tab. Tools to share files with Android
+  - fix:New debian source packages available
+  - fix:Upgrades to HttpFetcher performance. Cleanups and refactors
+  - fix:Upgrades java compatibility to Java 6
+  - fix:Upgrades Mojito-DHT to the latest version found on the LimeWire
+  - removed:Dependencies on Linux native libraries. JDIC is no more
+  - fix:Fixes issues when rendering and scrolling torrent search results
+
+FrostWire 4.21.1 SEP/22/2010
+  - fix:New auto-update support for Windows and Ubuntu
+  - fix:Upgrades Azureus Core (bittorrent engine) to version 4.5.0.4
+  - fix:New setting pane to allow user to turn off FrostClick promotions
+  - fix:Fixes issue with Application Icon. New high resolution icon now
+
+FrostWire 4.20.9 AUG/17/2010
+  - fix:Fixes bug where FrostWire would not try to open exclusively UDP tracked
+  - fix:New option -Dultrapeer=1 forces FrostWire to run as Ultrapeer. Only for
+
+FrostWire 4.20.8 AUG/05/2010
+  - fix:Upgrades search, now powered with ClearBits.net results a service
+  - fix:New BitTorrent Connection Settings Available
+  - fix:New ability to configure the max. number of active torrent downloads
+  - fix:New ability to configure the max. number of peers per torrent
+  - fix:New ability to configure the max. number of torrent connections
+  - fix:New ability to configure the max. number of torrent uploads
+  - fix:Fixes torrent auto resume bug
+
+FrostWire 4.20.7 JUL/01/2010
+  - fix:Improves Torrent search dramatically
+
+FrostWire 4.20.6 APR/25/2010
+  - fix:Upgrades Azureus Core to version 4.4.0.0 - Thanks to the
+
+FrostWire 4.20.5 APR/06/2010
+  - fix:Fixes audio player issues. Now all MP3s should support skipping
+  - fix:Fixes High CPU usage bug while loading hostiles ip list.
+
+FrostWire 4.20.4 MAR/28/2010
+  - fix:Fixes connectivity issues for Mac version
+
+FrostWire 4.20.3 MAR/15/2010
+  - fix:Fixes a bug where files couldn't be dragged out of the Library
+  - fix:Fixes a bug where opening a magnet link would freeze the UI
+
+FrostWire 4.20.2 FEB/02/2010
+  - fix:Fixes a bug on torrent resume — Installer sizes reduced over 58%
+
+FrostWire 4.20.1 FEB/01/2010
+  - fix:Major Upgrade: BitTorrent Engine replaced for a lightweight
+
+FrostWire 4.18.6 JAN/01/2010
+  - fix:New Feature: Right clicking on the tabs brings out a context
+
+FrostWire 4.18.5 DEC/01/2009
+  - fix:Fixes two NPEs that were causing FrostWire to kill
+
+FrostWire 4.18.4 NOV/01/2009
+  - new:"Tools > Refresh Connections". A network of FrostWire
+
+FrostWire 4.18.3 AUG/30/2009
+  - fix:Fixes connectivity issues on Snow Leopard where FrostWire would
+
+FrostWire 4.18.2 AUG/15/2009
+  - fix:Ads .wma and .au extension to the default excluded shared
+
+FrostWire 4.18.1 AUG/01/2009
+  - fix:Updates on the "Connection Doctor" component, to address
+  - fix:Fixes a bug where some mp3 would not play. Volume, Pause and
+
+FrostWire 4.18.0 MAY/01/2009
+  - fix:Fixes Bittorrent Incompatibilities. — Mac launcher fixes bug
+  - fix:Fixes bug on Welcome Screen, now you don't need to open
+
+FrostWire 4.17.2 NOV/30/2008
+  - fix:Fixes a newly introduced bug in Windows which would make
+
+FrostWire 4.17.1 NOV/01/2008
+  - fix:Heavy work on all translations. Translation files now work with
+
+FrostWire 4.17.0 JUL/01/2008
+  - fix:Completely new FrostWire(tm) based on the core of LimeWire
+
+FrostWire 4.13.5 FEB/01/2008
+  - fix:More fixes on peer discovery on connection bootstraping.
+
+FrostWire 4.13.4 NOV/22/2007
+  - fix:Connection Bootstrapping problems should be gone. TurboCharged
+
+FrostWire 4.13.3 AUG/01/2007
+  - fix:New Update Manager. Also allows delivery of special
+
+FrostWire 4.13.2 JUL/22/2007
+  - fix:No more BETA, this is the final release of the 4.13.1.8 branch
+  - fix:When music files are launched they're automatically added to the
+
+FrostWire 4.13.1 JUN/22/2007
+  - fix:Added IRC Chat (only for Windows and Mac until we resolve AWT
