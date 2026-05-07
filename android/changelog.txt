@@ -1,4 +1,5 @@
 FrostWire 3.1.4 build 775 UNRELEASED
+  - fix:SoftwareUpdaterDialog and NewTransferDialog no longer crash on Android 12 and lower with NoSuchMethodError; removed androidx BundleCompat.getSerializable() which internally calls the API 33-only typed overload, now using legacy Bundle.getSerializable(String) with explicit cast
   - fix:RenamePlaylist no longer crashes from background-thread getActivity() NPE when the dialog fragment detaches before MISC handler queries the playlist name; initObjects now passes application context and UI callbacks guard isAdded()/getDialog() null
   - fix:ArtistAlbumFragment onItemClick no longer crashes with NPE or races when calling getActivity().finish() from the MISC handler; activity is captured locally before the async post and finish() is marshalled back to the UI thread with lifecycle guards
 
