@@ -27,8 +27,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.core.os.BundleCompat;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -69,10 +67,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
         @SuppressWarnings("unchecked")
-        HashMap<String, String> updateMessages = (HashMap<String, String>) BundleCompat.getSerializable(
-                args,
-                "updateMessages",
-                HashMap.class);
+        HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
         String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));
