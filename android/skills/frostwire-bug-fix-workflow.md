@@ -8,6 +8,13 @@ description: FrostWire bug-fix workflow. Use when fixing bugs in the FrostWire m
 
 Applies to all bug fixes in the FrostWire monorepo (android/, desktop/, common/, jlibtorrent/).
 
+## 0. Root Cause Fix Philosophy (gubatron / aldenml style)
+
+- **Bugs are fixed by finding their root cause from first principles, not silenced or hidden.** A try/catch that swallows an exception without fixing the underlying reason is a last resort, not a solution. If you don't understand why something is failing, keep investigating until you do.
+- **DRY — Do Not Repeat Yourself.** When you spot the same fragile pattern in multiple places, refactor to a single reusable helper or enforce the invariant structurally (e.g., a source-scanning regression test). Re-used code behaves like a perfect equation — it starts being written by itself.
+- **Composition over inheritance.** If you're extending a non-abstract class to work around a bug, you should probably be composing it instead. Inheritance hides behavior you don't control; composition makes the fix explicit and testable.
+- **Minimum scope principle.** Keep variables as close to their local scope as possible. Classes should expose as little as possible: local variable first, private member if it must outlive the method, protected only for inheritance, public only when you are certain no consumer can break internal state.
+
 ## 1. Regression Tests (Whenever Possible)
 
 - Before committing a fix, ask whether the failure mode can be expressed as a unit, integration, instrumentation, or structural regression test.
