@@ -288,7 +288,14 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             // this makes sure we refresh the UI torrent
             if (currentTorrentHandle != null && torrentHandle != currentTorrentHandle) {
                 torrentHandle = currentTorrentHandle;
-                uiBittorrentDownload = (UIBittorrentDownload) TransferManager.instance().getBittorrentDownload(uiBittorrentDownload.getInfoHash());
+                BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(uiBittorrentDownload.getInfoHash());
+                if (bittorrentDownload instanceof UIBittorrentDownload) {
+                    uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
+                } else if (bittorrentDownload instanceof BTDownload) {
+                    uiBittorrentDownload = new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload);
+                }
+                // If bittorrentDownload is a TorrentFetcherDownload, uiBittorrentDownload stays unchanged
+                // until the fetch completes and the manager updates the map.
             }
         }
     }
