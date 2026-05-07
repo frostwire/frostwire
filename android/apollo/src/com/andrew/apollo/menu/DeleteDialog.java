@@ -46,6 +46,14 @@ public final class DeleteDialog extends DialogFragment {
     }
 
     /**
+     * Callback that runs immediately when the user confirms deletion,
+     * before the actual file deletion begins. Useful for optimistic UI updates.
+     */
+    public interface DeleteDialogPreDeleteCallback {
+        void onDeleteConfirmed(long[] id);
+    }
+
+    /**
      * The item(s) to delete
      */
     private long[] mItemList;
@@ -56,6 +64,7 @@ public final class DeleteDialog extends DialogFragment {
     private ImageFetcher mFetcher;
 
     private DeleteDialogCallback onDeleteCallback;
+    private DeleteDialogPreDeleteCallback preDeleteCallback;
 
     public DeleteDialog() {
     }
@@ -78,6 +87,11 @@ public final class DeleteDialog extends DialogFragment {
 
     public DeleteDialog setOnDeleteCallback(DeleteDialogCallback callback) {
         onDeleteCallback = callback;
+        return this;
+    }
+
+    public DeleteDialog setOnDeleteConfirmedCallback(DeleteDialogPreDeleteCallback callback) {
+        preDeleteCallback = callback;
         return this;
     }
 
@@ -139,6 +153,11 @@ public final class DeleteDialog extends DialogFragment {
             final Activity activity = getActivity();
             final Activity activityRef = activity;
             final long[] deletedIds = mItemList;
+            // Optimistic UI update: notify caller immediately so adapter can remove items
+            // before the background deletion completes.
+            if (preDeleteCallback != null) {
+                preDeleteCallback.onDeleteConfirmed(deletedIds);
+            }
             final Runnable onDeleted = () -> {
                 if (activityRef instanceof DeleteDialogCallback) {
                     ((DeleteDialogCallback) activityRef).onDelete(deletedIds);

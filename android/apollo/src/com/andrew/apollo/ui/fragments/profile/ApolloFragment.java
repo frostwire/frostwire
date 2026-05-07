@@ -356,13 +356,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             title = ((Artist) mItem).mArtistName;
         }
 
-        DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(id -> {
-            if (!isAdded()) {
-                return;
-            }
-            restartLoader(true);
-            refresh();
-        }).show(getParentFragmentManager(), "DeleteDialog");
+        DeleteDialog.newInstance(title, songList, null)
+            .setOnDeleteConfirmedCallback(id -> {
+                if (!isAdded() || mAdapter == null) {
+                    return;
+                }
+                mAdapter.removeItemsById(id);
+            })
+            .setOnDeleteCallback(id -> {
+                if (!isAdded()) {
+                    return;
+                }
+                restartLoader(true);
+                refresh();
+            }).show(getParentFragmentManager(), "DeleteDialog");
         return true;
     }
 

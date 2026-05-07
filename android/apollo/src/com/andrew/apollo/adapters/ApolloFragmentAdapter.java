@@ -106,6 +106,47 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         clear();
     }
 
+    /**
+     * Removes items from the adapter by their ID for immediate optimistic UI feedback.
+     * Does NOT delete from MediaStore or disk — caller must handle that separately.
+     */
+    public void removeItemsById(long[] ids) {
+        if (ids == null || ids.length == 0 || mDataList == null || mDataList.isEmpty()) {
+            return;
+        }
+        java.util.HashSet<Long> idSet = new java.util.HashSet<>();
+        for (long id : ids) {
+            idSet.add(id);
+        }
+        for (int i = mDataList.size() - 1; i >= 0; i--) {
+            I item = mDataList.get(i);
+            long itemId = -1;
+            if (item instanceof Song) {
+                itemId = ((Song) item).mSongId;
+            } else if (item instanceof Album) {
+                itemId = ((Album) item).mAlbumId;
+            } else if (item instanceof Artist) {
+                itemId = ((Artist) item).mArtistId;
+            } else if (item instanceof Genre) {
+                itemId = ((Genre) item).mGenreId;
+            } else if (item instanceof Playlist) {
+                itemId = ((Playlist) item).mPlaylistId;
+            }
+            if (itemId != -1 && idSet.contains(itemId)) {
+                mDataList.remove(i);
+                try {
+                    super.remove(item);
+                } catch (Throwable ignored) {
+                    // Item might not exist in ArrayAdapter's internal list
+                }
+            }
+        }
+        if (this instanceof Cacheable) {
+            ((Cacheable) this).buildCache();
+        }
+        notifyDataSetChanged();
+    }
+
     public void flush() {
         if (mImageFetcher != null) {
             mImageFetcher.flush();
