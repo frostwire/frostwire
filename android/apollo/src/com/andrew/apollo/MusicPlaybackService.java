@@ -967,7 +967,7 @@ public class MusicPlaybackService extends MediaSessionService {
         }
         try {
             Intent playerIntent = new Intent(this, AudioPlayerActivity.class);
-            playerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            playerIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 piFlags |= PendingIntent.FLAG_IMMUTABLE;
