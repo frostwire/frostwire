@@ -211,7 +211,6 @@
         <activity
                 android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
                 android:screenOrientation="portrait"
-                android:clearTaskOnLaunch="true"
                 android:label="@string/frostwire_player"
                 android:launchMode="singleTask"
                 android:windowSoftInputMode="adjustPan"
