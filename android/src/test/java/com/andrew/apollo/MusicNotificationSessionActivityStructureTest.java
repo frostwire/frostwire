@@ -17,31 +17,44 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Structural regression test: notification taps must create a fresh stack with
- * MainActivity below AudioPlayerActivity so Back returns to the home/search UI.
+ * Structural regression test: notification taps must use a trampoline activity
+ * which creates MainActivity below AudioPlayerActivity so Back returns home.
  */
 public class MusicNotificationSessionActivityStructureTest {
 
     private static final String SOURCE_FILE = "apollo/src/com/andrew/apollo/MusicPlaybackService.java";
+    private static final String TRAMPOLINE_SOURCE_FILE = "apollo/src/com/andrew/apollo/ui/activities/AudioPlayerNotificationActivity.java";
 
     @Test
     public void mediaSessionActivity_usesExplicitMainThenPlayerBackStack() throws IOException {
         String source = new String(Files.readAllBytes(resolveSourcePath()));
 
-        assertTrue("Music notification session activity must use PendingIntent.getActivities()",
-                source.contains("PendingIntent.getActivities"));
-        assertTrue("Music notification stack must start with MainActivity",
+        assertTrue("Music notification session activity must point to the trampoline activity",
+                source.contains("new Intent(this, AudioPlayerNotificationActivity.class)"));
+        assertTrue("Music notification session activity must use a single activity PendingIntent",
+                source.contains("PendingIntent.getActivity"));
+    }
+
+    @Test
+    public void notificationTrampoline_buildsMainThenPlayerStack() throws IOException {
+        String source = new String(Files.readAllBytes(resolveSourcePath(TRAMPOLINE_SOURCE_FILE)));
+
+        assertTrue("Notification trampoline must build a task stack",
+                source.contains("TaskStackBuilder.create(this)"));
+        assertTrue("Notification trampoline must put MainActivity under the player",
                 source.contains("new Intent(this, MainActivity.class)"));
-        assertTrue("Music notification stack must open AudioPlayerActivity on top",
+        assertTrue("Notification trampoline must open AudioPlayerActivity on top",
                 source.contains("new Intent(this, AudioPlayerActivity.class)"));
-        assertTrue("Music notification stack must clear old task state before creating a fresh stack",
-                source.contains("Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK"));
-        assertTrue("Music notification PendingIntent must place MainActivity below AudioPlayerActivity",
-                source.contains("new Intent[]{mainIntent, playerIntent}"));
+        assertTrue("Notification trampoline must finish itself after launching the player stack",
+                source.contains("finish();"));
     }
 
     private static Path resolveSourcePath() {
+        return resolveSourcePath(SOURCE_FILE);
+    }
+
+    private static Path resolveSourcePath(String sourceFile) {
         Path projectRoot = Paths.get(".").toAbsolutePath().normalize();
-        return projectRoot.resolve(SOURCE_FILE);
+        return projectRoot.resolve(sourceFile);
     }
 }

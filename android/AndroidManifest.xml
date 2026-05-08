@@ -275,6 +275,12 @@
             </intent-filter>
         </activity>
         <activity
+                android:name="com.andrew.apollo.ui.activities.AudioPlayerNotificationActivity"
+                android:excludeFromRecents="true"
+                android:noHistory="true"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:exported="false" />
+        <activity
                 android:name="com.andrew.apollo.ui.activities.ProfileActivity"
                 android:screenOrientation="portrait"
                 android:excludeFromRecents="true" />
