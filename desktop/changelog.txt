@@ -5,6 +5,16 @@ FrostWire 7.0.5
   - new:IP Filter now supports multiple block list formats — P2P, DAT, CIDR, and Hosts formats are auto-detected and parsed. ZIP archives are now supported alongside existing GZIP decompression. Extracted format readers into separate classes (P2PIPFilterInputStreamReader, DatFilterInputStreamReader, CidrFilterInputStreamReader, HostsFilterInputStreamReader) with shared IPFilterFormat enum
   - new:IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
   - new:IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
+  - fix:IP Filter critical blocking bug — add_rule() was passing flags=0 (allow) instead of ip_filter.access_flags.blocked.swigValue()=1, so blocked IP ranges were silently allowed through libtorrent (#1291) — caught by new IPFilterBlockingTest regression suite
+  - fix:IP Filter edit disappearance bug (#1291) — fixed off-by-one in BasicDataLineModel.refresh() causing edited rows to vanish from the table after an edit
+  - fix:IP Filter JPopupMenu background theming on dark themes (#1291)
+  - fix:IP Filter ip_filter.db corruption root cause (#1291) — atomic writes with synchronized access prevent concurrent corruption during import and clear operations
+  - fix:IP Filter ip_filter.db hardened against corruption (#1291) — version-byte validation, break on bad entries, graceful recovery when loading a damaged database
+  - fix:IP Filter robust db loading + Import button disabled when empty (#1291)
+  - fix:IP Filter persistence restored (#1291) — jlibtorrent session state does not persist ip_filter across restarts, so custom ip_filter.db persistence is required
+  - fix:IP Filter disabled tooltips on table to prevent macOS Input Method EDT freeze (#1291)
+  - fix:IP Filter HTTP errors now shown in panel + blocklist site links added (#1291)
+  - fix:IP Filter JNI calls moved off EDT to background threads to prevent UI stalls (#1291)
 
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
