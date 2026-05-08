@@ -25,6 +25,7 @@ import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaStyleNotificationHelper.MediaStyle;
 
+import com.andrew.apollo.ui.activities.AudioPlayerNotificationActivity;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.google.common.collect.ImmutableList;
@@ -80,7 +81,7 @@ final class ApolloMediaNotificationProvider implements MediaNotification.Provide
 
         Notification notification = builder
                 .setCategory(Notification.CATEGORY_TRANSPORT)
-                .setContentIntent(mediaSession.getSessionActivity())
+                .setContentIntent(AudioPlayerNotificationActivity.createPendingIntent(service))
                 .setDeleteIntent(actionFactory.createNotificationDismissalIntent(mediaSession))
                 .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.frostwire_notification_flat)

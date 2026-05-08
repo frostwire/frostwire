@@ -24,7 +24,6 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -967,15 +966,9 @@ public class MusicPlaybackService extends MediaSessionService {
             return;
         }
         try {
-            Intent playerIntent = new Intent(this, AudioPlayerNotificationActivity.class);
-            int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                piFlags |= PendingIntent.FLAG_IMMUTABLE;
-            }
-            PendingIntent sessionActivityPendingIntent = PendingIntent.getActivity(this, 0xA1D10, playerIntent, piFlags);
             mMediaSession = new MediaSession.Builder(this, mPlayer.mExoPlayer)
                     .setId("FrostWireApollo")
-                    .setSessionActivity(sessionActivityPendingIntent)
+                    .setSessionActivity(AudioPlayerNotificationActivity.createPendingIntent(this))
                     .build();
             addSession(mMediaSession);
             LOG.info("setUpMediaSession() MediaSession created and added to service");

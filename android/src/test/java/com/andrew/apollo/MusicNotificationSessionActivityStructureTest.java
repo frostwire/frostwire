@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 public class MusicNotificationSessionActivityStructureTest {
 
     private static final String SOURCE_FILE = "apollo/src/com/andrew/apollo/MusicPlaybackService.java";
+    private static final String NOTIFICATION_PROVIDER_SOURCE_FILE = "apollo/src/com/andrew/apollo/ApolloMediaNotificationProvider.java";
     private static final String TRAMPOLINE_SOURCE_FILE = "apollo/src/com/andrew/apollo/ui/activities/AudioPlayerNotificationActivity.java";
 
     @Test
@@ -30,9 +31,15 @@ public class MusicNotificationSessionActivityStructureTest {
         String source = new String(Files.readAllBytes(resolveSourcePath()));
 
         assertTrue("Music notification session activity must point to the trampoline activity",
-                source.contains("new Intent(this, AudioPlayerNotificationActivity.class)"));
-        assertTrue("Music notification session activity must use a single activity PendingIntent",
-                source.contains("PendingIntent.getActivity"));
+                source.contains("AudioPlayerNotificationActivity.createPendingIntent(this)"));
+    }
+
+    @Test
+    public void notificationProvider_setsContentIntentDirectlyToTrampoline() throws IOException {
+        String source = new String(Files.readAllBytes(resolveSourcePath(NOTIFICATION_PROVIDER_SOURCE_FILE)));
+
+        assertTrue("Notification builder must not rely on a stale mediaSession.getSessionActivity() value",
+                source.contains("setContentIntent(AudioPlayerNotificationActivity.createPendingIntent(service))"));
     }
 
     @Test
@@ -45,6 +52,8 @@ public class MusicNotificationSessionActivityStructureTest {
                 source.contains("new Intent(this, MainActivity.class)"));
         assertTrue("Notification trampoline must open AudioPlayerActivity on top",
                 source.contains("new Intent(this, AudioPlayerActivity.class)"));
+        assertTrue("Notification trampoline must own creation of its PendingIntent",
+                source.contains("PendingIntent.getActivity"));
         assertTrue("Notification trampoline must finish itself after launching the player stack",
                 source.contains("finish();"));
     }
