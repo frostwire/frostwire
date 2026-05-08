@@ -84,6 +84,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.DataStoreManager;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -966,13 +967,14 @@ public class MusicPlaybackService extends MediaSessionService {
             return;
         }
         try {
+            Intent mainIntent = new Intent(this, MainActivity.class);
+            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             Intent playerIntent = new Intent(this, AudioPlayerActivity.class);
-            playerIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 piFlags |= PendingIntent.FLAG_IMMUTABLE;
             }
-            PendingIntent sessionActivityPendingIntent = PendingIntent.getActivity(this, 0xA1D10, playerIntent, piFlags);
+            PendingIntent sessionActivityPendingIntent = PendingIntent.getActivities(this, 0xA1D10, new Intent[]{mainIntent, playerIntent}, piFlags);
             mMediaSession = new MediaSession.Builder(this, mPlayer.mExoPlayer)
                     .setId("FrostWireApollo")
                     .setSessionActivity(sessionActivityPendingIntent)
