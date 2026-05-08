@@ -26,6 +26,7 @@ build/
 reports/
 .gradle/
 .settings/
+*.pem
 *.swp
 .settings/
 *.sdf
