@@ -32,6 +32,12 @@ public class MainActivityMusicPlayerIntentStructureTest {
                 source.contains("ACTION_MUSIC_PLAYER.equals(intent.getAction())"));
         assertTrue("MainActivity must detect CATEGORY_APP_MUSIC launches",
                 source.contains("intent.hasCategory(Intent.CATEGORY_APP_MUSIC)"));
+        assertTrue("MainActivity must detect Oplus Seedling media-card launcher fallback",
+                source.contains("isOplusSeedlingMediaIntent(intent)"));
+        assertTrue("MainActivity must require the Oplus Seedling marker extra",
+                source.contains("EXTRA_OPLUS_SEEDLING"));
+        assertTrue("MainActivity must require a mediaId extra before redirecting launcher intents",
+                source.contains("EXTRA_MEDIA_ID"));
         assertTrue("MainActivity must forward music player launches to AudioPlayerActivity",
                 source.contains("startActivity(new Intent(this, AudioPlayerActivity.class))"));
     }

@@ -102,6 +102,8 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static final String ACTION_MUSIC_PLAYER = "android.intent.action.MUSIC_PLAYER";
+    private static final String EXTRA_OPLUS_SEEDLING = "isFromOplusSeedling";
+    private static final String EXTRA_MEDIA_ID = "mediaId";
     private static boolean firstTime = true;
     private boolean externalStoragePermissionsRequested = false;
 
@@ -303,7 +305,15 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
 
     private static boolean isMusicPlayerIntent(Intent intent) {
         return intent != null && (ACTION_MUSIC_PLAYER.equals(intent.getAction())
-                || intent.hasCategory(Intent.CATEGORY_APP_MUSIC));
+                || intent.hasCategory(Intent.CATEGORY_APP_MUSIC)
+                || isOplusSeedlingMediaIntent(intent));
+    }
+
+    private static boolean isOplusSeedlingMediaIntent(Intent intent) {
+        return Intent.ACTION_MAIN.equals(intent.getAction())
+                && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
+                && "true".equals(intent.getStringExtra(EXTRA_OPLUS_SEEDLING))
+                && intent.hasExtra(EXTRA_MEDIA_ID);
     }
 
     private void openTorrentUrl(Intent intent) {
