@@ -49,6 +49,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -100,6 +101,7 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     private static final String CURRENT_FRAGMENT_KEY = "current_fragment";
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
+    private static final String ACTION_MUSIC_PLAYER = "android.intent.action.MUSIC_PLAYER";
     private static boolean firstTime = true;
     private boolean externalStoragePermissionsRequested = false;
 
@@ -263,6 +265,13 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
             finish();
             return;
         }
+        if (isMusicPlayerIntent(intent)) {
+            intent.setAction(null);
+            intent.removeCategory(Intent.CATEGORY_APP_MUSIC);
+            LOG.info("MainActivity.onNewIntent(): forwarding music player intent to AudioPlayerActivity");
+            startActivity(new Intent(this, AudioPlayerActivity.class));
+            return;
+        }
         String action = intent.getAction();
         if (action != null) {
             switch (action) {
@@ -290,6 +299,11 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
             finish();
         }
         super.onNewIntent(intent);
+    }
+
+    private static boolean isMusicPlayerIntent(Intent intent) {
+        return intent != null && (ACTION_MUSIC_PLAYER.equals(intent.getAction())
+                || intent.hasCategory(Intent.CATEGORY_APP_MUSIC));
     }
 
     private void openTorrentUrl(Intent intent) {
