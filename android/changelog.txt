@@ -1,4 +1,4 @@
-FrostWire 3.1.4 build 775 UNRELEASED
+FrostWire 3.1.4 build 775 MAY/11/2026
   - fix:Music player notification now opens a fresh AudioPlayerActivity via a no-UI trampoline that builds MainActivity under the player; MediaSession/session content intents point to the trampoline, and MainActivity forwards Android/Oplus Seedling media-launch intents to the player for compact System UI media cards
   - fix:Transfer Detail no longer crashes with ClassCastException when a torrent is still in fetch phase; AbstractTransferDetailFragment.ensureTorrentHandle now guards getBittorrentDownload() results with instanceof before casting, preventing TorrentFetcherDownload→UIBittorrentDownload cast failures
   - fix:My Music song deletion now removes items from the list adapter immediately instead of waiting for the background MediaStore deletion and loader refresh; DeleteDialog fires a pre-delete callback that optimistically removes deleted IDs from ApolloFragmentAdapter before file deletion begins
