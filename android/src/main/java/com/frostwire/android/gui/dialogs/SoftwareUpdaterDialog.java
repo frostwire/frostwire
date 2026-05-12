@@ -56,7 +56,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
 
         Bundle args = new Bundle();
         args.putString("apkDownloadURL", apkDownloadURL);
-        args.putSerializable("updateMessages", new HashMap<>(updateMessages));
+        args.putBundle("updateMessages", toBundle(updateMessages));
         args.putStringArrayList("changelog", new ArrayList<>(changelog));
         dlg.setArguments(args);
 
@@ -66,8 +66,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
+        HashMap<String, String> updateMessages = fromBundle(args.getBundle("updateMessages"));
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
         String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));
@@ -118,5 +117,24 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
                         Constants.FROSTWIRE_ANDROID_GOOGLE_PLAY_URL :
                         Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
         dismiss();
+    }
+
+    static Bundle toBundle(Map<String, String> map) {
+        Bundle bundle = new Bundle();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            bundle.putString(entry.getKey(), entry.getValue());
+        }
+        return bundle;
+    }
+
+    static HashMap<String, String> fromBundle(Bundle bundle) {
+        HashMap<String, String> map = new HashMap<>();
+        if (bundle == null) {
+            return map;
+        }
+        for (String key : bundle.keySet()) {
+            map.put(key, bundle.getString(key));
+        }
+        return map;
     }
 }

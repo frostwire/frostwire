@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 public class DialogBundleCompatRegressionTest {
 
     private static final String FORBIDDEN_PATTERN = "BundleCompat.getSerializable";
+    private static final String SOFTWARE_UPDATER_FORBIDDEN_PATTERN = ".getSerializable(";
     private static final String DIALOGS_PACKAGE_DIR = "src/main/java/com/frostwire/android/gui/dialogs";
 
     @Test
@@ -52,6 +53,11 @@ public class DialogBundleCompatRegressionTest {
                          if (source.contains(FORBIDDEN_PATTERN)) {
                              fail(p.getFileName() + " must NOT use " + FORBIDDEN_PATTERN
                                  + " — it crashes on API < 33. Use Bundle.getSerializable(String) with cast instead.");
+                         }
+                         if ("SoftwareUpdaterDialog.java".equals(p.getFileName().toString())
+                                 && source.contains(SOFTWARE_UPDATER_FORBIDDEN_PATTERN)) {
+                             fail("SoftwareUpdaterDialog must not deserialize update messages with getSerializable(). "
+                                     + "Use a string Bundle so update messages stay compatible without deprecation warnings.");
                          }
                      } catch (IOException e) {
                          fail("Could not read " + p + ": " + e.getMessage());
