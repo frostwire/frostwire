@@ -36,6 +36,7 @@ public final class VPNs {
         boolean result = false;
         if (BTEngine.getInstance().swig() == null) {
             // still not started or already stopped
+            System.out.println("VPN DEBUG: BTEngine.getInstance().swig() is null, engine not started");
             return false;
         }
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
@@ -72,16 +73,20 @@ public final class VPNs {
         boolean result = false;
         try {
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
+            System.out.println("VPN DEBUG: routes count = " + routes.size());
             for (EnumNet.IpRoute route : routes) {
                 String route_name = route.name();
                 String destination = route.destination().toString();
+                System.out.println("VPN DEBUG: route = " + destination + " via " + route_name);
                 if (destination.equals("0.0.0.0") &&
                         (route_name.contains("tun") || route_name.contains("wg"))) {
                     result = true;
                     break;
                 }
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            System.out.println("VPN DEBUG: enumRoutes threw " + t);
+            t.printStackTrace();
         }
         return result;
     }

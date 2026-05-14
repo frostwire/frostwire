@@ -189,7 +189,8 @@ final class DesktopVPNMonitor implements VPNMonitor {
                         String lower = name.toLowerCase();
                         if (lower.contains("tun") || lower.contains("tap") ||
                                 lower.contains("wg") || lower.contains("utun") ||
-                                lower.contains("ppp") || lower.contains("ipsec")) {
+                                lower.contains("ppp") || lower.contains("ipsec") ||
+                                lower.contains("vpn")) {
                             return true;
                         }
                     }
