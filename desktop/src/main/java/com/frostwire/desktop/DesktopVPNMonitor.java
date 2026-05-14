@@ -185,12 +185,30 @@ final class DesktopVPNMonitor implements VPNMonitor {
                 while (interfaces.hasMoreElements()) {
                     NetworkInterface ni = interfaces.nextElement();
                     String name = ni.getName();
-                    if (name != null) {
+                    if (name != null && ni.isUp() && !ni.isLoopback()) {
                         String lower = name.toLowerCase();
                         if (lower.contains("tun") || lower.contains("tap") ||
                                 lower.contains("wg") || lower.contains("utun") ||
                                 lower.contains("ppp") || lower.contains("ipsec") ||
                                 lower.contains("vpn")) {
+                            // On macOS, utun* interfaces are used for both VPNs and system
+                            // services (iCloud, Back to My Mac). Verify the interface has
+                            // a real IPv4 address (not just fe80:: link-local) to avoid
+                            // false positives from dormant system tunnels.
+                            if (lower.contains("utun")) {
+                                boolean hasRealAddress = false;
+                                Enumeration<java.net.InetAddress> addrs = ni.getInetAddresses();
+                                while (addrs.hasMoreElements()) {
+                                    java.net.InetAddress addr = addrs.nextElement();
+                                    if (addr instanceof java.net.Inet4Address && !addr.isLinkLocalAddress()) {
+                                        hasRealAddress = true;
+                                        break;
+                                    }
+                                }
+                                if (!hasRealAddress) {
+                                    continue; // skip system utun interfaces with only link-local addresses
+                                }
+                            }
                             return true;
                         }
                     }
