@@ -1,3 +1,6 @@
+FrostWire 3.2.0 build 776 UNRELEASED
+ - new:Powered by jlibtorrent 2.0.12.9
+
 FrostWire 3.1.4 build 775 MAY/11/2026
   - fix:Music player notification now opens a fresh AudioPlayerActivity via a no-UI trampoline that builds MainActivity under the player; MediaSession/session content intents point to the trampoline, and MainActivity forwards Android/Oplus Seedling media-launch intents to the player for compact System UI media cards
   - fix:Transfer Detail no longer crashes with ClassCastException when a torrent is still in fetch phase; AbstractTransferDetailFragment.ensureTorrentHandle now guards getBittorrentDownload() results with instanceof before casting, preventing TorrentFetcherDownload→UIBittorrentDownload cast failures

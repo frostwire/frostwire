@@ -324,7 +324,7 @@ dependencies {
     implementation 'androidx.media3:media3-ui:1.10.0'
     implementation 'androidx.media3:media3-common:1.10.0'
 
-    def jlibtorrent_version = '2.0.12.7'
+    def jlibtorrent_version = '2.0.12.9'
     implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
