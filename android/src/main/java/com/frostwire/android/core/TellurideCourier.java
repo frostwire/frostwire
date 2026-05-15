@@ -46,6 +46,11 @@ public final class TellurideCourier {
     private static volatile TellurideCourierCallback lastKnownCallback = null;
     private static volatile String cachedYtDlpVersion = null;
 
+    /** Returns the cached yt_dlp version if available, otherwise null. */
+    public static String getCachedYtDlpVersion() {
+        return cachedYtDlpVersion;
+    }
+
     public static void abortCurrentQuery() {
         if (lastKnownCallback == null) {
             return;

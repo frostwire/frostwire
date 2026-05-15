@@ -151,6 +151,9 @@ public class MainApplication extends Application implements Configuration.Provid
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, SearchMediator::instance);
 
+        // Pre-warm yt_dlp version so Settings > About shows it instantly (no 5s placeholder delay)
+        TellurideCourier.ytDlpVersion(v -> { /* cached for AboutFragment */ });
+
         // Clean temp directory
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
 

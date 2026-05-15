@@ -71,6 +71,14 @@ public final class AboutFragment extends AbstractFragment {
         TextView jlibtorrentVersion = findView(rootView, R.id.fragment_about_jlibtorrent_version);
         jlibtorrentVersion.setText(jlibtorrentVersion());
 
+        // Show cached yt_dlp version instantly if pre-warmed at startup
+        TextView ytDlpVersionView = findView(rootView, R.id.fragment_about_yt_dlp_version);
+        String cached = TellurideCourier.getCachedYtDlpVersion();
+        if (cached != null && ytDlpVersionView != null) {
+            ytDlpVersionView.setText(String.format("yt_dlp %s", cached));
+        }
+
+        // Ensure version is loaded (no-op if already cached)
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
                 () -> TellurideCourier.ytDlpVersion(
                         (version) -> SystemUtils.postToUIThread(() -> {
