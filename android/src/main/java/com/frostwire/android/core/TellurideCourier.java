@@ -44,6 +44,7 @@ public final class TellurideCourier {
     private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
     private static volatile Gson gson = null;
     private static volatile TellurideCourierCallback lastKnownCallback = null;
+    private static volatile String cachedYtDlpVersion = null;
 
     public static void abortCurrentQuery() {
         if (lastKnownCallback == null) {
@@ -208,6 +209,13 @@ public final class TellurideCourier {
             return;
         }
         SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::ytDlpVersion");
+
+        // Return cached value instantly if available
+        if (cachedYtDlpVersion != null) {
+            callback.onVersion(cachedYtDlpVersion);
+            return;
+        }
+
         try {
             if (!Python.isStarted()) {
                 Engine.startPython();
@@ -249,7 +257,9 @@ public final class TellurideCourier {
             callback.onVersion("<unavailable>");
             return;
         }
-        callback.onVersion(ytDlpVersionString.toString());
+        String version = ytDlpVersionString.toString();
+        cachedYtDlpVersion = version;   // cache for future calls
+        callback.onVersion(version);
     }
 
 

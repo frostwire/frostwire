@@ -1,5 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
  - new:Powered by jlibtorrent 2.0.12.9
+ - fix:Settings > About now correctly displays the yt_dlp version instead of the placeholder text; added result caching in TellurideCourier and safe live-view update with invalidate/requestLayout in AboutFragment to handle slow Python initialization and fragment lifecycle races
 
 FrostWire 3.1.4 build 775 MAY/11/2026
   - fix:Music player notification now opens a fresh AudioPlayerActivity via a no-UI trampoline that builds MainActivity under the player; MediaSession/session content intents point to the trampoline, and MainActivity forwards Android/Oplus Seedling media-launch intents to the player for compact System UI media cards

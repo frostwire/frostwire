@@ -74,8 +74,15 @@ public final class AboutFragment extends AbstractFragment {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
                 () -> TellurideCourier.ytDlpVersion(
                         (version) -> SystemUtils.postToUIThread(() -> {
-                            TextView ytDlpVersion = findView(rootView, R.id.fragment_about_yt_dlp_version);
-                            ytDlpVersion.setText(String.format("yt_dlp %s", version));
+                            View v = getView();
+                            if (v != null) {
+                                TextView ytDlpVersion = v.findViewById(R.id.fragment_about_yt_dlp_version);
+                                if (ytDlpVersion != null) {
+                                    ytDlpVersion.setText(String.format("yt_dlp %s", version));
+                                    ytDlpVersion.invalidate();
+                                    ytDlpVersion.requestLayout();
+                                }
+                            }
                         })));
 
         TextView changelog = findView(rootView, R.id.fragment_about_changelog);
