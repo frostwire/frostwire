@@ -117,7 +117,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         final long piecesCount = pieces != null ? pieces.count() : -1;
         final int totalPiecesValue = torrentInfo != null ? torrentInfo.numPieces() : totalPieces;
         final String pieceSizeValue = torrentInfo != null
-                ? UIUtils.getBytesInHuman(torrentInfo.pieceSize(0))
+                ? UIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0))
                 : pieceSizeString;
 
         SystemUtils.postToUIThread(() ->

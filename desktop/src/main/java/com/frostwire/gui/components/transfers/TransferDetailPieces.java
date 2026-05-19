@@ -137,7 +137,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             TorrentHandle torrentHandle = bittorrentDownload.getDl().getTorrentHandle();
             TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
             TorrentInfo torrentInfo = torrentHandle.torrentFile();
-            pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
+            pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0));
             totalPieces = torrentInfo.numPieces();
             pieces = status.pieces();
             if (pieces.isAllSet()) {
