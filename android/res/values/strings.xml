@@ -157,6 +157,14 @@
     <string name="torrent_max_peers">Max Peers</string>
     <string name="incoming_connection_port_range">Incoming Connection Port Range</string>
     <string name="incoming_connection_port_range_summary">Configure ports for incoming connections</string>
+    <string name="advanced_bittorrent_settings">Advanced BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Allow multiple connections from the same peer ID</string>
+    <string name="allow_multiple_connections_per_pid_summary">Use only for private trackers, CGNAT, or other special network setups</string>
+    <string name="natpmp_gateway">NAT-PMP gateway override</string>
+    <string name="natpmp_gateway_summary">Optional router gateway address for NAT-PMP port mapping</string>
+    <string name="natpmp_lease_duration">NAT-PMP lease duration</string>
+    <string name="natpmp_lease_duration_summary">Requested port mapping lifetime in seconds. Default: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP lease duration must be greater than 0 seconds</string>
     <string name="port_range_dialog_title">Set Port Range</string>
     <string name="port_range_start_port">Starting Port</string>
     <string name="port_range_end_port">Ending Port</string>

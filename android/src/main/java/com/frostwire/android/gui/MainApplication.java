@@ -281,7 +281,7 @@ public class MainApplication extends Application implements Configuration.Provid
                 ctx.i2pInboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH), 3);
                 ctx.i2pOutboundLength = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH), 3);
                 ctx.natpmpGateway = cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
-                ctx.natpmpLeaseDuration = cm.getInt(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION);
+                ctx.natpmpLeaseDuration = parseI2PInt(cm.getString(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION), 3600);
                 ctx.allowMultipleConnectionsPerPid = cm.getBoolean(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
                 String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
                 ctx.version[0] = Integer.parseInt(vStrArray[0]);

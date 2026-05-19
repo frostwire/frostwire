@@ -169,4 +169,24 @@
             android:summary="@string/incoming_connection_port_range_summary"
             android:title="@string/incoming_connection_port_range"/>
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/advanced_bittorrent_settings">
+        <SwitchPreference
+            android:key="frostwire.prefs.network.allow_multiple_connections_per_pid"
+            android:summary="@string/allow_multiple_connections_per_pid_summary"
+            android:title="@string/allow_multiple_connections_per_pid"/>
+
+        <EditTextPreference
+            android:key="frostwire.prefs.network.natpmp_gateway"
+            android:defaultValue=""
+            android:summary="@string/natpmp_gateway_summary"
+            android:title="@string/natpmp_gateway"/>
+
+        <EditTextPreference
+            android:key="frostwire.prefs.network.natpmp_lease_duration"
+            android:defaultValue="3600"
+            android:inputType="number"
+            android:summary="@string/natpmp_lease_duration_summary"
+            android:title="@string/natpmp_lease_duration"/>
+    </PreferenceCategory>
 </PreferenceScreen>

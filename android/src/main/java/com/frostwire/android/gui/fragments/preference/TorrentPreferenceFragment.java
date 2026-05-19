@@ -21,12 +21,14 @@ package com.frostwire.android.gui.fragments.preference;
 
 import androidx.fragment.app.DialogFragment;
 
+import androidx.preference.EditTextPreference;
 import androidx.preference.SwitchPreference;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.jlibtorrent.SettingsPack;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
@@ -47,6 +49,7 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     @Override
     protected void initComponents() {
         setupTorrentOptions();
+        setupAdvancedJlibtorrentOptions();
         setupSeedingOptions();
     }
 
@@ -119,6 +122,51 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e);
     }
 
+    private void setupAdvancedJlibtorrentOptions() {
+        SwitchPreference allowMultipleConnections = findPreference(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID);
+        if (allowMultipleConnections != null) {
+            allowMultipleConnections.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean allow = (boolean) newValue;
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    SettingsPack settings = new SettingsPack();
+                    settings.allowMultipleConnectionsPerPid(allow);
+                    BTEngine.getInstance().applySettings(settings);
+                });
+                return true;
+            });
+        }
+
+        EditTextPreference natpmpGateway = findPreference(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY);
+        if (natpmpGateway != null) {
+            natpmpGateway.setOnPreferenceChangeListener((preference, newValue) -> {
+                String gateway = newValue != null ? newValue.toString().trim() : "";
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    SettingsPack settings = new SettingsPack();
+                    settings.natpmpGateway(gateway);
+                    BTEngine.getInstance().applySettings(settings);
+                });
+                return true;
+            });
+        }
+
+        EditTextPreference natpmpLeaseDuration = findPreference(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION);
+        if (natpmpLeaseDuration != null) {
+            natpmpLeaseDuration.setOnPreferenceChangeListener((preference, newValue) -> {
+                int leaseDuration = parsePositiveInt(newValue);
+                if (leaseDuration <= 0) {
+                    UIUtils.showShortMessage(getView(), R.string.natpmp_lease_duration_invalid);
+                    return false;
+                }
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    SettingsPack settings = new SettingsPack();
+                    settings.natpmpLeaseDuration(leaseDuration);
+                    BTEngine.getInstance().applySettings(settings);
+                });
+                return true;
+            });
+        }
+    }
+
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
         if (preference instanceof CustomSeekBarPreference) {
@@ -170,6 +218,17 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
             case Constants.PREF_KEY_TORRENT_MAX_PEERS:
                 btEngine.maxPeers(value);
                 break;
+        }
+    }
+
+    private static int parsePositiveInt(Object value) {
+        if (value == null) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException ignored) {
+            return -1;
         }
     }
 }

@@ -389,7 +389,7 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_NETWORK_I2P_INBOUND_LENGTH] = "3"
         m[Constants.PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH] = "3"
         m[Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY] = ""
-        m[Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION] = 3600
+        m[Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION] = "3600"
         m[Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID] = false
 
         m[Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS] = false
