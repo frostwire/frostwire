@@ -69,6 +69,9 @@ public final class Constants {
     public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY = "frostwire.prefs.network.i2p_outbound_quantity";
     public static final String PREF_KEY_NETWORK_I2P_INBOUND_LENGTH = "frostwire.prefs.network.i2p_inbound_length";
     public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH = "frostwire.prefs.network.i2p_outbound_length";
+    public static final String PREF_KEY_NETWORK_NATPMP_GATEWAY = "frostwire.prefs.network.natpmp_gateway";
+    public static final String PREF_KEY_NETWORK_NATPMP_LEASE_DURATION = "frostwire.prefs.network.natpmp_lease_duration";
+    public static final String PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID = "frostwire.prefs.network.allow_multiple_connections_per_pid";
 
     public static final String PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_download_for_torrent_deep_scan";
     public static final String PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_rounds_for_torrent_deep_scan";

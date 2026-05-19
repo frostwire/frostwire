@@ -47,4 +47,7 @@ public final class BTContext {
     public int i2pOutboundQuantity = 3;
     public int i2pInboundLength = 3;
     public int i2pOutboundLength = 3;
+    public String natpmpGateway = "";
+    public int natpmpLeaseDuration = 0;
+    public boolean allowMultipleConnectionsPerPid = false;
 }

@@ -103,8 +103,13 @@ public final class ConnectionSettings extends LimeProps {
             FACTORY.createIntSetting("I2P_INBOUND_LENGTH", 3);
     public static final IntSetting I2P_OUTBOUND_LENGTH =
             FACTORY.createIntSetting("I2P_OUTBOUND_LENGTH", 3);
+    public static final StringSetting NATPMP_GATEWAY =
+            FACTORY.createStringSetting("NATPMP_GATEWAY", "");
+    public static final IntSetting NATPMP_LEASE_DURATION =
+            FACTORY.createIntSetting("NATPMP_LEASE_DURATION", 0);
+    public static final BooleanSetting ALLOW_MULTIPLE_CONNECTIONS_PER_PID =
+            FACTORY.createBooleanSetting("ALLOW_MULTIPLE_CONNECTIONS_PER_PID", false);
 
     private ConnectionSettings() {
     }
 }
-

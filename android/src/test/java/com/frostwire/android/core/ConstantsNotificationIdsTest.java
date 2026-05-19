@@ -34,6 +34,13 @@ public class ConstantsNotificationIdsTest {
         assertTrue(unique.size() == ids.length);
     }
 
+    @Test
+    public void networkJlibtorrentSettingKeys_areStable() {
+        assertTrue(Constants.PREF_KEY_NETWORK_NATPMP_GATEWAY.endsWith("natpmp_gateway"));
+        assertTrue(Constants.PREF_KEY_NETWORK_NATPMP_LEASE_DURATION.endsWith("natpmp_lease_duration"));
+        assertTrue(Constants.PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID.endsWith("allow_multiple_connections_per_pid"));
+    }
+
     private static Set<Integer> toSet(int[] ids) {
         Set<Integer> unique = new HashSet<>();
         for (int id : ids) {

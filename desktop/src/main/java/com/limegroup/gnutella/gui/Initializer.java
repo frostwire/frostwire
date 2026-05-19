@@ -440,6 +440,9 @@ final class Initializer {
         ctx.i2pOutboundQuantity = ConnectionSettings.I2P_OUTBOUND_QUANTITY.getValue();
         ctx.i2pInboundLength = ConnectionSettings.I2P_INBOUND_LENGTH.getValue();
         ctx.i2pOutboundLength = ConnectionSettings.I2P_OUTBOUND_LENGTH.getValue();
+        ctx.natpmpGateway = ConnectionSettings.NATPMP_GATEWAY.getValue();
+        ctx.natpmpLeaseDuration = ConnectionSettings.NATPMP_LEASE_DURATION.getValue();
+        ctx.allowMultipleConnectionsPerPid = ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue();
         FrostWireUtils.getFrostWireVersionBuild(ctx.version);
         BTEngine.ctx = ctx;
         BTEngine.onCtxSetupComplete();
