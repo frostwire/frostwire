@@ -1,5 +1,7 @@
 FrostWire 3.2.0 build 776 UNRELEASED
  - new:Powered by jlibtorrent 2.0.12.9
+ - new:Advanced BitTorrent preferences now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
+ - fix:Transfer Detail > Pieces now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
  - fix:Settings > About now shows yt_dlp version instantly; pre-warmed at startup via MainApplication, cached in TellurideCourier with synchronous getter, and AboutFragment reads cache directly to avoid placeholder delay during slow Python init
 
 FrostWire 3.1.4 build 775 MAY/11/2026
