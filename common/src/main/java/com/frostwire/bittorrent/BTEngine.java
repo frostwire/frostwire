@@ -134,9 +134,7 @@ public final class BTEngine extends SessionManager {
 
     static void applyContextSettings(SettingsPack sp, BTContext ctx) {
         sp.natpmpGateway(ctx.natpmpGateway != null ? ctx.natpmpGateway : "");
-        if (ctx.natpmpLeaseDuration > 0) {
-            sp.natpmpLeaseDuration(ctx.natpmpLeaseDuration);
-        }
+        sp.natpmpLeaseDuration(ctx.natpmpLeaseDuration);
         sp.allowMultipleConnectionsPerPid(ctx.allowMultipleConnectionsPerPid);
     }
 

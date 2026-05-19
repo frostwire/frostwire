@@ -24,10 +24,27 @@ public class JlibtorrentFeatureAdoptionTest {
         assertUsesPieceSizeForReq("../android/src/main/java/com/frostwire/android/gui/fragments/TransferDetailPiecesFragment.java");
     }
 
+    @Test
+    public void desktopAdvancedSettingsExposeNewJlibtorrentSessionControls() throws Exception {
+        String routerPane = readSource("../desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java");
+        assertTrue(routerPane.contains("ConnectionSettings.NATPMP_GATEWAY"), routerPane);
+        assertTrue(routerPane.contains("ConnectionSettings.NATPMP_LEASE_DURATION"), routerPane);
+        assertTrue(routerPane.contains("settings.natpmpGateway"), routerPane);
+        assertTrue(routerPane.contains("settings.natpmpLeaseDuration"), routerPane);
+
+        String torrentConnectionPane = readSource("../desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java");
+        assertTrue(torrentConnectionPane.contains("ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID"), torrentConnectionPane);
+        assertTrue(torrentConnectionPane.contains("settings.allowMultipleConnectionsPerPid"), torrentConnectionPane);
+    }
+
     private static void assertUsesPieceSizeForReq(String path) throws Exception {
-        String source = Files.readString(Path.of(path), StandardCharsets.ISO_8859_1);
+        String source = readSource(path);
 
         assertTrue(source.contains(".pieceSizeForReq(0)"), path);
         assertFalse(source.contains(".pieceSize(0)"), path);
+    }
+
+    private static String readSource(String path) throws Exception {
+        return Files.readString(Path.of(path), StandardCharsets.ISO_8859_1);
     }
 }

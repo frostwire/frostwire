@@ -25,7 +25,7 @@ public class BTEngineContextSettingsTest {
         BTContext ctx = new BTContext();
 
         assertEquals("", ctx.natpmpGateway);
-        assertEquals(0, ctx.natpmpLeaseDuration);
+        assertEquals(3600, ctx.natpmpLeaseDuration);
         assertFalse(ctx.allowMultipleConnectionsPerPid);
     }
 
@@ -45,17 +45,16 @@ public class BTEngineContextSettingsTest {
     }
 
     @Test
-    public void applyContextSettingsKeepsDefaultLeaseDurationWhenContextValueIsNotPositive() throws Exception {
+    public void applyContextSettingsCopiesZeroLeaseDurationWhenExplicitlyConfigured() throws Exception {
         BTContext ctx = new BTContext();
         ctx.natpmpGateway = null;
         ctx.natpmpLeaseDuration = 0;
         SettingsPack settings = new SettingsPack();
-        int defaultLeaseDuration = settings.natpmpLeaseDuration();
 
         applyContextSettings(settings, ctx);
 
         assertEquals("", settings.natpmpGateway());
-        assertEquals(defaultLeaseDuration, settings.natpmpLeaseDuration());
+        assertEquals(0, settings.natpmpLeaseDuration());
         assertFalse(settings.allowMultipleConnectionsPerPid());
     }
 

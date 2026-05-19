@@ -106,7 +106,7 @@ public final class ConnectionSettings extends LimeProps {
     public static final StringSetting NATPMP_GATEWAY =
             FACTORY.createStringSetting("NATPMP_GATEWAY", "");
     public static final IntSetting NATPMP_LEASE_DURATION =
-            FACTORY.createIntSetting("NATPMP_LEASE_DURATION", 0);
+            FACTORY.createIntSetting("NATPMP_LEASE_DURATION", 3600);
     public static final BooleanSetting ALLOW_MULTIPLE_CONNECTIONS_PER_PID =
             FACTORY.createBooleanSetting("ALLOW_MULTIPLE_CONNECTIONS_PER_PID", false);
 

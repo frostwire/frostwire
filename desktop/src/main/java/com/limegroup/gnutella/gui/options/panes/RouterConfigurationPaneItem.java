@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.settings.ConnectionSettings;
@@ -45,6 +47,8 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
      */
     private final WholeNumberField PORT_0_FIELD = new SizedWholeNumberField();
     private final WholeNumberField PORT_1_FIELD = new SizedWholeNumberField();
+    private final JTextField NATPMP_GATEWAY_FIELD = new SizedTextField(12, SizePolicy.RESTRICT_HEIGHT);
+    private final WholeNumberField NATPMP_LEASE_DURATION_FIELD = new SizedWholeNumberField(3600, 6, SizePolicy.RESTRICT_BOTH);
     private final JRadioButton RANDOM_PORT = new JRadioButton(I18n.tr("Use random port (Recommended)"));
     private final JRadioButton MANUAL_PORT = new JRadioButton(I18n.tr("Manual port range"));
     private final JLabel _labelPort0;
@@ -91,6 +95,30 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         panel.add(PORT_1_FIELD, c);
+        JLabel natpmpLabel = new JLabel(I18n.tr("NAT-PMP Settings (Advanced):"));
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(8, 0, 2, 6);
+        panel.add(natpmpLabel, c);
+        JLabel natpmpGatewayLabel = new JLabel(I18n.tr("Gateway override:"));
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = new Insets(0, 10, 0, 5);
+        panel.add(natpmpGatewayLabel, c);
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        panel.add(NATPMP_GATEWAY_FIELD, c);
+        JLabel natpmpLeaseDurationLabel = new JLabel(I18n.tr("Lease duration (seconds):"));
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = new Insets(0, 10, 0, 5);
+        panel.add(natpmpLeaseDurationLabel, c);
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        panel.add(NATPMP_LEASE_DURATION_FIELD, c);
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
@@ -117,6 +145,8 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
         MANUAL_PORT.setSelected(ConnectionSettings.MANUAL_PORT_RANGE.getValue());
         PORT_0_FIELD.setValue(ConnectionSettings.PORT_RANGE_0.getValue());
         PORT_1_FIELD.setValue(ConnectionSettings.PORT_RANGE_1.getValue());
+        NATPMP_GATEWAY_FIELD.setText(ConnectionSettings.NATPMP_GATEWAY.getValue());
+        NATPMP_LEASE_DURATION_FIELD.setValue(ConnectionSettings.NATPMP_LEASE_DURATION.getValue());
         updateState();
     }
 
@@ -147,6 +177,18 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
             ConnectionSettings.PORT_RANGE_0.setValue(tcpRangeStart);
             ConnectionSettings.PORT_RANGE_1.setValue(tcpRangeEnd);
         }
+        String natpmpGateway = NATPMP_GATEWAY_FIELD.getText().trim();
+        int natpmpLeaseDuration = NATPMP_LEASE_DURATION_FIELD.getValue();
+        if (natpmpLeaseDuration <= 0) {
+            GUIMediator.showError(I18n.tr("NAT-PMP lease duration must be greater than 0 seconds."));
+            throw new IOException("bad NAT-PMP lease duration: " + natpmpLeaseDuration);
+        }
+        ConnectionSettings.NATPMP_GATEWAY.setValue(natpmpGateway);
+        ConnectionSettings.NATPMP_LEASE_DURATION.setValue(natpmpLeaseDuration);
+        SettingsPack settings = new SettingsPack();
+        settings.natpmpGateway(natpmpGateway);
+        settings.natpmpLeaseDuration(natpmpLeaseDuration);
+        BTEngine.getInstance().applySettings(settings);
         return true;
     }
 
@@ -154,7 +196,9 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
         if (ConnectionSettings.MANUAL_PORT_RANGE.getValue() != MANUAL_PORT.isSelected()) {
             return true;
         }
-        return MANUAL_PORT.isSelected()
+        return !ConnectionSettings.NATPMP_GATEWAY.getValue().equals(NATPMP_GATEWAY_FIELD.getText().trim()) ||
+                ConnectionSettings.NATPMP_LEASE_DURATION.getValue() != NATPMP_LEASE_DURATION_FIELD.getValue() ||
+                MANUAL_PORT.isSelected()
                 && (PORT_0_FIELD.getValue() != ConnectionSettings.PORT_RANGE_0.getValue() ||
                 PORT_1_FIELD.getValue() != ConnectionSettings.PORT_RANGE_1.getValue());
     }

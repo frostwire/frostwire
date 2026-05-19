@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -34,8 +35,10 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     private final static String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
     private final static String ENABLE_DISTRIBUTED_HASH_TABLE = I18n.tr("Enable Distributed Hash Table (DHT)");
     private final static String VPN_DROP_PROTECTION = I18n.tr("VPN-Drop Protection. Require VPN connection for BitTorrent");
+    private final static String ALLOW_MULTIPLE_CONNECTIONS_PER_PID = I18n.tr("Allow multiple connections from the same peer ID");
     private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
     private final JCheckBox VPN_DROP_PROTECTION_CHECKBOX = new JCheckBox();
+    private final JCheckBox ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX = new JCheckBox();
     private final WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
     private final WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
     private final WholeNumberField MAX_PEERS_FIELD = new SizedWholeNumberField(4);
@@ -58,6 +61,12 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
             panel.add(comp.getComponent());
             panel.addVerticalComponentGap();
         }
+        comp = new LabeledComponent(ALLOW_MULTIPLE_CONNECTIONS_PER_PID,
+                ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX,
+                LabeledComponent.LEFT_GLUE,
+                LabeledComponent.LEFT);
+        panel.add(comp.getComponent());
+        panel.addVerticalComponentGap();
         comp = new LabeledComponent(
                 MAX_ACTIVE_DOWNLOADS,
                 MAX_ACTIVE_DOWNLOADS_FIELD, LabeledComponent.LEFT_GLUE,
@@ -90,6 +99,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
         return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
                 ConnectionSettings.VPN_DROP_PROTECTION.getValue() != VPN_DROP_PROTECTION_CHECKBOX.isSelected() ||
+                ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue() != ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -101,6 +111,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
         ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue());
         VPN_DROP_PROTECTION_CHECKBOX.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
+        ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.setSelected(ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -112,6 +123,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
         applyVPNDropProtectionOption(btEngine);
+        applyPeerIdConnectionOption(btEngine);
         btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
         btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
         btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
@@ -141,5 +153,13 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);
         GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
         GUIMediator.instance().getStatusLine().refresh();
+    }
+
+    private void applyPeerIdConnectionOption(BTEngine btEngine) {
+        boolean allowMultipleConnections = ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected();
+        ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.setValue(allowMultipleConnections);
+        SettingsPack settings = new SettingsPack();
+        settings.allowMultipleConnectionsPerPid(allowMultipleConnections);
+        btEngine.applySettings(settings);
     }
 }
