@@ -131,7 +131,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         if (vpnGuardEnabled && !hasVpn) {
             LOG.info("VPN guard enabled but no VPN detected. Pausing torrents.");
             TransferManager.instance().pauseTorrents();
-            Engine.instance().stopServices(true);
             return;
         }
 

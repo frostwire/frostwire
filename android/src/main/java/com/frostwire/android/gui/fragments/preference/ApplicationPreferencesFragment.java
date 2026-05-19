@@ -157,8 +157,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (boolean) newValue;
             if (newVal && !NetworkManager.instance().isTunnelUp()) {
-                disconnect();
-                setChecked(findPreference("frostwire.prefs.internal.connect_disconnect"), false, false);
+                TransferManager.instance().pauseTorrents();
                 UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
             }
             return true;

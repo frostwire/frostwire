@@ -199,6 +199,10 @@ public final class TransferManager {
             return new InvalidBittorrentDownload(R.string.torrent_transfer_aborted_on_mobile_data, sr);
         }
 
+        if (isBittorrentSearchResultAndVpnRequired(sr)) {
+            return new InvalidBittorrentDownload(R.string.cannot_start_engine_without_vpn, sr);
+        }
+
         if (isMobileAndDataSavingsOn()) {
             return new InvalidDownload(R.string.cloud_download_aborted_on_mobile_data, sr);
         }
@@ -365,6 +369,10 @@ public final class TransferManager {
     }
 
     public BittorrentDownload downloadTorrent(String uri, TorrentFetcherListener fetcherListener, String tempDownloadTitle) {
+        if (isBittorrentOnVpnOnlyAndNoVpn()) {
+            return new InvalidBittorrentDownload(R.string.cannot_start_engine_without_vpn, null);
+        }
+
         String url = uri.trim();
         try {
             if (url.contains("urn%3Abtih%3A")) {
@@ -509,6 +517,17 @@ public final class TransferManager {
         return sr instanceof TorrentSearchResult && isMobileAndDataSavingsOn();
     }
 
+    public boolean isBittorrentSearchResultAndVpnRequired(SearchResult sr) {
+        return sr instanceof TorrentSearchResult && isBittorrentOnVpnOnlyAndNoVpn();
+    }
+
+    public boolean isBittorrentOnVpnOnlyAndNoVpn() {
+        NetworkManager networkManager = NetworkManager.instance();
+        return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                !networkManager.isTunnelUp() &&
+                !networkManager.isVpnConnected();
+    }
+
     public boolean isBittorrentDownloadAndMobileDataSavingsOn(Transfer transfer) {
         return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
@@ -548,7 +567,7 @@ public final class TransferManager {
     public void resumeResumableTransfers() {
         List<Transfer> transfers = getTransfers();
 
-        if (!isMobileAndDataSavingsOn()) {
+        if (!isMobileAndDataSavingsOn() && !isBittorrentOnVpnOnlyAndNoVpn()) {
             for (Transfer t : transfers) {
                 if (t instanceof BittorrentDownload) {
                     BittorrentDownload bt = (BittorrentDownload) t;
@@ -568,7 +587,7 @@ public final class TransferManager {
     public void seedFinishedTransfers() {
         List<Transfer> transfers = getTransfers();
 
-        if (!isMobileAndDataSavingsOn()) {
+        if (!isMobileAndDataSavingsOn() && !isBittorrentOnVpnOnlyAndNoVpn()) {
             for (Transfer t : transfers) {
                 if (t instanceof BittorrentDownload) {
                     BittorrentDownload bt = (BittorrentDownload) t;
