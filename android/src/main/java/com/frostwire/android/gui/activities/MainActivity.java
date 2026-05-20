@@ -184,11 +184,15 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
         shuttingDown.set(true);
         SearchMediator.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
-        finish();
+        finishForShutdown();
         OkHttpClientWrapper.cancelAllRequests();
         TellurideCourier.abortCurrentQuery();
         SystemUtils.stopAllHandlerThreads();
         Engine.instance().shutdown();
+    }
+
+    private void finishForShutdown() {
+        super.finish();
     }
 
     @Override

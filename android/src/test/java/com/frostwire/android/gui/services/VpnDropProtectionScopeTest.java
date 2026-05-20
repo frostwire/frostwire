@@ -27,6 +27,8 @@ public class VpnDropProtectionScopeTest {
         String vpnPreferenceBlock = blockStartingAt(source, "private void setupVPNRequirementOption()");
 
         assertTrue(vpnPreferenceBlock.contains("TransferManager.instance().pauseTorrents();"));
+        assertTrue(vpnPreferenceBlock.contains("SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,"));
+        assertTrue(vpnPreferenceBlock.contains("TransferManager.instance().resumeResumableTransfers()"));
         assertFalse(vpnPreferenceBlock.contains("disconnect();"));
         assertFalse(vpnPreferenceBlock.contains("setChecked(findPreference(\"frostwire.prefs.internal.connect_disconnect\"), false, false);"));
     }
