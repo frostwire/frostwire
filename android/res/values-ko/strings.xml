@@ -434,4 +434,151 @@
     <string name="error_restarting_torrent_engine">토런트 엔진 다시 시작 오류: %s</string>
     <string name="apply">적용</string>
     <string name="port_range_cancel">취소</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">시스템</string>
+    <string name="support_offer_header">지원 FrostWire</string>
+    <string name="support_offer_donation_title">지원 FrostWire</string>
+    <string name="support_offer_donation_message">귀하의 기부는 FrostWire를 무료로 유지하는 데 도움이 됩니다.</string>
+    <string name="support_offer_donation_action">기부</string>
+    <string name="support_offer_donation_badge">기부</string>
+    <string name="support_offer_vpn_title">개인정보 보호</string>
+    <string name="support_offer_vpn_message">FrostWire VPN를 구매하고 안전하게 다운로드하세요.</string>
+    <string name="support_offer_vpn_action">VPN 받기</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">지원 FrostWire</string>
+    <string name="support_offer_default_message">기부 또는 VPN 구독을 통해 FrostWire를 강력하게 유지하세요.</string>
+    <string name="no_browser_found">이 링크를 열 수 있는 브라우저를 찾을 수 없습니다.</string>
+    <string name="use_one337x">1337x 사용</string>
+    <string name="use_idope">Idope 사용</string>
+    <string name="use_knaben">Knaben 사용</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">고급 BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">동일한 피어 ID에서 여러 연결 허용</string>
+    <string name="allow_multiple_connections_per_pid_summary">개인 추적기, CGNAT 또는 기타 특수 네트워크 설정에만 사용</string>
+    <string name="natpmp_gateway">NAT-PMP 게이트웨이 재정의</string>
+    <string name="natpmp_gateway_summary">NAT-PMP 포트 매핑을 위한 선택적 라우터 게이트웨이 주소</string>
+    <string name="natpmp_lease_duration">NAT-PMP 임대 기간</string>
+    <string name="natpmp_lease_duration_summary">요청된 포트 매핑 수명(초)입니다. 기본값: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP 임대 기간은 0초보다 커야 합니다.</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">MagnetDL 사용</string>
+    <string name="use_torrentscsv">TorrentsCSV 사용</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P 설정</string>
+    <string name="enable_i2p">I2P 지원 활성화</string>
+    <string name="enable_i2p_summary">I2P 네트워크를 통한 익명 토렌트(I2P 라우터 실행 필요)</string>
+    <string name="i2p_sam_bridge">SAM 브리지</string>
+    <string name="i2p_sam_hostname">SAM 호스트 이름</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM 브리지 주소</string>
+    <string name="i2p_sam_port">SAM 포트</string>
+    <string name="i2p_sam_port_summary">I2P SAM 브리지 포트(일반적으로 7656)</string>
+    <string name="i2p_allow_mixed">혼합 모드 허용</string>
+    <string name="i2p_allow_mixed_summary">허용 I2P 토렌트는 I2P 및 일반 피어(덜 익명성) 모두에 연결합니다.</string>
+    <string name="i2p_advanced_settings">고급 터널 설정</string>
+    <string name="i2p_inbound_quantity">인바운드 터널</string>
+    <string name="i2p_inbound_quantity_summary">인바운드 터널 수 [1-16](높을수록 익명성이 높음, 느림)</string>
+    <string name="i2p_outbound_quantity">아웃바운드 터널</string>
+    <string name="i2p_outbound_quantity_summary">아웃바운드 터널 수[1-16](높을수록 익명성이 높음, 느림)</string>
+    <string name="i2p_inbound_length">인바운드 홉</string>
+    <string name="i2p_inbound_length_summary">인바운드 터널의 홉 수[0-7](높을수록 익명성이 높음, 느림)</string>
+    <string name="i2p_outbound_length">아웃바운드 홉</string>
+    <string name="i2p_outbound_length_summary">아웃바운드의 홉 수 터널 [0-7] (높을수록 익명성이 높음, 느림)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent 꺼짐(VPN 가드 활성)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">커뮤니티</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d 분 남음 광고 없음</string>
+    <string name="minute_left_ad_free">1분 남음 광고 없음</string>
+    <string name="reward_product_title">%d분</string>
+    <string name="reward_product_price">무료, 동영상 광고 1개 재생</string>
+    <string name="temporary_ad_removal">임시 광고 제거</string>
+    <string name="temporary_ad_removal_description">동영상 재생 후 %d에 대한 광고 없음</string>
+    <string name="looking_For_rewarded_video">보상형 동영상을 찾고 있습니다...</string>
+    <string name="no_reward_videos_available">보상형 비디오를 가져올 수 없습니다. 다시 시도해 주세요</string>
+    <string name="try_it_free_for_a_half_hour">30분 동안 무료로 사용해 보세요</string>
+    <string name="sorry_could_not_find_valid_download_location_at">죄송합니다. %s에서 유효한 다운로드 위치를 찾을 수 없습니다.</string>
+    <string name="free">무료</string>
+    <string name="dummy_ad">광고</string>
+    <string name="dummy_age_ago">2일 전</string>
+    <string name="one_second">1초</string>
+    <string name="n_seconds">%s 초</string>
+    <string name="one_minute">1분</string>
+    <string name="n_minutes">%s 분</string>
+    <string name="one_hour">1시간</string>
+    <string name="n_hours">%s 시간</string>
+    <string name="one_day">1일</string>
+    <string name="n_days">%s 일</string>
+    <string name="one_month">1개월</string>
+    <string name="n_months">%s개월</string>
+    <string name="n_years">%s년</string>
+    <string name="enable_sequential_download_summary">조각이 순서대로 다운로드됩니다. 네트워크 상태에 권장되지 않음</string>
+    <string name="dummy_period">/기간</string>
+    <string name="period_monthly">월별</string>
+    <string name="period_yearly">연간</string>
+    <string name="open_file_explorer">파일 탐색기 열기</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">권한이 거부됨</string>
+    <string name="information">정보</string>
+    <string name="ok">확인</string>
+    <string name="yt_not_supported_on_basic">YouTube 다운로드는 Google Play 규칙으로 인해 FrostWire Basic에서 지원되지 않습니다.\n\nFrostWire Plus의 무료 사본을 받으려면 공식 웹사이트 Frostwire.com을 방문하세요.</string>
+    <string name="use_btdigg">BTDigg</string>
+    <string name="use_yt">사용 YT</string>
+    <string name="error_cannot_open_downloads_folder">사용 다운로드를 볼 수 있는 앱이 없습니다. FrostWire에 권한이 있고 파일 탐색기가 설치되어 있는지 확인하세요.</string>
+    <string name="_30_minutes">30분</string>
+    <string name="ad_free_30_minutes">광고 없음 30분</string>
 </resources>

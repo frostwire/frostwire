@@ -432,4 +432,153 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">వ్యవస్థ</string>
+    <string name="support_offer_header">మద్దతు FrostWire</string>
+    <string name="support_offer_donation_title">మద్దతు FrostWire</string>
+    <string name="support_offer_donation_message">మీ విరాళం FrostWireని ఉచితంగా ఉంచడంలో సహాయపడుతుంది.</string>
+    <string name="support_offer_donation_action">దానం చేయండి</string>
+    <string name="support_offer_donation_badge">దానం చేయండి</string>
+    <string name="support_offer_vpn_title">మీ గోప్యతను రక్షించండి</string>
+    <string name="support_offer_vpn_message">FrostWire VPN పొందండి మరియు సురక్షితంగా డౌన్‌లోడ్ చేసుకోండి.</string>
+    <string name="support_offer_vpn_action">VPN పొందండి</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">మద్దతు FrostWire</string>
+    <string name="support_offer_default_message">విరాళం లేదా VPN సబ్‌స్క్రిప్షన్‌తో FrostWireని బలంగా ఉంచండి.</string>
+    <string name="no_browser_found">ఈ లింక్‌ని తెరవడానికి బ్రౌజర్ ఏదీ కనుగొనబడలేదు.</string>
+    <string name="use_one337x">1337x ఉపయోగించండి</string>
+    <string name="use_idope">ఐడోప్ ఉపయోగించండి</string>
+    <string name="use_knaben">Knaben ఉపయోగించండి</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">అధునాతన BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">ఒకే పీర్ ID నుండి బహుళ కనెక్షన్‌లను అనుమతించండి</string>
+    <string name="allow_multiple_connections_per_pid_summary">ప్రైవేట్ ట్రాకర్లు, CGNAT లేదా ఇతర ప్రత్యేక నెట్‌వర్క్ సెటప్‌ల కోసం మాత్రమే ఉపయోగించండి</string>
+    <string name="natpmp_gateway">NAT-PMP గేట్‌వే ఓవర్‌రైడ్</string>
+    <string name="natpmp_gateway_summary">NAT-PMP పోర్ట్ మ్యాపింగ్ కోసం ఐచ్ఛిక రూటర్ గేట్‌వే చిరునామా</string>
+    <string name="natpmp_lease_duration">NAT-PMP లీజు వ్యవధి</string>
+    <string name="natpmp_lease_duration_summary">సెకన్లలో పోర్ట్ మ్యాపింగ్ జీవితకాలం అభ్యర్థించబడింది. డిఫాల్ట్: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP లీజు వ్యవధి తప్పనిసరిగా 0 సెకన్ల కంటే ఎక్కువగా ఉండాలి</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="http_download_status_uncompressing">కంప్రెస్ చేయడం</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">MagnetDL ఉపయోగించండి</string>
+    <string name="use_torrentscsv">TorrentCSVని ఉపయోగించండి</string>
+    <string name="transfer_status_demuxing">డీమక్సింగ్</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P సెట్టింగ్‌లు</string>
+    <string name="enable_i2p">I2P మద్దతును ప్రారంభించండి</string>
+    <string name="enable_i2p_summary">I2P నెట్‌వర్క్ ద్వారా అనామక టొరెంటింగ్ (I2P రూటర్ రన్నింగ్ అవసరం)</string>
+    <string name="i2p_sam_bridge">SAM వంతెన</string>
+    <string name="i2p_sam_hostname">SAM హోస్ట్ పేరు</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM వంతెన చిరునామా</string>
+    <string name="i2p_sam_port">SAM పోర్ట్</string>
+    <string name="i2p_sam_port_summary">I2P SAM వంతెన పోర్ట్ (సాధారణంగా 7656)</string>
+    <string name="i2p_allow_mixed">మిక్స్‌డ్ మోడ్‌ని అనుమతించండి</string>
+    <string name="i2p_allow_mixed_summary">I2P టోరెంట్‌లను I2P మరియు సాధారణ పీర్‌లకు కనెక్ట్ చేయడానికి అనుమతించండి (తక్కువ అనామకులు)</string>
+    <string name="i2p_advanced_settings">అధునాతన టన్నెల్ సెట్టింగ్‌లు</string>
+    <string name="i2p_inbound_quantity">ఇన్‌బౌండ్ టన్నెల్స్</string>
+    <string name="i2p_inbound_quantity_summary">ఇన్‌బౌండ్ సొరంగాల సంఖ్య [1-16] (ఎక్కువ = ఎక్కువ అజ్ఞాతం, నెమ్మదిగా)</string>
+    <string name="i2p_outbound_quantity">అవుట్‌బౌండ్ సొరంగాలు</string>
+    <string name="i2p_outbound_quantity_summary">అవుట్‌బౌండ్ సొరంగాల సంఖ్య [1-16] (ఎక్కువ = ఎక్కువ అజ్ఞాతం, నెమ్మదిగా)</string>
+    <string name="i2p_inbound_length">ఇన్‌బౌండ్ హాప్స్</string>
+    <string name="i2p_inbound_length_summary">ఇన్‌బౌండ్ టన్నెల్‌ల కోసం హాప్ కౌంట్ [0-7] (ఎక్కువ = ఎక్కువ అజ్ఞాతం, నెమ్మదిగా)</string>
+    <string name="i2p_outbound_length">అవుట్‌బౌండ్ హాప్స్</string>
+    <string name="i2p_outbound_length_summary">అవుట్‌బౌండ్ టన్నెల్‌ల కోసం హాప్ కౌంట్ [0-7] (ఎక్కువ = ఎక్కువ అజ్ఞాతం, నెమ్మదిగా)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent ఆఫ్ (VPN గార్డ్ యాక్టివ్)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">సంఘం</string>
+    <string name="play_uppercase">ఆడండి</string>
+    <string name="minutes_left_ad_free">%d నిమిషాలు ప్రకటన రహితంగా మిగిలి ఉన్నాయి</string>
+    <string name="minute_left_ad_free">ప్రకటన రహితంగా ఒక నిమిషం మిగిలి ఉంది</string>
+    <string name="reward_product_title">%d నిమిషాలు</string>
+    <string name="reward_product_price">ఉచిత, 1 వీడియో ప్రకటనను ప్లే చేయండి</string>
+    <string name="temporary_ad_removal">తాత్కాలిక ప్రకటన తొలగింపు</string>
+    <string name="temporary_ad_removal_description">వీడియో ప్లే చేసిన తర్వాత %d నిమిషాలకు ప్రకటనలు లేవు</string>
+    <string name="looking_For_rewarded_video">రివార్డ్ వీడియో కోసం వెతుకుతోంది...</string>
+    <string name="no_reward_videos_available">రివార్డ్ వీడియోను పొందడం సాధ్యపడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి</string>
+    <string name="try_it_free_for_a_half_hour">దీన్ని అరగంట పాటు ఉచితంగా ప్రయత్నించండి</string>
+    <string name="sorry_could_not_find_valid_download_location_at">క్షమించండి, %s వద్ద చెల్లుబాటు అయ్యే డౌన్‌లోడ్ స్థానాన్ని కనుగొనలేకపోయాము</string>
+    <string name="free">ఉచిత</string>
+    <string name="dummy_ad">ప్రకటన</string>
+    <string name="dummy_age_ago">2 రోజుల క్రితం</string>
+    <string name="one_second">1 సెకను</string>
+    <string name="n_seconds">%s సెకన్లు</string>
+    <string name="one_minute">1 నిమిషం</string>
+    <string name="n_minutes">%s నిమిషాలు</string>
+    <string name="one_hour">1 గంట</string>
+    <string name="n_hours">%s గంటలు</string>
+    <string name="one_day">1 రోజు</string>
+    <string name="n_days">%s రోజులు</string>
+    <string name="one_month">1 నెల</string>
+    <string name="n_months">%s నెలలు</string>
+    <string name="n_years">%s సంవత్సరాలు</string>
+    <string name="enable_sequential_download_summary">ముక్కలు క్రమంలో డౌన్‌లోడ్ చేయబడతాయి. నెట్‌వర్క్ ఆరోగ్యానికి సిఫార్సు చేయబడలేదు</string>
+    <string name="dummy_period">/కాలం</string>
+    <string name="period_monthly">నెలవారీ</string>
+    <string name="period_yearly">సంవత్సరానికి</string>
+    <string name="open_file_explorer">ఫైల్ ఎక్స్‌ప్లోరర్‌ని తెరవండి</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">అనుమతి నిరాకరించబడింది</string>
+    <string name="information">సమాచారం</string>
+    <string name="ok">సరే</string>
+    <string name="yt_not_supported_on_basic">Google Play నియమాల కారణంగా YouTube డౌన్‌లోడ్‌లకు FrostWire బేసిక్ మద్దతు లేదు.\n\nFrostWire ప్లస్ యొక్క ఉచిత కాపీ కోసం మా అధికారిక వెబ్‌సైట్ frostwire.comకి వెళ్లండి</string>
+    <string name="use_btdigg">BTDiggని ఉపయోగించండి</string>
+    <string name="use_yt">YTని ఉపయోగించండి</string>
+    <string name="error_cannot_open_downloads_folder">డౌన్‌లోడ్‌లను వీక్షించడానికి యాప్ ఏదీ కనుగొనబడలేదు. FrostWireకి అనుమతులు ఉన్నాయని మరియు ఫైల్ ఎక్స్‌ప్లోరర్ ఇన్‌స్టాల్ చేయబడిందని నిర్ధారించుకోండి</string>
+    <string name="_30_minutes">30 నిమిషాలు</string>
+    <string name="ad_free_30_minutes">ప్రకటన రహిత 30 నిమిషాలు</string>
 </resources>

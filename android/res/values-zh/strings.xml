@@ -64,7 +64,7 @@
     <string name="are_you_sure_delete_files">确定想要永久删除选定文件?</string>
     <string name="delete_file_menu_action">删除</string>
     <string name="delete_file_menu_action_count">删除(%s)</string>
-    <string name="open_menu_action">打开 %</string>
+    <string name="open_menu_action">打开 %s</string>
     <string name="cancel_menu_action">停止传输</string>
     <string name="cancel_delete_menu_action">停止传输，删除数据</string>
     <string name="media_type_documents">书籍/文档</string>
@@ -437,4 +437,148 @@
     <string name="error_restarting_torrent_engine">重启种子引擎错误：%s</string>
     <string name="apply">应用</string>
     <string name="port_range_cancel">取消</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">系统</string>
+    <string name="support_offer_header">支持 FrostWire</string>
+    <string name="support_offer_donation_title">支持 FrostWire</string>
+    <string name="support_offer_donation_message">您的捐款有助于保持 FrostWire 的免费。</string>
+    <string name="support_offer_donation_action">捐赠</string>
+    <string name="support_offer_donation_badge">捐赠</string>
+    <string name="support_offer_vpn_title">保护您的隐私</string>
+    <string name="support_offer_vpn_message">获取 FrostWire VPN 并安全下载。</string>
+    <string name="support_offer_vpn_action">获取 VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">支持 FrostWire</string>
+    <string name="support_offer_default_message">通过捐赠或 VPN 订阅来保持 FrostWire 的强大。</string>
+    <string name="no_browser_found">找不到可以打开此链接的浏览器。</string>
+    <string name="use_one337x">使用 1337x</string>
+    <string name="use_idope">使用 Idope</string>
+    <string name="use_knaben">使用 Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">高级 BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">允许来自同一对等 ID 的多个连接</string>
+    <string name="allow_multiple_connections_per_pid_summary">仅用于专用跟踪器、CGNAT 或其他特殊网络设置</string>
+    <string name="natpmp_gateway">NAT-PMP 网关覆盖</string>
+    <string name="natpmp_gateway_summary">用于 NAT-PMP 端口映射的可选路由器网关地址</string>
+    <string name="natpmp_lease_duration">NAT-PMP 租用期限</string>
+    <string name="natpmp_lease_duration_summary">请求的端口映射生命周期（以秒为单位）。默认值：3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP 租用期限必须大于 0 秒</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">使用 MagnetDL</string>
+    <string name="use_torrentscsv">使用 TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P 设置</string>
+    <string name="enable_i2p">启用 I2P 支持</string>
+    <string name="enable_i2p_summary">通过 I2P 网络匿名洪流（需要运行 I2P 路由器）</string>
+    <string name="i2p_sam_bridge">SAM 桥接器</string>
+    <string name="i2p_sam_hostname">SAM 主机名</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM 桥地址</string>
+    <string name="i2p_sam_port">SAM 端口</string>
+    <string name="i2p_sam_port_summary">I2P SAM 桥端口（通常为 7656）</string>
+    <string name="i2p_allow_mixed">允许 混合模式</string>
+    <string name="i2p_allow_mixed_summary">允许用于连接到 I2P 和常规对等点的 I2P 种子（匿名程度较低）</string>
+    <string name="i2p_advanced_settings">高级隧道设置</string>
+    <string name="i2p_inbound_quantity">入站隧道</string>
+    <string name="i2p_inbound_quantity_summary">入站隧道数量 [1-16]（较高 = 匿名程度较高，速度较慢）</string>
+    <string name="i2p_outbound_quantity">出站隧道</string>
+    <string name="i2p_outbound_quantity_summary">出站隧道数量 [1-16]（较高 = 匿名性更强，速度较慢）</string>
+    <string name="i2p_inbound_length">入站跃点</string>
+    <string name="i2p_inbound_length_summary">入站隧道的跳数 [0-7]（较高 = 匿名性较高，速度较慢）</string>
+    <string name="i2p_outbound_length">出站跃点</string>
+    <string name="i2p_outbound_length_summary">出站隧道的跳数[0-7]（更高 = 匿名性更强，速度更慢）</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">“BitTorrent 关闭（VPN Guard Active）”</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">社区</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d 还剩分钟无广告</string>
+    <string name="minute_left_ad_free">还剩一分钟 无广告</string>
+    <string name="reward_product_title">%d 分钟</string>
+    <string name="reward_product_price">免费，播放 1 个视频广告</string>
+    <string name="temporary_ad_removal">临时广告删除</string>
+    <string name="temporary_ad_removal_description">播放视频后 %d 分钟无广告</string>
+    <string name="looking_For_rewarded_video">正在寻找奖励视频...</string>
+    <string name="no_reward_videos_available">无法获取奖励视频。请重试</string>
+    <string name="try_it_free_for_a_half_hour">免费试用半小时</string>
+    <string name="sorry_could_not_find_valid_download_location_at">抱歉，无法在 %s 找到有效的下载位置</string>
+    <string name="free">免费</string>
+    <string name="dummy_ad">广告</string>
+    <string name="dummy_age_ago">2 天前</string>
+    <string name="one_second">1 秒</string>
+    <string name="n_seconds">%s 秒</string>
+    <string name="one_minute">1 分钟</string>
+    <string name="n_minutes">%s 分钟</string>
+    <string name="one_hour">1 小时</string>
+    <string name="n_hours">%s 小时</string>
+    <string name="one_day">1 天</string>
+    <string name="n_days">%s 天</string>
+    <string name="one_month">1 个月</string>
+    <string name="n_months">%s 个月</string>
+    <string name="n_years">%s 年</string>
+    <string name="enable_sequential_download_summary">件按顺序下载。不建议用于网络运行状况</string>
+    <string name="dummy_period">/周期</string>
+    <string name="period_monthly">每月</string>
+    <string name="period_yearly">每年</string>
+    <string name="open_file_explorer">打开文件资源管理器</string>
+    <string name="comma">、</string>
+    <string name="permission_denied">权限被拒绝</string>
+    <string name="use_btdigg">使用 BTDigg</string>
+    <string name="use_yt">使用 YT</string>
+    <string name="error_cannot_open_downloads_folder">否找到应用程序以查看下载。确保 FrostWire 具有权限并且安装了文件资源管理器</string>
+    <string name="_30_minutes">30 分钟</string>
+    <string name="ad_free_30_minutes">无广告 30 分钟</string>
 </resources>

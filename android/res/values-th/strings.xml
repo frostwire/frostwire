@@ -434,4 +434,151 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">ระบบ</string>
+    <string name="support_offer_header">รองรับ FrostWire</string>
+    <string name="support_offer_donation_title">รองรับ FrostWire</string>
+    <string name="support_offer_donation_message">การบริจาคของคุณจะช่วยให้ FrostWire เป็นอิสระ</string>
+    <string name="support_offer_donation_action">บริจาค</string>
+    <string name="support_offer_donation_badge">บริจาค</string>
+    <string name="support_offer_vpn_title">ปกป้องความเป็นส่วนตัวของคุณ</string>
+    <string name="support_offer_vpn_message">รับ FrostWire VPN และดาวน์โหลดอย่างปลอดภัย</string>
+    <string name="support_offer_vpn_action">รับ VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">สนับสนุน FrostWire</string>
+    <string name="support_offer_default_message">รักษา FrostWire ให้แข็งแกร่งด้วยการบริจาคหรือการสมัครสมาชิก VPN</string>
+    <string name="no_browser_found">ไม่พบเบราว์เซอร์สำหรับเปิดลิงก์นี้</string>
+    <string name="use_one337x">ใช้ 1337x</string>
+    <string name="use_idope">ใช้ Idope</string>
+    <string name="use_knaben">ใช้ Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">ขั้นสูง BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">อนุญาตการเชื่อมต่อหลายรายการจากเพียร์เดียวกัน ID</string>
+    <string name="allow_multiple_connections_per_pid_summary">ใช้สำหรับตัวติดตามส่วนตัว, CGNAT หรือการตั้งค่าเครือข่ายพิเศษอื่นๆ เท่านั้น</string>
+    <string name="natpmp_gateway">NAT-PMP เกตเวย์แทนที่</string>
+    <string name="natpmp_gateway_summary">ที่อยู่เกตเวย์เราเตอร์เสริมสำหรับการแมปพอร์ต NAT-PMP</string>
+    <string name="natpmp_lease_duration">ระยะเวลาการเช่า NAT-PMP</string>
+    <string name="natpmp_lease_duration_summary">อายุการใช้งานการแมปพอร์ตที่ร้องขอในหน่วยวินาที ค่าเริ่มต้น: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP ระยะเวลาการเช่าต้องมากกว่า 0 วินาที</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">ใช้ MagnetDL</string>
+    <string name="use_torrentscsv">ใช้ TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P การตั้งค่า</string>
+    <string name="enable_i2p">เปิดใช้งาน I2P รองรับ</string>
+    <string name="enable_i2p_summary">ฝนตกหนักแบบไม่ระบุชื่อผ่านเครือข่าย I2P (ต้องใช้เราเตอร์ I2P ทำงาน)</string>
+    <string name="i2p_sam_bridge">SAM Bridge</string>
+    <string name="i2p_sam_hostname">SAM ชื่อโฮสต์</string>
+    <string name="i2p_sam_hostname_summary">I2P ที่อยู่บริดจ์ SAM</string>
+    <string name="i2p_sam_port">พอร์ต SAM พอร์ต</string>
+    <string name="i2p_sam_port_summary">I2P พอร์ตบริดจ์ SAM (ปกติคือ 7656)</string>
+    <string name="i2p_allow_mixed">อนุญาตโหมดผสม</string>
+    <string name="i2p_allow_mixed_summary">อนุญาตให้ฝนตกหนัก I2P เชื่อมต่อกับทั้ง I2P และเพียร์ปกติ (น้อยกว่า ไม่ระบุชื่อ)</string>
+    <string name="i2p_advanced_settings">การตั้งค่าอุโมงค์ขั้นสูง</string>
+    <string name="i2p_inbound_quantity">อุโมงค์ขาเข้า</string>
+    <string name="i2p_inbound_quantity_summary">จำนวนอุโมงค์ขาเข้า [1-16] (สูงกว่า = ไม่เปิดเผยตัวตนมากขึ้น ช้าลง)</string>
+    <string name="i2p_outbound_quantity">อุโมงค์ขาออก</string>
+    <string name="i2p_outbound_quantity_summary">จำนวนอุโมงค์ขาออก [1-16] (สูงกว่า = ไม่เปิดเผยชื่อมากขึ้น ช้ากว่า)</string>
+    <string name="i2p_inbound_length">Hops ขาเข้า</string>
+    <string name="i2p_inbound_length_summary">จำนวน Hop สำหรับอุโมงค์ขาเข้า [0-7] (สูงกว่า = ไม่เปิดเผยชื่อมากขึ้น ช้าลง)</string>
+    <string name="i2p_outbound_length">Hops ขาออก</string>
+    <string name="i2p_outbound_length_summary">จำนวน Hop สำหรับอุโมงค์ขาออก [0-7] (สูงกว่า = ไม่เปิดเผยตัวตนมากขึ้น ช้าลง)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"ปิด BitTorrent (VPN Guard Active)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">ชุมชน</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d เหลือนาที โฆษณาฟรี</string>
+    <string name="minute_left_ad_free">เหลือเวลาหนึ่งนาที โฆษณาฟรี</string>
+    <string name="reward_product_title">%d นาที</string>
+    <string name="reward_product_price">ฟรี เล่นโฆษณาวิดีโอ 1 รายการ</string>
+    <string name="temporary_ad_removal">การลบโฆษณาชั่วคราว</string>
+    <string name="temporary_ad_removal_description">ไม่มีโฆษณาสำหรับ %d นาทีหลังจากเล่นวิดีโอ</string>
+    <string name="looking_For_rewarded_video">กำลังมองหาวิดีโอที่ได้รับรางวัล...</string>
+    <string name="no_reward_videos_available">ไม่สามารถดึงข้อมูลได้ วิดีโอที่ได้รับรางวัล โปรดลองอีกครั้ง</string>
+    <string name="try_it_free_for_a_half_hour">ทดลองใช้ฟรีครึ่งชั่วโมง</string>
+    <string name="sorry_could_not_find_valid_download_location_at">ขออภัย ไม่พบตำแหน่งการดาวน์โหลดที่ถูกต้องที่ %s</string>
+    <string name="free">ฟรี</string>
+    <string name="dummy_ad">Ad</string>
+    <string name="dummy_age_ago">2 วันที่แล้ว</string>
+    <string name="one_second">1 วินาที</string>
+    <string name="n_seconds">%s วินาที</string>
+    <string name="one_minute">1 นาที</string>
+    <string name="n_minutes">%s นาที</string>
+    <string name="one_hour">1 ชั่วโมง</string>
+    <string name="n_hours">%s ชั่วโมง</string>
+    <string name="one_day">1 วัน</string>
+    <string name="n_days">%s วัน</string>
+    <string name="one_month">1 เดือน</string>
+    <string name="n_months">%s เดือน</string>
+    <string name="n_years">%s ปี</string>
+    <string name="enable_sequential_download_summary">มีการดาวน์โหลดชิ้นส่วนตามลำดับ ไม่แนะนำสำหรับความสมบูรณ์ของเครือข่าย</string>
+    <string name="dummy_period">/งวด</string>
+    <string name="period_monthly">รายเดือน</string>
+    <string name="period_yearly">รายปี</string>
+    <string name="open_file_explorer">Open File Explorer</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">ปฏิเสธการอนุญาต</string>
+    <string name="information">ข้อมูล</string>
+    <string name="ok">ตกลง ไม่รองรับการดาวน์โหลด</string>
+    <string name="yt_not_supported_on_basic">YouTube FrostWire พื้นฐานตามกฎของ Google Play\n\nหากต้องการสำเนา FrostWire Plus ฟรี โปรดไปที่เว็บไซต์อย่างเป็นทางการของเรา frostwire.com</string>
+    <string name="use_btdigg">ใช้ BTDigg</string>
+    <string name="use_yt">ใช้ YT</string>
+    <string name="error_cannot_open_downloads_folder">ไม่พบแอปเพื่อดูการดาวน์โหลด ตรวจสอบให้แน่ใจว่า FrostWire มีสิทธิ์และติดตั้ง File Explorer แล้ว</string>
+    <string name="_30_minutes">30 นาที</string>
+    <string name="ad_free_30_minutes">ไร้โฆษณา 30 นาที</string>
 </resources>

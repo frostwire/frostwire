@@ -436,4 +436,151 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">Систем</string>
+    <string name="support_offer_header">Подржите FrostWire</string>
+    <string name="support_offer_donation_title">Подржите FrostWire</string>
+    <string name="support_offer_donation_message">Ваша донација помаже да FrostWire остане бесплатан.</string>
+    <string name="support_offer_donation_action">Донирајте</string>
+    <string name="support_offer_donation_badge">Донирајте</string>
+    <string name="support_offer_vpn_title">Заштитите своју приватност</string>
+    <string name="support_offer_vpn_message">Набавите FrostWire VPN и преузимајте безбедно.</string>
+    <string name="support_offer_vpn_action">Набавите VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Подржите FrostWire</string>
+    <string name="support_offer_default_message">Ојачајте FrostWire донацијом или VPN претплатом.</string>
+    <string name="no_browser_found">Није пронађен ниједан прегледач за отварање ове везе.</string>
+    <string name="use_one337x">Користи 1337x</string>
+    <string name="use_idope">Користите Идопе</string>
+    <string name="use_knaben">Користи Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Напредни BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Дозволите више конекција са истог ИД-а равноправног корисника</string>
+    <string name="allow_multiple_connections_per_pid_summary">Користи се само за приватне трагаче, ЦГНАТ или друге посебне мрежне поставке</string>
+    <string name="natpmp_gateway">NAT-PMP замена мрежног пролаза</string>
+    <string name="natpmp_gateway_summary">Опциона адреса мрежног пролаза рутера за NAT-PMP мапирање портова</string>
+    <string name="natpmp_lease_duration">Трајање NAT-PMP закупа</string>
+    <string name="natpmp_lease_duration_summary">Тражени животни век мапирања порта у секундама. Подразумевано: 3600</string>
+    <string name="natpmp_lease_duration_invalid">Трајање NAT-PMP закупа мора бити дуже од 0 секунди</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">Користи MagnetDL</string>
+    <string name="use_torrentscsv">Користите ТоррентсЦСВ</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P подешавања</string>
+    <string name="enable_i2p">Омогући I2P подршку</string>
+    <string name="enable_i2p_summary">Анонимно торентовање преко I2P мреже (захтева покренут I2P рутер)</string>
+    <string name="i2p_sam_bridge">SAM мост</string>
+    <string name="i2p_sam_hostname">SAM име хоста</string>
+    <string name="i2p_sam_hostname_summary">Адреса I2P SAM моста</string>
+    <string name="i2p_sam_port">SAM порт</string>
+    <string name="i2p_sam_port_summary">Порт I2P SAM моста (обично 7656)</string>
+    <string name="i2p_allow_mixed">Дозволи мешовити режим</string>
+    <string name="i2p_allow_mixed_summary">Дозволи I2P торентима да се повежу и са I2P и са редовним учесницима (мање анонимно)</string>
+    <string name="i2p_advanced_settings">Напредна подешавања тунела</string>
+    <string name="i2p_inbound_quantity">Долазни тунели</string>
+    <string name="i2p_inbound_quantity_summary">Број улазних тунела [1-16] (већи = више анонимности, спорије)</string>
+    <string name="i2p_outbound_quantity">Оутбоунд Туннелс</string>
+    <string name="i2p_outbound_quantity_summary">Број излазних тунела [1-16] (већи = више анонимности, спорије)</string>
+    <string name="i2p_inbound_length">Инбоунд Хопс</string>
+    <string name="i2p_inbound_length_summary">Број скокова за улазне тунеле [0-7] (већи = већа анонимност, спорији)</string>
+    <string name="i2p_outbound_length">Оутбоунд Хопс</string>
+    <string name="i2p_outbound_length_summary">Број скокова за излазне тунеле [0-7] (већи = већа анонимност, спорији)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent искључен (VPN заштита активна)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">Заједница</string>
+    <string name="play_uppercase">ПЛАИ</string>
+    <string name="minutes_left_ad_free">%d минута је остало без огласа</string>
+    <string name="minute_left_ad_free">Још један минут без огласа</string>
+    <string name="reward_product_title">%d минута</string>
+    <string name="reward_product_price">Бесплатно, играјте 1 видео оглас</string>
+    <string name="temporary_ad_removal">Привремено уклањање огласа</string>
+    <string name="temporary_ad_removal_description">Нема огласа %d минута након пуштања видеа</string>
+    <string name="looking_For_rewarded_video">Тражи се награђени видео...</string>
+    <string name="no_reward_videos_available">Није могуће преузети награђени видео. Покушајте поново</string>
+    <string name="try_it_free_for_a_half_hour">Пробајте бесплатно пола сата</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Жао нам је, нисмо могли да пронађемо важећу локацију за преузимање на %s</string>
+    <string name="free">Бесплатно</string>
+    <string name="dummy_ad">Ад</string>
+    <string name="dummy_age_ago">пре 2 дана</string>
+    <string name="one_second">1 секунда</string>
+    <string name="n_seconds">%s секунди</string>
+    <string name="one_minute">1 минут</string>
+    <string name="n_minutes">%s минута</string>
+    <string name="one_hour">1 сат</string>
+    <string name="n_hours">%s сати</string>
+    <string name="one_day">1 дан</string>
+    <string name="n_days">%s дана</string>
+    <string name="one_month">1 месец</string>
+    <string name="n_months">%s месеци</string>
+    <string name="n_years">%s година</string>
+    <string name="enable_sequential_download_summary">Комади се преузимају по реду. Не препоручује се за здравље мреже</string>
+    <string name="dummy_period">/период</string>
+    <string name="period_monthly">месечно</string>
+    <string name="period_yearly">годишње</string>
+    <string name="open_file_explorer">Отворите Филе Екплорер</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">Дозвола одбијена</string>
+    <string name="information">Информације</string>
+    <string name="ok">ОК</string>
+    <string name="yt_not_supported_on_basic">YouTube преузимања нису подржана у FrostWire Basic због правила Google Play-а.\n\nЗа бесплатну копију FrostWire Plus посетите наш званични веб сајт frostwire.com</string>
+    <string name="use_btdigg">Користите БТДигг</string>
+    <string name="use_yt">Користите ИТ</string>
+    <string name="error_cannot_open_downloads_folder">Није пронађена апликација за приказ преузимања. Уверите се да FrostWire има дозволе и да је инсталиран File Explorer</string>
+    <string name="_30_minutes">30 минута</string>
+    <string name="ad_free_30_minutes">30 минута без огласа</string>
 </resources>

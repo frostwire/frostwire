@@ -432,4 +432,153 @@
     <string name="error_restarting_torrent_engine">خطأ في إعادة تشغيل محرك التورنت: %s</string>
     <string name="apply">تطبيق</string>
     <string name="port_range_cancel">إلغاء</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">النظام</string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> خصوصيتك هي حق أساسي من حقوق الإنسان </b>. يعني الاتصال غير المحمي أن كل ما تفعله عبر الإنترنت، بما في ذلك تنزيلات <b> وعمليات البحث والمراسلة </b>، يمكن مراقبته واعتراضه من قبل أي شخص على شبكتك، على سبيل المثال. مقدمو خدمات الإنترنت والمتسللون والحكومات.<br><br><b> نوصي بشدة باستخدام خدمة VPN</b>. <br> فيما يلي بعض الخيارات التي توفر خدمة موثوقة وتعمل بشكل جيد مع FrostWire:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[أنت متصل بالإنترنت باستخدام VPN. <br><br> إذا لم تكن كذلك، نوصي باستخدام إحدى الخدمات أدناه لتشفير اتصالك و<b> لحماية خصوصيتك</b>.]]></string>
+    <string name="support_offer_header">دعم FrostWire</string>
+    <string name="support_offer_donation_title">دعم FrostWire</string>
+    <string name="support_offer_donation_message">تبرعك يساعد في الحفاظ على FrostWire مجانيًا.</string>
+    <string name="support_offer_donation_action">تبرع</string>
+    <string name="support_offer_donation_badge">تبرع</string>
+    <string name="support_offer_vpn_title">حماية خصوصيتك</string>
+    <string name="support_offer_vpn_message">احصل على FrostWire VPN وقم بالتنزيل بأمان.</string>
+    <string name="support_offer_vpn_action">احصل على VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">دعم FrostWire</string>
+    <string name="support_offer_default_message">حافظ على قوة FrostWire من خلال التبرع أو الاشتراك في VPN.</string>
+    <string name="no_browser_found">لم يتم العثور على متصفح لفتح هذا الرابط.</string>
+    <string name="use_one337x">استخدم 1337x</string>
+    <string name="use_idope">استخدم Idope</string>
+    <string name="use_knaben">استخدم Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Advanced BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">السماح باتصالات متعددة من نفس معرف النظير</string>
+    <string name="allow_multiple_connections_per_pid_summary">استخدم فقط لأجهزة التتبع الخاصة أو CGNAT أو إعدادات الشبكة الخاصة الأخرى</string>
+    <string name="natpmp_gateway">تجاوز بوابة NAT-PMP</string>
+    <string name="natpmp_gateway_summary">عنوان بوابة جهاز التوجيه الاختياري لمنفذ NAT-PMP رسم الخرائط</string>
+    <string name="natpmp_lease_duration">NAT-PMP مدة الإيجار</string>
+    <string name="natpmp_lease_duration_summary">مطلوب عمر تعيين المنفذ بالثواني. الافتراضي: 3600</string>
+    <string name="natpmp_lease_duration_invalid">يجب أن تكون مدة عقد الإيجار NAT-PMP أكبر من 0 ثانية</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">الاستخدام MagnetDL</string>
+    <string name="use_torrentscsv">استخدام TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">إعدادات I2P</string>
+    <string name="enable_i2p">تمكين I2P دعم</string>
+    <string name="enable_i2p_summary">التورنت المجهول من خلال شبكة I2P (يتطلب جهاز التوجيه I2P قيد التشغيل)</string>
+    <string name="i2p_sam_bridge">SAM Bridge</string>
+    <string name="i2p_sam_hostname">SAM اسم المضيف</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM عنوان الجسر</string>
+    <string name="i2p_sam_port">SAM المنفذ</string>
+    <string name="i2p_sam_port_summary">I2P SAM منفذ الجسر (عادة 7656)</string>
+    <string name="i2p_allow_mixed">السماح للوضع المختلط</string>
+    <string name="i2p_allow_mixed_summary">السماح للتورنت I2P بالاتصال بكل من I2P والأقران العاديين (أقل مجهولين)</string>
+    <string name="i2p_advanced_settings">إعدادات النفق المتقدمة</string>
+    <string name="i2p_inbound_quantity">الأنفاق الداخلية</string>
+    <string name="i2p_inbound_quantity_summary">عدد الأنفاق الداخلية [1-16] (أعلى = مزيد من إخفاء الهوية، أبطأ)</string>
+    <string name="i2p_outbound_quantity">الأنفاق الصادرة</string>
+    <string name="i2p_outbound_quantity_summary">عدد الأنفاق الصادرة [1-16] (أعلى = المزيد من إخفاء الهوية، أبطأ)</string>
+    <string name="i2p_inbound_length">القفزات الداخلية</string>
+    <string name="i2p_inbound_length_summary">عدد القفزات للداخل الأنفاق [0-7] (أعلى = مزيد من إخفاء الهوية، أبطأ)</string>
+    <string name="i2p_outbound_length">القفزات الصادرة</string>
+    <string name="i2p_outbound_length_summary">عدد القفزات للأنفاق الصادرة [0-7] (أعلى = مزيد من إخفاء الهوية، أبطأ)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"إيقاف BitTorrent (VPN Guard Active)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">المجتمع</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d دقيقة متبقية بدون إعلانات</string>
+    <string name="minute_left_ad_free">دقيقة واحدة متبقية بدون إعلانات</string>
+    <string name="reward_product_title">%d دقيقة</string>
+    <string name="reward_product_price">مجانًا، تشغيل إعلان فيديو واحد</string>
+    <string name="temporary_ad_removal">إزالة مؤقتة للإعلانات</string>
+    <string name="temporary_ad_removal_description">لا توجد إعلانات لـ %d بعد دقائق من تشغيل مقطع فيديو</string>
+    <string name="looking_For_rewarded_video">جارٍ البحث عن فيديو بمكافأة...</string>
+    <string name="no_reward_videos_available">تعذر جلب فيديو بمكافأة. يرجى المحاولة مرة أخرى</string>
+    <string name="try_it_free_for_a_half_hour">جربه مجانًا لمدة نصف ساعة</string>
+    <string name="sorry_could_not_find_valid_download_location_at">عذرًا، تعذر العثور على موقع تنزيل صالح على %s</string>
+    <string name="free">إعلان</string>
+    <string name="dummy_ad">مجاني</string>
+    <string name="dummy_age_ago">منذ يومين</string>
+    <string name="one_second">ثانية واحدة</string>
+    <string name="n_seconds">%s ثانية</string>
+    <string name="one_minute">دقيقة واحدة</string>
+    <string name="n_minutes">%s دقيقة</string>
+    <string name="one_hour">ساعة واحدة</string>
+    <string name="n_hours">%s ساعة</string>
+    <string name="one_day">يوم واحد</string>
+    <string name="n_days">%s أيام</string>
+    <string name="one_month">شهر واحد</string>
+    <string name="n_months">%s أشهر</string>
+    <string name="n_years">%s سنوات</string>
+    <string name="enable_sequential_download_summary">يتم تنزيل القطع بالترتيب. غير مستحسن لسلامة الشبكة</string>
+    <string name="dummy_period">/الفترة</string>
+    <string name="period_monthly">شهري</string>
+    <string name="period_yearly">سنوي</string>
+    <string name="open_file_explorer">فتح مستكشف الملفات</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">تم رفض الإذن</string>
+    <string name="information">معلومات</string>
+    <string name="ok">نعم</string>
+    <string name="yt_not_supported_on_basic">تنزيلات YouTube غير مدعومة من قبل FrostWire Basic بسبب قواعد Google Play.\n\nللحصول على نسخة مجانية من FrostWire Plus، انتقل إلى موقعنا الرسمي على الويب frostwire.com</string>
+    <string name="use_btdigg">استخدم بي تي ديج</string>
+    <string name="use_yt">استخدم يوتيوب</string>
+    <string name="error_cannot_open_downloads_folder">لم يتم العثور على تطبيق لعرض التنزيلات. تأكد من أن FrostWire لديه الأذونات ومن تثبيت File Explorer</string>
+    <string name="_30_minutes">30 دقيقة</string>
+    <string name="ad_free_30_minutes">خالية من الإعلانات لمدة 30 دقيقة</string>
 </resources>

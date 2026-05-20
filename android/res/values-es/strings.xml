@@ -465,4 +465,123 @@
     <string name="error_restarting_torrent_engine">Error al reiniciar motor de torrents: %s</string>
     <string name="apply">Aplicar</string>
     <string name="port_range_cancel">Cancelar</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">Sistema</string>
+    <string name="support_offer_header">Soporte FrostWire</string>
+    <string name="support_offer_donation_title">Soporte FrostWire</string>
+    <string name="support_offer_donation_message">Su donación ayuda a mantener FrostWire gratuito.</string>
+    <string name="support_offer_donation_action">Donar</string>
+    <string name="support_offer_donation_badge">Donar</string>
+    <string name="support_offer_vpn_title">Proteja su privacidad</string>
+    <string name="support_offer_vpn_message">Obtenga FrostWire VPN y descárguelo de forma segura.</string>
+    <string name="support_offer_vpn_action">Obtenga VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Soporte FrostWire</string>
+    <string name="support_offer_default_message">Mantenga FrostWire fuerte con una donación o una suscripción a VPN.</string>
+    <string name="no_browser_found">No se encontró ningún navegador para abrir este enlace.</string>
+    <string name="use_knaben">Usar Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Avanzado BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Permitir múltiples conexiones desde el mismo ID de par</string>
+    <string name="allow_multiple_connections_per_pid_summary">Usar solo para rastreadores privados, CGNAT u otra red especial configuraciones</string>
+    <string name="natpmp_gateway">NAT-PMP anulación de puerta de enlace</string>
+    <string name="natpmp_gateway_summary">Dirección de puerta de enlace de enrutador opcional para la asignación de puertos NAT-PMP</string>
+    <string name="natpmp_lease_duration">Duración de la concesión de NAT-PMP</string>
+    <string name="natpmp_lease_duration_summary">Duración de la asignación de puertos solicitada en segundos. Valor predeterminado: 3600</string>
+    <string name="natpmp_lease_duration_invalid">La duración de la concesión de NAT-PMP debe ser mayor que 0 segundos</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_torrentscsv">Usar TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">Configuración de I2P</string>
+    <string name="enable_i2p">Habilitar soporte para I2P</string>
+    <string name="enable_i2p_summary">Torrent anónimo a través de la red I2P (requiere enrutador I2P en ejecución)</string>
+    <string name="i2p_sam_bridge">SAM Puente</string>
+    <string name="i2p_sam_hostname">SAM Nombre de host</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM Dirección de puente</string>
+    <string name="i2p_sam_port">SAM Puerto</string>
+    <string name="i2p_sam_port_summary">I2P Puerto de puente SAM (generalmente 7656)</string>
+    <string name="i2p_allow_mixed">Permitir modo mixto</string>
+    <string name="i2p_allow_mixed_summary">Permitir que los torrents I2P se conecten tanto a I2P como a pares regulares (menos anónimos)</string>
+    <string name="i2p_advanced_settings">Configuración avanzada de túneles</string>
+    <string name="i2p_inbound_quantity">Túneles de entrada</string>
+    <string name="i2p_inbound_quantity_summary">Número de túneles de entrada [1-16] (mayor = más anonimato, más lento)</string>
+    <string name="i2p_outbound_quantity">Túneles de salida</string>
+    <string name="i2p_outbound_quantity_summary">Número de túneles de salida [1-16] (mayor = más anonimato, más lento)</string>
+    <string name="i2p_inbound_length">Saltos de entrada</string>
+    <string name="i2p_inbound_length_summary">Recuento de saltos para túneles de entrada [0-7] (mayor = más anonimato, más lento)</string>
+    <string name="i2p_outbound_length">Saltos de salida</string>
+    <string name="i2p_outbound_length_summary">Recuento de saltos para túneles de salida [0-7] (mayor = más anonimato, más lento)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent apagado (VPN Guardia activa)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_decimals">%1$d de %2$d</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="try_it_free_for_a_half_hour">Pruébelo gratis durante media hora</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Lo sentimos, no se pudo encontrar una ubicación de descarga válida en %s</string>
+    <string name="dummy_ad">Anuncio</string>
+    <string name="dummy_age_ago">Hace 2 días</string>
+    <string name="enable_sequential_download_summary">Las piezas se descargan en orden. No recomendado para el estado de la red</string>
+    <string name="dummy_period">/período</string>
+    <string name="period_monthly">mensual</string>
+    <string name="period_yearly">anual</string>
+    <string name="open_file_explorer">Abrir Explorador de archivos</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">Permiso denegado</string>
+    <string name="use_btdigg">Usar BTDigg</string>
+    <string name="use_yt">Usar YT</string>
+    <string name="_30_minutes">30 minutos</string>
+    <string name="ad_free_30_minutes">30 minutos sin publicidad</string>
 </resources>

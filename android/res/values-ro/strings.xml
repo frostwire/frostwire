@@ -434,4 +434,151 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">Sistem</string>
+    <string name="support_offer_header">Suport FrostWire</string>
+    <string name="support_offer_donation_title">Suport FrostWire</string>
+    <string name="support_offer_donation_message">Donația dvs. ajută la menținerea FrostWire liber.</string>
+    <string name="support_offer_donation_action">Donează</string>
+    <string name="support_offer_donation_badge">Donează</string>
+    <string name="support_offer_vpn_title">Protejează-ți confidențialitatea</string>
+    <string name="support_offer_vpn_message">Obține FrostWire VPN și descarcă în siguranță.</string>
+    <string name="support_offer_vpn_action">Obțineți VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Asistență FrostWire</string>
+    <string name="support_offer_default_message">Păstrați FrostWire puternic cu o donație sau un abonament VPN.</string>
+    <string name="no_browser_found">Nu a fost găsit niciun browser care să deschidă acest link.</string>
+    <string name="use_one337x">Utilizați 1337x</string>
+    <string name="use_idope">Utilizați Idope</string>
+    <string name="use_knaben">Utilizați Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">BitTorrent avansat</string>
+    <string name="allow_multiple_connections_per_pid">Permite mai multe conexiuni de la același ID peer</string>
+    <string name="allow_multiple_connections_per_pid_summary">Utilizați numai pentru trackere private, CGNAT sau alte setări speciale de rețea</string>
+    <string name="natpmp_gateway">NAT-PMP anulare gateway</string>
+    <string name="natpmp_gateway_summary">Adresă opțională a gateway-ului routerului pentru maparea portului NAT-PMP</string>
+    <string name="natpmp_lease_duration">NAT-PMP durata de închiriere</string>
+    <string name="natpmp_lease_duration_summary">Durata de viață a mapării portului solicitată în secunde. Implicit: 3600</string>
+    <string name="natpmp_lease_duration_invalid">Durata de închiriere NAT-PMP trebuie să fie mai mare de 0 secunde</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">Utilizați MagnetDL</string>
+    <string name="use_torrentscsv">Utilizați TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">Setări I2P</string>
+    <string name="enable_i2p">Activați suportul I2P</string>
+    <string name="enable_i2p_summary">Torrent anonim prin rețeaua I2P (necesită rularea routerului I2P)</string>
+    <string name="i2p_sam_bridge">SAM Pod</string>
+    <string name="i2p_sam_hostname">SAM Nume gazdă</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM adresa puntea</string>
+    <string name="i2p_sam_port">Port SAM</string>
+    <string name="i2p_sam_port_summary">I2P SAM port bridge (de obicei 7656)</string>
+    <string name="i2p_allow_mixed">Permite modul mixt</string>
+    <string name="i2p_allow_mixed_summary">Permiteți torenților I2P să se conecteze atât la I2P, cât și la colegii obișnuiți (mai puțin anonimi)</string>
+    <string name="i2p_advanced_settings">Setări avansate pentru tunel</string>
+    <string name="i2p_inbound_quantity">Tuneluri de intrare</string>
+    <string name="i2p_inbound_quantity_summary">Numărul de tuneluri de intrare [1-16] (mai mare = mai mult anonimat, mai lent)</string>
+    <string name="i2p_outbound_quantity">Tuneluri de ieșire</string>
+    <string name="i2p_outbound_quantity_summary">Număr de tuneluri de ieșire [1-16] (mai mare = mai mult anonimat, mai lent)</string>
+    <string name="i2p_inbound_length">Hop de intrare</string>
+    <string name="i2p_inbound_length_summary">Număr de hop pentru tunelurile de intrare [0-7] (mai mare = mai mult anonimat, mai lent)</string>
+    <string name="i2p_outbound_length">Hop de ieșire</string>
+    <string name="i2p_outbound_length_summary">EP018 numărare pentru tunelurile de ieșire [0-7] (mai mare = mai mult anonimat, mai lent)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">0XZX0 dezactivat Activ)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">Comunitate</string>
+    <string name="play_uppercase"></string>
+    <string name="minutes_left_ad_free">%d minute fără reclame rămase</string>
+    <string name="minute_left_ad_free">A mai rămas un minut Fără reclame</string>
+    <string name="reward_product_title">%d minute</string>
+    <string name="reward_product_price">Gratuit, redați 1 anunț video</string>
+    <string name="temporary_ad_removal">Eliminare temporară a reclamelor</string>
+    <string name="temporary_ad_removal_description">Fără reclame timp de %d minute după redarea unui videoclip</string>
+    <string name="looking_For_rewarded_video">Se caută un videoclip recompensat...</string>
+    <string name="no_reward_videos_available">Nu s-a putut prelua un videoclip cu recompensă. Vă rugăm să încercați din nou</string>
+    <string name="try_it_free_for_a_half_hour">Încercați gratuit timp de jumătate de oră</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Ne pare rău, nu am găsit o locație validă de descărcare la %s</string>
+    <string name="free"></string>
+    <string name="dummy_ad">gratuit</string>
+    <string name="dummy_age_ago">Anunț</string>
+    <string name="one_second">1 secundă</string>
+    <string name="n_seconds">%s secunde</string>
+    <string name="one_minute">1 minut</string>
+    <string name="n_minutes">%s minute</string>
+    <string name="one_hour">1 oră</string>
+    <string name="n_hours">%s ore</string>
+    <string name="one_day">1 zi</string>
+    <string name="n_days">%s zile</string>
+    <string name="one_month">1 luna</string>
+    <string name="n_months">%s luni</string>
+    <string name="n_years">%s ani</string>
+    <string name="enable_sequential_download_summary">Piesele sunt descărcate în ordine. Nu este recomandat pentru sănătatea rețelei</string>
+    <string name="dummy_period">/perioadă</string>
+    <string name="period_monthly">lunar</string>
+    <string name="period_yearly">anual</string>
+    <string name="open_file_explorer">Deschideți File Explorer</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">Acces refuzat</string>
+    <string name="information">Informaţii</string>
+    <string name="ok">Bine</string>
+    <string name="yt_not_supported_on_basic">Descărcările YouTube nu sunt acceptate de FrostWire Basic din cauza regulilor Google Play.\n\nPentru o copie gratuită a FrostWire Plus, accesați site-ul nostru oficial frostwire.com</string>
+    <string name="use_btdigg">Utilizați BTDigg</string>
+    <string name="use_yt">Utilizați YT</string>
+    <string name="error_cannot_open_downloads_folder">Nu a fost găsită nicio aplicație pentru a vizualiza descărcări. Asigurați-vă că FrostWire are permisiuni și că este instalat un File Explorer</string>
+    <string name="_30_minutes">30 de minute</string>
+    <string name="ad_free_30_minutes">Fără anunțuri 30 de minute</string>
 </resources>

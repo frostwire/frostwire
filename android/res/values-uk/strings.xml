@@ -434,4 +434,151 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="support_offer_header">Підтримка FrostWire</string>
+    <string name="support_offer_donation_title">Підтримка FrostWire</string>
+    <string name="support_offer_donation_message">Ваша пожертва допомагає залишати FrostWire безкоштовним.</string>
+    <string name="support_offer_donation_action">Пожертвувати</string>
+    <string name="support_offer_donation_badge">Пожертвувати</string>
+    <string name="support_offer_vpn_title">Захистіть свою конфіденційність</string>
+    <string name="support_offer_vpn_message">Отримайте FrostWire VPN і безпечно завантажуйте.</string>
+    <string name="support_offer_vpn_action">Отримайте VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Підтримка FrostWire</string>
+    <string name="support_offer_default_message">Підтримуйте FrostWire сильним за допомогою пожертви або підписки на VPN.</string>
+    <string name="no_browser_found">Не знайдено браузер, щоб відкрити це посилання.</string>
+    <string name="use_one337x">Використовуйте 1337x</string>
+    <string name="use_idope">Використовуйте Idope</string>
+    <string name="use_knaben">Використовуйте Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Просунутий BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Дозволити кілька з’єднань від одного ідентифікатора вузла</string>
+    <string name="allow_multiple_connections_per_pid_summary">Використовуйте лише для приватних трекерів, CGNAT або інших спеціальних мережевих налаштувань</string>
+    <string name="natpmp_gateway">Перевизначення шлюзу NAT-PMP</string>
+    <string name="natpmp_gateway_summary">Додаткова адреса шлюзу маршрутизатора для відображення порту NAT-PMP</string>
+    <string name="natpmp_lease_duration">Тривалість оренди NAT-PMP</string>
+    <string name="natpmp_lease_duration_summary">Запитаний термін служби зіставлення портів у секундах. Типове значення: 3600</string>
+    <string name="natpmp_lease_duration_invalid">Тривалість оренди NAT-PMP має бути більше 0 секунд</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">Використовувати MagnetDL</string>
+    <string name="use_torrentscsv">Використовувати TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P Налаштування</string>
+    <string name="enable_i2p">Увімкнути I2P Підтримка</string>
+    <string name="enable_i2p_summary">Анонімний торрент через мережу I2P (потрібно запустити маршрутизатор I2P)</string>
+    <string name="i2p_sam_bridge">SAM Міст</string>
+    <string name="i2p_sam_hostname">SAM Ім’я хосту</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM адреса мосту</string>
+    <string name="i2p_sam_port">SAM Порт</string>
+    <string name="i2p_sam_port_summary">I2P SAM порт мосту (зазвичай 7656)</string>
+    <string name="i2p_allow_mixed">Дозволити змішаний режим</string>
+    <string name="i2p_allow_mixed_summary">Дозволити торрентам I2P підключатися як до I2P, так і до звичайних вузлів (менш анонімних)</string>
+    <string name="i2p_advanced_settings">Розширені налаштування тунелю</string>
+    <string name="i2p_inbound_quantity">Вхідні тунелі</string>
+    <string name="i2p_inbound_quantity_summary">Кількість вхідних тунелів [1-16] (вище = більше анонімності, повільніше)</string>
+    <string name="i2p_outbound_quantity">Вихідний Тунелі</string>
+    <string name="i2p_outbound_quantity_summary">Кількість вихідних тунелів [1-16] (більше = більше анонімності, повільніше)</string>
+    <string name="i2p_inbound_length">Вхідні переходи</string>
+    <string name="i2p_inbound_length_summary">Кількість переходів для вхідних тунелів [0-7] (вище = більше анонімності, повільніше)</string>
+    <string name="i2p_outbound_length">Вихідні переходи</string>
+    <string name="i2p_outbound_length_summary">Кількість переходів для вихідних тунелів [0-7] (вище = більше анонімності, повільніше)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent вимкнено (VPN Guard Active)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">Спільнота</string>
+    <string name="play_uppercase">ГРАТИ</string>
+    <string name="minutes_left_ad_free">%d Залишилося хвилин Без реклами</string>
+    <string name="minute_left_ad_free">Залишилася хвилина Без реклами</string>
+    <string name="reward_product_title">%d хвилин</string>
+    <string name="reward_product_price">Безкоштовно, відтворити 1 відеорекламу</string>
+    <string name="temporary_ad_removal">Тимчасове видалення реклами</string>
+    <string name="temporary_ad_removal_description">Немає реклами протягом %d хвилин після відтворення відео</string>
+    <string name="looking_For_rewarded_video">Шукаю відео з винагородою...</string>
+    <string name="no_reward_videos_available">Не вдалося отримати винагороджене відео. Будь ласка, спробуйте ще раз</string>
+    <string name="try_it_free_for_a_half_hour">Спробуйте безкоштовно протягом півгодини</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Вибачте, не вдалося знайти дійсне місце для завантаження на %s</string>
+    <string name="use_torrentz2">Використовуйте Torrentz2</string>
+    <string name="free">Безкоштовне оголошення</string>
+    <string name="dummy_ad"></string>
+    <string name="dummy_age_ago">2 дні тому</string>
+    <string name="one_second">1 секунда</string>
+    <string name="n_seconds">%s секунд</string>
+    <string name="one_minute">1 хвилина</string>
+    <string name="n_minutes">%s хвилин</string>
+    <string name="one_hour">1 година</string>
+    <string name="n_hours">%s годин</string>
+    <string name="one_day">1 день</string>
+    <string name="n_days">%s днів</string>
+    <string name="one_month">1 місяць</string>
+    <string name="n_months">%s місяці</string>
+    <string name="n_years">%s роки</string>
+    <string name="enable_sequential_download_summary">Точки завантажуються по порядку. Не рекомендовано для працездатності мережі</string>
+    <string name="dummy_period">/період</string>
+    <string name="period_monthly">щомісяця</string>
+    <string name="period_yearly">щорічно</string>
+    <string name="open_file_explorer">Відкрити Провідник файлів</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">У дозволі відмовлено</string>
+    <string name="information">Інформація</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">Завантаження YouTube не підтримуються FrostWire Basic через правила Google Play.\n\nЩоб отримати безкоштовну копію FrostWire Plus, відвідайте наш офіційний веб-сайт frostwire.com</string>
+    <string name="use_btdigg">Використовуйте BTDigg</string>
+    <string name="use_yt">Використовуйте YT</string>
+    <string name="error_cannot_open_downloads_folder">Не знайдено жодної програми для перегляду завантажень. Переконайтеся, що FrostWire має дозволи та встановлено Провідник файлів</string>
+    <string name="_30_minutes">30 хвилин</string>
+    <string name="ad_free_30_minutes">Без реклами 30 хвилин</string>
 </resources>

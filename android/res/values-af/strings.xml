@@ -435,4 +435,150 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="support_offer_header">Ondersteun FrostWire</string>
+    <string name="support_offer_donation_title">Ondersteun FrostWire</string>
+    <string name="support_offer_donation_message">Jou skenking help om FrostWire gratis te hou.</string>
+    <string name="support_offer_donation_action">Skenk</string>
+    <string name="support_offer_donation_badge">Skenk</string>
+    <string name="support_offer_vpn_title">Beskerm jou privaatheid</string>
+    <string name="support_offer_vpn_message">Kry FrostWire VPN en laai veilig af.</string>
+    <string name="support_offer_vpn_action">Kry VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Ondersteun FrostWire</string>
+    <string name="support_offer_default_message">Hou FrostWire sterk met \'n skenking of VPN-intekening.</string>
+    <string name="no_browser_found">Geen blaaier gevind om hierdie skakel oop te maak nie.</string>
+    <string name="use_one337x">Gebruik 1337x</string>
+    <string name="use_idope">Gebruik Idope</string>
+    <string name="use_knaben">Gebruik Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Gevorderde BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Laat veelvuldige verbindings vanaf dieselfde eweknie-ID toe</string>
+    <string name="allow_multiple_connections_per_pid_summary">Gebruik slegs vir private spoorsnyers, CGNAT of ander spesiale netwerkopstellings</string>
+    <string name="natpmp_gateway">NAT-PMP-poort-oorskakeling</string>
+    <string name="natpmp_gateway_summary">Opsionele router-poortadres vir NAT-PMP-poortkartering</string>
+    <string name="natpmp_lease_duration">NAT-PMP huurtermyn</string>
+    <string name="natpmp_lease_duration_summary">Versoek poortkartering leeftyd in sekondes. Verstek: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP-huurduur moet langer as 0 sekondes wees</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">Gebruik MagnetDL</string>
+    <string name="use_torrentscsv">Gebruik TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P-instellings</string>
+    <string name="enable_i2p">Aktiveer I2P-ondersteuning</string>
+    <string name="enable_i2p_summary">Anonieme torrenting deur I2P-netwerk (vereis dat I2P-roeteerder loop)</string>
+    <string name="i2p_sam_bridge">SAM-brug</string>
+    <string name="i2p_sam_hostname">SAM Gasheernaam</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM brugadres</string>
+    <string name="i2p_sam_port">SAM-poort</string>
+    <string name="i2p_sam_port_summary">I2P SAM brugpoort (gewoonlik 7656)</string>
+    <string name="i2p_allow_mixed">Laat gemengde modus toe</string>
+    <string name="i2p_allow_mixed_summary">Laat I2P-torrente toe om aan beide I2P en gewone eweknieë te koppel (minder anoniem)</string>
+    <string name="i2p_advanced_settings">Gevorderde tonnelinstellings</string>
+    <string name="i2p_inbound_quantity">Inkomende tonnels</string>
+    <string name="i2p_inbound_quantity_summary">Aantal inkomende tonnels [1-16] (hoër = meer anonimiteit, stadiger)</string>
+    <string name="i2p_outbound_quantity">Uitgaande tonnels</string>
+    <string name="i2p_outbound_quantity_summary">Aantal uitgaande tonnels [1-16] (hoër = meer anonimiteit, stadiger)</string>
+    <string name="i2p_inbound_length">Inkomende hop</string>
+    <string name="i2p_inbound_length_summary">Hoptelling vir inkomende tonnels [0-7] (hoër = meer anonimiteit, stadiger)</string>
+    <string name="i2p_outbound_length">Uitgaande hop</string>
+    <string name="i2p_outbound_length_summary">Hoptelling vir uitgaande tonnels [0-7] (hoër = meer anonimiteit, stadiger)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent af (VPN Guard Active)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">Gemeenskap</string>
+    <string name="play_uppercase">SPEEL</string>
+    <string name="minutes_left_ad_free">%d minute oor advertensievry</string>
+    <string name="minute_left_ad_free">Een minuut oor advertensievry</string>
+    <string name="reward_product_title">%d minute</string>
+    <string name="reward_product_price">Gratis, speel 1 video-advertensie</string>
+    <string name="temporary_ad_removal">Tydelike advertensieverwydering</string>
+    <string name="temporary_ad_removal_description">Geen advertensies vir %d minute nadat \'n video gespeel is nie</string>
+    <string name="looking_For_rewarded_video">Opsoek na \'n video met beloning...</string>
+    <string name="no_reward_videos_available">Kon nie \'n beloonde video gaan haal nie. Probeer asseblief weer</string>
+    <string name="try_it_free_for_a_half_hour">Probeer dit gratis vir \'n halfuur</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Jammer, kon nie \'n geldige aflaaiplek by %s vind nie</string>
+    <string name="free">Gratis</string>
+    <string name="dummy_ad">Ad</string>
+    <string name="dummy_age_ago">2 dae gelede</string>
+    <string name="one_second">1 sekonde</string>
+    <string name="n_seconds">%s sekondes</string>
+    <string name="one_minute">1 minuut</string>
+    <string name="n_minutes">%s minute</string>
+    <string name="one_hour">1 uur</string>
+    <string name="n_hours">%s ure</string>
+    <string name="one_day">1 dag</string>
+    <string name="n_days">%s dae</string>
+    <string name="one_month">1 maand</string>
+    <string name="n_months">%s maande</string>
+    <string name="n_years">%s jaar</string>
+    <string name="enable_sequential_download_summary">Stukke word in volgorde afgelaai. Nie aanbeveel vir netwerkgesondheid nie</string>
+    <string name="dummy_period">/periode</string>
+    <string name="period_monthly">maandeliks</string>
+    <string name="period_yearly">jaarliks</string>
+    <string name="open_file_explorer">Maak File Explorer oop</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">Toestemming geweier</string>
+    <string name="information">Inligting</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">YouTube-aflaaie word nie deur FrostWire Basic ondersteun nie weens Google Play-reëls.\n\nVir \'n gratis kopie van FrostWire Plus gaan na ons amptelike webwerf frostwire.com</string>
+    <string name="use_btdigg">Gebruik BTDigg</string>
+    <string name="use_yt">Gebruik YT</string>
+    <string name="error_cannot_open_downloads_folder">Geen toepassing gevind om aflaaie te sien nie. Maak seker dat FrostWire toestemmings het en dat \'n lêerverkenner geïnstalleer is</string>
+    <string name="_30_minutes">30 minute</string>
+    <string name="ad_free_30_minutes">Advertensievry 30 minute</string>
 </resources>

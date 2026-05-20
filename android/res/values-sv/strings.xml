@@ -434,4 +434,151 @@
     <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
     <string name="apply">Apply</string>
     <string name="port_range_cancel">Cancel</string>
+
+    <!-- Refreshed missing translations from base values/strings.xml. -->
+    <string name="system">System</string>
+    <string name="support_offer_header">Stöd FrostWire</string>
+    <string name="support_offer_donation_title">Stöd FrostWire</string>
+    <string name="support_offer_donation_message">Din donation hjälper till att hålla FrostWire gratis.</string>
+    <string name="support_offer_donation_action">Donera</string>
+    <string name="support_offer_donation_badge">Donera</string>
+    <string name="support_offer_vpn_title">Skydda din integritet</string>
+    <string name="support_offer_vpn_message">Skaffa FrostWire VPN och ladda ner säkert.</string>
+    <string name="support_offer_vpn_action">Skaffa VPN</string>
+    <string name="support_offer_vpn_badge">VPN</string>
+    <string name="support_offer_default_title">Stöd FrostWire</string>
+    <string name="support_offer_default_message">Håll FrostWire stark med en donation eller VPN-prenumeration.</string>
+    <string name="no_browser_found">Ingen webbläsare hittades för att öppna denna länk.</string>
+    <string name="use_one337x">Använd 1337x</string>
+    <string name="use_idope">Använd Idope</string>
+    <string name="use_knaben">Använd Knaben</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="advanced_bittorrent_settings">Avancerad BitTorrent</string>
+    <string name="allow_multiple_connections_per_pid">Tillåt flera anslutningar från samma peer-ID</string>
+    <string name="allow_multiple_connections_per_pid_summary">Använd endast för privata spårare, CGNAT eller andra speciella nätverksinställningar</string>
+    <string name="natpmp_gateway">NAT-PMP gateway åsidosätts</string>
+    <string name="natpmp_gateway_summary">Valfri router-gateway-adress för NAT-PMP-portmappning</string>
+    <string name="natpmp_lease_duration">NAT-PMP leasingperiod</string>
+    <string name="natpmp_lease_duration_summary">Begärd portmappningslivslängd i sekunder. Standard: 3600</string>
+    <string name="natpmp_lease_duration_invalid">NAT-PMP leasingperioden måste vara längre än 0 sekunder</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
+    <string name="empty_string" translatable="false" />
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
+    <string name="use_magnetdl">Använd MagnetDL</string>
+    <string name="use_torrentscsv">Använd TorrentsCSV</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="i2p_settings">I2P Inställningar</string>
+    <string name="enable_i2p">Aktivera I2P Support</string>
+    <string name="enable_i2p_summary">Anonym torrenting genom I2P-nätverket (kräver att en I2P-router körs)</string>
+    <string name="i2p_sam_bridge">SAM Bridge</string>
+    <string name="i2p_sam_hostname">SAM Värdnamn</string>
+    <string name="i2p_sam_hostname_summary">I2P SAM bryggadress</string>
+    <string name="i2p_sam_port">SAM-port</string>
+    <string name="i2p_sam_port_summary">I2P SAM bryggport (vanligtvis 7656)</string>
+    <string name="i2p_allow_mixed">Tillåt blandat läge</string>
+    <string name="i2p_allow_mixed_summary">Tillåt I2P torrents att ansluta till både I2P och vanliga kamrater (mindre anonyma)</string>
+    <string name="i2p_advanced_settings">Avancerade tunnelinställningar</string>
+    <string name="i2p_inbound_quantity">Inkommande tunnlar</string>
+    <string name="i2p_inbound_quantity_summary">Antal inkommande tunnlar [1-16] (högre = mer anonymitet, långsammare)</string>
+    <string name="i2p_outbound_quantity">Utgående tunnlar</string>
+    <string name="i2p_outbound_quantity_summary">Antal utgående tunnlar [1-16] (högre = mer anonymitet, långsammare)</string>
+    <string name="i2p_inbound_length">Inkommande humle</string>
+    <string name="i2p_inbound_length_summary">Hoppräkning för inkommande tunnlar [0-7] (högre = mer anonymitet, långsammare)</string>
+    <string name="i2p_outbound_length">Utgående humle</string>
+    <string name="i2p_outbound_length_summary">Hoppräkning för utgående tunnlar [0-7] (högre = mer anonymitet, långsammare)</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
+    <string name="bittorrent_off_vpn_required">"BitTorrent av (VPN Guard Active)"</string>
+    <string name="pro" translatable="false">PRO</string>
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
+    <string name="vpn_suggestion_pia" translatable="false">Private Internet Access</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="community">Gemenskap</string>
+    <string name="play_uppercase">SPELA</string>
+    <string name="minutes_left_ad_free">%d minuter kvar annonsfri</string>
+    <string name="minute_left_ad_free">En minut kvar annonsfri</string>
+    <string name="reward_product_title">%d minuter</string>
+    <string name="reward_product_price">Gratis, spela 1 videoannons</string>
+    <string name="temporary_ad_removal">Tillfällig annonsborttagning</string>
+    <string name="temporary_ad_removal_description">Inga annonser för %d minuter efter att en video spelat upp</string>
+    <string name="looking_For_rewarded_video">Letar du efter en premierad video...</string>
+    <string name="no_reward_videos_available">Det gick inte att hämta en premierad video. Försök igen</string>
+    <string name="try_it_free_for_a_half_hour">Prova gratis i en halvtimme</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Tyvärr, kunde inte hitta en giltig nedladdningsplats på %s</string>
+    <string name="free">Gratis</string>
+    <string name="dummy_ad">Ad</string>
+    <string name="dummy_age_ago">2 dagar sedan</string>
+    <string name="one_second">1 sekund</string>
+    <string name="n_seconds">%s sekunder</string>
+    <string name="one_minute">1 minut</string>
+    <string name="n_minutes">%s minuter</string>
+    <string name="one_hour">1 timme</string>
+    <string name="n_hours">%s timmar</string>
+    <string name="one_day">1 dag</string>
+    <string name="n_days">%s dagar</string>
+    <string name="one_month">1 månad</string>
+    <string name="n_months">%s månader</string>
+    <string name="n_years">%s år</string>
+    <string name="enable_sequential_download_summary">Bitarna laddas ner i ordning. Rekommenderas inte för nätverkshälsa</string>
+    <string name="dummy_period">/period</string>
+    <string name="period_monthly">månatlig</string>
+    <string name="period_yearly">årlig</string>
+    <string name="open_file_explorer">Öppna File Explorer</string>
+    <string name="comma">,</string>
+    <string name="permission_denied">Tillstånd nekad</string>
+    <string name="information">Information</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">YouTube-nedladdningar stöds inte av FrostWire Basic på grund av Google Play-regler.\n\nFör en gratis kopia av FrostWire Plus gå till vår officiella webbplats frostwire.com</string>
+    <string name="use_btdigg">Använd BTDigg</string>
+    <string name="use_yt">Använd YT</string>
+    <string name="error_cannot_open_downloads_folder">Ingen app hittades för att se nedladdningar. Se till att FrostWire har behörigheter och att en filutforskare är installerad</string>
+    <string name="_30_minutes">30 minuter</string>
+    <string name="ad_free_30_minutes">Annonsfri 30 minuter</string>
 </resources>
