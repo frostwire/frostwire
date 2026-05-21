@@ -2,6 +2,7 @@ FrostWire 3.2.0 build 776 UNRELEASED
  - new:Powered by jlibtorrent 2.0.12.9
  - new:Advanced BitTorrent preferences now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
  - update:Refreshed Android translations so all localized strings.xml files include every base string resource
+ - fix:VPN Drop protection now applies immediately during rapid on/off toggles and blocks manual seeding of finished torrents with a clear warning
  - fix:VPN Drop protection now resumes paused BitTorrent transfers after the setting is turned off, and shutdown avoids the Oplus finishAndRemoveTask StrictMode disk I/O path
  - fix:VPN Drop protection now pauses and blocks only BitTorrent transfers, leaving YouTube URL searches and other HTTP downloads unaffected
  - fix:Transfer Detail > Pieces now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
