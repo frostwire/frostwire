@@ -156,6 +156,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         }
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (boolean) newValue;
+            ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, newVal);
             if (newVal && !NetworkManager.instance().isTunnelUp()) {
                 TransferManager.instance().pauseTorrents();
                 UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);

@@ -115,6 +115,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     @Override
     public void onClick(Context context) {
+        if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
+            UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+            return;
+        }
         // NOTES.
         // Performance note: (specially when creating a .torrent of a big video)
         // wish we could know in advance if we've already created it
@@ -206,7 +210,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void seedEm() {
-        if (!TransferManager.instance().isMobileAndDataSavingsOn()) {
+        if (!TransferManager.instance().isMobileAndDataSavingsOn() &&
+                !TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
             if (fd == null && btDownload == null) {
                 TransferManager.instance().seedFinishedTransfers();
             } else if (fd != null && btDownload == null) {
@@ -270,6 +275,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void onSeedingEnabled() {
         ConfigurationManager.instance().setSeedFinishedTorrents(true);
+        if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
+            UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+            return;
+        }
         seedEm();
         UIUtils.showTransfersOnDownloadStart(getContext());
     }
