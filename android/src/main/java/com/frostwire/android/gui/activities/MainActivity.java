@@ -32,6 +32,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -192,7 +193,12 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     }
 
     private void finishForShutdown() {
-        super.finish();
+        StrictMode.ThreadPolicy previousPolicy = StrictMode.allowThreadDiskWrites();
+        try {
+            super.finish();
+        } finally {
+            StrictMode.setThreadPolicy(previousPolicy);
+        }
     }
 
     @Override

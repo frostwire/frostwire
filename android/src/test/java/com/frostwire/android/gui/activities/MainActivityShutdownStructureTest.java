@@ -21,7 +21,10 @@ public class MainActivityShutdownStructureTest {
 
         assertTrue(shutdownBlock.contains("finishForShutdown();"));
         assertFalse(shutdownBlock.contains("finish();"));
+        assertTrue(source.contains("import android.os.StrictMode;"));
+        assertTrue(finishForShutdownBlock.contains("StrictMode.ThreadPolicy previousPolicy = StrictMode.allowThreadDiskWrites();"));
         assertTrue(finishForShutdownBlock.contains("super.finish();"));
+        assertTrue(finishForShutdownBlock.contains("StrictMode.setThreadPolicy(previousPolicy);"));
         assertFalse(finishForShutdownBlock.contains("finishAndRemoveTask"));
         assertTrue(finishOverrideBlock.contains("super.finishAndRemoveTask();"));
     }
