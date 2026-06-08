@@ -454,7 +454,7 @@
     <string name="support_offer_default_message">Utrzymuj siłę FrostWire dzięki darowiznie lub subskrypcji VPN.</string>
     <string name="no_browser_found">Nie znaleziono przeglądarki umożliwiającej otwarcie tego łącza.</string>
     <string name="use_one337x">Użyj 1337x</string>
-    <string name="use_idope">Użyj Idope</string>
+
     <string name="use_knaben">Użyj Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

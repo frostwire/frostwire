@@ -39,7 +39,7 @@ FrostWire desktop ships a built-in MCP server with **38 tools** and **7 live res
 - **`frostwire_search_engines`** — List all engines with `id`, `name`, `enabled`, `type`.
 - **`frostwire_search_engine_toggle`** — Enable/disable an engine. Args: `engineId`, `enabled`.
 
-Engine IDs: `TPB_ID`, `SOUNDCLOUD_ID`, `INTERNET_ARCHIVE_ID`, `YT_ID`, `TELLURIDE_ID`, `NYAA_ID`, `ONE337X_ID`, `IDOPE_ID`, `TORRENTZ2_ID`, `MAGNETDL_ID`, `TORRENTSCSV_ID`, `KNABEN_ID`, `TORRENTDOWNLOADS_ID`.
+Engine IDs: `TPB_ID`, `SOUNDCLOUD_ID`, `INTERNET_ARCHIVE_ID`, `YT_ID`, `TELLURIDE_ID`, `NYAA_ID`, `ONE337X_ID`, `TORRENTZ2_ID`, `MAGNETDL_ID`, `TORRENTSCSV_ID`, `KNABEN_ID`, `TORRENTDOWNLOADS_ID`.
 
 ### Transfers (12 tools)
 

@@ -55,7 +55,6 @@ public class SettingsAdapter {
                 engines.addProperty("frostclick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED.getValue());
                 engines.addProperty("nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED.getValue());
                 engines.addProperty("1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED.getValue());
-                engines.addProperty("idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED.getValue());
                 engines.addProperty("torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED.getValue());
                 engines.addProperty("magnetdl", SearchEnginesSettings.MAGNETDL_ENABLED.getValue());
                 engines.addProperty("yt", SearchEnginesSettings.YT_SEARCH_ENABLED.getValue());
@@ -133,7 +132,6 @@ public class SettingsAdapter {
         map.put("FROSTCLICK_SEARCH_ENABLED", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED);
         map.put("NYAA_SEARCH_ENABLED", SearchEnginesSettings.NYAA_SEARCH_ENABLED);
         map.put("ONE337X_SEARCH_ENABLED", SearchEnginesSettings.ONE337X_SEARCH_ENABLED);
-        map.put("IDOPE_SEARCH_ENABLED", SearchEnginesSettings.IDOPE_SEARCH_ENABLED);
         map.put("TORRENTZ2_SEARCH_ENABLED", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED);
         map.put("MAGNETDL_ENABLED", SearchEnginesSettings.MAGNETDL_ENABLED);
         map.put("YT_SEARCH_ENABLED", SearchEnginesSettings.YT_SEARCH_ENABLED);

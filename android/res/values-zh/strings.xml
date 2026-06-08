@@ -453,7 +453,7 @@
     <string name="support_offer_default_message">通过捐赠或 VPN 订阅来保持 FrostWire 的强大。</string>
     <string name="no_browser_found">找不到可以打开此链接的浏览器。</string>
     <string name="use_one337x">使用 1337x</string>
-    <string name="use_idope">使用 Idope</string>
+
     <string name="use_knaben">使用 Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

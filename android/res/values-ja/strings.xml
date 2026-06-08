@@ -451,7 +451,7 @@
     <string name="support_offer_default_message">寄付または VPN サブスクリプションで FrostWire を強力に保ちましょう。</string>
     <string name="no_browser_found">このリンクを開けるブラウザが見つかりませんでした。</string>
     <string name="use_one337x">1337x を使用</string>
-    <string name="use_idope">Idope を使用</string>
+
     <string name="use_knaben">Knaben を使用</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

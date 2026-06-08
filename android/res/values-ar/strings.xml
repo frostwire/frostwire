@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">حافظ على قوة FrostWire من خلال التبرع أو الاشتراك في VPN.</string>
     <string name="no_browser_found">لم يتم العثور على متصفح لفتح هذا الرابط.</string>
     <string name="use_one337x">استخدم 1337x</string>
-    <string name="use_idope">استخدم Idope</string>
+
     <string name="use_knaben">استخدم Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

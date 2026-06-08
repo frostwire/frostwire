@@ -36,7 +36,6 @@ import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.one337x.One337xCrawlingStrategy;
-import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
@@ -63,7 +62,6 @@ public abstract class SearchEngine {
         INTERNET_ARCHIVE_ID,
         FROSTCLICK_ID,
         ONE337X_ID,
-        IDOPE_ID,
         NYAA_ID,
         TORRENTZ2_ID,
         MAGNETDL_ID,
@@ -173,19 +171,6 @@ public abstract class SearchEngine {
                     keywords,
                     new One337xSearchPattern(),
                     new One337xCrawlingStrategy(),
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
-    private static final SearchEngine IDOPE = new SearchEngine(SearchEngineID.IDOPE_ID, "idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.hair") {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with JSON API parsing (no crawling needed)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new IdopeSearchPattern(),
-                    null,  // No crawling needed
                     DEFAULT_TIMEOUT
             );
         }
@@ -306,7 +291,6 @@ public abstract class SearchEngine {
         return Arrays.asList(
                 YT,
                 INTERNET_ARCHIVE,
-                IDOPE,
                 KNABEN,
                 MAGNETDL,
                 NYAA,

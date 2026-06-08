@@ -452,7 +452,7 @@
     <string name="support_offer_default_message">Ојачајте FrostWire донацијом или VPN претплатом.</string>
     <string name="no_browser_found">Није пронађен ниједан прегледач за отварање ове везе.</string>
     <string name="use_one337x">Користи 1337x</string>
-    <string name="use_idope">Користите Идопе</string>
+
     <string name="use_knaben">Користи Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

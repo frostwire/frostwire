@@ -23,7 +23,7 @@
     <string name="dark">Темный</string>
     <string name="system">Система</string>
     <string name="use_one337x">Использовать 1337x</string>
-    <string name="use_idope">Использовать Idope</string>
+
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>

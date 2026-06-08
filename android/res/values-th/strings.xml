@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">รักษา FrostWire ให้แข็งแกร่งด้วยการบริจาคหรือการสมัครสมาชิก VPN</string>
     <string name="no_browser_found">ไม่พบเบราว์เซอร์สำหรับเปิดลิงก์นี้</string>
     <string name="use_one337x">ใช้ 1337x</string>
-    <string name="use_idope">ใช้ Idope</string>
+
     <string name="use_knaben">ใช้ Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

@@ -161,8 +161,11 @@ result.getTorrentUrl().ifPresent(url -> {
 
 ## Examples
 
-See the `v2/idope/` directory for a complete migration example:
-- `IdopeSearchPattern` - Replaces IdopeSearchPerformer
+See any of the existing `*/SearchPattern.java` implementations under
+`com.frostwire.search.*` (e.g. `yt/YTSearchPattern.java`,
+`magnetdl/MagnetDLSearchPattern.java`) for a complete example of a
+flat `SearchPattern` migration. Each pattern implements the
+`SearchPattern` interface directly with no abstract base class chain.
 
 ## Benefits
 

@@ -19,7 +19,6 @@
 package com.frostwire.search;
 
 import com.frostwire.search.ISearchPerformer;
-import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.util.UrlUtils;
 
 /**
@@ -31,25 +30,6 @@ import com.frostwire.util.UrlUtils;
 public class SearchPerformerFactory {
     private static final int DEFAULT_TIMEOUT = 30000;
     private static final TorrentCrawlingStrategy DEFAULT_TORRENT_CRAWLING = new TorrentCrawlingStrategy();
-
-    /**
-     * Creates a torrent search performer for idope.
-     *
-     * @param token the search token
-     * @param keywords the search keywords
-     * @param timeout the HTTP timeout
-     * @return a configured ISearchPerformer
-     */
-    public static ISearchPerformer createIdopeTorrentSearch(long token, String keywords, int timeout) {
-        return new SearchPerformer(
-                token,
-                keywords,
-                UrlUtils.encode(keywords),
-                new IdopeSearchPattern(),
-                DEFAULT_TORRENT_CRAWLING,  // Idope returns magnet links, but we can still crawl for more details
-                timeout
-        );
-    }
 
     /**
      * Creates a simple search performer without crawling.

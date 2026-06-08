@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">Tartsa a FrostWire erősségét adományozással vagy VPN előfizetéssel.</string>
     <string name="no_browser_found">Nem található böngésző a hivatkozás megnyitásához.</string>
     <string name="use_one337x">1337x</string>
-    <string name="use_idope">Idope használata</string>
+
     <string name="use_knaben">Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

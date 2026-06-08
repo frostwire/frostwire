@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">Pidä FrostWire vahvana lahjoituksella tai VPN-tilauksella.</string>
     <string name="no_browser_found">Selainta ei löytynyt tämän linkin avaamiseksi.</string>
     <string name="use_one337x">Käytä 1337x</string>
-    <string name="use_idope">Käytä Idope</string>
+
     <string name="use_knaben">Käytä Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

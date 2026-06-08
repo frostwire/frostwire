@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">Håll FrostWire stark med en donation eller VPN-prenumeration.</string>
     <string name="no_browser_found">Ingen webbläsare hittades för att öppna denna länk.</string>
     <string name="use_one337x">Använd 1337x</string>
-    <string name="use_idope">Använd Idope</string>
+
     <string name="use_knaben">Använd Knaben</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

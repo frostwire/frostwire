@@ -450,7 +450,7 @@
     <string name="support_offer_default_message">Bir bağış veya VPN aboneliğiyle FrostWire\'yi güçlü tutun.</string>
     <string name="no_browser_found">Bu bağlantıyı açacak tarayıcı bulunamadı.</string>
     <string name="use_one337x">1337x Kullanın</string>
-    <string name="use_idope">Idope Kullanın</string>
+
     <string name="use_knaben">Knaben Kullanın</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>

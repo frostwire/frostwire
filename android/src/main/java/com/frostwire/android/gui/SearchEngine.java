@@ -42,7 +42,6 @@ import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
-import com.frostwire.search.idope.IdopeSearchPattern;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
@@ -275,21 +274,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine IDOPE = new SearchEngine("idope", Constants.PREF_KEY_SEARCH_USE_IDOPE) {
-
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with JSON API parsing (no crawling needed)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new IdopeSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
-        }
-    };
-
     public static final SearchEngine TORRENTZ2 = new SearchEngine("torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
 
         @Override
@@ -387,7 +371,6 @@ public abstract class SearchEngine {
             MAGNETDL,
             TORRENTZ2,
             ONE337X,
-            IDOPE,
             FROSTCLICK,
             TPB,
             SOUNCLOUD,

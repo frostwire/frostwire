@@ -66,10 +66,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_one337x" />
     <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_idope"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_idope" />
-    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_knaben"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_knaben" />

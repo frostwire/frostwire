@@ -293,8 +293,6 @@ com.frostwire.search/
 ├── v2/
 │   ├── SearchPerformer.java
 │   ├── SearchPattern.java
-│   ├── idope/
-│   │   └── IdopeSearchPattern.java
 │   ├── yt/
 │   │   └── YTSearchPattern.java
 │   └── ... (15+ other patterns)
@@ -312,8 +310,6 @@ com.frostwire.search/
 ├── CompositeFileSearchResult.java (unified results)
 ├── SearchTimeoutException.java (better errors)
 ├── SizeParser.java (shared utility)
-├── idope/
-│   └── IdopeSearchPattern.java
 ├── yt/
 │   ├── YTSearchPattern.java (optimized)
 │   └── YTSearchResult.java (legacy, kept for compatibility)
