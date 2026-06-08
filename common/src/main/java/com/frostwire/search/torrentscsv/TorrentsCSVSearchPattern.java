@@ -17,6 +17,7 @@
  */
 
 package com.frostwire.search.torrentscsv;
+import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.search.CompositeFileSearchResult;
 
 import com.frostwire.search.FileSearchResult;
@@ -136,8 +137,7 @@ public class TorrentsCSVSearchPattern implements SearchPattern {
 
             // Generate magnet URL if not provided
             if (StringUtils.isNullOrEmpty(magnetUrl)) {
-                magnetUrl = UrlUtils.buildMagnetUrl(infoHash, name,
-                    UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+                magnetUrl = UrlUtils.buildMagnetUrl(infoHash, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
             }
 
             // Parse creation time

@@ -19,6 +19,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.swig.*;
@@ -320,22 +321,9 @@ public final class TorrentUtil {
     private static @NotNull create_torrent getCreateTorrent(boolean dhtTrackedOnly, file_storage fs, TorrentType torrentType) {
         create_torrent torrentCreator = createTorrentWithType(fs, torrentType);
         if (!dhtTrackedOnly) {
-            torrentCreator.add_tracker("udp://open.stealth.si:80/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.torrent.eu.org:451/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.publictracker.xyz:6969/announce", 0);
-            torrentCreator.add_tracker("udp://open.demonii.com:1337/announce", 0);
-            torrentCreator.add_tracker("udp://wepzone.net:6969/announce", 0);
-            torrentCreator.add_tracker("udp://uabits.today:6990/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.wildkat.net:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.tryhackx.org:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.theoks.net:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.t-1.org:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.qu.ax:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.opentorrent.top:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.dler.org:6969/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.corpscorp.online:80/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.bittor.pw:1337/announce", 0);
-            torrentCreator.add_tracker("udp://tracker.auctor.tv:6969/announce", 0);
+            for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
+                torrentCreator.add_tracker(tracker, 0);
+            }
         }
         torrentCreator.set_priv(false);
         torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
