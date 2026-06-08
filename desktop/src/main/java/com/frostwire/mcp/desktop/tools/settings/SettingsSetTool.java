@@ -70,6 +70,7 @@ public class SettingsSetTool implements MCPTool {
             allowed.add("YT_SEARCH_ENABLED");
             allowed.add("TORRENTSCSV_SEARCH_ENABLED");
             allowed.add("KNABEN_SEARCH_ENABLED");
+            allowed.add("BITSEARCH_SEARCH_ENABLED");
             allowed.add("TELLURIDE_ENABLED");
             allowed.add("TORRENTDOWNLOADS_SEARCH_ENABLED");
             error.add("allowedKeys", allowed);

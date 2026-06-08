@@ -60,6 +60,7 @@ public class SettingsAdapter {
                 engines.addProperty("yt", SearchEnginesSettings.YT_SEARCH_ENABLED.getValue());
                 engines.addProperty("torrentscsv", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED.getValue());
                 engines.addProperty("knaben", SearchEnginesSettings.KNABEN_SEARCH_ENABLED.getValue());
+                engines.addProperty("bitsearch", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED.getValue());
                 engines.addProperty("telluride", SearchEnginesSettings.TELLURIDE_ENABLED.getValue());
                 engines.addProperty("torrentdownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED.getValue());
                 settings.add("engines", engines);
@@ -137,6 +138,7 @@ public class SettingsAdapter {
         map.put("YT_SEARCH_ENABLED", SearchEnginesSettings.YT_SEARCH_ENABLED);
         map.put("TORRENTSCSV_SEARCH_ENABLED", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED);
         map.put("KNABEN_SEARCH_ENABLED", SearchEnginesSettings.KNABEN_SEARCH_ENABLED);
+        map.put("BITSEARCH_SEARCH_ENABLED", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED);
         map.put("TELLURIDE_ENABLED", SearchEnginesSettings.TELLURIDE_ENABLED);
         map.put("TORRENTDOWNLOADS_SEARCH_ENABLED", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED);
         return map;

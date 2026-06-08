@@ -30,6 +30,7 @@ import com.frostwire.search.tpb.TPBSearchPattern;
 import com.frostwire.search.tpb.TPBMirrors;
 import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
+import com.frostwire.search.bitsearch.BitsearchSearchPattern;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
@@ -68,7 +69,8 @@ public abstract class SearchEngine {
         TELLURIDE_ID,
         YT_ID,
         TORRENTSCSV_ID,
-        KNABEN_ID
+        KNABEN_ID,
+        BITSEARCH_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -249,6 +251,21 @@ public abstract class SearchEngine {
             );
         }
     };
+    private static final SearchEngine BITSEARCH = new SearchEngine(SearchEngineID.BITSEARCH_ID, "bitsearch", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED, "bitsearch.eu") {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: REST/JSON pattern, no crawling — the search response already
+            // carries infohash, title, size, seeders, leechers. Magnet is built
+            // client-side from DefaultTrackers.MAGNET_URL_PARAMETERS.
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new BitsearchSearchPattern(),
+                    null,  // No crawling needed
+                    DEFAULT_TIMEOUT
+            );
+        }
+    };
 
     private static final SearchEngine KNABEN = new SearchEngine(SearchEngineID.KNABEN_ID, "Knaben", SearchEnginesSettings.KNABEN_SEARCH_ENABLED, "knaben.org") {
         @Override
@@ -291,6 +308,7 @@ public abstract class SearchEngine {
         return Arrays.asList(
                 YT,
                 INTERNET_ARCHIVE,
+                BITSEARCH,
                 KNABEN,
                 MAGNETDL,
                 NYAA,
