@@ -211,7 +211,22 @@ public class CreateTorrentDialog extends JDialog {
         ThemeMediator.fixKeyStrokes(textTrackers);
         textTrackers.setToolTipText(labelTrackers.getToolTipText());
         textTrackers.setLineWrap(false);
-        textTrackers.setText("udp://tracker.opentrackr.org:1337/announce\nudp://tracker.openbittorrent.com:6969/announce\nudp://open.stealth.si:80/announce\nudp://exodus.desync.com:6969/announce\nudp://tracker.torrent.eu.org:451/announce\nudp://tracker.moeking.me:6969/announce\nudp://explodie.org:6969/announce\nudp://tracker.coppersurfer.tk:6969/announce");
+        textTrackers.setText("udp://open.stealth.si:80/announce\n" +
+                "udp://tracker.torrent.eu.org:451/announce\n" +
+                "udp://tracker.publictracker.xyz:6969/announce\n" +
+                "udp://open.demonii.com:1337/announce\n" +
+                "udp://wepzone.net:6969/announce\n" +
+                "udp://uabits.today:6990/announce\n" +
+                "udp://tracker.wildkat.net:6969/announce\n" +
+                "udp://tracker.tryhackx.org:6969/announce\n" +
+                "udp://tracker.theoks.net:6969/announce\n" +
+                "udp://tracker.t-1.org:6969/announce\n" +
+                "udp://tracker.qu.ax:6969/announce\n" +
+                "udp://tracker.opentorrent.top:6969/announce\n" +
+                "udp://tracker.dler.org:6969/announce\n" +
+                "udp://tracker.corpscorp.online:80/announce\n" +
+                "udp://tracker.bittor.pw:1337/announce\n" +
+                "udp://tracker.auctor.tv:6969/announce");
         textTrackersScrollPane = new JScrollPane(textTrackers);
         torrentTrackingPanel.add(textTrackersScrollPane, "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
         JLabel _labelWebseeds = new JLabel(I18n.tr("Web Seeds Mirror URLs"));

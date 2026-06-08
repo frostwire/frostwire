@@ -44,14 +44,22 @@ public final class UrlUtils {
     private static final Logger LOG = Logger.getLogger(UrlUtils.class);
     private final static Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
 
-    public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://tracker.opentrackr.org:1337/announce&" +
-            "tr=udp://tracker.openbittorrent.com:6969/announce&" +
-            "tr=udp://open.stealth.si:80/announce&" +
-            "tr=udp://exodus.desync.com:6969/announce&" +
+    public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://open.stealth.si:80/announce&" +
             "tr=udp://tracker.torrent.eu.org:451/announce&" +
-            "tr=udp://tracker.moeking.me:6969/announce&" +
-            "tr=udp://explodie.org:6969/announce&" +
-            "tr=udp://tracker.coppersurfer.tk:6969/announce&";
+            "tr=udp://tracker.publictracker.xyz:6969/announce&" +
+            "tr=udp://open.demonii.com:1337/announce&" +
+            "tr=udp://wepzone.net:6969/announce&" +
+            "tr=udp://uabits.today:6990/announce&" +
+            "tr=udp://tracker.wildkat.net:6969/announce&" +
+            "tr=udp://tracker.tryhackx.org:6969/announce&" +
+            "tr=udp://tracker.theoks.net:6969/announce&" +
+            "tr=udp://tracker.t-1.org:6969/announce&" +
+            "tr=udp://tracker.qu.ax:6969/announce&" +
+            "tr=udp://tracker.opentorrent.top:6969/announce&" +
+            "tr=udp://tracker.dler.org:6969/announce&" +
+            "tr=udp://tracker.corpscorp.online:80/announce&" +
+            "tr=udp://tracker.bittor.pw:1337/announce&" +
+            "tr=udp://tracker.auctor.tv:6969/announce&";
 
     private UrlUtils() {
     }

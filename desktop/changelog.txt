@@ -1,4 +1,5 @@
 FrostWire 7.0.5
+  - fix:Default tracker list in TorrentUtil, CreateTorrentDialog, and UrlUtils updated to 16 trackers that responded to a BEP 15 connect_request probe on 2026-06-08 — removed 6 dead trackers (opentrackr, openbittorrent, exodus, moeking, explodie, coppersurfer) and added reliable replacements from ngosang/trackerslist per #1004. New DefaultTrackerListTest regression suite asserts all three files stay in sync
   - fix:VPN detection false positive on macOS — system utun interfaces (iCloud, Back to My Mac) were falsely detected as active VPN tunnels even when VPN was off, because they match the "utun" interface name pattern. Now validates that utun interfaces have a real routable IPv4 address before counting them as VPN. Also added "vpn" to interface name checks for broader VPN detection coverage
   - new:Advanced BitTorrent settings now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
   - fix:Transfer detail Pieces tab now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
