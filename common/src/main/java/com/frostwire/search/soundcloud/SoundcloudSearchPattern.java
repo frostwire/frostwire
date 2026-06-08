@@ -45,8 +45,8 @@ public class SoundcloudSearchPattern implements SearchPattern {
     private final String appVersion;
 
     public SoundcloudSearchPattern(String clientId, String appVersion) {
-        this.clientId = clientId != null ? clientId : "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
-        this.appVersion = appVersion != null ? appVersion : "1775730350";
+        this.clientId = clientId != null ? clientId : "A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz";
+        this.appVersion = appVersion != null ? appVersion : "1780910323";
     }
 
     @Override

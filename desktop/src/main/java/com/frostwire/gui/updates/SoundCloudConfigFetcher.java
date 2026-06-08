@@ -36,8 +36,8 @@ public final class SoundCloudConfigFetcher {
     private static final int TIMEOUT = 10000; // 10 seconds
 
     // Fallback constants - these are the single source of truth for default credentials
-    public static final String DEFAULT_CLIENT_ID = "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
-    public static final String DEFAULT_APP_VERSION = "1766155513";
+    public static final String DEFAULT_CLIENT_ID = "A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz";
+    public static final String DEFAULT_APP_VERSION = "1780910323";
 
     // In-memory cache
     private static String cachedClientId = DEFAULT_CLIENT_ID;

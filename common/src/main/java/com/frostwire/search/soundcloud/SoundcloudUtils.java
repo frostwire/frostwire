@@ -27,8 +27,8 @@ import java.util.LinkedList;
  * Extracted from legacy SoundcloudSearchPerformer for use by V2 architecture and other code.
  */
 public final class SoundcloudUtils {
-    private static final String DEFAULT_SOUNDCLOUD_CLIENTID = "iuspDvaXDbD3AnFwLWK56Fk69q56xsKu";
-    private static final String DEFAULT_SOUNDCLOUD_APP_VERSION = "1766155513";
+    private static final String DEFAULT_SOUNDCLOUD_CLIENTID = "A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz";
+    private static final String DEFAULT_SOUNDCLOUD_APP_VERSION = "1780910323";
 
     private SoundcloudUtils() {
         // utility class
