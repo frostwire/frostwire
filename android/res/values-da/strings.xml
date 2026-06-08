@@ -451,7 +451,8 @@
     <string name="no_browser_found">Der blev ikke fundet nogen browser til at åbne dette link.</string>
     <string name="use_one337x">Brug 1337x</string>
 
-    <string name="use_knaben">Brug Knaben</string>
+    <string name="use_knaben">Use Knaben</string>
+    <string name="use_bitsearch">Use Bitsearch</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>

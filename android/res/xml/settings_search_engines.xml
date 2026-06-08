@@ -70,6 +70,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_knaben" />
     <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_bitsearch"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_bitsearch" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_yt"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_yt" />

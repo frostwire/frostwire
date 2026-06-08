@@ -458,7 +458,8 @@
     <string name="support_offer_default_title">Unterstützen Sie FrostWire</string>
     <string name="support_offer_default_message">Halten Sie FrostWire stark mit einer Spende oder einem VPN-Abonnement.</string>
     <string name="no_browser_found">Kein Browser zum Öffnen dieses Links gefunden.</string>
-    <string name="use_knaben">Verwenden Sie Knaben</string>
+    <string name="use_knaben">Use Knaben</string>
+    <string name="use_bitsearch">Use Bitsearch</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>

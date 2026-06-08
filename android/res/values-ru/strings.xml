@@ -551,7 +551,8 @@
     <string name="support_offer_default_title">Поддержите FrostWire</string>
     <string name="support_offer_default_message">Поддержите FrostWire с помощью пожертвования или подписки на VPN.</string>
     <string name="no_browser_found">Не найден браузер, позволяющий открыть эту ссылку.</string>
-    <string name="use_knaben">Используйте Knaben</string>
+    <string name="use_knaben">Use Knaben</string>
+    <string name="use_bitsearch">Use Bitsearch</string>
     <string name="advanced_bittorrent_settings">Расширенный BitTorrent</string>
     <string name="allow_multiple_connections_per_pid">Разрешить несколько соединений с одним и тем же идентификатором узла</string>
     <string name="allow_multiple_connections_per_pid_summary">Используйте только для частных трекеров, CGNAT или других специальных сетевых настроек</string>

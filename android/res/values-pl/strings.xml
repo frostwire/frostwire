@@ -455,7 +455,8 @@
     <string name="no_browser_found">Nie znaleziono przeglądarki umożliwiającej otwarcie tego łącza.</string>
     <string name="use_one337x">Użyj 1337x</string>
 
-    <string name="use_knaben">Użyj Knaben</string>
+    <string name="use_knaben">Use Knaben</string>
+    <string name="use_bitsearch">Use Bitsearch</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>

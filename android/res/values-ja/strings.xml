@@ -452,7 +452,8 @@
     <string name="no_browser_found">このリンクを開けるブラウザが見つかりませんでした。</string>
     <string name="use_one337x">1337x を使用</string>
 
-    <string name="use_knaben">Knaben を使用</string>
+    <string name="use_knaben">Use Knaben</string>
+    <string name="use_bitsearch">Use Bitsearch</string>
     <string name="dummy_title" translatable="false">[Title]</string>
     <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>

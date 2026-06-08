@@ -39,6 +39,7 @@ import com.frostwire.search.tpb.TPBSearchPattern;
 import com.frostwire.search.tpb.TPBMirrors;
 import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
 import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.bitsearch.BitsearchSearchPattern;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
 import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.search.one337x.One337xSearchPattern;
@@ -329,6 +330,22 @@ public abstract class SearchEngine {
                     token,
                     keywords,
                     new KnabenSearchPattern(),
+                    new KnabenCrawlingStrategy(),
+                    DEFAULT_TIMEOUT
+            );
+        }
+    };
+
+    public static final SearchEngine BITSEARCH = new SearchEngine("bitsearch", Constants.PREF_KEY_SEARCH_USE_BITSEARCH) {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            // V2: REST/JSON pattern, no crawling. Search response already
+            // carries infohash, title, size, seeders, leechers; magnet is
+            // built client-side from DefaultTrackers.MAGNET_URL_PARAMETERS.
+            return SearchPerformerFactory.createSearchPerformer(
+                    token,
+                    keywords,
+                    new BitsearchSearchPattern(),
                     null,  // No crawling needed
                     DEFAULT_TIMEOUT
             );
@@ -377,5 +394,6 @@ public abstract class SearchEngine {
             ARCHIVE,
             NYAA,
             TORRENTSCSV,
-            KNABEN);
+            KNABEN,
+            BITSEARCH);
 }
