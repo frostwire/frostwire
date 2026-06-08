@@ -102,6 +102,7 @@ public final class Ssl {
                 "api.frostclick.com",
                 "archive.org",
                 "btdig.com",
+                "bitsearch.eu",
                 "cdninstagram.com",
                 "clients1.google.com",
                 "cloudflaressl.com",
