@@ -1,5 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
- - new:Powered by jlibtorrent 2.0.12.9
+  - new:Bitsearch added as a new REST-API torrent search engine (bitsearch.eu) — clean JSON, 200 free requests/day per IP, magnet links built client-side from DefaultTrackers. No crawling, replaces the gap left by the Idope removal
+  - new:Powered by jlibtorrent 2.0.12.9
  - new:Advanced BitTorrent preferences now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
  - update:Refreshed Android translations so all localized strings.xml files include every base string resource
  - fix:Shutdown now suppresses OEM framework StrictMode disk I/O noise from the activity finish binder path
