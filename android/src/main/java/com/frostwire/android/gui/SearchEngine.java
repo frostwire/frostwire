@@ -330,13 +330,13 @@ public abstract class SearchEngine {
                     token,
                     keywords,
                     new KnabenSearchPattern(),
-                    new KnabenCrawlingStrategy(),
+                    null,  // No crawling needed
                     DEFAULT_TIMEOUT
             );
         }
     };
 
-    public static final SearchEngine BITSEARCH = new SearchEngine("bitsearch", Constants.PREF_KEY_SEARCH_USE_BITSEARCH) {
+    public static final SearchEngine BITSEARCH = new SearchEngine("Bitsearch", Constants.PREF_KEY_SEARCH_USE_BITSEARCH) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             // V2: REST/JSON pattern, no crawling. Search response already

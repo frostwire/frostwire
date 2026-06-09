@@ -251,7 +251,7 @@ public abstract class SearchEngine {
             );
         }
     };
-    private static final SearchEngine BITSEARCH = new SearchEngine(SearchEngineID.BITSEARCH_ID, "bitsearch", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED, "bitsearch.eu") {
+    private static final SearchEngine BITSEARCH = new SearchEngine(SearchEngineID.BITSEARCH_ID, "Bitsearch", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED, "bitsearch.eu") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             // V2: REST/JSON pattern, no crawling — the search response already
