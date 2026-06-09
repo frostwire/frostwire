@@ -117,7 +117,7 @@ public class BitsearchSearchPattern implements SearchPattern {
                             .filename(displayName + ".torrent")
                             .size(r.size)
                             .detailsUrl(detailsUrl)
-                            .source("bitsearch")
+                            .source("Bitsearch")
                             .torrent(magnet, r.infohash, r.seeders, magnet)
                             .preliminary(false)
                             .build();

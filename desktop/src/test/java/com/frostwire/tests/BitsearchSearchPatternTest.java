@@ -81,7 +81,7 @@ public final class BitsearchSearchPatternTest {
 
         CompositeFileSearchResult first = (CompositeFileSearchResult) results.get(0);
         assertEquals("ubuntu-19.04-desktop-amd64.iso", first.getDisplayName());
-        assertEquals("bitsearch", first.getSource());
+        assertEquals("Bitsearch", first.getSource());
         assertEquals("D540FC48EB12F2833163EED6421D449DD8F1CE1F", first.getTorrentHash().orElse(null));
         assertEquals(2097152000L, first.getSize());
         assertTrue(first.getSeeds().isPresent());
@@ -179,7 +179,7 @@ public final class BitsearchSearchPatternTest {
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedMessages.add("displayName is null or empty");
                 }
-                if (!"bitsearch".equals(sr.getSource())) {
+                if (!"Bitsearch".equals(sr.getSource())) {
                     failedMessages.add("source should be 'bitsearch', got: " + sr.getSource());
                 }
                 if (StringUtils.isNullOrEmpty(sr.getDetailsUrl())) {
