@@ -21,6 +21,12 @@ triggers:
   - coding guidelines
   - code review
   - changelog
+  - DHT
+  - BEP 5
+  - BEP 44
+  - BEP 46
+  - relayd
+  - headless
 ---
 
 # FrostWire Engineer
@@ -48,6 +54,8 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"DRY first, abstract later"** | Two call sites? Tolerable. Three? Extract. Don't preemptively abstract. |
 | **"Compose, don't extend"** | Default to wrapping/composition; only `extends` for abstract types |
 | **"One util to rule them all"** | Before writing `toHex`/`fromBase64`/etc., grep `com.frostwire.util.*` |
+| **"Check the primitive before designing the abstraction"** | DHT, JNI, SQLite, Android APIs — verify real API semantics first |
+| **"Headless first when the feature is network-native"** | Relay/search protocols must run without Swing/Android UI |
 
 ---
 
@@ -87,6 +95,20 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - Favor immutable objects and immutable state. Pairs naturally with minimum scope.
 - Final fields, defensive `byte[].clone()` on POJO boundaries, no setters on value types.
 - Reduces entire classes of concurrency bugs (no shared mutable state = no race).
+
+### Protocol Reality Before Architecture
+
+- Before designing a distributed protocol, verify the real primitive in the library API and specs. Do not design from a desired abstraction.
+- Example: BEP 44 mutable DHT items are **single-writer** (`SHA1(pubkey + salt)`), not arbitrary multi-writer buckets. If you need multi-writer discovery, use BEP 5 peer rendezvous (`dhtAnnounce` / `dhtGetPeers`) plus an authenticated protocol on top.
+- Write a small local integration test that proves the primitive before writing a large design around it. The test should validate discovery, not just put/get with an in-process key.
+- Prefer one simple protocol path over three clever DHT record types. If a proposed design needs `IndexAnnouncement`, `search-hint`, `relay-record`, and `identity-record` all in the DHT, ask whether two of those are really application messages between peers.
+
+### Headless-First Modularity
+
+- Network-native features must run in a headless JVM without Swing, Android, or desktop settings classes.
+- Split modules by role, not UI: `common/` for records, crypto, protocol messages, and interfaces; `desktop/` for Swing and JDBC implementations; `android/` for Android storage/UI; a small `relayd/` module for cloud relays.
+- A relay-only node should not require SQLite, a media library, a GUI, or large disk. It needs jlibtorrent, keys, rate limits, RAM-bounded caches, and fast networking.
+- Use composition for roles: `RelayRole`, `IndexRole`, `SearchRole`, `UiRole`. Avoid a monolithic `DistributedSearchManager` that owns everything.
 
 ---
 
@@ -226,6 +248,13 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 
 - If the underlying library (libtorrent / jlibtorrent) already persists state (e.g. `save_state_flags_t.all()`, `ip_filter`, DHT items, session state), **do not build a parallel persistence layer**. Trust the library.
 - Real example: removed `ip_filter.db` (149 lines) because jlibtorrent persists `ip_filter` via session state. Net-negative LoC, fewer bugs.
+
+### DHT Primitives (Do Not Invent Semantics)
+
+- BEP 5 `dhtAnnounce(infohash, port)` + `dhtGetPeers(infohash)` is the right tool for multi-writer rendezvous: many peers can announce themselves under the same 20-byte infohash target.
+- BEP 44 immutable put (`dhtPutItem(Entry)`) is content-addressed. You cannot choose its key; production discovery needs another channel.
+- BEP 44/46 mutable put (`dhtPutItem(pubkey, privkey, entry, salt)`) is single-writer. The address is derived from the publisher key and salt; it is perfect for "my latest manifest", not for "everyone writes into one registry".
+- DHT targets are 20-byte SHA-1 hashes. If a design says `SHA-256(... )[:32]` for a DHT lookup key, stop and correct it before coding.
 
 ### Lazy Loading
 
