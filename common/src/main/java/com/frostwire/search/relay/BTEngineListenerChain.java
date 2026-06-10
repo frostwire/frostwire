@@ -15,7 +15,6 @@ import com.frostwire.util.Logger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Composite {@link BTEngineListener} that fans events out to a
@@ -51,16 +50,16 @@ public final class BTEngineListenerChain implements BTEngineListener {
         BTEngineListener chain;
         if (existing == null) {
             chain = extra;
+            LOG.info("Installed single BTEngineListener");
         } else if (existing instanceof BTEngineListenerChain) {
             chain = ((BTEngineListenerChain) existing).with(extra);
+            LOG.info("Appended 1 listener to existing chain; total size " +
+                    ((BTEngineListenerChain) chain).delegates.size());
         } else {
             chain = new BTEngineListenerChain(existing, extra);
+            LOG.info("Wrapped existing listener into a 2-element chain");
         }
         engine.setListener(chain);
-        LOG.info("Installed BTEngineListenerChain with " +
-                (chain instanceof BTEngineListenerChain
-                        ? ((BTEngineListenerChain) chain).delegates.size()
-                        : 1) + " listener(s)");
         return chain;
     }
 
@@ -107,10 +106,5 @@ public final class BTEngineListenerChain implements BTEngineListener {
                 LOG.warn("Listener " + d + " threw, continuing", t);
             }
         }
-    }
-
-    // Defensive: a thin re-export of a list snapshot for tests/diagnostics.
-    List<BTEngineListener> delegates() {
-        return new CopyOnWriteArrayList<>(delegates);
     }
 }

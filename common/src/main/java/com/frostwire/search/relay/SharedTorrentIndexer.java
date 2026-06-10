@@ -17,8 +17,6 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.time.Instant;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -37,10 +35,12 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class SharedTorrentIndexer implements BTEngineListener {
 
+    static final String UNKNOWN_NAME = "unknown";
+    private static final String THREAD_NAME_PREFIX = "SharedTorrentIndexer-";
+
     private static final Logger LOG = Logger.getLogger(SharedTorrentIndexer.class);
 
     private final LocalIndex index;
-    private final ConcurrentMap<String, Boolean> indexingByInfoHash = new ConcurrentHashMap<>();
     private final AtomicReference<TorrentInfoSource> torrentInfoSource = new AtomicReference<>(
             new DefaultTorrentInfoSource());
 
@@ -68,15 +68,15 @@ public final class SharedTorrentIndexer implements BTEngineListener {
 
     @Override
     public void downloadAdded(BTEngine engine, BTDownload dl) {
-        scheduleIndex(engine, dl, "downloadAdded");
+        scheduleIndex(dl, IndexTrigger.ADDED);
     }
 
     @Override
     public void downloadUpdate(BTEngine engine, BTDownload dl) {
-        scheduleIndex(engine, dl, "downloadUpdate");
+        scheduleIndex(dl, IndexTrigger.UPDATE);
     }
 
-    private void scheduleIndex(BTEngine engine, BTDownload dl, String trigger) {
+    private void scheduleIndex(BTDownload dl, IndexTrigger trigger) {
         if (dl == null) {
             return;
         }
@@ -84,15 +84,15 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         if (infoHashHex == null) {
             return;
         }
-        if (indexingByInfoHash.putIfAbsent(infoHashHex, Boolean.TRUE) != null) {
-            return;
-        }
         ThreadExecutor.startThread(
-                () -> indexIfReady(engine, dl, infoHashHex, trigger),
-                "SharedTorrentIndexer-" + infoHashHex);
+                () -> indexIfReady(dl, infoHashHex, trigger),
+                THREAD_NAME_PREFIX + infoHashHex);
     }
 
-    void indexIfReady(BTEngine engine, BTDownload dl, String infoHashHex, String trigger) {
+    void indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
+        if (dl == null || infoHashHex == null) {
+            return;
+        }
         try {
             TorrentInfo ti = torrentInfoSource.get().torrentInfo(dl);
             if (ti == null) {
@@ -100,11 +100,9 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             }
             LocalSharedTorrent torrent = buildTorrent(dl, ti, infoHashHex);
             index.upsert(torrent);
-            LOG.info("Indexed torrent " + infoHashHex + " from " + trigger);
+            LOG.info("Indexed torrent " + infoHashHex + " from " + trigger.name());
         } catch (Throwable t) {
-            LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger, t);
-        } finally {
-            indexingByInfoHash.remove(infoHashHex);
+            LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger.name(), t);
         }
     }
 
@@ -141,10 +139,11 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                 if (v1 != null) {
                     return v1.toHex();
                 }
-            } catch (Throwable ignored) {
+            } catch (Throwable t) {
+                LOG.debug("TorrentInfo.infoHashV1() lookup failed during name fallback", t);
             }
         }
-        return "unknown";
+        return UNKNOWN_NAME;
     }
 
     private static String safeInfoHash(BTDownload dl) {
@@ -165,6 +164,7 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             long size = ti.totalSize();
             return size < 0 ? 0 : size;
         } catch (Throwable t) {
+            LOG.debug("TorrentInfo.totalSize() lookup failed", t);
             return 0;
         }
     }
@@ -174,6 +174,7 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             int n = ti.files().numFiles();
             return n <= 0 ? 1 : n;
         } catch (Throwable t) {
+            LOG.debug("TorrentInfo.files().numFiles() lookup failed", t);
             return 1;
         }
     }
@@ -182,7 +183,8 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         String downloadName = null;
         try {
             downloadName = dl.getName();
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            LOG.debug("BTDownload.getName() lookup failed", t);
         }
         return resolveName(downloadName, ti);
     }

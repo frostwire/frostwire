@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
      * NULL port — 0 means "not currently listening" — so the column is
      * always written with a value and reads return 0 for "no port".
      */
-public final class LocalIndexTable implements LocalIndex {
+public final class LocalIndexTable implements LocalIndex, AutoCloseable {
     private static final Logger LOG = Logger.getLogger(LocalIndexTable.class);
 
     public static final String DEFAULT_DB_NAME = "frostwire-shared-torrents.db";

@@ -290,6 +290,22 @@ class LocalIndexTableTest {
     }
 
     @Test
+    void tryWithResourcesClosesTable() throws Exception {
+        File f = new File(tempDir, "try-with-resources.db");
+        try (LocalIndexTable t = LocalIndexTable.open(f)) {
+            assertTrue(t.isOpen());
+            t.upsert(sampleTorrent("inside-try", 1_000_000L));
+        }
+        // After try-with-resources, the table is closed.
+        LocalIndexTable reopened = LocalIndexTable.open(f);
+        try {
+            assertEquals(1, reopened.size());
+        } finally {
+            reopened.close();
+        }
+    }
+
+    @Test
     void reopenExistingFilePreservesData() {
         LocalSharedTorrent t = sampleTorrent("Persistent", 1_000_000L);
         table.upsert(t);
