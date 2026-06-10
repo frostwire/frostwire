@@ -1,708 +1,575 @@
-# FrostWire Distributed Search & Relay Registry
+# FrostWire Distributed Search & Relay Network
 
-> Combined design for: (1) the relay-node registry (Phase 4a), and (2) the
-> end-to-end distributed search system (Phase 4) that makes every FrostWire
-> user a search engine for every other user.
-
----
-
-## 0. Vision
-
-Every FrostWire user automatically indexes the torrents they seed and
-publishes that index to a global, DHT-backed registry. Every user also
-relays encrypted search queries on behalf of firewalled/symmetric-NAT
-peers. Searches run against the union of:
-
-  * the user's own local index (what they seed)
-  * the indexes of every other FrostWire user they trust
-
-with results appearing in the standard search UI next to TPB, Bitsearch,
-etc. A new "Distributed" top-level panel shows a real-time event log
-(indexes added, queries in/out, relay handoffs) where clicking a peer
-ID opens that peer's full published index as browsable search results.
-
-Trust is enforced via Ed25519 signatures on every record, with a
-Web-of-Trust overlay (rooted at FrostWire release-signing keys) for
-spam and malware mitigation once the network is large enough to be
-attacked.
-
-**Non-goals (this design):** onion routing, full-text search across
-file contents, mobile UI for relay metrics.
+> Corrected design for the FrostWire distributed search network and privacy-preserving relay layer.
+> This version replaces the earlier relay-registry/index-announcement design with primitives that
+> actually exist in BitTorrent DHT (BEP 5, BEP 44, BEP 46) and makes a headless cloud `relayd`
+> a first-class deployment target.
 
 ---
 
-## 1. Architecture Overview
+## 0. Goal
 
-```
-+--------------------------------------------------------------+
-|  FrostWire Desktop                                           |
-|                                                              |
-|  BTEngine ──► SharedTorrentIndexer ──► Local Index (SQLite)  |
-|                    │                       │                 |
-|                    │ on add/update         │ query           |
-|                    ▼                       ▼                 |
-|         RelayAnnouncementPublisher   LocalSearchPerformer   |
-|                    │                       ▲                 |
-|                    │ publish               │ merge           |
-|                    ▼                       │                 |
-|         BEP 46 DHT (via jlibtorrent)  ◄────┘                 |
-|                    │                                          |
-|                    │ fetch                                    |
-|                    ▼                                          |
-|         IndexDiscoveryService                                 |
-|                    │                                          |
-|                    ▼                                          |
-|         DistributedSearchEventBus ──► DistributedSearchLogPanel
-|                    │                                          |
-|                    ▼                                          |
-|         PeerBrowseSearchPerformer  (click a peer in the log)  |
-+--------------------------------------------------------------+
-```
+Every FrostWire user can become part of a global, privacy-preserving search network:
 
-Components:
+1. Each node indexes the torrents it seeds or intentionally shares.
+2. Each node can search its own local index instantly.
+3. Each node can ask trusted peers and relays for matching results.
+4. Well-connected nodes, including headless cloud `relayd` nodes, help NAT-restricted users reach the mesh.
+5. Every identity, manifest, query result, and trust record is signed with Ed25519.
+6. Search payloads are end-to-end encrypted so relays do not learn query text or result content.
 
-| # | Component | Package | Status |
-|---|-----------|---------|--------|
-| 1 | `LocalDhtCluster` (test JUnit ext) | `com.frostwire.tests.dht` | **Done** |
-| 2 | `IdentityRecord` (DHT identity)   | `com.frostwire.search.relay` | **Done** |
-| 3 | `SharedTorrentIndexer` (auto-magic on downloadAdded) | `com.frostwire.search.relay` | Pending |
-| 4 | `LocalIndexTable` (SQLite FTS5)   | `com.frostwire.search.relay` | Pending |
-| 5 | `LocalSharedTorrentSearchPerformer` | `com.frostwire.search.relay` | Pending |
-| 6 | `DistributedSearchEventBus` (in-process pub/sub) | `com.frostwire.search.relay` | Pending |
-| 7 | `DistributedSearchLogPanel` (Swing UI) | `com.limegroup.gnutella.gui.search` | Pending |
-| 8 | `IndexAnnouncement` (signed, DHT-published) | `com.frostwire.search.relay` | Pending |
-| 9 | `RelayAnnouncementPublisher` (background re-publisher) | `com.frostwire.search.relay` | Pending |
-| 10 | `RelayRecord` (DHT relay candidate record) | `com.frostwire.search.relay` | Pending |
-| 11 | `IndexDiscoveryService` (pull-mode fetcher) | `com.frostwire.search.relay` | Pending |
-| 12 | `PeerBrowseSearchPerformer` (browse a peer) | `com.frostwire.search.relay` | Pending |
-| 13 | `SignatureVerifier` (Ed25519 on every fetched record) | `com.frostwire.search.relay` | Pending |
-| 14 | `TrustStore` + `WoTValidator` (delegation graph) | `com.frostwire.search.relay` | Pending |
-| 15 | `RelayServer` (forwards encrypted queries, rate-limited) | `com.frostwire.search.relay` | Pending |
-| 16 | `RelayClient` (uses relay when direct uTP fails) | `com.frostwire.search.relay` | Pending |
+Non-goals for v1:
 
+- Onion routing.
+- Full-text search inside file contents.
+- Android relay metrics UI.
+- Global keyword DHT indexing. Keyword search is handled by the peer mesh, not by DHT records.
 
 ---
 
-## 2. Hook Points & Existing Infrastructure We Reuse
+## 1. DHT Reality Checks
 
-### 2.1 BTEngine listener (the "auto-magic" trigger)
+These rules drive the whole design.
 
-`BTEngineListener.downloadAdded(BTEngine, BTDownload)` fires whenever a
-torrent is added to libtorrent — seeding, downloading, or magnet-open.
-This is the single entry point for `SharedTorrentIndexer`. We do NOT
-need to scan directories or hook `LibraryFilesTableMediator`.
+### 1.1 BEP 5 is multi-writer rendezvous
 
-`BTEngineListener.downloadUpdate(BTEngine, BTDownload)` is the
-secondary hook for when a torrent's metadata becomes available (magnet
-→ torrent) or its file list is finalized.
+`dhtAnnounce(infohash, port)` and `dhtGetPeers(infohash)` are the right primitives when many peers
+need to appear under one shared topic. The topic is a 20-byte SHA-1 target.
 
-### 2.2 BTContext identity persistence
+Use this for:
 
-`BTContext.homeDir` already exists. Identity keys persist at:
-* Desktop: `~/.frostwire/identity.dat` (Ed25519 + X25519 keys, 32 bytes
-  each, plain — file is created with mode 0600)
-* Android: app-private `identity.dat` (same scheme)
+- Discovering FrostWire peers.
+- Discovering public relays.
+- Discovering bootstrap-capable supernodes.
 
-Loaded once at startup; created on first run.
+### 1.2 BEP 44 immutable items are content-addressed
 
-### 2.3 SQLite infrastructure
+`dhtPutItem(Entry)` returns a key derived from the bencoded value. The application cannot choose the
+lookup key. This is useful for content-addressed blobs, not for registries.
 
-`com.frostwire.database.sqlite.SQLiteOpenHelper` and
-`SQLiteDatabase` already wrap the JDBC driver and handle schema
-migrations. Our new tables live in the existing
-`~/.frostwire/frostwire.db` (desktop) / `frostwire.db` (android).
+Do not use immutable DHT items for anything that must be discovered from a well-known application key.
 
-### 2.4 Search engine wiring
+### 1.3 BEP 44/46 mutable items are single-writer
 
-`SearchEngine.getEngines()` returns the list shown in the search UI.
-Adding a new engine is the same pattern as Bitsearch:
+`dhtPutItem(pubkey, privkey, entry, salt)` is addressed by `SHA1(pubkey + salt)`. One publisher owns
+one mutable record per salt. This is perfect for "my latest index manifest" and impossible for
+"everyone writes to one relay registry".
 
-```java
-private static final SearchEngine DISTRIBUTED =
-    new SearchEngine(SearchEngineID.DISTRIBUTED_ID, "Distributed",
-        SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED, null) {
-        @Override public SearchPerformer getPerformer(String token, String query) {
-            return new DistributedSearchPerformer(token, query);
-        }
-    };
-```
+Use this for:
 
-`SearchMediator.performSearch()` already fans out to all enabled
-engines and merges results — zero changes needed there.
+- A node's latest signed identity pointer.
+- A node's latest signed index manifest pointer.
+- A relay's latest signed public configuration.
 
-### 2.5 BEP 46 DHT (jlibtorrent)
+### 1.4 DHT targets are 20 bytes
 
-* `SessionManager.swig().dht_put_item(sha1_key, salt, entry, sig)` —
-  mutable item with explicit key/salt/entry/sig
-* `SessionManager.swig().dht_get_item(sha1_key)` — fetch
-* `DhtMutableItemAlert` and `DhtImmutableItemAlert` — alerts with
-  fetched item and signature/key
-* We use **mutable** items for everything (identity, relay, index
-  announcement) so we can re-publish with an updated `last_seen` and
-  rotate signatures. The native DHT does the storage, replication, and
-  per-publisher pubkey-keyed addressing.
+Do not use `SHA-256(... )[:32]` for DHT lookup targets. Use SHA-1 for DHT targets and SHA-256 only
+inside signed application records when a strong content hash is needed.
 
 ---
 
-## 3. DHT Record Types
+## 2. Architecture Overview
 
-All records are BEP 46 mutable items. Canonical bytes are the
-bencode-encoded dict; signatures are Ed25519 over the bencode bytes
-excluding the `sig` field itself.
-
-### 3.1 Identity Record  *(done — see `IdentityRecord.java`)*
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `v` | int | version, currently 1 |
-| `node_id` | 20 bytes hex | libtorrent node id (DHT address) |
-| `ed25519_pub` | 32 bytes b64 | for signing & WoT |
-| `x25519_pub` | 32 bytes b64 | for E2E payload encryption |
-| `utp_port` | int | uTP listen port |
-| `first_seen` | epoch sec | |
-| `last_seen` | epoch sec | refreshed on re-publish |
-| `sig` | 64 bytes b64 | Ed25519 over canonical bytes w/o sig |
-
-DHT key: `SHA-256("frostwire-identity-v1:" + node_id)[:32]`
-TTL: 30 min, re-publish every 5 min.
-
-### 3.2 Relay Record  *(commit 3 in original plan)*
-
-Identifies a node willing to forward search queries. The DHT key is
-`SHA-256("frostwire-relay-nodes-v1")[:32]` — a well-known key, the
-mutable item holds a single seq-numbered record per publisher.
-
-```json
-{
-  "v": 1,
-  "node_id": "A1B2...",
-  "ed25519_pub": "BASE64(...)",
-  "utp_port": 49152,
-  "first_seen": 1749400000,
-  "last_seen": 1749403600,
-  "relay_count": 47,
-  "max_qps": 5,
-  "hashcash": "0000a1f2...",
-  "sig": "BASE64(64 bytes)"
-}
+```
+                         Mainline DHT (BEP 5 rendezvous)
+                         topics: frostwire-peers-v1,
+                                 frostwire-relays-v1
+                                      |
+                                      v
++----------------------+       +----------------------+       +----------------------+
+| FrostWire Desktop    | <---> | Headless relayd      | <---> | FrostWire Desktop    |
+| LocalIndex(SQLite)   | uTP   | RAM caches only      | uTP   | LocalIndex(SQLite)   |
+| Search UI            | E2E   | forwards opaque blobs| E2E   | Search UI            |
++----------------------+       +----------------------+       +----------------------+
+        |                              |                              |
+        v                              v                              v
+  BEP 46 mutable                 BEP 46 mutable                 BEP 46 mutable
+  index manifest                 relay config                   index manifest
+  (single-writer)                (single-writer)                (single-writer)
 ```
 
-Hashcash is 4 leading zero bits of `SHA-256(pubkey || nonce)` — a
-defense against Sybil relays, recomputed every re-publish.
+The system has three independent roles that can be composed:
 
-### 3.3 Index Announcement  *(new — the core of distributed search)*
+| Role | Runs on desktop | Runs on relayd | Needs disk | Purpose |
+|------|-----------------|----------------|------------|---------|
+| Index role | yes | optional | SQLite or manifest cache | Build/search local torrent metadata. |
+| Search role | yes | optional | small cache | Query peers and merge signed results. |
+| Relay role | optional | yes | no | Forward encrypted query/result blobs for NAT-restricted nodes. |
 
-One per `(publisher_node_id, info_hash)` tuple. Immutable key so all
-publishers compete on the same keyspace and the DHT deduplicates
-storage.
-
-**DHT key:** `SHA-256("frostwire-index-v1:" + info_hash)[:32]`
-
-**Value (mutable item so we can rotate publisher):**
-
-```json
-{
-  "v": 1,
-  "info_hash": "AABBCC...",        // 20 bytes hex (v1) or 32 bytes hex (v2)
-  "name": "ubuntu-24.04.iso",
-  "size": 5347732480,
-  "file_count": 1,
-  "tags": ["linux", "iso", "ubuntu"],
-  "publisher_node_id": "A1B2C3...",
-  "publisher_ed25519_pub": "BASE64(32)",
-  "publisher_utp_port": 49152,
-  "first_seen": 1749400000,
-  "last_seen": 1749403600,
-  "ttl": 1800,                      // 30 min
-  "sig": "BASE64(64)"
-}
-```
-
-The mutable item's natural key is the `info_hash` (well-known), and
-the publisher's pubkey (Ed25519) is part of the value. The DHT's
-last-writer-wins on `last_seen` is acceptable because all publishers
-sign their own entries; verifiers pick the freshest entry whose
-signature checks out.
-
-### 3.4 Trust Delegation  *(commit 6 in original plan)*
-
-```json
-{
-  "v": 1,
-  "subject_id": "A1B2...",
-  "issuer_id": "ROOT1...",
-  "delegation_depth": 1,
-  "expiry": 1780936000,
-  "sig": "BASE64(64 bytes)"
-}
-```
-
-Validation: BFS from hardcoded root keys. Accept subject if a path
-exists with `delegation_depth ≤ 3` and all entries unexpired.
+Desktop will usually run all roles except heavy public relay. A cloud `relayd` usually runs relay role
+and a small manifest cache only.
 
 ---
 
-## 4. The Auto-Magic Indexing Pipeline  *(new section)*
+## 3. Module Layout
 
-### 4.1 SharedTorrentIndexer
+### 3.1 `common/`
 
-Singleton, registered as a `BTEngineListener`. Lives in
-`com.frostwire.search.relay`.
+Package: `com.frostwire.search.relay`
 
-Responsibilities:
+Contains code that can run on Desktop, Android, and headless relayd:
 
-1. On `downloadAdded(BTEngine, BTDownload dl)`:
-   * Wait for `dl.torrentFile()` to be valid (poll with 5s timeout)
-   * If `info_hash` already in `local_index` table, update only
-     `last_seen_at` and re-publish announcement
-   * Otherwise, insert new row and publish fresh announcement
-2. On `downloadUpdate(BTEngine, BTDownload dl)`:
-   * If torrent transitioned from magnet → with metadata, do step 1
-   * Otherwise, no-op
-3. On app shutdown: stop the re-publisher timer, persist final state
+- Records: `IdentityRecord`, `RelayRecord`, `IndexManifest`, `SearchQuery`, `SearchResultEnvelope`,
+  `TrustDelegation`.
+- Crypto: `SignatureVerifier`, `KeyMaterial`, `SessionCipher`.
+- Protocol: `PeerHandshake`, `RelayHandshake`, `PeerMesh`, `RelayClient`, `RelayServer` interfaces.
+- Interfaces: `LocalIndex`, `ManifestStore`, `TrustStore`.
+- Constants: `RelayConstants`.
 
-All file I/O is off the EDT (`com.frostwire.concurrent.ThreadExecutor`).
+No Swing, Android, or desktop database imports are allowed here.
 
-### 4.2 Local Index Table (SQLite)
+### 3.2 `desktop/`
+
+Desktop implementations and UI:
+
+- `LocalIndexTable`: JDBC SQLite + FTS5 implementation of `LocalIndex`.
+- `SharedTorrentIndexer`: `BTEngineListener` that populates the local index.
+- `LocalSharedTorrentSearchPerformer`: local-only search.
+- `DistributedSearchPerformer`: local + mesh search merger.
+- `DistributedSearchEventBus`: in-process event stream.
+- `DistributedSearchLogPanel` and `PeerBrowseWindow`: Swing UI.
+
+### 3.3 `relayd/` (new module)
+
+Headless cloud relay:
+
+- Single JVM main class.
+- Depends on `common/` and jlibtorrent.
+- No Swing, no Android, no media library, no SQLite requirement.
+- Configurable role flags: `--relay`, `--index-cache`, `--bootstrap`.
+- RAM-bounded caches for peer identities, manifests, and recent route state.
+- Designed for fast networking, decent CPU/memory, minimal disk.
+
+### 3.4 `android/` (later)
+
+Android can reuse common records and protocol. Android UI starts with peer browse and local search;
+relay metrics UI is out of scope for v1.
+
+---
+
+## 4. Local Index
+
+### 4.1 Current implementation
+
+Done:
+
+- `LocalSharedTorrent` in `common/`.
+- `LocalIndexTable` in `desktop/`.
+- JUnit coverage for schema, CRUD, FTS5 search, injection-safe query sanitation, required indexes,
+  reopen persistence, and republish cutoff queries.
+
+The local index stores one row per infohash:
 
 ```sql
 CREATE TABLE shared_torrents (
-    info_hash        TEXT PRIMARY KEY,    -- hex
-    name             TEXT NOT NULL,
-    size_bytes       INTEGER NOT NULL,
-    file_count       INTEGER NOT NULL,
-    files_json       TEXT NOT NULL,        -- [{path, size}, ...]
-    tags             TEXT,                 -- comma-joined
-    publisher_node_id TEXT NOT NULL,
-    publisher_ed25519_pub BLOB NOT NULL,   -- 32 bytes
-    publisher_utp_port INTEGER,
-    added_at         INTEGER NOT NULL,     -- epoch sec
-    last_seen_at     INTEGER NOT NULL,
-    last_published_at INTEGER
+    info_hash              TEXT PRIMARY KEY,
+    name                   TEXT NOT NULL,
+    size_bytes             INTEGER NOT NULL,
+    file_count             INTEGER NOT NULL,
+    files_json             TEXT NOT NULL,
+    tags                   TEXT,
+    publisher_node_id      TEXT NOT NULL,
+    publisher_ed25519_pub  BLOB NOT NULL,
+    publisher_utp_port     INTEGER,
+    added_at               INTEGER NOT NULL,
+    last_seen_at           INTEGER NOT NULL,
+    last_published_at      INTEGER
 );
 CREATE INDEX idx_shared_torrents_added ON shared_torrents(added_at);
-CREATE INDEX idx_shared_torrents_name  ON shared_torrents(name);
-
+CREATE INDEX idx_shared_torrents_name ON shared_torrents(name);
+CREATE INDEX idx_shared_torrents_last_published_at ON shared_torrents(last_published_at);
 CREATE VIRTUAL TABLE shared_torrents_fts USING fts5(
     name, tags, content='shared_torrents', content_rowid='rowid'
 );
 ```
 
-`LocalSharedTorrentSearchPerformer` queries
-`shared_torrents_fts MATCH ?` with the user's query, returns up to
-`MAX_RESULTS` (default 50) as `SearchResult`s with
-`source = "Local"`. The DHT layer is invisible here — this is a
-purely local feature that works even offline.
+### 4.2 Next implementation
 
-### 4.3 RelayAnnouncementPublisher
-
-Background `ScheduledExecutorService` running every
-`REPUBLISH_INTERVAL_SEC` (default 300). Two independent timers:
-
-* **Identity timer**: re-publishes own `IdentityRecord` with updated
-  `last_seen`
-* **Index timer**: scans `shared_torrents` for entries where
-  `last_published_at IS NULL OR last_published_at < now - 270`,
-  re-publishes each `IndexAnnouncement` with updated `last_seen`
-
-### 4.4 IndexDiscoveryService (pull mode)
-
-Triggered by a search. In parallel with HTTP search engines:
-
-1. For each keyword in the query, compute
-   `keyword_hash = SHA-256("frostwire-search-hint-v1:" + keyword)[:32]`
-   and `dhtGetItem(keyword_hash)` to fetch a "search hint" entry
-   pointing to recently-active `IndexAnnouncement` keys
-2. Fetch each hinted `IndexAnnouncement`, verify Ed25519 sig, dedup
-   by `info_hash`, score by (name/tag match) × (trust score)
-3. Return top N as `SearchResult`s
-
-Caching: LRU of last 10k `IndexAnnouncement`s per topic, evict by
-expired-first then LRU.
-
-### 4.5 Subscription / push mode (later)
-
-BEP 46 supports "subscribing" to a mutable item — get notified when
-a new version is published. The `IndexAnnouncement` is mutable, so
-a node can `dhtGetItem` with a `seq > X` filter to get only newer
-versions of a publisher's index. We can use this to get a
-near-real-time feed without polling.
-
-For the initial release, **pull mode is sufficient**. Push mode is
-a follow-up.
-
----
-
-## 5. The Real-Time Event Log UI  *(new section)*
-
-### 5.1 DistributedSearchEventBus
-
-In-process pub/sub, thread-safe, EDT-dispatched for UI consumers.
+Add `LocalIndex` in `common/` so desktop SQLite is one implementation, not the protocol boundary.
 
 ```java
-public final class DistributedSearchEventBus {
-    public enum Type {
-        IDENTITY_PUBLISHED,
-        INDEX_ANNOUNCED,           // we published a new torrent
-        INDEX_DISCOVERED,          // we found a peer's index for a search
-        SEARCH_INCOMING,           // someone queried via us (as relay)
-        SEARCH_OUTGOING,           // we queried
-        SEARCH_RELAYED,            // our query went through a relay
-        PEER_BROWSE_STARTED,       // user clicked a peer_id in the log
-        PEER_INDEX_FETCHED,        // we finished pulling a peer's index
-        TRUST_VERIFIED,            // signature passed
-        TRUST_REJECTED,            // signature failed
-        RELAY_COUNT_INCREMENTED
-    }
-
-    public static void publish(Type type, Map<String, Object> payload);
-    public static Disposable subscribe(Type type, Consumer<Event> handler);
+public interface LocalIndex {
+    void upsert(LocalSharedTorrent torrent);
+    Optional<LocalSharedTorrent> get(String infoHashHex);
+    List<LocalSharedTorrent> search(String query, int maxResults);
+    List<String> needsRepublish(long nowSec, long thresholdSec);
+    void markPublished(String infoHashHex, long timestampSec);
 }
 ```
 
-All publishers use `GUIMediator.safeInvokeLater` when the handler
-needs to touch Swing components.
-
-### 5.2 DistributedSearchLogPanel
-
-New top-level tab (next to Library / Search / Transfers), registered
-in `MainFrame` and `OptionsConstructor`. Built as a subclass of
-`AbstractTableMediator<DistributedSearchLogTableModel,
-DistributedSearchLogTableDataLine, DistributedSearchEvent>` so it
-follows the existing pattern and integrates with the GUI's tab/pane
-system.
-
-Columns:
-
-| Time | Type | Peer / Query | Detail | Action |
-|------|------|--------------|--------|--------|
-| 14:23:01 | IDX_PUB | — | ubuntu-24.04.iso (5.0 GB) | [view] |
-| 14:23:14 | SRC_IN  | A1B2C3D4 | "ubuntu 24" | [browse peer] |
-| 14:23:14 | SRC_OUT | — | "ubuntu 24" (3 results) | [re-run] |
-| 14:23:20 | RELAY   | relay7 | "ubuntu 24" → 49152 | — |
-
-Click handlers:
-
-* `peer_id` cell → opens `PeerBrowseWindow` (see §6)
-* `info_hash` cell → opens the torrent-detail dialog / adds to
-  downloads
-* query cell → re-runs the search
-
-Persistence: last 10k events written to a rotating
-`distributed_search_log.jsonl` so they survive restart. Newest first,
-older entries greyed out.
-
-### 5.3 What "non-malicious behavior" means at UI time
-
-In the initial release, every event is shown. Once `WoTValidator` is
-in place (§7), events from untrusted peers are tagged
-`[untrusted]` in red and folded by default. The user can expand them
-manually.
+`LocalIndexTable` then implements this interface. `relayd` can use an in-memory or no-op implementation.
 
 ---
 
-## 6. Peer Browsing — "Click a Peer, See Their Stuff"  *(new section)*
+## 5. Identity
 
-### 6.1 PeerBrowseSearchPerformer
+### 5.1 Identity fields
 
-A new `SearchPerformer` implementation. Given a `(peer_id, query)`:
+Each node has stable key material:
 
-1. Fetch the peer's `IdentityRecord` from DHT (single `dhtGetItem`)
-2. Verify the `ed25519_pub` matches the one in our `TrustStore`
-   (or seed it as a `seen_but_unverified` peer)
-3. Subscribe to the peer's `IndexAnnouncement` updates via mutable
-   item `seq > last_known_seq`
-4. Score each announcement by (name/tag match) × (trust score)
-5. Return top N as `SearchResult`s with
-   `source = "Peer:" + shortNodeId(peer_id)`
+- Ed25519 keypair for signatures and identity.
+- X25519 public key for ECDH transport sessions.
+- Libtorrent node ID for DHT addressability.
+- uTP listen port, or 0 when not listening.
 
-### 6.2 PeerBrowseWindow
+Desktop identity file:
 
-A `JDialog` containing a `SearchMediator` instance with only the
-peer-browse engine enabled. The user can:
-* type a new query → re-fetches & re-scores from the same peer
-* click any result → standard download flow
-* "Add to my index" → stores the `IndexAnnouncement` in our local
-  `peer_indexes` table for offline browsing (see §6.3)
+- `~/.frostwire/identity.dat`
+- POSIX mode 0600.
 
-### 6.3 Per-peer LRU index cache
+Android identity file:
 
-```sql
-CREATE TABLE peer_indexes (
-    publisher_node_id TEXT NOT NULL,
-    info_hash         TEXT NOT NULL,
-    name              TEXT NOT NULL,
-    tags              TEXT,
-    size_bytes        INTEGER,
-    raw_entry_bencode BLOB NOT NULL,
-    fetched_at        INTEGER NOT NULL,
-    expires_at        INTEGER NOT NULL,
-    PRIMARY KEY (publisher_node_id, info_hash)
-);
-CREATE INDEX idx_peer_indexes_expires ON peer_indexes(expires_at);
-```
+- App-private `identity.dat`.
 
-Eviction: background sweep every 10 min deletes rows with
-`expires_at < now`. LRU trim keeps last 10k rows per publisher
-(soft cap, configurable).
+### 5.2 Identity record rules
+
+Fix before building more protocol code:
+
+- Canonical bytes must be bencode, not hand-rolled JSON.
+- `IdentityRecord` should own `toEntry()` and `fromEntry()`.
+- A publishable identity must always have a valid signature. No zero-signature limbo state.
+- Remove `computeDhtKey()`. Identity is exchanged after rendezvous connection or fetched as a BEP 46
+  mutable item by known pubkey + salt, not by arbitrary 32-byte key.
 
 ---
 
-## 7. Trust, Spam, and Malware Mitigation  *(new section)*
+## 6. Peer and Relay Discovery
 
-### 7.1 Layer 1 — Signature verification (now, trivial)
+### 6.1 Topics
 
-Every fetched `IndexAnnouncement`, `RelayRecord`, and
-`IdentityRecord` MUST have its Ed25519 signature verified against
-the publisher's `ed25519_pub` (in the record itself for identity;
-cached in `TrustStore` for index/relay). Failures are logged to
-`TRUST_REJECTED` events and the record is dropped.
+Use SHA-1 topic hashes:
 
-`SignatureVerifier` is a stateless utility that wraps
-`java.security.Signature("Ed25519")`.
+| Topic | Purpose |
+|-------|---------|
+| `SHA1("frostwire-peers-v1")` | General FrostWire peers willing to answer search. |
+| `SHA1("frostwire-relays-v1")` | Public relays willing to forward encrypted blobs. |
+| `SHA1("frostwire-bootstrap-v1")` | Stable foundation/headless bootstrap nodes. |
 
-### 7.2 Layer 2 — Web of Trust (Phase 4a commit 6)
+### 6.2 Announce
 
-`TrustStore`:
-* Hardcoded list of 3-5 FrostWire release-signing Ed25519 pubkeys
-  (the same keys we use to sign releases; recovery path: reinstall)
-* LRU map of `(node_id → TrustEntry { depth, last_seen, trust_score }`
-* `WoTValidator.canTrust(node_id, delegation_path)` does BFS
-  through `TrustDelegation` records, bounded by `WOT_MAX_DEPTH = 3`
-
-Default `trust_score`:
-* Root key = 1.0
-* Depth 1 = 0.7
-* Depth 2 = 0.4
-* Depth 3 = 0.2
-* Depth 4+ = 0 (rejected unless `allow_untrusted` setting is on)
-
-### 7.3 Layer 3 — Rate limits (now, trivial)
-
-Per-publisher token bucket on the `RelayServer` side
-(`max_qps` default 5, per design doc §4.4 / §5.8).
-
-Per-searcher rate limit on the `RelayClient` side: at most 1
-in-flight relayed query per (searcher_node_id, target_relay) pair.
-
-### 7.4 Layer 4 — Spam heuristics (later, needs network scale)
-
-* **Dedup by content**: same `(name, size, file_count, files_hash)`
-  from N unconnected publishers in < T seconds → likely Sybil,
-  demote trust
-* **Hashcash cost scaling**: trusted peers pay 0 leading bits;
-  untrusted pay 8+ bits; spammers self-select out
-* **Suspicious pattern detection**: 100% new torrents from one peer
-  in one hour = probable spam; auto-quarantine for 24h
-
-### 7.5 Layer 5 — Malware (out of scope for indexing layer)
-
-* Local AV scan on every torrent we add to our own
-  `shared_torrents` (existing `LibraryUtils` integration); refuse to
-  publish `IndexAnnouncement` for known-bad hashes
-* Trust-signaled AV list: trusted peers can publish a signed
-  `MalwareHashList` record; we merge it into a local
-  `rejected_info_hashes` set and filter announcements before they
-  hit the UI
-
-### 7.6 Threat model summary
-
-| Attack | Mitigation |
-|--------|------------|
-| Impersonation: attacker claims victim's node_id | Ed25519 sig on every record (§7.1) |
-| Eclipse: attacker isolates victim from honest relays | WoT: relays must have valid trust chain from roots (§7.2) |
-| Sybil: attacker floods relay registry | Hashcash on relay record, 4 leading zero bits (§3.2); cost scales with trust (§7.4) |
-| DoS: attacker floods relay with queries | Per-source token bucket, `max_qps = 5` (§7.3) |
-| Privacy: relay reads queries | E2E AES-GCM payload encryption; relay only sees `target_node_id` (§8.4) |
-| Replay: attacker replays old challenge/response | 32-byte nonces + seq numbers on transport (§8.3) |
-| Spam: attacker floods index with junk | Dedup by content + trust-scaled hashcash (§7.4) |
-| Malware: attacker distributes malicious torrents | Local AV + trust-weighted AV list (§7.5) |
-
----
-
-## 8. The Relay Wire Protocol  *(unchanged from original plan, kept for reference)*
-
-### 8.1 Publishing
-
-`publishIdentity(Session s)` and `publishRelay(Session s)` both call
-`dht_put_item` with the canonical bytes and signature.
-
-### 8.2 Discovery
+Nodes periodically call:
 
 ```java
-Optional<IdentityRecord> fetchIdentity(Session s, byte[] nodeId);
-List<RelayRecord>       fetchRelays(Session s, int maxCount);
+session.dhtAnnounce(topicHash, utpPort, flags);
 ```
 
-### 8.3 Challenge/Response (NAT traversal)
+Desktop nodes announce peer topic by default. Public relay role announces relay topic. Foundation nodes may
+announce bootstrap topic.
 
-```
-A → R : CHALLENGE_RESPONSE { nonce_A[32], sig_R=Ed25519(nonce_A || nonce_R) }
-R → A : CHALLENGE_REPLY    { sig_A=Ed25519(x25519_pub_A || nonce_R) }
-A → R : CHALLENGE_ACK      { sig_R=Ed25519(x25519_pub_R || nonce_A) }
-```
+### 6.3 Connect and authenticate
 
-After: both sides derive `frostwire-relay-transport-v1` key for
-traffic (96-byte AES-GCM nonce).
+After `dhtGetPeers(topicHash)`, the node connects to candidates over uTP and performs:
 
-### 8.4 Search via relay
+1. Exchange `IdentityRecord`.
+2. Verify Ed25519 self-signature.
+3. Challenge/response with 32-byte nonces.
+4. Derive transport key with X25519 + KDF label `frostwire-relay-transport-v1`.
+5. Start encrypted framed messages.
 
-Searcher computes `target_node_id` from query (or chooses a known
-peer), encrypts a `RELAY_PAYLOAD` with `frostwire-search-v1` KDF,
-sends to relay. Relay forwards the opaque blob; target decrypts,
-sends encrypted results back. Relay only sees `target_node_id` and
-the relay-hint, never the query or results.
+Bad identities are dropped before any search payload is accepted.
 
 ---
 
-## 9. Build Order  *(reconciled — was 10 commits, now 16)*
+## 7. Index Manifests
 
-Each item is a single commit cluster (one logical change, possibly
-split into 2-3 commits per the skills/frostwire-engineer/SKILL.md
-granular-commits rule).
+Instead of one DHT record per torrent, each publisher exposes one latest manifest.
+
+### 7.1 BEP 46 mutable item
+
+Address:
+
+- key: publisher Ed25519 public key
+- salt: `frostwire-index-v1`
+
+Value:
+
+```json
+{
+  "v": 1,
+  "publisher_node_id": "20-byte hex",
+  "publisher_ed25519_pub": "base64url-no-padding",
+  "created_at": 1749400000,
+  "last_seen": 1749403600,
+  "seq": 42,
+  "count": 150,
+  "manifest_kind": "inline|torrent|merkle",
+  "manifest_sha256": "hex",
+  "manifest_ref": "inline blob, magnet URI, or chunk root",
+  "sig": "base64url-no-padding"
+}
+```
+
+v1 should start with inline manifests capped by byte size. If a node shares a large catalog, switch to a
+small torrent containing the manifest and publish the magnet/infohash as `manifest_ref`.
+
+### 7.2 Manifest content
+
+The manifest is a signed list of compact rows:
+
+```json
+{
+  "v": 1,
+  "publisher_ed25519_pub": "base64url-no-padding",
+  "rows": [
+    {
+      "info_hash": "hex",
+      "name": "ubuntu-24.04.iso",
+      "size_bytes": 5347732480,
+      "file_count": 1,
+      "tags": "linux iso ubuntu",
+      "last_seen": 1749403600
+    }
+  ],
+  "sig": "base64url-no-padding"
+}
+```
+
+Rows are scored by text match and trust score. Exact torrent availability still uses BitTorrent's normal
+`get_peers(info_hash)`.
+
+---
+
+## 8. Search Flow
+
+### 8.1 Local search
+
+`LocalSharedTorrentSearchPerformer` queries `LocalIndex.search(query, maxResults)` and maps rows to
+`SearchResult` with source `Local`.
+
+### 8.2 Mesh search
+
+`DistributedSearchPerformer` runs local search and mesh search in parallel:
+
+1. Normalize the query.
+2. Search local FTS5.
+3. Send encrypted `SearchQuery` to connected trusted peers and selected relays.
+4. Peers search their local index and return signed `SearchResultEnvelope` messages.
+5. Merge by infohash, score by local text score, trust score, seed confidence, recency.
+6. Return results to the standard Search UI.
+
+### 8.3 Relay search
+
+The relay forwards opaque encrypted frames:
+
+- It sees source connection, target peer or route hint, payload size, and timing.
+- It does not see query text or result contents.
+- It enforces per-source and per-target rate limits.
+
+The relay can also act as a stable peer directory cache, but cached identities/manifests must be signed
+and independently verifiable by clients.
+
+### 8.4 Hop limit
+
+v1 uses hop limit 2:
+
+- hop 0: local node
+- hop 1: directly connected peers and relays
+- hop 2: peers behind those relays
+
+No onion routing in v1.
+
+---
+
+## 9. Trust and Reputation
+
+### 9.1 Layer 1: signatures
+
+Every identity, manifest, and result envelope is Ed25519-signed. Invalid signatures are rejected and
+logged as `TRUST_REJECTED`.
+
+### 9.2 Layer 2: local trust store
+
+v1 trust store fields:
+
+```java
+TrustEntry {
+    byte[] ed25519Pub;
+    String nodeIdHex;
+    int depth;
+    double trustScore;
+    long firstSeen;
+    long lastSeen;
+    long lastGoodResultAt;
+    long rejectedCount;
+}
+```
+
+Default scoring:
+
+- FrostWire release-signing root: 1.0
+- Explicit user trust: 0.9
+- Depth 1 delegation: 0.7
+- Depth 2 delegation: 0.4
+- Depth 3 delegation: 0.2
+- Unknown: accepted only if `allow_untrusted_distributed_search` is enabled, scored <= 0.05
+
+### 9.3 Layer 3: Web of Trust delegation
+
+Delegation record:
+
+```json
+{
+  "v": 1,
+  "subject_ed25519_pub": "base64url-no-padding",
+  "issuer_ed25519_pub": "base64url-no-padding",
+  "delegation_depth": 1,
+  "expiry": 1780936000,
+  "sig": "base64url-no-padding"
+}
+```
+
+`WoTValidator` performs bounded BFS from FrostWire roots, max depth 3. Expired or invalid delegations are
+ignored.
+
+### 9.4 Layer 4: rate limits and spam heuristics
+
+v1:
+
+- Per-source token bucket.
+- Max in-flight relayed query per `(searcher, relay, target)`.
+- Result caps per query and per peer.
+
+Post-v1:
+
+- Trust-scaled rate limits.
+- Dedup-by-content spam demotion.
+- Signed malware hash lists from trusted peers.
+
+---
+
+## 10. Headless `relayd`
+
+### 10.1 Purpose
+
+`relayd` is a cloud-friendly relay and bootstrap node. It should run on a small VM with fast networking,
+decent CPU/RAM, and little disk.
+
+### 10.2 Requirements
+
+- No Swing.
+- No Android.
+- No media library.
+- No SQLite requirement for pure relay mode.
+- One config file or environment-variable config.
+- RAM-bounded LRU caches.
+- jlibtorrent DHT/uTP only.
+- Graceful shutdown and key persistence.
+
+### 10.3 Minimal config
+
+```
+FROSTWIRE_RELAY_ROLE=relay
+FROSTWIRE_RELAY_PORT=49152
+FROSTWIRE_RELAY_MAX_QPS=5
+FROSTWIRE_RELAY_MAX_PEERS=500
+FROSTWIRE_RELAY_CACHE_MB=256
+FROSTWIRE_RELAY_IDENTITY_FILE=/var/lib/frostwire-relayd/identity.dat
+```
+
+### 10.4 Metrics
+
+Expose logs first. Add HTTP metrics later if needed:
+
+- connected peers
+- relayed queries per minute
+- rejected queries
+- signature failures
+- average relay latency
+- cache hit rate
+
+---
+
+## 11. Event Log UI
+
+Desktop event types:
+
+```java
+IDENTITY_VERIFIED
+PEER_CONNECTED
+PEER_REJECTED
+LOCAL_INDEX_UPDATED
+MANIFEST_PUBLISHED
+MANIFEST_FETCHED
+SEARCH_OUTGOING
+SEARCH_INCOMING
+SEARCH_RELAYED
+SEARCH_RESULTS_MERGED
+TRUST_VERIFIED
+TRUST_REJECTED
+PEER_BROWSE_STARTED
+```
+
+`DistributedSearchLogPanel` shows newest-first events and lets users click a peer to open
+`PeerBrowseWindow`.
+
+---
+
+## 12. Revised Build Order
+
+Already done:
+
+| # | Component | Status |
+|---|-----------|--------|
+| 1 | `LocalDhtCluster` test harness | Done, needs cleanup |
+| 2 | `IdentityRecord` | Done, needs protocol fix |
+| 3 | `LocalSharedTorrent` + `LocalIndexTable` | Done |
+| 4 | `skills/frostwire-engineer/SKILL.md` | Done |
+
+Foundation fixes before new features:
 
 | # | Component | Tests required | Commit message |
 |---|-----------|----------------|----------------|
-| 1 | `LocalDhtCluster` (test JUnit ext) | 4 tests | *Done — `1df4edb66`* |
-| 2 | `IdentityRecord` + unit tests + DHT integration | 8 + 1 | *Done — `7a0ca463`* |
-| 3 | `LocalIndexTable` (SQLite) | unit: schema, CRUD, FTS5 match | `common] Add LocalIndexTable for shared torrents` |
-| 4 | `SharedTorrentIndexer` (auto-magic on downloadAdded) | unit: idempotent insert, magnet→metadata transition | `common] Add SharedTorrentIndexer (auto-magic on downloadAdded)` |
-| 5 | `LocalSharedTorrentSearchPerformer` | unit: FTS5 query, result mapping | `common] Add local search performer for shared torrents` |
-| 6 | Wire `LocalSharedTorrentSearchPerformer` into `SearchEngine` | integration: search returns "Local" results | `desktop] Wire "Local" search engine into SearchEngine list` |
-| 7 | `DistributedSearchEventBus` | unit: thread-safe pub/sub, EDT dispatch | `common] Add DistributedSearchEventBus` |
-| 8 | `DistributedSearchLogPanel` (Swing UI) | unit: row model, click handlers | `desktop] Add DistributedSearchLogPanel` |
-| 9 | `IndexAnnouncement` class | unit: serialize, parse, sign, verify | `common] Add IndexAnnouncement (DHT-published torrent metadata)` |
-| 10 | `RelayAnnouncementPublisher` (background timer) | unit: re-publish interval, dedup | `common] Add RelayAnnouncementPublisher` |
-| 11 | Hook `SharedTorrentIndexer` to publish `IndexAnnouncement` | integration: torrent add → DHT put | `common] Hook indexer to publish IndexAnnouncement` |
-| 12 | `IndexDiscoveryService` (pull mode) | unit: keyword hash, dedup, scoring | `common] Add IndexDiscoveryService (pull mode)` |
-| 13 | `DistributedSearchPerformer` (fans out to local + discovery) | integration: search hits both sources | `common] Add DistributedSearchPerformer` |
-| 14 | `SignatureVerifier` | unit: Ed25519 sign/verify, cache | `common] Add SignatureVerifier for DHT records` |
-| 15 | `PeerBrowseSearchPerformer` + `PeerBrowseWindow` | integration: click peer → browse results | `desktop] Add PeerBrowseSearchPerformer and window` |
-| 16 | `TrustStore` + `WoTValidator` | unit: BFS, depth limits, expiry | `common] Add TrustStore and WoTValidator` |
+| F1 | `IdentityRecord` bencode canonical form, no `computeDhtKey`, no unsigned limbo | serialize/parse/sign/verify | `[common] Fix IdentityRecord for BEP44-compatible signed bencode` |
+| F2 | `LocalDhtCluster` and DHT tests cleanup | deterministic DHT put/get, no sleeps/println | `[desktop] Clean up LocalDhtCluster and DHT tests` |
+| F3 | `RelayConstants` + `LocalIndex` interface | compile + interface tests | `[common] Add relay constants and LocalIndex interface` |
 
-After 16, the original relay-server commits (5.7-5.10 in the prior
-doc) become commits 17-20:
+Feature build order:
 
-| 17 | `RelayServer` (incoming challenge/response + forwarding) | integration: end-to-end NAT test |
-| 18 | `RelayClient` (uses relay when direct uTP fails) | integration: hole-punch fail → relay |
-| 19 | DoS protection + metrics | integration: `testRelayQpsLimit` |
-| 20 | Documentation + `changelog.txt` for Phase 4 | — |
-
----
-
-## 10. Configuration Constants  *(extended)*
-
-```java
-// All in com.frostwire.search.relay.RelayConstants
-
-// === Identity & relay registry ===
-int RELAY_REGISTRY_TTL_SEC            = 30 * 60;   // 30 min
-int IDENTITY_REPUBLISH_INTERVAL_SEC   = 5 * 60;    // 5 min
-int RELAY_REPUBLISH_INTERVAL_SEC      = 5 * 60;
-int HASHCASH_LEADING_ZERO_BITS        = 4;
-int DEFAULT_MAX_QPS                   = 5;
-int WOT_MAX_DEPTH                     = 3;
-
-// === Wire protocol ===
-int CHALLENGE_NONCE_BYTES             = 32;
-int TRANSPORT_NONCE_BYTES             = 12;        // AES-GCM 96-bit
-int PAYLOAD_NONCE_BYTES               = 12;
-
-// === DHT keys ===
-String DHT_IDENTITY_PREFIX            = "frostwire-identity-v1";
-String DHT_RELAY_PREFIX               = "frostwire-relay-nodes-v1";
-String DHT_INDEX_PREFIX               = "frostwire-index-v1";
-String DHT_SEARCH_HINT_PREFIX         = "frostwire-search-hint-v1";
-
-// === KDF labels ===
-String TRANSPORT_KDF_LABEL            = "frostwire-relay-transport-v1";
-String PAYLOAD_KDF_LABEL              = "frostwire-search-v1";
-
-// === Local index (NEW) ===
-int    LOCAL_INDEX_MAX_RESULTS        = 50;
-int    LOCAL_INDEX_PEER_LRU_PER_PEER  = 10_000;
-int    PEER_INDEX_SWEEP_INTERVAL_SEC  = 600;       // 10 min
-int    EVENT_LOG_MAX_ROWS             = 10_000;
-String EVENT_LOG_PATH                 = "distributed_search_log.jsonl";
-String IDENTITY_FILE                  = "identity.dat";
-```
+| # | Component | Tests required | Commit message |
+|---|-----------|----------------|----------------|
+| 5 | BEP 5 rendezvous discovery | local DHT announce/get_peers | `[common] Add FrostWire peer rendezvous discovery` |
+| 6 | `SharedTorrentIndexer` | idempotent insert, magnet -> metadata update | `[desktop] Add SharedTorrentIndexer for local shared torrents` |
+| 7 | `LocalSharedTorrentSearchPerformer` | query mapping to SearchResult | `[desktop] Add local shared-torrent search performer` |
+| 8 | Wire `Local` engine into SearchEngine | integration search returns Local results | `[desktop] Wire Local search engine` |
+| 9 | `IndexManifest` + manifest publisher | sign/verify/fetch latest manifest | `[common] Add signed index manifests` |
+| 10 | `PeerMesh` query/result messages | encrypted round trip, hop limit | `[common] Add encrypted peer mesh search protocol` |
+| 11 | `RelayServer` + `RelayClient` | relay opaque encrypted payload | `[common] Add encrypted relay server and client` |
+| 12 | `relayd` module | starts, announces, relays in local cluster | `[all] Add headless frostwire relayd` |
+| 13 | `DistributedSearchPerformer` | local + mesh merge | `[desktop] Add distributed search performer` |
+| 14 | `DistributedSearchEventBus` | thread-safe pub/sub | `[common] Add distributed search event bus` |
+| 15 | `DistributedSearchLogPanel` | row model, click actions | `[desktop] Add distributed search log panel` |
+| 16 | `PeerBrowseSearchPerformer` + window | browse known peer manifest | `[desktop] Add peer browse search window` |
+| 17 | `SignatureVerifier` everywhere | invalid sig rejects | `[common] Add signature verification for relay records` |
+| 18 | `TrustStore` + `WoTValidator` | BFS depth/expiry | `[common] Add trust store and WoT validator` |
+| 19 | DoS protection + metrics | qps limit, in-flight caps | `[common] Add relay rate limits and metrics` |
+| 20 | Documentation + changelog | docs only | `[all] Document distributed search and relay phase 4` |
 
 ---
 
-## 11. Out of Scope (Phase 4)
+## 13. Acceptance Story
 
-* Onion routing (Phase 5)
-* Full-text search across file contents (separate feature)
-* NAT hole-punch implementation — uses libtorrent's existing uTP
-* Android UI for the event log (Android gets a simpler
-  `PeerBrowseActivity` first; log panel is desktop-only)
-* Mobile metrics — desktop has the full UI, mobile can read log
-  via the existing `MCPNotificationBridge`
+Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 
----
-
-## 12. Review Checklist  *(reconciled)*
-
-Before implementation of each new component:
-
-* [ ] Reuse vs. new code: is there a libtorrent feature or
-      `com.frostwire.util` helper that does this already?
-* [ ] Off-EDT: any new code that touches `BTDownload` /
-      `BTEngine` / DHT must run on a background executor
-* [ ] i18n: every new user-facing string uses `I18n.tr()`
-* [ ] Logging: `com.frostwire.util.Logger`, no `System.out`
-* [ ] Null-safety: all new public APIs are null-safe
-* [ ] Tests: at least one happy-path + one edge-case test per
-      new public method
-* [ ] Changelog: user-facing changes get a `changelog.txt` line
-
-Security review points (cumulative, not per-commit):
-
-* [ ] WoT root keys: which 3-5 FrostWire release-signing ed25519
-      pubkeys? Where do we store them? (Open question — needs
-      owner input.)
-* [ ] Identity persistence: `~/.frostwire/identity.dat` mode 0600
-      on POSIX; KeyStore-backed on Android
-* [ ] `allow_untrusted` setting default: **off** (WoT required)
-      for first release; opt-in for power users
-* [ ] AV integration: do we block index-announce for
-      locally-detected malware, or just refuse to download?
-* [ ] Peer-browse: should untrusted peers' results be visually
-      distinguished in the search results table?
+1. `SharedTorrentIndexer` inserts it into `LocalIndexTable`.
+2. `ManifestPublisher` updates Alice's BEP 46 signed manifest.
+3. Alice announces herself under `frostwire-peers-v1`.
+4. Bob searches for `ubuntu 24`.
+5. Bob's desktop searches local FTS5 and sends encrypted mesh queries to trusted peers/relays.
+6. Alice receives the query, searches her local index, returns a signed result envelope.
+7. Bob verifies Alice's signature and trust score, merges the result into normal Search UI.
+8. If Bob is behind symmetric NAT, his query and Alice's result route through a relay, but the relay only sees opaque encrypted frames.
+9. Bob can click Alice's peer badge to browse Alice's signed manifest.
 
 ---
 
-## 13. End-to-End User Story (acceptance test)
+## 14. Open Questions
 
-> Alice starts FrostWire. She adds a magnet for `ubuntu-24.04.iso`.
-> Within 5 seconds:
->   1. `SharedTorrentIndexer` inserts the row in
->      `shared_torrents`
->   2. `RelayAnnouncementPublisher` puts an `IndexAnnouncement`
->      in the DHT under `SHA-256("frostwire-index-v1:" + infohash)`
->   3. `DistributedSearchEventBus` fires `INDEX_ANNOUNCED`
->   4. `DistributedSearchLogPanel` shows a new row
->
-> Bob searches for "ubuntu 24" 10 minutes later. `SearchMediator`
-> fans out to Bitsearch, TPB, **and Distributed**. The Distributed
-> engine runs `IndexDiscoveryService`, which fetches Alice's
-> announcement from the DHT, verifies the Ed25519 sig, and
-> returns the result alongside the web results. Bob sees
-> `ubuntu-24.04.iso · 5.0 GB · Peer: A1B2C3D4` in the results
-> table.
->
-> Bob clicks the peer badge. `PeerBrowseWindow` opens. It
-> subscribes to Alice's index and shows the full list of
-> torrents she's sharing, ordered by recency. Bob can browse,
-> filter, and download any of them — the standard download flow
-> takes over once he clicks.
->
-> Meanwhile, the event log shows in real time: Alice's index
-> publish, Bob's query, the discovery fetch, the signature
-> verify, the result merge.
+- Which Ed25519 public keys are FrostWire trust roots?
+- Should unknown peers be hidden by default or shown under an "Untrusted" fold?
+- Should desktop run relay role by default only when the node has a public/stable port?
+- How large should inline manifests be before switching to torrent-backed manifests?
+- Should `relayd` expose HTTP metrics in v1 or keep logs-only until operations need more?
 
 ---
 
-*End of design doc. Next step: review, then Commit 3
-(`LocalIndexTable` + `SharedTorrentIndexer`).*
-
+*Next step: implement F1 and F2 before adding new distributed-search features.*
