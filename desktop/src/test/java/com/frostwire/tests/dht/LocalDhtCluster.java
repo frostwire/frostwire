@@ -1,3 +1,10 @@
+/*
+ *     Created by Angel Leon (@gubatron)
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+ *
+ *     Licensed under GPL v3. See LICENSE file.
+ */
+
 package com.frostwire.tests.dht;
 
 import com.frostwire.jlibtorrent.*;
@@ -30,11 +37,6 @@ public class LocalDhtCluster implements BeforeAllCallback, AfterAllCallback, Par
         this.nodeCount = nodeCount;
         this.dhtReadyTimeoutSeconds = dhtReadyTimeoutSeconds;
         this.dhtReadyLatch = new CountDownLatch(nodeCount);
-    }
-    
-    public @interface Config {
-        int nodeCount() default 3;
-        int dhtReadyTimeoutSeconds() default 30;
     }
     
     @Override
@@ -143,6 +145,13 @@ public class LocalDhtCluster implements BeforeAllCallback, AfterAllCallback, Par
     public int getNodeCount() {
         return nodeCount;
     }
+
+    public int getPort(int index) {
+        if (index < 0 || index >= ports.size()) {
+            throw new IndexOutOfBoundsException("Port index out of bounds: " + index);
+        }
+        return ports.get(index);
+    }
     
     public boolean isNodeReady(int index) {
         if (index < 0 || index >= nodes.size()) {
@@ -151,20 +160,4 @@ public class LocalDhtCluster implements BeforeAllCallback, AfterAllCallback, Par
         return nodes.get(index).isDhtRunning();
     }
     
-    public void partition(int nodeA, int nodeB) {
-        if (nodeA < 0 || nodeA >= nodes.size() || nodeB < 0 || nodeB >= nodes.size()) {
-            throw new IndexOutOfBoundsException("Node index out of bounds: " + nodeA + ", " + nodeB);
-        }
-        if (nodeA == nodeB) {
-            throw new IllegalArgumentException("Cannot partition a node from itself");
-        }
-        LOG.warn("TODO: Implement UDP partition between node " + nodeA + " and node " + nodeB + " (stub)");
-    }
-    
-    public void allow(int nodeA, int nodeB) {
-        if (nodeA < 0 || nodeA >= nodes.size() || nodeB < 0 || nodeB >= nodes.size()) {
-            throw new IndexOutOfBoundsException("Node index out of bounds: " + nodeA + ", " + nodeB);
-        }
-        LOG.warn("TODO: Implement UDP allow between node " + nodeA + " and node " + nodeB + " (stub)");
-    }
 }
