@@ -108,19 +108,39 @@ public final class IdentityRecord {
         return new IdentityRecord(nodeId, ed25519, x25519, port, first, last, sig);
     }
 
+    public static byte[] extractRawEd25519(PublicKey ed25519) {
+        byte[] encoded = ed25519.getEncoded();
+        if (encoded.length == ED25519_PUB_LENGTH) {
+            return encoded;
+        }
+        if (encoded.length == 44 && encoded[0] == 0x30 && encoded[1] == 0x2a
+                && encoded[2] == 0x30 && encoded[3] == 0x05
+                && encoded[4] == 0x06 && encoded[5] == 0x03
+                && encoded[6] == 0x2b && encoded[7] == 0x65
+                && encoded[8] == 0x70 && encoded[9] == 0x03
+                && encoded[10] == 0x21 && encoded[11] == 0x00) {
+            byte[] raw = new byte[ED25519_PUB_LENGTH];
+            System.arraycopy(encoded, 12, raw, 0, ED25519_PUB_LENGTH);
+            return raw;
+        }
+        throw new IllegalArgumentException(
+                "Unexpected Ed25519 key encoding: " + encoded.length + " bytes");
+    }
+
     public static IdentityRecord create(byte[] nodeId, PublicKey ed25519, byte[] x25519,
                                        int utpPort) {
         if (nodeId.length != NODE_ID_LENGTH) {
             throw new IllegalArgumentException("nodeId must be 20 bytes");
         }
-        if (ed25519.getEncoded().length != ED25519_PUB_LENGTH) {
+        byte[] rawEd25519 = extractRawEd25519(ed25519);
+        if (rawEd25519.length != ED25519_PUB_LENGTH) {
             throw new IllegalArgumentException("ed25519 pub must be 32 bytes");
         }
         if (x25519.length != X25519_PUB_LENGTH) {
             throw new IllegalArgumentException("x25519 pub must be 32 bytes");
         }
         long now = Instant.now().getEpochSecond();
-        return new IdentityRecord(nodeId, ed25519.getEncoded(), x25519, utpPort, now, now,
+        return new IdentityRecord(nodeId, rawEd25519, x25519, utpPort, now, now,
                 new byte[64]);
     }
 
