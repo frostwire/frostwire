@@ -558,7 +558,8 @@ the relay-hint, never the query or results.
 ## 9. Build Order  *(reconciled — was 10 commits, now 16)*
 
 Each item is a single commit cluster (one logical change, possibly
-split into 2-3 commits per the AGENTS.md granular-commits rule).
+split into 2-3 commits per the skills/frostwire-engineer/SKILL.md
+granular-commits rule).
 
 | # | Component | Tests required | Commit message |
 |---|-----------|----------------|----------------|
