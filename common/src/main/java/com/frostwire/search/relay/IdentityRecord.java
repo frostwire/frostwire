@@ -7,27 +7,40 @@
 
 package com.frostwire.search.relay;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.util.Hex;
+
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Identity record published to the DHT so other nodes can discover
- * this node's ed25519/x25519 public keys and uTP port.
+ * Signed identity exchanged by FrostWire peers after DHT rendezvous and
+ * optionally published as a BEP 46 mutable item by known public key + salt.
  *
- * Stored as a BEP 46 mutable item in the DHT under key
- * SHA-256("frostwire-identity-v1:" + node_id)[:32].
+ * <p>The canonical signature payload is the bencoded dictionary returned by
+ * {@link #toCanonicalEntry()}, which is the full record without {@code sig}.
  */
 public final class IdentityRecord {
     public static final int VERSION = 1;
     public static final int NODE_ID_LENGTH = 20;
     public static final int ED25519_PUB_LENGTH = 32;
     public static final int X25519_PUB_LENGTH = 32;
-    public static final String DHT_KEY_PREFIX = "frostwire-identity-v1";
+    public static final int SIGNATURE_LENGTH = 64;
+    public static final String BEP46_SALT = "frostwire-identity-v1";
+
+    private static final byte[] ED25519_X509_PREFIX = new byte[]{
+            0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00
+    };
 
     private final byte[] nodeId;
     private final byte[] ed25519Pub;
@@ -36,11 +49,10 @@ public final class IdentityRecord {
     private final long firstSeen;
     private final long lastSeen;
     private final byte[] signature;
-    private final byte[] dhtKey;
 
     private IdentityRecord(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
-                           int utpPort, long firstSeen, long lastSeen,
-                           byte[] signature) {
+                           int utpPort, long firstSeen, long lastSeen, byte[] signature) {
+        validate(nodeId, ed25519Pub, x25519Pub, signature, firstSeen, lastSeen);
         this.nodeId = nodeId.clone();
         this.ed25519Pub = ed25519Pub.clone();
         this.x25519Pub = x25519Pub.clone();
@@ -48,64 +60,92 @@ public final class IdentityRecord {
         this.firstSeen = firstSeen;
         this.lastSeen = lastSeen;
         this.signature = signature.clone();
-        this.dhtKey = computeDhtKey(nodeId);
     }
 
-    public byte[] nodeId() { return nodeId.clone(); }
-    public byte[] ed25519Pub() { return ed25519Pub.clone(); }
-    public byte[] x25519Pub() { return x25519Pub.clone(); }
-    public int utpPort() { return utpPort; }
-    public long firstSeen() { return firstSeen; }
-    public long lastSeen() { return lastSeen; }
-    public byte[] signature() { return signature.clone(); }
-    public byte[] dhtKey() { return dhtKey.clone(); }
-
-    public static byte[] computeDhtKey(byte[] nodeId) {
-        if (nodeId == null || nodeId.length != NODE_ID_LENGTH) {
-            throw new IllegalArgumentException("nodeId must be 20 bytes");
-        }
-        try {
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            sha256.update(DHT_KEY_PREFIX.getBytes(StandardCharsets.US_ASCII));
-            sha256.update(nodeId);
-            byte[] hash = sha256.digest();
-            return Arrays.copyOf(hash, 32);
-        } catch (Exception e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+    public byte[] nodeId() {
+        return nodeId.clone();
     }
 
-    public String toCanonicalJson() {
-        StringBuilder sb = new StringBuilder(256);
-        sb.append("{");
-        sb.append("\"v\":").append(VERSION).append(",");
-        sb.append("\"node_id\":\"").append(toHex(nodeId)).append("\",");
-        sb.append("\"ed25519_pub\":\"").append(b64(ed25519Pub)).append("\",");
-        sb.append("\"x25519_pub\":\"").append(b64(x25519Pub)).append("\",");
-        sb.append("\"utp_port\":").append(utpPort).append(",");
-        sb.append("\"first_seen\":").append(firstSeen).append(",");
-        sb.append("\"last_seen\":").append(lastSeen);
-        sb.append("}");
-        return sb.toString();
+    public byte[] ed25519Pub() {
+        return ed25519Pub.clone();
+    }
+
+    public byte[] x25519Pub() {
+        return x25519Pub.clone();
+    }
+
+    public int utpPort() {
+        return utpPort;
+    }
+
+    public long firstSeen() {
+        return firstSeen;
+    }
+
+    public long lastSeen() {
+        return lastSeen;
+    }
+
+    public byte[] signature() {
+        return signature.clone();
+    }
+
+    public Entry toEntry() {
+        Map<String, Object> map = canonicalMap();
+        map.put("sig", new Entry(b64(signature)));
+        return Entry.fromMap(map);
+    }
+
+    public Entry toCanonicalEntry() {
+        return Entry.fromMap(canonicalMap());
     }
 
     public byte[] canonicalBytes() {
-        return toCanonicalJson().getBytes(StandardCharsets.US_ASCII);
+        return toCanonicalEntry().bencode();
     }
 
-    public static IdentityRecord parse(Map<String, String> map) {
-        int v = Integer.parseInt(map.get("v"));
-        if (v != VERSION) {
-            throw new IllegalArgumentException("Unsupported identity version: " + v);
+    public boolean verifySignature() {
+        try {
+            Signature verifier = Signature.getInstance("Ed25519");
+            verifier.initVerify(rawEd25519ToPublicKey(ed25519Pub));
+            verifier.update(canonicalBytes());
+            return verifier.verify(signature);
+        } catch (Exception e) {
+            return false;
         }
-        byte[] nodeId = fromHex(map.get("node_id"));
-        byte[] ed25519 = Base64.getDecoder().decode(map.get("ed25519_pub"));
-        byte[] x25519 = Base64.getDecoder().decode(map.get("x25519_pub"));
-        int port = Integer.parseInt(map.get("utp_port"));
-        long first = Long.parseLong(map.get("first_seen"));
-        long last = Long.parseLong(map.get("last_seen"));
-        byte[] sig = Base64.getDecoder().decode(map.get("sig"));
-        return new IdentityRecord(nodeId, ed25519, x25519, port, first, last, sig);
+    }
+
+    public IdentityRecord withUpdatedLastSeen(long ts, PrivateKey privateKey) {
+        if (ts < firstSeen) {
+            throw new IllegalArgumentException("last_seen must be >= first_seen");
+        }
+        return signed(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, ts, privateKey);
+    }
+
+    public static IdentityRecord createSigned(byte[] nodeId, KeyPair ed25519, byte[] x25519, int utpPort) {
+        long now = Instant.now().getEpochSecond();
+        byte[] rawEd25519 = extractRawEd25519(ed25519.getPublic());
+        return signed(nodeId, rawEd25519, x25519, utpPort, now, now, ed25519.getPrivate());
+    }
+
+    public static IdentityRecord fromEntry(Entry entry) {
+        Map<String, Entry> map = entry.dictionary();
+        int version = (int) map.get("v").integer();
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Unsupported identity version: " + version);
+        }
+        IdentityRecord record = new IdentityRecord(
+                Hex.decode(map.get("node_id").string()),
+                b64decode(map.get("ed25519_pub").string()),
+                b64decode(map.get("x25519_pub").string()),
+                (int) map.get("utp_port").integer(),
+                map.get("first_seen").integer(),
+                map.get("last_seen").integer(),
+                b64decode(map.get("sig").string()));
+        if (!record.verifySignature()) {
+            throw new IllegalArgumentException("Invalid identity signature");
+        }
+        return record;
     }
 
     public static byte[] extractRawEd25519(PublicKey ed25519) {
@@ -113,66 +153,80 @@ public final class IdentityRecord {
         if (encoded.length == ED25519_PUB_LENGTH) {
             return encoded;
         }
-        if (encoded.length == 44 && encoded[0] == 0x30 && encoded[1] == 0x2a
-                && encoded[2] == 0x30 && encoded[3] == 0x05
-                && encoded[4] == 0x06 && encoded[5] == 0x03
-                && encoded[6] == 0x2b && encoded[7] == 0x65
-                && encoded[8] == 0x70 && encoded[9] == 0x03
-                && encoded[10] == 0x21 && encoded[11] == 0x00) {
-            byte[] raw = new byte[ED25519_PUB_LENGTH];
-            System.arraycopy(encoded, 12, raw, 0, ED25519_PUB_LENGTH);
-            return raw;
+        if (encoded.length == ED25519_X509_PREFIX.length + ED25519_PUB_LENGTH) {
+            for (int i = 0; i < ED25519_X509_PREFIX.length; i++) {
+                if (encoded[i] != ED25519_X509_PREFIX[i]) {
+                    throw new IllegalArgumentException("Unexpected Ed25519 key prefix");
+                }
+            }
+            return Arrays.copyOfRange(encoded, ED25519_X509_PREFIX.length, encoded.length);
         }
         throw new IllegalArgumentException(
                 "Unexpected Ed25519 key encoding: " + encoded.length + " bytes");
     }
 
-    public static IdentityRecord create(byte[] nodeId, PublicKey ed25519, byte[] x25519,
-                                       int utpPort) {
-        if (nodeId.length != NODE_ID_LENGTH) {
+    private static IdentityRecord signed(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
+                                         int utpPort, long firstSeen, long lastSeen, PrivateKey privateKey) {
+        validate(nodeId, ed25519Pub, x25519Pub, new byte[SIGNATURE_LENGTH], firstSeen, lastSeen);
+        try {
+            IdentityRecord unsigned = new IdentityRecord(nodeId, ed25519Pub, x25519Pub,
+                    utpPort, firstSeen, lastSeen, new byte[SIGNATURE_LENGTH]);
+            Signature signer = Signature.getInstance("Ed25519");
+            signer.initSign(privateKey);
+            signer.update(unsigned.canonicalBytes());
+            return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, lastSeen, signer.sign());
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Unable to sign identity record", e);
+        }
+    }
+
+    private static PublicKey rawEd25519ToPublicKey(byte[] raw) throws Exception {
+        byte[] encoded = new byte[ED25519_X509_PREFIX.length + raw.length];
+        System.arraycopy(ED25519_X509_PREFIX, 0, encoded, 0, ED25519_X509_PREFIX.length);
+        System.arraycopy(raw, 0, encoded, ED25519_X509_PREFIX.length, raw.length);
+        return KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
+    }
+
+    private Map<String, Object> canonicalMap() {
+        Map<String, Object> map = new TreeMap<>();
+        map.put("ed25519_pub", new Entry(b64(ed25519Pub)));
+        map.put("first_seen", new Entry(firstSeen));
+        map.put("last_seen", new Entry(lastSeen));
+        map.put("node_id", new Entry(Hex.encode(nodeId)));
+        map.put("utp_port", new Entry((long) utpPort));
+        map.put("v", new Entry((long) VERSION));
+        map.put("x25519_pub", new Entry(b64(x25519Pub)));
+        return map;
+    }
+
+    private static void validate(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
+                                 byte[] signature, long firstSeen, long lastSeen) {
+        if (nodeId == null || nodeId.length != NODE_ID_LENGTH) {
             throw new IllegalArgumentException("nodeId must be 20 bytes");
         }
-        byte[] rawEd25519 = extractRawEd25519(ed25519);
-        if (rawEd25519.length != ED25519_PUB_LENGTH) {
+        if (ed25519Pub == null || ed25519Pub.length != ED25519_PUB_LENGTH) {
             throw new IllegalArgumentException("ed25519 pub must be 32 bytes");
         }
-        if (x25519.length != X25519_PUB_LENGTH) {
+        if (x25519Pub == null || x25519Pub.length != X25519_PUB_LENGTH) {
             throw new IllegalArgumentException("x25519 pub must be 32 bytes");
         }
-        long now = Instant.now().getEpochSecond();
-        return new IdentityRecord(nodeId, rawEd25519, x25519, utpPort, now, now,
-                new byte[64]);
-    }
-
-    public IdentityRecord withUpdatedLastSeen(long ts) {
-        return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, ts,
-                signature);
-    }
-
-    public IdentityRecord withSignature(byte[] sig) {
-        return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, lastSeen, sig);
-    }
-
-    private static String toHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b & 0xff));
+        if (signature == null || signature.length != SIGNATURE_LENGTH) {
+            throw new IllegalArgumentException("signature must be 64 bytes");
         }
-        return sb.toString();
-    }
-
-    private static byte[] fromHex(String hex) {
-        int len = hex.length();
-        byte[] result = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            result[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i + 1), 16));
+        if (firstSeen <= 0) {
+            throw new IllegalArgumentException("first_seen must be > 0");
         }
-        return result;
+        if (lastSeen < firstSeen) {
+            throw new IllegalArgumentException("last_seen must be >= first_seen");
+        }
     }
 
     private static String b64(byte[] bytes) {
         return Base64.getEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private static byte[] b64decode(String value) {
+        return Base64.getDecoder().decode(value);
     }
 
     @Override
@@ -180,10 +234,12 @@ public final class IdentityRecord {
         if (this == o) return true;
         if (!(o instanceof IdentityRecord)) return false;
         IdentityRecord that = (IdentityRecord) o;
-        return Arrays.equals(nodeId, that.nodeId)
+        return utpPort == that.utpPort
+                && firstSeen == that.firstSeen
+                && lastSeen == that.lastSeen
+                && Arrays.equals(nodeId, that.nodeId)
                 && Arrays.equals(ed25519Pub, that.ed25519Pub)
                 && Arrays.equals(x25519Pub, that.x25519Pub)
-                && utpPort == that.utpPort
                 && Arrays.equals(signature, that.signature);
     }
 
@@ -193,6 +249,8 @@ public final class IdentityRecord {
         result = 31 * result + Arrays.hashCode(ed25519Pub);
         result = 31 * result + Arrays.hashCode(x25519Pub);
         result = 31 * result + utpPort;
+        result = 31 * result + (int) (firstSeen ^ (firstSeen >>> 32));
+        result = 31 * result + (int) (lastSeen ^ (lastSeen >>> 32));
         result = 31 * result + Arrays.hashCode(signature);
         return result;
     }

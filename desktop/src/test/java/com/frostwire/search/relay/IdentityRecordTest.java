@@ -7,149 +7,130 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.jlibtorrent.Entry;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.util.Base64;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class IdentityRecordTest {
 
     @Test
-    void computeDhtKeyProducesCorrectLength() {
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] key = IdentityRecord.computeDhtKey(nodeId);
-        assertEquals(32, key.length, "DHT key should be 32 bytes (truncated SHA-256)");
-    }
-
-    @Test
-    void computeDhtKeyIsDeterministic() {
-        byte[] nodeId = new byte[20];
-        for (int i = 0; i < 20; i++) nodeId[i] = (byte) i;
-        byte[] key1 = IdentityRecord.computeDhtKey(nodeId);
-        byte[] key2 = IdentityRecord.computeDhtKey(nodeId);
-        assertArrayEquals(key1, key2, "DHT key should be deterministic");
-    }
-
-    @Test
-    void computeDhtKeyRejectsInvalidNodeIdLength() {
-        assertThrows(IllegalArgumentException.class,
-                () -> IdentityRecord.computeDhtKey(new byte[19]));
-        assertThrows(IllegalArgumentException.class,
-                () -> IdentityRecord.computeDhtKey(new byte[21]));
-        assertThrows(IllegalArgumentException.class,
-                () -> IdentityRecord.computeDhtKey(null));
-    }
-
-    @Test
-    void extractRawEd25519HandlesX509Encoding() throws NoSuchAlgorithmException {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
+    void extractRawEd25519HandlesX509Encoding() throws Exception {
+        KeyPair kp = ed25519();
         byte[] raw = IdentityRecord.extractRawEd25519(kp.getPublic());
         assertEquals(32, raw.length, "Raw Ed25519 key should be 32 bytes");
     }
 
     @Test
-    void createProducesValidRecord() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] x25519 = new byte[32];
-        new SecureRandom().nextBytes(x25519);
+    void createSignedProducesValidRecord() throws Exception {
+        KeyPair kp = ed25519();
+        byte[] nodeId = randomBytes(20);
+        byte[] x25519 = randomBytes(32);
 
-        IdentityRecord record = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
+        IdentityRecord record = IdentityRecord.createSigned(nodeId, kp, x25519, 49152);
         assertArrayEquals(nodeId, record.nodeId());
         assertEquals(32, record.ed25519Pub().length);
         assertArrayEquals(x25519, record.x25519Pub());
         assertEquals(49152, record.utpPort());
         assertTrue(record.firstSeen() > 0);
         assertTrue(record.lastSeen() > 0);
+        assertEquals(64, record.signature().length);
+        assertTrue(record.verifySignature());
     }
 
     @Test
-    void canonicalJsonIsStable() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        for (int i = 0; i < 20; i++) nodeId[i] = (byte) i;
-        byte[] x25519 = new byte[32];
-        for (int i = 0; i < 32; i++) x25519[i] = (byte) (i + 100);
+    void canonicalBytesAreStableBencodeWithoutSignature() throws Exception {
+        KeyPair kp = ed25519();
+        byte[] nodeId = fixedBytes(20, 1);
+        byte[] x25519 = fixedBytes(32, 100);
 
-        IdentityRecord r1 = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        IdentityRecord r2 = r1.withUpdatedLastSeen(r1.firstSeen());
-        assertEquals(r1.toCanonicalJson(), r2.toCanonicalJson(),
-                "Canonical JSON should be stable for same fields");
+        IdentityRecord record = IdentityRecord.createSigned(nodeId, kp, x25519, 49152);
+        byte[] canonical1 = record.canonicalBytes();
+        byte[] canonical2 = Entry.bdecode(record.canonicalBytes()).bencode();
+
+        assertArrayEquals(canonical1, canonical2);
+        assertFalse(new String(canonical1).contains("sig"));
+        assertTrue(record.toEntry().dictionary().containsKey("sig"));
     }
 
     @Test
-    void withUpdatedLastSeenChangesTimestamp() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] x25519 = new byte[32];
-        new SecureRandom().nextBytes(x25519);
+    void toEntryFromEntryRoundTripsAndVerifies() throws Exception {
+        IdentityRecord record = IdentityRecord.createSigned(randomBytes(20), ed25519(), randomBytes(32), 49152);
 
-        IdentityRecord r1 = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        IdentityRecord r2 = r1.withUpdatedLastSeen(r1.lastSeen() + 100);
-        assertEquals(r1.firstSeen(), r2.firstSeen(), "first_seen should not change");
-        assertEquals(r1.lastSeen() + 100, r2.lastSeen(), "last_seen should be updated");
+        IdentityRecord parsed = IdentityRecord.fromEntry(record.toEntry());
+        assertEquals(record, parsed);
+        assertTrue(parsed.verifySignature());
     }
 
     @Test
-    void withSignatureReplacesSignature() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] x25519 = new byte[32];
-        new SecureRandom().nextBytes(x25519);
+    void fromEntryRejectsTamperedRecord() throws Exception {
+        IdentityRecord record = IdentityRecord.createSigned(randomBytes(20), ed25519(), randomBytes(32), 49152);
+        java.util.Map<String, Object> tampered = new java.util.TreeMap<>();
+        java.util.Map<String, Entry> dict = record.toEntry().dictionary();
+        tampered.put("ed25519_pub", new Entry(dict.get("ed25519_pub").string()));
+        tampered.put("first_seen", new Entry(dict.get("first_seen").integer()));
+        tampered.put("last_seen", new Entry(dict.get("last_seen").integer()));
+        tampered.put("node_id", new Entry(dict.get("node_id").string()));
+        tampered.put("sig", new Entry(dict.get("sig").string()));
+        tampered.put("utp_port", new Entry(12345L));
+        tampered.put("v", new Entry(dict.get("v").integer()));
+        tampered.put("x25519_pub", new Entry(dict.get("x25519_pub").string()));
 
-        IdentityRecord record = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        byte[] sig = new byte[64];
-        new SecureRandom().nextBytes(sig);
-        IdentityRecord signed = record.withSignature(sig);
-        assertArrayEquals(sig, signed.signature());
-        assertArrayEquals(new byte[64], record.signature(),
-                "Original record should have zero signature");
+        assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromEntry(Entry.fromMap(tampered)));
     }
 
     @Test
-    void canonicalBytesAreAscii() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] x25519 = new byte[32];
-        new SecureRandom().nextBytes(x25519);
+    void withUpdatedLastSeenResignsRecord() throws Exception {
+        KeyPair kp = ed25519();
+        IdentityRecord r1 = IdentityRecord.createSigned(randomBytes(20), kp, randomBytes(32), 49152);
+        IdentityRecord r2 = r1.withUpdatedLastSeen(r1.lastSeen() + 100, kp.getPrivate());
 
-        IdentityRecord record = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        byte[] canonical = record.canonicalBytes();
-        String s = new String(canonical, StandardCharsets.US_ASCII);
-        assertEquals(s.getBytes(StandardCharsets.US_ASCII).length, canonical.length,
-                "Canonical bytes should be valid ASCII");
+        assertEquals(r1.firstSeen(), r2.firstSeen());
+        assertEquals(r1.lastSeen() + 100, r2.lastSeen());
+        assertTrue(r2.verifySignature());
+        assertNotEquals(java.util.Arrays.toString(r1.signature()), java.util.Arrays.toString(r2.signature()));
+    }
+
+    @Test
+    void createSignedRejectsInvalidLengths() throws Exception {
+        KeyPair kp = ed25519();
+        assertThrows(IllegalArgumentException.class,
+                () -> IdentityRecord.createSigned(new byte[19], kp, randomBytes(32), 49152));
+        assertThrows(IllegalArgumentException.class,
+                () -> IdentityRecord.createSigned(randomBytes(20), kp, new byte[31], 49152));
     }
 
     @Test
     void equalsAndHashCodeWork() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("Ed25519");
-        KeyPair kp = kpg.generateKeyPair();
-        byte[] nodeId = new byte[20];
-        new SecureRandom().nextBytes(nodeId);
-        byte[] x25519 = new byte[32];
-        new SecureRandom().nextBytes(x25519);
+        KeyPair kp = ed25519();
+        byte[] nodeId = randomBytes(20);
+        byte[] x25519 = randomBytes(32);
 
-        IdentityRecord r1 = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        IdentityRecord r2 = IdentityRecord.create(nodeId, kp.getPublic(), x25519, 49152);
-        byte[] sig = new byte[64];
-        sig[0] = 1;
-        r1 = r1.withSignature(sig);
-        r2 = r2.withSignature(sig);
+        IdentityRecord r1 = IdentityRecord.createSigned(nodeId, kp, x25519, 49152);
+        IdentityRecord r2 = IdentityRecord.fromEntry(r1.toEntry());
         assertEquals(r1, r2);
         assertEquals(r1.hashCode(), r2.hashCode());
+    }
+
+    private static KeyPair ed25519() throws Exception {
+        return KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    }
+
+    private static byte[] randomBytes(int n) {
+        byte[] b = new byte[n];
+        new SecureRandom().nextBytes(b);
+        return b;
+    }
+
+    private static byte[] fixedBytes(int n, int start) {
+        byte[] b = new byte[n];
+        for (int i = 0; i < n; i++) {
+            b[i] = (byte) (start + i);
+        }
+        return b;
     }
 }
