@@ -19,6 +19,8 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.relay.LocalIndex;
+import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.frostclick.FrostClickSearchPattern;
 import com.frostwire.search.nyaa.NyaaSearchPattern;
@@ -70,7 +72,8 @@ public abstract class SearchEngine {
         YT_ID,
         TORRENTSCSV_ID,
         KNABEN_ID,
-        BITSEARCH_ID
+        BITSEARCH_ID,
+        LOCAL_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -282,6 +285,26 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine LOCAL = new SearchEngine(SearchEngineID.LOCAL_ID, "Local", SearchEnginesSettings.LOCAL_SEARCH_ENABLED, "local") {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Local search engine has no LocalIndex installed; call LocalSearchEngineWire.setIndex(...) before searching.");
+            }
+            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex);
+        }
+
+        @Override
+        public boolean isReady() {
+            // Ready iff an installer has handed us a LocalIndex. Until then
+            // we are invisible to excludeNonReady=true searches.
+            return LOCAL.localIndex != null;
+        }
+    };
+
+    /** Holder for the LocalIndex backing the LOCAL engine; set by an installer at app start. */
+    private volatile LocalIndex localIndex;
+
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -306,6 +329,7 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         return Arrays.asList(
+                LOCAL,
                 YT,
                 INTERNET_ARCHIVE,
                 BITSEARCH,
@@ -389,5 +413,15 @@ public abstract class SearchEngine {
 
     public boolean isReady() {
         return _domainName != null;
+    }
+
+    /**
+     * Installs the {@link LocalIndex} that backs the {@code LOCAL} search
+     * engine. Idempotent; the most recent call wins. Returns this engine
+     * so the installer can chain.
+     */
+    public SearchEngine setLocalIndex(LocalIndex index) {
+        this.localIndex = index;
+        return this;
     }
 }
