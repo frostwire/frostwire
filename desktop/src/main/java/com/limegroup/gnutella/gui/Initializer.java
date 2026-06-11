@@ -20,7 +20,11 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.LocalIndexTable;
+import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
 import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UserAgentGenerator;
@@ -141,6 +145,7 @@ final class Initializer {
         // Start the core & run any queued control requests, and load DAAP.
         //System.out.println("Initializer.initialize() start core");
         startCore(limeWireCore);
+        startRelayStack();
         runQueuedRequests(limeWireCore);
         if (OSUtils.isMacOSX()) {
             GURLHandler.getInstance().register();
@@ -402,6 +407,43 @@ final class Initializer {
         GUIMediator.instance().coreInitialized();
         GUIMediator.setSplashScreenString(I18n.tr("Loading Old Downloads..."));
         limeWireCore.getDownloadManager().loadSavedDownloadsAndScheduleWriting();
+    }
+
+    /**
+     * Wires the distributed-search relay stack: opens the local torrent
+     * index, loads (or generates) the node's cryptographic identity, installs
+     * the auto-indexer on BTEngine, and hands the index to the LOCAL search
+     * engine so user searches can query it.
+     *
+     * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
+     * {@code DownloadManagerImpl} listener is already registered — the
+     * indexer installer chains onto it via {@code BTEngineListenerChain}.
+     */
+    private void startRelayStack() {
+        try {
+            File homeDir = new File(CommonUtils.getUserSettingsDir()
+                    + File.separator + "libtorrent" + File.separator);
+
+            // 1. Open the local torrent index (SQLite + FTS5).
+            File dbFile = new File(homeDir, LocalIndexTable.DEFAULT_DB_NAME);
+            LocalIndexTable localIndex = LocalIndexTable.open(dbFile);
+
+            // 2. Load or generate the node's Ed25519 / X25519 identity.
+            File identityFile = new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+            IdentityKeys identity = IdentityKeys.loadOrCreate(identityFile);
+
+            // 3. Install the auto-indexer on BTEngine (chains onto the
+            //    DownloadManagerImpl listener already set by startCore).
+            BTEngine btEngine = BTEngine.getInstance();
+            SharedTorrentIndexerInstaller.install(btEngine, localIndex, identity);
+
+            // 4. Hand the index to the LOCAL search engine.
+            LocalSearchEngineWire.setIndex(localIndex);
+        } catch (Exception e) {
+            // Non-fatal: the relay stack is optional; the app can run without it.
+            com.frostwire.util.Logger.getLogger(Initializer.class)
+                    .warn("Failed to start relay stack; distributed search disabled", e);
+        }
     }
 
     private void startBittorrentCore() {
