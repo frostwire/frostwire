@@ -51,6 +51,14 @@ public final class IdentityKeys {
 
     private static final Logger LOG = Logger.getLogger(IdentityKeys.class);
 
+    /**
+     * Byte offset of the raw 32-byte Ed25519 seed inside the JDK
+     * PKCS#8 encoding. The structure is:
+     * {@code 30 2e 02 01 00 30 05 06 03 2b 65 70 04 22 04 20 <32 bytes>}
+     * so the seed starts at byte 16.
+     */
+    static final int ED25519_PKCS8_SEED_OFFSET = 16;
+
     private final KeyPair ed25519;
     private final KeyPair x25519;
     private final byte[] ed25519PubRaw;
@@ -88,6 +96,44 @@ public final class IdentityKeys {
     /** 20-byte DHT node ID: SHA-1 of the raw Ed25519 public key. */
     public byte[] nodeId() {
         return nodeId.clone();
+    }
+
+    /**
+     * 32-byte Ed25519 seed extracted from the PKCS#8 private key.
+     *
+     * <p>The JDK Ed25519 PKCS#8 encoding is 48 bytes: a 16-byte ASN.1
+     * prefix followed by the 32-byte raw seed. This method extracts
+     * the seed for use with libtorrent's NaCl-based
+     * {@code Ed25519.createKeypair(seed)} or for constructing the
+     * 64-byte NaCl secret key ({@code seed || pubkey}).
+     */
+    public byte[] ed25519Seed() {
+        byte[] pkcs8 = ed25519.getPrivate().getEncoded();
+        if (pkcs8.length < ED25519_PKCS8_SEED_OFFSET + 32) {
+            throw new IllegalStateException(
+                    "Unexpected PKCS#8 length: " + pkcs8.length);
+        }
+        return Arrays.copyOfRange(pkcs8,
+                ED25519_PKCS8_SEED_OFFSET,
+                ED25519_PKCS8_SEED_OFFSET + 32);
+    }
+
+    /**
+     * 64-byte NaCl-format Ed25519 secret key (expanded form).
+     *
+     * <p>This is the format expected by libtorrent's
+     * {@code SessionManager.dhtPutItem(pubkey, privkey, entry, salt)}
+     * and {@code Ed25519.sign(message, pubkey, secretkey)}.
+     *
+     * <p>The NaCl secret key is derived from the seed via
+     * {@code Ed25519.createKeypair(seed)} — it is NOT a simple
+     * concatenation of seed and pubkey.
+     */
+    public byte[] ed25519SecretKeyNaCl() {
+        byte[] seed = ed25519Seed();
+        com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
+                com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
+        return pair.second;
     }
 
     /**

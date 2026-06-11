@@ -171,6 +171,39 @@ class IdentityKeysTest {
     }
 
     @Test
+    void ed25519SeedIs32Bytes() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate();
+        byte[] seed = keys.ed25519Seed();
+        assertEquals(32, seed.length, "Ed25519 seed must be 32 bytes");
+    }
+
+    @Test
+    void ed25519SecretKeyNaClIs64Bytes() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate();
+        byte[] sk = keys.ed25519SecretKeyNaCl();
+        assertEquals(64, sk.length, "NaCl secret key is 64 bytes (expanded form)");
+    }
+
+    @Test
+    void naclSecretKeyRoundTripsWithSeed() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate();
+        byte[] seed = keys.ed25519Seed();
+
+        // Derive the keypair using libtorrent's Ed25519 helper
+        com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
+                com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
+        byte[] naclPub = pair.first;
+        byte[] naclSk = pair.second;
+
+        // The NaCl pubkey derived from the seed must match our Java pubkey
+        assertArrayEquals(keys.ed25519PubRaw(), naclPub,
+                "NaCl pubkey from seed must match Java Ed25519 pubkey");
+        // The NaCl secret key must match our constructed one
+        assertArrayEquals(keys.ed25519SecretKeyNaCl(), naclSk,
+                "NaCl sk = seed || pubkey must match Ed25519.createKeypair output");
+    }
+
+    @Test
     void generateProducesDifferentKeysEachTime() throws Exception {
         IdentityKeys k1 = IdentityKeys.generate();
         IdentityKeys k2 = IdentityKeys.generate();
