@@ -24,6 +24,8 @@ import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.KarmaChainCommitScheduler;
+import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
@@ -420,8 +422,8 @@ final class Initializer {
      * index, loads (or generates) the node's cryptographic identity, installs
      * the auto-indexer on BTEngine, opens the karma chain table, wires
      * download-completion endorsements to a Bitcoin-anchored karma chain,
-     * and hands the index to the LOCAL search engine so user searches can
-     * query it.
+     * starts the periodic commit-and-publish scheduler, and hands the
+     * index to the LOCAL search engine so user searches can query it.
      *
      * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
      * {@code DownloadManagerImpl} listener is already registered — the
@@ -456,7 +458,14 @@ final class Initializer {
             BTEngineListenerChain.install(btEngine,
                     new KarmaEndorsementTrigger(localIndex, identity.ed25519PubRaw(), karmaWriter));
 
-            // 5. Hand the index to the LOCAL search engine.
+            // 5. Start the periodic commit-and-publish scheduler so the
+            //    chain advances and stays visible to peers even when no
+            //    downloads are happening.
+            KarmaChainPublisher karmaPublisher = new KarmaChainPublisher(karmaWriter, identity);
+            new KarmaChainCommitScheduler(karmaWriter, karmaPublisher,
+                    com.frostwire.search.relay.RelayConstants.KARMA_COMMIT_INTERVAL_SEC).start();
+
+            // 6. Hand the index to the LOCAL search engine.
             LocalSearchEngineWire.setIndex(localIndex);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
