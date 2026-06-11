@@ -21,6 +21,7 @@ package com.limegroup.gnutella;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
+import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.UpdateSettings;
 
@@ -50,7 +51,7 @@ public final class DownloadManagerImpl implements DownloadManager {
     public void loadSavedDownloadsAndScheduleWriting() {
         try {
             BTEngine engine = BTEngine.getInstance();
-            engine.setListener(new BTEngineAdapter() {
+            BTEngineListenerChain.install(engine, new BTEngineAdapter() {
                 @Override
                 public void downloadAdded(BTEngine engine, BTDownload dl) {
 
@@ -81,7 +82,7 @@ public final class DownloadManagerImpl implements DownloadManager {
                 public void downloadUpdate(BTEngine engine, BTDownload dl) {
                     updateDownload(dl);
                 }
-            });
+            });  // BTEngineListenerChain.install preserves any existing listener
             engine.restoreDownloads();
         } catch (Throwable e) {
             LOG.error("General error loading saved downloads", e);

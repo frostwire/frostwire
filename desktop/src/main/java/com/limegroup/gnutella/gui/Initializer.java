@@ -144,8 +144,8 @@ final class Initializer {
         loadLateTasksForUI();
         // Start the core & run any queued control requests, and load DAAP.
         //System.out.println("Initializer.initialize() start core");
-        startCore(limeWireCore);
         startRelayStack();
+        startCore(limeWireCore);
         runQueuedRequests(limeWireCore);
         if (OSUtils.isMacOSX()) {
             GURLHandler.getInstance().register();
