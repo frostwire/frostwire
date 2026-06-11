@@ -20,7 +20,13 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.search.relay.BlockHeaderSource;
+import com.frostwire.search.relay.BTEngineListenerChain;
+import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.KarmaChainTable;
+import com.frostwire.search.relay.KarmaChainWriter;
+import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndexTable;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -412,12 +418,15 @@ final class Initializer {
     /**
      * Wires the distributed-search relay stack: opens the local torrent
      * index, loads (or generates) the node's cryptographic identity, installs
-     * the auto-indexer on BTEngine, and hands the index to the LOCAL search
-     * engine so user searches can query it.
+     * the auto-indexer on BTEngine, opens the karma chain table, wires
+     * download-completion endorsements to a Bitcoin-anchored karma chain,
+     * and hands the index to the LOCAL search engine so user searches can
+     * query it.
      *
      * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
      * {@code DownloadManagerImpl} listener is already registered — the
-     * indexer installer chains onto it via {@code BTEngineListenerChain}.
+     * indexer and endorsement-trigger installers chain onto it via
+     * {@code BTEngineListenerChain}.
      */
     private void startRelayStack() {
         try {
@@ -437,7 +446,17 @@ final class Initializer {
             BTEngine btEngine = BTEngine.getInstance();
             SharedTorrentIndexerInstaller.install(btEngine, localIndex, identity);
 
-            // 4. Hand the index to the LOCAL search engine.
+            // 4. Open the karma chain table and wire download-completion
+            //    endorsements to a Bitcoin-anchored chain.
+            KarmaChainTable karmaTable = KarmaChainTable.open(dbFile);
+            File bitcoinCacheDir = new File(homeDir,
+                    com.frostwire.search.relay.RelayConstants.BITCOIN_HEADER_CACHE_DIR);
+            BlockHeaderSource blockSource = new HttpBlockHeaderFetcher(bitcoinCacheDir);
+            KarmaChainWriter karmaWriter = new KarmaChainWriter(identity, blockSource, karmaTable);
+            BTEngineListenerChain.install(btEngine,
+                    new KarmaEndorsementTrigger(localIndex, identity.ed25519PubRaw(), karmaWriter));
+
+            // 5. Hand the index to the LOCAL search engine.
             LocalSearchEngineWire.setIndex(localIndex);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.

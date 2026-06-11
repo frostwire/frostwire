@@ -40,6 +40,7 @@ public final class RelayConstants {
     public static final int EVENT_LOG_MAX_ROWS = 10_000;
     public static final String EVENT_LOG_PATH = "distributed_search_log.jsonl";
     public static final String IDENTITY_FILE = "identity.dat";
+    public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
 
     private RelayConstants() {
     }
