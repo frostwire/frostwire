@@ -17,6 +17,8 @@ public final class RelayConstants {
     public static final int RELAY_REGISTRY_TTL_SEC = 30 * 60;
     public static final int IDENTITY_REPUBLISH_INTERVAL_SEC = 5 * 60;
     public static final int RELAY_REPUBLISH_INTERVAL_SEC = 5 * 60;
+    public static final int KARMA_COMMIT_INTERVAL_SEC = 30 * 60;
+    public static final int KARMA_PUBLISH_INTERVAL_SEC = 30 * 60;
     public static final int DEFAULT_MAX_QPS = 5;
     public static final int WOT_MAX_DEPTH = 3;
 
