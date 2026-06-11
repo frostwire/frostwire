@@ -138,7 +138,14 @@ public final class IdentityKeys {
 
     /**
      * Load an existing identity from {@code file}, or generate a fresh
-     * one and persist it. The file parent directory is created if missing.
+     * one (with proof-of-work at {@link KarmaConstants#IDENTITY_DIFFICULTY}
+     * leading zero bits) and persist it. The file parent directory is
+     * created if missing.
+     *
+     * <p>Migration: if an existing identity does not meet the PoW
+     * difficulty, it is accepted as-is. PoW is enforced on new identity
+     * creation only; legacy identities from before the PoW feature
+     * continue to work.
      */
     public static IdentityKeys loadOrCreate(File file) throws IOException, GeneralSecurityException {
         if (file == null) {
@@ -147,19 +154,63 @@ public final class IdentityKeys {
         if (file.exists() && file.length() > 0) {
             return load(file);
         }
-        IdentityKeys keys = generate();
+        IdentityKeys keys = generate(KarmaConstants.IDENTITY_DIFFICULTY);
         save(keys, file);
         LOG.info("Generated new identity keys at " + file.getAbsolutePath());
         return keys;
     }
 
-    /** Generate a fresh identity with random Ed25519 and X25519 key pairs. */
+    /** Generate a fresh identity with no proof-of-work requirement. */
     public static IdentityKeys generate() throws GeneralSecurityException {
-        KeyPair ed = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        return generate(0);
+    }
+
+    /**
+     * Generate a PoW-qualified identity. Loops until
+     * {@code SHA-1(ed25519PubRaw)} has at least {@code minDifficulty}
+     * leading zero bits. With {@code minDifficulty=0}, the first
+     * generated keypair is returned. With {@code minDifficulty=20},
+     * the loop runs until ~1 million SHA-1 attempts yield a qualifying
+     * pubkey (~2-3 seconds on modern hardware).
+     */
+    public static IdentityKeys generate(int minDifficulty) throws GeneralSecurityException {
+        if (minDifficulty < 0) {
+            throw new IllegalArgumentException("minDifficulty must be >= 0");
+        }
+        KeyPairGenerator edGen = KeyPairGenerator.getInstance("Ed25519");
         KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
         xdh.initialize(NamedParameterSpec.X25519);
-        KeyPair x = xdh.generateKeyPair();
-        return new IdentityKeys(ed, x);
+
+        while (true) {
+            KeyPair ed = edGen.generateKeyPair();
+            byte[] rawPub = IdentityRecord.extractRawEd25519(ed.getPublic());
+            if (minDifficulty == 0 || countLeadingZeroBits(sha1(rawPub)) >= minDifficulty) {
+                return new IdentityKeys(ed, xdh.generateKeyPair());
+            }
+        }
+    }
+
+    /**
+     * Count the number of leading zero bits in {@code hash}, from the
+     * most significant bit of byte 0 downward. A hash of all zeros
+     * returns 160 (SHA-1 length in bits). A hash whose first bit is
+     * set returns 0.
+     */
+    static int countLeadingZeroBits(byte[] hash) {
+        if (hash == null) {
+            throw new IllegalArgumentException("hash is null");
+        }
+        int count = 0;
+        for (int i = 0; i < hash.length; i++) {
+            int b = hash[i] & 0xFF;
+            if (b == 0) {
+                count += 8;
+            } else {
+                count += Integer.numberOfLeadingZeros(b) - 24;
+                break;
+            }
+        }
+        return count;
     }
 
     /**

@@ -214,6 +214,59 @@ class IdentityKeysTest {
                 "Two generates should produce different node IDs");
     }
 
+    // --- PoW mining tests ---
+
+    @Test
+    void countLeadingZeroBitsAllZeros() {
+        assertEquals(160, IdentityKeys.countLeadingZeroBits(new byte[20]),
+                "20 zero bytes = 160 leading zero bits");
+    }
+
+    @Test
+    void countLeadingZeroBitsFirstBitSet() {
+        byte[] hash = new byte[20];
+        hash[0] = (byte) 0x80;
+        assertEquals(0, IdentityKeys.countLeadingZeroBits(hash),
+                "0x80 in byte 0 means 0 leading zero bits");
+    }
+
+    @Test
+    void countLeadingZeroBitsMixedByte() {
+        byte[] hash = new byte[20];
+        hash[0] = 0x00;
+        hash[1] = 0x01;
+        // 8 zero bits from byte 0, then 7 leading zero bits in byte 1 (0x01 = 00000001)
+        assertEquals(15, IdentityKeys.countLeadingZeroBits(hash));
+    }
+
+    @Test
+    void countLeadingZeroBitsRejectsNull() {
+        assertThrows(IllegalArgumentException.class,
+                () -> IdentityKeys.countLeadingZeroBits(null));
+    }
+
+    @Test
+    void generateWithDifficultyProducesQualifyingNodeId() throws Exception {
+        // Use a low difficulty so the test is fast; verify the contract.
+        IdentityKeys keys = IdentityKeys.generate(8);
+        int actual = IdentityKeys.countLeadingZeroBits(keys.nodeId());
+        assertTrue(actual >= 8,
+                "nodeId must have at least 8 leading zero bits, got " + actual);
+    }
+
+    @Test
+    void generateZeroDifficultyAlwaysSucceeds() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate(0);
+        assertNotNull(keys);
+        assertEquals(32, keys.ed25519PubRaw().length);
+    }
+
+    @Test
+    void generateRejectsNegativeDifficulty() {
+        assertThrows(IllegalArgumentException.class,
+                () -> IdentityKeys.generate(-1));
+    }
+
     private static void deleteRecursive(File f) {
         if (f == null || !f.exists()) return;
         if (f.isDirectory()) {
