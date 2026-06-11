@@ -29,9 +29,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * {@link LocalSharedTorrent} row into the configured
  * {@link LocalIndex}.
  *
- * <p>The publisher identity fields are filled with placeholder zero
- * bytes for now; the dedicated {@code IdentityKeys} generator will
- * replace them once it lands.
+ * <p>When constructed with an {@link IdentityKeys}, the publisher
+ * fields carry the node's real Ed25519 public key and derived node
+ * ID. When constructed without keys (e.g. unit tests), placeholder
+ * zero bytes are used.
  */
 public final class SharedTorrentIndexer implements BTEngineListener {
 
@@ -41,14 +42,29 @@ public final class SharedTorrentIndexer implements BTEngineListener {
     private static final Logger LOG = Logger.getLogger(SharedTorrentIndexer.class);
 
     private final LocalIndex index;
+    private final byte[] publisherNodeId;
+    private final byte[] publisherEd25519Pub;
     private final AtomicReference<TorrentInfoSource> torrentInfoSource = new AtomicReference<>(
             new DefaultTorrentInfoSource());
 
+    /** Construct with placeholder identity (for tests). */
     public SharedTorrentIndexer(LocalIndex index) {
+        this(index, null);
+    }
+
+    /** Construct with a real node identity. */
+    public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity) {
         if (index == null) {
             throw new IllegalArgumentException("index is null");
         }
         this.index = index;
+        if (identity != null) {
+            this.publisherNodeId = identity.nodeId();
+            this.publisherEd25519Pub = identity.ed25519PubRaw();
+        } else {
+            this.publisherNodeId = new byte[IdentityRecord.NODE_ID_LENGTH];
+            this.publisherEd25519Pub = new byte[IdentityRecord.ED25519_PUB_LENGTH];
+        }
     }
 
     void setTorrentInfoSource(TorrentInfoSource source) {
@@ -108,14 +124,12 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         }
     }
 
-    static LocalSharedTorrent buildTorrent(BTDownload dl, TorrentInfo ti, String infoHashHex) {
+    LocalSharedTorrent buildTorrent(BTDownload dl, TorrentInfo ti, String infoHashHex) {
         long now = Instant.now().getEpochSecond();
         long size = safeSize(ti);
         int fileCount = safeFileCount(ti);
         String name = safeName(dl, ti);
         String filesJson = FilesJson.minimal(fileCount, size);
-        byte[] placeholderPub = new byte[IdentityRecord.ED25519_PUB_LENGTH];
-        byte[] placeholderNodeId = new byte[IdentityRecord.NODE_ID_LENGTH];
 
         return new LocalSharedTorrent.Builder()
                 .infoHash(Hex.decode(infoHashHex))
@@ -123,8 +137,8 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                 .sizeBytes(size)
                 .fileCount(fileCount)
                 .filesJson(filesJson)
-                .publisherNodeId(placeholderNodeId)
-                .publisherEd25519Pub(placeholderPub)
+                .publisherNodeId(publisherNodeId)
+                .publisherEd25519Pub(publisherEd25519Pub)
                 .publisherUtpPort(0)
                 .addedAt(now)
                 .lastSeenAt(now)

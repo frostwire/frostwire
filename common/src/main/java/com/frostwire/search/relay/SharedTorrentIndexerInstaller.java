@@ -18,7 +18,13 @@ public final class SharedTorrentIndexerInstaller {
     private SharedTorrentIndexerInstaller() {
     }
 
+    /** Install with placeholder identity (for tests or headless nodes). */
     public static BTEngineListener install(BTEngine engine, LocalIndex index) {
         return BTEngineListenerChain.install(engine, new SharedTorrentIndexer(index));
+    }
+
+    /** Install with a real node identity. */
+    public static BTEngineListener install(BTEngine engine, LocalIndex index, IdentityKeys identity) {
+        return BTEngineListenerChain.install(engine, new SharedTorrentIndexer(index, identity));
     }
 }
