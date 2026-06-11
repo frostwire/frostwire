@@ -10,6 +10,7 @@ package com.frostwire.search.relay;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineListener;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 
@@ -31,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class KarmaEndorsementTrigger implements BTEngineListener {
 
     private static final Logger LOG = Logger.getLogger(KarmaEndorsementTrigger.class);
+
+    private static final String THREAD_NAME_PREFIX = "karma-endorse-";
 
     private final LocalIndex index;
     private final byte[] ownEd25519Pub;
@@ -115,7 +118,11 @@ public final class KarmaEndorsementTrigger implements BTEngineListener {
             if (allZero) {
                 return;
             }
-            sink.onDownloadCompletedFromPeer(peerPub, hexToBytes(infoHashHex));
+            final byte[] peerPubFinal = peerPub.clone();
+            final byte[] infoHashFinal = hexToBytes(infoHashHex);
+            ThreadExecutor.startThread(
+                    () -> sink.onDownloadCompletedFromPeer(peerPubFinal, infoHashFinal),
+                    THREAD_NAME_PREFIX + infoHashHex);
         } catch (Throwable t) {
             LOG.warn("KarmaEndorsementTrigger error on downloadUpdate", t);
         }
