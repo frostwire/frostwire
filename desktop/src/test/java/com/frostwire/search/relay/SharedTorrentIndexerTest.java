@@ -56,8 +56,9 @@ class SharedTorrentIndexerTest {
 
         // BTDownload is not dereferenced when the source short-circuits; the
         // null parameter is intentional to prove the seam is the boundary.
-        indexer.indexIfReady(null, INFO_HASH_HEX, IndexTrigger.ADDED);
+        IndexResult result = indexer.indexIfReady(null, INFO_HASH_HEX, IndexTrigger.ADDED);
 
+        assertEquals(IndexResult.NULL_INPUT, result, "null dl → NULL_INPUT");
         assertEquals(0, index.upserts.size(), "No metadata means no upsert");
     }
 
@@ -67,10 +68,22 @@ class SharedTorrentIndexerTest {
         SharedTorrentIndexer indexer = new SharedTorrentIndexer(index);
         indexer.setTorrentInfoSource(dl -> null);
 
-        indexer.indexIfReady(null, null, IndexTrigger.ADDED);
-        indexer.indexIfReady(null, INFO_HASH_HEX, null);
+        IndexResult r1 = indexer.indexIfReady(null, null, IndexTrigger.ADDED);
+        IndexResult r2 = indexer.indexIfReady(null, INFO_HASH_HEX, null);
 
+        assertEquals(IndexResult.NULL_INPUT, r1);
+        assertEquals(IndexResult.NULL_INPUT, r2);
         assertEquals(0, index.upserts.size());
+    }
+
+    @Test
+    void indexResultEnumIsExhaustive() {
+        IndexResult[] values = IndexResult.values();
+        assertEquals(4, values.length);
+        assertEquals(IndexResult.UPSERTED, values[0]);
+        assertEquals(IndexResult.NO_METADATA, values[1]);
+        assertEquals(IndexResult.NULL_INPUT, values[2]);
+        assertEquals(IndexResult.ERROR, values[3]);
     }
 
     @Test

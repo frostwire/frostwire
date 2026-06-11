@@ -89,20 +89,22 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                 THREAD_NAME_PREFIX + infoHashHex);
     }
 
-    void indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
+    IndexResult indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
         if (dl == null || infoHashHex == null) {
-            return;
+            return IndexResult.NULL_INPUT;
         }
         try {
             TorrentInfo ti = torrentInfoSource.get().torrentInfo(dl);
             if (ti == null) {
-                return;
+                return IndexResult.NO_METADATA;
             }
             LocalSharedTorrent torrent = buildTorrent(dl, ti, infoHashHex);
             index.upsert(torrent);
             LOG.info("Indexed torrent " + infoHashHex + " from " + trigger.name());
+            return IndexResult.UPSERTED;
         } catch (Throwable t) {
             LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger.name(), t);
+            return IndexResult.ERROR;
         }
     }
 
