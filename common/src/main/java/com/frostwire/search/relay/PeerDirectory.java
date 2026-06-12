@@ -244,6 +244,17 @@ public final class PeerDirectory {
         return entries.size();
     }
 
+    /**
+     * Drop an entry by pubkey. No-op if the entry is not present.
+     * Returns true if an entry was removed.
+     */
+    public boolean evict(byte[] peerPub) {
+        if (peerPub == null || peerPub.length != 32) {
+            return false;
+        }
+        return entries.remove(com.frostwire.util.Hex.encode(peerPub)) != null;
+    }
+
     /** Monotonic version counter; bumps on any write. */
     public long version() {
         return version.get();
