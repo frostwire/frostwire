@@ -22,9 +22,11 @@ import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.BTEngineListenerChain;
+import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
 import com.frostwire.search.relay.KarmaChainPublisher;
@@ -491,10 +493,33 @@ final class Initializer {
             //    RelaySearchService backed by the LOCAL index, and writes
             //    signed RemoteSearchResponse frames back.
             startRelayServer(identity, localIndex, karmaCache);
+
+            // 9. Start the DHT advertiser so other FrostWire nodes can
+            //    discover us: re-publishes our IdentityRecord (BEP 46)
+            //    and announces under the BEP 5 peer topic.
+            startDhtAdvertiser(btEngine, identity);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
             com.frostwire.util.Logger.getLogger(Initializer.class)
                     .warn("Failed to start relay stack; distributed search disabled", e);
+        }
+    }
+
+    /**
+     * Construct a DHT advertiser and start it on a daemon executor.
+     * The uTP port we advertise is the same as the relay server's
+     * listen port (6888 by default) so peers can both find our TCP
+     * endpoint via BEP 5 and our identity record via BEP 46.
+     */
+    private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity) {
+        try {
+            int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
+            IdentityRecordPublisher publisher = new IdentityRecordPublisher(identity, port);
+            new DhtAdvertiser(publisher,
+                    com.frostwire.search.relay.RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC).start();
+        } catch (Throwable t) {
+            com.frostwire.util.Logger.getLogger(Initializer.class)
+                    .warn("Failed to start DHT advertiser; node will not be discoverable", t);
         }
     }
 
