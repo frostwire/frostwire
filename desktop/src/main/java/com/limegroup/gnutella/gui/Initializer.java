@@ -24,6 +24,7 @@ import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
+import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecordPublisher;
@@ -36,6 +37,8 @@ import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
 import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.PeerDiscovery;
+import com.frostwire.search.relay.PeerDiscoveryScheduler;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
@@ -487,17 +490,26 @@ final class Initializer {
             // 7. Hand the index to the LOCAL search engine.
             LocalSearchEngineWire.setIndex(localIndex);
 
-            // 8. Start the relay search server so peers can query our
-            //    local index over the network. The server accepts signed
-            //    RemoteSearchRequest frames, dispatches them to a
-            //    RelaySearchService backed by the LOCAL index, and writes
-            //    signed RemoteSearchResponse frames back.
-            startRelayServer(identity, localIndex, karmaCache);
+            // 8. Construct the shared peer directory (used by both
+            //    the relay server's role and the discovery scheduler)
+            //    and start the relay search server. Discovered peers
+            //    will be registered into this same directory.
+            PeerDirectory directory = new PeerDirectory(karmaCache);
+            startRelayServer(identity, localIndex, directory);
 
             // 9. Start the DHT advertiser so other FrostWire nodes can
             //    discover us: re-publishes our IdentityRecord (BEP 46)
             //    and announces under the BEP 5 peer topic.
             startDhtAdvertiser(btEngine, identity);
+
+            // 10. Start the peer discovery scheduler so we can
+            //     discover other FrostWire nodes via BEP 5. Newly
+            //     discovered endpoints are registered in the
+            //     SHARED PeerDirectory with placeholder pubkeys
+            //     (derived from SHA-256(host:port)). When a peer
+            //     sends us a request, we learn their real pubkey
+            //     and can upgrade the entry.
+            startPeerDiscovery(directory, btEngine);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
             com.frostwire.util.Logger.getLogger(Initializer.class)
@@ -524,6 +536,25 @@ final class Initializer {
     }
 
     /**
+     * Start the peer discovery scheduler so we can find other
+     * FrostWire nodes via BEP 5 and populate the local
+     * {@link PeerDirectory}. By this point BTEngine is already
+     * running (the indexer and karma trigger were installed in
+     * steps 3 and 4), so {@code btEngine} is the live DHT-capable
+     * session.
+     */
+    private void startPeerDiscovery(PeerDirectory directory, BTEngine btEngine) {
+        try {
+            DhtPeerDiscoverySource source = new DhtPeerDiscoverySource(btEngine);
+            PeerDiscovery discovery = new PeerDiscovery(source, directory);
+            new PeerDiscoveryScheduler(discovery, 5 * 60).start();
+        } catch (Throwable t) {
+            com.frostwire.util.Logger.getLogger(Initializer.class)
+                    .warn("Failed to start peer discovery; will not learn about other peers", t);
+        }
+    }
+
+    /**
      * Construct the relay search service + role + TCP server, and
      * start listening. The server is daemon-threaded and does not
      * prevent JVM exit. If the listen port is already in use, the
@@ -531,11 +562,10 @@ final class Initializer {
      * rest of the relay stack still functions.
      */
     private void startRelayServer(IdentityKeys identity, LocalIndex localIndex,
-                                  PeerKarmaCache karmaCache) {
+                                  PeerDirectory directory) {
         try {
             int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
             RelaySearchService service = new RelaySearchService(localIndex, identity);
-            PeerDirectory directory = new PeerDirectory(karmaCache);
             RelayRole role = new RelayRole(service, directory);
             IncomingRelayServer server = new IncomingRelayServer(role, port);
             server.start();
