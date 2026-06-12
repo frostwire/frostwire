@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * additionally memoizes the aggregate result so we don't
  * re-iterate the chain on every score lookup.
  */
-public final class PeerKarmaCache {
+public class PeerKarmaCache {
 
     private static final Logger LOG = Logger.getLogger(PeerKarmaCache.class);
 
