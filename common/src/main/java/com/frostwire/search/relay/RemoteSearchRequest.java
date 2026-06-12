@@ -323,4 +323,54 @@ public final class RemoteSearchRequest {
         m.put("sig", Base64.getEncoder().withoutPadding().encodeToString(signature));
         return m;
     }
+
+    /**
+     * Reconstruct a request from a bencodeable map (the inverse of
+     * {@link #toBencodeableMap()}). Returns null if the map is null
+     * or missing required fields.
+     */
+    public static RemoteSearchRequest fromBencodeableMap(Map<String, Object> m) {
+        if (m == null) {
+            return null;
+        }
+        try {
+            Object vObj = m.get("v");
+            Object kObj = m.get("k");
+            Object limObj = m.get("lim");
+            Object nonceObj = m.get("nonce");
+            Object ttlObj = m.get("ttl");
+            Object pubObj = m.get("pub");
+            Object pathObj = m.get("path");
+            Object tsObj = m.get("ts");
+            Object sigObj = m.get("sig");
+            if (vObj == null || kObj == null || limObj == null
+                    || nonceObj == null || ttlObj == null
+                    || pubObj == null || tsObj == null || sigObj == null) {
+                return null;
+            }
+            byte[] nonce = Base64.getDecoder().decode((String) nonceObj);
+            byte[] requesterPub = Base64.getDecoder().decode((String) pubObj);
+            byte[] sig = Base64.getDecoder().decode((String) sigObj);
+            byte[][] path = new byte[0][];
+            if (pathObj instanceof java.util.List) {
+                java.util.List<?> plist = (java.util.List<?>) pathObj;
+                path = new byte[plist.size()][];
+                for (int i = 0; i < plist.size(); i++) {
+                    path[i] = Base64.getDecoder().decode((String) plist.get(i));
+                }
+            }
+            return RemoteSearchRequest.builder()
+                    .keywords((String) kObj)
+                    .limit(((Number) limObj).intValue())
+                    .nonce(nonce)
+                    .ttl(((Number) ttlObj).intValue())
+                    .requesterPub(requesterPub)
+                    .path(path)
+                    .timestamp(((Number) tsObj).longValue())
+                    .signature(sig)
+                    .build();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

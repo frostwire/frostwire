@@ -161,6 +161,94 @@ public final class RemoteSearchResponse {
                 ", ts=" + timestamp + "}";
     }
 
+    /**
+     * Convert to a bencodeable map for transport. Used by the wire
+     * codec to serialize the response.
+     */
+    public Map<String, Object> toBencodeableMap() {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("v", version);
+        m.put("nonce", Base64.getEncoder().withoutPadding().encodeToString(nonce));
+        m.put("ts", timestamp);
+        List<Map<String, Object>> rowMaps = new ArrayList<>(rows.size());
+        for (Row r : rows) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("ih", Hex.encode(r.infoHash));
+            row.put("n", r.name);
+            row.put("s", r.sizeBytes);
+            row.put("fc", (long) r.fileCount);
+            row.put("pub", Base64.getEncoder().withoutPadding()
+                    .encodeToString(r.publisherEd25519Pub));
+            if (r.publisherNodeId != null) {
+                row.put("nid", Hex.encode(r.publisherNodeId));
+            }
+            rowMaps.add(row);
+        }
+        m.put("rows", rowMaps);
+        m.put("sig", Base64.getEncoder().withoutPadding()
+                .encodeToString(signature));
+        return m;
+    }
+
+    /**
+     * Reconstruct a response from a bencodeable map (the inverse of
+     * {@link #toBencodeableMap()}). Returns null if the map is null
+     * or missing required fields.
+     */
+    @SuppressWarnings("unchecked")
+    public static RemoteSearchResponse fromBencodeableMap(Map<String, Object> m) {
+        if (m == null) {
+            return null;
+        }
+        try {
+            Object vObj = m.get("v");
+            Object nonceObj = m.get("nonce");
+            Object tsObj = m.get("ts");
+            Object rowsObj = m.get("rows");
+            Object sigObj = m.get("sig");
+            if (vObj == null || nonceObj == null || tsObj == null
+                    || sigObj == null || rowsObj == null) {
+                return null;
+            }
+            byte[] nonce = Base64.getDecoder().decode((String) nonceObj);
+            byte[] sig = Base64.getDecoder().decode((String) sigObj);
+            RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
+                    .nonce(nonce)
+                    .timestamp(((Number) tsObj).longValue())
+                    .signature(sig);
+            if (rowsObj instanceof List) {
+                List<?> rlist = (List<?>) rowsObj;
+                for (Object ro : rlist) {
+                    if (!(ro instanceof Map)) {
+                        return null;
+                    }
+                    Map<String, Object> row = (Map<String, Object>) ro;
+                    Object ihObj = row.get("ih");
+                    Object nObj = row.get("n");
+                    Object sObj = row.get("s");
+                    Object fcObj = row.get("fc");
+                    Object pubObj = row.get("pub");
+                    if (ihObj == null || nObj == null || sObj == null
+                            || fcObj == null || pubObj == null) {
+                        return null;
+                    }
+                    byte[] ih = Hex.decode((String) ihObj);
+                    byte[] pub = Base64.getDecoder().decode((String) pubObj);
+                    byte[] nid = null;
+                    Object nidObj = row.get("nid");
+                    if (nidObj != null) {
+                        nid = Hex.decode((String) nidObj);
+                    }
+                    b.addRow(ih, (String) nObj, ((Number) sObj).longValue(),
+                            ((Number) fcObj).intValue(), pub, nid);
+                }
+            }
+            return b.build();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     /** Immutable search result row. */
     public static final class Row {
         public final byte[] infoHash;
