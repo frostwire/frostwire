@@ -268,6 +268,107 @@ public final class KarmaChainEntry {
     }
 
     /**
+     * Reconstruct a chain entry from a bencoded dictionary as published
+     * by {@link KarmaChainPublisher}. Does NOT verify the signature —
+     * use {@link KarmaChain#verify(java.util.List)} for that, since
+     * verification requires the full chain context.
+     *
+     * <p>Field names match the publisher's manifest format:
+     * <ul>
+     *   <li>{@code k}: kind code ({@code "EC"} or {@code "EN"})</li>
+     *   <li>{@code seq}: 0-based sequence number</li>
+     *   <li>{@code bh}: Bitcoin block height</li>
+     *   <li>{@code bkh}: Bitcoin block hash (hex)</li>
+     *   <li>{@code ph}: previous entry hash (hex)</li>
+     *   <li>{@code pub}: endorser public key (base64url, no padding)</li>
+     *   <li>{@code s}: signature (base64url, no padding)</li>
+     *   <li>EC only: {@code ep} (epoch), {@code en} (energy, decimal string)</li>
+     *   <li>EN only: {@code pp} (peer pub, base64url), {@code ih} (info hash hex),
+     *       {@code sd} (score delta)</li>
+     * </ul>
+     *
+     * <p>Timestamp is not present in the published manifest; it is
+     * reconstructed as 0 (the canonical signing form does not include
+     * it either, so {@link #verifySignature()} works correctly).
+     *
+     * @return a new entry, or null if the dict is missing required
+     *         fields or has the wrong shape for the declared kind
+     */
+    public static KarmaChainEntry reconstruct(Map<String, Entry> dict) {
+        if (dict == null) {
+            return null;
+        }
+        try {
+            Entry kindEntry = dict.get("k");
+            Entry seqEntry = dict.get("seq");
+            Entry bhEntry = dict.get("bh");
+            Entry bkhEntry = dict.get("bkh");
+            Entry phEntry = dict.get("ph");
+            Entry pubEntry = dict.get("pub");
+            Entry sigEntry = dict.get("s");
+            if (kindEntry == null || seqEntry == null || bhEntry == null
+                    || bkhEntry == null || phEntry == null
+                    || pubEntry == null || sigEntry == null) {
+                return null;
+            }
+
+            String kindCode = kindEntry.string();
+            Kind kind;
+            if ("EC".equals(kindCode)) {
+                kind = Kind.EPOCH_COMMITMENT;
+            } else if ("EN".equals(kindCode)) {
+                kind = Kind.ENDORSEMENT;
+            } else {
+                return null;
+            }
+
+            Builder b = new Builder();
+            b.kind = kind;
+            b.prevHash = Hex.decode(phEntry.string());
+            b.seq = seqEntry.integer();
+            b.endorserPub = Base64.getDecoder().decode(pubEntry.string());
+            b.timestamp = 0L;
+            b.signature = Base64.getDecoder().decode(sigEntry.string());
+            b.blockHeight = bhEntry.integer();
+            b.blockHash = Hex.decode(bkhEntry.string());
+
+            if (kind == Kind.EPOCH_COMMITMENT) {
+                Entry epEntry = dict.get("ep");
+                Entry enEntry = dict.get("en");
+                if (epEntry == null || enEntry == null) {
+                    return null;
+                }
+                b.epoch = epEntry.integer();
+                try {
+                    b.energy = Double.parseDouble(enEntry.string());
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+                if (b.energy < 0 || b.energy > KarmaConstants.MAX_ENERGY + 0.01) {
+                    return null;
+                }
+            } else {
+                Entry ppEntry = dict.get("pp");
+                Entry ihEntry = dict.get("ih");
+                Entry sdEntry = dict.get("sd");
+                if (ppEntry == null || ihEntry == null || sdEntry == null) {
+                    return null;
+                }
+                b.peerPub = Base64.getDecoder().decode(ppEntry.string());
+                b.infoHash = Hex.decode(ihEntry.string());
+                if (b.infoHash.length != 20) {
+                    return null;
+                }
+                b.scoreDelta = (int) sdEntry.integer();
+            }
+            return b.build();
+        } catch (Throwable t) {
+            LOG.debug("Failed to reconstruct chain entry from manifest", t);
+            return null;
+        }
+    }
+
+    /**
      * Verifies the Ed25519 signature against the canonical bytes.
      */
     public boolean verifySignature() {

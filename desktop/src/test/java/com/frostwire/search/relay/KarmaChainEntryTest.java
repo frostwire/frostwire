@@ -7,10 +7,14 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.jlibtorrent.Entry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -209,5 +213,147 @@ class KarmaChainEntryTest {
         for (byte b : KarmaChainEntry.GENESIS_PREV_HASH) {
             assertEquals(0, b);
         }
+    }
+
+    // --- reconstruct() tests ---
+
+    @Test
+    void reconstructReturnsNullForNullDict() {
+        assertNull(KarmaChainEntry.reconstruct(null));
+    }
+
+    @Test
+    void reconstructRoundTripsEpochCommitment() {
+        KarmaChainEntry original = KarmaChainEntry.createEpochCommitment(
+                KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw, block, 5.0,
+                keyPair.getPrivate());
+
+        KarmaChainEntry reconstructed = KarmaChainEntry.reconstruct(publishDictOf(original));
+        assertNotNull(reconstructed);
+        assertEquals(original.kind(), reconstructed.kind());
+        assertEquals(original.seq(), reconstructed.seq());
+        assertEquals(original.blockHeight(), reconstructed.blockHeight());
+        assertArrayEquals(original.blockHash(), reconstructed.blockHash());
+        assertArrayEquals(original.prevHash(), reconstructed.prevHash());
+        assertArrayEquals(original.endorserPub(), reconstructed.endorserPub());
+        assertArrayEquals(original.signature(), reconstructed.signature());
+        assertEquals(original.energy(), reconstructed.energy(), 0.001);
+        assertEquals(original.epoch(), reconstructed.epoch());
+        assertTrue(reconstructed.verifySignature(),
+                "Reconstructed entry's signature must still verify");
+    }
+
+    @Test
+    void reconstructRoundTripsEndorsement() {
+        byte[] peerPub = new byte[32];
+        peerPub[0] = (byte) 0xAB;
+        byte[] infoHash = new byte[20];
+        for (int i = 0; i < 20; i++) infoHash[i] = (byte) (i + 1);
+
+        KarmaChainEntry original = KarmaChainEntry.createEndorsement(
+                KarmaChainEntry.GENESIS_PREV_HASH, 1, pubRaw, block,
+                peerPub, infoHash, 1, keyPair.getPrivate());
+
+        KarmaChainEntry reconstructed = KarmaChainEntry.reconstruct(publishDictOf(original));
+        assertNotNull(reconstructed);
+        assertEquals(KarmaChainEntry.Kind.ENDORSEMENT, reconstructed.kind());
+        assertArrayEquals(peerPub, reconstructed.peerPub());
+        assertArrayEquals(infoHash, reconstructed.infoHash());
+        assertEquals(1, reconstructed.scoreDelta());
+        assertTrue(reconstructed.verifySignature());
+    }
+
+    @Test
+    void reconstructReturnsNullForUnknownKind() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("k", new Entry("XX"));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForMissingFields() {
+        Map<String, Entry> dict = baseDict();
+        dict.remove("s");
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForEpochCommitmentMissingEpoch() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("k", new Entry("EC"));
+        dict.put("en", new Entry("5.00"));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForEndorsementMissingPeerPub() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("k", new Entry("EN"));
+        dict.put("ih", new Entry(com.frostwire.util.Hex.encode(new byte[20])));
+        dict.put("sd", new Entry(1L));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForBadHexInBlockHash() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("bkh", new Entry("not-valid-hex"));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForMalformedEnergy() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("k", new Entry("EC"));
+        dict.put("ep", new Entry(1L));
+        dict.put("en", new Entry("not-a-number"));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    @Test
+    void reconstructReturnsNullForEnergyOutOfRange() {
+        Map<String, Entry> dict = baseDict();
+        dict.put("k", new Entry("EC"));
+        dict.put("ep", new Entry(1L));
+        dict.put("en", new Entry("9999.00"));
+        assertNull(KarmaChainEntry.reconstruct(dict));
+    }
+
+    private Map<String, Entry> baseDict() {
+        Map<String, Entry> dict = new HashMap<>();
+        dict.put("k", new Entry("EC"));
+        dict.put("seq", new Entry(0L));
+        dict.put("bh", new Entry(850000L));
+        dict.put("bkh", new Entry(com.frostwire.util.Hex.encode(block.hash())));
+        dict.put("ph", new Entry(com.frostwire.util.Hex.encode(KarmaChainEntry.GENESIS_PREV_HASH)));
+        dict.put("pub", new Entry(Base64.getEncoder()
+                .withoutPadding().encodeToString(pubRaw)));
+        dict.put("s", new Entry(Base64.getEncoder()
+                .withoutPadding().encodeToString(new byte[64])));
+        return dict;
+    }
+
+    private Map<String, Entry> publishDictOf(KarmaChainEntry e) {
+        Map<String, Entry> dict = new HashMap<>();
+        dict.put("k", new Entry(e.kind().code()));
+        dict.put("seq", new Entry(e.seq()));
+        dict.put("bh", new Entry(e.blockHeight()));
+        dict.put("bkh", new Entry(com.frostwire.util.Hex.encode(e.blockHash())));
+        dict.put("ph", new Entry(com.frostwire.util.Hex.encode(e.prevHash())));
+        dict.put("pub", new Entry(Base64.getEncoder()
+                .withoutPadding().encodeToString(e.endorserPub())));
+        dict.put("s", new Entry(Base64.getEncoder()
+                .withoutPadding().encodeToString(e.signature())));
+        if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+            dict.put("ep", new Entry(e.epoch()));
+            dict.put("en", new Entry(String.format(java.util.Locale.ROOT,
+                    "%.3f", e.energy())));
+        } else {
+            dict.put("pp", new Entry(Base64.getEncoder()
+                    .withoutPadding().encodeToString(e.peerPub())));
+            dict.put("ih", new Entry(com.frostwire.util.Hex.encode(e.infoHash())));
+            dict.put("sd", new Entry(e.scoreDelta().longValue()));
+        }
+        return dict;
     }
 }
