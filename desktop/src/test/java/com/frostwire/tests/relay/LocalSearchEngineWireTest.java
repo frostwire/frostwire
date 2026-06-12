@@ -81,6 +81,23 @@ class LocalSearchEngineWireTest {
         assertTrue(found, "LOCAL engine must appear in getEngines()");
     }
 
+    @Test
+    void setKarmaCacheAcceptsNullAndNonNull() {
+        // setKarmaCache should accept null (disables weighting) and a real cache
+        // (enables it). It must not throw on either path.
+        com.frostwire.search.relay.PeerKarmaCache cache = new com.frostwire.search.relay.PeerKarmaCache(
+                new com.frostwire.search.relay.RemoteKarmaChainFetcher(
+                        new com.frostwire.search.relay.KarmaChainSource() {
+                            @Override
+                            public com.frostwire.jlibtorrent.Entry fetchManifest(byte[] peerPub) {
+                                return null;
+                            }
+                        }));
+        LocalSearchEngineWire.setKarmaCache(null);
+        LocalSearchEngineWire.setKarmaCache(cache);
+        LocalSearchEngineWire.setKarmaCache(null); // restore to no-weighting
+    }
+
     private static final class NoopLocalIndex implements LocalIndex {
         @Override
         public void upsert(LocalSharedTorrent torrent) {

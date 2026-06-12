@@ -22,6 +22,7 @@ import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.BTEngineListenerChain;
+import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
@@ -30,6 +31,8 @@ import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndexTable;
+import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
@@ -465,7 +468,14 @@ final class Initializer {
             new KarmaChainCommitScheduler(karmaWriter, karmaPublisher,
                     com.frostwire.search.relay.RelayConstants.KARMA_COMMIT_INTERVAL_SEC).start();
 
-            // 6. Hand the index to the LOCAL search engine.
+            // 6. Wire the karma cache into the LOCAL search engine so
+            //    user searches can weight results by the publisher's karma.
+            RemoteKarmaChainFetcher karmaFetcher = new RemoteKarmaChainFetcher(
+                    new DhtKarmaChainSource(btEngine));
+            PeerKarmaCache karmaCache = new PeerKarmaCache(karmaFetcher);
+            LocalSearchEngineWire.setKarmaCache(karmaCache);
+
+            // 7. Hand the index to the LOCAL search engine.
             LocalSearchEngineWire.setIndex(localIndex);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.

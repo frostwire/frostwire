@@ -291,7 +291,7 @@ public abstract class SearchEngine {
             if (!isReady()) {
                 throw new RuntimeException("Local search engine has no LocalIndex installed; call LocalSearchEngineWire.setIndex(...) before searching.");
             }
-            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex);
+            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
         }
 
         @Override
@@ -304,6 +304,9 @@ public abstract class SearchEngine {
 
     /** Holder for the LocalIndex backing the LOCAL engine; set by an installer at app start. */
     private volatile LocalIndex localIndex;
+
+    /** Optional karma cache for weighting LOCAL search results. */
+    private volatile com.frostwire.search.relay.PeerKarmaCache karmaCache;
 
     private final SearchEngineID _id;
     private final String _name;
@@ -422,6 +425,16 @@ public abstract class SearchEngine {
      */
     public SearchEngine setLocalIndex(LocalIndex index) {
         this.localIndex = index;
+        return this;
+    }
+
+    /**
+     * Installs the optional {@link com.frostwire.search.relay.PeerKarmaCache}
+     * used to weight LOCAL search results by the publisher's karma score.
+     * Pass {@code null} to disable karma weighting.
+     */
+    public SearchEngine setKarmaCache(com.frostwire.search.relay.PeerKarmaCache karmaCache) {
+        this.karmaCache = karmaCache;
         return this;
     }
 }
