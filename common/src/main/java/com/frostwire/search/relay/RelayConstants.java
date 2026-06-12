@@ -44,6 +44,12 @@ public final class RelayConstants {
     public static final String IDENTITY_FILE = "identity.dat";
     public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
 
+    /**
+     * Default TCP port for the relay search server. Separate from
+     * the BitTorrent listen port range to avoid conflicts.
+     */
+    public static final int RELAY_LISTEN_PORT = 6888;
+
     private RelayConstants() {
     }
 

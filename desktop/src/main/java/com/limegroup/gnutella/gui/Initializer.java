@@ -25,13 +25,18 @@ import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
 import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
+import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
+import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.RelayRole;
+import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -425,8 +430,10 @@ final class Initializer {
      * index, loads (or generates) the node's cryptographic identity, installs
      * the auto-indexer on BTEngine, opens the karma chain table, wires
      * download-completion endorsements to a Bitcoin-anchored karma chain,
-     * starts the periodic commit-and-publish scheduler, and hands the
-     * index to the LOCAL search engine so user searches can query it.
+     * starts the periodic commit-and-publish scheduler, hands the
+     * index to the LOCAL search engine so user searches can query it,
+     * and starts the relay search server so peers can query our index
+     * over the network.
      *
      * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
      * {@code DownloadManagerImpl} listener is already registered — the
@@ -477,10 +484,43 @@ final class Initializer {
 
             // 7. Hand the index to the LOCAL search engine.
             LocalSearchEngineWire.setIndex(localIndex);
+
+            // 8. Start the relay search server so peers can query our
+            //    local index over the network. The server accepts signed
+            //    RemoteSearchRequest frames, dispatches them to a
+            //    RelaySearchService backed by the LOCAL index, and writes
+            //    signed RemoteSearchResponse frames back.
+            startRelayServer(identity, localIndex, karmaCache);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
             com.frostwire.util.Logger.getLogger(Initializer.class)
                     .warn("Failed to start relay stack; distributed search disabled", e);
+        }
+    }
+
+    /**
+     * Construct the relay search service + role + TCP server, and
+     * start listening. The server is daemon-threaded and does not
+     * prevent JVM exit. If the listen port is already in use, the
+     * failure is logged and the relay server is left disabled; the
+     * rest of the relay stack still functions.
+     */
+    private void startRelayServer(IdentityKeys identity, LocalIndex localIndex,
+                                  PeerKarmaCache karmaCache) {
+        try {
+            int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
+            RelaySearchService service = new RelaySearchService(localIndex, identity);
+            PeerDirectory directory = new PeerDirectory(karmaCache);
+            RelayRole role = new RelayRole(service, directory);
+            IncomingRelayServer server = new IncomingRelayServer(role, port);
+            server.start();
+            com.frostwire.util.Logger.getLogger(Initializer.class)
+                    .info("Relay search server listening on port " + server.port());
+        } catch (java.io.IOException e) {
+            com.frostwire.util.Logger.getLogger(Initializer.class)
+                    .warn("Failed to start relay search server on port "
+                            + com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT
+                            + "; incoming relay search requests will not be served", e);
         }
     }
 
