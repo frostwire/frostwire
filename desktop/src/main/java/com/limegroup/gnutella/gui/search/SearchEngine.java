@@ -19,8 +19,12 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.relay.DistributedSearchPerformer;
+import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
+import com.frostwire.search.relay.OutgoingRelayClient;
+import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.frostclick.FrostClickSearchPattern;
 import com.frostwire.search.nyaa.NyaaSearchPattern;
@@ -73,7 +77,8 @@ public abstract class SearchEngine {
         TORRENTSCSV_ID,
         KNABEN_ID,
         BITSEARCH_ID,
-        LOCAL_ID
+        LOCAL_ID,
+        DISTRIBUTED_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -302,11 +307,44 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine DISTRIBUTED = new SearchEngine(SearchEngineID.DISTRIBUTED_ID, "Distributed", SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED, "distributed") {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Distributed search engine is not ready; install localIndex, peerDirectory, identity, and outgoingRelayClient.");
+            }
+            return new DistributedSearchPerformer(
+                    token,
+                    keywords,
+                    DISTRIBUTED.localIndex,
+                    DISTRIBUTED.peerDirectory,
+                    DISTRIBUTED.identity,
+                    DISTRIBUTED.outgoingRelayClient);
+        }
+
+        @Override
+        public boolean isReady() {
+            return DISTRIBUTED.localIndex != null
+                    && DISTRIBUTED.peerDirectory != null
+                    && DISTRIBUTED.identity != null
+                    && DISTRIBUTED.outgoingRelayClient != null;
+        }
+    };
+
     /** Holder for the LocalIndex backing the LOCAL engine; set by an installer at app start. */
     private volatile LocalIndex localIndex;
 
     /** Optional karma cache for weighting LOCAL search results. */
     private volatile com.frostwire.search.relay.PeerKarmaCache karmaCache;
+
+    /** Holder for authenticated peers used by the DISTRIBUTED engine. */
+    private volatile PeerDirectory peerDirectory;
+
+    /** Holder for this node's identity used by the DISTRIBUTED engine. */
+    private volatile IdentityKeys identity;
+
+    /** Holder for the outgoing relay client used by the DISTRIBUTED engine. */
+    private volatile OutgoingRelayClient outgoingRelayClient;
 
     private final SearchEngineID _id;
     private final String _name;
@@ -333,6 +371,7 @@ public abstract class SearchEngine {
     public static List<SearchEngine> getEngines() {
         return Arrays.asList(
                 LOCAL,
+                DISTRIBUTED,
                 YT,
                 INTERNET_ARCHIVE,
                 BITSEARCH,
@@ -435,6 +474,33 @@ public abstract class SearchEngine {
      */
     public SearchEngine setKarmaCache(com.frostwire.search.relay.PeerKarmaCache karmaCache) {
         this.karmaCache = karmaCache;
+        return this;
+    }
+
+    /**
+     * Installs the {@link PeerDirectory} that backs the DISTRIBUTED engine.
+     * Idempotent; the most recent call wins.
+     */
+    public SearchEngine setPeerDirectory(PeerDirectory peerDirectory) {
+        this.peerDirectory = peerDirectory;
+        return this;
+    }
+
+    /**
+     * Installs the {@link IdentityKeys} that backs the DISTRIBUTED engine.
+     * Idempotent; the most recent call wins.
+     */
+    public SearchEngine setIdentityKeys(IdentityKeys identity) {
+        this.identity = identity;
+        return this;
+    }
+
+    /**
+     * Installs the {@link OutgoingRelayClient} that backs the DISTRIBUTED engine.
+     * Idempotent; the most recent call wins.
+     */
+    public SearchEngine setOutgoingRelayClient(OutgoingRelayClient outgoingRelayClient) {
+        this.outgoingRelayClient = outgoingRelayClient;
         return this;
     }
 }

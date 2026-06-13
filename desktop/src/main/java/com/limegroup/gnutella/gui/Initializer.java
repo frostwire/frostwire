@@ -38,6 +38,7 @@ import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
+import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
@@ -48,6 +49,7 @@ import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
 import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
@@ -513,6 +515,12 @@ final class Initializer {
             //     sends us a request, we learn their real pubkey
             //     and can upgrade the entry.
             startPeerDiscovery(directory, btEngine);
+
+            // 11. Wire the DISTRIBUTED search engine so the user
+            //     can search both the local index and authenticated
+            //     peers from the normal Search UI.
+            DistributedSearchEngineWire.wire(
+                    localIndex, directory, identity, new OutgoingRelayClient());
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
             com.frostwire.util.Logger.getLogger(Initializer.class)
