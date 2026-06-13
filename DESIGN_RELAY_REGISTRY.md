@@ -506,6 +506,9 @@ PEER_BROWSE_STARTED
 
 ## 12. Revised Build Order
 
+The tables below are the historical target order. Section 12.1 records where the current implementation
+actually stands, and section 12.2 defines the stabilization work that now gates the next feature step.
+
 Already done:
 
 | # | Component | Status |
@@ -544,6 +547,68 @@ Feature build order:
 | 19 | DoS protection + metrics | qps limit, in-flight caps | `[common] Add relay rate limits and metrics` |
 | 20 | Documentation + changelog | docs only | `[all] Document distributed search and relay phase 4` |
 
+### 12.1 Current Implementation Checkpoint
+
+The current codebase is ahead of the original build order in some areas and still behind it in others.
+Before adding the user-facing distributed engine, treat the current relay stack as a **direct TCP peer-search
+prototype**, not as the privacy-preserving encrypted relay described above.
+
+Implemented and useful:
+
+- `LocalIndex`, `LocalIndexTable`, `SharedTorrentIndexer`, and `LocalSharedTorrentSearchPerformer`.
+- `SearchEngine.LOCAL` wiring, including optional karma-weighted local result ordering.
+- PoW-capable `IdentityKeys`, signed bencoded `IdentityRecord`, and BEP 46 identity publication.
+- BEP 5 topic helpers for peers, relays, and bootstrap nodes.
+- `PeerDiscovery`, `PeerDirectory`, and scheduled peer discovery scaffolding.
+- Signed `RemoteSearchRequest` / `RemoteSearchResponse` records, framed wire codec, plain TCP client/server.
+- Per-peer karma-chain scaffolding and DHT publisher/fetcher interfaces.
+- Localhost multi-instance relay tests and in-process DHT smoke tests.
+
+Not implemented yet:
+
+- `DistributedSearchPerformer`, `DISTRIBUTED_ID`, and `DISTRIBUTED_SEARCH_ENABLED`.
+- Authenticated discovery that turns a DHT endpoint into a verified Ed25519 identity before querying.
+- Response verification in the outgoing client boundary.
+- Encrypted `PeerMesh`, `SearchQuery`, `SearchResultEnvelope`, `SessionCipher`, or transport handshake.
+- Opaque relay forwarding; current relay requests expose query keywords to the target node.
+- `relayd` as a headless deployable module.
+- Public DHT two-machine advertise -> discover -> query verification.
+
+### 12.2 Stabilization Pass Before Distributed Search
+
+Do this pass before implementing build step 13 (`DistributedSearchPerformer`). The goal is not to finish the
+full privacy-preserving relay. The goal is to make the current direct peer-search substrate correct, honest,
+and safe enough to build on.
+
+| # | Component | Work | Tests required | Commit message |
+|---|-----------|------|----------------|----------------|
+| S1 | Request canonicalization | ~~Fix non-empty `RemoteSearchRequest.path` canonical bytes. `pathLengthBytes()` must account for the path count plus each length-prefixed 32-byte hop, or canonicalization should switch to `ByteArrayOutputStream` to avoid pre-computed sizes.~~ **Done.** `pathLengthBytes()` is now an instance method that returns `4 + path.length * (4 + 32)`. | ~~Signed request with one and multiple path entries verifies; malformed hop lengths reject; existing empty-path signatures still verify.~~ `RemoteSearchRequestTest.canonicalBytesWithNonEmptyPathAreStableAndVerifiable` covers this. | `[common] Fix relay request path canonicalization` |
+| S2 | Forwarding semantics | ~~Decide v1 policy: either remove/disable multi-hop forwarding for the direct TCP protocol, or introduce a proper forwarded envelope signed by the forwarding peer without pretending the original requester signed mutated bytes. Recommended v1: direct peer search only, no forwarding.~~ **Done.** `RelayRole.forward()` now throws `UnsupportedOperationException`. | ~~`RelayRole.forward` tests updated to reject unsupported forwarding, or new envelope tests prove requester and forwarder signatures independently verify.~~ `RelayRoleTest.forwardIsUnsupportedInDirectPeerSearchV1` covers this. | `[common] Clarify relay forwarding semantics` |
+| S3 | Response verification | ~~Add client-side verification of `RemoteSearchResponse`: expected responder Ed25519 pubkey, matching nonce, timestamp skew, and signature over canonical bytes. `OutgoingRelayClient` should either take the expected responder pubkey or expose a verified send method.~~ **Done.** `OutgoingRelayClient.send(host, port, request, expectedResponderPub)` verifies nonce, timestamp skew, and signature. | ~~Valid response accepted; wrong nonce rejected; stale response rejected; bad signature rejected; response signed by another peer rejected.~~ `RelayWireTest.verifiedSendAcceptsValidResponse`, `verifiedSendRejectsWrongResponderPub`, `verifyResponseRejectsWrongNonce`, `verifyResponseRejectsStaleTimestamp`, `verifyResponseRejectsBadSignature` cover this. | `[common] Verify relay responses at client boundary` |
+| S4 | Authenticated peer discovery | ~~After BEP 5 endpoint discovery, connect to the endpoint and learn a real `IdentityRecord` before adding it as queryable. Placeholder `SHA-256(host:port)` entries may remain only as temporary candidates and must not be used for trust or distributed search.~~ **Done.** Added `PeerAuthenticator`, `DirectTcpPeerAuthenticator`, TCP identity handshake in `IncomingRelayServer`/`OutgoingRelayClient`, `PeerDirectory.upsertVerified`, and wired it in `Initializer`. | ~~Fake discovery source plus fake identity fetch/exchange upgrades placeholder to real pubkey; invalid identity is dropped; duplicate endpoint does not create duplicate trusted peers.~~ `PeerDiscoveryTest.discoverWithAuthenticatorRegistersVerifiedPeers`, `discoverWithAuthenticatorDropsUnauthenticatedPeers`, `discoverWithAuthenticatorIsIdempotentForVerifiedPeers`; `RelayWireTest.identityHandshakeReturnsConfiguredRecord`, `directTcpAuthenticatorAcceptsValidServerIdentity`, `directTcpAuthenticatorRejectsMissingServerIdentity` cover this. | `[common] Authenticate peers discovered through DHT` |
+| S5 | Startup scheduling | ~~Make advertiser, discovery, and karma scheduler run one initial tick soon after startup instead of waiting 5-30 minutes. Preserve throttling inside publishers.~~ **Done.** `DhtAdvertiser`, `PeerDiscoveryScheduler`, and `KarmaChainCommitScheduler` now schedule with initial delay 0. | ~~Scheduler tests show first tick occurs immediately or through explicit `startAndTick`; repeated starts remain idempotent; publisher throttle still prevents excessive DHT puts.~~ Existing scheduler tests pass. | `[desktop] Run initial relay scheduler ticks at startup` |
+| S6 | Karma persistence continuity | ~~Implement `KarmaChainTable.loadChain(ownerPub)` and use it in `KarmaChainWriter`. Stop recreating the local chain from genesis on every app start. Avoid `INSERT OR REPLACE` for append-only rows unless replacing the identical row is proven safe.~~ **Done.** `KarmaChainTable.loadChain` reconstructs entries from stored columns; `KarmaChainWriter` loads the chain on construction. | ~~Append, close, reopen, load, append next entry with continuing seq/head; mismatched owner rows ignored or rejected; duplicate seq with different hash rejects.~~ `KarmaChainTableTest.loadChainRestoresPersistedEntries`, `loadChainReturnsEmptyChainForMissingOwner`, `loadChainReturnsFreshChainWhenStoredEntriesAreInvalid` cover this. | `[desktop] Load persisted karma chain on startup` |
+| S7 | Karma verifier hardening | ~~Strengthen `KarmaChain.verify` and its tests. Verification must reject broken hash links, wrong sequence order, mixed owners, endorsement before epoch commitment, endorsement in an uncommitted epoch if that remains policy, and over-budget chains.~~ **Done.** Added `KarmaChain.load` and tests that construct genuinely invalid chains via `KarmaChainEntry.create*` and `fromStoredFields`. | ~~Negative tests must actually construct invalid signed entries via `KarmaChainEntry.reconstruct` or test-only builders, not no-op assertions.~~ `KarmaChainTest.verifyRejectsNonGenesisFirstEntry`, `verifyRejectsBrokenHashLink`, `verifyRejectsWrongSequenceNumber`, `verifyRejectsOutOfOrderBlockHeights`, `verifyRejectsOverBudgetEndorsements`, `verifyRejectsEndorsementBeforeEpochCommitment`, `verifyRejectsOutOfEpochEndorsementBlock`, `verifyRejectsMixedEndorserPubs`, `verifyRejectsBadSignature` cover this. | `[common] Harden karma chain verification` |
+| S8 | Public truth in UI/docs | ~~Until encrypted mesh exists, name the current network path as direct peer search in logs/docs/UI. Do not claim privacy-preserving relay for plaintext TCP requests.~~ **Done.** `Initializer` logs/comments now say "direct peer-search server". This design doc section updated. | ~~Documentation assertions updated; any user-facing strings use `I18n.tr`; no references imply relays cannot see query text unless encrypted path is active.~~ Documentation and `Initializer` log messages updated. | `[all] Document direct peer search stabilization scope` |
+
+Acceptance criteria for the stabilization pass:
+
+- A direct TCP peer-search request can be signed, sent, answered, and verified end-to-end.
+- A client never accepts an unsigned, wrong-signer, stale, or wrong-nonce response.
+- Discovered endpoints are not considered trusted/queryable until tied to a verified `IdentityRecord`.
+- The local karma chain survives app restarts without resetting sequence numbers or overwriting prior entries.
+- Tests prove the meaningful negative cases instead of only proving valid paths.
+- Documentation clearly distinguishes direct peer search from the future encrypted opaque relay.
+
+All stabilization tasks are complete. The next step is **build step 13** — the user-facing distributed search performer — implemented in a deliberately narrow form:
+
+1. `DistributedSearchPerformer` searches local FTS5 and directly authenticated peers.
+2. It queries `PeerDirectory.topByTrustVerified(n)` so placeholder/unverified peers are skipped.
+3. It sends signed direct requests with `ttl=0` / forwarding disabled.
+4. It verifies each response with the expected responder pubkey before merging.
+5. It labels results as `Distributed` or `Peer`, not `Relay`, until encrypted relay mode exists.
+6. It fails closed: unreachable peers, invalid responses, and rate-limited peers simply contribute no results.
+
 ---
 
 ## 13. Acceptance Story
@@ -554,10 +619,10 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 2. `ManifestPublisher` updates Alice's BEP 46 signed manifest.
 3. Alice announces herself under `frostwire-peers-v1`.
 4. Bob searches for `ubuntu 24`.
-5. Bob's desktop searches local FTS5 and sends encrypted mesh queries to trusted peers/relays.
+5. Bob's desktop searches local FTS5 and sends signed direct peer-search queries to authenticated peers.
 6. Alice receives the query, searches her local index, returns a signed result envelope.
 7. Bob verifies Alice's signature and trust score, merges the result into normal Search UI.
-8. If Bob is behind symmetric NAT, his query and Alice's result route through a relay, but the relay only sees opaque encrypted frames.
+8. If Bob is behind symmetric NAT, direct queries may fail; NAT traversal / encrypted relay is future work.
 9. Bob can click Alice's peer badge to browse Alice's signed manifest.
 
 ---
@@ -572,4 +637,4 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 
 ---
 
-*Next step: implement F1 and F2 before adding new distributed-search features.*
+*Next step: complete the stabilization pass in section 12.2 before adding the user-facing distributed search performer.*
