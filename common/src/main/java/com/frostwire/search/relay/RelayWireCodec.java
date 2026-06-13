@@ -150,6 +150,75 @@ public final class RelayWireCodec {
     }
 
     /**
+     * Encode a {@link IdentityRecord} as a bencoded payload.
+     */
+    public static byte[] encodeIdentityRecord(IdentityRecord record) {
+        if (record == null) {
+            throw new IllegalArgumentException("record is null");
+        }
+        return record.toEntry().bencode();
+    }
+
+    /**
+     * Decode a {@link IdentityRecord} from a bencoded payload.
+     * Returns null on any failure.
+     */
+    public static IdentityRecord decodeIdentityRecord(byte[] payload) {
+        if (payload == null) {
+            return null;
+        }
+        try {
+            Entry entry = Entry.bdecode(payload);
+            return IdentityRecord.fromEntry(entry);
+        } catch (Throwable t) {
+            LOG.debug("Failed to decode identity record", t);
+            return null;
+        }
+    }
+
+    /**
+     * Write a length-prefixed identity record frame to {@code out}.
+     */
+    public static void writeIdentityRecord(OutputStream out, IdentityRecord record)
+            throws IOException {
+        writeFrame(out, encodeIdentityRecord(record));
+    }
+
+    /**
+     * Read a length-prefixed identity record frame from {@code in}.
+     * Returns null on any failure.
+     */
+    public static IdentityRecord readIdentityRecord(InputStream in) throws IOException {
+        byte[] payload = readFrame(in);
+        if (payload == null) {
+            return null;
+        }
+        return decodeIdentityRecord(payload);
+    }
+
+    /**
+     * Write the one-byte identity-request probe to {@code out}.
+     * The probe is a 4-byte length of 1 followed by the byte 0x01.
+     */
+    public static void writeIdentityRequest(OutputStream out) throws IOException {
+        if (out == null) {
+            throw new IllegalArgumentException("out is null");
+        }
+        DataOutputStream dout = (out instanceof DataOutputStream)
+                ? (DataOutputStream) out : new DataOutputStream(out);
+        dout.writeInt(1);
+        dout.write(0x01);
+        dout.flush();
+    }
+
+    /**
+     * Returns true if the payload is the identity-request probe.
+     */
+    public static boolean isIdentityRequest(byte[] payload) {
+        return payload != null && payload.length == 1 && payload[0] == 0x01;
+    }
+
+    /**
      * Write a length-prefixed frame containing the encoded
      * response payload to {@code out}.
      */

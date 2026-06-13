@@ -319,4 +319,46 @@ class PeerDirectoryTest {
         byte[] originalPub = d.get(pub).get().peerPub();
         assertFalse(java.util.Arrays.equals(originalPub, infoPub));
     }
+
+    @Test
+    void upsertVerifiedMarksEntryVerified() {
+        PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+        byte[] pub = new byte[32];
+        pub[31] = 0x01;
+        d.upsertVerified(pub, "host", 6881);
+        PeerDirectory.PeerInfo info = d.get(pub).get();
+        assertTrue(info.isVerified());
+    }
+
+    @Test
+    void upsertMarksEntryUnverified() {
+        PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+        byte[] pub = new byte[32];
+        pub[31] = 0x01;
+        d.upsert(pub, "host", 6881);
+        PeerDirectory.PeerInfo info = d.get(pub).get();
+        assertFalse(info.isVerified());
+    }
+
+    @Test
+    void topByTrustVerifiedExcludesUnverified() {
+        PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+        byte[] unverified = new byte[32];
+        byte[] verified = new byte[32];
+        unverified[31] = 0x01;
+        verified[31] = 0x02;
+        d.upsert(unverified, "unverified", 1);
+        d.upsertVerified(verified, "verified", 1);
+        var top = d.topByTrustVerified(10);
+        assertEquals(1, top.size());
+        assertArrayEquals(verified, top.get(0).peerPub());
+        assertTrue(top.get(0).isVerified());
+    }
+
+    @Test
+    void topByTrustVerifiedRejectsNonPositiveLimit() {
+        PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+        assertThrows(IllegalArgumentException.class, () -> d.topByTrustVerified(0));
+        assertThrows(IllegalArgumentException.class, () -> d.topByTrustVerified(-1));
+    }
 }

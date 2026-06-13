@@ -77,11 +77,25 @@ public final class PeerDirectory {
     }
 
     /**
-     * Add or update a peer in the directory. If the new entry pushes
-     * us past {@code maxEntries}, evicts the least-recently-updated
-     * entry.
+     * Add or update a peer in the directory. The entry is marked
+     * as unverified; it can be used for trust-graph edges but is
+     * not considered queryable by distributed search until it has
+     * been authenticated with {@link #upsertVerified(byte[], String, int)}.
      */
     public void upsert(byte[] peerPub, String hostname, int utpPort) {
+        upsert(peerPub, hostname, utpPort, false);
+    }
+
+    /**
+     * Add or update a verified peer in the directory. Verified peers
+     * have passed an identity handshake and may be queried by
+     * distributed search.
+     */
+    public void upsertVerified(byte[] peerPub, String hostname, int utpPort) {
+        upsert(peerPub, hostname, utpPort, true);
+    }
+
+    private void upsert(byte[] peerPub, String hostname, int utpPort, boolean verified) {
         if (peerPub == null || peerPub.length != 32) {
             throw new IllegalArgumentException("peerPub must be 32 bytes");
         }
@@ -93,14 +107,15 @@ public final class PeerDirectory {
         }
         String key = com.frostwire.util.Hex.encode(peerPub);
         entries.put(key, new Entry(peerPub, hostname, utpPort,
-                System.currentTimeMillis(), 0L, false));
+                System.currentTimeMillis(), 0L, false, verified));
         evictIfNeeded();
         version.incrementAndGet();
     }
 
     /**
      * Add an endorser trust edge: this peer trusts {@code target}.
-     * Used to build the web of trust over time.
+     * Used to build the web of trust over time. If the target is
+     * not yet known, it is registered as an unverified peer.
      */
     public void addEndorser(byte[] targetPub, byte[] endorserPub) {
         if (targetPub == null || targetPub.length != 32) {
@@ -113,7 +128,7 @@ public final class PeerDirectory {
         Entry e = entries.get(key);
         if (e == null) {
             // Implicit registration: target becomes a known peer with no hostname.
-            e = new Entry(targetPub, "", 0, System.currentTimeMillis(), 0L, false);
+            e = new Entry(targetPub, "", 0, System.currentTimeMillis(), 0L, false, false);
             entries.put(key, e);
         }
         e.addEndorser(endorserPub);
@@ -133,7 +148,7 @@ public final class PeerDirectory {
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry e = entries.get(key);
         if (e == null) {
-            e = new Entry(peerPub, "", 0, System.currentTimeMillis(), 0L, true);
+            e = new Entry(peerPub, "", 0, System.currentTimeMillis(), 0L, true, false);
             entries.put(key, e);
         } else {
             e.spam = true;
@@ -221,7 +236,31 @@ public final class PeerDirectory {
             return Optional.empty();
         }
         return Optional.of(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
-                e.lastUpdatedMs, e.endorsers.size(), e.spam));
+                e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
+    }
+
+    /**
+     * Returns up to {@code limit} verified entries sorted by trust score descending.
+     * Unverified placeholder entries are excluded.
+     */
+    public List<PeerInfo> topByTrustVerified(int limit) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit must be > 0");
+        }
+        List<Entry> snapshot = new ArrayList<>();
+        for (Entry e : entries.values()) {
+            if (e.verified) {
+                snapshot.add(e);
+            }
+        }
+        snapshot.sort((a, b) -> Double.compare(trustScore(b.peerPub), trustScore(a.peerPub)));
+        List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
+        for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
+            Entry e = snapshot.get(i);
+            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
+                    e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
+        }
+        return out;
     }
 
     /** Returns up to {@code limit} entries sorted by trust score descending. */
@@ -235,7 +274,7 @@ public final class PeerDirectory {
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
             Entry e = snapshot.get(i);
             out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
-                    e.lastUpdatedMs, e.endorsers.size(), e.spam));
+                    e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
         }
         return out;
     }
@@ -284,16 +323,18 @@ public final class PeerDirectory {
         long lastUpdatedMs;
         long localKarmaDelta;
         boolean spam;
+        boolean verified;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
         Entry(byte[] peerPub, String hostname, int utpPort, long lastUpdatedMs,
-              long localKarmaDelta, boolean spam) {
+              long localKarmaDelta, boolean spam, boolean verified) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
             this.lastUpdatedMs = lastUpdatedMs;
             this.localKarmaDelta = localKarmaDelta;
             this.spam = spam;
+            this.verified = verified;
         }
 
         void addEndorser(byte[] endorserPub) {
@@ -309,15 +350,17 @@ public final class PeerDirectory {
         private final long lastUpdatedMs;
         private final int endorserCount;
         private final boolean spam;
+        private final boolean verified;
 
         PeerInfo(byte[] peerPub, String hostname, int utpPort, long lastUpdatedMs,
-                 int endorserCount, boolean spam) {
+                 int endorserCount, boolean spam, boolean verified) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
             this.lastUpdatedMs = lastUpdatedMs;
             this.endorserCount = endorserCount;
             this.spam = spam;
+            this.verified = verified;
         }
 
         public byte[] peerPub() {
@@ -342,6 +385,10 @@ public final class PeerDirectory {
 
         public boolean isSpam() {
             return spam;
+        }
+
+        public boolean isVerified() {
+            return verified;
         }
     }
 }

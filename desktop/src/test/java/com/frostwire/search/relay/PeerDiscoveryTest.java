@@ -145,7 +145,95 @@ class PeerDiscoveryTest {
         assertNull(discovery.fetchIdentityRecord(new byte[32]));
     }
 
+    @Test
+    void discoverWithAuthenticatorRegistersVerifiedPeers() {
+        FakeAuthenticator auth = new FakeAuthenticator();
+        discovery = new PeerDiscovery(source, directory, auth);
+
+        source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
+        IdentityRecord record = auth.add("10.0.0.1", 6888);
+
+        List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
+
+        assertEquals(1, result.size());
+        assertEquals(1, directory.size());
+        byte[] realPub = record.ed25519Pub();
+        PeerDirectory.PeerInfo info = directory.get(realPub).orElse(null);
+        assertNotNull(info);
+        assertEquals("10.0.0.1", info.hostname());
+        assertEquals(6888, info.utpPort());
+        assertTrue(info.isVerified());
+    }
+
+    @Test
+    void discoverWithAuthenticatorDropsUnauthenticatedPeers() {
+        FakeAuthenticator auth = new FakeAuthenticator();
+        discovery = new PeerDiscovery(source, directory, auth);
+
+        source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
+        // No identity registered for this endpoint
+
+        List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
+
+        assertTrue(result.isEmpty());
+        assertEquals(0, directory.size());
+    }
+
+    @Test
+    void discoverWithAuthenticatorIsIdempotentForVerifiedPeers() {
+        FakeAuthenticator auth = new FakeAuthenticator();
+        discovery = new PeerDiscovery(source, directory, auth);
+
+        source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
+        auth.add("10.0.0.1", 6888);
+
+        assertEquals(1, discovery.discoverAndRegister().size());
+        assertTrue(discovery.discoverAndRegister().isEmpty());
+        assertEquals(1, directory.size());
+    }
+
+    @Test
+    void discoverWithAuthenticatorRejectsNullAuthenticator() {
+        assertDoesNotThrow(() -> new PeerDiscovery(source, directory, null));
+    }
+
+    @Test
+    void placeholderDiscoveryStillWorksWithoutAuthenticator() {
+        source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
+        List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
+        assertEquals(1, result.size());
+        assertEquals(1, directory.size());
+        PeerDirectory.PeerInfo info = directory.get(
+                PeerDiscovery.placeholderPubkey("10.0.0.1", 6888)).orElse(null);
+        assertNotNull(info);
+        assertFalse(info.isVerified());
+    }
+
     // --- helpers ---
+
+    private static final class FakeAuthenticator implements PeerAuthenticator {
+        final Map<String, IdentityRecord> records = new HashMap<>();
+
+        IdentityRecord add(String host, int port) {
+            try {
+                java.security.KeyPair kp = java.security.KeyPairGenerator
+                        .getInstance("Ed25519").generateKeyPair();
+                byte[] nodeId = new byte[20];
+                byte[] x25519 = new byte[32];
+                IdentityRecord record = IdentityRecord.createSigned(
+                        nodeId, kp, x25519, port);
+                records.put(host + ":" + port, record);
+                return record;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public java.util.Optional<IdentityRecord> authenticate(String host, int port) {
+            return java.util.Optional.ofNullable(records.get(host + ":" + port));
+        }
+    }
 
     private static final class FakeSource implements PeerDiscoverySource {
         final List<DiscoveredEndpoint> endpoints = new ArrayList<>();

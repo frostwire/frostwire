@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Discovers other FrostWire nodes on the DHT and registers them
@@ -24,25 +25,21 @@ import java.util.List;
  * <ol>
  *   <li>The source's {@link PeerDiscoverySource#fetchEndpoints}
  *       returns a list of {@code (host, port)} candidates.</li>
- *   <li>For each candidate, we register it in the
- *       {@link PeerDirectory} with a placeholder pubkey derived
- *       from {@code SHA-256(host:port)}. The placeholder is a
- *       stable 32-byte identifier that uniquely maps to the
- *       endpoint.</li>
- *   <li>When the peer actually contacts us (sends a relay
- *       request), we learn their real pubkey from the request
- *       signature. Callers can then call
- *       {@link PeerDirectory#evict} on the placeholder and
- *       {@link PeerDirectory#upsert} the real pubkey to
- *       upgrade the entry.</li>
+ *   <li>If a {@link PeerAuthenticator} is configured, each
+ *       candidate is authenticated before it is registered. On
+ *       success, the peer is inserted with its real Ed25519
+ *       pubkey via {@link PeerDirectory#upsertVerified(byte[], String, int)}.
+ *       On failure, the endpoint is dropped.</li>
+ *   <li>When no authenticator is configured, each candidate is
+ *       registered with a placeholder pubkey derived from
+ *       {@code SHA-256(host:port)}. Placeholder entries are
+ *       unverified and must not be used for distributed search.</li>
  * </ol>
  *
  * <p><b>Identity record fetch:</b>
  * {@link #fetchIdentityRecord} wraps the source's
  * {@link PeerDiscoverySource#fetchIdentityEntry} for a known
- * pubkey. This is the entry point for the future
- * "learn-the-peer's-identity" step, once we have the pubkey
- * (from a request signature or another out-of-band channel).
+ * pubkey.
  *
  * <p><b>Fail-closed:</b> any source error returns an empty list
  * or null.
@@ -56,8 +53,14 @@ public final class PeerDiscovery {
 
     private final PeerDiscoverySource source;
     private final PeerDirectory directory;
+    private final PeerAuthenticator authenticator;
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory) {
+        this(source, directory, null);
+    }
+
+    public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory,
+                         PeerAuthenticator authenticator) {
         if (source == null) {
             throw new IllegalArgumentException("source is null");
         }
@@ -66,12 +69,16 @@ public final class PeerDiscovery {
         }
         this.source = source;
         this.directory = directory;
+        this.authenticator = authenticator;
     }
 
     /**
      * Run one discovery pass. Returns the list of endpoints
      * that were newly registered in the directory (i.e., not
      * already known).
+     *
+     * <p>When an authenticator is present, only successfully
+     * authenticated endpoints are returned and registered.
      */
     public List<DiscoveredEndpoint> discoverAndRegister() {
         List<DiscoveredEndpoint> discovered = new ArrayList<>();
@@ -83,21 +90,39 @@ public final class PeerDiscovery {
                 if (host == null || host.isEmpty() || port <= 0) {
                     continue;
                 }
-                byte[] placeholderPubkey = placeholderPubkey(host, port);
-                PeerDirectory.PeerInfo existing =
-                        directory.get(placeholderPubkey).orElse(null);
-                if (existing != null
-                        && existing.hostname().equals(host)
-                        && existing.utpPort() == port) {
-                    continue;
+                if (authenticator != null) {
+                    Optional<IdentityRecord> maybeIdentity = authenticator.authenticate(host, port);
+                    if (maybeIdentity.isEmpty()) {
+                        LOG.debug("Authentication failed for discovered peer " + host + ":" + port);
+                        continue;
+                    }
+                    IdentityRecord identity = maybeIdentity.get();
+                    byte[] peerPub = identity.ed25519Pub();
+                    if (alreadyKnown(peerPub, host, port)) {
+                        continue;
+                    }
+                    directory.upsertVerified(peerPub, host, port);
+                    discovered.add(new DiscoveredEndpoint(host, port));
+                } else {
+                    byte[] placeholderPubkey = placeholderPubkey(host, port);
+                    if (alreadyKnown(placeholderPubkey, host, port)) {
+                        continue;
+                    }
+                    directory.upsert(placeholderPubkey, host, port);
+                    discovered.add(new DiscoveredEndpoint(host, port));
                 }
-                directory.upsert(placeholderPubkey, host, port);
-                discovered.add(new DiscoveredEndpoint(host, port));
             }
         } catch (Throwable t) {
             LOG.debug("Peer discovery failed", t);
         }
         return discovered;
+    }
+
+    private boolean alreadyKnown(byte[] pub, String host, int port) {
+        PeerDirectory.PeerInfo existing = directory.get(pub).orElse(null);
+        return existing != null
+                && existing.hostname().equals(host)
+                && existing.utpPort() == port;
     }
 
     /**

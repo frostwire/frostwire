@@ -54,6 +54,7 @@ public final class IncomingRelayServer {
     private static final int DEFAULT_SO_TIMEOUT_MS = 30_000;
 
     private final RelayRole role;
+    private final IdentityRecord identityRecord;
     private final int port;
     private final int backlog;
     private final int workerPoolSize;
@@ -66,10 +67,19 @@ public final class IncomingRelayServer {
     private volatile boolean running;
 
     public IncomingRelayServer(RelayRole role, int port) {
-        this(role, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
+        this(role, null, port);
+    }
+
+    public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port) {
+        this(role, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
     }
 
     public IncomingRelayServer(RelayRole role, int port, int backlog,
+                               int workerPoolSize, int soTimeoutMs) {
+        this(role, null, port, backlog, workerPoolSize, soTimeoutMs);
+    }
+
+    public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs) {
         if (role == null) {
             throw new IllegalArgumentException("role is null");
@@ -87,6 +97,7 @@ public final class IncomingRelayServer {
             throw new IllegalArgumentException("soTimeoutMs must be >= 0");
         }
         this.role = role;
+        this.identityRecord = identityRecord;
         this.port = port;
         this.backlog = backlog;
         this.workerPoolSize = workerPoolSize;
@@ -184,7 +195,16 @@ public final class IncomingRelayServer {
             socket.setSoTimeout(soTimeoutMs);
             try (InputStream in = socket.getInputStream();
                  OutputStream out = socket.getOutputStream()) {
-                RemoteSearchRequest request = RelayWireCodec.readRequest(in);
+                byte[] frame = RelayWireCodec.readFrame(in);
+                if (frame == null) {
+                    LOG.debug("Empty frame; closing");
+                    return;
+                }
+                if (RelayWireCodec.isIdentityRequest(frame)) {
+                    handleIdentityRequest(out);
+                    return;
+                }
+                RemoteSearchRequest request = RelayWireCodec.decodeRequest(frame);
                 if (request == null) {
                     LOG.debug("Invalid request frame; closing");
                     return;
@@ -200,6 +220,14 @@ public final class IncomingRelayServer {
         } finally {
             closeQuietly(socket);
         }
+    }
+
+    private void handleIdentityRequest(OutputStream out) throws IOException {
+        if (identityRecord == null) {
+            LOG.debug("Identity request received but no identity record configured");
+            return;
+        }
+        RelayWireCodec.writeIdentityRecord(out, identityRecord);
     }
 
     private static void closeQuietly(Socket socket) {
