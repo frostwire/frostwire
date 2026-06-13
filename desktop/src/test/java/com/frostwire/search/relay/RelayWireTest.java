@@ -170,6 +170,151 @@ class RelayWireTest {
     }
 
     @Test
+    void verifiedSendAcceptsValidResponse() throws Exception {
+        index.torrents.add(torrent("ubuntu", 1000, 1));
+        directory.upsert(requesterPub, "test", 1);
+        server = new IncomingRelayServer(role, 0);
+        server.start();
+        int port = server.port();
+
+        OutgoingRelayClient client = new OutgoingRelayClient();
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        Optional<RemoteSearchResponse> resp = client.send(
+                "127.0.0.1", port, req, responderIdentity.ed25519PubRaw());
+
+        assertTrue(resp.isPresent());
+        assertEquals(1, resp.get().rows().size());
+    }
+
+    @Test
+    void verifiedSendRejectsWrongResponderPub() throws Exception {
+        index.torrents.add(torrent("ubuntu", 1000, 1));
+        directory.upsert(requesterPub, "test", 1);
+        server = new IncomingRelayServer(role, 0);
+        server.start();
+        int port = server.port();
+
+        OutgoingRelayClient client = new OutgoingRelayClient();
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        byte[] wrongPub = new byte[32];
+        wrongPub[31] = 0x42;
+        Optional<RemoteSearchResponse> resp = client.send(
+                "127.0.0.1", port, req, wrongPub);
+
+        assertTrue(resp.isEmpty(),
+                "Response signed by a different peer must be rejected");
+    }
+
+    @Test
+    void verifiedSendRejectsInvalidResponderPubInput() throws Exception {
+        OutgoingRelayClient client = new OutgoingRelayClient();
+        RemoteSearchRequest req = signRequest("x", 1);
+        assertTrue(client.send("127.0.0.1", 1234, req, null).isEmpty());
+        assertTrue(client.send("127.0.0.1", 1234, req, new byte[31]).isEmpty());
+    }
+
+    @Test
+    void identityHandshakeReturnsConfiguredRecord() throws Exception {
+        IdentityRecord identity = sampleIdentityRecord();
+        server = new IncomingRelayServer(role, identity, 0);
+        server.start();
+        int port = server.port();
+
+        OutgoingRelayClient client = new OutgoingRelayClient();
+        Optional<IdentityRecord> fetched = client.fetchIdentity("127.0.0.1", port);
+
+        assertTrue(fetched.isPresent());
+        assertArrayEquals(identity.ed25519Pub(), fetched.get().ed25519Pub());
+        assertTrue(fetched.get().verifySignature());
+    }
+
+    @Test
+    void identityHandshakeReturnsEmptyWhenServerHasNoIdentity() throws Exception {
+        server = new IncomingRelayServer(role, 0);
+        server.start();
+        int port = server.port();
+
+        OutgoingRelayClient client = new OutgoingRelayClient();
+        Optional<IdentityRecord> fetched = client.fetchIdentity("127.0.0.1", port);
+
+        assertTrue(fetched.isEmpty());
+    }
+
+    @Test
+    void directTcpAuthenticatorAcceptsValidServerIdentity() throws Exception {
+        IdentityRecord identity = sampleIdentityRecord();
+        server = new IncomingRelayServer(role, identity, 0);
+        server.start();
+        int port = server.port();
+
+        DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator();
+        Optional<IdentityRecord> fetched = auth.authenticate("127.0.0.1", port);
+
+        assertTrue(fetched.isPresent());
+        assertArrayEquals(identity.ed25519Pub(), fetched.get().ed25519Pub());
+    }
+
+    @Test
+    void directTcpAuthenticatorRejectsMissingServerIdentity() throws Exception {
+        server = new IncomingRelayServer(role, 0);
+        server.start();
+        int port = server.port();
+
+        DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator();
+        Optional<IdentityRecord> fetched = auth.authenticate("127.0.0.1", port);
+
+        assertTrue(fetched.isEmpty(),
+                "Peer without a published identity record must not authenticate");
+    }
+
+    @Test
+    void verifyResponseAcceptsValidResponse() throws Exception {
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        RemoteSearchResponse resp = signResponse(req.nonce(), System.currentTimeMillis() / 1000L);
+        assertTrue(OutgoingRelayClient.verifyResponse(
+                resp, req, responderIdentity.ed25519PubRaw()));
+    }
+
+    @Test
+    void verifyResponseRejectsWrongNonce() throws Exception {
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        byte[] wrongNonce = req.nonce().clone();
+        wrongNonce[0] ^= 1;
+        RemoteSearchResponse resp = signResponse(wrongNonce, System.currentTimeMillis() / 1000L);
+        assertFalse(OutgoingRelayClient.verifyResponse(
+                resp, req, responderIdentity.ed25519PubRaw()));
+    }
+
+    @Test
+    void verifyResponseRejectsStaleTimestamp() throws Exception {
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        long stale = System.currentTimeMillis() / 1000L
+                - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC - 60;
+        RemoteSearchResponse resp = signResponse(req.nonce(), stale);
+        assertFalse(OutgoingRelayClient.verifyResponse(
+                resp, req, responderIdentity.ed25519PubRaw()));
+    }
+
+    @Test
+    void verifyResponseRejectsBadSignature() throws Exception {
+        RemoteSearchRequest req = signRequest("ubuntu", 5);
+        RemoteSearchResponse resp = signResponse(req.nonce(), System.currentTimeMillis() / 1000L);
+        byte[] tamperedSig = resp.signature().clone();
+        tamperedSig[0] ^= 1;
+        RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
+                .nonce(resp.nonce())
+                .timestamp(resp.timestamp())
+                .signature(tamperedSig);
+        for (RemoteSearchResponse.Row r : resp.rows()) {
+            b.addRow(r.infoHash, r.name, r.sizeBytes, r.fileCount,
+                    r.publisherEd25519Pub, r.publisherNodeId);
+        }
+        RemoteSearchResponse tampered = b.build();
+        assertFalse(OutgoingRelayClient.verifyResponse(
+                tampered, req, responderIdentity.ed25519PubRaw()));
+    }
+
+    @Test
     void inProcessServerRejectsInvalidSignature() throws Exception {
         index.torrents.add(torrent("ubuntu", 1000, 1));
         directory.upsert(requesterPub, "test", 1);
@@ -286,6 +431,33 @@ class RelayWireTest {
                 .path(new byte[0][])
                 .signature(signer.sign())
                 .build();
+    }
+
+    private static RemoteSearchResponse signResponse(byte[] nonce, long timestamp) throws Exception {
+        byte[] infoHash = new byte[20];
+        byte[] pub = new byte[32];
+        RemoteSearchResponse unsigned = RemoteSearchResponse.builder()
+                .nonce(nonce)
+                .timestamp(timestamp)
+                .addRow(infoHash, "ubuntu-22.04", 1000, 1, pub)
+                .signature(new byte[64])
+                .build();
+        java.security.Signature signer = java.security.Signature.getInstance("Ed25519");
+        signer.initSign(responderIdentity.ed25519().getPrivate());
+        signer.update(unsigned.canonicalBytes());
+        return RemoteSearchResponse.builder()
+                .nonce(nonce)
+                .timestamp(timestamp)
+                .addRow(infoHash, "ubuntu-22.04", 1000, 1, pub)
+                .signature(signer.sign())
+                .build();
+    }
+
+    private static IdentityRecord sampleIdentityRecord() throws Exception {
+        java.security.KeyPair kp = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        byte[] nodeId = new byte[20];
+        byte[] x25519 = new byte[32];
+        return IdentityRecord.createSigned(nodeId, kp, x25519, 6881);
     }
 
     private static LocalSharedTorrent torrent(String name, long size, int fileCount) {

@@ -14,6 +14,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -61,6 +67,31 @@ public final class OutgoingRelayClient {
      */
     public Optional<RemoteSearchResponse> send(String host, int port,
                                                 RemoteSearchRequest request) {
+        return sendInternal(host, port, request, null);
+    }
+
+    /**
+     * Send a request to {@code host:port}, read the response, and
+     * verify that it was signed by {@code expectedResponderPub},
+     * carries the request's nonce, and is within the timestamp
+     * skew window. Returns empty if any verification step fails.
+     *
+     * <p>This is the recommended entry point for direct peer
+     * search: callers know which peer they dialed and should
+     * reject responses that do not come from that peer.
+     */
+    public Optional<RemoteSearchResponse> send(String host, int port,
+                                                RemoteSearchRequest request,
+                                                byte[] expectedResponderPub) {
+        if (expectedResponderPub == null || expectedResponderPub.length != 32) {
+            return Optional.empty();
+        }
+        return sendInternal(host, port, request, expectedResponderPub);
+    }
+
+    private Optional<RemoteSearchResponse> sendInternal(String host, int port,
+                                                         RemoteSearchRequest request,
+                                                         byte[] expectedResponderPub) {
         if (host == null || host.isEmpty()) {
             return Optional.empty();
         }
@@ -77,7 +108,15 @@ public final class OutgoingRelayClient {
             try (InputStream in = socket.getInputStream();
                  OutputStream out = socket.getOutputStream()) {
                 RelayWireCodec.writeRequest(out, request);
-                return Optional.ofNullable(RelayWireCodec.readResponse(in));
+                RemoteSearchResponse response = RelayWireCodec.readResponse(in);
+                if (response == null) {
+                    return Optional.empty();
+                }
+                if (expectedResponderPub != null
+                        && !verifyResponse(response, request, expectedResponderPub)) {
+                    return Optional.empty();
+                }
+                return Optional.of(response);
             }
         } catch (Throwable t) {
             LOG.debug("OutgoingRelayClient.send failed for " + host + ":" + port, t);
@@ -88,5 +127,75 @@ public final class OutgoingRelayClient {
             } catch (IOException ignored) {
             }
         }
+    }
+
+    static boolean verifyResponse(RemoteSearchResponse response,
+                                  RemoteSearchRequest request,
+                                  byte[] expectedResponderPub) {
+        try {
+            if (!Arrays.equals(response.nonce(), request.nonce())) {
+                LOG.debug("Response verification failed: nonce mismatch");
+                return false;
+            }
+            long nowSec = System.currentTimeMillis() / 1000L;
+            long skew = Math.abs(nowSec - response.timestamp());
+            if (skew > RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC) {
+                LOG.debug("Response verification failed: timestamp skew " + skew + "s");
+                return false;
+            }
+            PublicKey pub = rawEd25519ToPublicKey(expectedResponderPub);
+            Signature verifier = Signature.getInstance("Ed25519");
+            verifier.initVerify(pub);
+            verifier.update(response.canonicalBytes());
+            if (!verifier.verify(response.signature())) {
+                LOG.debug("Response verification failed: bad signature");
+                return false;
+            }
+            return true;
+        } catch (GeneralSecurityException e) {
+            LOG.debug("Response verification threw", e);
+            return false;
+        }
+    }
+
+    /**
+     * Connect to {@code host:port}, request the peer's
+     * {@link IdentityRecord}, and return it. Returns empty on any
+     * network or decode error. The caller is responsible for
+     * verifying the record's signature.
+     */
+    public Optional<IdentityRecord> fetchIdentity(String host, int port) {
+        if (host == null || host.isEmpty()) {
+            return Optional.empty();
+        }
+        if (port <= 0 || port > 65535) {
+            return Optional.empty();
+        }
+        Socket socket = new Socket();
+        try {
+            socket.connect(new InetSocketAddress(host, port), connectTimeoutMs);
+            socket.setSoTimeout(soTimeoutMs);
+            try (InputStream in = socket.getInputStream();
+                 OutputStream out = socket.getOutputStream()) {
+                RelayWireCodec.writeIdentityRequest(out);
+                return Optional.ofNullable(RelayWireCodec.readIdentityRecord(in));
+            }
+        } catch (Throwable t) {
+            LOG.debug("OutgoingRelayClient.fetchIdentity failed for " + host + ":" + port, t);
+            return Optional.empty();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private static PublicKey rawEd25519ToPublicKey(byte[] raw) throws GeneralSecurityException {
+        byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
+        byte[] encoded = new byte[prefix.length + raw.length];
+        System.arraycopy(prefix, 0, encoded, 0, prefix.length);
+        System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
+        return KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
     }
 }
