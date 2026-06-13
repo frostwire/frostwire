@@ -445,28 +445,35 @@ final class Initializer {
      * and starts the direct peer-search server so peers can query our index
      * over plain TCP.
      *
-     * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
-     * {@code DownloadManagerImpl} listener is already registered — the
-     * indexer and endorsement-trigger installers chain onto it via
-     * {@code BTEngineListenerChain}.
+     * <p>Runs before {@link #startCore(LimeWireCore)} so the indexer is already
+     * installed when saved downloads are restored and their {@code downloadAdded}
+     * events fire. {@code BTEngineListenerChain.install} appends the
+     * {@code DownloadManagerImpl} listener later without disturbing the indexer.
      */
     private void startRelayStack() {
+        com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
         try {
             File homeDir = new File(CommonUtils.getUserSettingsDir()
                     + File.separator + "libtorrent" + File.separator);
+            relayLog.info("Relay stack home dir: " + homeDir.getAbsolutePath());
 
             // 1. Open the local torrent index (SQLite + FTS5).
             File dbFile = new File(homeDir, LocalIndexTable.DEFAULT_DB_NAME);
+            relayLog.info("Opening local index at: " + dbFile.getAbsolutePath());
             LocalIndexTable localIndex = LocalIndexTable.open(dbFile);
+            relayLog.info("Local index opened, size=" + localIndex.size());
 
             // 2. Load or generate the node's Ed25519 / X25519 identity.
             File identityFile = new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+            relayLog.info("Loading identity from: " + identityFile.getAbsolutePath());
             IdentityKeys identity = IdentityKeys.loadOrCreate(identityFile);
+            relayLog.info("Identity loaded, nodeId=" + com.frostwire.util.Hex.encode(identity.nodeId()));
 
-            // 3. Install the auto-indexer on BTEngine (chains onto the
-            //    DownloadManagerImpl listener already set by startCore).
+            // 3. Install the auto-indexer on BTEngine (chains onto any
+            //    listener already present; DownloadManagerImpl is added later).
             BTEngine btEngine = BTEngine.getInstance();
             SharedTorrentIndexerInstaller.install(btEngine, localIndex, identity);
+            relayLog.info("SharedTorrentIndexer installed");
 
             // 4. Open the karma chain table and wire download-completion
             //    endorsements to a Bitcoin-anchored chain.
@@ -521,10 +528,10 @@ final class Initializer {
             //     peers from the normal Search UI.
             DistributedSearchEngineWire.wire(
                     localIndex, directory, identity, new OutgoingRelayClient());
+            relayLog.info("Relay stack ready; Distributed search engine wired");
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
-            com.frostwire.util.Logger.getLogger(Initializer.class)
-                    .warn("Failed to start relay stack; distributed search disabled", e);
+            relayLog.warn("Failed to start relay stack; distributed search disabled", e);
         }
     }
 
