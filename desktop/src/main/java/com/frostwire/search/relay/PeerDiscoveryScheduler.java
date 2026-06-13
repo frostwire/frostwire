@@ -55,7 +55,7 @@ public final class PeerDiscoveryScheduler {
         running = true;
         executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
         task = executor.scheduleAtFixedRate(this::tick,
-                intervalSec, intervalSec, TimeUnit.SECONDS);
+                0, intervalSec, TimeUnit.SECONDS);
         LOG.info("PeerDiscoveryScheduler started, interval=" + intervalSec + "s");
     }
 

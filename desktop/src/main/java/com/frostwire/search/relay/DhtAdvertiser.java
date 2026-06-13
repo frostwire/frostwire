@@ -70,7 +70,7 @@ public final class DhtAdvertiser {
         }
         running = true;
         executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
-        task = executor.scheduleAtFixedRate(this::scheduledTick, intervalSec, intervalSec,
+        task = executor.scheduleAtFixedRate(this::scheduledTick, 0, intervalSec,
                 TimeUnit.SECONDS);
         LOG.info("DhtAdvertiser started, interval=" + intervalSec + "s");
     }

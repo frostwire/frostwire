@@ -78,7 +78,7 @@ public final class KarmaChainCommitScheduler {
             return;
         }
         executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
-        task = executor.scheduleAtFixedRate(this::tick, intervalSec, intervalSec, TimeUnit.SECONDS);
+        task = executor.scheduleAtFixedRate(this::tick, 0, intervalSec, TimeUnit.SECONDS);
         LOG.info("Karma commit scheduler started, interval=" + intervalSec + "s");
     }
 
