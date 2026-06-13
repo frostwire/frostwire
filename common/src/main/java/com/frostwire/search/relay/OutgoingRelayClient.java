@@ -35,7 +35,7 @@ import java.util.Optional;
  * <p>uTP is a future optimization. For now, plain TCP is enough
  * to prove the protocol end-to-end.
  */
-public final class OutgoingRelayClient {
+public class OutgoingRelayClient {
 
     private static final Logger LOG = Logger.getLogger(OutgoingRelayClient.class);
 
