@@ -25,8 +25,10 @@ import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
+import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
@@ -36,6 +38,7 @@ import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
+import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
@@ -431,14 +434,14 @@ final class Initializer {
     }
 
     /**
-     * Wires the distributed-search relay stack: opens the local torrent
+     * Wires the distributed-search direct peer-search stack: opens the local torrent
      * index, loads (or generates) the node's cryptographic identity, installs
      * the auto-indexer on BTEngine, opens the karma chain table, wires
      * download-completion endorsements to a Bitcoin-anchored karma chain,
      * starts the periodic commit-and-publish scheduler, hands the
      * index to the LOCAL search engine so user searches can query it,
-     * and starts the relay search server so peers can query our index
-     * over the network.
+     * and starts the direct peer-search server so peers can query our index
+     * over plain TCP.
      *
      * <p>Must run after {@link #startCore(LimeWireCore)} so the existing
      * {@code DownloadManagerImpl} listener is already registered — the
@@ -491,8 +494,8 @@ final class Initializer {
             LocalSearchEngineWire.setIndex(localIndex);
 
             // 8. Construct the shared peer directory (used by both
-            //    the relay server's role and the discovery scheduler)
-            //    and start the relay search server. Discovered peers
+            //    the direct peer-search server's role and the discovery scheduler)
+            //    and start the direct peer-search server. Discovered peers
             //    will be registered into this same directory.
             PeerDirectory directory = new PeerDirectory(karmaCache);
             startRelayServer(identity, localIndex, directory);
@@ -537,7 +540,8 @@ final class Initializer {
 
     /**
      * Start the peer discovery scheduler so we can find other
-     * FrostWire nodes via BEP 5 and populate the local
+     * FrostWire nodes via BEP 5, authenticate them via the direct
+     * TCP identity handshake, and populate the local
      * {@link PeerDirectory}. By this point BTEngine is already
      * running (the indexer and karma trigger were installed in
      * steps 3 and 4), so {@code btEngine} is the live DHT-capable
@@ -546,7 +550,8 @@ final class Initializer {
     private void startPeerDiscovery(PeerDirectory directory, BTEngine btEngine) {
         try {
             DhtPeerDiscoverySource source = new DhtPeerDiscoverySource(btEngine);
-            PeerDiscovery discovery = new PeerDiscovery(source, directory);
+            PeerAuthenticator authenticator = new DirectTcpPeerAuthenticator();
+            PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator);
             new PeerDiscoveryScheduler(discovery, 5 * 60).start();
         } catch (Throwable t) {
             com.frostwire.util.Logger.getLogger(Initializer.class)
@@ -555,11 +560,11 @@ final class Initializer {
     }
 
     /**
-     * Construct the relay search service + role + TCP server, and
+     * Construct the direct peer-search service + role + TCP server, and
      * start listening. The server is daemon-threaded and does not
      * prevent JVM exit. If the listen port is already in use, the
-     * failure is logged and the relay server is left disabled; the
-     * rest of the relay stack still functions.
+     * failure is logged and the direct peer-search server is left disabled; the
+     * rest of the direct peer-search stack still functions.
      */
     private void startRelayServer(IdentityKeys identity, LocalIndex localIndex,
                                   PeerDirectory directory) {
@@ -567,15 +572,18 @@ final class Initializer {
             int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
             RelaySearchService service = new RelaySearchService(localIndex, identity);
             RelayRole role = new RelayRole(service, directory);
-            IncomingRelayServer server = new IncomingRelayServer(role, port);
+            IdentityRecord identityRecord = IdentityRecord.createSigned(
+                    identity.nodeId(), identity.ed25519(),
+                    identity.x25519PubRaw(), port);
+            IncomingRelayServer server = new IncomingRelayServer(role, identityRecord, port);
             server.start();
             com.frostwire.util.Logger.getLogger(Initializer.class)
-                    .info("Relay search server listening on port " + server.port());
+                    .info("Direct peer-search server listening on port " + server.port());
         } catch (java.io.IOException e) {
             com.frostwire.util.Logger.getLogger(Initializer.class)
-                    .warn("Failed to start relay search server on port "
+                    .warn("Failed to start direct peer-search server on port "
                             + com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT
-                            + "; incoming relay search requests will not be served", e);
+                            + "; incoming direct peer-search requests will not be served", e);
         }
     }
 
