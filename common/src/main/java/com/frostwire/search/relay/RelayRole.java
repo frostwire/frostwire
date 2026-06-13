@@ -83,31 +83,21 @@ public final class RelayRole {
     }
 
     /**
-     * Forward a request to a trusted peer in the directory. The
-     * caller is responsible for actually dialing the peer and
-     * sending the bytes; this method just transforms the request
-     * (appends the next hop to the path, decrements ttl, returns
-     * the un-signed request for the caller to sign with the
-     * next-hop peer's key if needed).
+     * Forward a request to a trusted peer in the directory.
      *
-     * <p>Currently this only mutates the request; future work
-     * could include signature re-signing if the transport
-     * requires it.
+     * <p><b>v1 direct peer search does not support forwarding.</b> The
+     * current protocol is a signed direct request/response between two
+     * peers. Multi-hop relay forwarding requires an encrypted opaque
+     * envelope and a separate forwarder signature, which is out of
+     * scope for the direct TCP peer-search stabilization pass. This
+     * method throws {@link UnsupportedOperationException} to make that
+     * explicit.
+     *
+     * @throws UnsupportedOperationException always in v1
      */
     public RemoteSearchRequest forward(RemoteSearchRequest request, byte[] nextHopPub) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is null");
-        }
-        if (nextHopPub == null || nextHopPub.length != 32) {
-            throw new IllegalArgumentException("nextHopPub must be 32 bytes");
-        }
-        if (request.isLoop(nextHopPub)) {
-            throw new IllegalStateException("next hop already in path (loop)");
-        }
-        if (request.ttl() <= 0) {
-            throw new IllegalStateException("ttl exhausted, cannot forward");
-        }
-        return request.withNextHop(nextHopPub, request.ttl() - 1);
+        throw new UnsupportedOperationException(
+                "Multi-hop forwarding is not supported in the direct TCP peer-search protocol");
     }
 
     public RelaySearchService service() {

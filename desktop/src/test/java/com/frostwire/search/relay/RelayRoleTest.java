@@ -117,7 +117,7 @@ class RelayRoleTest {
     }
 
     @Test
-    void forwardAppendsToPath() {
+    void forwardIsUnsupportedInDirectPeerSearchV1() {
         byte[] a = new byte[32]; a[31] = 0x01;
         byte[] b = new byte[32]; b[31] = 0x02;
         byte[] nonce = new byte[32];
@@ -129,43 +129,11 @@ class RelayRoleTest {
                 .signature(new byte[64])
                 .build();
         byte[] nextHop = new byte[32]; nextHop[31] = 0x03;
-        RemoteSearchRequest forwarded = role.forward(req, nextHop);
-        assertEquals(2, forwarded.pathLength());
-        assertEquals(1, forwarded.ttl());
+        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, nextHop));
     }
 
     @Test
-    void forwardRejectsLoop() {
-        byte[] a = new byte[32]; a[31] = 0x01;
-        byte[] b = new byte[32]; b[31] = 0x02;
-        byte[] nonce = new byte[32];
-        RemoteSearchRequest req = RemoteSearchRequest.builder()
-                .nonce(nonce)
-                .requesterPub(a)
-                .ttl(2)
-                .path(new byte[][]{b})
-                .signature(new byte[64])
-                .build();
-        // b is already in the path
-        assertThrows(IllegalStateException.class, () -> role.forward(req, b));
-    }
-
-    @Test
-    void forwardRejectsExhaustedTtl() {
-        byte[] a = new byte[32]; a[31] = 0x01;
-        byte[] nonce = new byte[32];
-        RemoteSearchRequest req = RemoteSearchRequest.builder()
-                .nonce(nonce)
-                .requesterPub(a)
-                .ttl(0)
-                .signature(new byte[64])
-                .build();
-        byte[] nextHop = new byte[32]; nextHop[31] = 0x03;
-        assertThrows(IllegalStateException.class, () -> role.forward(req, nextHop));
-    }
-
-    @Test
-    void forwardRejectsBadInputs() {
+    void forwardRejectsBadInputsBeforeUnsupported() {
         byte[] nonce = new byte[32];
         byte[] a = new byte[32];
         RemoteSearchRequest req = RemoteSearchRequest.builder()
@@ -174,9 +142,10 @@ class RelayRoleTest {
                 .ttl(2)
                 .signature(new byte[64])
                 .build();
-        assertThrows(IllegalArgumentException.class, () -> role.forward(null, a));
-        assertThrows(IllegalArgumentException.class, () -> role.forward(req, null));
-        assertThrows(IllegalArgumentException.class, () -> role.forward(req, new byte[31]));
+        byte[] nextHop = new byte[32];
+        assertThrows(UnsupportedOperationException.class, () -> role.forward(null, a));
+        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, null));
+        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, new byte[31]));
     }
 
     @Test
