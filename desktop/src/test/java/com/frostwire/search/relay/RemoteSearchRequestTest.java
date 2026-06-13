@@ -129,6 +129,48 @@ class RemoteSearchRequestTest {
     }
 
     @Test
+    void canonicalBytesWithNonEmptyPathAreStableAndVerifiable() throws Exception {
+        byte[] nonce = new byte[32];
+        for (int i = 0; i < 32; i++) nonce[i] = (byte) i;
+        byte[] hop1 = new byte[32];
+        hop1[31] = 0x01;
+        byte[] hop2 = new byte[32];
+        hop2[31] = 0x02;
+        long ts = 1700000000L;
+        RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
+                .nonce(nonce)
+                .requesterPub(pubRaw)
+                .keywords("ubuntu")
+                .limit(10)
+                .ttl(2)
+                .timestamp(ts)
+                .path(new byte[][]{hop1, hop2})
+                .signature(new byte[64])
+                .build();
+        java.security.Signature signer = java.security.Signature.getInstance("Ed25519");
+        signer.initSign(keyPair.getPrivate());
+        signer.update(unsigned.canonicalBytes());
+        byte[] sig = signer.sign();
+
+        RemoteSearchRequest signed = RemoteSearchRequest.builder()
+                .nonce(nonce)
+                .requesterPub(pubRaw)
+                .keywords("ubuntu")
+                .limit(10)
+                .ttl(2)
+                .timestamp(ts)
+                .path(new byte[][]{hop1, hop2})
+                .signature(sig)
+                .build();
+
+        java.security.Signature verifier = java.security.Signature.getInstance("Ed25519");
+        verifier.initVerify(keyPair.getPublic());
+        verifier.update(signed.canonicalBytes());
+        assertTrue(verifier.verify(signed.signature()),
+                "signature over non-empty path canonical bytes must verify");
+    }
+
+    @Test
     void canonicalBytesDifferOnKeywordsChange() {
         byte[] nonce = new byte[32];
         long ts = 1700000000L;

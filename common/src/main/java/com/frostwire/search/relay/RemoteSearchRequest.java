@@ -143,9 +143,9 @@ public final class RemoteSearchRequest {
         return s.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
     }
 
-    private static int pathLengthBytes() {
-        // 4-byte length per entry, plus 32 bytes per entry.
-        return 0; // recomputed below
+    private int pathLengthBytes() {
+        // 4-byte count + (4-byte length prefix + 32-byte pubkey) per entry.
+        return 4 + path.length * (4 + 32);
     }
 
     private static void putLenPrefixed(ByteBuffer buf, byte[] data) {
