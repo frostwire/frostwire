@@ -67,7 +67,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink {
         this.signingKey = identity.ed25519().getPrivate();
         this.blockSource = blockSource;
         this.table = table;
-        this.chain = new KarmaChain(ownerPub);
+        this.chain = table.loadChain(ownerPub);
     }
 
     /**

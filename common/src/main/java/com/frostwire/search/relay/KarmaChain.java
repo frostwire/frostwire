@@ -42,6 +42,44 @@ public final class KarmaChain {
         this.ownerPub = ownerPub.clone();
     }
 
+    /**
+     * Load a chain from a list of previously persisted/verified entries.
+     * Returns null if the entries do not form a valid chain. On success,
+     * the returned chain has its epoch/energy state reconstructed so
+     * new endorsements can be appended immediately.
+     */
+    public static KarmaChain load(byte[] ownerPub, List<KarmaChainEntry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            return null;
+        }
+        if (!verify(entries)) {
+            return null;
+        }
+        KarmaChain chain = new KarmaChain(ownerPub);
+        chain.entries.addAll(entries);
+        chain.recomputeState();
+        return chain;
+    }
+
+    private void recomputeState() {
+        currentEpoch = -1;
+        currentEnergy = 0.0;
+        endorsementsThisEpoch = 0;
+        for (KarmaChainEntry e : entries) {
+            if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+                if (e.epoch() != null) {
+                    currentEpoch = e.epoch();
+                }
+                if (e.energy() != null) {
+                    currentEnergy = e.energy();
+                }
+                endorsementsThisEpoch = 0;
+            } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
+                endorsementsThisEpoch++;
+            }
+        }
+    }
+
     /** Read-only view of all entries (in order). */
     public synchronized List<KarmaChainEntry> entries() {
         return Collections.unmodifiableList(new ArrayList<>(entries));

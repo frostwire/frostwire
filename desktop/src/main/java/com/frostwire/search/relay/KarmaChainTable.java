@@ -194,60 +194,70 @@ public final class KarmaChainTable implements AutoCloseable {
 
     /**
      * Load the full chain into a KarmaChain. Used on startup.
+     * Returns an empty chain if no entries are persisted.
      */
     public KarmaChain loadChain(byte[] ownerPub) {
         if (ownerPub == null || ownerPub.length != 32) {
             throw new IllegalArgumentException("ownerPub must be 32 bytes");
         }
         ensureOpen();
-        KarmaChain chain = new KarmaChain(ownerPub);
+        List<KarmaChainEntry> loaded = new ArrayList<>();
         synchronized (connection) {
             try (Statement s = connection.createStatement();
                  ResultSet rs = s.executeQuery(
-                         "SELECT seq, kind, prev_hash, endorser_pub, timestamp, " +
+                         "SELECT kind, prev_hash, endorser_pub, timestamp, " +
                                  "block_height, block_hash, epoch, energy, " +
-                                 "peer_pub, info_hash, score_delta, signature, " +
-                                 "canonical_bytes " +
+                                 "peer_pub, info_hash, score_delta, signature " +
                                  "FROM " + CHAIN_TABLE + " ORDER BY seq ASC")) {
                 while (rs.next()) {
-                    int idx = 2;
-                    KarmaChainEntry.Kind kind = "EC".equals(rs.getString(idx++))
-                            ? KarmaChainEntry.Kind.EPOCH_COMMITMENT
-                            : KarmaChainEntry.Kind.ENDORSEMENT;
-                    byte[] prevHash = Hex.decode(rs.getString(idx++));
-                    byte[] endorserPub = Base64.getDecoder().decode(rs.getString(idx++));
-                    long timestamp = rs.getLong(idx++);
-                    long blockHeight = rs.getLong(idx++);
-                    byte[] blockHash = Hex.decode(rs.getString(idx++));
-                    long epoch = rs.getLong(idx++);
-                    boolean epochWasNull = rs.wasNull();
-                    double energy = rs.getDouble(idx++);
-                    boolean energyWasNull = rs.wasNull();
-                    String peerPubStr = rs.getString(idx++);
-                    byte[] peerPub = peerPubStr != null
-                            ? Base64.getDecoder().decode(peerPubStr) : null;
-                    String infoHashStr = rs.getString(idx++);
-                    byte[] infoHash = infoHashStr != null
-                            ? Hex.decode(infoHashStr) : null;
-                    int scoreDelta = rs.getInt(idx++);
-                    boolean scoreDeltaWasNull = rs.wasNull();
-                    byte[] signature = Base64.getDecoder().decode(rs.getString(idx++));
+                    int idx = 1;
+                    try {
+                        KarmaChainEntry.Kind kind = "EC".equals(rs.getString(idx++))
+                                ? KarmaChainEntry.Kind.EPOCH_COMMITMENT
+                                : KarmaChainEntry.Kind.ENDORSEMENT;
+                        byte[] prevHash = Hex.decode(rs.getString(idx++));
+                        byte[] endorserPub = Base64.getDecoder().decode(rs.getString(idx++));
+                        long timestamp = rs.getLong(idx++);
+                        long blockHeight = rs.getLong(idx++);
+                        byte[] blockHash = Hex.decode(rs.getString(idx++));
+                        long epoch = rs.getLong(idx++);
+                        boolean epochWasNull = rs.wasNull();
+                        double energy = rs.getDouble(idx++);
+                        boolean energyWasNull = rs.wasNull();
+                        String peerPubStr = rs.getString(idx++);
+                        byte[] peerPub = peerPubStr != null
+                                ? Base64.getDecoder().decode(peerPubStr) : null;
+                        String infoHashStr = rs.getString(idx++);
+                        byte[] infoHash = infoHashStr != null
+                                ? Hex.decode(infoHashStr) : null;
+                        int scoreDelta = rs.getInt(idx++);
+                        boolean scoreDeltaWasNull = rs.wasNull();
+                        byte[] signature = Base64.getDecoder().decode(rs.getString(idx++));
 
-                    // We don't re-sign entries loaded from storage; we reconstruct
-                    // the entry from stored fields. This bypasses the factory
-                    // validation but matches what we persisted.
-                    // For now, just use the first entry's endorserPub as the chain owner.
-                    if (chain.entries().isEmpty()) {
-                        // Start a new chain with the loaded owner
-                        // (chain was already created with the passed ownerPub)
+                        KarmaChainEntry entry = KarmaChainEntry.fromStoredFields(
+                                kind, prevHash, loaded.size(), endorserPub, timestamp,
+                                blockHeight, blockHash,
+                                epochWasNull ? null : epoch,
+                                energyWasNull ? null : energy,
+                                peerPub, infoHash,
+                                scoreDeltaWasNull ? null : scoreDelta,
+                                signature);
+                        loaded.add(entry);
+                    } catch (Throwable t) {
+                        LOG.warn("Skipping corrupt karma chain entry during load", t);
                     }
-                    // Skip reconstruction: loading is not used in this build.
-                    // The KarmaChain API is used for appending, not loading.
-                    // Loading is a future feature.
                 }
             } catch (SQLException e) {
                 throw new IllegalStateException("Failed to load karma chain", e);
             }
+        }
+        if (loaded.isEmpty()) {
+            return new KarmaChain(ownerPub);
+        }
+        KarmaChain chain = KarmaChain.load(ownerPub, loaded);
+        if (chain == null) {
+            LOG.warn("Persisted karma chain failed verification; starting fresh");
+            return new KarmaChain(ownerPub);
         }
         return chain;
     }

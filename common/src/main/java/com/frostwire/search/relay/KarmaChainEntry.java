@@ -184,6 +184,67 @@ public final class KarmaChainEntry {
         return b.build();
     }
 
+    /**
+     * Reconstruct an entry from its persisted fields without re-signing.
+     * Used by {@link KarmaChainTable#loadChain}. The caller is responsible
+     * for verifying the loaded chain with {@link KarmaChain#verify}.
+     */
+    public static KarmaChainEntry fromStoredFields(
+            Kind kind, byte[] prevHash, long seq, byte[] endorserPub,
+            long timestamp, long blockHeight, byte[] blockHash,
+            Long epoch, Double energy, byte[] peerPub, byte[] infoHash,
+            Integer scoreDelta, byte[] signature) {
+        if (kind == null) {
+            throw new IllegalArgumentException("kind is null");
+        }
+        if (prevHash == null || prevHash.length != 32) {
+            throw new IllegalArgumentException("prevHash must be 32 bytes");
+        }
+        if (endorserPub == null || endorserPub.length != 32) {
+            throw new IllegalArgumentException("endorserPub must be 32 bytes");
+        }
+        if (blockHash == null || blockHash.length != 32) {
+            throw new IllegalArgumentException("blockHash must be 32 bytes");
+        }
+        if (signature == null || signature.length != 64) {
+            throw new IllegalArgumentException("signature must be 64 bytes");
+        }
+        Builder b = new Builder();
+        b.kind = kind;
+        b.prevHash = prevHash;
+        b.seq = seq;
+        b.endorserPub = endorserPub;
+        b.timestamp = timestamp;
+        b.blockHeight = blockHeight;
+        b.blockHash = blockHash;
+        b.signature = signature.clone();
+        if (kind == Kind.EPOCH_COMMITMENT) {
+            if (epoch == null || energy == null) {
+                throw new IllegalArgumentException("epoch and energy are required for EPOCH_COMMITMENT");
+            }
+            if (energy < 0 || energy > KarmaConstants.MAX_ENERGY) {
+                throw new IllegalArgumentException("energy out of range");
+            }
+            b.epoch = epoch;
+            b.energy = energy;
+        } else {
+            if (peerPub == null || peerPub.length != 32) {
+                throw new IllegalArgumentException("peerPub must be 32 bytes for ENDORSEMENT");
+            }
+            if (infoHash == null || infoHash.length != 20) {
+                throw new IllegalArgumentException("infoHash must be 20 bytes for ENDORSEMENT");
+            }
+            if (scoreDelta == null) {
+                throw new IllegalArgumentException("scoreDelta is required for ENDORSEMENT");
+            }
+            b.peerPub = peerPub;
+            b.infoHash = infoHash;
+            b.scoreDelta = scoreDelta;
+        }
+        b.canonicalBytesForSigning();
+        return b.build();
+    }
+
     public Kind kind() {
         return kind;
     }

@@ -86,6 +86,50 @@ class KarmaChainTableTest {
     }
 
     @Test
+    void loadChainRestoresPersistedEntries() {
+        byte[] peer = dummyPeerPub(7);
+        KarmaChainEntry ec = KarmaChainEntry.createEpochCommitment(
+                KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
+                block(850000L), 5.0, keyPair.getPrivate());
+        KarmaChainEntry en = KarmaChainEntry.createEndorsement(
+                ec.entryHash(), 1, pubRaw, block(850050L),
+                peer, dummyInfoHash(7), 1, keyPair.getPrivate());
+        table.append(ec);
+        table.append(en);
+
+        KarmaChain loaded = table.loadChain(pubRaw);
+
+        assertNotNull(loaded);
+        assertEquals(2, loaded.entries().size());
+        assertEquals(0, loaded.entries().get(0).seq());
+        assertEquals(1, loaded.entries().get(1).seq());
+        assertEquals(5.0, loaded.entries().get(0).energy());
+        assertEquals(1, table.getPeerKarma(peer));
+    }
+
+    @Test
+    void loadChainReturnsEmptyChainForMissingOwner() {
+        KarmaChain loaded = table.loadChain(pubRaw);
+        assertNotNull(loaded);
+        assertTrue(loaded.entries().isEmpty());
+    }
+
+    @Test
+    void loadChainReturnsFreshChainWhenStoredEntriesAreInvalid() {
+        // Append a standalone endorsement without a preceding epoch commitment
+        KarmaChainEntry orphan = KarmaChainEntry.createEndorsement(
+                KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw, block(850050L),
+                dummyPeerPub(9), dummyInfoHash(9), 1, keyPair.getPrivate());
+        table.append(orphan);
+
+        KarmaChain loaded = table.loadChain(pubRaw);
+
+        assertNotNull(loaded);
+        assertTrue(loaded.entries().isEmpty(),
+                "Invalid persisted chain must be discarded, not loaded");
+    }
+
+    @Test
     void appendEndorsementUpdatesPeerKarma() {
         byte[] peer1 = dummyPeerPub(1);
         byte[] peer2 = dummyPeerPub(2);
