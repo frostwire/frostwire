@@ -257,7 +257,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         List<LocalSharedTorrent> rows = localIndex.search(keywords, localLimit);
         List<FileSearchResult> out = new ArrayList<>(rows.size());
         for (LocalSharedTorrent t : rows) {
-            out.add(LocalSharedTorrentSearchPerformer.toResult(t));
+            out.add(LocalSharedTorrentSearchPerformer.toResult(t, SOURCE_NAME));
         }
         return out;
     }

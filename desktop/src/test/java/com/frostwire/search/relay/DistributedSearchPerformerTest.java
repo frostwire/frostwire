@@ -119,7 +119,7 @@ class DistributedSearchPerformerTest {
         List<SearchResult> out = listener.results.get(0);
         assertEquals(1, out.size());
         assertEquals("ubuntu desktop", out.get(0).getDisplayName());
-        assertEquals(LocalSharedTorrentSearchPerformer.SOURCE_NAME, ((CompositeFileSearchResult) out.get(0)).getSource());
+        assertEquals(DistributedSearchPerformer.SOURCE_NAME, ((CompositeFileSearchResult) out.get(0)).getSource());
     }
 
     @Test

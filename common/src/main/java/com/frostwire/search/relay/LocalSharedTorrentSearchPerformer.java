@@ -207,6 +207,10 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
     }
 
     static CompositeFileSearchResult toResult(LocalSharedTorrent t) {
+        return toResult(t, SOURCE_NAME);
+    }
+
+    static CompositeFileSearchResult toResult(LocalSharedTorrent t, String source) {
         String name = t.name();
         String infoHashHex = t.infoHashHex();
         long size = t.sizeBytes();
@@ -217,7 +221,7 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
                 .filename(name + ".torrent")
                 .size(size)
                 .detailsUrl(detailsUrl)
-                .source(SOURCE_NAME)
+                .source(source)
                 .creationTime(t.addedAt() * 1000L)
                 .preliminary(false)
                 .torrent(magnet, infoHashHex, 0, magnet)
