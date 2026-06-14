@@ -129,6 +129,11 @@ public final class FileSearchResultUIWrapper extends AbstractUISearchResult {
 
     @Override
     public String getHash() {
+        // For torrent results, expose the info hash so table deduplication,
+        // copy-magnet, and other hash-based actions work.
+        if (searchResult.isTorrent()) {
+            return searchResult.getTorrentHash().orElse(null);
+        }
         // For YouTube/streaming results, no hash available
         return null;
     }

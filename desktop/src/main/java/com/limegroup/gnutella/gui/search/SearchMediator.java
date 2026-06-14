@@ -643,10 +643,16 @@ public final class SearchMediator {
                                 if (firstMediaType == null && sr.getExtension() != null) {
                                     firstMediaType = NamedMediaType.getFromExtension(sr.getExtension());
                                 }
+                            } else {
+                                LOG.info("Search result filtered out: " + sr.getDisplayName()
+                                        + " ext=" + sr.getExtension()
+                                        + " source=" + sr.getSource());
                             }
                         }
                         // Auto-select the appropriate media type tab for the first result
                         if (firstMediaType != null && added > 0) {
+                            LOG.info("Auto-selecting media type tab: " + firstMediaType.getName()
+                                    + " for result count=" + added);
                             rp.selectMediaType(firstMediaType);
                         }
                     } catch (Exception e) {
