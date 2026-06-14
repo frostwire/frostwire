@@ -136,7 +136,13 @@ public class TableRowFilteredModel extends ResultPanelModel {
      * Determines whether or not the specified line is allowed by the filter.
      */
     private boolean allow(SearchResultDataLine line) {
-        return FILTER.allow(line);
+        boolean ok = FILTER.allow(line);
+        if (!ok && line != null) {
+            LOG.info("TableRowFilteredModel: FILTER rejected: " + line.getFilename()
+                    + " lineMediaType=" + line.getNamedMediaType()
+                    + " filterClass=" + FILTER.getClass().getSimpleName());
+        }
+        return ok;
     }
 
     /**
