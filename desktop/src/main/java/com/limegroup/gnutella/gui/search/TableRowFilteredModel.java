@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.SearchSettings;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Map;
  * @author Sumeet Thadani, Sam Berlin
  */
 public class TableRowFilteredModel extends ResultPanelModel {
+    private static final Logger LOG = Logger.getLogger(TableRowFilteredModel.class);
     /**
      * A list of all filtered results.
      */
@@ -78,13 +80,18 @@ public class TableRowFilteredModel extends ResultPanelModel {
             //System.out.println("TableRowFilteredModel.add() allow= " + allow + " isNotJunk= " + isNotJunk + " hideJunk= " + SearchSettings.hideJunk() + " " + tl.getFilename());
             if (allow) {
                 //System.out.println("TableRowFilteredModel.add() " + tl.getFilename());
+                LOG.info("TableRowFilteredModel: visible add: " + tl.getFilename()
+                        + " ext=" + (tl.getExtension() != null ? tl.getExtension() : "null"));
                 return super.add(tl, row);
             } else {
                 //System.out.println("TableRowFilteredModel.add() HIDDEN " + tl.getFilename());
+                LOG.info("TableRowFilteredModel: hidden add: " + tl.getFilename()
+                        + " ext=" + (tl.getExtension() != null ? tl.getExtension() : "null"));
                 HIDDEN.add(tl);
                 _numResults += 1;
             }
         } else {
+            LOG.info("TableRowFilteredModel: junk filtered: " + tl.getFilename());
             _numResults += 1;
         }
         return -1;

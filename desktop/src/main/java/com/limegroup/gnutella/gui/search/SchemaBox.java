@@ -200,6 +200,9 @@ final class SchemaBox extends JPanel {
             // Defer doClick() to avoid EDT violation when called from background threads
             // setSelected doesn't fire the proper events, so we need doClick
             SwingUtilities.invokeLater(mediaTypeButton::doClick);
+        } else {
+            com.frostwire.util.Logger.getLogger(SchemaBox.class)
+                    .warn("selectMediaType: no button for " + (type != null ? type.getName() : "null"));
         }
     }
 
