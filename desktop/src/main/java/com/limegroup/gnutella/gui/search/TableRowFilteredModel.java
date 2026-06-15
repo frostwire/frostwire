@@ -80,18 +80,13 @@ public class TableRowFilteredModel extends ResultPanelModel {
             //System.out.println("TableRowFilteredModel.add() allow= " + allow + " isNotJunk= " + isNotJunk + " hideJunk= " + SearchSettings.hideJunk() + " " + tl.getFilename());
             if (allow) {
                 //System.out.println("TableRowFilteredModel.add() " + tl.getFilename());
-                LOG.info("TableRowFilteredModel: visible add: " + tl.getFilename()
-                        + " ext=" + (tl.getExtension() != null ? tl.getExtension() : "null"));
                 return super.add(tl, row);
             } else {
                 //System.out.println("TableRowFilteredModel.add() HIDDEN " + tl.getFilename());
-                LOG.info("TableRowFilteredModel: hidden add: " + tl.getFilename()
-                        + " ext=" + (tl.getExtension() != null ? tl.getExtension() : "null"));
                 HIDDEN.add(tl);
                 _numResults += 1;
             }
         } else {
-            LOG.info("TableRowFilteredModel: junk filtered: " + tl.getFilename());
             _numResults += 1;
         }
         return -1;
@@ -136,13 +131,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
      * Determines whether or not the specified line is allowed by the filter.
      */
     private boolean allow(SearchResultDataLine line) {
-        boolean ok = FILTER.allow(line);
-        if (!ok && line != null) {
-            LOG.info("TableRowFilteredModel: FILTER rejected: " + line.getFilename()
-                    + " lineMediaType=" + line.getNamedMediaType()
-                    + " filterClass=" + FILTER.getClass().getSimpleName());
-        }
-        return ok;
+        return FILTER.allow(line);
     }
 
     /**

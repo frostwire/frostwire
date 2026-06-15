@@ -18,8 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.util.Logger;
-
 import com.frostwire.gui.filters.TableLineFilter;
 
 import java.util.ArrayList;
@@ -29,8 +27,6 @@ import java.util.List;
  * A filter that takes multiple other filters.
  */
 class CompositeFilter implements TableLineFilter<SearchResultDataLine> {
-
-    private static final Logger LOG = Logger.getLogger(CompositeFilter.class);
 
     /**
      * The underlying filters.
@@ -63,12 +59,8 @@ class CompositeFilter implements TableLineFilter<SearchResultDataLine> {
      * can be displayed.
      */
     public boolean allow(SearchResultDataLine line) {
-        for (int i = 0; i < delegates.size(); i++) {
-            TableLineFilter<SearchResultDataLine> delegate = delegates.get(i);
+        for (TableLineFilter<SearchResultDataLine> delegate : delegates) {
             if (!delegate.allow(line)) {
-                LOG.info("CompositeFilter: depth=" + i
-                        + " filter=" + delegate.getClass().getSimpleName()
-                        + " rejected: " + (line != null ? line.getFilename() : "null"));
                 return false;
             }
         }
