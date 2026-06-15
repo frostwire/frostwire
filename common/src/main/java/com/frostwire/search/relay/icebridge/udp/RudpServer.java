@@ -18,7 +18,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
-import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
@@ -27,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * rUDP listener for the IceBridge servent.
  *
- * <p>v1 placeholder: binds a UDP socket and counts ingress/egress packets.
- * The reliability, NAT traversal, and relay-forwarding layers will be added
- * on top of this channel in later commits.
+ * <p>Binds a UDP socket and dispatches decoded packets to a
+ * {@link RudpSessionManager}. The manager handles reliability, hole punching,
+ * and relay forwarding.
  */
 @SuppressWarnings("deprecation")
 public final class RudpServer implements AutoCloseable {
@@ -37,13 +36,13 @@ public final class RudpServer implements AutoCloseable {
     private static final Logger LOG = Logger.getLogger(RudpServer.class);
 
     private final IceBridgeConfig config;
-    private final IceBridgeMetrics metrics;
+    private final RudpSessionManager manager;
     private EventLoopGroup group;
     private Channel channel;
 
-    public RudpServer(IceBridgeConfig config, IceBridgeMetrics metrics) {
+    public RudpServer(IceBridgeConfig config, RudpSessionManager manager) {
         this.config = config;
-        this.metrics = metrics;
+        this.manager = manager;
     }
 
     public void start() throws InterruptedException {
@@ -58,10 +57,13 @@ public final class RudpServer implements AutoCloseable {
                 .handler(new ChannelInitializer<DatagramChannel>() {
                     @Override
                     protected void initChannel(DatagramChannel ch) {
-                        ch.pipeline().addLast(new PacketHandler());
+                        ch.pipeline()
+                                .addLast(new RudpPacketCodec())
+                                .addLast(new PacketHandler());
                     }
                 });
         channel = bootstrap.bind(config.host(), port).sync().channel();
+        manager.setChannel(channel);
         LOG.info("IceBridge rUDP server listening on " + config.host() + ":" + actualPort());
     }
 
@@ -78,6 +80,7 @@ public final class RudpServer implements AutoCloseable {
 
     @Override
     public void close() {
+        manager.shutdown();
         if (channel != null) {
             channel.close().awaitUninterruptibly(5, TimeUnit.SECONDS);
         }
@@ -87,12 +90,10 @@ public final class RudpServer implements AutoCloseable {
         LOG.info("IceBridge rUDP server stopped");
     }
 
-    private final class PacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+    private final class PacketHandler extends SimpleChannelInboundHandler<RudpPacketEnvelope> {
         @Override
-        public void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
-            int readable = packet.content().readableBytes();
-            metrics.rudpPacketIn(readable);
-            // v1: drop the packet. Reliability/forwarding logic added later.
+        public void channelRead0(ChannelHandlerContext ctx, RudpPacketEnvelope envelope) {
+            manager.onPacket(envelope);
         }
     }
 }

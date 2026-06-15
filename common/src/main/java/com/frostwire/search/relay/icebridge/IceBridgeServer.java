@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
+import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.search.relay.icebridge.udp.RudpServer;
 import com.frostwire.util.Logger;
 
@@ -19,6 +20,7 @@ import java.security.GeneralSecurityException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Main entry point for the IceBridge relay servent.
@@ -40,6 +42,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private IceBridgeMetrics metrics;
     private ControlServer controlServer;
     private RudpServer rudpServer;
+    private RudpSessionManager rudpSessionManager;
     private ScheduledExecutorService janitor;
 
     public static void main(String[] args) throws Exception {
@@ -68,8 +71,9 @@ public final class IceBridgeServer implements AutoCloseable {
         this.identity = loadIdentity(config.identityFile());
         this.metrics = new IceBridgeMetrics();
         this.registry = new PeerRegistry(config);
+        this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, this::onRudpData);
         this.controlServer = new ControlServer(registry, metrics, config);
-        this.rudpServer = new RudpServer(config, metrics);
+        this.rudpServer = new RudpServer(config, rudpSessionManager);
 
         controlServer.start();
         rudpServer.start();
@@ -125,6 +129,15 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public IceBridgeMetrics metrics() {
         return metrics;
+    }
+
+    public RudpSessionManager rudpSessionManager() {
+        return rudpSessionManager;
+    }
+
+    private void onRudpData(byte[] payload) {
+        // v1: application payload received over rUDP. Later wired to distributed search.
+        LOG.debug("IceBridge received rUDP payload of " + payload.length + " bytes");
     }
 
     public int controlPort() {
