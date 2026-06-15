@@ -1,9 +1,12 @@
-# FrostWire Distributed Search & Relay Network
+# FrostWire Distributed Search & IceBridge Relay Network
 
 > Corrected design for the FrostWire distributed search network and privacy-preserving relay layer.
 > This version replaces the earlier relay-registry/index-announcement design with primitives that
-> actually exist in BitTorrent DHT (BEP 5, BEP 44, BEP 46) and makes a headless cloud `relayd`
-> a first-class deployment target.
+> actually exist in BitTorrent DHT (BEP 5, BEP 44, BEP 46) and makes a headless cloud **IceBridge**
+> servent a first-class deployment target.
+> 
+> **IceBridge** = the purpose-agnostic relay/servent layer. **Distributed Search** = the first
+> application that routes search messages through IceBridge.
 
 ---
 
@@ -14,9 +17,9 @@ Every FrostWire user can become part of a global, privacy-preserving search netw
 1. Each node indexes the torrents it seeds or intentionally shares.
 2. Each node can search its own local index instantly.
 3. Each node can ask trusted peers and relays for matching results.
-4. Well-connected nodes, including headless cloud `relayd` nodes, help NAT-restricted users reach the mesh.
+4. Well-connected nodes, including headless cloud **IceBridge** servents, help NAT-restricted users reach the mesh.
 5. Every identity, manifest, query result, and trust record is signed with Ed25519.
-6. Search payloads are end-to-end encrypted so relays do not learn query text or result content.
+6. Search payloads are end-to-end encrypted so IceBridge servents do not learn query text or result content.
 
 Non-goals for v1:
 
@@ -77,9 +80,10 @@ inside signed application records when a strong content hash is needed.
                                       |
                                       v
 +----------------------+       +----------------------+       +----------------------+
-| FrostWire Desktop    | <---> | Headless relayd      | <---> | FrostWire Desktop    |
-| LocalIndex(SQLite)   | uTP   | RAM caches only      | uTP   | LocalIndex(SQLite)   |
-| Search UI            | E2E   | forwards opaque blobs| E2E   | Search UI            |
+| FrostWire Desktop    |       | Headless IceBridge   |       | FrostWire Desktop    |
+| LocalIndex(SQLite)   |<----->| Servent              |<----->| LocalIndex(SQLite)   |
+| Search UI            | HTTP | RAM caches only      | rUDP  | Search UI            |
+| or stdio             | or   | forwards opaque blobs| E2E   | or stdio             |
 +----------------------+       +----------------------+       +----------------------+
         |                              |                              |
         v                              v                              v
@@ -88,16 +92,18 @@ inside signed application records when a strong content hash is needed.
   (single-writer)                (single-writer)                (single-writer)
 ```
 
-The system has three independent roles that can be composed:
+FrostWire does not talk directly to remote peers. It talks to a **local IceBridge servent** over
+HTTP or stdio; that servent forms a mesh with other IceBridge servents using **rUDP** and NAT
+traversal. Search is just one application payload carried by IceBridge.
 
-| Role | Runs on desktop | Runs on relayd | Needs disk | Purpose |
-|------|-----------------|----------------|------------|---------|
+| Role | Runs on desktop | Runs on IceBridge | Needs disk | Purpose |
+|------|-----------------|-------------------|------------|---------|
 | Index role | yes | optional | SQLite or manifest cache | Build/search local torrent metadata. |
 | Search role | yes | optional | small cache | Query peers and merge signed results. |
-| Relay role | optional | yes | no | Forward encrypted query/result blobs for NAT-restricted nodes. |
+| Relay role | yes (as local daemon or embed) | yes | no | Forward encrypted query/result blobs for NAT-restricted nodes. |
 
-Desktop will usually run all roles except heavy public relay. A cloud `relayd` usually runs relay role
-and a small manifest cache only.
+Desktop will usually run a **local IceBridge servent** as a child process. A cloud **IceBridge**
+servent usually runs the relay role with a small manifest cache only.
 
 ---
 
@@ -105,18 +111,21 @@ and a small manifest cache only.
 
 ### 3.1 `common/`
 
-Package: `com.frostwire.search.relay`
+Package: `com.frostwire.search.relay` (transport) and `com.frostwire.search.relay.icebridge` (servent)
 
-Contains code that can run on Desktop, Android, and headless relayd:
+Contains code that can run on Desktop, Android, and the headless IceBridge daemon:
 
-- Records: `IdentityRecord`, `RelayRecord`, `IndexManifest`, `SearchQuery`, `SearchResultEnvelope`,
-  `TrustDelegation`.
-- Crypto: `SignatureVerifier`, `KeyMaterial`, `SessionCipher`.
-- Protocol: `PeerHandshake`, `RelayHandshake`, `PeerMesh`, `RelayClient`, `RelayServer` interfaces.
-- Interfaces: `LocalIndex`, `ManifestStore`, `TrustStore`.
-- Constants: `RelayConstants`.
+- **IceBridge servent**: `IceBridgeServer`, `IceBridgeControlHandler`, `PeerRegistry`, `IceBridgeConfig`.
+- **rUDP transport**: reliable UDP framing, NAT traversal, hole-punch coordination, relay forwarding.
+- **Identity/auth**: `IdentityKeys`, `IdentityRecord`, `PeerAuthenticator`, Ed25519 signatures, rate limiting.
+- **Records**: `IndexManifest`, `SearchQuery`, `SearchResultEnvelope`, `TrustDelegation`.
+- **Crypto/transport**: `SessionCipher`, `PeerHandshake`, `RelayWireCodec`.
+- **Interfaces**: `LocalIndex`, `ManifestStore`, `TrustStore`.
+- **Constants**: `RelayConstants`.
 
-No Swing, Android, or desktop database imports are allowed here.
+No Swing, Android, or desktop database imports are allowed here. The IceBridge daemon main class
+lives in `common/` so the same code can be embedded, spawned as a child process, or built into a
+standalone fat JAR.
 
 ### 3.2 `desktop/`
 
@@ -125,25 +134,77 @@ Desktop implementations and UI:
 - `LocalIndexTable`: JDBC SQLite + FTS5 implementation of `LocalIndex`.
 - `SharedTorrentIndexer`: `BTEngineListener` that populates the local index.
 - `LocalSharedTorrentSearchPerformer`: local-only search.
-- `DistributedSearchPerformer`: local + mesh search merger.
+- `DistributedSearchPerformer`: local + mesh search merger. Talks to the **local IceBridge**
+  daemon via HTTP/stdio, not to remote peers directly.
+- `IceBridgeLauncher`: spawns/configures the local IceBridge child process (optional).
 - `DistributedSearchEventBus`: in-process event stream.
 - `DistributedSearchLogPanel` and `PeerBrowseWindow`: Swing UI.
 
-### 3.3 `relayd/` (new module)
+### 3.3 `icebridge` deployment artifact
 
-Headless cloud relay:
+No new source module is needed because the server source is in `common/`. A Gradle task in
+`desktop/build.gradle` builds a standalone **IceBridge fat JAR** with:
 
-- Single JVM main class.
-- Depends on `common/` and jlibtorrent.
-- No Swing, no Android, no media library, no SQLite requirement.
-- Configurable role flags: `--relay`, `--index-cache`, `--bootstrap`.
-- RAM-bounded caches for peer identities, manifests, and recent route state.
-- Designed for fast networking, decent CPU/memory, minimal disk.
+- Main class: `com.frostwire.search.relay.icebridge.IceBridgeServer`.
+- All `common/` classes + Netty.
+- No Swing, no Android, no media library, no SQLite requirement for the cloud role.
+- Configurable role flags: `--port`, `--control-http-port`, `--control-stdio`, `--bootstrap`, `--max-peers`, `--peer-ttl-sec`.
+- RAM-bounded caches for peer identities and routes.
+- Designed for fast networking, decent CPU/memory, minimal/near-zero disk.
+
+Cloud deployment example:
+
+```bash
+java -jar icebridge.jar --control-http-port 8080 --port 6888 --bootstrap
+```
 
 ### 3.4 `android/` (later)
 
-Android can reuse common records and protocol. Android UI starts with peer browse and local search;
-relay metrics UI is out of scope for v1.
+Android can reuse common records and protocol. It will talk to a local IceBridge servent (or ship
+one in-process). Relay metrics UI is out of scope for v1.
+
+---
+
+## 3.5 IceBridge Servent Design
+
+### Roles
+
+An IceBridge servent can operate in **forwarder** or **client** mode:
+
+- **Forwarder**: can accept incoming connections (DMZ, port-forwarded, or hole-punched). It keeps a
+  public endpoint and forwards encrypted blobs for other servents. It is the durable fabric of the
+  relay network.
+- **Client**: behind a strict NAT. It maintains outgoing rUDP associations to forwarders and can
+  route through them. It may become a forwarder if hole punching succeeds.
+
+### Local API (FrostWire ↔ IceBridge)
+
+FrostWire talks to its local IceBridge servent over one of two channels:
+
+1. **HTTP** (`--control-http-port`): simple REST-ish API for registration, send, receive,
+   lookup-relay-peers.
+2. **stdio pipe** (`--control-stdio`): line-delimited or length-prefixed messages. Useful when
+   launching IceBridge as a child process.
+
+Both channels are local-only interfaces by default. All messages between FrostWire and IceBridge are
+unencrypted at this boundary because they run under the same user; encryption happens on the rUDP
+mesh.
+
+### Remote Protocol (IceBridge ↔ IceBridge)
+
+Servents communicate over **rUDP** (reliable UDP):
+
+- UDP is used for NAT traversal / hole punching.
+- A thin reliability layer (acks, retransmit, connection IDs) sits on top for messages that need it.
+- All mesh traffic is authenticated by Ed25519 and encrypted per-session.
+- Payloads are opaque to IceBridge; the relay layer only sees `from`, `to`, size, and timing.
+
+### Peer Registry
+
+Each IceBridge servent keeps an in-memory registry of peers it has recently authenticated to. Public
+/cloud servents may additionally expose a lookup endpoint so clients can discover forwarders. The
+DHT bootstrap topics (`frostwire-relays-v1`, `frostwire-bootstrap-v1`) remain the primary discovery
+mechanism; the cloud registry is a convenience fallback.
 
 ---
 
@@ -197,7 +258,7 @@ public interface LocalIndex {
 }
 ```
 
-`LocalIndexTable` then implements this interface. `relayd` can use an in-memory or no-op implementation.
+`LocalIndexTable` then implements this interface. A headless IceBridge servent can use an in-memory or no-op implementation.
 
 ---
 
@@ -258,13 +319,14 @@ announce bootstrap topic.
 
 ### 6.3 Connect and authenticate
 
-After `dhtGetPeers(topicHash)`, the node connects to candidates over uTP and performs:
+After `dhtGetPeers(topicHash)`, servents connect to candidates over **rUDP** and perform:
 
-1. Exchange `IdentityRecord`.
-2. Verify Ed25519 self-signature.
-3. Challenge/response with 32-byte nonces.
-4. Derive transport key with X25519 + KDF label `frostwire-relay-transport-v1`.
-5. Start encrypted framed messages.
+1. NAT traversal / hole punching where needed, falling back to a known forwarder.
+2. Exchange `IdentityRecord`.
+3. Verify Ed25519 self-signature.
+4. Challenge/response with 32-byte nonces.
+5. Derive transport key with X25519 + KDF label `frostwire-relay-transport-v1`.
+6. Start encrypted framed messages.
 
 Bad identities are dropped before any search payload is accepted.
 
@@ -349,7 +411,7 @@ Rows are scored by text match and trust score. Exact torrent availability still 
 
 ### 8.3 Relay search
 
-The relay forwards opaque encrypted frames:
+IceBridge forwards opaque encrypted frames:
 
 - It sees source connection, target peer or route hint, payload size, and timing.
 - It does not see query text or result contents.
@@ -437,12 +499,13 @@ Post-v1:
 
 ---
 
-## 10. Headless `relayd`
+## 10. Headless IceBridge
 
 ### 10.1 Purpose
 
-`relayd` is a cloud-friendly relay and bootstrap node. It should run on a small VM with fast networking,
-decent CPU/RAM, and little disk.
+IceBridge is a cloud-friendly relay and bootstrap servent. It runs as a standalone process on a
+small VM with fast networking, decent CPU/RAM, and little disk. The same code can also be embedded
+inside FrostWire for development or special deployments.
 
 ### 10.2 Requirements
 
@@ -451,19 +514,22 @@ decent CPU/RAM, and little disk.
 - No media library.
 - No SQLite requirement for pure relay mode.
 - One config file or environment-variable config.
-- RAM-bounded LRU caches.
-- jlibtorrent DHT/uTP only.
+- RAM-bounded LRU caches (near-zero disk I/O).
+- rUDP mesh transport.
+- HTTP or stdio control interface for local FrostWire integration.
 - Graceful shutdown and key persistence.
 
 ### 10.3 Minimal config
 
 ```
-FROSTWIRE_RELAY_ROLE=relay
-FROSTWIRE_RELAY_PORT=49152
-FROSTWIRE_RELAY_MAX_QPS=5
-FROSTWIRE_RELAY_MAX_PEERS=500
-FROSTWIRE_RELAY_CACHE_MB=256
-FROSTWIRE_RELAY_IDENTITY_FILE=/var/lib/frostwire-relayd/identity.dat
+ICEBRIDGE_ROLE=relay
+ICEBRIDGE_RUDP_PORT=49152
+ICEBRIDGE_CONTROL_HTTP_PORT=8080
+ICEBRIDGE_CONTROL_STDIO=false
+ICEBRIDGE_MAX_QPS=5
+ICEBRIDGE_MAX_PEERS=500
+ICEBRIDGE_CACHE_MB=256
+ICEBRIDGE_IDENTITY_FILE=/var/lib/icebridge/identity.dat
 ```
 
 ### 10.4 Metrics
@@ -471,11 +537,12 @@ FROSTWIRE_RELAY_IDENTITY_FILE=/var/lib/frostwire-relayd/identity.dat
 Expose logs first. Add HTTP metrics later if needed:
 
 - connected peers
-- relayed queries per minute
-- rejected queries
+- relayed messages per minute
+- rejected messages
 - signature failures
 - average relay latency
 - cache hit rate
+- rUDP hole-punch success/failure
 
 ---
 
@@ -537,15 +604,16 @@ Feature build order:
 | 9 | `IndexManifest` + manifest publisher | sign/verify/fetch latest manifest | `[common] Add signed index manifests` |
 | 10 | `PeerMesh` query/result messages | encrypted round trip, hop limit | `[common] Add encrypted peer mesh search protocol` |
 | 11 | `RelayServer` + `RelayClient` | relay opaque encrypted payload | `[common] Add encrypted relay server and client` |
-| 12 | `relayd` module | starts, announces, relays in local cluster | `[all] Add headless frostwire relayd` |
-| 13 | `DistributedSearchPerformer` | local + mesh merge | `[desktop] Add distributed search performer` |
-| 14 | `DistributedSearchEventBus` | thread-safe pub/sub | `[common] Add distributed search event bus` |
-| 15 | `DistributedSearchLogPanel` | row model, click actions | `[desktop] Add distributed search log panel` |
-| 16 | `PeerBrowseSearchPerformer` + window | browse known peer manifest | `[desktop] Add peer browse search window` |
-| 17 | `SignatureVerifier` everywhere | invalid sig rejects | `[common] Add signature verification for relay records` |
-| 18 | `TrustStore` + `WoTValidator` | BFS depth/expiry | `[common] Add trust store and WoT validator` |
-| 19 | DoS protection + metrics | qps limit, in-flight caps | `[common] Add relay rate limits and metrics` |
-| 20 | Documentation + changelog | docs only | `[all] Document distributed search and relay phase 4` |
+| 12 | IceBridge servent + CLI | starts, announces, relays in local cluster over rUDP | `[all] Add headless IceBridge relay servent` |
+| 13 | IceBridge HTTP/stdio control API | FrostWire talks to local IceBridge daemon | `[common] Add IceBridge local control API` |
+| 14 | `DistributedSearchPerformer` over IceBridge | local + mesh merge via local daemon | `[desktop] Add distributed search performer` |
+| 15 | `DistributedSearchEventBus` | thread-safe pub/sub | `[common] Add distributed search event bus` |
+| 16 | `DistributedSearchLogPanel` | row model, click actions | `[desktop] Add distributed search log panel` |
+| 17 | `PeerBrowseSearchPerformer` + window | browse known peer manifest | `[desktop] Add peer browse search window` |
+| 18 | `SignatureVerifier` everywhere | invalid sig rejects | `[common] Add signature verification for relay records` |
+| 19 | `TrustStore` + `WoTValidator` | BFS depth/expiry | `[common] Add trust store and WoT validator` |
+| 20 | DoS protection + metrics | qps limit, in-flight caps | `[common] Add relay rate limits and metrics` |
+| 21 | Documentation + changelog | docs only | `[all] Document distributed search and IceBridge phase 4` |
 
 ### 12.1 Current Implementation Checkpoint
 
@@ -556,23 +624,24 @@ prototype**, not as the privacy-preserving encrypted relay described above.
 Implemented and useful:
 
 - `LocalIndex`, `LocalIndexTable`, `SharedTorrentIndexer`, and `LocalSharedTorrentSearchPerformer`.
-- `SearchEngine.LOCAL` wiring, including optional karma-weighted local result ordering.
+- `SearchEngine.LOCAL` and `SearchEngine.DISTRIBUTED` wiring, including optional karma-weighted local result ordering.
 - PoW-capable `IdentityKeys`, signed bencoded `IdentityRecord`, and BEP 46 identity publication.
 - BEP 5 topic helpers for peers, relays, and bootstrap nodes.
 - `PeerDiscovery`, `PeerDirectory`, and scheduled peer discovery scaffolding.
 - Signed `RemoteSearchRequest` / `RemoteSearchResponse` records, framed wire codec, plain TCP client/server.
 - Per-peer karma-chain scaffolding and DHT publisher/fetcher interfaces.
 - Localhost multi-instance relay tests and in-process DHT smoke tests.
+- UI source-label and hash-dedup fixes so distributed results display cleanly.
 
 Not implemented yet:
 
-- `DistributedSearchPerformer`, `DISTRIBUTED_ID`, and `DISTRIBUTED_SEARCH_ENABLED`.
-- Authenticated discovery that turns a DHT endpoint into a verified Ed25519 identity before querying.
-- Response verification in the outgoing client boundary.
+- IceBridge servent, rUDP mesh, and NAT traversal.
+- IceBridge HTTP/stdio local control API.
+- Refactor `DistributedSearchPerformer` to talk to a local IceBridge daemon instead of directly using `OutgoingRelayClient`.
 - Encrypted `PeerMesh`, `SearchQuery`, `SearchResultEnvelope`, `SessionCipher`, or transport handshake.
 - Opaque relay forwarding; current relay requests expose query keywords to the target node.
-- `relayd` as a headless deployable module.
 - Public DHT two-machine advertise -> discover -> query verification.
+- Android IceBridge integration.
 
 ### 12.2 Stabilization Pass Before Distributed Search
 
@@ -619,11 +688,12 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 2. `ManifestPublisher` updates Alice's BEP 46 signed manifest.
 3. Alice announces herself under `frostwire-peers-v1`.
 4. Bob searches for `ubuntu 24`.
-5. Bob's desktop searches local FTS5 and sends signed direct peer-search queries to authenticated peers.
-6. Alice receives the query, searches her local index, returns a signed result envelope.
-7. Bob verifies Alice's signature and trust score, merges the result into normal Search UI.
-8. If Bob is behind symmetric NAT, direct queries may fail; NAT traversal / encrypted relay is future work.
-9. Bob can click Alice's peer badge to browse Alice's signed manifest.
+5. Bob's desktop starts its local IceBridge servent.
+6. Bob's desktop searches local FTS5 and asks the local IceBridge to send signed `SearchQuery` messages to authenticated peers and forwarders.
+7. Alice receives the query through her IceBridge servent, searches her local index, returns a signed result envelope through IceBridge.
+8. Bob verifies Alice's signature and trust score, merges the result into normal Search UI.
+9. If Bob is behind symmetric NAT, IceBridge finds a forwarder and relays the encrypted query/response.
+10. Bob can click Alice's peer badge to browse Alice's signed manifest.
 
 ---
 
@@ -631,10 +701,11 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 
 - Which Ed25519 public keys are FrostWire trust roots?
 - Should unknown peers be hidden by default or shown under an "Untrusted" fold?
-- Should desktop run relay role by default only when the node has a public/stable port?
+- Should desktop run an IceBridge forwarder role by default only when the node has a public/stable port?
 - How large should inline manifests be before switching to torrent-backed manifests?
-- Should `relayd` expose HTTP metrics in v1 or keep logs-only until operations need more?
+- Should IceBridge expose HTTP metrics in v1 or keep logs-only until operations need more?
+- Should the local IceBridge daemon be spawned automatically by desktop, or left as a manual/admin opt-in?
 
 ---
 
-*Next step: complete the stabilization pass in section 12.2 before adding the user-facing distributed search performer.*
+*Next step: build the IceBridge servent (common/), its HTTP/stdio control API, and refactor the desktop distributed search performer to send queries through the local IceBridge daemon instead of directly using the TCP relay client.*
