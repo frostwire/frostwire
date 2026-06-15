@@ -59,6 +59,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
@@ -99,6 +100,11 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     private SearchOptionsPanel searchOptionsPanel;
     private JScrollPane scrollPaneSearchOptions;
     private boolean stopped;
+    /**
+     * Tracks result hashes already added to this panel to avoid duplicates
+     * when multiple engines (e.g. Local and Distributed) return the same item.
+     */
+    private final Set<String> addedHashes = new java.util.HashSet<>();
 
     /**
      * Specialized constructor for creating a "dummy" result panel.
@@ -445,6 +451,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     private void repeatSearch() {
         stopped = false;
         clearTable();
+        addedHashes.clear();
         resetFilters();
         schemaBox.resetCounters();
         SearchMediator.setTabDisplayCount(this);
@@ -758,6 +765,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     @Override
     public void add(UISearchResult o, int index) {
+        String hash = o.getHash();
+        if (hash != null && !hash.isEmpty() && !addedHashes.add(hash)) {
+            return; // duplicate of an already-displayed result
+        }
         super.add(o, index);
         schemaBox.updateCounters(o);
     }
