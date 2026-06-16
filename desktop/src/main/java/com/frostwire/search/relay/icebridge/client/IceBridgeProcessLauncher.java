@@ -12,6 +12,7 @@ import com.frostwire.util.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
     private Process process;
     private IceBridgeClient client;
+    private File logDir;
 
     /**
      * Construct a launcher with explicit ports (use 0 to auto-select).
@@ -70,8 +72,9 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     }
 
     /**
-     * Start the IceBridge process. The process inherits stdout/stderr so
-     * daemon logs still reach the FrostWire launcher.
+     * Start the IceBridge process. Daemon stdout/stderr are redirected to
+     * files under a temporary directory so the subprocess cannot block on a
+     * shared Gradle worker pipe.
      *
      * @throws IOException if the jar is missing or the process cannot start
      */
@@ -99,8 +102,12 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
             command.add(identityFile.getAbsolutePath());
         }
 
+        logDir = Files.createTempDirectory("icebridge-launcher-" + controlHttpPort).toFile();
+        File stdout = new File(logDir, "stdout.log");
+        File stderr = new File(logDir, "stderr.log");
         ProcessBuilder pb = new ProcessBuilder(command);
-        pb.inheritIO();
+        pb.redirectOutput(stdout);
+        pb.redirectError(stderr);
         LOG.info("Starting IceBridge: " + String.join(" ", command));
         process = pb.start();
         client = new IceBridgeClient(controlHttpPort);
@@ -129,6 +136,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
     public boolean isAlive() {
         return process != null && process.isAlive();
+    }
+
+    public File logDir() {
+        return logDir;
     }
 
     private static int freePort() {
