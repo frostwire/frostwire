@@ -14,12 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -113,7 +107,7 @@ public class OutgoingRelayClient {
                     return Optional.empty();
                 }
                 if (expectedResponderPub != null
-                        && !verifyResponse(response, request, expectedResponderPub)) {
+                        && !SearchResponseVerifier.verify(response, request, expectedResponderPub)) {
                     return Optional.empty();
                 }
                 return Optional.of(response);
@@ -126,35 +120,6 @@ public class OutgoingRelayClient {
                 socket.close();
             } catch (IOException ignored) {
             }
-        }
-    }
-
-    static boolean verifyResponse(RemoteSearchResponse response,
-                                  RemoteSearchRequest request,
-                                  byte[] expectedResponderPub) {
-        try {
-            if (!Arrays.equals(response.nonce(), request.nonce())) {
-                LOG.debug("Response verification failed: nonce mismatch");
-                return false;
-            }
-            long nowSec = System.currentTimeMillis() / 1000L;
-            long skew = Math.abs(nowSec - response.timestamp());
-            if (skew > RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC) {
-                LOG.debug("Response verification failed: timestamp skew " + skew + "s");
-                return false;
-            }
-            PublicKey pub = rawEd25519ToPublicKey(expectedResponderPub);
-            Signature verifier = Signature.getInstance("Ed25519");
-            verifier.initVerify(pub);
-            verifier.update(response.canonicalBytes());
-            if (!verifier.verify(response.signature())) {
-                LOG.debug("Response verification failed: bad signature");
-                return false;
-            }
-            return true;
-        } catch (GeneralSecurityException e) {
-            LOG.debug("Response verification threw", e);
-            return false;
         }
     }
 
@@ -189,13 +154,5 @@ public class OutgoingRelayClient {
             } catch (IOException ignored) {
             }
         }
-    }
-
-    private static PublicKey rawEd25519ToPublicKey(byte[] raw) throws GeneralSecurityException {
-        byte[] prefix = {0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
-        byte[] encoded = new byte[prefix.length + raw.length];
-        System.arraycopy(prefix, 0, encoded, 0, prefix.length);
-        System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-        return KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
     }
 }

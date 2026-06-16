@@ -26,28 +26,27 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Search performer that merges local {@link LocalIndex} results with
- * results returned from directly authenticated peers.
+ * results returned from authenticated peers via a {@link DistributedSearchTransport}.
  *
- * <p>This is the narrow v1 distributed search performer described in
- * the relay design doc: it queries only {@link PeerDirectory#topByTrustVerified(int)}
- * peers, sends signed direct requests with {@code ttl=0} (forwarding disabled),
- * and verifies every response against the expected responder's Ed25519 public
- * key before accepting any rows.
+ * <p>Unlike the previous direct-TCP implementation, this performer sends signed
+ * requests through an asynchronous transport (IceBridge) and collects responses
+ * via a temporary listener registered for the duration of the search. The
+ * transport's internal poller thread delivers inbound payloads to all
+ * registered listeners; the performer filters by nonce and verifies every
+ * response against the expected responder's Ed25519 public key.
  *
  * <p>Fail-closed: unreachable peers, invalid signatures, stale responses,
  * wrong nonces, and rate-limited peers simply contribute no results. The
  * listener always receives a single {@code onResults} callback with the merged
  * local + peer result set, even if every peer fails.
  *
- * <p>Source label for peer-originated results: {@link #SOURCE_NAME}.
+ * <p>Source label for all results: {@link #SOURCE_NAME}.
  */
 public final class DistributedSearchPerformer implements ISearchPerformer {
 
@@ -64,7 +63,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private final LocalIndex localIndex;
     private final PeerDirectory peerDirectory;
     private final IdentityKeys identity;
-    private final OutgoingRelayClient client;
+    private final DistributedSearchTransport transport;
     private final int maxPeers;
     private final int localLimit;
     private final int peerLimit;
@@ -72,26 +71,25 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
 
     private volatile boolean stopped;
     private volatile SearchListener listener;
-    private volatile ExecutorService executor;
 
     public DistributedSearchPerformer(long token, String keywords,
-                                        LocalIndex localIndex,
-                                        PeerDirectory peerDirectory,
-                                        IdentityKeys identity,
-                                        OutgoingRelayClient client) {
-        this(token, keywords, localIndex, peerDirectory, identity, client,
+                                       LocalIndex localIndex,
+                                       PeerDirectory peerDirectory,
+                                       IdentityKeys identity,
+                                       DistributedSearchTransport transport) {
+        this(token, keywords, localIndex, peerDirectory, identity, transport,
                 DEFAULT_MAX_PEERS, DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT, DEFAULT_PEER_TIMEOUT_SEC);
     }
 
     public DistributedSearchPerformer(long token, String keywords,
-                                        LocalIndex localIndex,
-                                        PeerDirectory peerDirectory,
-                                        IdentityKeys identity,
-                                        OutgoingRelayClient client,
-                                        int maxPeers,
-                                        int localLimit,
-                                        int peerLimit,
-                                        int peerTimeoutSec) {
+                                       LocalIndex localIndex,
+                                       PeerDirectory peerDirectory,
+                                       IdentityKeys identity,
+                                       DistributedSearchTransport transport,
+                                       int maxPeers,
+                                       int localLimit,
+                                       int peerLimit,
+                                       int peerTimeoutSec) {
         if (token < 0) {
             throw new IllegalArgumentException("token must be >= 0");
         }
@@ -107,8 +105,8 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
-        if (client == null) {
-            throw new IllegalArgumentException("client is null");
+        if (transport == null) {
+            throw new IllegalArgumentException("transport is null");
         }
         if (maxPeers <= 0) {
             throw new IllegalArgumentException("maxPeers must be > 0");
@@ -128,7 +126,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         this.localIndex = localIndex;
         this.peerDirectory = peerDirectory;
         this.identity = identity;
-        this.client = client;
+        this.transport = transport;
         this.maxPeers = maxPeers;
         this.localLimit = localLimit;
         this.peerLimit = peerLimit;
@@ -150,42 +148,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         if (stopped || l == null) {
             return;
         }
-        List<FileSearchResult> merged = new ArrayList<>();
-        ExecutorService exec = null;
         try {
-            List<FileSearchResult> local = queryLocal();
+            List<FileSearchResult> merged = new ArrayList<>(queryLocal());
             if (stopped) {
                 return;
             }
-            merged.addAll(local);
 
             List<PeerDirectory.PeerInfo> peers = peerDirectory.topByTrustVerified(maxPeers);
             if (!peers.isEmpty()) {
-                exec = Executors.newCachedThreadPool(r -> {
-                    Thread t = new Thread(r, "distributed-search-" + token);
-                    t.setDaemon(true);
-                    return t;
-                });
-                this.executor = exec;
-                List<Future<List<FileSearchResult>>> futures = new ArrayList<>(peers.size());
-                for (PeerDirectory.PeerInfo peer : peers) {
-                    futures.add(exec.submit(() -> queryPeer(peer)));
-                }
-                for (Future<List<FileSearchResult>> f : futures) {
-                    if (stopped) {
-                        break;
-                    }
-                    try {
-                        List<FileSearchResult> peerResults = f.get(peerTimeoutSec, TimeUnit.SECONDS);
-                        if (peerResults != null) {
-                            merged.addAll(peerResults);
-                        }
-                    } catch (java.util.concurrent.TimeoutException e) {
-                        f.cancel(true);
-                    } catch (Throwable t) {
-                        LOG.debug("Peer query task failed for token " + token, t);
-                    }
-                }
+                merged.addAll(queryPeers(peers));
             }
             if (stopped) {
                 return;
@@ -199,11 +170,6 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             if (listener != null && !stopped) {
                 listener.onError(token, new SearchError(-1, t.getMessage()));
             }
-        } finally {
-            if (exec != null) {
-                exec.shutdownNow();
-                this.executor = null;
-            }
         }
     }
 
@@ -215,10 +181,6 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     @Override
     public void stop() {
         stopped = true;
-        ExecutorService exec = executor;
-        if (exec != null) {
-            exec.shutdownNow();
-        }
         try {
             if (listener != null) {
                 listener.onStopped(token);
@@ -253,6 +215,10 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         return false;
     }
 
+    /**
+     * Query the local index and wrap each row as a {@link CompositeFileSearchResult}
+     * tagged with {@link #SOURCE_NAME}.
+     */
     private List<FileSearchResult> queryLocal() {
         List<LocalSharedTorrent> rows = localIndex.search(keywords, localLimit);
         List<FileSearchResult> out = new ArrayList<>(rows.size());
@@ -262,20 +228,73 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         return out;
     }
 
-    private List<FileSearchResult> queryPeer(PeerDirectory.PeerInfo peer) {
+    /**
+     * Send signed requests to all peers in parallel, then wait for responses
+     * to arrive on the transport within the timeout window.
+     *
+     * <p>A temporary {@link DistributedSearchTransport.PayloadListener} is
+     * registered for the duration of the search. It decodes each inbound
+     * payload as a {@link RemoteSearchResponse}, matches the nonce to a
+     * pending request, verifies the signature against the expected peer's
+     * public key, and collects verified rows.
+     */
+    private List<FileSearchResult> queryPeers(List<PeerDirectory.PeerInfo> peers) {
+        // The latch covers every peer: successful sends will be counted down
+        // when a response arrives (or times out); failed sends are counted
+        // down immediately. The listener is registered BEFORE any sends so
+        // that responses delivered by the transport's poller thread are not
+        // missed.
+        int totalPeers = peers.size();
+        Map<String, PendingRequest> pending = new ConcurrentHashMap<>();
+        List<FileSearchResult> results = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch latch = new CountDownLatch(totalPeers);
+
+        DistributedSearchTransport.PayloadListener responseListener =
+                (sourcePub, payload, receivedMs) -> {
+                    RemoteSearchResponse response = SearchPayloadCodec.decodeResponse(payload);
+                    if (response == null) {
+                        return;
+                    }
+                    PendingRequest req = pending.remove(Hex.encode(response.nonce()));
+                    if (req == null) {
+                        return; // not our response
+                    }
+                    if (SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
+                        results.addAll(toResults(response));
+                    }
+                    latch.countDown();
+                };
+
+        transport.addListener(responseListener);
         try {
-            RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit);
-            Optional<RemoteSearchResponse> response = client.send(
-                    peer.hostname(), peer.utpPort(), request, peer.peerPub());
-            if (!response.isPresent()) {
-                return Collections.emptyList();
+            for (PeerDirectory.PeerInfo peer : peers) {
+                if (stopped) {
+                    latch.countDown();
+                    continue;
+                }
+                try {
+                    RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit);
+                    byte[] payload = SearchPayloadCodec.encodeRequest(request);
+                    if (transport.send(peer.peerPub(), payload)) {
+                        pending.put(Hex.encode(request.nonce()),
+                                new PendingRequest(peer, request));
+                    } else {
+                        latch.countDown(); // send failed — no response expected
+                    }
+                } catch (Throwable t) {
+                    LOG.debug("Failed to send search request to peer "
+                            + peer.hostname() + ":" + peer.utpPort()
+                            + " token=" + token, t);
+                    latch.countDown();
+                }
             }
-            return toResults(response.get());
-        } catch (Throwable t) {
-            LOG.debug("Peer query failed for " + peer.hostname() + ":" + peer.utpPort()
-                    + " token=" + token, t);
-            return Collections.emptyList();
+            latch.await(peerTimeoutSec, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            transport.removeListener(responseListener);
         }
+        return results;
     }
 
     private RemoteSearchRequest buildSignedRequest(String keywords, int limit) throws GeneralSecurityException {
@@ -343,15 +362,18 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 continue;
             }
             CompositeFileSearchResult c = (CompositeFileSearchResult) r;
-            Optional<String> hashOpt = c.getTorrentHash();
-            if (!hashOpt.isPresent()) {
+            if (c.getTorrentHash().isEmpty()) {
                 continue;
             }
-            String hash = hashOpt.get();
+            String hash = c.getTorrentHash().get();
             if (!seen.containsKey(hash)) {
                 seen.put(hash, r);
             }
         }
         return new ArrayList<>(seen.values());
+    }
+
+    /** Associates a sent request with the peer it was sent to. */
+    private record PendingRequest(PeerDirectory.PeerInfo peer, RemoteSearchRequest request) {
     }
 }
