@@ -12,6 +12,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
+import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
@@ -40,6 +41,8 @@ import java.util.stream.Collectors;
  * <ul>
  *   <li>{@code POST /register} — register or refresh a peer identity and endpoint.</li>
  *   <li>{@code GET /lookup?count=N} — return up to N forward-capable peers.</li>
+ *   <li>{@code POST /send} — send an opaque payload to a target peer.</li>
+ *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.</li>
  *   <li>{@code GET /metrics} — return in-memory counters and registry size.</li>
  *   <li>{@code GET /health} — liveness check.</li>
  * </ul>
@@ -49,15 +52,24 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private static final Logger LOG = Logger.getLogger(ControlHandler.class);
     private static final Gson GSON = new Gson();
     private static final int DEFAULT_LOOKUP_COUNT = 10;
+    private static final int DEFAULT_POLL_COUNT = 64;
 
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
     private final IceBridgeConfig config;
+    private final RudpSessionManager rudpSessionManager;
+    private final InboundMessageQueue inboundQueue;
 
-    public ControlHandler(PeerRegistry registry, IceBridgeMetrics metrics, IceBridgeConfig config) {
+    public ControlHandler(PeerRegistry registry,
+                          IceBridgeMetrics metrics,
+                          IceBridgeConfig config,
+                          RudpSessionManager rudpSessionManager,
+                          InboundMessageQueue inboundQueue) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
+        this.rudpSessionManager = rudpSessionManager;
+        this.inboundQueue = inboundQueue;
     }
 
     @Override
@@ -73,6 +85,10 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = handleRegister(request);
             } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
                 response = handleLookup(uri);
+            } else if (method == HttpMethod.POST && "/send".equals(path)) {
+                response = handleSend(request);
+            } else if (method == HttpMethod.GET && "/poll".equals(path)) {
+                response = handlePoll(uri);
             } else if (method == HttpMethod.GET && "/metrics".equals(path)) {
                 response = handleMetrics();
             } else if (method == HttpMethod.GET && "/health".equals(path)) {
@@ -159,6 +175,61 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                         p.lastSeenMs()))
                 .collect(Collectors.toList());
         return ApiResponse.success(info);
+    }
+
+    private ApiResponse<String> handleSend(FullHttpRequest request) {
+        if (rudpSessionManager == null) {
+            return ApiResponse.error("rUDP stack not available");
+        }
+        SendRequest req = decodeBody(request, SendRequest.class);
+        if (req == null || req.targetPub == null || req.payload == null) {
+            return ApiResponse.error("targetPub and payload are required");
+        }
+        byte[] targetPub;
+        byte[] payload;
+        try {
+            targetPub = IceBridgeAuth.decodeBase64(req.targetPub);
+            payload = IceBridgeAuth.decodeBase64(req.payload);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid base64: " + e.getMessage());
+        }
+        if (targetPub.length != 32) {
+            return ApiResponse.error("targetPub must be 32 bytes");
+        }
+        if (payload.length == 0) {
+            return ApiResponse.error("payload must not be empty");
+        }
+        rudpSessionManager.deliver(targetPub, payload);
+        return ApiResponse.success("queued");
+    }
+
+    private ApiResponse<List<InboundMessageInfo>> handlePoll(String uri) {
+        if (inboundQueue == null) {
+            return ApiResponse.error("inbound queue not available");
+        }
+        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+        int count = DEFAULT_POLL_COUNT;
+        List<String> countParams = decoder.parameters().get("count");
+        if (countParams != null && !countParams.isEmpty()) {
+            try {
+                count = Integer.parseInt(countParams.get(0));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        List<InboundMessageInfo> result = inboundQueue.poll(Math.max(1, Math.min(count, 256))).stream()
+                .map(m -> new InboundMessageInfo(
+                        Base64.getUrlEncoder().withoutPadding().encodeToString(m.sourcePub()),
+                        Base64.getUrlEncoder().withoutPadding().encodeToString(m.payload()),
+                        m.receivedMs()))
+                .collect(Collectors.toList());
+        return ApiResponse.success(result);
+    }
+
+    private <T> T decodeBody(FullHttpRequest request, Class<T> type) {
+        ByteBuf content = request.content();
+        byte[] bytes = new byte[content.readableBytes()];
+        content.readBytes(bytes);
+        return GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), type);
     }
 
     private ApiResponse<MetricsSnapshot> handleMetrics() {

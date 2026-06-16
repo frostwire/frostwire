@@ -9,9 +9,11 @@ package com.frostwire.search.relay.icebridge;
 
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
+import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.search.relay.icebridge.udp.RudpServer;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.io.File;
@@ -20,7 +22,6 @@ import java.security.GeneralSecurityException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * Main entry point for the IceBridge relay servent.
@@ -43,6 +44,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private ControlServer controlServer;
     private RudpServer rudpServer;
     private RudpSessionManager rudpSessionManager;
+    private InboundMessageQueue inboundQueue;
     private ScheduledExecutorService janitor;
 
     public static void main(String[] args) throws Exception {
@@ -71,8 +73,9 @@ public final class IceBridgeServer implements AutoCloseable {
         this.identity = loadIdentity(config.identityFile());
         this.metrics = new IceBridgeMetrics();
         this.registry = new PeerRegistry(config);
-        this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, this::onRudpData);
-        this.controlServer = new ControlServer(registry, metrics, config);
+        this.inboundQueue = new InboundMessageQueue();
+        this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
+        this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue);
         this.rudpServer = new RudpServer(config, rudpSessionManager);
 
         controlServer.start();
@@ -133,11 +136,6 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public RudpSessionManager rudpSessionManager() {
         return rudpSessionManager;
-    }
-
-    private void onRudpData(byte[] payload) {
-        // v1: application payload received over rUDP. Later wired to distributed search.
-        LOG.debug("IceBridge received rUDP payload of " + payload.length + " bytes");
     }
 
     public int controlPort() {
