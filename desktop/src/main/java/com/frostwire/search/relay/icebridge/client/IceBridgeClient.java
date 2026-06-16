@@ -12,6 +12,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.control.ApiResponse;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
 import com.frostwire.search.relay.icebridge.control.RegisterRequest;
+import com.frostwire.search.relay.icebridge.control.RouteRequest;
 import com.frostwire.search.relay.icebridge.control.SendRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -109,6 +110,28 @@ public final class IceBridgeClient implements AutoCloseable {
         }
 
         ApiResponse<?> response = post("/register", req, new TypeToken<ApiResponse<?>>() {
+        });
+        return response != null && response.ok;
+    }
+
+    /**
+     * Add a peer to the local IceBridge daemon's registry without a
+     * signature. This is a localhost-trusted call used by the desktop to
+     * tell the daemon where to route packets for a discovered peer.
+     */
+    public boolean route(byte[] peerPub, String host, int rudpPort,
+                         IceBridgeConfig.Role role) {
+        if (peerPub == null || peerPub.length != 32
+                || host == null || host.isEmpty()
+                || rudpPort <= 0 || role == null) {
+            return false;
+        }
+        RouteRequest req = new RouteRequest();
+        req.pub = Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub);
+        req.host = host;
+        req.rudpPort = rudpPort;
+        req.role = role;
+        ApiResponse<?> response = post("/route", req, new TypeToken<ApiResponse<?>>() {
         });
         return response != null && response.ok;
     }
