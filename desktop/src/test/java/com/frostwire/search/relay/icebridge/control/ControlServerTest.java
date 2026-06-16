@@ -126,6 +126,21 @@ class ControlServerTest {
     }
 
     @Test
+    void routeAddsPeerWithoutSignature() throws Exception {
+        RouteRequest req = new RouteRequest();
+        req.pub = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());
+        req.host = "198.51.100.2";
+        req.rudpPort = 6889;
+        req.role = IceBridgeConfig.Role.BOTH;
+
+        HttpResponse<String> response = post("/route", req);
+        assertEquals(200, response.statusCode(), response.body());
+        ApiResponse<?> body = GSON.fromJson(response.body(), ApiResponse.class);
+        assertTrue(body.ok, response.body());
+        assertEquals(1, registry.size());
+    }
+
+    @Test
     void pollRetrievesInboundMessages() throws Exception {
         String pubB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());
         String payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString("hello".getBytes(StandardCharsets.UTF_8));
