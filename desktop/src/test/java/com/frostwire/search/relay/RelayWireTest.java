@@ -271,7 +271,7 @@ class RelayWireTest {
     void verifyResponseAcceptsValidResponse() throws Exception {
         RemoteSearchRequest req = signRequest("ubuntu", 5);
         RemoteSearchResponse resp = signResponse(req.nonce(), System.currentTimeMillis() / 1000L);
-        assertTrue(OutgoingRelayClient.verifyResponse(
+        assertTrue(SearchResponseVerifier.verify(
                 resp, req, responderIdentity.ed25519PubRaw()));
     }
 
@@ -281,7 +281,7 @@ class RelayWireTest {
         byte[] wrongNonce = req.nonce().clone();
         wrongNonce[0] ^= 1;
         RemoteSearchResponse resp = signResponse(wrongNonce, System.currentTimeMillis() / 1000L);
-        assertFalse(OutgoingRelayClient.verifyResponse(
+        assertFalse(SearchResponseVerifier.verify(
                 resp, req, responderIdentity.ed25519PubRaw()));
     }
 
@@ -291,7 +291,7 @@ class RelayWireTest {
         long stale = System.currentTimeMillis() / 1000L
                 - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC - 60;
         RemoteSearchResponse resp = signResponse(req.nonce(), stale);
-        assertFalse(OutgoingRelayClient.verifyResponse(
+        assertFalse(SearchResponseVerifier.verify(
                 resp, req, responderIdentity.ed25519PubRaw()));
     }
 
@@ -310,7 +310,7 @@ class RelayWireTest {
                     r.publisherEd25519Pub, r.publisherNodeId);
         }
         RemoteSearchResponse tampered = b.build();
-        assertFalse(OutgoingRelayClient.verifyResponse(
+        assertFalse(SearchResponseVerifier.verify(
                 tampered, req, responderIdentity.ed25519PubRaw()));
     }
 

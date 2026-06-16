@@ -7,11 +7,11 @@
 
 package com.frostwire.tests.relay;
 
+import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.KarmaChainSource;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
-import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
@@ -59,14 +59,14 @@ class DistributedSearchEngineWireTest {
         LocalIndex index = new InMemoryLocalIndex();
         PeerDirectory directory = new PeerDirectory(new PeerKarmaCache(new RemoteKarmaChainFetcher(new NoOpKarmaSource())));
         IdentityKeys identity = IdentityKeys.generate();
-        OutgoingRelayClient client = new OutgoingRelayClient();
+        DistributedSearchTransport transport = new NoopTransport();
 
-        DistributedSearchEngineWire.wire(index, directory, identity, client);
+        DistributedSearchEngineWire.wire(index, directory, identity, transport);
 
         assertTrue(engine.isReady(), "DISTRIBUTED engine is ready after wiring");
 
         // Reset to avoid leaking state into other tests.
-        engine.setLocalIndex(null).setPeerDirectory(null).setIdentityKeys(null).setOutgoingRelayClient(null);
+        engine.setLocalIndex(null).setPeerDirectory(null).setIdentityKeys(null).setSearchTransport(null);
         assertFalse(engine.isReady());
     }
 
@@ -75,14 +75,14 @@ class DistributedSearchEngineWireTest {
         LocalIndex index = new InMemoryLocalIndex();
         PeerDirectory directory = new PeerDirectory(new PeerKarmaCache(new RemoteKarmaChainFetcher(new NoOpKarmaSource())));
         IdentityKeys identity = IdentityKeys.generate();
-        OutgoingRelayClient client = new OutgoingRelayClient();
+        DistributedSearchTransport transport = new NoopTransport();
 
         assertThrows(IllegalArgumentException.class,
-                () -> DistributedSearchEngineWire.wire(null, directory, identity, client));
+                () -> DistributedSearchEngineWire.wire(null, directory, identity, transport));
         assertThrows(IllegalArgumentException.class,
-                () -> DistributedSearchEngineWire.wire(index, null, identity, client));
+                () -> DistributedSearchEngineWire.wire(index, null, identity, transport));
         assertThrows(IllegalArgumentException.class,
-                () -> DistributedSearchEngineWire.wire(index, directory, null, client));
+                () -> DistributedSearchEngineWire.wire(index, directory, null, transport));
         assertThrows(IllegalArgumentException.class,
                 () -> DistributedSearchEngineWire.wire(index, directory, identity, null));
     }
@@ -129,6 +129,22 @@ class DistributedSearchEngineWireTest {
         @Override
         public com.frostwire.jlibtorrent.Entry fetchManifest(byte[] peerPub) {
             return null;
+        }
+    }
+
+    /** Minimal no-op transport for wiring tests. */
+    private static final class NoopTransport implements DistributedSearchTransport {
+        @Override
+        public boolean send(byte[] targetPub, byte[] payload) {
+            return false;
+        }
+
+        @Override
+        public void addListener(PayloadListener listener) {
+        }
+
+        @Override
+        public void removeListener(PayloadListener listener) {
         }
     }
 }

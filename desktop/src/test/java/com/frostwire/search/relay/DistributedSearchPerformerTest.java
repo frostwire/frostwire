@@ -15,8 +15,6 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.util.Hex;
 import org.junit.jupiter.api.Test;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +34,7 @@ class DistributedSearchPerformerTest {
         IdentityKeys id = IdentityKeys.generate();
         assertThrows(IllegalArgumentException.class,
                 () -> new DistributedSearchPerformer(0L, null, new InMemoryLocalIndex(),
-                        emptyDirectory(), id, new OutgoingRelayClient()));
+                        emptyDirectory(), id, new FakeTransport()));
     }
 
     @Test
@@ -44,7 +42,7 @@ class DistributedSearchPerformerTest {
         IdentityKeys id = IdentityKeys.generate();
         assertThrows(IllegalArgumentException.class,
                 () -> new DistributedSearchPerformer(-1L, "ubuntu", new InMemoryLocalIndex(),
-                        emptyDirectory(), id, new OutgoingRelayClient()));
+                        emptyDirectory(), id, new FakeTransport()));
     }
 
     @Test
@@ -52,13 +50,13 @@ class DistributedSearchPerformerTest {
         IdentityKeys id = IdentityKeys.generate();
         LocalIndex index = new InMemoryLocalIndex();
         PeerDirectory dir = emptyDirectory();
-        OutgoingRelayClient client = new OutgoingRelayClient();
+        FakeTransport transport = new FakeTransport();
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", null, dir, id, client));
+                () -> new DistributedSearchPerformer(0L, "ubuntu", null, dir, id, transport));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, null, id, client));
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, null, id, transport));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, null, client));
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, null, transport));
         assertThrows(IllegalArgumentException.class,
                 () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, null));
     }
@@ -68,21 +66,21 @@ class DistributedSearchPerformerTest {
         IdentityKeys id = IdentityKeys.generate();
         LocalIndex index = new InMemoryLocalIndex();
         PeerDirectory dir = emptyDirectory();
-        OutgoingRelayClient client = new OutgoingRelayClient();
+        FakeTransport transport = new FakeTransport();
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, client,
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, transport,
                         0, 50, 25, 10));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, client,
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, transport,
                         5, 0, 25, 10));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, client,
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, transport,
                         5, 50, 0, 10));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, client,
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, transport,
                         5, 50, RemoteSearchRequest.MAX_LIMIT + 1, 10));
         assertThrows(IllegalArgumentException.class,
-                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, client,
+                () -> new DistributedSearchPerformer(0L, "ubuntu", index, dir, id, transport,
                         5, 50, 25, 0));
     }
 
@@ -90,7 +88,7 @@ class DistributedSearchPerformerTest {
     void flagsAreNonCrawlerAndNoDdos() throws Exception {
         DistributedSearchPerformer p = new DistributedSearchPerformer(
                 0L, "ubuntu", new InMemoryLocalIndex(), emptyDirectory(),
-                IdentityKeys.generate(), new OutgoingRelayClient());
+                IdentityKeys.generate(), new FakeTransport());
         assertFalse(p.isCrawler());
         assertFalse(p.isDDOSProtectionActive());
     }
@@ -99,7 +97,7 @@ class DistributedSearchPerformerTest {
     void getKeywordsReturnsConstructorValue() throws Exception {
         DistributedSearchPerformer p = new DistributedSearchPerformer(
                 0L, "ubuntu", new InMemoryLocalIndex(), emptyDirectory(),
-                IdentityKeys.generate(), new OutgoingRelayClient());
+                IdentityKeys.generate(), new FakeTransport());
         assertEquals("ubuntu", p.getKeywords());
     }
 
@@ -110,7 +108,7 @@ class DistributedSearchPerformerTest {
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
                 1L, "ubuntu", index, emptyDirectory(),
-                IdentityKeys.generate(), new OutgoingRelayClient());
+                IdentityKeys.generate(), new FakeTransport());
         p.setListener(listener);
 
         p.perform();
@@ -131,12 +129,12 @@ class DistributedSearchPerformerTest {
         IdentityKeys requesterKeys = IdentityKeys.generate();
         PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
-        FakeClient client = new FakeClient();
-        client.addResponse("127.0.0.1", 6888, peerKeys, "peer ubuntu", 200L, 1);
+        FakeTransport transport = new FakeTransport();
+        transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 200L, 1);
 
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
-                2L, "ubuntu", index, directory, requesterKeys, client,
+                2L, "ubuntu", index, directory, requesterKeys, transport,
                 5, 50, 25, 10);
         p.setListener(listener);
 
@@ -161,13 +159,13 @@ class DistributedSearchPerformerTest {
         IdentityKeys requesterKeys = IdentityKeys.generate();
         PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
 
-        FakeClient client = new FakeClient();
-        client.addResponse("127.0.0.1", 6888, peerKeys,
+        FakeTransport transport = new FakeTransport();
+        transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys,
                 local.infoHash(), "peer ubuntu", 200L, 1);
 
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
-                3L, "ubuntu", index, directory, requesterKeys, client,
+                3L, "ubuntu", index, directory, requesterKeys, transport,
                 5, 50, 25, 10);
         p.setListener(listener);
 
@@ -185,12 +183,12 @@ class DistributedSearchPerformerTest {
         PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
         directory.upsert(peerKeys.ed25519PubRaw(), "127.0.0.1", 6888); // unverified
 
-        FakeClient client = new FakeClient();
-        client.addResponse("127.0.0.1", 6888, peerKeys, "peer ubuntu", 100L, 1);
+        FakeTransport transport = new FakeTransport();
+        transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 100L, 1);
 
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
-                4L, "ubuntu", index, directory, IdentityKeys.generate(), client,
+                4L, "ubuntu", index, directory, IdentityKeys.generate(), transport,
                 5, 50, 25, 10);
         p.setListener(listener);
 
@@ -205,12 +203,12 @@ class DistributedSearchPerformerTest {
         InMemoryLocalIndex index = new InMemoryLocalIndex();
         IdentityKeys peerKeys = IdentityKeys.generate();
         PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
-        FakeClient client = new FakeClient(); // no response registered -> empty
+        FakeTransport transport = new FakeTransport(); // no response registered -> empty
 
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
-                5L, "ubuntu", index, directory, IdentityKeys.generate(), client,
-                5, 50, 25, 10);
+                5L, "ubuntu", index, directory, IdentityKeys.generate(), transport,
+                5, 50, 25, 3);
         p.setListener(listener);
 
         p.perform();
@@ -226,7 +224,7 @@ class DistributedSearchPerformerTest {
         RecordingListener listener = new RecordingListener();
         DistributedSearchPerformer p = new DistributedSearchPerformer(
                 6L, "ubuntu", index, emptyDirectory(),
-                IdentityKeys.generate(), new OutgoingRelayClient());
+                IdentityKeys.generate(), new FakeTransport());
         p.setListener(listener);
         p.stop();
 
@@ -239,7 +237,7 @@ class DistributedSearchPerformerTest {
     }
 
     @Test
-    void endToEndWithLocalRelayServer() throws Exception {
+    void endToEndWithFakeTransportAndRelayService() throws Exception {
         IdentityKeys responderKeys = IdentityKeys.generate();
         IdentityKeys requesterKeys = IdentityKeys.generate();
 
@@ -247,44 +245,36 @@ class DistributedSearchPerformerTest {
         responderIndex.upsert(torrent("ubuntu server", 500L, 1));
 
         RelaySearchService service = new RelaySearchService(responderIndex, responderKeys);
-        IdentityRecord identityRecord = IdentityRecord.createSigned(
-                responderKeys.nodeId(), responderKeys.ed25519(),
-                responderKeys.x25519PubRaw(), 0);
-        IncomingRelayServer server = new IncomingRelayServer(
-                new RelayRole(service, emptyDirectory()), identityRecord, 0);
-        server.start();
-        try {
-            int port = server.port();
 
-            InMemoryLocalIndex requesterIndex = new InMemoryLocalIndex();
-            PeerDirectory directory = directoryWithVerifiedPeer(
-                    responderKeys, "127.0.0.1", port);
+        PeerDirectory directory = directoryWithVerifiedPeer(
+                responderKeys, "127.0.0.1", 6888);
 
-            RecordingListener listener = new RecordingListener();
-            DistributedSearchPerformer p = new DistributedSearchPerformer(
-                    7L, "ubuntu", requesterIndex, directory, requesterKeys,
-                    new OutgoingRelayClient(2000, 5000),
-                    5, 50, 25, 10);
-            p.setListener(listener);
+        FakeTransport transport = new FakeTransport();
+        transport.setSearchService(responderKeys.ed25519PubRaw(), service);
 
-            p.perform();
+        InMemoryLocalIndex requesterIndex = new InMemoryLocalIndex();
 
-            assertEquals(1, listener.results.size());
-            List<SearchResult> out = listener.results.get(0);
-            assertEquals(1, out.size());
-            assertEquals("ubuntu server", out.get(0).getDisplayName());
-            assertEquals(DistributedSearchPerformer.SOURCE_NAME,
-                    ((CompositeFileSearchResult) out.get(0)).getSource());
-        } finally {
-            server.stop();
-        }
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer p = new DistributedSearchPerformer(
+                7L, "ubuntu", requesterIndex, directory, requesterKeys,
+                transport, 5, 50, 25, 10);
+        p.setListener(listener);
+
+        p.perform();
+
+        assertEquals(1, listener.results.size());
+        List<SearchResult> out = listener.results.get(0);
+        assertEquals(1, out.size());
+        assertEquals("ubuntu server", out.get(0).getDisplayName());
+        assertEquals(DistributedSearchPerformer.SOURCE_NAME,
+                ((CompositeFileSearchResult) out.get(0)).getSource());
     }
 
     @Test
     void crawlIsNoOp() throws Exception {
         DistributedSearchPerformer p = new DistributedSearchPerformer(
                 0L, "ubuntu", new InMemoryLocalIndex(), emptyDirectory(),
-                IdentityKeys.generate(), new OutgoingRelayClient());
+                IdentityKeys.generate(), new FakeTransport());
         p.crawl((CrawlableSearchResult) null);
     }
 
@@ -427,36 +417,82 @@ class DistributedSearchPerformerTest {
         }
     }
 
-    private static final class FakeClient extends OutgoingRelayClient {
+    /**
+     * Fake transport that delivers mock responses asynchronously via a
+     * background thread. Two modes:
+     * <ul>
+     *   <li>{@code addResponse}: delivers a pre-built signed response.</li>
+     *   <li>{@code setSearchService}: routes the request through a real
+     *       {@link RelaySearchService} for end-to-end testing.</li>
+     * </ul>
+     */
+    private static final class FakeTransport implements DistributedSearchTransport {
         private final Map<String, PeerResponse> responses = new ConcurrentHashMap<>();
+        private final Map<String, RelaySearchService> services = new ConcurrentHashMap<>();
+        private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
 
-        FakeClient() {
-            super(100, 100);
-        }
-
-        void addResponse(String host, int port, IdentityKeys signer,
+        void addResponse(byte[] peerPub, IdentityKeys signer,
                          String name, long size, int fileCount) {
-            responses.put(host + ":" + port, new PeerResponse(signer, name, size, fileCount, null));
+            responses.put(Hex.encode(peerPub),
+                    new PeerResponse(signer, name, size, fileCount, null));
         }
 
-        void addResponse(String host, int port, IdentityKeys signer,
+        void addResponse(byte[] peerPub, IdentityKeys signer,
                          byte[] infoHash, String name, long size, int fileCount) {
-            responses.put(host + ":" + port, new PeerResponse(signer, name, size, fileCount, infoHash));
+            responses.put(Hex.encode(peerPub),
+                    new PeerResponse(signer, name, size, fileCount, infoHash));
+        }
+
+        void setSearchService(byte[] peerPub, RelaySearchService service) {
+            services.put(Hex.encode(peerPub), service);
         }
 
         @Override
-        public Optional<RemoteSearchResponse> send(String host, int port,
-                                                    RemoteSearchRequest request,
-                                                    byte[] expectedResponderPub) {
-            PeerResponse pr = responses.get(host + ":" + port);
-            if (pr == null) {
-                return Optional.empty();
+        public boolean send(byte[] targetPub, byte[] payload) {
+            String key = Hex.encode(targetPub);
+            PeerResponse pr = responses.get(key);
+            RelaySearchService svc = services.get(key);
+            if (pr == null && svc == null) {
+                return true; // accepted but no response will come
             }
-            try {
-                return Optional.of(pr.signFor(request));
-            } catch (Exception e) {
-                return Optional.empty();
+            RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
+            if (request == null) {
+                return false;
             }
+            // Deliver the response asynchronously to mimic the real transport.
+            Thread t = new Thread(() -> {
+                try {
+                    byte[] responseBytes;
+                    if (svc != null) {
+                        Optional<RemoteSearchResponse> response = svc.handle(request);
+                        if (response.isEmpty()) {
+                            return;
+                        }
+                        responseBytes = SearchPayloadCodec.encodeResponse(response.get());
+                    } else {
+                        RemoteSearchResponse response = pr.signFor(request);
+                        responseBytes = SearchPayloadCodec.encodeResponse(response);
+                    }
+                    for (PayloadListener l : listeners) {
+                        l.onPayload(targetPub, responseBytes, System.currentTimeMillis());
+                    }
+                } catch (Exception e) {
+                    // swallow — fail-closed
+                }
+            }, "fake-transport-" + key.substring(0, 8));
+            t.setDaemon(true);
+            t.start();
+            return true;
+        }
+
+        @Override
+        public void addListener(PayloadListener listener) {
+            listeners.add(listener);
+        }
+
+        @Override
+        public void removeListener(PayloadListener listener) {
+            listeners.remove(listener);
         }
     }
 

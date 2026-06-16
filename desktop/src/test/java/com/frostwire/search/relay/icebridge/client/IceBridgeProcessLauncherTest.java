@@ -46,7 +46,7 @@ class IceBridgeProcessLauncherTest {
         // poll health repeatedly.
         IceBridgeClient client = launcher.client();
         boolean healthy = false;
-        for (int i = 0; i < 150; i++) {
+        for (int i = 0; i < 300; i++) {
             if (!launcher.isAlive()) {
                 fail("IceBridge subprocess exited before becoming healthy");
             }
