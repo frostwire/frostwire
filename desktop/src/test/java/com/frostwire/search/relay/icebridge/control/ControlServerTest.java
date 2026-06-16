@@ -12,6 +12,7 @@ import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
+import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +41,8 @@ class ControlServerTest {
     private IceBridgeMetrics metrics;
     private ControlServer server;
     private IdentityKeys identity;
+    private InboundMessageQueue inboundQueue;
+    private RudpSessionManager rudpSessionManager;
 
     @BeforeEach
     void startServer() throws Exception {
@@ -54,7 +57,9 @@ class ControlServerTest {
                 .build();
         registry = new PeerRegistry(config);
         metrics = new IceBridgeMetrics();
-        server = new ControlServer(registry, metrics, config);
+        inboundQueue = new InboundMessageQueue();
+        rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
+        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue);
         server.start();
     }
 
@@ -118,6 +123,40 @@ class ControlServerTest {
         ApiResponse<?> body = GSON.fromJson(response.body(), ApiResponse.class);
         assertFalse(body.ok);
         assertEquals("invalid signature", body.error);
+    }
+
+    @Test
+    void pollRetrievesInboundMessages() throws Exception {
+        String pubB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());
+        String payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString("hello".getBytes(StandardCharsets.UTF_8));
+        inboundQueue.onMessage(identity.ed25519PubRaw(), "hello".getBytes(StandardCharsets.UTF_8));
+
+        HttpResponse<String> response = get("/poll?count=10");
+        assertEquals(200, response.statusCode());
+        java.lang.reflect.Type type = new TypeToken<ApiResponse<List<InboundMessageInfo>>>() {
+        }.getType();
+        ApiResponse<List<InboundMessageInfo>> body = GSON.fromJson(response.body(), type);
+        assertTrue(body.ok, response.body());
+        assertEquals(1, body.data.size());
+        assertEquals(pubB64, body.data.get(0).sourcePub);
+        assertEquals(payloadB64, body.data.get(0).payload);
+    }
+
+    @Test
+    void sendAcceptsTargetAndPayload() throws Exception {
+        byte[] targetPub = identity.ed25519PubRaw();
+        String targetB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(targetPub);
+        String payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString("query".getBytes(StandardCharsets.UTF_8));
+
+        SendRequest req = new SendRequest();
+        req.targetPub = targetB64;
+        req.payload = payloadB64;
+
+        HttpResponse<String> response = post("/send", req);
+        assertEquals(200, response.statusCode());
+        ApiResponse<?> body = GSON.fromJson(response.body(), ApiResponse.class);
+        assertTrue(body.ok, response.body());
+        assertEquals("queued", body.data);
     }
 
     private String signRegister(RegisterRequest req) throws Exception {
