@@ -49,6 +49,7 @@ import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeProcessLauncher;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
+import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -560,12 +561,20 @@ final class Initializer {
                 return;
             }
 
+            // Share the relay identity with the IceBridge daemon so that
+            // the Ed25519 pubkey used for DHT discovery is the same one
+            // the daemon uses for rUDP routing.
             File homeDir = new File(CommonUtils.getUserSettingsDir()
                     + File.separator + "libtorrent" + File.separator);
-            File iceBridgeIdentity = new File(homeDir, "icebridge-identity.dat");
+            File identityFile = new File(homeDir,
+                    com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+
+            // Use the well-known rUDP port so remote peers can reach us
+            // without an additional discovery round-trip.
+            int rudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
 
             IceBridgeProcessLauncher launcher = new IceBridgeProcessLauncher(
-                    jarPath, iceBridgeIdentity, 0, 0, "BOTH");
+                    jarPath, identityFile, 0, rudpPort, "BOTH");
             launcher.start();
             relayLog.info("IceBridge daemon started: controlPort=" + launcher.controlPort()
                     + " rudpPort=" + launcher.rudpPort());
@@ -601,6 +610,14 @@ final class Initializer {
             IncomingSearchRequestHandler incomingHandler =
                     new IncomingSearchRequestHandler(transport, searchService);
             incomingHandler.start();
+
+            // Start the peer registry sync so the IceBridge daemon knows
+            // the rUDP endpoints of all verified peers in our directory.
+            String localHost = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT > 0
+                    ? java.net.InetAddress.getLocalHost().getHostAddress()
+                    : "127.0.0.1";
+            PeerRegistrySync peerSync = new PeerRegistrySync(client, directory, localHost);
+            peerSync.start();
 
             // Wire the DISTRIBUTED search engine.
             DistributedSearchEngineWire.wire(localIndex, directory, identity, transport);
