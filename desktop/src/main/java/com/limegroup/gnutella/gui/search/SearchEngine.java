@@ -23,7 +23,7 @@ import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
-import com.frostwire.search.relay.OutgoingRelayClient;
+import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.frostclick.FrostClickSearchPattern;
@@ -311,7 +311,7 @@ public abstract class SearchEngine {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {
-                throw new RuntimeException("Distributed search engine is not ready; install localIndex, peerDirectory, identity, and outgoingRelayClient.");
+                throw new RuntimeException("Distributed search engine is not ready; install localIndex, peerDirectory, identity, and searchTransport.");
             }
             return new DistributedSearchPerformer(
                     token,
@@ -319,7 +319,7 @@ public abstract class SearchEngine {
                     DISTRIBUTED.localIndex,
                     DISTRIBUTED.peerDirectory,
                     DISTRIBUTED.identity,
-                    DISTRIBUTED.outgoingRelayClient);
+                    DISTRIBUTED.searchTransport);
         }
 
         @Override
@@ -327,7 +327,7 @@ public abstract class SearchEngine {
             return DISTRIBUTED.localIndex != null
                     && DISTRIBUTED.peerDirectory != null
                     && DISTRIBUTED.identity != null
-                    && DISTRIBUTED.outgoingRelayClient != null;
+                    && DISTRIBUTED.searchTransport != null;
         }
     };
 
@@ -343,8 +343,8 @@ public abstract class SearchEngine {
     /** Holder for this node's identity used by the DISTRIBUTED engine. */
     private volatile IdentityKeys identity;
 
-    /** Holder for the outgoing relay client used by the DISTRIBUTED engine. */
-    private volatile OutgoingRelayClient outgoingRelayClient;
+    /** Holder for the transport used by the DISTRIBUTED engine to send/receive search payloads. */
+    private volatile DistributedSearchTransport searchTransport;
 
     private final SearchEngineID _id;
     private final String _name;
@@ -496,11 +496,11 @@ public abstract class SearchEngine {
     }
 
     /**
-     * Installs the {@link OutgoingRelayClient} that backs the DISTRIBUTED engine.
+     * Installs the {@link DistributedSearchTransport} that backs the DISTRIBUTED engine.
      * Idempotent; the most recent call wins.
      */
-    public SearchEngine setOutgoingRelayClient(OutgoingRelayClient outgoingRelayClient) {
-        this.outgoingRelayClient = outgoingRelayClient;
+    public SearchEngine setSearchTransport(DistributedSearchTransport searchTransport) {
+        this.searchTransport = searchTransport;
         return this;
     }
 }

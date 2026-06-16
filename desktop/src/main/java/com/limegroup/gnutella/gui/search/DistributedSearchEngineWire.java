@@ -7,9 +7,9 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
-import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.search.relay.PeerDirectory;
 
 /**
@@ -18,8 +18,9 @@ import com.frostwire.search.relay.PeerDirectory;
  * <p>All four dependencies must be installed before the engine reports
  * itself as ready: a {@link LocalIndex} for the local half of the search,
  * a {@link PeerDirectory} for authenticated peers, the node's
- * {@link IdentityKeys} for signing requests, and an
- * {@link OutgoingRelayClient} for talking to peers.
+ * {@link IdentityKeys} for signing requests, and a
+ * {@link DistributedSearchTransport} for sending and receiving payloads
+ * over IceBridge.
  */
 public final class DistributedSearchEngineWire {
     private DistributedSearchEngineWire() {
@@ -28,7 +29,7 @@ public final class DistributedSearchEngineWire {
     public static void wire(LocalIndex localIndex,
                             PeerDirectory peerDirectory,
                             IdentityKeys identity,
-                            OutgoingRelayClient client) {
+                            DistributedSearchTransport transport) {
         if (localIndex == null) {
             throw new IllegalArgumentException("localIndex is null");
         }
@@ -38,8 +39,8 @@ public final class DistributedSearchEngineWire {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
-        if (client == null) {
-            throw new IllegalArgumentException("client is null");
+        if (transport == null) {
+            throw new IllegalArgumentException("transport is null");
         }
         SearchEngine distributed = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
         if (distributed == null) {
@@ -48,6 +49,6 @@ public final class DistributedSearchEngineWire {
         distributed.setLocalIndex(localIndex)
                 .setPeerDirectory(peerDirectory)
                 .setIdentityKeys(identity)
-                .setOutgoingRelayClient(client);
+                .setSearchTransport(transport);
     }
 }

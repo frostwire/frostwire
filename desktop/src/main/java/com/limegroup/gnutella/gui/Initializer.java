@@ -38,7 +38,6 @@ import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
-import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
@@ -46,6 +45,10 @@ import com.frostwire.search.relay.PeerDiscoveryScheduler;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
+import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
+import com.frostwire.search.relay.icebridge.client.IceBridgeProcessLauncher;
+import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
+import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -523,16 +526,119 @@ final class Initializer {
             //     and can upgrade the entry.
             startPeerDiscovery(directory, btEngine);
 
-            // 11. Wire the DISTRIBUTED search engine so the user
-            //     can search both the local index and authenticated
+            // 11. Launch the local IceBridge daemon, create the search
+            //     transport, and wire the DISTRIBUTED search engine so the
+            //     user can search both the local index and authenticated
             //     peers from the normal Search UI.
-            DistributedSearchEngineWire.wire(
-                    localIndex, directory, identity, new OutgoingRelayClient());
-            relayLog.info("Relay stack ready; Distributed search engine wired");
+            startIceBridgeSearch(localIndex, directory, identity, relayLog);
         } catch (Exception e) {
             // Non-fatal: the relay stack is optional; the app can run without it.
             relayLog.warn("Failed to start relay stack; distributed search disabled", e);
         }
+    }
+
+    /**
+     * Launch the local IceBridge daemon as a subprocess, create the
+     * {@link com.frostwire.search.relay.DistributedSearchTransport} that
+     * bridges the daemon's HTTP control API to the search engine, register
+     * an incoming-request handler so remote peers can search our index, and
+     * wire everything into the DISTRIBUTED search engine.
+     *
+     * <p>If the IceBridge jar is not found or the daemon fails to start,
+     * the DISTRIBUTED engine is left un-wired (not ready). The rest of
+     * FrostWire — LOCAL search, karma, DHT — still works.
+     */
+    private void startIceBridgeSearch(LocalIndex localIndex,
+                                       PeerDirectory directory,
+                                       IdentityKeys identity,
+                                       com.frostwire.util.Logger relayLog) {
+        try {
+            File jarPath = resolveIceBridgeJar();
+            if (jarPath == null) {
+                relayLog.warn("IceBridge jar not found; distributed search disabled. "
+                        + "Run ./gradlew icebridgeJar to build it.");
+                return;
+            }
+
+            File homeDir = new File(CommonUtils.getUserSettingsDir()
+                    + File.separator + "libtorrent" + File.separator);
+            File iceBridgeIdentity = new File(homeDir, "icebridge-identity.dat");
+
+            IceBridgeProcessLauncher launcher = new IceBridgeProcessLauncher(
+                    jarPath, iceBridgeIdentity, 0, 0, "BOTH");
+            launcher.start();
+            relayLog.info("IceBridge daemon started: controlPort=" + launcher.controlPort()
+                    + " rudpPort=" + launcher.rudpPort());
+
+            // Wait for the daemon to become healthy (up to 15s).
+            IceBridgeClient client = launcher.client();
+            boolean healthy = false;
+            for (int i = 0; i < 150; i++) {
+                if (client.health()) {
+                    healthy = true;
+                    break;
+                }
+                if (!launcher.isAlive()) {
+                    relayLog.warn("IceBridge process exited before becoming healthy");
+                    return;
+                }
+                Thread.sleep(100);
+            }
+            if (!healthy) {
+                relayLog.warn("IceBridge daemon did not become healthy in time; "
+                        + "distributed search disabled");
+                launcher.close();
+                return;
+            }
+
+            // Create the transport and start the background poller.
+            IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
+            transport.start();
+
+            // Register an incoming-request handler so remote peers can
+            // search our local index through IceBridge.
+            RelaySearchService searchService = new RelaySearchService(localIndex, identity);
+            IncomingSearchRequestHandler incomingHandler =
+                    new IncomingSearchRequestHandler(transport, searchService);
+            incomingHandler.start();
+
+            // Wire the DISTRIBUTED search engine.
+            DistributedSearchEngineWire.wire(localIndex, directory, identity, transport);
+            relayLog.info("Relay stack ready; Distributed search engine wired via IceBridge");
+        } catch (Throwable t) {
+            relayLog.warn("Failed to start IceBridge; distributed search disabled", t);
+        }
+    }
+
+    /**
+     * Resolve the path to the IceBridge fat JAR.
+     *
+     * <p>Search order:
+     * <ol>
+     *   <li>{@code frostwire.icebridge.jar} system property</li>
+     *   <li>{@code build/libs/icebridge.jar} relative to the working directory (dev mode)</li>
+     *   <li>{@code icebridge.jar} in the user settings directory (production)</li>
+     * </ol>
+     *
+     * @return the jar file, or {@code null} if not found
+     */
+    private static File resolveIceBridgeJar() {
+        String prop = System.getProperty("frostwire.icebridge.jar");
+        if (prop != null && !prop.isEmpty()) {
+            File f = new File(prop);
+            if (f.isFile()) {
+                return f;
+            }
+        }
+        File devJar = new File("build/libs/icebridge.jar");
+        if (devJar.isFile()) {
+            return devJar;
+        }
+        File prodJar = new File(CommonUtils.getUserSettingsDir(), "icebridge.jar");
+        if (prodJar.isFile()) {
+            return prodJar;
+        }
+        return null;
     }
 
     /**
