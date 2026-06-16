@@ -55,7 +55,7 @@ class RudpSessionManagerTest {
     void helloCreatesSessionAndDeliversData() throws Exception {
         long connectionId = 424242L;
         RudpSessionManager remoteManager = new RudpSessionManager(
-                remote, registry, metrics, payload -> {
+                remote, registry, metrics, (pub, payload) -> {
             received.add(payload);
             receivedCount.incrementAndGet();
         });
@@ -82,7 +82,7 @@ class RudpSessionManagerTest {
     void badHelloIsDropped() throws Exception {
         long connectionId = 999L;
         RudpSessionManager remoteManager = new RudpSessionManager(
-                remote, registry, metrics, payload -> receivedCount.incrementAndGet());
+                remote, registry, metrics, (pub, payload) -> receivedCount.incrementAndGet());
 
         byte[] badHello = new byte[96];
         RudpPacket hello = new RudpPacket(RudpPacket.Type.HELLO, connectionId, 0, 0, badHello);
@@ -98,7 +98,7 @@ class RudpSessionManagerTest {
         long localCid = 111L;
         long remoteCid = 222L;
         RudpSessionManager localManager = new RudpSessionManager(
-                local, registry, metrics, p -> {});
+                local, registry, metrics, (pub, payload) -> {});
 
         InetSocketAddress remoteAddress = new InetSocketAddress("127.0.0.1", 62003);
         RudpSession session = new RudpSession(localCid, remoteCid, remoteAddress, null, true);
@@ -130,7 +130,7 @@ class RudpSessionManagerTest {
 
         List<byte[]> forwarded = new ArrayList<>();
         RudpSessionManager forwarder = new RudpSessionManager(
-                local, registry, metrics, p -> forwarded.add(p));
+                local, registry, metrics, (pub, payload) -> forwarded.add(payload));
 
         byte[] sourcePub = local.ed25519PubRaw();
         byte[] appPayload = "relayed".getBytes();

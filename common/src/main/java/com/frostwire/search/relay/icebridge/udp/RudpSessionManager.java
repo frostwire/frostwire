@@ -11,6 +11,7 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import io.netty.channel.Channel;
 
@@ -18,12 +19,12 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * Manages rUDP sessions, hole punching, and relay forwarding for an IceBridge
@@ -46,7 +47,7 @@ public final class RudpSessionManager {
     private final IdentityKeys identity;
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
-    private final Consumer<byte[]> dataListener;
+    private final RudpMessageListener messageListener;
 
     private final Map<Long, RudpSession> sessionsByRemoteId = new ConcurrentHashMap<>();
     private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new ConcurrentHashMap<>();
@@ -58,11 +59,11 @@ public final class RudpSessionManager {
     public RudpSessionManager(IdentityKeys identity,
                               PeerRegistry registry,
                               IceBridgeMetrics metrics,
-                              Consumer<byte[]> dataListener) {
+                              RudpMessageListener messageListener) {
         this.identity = identity;
         this.registry = registry;
         this.metrics = metrics;
-        this.dataListener = dataListener;
+        this.messageListener = messageListener;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-rudp-manager");
             t.setDaemon(true);
@@ -74,6 +75,30 @@ public final class RudpSessionManager {
 
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    /**
+     * Send application data to a remote endpoint identified by public key.
+     *
+     * <p>If the registry knows the target's rUDP endpoint, a direct packet is
+     * sent; otherwise the data is relayed through the first known forwarder.
+     */
+    public void deliver(byte[] targetPub, byte[] payload) {
+        if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
+            return;
+        }
+        PeerRecord target = registry.lookup(targetPub);
+        if (target != null) {
+            sendData(new InetSocketAddress(target.host(), target.rudpPort()), payload);
+            return;
+        }
+        List<PeerRecord> forwarders = registry.lookupForwarders(1);
+        if (forwarders.isEmpty()) {
+            LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
+            return;
+        }
+        PeerRecord forwarder = forwarders.get(0);
+        sendRelay(new InetSocketAddress(forwarder.host(), forwarder.rudpPort()), targetPub, payload);
     }
 
     /**
@@ -246,12 +271,8 @@ public final class RudpSessionManager {
         if (session == null) {
             return;
         }
-        if (session.receiveRemote(packet.sequence()) && dataListener != null) {
-            try {
-                dataListener.accept(packet.payload());
-            } catch (Throwable t) {
-                LOG.warn("RudpSessionManager: data listener failed", t);
-            }
+        if (session.receiveRemote(packet.sequence())) {
+            notifyListener(session.remotePub(), packet.payload());
         }
         send(session, session.dataAck());
     }
@@ -327,15 +348,17 @@ public final class RudpSessionManager {
         }
         byte[] sourcePub = Arrays.copyOfRange(payload, 0, 32);
         byte[] appPayload = Arrays.copyOfRange(payload, 32, payload.length);
-        if (dataListener != null) {
+        notifyListener(sourcePub, appPayload);
+    }
+
+    private void notifyListener(byte[] sourcePub, byte[] payload) {
+        if (messageListener != null) {
             try {
-                dataListener.accept(appPayload);
+                messageListener.onMessage(sourcePub == null ? new byte[0] : sourcePub, payload);
             } catch (Throwable t) {
-                LOG.warn("RudpSessionManager: relay response listener failed", t);
+                LOG.warn("RudpSessionManager: message listener failed", t);
             }
         }
-        LOG.debug("RudpSessionManager: relay response delivered from "
-                + java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(sourcePub));
     }
 
     // ---- maintenance ----
