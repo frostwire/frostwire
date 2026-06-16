@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
  *
  * <p>Endpoints:
  * <ul>
- *   <li>{@code POST /register} — register or refresh a peer identity and endpoint.</li>
+ *   <li>{@code POST /register} — register or refresh a peer identity and endpoint (signed).</li>
+ *   <li>{@code POST /route} — add a peer to the registry without a signature (localhost-only trust).</li>
  *   <li>{@code GET /lookup?count=N} — return up to N forward-capable peers.</li>
  *   <li>{@code POST /send} — send an opaque payload to a target peer.</li>
  *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.</li>
@@ -83,6 +84,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             ApiResponse<?> response;
             if (method == HttpMethod.POST && "/register".equals(path)) {
                 response = handleRegister(request);
+            } else if (method == HttpMethod.POST && "/route".equals(path)) {
+                response = handleRoute(request);
             } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
                 response = handleLookup(uri);
             } else if (method == HttpMethod.POST && "/send".equals(path)) {
@@ -153,6 +156,37 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
 
     private byte[] canonicalBytes(RegisterRequest req) {
         return req.canonicalString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Localhost-trusted endpoint that adds a peer to the registry without
+     * requiring a signature. Only the co-located FrostWire process can
+     * call this (the control server binds to 127.0.0.1).
+     */
+    private ApiResponse<String> handleRoute(FullHttpRequest request) {
+        RouteRequest req = decodeBody(request, RouteRequest.class);
+        if (req == null || req.pub == null || req.host == null) {
+            return ApiResponse.error("pub and host are required");
+        }
+        byte[] rawPub;
+        try {
+            rawPub = IceBridgeAuth.decodeBase64(req.pub);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid base64: " + e.getMessage());
+        }
+        if (rawPub.length != 32) {
+            return ApiResponse.error("pub must be 32 bytes");
+        }
+        if (req.rudpPort <= 0 || req.rudpPort > 65535) {
+            return ApiResponse.error("rudpPort must be in [1, 65535]");
+        }
+        PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
+                req.role == null ? IceBridgeConfig.Role.BOTH : req.role,
+                System.currentTimeMillis());
+        boolean accepted = registry.register(record);
+        return accepted
+                ? ApiResponse.success("routed")
+                : ApiResponse.error("rate limited or at capacity");
     }
 
     private ApiResponse<List<PeerInfo>> handleLookup(String uri) {
