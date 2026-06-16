@@ -377,6 +377,7 @@ tasks.register('runWithJSig', JavaExec) {
 }
 
 test {
+    dependsOn icebridgeJar
     failFast = false
     enabled = gradle.startParameter.taskNames.contains("test")
     useJUnitPlatform()
