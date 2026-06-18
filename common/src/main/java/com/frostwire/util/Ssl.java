@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Util class to provide SSL/TLS specific features.
@@ -181,45 +182,34 @@ public final class Ssl {
 
         @Override
         public boolean verify(String s, SSLSession sslSession) {
-            if (!validDomainsSet.contains(s)) {
-                // check if the s is a subdomain
-                // Create a copy to avoid ConcurrentModificationException when adding during iteration
-                synchronized (validDomainsSet) {
-                    for (String baseDomain : validDomainsSet) {
-                        if (s.contains(baseDomain)) {
-                            validDomainsSet.add(s);
-                            return true;
-                        }
-                    }
-                }
-            }
-            return validDomainsSet.contains(s);
+            return hostnameIsValid(s);
         }
 
         public static boolean hostnameIsValid(String hostname) {
-            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + "...");
-            if (!validDomainsSet.contains(hostname)) {
-                // check if the s is a subdomain
-                // Create a copy to avoid ConcurrentModificationException when adding during iteration
-                synchronized (validDomainsSet) {
-                    for (String baseDomain : validDomainsSet) {
-                        if (hostname.contains(baseDomain)) {
-                            validDomainsSet.add(hostname);
-                            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": TRUE, validDomainSet updated with: " + hostname);
-
-                            return true;
-                        }
+            if (hostname == null || hostname.isEmpty()) {
+                return false;
+            }
+            // Check exact match first.
+            synchronized (validDomainsSet) {
+                if (validDomainsSet.contains(hostname)) {
+                    return true;
+                }
+                // Check if hostname is a subdomain of a known base domain.
+                // Use proper suffix matching (hostname ends with "." + baseDomain)
+                // to prevent "evil.com" matching "com".
+                for (String baseDomain : validDomainsSet) {
+                    if (hostname.endsWith("." + baseDomain) || hostname.equals(baseDomain)) {
+                        validDomainsSet.add(hostname);
+                        return true;
                     }
                 }
             }
-            boolean result = validDomainsSet.contains(hostname);
-            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": " + result);
-            return result;
+            return false;
         }
     }
 
     private static final class NullTrustManager implements X509TrustManager {
-        private final List<X509Certificate> acceptedCertificates = new ArrayList<>();
+        private final List<X509Certificate> acceptedCertificates = new CopyOnWriteArrayList<>();
 
         public X509Certificate[] getAcceptedIssuers() {
             return acceptedCertificates.toArray(new X509Certificate[0]);

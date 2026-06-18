@@ -47,6 +47,12 @@ import java.util.concurrent.TimeUnit;
 public class OkHttpClientWrapper extends AbstractHttpClient {
     public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(8, 30, TimeUnit.SECONDS);
     private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
+
+    /** Maximum response body size for get() (16 MB). Prevents OOM from malicious servers. */
+    private static final long MAX_STRING_RESPONSE_BYTES = 16L * 1024 * 1024;
+    /** Maximum response body size for getBytes() (32 MB — allows large .torrent files). */
+    private static final long MAX_BYTES_RESPONSE_BYTES = 32L * 1024 * 1024;
+
     private final ThreadPool pool;
     private final OkHttpClient sharedClient;
 
@@ -141,6 +147,12 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             }
             responseBody = response.body();
             if (responseBody != null) {
+                long contentLength = responseBody.contentLength();
+                if (contentLength > MAX_BYTES_RESPONSE_BYTES) {
+                    LOG.warn("OkHttpClientWrapper::getBytes - response too large (" + contentLength + " bytes) for " + url);
+                    closeQuietly(responseBody);
+                    return null;
+                }
                 result = responseBody.bytes();
             }
         } catch (Throwable e) {
@@ -174,6 +186,12 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             }
             responseBody = response.body();
             if (responseBody != null) {
+                long contentLength = responseBody.contentLength();
+                if (contentLength > MAX_STRING_RESPONSE_BYTES) {
+                    LOG.warn("OkHttpClientWrapper::get - response too large (" + contentLength + " bytes) for " + url);
+                    closeQuietly(responseBody);
+                    return null;
+                }
                 result = responseBody.string();
             }
         } catch (IOException ioe) {

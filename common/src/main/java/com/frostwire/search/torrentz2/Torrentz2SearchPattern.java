@@ -43,32 +43,15 @@ import java.util.regex.PatternSyntaxException;
 public class Torrentz2SearchPattern implements SearchPattern {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPattern.class);
     private static final String DOMAIN = "torrentz2.nz";
-    private static Pattern searchPattern;
-    private static Pattern sizePattern;
-    private static Pattern seedersPattern;
+    private static final Pattern searchPattern = Pattern.compile(
+        "(?is)<a\\s+href=\"/torrent/[a-f0-9]+\"[^>]*>\\s*(?<title>[^<]*?)\\s*</a>" +
+        "(?<metadata>.*?)" +
+        "<a\\s+href=\"(?<magnet>magnet:\\?[^\"]*)\"[^>]*>\\s*(?:<i[^>]*></i>)?\\s*Magnet"
+    );
+    private static final Pattern sizePattern = Pattern.compile("(?is)<i\\s+class=\"fas\\s+fa-download\"></i>\\s*<span>(?<size>[^<]+)</span>");
+    private static final Pattern seedersPattern = Pattern.compile("(?is)seeders</span>.*?<span\\s+class=\"font-medium\">(?<seeders>\\d+)</span>");
 
     public Torrentz2SearchPattern() {
-        if (searchPattern == null) {
-            try {
-                // New pattern for modern Torrentz2 HTML (2024+ redesign)
-                // Capture title and magnet link - extract hash from magnet link instead of URL
-                // The /torrent/XXXXX URLs use short hashes (24 chars), but magnet links have full SHA1 hashes (40 chars)
-                // We match from title through the magnet link, capturing metadata in between
-                searchPattern = Pattern.compile(
-                    "(?is)<a\\s+href=\"/torrent/[a-f0-9]+\"[^>]*>\\s*(?<title>[^<]*?)\\s*</a>" +
-                    "(?<metadata>.*?)" +  // Capture everything between title and magnet (includes size/seeders)
-                    "<a\\s+href=\"(?<magnet>magnet:\\?[^\"]*)\"[^>]*>\\s*(?:<i[^>]*></i>)?\\s*Magnet"
-                );
-
-                // Extract size from: <i class="fas fa-download"></i>\s*<span>(?<size>.*?)</span>
-                sizePattern = Pattern.compile("(?is)<i\\s+class=\"fas\\s+fa-download\"></i>\\s*<span>(?<size>[^<]+)</span>");
-
-                // Extract seeders from: seeders</span>\s*</span>\s*<span class="inline-flex[^>]*>(?:.*?)<span class="font-medium">(?<seeders>\\d+)
-                seedersPattern = Pattern.compile("(?is)seeders</span>.*?<span\\s+class=\"font-medium\">(?<seeders>\\d+)</span>");
-            } catch (PatternSyntaxException e) {
-                LOG.error("Error compiling Torrentz2 search results pattern", e);
-            }
-        }
     }
 
     @Override

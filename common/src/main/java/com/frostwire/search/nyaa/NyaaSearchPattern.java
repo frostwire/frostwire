@@ -43,7 +43,16 @@ public class NyaaSearchPattern implements SearchPattern {
     private static final Logger LOG = Logger.getLogger(NyaaSearchPattern.class);
     private static final String DOMAIN = "nyaa.si";
     private static final Map<String, Long> UNIT_TO_BYTES = new HashMap<>();
-    private static Pattern searchPattern;
+    private static final Pattern searchPattern = Pattern.compile(
+            "(?is)<tr class=\"default\">.*?" +
+                    "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
+                    "<a href=\".*?\" class=\"comments\" title=\".*?\">.*?<i class=\"fa fa-comments-o\"></i>.*?" +
+                    "<a href=\"(?<detailsurl>.*?)\" title=\"(?<displayname>.*?)\">.*?<td class=\"text-center\">.*?" +
+                    "<a href=\"(?<torrenturl>.*?)\"><i class=\"fa fa-fw fa-download\"></i></a>.*?" +
+                    "<a href=\"(?<magneturl>.*?)\"><i class=\"fa fa-fw fa-magnet\"></i></a>.*?" +
+                    "<td class=\"text-center\">(?<filesize>.*?)</td>.*?" +
+                    "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
+                    "<td class=\"text-center\">(?<seeds>.*?)</td>");
     private static final int MAX_RESULTS = 75;
 
     static {
@@ -57,18 +66,6 @@ public class NyaaSearchPattern implements SearchPattern {
     }
 
     public NyaaSearchPattern() {
-        if (searchPattern == null) {
-            searchPattern = Pattern.compile(
-                    "(?is)<tr class=\"default\">.*?" +
-                            "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
-                            "<a href=\".*?\" class=\"comments\" title=\".*?\">.*?<i class=\"fa fa-comments-o\"></i>.*?" +
-                            "<a href=\"(?<detailsurl>.*?)\" title=\"(?<displayname>.*?)\">.*?<td class=\"text-center\">.*?" +
-                            "<a href=\"(?<torrenturl>.*?)\"><i class=\"fa fa-fw fa-download\"></i></a>.*?" +
-                            "<a href=\"(?<magneturl>.*?)\"><i class=\"fa fa-fw fa-magnet\"></i></a>.*?" +
-                            "<td class=\"text-center\">(?<filesize>.*?)</td>.*?" +
-                            "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
-                            "<td class=\"text-center\">(?<seeds>.*?)</td>");
-        }
     }
 
     @Override

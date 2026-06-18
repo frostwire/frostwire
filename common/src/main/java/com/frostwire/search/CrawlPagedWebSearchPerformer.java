@@ -49,11 +49,11 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
         UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
     }
 
-    private int numCrawls;
+    private final java.util.concurrent.atomic.AtomicInteger numCrawls;
 
     public CrawlPagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages);
-        this.numCrawls = numCrawls;
+        this.numCrawls = new java.util.concurrent.atomic.AtomicInteger(numCrawls);
     }
 
     public static void setCache(CrawlCache cache) {
@@ -143,8 +143,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     @Override
     public void crawl(CrawlableSearchResult sr) {
-        if (numCrawls > 0) {
-            numCrawls--;
+        if (numCrawls.get() > 0 && numCrawls.decrementAndGet() >= 0) {
             T obj = cast(sr);
             if (obj != null) {
                 String url = getCrawlUrl(obj);
