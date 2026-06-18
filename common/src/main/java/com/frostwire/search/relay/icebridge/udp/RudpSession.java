@@ -14,6 +14,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * State for one rUDP association between two IceBridge servents.
+ *
+ * <p>Sequence numbers are treated as <em>unsigned</em> 32-bit integers
+ * (0..4294967295) for comparison purposes, using
+ * {@link Integer#compareUnsigned}. This prevents a deadlock at the
+ * {@code Integer.MAX_VALUE → Integer.MIN_VALUE} boundary where signed
+ * comparison would reject the wrapped sequence as a duplicate.
  */
 final class RudpSession {
 
@@ -27,7 +33,14 @@ final class RudpSession {
     private final AtomicInteger nextLocalSeq = new AtomicInteger(1);
     private final AtomicInteger ackedThroughLocal = new AtomicInteger(0);
     private final AtomicInteger receivedThroughRemote = new AtomicInteger(0);
-    private final ConcurrentNavigableMap<Integer, PendingPacket> pending = new ConcurrentSkipListMap<>();
+
+    /**
+     * Pending packets keyed by sequence number, using unsigned comparison
+     * so that {@code headMap(ackThrough, true)} correctly clears entries
+     * across the signed-int wrap boundary.
+     */
+    private final ConcurrentNavigableMap<Integer, PendingPacket> pending =
+            new ConcurrentSkipListMap<>(Integer::compareUnsigned);
 
     RudpSession(long localConnectionId,
                 long remoteConnectionId,
@@ -78,11 +91,16 @@ final class RudpSession {
         return ackedThroughLocal.get();
     }
 
+    /**
+     * Mark local packets as acknowledged up to and including
+     * {@code ackThrough} (unsigned comparison). Removes acknowledged
+     * entries from the pending map.
+     */
     void ackLocal(int ackThrough) {
         int current;
         do {
             current = ackedThroughLocal.get();
-            if (ackThrough <= current) {
+            if (Integer.compareUnsigned(ackThrough, current) <= 0) {
                 return;
             }
         } while (!ackedThroughLocal.compareAndSet(current, ackThrough));
@@ -93,16 +111,25 @@ final class RudpSession {
         return receivedThroughRemote.get();
     }
 
+    /**
+     * Accept an inbound data packet's sequence number if it is the next
+     * expected one (in-order delivery). Uses unsigned comparison so that
+     * the {@code MAX_VALUE → MIN_VALUE} wrap is handled correctly.
+     *
+     * @return true if the packet is new and in-order, false if duplicate or gap
+     */
     boolean receiveRemote(int sequence) {
         int current;
         do {
             current = receivedThroughRemote.get();
-            if (sequence <= current) {
+            if (Integer.compareUnsigned(sequence, current) <= 0) {
                 return false; // duplicate or old
             }
+            // Check for in-order: sequence must be exactly current + 1.
+            // Integer overflow wraps MAX_VALUE+1 → MIN_VALUE, which is
+            // the correct "next" value under unsigned semantics.
             if (sequence != current + 1) {
-                // v1: require in-order; drop gap
-                return false;
+                return false; // gap — v1 requires in-order
             }
         } while (!receivedThroughRemote.compareAndSet(current, sequence));
         markActivity();
