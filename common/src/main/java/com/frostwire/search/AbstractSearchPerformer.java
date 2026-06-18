@@ -30,8 +30,8 @@ import java.util.List;
 public abstract class AbstractSearchPerformer implements ISearchPerformer {
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
     private final long token;
-    protected boolean stopped;
-    private SearchListener listener;
+    protected volatile boolean stopped;
+    private volatile SearchListener listener;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;

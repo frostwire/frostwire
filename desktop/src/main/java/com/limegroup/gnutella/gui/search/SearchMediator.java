@@ -512,7 +512,9 @@ public final class SearchMediator {
         if (searchTokens == null || searchTokens.isEmpty()) {
             list = new ArrayList<>(results);
         } else {
-            list = filter2(results, searchTokens);
+            // Pass a defensive copy so the panel's original searchTokens
+            // list is never mutated by filter2's internal token removal.
+            list = filter2(results, new ArrayList<>(searchTokens));
         }
         return list;
     }
@@ -612,6 +614,9 @@ public final class SearchMediator {
     }
 
     private void onResults(final long token, List<? extends SearchResult> results) {
+        if (results == null || results.isEmpty()) {
+            return;
+        }
         final SearchResultMediator rp = getResultPanelForGUID(token);
         boolean isTellurideSearchResult = results.get(0).getSource().startsWith("Cloud:"); // will be stopped
         if (rp != null && (isTellurideSearchResult || !rp.isStopped())) {

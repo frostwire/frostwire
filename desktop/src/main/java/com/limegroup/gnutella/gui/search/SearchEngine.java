@@ -84,12 +84,17 @@ public abstract class SearchEngine {
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
-            new Thread(() -> {
-                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                // from https://piratebayproxy.info/
-                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBMirrors.getMirrors(), 1000, 6);
-            }
-            ).start();
+            Thread t = new Thread(() -> {
+                try {
+                    HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                    // from https://piratebayproxy.info/
+                    TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBMirrors.getMirrors(), 1000, 6);
+                } catch (Throwable e) {
+                    // Non-fatal: TPB will remain not-ready.
+                }
+            }, "tpb-mirror-finder");
+            t.setDaemon(true);
+            t.start();
         }
 
         @Override
@@ -349,8 +354,8 @@ public abstract class SearchEngine {
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
-    private String redirectUrl = null;
-    private String _domainName;
+    private volatile String redirectUrl = null;
+    private volatile String _domainName;
 
     private SearchEngine(SearchEngineID id, String name, BooleanSetting setting, String domainName) {
         _id = id;
