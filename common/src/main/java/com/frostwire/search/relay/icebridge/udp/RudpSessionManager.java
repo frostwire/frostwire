@@ -44,10 +44,17 @@ public final class RudpSessionManager {
     private static final int MAX_RETRIES = 5;
     private static final long SESSION_IDLE_MS = 120_000;
 
+    /**
+     * Fragment header prepended to each DATA_FRAG / DATA_END payload:
+     * [groupId(4)][fragIndex(4)][totalFrags(4)].
+     */
+    private static final int FRAG_HEADER_SIZE = 12;
+
     private final IdentityKeys identity;
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
     private final RudpMessageListener messageListener;
+    private final FragmentReassembler reassembler = new FragmentReassembler();
 
     private final Map<Long, RudpSession> sessionsByRemoteId = new ConcurrentHashMap<>();
     private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new ConcurrentHashMap<>();
@@ -127,7 +134,10 @@ public final class RudpSessionManager {
     }
 
     /**
-     * Send application data reliably to a remote endpoint.
+     * Send application data reliably to a remote endpoint. Payloads larger
+     * than {@link RudpPacket#MAX_FRAGMENT_PAYLOAD} are split into chunks,
+     * each sent as a separate reliable {@code DATA_FRAG} packet followed by
+     * a {@code DATA_END} packet. The receiver reassembles them.
      */
     public void sendData(InetSocketAddress remoteAddress, byte[] payload) {
         if (payload == null || payload.length == 0) {
@@ -141,8 +151,42 @@ public final class RudpSessionManager {
                 return;
             }
         }
-        RudpPacket packet = session.data(payload);
-        sendReliable(session, packet);
+        if (payload.length <= RudpPacket.MAX_FRAGMENT_PAYLOAD) {
+            // Single packet — no fragmentation needed.
+            RudpPacket packet = session.data(payload);
+            sendReliable(session, packet);
+        } else {
+            sendFragmented(session, payload);
+        }
+    }
+
+    /**
+     * Split a payload into fragments and send each as a reliable packet.
+     * Each fragment payload carries a 12-byte header:
+     * [groupId(4)][fragIndex(4)][totalFrags(4)] followed by the chunk bytes.
+     * Intermediate fragments use type {@code DATA_FRAG}; the last uses
+     * {@code DATA_END}.
+     */
+    private void sendFragmented(RudpSession session, byte[] payload) {
+        int totalFrags = (payload.length + RudpPacket.MAX_FRAGMENT_PAYLOAD - 1)
+                / RudpPacket.MAX_FRAGMENT_PAYLOAD;
+        int groupId = random.nextInt();
+        int offset = 0;
+        for (int i = 0; i < totalFrags; i++) {
+            int chunkLen = Math.min(RudpPacket.MAX_FRAGMENT_PAYLOAD, payload.length - offset);
+            byte[] fragPayload = new byte[FRAG_HEADER_SIZE + chunkLen];
+            writeIntBE(fragPayload, 0, groupId);
+            writeIntBE(fragPayload, 4, i);
+            writeIntBE(fragPayload, 8, totalFrags);
+            System.arraycopy(payload, offset, fragPayload, FRAG_HEADER_SIZE, chunkLen);
+            offset += chunkLen;
+
+            boolean isLast = (i == totalFrags - 1);
+            RudpPacket.Type type = isLast ? RudpPacket.Type.DATA_END : RudpPacket.Type.DATA_FRAG;
+            RudpPacket packet = new RudpPacket(type, session.remoteConnectionId(),
+                    session.nextLocalSequence(), session.receivedThroughRemote(), fragPayload);
+            sendReliable(session, packet);
+        }
     }
 
     /**
@@ -180,6 +224,12 @@ public final class RudpSessionManager {
                 break;
             case DATA_ACK:
                 handleDataAck(packet);
+                break;
+            case DATA_FRAG:
+                handleDataFrag(packet, sender, false);
+                break;
+            case DATA_END:
+                handleDataFrag(packet, sender, true);
                 break;
             case HOLE_PUNCH:
                 handleHolePunch(packet, sender);
@@ -219,12 +269,12 @@ public final class RudpSessionManager {
     }
 
     private void write(InetSocketAddress recipient, RudpPacket packet) {
+        metrics.rudpPacketOut(packet.size());
         Channel ch = channel;
         if (ch == null || !ch.isOpen()) {
             return;
         }
         ch.writeAndFlush(new RudpPacketEnvelope(packet, null, recipient));
-        metrics.rudpPacketOut(packet.size());
     }
 
     private long randomConnectionId() {
@@ -284,6 +334,41 @@ public final class RudpSessionManager {
         }
         session.ackLocal(packet.ackThrough());
         session.markActivity();
+    }
+
+    /**
+     * Handle a fragment packet (DATA_FRAG or DATA_END). Ack the packet,
+     * feed it to the reassembler, and deliver the completed payload to the
+     * listener when all fragments have arrived.
+     */
+    private void handleDataFrag(RudpPacket packet, InetSocketAddress sender, boolean isLast) {
+        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
+        if (session == null) {
+            return;
+        }
+        // Ack every fragment so the sender can clear its pending queue.
+        if (session.receiveRemote(packet.sequence())) {
+            send(session, session.dataAck());
+        } else {
+            // Duplicate — re-ack so the sender stops retransmitting.
+            send(session, session.dataAck());
+            return;
+        }
+
+        byte[] raw = packet.payload();
+        if (raw == null || raw.length < FRAG_HEADER_SIZE) {
+            return;
+        }
+        int groupId = readIntBE(raw, 0);
+        int fragIndex = readIntBE(raw, 4);
+        int totalFrags = readIntBE(raw, 8);
+        byte[] chunk = new byte[raw.length - FRAG_HEADER_SIZE];
+        System.arraycopy(raw, FRAG_HEADER_SIZE, chunk, 0, chunk.length);
+
+        byte[] assembled = reassembler.addFragment(groupId, fragIndex, isLast, chunk);
+        if (assembled != null) {
+            notifyListener(session.remotePub(), assembled);
+        }
     }
 
     private void handleHolePunch(RudpPacket packet, InetSocketAddress sender) {
@@ -380,5 +465,22 @@ public final class RudpSessionManager {
                 sessionsByAddress.remove(session.remoteAddress());
             }
         }
+        reassembler.evictStale();
+    }
+
+    // ---- utilities ----
+
+    private static void writeIntBE(byte[] buf, int offset, int value) {
+        buf[offset] = (byte) (value >>> 24);
+        buf[offset + 1] = (byte) (value >>> 16);
+        buf[offset + 2] = (byte) (value >>> 8);
+        buf[offset + 3] = (byte) value;
+    }
+
+    private static int readIntBE(byte[] buf, int offset) {
+        return ((buf[offset] & 0xff) << 24)
+                | ((buf[offset + 1] & 0xff) << 16)
+                | ((buf[offset + 2] & 0xff) << 8)
+                | (buf[offset + 3] & 0xff);
     }
 }
