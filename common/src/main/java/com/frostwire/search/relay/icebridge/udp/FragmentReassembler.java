@@ -37,7 +37,7 @@ final class FragmentReassembler {
     /** Maximum total reassembled payload size (16 MB). */
     static final long MAX_ASSEMBLED_SIZE = 16L * 1024 * 1024;
 
-    private final Map<Integer, FragmentGroup> groups = new TreeMap<>();
+    private final Map<String, FragmentGroup> groups = new TreeMap<>();
 
     /**
      * Add a fragment. Returns the fully reassembled payload if this fragment
@@ -47,13 +47,13 @@ final class FragmentReassembler {
      * {@link #MAX_FRAGMENTS_PER_GROUP}. Rejects groups whose total
      * assembled size would exceed {@link #MAX_ASSEMBLED_SIZE}.
      *
-     * @param groupId    fragment group id (from packet.ackThrough)
+     * @param groupKey   unique key identifying the fragment group (should include sender identity to prevent cross-session collision)
      * @param fragIndex  0-based fragment index (from packet.sequence)
      * @param isLast     true if this is the DATA_END fragment
      * @param payload    the fragment payload bytes
      * @return reassembled payload, or null if incomplete or rejected
      */
-    synchronized byte[] addFragment(int groupId, int fragIndex, boolean isLast, byte[] payload) {
+    synchronized byte[] addFragment(String groupKey, int fragIndex, boolean isLast, byte[] payload) {
         if (fragIndex < 0 || fragIndex >= MAX_FRAGMENTS_PER_GROUP) {
             return null;
         }
@@ -61,15 +61,15 @@ final class FragmentReassembler {
             return null;
         }
 
-        if (groups.size() >= MAX_PENDING_GROUPS && !groups.containsKey(groupId)) {
+        if (groups.size() >= MAX_PENDING_GROUPS && !groups.containsKey(groupKey)) {
             evictOldest();
         }
-        FragmentGroup group = groups.computeIfAbsent(groupId, k -> new FragmentGroup());
+        FragmentGroup group = groups.computeIfAbsent(groupKey, k -> new FragmentGroup());
 
         // Reject if total size would exceed the cap.
         long projectedSize = (long) group.totalFragmentBytes() + (long) payload.length;
         if (projectedSize > MAX_ASSEMBLED_SIZE) {
-            groups.remove(groupId);
+            groups.remove(groupKey);
             return null;
         }
 
@@ -78,7 +78,7 @@ final class FragmentReassembler {
 
         if (group.isComplete()) {
             byte[] assembled = group.assemble();
-            groups.remove(groupId);
+            groups.remove(groupKey);
             return assembled;
         }
         return null;
@@ -94,8 +94,8 @@ final class FragmentReassembler {
 
     private void evictOldest() {
         long oldest = Long.MAX_VALUE;
-        Integer oldestKey = null;
-        for (Map.Entry<Integer, FragmentGroup> e : groups.entrySet()) {
+        String oldestKey = null;
+        for (Map.Entry<String, FragmentGroup> e : groups.entrySet()) {
             if (e.getValue().lastUpdatedMs < oldest) {
                 oldest = e.getValue().lastUpdatedMs;
                 oldestKey = e.getKey();

@@ -132,7 +132,14 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, cookies);
         ResponseBody responseBody = null;
         try {
-            responseBody = getSyncResponse(client, builder).body();
+            Response response = getSyncResponse(client, builder);
+            int code = response.code();
+            if (code < 200 || code >= 300) {
+                LOG.warn("OkHttpClientWrapper::getBytes - HTTP " + code + " for " + url);
+                closeQuietly(response.body());
+                return null;
+            }
+            responseBody = response.body();
             if (responseBody != null) {
                 result = responseBody.bytes();
             }
@@ -158,12 +165,18 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         addCustomHeaders(customHeaders, builder);
         ResponseBody responseBody = null;
         try {
-            responseBody = getSyncResponse(client, builder).body();
+            Response response = getSyncResponse(client, builder);
+            int code = response.code();
+            if (code < 200 || code >= 300) {
+                LOG.warn("OkHttpClientWrapper::get - HTTP " + code + " for " + url);
+                closeQuietly(response.body());
+                return null;
+            }
+            responseBody = response.body();
             if (responseBody != null) {
                 result = responseBody.string();
             }
         } catch (IOException ioe) {
-            //ioe.printStackTrace();
             throw ioe;
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
@@ -311,7 +324,6 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         }
         builder.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         builder.header("Accept-Language", "en-us,en;q=0.5");
-        builder.header("Sec-Fetch-Mode", "navigate");
         if (!StringUtils.isNullOrEmpty(referrer)) {
             try {
                 builder.header("Referer", referrer); // [sic - typo in HTTP protocol]

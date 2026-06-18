@@ -52,24 +52,21 @@ public class KnabenSearchPattern implements SearchPattern {
 
     @Override
     public String getRequestBody(String keywords) {
-        // Construct JSON POST body with search query
-        String escapedQuery = keywords.replace("\"", "\\\"");
-        return String.format(
-            "{" +
-            "\"query\":\"%s\"," +
-            "\"search_type\":\"100%%\"," +
-            "\"search_field\":\"title\"," +
-            "\"order_by\":\"peers\"," +
-            "\"order_direction\":\"desc\"," +
-            "\"from\":0," +
-            "\"size\":%d," +
-            "\"hide_unsafe\":true," +
-            "\"hide_xxx\":true," +
-            "\"seconds_since_last_seen\":86400" +
-            "}",
-            escapedQuery,
-            MAX_RESULTS
-        );
+        // Build JSON via Gson for proper escaping of backslashes, newlines,
+        // control characters, and Unicode.
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        java.util.LinkedHashMap<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("query", keywords);
+        body.put("search_type", "100%");
+        body.put("search_field", "title");
+        body.put("order_by", "peers");
+        body.put("order_direction", "desc");
+        body.put("from", 0);
+        body.put("size", MAX_RESULTS);
+        body.put("hide_unsafe", true);
+        body.put("hide_xxx", true);
+        body.put("seconds_since_last_seen", 86400);
+        return gson.toJson(body);
     }
 
     @Override

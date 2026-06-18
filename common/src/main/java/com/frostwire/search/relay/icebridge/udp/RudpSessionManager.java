@@ -365,7 +365,9 @@ public final class RudpSessionManager {
         byte[] chunk = new byte[raw.length - FRAG_HEADER_SIZE];
         System.arraycopy(raw, FRAG_HEADER_SIZE, chunk, 0, chunk.length);
 
-        byte[] assembled = reassembler.addFragment(groupId, fragIndex, isLast, chunk);
+        // Key by sender address + groupId to prevent cross-session collision.
+        String groupKey = sender.toString() + ":" + groupId;
+        byte[] assembled = reassembler.addFragment(groupKey, fragIndex, isLast, chunk);
         if (assembled != null) {
             notifyListener(session.remotePub(), assembled);
         }

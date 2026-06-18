@@ -28,9 +28,9 @@ import com.frostwire.util.http.HttpClient;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Strategy for crawling torrent files to extract file listings.
@@ -40,8 +40,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TorrentCrawlingStrategy implements CrawlingStrategy {
     private static final Logger LOG = Logger.getLogger(TorrentCrawlingStrategy.class);
-    private static final Map<String, byte[]> CACHE = new ConcurrentHashMap<>();
-    private static final int CACHE_MAX_SIZE = 1000;
+
+    /**
+     * LRU cache for .torrent file bytes. Synchronized via the monitor on
+     * the map object itself (see {@link #cacheGet} and {@link #cachePut}).
+     * Evicts the least-recently-accessed entry when full.
+     */
+    private static final Map<String, byte[]> CACHE = Collections.synchronizedMap(
+            new LinkedHashMap<String, byte[]>(64, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+                    return size() > CACHE_MAX_SIZE;
+                }
+            });
+    private static final int CACHE_MAX_SIZE = 500;
 
     private final HttpClient httpClient;
     private final int timeout;
@@ -114,7 +126,7 @@ public class TorrentCrawlingStrategy implements CrawlingStrategy {
 
     private byte[] fetchTorrentData(String torrentUrl) {
         // Check cache first
-        byte[] cachedData = CACHE.get(torrentUrl);
+        byte[] cachedData = cacheGet(torrentUrl);
         if (cachedData != null) {
             return cachedData;
         }
@@ -123,15 +135,24 @@ public class TorrentCrawlingStrategy implements CrawlingStrategy {
         try {
             byte[] data = httpClient.getBytes(torrentUrl, timeout, "FrostWire/1.0", null);
             if (data != null && data.length > 0) {
-                // Store in cache (with simple size management)
-                if (CACHE.size() < CACHE_MAX_SIZE) {
-                    CACHE.put(torrentUrl, data);
-                }
+                cachePut(torrentUrl, data);
             }
             return data;
         } catch (Exception e) {
             LOG.warn("Error fetching torrent: " + e.getMessage());
             return null;
+        }
+    }
+
+    private static byte[] cacheGet(String url) {
+        synchronized (CACHE) {
+            return CACHE.get(url);
+        }
+    }
+
+    private static void cachePut(String url, byte[] data) {
+        synchronized (CACHE) {
+            CACHE.put(url, data);
         }
     }
 
