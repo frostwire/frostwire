@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreadPool extends ThreadPoolExecutor {
     private static boolean DEBUG_MODE_ON = false;
-    private static final long THREAD_STACK_SIZE = 1024 * 4;
+    private static final long THREAD_STACK_SIZE = 1024 * 512; // 512 KB
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String name;
     private static Logger LOG = Logger.getLogger(ThreadPool.class);
