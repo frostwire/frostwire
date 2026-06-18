@@ -451,13 +451,23 @@ public final class RudpSessionManager {
     private void retransmitAndEvict() {
         long now = System.currentTimeMillis();
         for (RudpSession session : sessionsByRemoteId.values()) {
-            for (PendingPacket pending : session.pending().values()) {
-                if (now - pending.lastSentMs > RETRANSMIT_INTERVAL_MS
-                        && now - pending.firstSentMs < RETRANSMIT_TIMEOUT_MS
-                        && pending.retries < MAX_RETRIES) {
-                    pending.retries++;
-                    pending.lastSentMs = now;
-                    write(pending.recipient, pending.packet);
+            // Retransmit unacked packets that are due, and purge packets
+            // that have exhausted retries or exceeded the timeout.
+            var pendingMap = session.pending();
+            var iter = pendingMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                var entry = iter.next();
+                PendingPacket pp = entry.getValue();
+                boolean exhausted = pp.retries >= MAX_RETRIES
+                        || (now - pp.firstSentMs) >= RETRANSMIT_TIMEOUT_MS;
+                if (exhausted) {
+                    iter.remove();
+                    continue;
+                }
+                if (now - pp.lastSentMs > RETRANSMIT_INTERVAL_MS) {
+                    pp.retries++;
+                    pp.lastSentMs = now;
+                    write(pp.recipient, pp.packet);
                 }
             }
             if (now - session.lastActivityMs() > SESSION_IDLE_MS) {

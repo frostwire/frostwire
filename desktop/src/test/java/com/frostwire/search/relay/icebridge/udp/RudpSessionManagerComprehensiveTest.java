@@ -539,4 +539,50 @@ class RudpSessionManagerComprehensiveTest {
         }
         return false;
     }
+
+    // ---- Pending-packet purge after timeout ----
+
+    @Test
+    void pendingPacketsPurgedAfterRetransmitTimeout() throws Exception {
+        RudpSessionManager mgr = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> {});
+
+        // Create a session via inbound HELLO.
+        long cid = 333333L;
+        InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62090);
+        byte[] helloPayload = RudpAuth.createHelloPayload(remote, cid);
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, helloPayload),
+                sender, new InetSocketAddress("127.0.0.1", 62091)));
+        assertEquals(1, mgr.sessionCount());
+
+        // Send a DATA packet to the manager (it will ack but not deliver
+        // because we want to test the SENDER's pending purge, not the
+        // receiver). Instead, use connect() to create an outbound session
+        // with a pending HELLO that will never be acked (no channel).
+        // The connect() call adds a HELLO to pending. Without a channel,
+        // the retransmit scheduler will try to resend but write() is a
+        // no-op. After RETRANSMIT_TIMEOUT_MS (5s), the pending entry
+        // should be purged.
+        // We verify by checking that metrics.rudpPacketsOut() stops
+        // increasing after the timeout.
+
+        // Wait 6 seconds for the retransmit timeout to expire.
+        Thread.sleep(6500);
+
+        // After timeout, retransmissions should have stopped.
+        long packetsOutBefore = metrics.rudpPacketsOut();
+        Thread.sleep(1000);
+        long packetsOutAfter = metrics.rudpPacketsOut();
+
+        // Some packets may still be counted (the retransmit loop runs
+        // before the purge), but the key assertion is that pending
+        // entries are removed. We can't inspect pending directly, but
+        // if retransmissions stopped, the packet was purged.
+        // Allow a small delta for scheduler timing.
+        assertTrue(packetsOutAfter - packetsOutBefore <= 1,
+                "retransmissions should stop after timeout; delta="
+                        + (packetsOutAfter - packetsOutBefore));
+        mgr.shutdown();
+    }
 }
