@@ -3,6 +3,19 @@ FrostWire 3.2.0 build 776 UNRELEASED
   - new:Powered by jlibtorrent 2.0.12.9
  - new:Advanced BitTorrent preferences now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
  - update:Refreshed Android translations so all localized strings.xml files include every base string resource
+ - fix:ThreadPool stack size increased from 4 KB to 512 KB — the previous 4 KB stack was far below the JVM default and caused StackOverflowError on deep call chains (regex backtracking, TLS handshakes, jlibtorrent bdecode), silently killing search tasks
+ - fix:TLS hostname verification now uses proper suffix matching instead of substring contains — prevents attacker-controlled hostnames like 'torrentz2.nz.evil.com' from matching the whitelisted 'torrentz2.nz'. Also stops unbounded growth of the valid-domains set
+ - fix:HTTP search responses now check for 4xx/5xx error codes before returning the body — Cloudflare challenge pages and rate-limit responses are no longer passed to parsers as if they were valid search results
+ - fix:HTTP response body size capped at 16 MB (search) and 32 MB (torrent downloads) to prevent OOM from malicious or misconfigured servers returning multi-gigabyte responses
+ - fix:Torrent crawl cache replaced with LRU eviction (LinkedHashMap, max 500 entries) — old cache had no eviction, causing unbounded memory growth (~1 GB resident) in long-running sessions
+ - fix:Knaben search query JSON now properly escaped via Gson — backslashes, newlines, and control characters in search keywords no longer produce malformed JSON requests
+ - fix:Removed 'Sec-Fetch-Mode: navigate' header from all HTTP requests — API endpoints (Knaben, Soundcloud, etc.) should not receive browser-navigation headers
+ - fix:AbstractSearchPerformer 'stopped' and 'listener' fields are now volatile — stop() from the UI thread is now visible to executor threads, preventing search results from being delivered after the user cancels
+ - fix:SearchManager no longer crawls search results that are already complete — avoids wasting a thread re-fetching data that's already available
+ - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields instead of lazy-initialized in constructors — eliminates non-thread-safe lazy-init race and redundant compilation
+ - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger — concurrent crawl() calls from the thread pool no longer lose updates, preventing more crawls than configured
+ - fix:PerformersHelper.reduceHtml no longer double-allocates strings via toCharArray() + new String(char[]) — substring already creates a new String
+ - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList) — prevents data races under concurrent TLS handshakes
  - fix:Shutdown now suppresses OEM framework StrictMode disk I/O noise from the activity finish binder path
  - fix:VPN Drop protection now applies immediately during rapid on/off toggles and blocks manual seeding of finished torrents with a clear warning
  - fix:VPN Drop protection now resumes paused BitTorrent transfers after the setting is turned off, and shutdown avoids the Oplus finishAndRemoveTask StrictMode disk I/O path
