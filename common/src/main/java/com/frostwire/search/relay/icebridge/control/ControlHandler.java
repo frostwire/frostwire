@@ -140,14 +140,16 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             return ApiResponse.error("invalid signature");
         }
 
-        long now = System.currentTimeMillis();
-        long tsSkew = Math.abs(now / 1000 - req.timestamp);
+        long nowSec = System.currentTimeMillis() / 1000L;
+        long diff = nowSec - req.timestamp;
+        long tsSkew = diff >= 0 ? diff : -diff;
         if (tsSkew > 60) {
             return ApiResponse.error("timestamp skew too large");
         }
 
         PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
-                req.role == null ? IceBridgeConfig.Role.CLIENT : req.role, now);
+                req.role == null ? IceBridgeConfig.Role.CLIENT : req.role,
+                System.currentTimeMillis());
         boolean accepted = registry.register(record);
         return accepted
                 ? ApiResponse.success("registered")

@@ -26,6 +26,10 @@ final class RudpPacketCodec extends MessageToMessageCodec<DatagramPacket, RudpPa
     protected void encode(ChannelHandlerContext ctx, RudpPacketEnvelope envelope, List<Object> out) {
         RudpPacket packet = envelope.packet();
         byte[] payload = packet.payload();
+        if (payload.length > 65535) {
+            LOG.warn("RudpPacketCodec: dropping packet with payload > 65535 bytes (" + payload.length + ")");
+            return;
+        }
         ByteBuf buf = ctx.alloc().buffer(RudpPacket.HEADER_SIZE + payload.length);
         buf.writeShort(RudpPacket.MAGIC);
         buf.writeByte(RudpPacket.VERSION);

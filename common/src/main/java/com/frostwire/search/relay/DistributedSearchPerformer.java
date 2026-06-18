@@ -259,8 +259,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     if (req == null) {
                         return; // not our response
                     }
+                    // Always count down — whether verification succeeds or
+                    // fails, this peer has "responded" and we should not
+                    // wait the full timeout for them.
                     if (SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
-                        results.addAll(toResults(response));
+                        try {
+                            results.addAll(toResults(response));
+                        } catch (Throwable t) {
+                            LOG.debug("Failed to convert search response rows", t);
+                        }
                     }
                     latch.countDown();
                 };
@@ -293,6 +300,8 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             Thread.currentThread().interrupt();
         } finally {
             transport.removeListener(responseListener);
+            // Clear any unresponded entries to prevent memory leak.
+            pending.clear();
         }
         return results;
     }
@@ -330,12 +339,22 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private static List<FileSearchResult> toResults(RemoteSearchResponse response) {
         List<FileSearchResult> out = new ArrayList<>(response.rows().size());
         for (RemoteSearchResponse.Row row : response.rows()) {
-            out.add(toResult(row));
+            try {
+                FileSearchResult result = toResult(row);
+                if (result != null) {
+                    out.add(result);
+                }
+            } catch (Throwable t) {
+                LOG.debug("Skipping malformed search result row", t);
+            }
         }
         return out;
     }
 
     private static CompositeFileSearchResult toResult(RemoteSearchResponse.Row row) {
+        if (row.name == null || row.infoHash == null || row.infoHash.length != 20) {
+            return null;
+        }
         String name = row.name;
         String infoHashHex = Hex.encode(row.infoHash);
         String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);

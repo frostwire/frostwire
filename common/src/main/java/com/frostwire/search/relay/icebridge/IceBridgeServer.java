@@ -108,7 +108,7 @@ public final class IceBridgeServer implements AutoCloseable {
 
     private void runJanitor() {
         try {
-            long ttlMs = config.peerTtlSec() * 1000;
+            long ttlMs = Math.multiplyExact(config.peerTtlSec(), 1000L);
             int removed = registry.evictStale(ttlMs);
             if (removed > 0) {
                 LOG.info("IceBridge janitor evicted " + removed + " stale peers; registry size=" + registry.size());

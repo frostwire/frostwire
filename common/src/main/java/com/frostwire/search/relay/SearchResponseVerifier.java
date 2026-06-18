@@ -65,7 +65,8 @@ public final class SearchResponseVerifier {
                 return false;
             }
             long nowSec = System.currentTimeMillis() / 1000L;
-            long skew = Math.abs(nowSec - response.timestamp());
+            long diff = nowSec - response.timestamp();
+            long skew = diff >= 0 ? diff : -diff;
             if (skew > RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC) {
                 LOG.debug("Response verification failed: timestamp skew " + skew + "s");
                 return false;

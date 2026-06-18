@@ -124,6 +124,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
             try {
                 if (!process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)) {
                     process.destroyForcibly();
+                    process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -132,6 +133,23 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         }
         process = null;
         client = null;
+        deleteLogDir();
+    }
+
+    private void deleteLogDir() {
+        if (logDir == null) {
+            return;
+        }
+        try {
+            Files.walk(logDir.toPath())
+                    .sorted(java.util.Comparator.reverseOrder())
+                    .map(java.nio.file.Path::toFile)
+                    .forEach(File::delete);
+            logDir.delete();
+        } catch (Throwable t) {
+            LOG.warn("Failed to delete IceBridge log dir: " + logDir, t);
+        }
+        logDir = null;
     }
 
     public boolean isAlive() {
