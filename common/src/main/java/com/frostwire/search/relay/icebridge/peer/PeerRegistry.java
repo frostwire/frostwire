@@ -59,6 +59,16 @@ public final class PeerRegistry {
             return false;
         }
         String key = Hex.encode(pub);
+        boolean isNewPeer = !byPubHex.containsKey(key);
+
+        // Reject new identities once we are at capacity. Refreshes of
+        // existing peers are always allowed.
+        if (isNewPeer && byPubHex.size() >= maxPeers) {
+            LOG.warn("PeerRegistry: at capacity (" + maxPeers
+                    + "); dropped new peer " + record.ed25519PubHex());
+            return false;
+        }
+
         byPubHex.merge(key, record, (existing, incoming) -> {
             // Fresher endpoint wins; otherwise keep existing.
             if (incoming.lastSeenMs() >= existing.lastSeenMs()) {
@@ -67,13 +77,6 @@ public final class PeerRegistry {
             return existing;
         });
         registrations.incrementAndGet();
-
-        // Reject new identities once we are over capacity, but allow refresh.
-        if (byPubHex.size() > maxPeers && !byPubHex.containsKey(key)) {
-            byPubHex.remove(key);
-            LOG.warn("PeerRegistry: at capacity (" + maxPeers + "); dropped new peer " + record.ed25519PubHex());
-            return false;
-        }
         return true;
     }
 

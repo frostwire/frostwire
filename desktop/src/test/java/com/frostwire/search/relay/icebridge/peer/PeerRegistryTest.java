@@ -79,6 +79,34 @@ class PeerRegistryTest {
         assertFalse(registry.register(record));
     }
 
+    @Test
+    void capacityRejectsNewPeersButAllowsRefresh() {
+        PeerRegistry registry = new RegistryBuilder().maxPeers(2).build();
+
+        byte[] pubA = new byte[32];
+        pubA[0] = 1;
+        byte[] pubB = new byte[32];
+        pubB[0] = 2;
+        byte[] pubC = new byte[32];
+        pubC[0] = 3;
+
+        assertTrue(registry.register(new PeerRecord(pubA, "1.0.0.1", 6888,
+                IceBridgeConfig.Role.FORWARDER, System.currentTimeMillis())));
+        assertTrue(registry.register(new PeerRecord(pubB, "1.0.0.2", 6888,
+                IceBridgeConfig.Role.FORWARDER, System.currentTimeMillis())));
+
+        // At capacity — new peer rejected.
+        assertFalse(registry.register(new PeerRecord(pubC, "1.0.0.3", 6888,
+                IceBridgeConfig.Role.FORWARDER, System.currentTimeMillis())));
+        assertEquals(2, registry.size());
+
+        // Existing peer refresh is allowed even at capacity.
+        assertTrue(registry.register(new PeerRecord(pubA, "1.0.0.10", 6889,
+                IceBridgeConfig.Role.FORWARDER, System.currentTimeMillis())));
+        assertEquals(2, registry.size());
+        assertEquals("1.0.0.10", registry.lookup(pubA).host());
+    }
+
     private static final class RegistryBuilder {
         private int maxPeers = 100;
         private long peerTtlSec = 120;
