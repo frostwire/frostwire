@@ -31,23 +31,48 @@ final class FragmentReassembler {
     /** Maximum age of an incomplete fragment group before eviction (ms). */
     private static final long GROUP_TIMEOUT_MS = 30_000;
 
+    /** Maximum number of fragments per group. Prevents DoS via huge fragIndex. */
+    static final int MAX_FRAGMENTS_PER_GROUP = 4096;
+
+    /** Maximum total reassembled payload size (16 MB). */
+    static final long MAX_ASSEMBLED_SIZE = 16L * 1024 * 1024;
+
     private final Map<Integer, FragmentGroup> groups = new TreeMap<>();
 
     /**
      * Add a fragment. Returns the fully reassembled payload if this fragment
      * completes the group, or {@code null} if more fragments are needed.
      *
+     * <p>Rejects fragments with negative indices or indices exceeding
+     * {@link #MAX_FRAGMENTS_PER_GROUP}. Rejects groups whose total
+     * assembled size would exceed {@link #MAX_ASSEMBLED_SIZE}.
+     *
      * @param groupId    fragment group id (from packet.ackThrough)
      * @param fragIndex  0-based fragment index (from packet.sequence)
      * @param isLast     true if this is the DATA_END fragment
      * @param payload    the fragment payload bytes
-     * @return reassembled payload, or null if incomplete
+     * @return reassembled payload, or null if incomplete or rejected
      */
     synchronized byte[] addFragment(int groupId, int fragIndex, boolean isLast, byte[] payload) {
+        if (fragIndex < 0 || fragIndex >= MAX_FRAGMENTS_PER_GROUP) {
+            return null;
+        }
+        if (payload == null || payload.length == 0) {
+            return null;
+        }
+
         if (groups.size() >= MAX_PENDING_GROUPS && !groups.containsKey(groupId)) {
             evictOldest();
         }
         FragmentGroup group = groups.computeIfAbsent(groupId, k -> new FragmentGroup());
+
+        // Reject if total size would exceed the cap.
+        long projectedSize = (long) group.totalFragmentBytes() + (long) payload.length;
+        if (projectedSize > MAX_ASSEMBLED_SIZE) {
+            groups.remove(groupId);
+            return null;
+        }
+
         group.add(fragIndex, payload, isLast);
         group.lastUpdatedMs = System.currentTimeMillis();
 
@@ -89,11 +114,13 @@ final class FragmentReassembler {
         private final TreeMap<Integer, byte[]> fragments = new TreeMap<>();
         private boolean lastReceived = false;
         private int lastIndex = -1;
+        private long totalBytes = 0;
         private volatile long lastUpdatedMs = System.currentTimeMillis();
 
         void add(int index, byte[] payload, boolean isLast) {
             if (!fragments.containsKey(index)) {
                 fragments.put(index, payload);
+                totalBytes += payload.length;
             }
             if (isLast) {
                 lastReceived = true;
@@ -101,8 +128,15 @@ final class FragmentReassembler {
             }
         }
 
+        long totalFragmentBytes() {
+            return totalBytes;
+        }
+
         boolean isComplete() {
             if (!lastReceived || fragments.isEmpty()) {
+                return false;
+            }
+            if (lastIndex >= MAX_FRAGMENTS_PER_GROUP) {
                 return false;
             }
             // All indices 0..lastIndex must be present.
@@ -115,16 +149,17 @@ final class FragmentReassembler {
         }
 
         byte[] assemble() {
-            int total = 0;
-            for (byte[] frag : fragments.values()) {
-                total += frag.length;
+            // Use long to detect overflow before allocating.
+            long total = totalBytes;
+            if (total > MAX_ASSEMBLED_SIZE || total < 0) {
+                return null;
             }
-            byte[] out = new byte[total];
+            byte[] out = new byte[(int) total];
             int offset = 0;
             for (int i = 0; i <= lastIndex; i++) {
                 byte[] frag = fragments.get(i);
                 if (frag == null) {
-                    return null; // shouldn't happen if isComplete() passed
+                    return null;
                 }
                 System.arraycopy(frag, 0, out, offset, frag.length);
                 offset += frag.length;
