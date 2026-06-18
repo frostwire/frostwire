@@ -121,8 +121,9 @@ public final class SearchManager {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
                 if (csr.isComplete()) {
                     list.add(sr);
+                } else {
+                    crawl(performer, csr);
                 }
-                crawl(performer, csr);
             } else {
                 list.add(sr);
             }

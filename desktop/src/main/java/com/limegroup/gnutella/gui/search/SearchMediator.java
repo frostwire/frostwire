@@ -215,9 +215,12 @@ public final class SearchMediator {
         }
     }
 
+    private static final java.util.regex.Pattern HTML_TAG_PATTERN = java.util.regex.Pattern.compile("\\<.*?>");
+    private static final java.util.regex.Pattern HTML_ENTITY_PATTERN = java.util.regex.Pattern.compile("\\&.*?\\;");
+
     private static String stripHtml(String str) {
-        str = str.replaceAll("\\<.*?>", "");
-        str = str.replaceAll("\\&.*?\\;", "");
+        str = HTML_TAG_PATTERN.matcher(str).replaceAll("");
+        str = HTML_ENTITY_PATTERN.matcher(str).replaceAll("");
         return str;
     }
 
@@ -480,7 +483,7 @@ public final class SearchMediator {
     }
 
     private long newSearchToken() {
-        return Math.abs(System.nanoTime());
+        return System.nanoTime() & Long.MAX_VALUE;
     }
 
     private void performSearch(final long token, String query) {

@@ -372,23 +372,15 @@ public abstract class SearchEngine {
     }
 
 
+    private static final List<SearchEngine> ENGINES = java.util.Collections.unmodifiableList(
+            java.util.Arrays.asList(
+                    LOCAL, DISTRIBUTED, YT, INTERNET_ARCHIVE, BITSEARCH,
+                    KNABEN, MAGNETDL, NYAA, ONE337X, TPB,
+                    TORRENTZ2, TORRENTSCSV, SOUNDCLOUD, FROSTCLICK));
+
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(
-                LOCAL,
-                DISTRIBUTED,
-                YT,
-                INTERNET_ARCHIVE,
-                BITSEARCH,
-                KNABEN,
-                MAGNETDL,
-                NYAA,
-                ONE337X,
-                TPB,
-                TORRENTZ2,
-                TORRENTSCSV,
-                SOUNDCLOUD,
-                FROSTCLICK);
+        return ENGINES;
     }
 
     static SearchEngine getSearchEngineByName(String name) {
@@ -396,7 +388,7 @@ public abstract class SearchEngine {
             return TELLURIDE;
         }
         return getEngines().stream().
-                filter(se -> name.startsWith(se.getName())).findFirst().
+                filter(se -> name.equals(se.getName()) || name.startsWith(se.getName() + " ")).findFirst().
                 orElse(null);
     }
 

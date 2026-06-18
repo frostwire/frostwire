@@ -177,7 +177,7 @@ public final class PerformersHelper {
                 LOG.info(html);
                 return null;
             }
-            html = new String(html.substring(prefixOffset, suffixOffset).toCharArray());
+            html = html.substring(prefixOffset, suffixOffset);
         }
         return html;
     }

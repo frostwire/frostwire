@@ -346,6 +346,16 @@ public final class RudpSessionManager {
         if (session == null) {
             return;
         }
+
+        // Validate the fragment header BEFORE acking so that malformed
+        // fragments are not silently dropped after the sender believes
+        // they were delivered.
+        byte[] raw = packet.payload();
+        if (raw == null || raw.length < FRAG_HEADER_SIZE) {
+            LOG.debug("RudpSessionManager: dropping fragment with invalid header");
+            return; // do not ack — sender will retransmit
+        }
+
         // Ack every fragment so the sender can clear its pending queue.
         if (session.receiveRemote(packet.sequence())) {
             send(session, session.dataAck());
@@ -355,10 +365,6 @@ public final class RudpSessionManager {
             return;
         }
 
-        byte[] raw = packet.payload();
-        if (raw == null || raw.length < FRAG_HEADER_SIZE) {
-            return;
-        }
         int groupId = readIntBE(raw, 0);
         int fragIndex = readIntBE(raw, 4);
         int totalFrags = readIntBE(raw, 8);
