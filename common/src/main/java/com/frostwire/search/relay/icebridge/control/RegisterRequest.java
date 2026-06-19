@@ -32,7 +32,18 @@ public final class RegisterRequest {
     /** Ed25519 signature of the canonical registration string, base64url-no-padding. */
     public String signature;
 
+    /**
+     * Canonical string for signature verification.
+     *
+     * <p>Uses length-prefixed fields to prevent delimiter injection —
+     * a host containing {@code |} cannot produce the same canonical
+     * string as a different (pub, host, port, role, timestamp) tuple.
+     */
     public String canonicalString() {
-        return pub + "|" + host + "|" + rudpPort + "|" + role + "|" + timestamp;
+        return pub.length() + ":" + pub + "|"
+                + host.length() + ":" + host + "|"
+                + rudpPort + "|"
+                + (role == null ? "null" : role.name()) + "|"
+                + timestamp;
     }
 }

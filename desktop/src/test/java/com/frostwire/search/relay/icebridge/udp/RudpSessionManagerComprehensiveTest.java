@@ -97,7 +97,7 @@ class RudpSessionManagerComprehensiveTest {
         RudpSessionManager mgr = new RudpSessionManager(
                 remote, registry, metrics, (pub, payload) -> {});
         mgr.onPacket(new RudpPacketEnvelope(
-                new RudpPacket(RudpPacket.Type.HELLO, 999L, 0, 0, new byte[96]),
+                new RudpPacket(RudpPacket.Type.HELLO, 999L, 0, 0, new byte[104]),
                 new InetSocketAddress("127.0.0.1", 62001),
                 new InetSocketAddress("127.0.0.1", 62002)));
         assertEquals(0, mgr.sessionCount());

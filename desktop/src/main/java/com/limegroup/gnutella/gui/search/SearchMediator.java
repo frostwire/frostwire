@@ -637,7 +637,7 @@ public final class SearchMediator {
                     return;
                 }
                 final List<UISearchResult> uiResults = convertResults(filtered, se, rp.getQuery());
-                GUIMediator.safeInvokeAndWait(() -> {
+                GUIMediator.safeInvokeLater(() -> {
                     try {
                         SearchFilter filter = getSearchFilterFactory().createFilter();
                         SearchResultDisplayer searchResultDisplayer = getSearchResultDisplayer();

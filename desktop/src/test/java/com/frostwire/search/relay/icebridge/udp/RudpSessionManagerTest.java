@@ -84,7 +84,7 @@ class RudpSessionManagerTest {
         RudpSessionManager remoteManager = new RudpSessionManager(
                 remote, registry, metrics, (pub, payload) -> receivedCount.incrementAndGet());
 
-        byte[] badHello = new byte[96];
+        byte[] badHello = new byte[104]; // 104-byte new format but all zeros → bad signature
         RudpPacket hello = new RudpPacket(RudpPacket.Type.HELLO, connectionId, 0, 0, badHello);
         remoteManager.onPacket(new RudpPacketEnvelope(hello,
                 new InetSocketAddress("127.0.0.1", 62001),

@@ -98,7 +98,11 @@ public final class SearchManager {
 
     public void stop() {
         stopTasks();
-        OkHttpClientWrapper.cancelAllRequests();
+        // Do NOT call OkHttpClientWrapper.cancelAllRequests() here — it
+        // cancels ALL OkHttp requests globally, including non-search
+        // subsystems (updates, FrostClick API). Stopping tasks sets the
+        // 'stopped' flag on each performer so they abort before issuing
+        // new HTTP requests. In-flight requests will complete or time out.
     }
 
     public SearchListener getListener() {

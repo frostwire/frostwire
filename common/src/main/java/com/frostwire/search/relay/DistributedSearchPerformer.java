@@ -352,7 +352,10 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     }
 
     private static CompositeFileSearchResult toResult(RemoteSearchResponse.Row row) {
-        if (row.name == null || row.infoHash == null || row.infoHash.length != 20) {
+        if (row.name == null || row.name.isEmpty() || row.name.length() > 2048) {
+            return null;
+        }
+        if (row.infoHash == null || row.infoHash.length != 20) {
             return null;
         }
         String name = row.name;
