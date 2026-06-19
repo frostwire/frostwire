@@ -83,6 +83,21 @@ class LocalIndexTableTest {
                 .build();
     }
 
+    private LocalSharedTorrent torrentWithFiles(String name, String filesJson, long now) {
+        return new LocalSharedTorrent.Builder()
+                .infoHash(randomBytes(20))
+                .name(name)
+                .sizeBytes(1024L * 1024L)
+                .fileCount(3)
+                .filesJson(filesJson)
+                .publisherNodeId(randomBytes(20))
+                .publisherEd25519Pub(randomBytes(32))
+                .publisherUtpPort(49152)
+                .addedAt(now)
+                .lastSeenAt(now)
+                .build();
+    }
+
     private static byte[] randomBytes(int n) {
         byte[] b = new byte[n];
         new SecureRandom().nextBytes(b);
@@ -367,5 +382,246 @@ class LocalIndexTableTest {
         // Insert one with a unique keyword, search for it
         table.upsert(sampleTorrent("uniqueKeywordMarkerIso torrent", now));
         assertEquals(1, table.search("uniqueKeywordMarkerIso", 1000).size());
+    }
+
+    // ===== File-level search tests =====
+
+    @Test
+    void searchByFilePathFindsTorrentAndPopulatesMatchedFile() {
+        long now = 1_000_000L;
+        // Torrent name has nothing to do with "readme"; only a file inside does.
+        table.upsert(torrentWithFiles(
+                "Some Random Project",
+                "[{\"path\":\"docs/readme.txt\",\"size\":1024},{\"path\":\"src/main.java\",\"size\":2048}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("readme", 10);
+        assertEquals(1, results.size());
+        assertEquals("Some Random Project", results.get(0).name());
+        assertNotNull(results.get(0).matchedFile(), "matchedFile should be populated for file-path matches");
+        assertTrue(results.get(0).matchedFile().contains("readme.txt"));
+    }
+
+    @Test
+    void searchByTorrentNameLeavesMatchedFileNull() {
+        long now = 1_000_000L;
+        table.upsert(torrentWithFiles(
+                "Ubuntu 24.04 Desktop",
+                "[{\"path\":\"ubuntu-24.04.iso\",\"size\":4000000000}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("ubuntu", 10);
+        assertEquals(1, results.size());
+        assertNull(results.get(0).matchedFile(),
+                "matchedFile should be null when the match is on the torrent name, not a file path");
+    }
+
+    @Test
+    void torrentNameMatchTakesPriorityOverFileMatch() {
+        long now = 1_000_000L;
+        // This torrent matches "keyword" in both name and file path.
+        table.upsert(torrentWithFiles(
+                "Keyword In Name",
+                "[{\"path\":\"keyword_file.txt\",\"size\":100}]",
+                now));
+        // This torrent only matches "keyword" in a file path.
+        table.upsert(torrentWithFiles(
+                "Different Name",
+                "[{\"path\":\"keyword_other.txt\",\"size\":100}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("keyword", 10);
+        assertEquals(2, results.size());
+        // Torrent-name match should come first (Phase 1 runs before Phase 2).
+        assertEquals("Keyword In Name", results.get(0).name());
+        assertNull(results.get(0).matchedFile(), "Phase 1 match should have null matchedFile");
+        // File-path match should come second.
+        assertEquals("Different Name", results.get(1).name());
+        assertNotNull(results.get(1).matchedFile(), "Phase 2 match should have populated matchedFile");
+    }
+
+    @Test
+    void searchDoesNotDuplicateWhenBothNameAndFileMatch() {
+        long now = 1_000_000L;
+        // Torrent matches "ubuntu" in both name and a file path.
+        table.upsert(torrentWithFiles(
+                "Ubuntu LTS",
+                "[{\"path\":\"ubuntu-desktop.iso\",\"size\":1000000000}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("ubuntu", 10);
+        assertEquals(1, results.size(), "Should not duplicate even if both name and file match");
+        // Phase 1 (torrent-name) wins, so matchedFile is null.
+        assertNull(results.get(0).matchedFile());
+    }
+
+    @Test
+    void upsertReplacesSharedFilesOnUpdate() {
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles(
+                "MyTorrent",
+                "[{\"path\":\"old_file.txt\",\"size\":100}]",
+                now);
+        table.upsert(t);
+
+        // Verify the old file is searchable.
+        assertEquals(1, table.search("old_file", 10).size());
+
+        // Update with new file paths.
+        LocalSharedTorrent updated = t.toBuilder()
+                .filesJson("[{\"path\":\"new_file.txt\",\"size\":200}]")
+                .lastSeenAt(now + 100)
+                .build();
+        table.upsert(updated);
+
+        // Old file should no longer be in shared_files.
+        assertEquals(0, table.search("old_file", 10).size(),
+                "Old file path should be removed after upsert with new files_json");
+        // New file should be searchable.
+        List<LocalSharedTorrent> results = table.search("new_file", 10);
+        assertEquals(1, results.size());
+        assertNotNull(results.get(0).matchedFile());
+        assertTrue(results.get(0).matchedFile().contains("new_file.txt"));
+    }
+
+    @Test
+    void deleteCascadesToSharedFiles() {
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles(
+                "ToDelete",
+                "[{\"path\":\"unique_cascade_file.txt\",\"size\":100}]",
+                now);
+        table.upsert(t);
+        assertEquals(1, table.search("unique_cascade_file", 10).size());
+
+        table.delete(hexOf(t.infoHash()));
+        assertEquals(0, table.search("unique_cascade_file", 10).size(),
+                "File-path FTS entries should be cascade-deleted with the torrent");
+    }
+
+    @Test
+    void searchMultipleFileMatchesReturnsDistinctTorrents() {
+        long now = 1_000_000L;
+        table.upsert(torrentWithFiles(
+                "Torrent A",
+                "[{\"path\":\"shared/readme.md\",\"size\":100}]",
+                now));
+        table.upsert(torrentWithFiles(
+                "Torrent B",
+                "[{\"path\":\"docs/readme.md\",\"size\":200}]",
+                now));
+        table.upsert(torrentWithFiles(
+                "Torrent C",
+                "[{\"path\":\"other/guide.txt\",\"size\":300}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("readme", 10);
+        assertEquals(2, results.size(), "Only torrents with 'readme' in a file path should match");
+        java.util.Set<String> names = new java.util.HashSet<>();
+        for (LocalSharedTorrent r : results) {
+            names.add(r.name());
+            assertNotNull(r.matchedFile());
+        }
+        assertTrue(names.contains("Torrent A"));
+        assertTrue(names.contains("Torrent B"));
+        assertFalse(names.contains("Torrent C"));
+    }
+
+    @Test
+    void searchRespectsLimitAcrossBothPhases() {
+        long now = 1_000_000L;
+        // Insert 3 name-matching torrents and 3 file-matching torrents.
+        for (int i = 0; i < 3; i++) {
+            table.upsert(torrentWithFiles(
+                    "CommonKeyword Name " + i,
+                    "[{\"path\":\"file" + i + ".txt\",\"size\":100}]",
+                    now));
+        }
+        for (int i = 0; i < 3; i++) {
+            table.upsert(torrentWithFiles(
+                    "Unrelated " + i,
+                    "[{\"path\":\"commonkeyword_file.txt\",\"size\":100}]",
+                    now));
+        }
+
+        // Limit 2: should return 2 name matches (Phase 1 fills the quota).
+        List<LocalSharedTorrent> results = table.search("commonkeyword", 2);
+        assertEquals(2, results.size());
+        for (LocalSharedTorrent r : results) {
+            assertTrue(r.name().startsWith("CommonKeyword Name"));
+            assertNull(r.matchedFile());
+        }
+    }
+
+    @Test
+    void searchFileMatchFillsRemainingQuotaAfterNameMatches() {
+        long now = 1_000_000L;
+        // 1 name match
+        table.upsert(torrentWithFiles(
+                "AlphaRelease torrent",
+                "[{\"path\":\"data.bin\",\"size\":100}]",
+                now));
+        // 2 file-only matches
+        table.upsert(torrentWithFiles(
+                "Unrelated 1",
+                "[{\"path\":\"alpharelease_notes.txt\",\"size\":100}]",
+                now));
+        table.upsert(torrentWithFiles(
+                "Unrelated 2",
+                "[{\"path\":\"alpharelease_changelog.txt\",\"size\":100}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("alpharelease", 10);
+        assertEquals(3, results.size());
+        // First result is the name match (matchedFile null).
+        assertNull(results.get(0).matchedFile());
+        // Remaining results are file matches (matchedFile populated).
+        assertNotNull(results.get(1).matchedFile());
+        assertNotNull(results.get(2).matchedFile());
+    }
+
+    @Test
+    void emptyFilesJsonDoesNotBreakSearch() {
+        long now = 1_000_000L;
+        table.upsert(torrentWithFiles("ValidName", "[]", now));
+
+        List<LocalSharedTorrent> nameResults = table.search("validname", 10);
+        assertEquals(1, nameResults.size());
+        assertNull(nameResults.get(0).matchedFile());
+    }
+
+    @Test
+    void filesJsonWithMissingPathIsSkipped() {
+        long now = 1_000_000L;
+        // Entry without "path" should be silently skipped.
+        table.upsert(torrentWithFiles(
+                "TestTorrent",
+                "[{\"size\":100},{\"path\":\"real_file.txt\",\"size\":200}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("real_file", 10);
+        assertEquals(1, results.size());
+        assertNotNull(results.get(0).matchedFile());
+    }
+
+    @Test
+    void sharedFilesSurviveReopen() {
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles(
+                "PersistentFiles",
+                "[{\"path\":\"persistent_readme.txt\",\"size\":100}]",
+                now);
+        table.upsert(t);
+        table.close();
+
+        LocalIndexTable reopened = LocalIndexTable.open(dbFile);
+        try {
+            List<LocalSharedTorrent> results = reopened.search("persistent_readme", 10);
+            assertEquals(1, results.size());
+            assertNotNull(results.get(0).matchedFile());
+            assertTrue(results.get(0).matchedFile().contains("persistent_readme.txt"));
+        } finally {
+            reopened.close();
+        }
     }
 }
