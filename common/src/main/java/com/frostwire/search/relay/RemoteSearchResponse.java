@@ -115,15 +115,14 @@ public final class RemoteSearchResponse {
         return out.toByteArray();
     }
 
-    private static int estimateRowsBytes() {
-        return 0; // dynamic
-    }
-
     private static void appendRowBencode(java.io.ByteArrayOutputStream out, Row r) {
-        // Bencode a dict with sorted keys: fc, ih, n, nid?, pub, s
+        // Bencode a dict with sorted keys: fc, ih, mf?, n, nid?, pub, s
         java.util.Map<String, byte[]> parts = new java.util.TreeMap<>();
         parts.put("fc", Long.toString(r.fileCount).getBytes(java.nio.charset.StandardCharsets.UTF_8));
         parts.put("ih", Hex.encode(r.infoHash).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        if (r.matchedFile != null) {
+            parts.put("mf", r.matchedFile.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
         parts.put("n", r.name.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if (r.publisherNodeId != null) {
             parts.put("nid", Hex.encode(r.publisherNodeId).getBytes(java.nio.charset.StandardCharsets.UTF_8));
