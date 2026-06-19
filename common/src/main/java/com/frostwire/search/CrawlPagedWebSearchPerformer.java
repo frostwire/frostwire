@@ -36,8 +36,8 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
     private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 600000; // 10 minutes.
     private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT_SECS = 20; // 20 seconds.
-    private static CrawlCache cache = null;
-    private static MagnetDownloader magnetDownloader = null;
+    private static volatile CrawlCache cache = null;
+    private static volatile MagnetDownloader magnetDownloader = null;
 
     static {
         // Pre-size: 5 entries at 0.75 load factor = 8 capacity
@@ -79,31 +79,26 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     }
 
     public static void clearCache() {
-        if (cache != null) {
-            synchronized (cache) {
-                cache.clear();
-            }
+        CrawlCache c = cache;
+        if (c != null) {
+            c.clear();
         }
     }
 
     public static long getCacheNumEntries() {
-        long result = 0;
-        if (cache != null) {
-            synchronized (cache) {
-                result = cache.numEntries();
-            }
+        CrawlCache c = cache;
+        if (c != null) {
+            return c.numEntries();
         }
-        return result;
+        return 0;
     }
 
     public static long getCacheSize() {
-        long result = 0;
-        if (cache != null) {
-            synchronized (cache) {
-                result = cache.sizeInBytes();
-            }
+        CrawlCache c = cache;
+        if (c != null) {
+            return c.sizeInBytes();
         }
-        return result;
+        return 0;
     }
 
     private static long byteArrayToLong(final byte[] src, final int srcPos, final long dstInit, final int dstPos,
@@ -238,32 +233,24 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     }
 
     private byte[] cacheGet(String key) {
-//        //UNCOMMENT TO TEST/DEBUG SEARCHES THAT KEEP FAILING
-//        if (key.startsWith("failed:")) {
-//            return null;
-//        }
-        if (cache != null) {
-            synchronized (cache) {
-                return cache.get(key);
-            }
-        } else {
-            return null;
+        CrawlCache c = cache;
+        if (c != null) {
+            return c.get(key);
         }
+        return null;
     }
 
     private void cachePut(String key, byte[] data) {
-        if (cache != null) {
-            synchronized (cache) {
-                cache.put(key, data);
-            }
+        CrawlCache c = cache;
+        if (c != null) {
+            c.put(key, data);
         }
     }
 
     private void cacheRemove(String key) {
-        if (cache != null) {
-            synchronized (cache) {
-                cache.remove(key);
-            }
+        CrawlCache c = cache;
+        if (c != null) {
+            c.remove(key);
         }
     }
 

@@ -49,13 +49,16 @@ public final class SearchResultDisplayer implements RefreshListener {
     /**
      * The contents of tabbedPane.
      * INVARIANT: entries.size()==# of tabs in tabbedPane
-     * LOCKING: +obtain entries' monitor before adjusting number of
-     * outstanding searches, i.e., the number of tabs
+     * LOCKING: All access to entries must be synchronized on the entries
+     * list itself. EDT methods (add/remove/close tabs) and off-EDT
+     * methods (getResultPanelForGUID called from search executor threads)
+     * both touch this list. The synchronized blocks keep the EDT light —
+     * only the list operation is held, not any Swing component work.
      * +obtain a ResultPanel's monitor before adding or removing
      * results + to prevent deadlock, never obtain ResultPanel's
      * lock if holding entries'.
      */
-    private static final List<SearchResultMediator> entries = new ArrayList<>();
+    private static final List<SearchResultMediator> entries = java.util.Collections.synchronizedList(new ArrayList<>());
     private static final int MIN_HEIGHT = 220;
     /**
      * Listener for events on the tabbed pane.
@@ -207,17 +210,21 @@ public final class SearchResultDisplayer implements RefreshListener {
         ArrayList<SearchResultMediator> ents = new ArrayList<>();
         ArrayList<Component> tabs = new ArrayList<>();
         ArrayList<String> titles = new ArrayList<>();
-        for (int i = 0; i < tabbedPane.getTabCount() && i < entries.size(); ++i) {
-            tabs.add(tabbedPane.getComponent(i));
-            titles.add(tabbedPane.getTitleAt(i));
-            ents.add(entries.get(i));
+        synchronized (entries) {
+            for (int i = 0; i < tabbedPane.getTabCount() && i < entries.size(); ++i) {
+                tabs.add(tabbedPane.getComponent(i));
+                titles.add(tabbedPane.getTitleAt(i));
+                ents.add(entries.get(i));
+            }
+            tabbedPane.removeAll();
+            entries.clear();
         }
-        tabbedPane.removeAll();
-        entries.clear();
         setupTabbedPane();
-        for (int i = 0; i < tabs.size(); ++i) {
-            entries.add(ents.get(i));
-            tabbedPane.addTab(titles.get(i), tabs.get(i));
+        synchronized (entries) {
+            for (int i = 0; i < tabs.size(); ++i) {
+                entries.add(ents.get(i));
+                tabbedPane.addTab(titles.get(i), tabs.get(i));
+            }
         }
     }
 
@@ -338,9 +345,11 @@ public final class SearchResultDisplayer implements RefreshListener {
      * if none match.
      */
     public SearchResultMediator getResultPanelForGUID(long token) {
-        for (SearchResultMediator rp : entries) {
-            if (rp.matches(token)) { //order matters: rp may be a dummy guid.
-                return rp;
+        synchronized (entries) {
+            for (SearchResultMediator rp : entries) {
+                if (rp.matches(token)) {
+                    return rp;
+                }
             }
         }
         return null;
@@ -438,21 +447,25 @@ public final class SearchResultDisplayer implements RefreshListener {
         Object panel;
         int i = 0;
         boolean found = false;
-        for (; i < entries.size(); i++) {//safe its synchronized
-            panel = entries.get(i);
-            if (panel == rp) {
-                found = true;
-                break;
+        synchronized (entries) {
+            for (; i < entries.size(); i++) {
+                panel = entries.get(i);
+                if (panel == rp) {
+                    found = true;
+                    break;
+                }
             }
         }
-        if (found)//find the number of lines in model
+        if (found)
             tabbedPane.setTitleAt(i, titleOf(rp));
     }
 
     private void fixIcons() {
         int sel = tabbedPane.getSelectedIndex();
-        for (int i = 0; i < entries.size() && i < tabbedPane.getTabCount(); i++) {
-            tabbedPane.setIconAt(i, i == sel ? CancelSearchIconProxy.createSelected() : CancelSearchIconProxy.createPlain());
+        synchronized (entries) {
+            for (int i = 0; i < entries.size() && i < tabbedPane.getTabCount(); i++) {
+                tabbedPane.setIconAt(i, i == sel ? CancelSearchIconProxy.createSelected() : CancelSearchIconProxy.createPlain());
+            }
         }
     }
 
@@ -506,11 +519,9 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     int tabCount() {
-        int result = 0;
-        if (!entries.isEmpty()) {
-            result = entries.size();
+        synchronized (entries) {
+            return entries.size();
         }
-        return result;
     }
 
     int currentTabIndex() {

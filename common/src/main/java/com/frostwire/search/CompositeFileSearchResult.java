@@ -44,12 +44,14 @@ public class CompositeFileSearchResult implements FileSearchResult {
     private final String thumbnailUrl;
     private final boolean preliminary;
 
-    // Optional metadata composed into the result
-    private final Optional<Integer> viewCount;
-    private final Optional<TorrentMetadata> torrent;
-    private final Optional<String> httpDownloadUrl;
-    private final Optional<StreamingCapability> streaming;
-    private final Optional<CrawlableCapability> crawlable;
+    // Optional metadata composed into the result — stored as nullable
+    // fields with Optional created at the accessor boundary to avoid
+    // allocating 5 Optional wrappers per build() call (PERF10/PERF12).
+    private final Integer viewCount;
+    private final TorrentMetadata torrent;
+    private final String httpDownloadUrl;
+    private final StreamingCapability streaming;
+    private final CrawlableCapability crawlable;
 
     public CompositeFileSearchResult(
             String displayName,
@@ -75,11 +77,11 @@ public class CompositeFileSearchResult implements FileSearchResult {
         this.license = license;
         this.thumbnailUrl = thumbnailUrl;
         this.preliminary = preliminary;
-        this.viewCount = viewCount;
-        this.torrent = torrent;
-        this.httpDownloadUrl = httpDownloadUrl;
-        this.streaming = streaming;
-        this.crawlable = crawlable;
+        this.viewCount = viewCount != null ? viewCount.orElse(null) : null;
+        this.torrent = torrent != null ? torrent.orElse(null) : null;
+        this.httpDownloadUrl = httpDownloadUrl != null ? httpDownloadUrl.orElse(null) : null;
+        this.streaming = streaming != null ? streaming.orElse(null) : null;
+        this.crawlable = crawlable != null ? crawlable.orElse(null) : null;
     }
 
     // SearchResult interface implementation
@@ -131,64 +133,64 @@ public class CompositeFileSearchResult implements FileSearchResult {
 
     // Torrent-specific accessors (null-safe via Optional)
     public Optional<String> getTorrentUrl() {
-        return torrent.map(TorrentMetadata::getUrl);
+        return torrent != null ? Optional.ofNullable(torrent.getUrl()) : Optional.empty();
     }
 
     public Optional<String> getTorrentHash() {
-        return torrent.map(TorrentMetadata::getHash);
+        return torrent != null ? Optional.ofNullable(torrent.getHash()) : Optional.empty();
     }
 
     public Optional<Integer> getSeeds() {
-        return torrent.map(TorrentMetadata::getSeeds);
+        return torrent != null ? Optional.ofNullable(torrent.getSeeds()) : Optional.empty();
     }
 
     public Optional<String> getReferrerUrl() {
-        return torrent.map(TorrentMetadata::getReferrerUrl);
+        return torrent != null ? Optional.ofNullable(torrent.getReferrerUrl()) : Optional.empty();
     }
 
     public boolean isTorrent() {
-        return torrent.isPresent();
+        return torrent != null;
     }
 
     public Optional<String> getHttpDownloadUrl() {
-        return httpDownloadUrl;
+        return httpDownloadUrl != null ? Optional.of(httpDownloadUrl) : Optional.empty();
     }
 
     public boolean isHttpDownloadable() {
-        return httpDownloadUrl.isPresent();
+        return httpDownloadUrl != null;
     }
 
     // Streaming-specific accessors
     public Optional<String> getStreamUrl() {
-        return streaming.map(StreamingCapability::getUrl);
+        return streaming != null ? Optional.ofNullable(streaming.getUrl()) : Optional.empty();
     }
 
     public boolean isStreamable() {
-        return streaming.isPresent();
+        return streaming != null;
     }
 
     // Crawlable-specific accessors
     public Optional<List<FileSearchResult>> getCrawledChildren() {
-        return crawlable.map(c -> c.children);
+        return crawlable != null ? Optional.of(crawlable.children) : Optional.empty();
     }
 
     public boolean isCrawlable() {
-        return crawlable.isPresent() && !crawlable.get().isComplete;
+        return crawlable != null && !crawlable.isComplete;
     }
 
     public boolean isCrawlComplete() {
-        return crawlable.isPresent() && crawlable.get().isComplete;
+        return crawlable != null && crawlable.isComplete;
     }
 
     public void setCrawlableChildren(List<FileSearchResult> children) {
-        if (crawlable.isPresent()) {
-            crawlable.get().children = children;
-            crawlable.get().isComplete = true;
+        if (crawlable != null) {
+            crawlable.children = children;
+            crawlable.isComplete = true;
         }
     }
 
     public Optional<Integer> getViewCount() {
-        return viewCount;
+        return viewCount != null ? Optional.of(viewCount) : Optional.empty();
     }
 
     // Builder pattern for easier construction
@@ -308,11 +310,11 @@ public class CompositeFileSearchResult implements FileSearchResult {
                     license,
                     thumbnailUrl,
                     preliminary,
-                    Optional.ofNullable(viewCount),
-                    Optional.ofNullable(torrent),
-                    Optional.ofNullable(httpDownloadUrl),
-                    Optional.ofNullable(streaming),
-                    Optional.ofNullable(crawlable)
+                    viewCount != null ? Optional.of(viewCount) : Optional.empty(),
+                    torrent != null ? Optional.of(torrent) : Optional.empty(),
+                    httpDownloadUrl != null ? Optional.of(httpDownloadUrl) : Optional.empty(),
+                    streaming != null ? Optional.of(streaming) : Optional.empty(),
+                    crawlable != null ? Optional.of(crawlable) : Optional.empty()
             );
         }
     }

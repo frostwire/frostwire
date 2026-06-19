@@ -114,7 +114,9 @@ public final class SearchManager {
     }
 
     private void submitSimpleSearchTask(SearchTask task, ExecutorService executor) {
-        tasks.add(task);
+        synchronized (tasks) {
+            tasks.add(task);
+        }
         executor.execute(task);
     }
 
@@ -182,7 +184,9 @@ public final class SearchManager {
         if (performer != null && !performer.isStopped()) {
             try {
                 CrawlTask task = new CrawlTask(this, performer, sr);
-                tasks.add(task);
+                synchronized (tasks) {
+                    tasks.add(task);
+                }
                 crawlingExecutor.execute(task);
             } catch (Throwable e) {
                 LOG.warn("Error scheduling crawling of search result: " + sr);
