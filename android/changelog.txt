@@ -15,7 +15,15 @@ FrostWire 3.2.0 build 776 UNRELEASED
  - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields instead of lazy-initialized in constructors — eliminates non-thread-safe lazy-init race and redundant compilation
  - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger — concurrent crawl() calls from the thread pool no longer lose updates, preventing more crawls than configured
  - fix:PerformersHelper.reduceHtml no longer double-allocates strings via toCharArray() + new String(char[]) — substring already creates a new String
- - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList) — prevents data races under concurrent TLS handshakes
+  - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList) — prevents data races under concurrent TLS handshakes
+  - fix:SearchManager no longer cancels all global HTTP requests on stop — OkHttpClientWrapper.cancelAllRequests() was nuking non-search HTTP traffic. Stopped performers now abort via the 'stopped' flag
+  - fix:SearchManager checkIfFinished race — crawl() and submitSimpleSearchTask() now add tasks inside synchronized(tasks) blocks
+  - fix:SearchManager removed O(n²) nextOrdinal — iterated all tasks per crawlable result, was never used for sorting
+  - fix:SearchManager no longer crawls search results that are already complete
+  - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional at accessor boundary
+  - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — cache field is volatile with local-variable snapshots
+  - fix:PerformersHelper.reduceHtml no longer double-allocates strings
+  - fix:SearchMediator search query sanitization — control characters stripped, length capped at 1024
  - fix:Shutdown now suppresses OEM framework StrictMode disk I/O noise from the activity finish binder path
  - fix:VPN Drop protection now applies immediately during rapid on/off toggles and blocks manual seeding of finished torrents with a clear warning
  - fix:VPN Drop protection now resumes paused BitTorrent transfers after the setting is turned off, and shutdown avoids the Oplus finishAndRemoveTask StrictMode disk I/O path

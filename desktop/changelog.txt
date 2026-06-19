@@ -22,6 +22,41 @@ FrostWire 7.1.0 UNRELEASED
   - fix:SearchEngine TPB _domainName not volatile — background thread wrote _domainName; isReady() read it on EDT. Without volatile, TPB might never become ready. Also added try/catch and named daemon thread for mirror fetch
   - fix:SearchMediator onResults IndexOutOfBoundsException — results.get(0) without null/empty check crashed the executor thread when a performer called onResults([])
   - fix:SearchMediator filter token-mutation fragility — searchTokens list was passed to filter2 which could mutate it via internal token removal. Now a defensive copy is made at the filter entry point
+  - fix:SearchMediator onResults no longer blocks search executor threads on the EDT — changed safeInvokeAndWait to safeInvokeLater so results are dispatched asynchronously
+  - fix:SearchMediator search query sanitization — control characters stripped and query length capped at 1024 characters before dispatching to performers, preventing injection into URL templates, regex patterns, and JSON request bodies
+  - fix:SearchResultDisplayer entries list now synchronized — the static ArrayList was mutated from EDT and iterated from search executor threads without synchronization, risking ConcurrentModificationException. Now a Collections.synchronizedList with synchronized blocks on all iteration paths
+  - fix:SearchManager checkIfFinished race — crawl() and submitSimpleSearchTask() now add tasks inside synchronized(tasks) blocks, closing the race where a CrawlTask was enqueued between checkIfFinished's 'no pending' check and the onStopped callback
+  - fix:SearchManager no longer cancels all global HTTP requests on stop — OkHttpClientWrapper.cancelAllRequests() was nuking non-search HTTP traffic (updates, FrostClick). Stopped performers now abort via the 'stopped' flag
+  - fix:SearchManager removed O(n²) nextOrdinal — the method iterated all tasks per crawlable result and was never used for sorting (no priority queue). Removed Comparable, ordinal field, and nextOrdinal method
+  - fix:SearchEngine.getEngines cached as static final — was allocating a new Arrays.asList on every call (per search, per result lookup, per engine lookup)
+  - fix:SearchEngine.getSearchEngineByName prefix matching — fragile name.startsWith() replaced with exact name match or name + space prefix to prevent short engine names from matching longer ones
+  - fix:SearchEngine TPB mirror fetch error handling — added try/catch and named daemon thread instead of raw new Thread()
+  - fix:SearchMediator stripHtml regex precompiled — two String.replaceAll calls per result were recompiling regex on every search result. Now static final Pattern
+  - fix:HTTP search responses now check for 4xx/5xx error codes before returning the body — Cloudflare challenge pages and rate-limit responses are no longer passed to parsers as if they were valid search results
+  - fix:HTTP response body size capped at 16 MB (search) and 32 MB (torrent downloads) to prevent OOM from malicious or misconfigured servers
+  - fix:Torrent crawl cache replaced with LRU eviction (LinkedHashMap, max 500 entries) — old cache had no eviction, causing unbounded memory growth in long-running sessions
+  - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — the underlying DatabaseCrawlCache handles its own thread safety. Cache field is now volatile with local-variable snapshots
+  - fix:ThreadPool stack size increased from 4 KB to 512 KB — the previous 4 KB stack was far below the JVM default and caused StackOverflowError on deep call chains
+  - fix:TLS hostname verification now uses proper suffix matching instead of substring contains — prevents attacker-controlled hostnames from matching whitelisted domains
+  - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList)
+  - fix:JdkHttpClient.head reads response code before disconnect and drains error stream to prevent socket leaks
+  - fix:Knaben search query JSON now properly escaped via Gson
+  - fix:Removed Sec-Fetch-Mode: navigate header from all HTTP requests
+  - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields
+  - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger
+  - fix:PerformersHelper.reduceHtml no longer double-allocates strings
+  - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional created at accessor boundary only
+  - fix:rUDP HELLO replay prevention — 8-byte Unix timestamp added to the signed message. HELLOs with timestamp skew > 300s are rejected. Legacy 96-byte format accepted for backward compat
+  - fix:RegisterRequest canonical string uses length-prefixed fields to prevent delimiter injection
+  - fix:DistributedSearchPerformer validates search result row fields — name max 2048 chars, infoHash must be 20 bytes, per-row try/catch prevents NPE from malformed responses
+  - fix:IceBridge control API requires auth token (X-IceBridge-Token header) on all endpoints except /health — 32-byte random hex string generated at startup
+  - fix:rUDP binds to 127.0.0.1 for local daemon profile — was 0.0.0.0, exposing unauthenticated handlers to the internet
+  - fix:rUDP max sessions cap (256) — prevents memory exhaustion from unbounded session creation
+  - fix:rUDP relay source verification — handleRelay verifies sourcePub matches the sender's authenticated session identity
+  - fix:rUDP hole-punch requires authenticated session — unauthenticated peers can no longer trigger amplification
+  - fix:IncomingSearchRequestHandler rate-limits per source to 30 requests/minute
+  - fix:PeerRegistrySync rUDP port is now configurable via constructor parameter
+  - fix:FragmentReassembler cross-session collision — group key changed from int groupId to String (sender + groupId)
   - fix:Default tracker list in TorrentUtil, CreateTorrentDialog, and UrlUtils updated to 16 trackers that responded to a BEP 15 connect_request probe on 2026-06-08 — removed 6 dead trackers (opentrackr, openbittorrent, exodus, moeking, explodie, coppersurfer) and added reliable replacements from ngosang/trackerslist per #1004. New DefaultTrackerListTest regression suite asserts all three files stay in sync
   - fix:SoundCloud default credentials refreshed to the values published at update.frostwire.com/android (client_id=A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz, app_version=1780910323) — pre-existing drift across SoundCloudConfigFetcher, SoundcloudSearchPattern, SoundcloudUtils, and SoftwareUpdater fallbacks now also aligned
   - fix:Idope search engine removed from commons, desktop, and android — idope.pics now requires TLS 1.3 and was failing handshakes on macOS arm64 and other TLS-1.2-only stacks. Removed IdopeSearchPattern, createIdopeTorrentSearch, SearchEngineID.IDOPE_ID, IDOPE_SEARCH_ENABLED, PREF_KEY_SEARCH_USE_IDOPE, all 39 localized use_idope strings, the android settings entry, and the desktop MCP engine registry. Added IdopeRemovalTest regression suite
