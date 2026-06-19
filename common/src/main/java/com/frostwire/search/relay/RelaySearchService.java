@@ -120,7 +120,7 @@ public final class RelaySearchService {
         for (LocalSharedTorrent t : rows) {
             byte[] nodeId = t.publisherNodeId();
             b.addRow(t.infoHash(), t.name(), t.sizeBytes(), t.fileCount(),
-                    t.publisherEd25519Pub(), nodeId);
+                    t.publisherEd25519Pub(), nodeId, t.matchedFile());
         }
         RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
         byte[] sig = sign(unsigned.canonicalBytes());

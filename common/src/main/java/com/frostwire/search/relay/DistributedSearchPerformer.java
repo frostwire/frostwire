@@ -361,9 +361,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         String name = row.name;
         String infoHashHex = Hex.encode(row.infoHash);
         String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
+        String filename = (row.matchedFile != null && !row.matchedFile.isEmpty())
+                ? row.matchedFile
+                : name + ".torrent";
         return CompositeFileSearchResult.builder()
                 .displayName(name)
-                .filename(name + ".torrent")
+                .filename(filename)
                 .size(row.sizeBytes)
                 .detailsUrl(magnet)
                 .source(SOURCE_NAME)
