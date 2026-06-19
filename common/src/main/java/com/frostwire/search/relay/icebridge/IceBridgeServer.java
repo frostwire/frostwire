@@ -238,6 +238,10 @@ public final class IceBridgeServer implements AutoCloseable {
                 case "--host":
                     b.host(next(args, ++i, "--host"));
                     break;
+                case "--auth-token":
+                    // Parsed separately by parseAuthToken(); skip value.
+                    i++;
+                    break;
                 case "--help":
                     printHelp();
                     System.exit(0);
