@@ -43,6 +43,7 @@ public final class ControlServer implements AutoCloseable {
     private final IceBridgeConfig config;
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
+    private final String authToken;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel channel;
@@ -51,12 +52,22 @@ public final class ControlServer implements AutoCloseable {
                          IceBridgeMetrics metrics,
                          IceBridgeConfig config,
                          RudpSessionManager rudpSessionManager,
-                         InboundMessageQueue inboundQueue) {
+                         InboundMessageQueue inboundQueue,
+                         String authToken) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
         this.rudpSessionManager = rudpSessionManager;
         this.inboundQueue = inboundQueue;
+        this.authToken = authToken;
+    }
+
+    /**
+     * Returns the auth token that must be included in the
+     * {@code X-IceBridge-Token} header of every control API request.
+     */
+    public String authToken() {
+        return authToken;
     }
 
     public void start() throws InterruptedException {
@@ -77,7 +88,7 @@ public final class ControlServer implements AutoCloseable {
                         ch.pipeline()
                                 .addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue));
+                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authToken));
                     }
                 });
 

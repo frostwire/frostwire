@@ -33,6 +33,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     private final int controlHttpPort;
     private final int rudpPort;
     private final String role;
+    private final String authToken;
 
     private Process process;
     private IceBridgeClient client;
@@ -57,6 +58,14 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         this.controlHttpPort = controlHttpPort <= 0 ? freePort() : controlHttpPort;
         this.rudpPort = rudpPort <= 0 ? freePort() : rudpPort;
         this.role = role == null || role.isEmpty() ? "BOTH" : role;
+        // Generate a random auth token for the control API.
+        byte[] tokenBytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(tokenBytes);
+        this.authToken = com.frostwire.util.Hex.encode(tokenBytes);
+    }
+
+    public String authToken() {
+        return authToken;
     }
 
     public IceBridgeClient client() {
@@ -99,6 +108,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         command.add(role);
         command.add("--host");
         command.add("127.0.0.1");
+        command.add("--auth-token");
+        command.add(authToken);
         if (identityFile != null) {
             command.add("--identity-file");
             command.add(identityFile.getAbsolutePath());
@@ -113,6 +124,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         LOG.info("Starting IceBridge: " + String.join(" ", command));
         process = pb.start();
         client = new IceBridgeClient(controlHttpPort);
+        client.setAuthToken(authToken);
     }
 
     /**

@@ -44,6 +44,7 @@ public final class IceBridgeClient implements AutoCloseable {
 
     private final HttpClient http;
     private final String baseUrl;
+    private volatile String authToken;
 
     public IceBridgeClient(int controlPort) {
         this("http://127.0.0.1:" + controlPort);
@@ -54,6 +55,14 @@ public final class IceBridgeClient implements AutoCloseable {
         this.http = HttpClient.newBuilder()
                 .connectTimeout(TIMEOUT)
                 .build();
+    }
+
+    /**
+     * Set the auth token to include in the {@code X-IceBridge-Token} header
+     * of every control API request (except /health).
+     */
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     /**
@@ -181,12 +190,12 @@ public final class IceBridgeClient implements AutoCloseable {
 
     private <T> T get(String path, TypeToken<T> type) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + path))
                     .timeout(TIMEOUT)
-                    .GET()
-                    .build();
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+                    .GET();
+            addAuthHeader(builder);
+            HttpResponse<String> response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
             return GSON.fromJson(response.body(), type.getType());
         } catch (Exception e) {
             return null;
@@ -195,16 +204,23 @@ public final class IceBridgeClient implements AutoCloseable {
 
     private <T> T post(String path, Object body, TypeToken<T> type) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + path))
                     .timeout(TIMEOUT)
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)))
-                    .build();
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
+            addAuthHeader(builder);
+            HttpResponse<String> response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
             return GSON.fromJson(response.body(), type.getType());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    private void addAuthHeader(HttpRequest.Builder builder) {
+        String token = authToken;
+        if (token != null && !token.isEmpty()) {
+            builder.header("X-IceBridge-Token", token);
         }
     }
 

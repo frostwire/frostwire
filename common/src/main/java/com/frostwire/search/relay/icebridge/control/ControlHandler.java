@@ -60,24 +60,38 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private final IceBridgeConfig config;
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
+    private final String authToken;
 
     public ControlHandler(PeerRegistry registry,
                           IceBridgeMetrics metrics,
                           IceBridgeConfig config,
                           RudpSessionManager rudpSessionManager,
-                          InboundMessageQueue inboundQueue) {
+                          InboundMessageQueue inboundQueue,
+                          String authToken) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
         this.rudpSessionManager = rudpSessionManager;
         this.inboundQueue = inboundQueue;
+        this.authToken = authToken;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         metrics.controlRequest();
+
+        // SEC5: Require auth token on all endpoints except /health.
+        String path = new QueryStringDecoder(request.uri()).path();
+        if (!"/health".equals(path)) {
+            String token = request.headers().get("X-IceBridge-Token");
+            if (authToken != null && !authToken.isEmpty() && !authToken.equals(token)) {
+                sendJson(ctx, request, HttpResponseStatus.UNAUTHORIZED,
+                        ApiResponse.error("unauthorized"));
+                return;
+            }
+        }
+
         String uri = request.uri();
-        String path = new QueryStringDecoder(uri).path();
         HttpMethod method = request.method();
 
         try {

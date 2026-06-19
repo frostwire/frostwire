@@ -180,6 +180,7 @@ class MultiInstanceDistributedSearchTest {
 
         // Wait for the control server to be reachable.
         IceBridgeClient client = new IceBridgeClient(server.controlPort());
+        client.setAuthToken(server.authToken());
         boolean healthy = false;
         for (int i = 0; i < 100; i++) {
             if (client.health()) {

@@ -38,6 +38,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private static final long JANITOR_INTERVAL_SEC = 30;
 
     private final IceBridgeConfig config;
+    private final String authToken;
     private IdentityKeys identity;
     private PeerRegistry registry;
     private IceBridgeMetrics metrics;
@@ -49,18 +50,39 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public static void main(String[] args) throws Exception {
         IceBridgeConfig config = parseArgs(args);
-        try (IceBridgeServer server = new IceBridgeServer(config)) {
+        String authToken = parseAuthToken(args);
+        try (IceBridgeServer server = new IceBridgeServer(config, authToken)) {
             server.start();
             LOG.info("IceBridge running, press Ctrl-C to stop");
             Thread.sleep(Long.MAX_VALUE);
         }
     }
 
+    private static String parseAuthToken(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if ("--auth-token".equals(args[i]) && i + 1 < args.length) {
+                return args[i + 1];
+            }
+        }
+        return null;
+    }
+
     public IceBridgeServer(IceBridgeConfig config) {
+        this(config, null);
+    }
+
+    public IceBridgeServer(IceBridgeConfig config, String authToken) {
         if (config == null) {
             throw new IllegalArgumentException("config is null");
         }
         this.config = config;
+        this.authToken = authToken != null ? authToken : generateAuthToken();
+    }
+
+    private static String generateAuthToken() {
+        byte[] tokenBytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(tokenBytes);
+        return com.frostwire.util.Hex.encode(tokenBytes);
     }
 
     /**
@@ -75,7 +97,7 @@ public final class IceBridgeServer implements AutoCloseable {
         this.registry = new PeerRegistry(config);
         this.inboundQueue = new InboundMessageQueue();
         this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
-        this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue);
+        this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, authToken);
         this.rudpServer = new RudpServer(config, rudpSessionManager);
 
         controlServer.start();
@@ -86,6 +108,9 @@ public final class IceBridgeServer implements AutoCloseable {
                 + " role=" + config.role()
                 + " rudpPort=" + rudpServer.port()
                 + " httpPort=" + controlServer.port());
+        // Print auth token to stdout for the launcher to parse.
+        System.out.println("ICEBRIDGE_AUTH_TOKEN=" + authToken);
+        System.out.flush();
     }
 
     private IdentityKeys loadIdentity(File file) throws IOException, GeneralSecurityException {
@@ -140,6 +165,14 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public int controlPort() {
         return controlServer == null ? 0 : controlServer.port();
+    }
+
+    /**
+     * Returns the auth token required for control API requests, or
+     * {@code null} if the server hasn't been started yet.
+     */
+    public String authToken() {
+        return controlServer == null ? null : controlServer.authToken();
     }
 
     public int rudpPort() {

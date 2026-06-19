@@ -50,7 +50,7 @@ class PeerRegistrySyncTest {
         IceBridgeMetrics metrics = new IceBridgeMetrics();
         InboundMessageQueue queue = new InboundMessageQueue();
         RudpSessionManager rudp = new RudpSessionManager(identity, registry, metrics, queue);
-        server = new ControlServer(registry, metrics, config, rudp, queue);
+        server = new ControlServer(registry, metrics, config, rudp, queue, null);
         server.start();
         client = new IceBridgeClient(server.port());
         directory = new PeerDirectory(new PeerKarmaCache(

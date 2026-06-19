@@ -387,6 +387,13 @@ public final class RudpSessionManager {
     }
 
     private void handleHolePunch(RudpPacket packet, InetSocketAddress sender) {
+        // SEC4: Require an authenticated session — only peers who have
+        // completed a HELLO handshake can initiate hole punching.
+        RudpSession senderSession = sessionsByAddress.get(sender);
+        if (senderSession == null) {
+            LOG.debug("RudpSessionManager: rejected HOLE_PUNCH from unauthenticated " + sender);
+            return;
+        }
         byte[] payload = packet.payload();
         if (payload == null || payload.length < 32) {
             return;
@@ -425,6 +432,21 @@ public final class RudpSessionManager {
         byte[] sourcePub = Arrays.copyOfRange(payload, 0, 32);
         byte[] targetPub = Arrays.copyOfRange(payload, 32, 64);
         byte[] appPayload = Arrays.copyOfRange(payload, 64, payload.length);
+
+        // SEC3: Verify that sourcePub matches the sender's authenticated
+        // session identity. Without this check, anyone can claim any
+        // sourcePub and have the forwarder deliver payloads attributed
+        // to that key.
+        RudpSession senderSession = sessionsByAddress.get(sender);
+        if (senderSession == null) {
+            LOG.debug("RudpSessionManager: rejected RELAY from unauthenticated " + sender);
+            return;
+        }
+        byte[] senderPub = senderSession.remotePub();
+        if (senderPub == null || !Arrays.equals(sourcePub, senderPub)) {
+            LOG.debug("RudpSessionManager: rejected RELAY — sourcePub does not match sender session");
+            return;
+        }
 
         PeerRecord target = registry.lookup(targetPub);
         if (target == null) {

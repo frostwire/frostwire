@@ -51,7 +51,7 @@ class IceBridgeClientTest {
         metrics = new IceBridgeMetrics();
         inboundQueue = new InboundMessageQueue();
         rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
-        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue);
+        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, null);
         server.start();
         client = new IceBridgeClient(server.port());
     }
