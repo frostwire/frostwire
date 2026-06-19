@@ -361,8 +361,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         String name = row.name;
         String infoHashHex = Hex.encode(row.infoHash);
         String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
-        String filename = (row.matchedFile != null && !row.matchedFile.isEmpty())
-                ? row.matchedFile
+        // Validate matchedFile: reject null, empty, or pathologically long values.
+        String matchedFile = row.matchedFile;
+        if (matchedFile != null) {
+            if (matchedFile.isEmpty() || matchedFile.length() > 4096) {
+                matchedFile = null;
+            }
+        }
+        String filename = matchedFile != null
+                ? matchedFile
                 : name + ".torrent";
         return CompositeFileSearchResult.builder()
                 .displayName(name)

@@ -217,7 +217,10 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
         String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
         String detailsUrl = magnet;
         String matched = t.matchedFile();
-        String filename = (matched != null && !matched.isEmpty())
+        if (matched != null && (matched.isEmpty() || matched.length() > 4096)) {
+            matched = null;
+        }
+        String filename = matched != null
                 ? matched
                 : name + ".torrent";
         return CompositeFileSearchResult.builder()
