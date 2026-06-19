@@ -41,6 +41,16 @@ import java.util.concurrent.TimeUnit;
  * COMMON
  * An OkHttpClient based AbstractHttpClient.
  *
+ * <p>SECURITY AUDIT NOTE (C24): Crawl URLs and fetchBytes URLs are taken
+ * from search-result HTML/JSON with no host validation at the HTTP client
+ * layer. The Ssl.FWHostnameVerifier domain whitelist is enforced at TLS
+ * handshake time but not at the HTTP request layer. An allowlist check
+ * rejecting loopback/internal IPs (127.0.0.0/8, 10.0.0.0/8, 169.254.0.0/16)
+ * was considered but intentionally left as-is — FrostWire only crawls
+ * known torrent sites and the hostname verifier already restricts TLS
+ * connections to whitelisted domains. Do NOT add IP-range blocking
+ * without verifying it doesn't break legitimate CDN/cloud-fronted sites.
+ *
  * @author gubatron
  * @author aldenml
  */

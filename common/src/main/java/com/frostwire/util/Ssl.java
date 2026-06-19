@@ -208,6 +208,15 @@ public final class Ssl {
         }
     }
 
+    // SECURITY AUDIT NOTE (C17): NullTrustManager intentionally accepts all
+    // server certificates. Many torrent search sites (TPB mirrors, Nyaa, etc.)
+    // use self-signed or expired certs. Switching to the platform default
+    // TrustManager would break search for those sites. Per-domain cert
+    // pinning via OkHttp CertificatePinner was considered but rejected because
+    // mirrors change frequently and the pin list would need constant maintenance.
+    // The FWHostnameVerifier domain whitelist provides a first line of defense
+    // but does not validate the certificate chain. Do NOT change this without a
+    // product decision on which sites to pin and a maintenance plan for pin updates.
     private static final class NullTrustManager implements X509TrustManager {
         private final List<X509Certificate> acceptedCertificates = new CopyOnWriteArrayList<>();
 

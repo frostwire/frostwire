@@ -81,6 +81,16 @@ public abstract class SearchEngine {
         DISTRIBUTED_ID
     }
 
+    // SECURITY AUDIT NOTE (SEC8): TPB mirror list is fetched from
+    // piratebayproxy.info at startup without certificate pinning. A
+    // compromised mirror list could redirect all TPB searches to an
+    // attacker-controlled domain. Certificate pinning was considered
+    // but rejected because mirrors change frequently and pinning would
+    // require constant maintenance. The Ssl.FWHostnameVerifier domain
+    // whitelist restricts which domains can be used, but a MITM on
+    // piratebayproxy.info itself could inject new domains into the
+    // whitelist. Do NOT add cert pinning without a maintenance plan
+    // for updating the pin list when mirrors change.
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
