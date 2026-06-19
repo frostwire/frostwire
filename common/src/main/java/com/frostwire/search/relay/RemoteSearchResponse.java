@@ -182,6 +182,9 @@ public final class RemoteSearchResponse {
             if (r.publisherNodeId != null) {
                 row.put("nid", Hex.encode(r.publisherNodeId));
             }
+            if (r.matchedFile != null) {
+                row.put("mf", r.matchedFile);
+            }
             rowMaps.add(row);
         }
         m.put("rows", rowMaps);
@@ -239,8 +242,13 @@ public final class RemoteSearchResponse {
                     if (nidObj != null) {
                         nid = Hex.decode((String) nidObj);
                     }
+                    String matchedFile = null;
+                    Object mfObj = row.get("mf");
+                    if (mfObj != null) {
+                        matchedFile = (String) mfObj;
+                    }
                     b.addRow(ih, (String) nObj, ((Number) sObj).longValue(),
-                            ((Number) fcObj).intValue(), pub, nid);
+                            ((Number) fcObj).intValue(), pub, nid, matchedFile);
                 }
             }
             return b.build();
@@ -257,9 +265,16 @@ public final class RemoteSearchResponse {
         public final int fileCount;
         public final byte[] publisherEd25519Pub;
         public final byte[] publisherNodeId; // nullable
+        /** File path within the torrent that matched the search, or null if matched on name. */
+        public final String matchedFile;
 
         public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
                   byte[] publisherEd25519Pub, byte[] publisherNodeId) {
+            this(infoHash, name, sizeBytes, fileCount, publisherEd25519Pub, publisherNodeId, null);
+        }
+
+        public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                  byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile) {
             if (infoHash == null || infoHash.length != 20) {
                 throw new IllegalArgumentException("infoHash must be 20 bytes");
             }
@@ -275,6 +290,7 @@ public final class RemoteSearchResponse {
             this.fileCount = fileCount;
             this.publisherEd25519Pub = publisherEd25519Pub.clone();
             this.publisherNodeId = publisherNodeId == null ? null : publisherNodeId.clone();
+            this.matchedFile = matchedFile;
         }
     }
 
@@ -304,7 +320,14 @@ public final class RemoteSearchResponse {
         public Builder addRow(byte[] infoHash, String name, long sizeBytes, int fileCount,
                               byte[] publisherEd25519Pub, byte[] publisherNodeId) {
             rows.add(new Row(infoHash, name, sizeBytes, fileCount,
-                    publisherEd25519Pub, publisherNodeId));
+                    publisherEd25519Pub, publisherNodeId, null));
+            return this;
+        }
+
+        public Builder addRow(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                              byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile) {
+            rows.add(new Row(infoHash, name, sizeBytes, fileCount,
+                    publisherEd25519Pub, publisherNodeId, matchedFile));
             return this;
         }
 

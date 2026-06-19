@@ -32,6 +32,7 @@ public final class LocalSharedTorrent {
     private final long addedAt;
     private final long lastSeenAt;
     private final Long lastPublishedAt;
+    private final String matchedFile;
 
     private LocalSharedTorrent(Builder b) {
         this.infoHash = b.infoHash.clone();
@@ -46,6 +47,15 @@ public final class LocalSharedTorrent {
         this.addedAt = b.addedAt;
         this.lastSeenAt = b.lastSeenAt;
         this.lastPublishedAt = b.lastPublishedAt;
+        this.matchedFile = b.matchedFile;
+    }
+
+    /**
+     * Returns the file path within the torrent that matched the search
+     * query, or {@code null} if the match was on the torrent name only.
+     */
+    public String matchedFile() {
+        return matchedFile;
     }
 
     public byte[] infoHash() {
@@ -118,6 +128,7 @@ public final class LocalSharedTorrent {
         b.addedAt = this.addedAt;
         b.lastSeenAt = this.lastSeenAt;
         b.lastPublishedAt = this.lastPublishedAt;
+        b.matchedFile = this.matchedFile;
         return b;
     }
 
@@ -162,6 +173,7 @@ public final class LocalSharedTorrent {
         private long addedAt;
         private long lastSeenAt;
         private Long lastPublishedAt;
+        private String matchedFile;
 
         public Builder infoHash(byte[] v) {
             this.infoHash = v;
@@ -220,6 +232,11 @@ public final class LocalSharedTorrent {
 
         public Builder lastPublishedAt(Long v) {
             this.lastPublishedAt = v;
+            return this;
+        }
+
+        public Builder matchedFile(String v) {
+            this.matchedFile = v;
             return this;
         }
 

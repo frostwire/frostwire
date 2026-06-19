@@ -129,7 +129,7 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         long size = safeSize(ti);
         int fileCount = safeFileCount(ti);
         String name = safeName(dl, ti);
-        String filesJson = FilesJson.minimal(fileCount, size);
+        String filesJson = buildFilesJson(ti, fileCount, size);
 
         return new LocalSharedTorrent.Builder()
                 .infoHash(Hex.decode(infoHashHex))
@@ -143,6 +143,100 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                 .addedAt(now)
                 .lastSeenAt(now)
                 .build();
+    }
+
+    /**
+     * Build a JSON array of real file paths extracted from the torrent's
+     * {@link TorrentInfo}. Each entry is {@code {"path":"...","size":N}}.
+     *
+     * <p>Skips pad files and hidden files (same filters as
+     * {@link com.frostwire.search.PerformersHelper#crawlTorrentInfo}).
+     * Falls back to {@link FilesJson#minimal} if extraction fails.
+     */
+    private static String buildFilesJson(TorrentInfo ti, int fileCount, long totalSize) {
+        try {
+            var fs = ti.files();
+            int n = fs.numFiles();
+            if (n <= 0) {
+                return FilesJson.minimal(fileCount, totalSize);
+            }
+            StringBuilder sb = new StringBuilder(256);
+            sb.append('[');
+            boolean first = true;
+            for (int i = 0; i < n; i++) {
+                // Skip pad files and hidden files.
+                if (fs.padFileAt(i)) {
+                    continue;
+                }
+                try {
+                    var flags = fs.fileFlags(i);
+                    if (flags != null && flags.and_(com.frostwire.jlibtorrent.FileStorage.FLAG_HIDDEN).nonZero()) {
+                        continue;
+                    }
+                } catch (Throwable ignored) {
+                    // fileFlags may not be available on all platforms; proceed.
+                }
+                String path;
+                try {
+                    path = fs.filePath(i);
+                } catch (Throwable t) {
+                    path = null;
+                }
+                if (path == null || path.isEmpty()) {
+                    continue;
+                }
+                long fileSize;
+                try {
+                    fileSize = fs.fileSize(i);
+                } catch (Throwable t) {
+                    fileSize = 0;
+                }
+                if (!first) {
+                    sb.append(',');
+                }
+                first = false;
+                sb.append("{\"path\":");
+                // Escape JSON string content.
+                appendJsonString(sb, path);
+                sb.append(",\"size\":").append(fileSize).append('}');
+            }
+            sb.append(']');
+            if (first) {
+                // No real files extracted — fall back to minimal.
+                return FilesJson.minimal(fileCount, totalSize);
+            }
+            return sb.toString();
+        } catch (Throwable t) {
+            LOG.debug("buildFilesJson: extraction failed, using minimal", t);
+            return FilesJson.minimal(fileCount, totalSize);
+        }
+    }
+
+    /**
+     * Append a JSON-escaped string (with surrounding double quotes) to
+     * the builder. Escapes backslash, double-quote, newline, carriage
+     * return, and tab.
+     */
+    private static void appendJsonString(StringBuilder sb, String s) {
+        sb.append('"');
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '\\' -> sb.append("\\\\");
+                case '"' -> sb.append("\\\"");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+                }
+            }
+        }
+        sb.append('"');
     }
 
     static String resolveName(String downloadName, TorrentInfo ti) {
