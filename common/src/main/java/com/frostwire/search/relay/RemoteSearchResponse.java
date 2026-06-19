@@ -57,7 +57,8 @@ public final class RemoteSearchResponse {
         for (Row r : rows) {
             this.rows.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
-                    r.publisherNodeId == null ? null : r.publisherNodeId.clone()));
+                    r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
+                    r.matchedFile));
         }
         this.signature = signature.clone();
     }
@@ -79,7 +80,8 @@ public final class RemoteSearchResponse {
         for (Row r : rows) {
             out.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
-                    r.publisherNodeId == null ? null : r.publisherNodeId.clone()));
+                    r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
+                    r.matchedFile));
         }
         return out;
     }
