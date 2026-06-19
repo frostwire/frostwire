@@ -149,6 +149,161 @@ class MultiInstanceDistributedSearchTest {
         assertEquals("ubuntu server", listener.results.get(0).get(0).getDisplayName());
     }
 
+    /**
+     * Two-peer integration test that verifies file-level matching across
+     * the distributed search path.
+     *
+     * <p>Node A has a torrent named "Project Atlas" whose files include
+     * "docs/architecture.md". Node B has a torrent named "Cookbook
+     * Recipes" whose files include "docs/architecture-notes.txt".
+     *
+     * <p>Searching for "architecture" from Node A should return:
+     * <ul>
+     *   <li>Local result from A — matchedFile populated (file-path match,
+     *       torrent name doesn't contain "architecture")</li>
+     *   <li>Remote result from B — matchedFile populated (file-path match
+     *       via rUDP round-trip)</li>
+     * </ul>
+     *
+     * <p>This validates the full matchedFile pipeline:
+     * LocalIndex → RelaySearchService → RemoteSearchResponse (JSON "mf"
+     * field) → SearchPayloadCodec → IceBridge rUDP →
+     * DistributedSearchPerformer.toResult → CompositeFileSearchResult.filename
+     */
+    @Test
+    void twoInstancesFileLevelMatchAcrossRudp() throws Exception {
+        Instance nodeA = startInstance("A");
+        Instance nodeB = startInstance("B");
+
+        // Cross-register identities (simulate DHT discovery).
+        nodeA.directory.upsertVerified(
+                nodeB.identity.ed25519PubRaw(), "127.0.0.1", nodeB.rudpPort);
+        nodeB.directory.upsertVerified(
+                nodeA.identity.ed25519PubRaw(), "127.0.0.1", nodeA.rudpPort);
+
+        assertTrue(nodeA.client.route(
+                nodeB.identity.ed25519PubRaw(), "127.0.0.1", nodeB.rudpPort,
+                IceBridgeConfig.Role.BOTH));
+        assertTrue(nodeB.client.route(
+                nodeA.identity.ed25519PubRaw(), "127.0.0.1", nodeA.rudpPort,
+                IceBridgeConfig.Role.BOTH));
+
+        // Node A: torrent name has nothing to do with "architecture";
+        // only a file inside it does.
+        nodeA.index.upsert(torrent("Project Atlas", 5_000L, 3,
+                "[{\"path\":\"docs/architecture.md\",\"size\":2048}," +
+                "{\"path\":\"src/main.java\",\"size\":1024}]"));
+
+        // Node B: also only matches "architecture" in a file path.
+        nodeB.index.upsert(torrent("Cookbook Recipes", 8_000L, 2,
+                "[{\"path\":\"docs/architecture-notes.txt\",\"size\":4096}," +
+                "{\"path\":\"recipes/soup.txt\",\"size\":512}]"));
+
+        // Perform distributed search from Node A.
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer performer = new DistributedSearchPerformer(
+                10L, "architecture", nodeA.index, nodeA.directory,
+                nodeA.identity, nodeA.transport,
+                5, 50, 25, 15);
+        performer.setListener(listener);
+        performer.perform();
+
+        // Verify we got results.
+        assertEquals(1, listener.results.size(), "performer should deliver one result batch");
+        List<SearchResult> results = listener.results.get(0);
+        assertEquals(2, results.size(),
+                "should have local (A) + remote (B) file-level matches");
+
+        // Both results should have the matched file as the filename
+        // (not "<name>.torrent") because the match was on a file path.
+        for (SearchResult sr : results) {
+            CompositeFileSearchResult cfsr = (CompositeFileSearchResult) sr;
+            String filename = cfsr.getFilename();
+            assertNotNull(filename);
+            assertTrue(filename.contains("architecture"),
+                    "filename should contain the matched file path, got: " + filename);
+            assertNotEquals(cfsr.getDisplayName() + ".torrent", filename,
+                    "filename should be the matched file, not the default torrent name");
+        }
+
+        // Verify both torrent names are present (neither contains "architecture").
+        List<String> names = results.stream()
+                .map(SearchResult::getDisplayName)
+                .sorted()
+                .toList();
+        assertEquals("Cookbook Recipes", names.get(0), "remote result from Node B");
+        assertEquals("Project Atlas", names.get(1), "local result from Node A");
+
+        // Verify the matched files are distinct and correct.
+        List<String> matchedFiles = results.stream()
+                .map(sr -> ((CompositeFileSearchResult) sr).getFilename())
+                .sorted()
+                .toList();
+        assertTrue(matchedFiles.get(0).contains("architecture-notes.txt"),
+                "Node B's matched file should be architecture-notes.txt, got: " + matchedFiles.get(0));
+        assertTrue(matchedFiles.get(1).contains("architecture.md"),
+                "Node A's matched file should be architecture.md, got: " + matchedFiles.get(1));
+    }
+
+    /**
+     * Mixed-match scenario: one torrent matches on its name (local),
+     * another matches only on a file path (remote). Verifies that
+     * matchedFile is null for name matches and populated for file
+     * matches across the rUDP path.
+     */
+    @Test
+    void mixedNameAndFileMatchAcrossPeers() throws Exception {
+        Instance nodeA = startInstance("A");
+        Instance nodeB = startInstance("B");
+
+        nodeA.directory.upsertVerified(
+                nodeB.identity.ed25519PubRaw(), "127.0.0.1", nodeB.rudpPort);
+        nodeB.directory.upsertVerified(
+                nodeA.identity.ed25519PubRaw(), "127.0.0.1", nodeA.rudpPort);
+
+        nodeA.client.route(nodeB.identity.ed25519PubRaw(), "127.0.0.1", nodeB.rudpPort,
+                IceBridgeConfig.Role.BOTH);
+        nodeB.client.route(nodeA.identity.ed25519PubRaw(), "127.0.0.1", nodeA.rudpPort,
+                IceBridgeConfig.Role.BOTH);
+
+        // Node A: torrent NAME contains "freeware" → name match (matchedFile null).
+        nodeA.index.upsert(torrent("Freeware Collection", 10_000L, 2,
+                "[{\"path\":\"setup.exe\",\"size\":5000}]"));
+
+        // Node B: only a FILE contains "freeware" → file match (matchedFile set).
+        nodeB.index.upsert(torrent("Random Stuff", 3_000L, 1,
+                "[{\"path\":\"freeware-tool.zip\",\"size\":3000}]"));
+
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer performer = new DistributedSearchPerformer(
+                20L, "freeware", nodeA.index, nodeA.directory,
+                nodeA.identity, nodeA.transport,
+                5, 50, 25, 15);
+        performer.setListener(listener);
+        performer.perform();
+
+        assertEquals(1, listener.results.size());
+        List<SearchResult> results = listener.results.get(0);
+        assertEquals(2, results.size());
+
+        CompositeFileSearchResult localResult = results.stream()
+                .filter(r -> r.getDisplayName().equals("Freeware Collection"))
+                .map(r -> (CompositeFileSearchResult) r)
+                .findFirst().orElseThrow();
+        CompositeFileSearchResult remoteResult = results.stream()
+                .filter(r -> r.getDisplayName().equals("Random Stuff"))
+                .map(r -> (CompositeFileSearchResult) r)
+                .findFirst().orElseThrow();
+
+        // Local name match → filename is the default (name + .torrent)
+        assertEquals("Freeware Collection.torrent", localResult.getFilename(),
+                "name match should use default filename, not matched file");
+        assertNotEquals("Freeware Collection.torrent", remoteResult.getFilename(),
+                "file match should use matched file path, not default filename");
+        assertTrue(remoteResult.getFilename().contains("freeware-tool.zip"),
+                "remote file match should surface the matched file path");
+    }
+
     // --- helpers ---
 
     /**
@@ -222,6 +377,10 @@ class MultiInstanceDistributedSearchTest {
     }
 
     private static LocalSharedTorrent torrent(String name, long size, int fileCount) {
+        return torrent(name, size, fileCount, "[]");
+    }
+
+    private static LocalSharedTorrent torrent(String name, long size, int fileCount, String filesJson) {
         byte[] hash = new byte[20];
         int n = HASH_COUNTER.incrementAndGet();
         hash[0] = (byte) (n >>> 24);
@@ -237,7 +396,7 @@ class MultiInstanceDistributedSearchTest {
                 .name(name)
                 .sizeBytes(size)
                 .fileCount(fileCount)
-                .filesJson("[]")
+                .filesJson(filesJson)
                 .publisherNodeId(nodeId)
                 .publisherEd25519Pub(pub)
                 .publisherUtpPort(0)
@@ -318,13 +477,49 @@ class MultiInstanceDistributedSearchTest {
             }
             String q = query.toLowerCase();
             List<LocalSharedTorrent> out = new ArrayList<>();
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            // Phase 1: torrent-name match (matchedFile = null)
             for (LocalSharedTorrent r : rows) {
                 if (r.name().toLowerCase().contains(q)) {
-                    out.add(r);
-                    if (out.size() >= limit) break;
+                    if (seen.add(r.infoHashHex())) {
+                        out.add(r);
+                        if (out.size() >= limit) break;
+                    }
+                }
+            }
+            if (out.size() >= limit) return out;
+            // Phase 2: file-path match (matchedFile = matched path)
+            for (LocalSharedTorrent r : rows) {
+                if (out.size() >= limit) break;
+                if (seen.contains(r.infoHashHex())) continue;
+                String matched = matchFilePath(r, q);
+                if (matched != null) {
+                    out.add(r.toBuilder().matchedFile(matched).build());
+                    seen.add(r.infoHashHex());
                 }
             }
             return out;
+        }
+
+        private static String matchFilePath(LocalSharedTorrent t, String query) {
+            String json = t.filesJson();
+            if (json == null || json.isEmpty() || "[]".equals(json)) {
+                return null;
+            }
+            try {
+                var arr = com.google.gson.JsonParser.parseString(json).getAsJsonArray();
+                for (var el : arr) {
+                    var obj = el.getAsJsonObject();
+                    var pathEl = obj.get("path");
+                    if (pathEl == null || pathEl.isJsonNull()) continue;
+                    String path = pathEl.getAsString();
+                    if (path != null && path.toLowerCase().contains(query)) {
+                        return path;
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+            return null;
         }
 
         @Override
