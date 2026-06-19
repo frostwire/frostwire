@@ -616,7 +616,7 @@ final class Initializer {
             String localHost = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT > 0
                     ? java.net.InetAddress.getLocalHost().getHostAddress()
                     : "127.0.0.1";
-            PeerRegistrySync peerSync = new PeerRegistrySync(client, directory, localHost);
+            PeerRegistrySync peerSync = new PeerRegistrySync(client, directory, localHost, launcher.rudpPort());
             peerSync.start();
 
             // Wire the DISTRIBUTED search engine.

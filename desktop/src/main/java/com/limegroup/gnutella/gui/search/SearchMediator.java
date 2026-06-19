@@ -491,6 +491,16 @@ public final class SearchMediator {
             return;
         }
 
+        // SEC9: Sanitize the query — strip control characters and limit
+        // length to prevent injection into URL templates, regex patterns,
+        // and JSON request bodies used by search performers.
+        if (!query.startsWith("http")) {
+            query = sanitizeQuery(query);
+            if (query.isEmpty()) {
+                return;
+            }
+        }
+
         if (!query.startsWith("http")) {
             manager.stop();
         }
@@ -569,6 +579,26 @@ public final class SearchMediator {
         str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
         str = StringUtils.removeDoubleSpaces(str);
         return str.trim();
+    }
+
+    /**
+     * Sanitize a search query before dispatching to performers.
+     *
+     * <p>Strips control characters (except common whitespace), null bytes,
+     * and limits length to 1024 characters to prevent injection into URL
+     * templates, regex patterns, and JSON request bodies.
+     */
+    private static String sanitizeQuery(String query) {
+        // Remove control characters (except tab, newline, carriage return)
+        // and null bytes.
+        StringBuilder sb = new StringBuilder(query.length());
+        for (int i = 0; i < query.length() && sb.length() < 1024; i++) {
+            char c = query.charAt(i);
+            if (c == '\t' || c == '\n' || c == '\r' || c >= ' ') {
+                sb.append(c);
+            }
+        }
+        return sb.toString().trim();
     }
 
     private List<String> tokenize(String keywords) {

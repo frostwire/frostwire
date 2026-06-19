@@ -49,11 +49,19 @@ public final class PeerRegistrySync implements AutoCloseable {
     private final IceBridgeClient client;
     private final PeerDirectory directory;
     private final String localHost;
+    private final int rudpPort;
     private final ScheduledExecutorService scheduler;
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
                             String localHost) {
+        this(client, directory, localHost, ICEBRIDGE_RUDP_PORT);
+    }
+
+    public PeerRegistrySync(IceBridgeClient client,
+                            PeerDirectory directory,
+                            String localHost,
+                            int rudpPort) {
         if (client == null) {
             throw new IllegalArgumentException("client is null");
         }
@@ -66,6 +74,7 @@ public final class PeerRegistrySync implements AutoCloseable {
         this.client = client;
         this.directory = directory;
         this.localHost = localHost;
+        this.rudpPort = rudpPort;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-peer-sync");
             t.setDaemon(true);
@@ -83,12 +92,13 @@ public final class PeerRegistrySync implements AutoCloseable {
                 INITIAL_DELAY_SEC, SYNC_INTERVAL_SEC, TimeUnit.SECONDS);
         LOG.info("PeerRegistrySync started: interval=" + SYNC_INTERVAL_SEC + "s"
                 + " localHost=" + localHost
-                + " rudpPort=" + ICEBRIDGE_RUDP_PORT);
+                + " rudpPort=" + rudpPort);
     }
 
     /**
      * Perform a single sync cycle: register all verified peers from the
-     * directory with the local IceBridge daemon.
+     * directory with the local IceBridge daemon using the configured
+     * rUDP port.
      */
     void sync() {
         try {
@@ -100,7 +110,7 @@ public final class PeerRegistrySync implements AutoCloseable {
                     continue;
                 }
                 if (client.route(peer.peerPub(), peer.hostname(),
-                        ICEBRIDGE_RUDP_PORT, IceBridgeConfig.Role.BOTH)) {
+                        rudpPort, IceBridgeConfig.Role.BOTH)) {
                     registered++;
                 }
             }

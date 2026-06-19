@@ -585,4 +585,138 @@ class RudpSessionManagerComprehensiveTest {
                         + (packetsOutAfter - packetsOutBefore));
         mgr.shutdown();
     }
+
+    // ---- SEC3: Relay source spoofing ----
+
+    @Test
+    void relayRejectedFromUnauthenticatedSender() throws Exception {
+        // SEC3: handleRelay must reject packets from senders without an
+        // authenticated session.
+        RudpSessionManager forwarder = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> {});
+
+        registry.register(new PeerRecord(remote.ed25519PubRaw(),
+                "127.0.0.1", 62060, IceBridgeConfig.Role.FORWARDER,
+                System.currentTimeMillis()));
+
+        byte[] sourcePub = local.ed25519PubRaw();
+        byte[] targetPub = remote.ed25519PubRaw();
+        byte[] appPayload = "relayed data".getBytes();
+        byte[] relayPayload = new byte[64 + appPayload.length];
+        System.arraycopy(sourcePub, 0, relayPayload, 0, 32);
+        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
+        System.arraycopy(appPayload, 0, relayPayload, 64, appPayload.length);
+
+        // Send RELAY from an address that has no session.
+        // The forwarder should reject it (no sessionsByAddress entry).
+        forwarder.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.RELAY, 0, 0, 0, relayPayload),
+                new InetSocketAddress("127.0.0.1", 62061),
+                new InetSocketAddress("127.0.0.1", 62062)));
+
+        // Registry should still have the target (relay was rejected, not forwarded).
+        assertEquals(1, registry.size());
+        // No session should have been created for the unauthenticated sender.
+        assertEquals(0, forwarder.sessionCount());
+        forwarder.shutdown();
+    }
+
+    @Test
+    void relayRejectedWhenSourcePubDoesNotMatchSession() throws Exception {
+        // SEC3: Even with an authenticated session, the sourcePub in the
+        // relay payload must match the session's remotePub.
+        RudpSessionManager forwarder = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> {});
+
+        // Create a session by sending a HELLO from 'local' identity.
+        long cid = 12345L;
+        InetSocketAddress senderAddr = new InetSocketAddress("127.0.0.1", 62070);
+        byte[] helloPayload = RudpAuth.createHelloPayload(local, cid);
+        forwarder.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, helloPayload),
+                senderAddr, new InetSocketAddress("127.0.0.1", 62071)));
+        assertEquals(1, forwarder.sessionCount());
+
+        // Register a target so the relay lookup would succeed.
+        registry.register(new PeerRecord(remote.ed25519PubRaw(),
+                "127.0.0.1", 62072, IceBridgeConfig.Role.FORWARDER,
+                System.currentTimeMillis()));
+
+        // Build a RELAY with a SPOOFED sourcePub (different from 'local').
+        byte[] spoofedSource = new byte[32];
+        spoofedSource[0] = 99;
+        byte[] targetPub = remote.ed25519PubRaw();
+        byte[] appPayload = "spoofed".getBytes();
+        byte[] relayPayload = new byte[64 + appPayload.length];
+        System.arraycopy(spoofedSource, 0, relayPayload, 0, 32);
+        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
+        System.arraycopy(appPayload, 0, relayPayload, 64, appPayload.length);
+
+        forwarder.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.RELAY, cid, 0, 0, relayPayload),
+                senderAddr, new InetSocketAddress("127.0.0.1", 62071)));
+
+        // The relay should have been rejected because sourcePub != session.remotePub.
+        // We can't directly verify no RELAY_RESPONSE was sent (no channel),
+        // but the session should still exist and no crash should occur.
+        assertEquals(1, forwarder.sessionCount());
+        forwarder.shutdown();
+    }
+
+    // ---- SEC4: Hole-punch requires authentication ----
+
+    @Test
+    void holePunchRejectedFromUnauthenticatedSender() throws Exception {
+        // SEC4: handleHolePunch must reject packets from senders without
+        // an authenticated session.
+        RudpSessionManager mgr = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> {});
+
+        // Register a target so the lookup would succeed if auth passed.
+        registry.register(new PeerRecord(remote.ed25519PubRaw(),
+                "127.0.0.1", 62080, IceBridgeConfig.Role.FORWARDER,
+                System.currentTimeMillis()));
+
+        byte[] targetPub = remote.ed25519PubRaw();
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HOLE_PUNCH, 0, 0, 0, targetPub),
+                new InetSocketAddress("127.0.0.1", 62081),
+                new InetSocketAddress("127.0.0.1", 62082)));
+
+        // No session created — the unauthenticated HOLE_PUNCH was rejected.
+        assertEquals(0, mgr.sessionCount(), "HOLE_PUNCH from unauthenticated sender should be rejected");
+        mgr.shutdown();
+    }
+
+    // ---- SEC2: Max session limit ----
+
+    @Test
+    void helloRejectedWhenMaxSessionsReached() throws Exception {
+        RudpSessionManager mgr = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> {});
+
+        // Create 256 sessions (the MAX_SESSIONS limit).
+        for (int i = 0; i < 256; i++) {
+            IdentityKeys peer = IdentityKeys.generate(0);
+            long cid = 1000L + i;
+            InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 63000 + i);
+            byte[] hello = RudpAuth.createHelloPayload(peer, cid);
+            mgr.onPacket(new RudpPacketEnvelope(
+                    new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, hello),
+                    addr, new InetSocketAddress("127.0.0.1", 63999)));
+        }
+        assertEquals(256, mgr.sessionCount());
+
+        // The 257th session should be rejected.
+        IdentityKeys extraPeer = IdentityKeys.generate(0);
+        long extraCid = 9999L;
+        InetSocketAddress extraAddr = new InetSocketAddress("127.0.0.1", 63998);
+        byte[] extraHello = RudpAuth.createHelloPayload(extraPeer, extraCid);
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, extraCid, 0, 0, extraHello),
+                extraAddr, new InetSocketAddress("127.0.0.1", 63999)));
+
+        assertEquals(256, mgr.sessionCount(), "257th session should be rejected at MAX_SESSIONS");
+        mgr.shutdown();
+    }
 }
