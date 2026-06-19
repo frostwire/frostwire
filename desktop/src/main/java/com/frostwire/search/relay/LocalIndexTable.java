@@ -59,12 +59,20 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
     private static final Logger LOG = Logger.getLogger(LocalIndexTable.class);
 
     public static final String DEFAULT_DB_NAME = "frostwire-shared-torrents.db";
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     static final String TABLE = "shared_torrents";
     static final String FTS = "shared_torrents_fts";
     static final String FILES_TABLE = "shared_files";
     static final String FILES_FTS = "shared_files_fts";
+
+    /**
+     * Maximum number of file paths indexed per torrent in
+     * {@code shared_files}. Prevents unbounded row growth for torrents
+     * with tens of thousands of files (e.g. Linux distro piece
+     * archives). Excess files are silently truncated.
+     */
+    static final int MAX_FILES_PER_TORRENT = 10_000;
 
     private static final String CREATE_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS " + TABLE + " (" +
@@ -111,15 +119,15 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
                     "ON " + FILES_TABLE + " (torrent_rowid)";
 
     /**
-     * FTS5 virtual table indexing individual file paths. This enables
-     * searching for specific files within torrents (e.g. "readme.txt"
-     * matches a torrent containing that file even if the torrent name
-     * doesn't contain "readme").
+     * FTS5 virtual table indexing individual file paths. Uses a standalone
+     * FTS5 table (not external content) to avoid trigger and rowid-reuse
+     * issues. Stores {@code torrent_rowid} so search results can join
+     * back to {@code shared_torrents} without going through
+     * {@code shared_files}.
      */
     private static final String CREATE_FILES_FTS_SQL =
             "CREATE VIRTUAL TABLE IF NOT EXISTS " + FILES_FTS + " USING fts5(" +
-                    "file_path, " +
-                    "content='" + FILES_TABLE + "', content_rowid='rowid', " +
+                    "file_path, torrent_rowid UNINDEXED, " +
                     "tokenize='porter unicode61'" +
                     ")";
 
@@ -140,15 +148,11 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
                     "END;";
 
     /**
-     * Triggers to keep shared_files_fts in sync with shared_files.
+     * No triggers for shared_files_fts — the FTS5 index is managed
+     * manually in {@link #syncSharedFiles} and {@link #delete}. This
+     * avoids issues with FTS5 "delete" trigger commands when rowids
+     * are reused after INSERT OR REPLACE on shared_torrents.
      */
-    private static final String CREATE_FILES_TRIGGERS_SQL =
-            "CREATE TRIGGER IF NOT EXISTS " + FILES_TABLE + "_ai AFTER INSERT ON " + FILES_TABLE + " BEGIN " +
-                    "INSERT INTO " + FILES_FTS + "(rowid, file_path) VALUES (new.rowid, new.file_path); " +
-                    "END;" +
-                    "CREATE TRIGGER IF NOT EXISTS " + FILES_TABLE + "_ad AFTER DELETE ON " + FILES_TABLE + " BEGIN " +
-                    "INSERT INTO " + FILES_FTS + "(" + FILES_FTS + ", rowid, file_path) VALUES('delete', old.rowid, old.file_path); " +
-                    "END;";
 
     private static final String CREATE_META_SQL =
             "CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)";
@@ -208,31 +212,51 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
 
     public void upsert(LocalSharedTorrent t) {
         ensureOpen();
-        String sql = "INSERT OR REPLACE INTO " + TABLE +
+        String upsertSql = "INSERT OR REPLACE INTO " + TABLE +
                 " (info_hash, name, size_bytes, file_count, files_json, tags, " +
                 " publisher_node_id, publisher_ed25519_pub, publisher_utp_port, " +
                 " added_at, last_seen_at, last_published_at) " +
                 " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         synchronized (connection) {
-            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, t.infoHashHex());
-                ps.setString(2, t.name());
-                ps.setLong(3, t.sizeBytes());
-                ps.setInt(4, t.fileCount());
-                ps.setString(5, t.filesJson());
-                ps.setString(6, t.tags());
-                ps.setString(7, Hex.encode(t.publisherNodeId()));
-                ps.setBytes(8, t.publisherEd25519Pub());
-                ps.setInt(9, t.publisherUtpPort());
-                ps.setLong(10, t.addedAt());
-                ps.setLong(11, t.lastSeenAt());
-                if (t.lastPublishedAt() != null) {
-                    ps.setLong(12, t.lastPublishedAt());
-                } else {
-                    ps.setNull(12, Types.INTEGER);
+            try {
+                // Look up and delete old shared_files rows BEFORE the
+                // INSERT OR REPLACE, because REPLACE assigns a new rowid —
+                // old file rows would be orphaned (no FK on implicit rowid
+                // to cascade).
+                try (PreparedStatement lookup = connection.prepareStatement(
+                        "SELECT rowid FROM " + TABLE + " WHERE info_hash = ?")) {
+                    lookup.setString(1, t.infoHashHex());
+                    try (ResultSet rs = lookup.executeQuery()) {
+                        if (rs.next()) {
+                            long oldRowid = rs.getLong(1);
+                            try (PreparedStatement del = connection.prepareStatement(
+                                    "DELETE FROM " + FILES_TABLE + " WHERE torrent_rowid = ?")) {
+                                del.setLong(1, oldRowid);
+                                del.executeUpdate();
+                            }
+                        }
+                    }
                 }
-                ps.executeUpdate();
-                syncSharedFiles(t.filesJson());
+                try (PreparedStatement ps = connection.prepareStatement(upsertSql)) {
+                    ps.setString(1, t.infoHashHex());
+                    ps.setString(2, t.name());
+                    ps.setLong(3, t.sizeBytes());
+                    ps.setInt(4, t.fileCount());
+                    ps.setString(5, t.filesJson());
+                    ps.setString(6, t.tags());
+                    ps.setString(7, Hex.encode(t.publisherNodeId()));
+                    ps.setBytes(8, t.publisherEd25519Pub());
+                    ps.setInt(9, t.publisherUtpPort());
+                    ps.setLong(10, t.addedAt());
+                    ps.setLong(11, t.lastSeenAt());
+                    if (t.lastPublishedAt() != null) {
+                        ps.setLong(12, t.lastPublishedAt());
+                    } else {
+                        ps.setNull(12, Types.INTEGER);
+                    }
+                    ps.executeUpdate();
+                }
+                syncSharedFiles(t.infoHashHex(), t.filesJson());
             } catch (SQLException e) {
                 throw new IllegalStateException("upsert failed for " + t.infoHashHex(), e);
             }
@@ -240,47 +264,68 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
     }
 
     /**
-     * Replace all rows in {@code shared_files} for the torrent that was
-     * just inserted/updated. The torrent's {@code rowid} is looked up by
-     * info_hash, then old file rows are deleted and new ones inserted so
-     * the FTS5 triggers fire correctly.
+     * Replace all rows in {@code shared_files} and {@code shared_files_fts}
+     * for the torrent that was just inserted/updated.
+     *
+     * <p>FTS index is managed manually (standalone FTS5 table, no triggers)
+     * to avoid issues with external content table "delete" commands when
+     * rowids are reused.
      */
-    private void syncSharedFiles(String filesJson) throws SQLException {
-        Long torrentRowid = lookupTorrentRowid();
+    private void syncSharedFiles(String infoHashHex, String filesJson) throws SQLException {
+        Long torrentRowid = lookupTorrentRowid(infoHashHex);
         if (torrentRowid == null) {
             return;
+        }
+        // Delete old shared_files rows and FTS entries for this torrent.
+        try (PreparedStatement delFts = connection.prepareStatement(
+                "DELETE FROM " + FILES_FTS + " WHERE torrent_rowid = ?")) {
+            delFts.setLong(1, torrentRowid);
+            delFts.executeUpdate();
         }
         try (PreparedStatement del = connection.prepareStatement(
                 "DELETE FROM " + FILES_TABLE + " WHERE torrent_rowid = ?")) {
             del.setLong(1, torrentRowid);
             del.executeUpdate();
         }
+        // Insert new shared_files rows and FTS entries.
         List<FileEntry> entries = parseFilesJson(filesJson);
         if (entries.isEmpty()) {
             return;
         }
-        try (PreparedStatement ins = connection.prepareStatement(
+        try (PreparedStatement insFile = connection.prepareStatement(
                 "INSERT INTO " + FILES_TABLE + " (torrent_rowid, file_path, file_size) VALUES (?,?,?)")) {
-            for (FileEntry e : entries) {
-                ins.setLong(1, torrentRowid);
-                ins.setString(2, e.path);
-                ins.setLong(3, e.size);
-                ins.addBatch();
+            try (PreparedStatement insFts = connection.prepareStatement(
+                    "INSERT INTO " + FILES_FTS + " (file_path, torrent_rowid) VALUES (?,?)")) {
+                for (FileEntry e : entries) {
+                    insFile.setLong(1, torrentRowid);
+                    insFile.setString(2, e.path);
+                    insFile.setLong(3, e.size);
+                    insFile.addBatch();
+
+                    insFts.setString(1, e.path);
+                    insFts.setLong(2, torrentRowid);
+                    insFts.addBatch();
+                }
+                insFile.executeBatch();
+                insFts.executeBatch();
             }
-            ins.executeBatch();
         }
     }
 
     /**
-     * Resolve the {@code rowid} of the most recently upserted torrent.
-     * Called immediately after {@code INSERT OR REPLACE} so the row is
-     * guaranteed to exist.
+     * Resolve the {@code rowid} of the torrent with the given info_hash.
+     * Called after {@code INSERT OR REPLACE} so the row is guaranteed to
+     * exist. Uses an explicit lookup instead of {@code last_insert_rowid()}
+     * because FTS5 trigger INSERTs can interfere with the latter.
      */
-    private Long lookupTorrentRowid() throws SQLException {
-        try (Statement s = connection.createStatement();
-             ResultSet rs = s.executeQuery("SELECT last_insert_rowid()")) {
-            if (rs.next()) {
-                return rs.getLong(1);
+    private Long lookupTorrentRowid(String infoHashHex) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT rowid FROM " + TABLE + " WHERE info_hash = ?")) {
+            ps.setString(1, infoHashHex);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
             }
         }
         return null;
@@ -294,6 +339,9 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
         try {
             var arr = com.google.gson.JsonParser.parseString(json).getAsJsonArray();
             for (var el : arr) {
+                if (out.size() >= MAX_FILES_PER_TORRENT) {
+                    break;
+                }
                 var obj = el.getAsJsonObject();
                 var pathEl = obj.get("path");
                 if (pathEl == null || pathEl.isJsonNull()) {
@@ -342,6 +390,11 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
                     }
                 }
                 if (torrentRowid != -1) {
+                    try (PreparedStatement ps = connection.prepareStatement(
+                            "DELETE FROM " + FILES_FTS + " WHERE torrent_rowid = ?")) {
+                        ps.setLong(1, torrentRowid);
+                        ps.executeUpdate();
+                    }
                     try (PreparedStatement ps = connection.prepareStatement(
                             "DELETE FROM " + FILES_TABLE + " WHERE torrent_rowid = ?")) {
                         ps.setLong(1, torrentRowid);
@@ -420,10 +473,9 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
                         "SELECT s.info_hash, s.name, s.size_bytes, s.file_count, s.files_json, s.tags, " +
                                 "s.publisher_node_id, s.publisher_ed25519_pub, s.publisher_utp_port, " +
                                 "s.added_at, s.last_seen_at, s.last_published_at, " +
-                                "f.file_path AS matched_file " +
+                                "ffts.file_path AS matched_file " +
                                 "FROM " + TABLE + " s " +
-                                "JOIN " + FILES_TABLE + " f ON f.torrent_rowid = s.rowid " +
-                                "JOIN " + FILES_FTS + " ON " + FILES_FTS + ".rowid = f.rowid " +
+                                "JOIN " + FILES_FTS + " ffts ON ffts.torrent_rowid = s.rowid " +
                                 "WHERE " + FILES_FTS + " MATCH ? " +
                                 "ORDER BY bm25(" + FILES_FTS + ") " +
                                 "LIMIT ?";
@@ -559,7 +611,6 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
             s.execute(CREATE_TRIGGERS_SQL);
             s.execute(CREATE_FILES_TABLE_SQL);
             s.execute(CREATE_FILES_FTS_SQL);
-            s.execute(CREATE_FILES_TRIGGERS_SQL);
             s.execute(CREATE_INDEX_FILES_TORRENT_SQL);
             s.execute(CREATE_INDEX_ADDED_SQL);
             s.execute(CREATE_INDEX_NAME_SQL);
@@ -588,7 +639,9 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
      * <p>Rules:
      * <ul>
      *   <li>Lowercase.</li>
-     *   <li>Keep only [a-z0-9] and whitespace; everything else is dropped.</li>
+     *   <li>Keep only [a-z0-9]; replace everything else (including
+     *       underscore, dot, dash, slash) with a space so token
+     *       boundaries match the FTS5 unicode61 tokenizer.</li>
      *   <li>Split on whitespace, discard empty tokens.</li>
      *   <li>Wrap each remaining token in double quotes (phrase token) so
      *       FTS5 reserved words like {@code OR}, {@code AND}, {@code NOT},
@@ -597,6 +650,12 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
      *   <li>Return empty string if no usable tokens remain (caller
      *       treats as "no results", not as an error).</li>
      * </ul>
+     *
+     * <p><b>Safety note:</b> Wrapping tokens in double quotes is safe
+     * because the preceding sanitization step strips all non-[a-z0-9]
+     * characters — there is no way for a {@code "} or {@code *} to
+     * survive into the quoted token. If the sanitization logic changes,
+     * this invariant must be preserved.
      */
     private static String sanitizeFtsQuery(String raw) {
         if (raw == null) return "";

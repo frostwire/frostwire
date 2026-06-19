@@ -624,4 +624,99 @@ class LocalIndexTableTest {
             reopened.close();
         }
     }
+
+    @Test
+    void upsertReplaceDoesNotOrphanSharedFilesRows() throws Exception {
+        // Regression test: INSERT OR REPLACE assigns a new rowid on conflict.
+        // Old shared_files rows referencing the old rowid must be cleaned up,
+        // not orphaned. Verify by counting rows in shared_files directly.
+        long now = 1_000_000L;
+        LocalSharedTorrent t1 = torrentWithFiles(
+                "MyTorrent",
+                "[{\"path\":\"file_a.txt\",\"size\":100},{\"path\":\"file_b.txt\",\"size\":200}]",
+                now);
+        table.upsert(t1);
+
+        // Upsert again with different files (same info_hash → REPLACE).
+        LocalSharedTorrent t2 = t1.toBuilder()
+                .filesJson("[{\"path\":\"file_c.txt\",\"size\":300}]")
+                .lastSeenAt(now + 100)
+                .build();
+        table.upsert(t2);
+
+        // Count shared_files rows for this torrent — should be 1, not 3.
+        int fileCount = countSharedFilesRows();
+        assertEquals(1, fileCount,
+                "INSERT OR REPLACE must not orphan old shared_files rows; expected 1, got " + fileCount);
+
+        // Old files should not be searchable.
+        assertEquals(0, table.search("file_a", 10).size());
+        assertEquals(0, table.search("file_b", 10).size());
+        // New file should be searchable.
+        assertEquals(1, table.search("file_c", 10).size());
+    }
+
+    @Test
+    void repeatedUpsertsDoNotAccumulateSharedFilesRows() throws Exception {
+        // Stress the orphan bug: many upserts of the same torrent with
+        // different file lists. If orphans accumulate, the count grows
+        // unboundedly.
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles("StressTest", "[{\"path\":\"v1.txt\",\"size\":1}]", now);
+        byte[] ih = t.infoHash();
+
+        for (int i = 0; i < 20; i++) {
+            t = t.toBuilder()
+                    .filesJson("[{\"path\":\"v" + i + ".txt\",\"size\":1}]")
+                    .lastSeenAt(now + i)
+                    .build();
+            table.upsert(t);
+        }
+
+        int fileCount = countSharedFilesRows();
+        assertEquals(1, fileCount,
+                "20 upserts should leave exactly 1 shared_files row, not " + fileCount);
+    }
+
+    @Test
+    void parseFilesJsonCapsAtMaxFilesPerTorrent() throws Exception {
+        // Build a files_json with more than MAX_FILES_PER_TORRENT entries.
+        int excess = LocalIndexTable.MAX_FILES_PER_TORRENT + 500;
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < excess; i++) {
+            if (i > 0) sb.append(',');
+            sb.append("{\"path\":\"file").append(i).append(".txt\",\"size\":1}");
+        }
+        sb.append(']');
+        long now = 1_000_000L;
+        table.upsert(torrentWithFiles("HugeTorrent", sb.toString(), now));
+
+        int fileCount = countSharedFilesRows();
+        assertEquals(LocalIndexTable.MAX_FILES_PER_TORRENT, fileCount,
+                "shared_files should be capped at MAX_FILES_PER_TORRENT");
+    }
+
+    @Test
+    void schemaVersionIsBumpedTo2() throws Exception {
+        // Regression: schema version must reflect the addition of
+        // shared_files and shared_files_fts tables.
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + dbFile.getAbsolutePath());
+             java.sql.Statement s = c.createStatement();
+             java.sql.ResultSet rs = s.executeQuery(
+                     "SELECT value FROM schema_meta WHERE key = 'version'")) {
+            assertTrue(rs.next());
+            assertEquals("2", rs.getString(1),
+                    "SCHEMA_VERSION must be 2 after adding shared_files tables");
+        }
+    }
+
+    private int countSharedFilesRows() throws Exception {
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + dbFile.getAbsolutePath());
+             java.sql.Statement s = c.createStatement();
+             java.sql.ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM shared_files")) {
+            return rs.next() ? rs.getInt(1) : -1;
+        }
+    }
 }
