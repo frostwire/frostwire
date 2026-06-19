@@ -24,6 +24,8 @@ FrostWire 3.2.0 build 776 UNRELEASED
   - new:File-level search indexing — individual file paths within torrents are now indexed in a separate shared_files FTS5 table, enabling search matches on file names (e.g. "readme.txt") even when the torrent name doesn't contain the query
   - fix:sanitizeFtsQuery now replaces non-alphanumeric separators (underscore, dot, dash, slash) with spaces instead of dropping them — prevents mismatch between FTS5 tokenizer (which splits on these chars) and the query sanitizer (which was concatenating tokens like "real_file" into "realfile")
   - fix:IceBridgeServer.parseArgs now skips --auth-token (handled separately by parseAuthToken) — previously threw IllegalArgumentException on unknown option
+  - fix:CRITICAL: matchedFile excluded from RemoteSearchResponse canonical bytes — Ed25519 signature did not cover the matched file path, allowing MITM tampering
+  - fix:matchedFile length validation (max 4096 chars) in search performers — rejects pathologically long values from malicious remote peers
   - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — cache field is volatile with local-variable snapshots
   - fix:PerformersHelper.reduceHtml no longer double-allocates strings
   - fix:SearchMediator search query sanitization — control characters stripped, length capped at 1024
