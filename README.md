@@ -104,6 +104,89 @@ Build with Android studio or go inside the `android` directory and type:
 `./gradlew assembleDebug`, debug builds will be created inside the `android/build` folder.
 
 
+### IceBridge Distributed Search
+
+FrostWire includes **IceBridge**, a standalone relay servent that provides reliable, authenticated, fragmented mesh transport between FrostWire peers for distributed search.
+
+#### What it does
+
+- Enables peer-to-peer search without a central index server
+- Each FrostWire instance runs a local IceBridge daemon (in-process on desktop, separate JAR for testing)
+- Daemons communicate over **rUDP** (Reliable UDP) — a custom protocol built on Netty with Ed25519-authenticated handshakes, ACK/retransmission, and fragmentation/reassembly for payloads exceeding the UDP MTU
+- The desktop client talks to its local daemon over a **localhost HTTP control API**
+- Search requests are signed with the peer's Ed25519 key; responses are verified by the requester
+
+#### Architecture
+
+```
+FrostWire Desktop ──HTTP──▶ Local IceBridge Daemon ──rUDP──▶ Remote IceBridge Daemon
+     (search UI)              (/send, /poll)                   (processes request,
+                                                               queries local index,
+                                                               signs response)
+```
+
+#### Building the standalone IceBridge JAR
+
+```bash
+cd desktop
+./gradlew icebridgeJar
+# Output: desktop/build/libs/icebridge.jar
+```
+
+#### Running IceBridge standalone
+
+```bash
+java -jar icebridge.jar \
+  --rudp-port 6889 \
+  --control-http-port 50066 \
+  --role BOTH \
+  --host 127.0.0.1 \
+  --identity-file ~/.frostwire/icebridge-identity.dat
+```
+
+On startup, IceBridge prints `ICEBRIDGE_AUTH_TOKEN=<hex>` to stdout. All control API endpoints (except `/health`) require this token in the `X-IceBridge-Token` header.
+
+#### Control API endpoints
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/health` | GET | No | Health check (`{"ok":true,"data":"ok"}`) |
+| `/register` | POST | Yes | Ed25519-signed peer registration |
+| `/route` | POST | Yes | Localhost-trusted peer routing (no signature required) |
+| `/lookup` | GET | Yes | Look up a peer by Ed25519 public key |
+| `/send` | POST | Yes | Send an opaque payload to a remote peer via rUDP |
+| `/poll` | GET | Yes | Drain inbound messages |
+| `/metrics` | GET | Yes | Runtime metrics (packet counts, registry size, etc.) |
+
+#### rUDP protocol
+
+The rUDP layer implements:
+
+- **HELLO** — Ed25519-authenticated handshake with timestamp replay prevention (300s skew window)
+- **DATA** — Sequence-numbered reliable delivery with ACK and retransmission (500ms interval, 5 retries, 5s timeout)
+- **DATA_FRAG / DATA_END** — Fragmentation for payloads >1024 bytes (12-byte fragment headers, max 4096 fragments per group, max 16MB assembled)
+- **HOLE_PUNCH** — NAT traversal (requires authenticated session)
+- **RELAY** — Forwarding through forwarder peers (source identity verified)
+
+Sessions are capped at 256 per daemon. Incoming search requests are rate-limited to 30 requests/minute per source.
+
+#### File-level search
+
+FrostWire indexes both torrent names and individual file paths within torrents using SQLite FTS5 with BM25 ranking. This means searching for "readme.txt" will find torrents containing that file even if the torrent name doesn't include "readme". Results that match on a file path surface the matched filename in the search results.
+
+#### Key source locations
+
+| Component | Location |
+|-----------|----------|
+| IceBridge server | `common/src/main/java/com/frostwire/search/relay/icebridge/` |
+| rUDP transport | `common/src/main/java/com/frostwire/search/relay/icebridge/udp/` |
+| Control API | `common/src/main/java/com/frostwire/search/relay/icebridge/control/` |
+| Desktop client + launcher | `desktop/src/main/java/com/frostwire/search/relay/icebridge/client/` |
+| Local index (SQLite + FTS5) | `desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java` |
+| Distributed search performer | `common/src/main/java/com/frostwire/search/relay/DistributedSearchPerformer.java` |
+| Tests | `desktop/src/test/java/com/frostwire/search/relay/` |
+
+
 ### License
 
 Frostwire Desktop and Frostwire Android are offered under the [GNU General Public License Version 3 (GPL 3.0)](https://www.gnu.org/licenses/gpl-3.0.txt).
