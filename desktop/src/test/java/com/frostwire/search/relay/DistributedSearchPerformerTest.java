@@ -278,6 +278,63 @@ class DistributedSearchPerformerTest {
         p.crawl((CrawlableSearchResult) null);
     }
 
+    @Test
+    void performSurfacesMatchedFileFromPeerResponse() throws Exception {
+        InMemoryLocalIndex index = new InMemoryLocalIndex();
+        IdentityKeys peerKeys = IdentityKeys.generate();
+        IdentityKeys requesterKeys = IdentityKeys.generate();
+        PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
+
+        FakeTransport transport = new FakeTransport();
+        transport.addResponseWithMatchedFile(
+                peerKeys.ed25519PubRaw(), peerKeys, "Peer Project",
+                200L, 1, "docs/readme.txt");
+
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer p = new DistributedSearchPerformer(
+                10L, "readme", index, directory, requesterKeys, transport,
+                5, 50, 25, 10);
+        p.setListener(listener);
+
+        p.perform();
+
+        assertEquals(1, listener.results.size());
+        List<SearchResult> out = listener.results.get(0);
+        assertEquals(1, out.size());
+        CompositeFileSearchResult cfsr = (CompositeFileSearchResult) out.get(0);
+        assertEquals("Peer Project", cfsr.getDisplayName());
+        assertEquals("docs/readme.txt", cfsr.getFilename(),
+                "matchedFile from remote response should be used as filename");
+    }
+
+    @Test
+    void performRejectsOversizedMatchedFileFromPeer() throws Exception {
+        InMemoryLocalIndex index = new InMemoryLocalIndex();
+        IdentityKeys peerKeys = IdentityKeys.generate();
+        IdentityKeys requesterKeys = IdentityKeys.generate();
+        PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
+
+        String huge = "a".repeat(5000);
+        FakeTransport transport = new FakeTransport();
+        transport.addResponseWithMatchedFile(
+                peerKeys.ed25519PubRaw(), peerKeys, "Peer Project",
+                200L, 1, huge);
+
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer p = new DistributedSearchPerformer(
+                11L, "readme", index, directory, requesterKeys, transport,
+                5, 50, 25, 10);
+        p.setListener(listener);
+
+        p.perform();
+
+        List<SearchResult> out = listener.results.get(0);
+        assertEquals(1, out.size());
+        CompositeFileSearchResult cfsr = (CompositeFileSearchResult) out.get(0);
+        assertEquals("Peer Project.torrent", cfsr.getFilename(),
+                "oversized matchedFile should be rejected, fall back to default");
+    }
+
     // --- helpers ---
 
     private static PeerDirectory emptyDirectory() {
@@ -434,13 +491,19 @@ class DistributedSearchPerformerTest {
         void addResponse(byte[] peerPub, IdentityKeys signer,
                          String name, long size, int fileCount) {
             responses.put(Hex.encode(peerPub),
-                    new PeerResponse(signer, name, size, fileCount, null));
+                    new PeerResponse(signer, name, size, fileCount, null, null));
         }
 
         void addResponse(byte[] peerPub, IdentityKeys signer,
                          byte[] infoHash, String name, long size, int fileCount) {
             responses.put(Hex.encode(peerPub),
-                    new PeerResponse(signer, name, size, fileCount, infoHash));
+                    new PeerResponse(signer, name, size, fileCount, infoHash, null));
+        }
+
+        void addResponseWithMatchedFile(byte[] peerPub, IdentityKeys signer,
+                         String name, long size, int fileCount, String matchedFile) {
+            responses.put(Hex.encode(peerPub),
+                    new PeerResponse(signer, name, size, fileCount, null, matchedFile));
         }
 
         void setSearchService(byte[] peerPub, RelaySearchService service) {
@@ -502,13 +565,16 @@ class DistributedSearchPerformerTest {
         final long size;
         final int fileCount;
         final byte[] fixedInfoHash;
+        final String matchedFile;
 
-        PeerResponse(IdentityKeys signer, String name, long size, int fileCount, byte[] fixedInfoHash) {
+        PeerResponse(IdentityKeys signer, String name, long size, int fileCount,
+                     byte[] fixedInfoHash, String matchedFile) {
             this.signer = signer;
             this.name = name;
             this.size = size;
             this.fileCount = fileCount;
             this.fixedInfoHash = fixedInfoHash;
+            this.matchedFile = matchedFile;
         }
 
         RemoteSearchResponse signFor(RemoteSearchRequest request) throws Exception {
@@ -516,7 +582,8 @@ class DistributedSearchPerformerTest {
             RemoteSearchResponse unsigned = RemoteSearchResponse.builder()
                     .nonce(request.nonce())
                     .timestamp(System.currentTimeMillis() / 1000L)
-                    .addRow(infoHash, name, size, fileCount, signer.ed25519PubRaw())
+                    .addRow(infoHash, name, size, fileCount, signer.ed25519PubRaw(),
+                            null, matchedFile)
                     .signature(new byte[64])
                     .build();
             Signature sig = Signature.getInstance("Ed25519");
@@ -525,7 +592,8 @@ class DistributedSearchPerformerTest {
             return RemoteSearchResponse.builder()
                     .nonce(request.nonce())
                     .timestamp(unsigned.timestamp())
-                    .addRow(infoHash, name, size, fileCount, signer.ed25519PubRaw())
+                    .addRow(infoHash, name, size, fileCount, signer.ed25519PubRaw(),
+                            null, matchedFile)
                     .signature(sig.sign())
                     .build();
         }

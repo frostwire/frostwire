@@ -182,6 +182,54 @@ class LocalSharedTorrentSearchPerformerTest {
         assertEquals(t.addedAt() * 1000L, c.getCreationTime());
     }
 
+    @Test
+    void toResultUsesMatchedFileAsFilenameWhenPresent() {
+        LocalSharedTorrent t = torrentWithMatchedFile("MyTorrent", "docs/readme.txt");
+        CompositeFileSearchResult c = LocalSharedTorrentSearchPerformer.toResult(t);
+        assertEquals("docs/readme.txt", c.getFilename(),
+                "matchedFile should be used as filename");
+        assertEquals("MyTorrent", c.getDisplayName(),
+                "displayName should be the torrent name, not the file");
+    }
+
+    @Test
+    void toResultFallsBackToDefaultFilenameWhenMatchedFileNull() {
+        LocalSharedTorrent t = torrent("MyTorrent", 100L, 1);
+        CompositeFileSearchResult c = LocalSharedTorrentSearchPerformer.toResult(t);
+        assertEquals("MyTorrent.torrent", c.getFilename(),
+                "null matchedFile should fall back to name.torrent");
+    }
+
+    @Test
+    void toResultRejectsEmptyMatchedFile() {
+        LocalSharedTorrent t = torrentWithMatchedFile("MyTorrent", "");
+        CompositeFileSearchResult c = LocalSharedTorrentSearchPerformer.toResult(t);
+        assertEquals("MyTorrent.torrent", c.getFilename(),
+                "empty matchedFile should be rejected and fall back to default");
+    }
+
+    @Test
+    void toResultRejectsOversizedMatchedFile() {
+        String huge = "a".repeat(5000);
+        LocalSharedTorrent t = torrentWithMatchedFile("MyTorrent", huge);
+        CompositeFileSearchResult c = LocalSharedTorrentSearchPerformer.toResult(t);
+        assertEquals("MyTorrent.torrent", c.getFilename(),
+                "matchedFile > 4096 chars should be rejected and fall back to default");
+    }
+
+    @Test
+    void toResultAcceptsMaxLengthMatchedFile() {
+        String exact = "a".repeat(4096);
+        LocalSharedTorrent t = torrentWithMatchedFile("MyTorrent", exact);
+        CompositeFileSearchResult c = LocalSharedTorrentSearchPerformer.toResult(t);
+        assertEquals(exact, c.getFilename(),
+                "matchedFile of exactly 4096 chars should be accepted");
+    }
+
+    private static LocalSharedTorrent torrentWithMatchedFile(String name, String matchedFile) {
+        return torrent(name, 100L, 1).toBuilder().matchedFile(matchedFile).build();
+    }
+
     private static final AtomicInteger HASH_COUNTER = new AtomicInteger();
 
     private static LocalSharedTorrent torrent(String name, long size, int fileCount) {
