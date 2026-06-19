@@ -21,6 +21,9 @@ FrostWire 3.2.0 build 776 UNRELEASED
   - fix:SearchManager removed O(n²) nextOrdinal — iterated all tasks per crawlable result, was never used for sorting
   - fix:SearchManager no longer crawls search results that are already complete
   - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional at accessor boundary
+  - new:File-level search indexing — individual file paths within torrents are now indexed in a separate shared_files FTS5 table, enabling search matches on file names (e.g. "readme.txt") even when the torrent name doesn't contain the query
+  - fix:sanitizeFtsQuery now replaces non-alphanumeric separators (underscore, dot, dash, slash) with spaces instead of dropping them — prevents mismatch between FTS5 tokenizer (which splits on these chars) and the query sanitizer (which was concatenating tokens like "real_file" into "realfile")
+  - fix:IceBridgeServer.parseArgs now skips --auth-token (handled separately by parseAuthToken) — previously threw IllegalArgumentException on unknown option
   - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — cache field is volatile with local-variable snapshots
   - fix:PerformersHelper.reduceHtml no longer double-allocates strings
   - fix:SearchMediator search query sanitization — control characters stripped, length capped at 1024
