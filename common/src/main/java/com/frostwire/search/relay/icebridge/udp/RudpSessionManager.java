@@ -287,6 +287,8 @@ public final class RudpSessionManager {
         return id;
     }
 
+    private static final int MAX_SESSIONS = 256;
+
     // ---- packet handlers ----
 
     private void handleHello(RudpPacket packet, InetSocketAddress sender) {
@@ -297,6 +299,11 @@ public final class RudpSessionManager {
         }
         RudpSession session = sessionsByRemoteId.get(remoteCid);
         if (session == null) {
+            if (sessionsByRemoteId.size() >= MAX_SESSIONS) {
+                LOG.warn("RudpSessionManager: rejected HELLO from " + sender
+                        + " — max sessions (" + MAX_SESSIONS + ") reached");
+                return;
+            }
             long localCid = randomConnectionId();
             byte[] remotePub = Arrays.copyOfRange(packet.payload(), 0, 32);
             session = new RudpSession(localCid, remoteCid, sender, remotePub, false);

@@ -113,6 +113,7 @@ public final class IceBridgeConfig {
     /** Default config for a local daemon controlled by FrostWire. */
     public static IceBridgeConfig localDefaults() {
         return newBuilder()
+                .host("127.0.0.1")
                 .rudpPort(0)
                 .controlHttpPort(8797)
                 .controlStdio(false)

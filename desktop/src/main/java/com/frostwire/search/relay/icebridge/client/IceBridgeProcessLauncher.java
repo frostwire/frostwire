@@ -97,6 +97,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         command.add(String.valueOf(controlHttpPort));
         command.add("--role");
         command.add(role);
+        command.add("--host");
+        command.add("127.0.0.1");
         if (identityFile != null) {
             command.add("--identity-file");
             command.add(identityFile.getAbsolutePath());
