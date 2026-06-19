@@ -89,7 +89,7 @@ public final class SearchManager {
                     // nothing since this is calculated in aggregation
                 }
             });
-            SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
+            SearchTask task = new PerformTask(this, performer);
             submitSimpleSearchTask(task, performer.isCrawler() ? crawlingExecutor : singlePageRequestExecutor);
         } else {
             LOG.warn("Search performer is null, review your logic");
@@ -181,7 +181,7 @@ public final class SearchManager {
     private void crawl(ISearchPerformer performer, CrawlableSearchResult sr) {
         if (performer != null && !performer.isStopped()) {
             try {
-                CrawlTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
+                CrawlTask task = new CrawlTask(this, performer, sr);
                 tasks.add(task);
                 crawlingExecutor.execute(task);
             } catch (Throwable e) {
@@ -219,31 +219,17 @@ public final class SearchManager {
         }
     }
 
-    private int nextOrdinal(long token) {
-        int ordinal = 0;
-        synchronized (tasks) {
-            for (SearchTask task : tasks) {
-                if (task.token() == token) {
-                    ordinal = ordinal + 1;
-                }
-            }
-        }
-        return ordinal;
-    }
-
     private static class Loader {
         static final SearchManager INSTANCE = new SearchManager(3, 6);
     }
 
-    private static abstract class SearchTask implements Runnable, Comparable<SearchTask> {
+    private static abstract class SearchTask implements Runnable {
         protected final SearchManager manager;
         final ISearchPerformer performer;
-        private final int ordinal;
 
-        SearchTask(SearchManager manager, ISearchPerformer performer, int ordinal) {
+        SearchTask(SearchManager manager, ISearchPerformer performer) {
             this.manager = manager;
             this.performer = performer;
-            this.ordinal = ordinal;
         }
 
         public long token() {
@@ -257,16 +243,11 @@ public final class SearchManager {
         void stopSearch() {
             performer.stop();
         }
-
-        @Override
-        public int compareTo(SearchTask o) {
-            return Integer.compare(ordinal, o.ordinal);
-        }
     }
 
     private static final class PerformTask extends SearchTask {
-        PerformTask(SearchManager manager, ISearchPerformer performer, int order) {
-            super(manager, performer, order);
+        PerformTask(SearchManager manager, ISearchPerformer performer) {
+            super(manager, performer);
         }
 
         @Override
@@ -289,8 +270,8 @@ public final class SearchManager {
     private static final class CrawlTask extends SearchTask {
         private final CrawlableSearchResult sr;
 
-        CrawlTask(SearchManager manager, ISearchPerformer performer, CrawlableSearchResult sr, int order) {
-            super(manager, performer, order);
+        CrawlTask(SearchManager manager, ISearchPerformer performer, CrawlableSearchResult sr) {
+            super(manager, performer);
             this.sr = sr;
         }
 
