@@ -202,6 +202,7 @@ sourceSets {
 
         resources {
             srcDir 'resources'
+            srcDir '../common/src/main/resources'
             include '**/*.properties'
             include '**/*.png'
             include '**/*.gif'
@@ -211,6 +212,7 @@ sourceSets {
             include '**/*.sh'
             include '**/*.dat'
             include '**/*.icc'
+            include '**/*.txt'
             exclude '**/*.DS_Store'
         }
     }
@@ -391,7 +393,8 @@ test {
         includeTestsMatching "com.frostwire.platform.*"
         includeTestsMatching "com.frostwire.search.*"
         includeTestsMatching "com.frostwire.util.*"
-        includeTestsMatching "com.frostwire.tests.*"        
+        includeTestsMatching "com.frostwire.tests.*"
+        includeTestsMatching "com.frostwire.crypto.*"
     }
 
     testLogging {
