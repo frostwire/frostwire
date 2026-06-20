@@ -267,6 +267,77 @@ class IdentityKeysTest {
                 () -> IdentityKeys.generate(-1));
     }
 
+    @Test
+    void fromSeedReconstructsSamePublicKey() throws Exception {
+        IdentityKeys original = IdentityKeys.generate(0);
+        byte[] seed = original.ed25519Seed();
+        assertEquals(32, seed.length);
+
+        IdentityKeys restored = IdentityKeys.fromSeed(seed);
+        assertArrayEquals(original.ed25519PubRaw(), restored.ed25519PubRaw(),
+                "fromSeed must reproduce the same Ed25519 public key");
+        assertArrayEquals(original.nodeId(), restored.nodeId(),
+                "fromSeed must reproduce the same node ID");
+        assertArrayEquals(seed, restored.ed25519Seed(),
+                "fromSeed must preserve the seed");
+    }
+
+    @Test
+    void fromSeedRejectsNullSeed() {
+        assertThrows(IllegalArgumentException.class, () -> IdentityKeys.fromSeed(null));
+    }
+
+    @Test
+    void fromSeedRejectsWrongLengthSeed() {
+        assertThrows(IllegalArgumentException.class, () -> IdentityKeys.fromSeed(new byte[31]));
+        assertThrows(IllegalArgumentException.class, () -> IdentityKeys.fromSeed(new byte[33]));
+    }
+
+    @Test
+    void fromSeedGeneratedKeyCanSignAndVerify() throws Exception {
+        IdentityKeys keys = IdentityKeys.fromSeed(new byte[32]);
+        byte[] message = "test message".getBytes();
+        Signature sig = Signature.getInstance("Ed25519");
+        sig.initSign(keys.ed25519().getPrivate());
+        sig.update(message);
+        byte[] signature = sig.sign();
+
+        Signature verifier = Signature.getInstance("Ed25519");
+        verifier.initVerify(keys.ed25519().getPublic());
+        verifier.update(message);
+        assertTrue(verifier.verify(signature),
+                "fromSeed keypair must be functional for signing/verifying");
+    }
+
+    @Test
+    void mnemonicRoundTripPreservesIdentity() throws Exception {
+        IdentityKeys original = IdentityKeys.generate(0);
+        byte[] seed = original.ed25519Seed();
+        String mnemonic = com.frostwire.crypto.Bip39Mnemonic.entropyToMnemonic(seed);
+        assertNotNull(mnemonic);
+        assertTrue(mnemonic.split(" ").length == 24, "256-bit entropy → 24 words");
+
+        byte[] restoredSeed = com.frostwire.crypto.Bip39Mnemonic.mnemonicToEntropy(mnemonic);
+        assertArrayEquals(seed, restoredSeed, "mnemonic round-trip must preserve seed");
+
+        IdentityKeys restored = IdentityKeys.fromSeed(restoredSeed);
+        assertArrayEquals(original.ed25519PubRaw(), restored.ed25519PubRaw(),
+                "mnemonic → fromSeed must reproduce same public key");
+        assertArrayEquals(original.nodeId(), restored.nodeId(),
+                "mnemonic → fromSeed must reproduce same node ID");
+    }
+
+    @Test
+    void saveAndLoadArePublic() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate(0);
+        File f = new File(tempDir, "public-save-load.dat");
+        IdentityKeys.save(keys, f);
+        assertTrue(f.exists());
+        IdentityKeys loaded = IdentityKeys.load(f);
+        assertArrayEquals(keys.ed25519PubRaw(), loaded.ed25519PubRaw());
+        assertArrayEquals(keys.nodeId(), loaded.nodeId());
+    }
+
     private static void deleteRecursive(File f) {
         if (f == null || !f.exists()) return;
         if (f.isDirectory()) {
