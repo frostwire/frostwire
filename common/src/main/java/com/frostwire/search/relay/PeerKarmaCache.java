@@ -93,8 +93,8 @@ public class PeerKarmaCache {
         return cacheHits.get();
     }
 
-    /** Visible for tests: compute the score from a chain without caching. */
-    static long computeScore(List<KarmaChainEntry> chain) {
+    /** Compute the score from a chain without caching. */
+    public static long computeScore(List<KarmaChainEntry> chain) {
         if (chain == null || chain.isEmpty()) {
             return 0;
         }

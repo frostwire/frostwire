@@ -475,6 +475,14 @@ public abstract class SearchEngine {
     }
 
     /**
+     * Returns the {@link LocalIndex} backing the {@code LOCAL} search engine,
+     * or {@code null} if none has been installed yet.
+     */
+    public LocalIndex getLocalIndex() {
+        return localIndex;
+    }
+
+    /**
      * Installs the optional {@link com.frostwire.search.relay.PeerKarmaCache}
      * used to weight LOCAL search results by the publisher's karma score.
      * Pass {@code null} to disable karma weighting.

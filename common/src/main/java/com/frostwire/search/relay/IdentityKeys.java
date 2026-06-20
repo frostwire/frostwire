@@ -251,7 +251,7 @@ public final class IdentityKeys {
      * returns 160 (SHA-1 length in bits). A hash whose first bit is
      * set returns 0.
      */
-    static int countLeadingZeroBits(byte[] hash) {
+    public static int countLeadingZeroBits(byte[] hash) {
         if (hash == null) {
             throw new IllegalArgumentException("hash is null");
         }
