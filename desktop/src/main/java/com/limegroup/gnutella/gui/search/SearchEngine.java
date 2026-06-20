@@ -502,6 +502,10 @@ public abstract class SearchEngine {
         return this;
     }
 
+    public IdentityKeys identityKeys() {
+        return identity;
+    }
+
     /**
      * Installs the {@link DistributedSearchTransport} that backs the DISTRIBUTED engine.
      * Idempotent; the most recent call wins.

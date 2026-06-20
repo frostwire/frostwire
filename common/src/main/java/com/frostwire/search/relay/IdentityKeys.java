@@ -166,6 +166,61 @@ public final class IdentityKeys {
     }
 
     /**
+     * Reconstruct an identity from a 32-byte Ed25519 seed. The X25519
+     * keypair is freshly generated (it cannot be derived from the
+     * Ed25519 seed). No proof-of-work is performed.
+     *
+     * <p>The Ed25519 keypair is deterministically derived from the seed
+     * via libtorrent's {@code Ed25519.createKeypair(seed)}, then
+     * converted to JDK KeyPair form.
+     *
+     * <p>Used to restore an identity from a BIP39 mnemonic phrase.
+     */
+    public static IdentityKeys fromSeed(byte[] seed) throws GeneralSecurityException {
+        if (seed == null || seed.length != 32) {
+            throw new IllegalArgumentException("seed must be 32 bytes");
+        }
+        com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
+                com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
+        byte[] rawPub = pair.first;
+        byte[] rawPriv = pair.second;
+
+        byte[] pkcs8 = buildEd25519Pkcs8FromSeed(seed);
+        byte[] x509 = buildEd25519X509FromRawPub(rawPub);
+        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8));
+        PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(x509));
+        KeyPair edPair = new KeyPair(pub, priv);
+
+        KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
+        xdh.initialize(NamedParameterSpec.X25519);
+        KeyPair xPair = xdh.generateKeyPair();
+
+        return new IdentityKeys(edPair, xPair);
+    }
+
+    private static byte[] buildEd25519Pkcs8FromSeed(byte[] seed) {
+        byte[] pkcs8 = new byte[48];
+        pkcs8[0] = 0x30; pkcs8[1] = 0x2e;
+        pkcs8[2] = 0x02; pkcs8[3] = 0x01; pkcs8[4] = 0x00;
+        pkcs8[5] = 0x30; pkcs8[6] = 0x05; pkcs8[7] = 0x06;
+        pkcs8[8] = 0x03; pkcs8[9] = 0x2b; pkcs8[10] = 0x65; pkcs8[11] = 0x70;
+        pkcs8[12] = 0x04; pkcs8[13] = 0x22; pkcs8[14] = 0x04; pkcs8[15] = 0x20;
+        System.arraycopy(seed, 0, pkcs8, 16, 32);
+        return pkcs8;
+    }
+
+    private static byte[] buildEd25519X509FromRawPub(byte[] rawPub) {
+        byte[] x509 = new byte[44];
+        x509[0] = 0x30; x509[1] = 0x2a;
+        x509[2] = 0x30; x509[3] = 0x05;
+        x509[4] = 0x06; x509[5] = 0x03; x509[6] = 0x2b; x509[7] = 0x65; x509[8] = 0x70;
+        x509[9] = 0x03; x509[10] = 0x21; x509[11] = 0x00;
+        System.arraycopy(rawPub, 0, x509, 12, 32);
+        return x509;
+    }
+
+    /**
      * Generate a PoW-qualified identity. Loops until
      * {@code SHA-1(ed25519PubRaw)} has at least {@code minDifficulty}
      * leading zero bits. With {@code minDifficulty=0}, the first
@@ -216,7 +271,7 @@ public final class IdentityKeys {
     /**
      * Load identity keys from a file previously written by {@link #save}.
      */
-    static IdentityKeys load(File file) throws IOException, GeneralSecurityException {
+    public static IdentityKeys load(File file) throws IOException, GeneralSecurityException {
         byte[] data = Files.readAllBytes(file.toPath());
         int offset = 0;
 
@@ -249,7 +304,7 @@ public final class IdentityKeys {
      * (X.509) encodings are stored so round-trip does not depend on
      * JDK-version-specific ASN.1 layout quirks.
      */
-    static void save(IdentityKeys keys, File file) throws IOException {
+    public static void save(IdentityKeys keys, File file) throws IOException {
         File parent = file.getAbsoluteFile().getParentFile();
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
             throw new IOException("Could not create directory: " + parent);
