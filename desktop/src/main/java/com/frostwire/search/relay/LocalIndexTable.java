@@ -564,6 +564,27 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
         return 0;
     }
 
+    @Override
+    public List<LocalSharedTorrent> listAll() {
+        ensureOpen();
+        String sql = "SELECT info_hash, name, size_bytes, file_count, files_json, tags, " +
+                "publisher_node_id, publisher_ed25519_pub, publisher_utp_port, " +
+                "added_at, last_seen_at, last_published_at " +
+                "FROM " + TABLE + " ORDER BY last_seen_at DESC";
+        List<LocalSharedTorrent> out = new ArrayList<>();
+        synchronized (connection) {
+            try (PreparedStatement ps = connection.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(readRow(rs));
+                }
+            } catch (SQLException e) {
+                LOG.warn("listAll failed", e);
+            }
+        }
+        return out;
+    }
+
     public long sizeInBytes() {
         ensureOpen();
         long total = 0;

@@ -2,6 +2,9 @@ FrostWire 3.2.0 build 776 UNRELEASED
   - new:BIP39 mnemonic support for identity backup — com.frostwire.crypto.Bip39Mnemonic encodes/decodes the 32-byte Ed25519 seed as a 24-word mnemonic using the standard BIP39 English wordlist with SHA-256 checksum. Enables offline paper backup of FrostWire identities
   - new:IdentityKeys.fromSeed() — deterministically reconstructs an Ed25519 keypair from a 32-byte seed via jlibtorrent's Ed25519.createKeypair, enabling identity restore from a BIP39 mnemonic. IdentityKeys.save/load are now public for import/export
   - fix:IdentityKeys.generate() now uses jlibtorrent's native Ed25519 for keypair generation instead of the JDK's KeyPairGenerator — the JDK's pure-Java Ed25519 implementation is 50-100x slower than native on some platforms (macOS arm64), causing first-run identity PoW mining to take >2 minutes instead of ~1-2 seconds
+  - new:Distributed search forwarding (v2) — search requests now use ttl=1 and include the requester's pubkey in the path array, enabling one-hop forwarding through trusted peers
+  - new:Remote peer catalog fetch protocol — RemoteIndexFetcher fetches a peer's shared torrent catalog from the DHT via BEP 46
+  - new:LocalIndex.listAll() — enumerate all shared torrents in the local index for UI browsing
   - new:Bitsearch added as a new REST-API torrent search engine (bitsearch.eu) — clean JSON, 200 free requests/day per IP, magnet links built client-side from DefaultTrackers. No crawling, replaces the gap left by the Idope removal
   - new:Powered by jlibtorrent 2.0.12.9
  - new:Advanced BitTorrent preferences now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID

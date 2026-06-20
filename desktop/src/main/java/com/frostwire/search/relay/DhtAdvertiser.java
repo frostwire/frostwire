@@ -45,15 +45,23 @@ public final class DhtAdvertiser {
     private static final String THREAD_NAME = "dht-advertiser";
 
     private final IdentityRecordPublisher identityPublisher;
+    private final IndexAnnouncementPublisher indexPublisher;
     private final long intervalSec;
     private final AtomicLong lastTickEpochSec = new AtomicLong();
     private final AtomicLong identityPublishes = new AtomicLong();
+    private final AtomicLong indexPublishes = new AtomicLong();
     private final AtomicLong announceCalls = new AtomicLong();
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> task;
     private volatile boolean running;
 
     public DhtAdvertiser(IdentityRecordPublisher identityPublisher, long intervalSec) {
+        this(identityPublisher, null, intervalSec);
+    }
+
+    public DhtAdvertiser(IdentityRecordPublisher identityPublisher,
+                         IndexAnnouncementPublisher indexPublisher,
+                         long intervalSec) {
         if (identityPublisher == null) {
             throw new IllegalArgumentException("identityPublisher is null");
         }
@@ -61,6 +69,7 @@ public final class DhtAdvertiser {
             throw new IllegalArgumentException("intervalSec must be > 0");
         }
         this.identityPublisher = identityPublisher;
+        this.indexPublisher = indexPublisher;
         this.intervalSec = intervalSec;
     }
 
@@ -131,6 +140,12 @@ public final class DhtAdvertiser {
             if (published > 0) {
                 identityPublishes.incrementAndGet();
             }
+            if (indexPublisher != null) {
+                int rows = indexPublisher.publishIfNeeded(session);
+                if (rows > 0) {
+                    indexPublishes.incrementAndGet();
+                }
+            }
             DhtRendezvous.announcePeer(session, identityPublisher.utpPort());
             announceCalls.incrementAndGet();
             lastTickEpochSec.set(System.currentTimeMillis() / 1000L);
@@ -147,6 +162,10 @@ public final class DhtAdvertiser {
 
     public long identityPublishCount() {
         return identityPublishes.get();
+    }
+
+    public long indexPublishCount() {
+        return indexPublishes.get();
     }
 
     public long announceCount() {

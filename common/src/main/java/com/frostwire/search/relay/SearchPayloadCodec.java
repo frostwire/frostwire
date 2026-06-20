@@ -84,4 +84,31 @@ public final class SearchPayloadCodec {
             return null;
         }
     }
+
+    /**
+     * Encode a signed catalog browse request to UTF-8 JSON bytes.
+     */
+    public static byte[] encodeCatalogBrowseRequest(RemoteCatalogBrowseRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request is null");
+        }
+        return GSON.toJson(request.toBencodeableMap()).getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Decode a catalog browse request from JSON bytes.
+     *
+     * @return the request, or {@code null} if the bytes are empty or malformed
+     */
+    public static RemoteCatalogBrowseRequest decodeCatalogBrowseRequest(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        try {
+            Map<String, Object> map = GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), MAP_TYPE);
+            return RemoteCatalogBrowseRequest.fromBencodeableMap(map);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

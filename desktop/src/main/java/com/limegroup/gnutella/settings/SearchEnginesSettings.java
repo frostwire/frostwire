@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.settings;
 
 import org.limewire.setting.BooleanSetting;
+import org.limewire.setting.StringSetting;
 
 /**
  * @author gubatron
@@ -43,4 +44,13 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting BITSEARCH_SEARCH_ENABLED = FACTORY.createBooleanSetting("BITSEARCH_SEARCH_ENABLED", true);
     public static final BooleanSetting LOCAL_SEARCH_ENABLED = FACTORY.createBooleanSetting("LOCAL_SEARCH_ENABLED", true);
     public static final BooleanSetting DISTRIBUTED_SEARCH_ENABLED = FACTORY.createBooleanSetting("DISTRIBUTED_SEARCH_ENABLED", false);
+
+    /**
+     * Bind host for the IceBridge rUDP server. Use "127.0.0.1" for
+     * local-only daemon mode (default) or "0.0.0.0" to accept rUDP
+     * from remote peers (cloud forwarder mode). The control HTTP
+     * server always binds to 127.0.0.1 regardless of this setting.
+     */
+    public static final StringSetting ICEBRIDGE_BIND_HOST =
+            (StringSetting) FACTORY.createStringSetting("ICEBRIDGE_BIND_HOST", "127.0.0.1").setAlwaysSave(true);
 }

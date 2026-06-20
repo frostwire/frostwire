@@ -356,7 +356,7 @@ class MultiInstanceDistributedSearchTest {
 
         RelaySearchService searchService = new RelaySearchService(index, identity);
         IncomingSearchRequestHandler incomingHandler =
-                new IncomingSearchRequestHandler(transport, searchService);
+                new IncomingSearchRequestHandler(transport, searchService, directory, identity);
         incomingHandler.start();
         // IncomingSearchRequestHandler doesn't implement AutoCloseable;
         // stop it via the transport's removeListener in tearDown by

@@ -310,13 +310,14 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         byte[] nonce = new byte[32];
         SecureRandom.getInstanceStrong().nextBytes(nonce);
         long timestamp = System.currentTimeMillis() / 1000L;
+        byte[] ownPub = identity.ed25519PubRaw();
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(0)
-                .requesterPub(identity.ed25519PubRaw())
-                .path(new byte[0][])
+                .ttl(1)
+                .requesterPub(ownPub)
+                .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
                 .signature(new byte[64])
                 .build();
@@ -328,9 +329,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(0)
-                .requesterPub(identity.ed25519PubRaw())
-                .path(new byte[0][])
+                .ttl(1)
+                .requesterPub(ownPub)
+                .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
                 .signature(sig)
                 .build();

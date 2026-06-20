@@ -23,6 +23,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BlockHeaderSource;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtAdvertiser;
+import com.frostwire.search.relay.IndexAnnouncementPublisher;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
@@ -54,6 +55,7 @@ import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
+import com.limegroup.gnutella.gui.search.IceBridgeUrlHandler;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
 import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
@@ -175,6 +177,7 @@ final class Initializer {
         // Start the core & run any queued control requests, and load DAAP.
         //System.out.println("Initializer.initialize() start core");
         startRelayStack();
+        IceBridgeUrlHandler.register();
         startCore(limeWireCore);
         runQueuedRequests(limeWireCore);
         if (OSUtils.isMacOSX()) {
@@ -516,7 +519,7 @@ final class Initializer {
             // 9. Start the DHT advertiser so other FrostWire nodes can
             //    discover us: re-publishes our IdentityRecord (BEP 46)
             //    and announces under the BEP 5 peer topic.
-            startDhtAdvertiser(btEngine, identity);
+            startDhtAdvertiser(btEngine, identity, localIndex);
 
             // 10. Start the peer discovery scheduler so we can
             //     discover other FrostWire nodes via BEP 5. Newly
@@ -572,9 +575,10 @@ final class Initializer {
             // Use the well-known rUDP port so remote peers can reach us
             // without an additional discovery round-trip.
             int rudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+            String bindHost = SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue();
 
             IceBridgeProcessLauncher launcher = new IceBridgeProcessLauncher(
-                    jarPath, identityFile, 0, rudpPort, "BOTH");
+                    jarPath, identityFile, 0, rudpPort, "BOTH", bindHost);
             launcher.start();
             relayLog.info("IceBridge daemon started: controlPort=" + launcher.controlPort()
                     + " rudpPort=" + launcher.rudpPort());
@@ -608,7 +612,7 @@ final class Initializer {
             // search our local index through IceBridge.
             RelaySearchService searchService = new RelaySearchService(localIndex, identity);
             IncomingSearchRequestHandler incomingHandler =
-                    new IncomingSearchRequestHandler(transport, searchService);
+                    new IncomingSearchRequestHandler(transport, searchService, directory, identity);
             incomingHandler.start();
 
             // Start the peer registry sync so the IceBridge daemon knows
@@ -664,11 +668,12 @@ final class Initializer {
      * listen port (6888 by default) so peers can both find our TCP
      * endpoint via BEP 5 and our identity record via BEP 46.
      */
-    private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity) {
+    private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex) {
         try {
             int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
             IdentityRecordPublisher publisher = new IdentityRecordPublisher(identity, port);
-            new DhtAdvertiser(publisher,
+            IndexAnnouncementPublisher indexPublisher = new IndexAnnouncementPublisher(localIndex, identity);
+            new DhtAdvertiser(publisher, indexPublisher,
                     com.frostwire.search.relay.RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC).start();
         } catch (Throwable t) {
             com.frostwire.util.Logger.getLogger(Initializer.class)
@@ -709,7 +714,7 @@ final class Initializer {
         try {
             int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
             RelaySearchService service = new RelaySearchService(localIndex, identity);
-            RelayRole role = new RelayRole(service, directory);
+            RelayRole role = new RelayRole(service, directory, identity);
             IdentityRecord identityRecord = IdentityRecord.createSigned(
                     identity.nodeId(), identity.ed25519(),
                     identity.x25519PubRaw(), port);

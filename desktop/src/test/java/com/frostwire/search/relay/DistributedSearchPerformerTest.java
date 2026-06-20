@@ -335,6 +335,31 @@ class DistributedSearchPerformerTest {
                 "oversized matchedFile should be rejected, fall back to default");
     }
 
+    @Test
+    void performSetsTtlOneAndIncludesOwnPubkeyInPath() throws Exception {
+        IdentityKeys peerKeys = IdentityKeys.generate();
+        IdentityKeys requesterKeys = IdentityKeys.generate();
+        PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
+
+        FakeTransport transport = new FakeTransport();
+        transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 200L, 1);
+
+        RecordingListener listener = new RecordingListener();
+        DistributedSearchPerformer p = new DistributedSearchPerformer(
+                12L, "ubuntu", new InMemoryLocalIndex(), directory, requesterKeys, transport,
+                5, 50, 25, 10);
+        p.setListener(listener);
+
+        p.perform();
+
+        assertFalse(transport.sentRequests.isEmpty(), "at least one request must have been sent");
+        RemoteSearchRequest sent = transport.sentRequests.get(0);
+        assertEquals(1, sent.ttl(), "ttl must be 1 to allow one forwarding hop");
+        assertEquals(1, sent.pathLength(), "path must contain the requester's own pubkey");
+        assertArrayEquals(requesterKeys.ed25519PubRaw(), sent.path()[0],
+                "path[0] must be this node's own Ed25519 pubkey");
+    }
+
     // --- helpers ---
 
     private static PeerDirectory emptyDirectory() {
@@ -487,6 +512,7 @@ class DistributedSearchPerformerTest {
         private final Map<String, PeerResponse> responses = new ConcurrentHashMap<>();
         private final Map<String, RelaySearchService> services = new ConcurrentHashMap<>();
         private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
+        final List<RemoteSearchRequest> sentRequests = new CopyOnWriteArrayList<>();
 
         void addResponse(byte[] peerPub, IdentityKeys signer,
                          String name, long size, int fileCount) {
@@ -512,13 +538,16 @@ class DistributedSearchPerformerTest {
 
         @Override
         public boolean send(byte[] targetPub, byte[] payload) {
+            RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
+            if (request != null) {
+                sentRequests.add(request);
+            }
             String key = Hex.encode(targetPub);
             PeerResponse pr = responses.get(key);
             RelaySearchService svc = services.get(key);
             if (pr == null && svc == null) {
                 return true; // accepted but no response will come
             }
-            RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
             if (request == null) {
                 return false;
             }

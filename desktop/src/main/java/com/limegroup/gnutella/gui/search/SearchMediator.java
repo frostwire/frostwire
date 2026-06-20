@@ -473,6 +473,11 @@ public final class SearchMediator {
      * otherwise returns null.
      */
     public long triggerSearch(final SearchInformation info) {
+        String query = info.getQuery();
+        if (query != null && query.trim().toLowerCase().startsWith("icebridge://")) {
+            IceBridgeUrlHandler.handle(query.trim());
+            return 0;
+        }
         if (!validate(info)) {
             return 0;
         }

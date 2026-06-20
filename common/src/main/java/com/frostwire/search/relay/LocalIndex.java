@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,14 @@ public interface LocalIndex {
     void updateLastSeen(String infoHashHex, long ts);
 
     int size();
+
+    /**
+     * Return all torrents in the index, ordered by most recently seen
+     * first. Used by catalog browse responses. The default implementation
+     * returns an empty list; production implementations should override
+     * with a real query.
+     */
+    default List<LocalSharedTorrent> listAll() {
+        return Collections.emptyList();
+    }
 }

@@ -23,6 +23,8 @@ import com.frostwire.search.relay.PeerDirectory;
  * over IceBridge.
  */
 public final class DistributedSearchEngineWire {
+    private static volatile PeerDirectory peerDirectoryRef;
+
     private DistributedSearchEngineWire() {
     }
 
@@ -50,5 +52,10 @@ public final class DistributedSearchEngineWire {
                 .setPeerDirectory(peerDirectory)
                 .setIdentityKeys(identity)
                 .setSearchTransport(transport);
+        peerDirectoryRef = peerDirectory;
+    }
+
+    public static PeerDirectory getPeerDirectory() {
+        return peerDirectoryRef;
     }
 }

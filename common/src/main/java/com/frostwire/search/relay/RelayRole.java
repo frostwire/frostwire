@@ -9,6 +9,11 @@ package com.frostwire.search.relay;
 
 import com.frostwire.util.Logger;
 
+import java.security.GeneralSecurityException;
+import java.security.Signature;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,16 +42,30 @@ public final class RelayRole {
 
     private static final Logger LOG = Logger.getLogger(RelayRole.class);
 
+    /** Maximum number of peers a single request is forwarded to. */
+    public static final int MAX_FORWARD_TARGETS = 3;
+
     private final RelaySearchService service;
     private final PeerDirectory directory;
     private final int defaultTrustFloor;
+    private final IdentityKeys identity;
 
     public RelayRole(RelaySearchService service, PeerDirectory directory) {
-        this(service, directory, 0);
+        this(service, directory, 0, null);
     }
 
     public RelayRole(RelaySearchService service, PeerDirectory directory,
                      int defaultTrustFloor) {
+        this(service, directory, defaultTrustFloor, null);
+    }
+
+    public RelayRole(RelaySearchService service, PeerDirectory directory,
+                     IdentityKeys identity) {
+        this(service, directory, 0, identity);
+    }
+
+    public RelayRole(RelaySearchService service, PeerDirectory directory,
+                     int defaultTrustFloor, IdentityKeys identity) {
         if (service == null) {
             throw new IllegalArgumentException("service is null");
         }
@@ -56,6 +75,7 @@ public final class RelayRole {
         this.service = service;
         this.directory = directory;
         this.defaultTrustFloor = defaultTrustFloor;
+        this.identity = identity;
     }
 
     /**
@@ -83,21 +103,110 @@ public final class RelayRole {
     }
 
     /**
-     * Forward a request to a trusted peer in the directory.
+     * Build signed forwarded requests for up to {@link #MAX_FORWARD_TARGETS}
+     * trusted verified peers not already in the request's path.
      *
-     * <p><b>v1 direct peer search does not support forwarding.</b> The
-     * current protocol is a signed direct request/response between two
-     * peers. Multi-hop relay forwarding requires an encrypted opaque
-     * envelope and a separate forwarder signature, which is out of
-     * scope for the direct TCP peer-search stabilization pass. This
-     * method throws {@link UnsupportedOperationException} to make that
-     * explicit.
+     * <p>Each forwarded request has this node's Ed25519 pubkey appended to the
+     * path (via {@link RemoteSearchRequest#withNextHop}), the ttl decremented
+     * by 1, and a fresh signature over the canonical bytes. The returned
+     * {@link ForwardTarget} pairs each signed request with the target peer's
+     * public key so the caller can send it via a transport.
      *
-     * @throws UnsupportedOperationException always in v1
+     * <p>Returns an empty list when:
+     * <ul>
+     *   <li>{@code request.ttl()} is 0 or negative (no more hops allowed),</li>
+     *   <li>no identity is configured (forwarding requires re-signing),</li>
+     *   <li>no eligible peers are available (all are in the path or the
+     *       directory is empty).</li>
+     * </ul>
+     *
+     * @throws IllegalArgumentException if {@code request} is null
+     * @throws IllegalStateException if no identity is configured
      */
-    public RemoteSearchRequest forward(RemoteSearchRequest request, byte[] nextHopPub) {
-        throw new UnsupportedOperationException(
-                "Multi-hop forwarding is not supported in the direct TCP peer-search protocol");
+    public List<ForwardTarget> forward(RemoteSearchRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request is null");
+        }
+        if (identity == null) {
+            throw new IllegalStateException(
+                    "identity not configured for forwarding");
+        }
+        if (request.ttl() <= 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return selectAndSignForwardTargets(request);
+        } catch (Throwable t) {
+            LOG.warn("RelayRole.forward failed", t);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<ForwardTarget> selectAndSignForwardTargets(RemoteSearchRequest request)
+            throws GeneralSecurityException {
+        byte[] ownPub = identity.ed25519PubRaw();
+        int newTtl = request.ttl() - 1;
+        List<PeerDirectory.PeerInfo> candidates =
+                directory.topByTrustVerified(MAX_FORWARD_TARGETS * 3);
+        List<ForwardTarget> out = new ArrayList<>(MAX_FORWARD_TARGETS);
+        for (PeerDirectory.PeerInfo peer : candidates) {
+            if (out.size() >= MAX_FORWARD_TARGETS) {
+                break;
+            }
+            byte[] peerPub = peer.peerPub();
+            if (request.isLoop(peerPub)) {
+                continue;
+            }
+            RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);
+            RemoteSearchRequest signed = signForwardedRequest(nextHop);
+            out.add(new ForwardTarget(peerPub, signed));
+        }
+        return out;
+    }
+
+    private RemoteSearchRequest signForwardedRequest(RemoteSearchRequest unsigned)
+            throws GeneralSecurityException {
+        Signature signer = Signature.getInstance("Ed25519");
+        signer.initSign(identity.ed25519().getPrivate());
+        signer.update(unsigned.canonicalBytes());
+        byte[] sig = signer.sign();
+        return RemoteSearchRequest.builder()
+                .keywords(unsigned.keywords())
+                .limit(unsigned.limit())
+                .nonce(unsigned.nonce())
+                .ttl(unsigned.ttl())
+                .requesterPub(unsigned.requesterPub())
+                .path(unsigned.path())
+                .timestamp(unsigned.timestamp())
+                .signature(sig)
+                .build();
+    }
+
+    /**
+     * A signed forwarded request paired with the target peer's public key.
+     */
+    public static final class ForwardTarget {
+        private final byte[] peerPub;
+        private final RemoteSearchRequest request;
+
+        public ForwardTarget(byte[] peerPub, RemoteSearchRequest request) {
+            if (peerPub == null || peerPub.length != 32) {
+                throw new IllegalArgumentException("peerPub must be 32 bytes");
+            }
+            if (request == null) {
+                throw new IllegalArgumentException("request is null");
+            }
+            this.peerPub = peerPub.clone();
+            this.request = request;
+        }
+
+        public byte[] peerPub() {
+            return peerPub.clone();
+        }
+
+        public RemoteSearchRequest request() {
+            return request;
+        }
     }
 
     public RelaySearchService service() {

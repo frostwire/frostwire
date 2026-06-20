@@ -522,4 +522,8 @@ public abstract class SearchEngine {
         this.searchTransport = searchTransport;
         return this;
     }
+
+    public DistributedSearchTransport getSearchTransport() {
+        return searchTransport;
+    }
 }

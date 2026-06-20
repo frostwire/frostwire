@@ -33,6 +33,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     private final int controlHttpPort;
     private final int rudpPort;
     private final String role;
+    private final String host;
     private final String authToken;
 
     private Process process;
@@ -47,6 +48,22 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
                                     int controlHttpPort,
                                     int rudpPort,
                                     String role) {
+        this(jarPath, identityFile, controlHttpPort, rudpPort, role, "127.0.0.1");
+    }
+
+    /**
+     * Construct a launcher with explicit ports (use 0 to auto-select) and
+     * a custom rUDP bind host. Use {@code "0.0.0.0"} to accept rUDP from
+     * remote peers (cloud forwarder mode); use {@code "127.0.0.1"} for
+     * local-only daemon mode. The control HTTP server always binds to
+     * 127.0.0.1 regardless of this parameter.
+     */
+    public IceBridgeProcessLauncher(File jarPath,
+                                    File identityFile,
+                                    int controlHttpPort,
+                                    int rudpPort,
+                                    String role,
+                                    String host) {
         if (jarPath == null) {
             throw new IllegalArgumentException("jarPath is null");
         }
@@ -58,6 +75,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         this.controlHttpPort = controlHttpPort <= 0 ? freePort() : controlHttpPort;
         this.rudpPort = rudpPort <= 0 ? freePort() : rudpPort;
         this.role = role == null || role.isEmpty() ? "BOTH" : role;
+        this.host = host == null || host.isEmpty() ? "127.0.0.1" : host;
         // Generate a random auth token for the control API.
         byte[] tokenBytes = new byte[32];
         new java.security.SecureRandom().nextBytes(tokenBytes);
@@ -78,6 +96,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
     public int rudpPort() {
         return rudpPort;
+    }
+
+    public String host() {
+        return host;
     }
 
     /**
@@ -107,7 +129,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         command.add("--role");
         command.add(role);
         command.add("--host");
-        command.add("127.0.0.1");
+        command.add(host);
         command.add("--auth-token");
         command.add(authToken);
         if (identityFile != null) {

@@ -76,6 +76,9 @@ public final class OptionsConstructor {
     private static final String I2P_KEY = "OPTIONS_I2P_MAIN_TITLE";
     private static final String MCP_KEY = "OPTIONS_MCP_MAIN_TITLE";
     private static final String IDENTITY_KEY = "OPTIONS_IDENTITY_MAIN_TITLE";
+    private static final String KARMA_KEY = "OPTIONS_KARMA_MAIN_TITLE";
+    private static final String PEER_DIRECTORY_KEY = "OPTIONS_PEER_DIRECTORY_MAIN_TITLE";
+    private static final String SHARED_TORRENTS_DB_KEY = "OPTIONS_SHARED_TORRENTS_DB_MAIN_TITLE";
     private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
     private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
     /**
@@ -224,6 +227,9 @@ public final class OptionsConstructor {
 
         addOption(OptionsMediator.ROOT_NODE_KEY, MCP_KEY, I18n.tr("MCP Server"), MCPSettingsPaneItem.class);
         addOption(OptionsMediator.ROOT_NODE_KEY, IDENTITY_KEY, I18n.tr("Identity"), IdentitySettingsPaneItem.class);
+        addOption(OptionsMediator.ROOT_NODE_KEY, KARMA_KEY, I18n.tr("Karma"), KarmaSettingsPaneItem.class);
+        addOption(OptionsMediator.ROOT_NODE_KEY, PEER_DIRECTORY_KEY, I18n.tr("Peers"), PeerDirectorySettingsPaneItem.class);
+        addOption(OptionsMediator.ROOT_NODE_KEY, SHARED_TORRENTS_DB_KEY, I18n.tr("Shared Torrents"), SharedTorrentsDatabasePaneItem.class);
         OptionsTreeNode node = keysToNodes.get(ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.getValue());
         if (node == null) {
             ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.revertToDefault();

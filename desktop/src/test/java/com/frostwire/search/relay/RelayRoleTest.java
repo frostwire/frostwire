@@ -11,7 +11,10 @@ import com.frostwire.jlibtorrent.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +27,20 @@ class RelayRoleTest {
     private NoopKarmaCache karma;
     private NoopLocalIndex index;
     private PeerDirectory directory;
+    private IdentityKeys identity;
     private RelaySearchService service;
     private RelayRole role;
+    private RelayRole forwardingRole;
 
     @BeforeEach
     void setUp() throws Exception {
         karma = new NoopKarmaCache();
         index = new NoopLocalIndex();
         directory = new PeerDirectory(karma);
-        service = new RelaySearchService(index, IdentityKeys.generate(4));
+        identity = IdentityKeys.generate();
+        service = new RelaySearchService(index, identity);
         role = new RelayRole(service, directory);
+        forwardingRole = new RelayRole(service, directory, identity);
     }
 
     @Test
@@ -117,35 +124,77 @@ class RelayRoleTest {
     }
 
     @Test
-    void forwardIsUnsupportedInDirectPeerSearchV1() {
-        byte[] a = new byte[32]; a[31] = 0x01;
-        byte[] b = new byte[32]; b[31] = 0x02;
-        byte[] nonce = new byte[32];
-        RemoteSearchRequest req = RemoteSearchRequest.builder()
-                .nonce(nonce)
-                .requesterPub(a)
-                .ttl(2)
-                .path(new byte[][]{b})
-                .signature(new byte[64])
-                .build();
-        byte[] nextHop = new byte[32]; nextHop[31] = 0x03;
-        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, nextHop));
+    void forwardRejectsNullRequest() {
+        assertThrows(IllegalArgumentException.class, () -> forwardingRole.forward(null));
     }
 
     @Test
-    void forwardRejectsBadInputsBeforeUnsupported() {
-        byte[] nonce = new byte[32];
-        byte[] a = new byte[32];
-        RemoteSearchRequest req = RemoteSearchRequest.builder()
-                .nonce(nonce)
-                .requesterPub(a)
-                .ttl(2)
-                .signature(new byte[64])
-                .build();
-        byte[] nextHop = new byte[32];
-        assertThrows(UnsupportedOperationException.class, () -> role.forward(null, a));
-        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, null));
-        assertThrows(UnsupportedOperationException.class, () -> role.forward(req, new byte[31]));
+    void forwardThrowsWithoutIdentity() {
+        RelayRole noIdentityRole = new RelayRole(service, directory);
+        RemoteSearchRequest req = buildForwardableRequest(new byte[32], 1, new byte[0][]);
+        assertThrows(IllegalStateException.class, () -> noIdentityRole.forward(req));
+    }
+
+    @Test
+    void forwardReturnsEmptyWhenTtlZero() throws Exception {
+        KeyPairBag peerA = new KeyPairBag();
+        directory.upsertVerified(peerA.pub, "host-a", 6881);
+        RemoteSearchRequest req = buildForwardableRequest(new byte[32], 0, new byte[0][]);
+        List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void forwardSelectsAtMostThreePeers() throws Exception {
+        KeyPairBag peerA = new KeyPairBag();
+        KeyPairBag peerB = new KeyPairBag();
+        KeyPairBag peerC = new KeyPairBag();
+        KeyPairBag peerD = new KeyPairBag();
+        KeyPairBag peerE = new KeyPairBag();
+        directory.upsertVerified(peerA.pub, "host-a", 6881);
+        directory.upsertVerified(peerB.pub, "host-b", 6882);
+        directory.upsertVerified(peerC.pub, "host-c", 6883);
+        directory.upsertVerified(peerD.pub, "host-d", 6884);
+        directory.upsertVerified(peerE.pub, "host-e", 6885);
+        byte[] requesterPub = new byte[32];
+        RemoteSearchRequest req = buildForwardableRequest(requesterPub, 2, new byte[0][]);
+        List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+        assertEquals(RelayRole.MAX_FORWARD_TARGETS, result.size());
+    }
+
+    @Test
+    void forwardSkipsPeersInPath() throws Exception {
+        KeyPairBag peerA = new KeyPairBag();
+        KeyPairBag peerB = new KeyPairBag();
+        directory.upsertVerified(peerA.pub, "host-a", 6881);
+        directory.upsertVerified(peerB.pub, "host-b", 6882);
+        byte[] requesterPub = new byte[32];
+        byte[][] path = {peerA.pub};
+        RemoteSearchRequest req = buildForwardableRequest(requesterPub, 2, path);
+        List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+        assertEquals(1, result.size());
+        assertTrue(Arrays.equals(result.get(0).peerPub(), peerB.pub),
+                "peerA is in the path and must be skipped");
+    }
+
+    @Test
+    void forwardResignsWithOwnKey() throws Exception {
+        KeyPairBag peerA = new KeyPairBag();
+        directory.upsertVerified(peerA.pub, "host-a", 6881);
+        byte[] requesterPub = new byte[32];
+        RemoteSearchRequest req = buildForwardableRequest(requesterPub, 1, new byte[0][]);
+        List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+        assertEquals(1, result.size());
+        RelayRole.ForwardTarget target = result.get(0);
+        RemoteSearchRequest forwarded = target.request();
+        assertEquals(0, forwarded.ttl(), "ttl must be decremented");
+        assertEquals(1, forwarded.pathLength(), "own pubkey must be appended to path");
+        assertTrue(Arrays.equals(forwarded.path()[0], identity.ed25519PubRaw()),
+                "path must contain this node's own pubkey");
+        assertTrue(Arrays.equals(target.peerPub(), peerA.pub),
+                "target must be the selected peer");
+        assertTrue(verifySignature(forwarded, identity.ed25519PubRaw()),
+                "forwarded request must be signed by this node's key");
     }
 
     @Test
@@ -157,6 +206,30 @@ class RelayRoleTest {
     }
 
     // --- helpers ---
+
+    private static RemoteSearchRequest buildForwardableRequest(byte[] requesterPub,
+                                                                int ttl, byte[][] path) {
+        byte[] nonce = new byte[32];
+        return RemoteSearchRequest.builder()
+                .keywords("ubuntu")
+                .limit(25)
+                .nonce(nonce)
+                .ttl(ttl)
+                .requesterPub(requesterPub)
+                .path(path)
+                .timestamp(System.currentTimeMillis() / 1000L)
+                .signature(new byte[64])
+                .build();
+    }
+
+    private static boolean verifySignature(RemoteSearchRequest request, byte[] expectedPubRaw)
+            throws Exception {
+        PublicKey pub = SearchResponseVerifier.rawEd25519ToPublicKey(expectedPubRaw);
+        Signature verifier = Signature.getInstance("Ed25519");
+        verifier.initVerify(pub);
+        verifier.update(request.canonicalBytes());
+        return verifier.verify(request.signature());
+    }
 
     private static RemoteSearchRequest signRequest(KeyPairBag requester,
                                                     String keywords, int limit) throws Exception {
