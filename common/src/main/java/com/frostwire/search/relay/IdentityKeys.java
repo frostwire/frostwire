@@ -19,6 +19,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.NamedParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -183,20 +184,23 @@ public final class IdentityKeys {
         com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
                 com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
         byte[] rawPub = pair.first;
-        byte[] rawPriv = pair.second;
 
-        byte[] pkcs8 = buildEd25519Pkcs8FromSeed(seed);
-        byte[] x509 = buildEd25519X509FromRawPub(rawPub);
-        KeyFactory kf = KeyFactory.getInstance("Ed25519");
-        PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8));
-        PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(x509));
-        KeyPair edPair = new KeyPair(pub, priv);
+        KeyPair edPair = buildEd25519KeyPair(seed, rawPub);
 
         KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
         xdh.initialize(NamedParameterSpec.X25519);
         KeyPair xPair = xdh.generateKeyPair();
 
         return new IdentityKeys(edPair, xPair);
+    }
+
+    private static KeyPair buildEd25519KeyPair(byte[] seed, byte[] rawPub) throws GeneralSecurityException {
+        byte[] pkcs8 = buildEd25519Pkcs8FromSeed(seed);
+        byte[] x509 = buildEd25519X509FromRawPub(rawPub);
+        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8));
+        PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(x509));
+        return new KeyPair(pub, priv);
     }
 
     private static byte[] buildEd25519Pkcs8FromSeed(byte[] seed) {
@@ -226,21 +230,31 @@ public final class IdentityKeys {
      * leading zero bits. With {@code minDifficulty=0}, the first
      * generated keypair is returned. With {@code minDifficulty=20},
      * the loop runs until ~1 million SHA-1 attempts yield a qualifying
-     * pubkey (~2-3 seconds on modern hardware).
+     * pubkey (~1-2 seconds using native jlibtorrent Ed25519).
+     *
+     * <p>Uses jlibtorrent's native Ed25519 implementation for key
+     * generation instead of the JDK's {@code KeyPairGenerator}, which
+     * is a pure-Java implementation on some platforms and can be
+     * 50-100x slower.
      */
     public static IdentityKeys generate(int minDifficulty) throws GeneralSecurityException {
         if (minDifficulty < 0) {
             throw new IllegalArgumentException("minDifficulty must be >= 0");
         }
-        KeyPairGenerator edGen = KeyPairGenerator.getInstance("Ed25519");
+        SecureRandom rng = new SecureRandom();
+        MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
         KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
         xdh.initialize(NamedParameterSpec.X25519);
 
         while (true) {
-            KeyPair ed = edGen.generateKeyPair();
-            byte[] rawPub = IdentityRecord.extractRawEd25519(ed.getPublic());
-            if (minDifficulty == 0 || countLeadingZeroBits(sha1(rawPub)) >= minDifficulty) {
-                return new IdentityKeys(ed, xdh.generateKeyPair());
+            byte[] seed = new byte[32];
+            rng.nextBytes(seed);
+            com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
+                    com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
+            byte[] rawPub = pair.first;
+            if (minDifficulty == 0 || countLeadingZeroBits(sha1.digest(rawPub)) >= minDifficulty) {
+                KeyPair edPair = buildEd25519KeyPair(seed, rawPub);
+                return new IdentityKeys(edPair, xdh.generateKeyPair());
             }
         }
     }

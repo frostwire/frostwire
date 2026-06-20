@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay.icebridge.client;
 
+import com.frostwire.search.relay.IdentityKeys;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,12 @@ class IceBridgeProcessLauncherTest {
         Path tmp = Files.createTempDirectory("icebridge-test");
         File identityFile = new File(tmp.toFile(), "identity.dat");
 
+        // Pre-generate identity with no PoW so the daemon doesn't spend
+        // minutes mining 20-bit difficulty (JDK Ed25519 KeyPairGenerator
+        // is ~100x slower than native on some platforms).
+        IdentityKeys keys = IdentityKeys.generate(0);
+        IdentityKeys.save(keys, identityFile);
+
         launcher = new IceBridgeProcessLauncher(jar, identityFile, 0, 0, "BOTH");
         launcher.start();
 
@@ -42,11 +49,9 @@ class IceBridgeProcessLauncherTest {
         assertTrue(launcher.controlPort() > 0);
         assertTrue(launcher.rudpPort() > 0);
 
-        // Give the daemon time to boot (JVM + Netty + identity load) and then
-        // poll health repeatedly.
         IceBridgeClient client = launcher.client();
         boolean healthy = false;
-        for (int i = 0; i < 600; i++) {
+        for (int i = 0; i < 300; i++) {
             if (!launcher.isAlive()) {
                 fail("IceBridge subprocess exited before becoming healthy");
             }
@@ -56,6 +61,6 @@ class IceBridgeProcessLauncherTest {
             }
             Thread.sleep(100);
         }
-        assertTrue(healthy, "IceBridge daemon did not become healthy in time (60s)");
+        assertTrue(healthy, "IceBridge daemon did not become healthy in time (30s)");
     }
 }
