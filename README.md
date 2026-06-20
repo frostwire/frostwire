@@ -174,6 +174,16 @@ Sessions are capped at 256 per daemon. Incoming search requests are rate-limited
 
 FrostWire indexes both torrent names and individual file paths within torrents using SQLite FTS5 with BM25 ranking. This means searching for "readme.txt" will find torrents containing that file even if the torrent name doesn't include "readme". Results that match on a file path surface the matched filename in the search results.
 
+#### Identity management
+
+Each FrostWire node has a cryptographic identity consisting of an Ed25519 keypair (signing) and an X25519 keypair (Diffie-Hellman). The identity's node ID is `SHA-1(ed25519PubRaw)` with a configurable proof-of-work difficulty (default 20 leading zero bits) to prevent Sybil attacks.
+
+Identity generation uses jlibtorrent's native Ed25519 implementation for performance — the JDK's pure-Java Ed25519 is 50-100x slower on some platforms.
+
+Identities can be backed up and restored using a **BIP39 24-word mnemonic phrase** (`com.frostwire.crypto.Bip39Mnemonic`). The 32-byte Ed25519 seed is encoded as a mnemonic with a SHA-256 checksum, enabling offline paper backup. `IdentityKeys.fromSeed(seed)` deterministically reconstructs the Ed25519 keypair from the mnemonic.
+
+The desktop client exposes identity management via **Options > Identity**, showing the node ID, fingerprint, public key, difficulty, karma score, and shared torrent count, with buttons to show the seed phrase, restore from seed phrase, and export/import identity files.
+
 #### Key source locations
 
 | Component | Location |
@@ -184,6 +194,9 @@ FrostWire indexes both torrent names and individual file paths within torrents u
 | Desktop client + launcher | `desktop/src/main/java/com/frostwire/search/relay/icebridge/client/` |
 | Local index (SQLite + FTS5) | `desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java` |
 | Distributed search performer | `common/src/main/java/com/frostwire/search/relay/DistributedSearchPerformer.java` |
+| BIP39 mnemonic | `common/src/main/java/com/frostwire/crypto/Bip39Mnemonic.java` |
+| Identity keys | `common/src/main/java/com/frostwire/search/relay/IdentityKeys.java` |
+| Identity settings UI | `desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java` |
 | Tests | `desktop/src/test/java/com/frostwire/search/relay/` |
 
 
