@@ -86,8 +86,8 @@ class IceBridgeClientTest {
         inboundQueue.onMessage(targetPub, payload);
         List<IceBridgeClient.InboundMessage> messages = client.poll(10);
         assertEquals(1, messages.size());
-        assertArrayEquals(targetPub, messages.get(0).sourcePub);
-        assertArrayEquals(payload, messages.get(0).payload);
+        assertArrayEquals(targetPub, messages.get(0).sourcePub());
+        assertArrayEquals(payload, messages.get(0).payload());
     }
 
     private static int freePort() throws IOException {

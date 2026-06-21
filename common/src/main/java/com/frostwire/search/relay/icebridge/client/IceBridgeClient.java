@@ -14,6 +14,7 @@ import com.frostwire.search.relay.icebridge.control.PeerInfo;
 import com.frostwire.search.relay.icebridge.control.RegisterRequest;
 import com.frostwire.search.relay.icebridge.control.RouteRequest;
 import com.frostwire.search.relay.icebridge.control.SendRequest;
+import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -43,10 +44,12 @@ import okhttp3.Response;
  */
 public final class IceBridgeClient implements AutoCloseable {
 
+    private static final Logger LOG = Logger.getLogger(IceBridgeClient.class);
     private static final Gson GSON = new Gson();
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final long CONNECT_TIMEOUT_SEC = 10;
     private static final long CALL_TIMEOUT_SEC = 10;
+    private static final int MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
 
     private final OkHttpClient http;
     private final String baseUrl;
@@ -196,7 +199,8 @@ public final class IceBridgeClient implements AutoCloseable {
 
     @Override
     public void close() {
-        // OkHttpClient does not need explicit shutdown.
+        http.dispatcher().executorService().shutdown();
+        http.connectionPool().evictAll();
     }
 
     private <T> T get(String path, TypeToken<T> type) {
@@ -206,7 +210,10 @@ public final class IceBridgeClient implements AutoCloseable {
                     .get();
             addAuthHeader(builder);
             try (Response response = http.newCall(builder.build()).execute()) {
-                String body = response.body() != null ? response.body().string() : "";
+                String body = readBody(response);
+                if (body == null) {
+                    return null;
+                }
                 return GSON.fromJson(body, type.getType());
             }
         } catch (Exception e) {
@@ -222,12 +229,33 @@ public final class IceBridgeClient implements AutoCloseable {
                     .post(requestBody);
             addAuthHeader(builder);
             try (Response response = http.newCall(builder.build()).execute()) {
-                String responseBody = response.body() != null ? response.body().string() : "";
+                String responseBody = readBody(response);
+                if (responseBody == null) {
+                    return null;
+                }
                 return GSON.fromJson(responseBody, type.getType());
             }
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static String readBody(Response response) throws java.io.IOException {
+        if (response.body() == null) {
+            return "";
+        }
+        okhttp3.ResponseBody rb = response.body();
+        long len = rb.contentLength();
+        if (len > MAX_RESPONSE_BYTES) {
+            LOG.warn("Control API response too large: " + len + " bytes");
+            return null;
+        }
+        String body = rb.string();
+        if (body.length() > MAX_RESPONSE_BYTES) {
+            LOG.warn("Control API response too large: " + body.length() + " chars");
+            return null;
+        }
+        return body;
     }
 
     private void addAuthHeader(Request.Builder builder) {
@@ -243,16 +271,31 @@ public final class IceBridgeClient implements AutoCloseable {
 
     /**
      * A received payload decoded from {@code /poll}.
+     *
+     * <p>Byte arrays are defensively copied on construction and on access
+     * to prevent aliasing — callers cannot mutate the internal state.
      */
     public static final class InboundMessage {
-        public final byte[] sourcePub;
-        public final byte[] payload;
-        public final long receivedMs;
+        private final byte[] sourcePub;
+        private final byte[] payload;
+        private final long receivedMs;
 
         public InboundMessage(byte[] sourcePub, byte[] payload, long receivedMs) {
-            this.sourcePub = sourcePub;
-            this.payload = payload;
+            this.sourcePub = sourcePub == null ? new byte[0] : sourcePub.clone();
+            this.payload = payload == null ? new byte[0] : payload.clone();
             this.receivedMs = receivedMs;
+        }
+
+        public byte[] sourcePub() {
+            return sourcePub.clone();
+        }
+
+        public byte[] payload() {
+            return payload.clone();
+        }
+
+        public long receivedMs() {
+            return receivedMs;
         }
     }
 }

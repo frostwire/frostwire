@@ -88,7 +88,7 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
             for (InboundMessage msg : messages) {
                 for (PayloadListener listener : listeners) {
                     try {
-                        listener.onPayload(msg.sourcePub, msg.payload, msg.receivedMs);
+                        listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs());
                     } catch (Throwable t) {
                         LOG.warn("Payload listener threw", t);
                     }
