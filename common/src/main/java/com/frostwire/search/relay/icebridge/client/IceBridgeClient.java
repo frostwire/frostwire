@@ -17,32 +17,38 @@ import com.frostwire.search.relay.icebridge.control.SendRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.Signature;
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import java.util.stream.Collectors;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * HTTP client for the local IceBridge control API.
  *
  * <p>All methods target {@code http://127.0.0.1:<controlPort>} so FrostWire can
- * talk to the co-located IceBridge daemon started by
- * {@link IceBridgeProcessLauncher}.
+ * talk to the co-located IceBridge daemon — whether started as a subprocess
+ * on desktop or in-process on Android.
+ *
+ * <p>Uses OkHttp (available on both desktop and Android) instead of
+ * {@code java.net.http.HttpClient} (Java 11+, not available on Android).
  */
 public final class IceBridgeClient implements AutoCloseable {
 
     private static final Gson GSON = new Gson();
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private static final long CONNECT_TIMEOUT_SEC = 10;
+    private static final long CALL_TIMEOUT_SEC = 10;
 
-    private final HttpClient http;
+    private final OkHttpClient http;
     private final String baseUrl;
     private volatile String authToken;
 
@@ -52,8 +58,10 @@ public final class IceBridgeClient implements AutoCloseable {
 
     public IceBridgeClient(String baseUrl) {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        this.http = HttpClient.newBuilder()
-                .connectTimeout(TIMEOUT)
+        this.http = new OkHttpClient.Builder()
+                .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
+                .callTimeout(CALL_TIMEOUT_SEC, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(false)
                 .build();
     }
 
@@ -125,8 +133,9 @@ public final class IceBridgeClient implements AutoCloseable {
 
     /**
      * Add a peer to the local IceBridge daemon's registry without a
-     * signature. This is a localhost-trusted call used by the desktop to
-     * tell the daemon where to route packets for a discovered peer.
+     * signature. This is a localhost-trusted call used by the desktop
+     * or Android app to tell the daemon where to route packets for a
+     * discovered peer.
      */
     public boolean route(byte[] peerPub, String host, int rudpPort,
                          IceBridgeConfig.Role role) {
@@ -175,28 +184,31 @@ public final class IceBridgeClient implements AutoCloseable {
         if (response == null || response.data == null) {
             return Collections.emptyList();
         }
-        return response.data.stream()
-                .map(info -> new InboundMessage(
-                        decode(info.sourcePub),
-                        decode(info.payload),
-                        info.receivedMs))
-                .collect(Collectors.toList());
+        List<InboundMessage> out = new ArrayList<>(response.data.size());
+        for (com.frostwire.search.relay.icebridge.control.InboundMessageInfo info : response.data) {
+            out.add(new InboundMessage(
+                    decode(info.sourcePub),
+                    decode(info.payload),
+                    info.receivedMs));
+        }
+        return out;
     }
 
     @Override
     public void close() {
-        // HttpClient does not need explicit shutdown.
+        // OkHttpClient does not need explicit shutdown.
     }
 
     private <T> T get(String path, TypeToken<T> type) {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + path))
-                    .timeout(TIMEOUT)
-                    .GET();
+            Request.Builder builder = new Request.Builder()
+                    .url(baseUrl + path)
+                    .get();
             addAuthHeader(builder);
-            HttpResponse<String> response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-            return GSON.fromJson(response.body(), type.getType());
+            try (Response response = http.newCall(builder.build()).execute()) {
+                String body = response.body() != null ? response.body().string() : "";
+                return GSON.fromJson(body, type.getType());
+            }
         } catch (Exception e) {
             return null;
         }
@@ -204,20 +216,21 @@ public final class IceBridgeClient implements AutoCloseable {
 
     private <T> T post(String path, Object body, TypeToken<T> type) {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + path))
-                    .timeout(TIMEOUT)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
+            RequestBody requestBody = RequestBody.create(GSON.toJson(body), JSON);
+            Request.Builder builder = new Request.Builder()
+                    .url(baseUrl + path)
+                    .post(requestBody);
             addAuthHeader(builder);
-            HttpResponse<String> response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-            return GSON.fromJson(response.body(), type.getType());
+            try (Response response = http.newCall(builder.build()).execute()) {
+                String responseBody = response.body() != null ? response.body().string() : "";
+                return GSON.fromJson(responseBody, type.getType());
+            }
         } catch (Exception e) {
             return null;
         }
     }
 
-    private void addAuthHeader(HttpRequest.Builder builder) {
+    private void addAuthHeader(Request.Builder builder) {
         String token = authToken;
         if (token != null && !token.isEmpty()) {
             builder.header("X-IceBridge-Token", token);
