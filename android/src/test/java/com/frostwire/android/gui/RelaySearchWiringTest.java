@@ -44,41 +44,15 @@ public class RelaySearchWiringTest {
     }
 
     @Test
-    public void localEngine_notReady_beforeWiring() {
-        assertFalse("LOCAL should not be ready before wiring",
-                SearchEngine.LOCAL.isReady());
-    }
-
-    @Test
     public void distributedEngine_notReady_beforeWiring() {
         assertFalse("DISTRIBUTED should not be ready before wiring",
                 SearchEngine.DISTRIBUTED.isReady());
     }
 
     @Test
-    public void localEngine_getPerformerReturnsNull_whenNotReady() {
-        assertNull("getPerformer should return null when not ready",
-                SearchEngine.LOCAL.getPerformer(1L, "test"));
-    }
-
-    @Test
     public void distributedEngine_getPerformerReturnsNull_whenNotReady() {
         assertNull("getPerformer should return null when not ready",
                 SearchEngine.DISTRIBUTED.getPerformer(1L, "test"));
-    }
-
-    @Test
-    public void localEngine_ready_afterWiringLocalIndex() {
-        LocalIndex stubIndex = new StubLocalIndex();
-        java.util.Optional<LocalIndex> saved = java.util.Optional.ofNullable(
-                SearchEngine.LOCAL_WIRING.localIndex());
-        try {
-            SearchEngine.LOCAL_WIRING.localIndex(stubIndex);
-            org.junit.Assert.assertTrue("LOCAL should be ready after wiring localIndex",
-                    SearchEngine.LOCAL.isReady());
-        } finally {
-            SearchEngine.LOCAL_WIRING.localIndex(saved.orElse(null));
-        }
     }
 
     @Test

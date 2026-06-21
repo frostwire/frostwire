@@ -20,6 +20,7 @@ package com.frostwire.android.search;
 
 import android.content.Context;
 
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtAdvertiser;
@@ -200,10 +201,10 @@ public final class AndroidRelayStack implements AutoCloseable {
             if (li == null || karmaCache == null || pd == null || ident == null || tr == null) {
                 throw new IllegalStateException("Wiring inputs must be non-null");
             }
-            com.frostwire.android.gui.SearchEngine.LOCAL_WIRING
+            SearchEngine.LOCAL_WIRING
                     .localIndex(li)
                     .karmaCache(karmaCache);
-            com.frostwire.android.gui.SearchEngine.DISTRIBUTED_WIRING
+            SearchEngine.DISTRIBUTED_WIRING
                     .localIndex(li)
                     .peerDirectory(pd)
                     .identity(ident)
