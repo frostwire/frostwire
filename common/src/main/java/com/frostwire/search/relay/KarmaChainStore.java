@@ -19,7 +19,7 @@ import java.util.List;
  * <p>Implementations MUST be thread-safe. The {@link KarmaChainWriter}
  * calls {@link #append} and {@link #loadChain} under a
  * {@code ReentrantLock}, but the store itself may be accessed from
- * other threads (e.g. {@code getTopPeers} from the UI).
+ * other threads.
  */
 public interface KarmaChainStore extends AutoCloseable {
 
