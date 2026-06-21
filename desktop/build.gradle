@@ -12,10 +12,32 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.diffplug.spotless' version '7.0.4'
 }
 
 group = 'com.frostwire'
 version = '1.0-SNAPSHOT'
+
+spotless {
+    java {
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        ratchetFrom 'origin/master'
+        googleJavaFormat('1.24.0')
+        toggleOffOn()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+tasks.register('lint') {
+    group = 'verification'
+    description = 'Runs Spotless format check + javac warnings (lint).'
+    dependsOn 'spotlessCheck', 'compileJava', 'compileTestJava'
+    doLast {
+        println 'Lint check complete. Fix with: ./gradlew spotlessApply'
+    }
+}
 
 import org.gradle.internal.os.OperatingSystem
 
