@@ -40,6 +40,7 @@ plugins {
     id 'com.google.gms.google-services' version '4.4.4'
     id 'com.google.firebase.crashlytics' version '3.0.7'
     id 'com.chaquo.python' version '17.0.0'
+    id 'com.diffplug.spotless' version '7.0.4'
     // org.jetbrains.kotlin.android is no longer needed: AGP 9.0+ has built-in Kotlin support.
 }
 
@@ -285,6 +286,27 @@ androidComponents {
                 output.outputFileName.set(apkName)
             }
         }
+    }
+}
+
+spotless {
+    java {
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        ratchetFrom 'origin/master'
+        googleJavaFormat('1.24.0')
+        toggleOffOn()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+tasks.register('spotlessLint') {
+    group = 'verification'
+    description = 'Runs Spotless format check + javac warnings (lint).'
+    dependsOn 'spotlessCheck', 'compilePlus1DebugJavaWithJavac', 'compilePlus1DebugUnitTestJavaWithJavac'
+    doLast {
+        println 'Lint check complete. Fix with: ./gradlew spotlessApply'
     }
 }
 
