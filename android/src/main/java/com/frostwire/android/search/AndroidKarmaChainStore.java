@@ -176,6 +176,8 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                     updatePeerKarma(entry.peerPub(), entry.scoreDelta(), entry.timestamp());
                 }
                 db.setTransactionSuccessful();
+            } catch (Throwable t) {
+                LOG.warn("Failed to append karma entry seq=" + entry.seq(), t);
             } finally {
                 db.endTransaction();
             }
