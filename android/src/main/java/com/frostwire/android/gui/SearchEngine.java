@@ -28,6 +28,13 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.relay.DistributedSearchPerformer;
+import com.frostwire.search.relay.DistributedSearchTransport;
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.LocalIndex;
+import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
+import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.frostclick.FrostClickSearchPattern;
 import com.frostwire.search.nyaa.NyaaSearchPattern;
@@ -65,6 +72,12 @@ public abstract class SearchEngine {
     private final String preferenceKey;
 
     private boolean active;
+
+    private volatile LocalIndex localIndex;
+    private volatile PeerKarmaCache karmaCache;
+    private volatile PeerDirectory peerDirectory;
+    private volatile IdentityKeys identity;
+    private volatile DistributedSearchTransport searchTransport;
 
     private SearchEngine(String name, String preferenceKey) {
         this.name = name;
@@ -108,6 +121,35 @@ public abstract class SearchEngine {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public SearchEngine setLocalIndex(LocalIndex index) {
+        this.localIndex = index;
+        return this;
+    }
+
+    public LocalIndex getLocalIndex() {
+        return localIndex;
+    }
+
+    public SearchEngine setKarmaCache(PeerKarmaCache karmaCache) {
+        this.karmaCache = karmaCache;
+        return this;
+    }
+
+    public SearchEngine setPeerDirectory(PeerDirectory peerDirectory) {
+        this.peerDirectory = peerDirectory;
+        return this;
+    }
+
+    public SearchEngine setIdentityKeys(IdentityKeys identity) {
+        this.identity = identity;
+        return this;
+    }
+
+    public SearchEngine setSearchTransport(DistributedSearchTransport transport) {
+        this.searchTransport = transport;
+        return this;
     }
 
     @NonNull
@@ -383,7 +425,48 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine LOCAL = new SearchEngine("Local", Constants.PREF_KEY_SEARCH_USE_LOCAL) {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Local search engine not ready; wire LocalIndex via SearchEngine.LOCAL.setLocalIndex(...)");
+            }
+            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
+        }
+
+        @Override
+        protected boolean isReady() {
+            return LOCAL.localIndex != null;
+        }
+    };
+
+    public static final SearchEngine DISTRIBUTED = new SearchEngine("Distributed", Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED) {
+        @Override
+        public ISearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Distributed search engine not ready; wire localIndex, peerDirectory, identity, and searchTransport.");
+            }
+            return new DistributedSearchPerformer(
+                    token,
+                    keywords,
+                    DISTRIBUTED.localIndex,
+                    DISTRIBUTED.peerDirectory,
+                    DISTRIBUTED.identity,
+                    DISTRIBUTED.searchTransport);
+        }
+
+        @Override
+        protected boolean isReady() {
+            return DISTRIBUTED.localIndex != null
+                    && DISTRIBUTED.peerDirectory != null
+                    && DISTRIBUTED.identity != null
+                    && DISTRIBUTED.searchTransport != null;
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
+            LOCAL,
+            DISTRIBUTED,
             YT,
             MAGNETDL,
             TORRENTZ2,
