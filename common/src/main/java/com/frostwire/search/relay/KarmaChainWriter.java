@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *   <li>Lazily commits an {@code EPOCH_COMMITMENT} entry if the chain
  *       has not yet committed for this epoch.</li>
  *   <li>Appends an {@code ENDORSEMENT} entry and persists both new
- *       entries to the {@link KarmaChainTable}.</li>
+ *       entries to the {@link KarmaChainStore}.</li>
  * </ol>
  *
  * <p>Thread-safety: all mutating operations are serialized through a
@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * <p><b>Scope of this build:</b> the in-memory chain is reconstructed
  * from genesis on each app startup. Loading persisted entries on
- * startup is a future feature; see {@link KarmaChainTable#loadChain}.
+ * startup is a future feature; see {@link KarmaChainStore#loadChain}.
  */
 public final class KarmaChainWriter implements KarmaEndorsementSink {
 
@@ -47,13 +47,13 @@ public final class KarmaChainWriter implements KarmaEndorsementSink {
     private final byte[] ownerPub;
     private final PrivateKey signingKey;
     private final BlockHeaderSource blockSource;
-    private final KarmaChainTable table;
+    private final KarmaChainStore table;
     private final KarmaChain chain;
     private final ReentrantLock writeLock = new ReentrantLock();
 
     public KarmaChainWriter(IdentityKeys identity,
                             BlockHeaderSource blockSource,
-                            KarmaChainTable table) {
+                            KarmaChainStore table) {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
