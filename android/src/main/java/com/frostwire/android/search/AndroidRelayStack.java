@@ -69,7 +69,7 @@ import java.io.File;
  * BTEngine must already be started before calling {@code start}.
  *
  * <p><b>Shutdown ordering:</b> reverse of startup —
- * peerSync → dhtAdvertiser → peerDiscoveryScheduler → incomingHandler →
+ * dhtAdvertiser → peerDiscoveryScheduler → peerRegistrySync → incomingHandler →
  * transport → client → server → localIndex.
  */
 public final class AndroidRelayStack implements AutoCloseable {
