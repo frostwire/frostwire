@@ -22,7 +22,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.frostwire.search.relay.KarmaChain;
 import com.frostwire.search.relay.KarmaChainEntry;
@@ -31,6 +30,7 @@ import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -43,7 +43,12 @@ import java.util.List;
  * databases are compatible if copied between platforms.
  *
  * <p>The database file is shared with {@link AndroidLocalIndex} (WAL mode
- * allows multiple connections from the same process).
+ * allows multiple connections from the same process). This class opens
+ * the existing database directly via {@link SQLiteDatabase#openDatabase}
+ * instead of using a {@code SQLiteOpenHelper} — the helper in
+ * {@link AndroidLocalIndex} owns schema versioning, and a second helper
+ * with a different version number would trigger an unwanted
+ * {@code onDowngrade} crash.
  */
 public final class AndroidKarmaChainStore implements KarmaChainStore {
 
@@ -88,7 +93,6 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
             "CREATE INDEX IF NOT EXISTS idx_" + PEER_TABLE + "_score ON " +
                     PEER_TABLE + " (total_score)";
 
-    private final DbHelper helper;
     private final SQLiteDatabase db;
     private volatile boolean open = true;
 
@@ -100,9 +104,22 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
      * @param dbName  the database file name (same as AndroidLocalIndex)
      */
     public AndroidKarmaChainStore(Context context, String dbName) {
-        this.helper = new DbHelper(context.getApplicationContext(), dbName);
-        this.db = helper.getWritableDatabase();
-        this.db.enableWriteAheadLogging();
+        File dbFile = context.getDatabasePath(dbName);
+        File parent = dbFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+        this.db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null,
+                SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY);
+        initializeSchema();
+    }
+
+    private void initializeSchema() {
+        db.execSQL(CREATE_CHAIN_TABLE_SQL);
+        db.execSQL(CREATE_PEER_TABLE_SQL);
+        db.execSQL(CREATE_INDEX_EPOCH_SQL);
+        db.execSQL(CREATE_INDEX_BLOCK_SQL);
+        db.execSQL(CREATE_INDEX_SCORE_SQL);
     }
 
     @Override
@@ -246,7 +263,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
             }
             open = false;
             try {
-                helper.close();
+                db.close();
             } catch (Throwable t) {
                 LOG.warn("Error closing karma chain database", t);
             }
@@ -280,31 +297,6 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
     private void ensureOpen() {
         if (!open) {
             throw new IllegalStateException("AndroidKarmaChainStore is closed");
-        }
-    }
-
-    private static final class DbHelper extends SQLiteOpenHelper {
-
-        private static final int VERSION = 1;
-
-        DbHelper(Context context, String name) {
-            super(context, name, null, VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(CREATE_CHAIN_TABLE_SQL);
-            db.execSQL(CREATE_PEER_TABLE_SQL);
-            db.execSQL(CREATE_INDEX_EPOCH_SQL);
-            db.execSQL(CREATE_INDEX_BLOCK_SQL);
-            db.execSQL(CREATE_INDEX_SCORE_SQL);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + PEER_TABLE);
-            db.execSQL("DROP TABLE IF EXISTS " + CHAIN_TABLE);
-            onCreate(db);
         }
     }
 }
