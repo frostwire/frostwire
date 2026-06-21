@@ -90,6 +90,44 @@ class IceBridgeClientTest {
         assertArrayEquals(payload, messages.get(0).payload());
     }
 
+    @Test
+    void inboundMessage_defensiveCopies_preventAliasing() {
+        byte[] sourcePub = new byte[32];
+        byte[] payload = "hello".getBytes(StandardCharsets.UTF_8);
+        IceBridgeClient.InboundMessage msg = new IceBridgeClient.InboundMessage(sourcePub, payload, 123L);
+
+        byte[] gotSource = msg.sourcePub();
+        byte[] gotPayload = msg.payload();
+        gotSource[0] = (byte) 0xFF;
+        gotPayload[0] = (byte) 0xFF;
+
+        assertArrayEquals(sourcePub, msg.sourcePub());
+        assertArrayEquals(payload, msg.payload());
+        assertEquals(123L, msg.receivedMs());
+    }
+
+    @Test
+    void inboundMessage_handlesNullArrays() {
+        IceBridgeClient.InboundMessage msg = new IceBridgeClient.InboundMessage(null, null, 0L);
+        assertEquals(0, msg.sourcePub().length);
+        assertEquals(0, msg.payload().length);
+        assertEquals(0L, msg.receivedMs());
+    }
+
+    @Test
+    void close_doesNotThrow() {
+        client.health();
+        client.close();
+        client.close();
+    }
+
+    @Test
+    void route_addsPeerToRegistry() {
+        byte[] peerPub = new byte[32];
+        peerPub[0] = 0x42;
+        assertTrue(client.route(peerPub, "10.0.0.5", 6889, IceBridgeConfig.Role.BOTH));
+    }
+
     private static int freePort() throws IOException {
         try (ServerSocket s = new ServerSocket(0)) {
             return s.getLocalPort();
