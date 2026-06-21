@@ -21,14 +21,19 @@ package com.frostwire.android.search;
 import android.content.Context;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.DhtAdvertiser;
+import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IndexAnnouncementPublisher;
-import com.frostwire.search.relay.KarmaChainSource;
+import com.frostwire.search.relay.KarmaChainCommitScheduler;
+import com.frostwire.search.relay.KarmaChainPublisher;
+import com.frostwire.search.relay.KarmaChainStore;
+import com.frostwire.search.relay.KarmaChainWriter;
+import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
@@ -62,15 +67,17 @@ import java.io.File;
  * DhtAdvertiser (BEP 46 identity + BEP 5 index announcement),
  * PeerRegistrySync (syncs verified peers into IceBridge routing table).
  *
- * <p>Phase 4 (Karma): PeerKarmaCache currently uses a no-op source; will be
- * replaced with DhtKarmaChainSource when Karma is wired.
+ * <p>Phase 4 (Karma): KarmaChainStore (Android SQLite), KarmaChainWriter
+ * (Bitcoin-anchored endorsements), KarmaEndorsementTrigger (fires on
+ * download completion), KarmaChainCommitScheduler (periodic commit +
+ * DHT publish), PeerKarmaCache via DhtKarmaChainSource.
  *
  * <p><b>Threading:</b> {@link #start} must be called off the main thread.
  * BTEngine must already be started before calling {@code start}.
  *
  * <p><b>Shutdown ordering:</b> reverse of startup —
- * dhtAdvertiser → peerDiscoveryScheduler → peerRegistrySync → incomingHandler →
- * transport → client → server → localIndex.
+ * karmaScheduler → dhtAdvertiser → peerDiscoveryScheduler → peerRegistrySync → incomingHandler →
+ * transport → client → server → karmaStore → localIndex.
  */
 public final class AndroidRelayStack implements AutoCloseable {
 
@@ -90,6 +97,8 @@ public final class AndroidRelayStack implements AutoCloseable {
     private final PeerRegistrySync peerRegistrySync;
     private final PeerDiscoveryScheduler peerDiscoveryScheduler;
     private final DhtAdvertiser dhtAdvertiser;
+    private final KarmaChainStore karmaStore;
+    private final KarmaChainCommitScheduler karmaScheduler;
 
     /**
      * Start the relay stack. All heavy work is done on the calling thread.
@@ -111,6 +120,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         PeerRegistrySync prs = null;
         PeerDiscoveryScheduler pds = null;
         DhtAdvertiser da = null;
+        AndroidKarmaChainStore ks = null;
+        KarmaChainCommitScheduler kcs = null;
         try {
             li = AndroidLocalIndex.open(context);
 
@@ -121,6 +132,19 @@ public final class AndroidRelayStack implements AutoCloseable {
 
             SharedTorrentIndexerInstaller.install(btEngine, li, ident);
             LOG.info("AndroidRelayStack: SharedTorrentIndexer installed");
+
+            ks = new AndroidKarmaChainStore(context, AndroidLocalIndex.DEFAULT_DB_NAME);
+            File bitcoinCacheDir = new File(homeDir, RelayConstants.BITCOIN_HEADER_CACHE_DIR);
+            com.frostwire.search.relay.BlockHeaderSource blockSource =
+                    new com.frostwire.search.relay.HttpBlockHeaderFetcher(bitcoinCacheDir);
+            KarmaChainWriter karmaWriter = new KarmaChainWriter(ident, blockSource, ks);
+            BTEngineListenerChain.install(btEngine,
+                    new KarmaEndorsementTrigger(li, ident.ed25519PubRaw(), karmaWriter));
+            KarmaChainPublisher karmaPublisher = new KarmaChainPublisher(karmaWriter, ident);
+            kcs = new KarmaChainCommitScheduler(karmaWriter, karmaPublisher,
+                    RelayConstants.KARMA_COMMIT_INTERVAL_SEC);
+            kcs.start();
+            LOG.info("AndroidRelayStack: Karma chain wired");
 
             IceBridgeConfig config = IceBridgeConfig.newBuilder()
                     .host("0.0.0.0")
@@ -145,7 +169,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             tr.start();
 
             PeerKarmaCache karmaCache = new PeerKarmaCache(
-                    new RemoteKarmaChainFetcher(new NoOpKarmaChainSource()));
+                    new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
             pd = new PeerDirectory(karmaCache);
 
             RelaySearchService ss = new RelaySearchService(li, ident);
@@ -174,7 +198,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             LOG.info("AndroidRelayStack: DhtAdvertiser started");
 
             AndroidRelayStack stack = new AndroidRelayStack(li, ident, srv, cl, tr, ss, ih,
-                    pd, prs, pds, da);
+                    pd, prs, pds, da, ks, kcs);
             li = null;
             srv = null;
             cl = null;
@@ -184,10 +208,13 @@ public final class AndroidRelayStack implements AutoCloseable {
             prs = null;
             pds = null;
             da = null;
+            ks = null;
+            kcs = null;
             LOG.info("AndroidRelayStack: started successfully");
             return stack;
         } catch (Throwable t) {
             LOG.warn("Failed to start AndroidRelayStack", t);
+            if (kcs != null) try { kcs.stop(); } catch (Throwable ignored) {}
             if (da != null) try { da.stop(); } catch (Throwable ignored) {}
             if (pds != null) try { pds.stop(); } catch (Throwable ignored) {}
             if (prs != null) try { prs.close(); } catch (Throwable ignored) {}
@@ -195,6 +222,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             if (tr != null) try { tr.close(); } catch (Throwable ignored) {}
             if (cl != null) try { cl.close(); } catch (Throwable ignored) {}
             if (srv != null) try { srv.close(); } catch (Throwable ignored) {}
+            if (ks != null) try { ks.close(); } catch (Throwable ignored) {}
             if (li != null) try { li.close(); } catch (Throwable ignored) {}
             return null;
         }
@@ -210,7 +238,9 @@ public final class AndroidRelayStack implements AutoCloseable {
                               PeerDirectory peerDirectory,
                               PeerRegistrySync peerRegistrySync,
                               PeerDiscoveryScheduler peerDiscoveryScheduler,
-                              DhtAdvertiser dhtAdvertiser) {
+                              DhtAdvertiser dhtAdvertiser,
+                              KarmaChainStore karmaStore,
+                              KarmaChainCommitScheduler karmaScheduler) {
         this.localIndex = localIndex;
         this.identity = identity;
         this.server = server;
@@ -222,6 +252,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         this.peerRegistrySync = peerRegistrySync;
         this.peerDiscoveryScheduler = peerDiscoveryScheduler;
         this.dhtAdvertiser = dhtAdvertiser;
+        this.karmaStore = karmaStore;
+        this.karmaScheduler = karmaScheduler;
     }
 
     public AndroidLocalIndex localIndex() {
@@ -251,6 +283,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     @Override
     public void close() {
         LOG.info("AndroidRelayStack: shutting down...");
+        try { if (karmaScheduler != null) karmaScheduler.stop(); } catch (Throwable t) { LOG.warn("Error stopping KarmaChainCommitScheduler", t); }
         try { if (dhtAdvertiser != null) dhtAdvertiser.stop(); } catch (Throwable t) { LOG.warn("Error stopping DhtAdvertiser", t); }
         try { if (peerDiscoveryScheduler != null) peerDiscoveryScheduler.stop(); } catch (Throwable t) { LOG.warn("Error stopping PeerDiscoveryScheduler", t); }
         try { if (peerRegistrySync != null) peerRegistrySync.close(); } catch (Throwable t) { LOG.warn("Error closing PeerRegistrySync", t); }
@@ -258,19 +291,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         try { if (transport != null) transport.close(); } catch (Throwable t) { LOG.warn("Error closing transport", t); }
         try { if (client != null) client.close(); } catch (Throwable t) { LOG.warn("Error closing client", t); }
         try { if (server != null) server.close(); } catch (Throwable t) { LOG.warn("Error closing server", t); }
+        try { if (karmaStore != null) karmaStore.close(); } catch (Throwable t) { LOG.warn("Error closing karmaStore", t); }
         try { if (localIndex != null) localIndex.close(); } catch (Throwable t) { LOG.warn("Error closing localIndex", t); }
         LOG.info("AndroidRelayStack: shutdown complete");
-    }
-
-    /**
-     * No-op KarmaChainSource for Phase 3. Returns null for all fetches,
-     * meaning all peers have a karma score of 0. Replaced with
-     * DhtKarmaChainSource in Phase 4.
-     */
-    private static final class NoOpKarmaChainSource implements KarmaChainSource {
-        @Override
-        public Entry fetchManifest(byte[] peerPub) {
-            return null;
-        }
     }
 }
