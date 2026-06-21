@@ -73,12 +73,6 @@ public abstract class SearchEngine {
 
     private boolean active;
 
-    private volatile LocalIndex localIndex;
-    private volatile PeerKarmaCache karmaCache;
-    private volatile PeerDirectory peerDirectory;
-    private volatile IdentityKeys identity;
-    private volatile DistributedSearchTransport searchTransport;
-
     private SearchEngine(String name, String preferenceKey) {
         this.name = name;
         this.preferenceKey = preferenceKey;
@@ -121,35 +115,6 @@ public abstract class SearchEngine {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public SearchEngine setLocalIndex(LocalIndex index) {
-        this.localIndex = index;
-        return this;
-    }
-
-    public LocalIndex getLocalIndex() {
-        return localIndex;
-    }
-
-    public SearchEngine setKarmaCache(PeerKarmaCache karmaCache) {
-        this.karmaCache = karmaCache;
-        return this;
-    }
-
-    public SearchEngine setPeerDirectory(PeerDirectory peerDirectory) {
-        this.peerDirectory = peerDirectory;
-        return this;
-    }
-
-    public SearchEngine setIdentityKeys(IdentityKeys identity) {
-        this.identity = identity;
-        return this;
-    }
-
-    public SearchEngine setSearchTransport(DistributedSearchTransport transport) {
-        this.searchTransport = transport;
-        return this;
     }
 
     @NonNull
@@ -425,42 +390,46 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final RelaySearchWiring LOCAL_WIRING = new RelaySearchWiring();
+
     public static final SearchEngine LOCAL = new SearchEngine("Local", Constants.PREF_KEY_SEARCH_USE_LOCAL) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {
-                throw new RuntimeException("Local search engine not ready; wire LocalIndex via SearchEngine.LOCAL.setLocalIndex(...)");
+                return null;
             }
-            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
+            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL_WIRING.localIndex(), LOCAL_WIRING.karmaCache());
         }
 
         @Override
         protected boolean isReady() {
-            return LOCAL.localIndex != null;
+            return LOCAL_WIRING.localIndex() != null;
         }
     };
+
+    public static final RelaySearchWiring DISTRIBUTED_WIRING = new RelaySearchWiring();
 
     public static final SearchEngine DISTRIBUTED = new SearchEngine("Distributed", Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {
-                throw new RuntimeException("Distributed search engine not ready; wire localIndex, peerDirectory, identity, and searchTransport.");
+                return null;
             }
             return new DistributedSearchPerformer(
                     token,
                     keywords,
-                    DISTRIBUTED.localIndex,
-                    DISTRIBUTED.peerDirectory,
-                    DISTRIBUTED.identity,
-                    DISTRIBUTED.searchTransport);
+                    DISTRIBUTED_WIRING.localIndex(),
+                    DISTRIBUTED_WIRING.peerDirectory(),
+                    DISTRIBUTED_WIRING.identity(),
+                    DISTRIBUTED_WIRING.searchTransport());
         }
 
         @Override
         protected boolean isReady() {
-            return DISTRIBUTED.localIndex != null
-                    && DISTRIBUTED.peerDirectory != null
-                    && DISTRIBUTED.identity != null
-                    && DISTRIBUTED.searchTransport != null;
+            return DISTRIBUTED_WIRING.localIndex() != null
+                    && DISTRIBUTED_WIRING.peerDirectory() != null
+                    && DISTRIBUTED_WIRING.identity() != null
+                    && DISTRIBUTED_WIRING.searchTransport() != null;
         }
     };
 
