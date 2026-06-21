@@ -392,21 +392,6 @@ public abstract class SearchEngine {
 
     public static final RelaySearchWiring LOCAL_WIRING = new RelaySearchWiring();
 
-    public static final SearchEngine LOCAL = new SearchEngine("Local", Constants.PREF_KEY_SEARCH_USE_LOCAL) {
-        @Override
-        public ISearchPerformer getPerformer(long token, String keywords) {
-            if (!isReady()) {
-                return null;
-            }
-            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL_WIRING.localIndex(), LOCAL_WIRING.karmaCache());
-        }
-
-        @Override
-        protected boolean isReady() {
-            return LOCAL_WIRING.localIndex() != null;
-        }
-    };
-
     public static final RelaySearchWiring DISTRIBUTED_WIRING = new RelaySearchWiring();
 
     public static final SearchEngine DISTRIBUTED = new SearchEngine("Distributed", Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED) {
@@ -434,7 +419,6 @@ public abstract class SearchEngine {
     };
 
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
-            LOCAL,
             DISTRIBUTED,
             YT,
             MAGNETDL,
