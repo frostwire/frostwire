@@ -197,6 +197,15 @@ public final class AndroidRelayStack implements AutoCloseable {
             da.start();
             LOG.info("AndroidRelayStack: DhtAdvertiser started");
 
+            com.frostwire.android.gui.SearchEngine.LOCAL.setLocalIndex(li);
+            com.frostwire.android.gui.SearchEngine.LOCAL.setKarmaCache(karmaCache);
+            com.frostwire.android.gui.SearchEngine.DISTRIBUTED
+                    .setLocalIndex(li)
+                    .setPeerDirectory(pd)
+                    .setIdentityKeys(ident)
+                    .setSearchTransport(tr);
+            LOG.info("AndroidRelayStack: LOCAL and DISTRIBUTED search engines wired");
+
             AndroidRelayStack stack = new AndroidRelayStack(li, ident, srv, cl, tr, ss, ih,
                     pd, prs, pds, da, ks, kcs);
             li = null;
