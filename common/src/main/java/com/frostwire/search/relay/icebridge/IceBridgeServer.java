@@ -108,9 +108,6 @@ public final class IceBridgeServer implements AutoCloseable {
                 + " role=" + config.role()
                 + " rudpPort=" + rudpServer.port()
                 + " httpPort=" + controlServer.port());
-        // Print auth token to stdout for the launcher to parse.
-        System.out.println("ICEBRIDGE_AUTH_TOKEN=" + authToken);
-        System.out.flush();
     }
 
     private IdentityKeys loadIdentity(File file) throws IOException, GeneralSecurityException {
