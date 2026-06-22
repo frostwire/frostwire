@@ -52,6 +52,9 @@
                 android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
                 android:title="@string/search_header" />
         <Preference
+                android:fragment="com.frostwire.android.gui.fragments.preference.DistributedSearchPreferenceFragment"
+                android:title="@string/distributed_search_header" />
+        <Preference
                 android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
                 android:title="@string/torrent_preferences_header" />
     </PreferenceCategory>
