@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Created by Angel Leon (@gubatron)
+    Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/distributed_search_header">
+
+        <SwitchPreference
+            android:key="frostwire.prefs.search.use_distributed"
+            android:title="@string/use_distributed"
+            android:summary="@string/distributed_search_summary"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/distributed_identity_header">
+
+        <Preference
+            android:key="frostwire.prefs.distributed.identity.node_id"
+            android:title="@string/distributed_identity_node_id"
+            android:summary="@string/distributed_identity_not_initialized"
+            android:selectable="false" />
+
+        <Preference
+            android:key="frostwire.prefs.distributed.identity.fingerprint"
+            android:title="@string/distributed_identity_fingerprint"
+            android:summary="@string/distributed_identity_not_initialized"
+            android:selectable="false" />
+
+        <Preference
+            android:key="frostwire.prefs.distributed.identity.difficulty"
+            android:title="@string/distributed_identity_difficulty"
+            android:summary="@string/distributed_identity_not_initialized"
+            android:selectable="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/distributed_peers_header">
+
+        <Preference
+            android:key="frostwire.prefs.distributed.peers.count"
+            android:title="@string/distributed_peers_header"
+            android:summary="@string/distributed_peers_not_available"
+            android:selectable="false" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.peers.refresh"
+            android:title="@string/distributed_peers_refresh"
+            app:button_text="@string/distributed_peers_refresh" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
