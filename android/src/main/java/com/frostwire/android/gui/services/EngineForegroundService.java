@@ -46,6 +46,7 @@ import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.workers.TorrentEngineWorker;
+import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
@@ -71,6 +72,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     public byte STATE_DISCONNECTED = 14;
     private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
+    private volatile AndroidRelayStack relayStack;
 
     public static EngineForegroundService getInstance() {
         return instance;
@@ -87,6 +89,7 @@ public class EngineForegroundService extends Service implements IEngineService {
             TransferManager.instance().reset();
         }
         btEngine.resume();
+        engineForegroundService.startRelayStack(btEngine);
         if (!wasShutdown) {
             TransferManager.instance().forceReannounceTorrents();
         }
@@ -222,6 +225,44 @@ public class EngineForegroundService extends Service implements IEngineService {
         if (notificationUpdateDaemon != null) {
             cancelAllNotificationsTask(this);
             notificationUpdateDaemon.stop();
+        }
+
+        stopRelayStack();
+    }
+
+    private void startRelayStack(BTEngine btEngine) {
+        if (relayStack != null) {
+            return;
+        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+                if (homeDir == null) {
+                    LOG.warn("EngineForegroundService::startRelayStack: no libtorrent homeDir");
+                    return;
+                }
+                relayStack = AndroidRelayStack.start(this, homeDir, btEngine);
+                if (relayStack != null) {
+                    LOG.info("EngineForegroundService::startRelayStack: AndroidRelayStack started");
+                } else {
+                    LOG.warn("EngineForegroundService::startRelayStack: AndroidRelayStack.start returned null");
+                }
+            } catch (Throwable t) {
+                LOG.warn("EngineForegroundService::startRelayStack failed", t);
+            }
+        });
+    }
+
+    private void stopRelayStack() {
+        AndroidRelayStack stack = relayStack;
+        relayStack = null;
+        if (stack != null) {
+            try {
+                stack.close();
+                LOG.info("EngineForegroundService::stopRelayStack: AndroidRelayStack closed");
+            } catch (Throwable t) {
+                LOG.warn("EngineForegroundService::stopRelayStack failed", t);
+            }
         }
     }
 
