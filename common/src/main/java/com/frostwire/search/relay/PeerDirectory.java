@@ -83,19 +83,22 @@ public final class PeerDirectory {
      * been authenticated with {@link #upsertVerified(byte[], String, int)}.
      */
     public void upsert(byte[] peerPub, String hostname, int utpPort) {
-        upsert(peerPub, hostname, utpPort, false);
+        upsert(peerPub, hostname, utpPort, 0, false);
     }
 
-    /**
-     * Add or update a verified peer in the directory. Verified peers
-     * have passed an identity handshake and may be queried by
-     * distributed search.
-     */
+    public void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort) {
+        upsert(peerPub, hostname, utpPort, rudpPort, false);
+    }
+
     public void upsertVerified(byte[] peerPub, String hostname, int utpPort) {
-        upsert(peerPub, hostname, utpPort, true);
+        upsert(peerPub, hostname, utpPort, 0, true);
     }
 
-    private void upsert(byte[] peerPub, String hostname, int utpPort, boolean verified) {
+    public void upsertVerified(byte[] peerPub, String hostname, int utpPort, int rudpPort) {
+        upsert(peerPub, hostname, utpPort, rudpPort, true);
+    }
+
+    private void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort, boolean verified) {
         if (peerPub == null || peerPub.length != 32) {
             throw new IllegalArgumentException("peerPub must be 32 bytes");
         }
@@ -106,7 +109,9 @@ public final class PeerDirectory {
             throw new IllegalArgumentException("utpPort out of range");
         }
         String key = com.frostwire.util.Hex.encode(peerPub);
-        entries.put(key, new Entry(peerPub, hostname, utpPort,
+        Entry existing = entries.get(key);
+        int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
+        entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
                 System.currentTimeMillis(), 0L, false, verified));
         evictIfNeeded();
         version.incrementAndGet();
@@ -128,7 +133,7 @@ public final class PeerDirectory {
         Entry e = entries.get(key);
         if (e == null) {
             // Implicit registration: target becomes a known peer with no hostname.
-            e = new Entry(targetPub, "", 0, System.currentTimeMillis(), 0L, false, false);
+            e = new Entry(targetPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false);
             entries.put(key, e);
         }
         e.addEndorser(endorserPub);
@@ -148,7 +153,7 @@ public final class PeerDirectory {
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry e = entries.get(key);
         if (e == null) {
-            e = new Entry(peerPub, "", 0, System.currentTimeMillis(), 0L, true, false);
+            e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, true, false);
             entries.put(key, e);
         } else {
             e.spam = true;
@@ -235,7 +240,7 @@ public final class PeerDirectory {
         if (e == null) {
             return Optional.empty();
         }
-        return Optional.of(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
+        return Optional.of(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
                 e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
     }
 
@@ -257,7 +262,7 @@ public final class PeerDirectory {
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
             Entry e = snapshot.get(i);
-            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
+            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
                     e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
         }
         return out;
@@ -273,7 +278,7 @@ public final class PeerDirectory {
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
             Entry e = snapshot.get(i);
-            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort,
+            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
                     e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
         }
         return out;
@@ -320,17 +325,19 @@ public final class PeerDirectory {
         final byte[] peerPub;
         String hostname;
         int utpPort;
+        int rudpPort;
         long lastUpdatedMs;
         long localKarmaDelta;
         boolean spam;
         boolean verified;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
-        Entry(byte[] peerPub, String hostname, int utpPort, long lastUpdatedMs,
+        Entry(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
               long localKarmaDelta, boolean spam, boolean verified) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
+            this.rudpPort = rudpPort;
             this.lastUpdatedMs = lastUpdatedMs;
             this.localKarmaDelta = localKarmaDelta;
             this.spam = spam;
@@ -347,16 +354,18 @@ public final class PeerDirectory {
         private final byte[] peerPub;
         private final String hostname;
         private final int utpPort;
+        private final int rudpPort;
         private final long lastUpdatedMs;
         private final int endorserCount;
         private final boolean spam;
         private final boolean verified;
 
-        PeerInfo(byte[] peerPub, String hostname, int utpPort, long lastUpdatedMs,
+        PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
                  int endorserCount, boolean spam, boolean verified) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
+            this.rudpPort = rudpPort;
             this.lastUpdatedMs = lastUpdatedMs;
             this.endorserCount = endorserCount;
             this.spam = spam;
@@ -373,6 +382,10 @@ public final class PeerDirectory {
 
         public int utpPort() {
             return utpPort;
+        }
+
+        public int rudpPort() {
+            return rudpPort;
         }
 
         public long lastUpdatedMs() {

@@ -101,7 +101,7 @@ public final class PeerDiscovery {
                     if (alreadyKnown(peerPub, host, port)) {
                         continue;
                     }
-                    directory.upsertVerified(peerPub, host, port);
+                    directory.upsertVerified(peerPub, host, port, identity.rudpPort());
                     discovered.add(new DiscoveredEndpoint(host, port));
                 } else {
                     byte[] placeholderPubkey = placeholderPubkey(host, port);

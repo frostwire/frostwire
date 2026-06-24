@@ -109,8 +109,9 @@ public final class PeerRegistrySync implements AutoCloseable {
                 if (peer.hostname() == null || peer.hostname().isBlank()) {
                     continue;
                 }
+                int peerRudpPort = peer.rudpPort() > 0 ? peer.rudpPort() : rudpPort;
                 if (client.route(peer.peerPub(), peer.hostname(),
-                        rudpPort, IceBridgeConfig.Role.BOTH)) {
+                        peerRudpPort, IceBridgeConfig.Role.BOTH)) {
                     registered++;
                 }
             }
