@@ -31,7 +31,7 @@ import java.util.TreeMap;
  * {@link #toCanonicalEntry()}, which is the full record without {@code sig}.
  */
 public final class IdentityRecord {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final int NODE_ID_LENGTH = 20;
     public static final int ED25519_PUB_LENGTH = 32;
     public static final int X25519_PUB_LENGTH = 32;
@@ -46,17 +46,22 @@ public final class IdentityRecord {
     private final byte[] ed25519Pub;
     private final byte[] x25519Pub;
     private final int utpPort;
+    private final int rudpPort;
+    private final String role;
     private final long firstSeen;
     private final long lastSeen;
     private final byte[] signature;
 
     private IdentityRecord(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
-                           int utpPort, long firstSeen, long lastSeen, byte[] signature) {
+                           int utpPort, int rudpPort, String role,
+                           long firstSeen, long lastSeen, byte[] signature) {
         validate(nodeId, ed25519Pub, x25519Pub, signature, firstSeen, lastSeen);
         this.nodeId = nodeId.clone();
         this.ed25519Pub = ed25519Pub.clone();
         this.x25519Pub = x25519Pub.clone();
         this.utpPort = utpPort;
+        this.rudpPort = rudpPort;
+        this.role = role != null ? role : "BOTH";
         this.firstSeen = firstSeen;
         this.lastSeen = lastSeen;
         this.signature = signature.clone();
@@ -76,6 +81,14 @@ public final class IdentityRecord {
 
     public int utpPort() {
         return utpPort;
+    }
+
+    public int rudpPort() {
+        return rudpPort;
+    }
+
+    public String role() {
+        return role;
     }
 
     public long firstSeen() {
@@ -119,18 +132,39 @@ public final class IdentityRecord {
         if (ts < firstSeen) {
             throw new IllegalArgumentException("last_seen must be >= first_seen");
         }
-        return signed(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, ts, privateKey);
+        return signed(nodeId, ed25519Pub, x25519Pub, utpPort, rudpPort, role, firstSeen, ts, privateKey);
     }
 
     public static IdentityRecord createSigned(byte[] nodeId, KeyPair ed25519, byte[] x25519, int utpPort) {
+        return createSigned(nodeId, ed25519, x25519, utpPort, 0, "BOTH");
+    }
+
+    public static IdentityRecord createSigned(byte[] nodeId, KeyPair ed25519, byte[] x25519,
+                                              int utpPort, int rudpPort, String role) {
         long now = Instant.now().getEpochSecond();
         byte[] rawEd25519 = extractRawEd25519(ed25519.getPublic());
-        return signed(nodeId, rawEd25519, x25519, utpPort, now, now, ed25519.getPrivate());
+        return signed(nodeId, rawEd25519, x25519, utpPort, rudpPort, role, now, now, ed25519.getPrivate());
     }
 
     public static IdentityRecord fromEntry(Entry entry) {
         Map<String, Entry> map = entry.dictionary();
         int version = (int) map.get("v").integer();
+        if (version == 1) {
+            IdentityRecord record = new IdentityRecord(
+                    Hex.decode(map.get("node_id").string()),
+                    b64decode(map.get("ed25519_pub").string()),
+                    b64decode(map.get("x25519_pub").string()),
+                    (int) map.get("utp_port").integer(),
+                    0,
+                    "BOTH",
+                    map.get("first_seen").integer(),
+                    map.get("last_seen").integer(),
+                    b64decode(map.get("sig").string()));
+            if (!record.verifySignature()) {
+                throw new IllegalArgumentException("Invalid identity signature");
+            }
+            return record;
+        }
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported identity version: " + version);
         }
@@ -139,6 +173,8 @@ public final class IdentityRecord {
                 b64decode(map.get("ed25519_pub").string()),
                 b64decode(map.get("x25519_pub").string()),
                 (int) map.get("utp_port").integer(),
+                map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
+                map.containsKey("role") ? map.get("role").string() : "BOTH",
                 map.get("first_seen").integer(),
                 map.get("last_seen").integer(),
                 b64decode(map.get("sig").string()));
@@ -166,15 +202,17 @@ public final class IdentityRecord {
     }
 
     private static IdentityRecord signed(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
-                                         int utpPort, long firstSeen, long lastSeen, PrivateKey privateKey) {
+                                         int utpPort, int rudpPort, String role,
+                                         long firstSeen, long lastSeen, PrivateKey privateKey) {
         validate(nodeId, ed25519Pub, x25519Pub, new byte[SIGNATURE_LENGTH], firstSeen, lastSeen);
         try {
             IdentityRecord unsigned = new IdentityRecord(nodeId, ed25519Pub, x25519Pub,
-                    utpPort, firstSeen, lastSeen, new byte[SIGNATURE_LENGTH]);
+                    utpPort, rudpPort, role, firstSeen, lastSeen, new byte[SIGNATURE_LENGTH]);
             Signature signer = Signature.getInstance("Ed25519");
             signer.initSign(privateKey);
             signer.update(unsigned.canonicalBytes());
-            return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, firstSeen, lastSeen, signer.sign());
+            return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, rudpPort, role,
+                    firstSeen, lastSeen, signer.sign());
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Unable to sign identity record", e);
         }
@@ -193,6 +231,8 @@ public final class IdentityRecord {
         map.put("first_seen", new Entry(firstSeen));
         map.put("last_seen", new Entry(lastSeen));
         map.put("node_id", new Entry(Hex.encode(nodeId)));
+        map.put("rudp_port", new Entry((long) rudpPort));
+        map.put("role", new Entry(role));
         map.put("utp_port", new Entry((long) utpPort));
         map.put("v", new Entry((long) VERSION));
         map.put("x25519_pub", new Entry(b64(x25519Pub)));
@@ -235,8 +275,10 @@ public final class IdentityRecord {
         if (!(o instanceof IdentityRecord)) return false;
         IdentityRecord that = (IdentityRecord) o;
         return utpPort == that.utpPort
+                && rudpPort == that.rudpPort
                 && firstSeen == that.firstSeen
                 && lastSeen == that.lastSeen
+                && role.equals(that.role)
                 && Arrays.equals(nodeId, that.nodeId)
                 && Arrays.equals(ed25519Pub, that.ed25519Pub)
                 && Arrays.equals(x25519Pub, that.x25519Pub)
@@ -249,6 +291,8 @@ public final class IdentityRecord {
         result = 31 * result + Arrays.hashCode(ed25519Pub);
         result = 31 * result + Arrays.hashCode(x25519Pub);
         result = 31 * result + utpPort;
+        result = 31 * result + rudpPort;
+        result = 31 * result + role.hashCode();
         result = 31 * result + (int) (firstSeen ^ (firstSeen >>> 32));
         result = 31 * result + (int) (lastSeen ^ (lastSeen >>> 32));
         result = 31 * result + Arrays.hashCode(signature);

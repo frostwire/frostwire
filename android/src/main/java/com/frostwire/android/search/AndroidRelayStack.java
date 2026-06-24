@@ -191,7 +191,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
 
             IdentityRecordPublisher identityPublisher =
-                    new IdentityRecordPublisher(ident, srv.rudpPort());
+                    new IdentityRecordPublisher(ident, RelayConstants.RELAY_LISTEN_PORT, srv.rudpPort(), "BOTH");
             IndexAnnouncementPublisher indexPublisher =
                     new IndexAnnouncementPublisher(li, ident);
             da = new DhtAdvertiser(identityPublisher, indexPublisher, DHT_ADVERTISE_INTERVAL_SEC);

@@ -40,17 +40,28 @@ public final class IdentityRecordPublisher {
 
     private final IdentityKeys identity;
     private final int utpPort;
+    private final int rudpPort;
+    private final String role;
     private long lastPublishEpochSec;
 
     public IdentityRecordPublisher(IdentityKeys identity, int utpPort) {
+        this(identity, utpPort, 0, "BOTH");
+    }
+
+    public IdentityRecordPublisher(IdentityKeys identity, int utpPort, int rudpPort, String role) {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
         if (utpPort < 0 || utpPort > 65535) {
             throw new IllegalArgumentException("utpPort out of range: " + utpPort);
         }
+        if (rudpPort < 0 || rudpPort > 65535) {
+            throw new IllegalArgumentException("rudpPort out of range: " + rudpPort);
+        }
         this.identity = identity;
         this.utpPort = utpPort;
+        this.rudpPort = rudpPort;
+        this.role = role != null ? role : "BOTH";
     }
 
     /**
@@ -92,7 +103,7 @@ public final class IdentityRecordPublisher {
                     identity.nodeId(),
                     identity.ed25519(),
                     identity.x25519PubRaw(),
-                    utpPort);
+                    utpPort, rudpPort, role);
             Entry entry = record.toEntry();
             byte[] pubKey = identity.ed25519PubRaw();
             byte[] privKey = identity.ed25519SecretKeyNaCl();
@@ -112,6 +123,14 @@ public final class IdentityRecordPublisher {
 
     public int utpPort() {
         return utpPort;
+    }
+
+    public int rudpPort() {
+        return rudpPort;
+    }
+
+    public String role() {
+        return role;
     }
 
     public long lastPublishEpochSec() {
