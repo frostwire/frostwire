@@ -62,21 +62,38 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         if (session == null) {
             return new ArrayList<>();
         }
+        List<DiscoveredEndpoint> result = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
         try {
             ArrayList<TcpEndpoint> endpoints = DhtRendezvous.findPeers(session, discoveryTimeoutSec);
-            List<DiscoveredEndpoint> result = new ArrayList<>(endpoints.size());
-            for (TcpEndpoint ep : endpoints) {
-                String host = ep.address() == null ? null : ep.address().toString();
-                int port = ep.port();
-                if (host == null || host.isEmpty() || port <= 0) {
-                    continue;
-                }
+            addEndpoints(endpoints, result, seen);
+            if (result.size() < 10) {
+                ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session, discoveryTimeoutSec);
+                addEndpoints(relays, result, seen);
+            }
+            if (result.isEmpty()) {
+                ArrayList<TcpEndpoint> bootstrap = DhtRendezvous.findBootstrapNodes(session, discoveryTimeoutSec);
+                addEndpoints(bootstrap, result, seen);
+            }
+        } catch (Throwable t) {
+            LOG.debug("DHT discovery failed", t);
+        }
+        return result;
+    }
+
+    private static void addEndpoints(ArrayList<TcpEndpoint> endpoints,
+                                     List<DiscoveredEndpoint> result,
+                                     java.util.Set<String> seen) {
+        for (TcpEndpoint ep : endpoints) {
+            String host = ep.address() == null ? null : ep.address().toString();
+            int port = ep.port();
+            if (host == null || host.isEmpty() || port <= 0) {
+                continue;
+            }
+            String key = host + ":" + port;
+            if (seen.add(key)) {
                 result.add(new DiscoveredEndpoint(host, port));
             }
-            return result;
-        } catch (Throwable t) {
-            LOG.debug("DHT findPeers failed", t);
-            return new ArrayList<>();
         }
     }
 

@@ -55,14 +55,16 @@ class DhtAdvertiserTest {
 
     @Test
     void tickCallsPublisherAndAnnounces() {
-        // tick() does two DHT operations:
+        // tick() does DHT operations:
         //  1. identityPublisher.publishIfNeeded -> dhtPutItem for the
         //     BEP 46 identity record
-        //  2. DhtRendezvous.announcePeer -> dhtPutItem for the BEP 5
-        //     rendezvous hash
-        // Both record via putItemCalls.
+        //  2. DhtRendezvous.announcePeer -> dhtAnnounce for the BEP 5
+        //     peer topic
+        //  3. DhtRendezvous.announceRelay -> dhtAnnounce for the BEP 5
+        //     relay topic (because role=BOTH is a forwarder)
+        // All record via putItemCalls.
         assertTrue(advertiser.tick(session));
-        assertEquals(2, session.putItemCalls.size());
+        assertEquals(3, session.putItemCalls.size());
     }
 
     @Test
