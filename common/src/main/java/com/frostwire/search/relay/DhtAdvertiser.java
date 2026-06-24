@@ -148,8 +148,12 @@ public final class DhtAdvertiser {
             }
             DhtRendezvous.announcePeer(session, identityPublisher.utpPort());
             String role = identityPublisher.role();
-            if ("FORWARDER".equals(role) || "BOTH".equals(role)) {
+            boolean connectable = com.frostwire.search.relay.ConnectivityDetector.instance().isConnectable();
+            if ("FORWARDER".equals(role) || "BOTH".equals(role) || (connectable && "CLIENT".equals(role))) {
                 DhtRendezvous.announceRelay(session, identityPublisher.utpPort());
+                if (connectable && "CLIENT".equals(role)) {
+                    LOG.info("DhtAdvertiser: auto-electing as forwarder (connectable, was CLIENT)");
+                }
             }
             announceCalls.incrementAndGet();
             lastTickEpochSec.set(System.currentTimeMillis() / 1000L);
