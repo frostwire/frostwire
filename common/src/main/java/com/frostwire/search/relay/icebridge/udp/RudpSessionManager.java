@@ -435,6 +435,34 @@ public final class RudpSessionManager {
 
     private void handleHolePunchResponse(RudpPacket packet, InetSocketAddress sender) {
         LOG.debug("RudpSessionManager: received hole-punch response from " + sender);
+        byte[] payload = packet.payload();
+        if (payload == null || payload.length == 0) {
+            return;
+        }
+        String info = new String(payload, StandardCharsets.UTF_8);
+        int colon = info.lastIndexOf(':');
+        if (colon < 0) {
+            LOG.warn("RudpSessionManager: malformed hole-punch response: " + info);
+            return;
+        }
+        String host = info.substring(0, colon);
+        int port;
+        try {
+            port = Integer.parseInt(info.substring(colon + 1));
+        } catch (NumberFormatException e) {
+            LOG.warn("RudpSessionManager: bad port in hole-punch response: " + info);
+            return;
+        }
+        if (port <= 0 || port > 65535) {
+            return;
+        }
+        InetSocketAddress targetAddress = new InetSocketAddress(host, port);
+        if (sessionsByAddress.containsKey(targetAddress)) {
+            LOG.debug("RudpSessionManager: already have session to " + targetAddress);
+            return;
+        }
+        LOG.info("RudpSessionManager: hole-punch — connecting to introduced peer at " + targetAddress);
+        connect(targetAddress);
     }
 
     private void handleRelay(RudpPacket packet, InetSocketAddress sender) {
