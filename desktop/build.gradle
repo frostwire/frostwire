@@ -288,6 +288,32 @@ tasks.register('icebridgeJar', Jar) {
     }
 }
 
+tasks.register('icebridge', JavaExec) {
+    group = 'application'
+    description = 'Runs the IceBridge relay server. Reads config from .env or ICEBRIDGE_* env vars.'
+
+    dependsOn icebridgeJar
+
+    classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge.jar")
+    mainClass = 'com.frostwire.search.relay.icebridge.IceBridgeServer'
+
+    // Pass through all system properties starting with ICEBRIDGE_
+    System.getProperties().stringPropertyNames().each { name ->
+        if (name.startsWith('ICEBRIDGE_')) {
+            systemProperty name, System.getProperty(name)
+        }
+    }
+
+    // Pass through ICEBRIDGE_ env vars as system properties
+    System.getenv().each { name, value ->
+        if (name.startsWith('ICEBRIDGE_')) {
+            systemProperty name, value
+        }
+    }
+
+    standardInput = System.in
+}
+
 // Configure distribution tasks to handle duplicate jar files
 tasks.withType(Tar).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
