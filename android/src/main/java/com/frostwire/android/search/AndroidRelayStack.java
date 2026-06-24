@@ -28,8 +28,10 @@ import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IndexAnnouncementPublisher;
+import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
 import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainStore;
@@ -40,6 +42,7 @@ import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
+import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
@@ -100,6 +103,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     private final DhtAdvertiser dhtAdvertiser;
     private final KarmaChainStore karmaStore;
     private final KarmaChainCommitScheduler karmaScheduler;
+    private final IncomingRelayServer relayServer;
 
     /**
      * Start the relay stack. All heavy work is done on the calling thread.
@@ -123,6 +127,7 @@ public final class AndroidRelayStack implements AutoCloseable {
         DhtAdvertiser da = null;
         AndroidKarmaChainStore ks = null;
         KarmaChainCommitScheduler kcs = null;
+        IncomingRelayServer relaySrv = null;
         try {
             li = AndroidLocalIndex.open(context);
 
@@ -173,6 +178,22 @@ public final class AndroidRelayStack implements AutoCloseable {
                     new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
             pd = new PeerDirectory(karmaCache);
 
+            IncomingRelayServer relaySrv2 = null;
+            try {
+                int relayPort = RelayConstants.RELAY_LISTEN_PORT;
+                RelaySearchService relayService = new RelaySearchService(li, ident);
+                RelayRole relayRole = new RelayRole(relayService, pd, ident);
+                IdentityRecord identityRecord = IdentityRecord.createSigned(
+                        ident.nodeId(), ident.ed25519(),
+                        ident.x25519PubRaw(), relayPort, srv.rudpPort(), "BOTH");
+                relaySrv2 = new IncomingRelayServer(relayRole, identityRecord, relayPort);
+                relaySrv2.start();
+                relaySrv = relaySrv2;
+                LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
+            } catch (Throwable t) {
+                LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
+            }
+
             RelaySearchService ss = new RelaySearchService(li, ident);
 
             ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
@@ -212,7 +233,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             LOG.info("AndroidRelayStack: LOCAL and DISTRIBUTED search engines wired");
 
             AndroidRelayStack stack = new AndroidRelayStack(li, ident, srv, cl, tr, ss, ih,
-                    pd, prs, pds, da, ks, kcs);
+                    pd, prs, pds, da, ks, kcs, relaySrv);
             li = null;
             srv = null;
             cl = null;
@@ -224,6 +245,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             da = null;
             ks = null;
             kcs = null;
+            relaySrv = null;
             LOG.info("AndroidRelayStack: started successfully");
             return stack;
         } catch (Throwable t) {
@@ -231,6 +253,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             if (kcs != null) try { kcs.stop(); } catch (Throwable ignored) {}
             if (da != null) try { da.stop(); } catch (Throwable ignored) {}
             if (pds != null) try { pds.stop(); } catch (Throwable ignored) {}
+            if (relaySrv != null) try { relaySrv.stop(); } catch (Throwable ignored) {}
             if (prs != null) try { prs.close(); } catch (Throwable ignored) {}
             if (ih != null) try { ih.stop(); } catch (Throwable ignored) {}
             if (tr != null) try { tr.close(); } catch (Throwable ignored) {}
@@ -254,7 +277,8 @@ public final class AndroidRelayStack implements AutoCloseable {
                               PeerDiscoveryScheduler peerDiscoveryScheduler,
                               DhtAdvertiser dhtAdvertiser,
                               KarmaChainStore karmaStore,
-                              KarmaChainCommitScheduler karmaScheduler) {
+                              KarmaChainCommitScheduler karmaScheduler,
+                              IncomingRelayServer relayServer) {
         this.localIndex = localIndex;
         this.identity = identity;
         this.server = server;
@@ -268,6 +292,7 @@ public final class AndroidRelayStack implements AutoCloseable {
         this.dhtAdvertiser = dhtAdvertiser;
         this.karmaStore = karmaStore;
         this.karmaScheduler = karmaScheduler;
+        this.relayServer = relayServer;
     }
 
     public AndroidLocalIndex localIndex() {
@@ -299,6 +324,7 @@ public final class AndroidRelayStack implements AutoCloseable {
         LOG.info("AndroidRelayStack: shutting down...");
         try { if (karmaScheduler != null) karmaScheduler.stop(); } catch (Throwable t) { LOG.warn("Error stopping KarmaChainCommitScheduler", t); }
         try { if (dhtAdvertiser != null) dhtAdvertiser.stop(); } catch (Throwable t) { LOG.warn("Error stopping DhtAdvertiser", t); }
+        try { if (relayServer != null) relayServer.stop(); } catch (Throwable t) { LOG.warn("Error stopping IncomingRelayServer", t); }
         try { if (peerDiscoveryScheduler != null) peerDiscoveryScheduler.stop(); } catch (Throwable t) { LOG.warn("Error stopping PeerDiscoveryScheduler", t); }
         try { if (peerRegistrySync != null) peerRegistrySync.close(); } catch (Throwable t) { LOG.warn("Error closing PeerRegistrySync", t); }
         try { if (incomingHandler != null) incomingHandler.stop(); } catch (Throwable t) { LOG.warn("Error stopping IncomingSearchRequestHandler", t); }
