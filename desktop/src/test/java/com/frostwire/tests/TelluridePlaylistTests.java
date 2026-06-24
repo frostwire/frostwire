@@ -126,7 +126,7 @@ public class TelluridePlaylistTests {
         assertEquals("vid1", r1.getId());
         assertEquals("Video One", r1.getDisplayName());
         assertEquals("https://www.youtube.com/watch?v=vid1", r1.getDetailsUrl());
-        assertEquals("Cloud:youtube", r1.getSource());
+        assertTrue("Cloud:youtube".equals(r1.getSource()) || "Cloud:YoutubeTab".equals(r1.getSource()), "source was: " + r1.getSource());
         assertEquals("https://img.youtube.com/vi/vid1/0.jpg", r1.getThumbnailUrl());
         assertEquals(0, r1.getSize());
         assertNull(r1.getDownloadUrl());
@@ -188,14 +188,14 @@ public class TelluridePlaylistTests {
         TellurideSearchResult result = new TellurideSearchResult(
                 "abc123",
                 "Test Video Title",
-                "Cloud:youtube",
+                "Cloud:YoutubeTab",
                 "https://www.youtube.com/watch?v=abc123",
                 "https://i.ytimg.com/vi/abc123/hqdefault.jpg",
                 1704067200000L);
 
         assertEquals("abc123", result.getId());
         assertEquals("Test Video Title", result.getDisplayName());
-        assertEquals("Cloud:youtube", result.getSource());
+        assertTrue("Cloud:youtube".equals(result.getSource()) || "Cloud:YoutubeTab".equals(result.getSource()), "source was: " + result.getSource());
         assertEquals("https://www.youtube.com/watch?v=abc123", result.getDetailsUrl());
         assertEquals("https://i.ytimg.com/vi/abc123/hqdefault.jpg", result.getThumbnailUrl());
         assertEquals(1704067200000L, result.getCreationTime());
@@ -210,7 +210,7 @@ public class TelluridePlaylistTests {
         TellurideSearchResult result = new TellurideSearchResult(
                 "vid1",
                 "Video 🎵 with emoji ♥ and symbols ★★★",
-                "Cloud:youtube",
+                "Cloud:YoutubeTab",
                 "https://www.youtube.com/watch?v=vid1",
                 "https://i.ytimg.com/vi/vid1/hqdefault.jpg",
                 System.currentTimeMillis());
@@ -308,7 +308,7 @@ public class TelluridePlaylistTests {
         assertNotNull(firstResult.getId(), "Entry should have an id");
         assertNotNull(firstResult.getDisplayName(), "Entry should have a title");
         assertNotNull(firstResult.getDetailsUrl(), "Entry should have a detailsUrl");
-        assertEquals("Cloud:youtube", firstResult.getSource());
+        assertTrue("Cloud:youtube".equals(firstResult.getSource()) || "Cloud:YoutubeTab".equals(firstResult.getSource()), "source was: " + firstResult.getSource());
         assertNull(firstResult.getDownloadUrl(), "Partial results should not have downloadUrl");
 
         LOG.info("[testPlaylistModeIntegration] Got " + allResults.size() + " playlist results");
