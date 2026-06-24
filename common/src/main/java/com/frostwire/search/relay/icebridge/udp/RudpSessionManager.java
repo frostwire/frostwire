@@ -304,6 +304,9 @@ public final class RudpSessionManager {
                         + " — max sessions (" + MAX_SESSIONS + ") reached");
                 return;
             }
+            if (!sessionInitiatedByUs(sender)) {
+                com.frostwire.search.relay.ConnectivityDetector.instance().markConnectable();
+            }
             long localCid = randomConnectionId();
             byte[] remotePub = Arrays.copyOfRange(packet.payload(), 0, 32);
             session = new RudpSession(localCid, remoteCid, sender, remotePub, false);
@@ -312,6 +315,16 @@ public final class RudpSessionManager {
         }
         session.markActivity();
         send(session, session.helloAck());
+    }
+
+    /**
+     * Check whether we have an outbound session to the given address,
+     * meaning we initiated the connection. If not, an inbound HELLO
+     * from this address indicates we are connectable.
+     */
+    private boolean sessionInitiatedByUs(InetSocketAddress sender) {
+        RudpSession existing = sessionsByAddress.get(sender);
+        return existing != null && existing.weAreInitiator();
     }
 
     private void handleHelloAck(RudpPacket packet, InetSocketAddress sender) {
