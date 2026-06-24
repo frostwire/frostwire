@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v5
@@ -37,13 +37,13 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
-      - name: Compile Android tests
+      - name: Compile Android main + test code
         working-directory: android
-        run: ./gradlew compilePlus1DebugUnitTestJavaWithJavac --no-daemon
+        run: ./gradlew compilePlus1DebugJavaWithJavac compilePlus1DebugUnitTestJavaWithJavac --no-daemon
 
-      - name: Run Android search unit tests
+      - name: Run non-Robolectric unit tests
         working-directory: android
-        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.search.*" --tests "com.frostwire.android.gui.RelaySearchWiringTest" --no-daemon --continue
+        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.gui.RelaySearchWiringTest" --tests "com.frostwire.android.core.*" --no-daemon --continue
 
       - name: Upload test results
         if: always()
