@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class MagnetDLSearchPattern implements SearchPattern {
     private static final Logger LOG = Logger.getLogger(MagnetDLSearchPattern.class);
-    private static final String DOMAIN = "magnetdl.homes";
+    private static final String DOMAIN = "torrentgalaxy.hair";
 
     /**
      * MagnetDL JSON API result structure

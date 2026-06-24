@@ -147,6 +147,8 @@ public final class Ssl {
                 "torrent-paradise.ml",
                 "torrents-csv.com",
                 "torrentz2.nz",
+                "torrentgalaxy.hair",
+                "www.torrentgalaxy.hair",
                 "tpb.party",
                 "update.frostwire.com",
                 "www.1377x.to",
