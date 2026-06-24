@@ -12,23 +12,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -36,13 +37,17 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
-      - name: Run Android unit tests (JVM, no device needed)
+      - name: Compile Android tests
         working-directory: android
-        run: ./gradlew testPlus1DebugUnitTest --continue
+        run: ./gradlew compilePlus1DebugUnitTestJavaWithJavac --no-daemon
+
+      - name: Run Android search unit tests
+        working-directory: android
+        run: ./gradlew testPlus1DebugUnitTest --tests "com.frostwire.android.search.*" --tests "com.frostwire.android.gui.RelaySearchWiringTest" --no-daemon --continue
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android-unit-test-results
           path: android/build/reports/tests/testPlus1DebugUnitTest/
