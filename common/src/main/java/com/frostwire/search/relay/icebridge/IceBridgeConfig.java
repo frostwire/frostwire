@@ -240,4 +240,96 @@ public final class IceBridgeConfig {
         }
         return value;
     }
+
+    /**
+     * Build a config from environment variables prefixed with {@code ICEBRIDGE_}.
+     *
+     * <p>Supported variables:
+     * <ul>
+     *   <li>{@code ICEBRIDGE_HOST} — bind address (default: 0.0.0.0)</li>
+     *   <li>{@code ICEBRIDGE_RUDP_PORT} — rUDP listen port (default: 6889)</li>
+     *   <li>{@code ICEBRIDGE_CONTROL_HTTP_PORT} — HTTP control port (default: 8080, 0=disable)</li>
+     *   <li>{@code ICEBRIDGE_ROLE} — FORWARDER, CLIENT, or BOTH (default: FORWARDER)</li>
+     *   <li>{@code ICEBRIDGE_IDENTITY_FILE} — path to identity.dat (default: ./identity.dat)</li>
+     *   <li>{@code ICEBRIDGE_MAX_PEERS} — max tracked peers (default: 10000)</li>
+     *   <li>{@code ICEBRIDGE_PEER_TTL_SEC} — peer eviction TTL (default: 300)</li>
+     *   <li>{@code ICEBRIDGE_MAX_QPS_PER_KEY} — rate limit per pub key (default: 30.0)</li>
+     *   <li>{@code ICEBRIDGE_BOOTSTRAP} — announce on bootstrap DHT topic (default: true)</li>
+     * </ul>
+     *
+     * @return config built from env vars, with cloud defaults for unset vars
+     */
+    public static IceBridgeConfig fromEnv() {
+        Builder b = newBuilder();
+        String host = env("ICEBRIDGE_HOST", "0.0.0.0");
+        b.host(host);
+        b.rudpPort(envInt("ICEBRIDGE_RUDP_PORT", 6889));
+        b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8080));
+        b.controlStdio(false);
+        String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
+        b.role(Role.valueOf(roleStr.toUpperCase()));
+        String identityPath = env("ICEBRIDGE_IDENTITY_FILE", "identity.dat");
+        b.identityFile(new File(identityPath));
+        b.maxPeers(envInt("ICEBRIDGE_MAX_PEERS", 10000));
+        b.peerTtlSec(envLong("ICEBRIDGE_PEER_TTL_SEC", 300));
+        b.maxQpsPerKey(envDouble("ICEBRIDGE_MAX_QPS_PER_KEY", 30.0));
+        b.bootstrap(envBool("ICEBRIDGE_BOOTSTRAP", true));
+        return b.build();
+    }
+
+    private static String env(String key, String def) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        return v != null && !v.isEmpty() ? v : def;
+    }
+
+    private static int envInt(String key, int def) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        if (v == null || v.isEmpty()) return def;
+        try {
+            return Integer.parseInt(v);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
+    private static long envLong(String key, long def) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        if (v == null || v.isEmpty()) return def;
+        try {
+            return Long.parseLong(v);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
+    private static double envDouble(String key, double def) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        if (v == null || v.isEmpty()) return def;
+        try {
+            return Double.parseDouble(v);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
+    private static boolean envBool(String key, boolean def) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        if (v == null || v.isEmpty()) return def;
+        return "true".equalsIgnoreCase(v) || "1".equals(v) || "yes".equalsIgnoreCase(v);
+    }
 }

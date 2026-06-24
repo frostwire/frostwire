@@ -49,12 +49,56 @@ public final class IceBridgeServer implements AutoCloseable {
     private ScheduledExecutorService janitor;
 
     public static void main(String[] args) throws Exception {
-        IceBridgeConfig config = parseArgs(args);
-        String authToken = parseAuthToken(args);
+        loadDotEnv();
+        IceBridgeConfig config;
+        String authToken;
+        if (args.length == 0) {
+            config = IceBridgeConfig.fromEnv();
+            authToken = null;
+        } else {
+            config = parseArgs(args);
+            authToken = parseAuthToken(args);
+        }
         try (IceBridgeServer server = new IceBridgeServer(config, authToken)) {
             server.start();
             LOG.info("IceBridge running, press Ctrl-C to stop");
             Thread.sleep(Long.MAX_VALUE);
+        }
+    }
+
+    /**
+     * Load a {@code .env} file from the current directory if it exists.
+     * Sets variables as system properties so {@link IceBridgeConfig#fromEnv()}
+     * can read them via {@code System.getenv()} (via {@code -D} fallback).
+     */
+    private static void loadDotEnv() {
+        File envFile = new File(".env");
+        if (!envFile.exists()) {
+            return;
+        }
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.FileReader(envFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+                int eq = line.indexOf('=');
+                if (eq < 0) {
+                    continue;
+                }
+                String key = line.substring(0, eq).trim();
+                String value = line.substring(eq + 1).trim();
+                if (value.startsWith("\"") && value.endsWith("\"")) {
+                    value = value.substring(1, value.length() - 1);
+                }
+                if (System.getenv(key) == null) {
+                    System.setProperty(key, value);
+                }
+            }
+        } catch (Throwable t) {
+            LOG.warn("Failed to load .env file", t);
         }
     }
 
