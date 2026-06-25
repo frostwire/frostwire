@@ -429,6 +429,35 @@ tasks.matching { it.name in ["assembleRelease", "assemblePlus1Release"] }.config
     finalizedBy(copyPlus1ReleaseApkToWorkspaceBuild)
 }
 
+def plusWorkspaceDebugApkFile = layout.buildDirectory.file("frostwire-android-debug-${project.ext.versionName}-b${project.ext.versionCode}-plus.apk")
+
+def copyPlus1DebugApkToWorkspaceBuild = tasks.register("copyPlus1DebugApkToWorkspaceBuild") {
+    dependsOn(tasks.named("assemblePlus1Debug"))
+    def debugApkName = "frostwire-android-debug-${project.ext.versionName}-b${project.ext.versionCode}-plus.apk"
+    def sourceApk = layout.buildDirectory.file("outputs/apk/plus1/debug/${debugApkName}")
+    inputs.file(sourceApk)
+    outputs.file(plusWorkspaceDebugApkFile)
+    doLast {
+        File src = sourceApk.get().asFile
+        File dest = plusWorkspaceDebugApkFile.get().asFile
+        if (!src.exists()) {
+            throw new GradleException("Expected debug APK not found: ${src}")
+        }
+        if (!dest.parentFile.exists()) {
+            dest.parentFile.mkdirs()
+        }
+        copy {
+            from(src)
+            into(dest.parentFile)
+            rename { debugApkName }
+        }
+    }
+}
+
+tasks.matching { it.name in ["assembleDebug", "assemblePlus1Debug"] }.configureEach {
+    finalizedBy(copyPlus1DebugApkToWorkspaceBuild)
+}
+
 class SignatureRequester {
     private final String defaultKeyAlias
     private final String providedKeyPassword
