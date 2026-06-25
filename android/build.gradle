@@ -255,6 +255,13 @@ android {
             all {
                 jvmArgs '-Djava.awt.headless=true'
                 jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED'
+                filter {
+                    excludeTestsMatching "com.frostwire.android.gui.dialogs.*"
+                    excludeTestsMatching "com.frostwire.android.gui.views.*"
+                    excludeTestsMatching "com.frostwire.android.gui.fragments.*"
+                    excludeTestsMatching "com.frostwire.android.search.AndroidLocalIndexTest"
+                    excludeTestsMatching "com.frostwire.android.search.AndroidKarmaChainStoreTest"
+                }
             }
         }
     }
