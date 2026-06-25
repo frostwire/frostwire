@@ -270,6 +270,11 @@ android {
         buildConfig true
         resValues true
     }
+    packaging {
+        resources {
+            excludes += ['META-INF/INDEX.LIST', 'META-INF/io.netty.versions.properties']
+        }
+    }
 }
 
 // Replaces the old applicationVariants.configureEach { changeApkOutput(variant) } call.
