@@ -67,6 +67,7 @@ application {
                                  '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
                                  '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
                                  '--enable-native-access=ALL-UNNAMED',
+                                 '-Dsun.java2d.fontlayout=0',
 				 '-XX:+PreserveFramePointer',
 				 '-XX:ErrorFile=./hs_err_pid%p.log',
 				 '-XX:+CreateCoredumpOnCrash',
