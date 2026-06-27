@@ -47,6 +47,9 @@ public final class BTEngineListenerChain implements BTEngineListener {
             return engine.getListener();
         }
         BTEngineListener existing = engine.getListener();
+        if (existing == extra) {
+            return existing;
+        }
         BTEngineListener chain;
         if (existing == null) {
             chain = extra;
@@ -66,6 +69,11 @@ public final class BTEngineListenerChain implements BTEngineListener {
     public BTEngineListenerChain with(BTEngineListener extra) {
         if (extra == null) {
             throw new IllegalArgumentException("extra is null");
+        }
+        for (BTEngineListener d : delegates) {
+            if (d == extra) {
+                return this;
+            }
         }
         BTEngineListener[] merged = new BTEngineListener[delegates.size() + 1];
         for (int i = 0; i < delegates.size(); i++) {
@@ -93,6 +101,10 @@ public final class BTEngineListenerChain implements BTEngineListener {
     @Override
     public void downloadUpdate(BTEngine engine, BTDownload dl) {
         forEach(d -> d.downloadUpdate(engine, dl));
+    }
+
+    public int size() {
+        return delegates.size();
     }
 
     private void forEach(java.util.function.Consumer<BTEngineListener> action) {
