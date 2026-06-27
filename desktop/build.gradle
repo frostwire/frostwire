@@ -276,6 +276,7 @@ tasks.register('icebridgeJar', Jar) {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF', 'META-INF/*.md')
+    exclude('META-INF/INDEX.LIST', 'META-INF/io.netty.versions.properties')
     exclude('com/limegroup/gnutella/gui/**')
     exclude('com/frostwire/gui/**')
     exclude('com/frostwire/desktop/**')
