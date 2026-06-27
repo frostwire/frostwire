@@ -76,7 +76,6 @@ application {
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
                                  //'-Xss768k', // 768k stack (development)
                                  '-Xss256k', // 256k stack (production)
-                                 '-Xcheck:jni',
                                  '-Dcom.sun.management.jmxremote.port=9595',
                                  '-Dcom.sun.management.jmxremote.ssl=false',
                                  '-Dcom.sun.management.jmxremote.authenticate=false',
