@@ -697,17 +697,15 @@ class LocalIndexTableTest {
     }
 
     @Test
-    void schemaVersionIsBumpedTo2() throws Exception {
-        // Regression: schema version must reflect the addition of
-        // shared_files and shared_files_fts tables.
+    void schemaVersionIsBumpedToCurrent() throws Exception {
         try (java.sql.Connection c = java.sql.DriverManager.getConnection(
                 "jdbc:sqlite:" + dbFile.getAbsolutePath());
              java.sql.Statement s = c.createStatement();
              java.sql.ResultSet rs = s.executeQuery(
                      "SELECT value FROM schema_meta WHERE key = 'version'")) {
             assertTrue(rs.next());
-            assertEquals("2", rs.getString(1),
-                    "SCHEMA_VERSION must be 2 after adding shared_files tables");
+            assertEquals(String.valueOf(LocalIndexTable.SCHEMA_VERSION), rs.getString(1),
+                    "SCHEMA_VERSION must be " + LocalIndexTable.SCHEMA_VERSION + " after init");
         }
     }
 
