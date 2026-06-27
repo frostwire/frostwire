@@ -636,11 +636,41 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
             s.execute(CREATE_INDEX_ADDED_SQL);
             s.execute(CREATE_INDEX_NAME_SQL);
             s.execute(CREATE_INDEX_LAST_PUBLISHED_SQL);
+            migrateSchema(s);
             try (PreparedStatement ps = connection.prepareStatement(
                     "INSERT OR REPLACE INTO schema_meta(key, value) VALUES('version', ?)")) {
                 ps.setString(1, String.valueOf(SCHEMA_VERSION));
                 ps.executeUpdate();
             }
+        }
+    }
+
+    /**
+     * Check for and fix missing columns from older schema versions.
+     * CREATE TABLE IF NOT EXISTS won't add columns to an existing table,
+     * so we need ALTER TABLE for databases created before the column existed.
+     */
+    private void migrateSchema(Statement s) throws SQLException {
+        int oldVersion = 0;
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT value FROM schema_meta WHERE key = 'version'")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    oldVersion = Integer.parseInt(rs.getString(1));
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        if (oldVersion < SCHEMA_VERSION) {
+            try {
+                s.execute("ALTER TABLE " + FILES_TABLE + " ADD COLUMN torrent_rowid INTEGER NOT NULL DEFAULT 0");
+            } catch (SQLException ignored) {
+            }
+            try {
+                s.execute("ALTER TABLE " + FILES_FTS + " ADD COLUMN torrent_rowid UNINDEXED");
+            } catch (SQLException ignored) {
+            }
+            LOG.info("Migrated LocalIndexTable schema from v" + oldVersion + " to v" + SCHEMA_VERSION);
         }
     }
 
