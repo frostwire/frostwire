@@ -48,7 +48,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private InboundMessageQueue inboundQueue;
     private ScheduledExecutorService janitor;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         loadDotEnv();
         IceBridgeConfig config;
         String authToken;
@@ -59,10 +59,62 @@ public final class IceBridgeServer implements AutoCloseable {
             config = parseArgs(args);
             authToken = parseAuthToken(args);
         }
+
+        System.out.println("IceBridge — FrostWire relay servent");
+        System.out.println();
+        System.out.println("Configuration (from .env / ICEBRIDGE_* env vars):");
+        System.out.println("  ICEBRIDGE_HOST              = " + config.host());
+        System.out.println("  ICEBRIDGE_RUDP_PORT         = " + config.rudpPort() + " (UDP)");
+        System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + (config.controlHttpPort() > 0 ? config.controlHttpPort() + " (TCP)" : "0 (disabled)"));
+        System.out.println("  ICEBRIDGE_ROLE              = " + config.role());
+        System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
+        System.out.println("  ICEBRIDGE_MAX_PEERS         = " + config.maxPeers());
+        System.out.println("  ICEBRIDGE_PEER_TTL_SEC      = " + config.peerTtlSec());
+        System.out.println("  ICEBRIDGE_MAX_QPS_PER_KEY   = " + config.maxQpsPerKey());
+        System.out.println("  ICEBRIDGE_BOOTSTRAP         = " + config.bootstrap());
+        System.out.println();
+
+        if (!checkPortAvailable(config.host(), config.rudpPort(), true)) {
+            System.err.println("ERROR: UDP port " + config.rudpPort() + " is already in use.");
+            System.err.println("       Another IceBridge instance or FrostWire may already be running.");
+            System.err.println("       To use a different port: ICEBRIDGE_RUDP_PORT=<port> ./gradlew icebridge");
+            System.exit(1);
+        }
+        if (config.controlHttpPort() > 0 && !checkPortAvailable(config.host(), config.controlHttpPort(), false)) {
+            System.err.println("ERROR: TCP port " + config.controlHttpPort() + " is already in use.");
+            System.err.println("       Another IceBridge instance or FrostWire may already be running.");
+            System.err.println("       To use a different port: ICEBRIDGE_CONTROL_HTTP_PORT=<port> ./gradlew icebridge");
+            System.exit(1);
+        }
+
         try (IceBridgeServer server = new IceBridgeServer(config, authToken)) {
             server.start();
-            LOG.info("IceBridge running, press Ctrl-C to stop");
+            System.out.println();
+            System.out.println("IceBridge is running. Press Ctrl-C to stop.");
             Thread.sleep(Long.MAX_VALUE);
+        } catch (Throwable t) {
+            System.err.println();
+            System.err.println("FATAL: IceBridge failed to start: " + t.getMessage());
+            System.err.println();
+            t.printStackTrace(System.err);
+            System.exit(1);
+        }
+    }
+
+    private static boolean checkPortAvailable(String host, int port, boolean udp) {
+        try {
+            if (udp) {
+                java.net.DatagramSocket socket = new java.net.DatagramSocket(port, java.net.InetAddress.getByName(host));
+                socket.setReuseAddress(true);
+                socket.close();
+            } else {
+                java.net.ServerSocket socket = new java.net.ServerSocket(port, 0, java.net.InetAddress.getByName(host));
+                socket.setReuseAddress(true);
+                socket.close();
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
