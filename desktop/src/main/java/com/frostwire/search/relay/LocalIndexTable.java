@@ -662,15 +662,13 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
         } catch (Exception ignored) {
         }
         if (oldVersion < SCHEMA_VERSION) {
-            try {
-                s.execute("ALTER TABLE " + FILES_TABLE + " ADD COLUMN torrent_rowid INTEGER NOT NULL DEFAULT 0");
-            } catch (SQLException ignored) {
-            }
-            try {
-                s.execute("ALTER TABLE " + FILES_FTS + " ADD COLUMN torrent_rowid UNINDEXED");
-            } catch (SQLException ignored) {
-            }
-            LOG.info("Migrated LocalIndexTable schema from v" + oldVersion + " to v" + SCHEMA_VERSION);
+            s.execute("DROP TABLE IF EXISTS " + FILES_FTS);
+            s.execute("DROP TABLE IF EXISTS " + FILES_TABLE);
+            s.execute(CREATE_FILES_TABLE_SQL);
+            s.execute(CREATE_FILES_FTS_SQL);
+            s.execute(CREATE_INDEX_FILES_TORRENT_SQL);
+            LOG.info("Migrated LocalIndexTable schema from v" + oldVersion + " to v" + SCHEMA_VERSION
+                    + " (rebuilt shared_files + shared_files_fts tables)");
         }
     }
 
