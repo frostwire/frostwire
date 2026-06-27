@@ -59,7 +59,7 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
     private static final Logger LOG = Logger.getLogger(LocalIndexTable.class);
 
     public static final String DEFAULT_DB_NAME = "frostwire-shared-torrents.db";
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     static final String TABLE = "shared_torrents";
     static final String FTS = "shared_torrents_fts";
