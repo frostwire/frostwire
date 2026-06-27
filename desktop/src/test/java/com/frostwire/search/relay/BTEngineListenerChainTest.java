@@ -91,6 +91,16 @@ class BTEngineListenerChainTest {
         assertEquals(1, a.events.size());
     }
 
+    @Test
+    void withDoesNotAddDuplicateListener() {
+        RecordingListener a = new RecordingListener();
+        BTEngineListenerChain chain = new BTEngineListenerChain(a);
+        BTEngineListenerChain chain2 = chain.with(a);
+
+        assertSame(chain, chain2);
+        assertEquals(1, chain2.size());
+    }
+
     private static final class RecordingListener extends BTEngineAdapter {
         final List<String> events = new ArrayList<>();
 
