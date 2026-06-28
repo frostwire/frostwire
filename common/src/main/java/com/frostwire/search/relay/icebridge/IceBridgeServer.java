@@ -41,8 +41,9 @@ public final class IceBridgeServer implements AutoCloseable {
     private static final long JANITOR_INTERVAL_SEC = 30;
 
     private final IceBridgeConfig config;
-    private final String authToken;
+    private final IceBridgeTokens authTokens;
     private IdentityKeys identity;
+    private String runtimeAuthToken;
     private PeerRegistry registry;
     private IceBridgeMetrics metrics;
     private ControlServer controlServer;
@@ -54,14 +55,30 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public static void main(String[] args) {
         loadDotEnv();
+
+        // --generate-token support: prints the new token *only* (once) to stdout.
+        // New tokens are appended to the tokens file and take effect immediately (no restart).
+        if (containsGenerateToken(args)) {
+            File tf = resolveAuthTokensFile(args);
+            new IceBridgeTokens(tf).generateAndAdd();
+            System.exit(0);
+        }
+
         IceBridgeConfig config;
-        String authToken;
+        String legacySingleToken = null;
         if (args.length == 0) {
             config = IceBridgeConfig.fromEnv();
-            authToken = null;
         } else {
             config = parseArgs(args);
-            authToken = parseAuthToken(args);
+            legacySingleToken = parseAuthToken(args);
+        }
+
+        File tokensFile = resolveAuthTokensFile(args, config);
+        IceBridgeTokens authTokens = new IceBridgeTokens(tokensFile);
+
+        if (legacySingleToken != null && !legacySingleToken.isEmpty()) {
+            authTokens.addRuntimeToken(legacySingleToken);
+            LOG.info("Legacy single --auth-token added for this run (prefer the tokens file for persistence and multiple tokens)");
         }
 
         System.out.println("IceBridge — FrostWire relay servent");
@@ -73,6 +90,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + (config.controlHttpPort() > 0 ? config.controlHttpPort() + " (TCP)" : "0 (disabled)"));
         System.out.println("  ICEBRIDGE_ROLE              = " + config.role());
         System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
+        System.out.println("  ICEBRIDGE_AUTH_TOKENS_FILE  = " + tokensFile.getAbsolutePath());
         System.out.println("  ICEBRIDGE_MAX_PEERS         = " + config.maxPeers());
         System.out.println("  ICEBRIDGE_PEER_TTL_SEC      = " + config.peerTtlSec());
         System.out.println("  ICEBRIDGE_MAX_QPS_PER_KEY   = " + config.maxQpsPerKey());
@@ -97,7 +115,7 @@ public final class IceBridgeServer implements AutoCloseable {
             System.exit(1);
         }
 
-        try (IceBridgeServer server = new IceBridgeServer(config, authToken)) {
+        try (IceBridgeServer server = new IceBridgeServer(config, authTokens)) {
             server.start();
             System.out.println();
             System.out.println("IceBridge is running. Press Ctrl-C to stop.");
@@ -174,21 +192,15 @@ public final class IceBridgeServer implements AutoCloseable {
     }
 
     public IceBridgeServer(IceBridgeConfig config) {
-        this(config, null);
+        this(config, (IceBridgeTokens) null);
     }
 
-    public IceBridgeServer(IceBridgeConfig config, String authToken) {
+    public IceBridgeServer(IceBridgeConfig config, IceBridgeTokens authTokens) {
         if (config == null) {
             throw new IllegalArgumentException("config is null");
         }
         this.config = config;
-        this.authToken = authToken != null ? authToken : generateAuthToken();
-    }
-
-    private static String generateAuthToken() {
-        byte[] tokenBytes = new byte[32];
-        new java.security.SecureRandom().nextBytes(tokenBytes);
-        return com.frostwire.util.Hex.encode(tokenBytes);
+        this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
     }
 
     /**
@@ -198,12 +210,13 @@ public final class IceBridgeServer implements AutoCloseable {
         if (identity != null) {
             throw new IllegalStateException("server already started");
         }
+        ensureRuntimeAuthToken();
         this.identity = loadIdentity(config.identityFile());
         this.metrics = new IceBridgeMetrics();
         this.registry = new PeerRegistry(config);
         this.inboundQueue = new InboundMessageQueue();
         this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
-        this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, authToken);
+        this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, this.authTokens);
         this.rudpServer = new RudpServer(config, rudpSessionManager);
 
         controlServer.start();
@@ -288,11 +301,26 @@ public final class IceBridgeServer implements AutoCloseable {
     }
 
     /**
-     * Returns the auth token required for control API requests, or
-     * {@code null} if the server hasn't been started yet.
+     * Returns a bearer token for co-located clients (local child launcher, in-process
+     * Android stack, tests). Provisioning happens in {@link #start()} when the tokens
+     * file is empty; legacy {@code --auth-token} values are added before start.
      */
     public String authToken() {
-        return controlServer == null ? null : controlServer.authToken();
+        if (runtimeAuthToken != null) {
+            return runtimeAuthToken;
+        }
+        return authTokens != null ? authTokens.clientToken() : null;
+    }
+
+    private void ensureRuntimeAuthToken() {
+        if (authTokens == null || !authTokens.isEmpty()) {
+            return;
+        }
+        byte[] b = new byte[32];
+        new java.security.SecureRandom().nextBytes(b);
+        runtimeAuthToken = com.frostwire.util.Hex.encode(b);
+        authTokens.addRuntimeToken(runtimeAuthToken);
+        LOG.info("Provisioned runtime auth token (no entries in tokens file)");
     }
 
     public int rudpPort() {
@@ -343,9 +371,6 @@ public final class IceBridgeServer implements AutoCloseable {
                 case "--control-http-port":
                     b.controlHttpPort(parseInt(next(args, ++i, "--control-http-port")));
                     break;
-                case "--control-stdio":
-                    b.controlStdio(true);
-                    break;
                 case "--role":
                     b.role(IceBridgeConfig.Role.valueOf(next(args, ++i, "--role").toUpperCase()));
                     break;
@@ -370,6 +395,13 @@ public final class IceBridgeServer implements AutoCloseable {
                 case "--auth-token":
                     // Parsed separately by parseAuthToken(); skip value.
                     i++;
+                    break;
+                case "--auth-tokens-file":
+                    // Handled early in main; skip value here.
+                    i++;
+                    break;
+                case "--generate-token":
+                    // Handled early in main.
                     break;
                 case "--help":
                     printHelp();
@@ -407,7 +439,6 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  --rudp-port PORT           rUDP listen port (0 = disable, auto for local)");
         System.out.println("  --relay-port PORT          TCP identity/relay handshake port (default 6888)");
         System.out.println("  --control-http-port PORT   HTTP control port (0 = disable)");
-        System.out.println("  --control-stdio            Enable stdio control channel");
         System.out.println("  --role ROLE                FORWARDER, CLIENT, or BOTH");
         System.out.println("  --identity-file PATH       Ed25519 identity file");
         System.out.println("  --max-peers N              Maximum tracked peers");
@@ -415,6 +446,36 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  --max-qps-per-key N        Registration rate limit per public key");
         System.out.println("  --bootstrap                Advertise bootstrap DHT topic");
         System.out.println("  --host HOST                Bind host");
+        System.out.println("  --auth-tokens-file PATH    File with one bearer token per line (default icebridge-tokens.txt)");
+        System.out.println("  --generate-token           Generate + print one new token (only the token to stdout), store it, exit");
+    }
+
+    private static boolean containsGenerateToken(String[] args) {
+        for (String a : args) if ("--generate-token".equals(a)) return true;
+        return false;
+    }
+
+    private static File resolveAuthTokensFile(String[] args) {
+        return resolveAuthTokensFile(args, null);
+    }
+
+    private static File resolveAuthTokensFile(String[] args, IceBridgeConfig cfg) {
+        // CLI takes precedence
+        for (int i = 0; i < args.length; i++) {
+            if ("--auth-tokens-file".equals(args[i]) && i + 1 < args.length) {
+                return new File(args[i + 1]);
+            }
+        }
+        // Then env / property (populated by loadDotEnv and gradle task)
+        String fromEnv = System.getenv("ICEBRIDGE_AUTH_TOKENS_FILE");
+        if (fromEnv == null || fromEnv.isEmpty()) fromEnv = System.getProperty("ICEBRIDGE_AUTH_TOKENS_FILE");
+        if (fromEnv != null && !fromEnv.isEmpty()) {
+            return new File(fromEnv);
+        }
+        if (cfg != null && cfg.authTokensFile() != null) {
+            return cfg.authTokensFile();
+        }
+        return new File("icebridge-tokens.txt");
     }
 
     /** Small Hex helper so the server can log its own identity. */

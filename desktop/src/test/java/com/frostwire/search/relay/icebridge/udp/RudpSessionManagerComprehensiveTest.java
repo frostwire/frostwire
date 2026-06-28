@@ -44,8 +44,7 @@ class RudpSessionManagerComprehensiveTest {
 
     private static final IceBridgeConfig CONFIG = IceBridgeConfig.newBuilder()
             .rudpPort(0)
-            .controlHttpPort(0)
-            .controlStdio(true)
+            .controlHttpPort(8797)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
             .peerTtlSec(120)
@@ -342,10 +341,10 @@ class RudpSessionManagerComprehensiveTest {
                 remote, registryB, metricsB, (pub, payload) -> receivedB.incrementAndGet());
 
         IceBridgeConfig configA = IceBridgeConfig.newBuilder()
-                .rudpPort(freePort()).controlHttpPort(0).controlStdio(true)
+                .rudpPort(freePort()).controlHttpPort(8797)
                 .role(IceBridgeConfig.Role.BOTH).build();
         IceBridgeConfig configB = IceBridgeConfig.newBuilder()
-                .rudpPort(freePort()).controlHttpPort(0).controlStdio(true)
+                .rudpPort(freePort()).controlHttpPort(8797)
                 .role(IceBridgeConfig.Role.BOTH).build();
 
         RudpServer serverA = new RudpServer(configA, mgrA);
@@ -395,10 +394,10 @@ class RudpSessionManagerComprehensiveTest {
                 });
 
         IceBridgeConfig configA = IceBridgeConfig.newBuilder()
-                .rudpPort(freePort()).controlHttpPort(0).controlStdio(true)
+                .rudpPort(freePort()).controlHttpPort(8797)
                 .role(IceBridgeConfig.Role.BOTH).build();
         IceBridgeConfig configB = IceBridgeConfig.newBuilder()
-                .rudpPort(freePort()).controlHttpPort(0).controlStdio(true)
+                .rudpPort(freePort()).controlHttpPort(8797)
                 .role(IceBridgeConfig.Role.BOTH).build();
 
         RudpServer serverA = new RudpServer(configA, mgrA);

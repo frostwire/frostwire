@@ -34,18 +34,17 @@ public final class IceBridgeConfig {
     private final int rudpPort;
     private final int relayPort;
     private final int controlHttpPort;
-    private final boolean controlStdio;
     private final Role role;
     private final File identityFile;
     private final int maxPeers;
     private final long peerTtlSec;
     private final double maxQpsPerKey;
     private final boolean bootstrap;
+    private final File authTokensFile;
 
     public IceBridgeConfig(String host,
                            int rudpPort,
                            int controlHttpPort,
-                           boolean controlStdio,
                            Role role,
                            File identityFile,
                            int maxPeers,
@@ -53,35 +52,32 @@ public final class IceBridgeConfig {
                            double maxQpsPerKey,
                            boolean bootstrap) {
         this(host, rudpPort, com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
-             controlHttpPort, controlStdio, role, identityFile,
-             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap);
+             controlHttpPort, role, identityFile,
+             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, null);
     }
 
     public IceBridgeConfig(String host,
                            int rudpPort,
                            int relayPort,
                            int controlHttpPort,
-                           boolean controlStdio,
                            Role role,
                            File identityFile,
                            int maxPeers,
                            long peerTtlSec,
                            double maxQpsPerKey,
-                           boolean bootstrap) {
+                           boolean bootstrap,
+                           File authTokensFile) {
         this.host = Objects.requireNonNullElse(host, "0.0.0.0");
         this.rudpPort = requirePositiveOrZero(rudpPort, "rudpPort");
         this.relayPort = requirePositiveOrZero(relayPort, "relayPort");
-        this.controlHttpPort = controlHttpPort;
-        this.controlStdio = controlStdio;
+        this.controlHttpPort = requirePositive(controlHttpPort, "controlHttpPort");
         this.role = Objects.requireNonNullElse(role, Role.CLIENT);
         this.identityFile = identityFile;
         this.maxPeers = requirePositive(maxPeers, "maxPeers");
         this.peerTtlSec = requirePositive(peerTtlSec, "peerTtlSec");
         this.maxQpsPerKey = requirePositive(maxQpsPerKey, "maxQpsPerKey");
         this.bootstrap = bootstrap;
-        if (controlHttpPort <= 0 && !controlStdio) {
-            throw new IllegalArgumentException("At least one control channel must be enabled");
-        }
+        this.authTokensFile = authTokensFile != null ? authTokensFile : new File("icebridge-tokens.txt");
     }
 
     public String host() {
@@ -98,10 +94,6 @@ public final class IceBridgeConfig {
 
     public int controlHttpPort() {
         return controlHttpPort;
-    }
-
-    public boolean controlStdio() {
-        return controlStdio;
     }
 
     public Role role() {
@@ -128,6 +120,10 @@ public final class IceBridgeConfig {
         return bootstrap;
     }
 
+    public File authTokensFile() {
+        return authTokensFile;
+    }
+
     public boolean canAcceptIncoming() {
         return role == Role.FORWARDER || role == Role.BOTH;
     }
@@ -138,7 +134,6 @@ public final class IceBridgeConfig {
                 .host("127.0.0.1")
                 .rudpPort(0)
                 .controlHttpPort(8797)
-                .controlStdio(false)
                 .role(Role.BOTH)
                 .maxPeers(1000)
                 .peerTtlSec(120)
@@ -151,7 +146,6 @@ public final class IceBridgeConfig {
         return newBuilder()
                 .rudpPort(6888)
                 .controlHttpPort(8080)
-                .controlStdio(false)
                 .role(Role.FORWARDER)
                 .maxPeers(10000)
                 .peerTtlSec(120)
@@ -169,13 +163,13 @@ public final class IceBridgeConfig {
         private int rudpPort;
         private int relayPort = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
         private int controlHttpPort;
-        private boolean controlStdio;
         private Role role = Role.CLIENT;
         private File identityFile;
         private int maxPeers = 1000;
         private long peerTtlSec = 120;
         private double maxQpsPerKey = 5.0;
         private boolean bootstrap;
+        private File authTokensFile;
 
         private Builder() {
         }
@@ -197,11 +191,6 @@ public final class IceBridgeConfig {
 
         public Builder controlHttpPort(int controlHttpPort) {
             this.controlHttpPort = controlHttpPort;
-            return this;
-        }
-
-        public Builder controlStdio(boolean controlStdio) {
-            this.controlStdio = controlStdio;
             return this;
         }
 
@@ -235,9 +224,14 @@ public final class IceBridgeConfig {
             return this;
         }
 
+        public Builder authTokensFile(File authTokensFile) {
+            this.authTokensFile = authTokensFile;
+            return this;
+        }
+
         public IceBridgeConfig build() {
-            return new IceBridgeConfig(host, rudpPort, relayPort, controlHttpPort, controlStdio, role,
-                    identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap);
+            return new IceBridgeConfig(host, rudpPort, relayPort, controlHttpPort, role,
+                    identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, authTokensFile);
         }
     }
 
@@ -276,13 +270,14 @@ public final class IceBridgeConfig {
      * <ul>
      *   <li>{@code ICEBRIDGE_HOST} — bind address (default: 0.0.0.0)</li>
      *   <li>{@code ICEBRIDGE_RUDP_PORT} — rUDP listen port (default: 6889)</li>
-     *   <li>{@code ICEBRIDGE_CONTROL_HTTP_PORT} — HTTP control port (default: 8080, 0=disable)</li>
+     *   <li>{@code ICEBRIDGE_CONTROL_HTTP_PORT} — HTTP control port (default: 8080)</li>
      *   <li>{@code ICEBRIDGE_ROLE} — FORWARDER, CLIENT, or BOTH (default: FORWARDER)</li>
      *   <li>{@code ICEBRIDGE_IDENTITY_FILE} — path to identity.dat (default: ./identity.dat)</li>
      *   <li>{@code ICEBRIDGE_MAX_PEERS} — max tracked peers (default: 10000)</li>
      *   <li>{@code ICEBRIDGE_PEER_TTL_SEC} — peer eviction TTL (default: 300)</li>
      *   <li>{@code ICEBRIDGE_MAX_QPS_PER_KEY} — rate limit per pub key (default: 30.0)</li>
      *   <li>{@code ICEBRIDGE_BOOTSTRAP} — announce on bootstrap DHT topic (default: true)</li>
+     *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
      * </ul>
      *
      * @return config built from env vars, with cloud defaults for unset vars
@@ -294,7 +289,6 @@ public final class IceBridgeConfig {
         b.rudpPort(envInt("ICEBRIDGE_RUDP_PORT", 6889));
         b.relayPort(envInt("ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
         b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8080));
-        b.controlStdio(false);
         String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
         b.role(Role.valueOf(roleStr.toUpperCase()));
         String identityPath = env("ICEBRIDGE_IDENTITY_FILE", "identity.dat");
@@ -303,6 +297,8 @@ public final class IceBridgeConfig {
         b.peerTtlSec(envLong("ICEBRIDGE_PEER_TTL_SEC", 300));
         b.maxQpsPerKey(envDouble("ICEBRIDGE_MAX_QPS_PER_KEY", 30.0));
         b.bootstrap(envBool("ICEBRIDGE_BOOTSTRAP", true));
+        String tokensFile = env("ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
+        b.authTokensFile(new File(tokensFile));
         return b.build();
     }
 

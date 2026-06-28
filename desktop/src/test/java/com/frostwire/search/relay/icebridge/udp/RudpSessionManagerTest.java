@@ -26,8 +26,7 @@ class RudpSessionManagerTest {
 
     private static final IceBridgeConfig CONFIG = IceBridgeConfig.newBuilder()
             .rudpPort(0)
-            .controlHttpPort(0)
-            .controlStdio(true)
+            .controlHttpPort(8797)
             .role(IceBridgeConfig.Role.BOTH)
             .maxPeers(100)
             .peerTtlSec(120)
