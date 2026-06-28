@@ -178,6 +178,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                 db.setTransactionSuccessful();
             } catch (Throwable t) {
                 LOG.warn("Failed to append karma entry seq=" + entry.seq(), t);
+                throw new IllegalStateException("Failed to append karma entry seq=" + entry.seq(), t);
             } finally {
                 db.endTransaction();
             }
