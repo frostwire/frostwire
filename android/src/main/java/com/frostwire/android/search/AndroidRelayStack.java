@@ -152,10 +152,11 @@ public final class AndroidRelayStack implements AutoCloseable {
             kcs.start();
             LOG.info("AndroidRelayStack: Karma chain wired");
 
+            int controlPort = freeLocalControlPort();
             IceBridgeConfig config = IceBridgeConfig.newBuilder()
                     .host("0.0.0.0")
                     .rudpPort(PeerRegistrySync.ICEBRIDGE_RUDP_PORT)
-                    .controlHttpPort(0)
+                    .controlHttpPort(controlPort)
                     .role(IceBridgeConfig.Role.BOTH)
                     .identityFile(identityFile)
                     .maxPeers(500)
@@ -318,6 +319,12 @@ public final class AndroidRelayStack implements AutoCloseable {
 
     public PeerDirectory peerDirectory() {
         return peerDirectory;
+    }
+
+    private static int freeLocalControlPort() throws java.io.IOException {
+        try (java.net.ServerSocket socket = new java.net.ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
     }
 
     @Override
