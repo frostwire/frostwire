@@ -180,8 +180,18 @@ public class StreamableHttpTransport implements MCPTransport {
       }
     }
 
+    private static boolean isLoopbackOrigin(String origin) {
+      return origin.startsWith("http://127.0.0.1")
+          || origin.startsWith("http://localhost")
+          || origin.startsWith("https://127.0.0.1")
+          || origin.startsWith("https://localhost");
+    }
+
     private void setCorsHeaders(HttpExchange exchange) {
-      exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+      String origin = exchange.getRequestHeaders().getFirst("Origin");
+      if (origin != null && isLoopbackOrigin(origin)) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origin);
+      }
       exchange
           .getResponseHeaders()
           .set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
