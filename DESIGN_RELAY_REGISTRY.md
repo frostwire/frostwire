@@ -1,5 +1,7 @@
 # FrostWire Distributed Search & IceBridge Relay Network
 
+> **Note (2026)**: This document is the original design + evolutionary record. The system has been implemented with a hybrid identity (direct TCP) + data (IceBridge rUDP) architecture, remote IceBridge support, rich configuration, multi-token auth, etc. See the "Current Implementation" and "Note on Future Documentation" sections near the end. A separate comprehensive `ICEBRIDGE.md` user/operator guide is still needed.
+
 > Corrected design for the FrostWire distributed search network and privacy-preserving relay layer.
 > This version replaces the earlier relay-registry/index-announcement design with primitives that
 > actually exist in BitTorrent DHT (BEP 5, BEP 44, BEP 46) and makes a headless cloud **IceBridge**
@@ -92,18 +94,23 @@ inside signed application records when a strong content hash is needed.
   (single-writer)                (single-writer)                (single-writer)
 ```
 
-FrostWire does not talk directly to remote peers. It talks to a **local IceBridge servent** over
-HTTP or stdio; that servent forms a mesh with other IceBridge servents using **rUDP** and NAT
-traversal. Search is just one application payload carried by IceBridge.
+FrostWire (desktop or Android) primarily routes distributed search and peer communication through an **IceBridge** instance.
 
-| Role | Runs on desktop | Runs on IceBridge | Needs disk | Purpose |
-|------|-----------------|-------------------|------------|---------|
-| Index role | yes | optional | SQLite or manifest cache | Build/search local torrent metadata. |
-| Search role | yes | optional | small cache | Query peers and merge signed results. |
-| Relay role | yes (as local daemon or embed) | yes | no | Forward encrypted query/result blobs for NAT-restricted nodes. |
+**Current architecture (as implemented):**
 
-Desktop will usually run a **local IceBridge servent** as a child process. A cloud **IceBridge**
-servent usually runs the relay role with a small manifest cache only.
+- **Identity / bootstrap plane**: Direct TCP (on the "relay listen port") using `IncomingRelayServer` + `DirectTcpPeerAuthenticator` + `OutgoingRelayClient`. Used to exchange and verify `IdentityRecord` (BEP 46) after DHT discovery. This gives each node a verified Ed25519 pubkey + rUDP endpoint for a peer.
+- **Data / relay plane**: Opaque payloads routed over the **IceBridge rUDP mesh** (`IceBridgeSearchTransport` implementing `DistributedSearchTransport`). Desktop talks to a local or remote IceBridge via its HTTP control API (`/send`, `/poll`, `/route`, `/lookup` etc.). IceBridge handles reliable delivery, NAT traversal, and forwarding over rUDP.
+- Desktop **never** sends search payloads directly to remote peers over the identity TCP path in the final flow; it goes through the IceBridge transport abstraction.
+- A local IceBridge can be forked as a child process (default) or a remote/standalone IceBridge can be used (useful for cloud relays or testing).
+
+| Role              | Desktop                  | IceBridge (local child or remote) | Needs disk          | Purpose |
+|-------------------|--------------------------|-----------------------------------|---------------------|---------|
+| Index role        | Yes (LocalIndexTable)    | Optional (cache)                  | SQLite / RAM        | Local torrent metadata |
+| Search role       | Yes (`DistributedSearchPerformer`) | Routes opaque payloads        | Small               | Mesh query + result merge |
+| Relay / Forwarder | Can (via local IceBridge)| Primary                           | RAM only (cloud)    | rUDP mesh + forwarding for NATed nodes |
+| Identity server   | Yes (`IncomingRelayServer` on relay port) | Also (standalone)            | No                  | TCP bootstrap for verified pubkeys + rUDP addrs |
+
+Desktop normally forks a **local IceBridge** child. Users can also point at a remote IceBridge (e.g. one launched with `./gradlew icebridge` on a VPS). Android supports in-process IceBridge.
 
 ---
 
@@ -111,100 +118,84 @@ servent usually runs the relay role with a small manifest cache only.
 
 ### 3.1 `common/`
 
-Package: `com.frostwire.search.relay` (transport) and `com.frostwire.search.relay.icebridge` (servent)
+Package: `com.frostwire.search.relay` (core relay + transport abstractions) and `com.frostwire.search.relay.icebridge` (servent + control).
 
-Contains code that can run on Desktop, Android, and the headless IceBridge daemon:
+Shared across Desktop, Android, and standalone IceBridge:
 
-- **IceBridge servent**: `IceBridgeServer`, `IceBridgeControlHandler`, `PeerRegistry`, `IceBridgeConfig`.
-- **rUDP transport**: reliable UDP framing, NAT traversal, hole-punch coordination, relay forwarding.
-- **Identity/auth**: `IdentityKeys`, `IdentityRecord`, `PeerAuthenticator`, Ed25519 signatures, rate limiting.
-- **Records**: `IndexManifest`, `SearchQuery`, `SearchResultEnvelope`, `TrustDelegation`.
-- **Crypto/transport**: `SessionCipher`, `PeerHandshake`, `RelayWireCodec`.
-- **Interfaces**: `LocalIndex`, `ManifestStore`, `TrustStore`.
-- **Constants**: `RelayConstants`.
+- **IceBridge core**: `IceBridgeServer`, `IceBridgeConfig`, `IceBridgeTokens` (multiple bearer tokens for control API, hot-reloadable from file), `IceBridgeClient` (HTTP client to control API).
+- **Control API** (`control/`): `ControlServer` (Netty, bound to 127.0.0.1), `ControlHandler` (endpoints: /register, /route, /lookup, /send, /poll, /metrics, /health). Auth via `X-IceBridge-Token`.
+- **rUDP mesh**: `RudpServer`, `RudpSessionManager`, `RudpSession`, fragmentation, hole-punch support.
+- **Peer/relay management**: `PeerRegistry`, `PeerDirectory`, `PeerRegistrySync`.
+- **Discovery + identity**: `DhtPeerDiscoverySource`, `PeerDiscovery` (with `DirectTcpPeerAuthenticator` for bootstrap), `IdentityKeys`, `IdentityRecord` (includes `rudpPort` + `role` since v2), `DhtAdvertiser`, `IdentityRecordPublisher`.
+- **Search transport abstraction**: `DistributedSearchTransport`, `IceBridgeSearchTransport` (polls IceBridge + sends opaque payloads), `IncomingSearchRequestHandler`, `DistributedSearchPerformer`.
+- **Wire + records**: `RelayWireCodec`, `RemoteSearchRequest`/`RemoteSearchResponse` (signed), `RelayConstants`.
+- **Constants / helpers**: `RelayConstants` (topics, default ports).
 
-No Swing, Android, or desktop database imports are allowed here. The IceBridge daemon main class
-lives in `common/` so the same code can be embedded, spawned as a child process, or built into a
-standalone fat JAR.
+The IceBridge fat JAR (built by `desktop/build.gradle` `icebridgeJar` task) contains only what's needed for a headless servent (no Swing, no SQLite for pure-relay use). Main class: `com.frostwire.search.relay.icebridge.IceBridgeServer`.
+
+Desktop also starts its own `IncomingRelayServer` (direct TCP identity handshake listener) on the configured relay listen port in addition to talking to IceBridge for data.
 
 ### 3.2 `desktop/`
 
-Desktop implementations and UI:
-
-- `LocalIndexTable`: JDBC SQLite + FTS5 implementation of `LocalIndex`.
-- `SharedTorrentIndexer`: `BTEngineListener` that populates the local index.
-- `LocalSharedTorrentSearchPerformer`: local-only search.
-- `DistributedSearchPerformer`: local + mesh search merger. Talks to the **local IceBridge**
-  daemon via HTTP/stdio, not to remote peers directly.
-- `IceBridgeLauncher`: spawns/configures the local IceBridge child process (optional).
-- `DistributedSearchEventBus`: in-process event stream.
-- `DistributedSearchLogPanel` and `PeerBrowseWindow`: Swing UI.
+- `LocalIndexTable` + `SharedTorrentIndexer` + local search performer (unchanged).
+- `SearchEnginesSettings`: `ICEBRIDGE_ENABLED`, `ICEBRIDGE_USE_REMOTE`, `ICEBRIDGE_REMOTE_URL`, `ICEBRIDGE_REMOTE_AUTH_TOKEN`, `ICEBRIDGE_RUDP_PORT`, `ICEBRIDGE_RELAY_LISTEN_PORT`, `ICEBRIDGE_ROLE`, etc.
+- `IceBridgeSettingsPaneItem`: full options panel (enable, local vs remote radio, bind host, rUDP port, relay listen port (identity), role, remote URL + token).
+- `IceBridgeProcessLauncher`: builds command line for child `icebridge.jar` (passes --rudp-port, --relay-port, --control-http-port, --role, --host, --auth-token, --identity-file). Shares the same Ed25519 identity.
+- `Initializer.startRelayStack` / `startIceBridgeSearch` / `startPeerDiscovery`: wires everything, supports remote IceBridge client, starts desktop's `IncomingRelayServer`, DHT advertiser, discovery scheduler (aggressive 30s + immediate tick), `PeerRegistrySync`.
+- `IceBridgeSearchTransport` (via `DistributedSearchTransport`): the bridge used by `DistributedSearchPerformer`.
+- `IceBridgeClient` (OkHttp) used for both local child and remote.
+- UI elements updated to label results appropriately (Local / Distributed / Peer).
 
 ### 3.3 `icebridge` deployment artifact
 
-No new source module is needed because the server source is in `common/`. A Gradle task in
-`desktop/build.gradle` builds a standalone **IceBridge fat JAR** with:
+Standalone fat JAR built by `icebridgeJar` task (main = `IceBridgeServer`).
 
-- Main class: `com.frostwire.search.relay.icebridge.IceBridgeServer`.
-- All `common/` classes + Netty.
-- No Swing, no Android, no media library, no SQLite requirement for the cloud role.
-- Configurable role flags: `--port`, `--control-http-port`, `--control-stdio`, `--bootstrap`, `--max-peers`, `--peer-ttl-sec`.
-- RAM-bounded caches for peer identities and routes.
-- Designed for fast networking, decent CPU/memory, minimal/near-zero disk.
-
-Cloud deployment example:
+Run with:
 
 ```bash
-java -jar icebridge.jar --control-http-port 8080 --port 6888 --bootstrap
+java -jar icebridge.jar
+# or
+./gradlew icebridge
 ```
 
-### 3.4 `android/` (later)
+Config sources (all supported):
+- `.env` in cwd (loaded by `loadDotEnv()`, turned into system props).
+- `ICEBRIDGE_*` environment variables.
+- Command-line flags (`--rudp-port`, `--relay-port`, `--control-http-port`, `--role`, `--host`, `--identity-file`, `--auth-tokens-file`, `--generate-token`, ...).
+- For remote use from desktop: the control URL + one bearer token.
 
-Android can reuse common records and protocol. It will talk to a local IceBridge servent (or ship
-one in-process). Relay metrics UI is out of scope for v1.
+**Auth tokens** (control API):
+- Single `--auth-token` still supported (legacy / local child).
+- Preferred: `ICEBRIDGE_AUTH_TOKENS_FILE` (default `icebridge-tokens.txt`). One token per line.
+- `--generate-token` command: prints exactly one new secure token to stdout (for admin to hand to a user), appends it to the tokens file with timestamp comment. Tokens are hot-reloaded on every auth check — no restart needed.
+- Header: `X-IceBridge-Token`.
+- `/health` is unauthenticated.
+
+The child launched by desktop receives its token on the command line and uses it for its local control API.
+
+### 3.4 Android
+
+Reuses large parts of `common/`:
+- In-process `IceBridgeServer` (no subprocess).
+- `AndroidLocalIndex` (SQLite + FTS5).
+- `AndroidRelayStack`, `AndroidKarmaChainStore`, etc.
+- Same discovery, identity, and transport abstractions.
+- `IncomingRelayServer` (identity TCP) and rUDP also run in-process.
+
+See `EngineForegroundService` wiring.
 
 ---
 
-## 3.5 IceBridge Servent Design
+## 3.5 IceBridge + Hybrid Relay Reality (Current)
 
-### Roles
+See the detailed description added in section 3.5 above (the hybrid identity TCP + IceBridge rUDP model, ports, auth tokens, generate command, desktop + Android integration, and discovery flow).
 
-An IceBridge servent can operate in **forwarder** or **client** mode:
-
-- **Forwarder**: can accept incoming connections (DMZ, port-forwarded, or hole-punched). It keeps a
-  public endpoint and forwards encrypted blobs for other servents. It is the durable fabric of the
-  relay network.
-- **Client**: behind a strict NAT. It maintains outgoing rUDP associations to forwarders and can
-  route through them. It may become a forwarder if hole punching succeeds.
-
-### Local API (FrostWire ↔ IceBridge)
-
-FrostWire talks to its local IceBridge servent over one of two channels:
-
-1. **HTTP** (`--control-http-port`): simple REST-ish API for registration, send, receive,
-   lookup-relay-peers.
-2. **stdio pipe** (`--control-stdio`): line-delimited or length-prefixed messages. Useful when
-   launching IceBridge as a child process.
-
-Both channels are local-only interfaces by default. All messages between FrostWire and IceBridge are
-unencrypted at this boundary because they run under the same user; encryption happens on the rUDP
-mesh.
-
-### Remote Protocol (IceBridge ↔ IceBridge)
-
-Servents communicate over **rUDP** (reliable UDP):
-
-- UDP is used for NAT traversal / hole punching.
-- A thin reliability layer (acks, retransmit, connection IDs) sits on top for messages that need it.
-- All mesh traffic is authenticated by Ed25519 and encrypted per-session.
-- Payloads are opaque to IceBridge; the relay layer only sees `from`, `to`, size, and timing.
-
-### Peer Registry
-
-Each IceBridge servent keeps an in-memory registry of peers it has recently authenticated to. Public
-/cloud servents may additionally expose a lookup endpoint so clients can discover forwarders. The
-DHT bootstrap topics (`frostwire-relays-v1`, `frostwire-bootstrap-v1`) remain the primary discovery
-mechanism; the cloud registry is a convenience fallback.
+Key evolution points from the original design:
+- A pragmatic **direct TCP identity/bootstrap plane** was added (and stabilized) alongside the rUDP data plane. This makes initial pubkey + endpoint verification reliable even before/without a full mesh.
+- Desktop maintains both its own `IncomingRelayServer` (for identity handshakes) **and** a (child or remote) IceBridge instance for rUDP routing.
+- Full remote IceBridge support + rich configuration UI were added.
+- Auth for the control plane moved to a multi-token file with a safe one-time ` --generate-token` command and hot reload.
+- Discovery includes strong self-skip (own pub + local interfaces) to handle co-located desktop + standalone cases.
 
 ---
 
@@ -615,33 +606,28 @@ Feature build order:
 | 20 | DoS protection + metrics | qps limit, in-flight caps | `[common] Add relay rate limits and metrics` |
 | 21 | Documentation + changelog | docs only | `[all] Document distributed search and IceBridge phase 4` |
 
-### 12.1 Current Implementation Checkpoint
+### 12.1 Current Implementation Checkpoint (mid-2026)
 
-The current codebase is ahead of the original build order in some areas and still behind it in others.
-Before adding the user-facing distributed engine, treat the current relay stack as a **direct TCP peer-search
-prototype**, not as the privacy-preserving encrypted relay described above.
+**Major components delivered** (beyond the original stabilization list):
 
-Implemented and useful:
+- Full IceBridge servent (`IceBridgeServer` + Netty control API + rUDP mesh).
+- Local child process launch + **remote/standalone IceBridge** support (with auth token).
+- Comprehensive configuration: `SearchEnginesSettings`, full Swing options pane (`IceBridgeSettingsPaneItem`), env var overrides, `.env` support for standalone.
+- Separate configurable ports: rUDP port vs relay listen port (identity TCP handshake).
+- `DistributedSearchTransport` + `IceBridgeSearchTransport` + `DistributedSearchPerformer` wired through IceBridge (opaque payloads).
+- `PeerRegistrySync`, `IncomingSearchRequestHandler`.
+- `DhtPeerDiscoverySource` (aggressive relays-first), self-skip using own Ed25519 pub + local interface matching.
+- `IdentityRecord` v2 (rudpPort + role), BEP 46 publication + direct TCP bootstrap.
+- Multiple bearer tokens for control API + `--generate-token` (prints once, hot-reloadable file).
+- Android in-process port (AndroidRelayStack, AndroidLocalIndex, etc.).
+- Many robustness fixes (self-discovery, port conflicts, scheduler timing, etc.).
 
-- `LocalIndex`, `LocalIndexTable`, `SharedTorrentIndexer`, and `LocalSharedTorrentSearchPerformer`.
-- `SearchEngine.LOCAL` and `SearchEngine.DISTRIBUTED` wiring, including optional karma-weighted local result ordering.
-- PoW-capable `IdentityKeys`, signed bencoded `IdentityRecord`, and BEP 46 identity publication.
-- BEP 5 topic helpers for peers, relays, and bootstrap nodes.
-- `PeerDiscovery`, `PeerDirectory`, and scheduled peer discovery scaffolding.
-- Signed `RemoteSearchRequest` / `RemoteSearchResponse` records, framed wire codec, plain TCP client/server.
-- Per-peer karma-chain scaffolding and DHT publisher/fetcher interfaces.
-- Localhost multi-instance relay tests and in-process DHT smoke tests.
-- UI source-label and hash-dedup fixes so distributed results display cleanly.
+**Hybrid nature** (the biggest evolution from the pure original doc):
+The system uses a direct TCP identity/auth plane (for reliable verified pubkeys from DHT contacts) + the IceBridge rUDP plane (for actual search payload routing and forwarding). This was a pragmatic stabilization + bootstrap choice.
 
-Not implemented yet:
+Search payloads over IceBridge are opaque to the relay layer but are signed and processed by the search application code.
 
-- IceBridge servent, rUDP mesh, and NAT traversal.
-- IceBridge HTTP/stdio local control API.
-- Refactor `DistributedSearchPerformer` to talk to a local IceBridge daemon instead of directly using `OutgoingRelayClient`.
-- Encrypted `PeerMesh`, `SearchQuery`, `SearchResultEnvelope`, `SessionCipher`, or transport handshake.
-- Opaque relay forwarding; current relay requests expose query keywords to the target node.
-- Public DHT two-machine advertise -> discover -> query verification.
-- Android IceBridge integration.
+The original "everything opaque through local IceBridge only" vision is largely realized for the data path; the identity plane is an additional direct mechanism.
 
 ### 12.2 Stabilization Pass Before Distributed Search
 
@@ -669,7 +655,7 @@ Acceptance criteria for the stabilization pass:
 - Tests prove the meaningful negative cases instead of only proving valid paths.
 - Documentation clearly distinguishes direct peer search from the future encrypted opaque relay.
 
-All stabilization tasks are complete. The next step is **build step 13** — the user-facing distributed search performer — implemented in a deliberately narrow form:
+Most of the original stabilization + IceBridge + distributed performer work is complete (with the hybrid architecture noted above). The system is in active use and refinement.
 
 1. `DistributedSearchPerformer` searches local FTS5 and directly authenticated peers.
 2. It queries `PeerDirectory.topByTrustVerified(n)` so placeholder/unverified peers are skipped.
@@ -697,15 +683,33 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 
 ---
 
-## 14. Open Questions
+## 14. Open Questions / Future Work
 
-- Which Ed25519 public keys are FrostWire trust roots?
-- Should unknown peers be hidden by default or shown under an "Untrusted" fold?
-- Should desktop run an IceBridge forwarder role by default only when the node has a public/stable port?
-- How large should inline manifests be before switching to torrent-backed manifests?
-- Should IceBridge expose HTTP metrics in v1 or keep logs-only until operations need more?
-- Should the local IceBridge daemon be spawned automatically by desktop, or left as a manual/admin opt-in?
+- Full end-to-end encryption for search payloads over the rUDP mesh (X25519 keys are present in `IdentityKeys` but not yet used for all paths).
+- Richer trust / WoT UI and defaults.
+- When / whether desktop nodes should advertise as forwarders.
+- Metrics, observability, and operations tooling for cloud IceBridge instances.
+- Android device experience and battery impact of the in-process relay stack.
+- Stable public relay discovery / curated bootstrap lists.
 
 ---
 
-*Next step: build the IceBridge servent (common/), its HTTP/stdio control API, and refactor the desktop distributed search performer to send queries through the local IceBridge daemon instead of directly using the TCP relay client.*
+## 15. Note on Future Documentation
+
+A dedicated `ICEBRIDGE.md` (or `docs/icebridge/`) is planned. It should cover:
+
+- Capabilities (rUDP mesh, control API endpoints, NAT traversal, roles).
+- Usage on desktop (settings pane, local child vs remote, what the ports mean).
+- Usage on Android.
+- Running a standalone cloud relay (`./gradlew icebridge`, .env, --generate-token, tokens file, ports, role=FORWARDER, firewall).
+- Security model (identity, bearer tokens for control, signed search messages).
+- Debugging, logs, and common pitfalls (self-discovery, bind host, port conflicts).
+- How the identity TCP plane and rUDP data plane interact.
+
+This DESIGN document captures the historical intent and the major evolutionary steps taken.
+
+---
+
+*Status (2026)*: The IceBridge servent, control API, rUDP mesh, desktop integration (local + remote), Android support, configuration UI, discovery, and distributed search performer over the transport have all been implemented and iterated on (including multiple-token auth, self-skip, port configurability, and stabilization of the direct identity bootstrap path).
+
+Next documentation / cleanup steps include a comprehensive `ICEBRIDGE.md` (see note at top of this file).
