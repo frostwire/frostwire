@@ -65,12 +65,15 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         List<DiscoveredEndpoint> result = new ArrayList<>();
         java.util.Set<String> seen = new java.util.HashSet<>();
         try {
+            // Always aggressively discover dedicated relayers first (via frostwire-relays-v1),
+            // then peers. This ensures desktop finds remote IceBridge relays easily via DHT
+            // and can use them for routing search/index commands over the rUDP mesh.
+            ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session, discoveryTimeoutSec);
+            addEndpoints(relays, result, seen);
+
             ArrayList<TcpEndpoint> endpoints = DhtRendezvous.findPeers(session, discoveryTimeoutSec);
             addEndpoints(endpoints, result, seen);
-            if (result.size() < 10) {
-                ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session, discoveryTimeoutSec);
-                addEndpoints(relays, result, seen);
-            }
+
             if (result.isEmpty()) {
                 ArrayList<TcpEndpoint> bootstrap = DhtRendezvous.findBootstrapNodes(session, discoveryTimeoutSec);
                 addEndpoints(bootstrap, result, seen);

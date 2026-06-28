@@ -13,6 +13,7 @@ import com.frostwire.util.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,13 +55,19 @@ public final class PeerDiscovery {
     private final PeerDiscoverySource source;
     private final PeerDirectory directory;
     private final PeerAuthenticator authenticator;
+    private final byte[] ownEd25519Pub;
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory) {
-        this(source, directory, null);
+        this(source, directory, null, null);
     }
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory,
                          PeerAuthenticator authenticator) {
+        this(source, directory, authenticator, null);
+    }
+
+    public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory,
+                         PeerAuthenticator authenticator, byte[] ownEd25519Pub) {
         if (source == null) {
             throw new IllegalArgumentException("source is null");
         }
@@ -70,6 +77,7 @@ public final class PeerDiscovery {
         this.source = source;
         this.directory = directory;
         this.authenticator = authenticator;
+        this.ownEd25519Pub = (ownEd25519Pub != null) ? ownEd25519Pub.clone() : null;
     }
 
     /**
@@ -90,6 +98,10 @@ public final class PeerDiscovery {
                 if (host == null || host.isEmpty() || port <= 0) {
                     continue;
                 }
+                if (isLocalEndpoint(host)) {
+                    LOG.debug("Skipping likely local/self endpoint " + host + ":" + port);
+                    continue;
+                }
                 if (authenticator != null) {
                     Optional<IdentityRecord> maybeIdentity = authenticator.authenticate(host, port);
                     if (maybeIdentity.isEmpty()) {
@@ -97,6 +109,10 @@ public final class PeerDiscovery {
                         continue;
                     }
                     IdentityRecord identity = maybeIdentity.get();
+                    if (ownEd25519Pub != null && Arrays.equals(identity.ed25519Pub(), ownEd25519Pub)) {
+                        LOG.debug("Skipping self discovery for " + host + ":" + port);
+                        continue;
+                    }
                     byte[] peerPub = identity.ed25519Pub();
                     if (alreadyKnown(peerPub, host, port)) {
                         continue;
@@ -161,5 +177,12 @@ public final class PeerDiscovery {
         } catch (Exception e) {
             throw new IllegalStateException("SHA-256 unavailable", e);
         }
+    }
+
+    private static boolean isLocalEndpoint(String host) {
+        return "127.0.0.1".equals(host)
+                || "localhost".equalsIgnoreCase(host)
+                || "::1".equals(host)
+                || "0:0:0:0:0:0:0:1".equals(host);
     }
 }
