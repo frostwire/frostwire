@@ -69,6 +69,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("Configuration (from .env / ICEBRIDGE_* env vars):");
         System.out.println("  ICEBRIDGE_HOST              = " + config.host());
         System.out.println("  ICEBRIDGE_RUDP_PORT         = " + config.rudpPort() + " (UDP)");
+        System.out.println("  ICEBRIDGE_RELAY_PORT        = " + config.relayPort() + " (TCP, identity handshake)");
         System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + (config.controlHttpPort() > 0 ? config.controlHttpPort() + " (TCP)" : "0 (disabled)"));
         System.out.println("  ICEBRIDGE_ROLE              = " + config.role());
         System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
@@ -83,6 +84,11 @@ public final class IceBridgeServer implements AutoCloseable {
             System.err.println("       Another IceBridge instance or FrostWire may already be running.");
             System.err.println("       To use a different port: ICEBRIDGE_RUDP_PORT=<port> ./gradlew icebridge");
             System.exit(1);
+        }
+        if (config.relayPort() > 0 && !checkPortAvailable(config.host(), config.relayPort(), false)) {
+            System.err.println("WARNING: TCP port " + config.relayPort() + " (identity handshake) is already in use.");
+            System.err.println("         Another IceBridge instance or FrostWire may already be running.");
+            System.err.println("         To use a different port: ICEBRIDGE_RELAY_PORT=<port> ./gradlew icebridge");
         }
         if (config.controlHttpPort() > 0 && !checkPortAvailable(config.host(), config.controlHttpPort(), false)) {
             System.err.println("ERROR: TCP port " + config.controlHttpPort() + " is already in use.");
@@ -230,7 +236,7 @@ public final class IceBridgeServer implements AutoCloseable {
     }
 
     private void startRelayServer() {
-        int relayPort = RelayConstants.RELAY_LISTEN_PORT;
+        int relayPort = config.relayPort();
         try {
             IdentityRecord record = IdentityRecord.createSigned(
                     identity.nodeId(), identity.ed25519(),

@@ -32,6 +32,7 @@ public final class IceBridgeConfig {
 
     private final String host;
     private final int rudpPort;
+    private final int relayPort;
     private final int controlHttpPort;
     private final boolean controlStdio;
     private final Role role;
@@ -51,8 +52,25 @@ public final class IceBridgeConfig {
                            long peerTtlSec,
                            double maxQpsPerKey,
                            boolean bootstrap) {
+        this(host, rudpPort, com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
+             controlHttpPort, controlStdio, role, identityFile,
+             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap);
+    }
+
+    public IceBridgeConfig(String host,
+                           int rudpPort,
+                           int relayPort,
+                           int controlHttpPort,
+                           boolean controlStdio,
+                           Role role,
+                           File identityFile,
+                           int maxPeers,
+                           long peerTtlSec,
+                           double maxQpsPerKey,
+                           boolean bootstrap) {
         this.host = Objects.requireNonNullElse(host, "0.0.0.0");
         this.rudpPort = requirePositiveOrZero(rudpPort, "rudpPort");
+        this.relayPort = requirePositiveOrZero(relayPort, "relayPort");
         this.controlHttpPort = controlHttpPort;
         this.controlStdio = controlStdio;
         this.role = Objects.requireNonNullElse(role, Role.CLIENT);
@@ -72,6 +90,10 @@ public final class IceBridgeConfig {
 
     public int rudpPort() {
         return rudpPort;
+    }
+
+    public int relayPort() {
+        return relayPort;
     }
 
     public int controlHttpPort() {
@@ -145,6 +167,7 @@ public final class IceBridgeConfig {
     public static final class Builder {
         private String host = "0.0.0.0";
         private int rudpPort;
+        private int relayPort = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
         private int controlHttpPort;
         private boolean controlStdio;
         private Role role = Role.CLIENT;
@@ -164,6 +187,11 @@ public final class IceBridgeConfig {
 
         public Builder rudpPort(int rudpPort) {
             this.rudpPort = rudpPort;
+            return this;
+        }
+
+        public Builder relayPort(int relayPort) {
+            this.relayPort = relayPort;
             return this;
         }
 
@@ -208,7 +236,7 @@ public final class IceBridgeConfig {
         }
 
         public IceBridgeConfig build() {
-            return new IceBridgeConfig(host, rudpPort, controlHttpPort, controlStdio, role,
+            return new IceBridgeConfig(host, rudpPort, relayPort, controlHttpPort, controlStdio, role,
                     identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap);
         }
     }
@@ -264,6 +292,7 @@ public final class IceBridgeConfig {
         String host = env("ICEBRIDGE_HOST", "0.0.0.0");
         b.host(host);
         b.rudpPort(envInt("ICEBRIDGE_RUDP_PORT", 6889));
+        b.relayPort(envInt("ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
         b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8080));
         b.controlStdio(false);
         String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
