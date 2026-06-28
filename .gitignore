@@ -109,3 +109,11 @@ frostwire_launcher.py  # lives in android/ subdirectory
 # Documentation artifacts
 desktop/TECH_DEBT.md
 desktop/mcp-client-config-reference.md
+
+# IceBridge secrets (local dev)
+.env
+**/.env
+identity.dat
+**/identity.dat
+icebridge-tokens.txt
+**/icebridge-tokens.txt
