@@ -87,7 +87,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  ICEBRIDGE_HOST              = " + config.host());
         System.out.println("  ICEBRIDGE_RUDP_PORT         = " + config.rudpPort() + " (UDP)");
         System.out.println("  ICEBRIDGE_RELAY_PORT        = " + config.relayPort() + " (TCP, identity handshake)");
-        System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + (config.controlHttpPort() > 0 ? config.controlHttpPort() + " (TCP)" : "0 (disabled)"));
+        System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + config.controlHttpPort() + " (TCP)");
         System.out.println("  ICEBRIDGE_ROLE              = " + config.role());
         System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
         System.out.println("  ICEBRIDGE_AUTH_TOKENS_FILE  = " + tokensFile.getAbsolutePath());
@@ -369,7 +369,12 @@ public final class IceBridgeServer implements AutoCloseable {
                     b.relayPort(parseInt(next(args, ++i, "--relay-port")));
                     break;
                 case "--control-http-port":
-                    b.controlHttpPort(parseInt(next(args, ++i, "--control-http-port")));
+                    int controlPort = parseInt(next(args, ++i, "--control-http-port"));
+                    if (controlPort <= 0) {
+                        throw new IllegalArgumentException(
+                                "--control-http-port must be > 0 (HTTP control is required)");
+                    }
+                    b.controlHttpPort(controlPort);
                     break;
                 case "--role":
                     b.role(IceBridgeConfig.Role.valueOf(next(args, ++i, "--role").toUpperCase()));
@@ -438,7 +443,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("Options:");
         System.out.println("  --rudp-port PORT           rUDP listen port (0 = disable, auto for local)");
         System.out.println("  --relay-port PORT          TCP identity/relay handshake port (default 6888)");
-        System.out.println("  --control-http-port PORT   HTTP control port (0 = disable)");
+        System.out.println("  --control-http-port PORT   HTTP control port on 127.0.0.1 (required, must be > 0)");
         System.out.println("  --role ROLE                FORWARDER, CLIENT, or BOTH");
         System.out.println("  --identity-file PATH       Ed25519 identity file");
         System.out.println("  --max-peers N              Maximum tracked peers");
