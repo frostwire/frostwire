@@ -697,6 +697,78 @@ class LocalIndexTableTest {
     }
 
     @Test
+    void migrationBackfillsSharedFilesFromFilesJson() throws Exception {
+        table.close();
+        table = null;
+        deleteRecursive(dbFile);
+        seedV2DatabaseWithTorrent(
+                "legacy-torrent",
+                "[{\"path\":\"v2_unique_readme.txt\",\"size\":42}]");
+
+        LocalIndexTable reopened = LocalIndexTable.open(dbFile);
+        try {
+            List<LocalSharedTorrent> results = reopened.search("v2_unique_readme", 10);
+            assertEquals(1, results.size(), "file-path search must work after v2->v3 migration");
+            assertNotNull(results.get(0).matchedFile());
+            assertTrue(results.get(0).matchedFile().contains("v2_unique_readme.txt"));
+        } finally {
+            reopened.close();
+        }
+    }
+
+    /**
+     * Simulates a v2 database: shared_torrents populated, schema version 2,
+     * no shared_files index (pre-v3 file FTS).
+     */
+    private void seedV2DatabaseWithTorrent(String name, String filesJson) throws Exception {
+        byte[] infoHash = randomBytes(20);
+        byte[] nodeId = randomBytes(20);
+        byte[] pub = randomBytes(32);
+        long now = 1_000_000L;
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + dbFile.getAbsolutePath());
+             java.sql.Statement s = c.createStatement()) {
+            s.execute("CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+            s.execute("INSERT INTO schema_meta(key, value) VALUES ('version', '2')");
+            s.execute("CREATE TABLE shared_torrents ("
+                    + "info_hash TEXT PRIMARY KEY, "
+                    + "name TEXT NOT NULL, "
+                    + "size_bytes INTEGER NOT NULL, "
+                    + "file_count INTEGER NOT NULL, "
+                    + "files_json TEXT NOT NULL, "
+                    + "tags TEXT, "
+                    + "publisher_node_id TEXT NOT NULL, "
+                    + "publisher_ed25519_pub BLOB NOT NULL, "
+                    + "publisher_utp_port INTEGER, "
+                    + "added_at INTEGER NOT NULL, "
+                    + "last_seen_at INTEGER NOT NULL, "
+                    + "last_published_at INTEGER)");
+            s.execute("CREATE VIRTUAL TABLE shared_torrents_fts USING fts5("
+                    + "name, tags, content='shared_torrents', content_rowid='rowid', "
+                    + "tokenize='porter unicode61')");
+            try (java.sql.PreparedStatement ps = c.prepareStatement(
+                    "INSERT INTO shared_torrents (info_hash, name, size_bytes, file_count, "
+                            + "files_json, tags, publisher_node_id, publisher_ed25519_pub, "
+                            + "publisher_utp_port, added_at, last_seen_at, last_published_at) "
+                            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                ps.setString(1, Hex.encode(infoHash));
+                ps.setString(2, name);
+                ps.setLong(3, 1024L);
+                ps.setInt(4, 1);
+                ps.setString(5, filesJson);
+                ps.setString(6, null);
+                ps.setString(7, Hex.encode(nodeId));
+                ps.setBytes(8, pub);
+                ps.setInt(9, 49152);
+                ps.setLong(10, now);
+                ps.setLong(11, now);
+                ps.setNull(12, java.sql.Types.INTEGER);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    @Test
     void schemaVersionIsBumpedToCurrent() throws Exception {
         try (java.sql.Connection c = java.sql.DriverManager.getConnection(
                 "jdbc:sqlite:" + dbFile.getAbsolutePath());

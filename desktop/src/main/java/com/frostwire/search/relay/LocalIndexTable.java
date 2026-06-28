@@ -667,8 +667,32 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
             s.execute(CREATE_FILES_TABLE_SQL);
             s.execute(CREATE_FILES_FTS_SQL);
             s.execute(CREATE_INDEX_FILES_TORRENT_SQL);
+            backfillSharedFiles();
             LOG.info("Migrated LocalIndexTable schema from v" + oldVersion + " to v" + SCHEMA_VERSION
                     + " (rebuilt shared_files + shared_files_fts tables)");
+        }
+    }
+
+    /**
+     * Repopulate {@code shared_files} and FTS from existing {@code shared_torrents}
+     * rows after a schema upgrade that recreated the file index tables.
+     */
+    private void backfillSharedFiles() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT info_hash, files_json FROM " + TABLE)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String infoHash = rs.getString(1);
+                    String filesJson = rs.getString(2);
+                    try {
+                        syncSharedFiles(infoHash, filesJson);
+                    } catch (SQLException e) {
+                        LOG.warn("backfillSharedFiles failed for " + infoHash, e);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOG.warn("backfillSharedFiles query failed", e);
         }
     }
 
