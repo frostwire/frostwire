@@ -134,14 +134,18 @@ public class AgentConfigWriter {
 
             if (sectionIndex >= 0) {
                 int urlIndex = -1;
+                int enabledIndex = -1;
+                int firstPropAfter = sectionIndex + 1;
                 for (int i = sectionIndex + 1; i < lines.size(); i++) {
                     String trimmed = lines.get(i).trim();
                     if (trimmed.startsWith("[")) {
                         break;
                     }
-                    if (trimmed.startsWith("url")) {
+                    if (urlIndex < 0 && trimmed.startsWith("url")) {
                         urlIndex = i;
-                        break;
+                    }
+                    if (enabledIndex < 0 && trimmed.startsWith("enabled")) {
+                        enabledIndex = i;
                     }
                 }
                 if (urlIndex >= 0) {
@@ -149,12 +153,33 @@ public class AgentConfigWriter {
                 } else {
                     lines.add(sectionIndex + 1, urlLine);
                 }
+                if (enabledIndex < 0) {
+                    // find position after url (or first prop)
+                    int insertPos = sectionIndex + 1;
+                    for (int i = sectionIndex + 1; i < lines.size(); i++) {
+                        String t = lines.get(i).trim();
+                        if (t.startsWith("url")) { insertPos = i + 1; break; }
+                        if (t.startsWith("[")) break;
+                        insertPos = i + 1;
+                    }
+                    if (insertPos > lines.size()) insertPos = lines.size();
+                    // avoid adding dup
+                    boolean hasEn = false;
+                    for (int i = sectionIndex + 1; i < lines.size(); i++) {
+                        if (lines.get(i).trim().startsWith("enabled")) { hasEn = true; break; }
+                        if (lines.get(i).trim().startsWith("[")) break;
+                    }
+                    if (!hasEn) {
+                        lines.add(insertPos, "enabled = true");
+                    }
+                }
             } else {
                 if (!lines.isEmpty() && !lines.get(lines.size() - 1).trim().isEmpty()) {
                     lines.add("");
                 }
                 lines.add(sectionHeader);
                 lines.add(urlLine);
+                lines.add("enabled = true");
             }
 
             return writeTomlFileAtomic(configFile, lines);
@@ -302,6 +327,9 @@ public class AgentConfigWriter {
                 entry.addProperty("enabled", true);
                 break;
             case "qwen":
+                entry.addProperty("url", mcpUrl);
+                break;
+            case "grok":
                 entry.addProperty("url", mcpUrl);
                 break;
             case "chatgpt-desktop":

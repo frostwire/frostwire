@@ -23,6 +23,7 @@ public class AgentDetector {
         agents.add(detectCodex());
         agents.add(detectOpenCode());
         agents.add(detectQwen());
+        agents.add(detectGrok());
         agents.add(detectChatGPTDesktop());
         return agents;
     }
@@ -196,6 +197,29 @@ public class AgentDetector {
         boolean appExists = isCommandInPath("qwen");
         boolean configured = isFrostwireConfigured(configPath, "mcpServers");
         return new AgentInfo("qwen", "Qwen Code", configPath, "mcpServers", appExists, configured);
+    }
+
+    static AgentInfo detectGrok() {
+        String configPath = getHomeDir() + "/.grok/config.toml";
+        if (isWindows()) {
+            configPath = getHomeDir() + "\\.grok\\config.toml";
+        }
+        boolean appExists = isCommandInPath("grok");
+        if (!appExists && isMac()) {
+            // Check common locations for the grok binary / install
+            appExists = new File(getHomeDir() + "/.grok/bin/grok").exists()
+                    || new File("/usr/local/bin/grok").exists()
+                    || new File("/opt/homebrew/bin/grok").exists();
+        }
+        if (!appExists && isWindows()) {
+            String localAppData = System.getenv("LOCALAPPDATA");
+            if (localAppData != null) {
+                appExists = new File(localAppData + "\\grok\\grok.exe").exists()
+                        || new File(localAppData + "\\Programs\\grok\\grok.exe").exists();
+            }
+        }
+        boolean configured = isFrostwireConfiguredToml(configPath, "mcp_servers");
+        return new AgentInfo("grok", "Grok Build", configPath, "mcp_servers", AgentInfo.ConfigFormat.TOML, appExists, configured);
     }
 
     static AgentInfo detectChatGPTDesktop() {
