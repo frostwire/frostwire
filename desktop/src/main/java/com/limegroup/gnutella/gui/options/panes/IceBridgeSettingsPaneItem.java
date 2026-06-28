@@ -163,6 +163,22 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     SearchEnginesSettings.ICEBRIDGE_ROLE.setValue((String) ROLE_COMBO.getSelectedItem());
     SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.setValue(REMOTE_URL_FIELD.getText().trim());
     SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.setValue(REMOTE_TOKEN_FIELD.getText().trim());
+
+    // Log the configuration change. The IceBridge child is started only at app launch,
+    // so these values take effect after restart.
+    com.frostwire.util.Logger log = com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class);
+    log.info("=== IceBridge Configuration (updated via settings; restart required) ===");
+    log.info("  ICEBRIDGE_ENABLED             = " + SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    log.info("  ICEBRIDGE_USE_REMOTE          = " + SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue());
+    log.info("  ICEBRIDGE_REMOTE_URL          = " + SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue());
+    boolean hasRemoteToken = !SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue().isEmpty();
+    log.info("  ICEBRIDGE_REMOTE_AUTH_TOKEN   = " + (hasRemoteToken ? "[set]" : "(empty)"));
+    log.info("  ICEBRIDGE_BIND_HOST           = " + SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue());
+    log.info("  ICEBRIDGE_RUDP_PORT           = " + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
+    log.info("  ICEBRIDGE_RELAY_LISTEN_PORT   = " + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
+    log.info("  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
+    log.info("  ICEBRIDGE_CONTROL_HTTP_PORT   = " + SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
+    log.info("======================================================================");
     return false;
   }
 

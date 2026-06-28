@@ -498,6 +498,10 @@ final class Initializer {
       //     and can upgrade the entry.
       startPeerDiscovery(directory, btEngine, identity);
 
+      // Log IceBridge configuration (from settings) early. This shows what will be used
+      // for any IceBridge child process launched this session. Env vars can still override.
+      logIceBridgeConfiguration();
+
       // 11. Launch the local IceBridge daemon (or connect to remote), create the search
       //     transport, and wire the DISTRIBUTED search engine so the
       //     user can search both the local index and authenticated
@@ -523,6 +527,27 @@ final class Initializer {
    * <p>If the IceBridge jar is not found or the daemon fails to start, the DISTRIBUTED engine is
    * left un-wired (not ready). The rest of FrostWire — LOCAL search, karma, DHT — still works.
    */
+  /**
+   * Logs the current IceBridge configuration from settings (and notes env override potential).
+   * Called on startup.
+   */
+  private static void logIceBridgeConfiguration() {
+    com.frostwire.util.Logger log = com.frostwire.util.Logger.getLogger(Initializer.class);
+    log.info("=== IceBridge Configuration ===");
+    log.info("  ICEBRIDGE_ENABLED             = " + SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    log.info("  ICEBRIDGE_USE_REMOTE          = " + SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue());
+    log.info("  ICEBRIDGE_REMOTE_URL          = " + SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue());
+    boolean hasRemoteToken = !SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue().isEmpty();
+    log.info("  ICEBRIDGE_REMOTE_AUTH_TOKEN   = " + (hasRemoteToken ? "[set]" : "(empty)"));
+    log.info("  ICEBRIDGE_BIND_HOST           = " + SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue());
+    log.info("  ICEBRIDGE_RUDP_PORT           = " + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
+    log.info("  ICEBRIDGE_RELAY_LISTEN_PORT   = " + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
+    log.info("  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
+    log.info("  ICEBRIDGE_CONTROL_HTTP_PORT   = " + SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
+    log.info("  (Env vars ICEBRIDGE_* can override some of the above at process launch time)");
+    log.info("===============================");
+  }
+
   private void startIceBridgeSearch(
       LocalIndex localIndex,
       PeerDirectory directory,
@@ -560,6 +585,7 @@ final class Initializer {
           client.setAuthToken(token);
         }
         relayLog.info("Using remote IceBridge at " + remoteUrl + " (no local subprocess)");
+        relayLog.info("  (remote auth token " + (token != null && !token.isEmpty() ? "provided" : "not set") + ")");
         // Assume user ensures the remote is healthy.
       } else {
         File jarPath = resolveIceBridgeJar();
@@ -591,10 +617,11 @@ final class Initializer {
                 jarPath, identityFile, 0, effectiveRudpPort, relayListenPort, role, bindHost);
         launcher.start();
         relayLog.info(
-            "IceBridge daemon started: controlPort="
-                + launcher.controlPort()
-                + " rudpPort="
-                + launcher.rudpPort());
+            "IceBridge daemon (local child) started:");
+        relayLog.info("  controlPort=" + launcher.controlPort() + " (auto-assigned)");
+        relayLog.info("  rudpPort=" + launcher.rudpPort());
+        relayLog.info("  relayPort=" + launcher.relayPort() + " (identity)");
+        relayLog.info("  bindHost=" + bindHost + " role=" + role);
 
         // Wait for the daemon to become healthy (up to 15s).
         client = launcher.client();

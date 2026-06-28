@@ -291,7 +291,7 @@ tasks.register('icebridgeJar', Jar) {
 
 tasks.register('icebridge', JavaExec) {
     group = 'application'
-    description = 'Runs the IceBridge relay server. Reads config from .env or ICEBRIDGE_* env vars.'
+    description = 'Runs the IceBridge relay server. Reads config from .env or ICEBRIDGE_* env vars. Use -Picebridge.args="--generate-token" to create a new bearer token.'
 
     dependsOn icebridgeJar
 
@@ -310,6 +310,10 @@ tasks.register('icebridge', JavaExec) {
         if (name.startsWith('ICEBRIDGE_')) {
             systemProperty name, value
         }
+    }
+
+    if (project.hasProperty('icebridge.args')) {
+        args project.property('icebridge.args').toString().split()
     }
 
     standardInput = System.in
