@@ -18,512 +18,608 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.search.ISearchPerformer;
+import com.frostwire.search.SearchPerformerFactory;
+import com.frostwire.search.bitsearch.BitsearchSearchPattern;
+import com.frostwire.search.frostclick.FrostClickSearchPattern;
+import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.internetarchive.InternetArchiveCrawlingStrategy;
+import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
+import com.frostwire.search.knaben.KnabenSearchPattern;
+import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
+import com.frostwire.search.nyaa.NyaaSearchPattern;
+import com.frostwire.search.one337x.One337xCrawlingStrategy;
+import com.frostwire.search.one337x.One337xSearchPattern;
 import com.frostwire.search.relay.DistributedSearchPerformer;
+import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrentSearchPerformer;
-import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.PeerDirectory;
-import com.frostwire.search.frostclick.UserAgent;
-import com.frostwire.search.frostclick.FrostClickSearchPattern;
-import com.frostwire.search.nyaa.NyaaSearchPattern;
-import com.frostwire.search.knaben.KnabenSearchPattern;
-import com.frostwire.search.magnetdl.MagnetDLSearchPattern;
-import com.frostwire.search.internetarchive.InternetArchiveSearchPattern;
-import com.frostwire.search.internetarchive.InternetArchiveCrawlingStrategy;
-import com.frostwire.search.tpb.TPBSearchPattern;
-import com.frostwire.search.tpb.TPBMirrors;
-import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.search.soundcloud.SoundcloudSearchPattern;
-import com.frostwire.search.bitsearch.BitsearchSearchPattern;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
-import com.frostwire.search.SearchPerformerFactory;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPattern;
-import com.frostwire.search.yt.YTSearchPattern;
-import com.frostwire.search.one337x.One337xSearchPattern;
-import com.frostwire.search.one337x.One337xCrawlingStrategy;
 import com.frostwire.search.torrentz2.Torrentz2SearchPattern;
+import com.frostwire.search.tpb.TPBMirrors;
+import com.frostwire.search.tpb.TPBSearchPattern;
+import com.frostwire.search.yt.YTSearchPattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.limewire.setting.BooleanSetting;
-
-import java.util.Arrays;
 import java.util.List;
+import org.limewire.setting.BooleanSetting;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public abstract class SearchEngine {
-    //private static final Logger LOG = Logger.getLogger(SearchEngine.class);
-    private static final int DEFAULT_TIMEOUT = 5000;
+  // private static final Logger LOG = Logger.getLogger(SearchEngine.class);
+  private static final int DEFAULT_TIMEOUT = 5000;
 
-    public enum SearchEngineID {
-        TPB_ID,
-        SOUNDCLOUD_ID,
-        INTERNET_ARCHIVE_ID,
-        FROSTCLICK_ID,
-        ONE337X_ID,
-        NYAA_ID,
-        TORRENTZ2_ID,
-        MAGNETDL_ID,
-        TELLURIDE_ID,
-        YT_ID,
-        TORRENTSCSV_ID,
-        KNABEN_ID,
-        BITSEARCH_ID,
-        LOCAL_ID,
-        DISTRIBUTED_ID
-    }
+  public enum SearchEngineID {
+    TPB_ID,
+    SOUNDCLOUD_ID,
+    INTERNET_ARCHIVE_ID,
+    FROSTCLICK_ID,
+    ONE337X_ID,
+    NYAA_ID,
+    TORRENTZ2_ID,
+    MAGNETDL_ID,
+    TELLURIDE_ID,
+    YT_ID,
+    TORRENTSCSV_ID,
+    KNABEN_ID,
+    BITSEARCH_ID,
+    LOCAL_ID,
+    DISTRIBUTED_ID
+  }
 
-    // SECURITY AUDIT NOTE (SEC8): TPB mirror list is fetched from
-    // piratebayproxy.info at startup without certificate pinning. A
-    // compromised mirror list could redirect all TPB searches to an
-    // attacker-controlled domain. Certificate pinning was considered
-    // but rejected because mirrors change frequently and pinning would
-    // require constant maintenance. The Ssl.FWHostnameVerifier domain
-    // whitelist restricts which domains can be used, but a MITM on
-    // piratebayproxy.info itself could inject new domains into the
-    // whitelist. Do NOT add cert pinning without a maintenance plan
-    // for updating the pin list when mirrors change.
-    private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
+  // SECURITY AUDIT NOTE (SEC8): TPB mirror list is fetched from
+  // piratebayproxy.info at startup without certificate pinning. A
+  // compromised mirror list could redirect all TPB searches to an
+  // attacker-controlled domain. Certificate pinning was considered
+  // but rejected because mirrors change frequently and pinning would
+  // require constant maintenance. The Ssl.FWHostnameVerifier domain
+  // whitelist restricts which domains can be used, but a MITM on
+  // piratebayproxy.info itself could inject new domains into the
+  // whitelist. Do NOT add cert pinning without a maintenance plan
+  // for updating the pin list when mirrors change.
+  private static final SearchEngine TPB =
+      new SearchEngine(
+          SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
-            // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
-            Thread t = new Thread(() -> {
-                try {
-                    HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                    // from https://piratebayproxy.info/
-                    TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBMirrors.getMirrors(), 1000, 6);
-                } catch (Throwable e) {
-                    // Non-fatal: TPB will remain not-ready.
-                }
-            }, "tpb-mirror-finder");
-            t.setDaemon(true);
-            t.start();
+          // while this is happening TPB.isReady() should be false, as it's initialized with a null
+          // domain name.
+          Thread t =
+              new Thread(
+                  () -> {
+                    try {
+                      HttpClient httpClient =
+                          HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                      // from https://piratebayproxy.info/
+                      TPB._domainName =
+                          UrlUtils.getFastestMirrorDomain(
+                              httpClient, TPBMirrors.getMirrors(), 1000, 6);
+                    } catch (Throwable e) {
+                      // Non-fatal: TPB will remain not-ready.
+                    }
+                  },
+                  "tpb-mirror-finder");
+          t.setDaemon(true);
+          t.start();
         }
 
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            if (!isReady()) {
-                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
-            }
-            // V2: Using new flat architecture with regex pattern for dual HTML format support
-            // TPB requires access to domain for URL construction, so create V2 SearchEngine directly
-            String encodedKeywords = UrlUtils.encode(keywords);
-            com.frostwire.search.SearchPerformer searchEngine = new com.frostwire.search.SearchPerformer(
-                    token,
-                    keywords,
-                    encodedKeywords,
-                    new TPBSearchPattern(TPB.getDomainName()),  // Pass domain to pattern
-                    null,  // No crawling needed - complete data on search page
-                    DEFAULT_TIMEOUT
-            );
-            return searchEngine;
+          if (!isReady()) {
+            throw new RuntimeException(
+                "Check your logic, a search performer that's not ready should not be in the list of performers yet.");
+          }
+          // V2: Using new flat architecture with regex pattern for dual HTML format support
+          // TPB requires access to domain for URL construction, so create V2 SearchEngine directly
+          String encodedKeywords = UrlUtils.encode(keywords);
+          com.frostwire.search.SearchPerformer searchEngine =
+              new com.frostwire.search.SearchPerformer(
+                  token,
+                  keywords,
+                  encodedKeywords,
+                  new TPBSearchPattern(TPB.getDomainName()), // Pass domain to pattern
+                  null, // No crawling needed - complete data on search page
+                  DEFAULT_TIMEOUT);
+          return searchEngine;
         }
-    };
-    private static final SearchEngine SOUNDCLOUD = new SearchEngine(SearchEngineID.SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api-v2.soundcloud.com") {
+      };
+  private static final SearchEngine SOUNDCLOUD =
+      new SearchEngine(
+          SearchEngineID.SOUNDCLOUD_ID,
+          "Soundcloud",
+          SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED,
+          "api-v2.soundcloud.com") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with JSON API parsing for audio streaming
-            // Get dynamic credentials fetched from remote server
-            String clientId = SoundCloudConfigFetcher.getClientId();
-            String appVersion = SoundCloudConfigFetcher.getAppVersion();
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new SoundcloudSearchPattern(clientId, appVersion),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture with JSON API parsing for audio streaming
+          // Get dynamic credentials fetched from remote server
+          String clientId = SoundCloudConfigFetcher.getClientId();
+          String appVersion = SoundCloudConfigFetcher.getAppVersion();
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new SoundcloudSearchPattern(clientId, appVersion),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine INTERNET_ARCHIVE = new SearchEngine(SearchEngineID.INTERNET_ARCHIVE_ID, "Archive.org", SearchEnginesSettings.INTERNET_ARCHIVE_SEARCH_ENABLED, "archive.org") {
+      };
+  private static final SearchEngine INTERNET_ARCHIVE =
+      new SearchEngine(
+          SearchEngineID.INTERNET_ARCHIVE_ID,
+          "Archive.org",
+          SearchEnginesSettings.INTERNET_ARCHIVE_SEARCH_ENABLED,
+          "archive.org") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with crawling strategy
-            // Search page returns preliminary results, strategy fetches file list from detail pages
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new InternetArchiveSearchPattern(),
-                    new InternetArchiveCrawlingStrategy(),
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture with crawling strategy
+          // Search page returns preliminary results, strategy fetches file list from detail pages
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new InternetArchiveSearchPattern(),
+              new InternetArchiveCrawlingStrategy(),
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine FROSTCLICK = new SearchEngine(SearchEngineID.FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
-        private final UserAgent userAgent = new UserAgent(OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
+      };
+  private static final SearchEngine FROSTCLICK =
+      new SearchEngine(
+          SearchEngineID.FROSTCLICK_ID,
+          "FrostClick",
+          SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED,
+          "api.frostclick.com") {
+        private final UserAgent userAgent =
+            new UserAgent(
+                OSUtils.getFullOS(),
+                FrostWireUtils.getFrostWireVersion(),
+                String.valueOf(FrostWireUtils.getBuildNumber()));
 
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with custom headers for API authentication
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new FrostClickSearchPattern(userAgent.toString(), userAgent.getUUID(), userAgent.getHeadersMap()),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture with custom headers for API authentication
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new FrostClickSearchPattern(
+                  userAgent.toString(), userAgent.getUUID(), userAgent.getHeadersMap()),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine NYAA = new SearchEngine(SearchEngineID.NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
+      };
+  private static final SearchEngine NYAA =
+      new SearchEngine(
+          SearchEngineID.NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using SearchPerformerFactory with regex-based HTML parsing pattern
-            // NyaaSearchPattern extracts anime torrent metadata from search result table
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new NyaaSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using SearchPerformerFactory with regex-based HTML parsing pattern
+          // NyaaSearchPattern extracts anime torrent metadata from search result table
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new NyaaSearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
+      };
 
-    private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
+  private static final SearchEngine ONE337X =
+      new SearchEngine(
+          SearchEngineID.ONE337X_ID,
+          "1337x",
+          SearchEnginesSettings.ONE337X_SEARCH_ENABLED,
+          "www.1377x.to") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture with crawling strategy
-            // Search page returns crawlable results, strategy fetches detail pages to extract magnet links and metadata
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new One337xSearchPattern(),
-                    new One337xCrawlingStrategy(),
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture with crawling strategy
+          // Search page returns crawlable results, strategy fetches detail pages to extract magnet
+          // links and metadata
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new One337xSearchPattern(),
+              new One337xCrawlingStrategy(),
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine TORRENTZ2 = new SearchEngine(SearchEngineID.TORRENTZ2_ID, "torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.nz") {
+      };
+  private static final SearchEngine TORRENTZ2 =
+      new SearchEngine(
+          SearchEngineID.TORRENTZ2_ID,
+          "torrentz2",
+          SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED,
+          "torrentz2.nz") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed - Torrentz2 provides complete data)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new Torrentz2SearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture (no crawling needed - Torrentz2 provides complete data)
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new Torrentz2SearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine MAGNETDL = new SearchEngine(SearchEngineID.MAGNETDL_ID, "magnetdl", SearchEnginesSettings.MAGNETDL_ENABLED, "magnetdl.homes") {
+      };
+  private static final SearchEngine MAGNETDL =
+      new SearchEngine(
+          SearchEngineID.MAGNETDL_ID,
+          "magnetdl",
+          SearchEnginesSettings.MAGNETDL_ENABLED,
+          "magnetdl.homes") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture (no crawling needed - MagnetDL provides complete data via JSON API)
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new MagnetDLSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture (no crawling needed - MagnetDL provides complete data
+          // via JSON API)
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new MagnetDLSearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
+      };
 
-    private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", SearchEnginesSettings.TELLURIDE_ENABLED, "*") {
+  private static final SearchEngine TELLURIDE =
+      new SearchEngine(
+          SearchEngineID.TELLURIDE_ID,
+          "Cloud Backup",
+          SearchEnginesSettings.TELLURIDE_ENABLED,
+          "*") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            return new TellurideSearchPerformer(token,
-                    keywords,
-                    new TellurideSearchPerformerDesktopListener(),
-                    FrostWireUtils.getTellurideLauncherFile());
+          return new TellurideSearchPerformer(
+              token,
+              keywords,
+              new TellurideSearchPerformerDesktopListener(),
+              FrostWireUtils.getTellurideLauncherFile());
         }
 
         @Override
         public ISearchPerformer getPerformer(long token, String keywords, boolean playlistMode) {
-            return new TellurideSearchPerformer(token,
-                    keywords,
-                    new TellurideSearchPerformerDesktopListener(),
-                    FrostWireUtils.getTellurideLauncherFile(),
-                    playlistMode);
+          return new TellurideSearchPerformer(
+              token,
+              keywords,
+              new TellurideSearchPerformerDesktopListener(),
+              FrostWireUtils.getTellurideLauncherFile(),
+              playlistMode);
         }
-    };
+      };
 
-    private static final SearchEngine YT = new SearchEngine(SearchEngineID.YT_ID, "YT", SearchEnginesSettings.YT_SEARCH_ENABLED, "www.youtube.com") {
+  private static final SearchEngine YT =
+      new SearchEngine(
+          SearchEngineID.YT_ID, "YT", SearchEnginesSettings.YT_SEARCH_ENABLED, "www.youtube.com") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using new flat architecture
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new YTSearchPattern(),
-                    null,  // No crawling needed for YouTube
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using new flat architecture
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new YTSearchPattern(),
+              null, // No crawling needed for YouTube
+              DEFAULT_TIMEOUT);
         }
-    };
+      };
 
-    private static final SearchEngine TORRENTSCSV = new SearchEngine(SearchEngineID.TORRENTSCSV_ID, "TorrentsCSV", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED, "torrents-csv.com") {
+  private static final SearchEngine TORRENTSCSV =
+      new SearchEngine(
+          SearchEngineID.TORRENTSCSV_ID,
+          "TorrentsCSV",
+          SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED,
+          "torrents-csv.com") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using SearchPerformerFactory with JSON API pattern
-            // TorrentsCSVSearchPattern provides complete torrent metadata via JSON API
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new TorrentsCSVSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using SearchPerformerFactory with JSON API pattern
+          // TorrentsCSVSearchPattern provides complete torrent metadata via JSON API
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new TorrentsCSVSearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
-    private static final SearchEngine BITSEARCH = new SearchEngine(SearchEngineID.BITSEARCH_ID, "Bitsearch", SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED, "bitsearch.eu") {
+      };
+  private static final SearchEngine BITSEARCH =
+      new SearchEngine(
+          SearchEngineID.BITSEARCH_ID,
+          "Bitsearch",
+          SearchEnginesSettings.BITSEARCH_SEARCH_ENABLED,
+          "bitsearch.eu") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: REST/JSON pattern, no crawling — the search response already
-            // carries infohash, title, size, seeders, leechers. Magnet is built
-            // client-side from DefaultTrackers.MAGNET_URL_PARAMETERS.
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new BitsearchSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: REST/JSON pattern, no crawling — the search response already
+          // carries infohash, title, size, seeders, leechers. Magnet is built
+          // client-side from DefaultTrackers.MAGNET_URL_PARAMETERS.
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new BitsearchSearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
+      };
 
-    private static final SearchEngine KNABEN = new SearchEngine(SearchEngineID.KNABEN_ID, "Knaben", SearchEnginesSettings.KNABEN_SEARCH_ENABLED, "knaben.org") {
+  private static final SearchEngine KNABEN =
+      new SearchEngine(
+          SearchEngineID.KNABEN_ID,
+          "Knaben",
+          SearchEnginesSettings.KNABEN_SEARCH_ENABLED,
+          "knaben.org") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            // V2: Using SearchPerformerFactory with custom pattern that declares POST_JSON HTTP method
-            // KnabenSearchPattern specifies HTTP method and constructs the JSON request body
-            return SearchPerformerFactory.createSearchPerformer(
-                    token,
-                    keywords,
-                    new KnabenSearchPattern(),
-                    null,  // No crawling needed
-                    DEFAULT_TIMEOUT
-            );
+          // V2: Using SearchPerformerFactory with custom pattern that declares POST_JSON HTTP
+          // method
+          // KnabenSearchPattern specifies HTTP method and constructs the JSON request body
+          return SearchPerformerFactory.createSearchPerformer(
+              token,
+              keywords,
+              new KnabenSearchPattern(),
+              null, // No crawling needed
+              DEFAULT_TIMEOUT);
         }
-    };
+      };
 
-    private static final SearchEngine LOCAL = new SearchEngine(SearchEngineID.LOCAL_ID, "Local", SearchEnginesSettings.LOCAL_SEARCH_ENABLED, "local") {
+  private static final SearchEngine LOCAL =
+      new SearchEngine(
+          SearchEngineID.LOCAL_ID, "Local", SearchEnginesSettings.LOCAL_SEARCH_ENABLED, "local") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            if (!isReady()) {
-                throw new RuntimeException("Local search engine has no LocalIndex installed; call LocalSearchEngineWire.setIndex(...) before searching.");
-            }
-            return new LocalSharedTorrentSearchPerformer(token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
+          if (!isReady()) {
+            throw new RuntimeException(
+                "Local search engine has no LocalIndex installed; call LocalSearchEngineWire.setIndex(...) before searching.");
+          }
+          return new LocalSharedTorrentSearchPerformer(
+              token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
         }
 
         @Override
         public boolean isReady() {
-            // Ready iff an installer has handed us a LocalIndex. Until then
-            // we are invisible to excludeNonReady=true searches.
-            return LOCAL.localIndex != null;
+          // Ready iff an installer has handed us a LocalIndex. Until then
+          // we are invisible to excludeNonReady=true searches.
+          return LOCAL.localIndex != null;
         }
-    };
+      };
 
-    private static final SearchEngine DISTRIBUTED = new SearchEngine(SearchEngineID.DISTRIBUTED_ID, "Distributed", SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED, "distributed") {
+  private static final SearchEngine DISTRIBUTED =
+      new SearchEngine(
+          SearchEngineID.DISTRIBUTED_ID,
+          "Distributed",
+          SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED,
+          "distributed") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
-            if (!isReady()) {
-                throw new RuntimeException("Distributed search engine is not ready; install localIndex, peerDirectory, identity, and searchTransport.");
-            }
-            return new DistributedSearchPerformer(
-                    token,
-                    keywords,
-                    DISTRIBUTED.localIndex,
-                    DISTRIBUTED.peerDirectory,
-                    DISTRIBUTED.identity,
-                    DISTRIBUTED.searchTransport);
+          if (!isReady()) {
+            throw new RuntimeException(
+                "Distributed search engine is not ready; install localIndex, peerDirectory, identity, and searchTransport.");
+          }
+          return new DistributedSearchPerformer(
+              token,
+              keywords,
+              DISTRIBUTED.localIndex,
+              DISTRIBUTED.peerDirectory,
+              DISTRIBUTED.identity,
+              DISTRIBUTED.searchTransport);
         }
 
         @Override
         public boolean isReady() {
-            return DISTRIBUTED.localIndex != null
-                    && DISTRIBUTED.peerDirectory != null
-                    && DISTRIBUTED.identity != null
-                    && DISTRIBUTED.searchTransport != null;
+          return DISTRIBUTED.localIndex != null
+              && DISTRIBUTED.peerDirectory != null
+              && DISTRIBUTED.identity != null
+              && DISTRIBUTED.searchTransport != null;
         }
-    };
+      };
 
-    /** Holder for the LocalIndex backing the LOCAL engine; set by an installer at app start. */
-    private volatile LocalIndex localIndex;
+  /** Holder for the LocalIndex backing the LOCAL engine; set by an installer at app start. */
+  private volatile LocalIndex localIndex;
 
-    /** Optional karma cache for weighting LOCAL search results. */
-    private volatile com.frostwire.search.relay.PeerKarmaCache karmaCache;
+  /** Optional karma cache for weighting LOCAL search results. */
+  private volatile com.frostwire.search.relay.PeerKarmaCache karmaCache;
 
-    /** Holder for authenticated peers used by the DISTRIBUTED engine. */
-    private volatile PeerDirectory peerDirectory;
+  /** Holder for authenticated peers used by the DISTRIBUTED engine. */
+  private volatile PeerDirectory peerDirectory;
 
-    /** Holder for this node's identity used by the DISTRIBUTED engine. */
-    private volatile IdentityKeys identity;
+  /** Holder for this node's identity used by the DISTRIBUTED engine. */
+  private volatile IdentityKeys identity;
 
-    /** Holder for the transport used by the DISTRIBUTED engine to send/receive search payloads. */
-    private volatile DistributedSearchTransport searchTransport;
+  /** Holder for the transport used by the DISTRIBUTED engine to send/receive search payloads. */
+  private volatile DistributedSearchTransport searchTransport;
 
-    private final SearchEngineID _id;
-    private final String _name;
-    private final BooleanSetting _setting;
-    private volatile String redirectUrl = null;
-    private volatile String _domainName;
+  /** MCP / diagnostics accessors for distributed relay wiring. */
+  public static com.frostwire.search.relay.PeerDirectory getDistributedPeerDirectory() {
+    return DISTRIBUTED.peerDirectory;
+  }
 
-    private SearchEngine(SearchEngineID id, String name, BooleanSetting setting, String domainName) {
-        _id = id;
-        _name = name;
-        _setting = setting;
-        _domainName = domainName;
-        postInitWork();
+  public static com.frostwire.search.relay.IdentityKeys getDistributedIdentity() {
+    return DISTRIBUTED.identity;
+  }
+
+  public static com.frostwire.search.relay.DistributedSearchTransport
+      getDistributedSearchTransport() {
+    return DISTRIBUTED.searchTransport;
+  }
+
+  public static com.frostwire.search.relay.LocalIndex getDistributedLocalIndex() {
+    return DISTRIBUTED.localIndex;
+  }
+
+  private final SearchEngineID _id;
+  private final String _name;
+  private final BooleanSetting _setting;
+  private volatile String redirectUrl = null;
+  private volatile String _domainName;
+
+  private SearchEngine(SearchEngineID id, String name, BooleanSetting setting, String domainName) {
+    _id = id;
+    _name = name;
+    _setting = setting;
+    _domainName = domainName;
+    postInitWork();
+  }
+
+  /** Override for things like picking the fastest mirror domainName */
+  protected void postInitWork() {}
+
+  private static final List<SearchEngine> ENGINES =
+      java.util.Collections.unmodifiableList(
+          java.util.Arrays.asList(
+              LOCAL,
+              DISTRIBUTED,
+              YT,
+              INTERNET_ARCHIVE,
+              BITSEARCH,
+              KNABEN,
+              MAGNETDL,
+              NYAA,
+              ONE337X,
+              TPB,
+              TORRENTZ2,
+              TORRENTSCSV,
+              SOUNDCLOUD,
+              FROSTCLICK));
+
+  // desktop/ is currently using this class, but it should use common/SearchManager.java in the near
+  // future (like android/)
+  public static List<SearchEngine> getEngines() {
+    return ENGINES;
+  }
+
+  static SearchEngine getSearchEngineByName(String name) {
+    if (name.startsWith("Cloud:")) {
+      return TELLURIDE;
     }
+    return getEngines().stream()
+        .filter(se -> name.equals(se.getName()) || name.startsWith(se.getName() + " "))
+        .findFirst()
+        .orElse(null);
+  }
 
-    /**
-     * Override for things like picking the fastest mirror domainName
-     */
-    protected void postInitWork() {
+  public static SearchEngine getSearchEngineByID(SearchEngineID id) {
+    if (id == SearchEngineID.TELLURIDE_ID) {
+      return TELLURIDE;
     }
-
-
-    private static final List<SearchEngine> ENGINES = java.util.Collections.unmodifiableList(
-            java.util.Arrays.asList(
-                    LOCAL, DISTRIBUTED, YT, INTERNET_ARCHIVE, BITSEARCH,
-                    KNABEN, MAGNETDL, NYAA, ONE337X, TPB,
-                    TORRENTZ2, TORRENTSCSV, SOUNDCLOUD, FROSTCLICK));
-
-    // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
-    public static List<SearchEngine> getEngines() {
-        return ENGINES;
+    for (SearchEngine engine : getEngines()) {
+      if (engine.getId() == id) {
+        return engine;
+      }
     }
+    return null;
+  }
 
-    static SearchEngine getSearchEngineByName(String name) {
-        if (name.startsWith("Cloud:")) {
-            return TELLURIDE;
-        }
-        return getEngines().stream().
-                filter(se -> name.equals(se.getName()) || name.startsWith(se.getName() + " ")).findFirst().
-                orElse(null);
-    }
+  public SearchEngineID getId() {
+    return _id;
+  }
 
-    public static SearchEngine getSearchEngineByID(SearchEngineID id) {
-        if (id == SearchEngineID.TELLURIDE_ID) {
-            return TELLURIDE;
-        }
-        for (SearchEngine engine : getEngines()) {
-            if (engine.getId() == id) {
-                return engine;
-            }
-        }
-        return null;
-    }
+  public String getName() {
+    return _name;
+  }
 
+  private String getDomainName() {
+    return _domainName;
+  }
 
-    public SearchEngineID getId() {
-        return _id;
-    }
+  public boolean isEnabled() {
+    return _setting.getValue();
+  }
 
-    public String getName() {
-        return _name;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof SearchEngine && _id == ((SearchEngine) obj)._id;
+  }
 
-    private String getDomainName() {
-        return _domainName;
-    }
+  @Override
+  public int hashCode() {
+    return _id.ordinal();
+  }
 
-    public boolean isEnabled() {
-        return _setting.getValue();
-    }
+  public abstract ISearchPerformer getPerformer(long token, String keywords);
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof SearchEngine && _id == ((SearchEngine) obj)._id;
-    }
+  public ISearchPerformer getPerformer(long token, String keywords, boolean playlistMode) {
+    return getPerformer(token, keywords);
+  }
 
-    @Override
-    public int hashCode() {
-        return _id.ordinal();
-    }
+  public BooleanSetting getEnabledSetting() {
+    return _setting;
+  }
 
-    public abstract ISearchPerformer getPerformer(long token, String keywords);
+  @SuppressWarnings("unused")
+  public String getRedirectUrl() {
+    return redirectUrl;
+  }
 
-    public ISearchPerformer getPerformer(long token, String keywords, boolean playlistMode) {
-        return getPerformer(token, keywords);
-    }
+  public void setRedirectUrl(String redirectUrl) {
+    this.redirectUrl = redirectUrl;
+  }
 
-    public BooleanSetting getEnabledSetting() {
-        return _setting;
-    }
+  public boolean isReady() {
+    return _domainName != null;
+  }
 
-    @SuppressWarnings("unused")
-    public String getRedirectUrl() {
-        return redirectUrl;
-    }
+  /**
+   * Installs the {@link LocalIndex} that backs the {@code LOCAL} search engine. Idempotent; the
+   * most recent call wins. Returns this engine so the installer can chain.
+   */
+  public SearchEngine setLocalIndex(LocalIndex index) {
+    this.localIndex = index;
+    return this;
+  }
 
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
+  /**
+   * Returns the {@link LocalIndex} backing the {@code LOCAL} search engine, or {@code null} if none
+   * has been installed yet.
+   */
+  public LocalIndex getLocalIndex() {
+    return localIndex;
+  }
 
-    public boolean isReady() {
-        return _domainName != null;
-    }
+  /**
+   * Installs the optional {@link com.frostwire.search.relay.PeerKarmaCache} used to weight LOCAL
+   * search results by the publisher's karma score. Pass {@code null} to disable karma weighting.
+   */
+  public SearchEngine setKarmaCache(com.frostwire.search.relay.PeerKarmaCache karmaCache) {
+    this.karmaCache = karmaCache;
+    return this;
+  }
 
-    /**
-     * Installs the {@link LocalIndex} that backs the {@code LOCAL} search
-     * engine. Idempotent; the most recent call wins. Returns this engine
-     * so the installer can chain.
-     */
-    public SearchEngine setLocalIndex(LocalIndex index) {
-        this.localIndex = index;
-        return this;
-    }
+  /**
+   * Installs the {@link PeerDirectory} that backs the DISTRIBUTED engine. Idempotent; the most
+   * recent call wins.
+   */
+  public SearchEngine setPeerDirectory(PeerDirectory peerDirectory) {
+    this.peerDirectory = peerDirectory;
+    return this;
+  }
 
-    /**
-     * Returns the {@link LocalIndex} backing the {@code LOCAL} search engine,
-     * or {@code null} if none has been installed yet.
-     */
-    public LocalIndex getLocalIndex() {
-        return localIndex;
-    }
+  /**
+   * Installs the {@link IdentityKeys} that backs the DISTRIBUTED engine. Idempotent; the most
+   * recent call wins.
+   */
+  public SearchEngine setIdentityKeys(IdentityKeys identity) {
+    this.identity = identity;
+    return this;
+  }
 
-    /**
-     * Installs the optional {@link com.frostwire.search.relay.PeerKarmaCache}
-     * used to weight LOCAL search results by the publisher's karma score.
-     * Pass {@code null} to disable karma weighting.
-     */
-    public SearchEngine setKarmaCache(com.frostwire.search.relay.PeerKarmaCache karmaCache) {
-        this.karmaCache = karmaCache;
-        return this;
-    }
+  public IdentityKeys identityKeys() {
+    return identity;
+  }
 
-    /**
-     * Installs the {@link PeerDirectory} that backs the DISTRIBUTED engine.
-     * Idempotent; the most recent call wins.
-     */
-    public SearchEngine setPeerDirectory(PeerDirectory peerDirectory) {
-        this.peerDirectory = peerDirectory;
-        return this;
-    }
+  /**
+   * Installs the {@link DistributedSearchTransport} that backs the DISTRIBUTED engine. Idempotent;
+   * the most recent call wins.
+   */
+  public SearchEngine setSearchTransport(DistributedSearchTransport searchTransport) {
+    this.searchTransport = searchTransport;
+    return this;
+  }
 
-    /**
-     * Installs the {@link IdentityKeys} that backs the DISTRIBUTED engine.
-     * Idempotent; the most recent call wins.
-     */
-    public SearchEngine setIdentityKeys(IdentityKeys identity) {
-        this.identity = identity;
-        return this;
-    }
-
-    public IdentityKeys identityKeys() {
-        return identity;
-    }
-
-    /**
-     * Installs the {@link DistributedSearchTransport} that backs the DISTRIBUTED engine.
-     * Idempotent; the most recent call wins.
-     */
-    public SearchEngine setSearchTransport(DistributedSearchTransport searchTransport) {
-        this.searchTransport = searchTransport;
-        return this;
-    }
-
-    public DistributedSearchTransport getSearchTransport() {
-        return searchTransport;
-    }
+  public DistributedSearchTransport getSearchTransport() {
+    return searchTransport;
+  }
 }

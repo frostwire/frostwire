@@ -496,13 +496,18 @@ final class Initializer {
       //     (derived from SHA-256(host:port)). When a peer
       //     sends us a request, we learn their real pubkey
       //     and can upgrade the entry.
-      startPeerDiscovery(directory, btEngine);
+      startPeerDiscovery(directory, btEngine, identity);
 
-      // 11. Launch the local IceBridge daemon, create the search
+      // 11. Launch the local IceBridge daemon (or connect to remote), create the search
       //     transport, and wire the DISTRIBUTED search engine so the
       //     user can search both the local index and authenticated
       //     peers from the normal Search UI.
-      startIceBridgeSearch(localIndex, directory, identity, relayLog);
+      if (SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
+          && SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue()) {
+        startIceBridgeSearch(localIndex, directory, identity, relayLog);
+      } else {
+        relayLog.info("IceBridge disabled via settings.");
+      }
     } catch (Exception e) {
       // Non-fatal: the relay stack is optional; the app can run without it.
       relayLog.warn("Failed to start relay stack; distributed search disabled", e);
@@ -524,56 +529,95 @@ final class Initializer {
       IdentityKeys identity,
       com.frostwire.util.Logger relayLog) {
     try {
-      File jarPath = resolveIceBridgeJar();
-      if (jarPath == null) {
-        relayLog.warn(
-            "IceBridge jar not found; distributed search disabled. "
-                + "Run ./gradlew icebridgeJar to build it.");
-        return;
+      IceBridgeClient client;
+
+      // Settings take precedence; env vars allow advanced override (e.g. testing).
+      boolean useRemote = SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue();
+      String remoteUrl = System.getenv("ICEBRIDGE_REMOTE_URL");
+      if (remoteUrl == null || remoteUrl.isEmpty()) {
+        remoteUrl = SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue();
+      }
+      String token = System.getenv("ICEBRIDGE_AUTH_TOKEN");
+      if (token == null || token.isEmpty()) {
+        token = SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue();
       }
 
-      // Share the relay identity with the IceBridge daemon so that
-      // the Ed25519 pubkey used for DHT discovery is the same one
-      // the daemon uses for rUDP routing.
-      File homeDir =
-          new File(
-              CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
-      File identityFile =
-          new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
-
-      // Use the well-known rUDP port so remote peers can reach us
-      // without an additional discovery round-trip.
-      int rudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
-      String bindHost = SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue();
-
-      IceBridgeProcessLauncher launcher =
-          new IceBridgeProcessLauncher(jarPath, identityFile, 0, rudpPort, "BOTH", bindHost);
-      launcher.start();
-      relayLog.info(
-          "IceBridge daemon started: controlPort="
-              + launcher.controlPort()
-              + " rudpPort="
-              + launcher.rudpPort());
-
-      // Wait for the daemon to become healthy (up to 15s).
-      IceBridgeClient client = launcher.client();
-      boolean healthy = false;
-      for (int i = 0; i < 150; i++) {
-        if (client.health()) {
-          healthy = true;
-          break;
+      int effectiveRudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
+      String envRudp = System.getenv("ICEBRIDGE_RUDP_PORT");
+      if (envRudp != null && !envRudp.isEmpty()) {
+        try {
+          effectiveRudpPort = Integer.parseInt(envRudp);
+        } catch (NumberFormatException ignored) {
         }
-        if (!launcher.isAlive()) {
-          relayLog.warn("IceBridge process exited before becoming healthy");
+      }
+
+      if (useRemote && remoteUrl != null && !remoteUrl.isEmpty()) {
+        // Support talking directly to a remote IceBridge relay (e.g. standalone launched
+        // separately).
+        // Desktop will use the remote as its IceBridge backend instead of forking a local daemon.
+        client = new IceBridgeClient(remoteUrl);
+        if (token != null && !token.isEmpty()) {
+          client.setAuthToken(token);
+        }
+        relayLog.info("Using remote IceBridge at " + remoteUrl + " (no local subprocess)");
+        // Assume user ensures the remote is healthy.
+      } else {
+        File jarPath = resolveIceBridgeJar();
+        if (jarPath == null) {
+          relayLog.warn(
+              "IceBridge jar not found; distributed search disabled. "
+                  + "Run ./gradlew icebridgeJar to build it.");
           return;
         }
-        Thread.sleep(100);
-      }
-      if (!healthy) {
-        relayLog.warn(
-            "IceBridge daemon did not become healthy in time; " + "distributed search disabled");
-        launcher.close();
-        return;
+
+        // Share the relay identity with the IceBridge daemon so that
+        // the Ed25519 pubkey used for DHT discovery is the same one
+        // the daemon uses for rUDP routing.
+        File homeDir =
+            new File(
+                CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
+        File identityFile =
+            new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+
+        String bindHost = SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue();
+
+        // Respect role from settings
+        String role = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
+        if (role == null || role.isEmpty()) role = "BOTH";
+
+        int relayListenPort = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
+        IceBridgeProcessLauncher launcher =
+            new IceBridgeProcessLauncher(
+                jarPath, identityFile, 0, effectiveRudpPort, relayListenPort, role, bindHost);
+        launcher.start();
+        relayLog.info(
+            "IceBridge daemon started: controlPort="
+                + launcher.controlPort()
+                + " rudpPort="
+                + launcher.rudpPort());
+
+        // Wait for the daemon to become healthy (up to 15s).
+        client = launcher.client();
+        boolean healthy = false;
+        for (int i = 0; i < 150; i++) {
+          if (client.health()) {
+            healthy = true;
+            break;
+          }
+          if (!launcher.isAlive()) {
+            relayLog.warn("IceBridge process exited before becoming healthy");
+            return;
+          }
+          Thread.sleep(100);
+        }
+        if (!healthy) {
+          relayLog.warn(
+              "IceBridge daemon did not become healthy in time; " + "distributed search disabled");
+          launcher.close();
+          return;
+        }
+
+        effectiveRudpPort = launcher.rudpPort(); // in case auto
       }
 
       // Create the transport and start the background poller.
@@ -594,12 +638,15 @@ final class Initializer {
               ? java.net.InetAddress.getLocalHost().getHostAddress()
               : "127.0.0.1";
       PeerRegistrySync peerSync =
-          new PeerRegistrySync(client, directory, localHost, launcher.rudpPort());
+          new PeerRegistrySync(client, directory, localHost, effectiveRudpPort);
       peerSync.start();
 
       // Wire the DISTRIBUTED search engine.
       DistributedSearchEngineWire.wire(localIndex, directory, identity, transport);
-      relayLog.info("Relay stack ready; Distributed search engine wired via IceBridge");
+      boolean usingRemote = useRemote && remoteUrl != null && !remoteUrl.isEmpty();
+      relayLog.info(
+          "Relay stack ready; Distributed search engine wired via IceBridge"
+              + (usingRemote ? " (remote)" : " (local daemon)"));
     } catch (Throwable t) {
       relayLog.warn("Failed to start IceBridge; distributed search disabled", t);
     }
@@ -639,23 +686,26 @@ final class Initializer {
 
   /**
    * Construct a DHT advertiser and start it on a daemon executor. The uTP port we advertise is the
-   * same as the relay server's listen port (6888 by default) so peers can both find our TCP
-   * endpoint via BEP 5 and our identity record via BEP 46.
+   * rUDP port, and the relay listen port (configurable) so peers can find our TCP endpoint via BEP
+   * 5 and our identity record via BEP 46.
    */
   private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex) {
     try {
-      int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
-      int rudpPort =
-          com.frostwire.search.relay.icebridge.client.PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+      int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
+      int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
+      String envRudp = System.getenv("ICEBRIDGE_RUDP_PORT");
+      if (envRudp != null && !envRudp.isEmpty()) {
+        try {
+          rudpPort = Integer.parseInt(envRudp);
+        } catch (NumberFormatException ignored) {
+        }
+      }
       IdentityRecordPublisher publisher =
           new IdentityRecordPublisher(identity, port, rudpPort, "BOTH");
       IndexAnnouncementPublisher indexPublisher =
           new IndexAnnouncementPublisher(localIndex, identity);
-      new DhtAdvertiser(
-              publisher,
-              indexPublisher,
-              com.frostwire.search.relay.RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC)
-          .start();
+      // More aggressive DHT announcements so relayers and peers are found faster.
+      new DhtAdvertiser(publisher, indexPublisher, 30).start();
     } catch (Throwable t) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn("Failed to start DHT advertiser; node will not be discoverable", t);
@@ -668,12 +718,22 @@ final class Initializer {
    * this point BTEngine is already running (the indexer and karma trigger were installed in steps 3
    * and 4), so {@code btEngine} is the live DHT-capable session.
    */
-  private void startPeerDiscovery(PeerDirectory directory, BTEngine btEngine) {
+  private void startPeerDiscovery(
+      PeerDirectory directory, BTEngine btEngine, IdentityKeys ownIdentity) {
     try {
       DhtPeerDiscoverySource source = new DhtPeerDiscoverySource(btEngine);
       PeerAuthenticator authenticator = new DirectTcpPeerAuthenticator();
-      PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator);
-      new PeerDiscoveryScheduler(discovery, 5 * 60).start();
+      byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
+      PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
+      // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
+      // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
+      new PeerDiscoveryScheduler(discovery, 30).start();
+      // Immediate discovery tick so peers/relayers appear quickly instead of waiting for first
+      // scheduled tick.
+      try {
+        discovery.discoverAndRegister();
+      } catch (Exception ignored) {
+      }
     } catch (Throwable t) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn("Failed to start peer discovery; will not learn about other peers", t);
@@ -689,9 +749,8 @@ final class Initializer {
   private void startRelayServer(
       IdentityKeys identity, LocalIndex localIndex, PeerDirectory directory) {
     try {
-      int port = com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT;
-      int rudpPort =
-          com.frostwire.search.relay.icebridge.client.PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+      int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
+      int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
       RelaySearchService service = new RelaySearchService(localIndex, identity);
       RelayRole role = new RelayRole(service, directory, identity);
       IdentityRecord identityRecord =
@@ -710,7 +769,7 @@ final class Initializer {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn(
               "Failed to start direct peer-search server on port "
-                  + com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT
+                  + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue()
                   + "; incoming direct peer-search requests will not be served",
               e);
     }
