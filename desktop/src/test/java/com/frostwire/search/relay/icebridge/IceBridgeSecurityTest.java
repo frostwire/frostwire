@@ -107,7 +107,8 @@ class IceBridgeSecurityTest {
         assertEquals(401, response.statusCode(), "lookup should require auth token");
         assertTrue(response.body().contains("unauthorized"),
                 "401 body must report unauthorized, got: " + response.body());
-        System.out.println("IceBridgeSecurityTest: control-api-unauthorized " + response.body());
+        com.frostwire.util.Logger.getLogger(IceBridgeSecurityTest.class)
+                .info("control-api-unauthorized: " + response.body());
     }
 
     @Test
@@ -218,7 +219,8 @@ class IceBridgeSecurityTest {
                 "lookup must be rejected when tokens file is empty and no token provided");
         assertTrue(response.body().contains("unauthorized"),
                 "401 body must report unauthorized, got: " + response.body());
-        System.out.println("IceBridgeSecurityTest: control-api-unauthorized empty-tokens " + response.body());
+        com.frostwire.util.Logger.getLogger(IceBridgeSecurityTest.class)
+                .info("control-api-unauthorized empty-tokens: " + response.body());
     }
 
     @Test
