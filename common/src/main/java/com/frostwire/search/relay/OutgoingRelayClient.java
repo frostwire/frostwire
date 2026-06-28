@@ -146,7 +146,11 @@ public class OutgoingRelayClient {
                 return Optional.ofNullable(RelayWireCodec.readIdentityRecord(in));
             }
         } catch (Throwable t) {
-            LOG.debug("OutgoingRelayClient.fetchIdentity failed for " + host + ":" + port, t);
+            if (t instanceof java.net.ConnectException || t.getCause() instanceof java.net.ConnectException) {
+                LOG.debug("OutgoingRelayClient.fetchIdentity connection refused for " + host + ":" + port);
+            } else {
+                LOG.debug("OutgoingRelayClient.fetchIdentity failed for " + host + ":" + port, t);
+            }
             return Optional.empty();
         } finally {
             try {

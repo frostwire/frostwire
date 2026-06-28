@@ -54,7 +54,11 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator {
             }
             return Optional.of(record);
         } catch (Throwable t) {
-            LOG.debug("Authentication failed for " + host + ":" + port, t);
+            if (t instanceof java.net.ConnectException || t.getCause() instanceof java.net.ConnectException) {
+                LOG.debug("DirectTcp auth connection refused for " + host + ":" + port);
+            } else {
+                LOG.debug("Authentication failed for " + host + ":" + port, t);
+            }
             return Optional.empty();
         }
     }

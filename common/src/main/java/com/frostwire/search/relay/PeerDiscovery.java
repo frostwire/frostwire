@@ -180,9 +180,32 @@ public final class PeerDiscovery {
     }
 
     private static boolean isLocalEndpoint(String host) {
-        return "127.0.0.1".equals(host)
+        if (host == null || host.isEmpty()) return false;
+        if ("127.0.0.1".equals(host)
                 || "localhost".equalsIgnoreCase(host)
                 || "::1".equals(host)
-                || "0:0:0:0:0:0:0:1".equals(host);
+                || "0:0:0:0:0:0:0:1".equals(host)) {
+            return true;
+        }
+        try {
+            java.net.InetAddress addr = java.net.InetAddress.getByName(host);
+            if (addr.isLoopbackAddress() || addr.isLinkLocalAddress()) {
+                return true;
+            }
+            // Exact match against this machine's interface addresses (catches the machine's own LAN/WAN IPs if announced)
+            for (java.util.Enumeration<java.net.NetworkInterface> ifaces =
+                     java.net.NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements(); ) {
+                java.net.NetworkInterface iface = ifaces.nextElement();
+                for (java.net.InterfaceAddress ia : iface.getInterfaceAddresses()) {
+                    java.net.InetAddress localAddr = ia.getAddress();
+                    if (localAddr != null && localAddr.equals(addr)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // resolution or interface enumeration failed; fall through
+        }
+        return false;
     }
 }
