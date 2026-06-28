@@ -651,16 +651,7 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
      * so we need ALTER TABLE for databases created before the column existed.
      */
     private void migrateSchema(Statement s) throws SQLException {
-        int oldVersion = 0;
-        try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT value FROM schema_meta WHERE key = 'version'")) {
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    oldVersion = Integer.parseInt(rs.getString(1));
-                }
-            }
-        } catch (Exception ignored) {
-        }
+        int oldVersion = readStoredSchemaVersion();
         if (oldVersion < SCHEMA_VERSION) {
             s.execute("DROP TABLE IF EXISTS " + FILES_FTS);
             s.execute("DROP TABLE IF EXISTS " + FILES_TABLE);
@@ -671,6 +662,25 @@ public final class LocalIndexTable implements LocalIndex, AutoCloseable {
             LOG.info("Migrated LocalIndexTable schema from v" + oldVersion + " to v" + SCHEMA_VERSION
                     + " (rebuilt shared_files + shared_files_fts tables)");
         }
+    }
+
+    private int readStoredSchemaVersion() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT value FROM schema_meta WHERE key = 'version'")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String raw = rs.getString(1);
+                    if (raw != null && !raw.isEmpty()) {
+                        return Integer.parseInt(raw.trim());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOG.debug("Could not read schema_meta version; assuming 0", e);
+        } catch (NumberFormatException e) {
+            LOG.warn("Invalid schema_meta version value; assuming 0", e);
+        }
+        return 0;
     }
 
     /**

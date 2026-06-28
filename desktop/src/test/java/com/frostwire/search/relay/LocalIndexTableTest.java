@@ -698,15 +698,21 @@ class LocalIndexTableTest {
 
     @Test
     void migrationBackfillsSharedFilesFromFilesJson() throws Exception {
-        table.close();
-        table = null;
-        deleteRecursive(dbFile);
-        seedV2DatabaseWithTorrent(
+        File v2Db = new File(tempDir, "v2-migrate-test.db");
+        deleteSqliteDatabase(v2Db);
+        seedV2DatabaseWithTorrent(v2Db,
                 "legacy-torrent",
                 "[{\"path\":\"v2_unique_readme.txt\",\"size\":42}]");
+        assertEquals("2", readSchemaVersion(v2Db), "precondition: seeded database must be schema v2");
+        assertEquals(0, countSharedFilesRows(v2Db), "precondition: v2 db has no shared_files rows");
 
-        LocalIndexTable reopened = LocalIndexTable.open(dbFile);
+        LocalIndexTable reopened = LocalIndexTable.open(v2Db);
         try {
+            assertEquals(String.valueOf(LocalIndexTable.SCHEMA_VERSION), readSchemaVersion(v2Db),
+                    "schema must be bumped to v" + LocalIndexTable.SCHEMA_VERSION);
+            assertEquals(1, countSharedFilesRows(v2Db),
+                    "migration must backfill shared_files from files_json");
+
             List<LocalSharedTorrent> results = reopened.search("v2_unique_readme", 10);
             assertEquals(1, results.size(), "file-path search must work after v2->v3 migration");
             assertNotNull(results.get(0).matchedFile());
@@ -720,32 +726,39 @@ class LocalIndexTableTest {
      * Simulates a v2 database: shared_torrents populated, schema version 2,
      * no shared_files index (pre-v3 file FTS).
      */
-    private void seedV2DatabaseWithTorrent(String name, String filesJson) throws Exception {
+    private void seedV2DatabaseWithTorrent(File db, String name, String filesJson) throws Exception {
+        deleteSqliteDatabase(db);
+        File parent = db.getAbsoluteFile().getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IOException("Could not create directory: " + parent);
+        }
         byte[] infoHash = randomBytes(20);
         byte[] nodeId = randomBytes(20);
         byte[] pub = randomBytes(32);
         long now = 1_000_000L;
         try (java.sql.Connection c = java.sql.DriverManager.getConnection(
-                "jdbc:sqlite:" + dbFile.getAbsolutePath());
-             java.sql.Statement s = c.createStatement()) {
-            s.execute("CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
-            s.execute("INSERT INTO schema_meta(key, value) VALUES ('version', '2')");
-            s.execute("CREATE TABLE shared_torrents ("
-                    + "info_hash TEXT PRIMARY KEY, "
-                    + "name TEXT NOT NULL, "
-                    + "size_bytes INTEGER NOT NULL, "
-                    + "file_count INTEGER NOT NULL, "
-                    + "files_json TEXT NOT NULL, "
-                    + "tags TEXT, "
-                    + "publisher_node_id TEXT NOT NULL, "
-                    + "publisher_ed25519_pub BLOB NOT NULL, "
-                    + "publisher_utp_port INTEGER, "
-                    + "added_at INTEGER NOT NULL, "
-                    + "last_seen_at INTEGER NOT NULL, "
-                    + "last_published_at INTEGER)");
-            s.execute("CREATE VIRTUAL TABLE shared_torrents_fts USING fts5("
-                    + "name, tags, content='shared_torrents', content_rowid='rowid', "
-                    + "tokenize='porter unicode61')");
+                "jdbc:sqlite:" + db.getAbsolutePath())) {
+            try (java.sql.Statement s = c.createStatement()) {
+                s.execute("PRAGMA journal_mode = DELETE");
+                s.execute("CREATE TABLE schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+                s.execute("INSERT INTO schema_meta(key, value) VALUES ('version', '2')");
+                s.execute("CREATE TABLE shared_torrents ("
+                        + "info_hash TEXT PRIMARY KEY, "
+                        + "name TEXT NOT NULL, "
+                        + "size_bytes INTEGER NOT NULL, "
+                        + "file_count INTEGER NOT NULL, "
+                        + "files_json TEXT NOT NULL, "
+                        + "tags TEXT, "
+                        + "publisher_node_id TEXT NOT NULL, "
+                        + "publisher_ed25519_pub BLOB NOT NULL, "
+                        + "publisher_utp_port INTEGER, "
+                        + "added_at INTEGER NOT NULL, "
+                        + "last_seen_at INTEGER NOT NULL, "
+                        + "last_published_at INTEGER)");
+                s.execute("CREATE VIRTUAL TABLE shared_torrents_fts USING fts5("
+                        + "name, tags, content='shared_torrents', content_rowid='rowid', "
+                        + "tokenize='porter unicode61')");
+            }
             try (java.sql.PreparedStatement ps = c.prepareStatement(
                     "INSERT INTO shared_torrents (info_hash, name, size_bytes, file_count, "
                             + "files_json, tags, publisher_node_id, publisher_ed25519_pub, "
@@ -768,6 +781,32 @@ class LocalIndexTableTest {
         }
     }
 
+    private static void deleteSqliteDatabase(File db) {
+        if (db == null) {
+            return;
+        }
+        String path = db.getAbsolutePath();
+        for (String suffix : new String[]{"", "-wal", "-shm", "-journal"}) {
+            File f = new File(path + suffix);
+            if (f.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                f.delete();
+            }
+        }
+    }
+
+    private static String readSchemaVersion(File db) throws Exception {
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + db.getAbsolutePath());
+             java.sql.PreparedStatement ps = c.prepareStatement(
+                     "SELECT value FROM schema_meta WHERE key = 'version'")) {
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                assertTrue(rs.next(), "schema_meta version row missing in " + db);
+                return rs.getString(1);
+            }
+        }
+    }
+
     @Test
     void schemaVersionIsBumpedToCurrent() throws Exception {
         try (java.sql.Connection c = java.sql.DriverManager.getConnection(
@@ -782,11 +821,22 @@ class LocalIndexTableTest {
     }
 
     private int countSharedFilesRows() throws Exception {
+        return countSharedFilesRows(dbFile);
+    }
+
+    private static int countSharedFilesRows(File db) throws Exception {
         try (java.sql.Connection c = java.sql.DriverManager.getConnection(
-                "jdbc:sqlite:" + dbFile.getAbsolutePath());
-             java.sql.Statement s = c.createStatement();
-             java.sql.ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM shared_files")) {
-            return rs.next() ? rs.getInt(1) : -1;
+                "jdbc:sqlite:" + db.getAbsolutePath());
+             java.sql.Statement s = c.createStatement()) {
+            try (java.sql.ResultSet tables = s.executeQuery(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='shared_files'")) {
+                if (!tables.next() || tables.getInt(1) == 0) {
+                    return 0;
+                }
+            }
+            try (java.sql.ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM shared_files")) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
         }
     }
 }
