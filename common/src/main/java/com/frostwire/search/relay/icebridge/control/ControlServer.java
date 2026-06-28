@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.control;
 
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.util.Logger;
@@ -43,7 +44,7 @@ public final class ControlServer implements AutoCloseable {
     private final IceBridgeConfig config;
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
-    private final String authToken;
+    private final IceBridgeTokens authTokens;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel channel;
@@ -53,21 +54,25 @@ public final class ControlServer implements AutoCloseable {
                          IceBridgeConfig config,
                          RudpSessionManager rudpSessionManager,
                          InboundMessageQueue inboundQueue,
-                         String authToken) {
+                         IceBridgeTokens authTokens) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
         this.rudpSessionManager = rudpSessionManager;
         this.inboundQueue = inboundQueue;
-        this.authToken = authToken;
+        this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
     }
 
     /**
-     * Returns the auth token that must be included in the
-     * {@code X-IceBridge-Token} header of every control API request.
+     * For compatibility. With file-based tokens this may return null.
+     * Prefer using the tokens object for validation.
      */
     public String authToken() {
-        return authToken;
+        return null;
+    }
+
+    public IceBridgeTokens authTokens() {
+        return authTokens;
     }
 
     public void start() throws InterruptedException {
@@ -88,7 +93,7 @@ public final class ControlServer implements AutoCloseable {
                         ch.pipeline()
                                 .addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authToken));
+                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens));
                     }
                 });
 

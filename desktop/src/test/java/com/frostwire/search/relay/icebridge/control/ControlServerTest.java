@@ -11,6 +11,7 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.google.gson.Gson;
@@ -43,6 +44,7 @@ class ControlServerTest {
     private IdentityKeys identity;
     private InboundMessageQueue inboundQueue;
     private RudpSessionManager rudpSessionManager;
+    private String authToken;
 
     @BeforeEach
     void startServer() throws Exception {
@@ -59,7 +61,14 @@ class ControlServerTest {
         metrics = new IceBridgeMetrics();
         inboundQueue = new InboundMessageQueue();
         rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
-        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, null);
+        byte[] tokenBytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(tokenBytes);
+        authToken = com.frostwire.util.Hex.encode(tokenBytes);
+        java.io.File tmpTokens = java.io.File.createTempFile("control-server-test-tokens-", ".txt");
+        tmpTokens.deleteOnExit();
+        IceBridgeTokens tokens = new IceBridgeTokens(tmpTokens);
+        tokens.addRuntimeToken(authToken);
+        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, tokens);
         server.start();
     }
 
@@ -183,20 +192,26 @@ class ControlServerTest {
     }
 
     private HttpResponse<String> get(String path) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl() + path))
-                .GET()
-                .build();
-        return HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+                .GET();
+        addAuthHeader(builder, path);
+        return HTTP.send(builder.build(), HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> post(String path, Object body) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl() + path))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)))
-                .build();
-        return HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
+        addAuthHeader(builder, path);
+        return HTTP.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private void addAuthHeader(HttpRequest.Builder builder, String path) {
+        if (!path.startsWith("/health")) {
+            builder.header("X-IceBridge-Token", authToken);
+        }
     }
 
     private String baseUrl() {

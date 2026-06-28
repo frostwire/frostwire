@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.control;
 import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
@@ -60,31 +61,31 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private final IceBridgeConfig config;
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
-    private final String authToken;
+    private final IceBridgeTokens authTokens;
 
     public ControlHandler(PeerRegistry registry,
                           IceBridgeMetrics metrics,
                           IceBridgeConfig config,
                           RudpSessionManager rudpSessionManager,
                           InboundMessageQueue inboundQueue,
-                          String authToken) {
+                          IceBridgeTokens authTokens) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
         this.rudpSessionManager = rudpSessionManager;
         this.inboundQueue = inboundQueue;
-        this.authToken = authToken;
+        this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         metrics.controlRequest();
 
-        // SEC5: Require auth token on all endpoints except /health.
+        // SEC5: Require a valid bearer token (supports multiple) on all endpoints except /health.
         String path = new QueryStringDecoder(request.uri()).path();
         if (!"/health".equals(path)) {
             String token = request.headers().get("X-IceBridge-Token");
-            if (authToken != null && !authToken.isEmpty() && !authToken.equals(token)) {
+            if (authTokens == null || !authTokens.isValid(token)) {
                 sendJson(ctx, request, HttpResponseStatus.UNAUTHORIZED,
                         ApiResponse.error("unauthorized"));
                 return;

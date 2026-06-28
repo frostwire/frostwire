@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
@@ -35,6 +36,7 @@ class IceBridgeClientTest {
     private InboundMessageQueue inboundQueue;
     private ControlServer server;
     private IceBridgeClient client;
+    private String authToken;
 
     @BeforeEach
     void startServer() throws Exception {
@@ -51,9 +53,17 @@ class IceBridgeClientTest {
         metrics = new IceBridgeMetrics();
         inboundQueue = new InboundMessageQueue();
         rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
-        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, null);
+        byte[] tokenBytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(tokenBytes);
+        authToken = com.frostwire.util.Hex.encode(tokenBytes);
+        java.io.File tmpTokens = java.io.File.createTempFile("ice-client-test-tokens-", ".txt");
+        tmpTokens.deleteOnExit();
+        IceBridgeTokens tokens = new IceBridgeTokens(tmpTokens);
+        tokens.addRuntimeToken(authToken);
+        server = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, tokens);
         server.start();
         client = new IceBridgeClient(server.port());
+        client.setAuthToken(authToken);
     }
 
     @AfterEach

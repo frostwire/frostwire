@@ -13,6 +13,7 @@ import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTokens;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
@@ -50,9 +51,17 @@ class PeerRegistrySyncTest {
         IceBridgeMetrics metrics = new IceBridgeMetrics();
         InboundMessageQueue queue = new InboundMessageQueue();
         RudpSessionManager rudp = new RudpSessionManager(identity, registry, metrics, queue);
-        server = new ControlServer(registry, metrics, config, rudp, queue, null);
+        byte[] tokenBytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(tokenBytes);
+        String authToken = com.frostwire.util.Hex.encode(tokenBytes);
+        java.io.File tmpTokens = java.io.File.createTempFile("peer-registry-sync-tokens-", ".txt");
+        tmpTokens.deleteOnExit();
+        IceBridgeTokens tokens = new IceBridgeTokens(tmpTokens);
+        tokens.addRuntimeToken(authToken);
+        server = new ControlServer(registry, metrics, config, rudp, queue, tokens);
         server.start();
         client = new IceBridgeClient(server.port());
+        client.setAuthToken(authToken);
         directory = new PeerDirectory(new PeerKarmaCache(
                 new RemoteKarmaChainFetcher(pub -> null)));
     }

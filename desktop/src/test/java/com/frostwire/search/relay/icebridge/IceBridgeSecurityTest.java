@@ -66,7 +66,13 @@ class IceBridgeSecurityTest {
         new java.security.SecureRandom().nextBytes(tokenBytes);
         authToken = com.frostwire.util.Hex.encode(tokenBytes);
 
-        server = new ControlServer(registry, metrics, config, rudp, queue, authToken);
+        java.io.File tmpTokens = java.io.File.createTempFile("ice-test-tokens-", ".txt");
+        tmpTokens.deleteOnExit();
+        try (java.io.FileWriter fw = new java.io.FileWriter(tmpTokens)) {
+            fw.write(authToken + "\n");
+        }
+        IceBridgeTokens tokens = new IceBridgeTokens(tmpTokens);
+        server = new ControlServer(registry, metrics, config, rudp, queue, tokens);
         server.start();
         port = server.port();
         http = HttpClient.newHttpClient();
@@ -171,6 +177,42 @@ class IceBridgeSecurityTest {
                         .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertEquals(401, response.statusCode(), "metrics should require auth token");
+    }
+
+    @Test
+    void lookupRejectedWhenTokensFileEmpty() throws Exception {
+        server.close();
+        IdentityKeys identity = IdentityKeys.generate(0);
+        IceBridgeConfig config = IceBridgeConfig.newBuilder()
+                .controlHttpPort(freePort())
+                .rudpPort(0)
+                .role(IceBridgeConfig.Role.BOTH)
+                .maxPeers(100)
+                .peerTtlSec(120)
+                .maxQpsPerKey(100.0)
+                .build();
+        PeerRegistry registry = new PeerRegistry(config);
+        IceBridgeMetrics metrics = new IceBridgeMetrics();
+        InboundMessageQueue queue = new InboundMessageQueue();
+        RudpSessionManager rudp = new RudpSessionManager(identity, registry, metrics, queue);
+
+        java.io.File emptyTokens = java.io.File.createTempFile("ice-empty-tokens-", ".txt");
+        emptyTokens.deleteOnExit();
+        IceBridgeTokens tokens = new IceBridgeTokens(emptyTokens);
+        assertTrue(tokens.isEmpty(), "precondition: empty tokens file");
+
+        server = new ControlServer(registry, metrics, config, rudp, queue, tokens);
+        server.start();
+        port = server.port();
+
+        HttpResponse<String> response = http.send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://127.0.0.1:" + port + "/lookup?count=10"))
+                        .GET()
+                        .build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertEquals(401, response.statusCode(),
+                "lookup must be rejected when tokens file is empty and no token provided");
     }
 
     @Test
