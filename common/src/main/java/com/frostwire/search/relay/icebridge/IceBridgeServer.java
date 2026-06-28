@@ -337,6 +337,9 @@ public final class IceBridgeServer implements AutoCloseable {
                 case "--rudp-port":
                     b.rudpPort(parseInt(next(args, ++i, "--rudp-port")));
                     break;
+                case "--relay-port":
+                    b.relayPort(parseInt(next(args, ++i, "--relay-port")));
+                    break;
                 case "--control-http-port":
                     b.controlHttpPort(parseInt(next(args, ++i, "--control-http-port")));
                     break;
@@ -402,6 +405,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("IceBridge — FrostWire relay servent");
         System.out.println("Options:");
         System.out.println("  --rudp-port PORT           rUDP listen port (0 = disable, auto for local)");
+        System.out.println("  --relay-port PORT          TCP identity/relay handshake port (default 6888)");
         System.out.println("  --control-http-port PORT   HTTP control port (0 = disable)");
         System.out.println("  --control-stdio            Enable stdio control channel");
         System.out.println("  --role ROLE                FORWARDER, CLIENT, or BOTH");
