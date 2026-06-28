@@ -444,6 +444,7 @@ test {
         includeTestsMatching "com.frostwire.util.*"
         includeTestsMatching "com.frostwire.tests.*"
         includeTestsMatching "com.frostwire.crypto.*"
+        includeTestsMatching "com.frostwire.mcp.*"
     }
 
     testLogging {

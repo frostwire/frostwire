@@ -205,8 +205,9 @@ public final class AndroidRelayStack implements AutoCloseable {
             LOG.info("AndroidRelayStack: PeerRegistrySync started");
 
             DhtPeerDiscoverySource discoverySource = new DhtPeerDiscoverySource(btEngine);
+            byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
             PeerDiscovery discovery = new PeerDiscovery(discoverySource, pd,
-                    new DirectTcpPeerAuthenticator());
+                    new DirectTcpPeerAuthenticator(), ownPub);
             pds = new PeerDiscoveryScheduler(discovery, PEER_DISCOVERY_INTERVAL_SEC);
             pds.start();
             LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
