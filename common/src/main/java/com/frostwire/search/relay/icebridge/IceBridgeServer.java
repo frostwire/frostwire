@@ -8,6 +8,9 @@
 package com.frostwire.search.relay.icebridge;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.IncomingRelayServer;
+import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
@@ -47,6 +50,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private RudpSessionManager rudpSessionManager;
     private InboundMessageQueue inboundQueue;
     private ScheduledExecutorService janitor;
+    private IncomingRelayServer relayServer;
 
     public static void main(String[] args) {
         loadDotEnv();
@@ -198,6 +202,7 @@ public final class IceBridgeServer implements AutoCloseable {
 
         controlServer.start();
         rudpServer.start();
+        startRelayServer();
         startJanitor();
 
         LOG.info("IceBridge started: identity=" + Hex.encode(identity.ed25519PubRaw())
@@ -222,6 +227,22 @@ public final class IceBridgeServer implements AutoCloseable {
         });
         janitor.scheduleWithFixedDelay(this::runJanitor,
                 JANITOR_INITIAL_DELAY_SEC, JANITOR_INTERVAL_SEC, TimeUnit.SECONDS);
+    }
+
+    private void startRelayServer() {
+        int relayPort = RelayConstants.RELAY_LISTEN_PORT;
+        try {
+            IdentityRecord record = IdentityRecord.createSigned(
+                    identity.nodeId(), identity.ed25519(),
+                    identity.x25519PubRaw(), relayPort,
+                    config.rudpPort(), config.role().name());
+            relayServer = new IncomingRelayServer(record, relayPort);
+            relayServer.start();
+            LOG.info("IceBridge identity handshake server listening on port " + relayPort + " (TCP)");
+        } catch (Throwable t) {
+            LOG.warn("Failed to start identity handshake server on port " + relayPort
+                    + "; peers will not be able to authenticate this relay via TCP", t);
+        }
     }
 
     private void runJanitor() {
@@ -277,6 +298,12 @@ public final class IceBridgeServer implements AutoCloseable {
         LOG.info("Shutting down IceBridge");
         if (janitor != null) {
             janitor.shutdownNow();
+        }
+        if (relayServer != null) {
+            try {
+                relayServer.stop();
+            } catch (Throwable ignored) {
+            }
         }
         if (rudpServer != null) {
             try {

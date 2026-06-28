@@ -74,6 +74,15 @@ public final class IncomingRelayServer {
         this(role, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
     }
 
+    /**
+     * Identity-only constructor for standalone forwarders (e.g. cloud
+     * IceBridge relays) that don't have a LocalIndex or PeerDirectory.
+     * Only serves identity handshakes; rejects all search requests.
+     */
+    public IncomingRelayServer(IdentityRecord identityRecord, int port) {
+        this(null, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
+    }
+
     public IncomingRelayServer(RelayRole role, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs) {
         this(role, null, port, backlog, workerPoolSize, soTimeoutMs);
@@ -81,8 +90,8 @@ public final class IncomingRelayServer {
 
     public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs) {
-        if (role == null) {
-            throw new IllegalArgumentException("role is null");
+        if (role == null && identityRecord == null) {
+            throw new IllegalArgumentException("either role or identityRecord must be non-null");
         }
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("port out of range: " + port);
@@ -202,6 +211,10 @@ public final class IncomingRelayServer {
                 }
                 if (RelayWireCodec.isIdentityRequest(frame)) {
                     handleIdentityRequest(out);
+                    return;
+                }
+                if (role == null) {
+                    LOG.debug("Search request received but no role configured (identity-only server)");
                     return;
                 }
                 RemoteSearchRequest request = RelayWireCodec.decodeRequest(frame);
