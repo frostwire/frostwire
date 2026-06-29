@@ -142,7 +142,10 @@ public final class IceBridgeTokens {
     private void appendToFile(String token) {
         if (tokensFile == null) return;
         try {
-            tokensFile.getParentFile().mkdirs(); // safe if in subdir
+            File parent = tokensFile.getParentFile();
+            if (parent != null) {
+                parent.mkdirs();
+            }
             try (BufferedWriter w = new BufferedWriter(new FileWriter(tokensFile, StandardCharsets.UTF_8, true))) {
                 w.write("# generated " + java.time.Instant.now() + "\n");
                 w.write(token + "\n");
