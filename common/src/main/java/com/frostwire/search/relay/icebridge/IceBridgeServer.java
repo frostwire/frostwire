@@ -255,9 +255,9 @@ public final class IceBridgeServer implements AutoCloseable {
                     identity.nodeId(), identity.ed25519(),
                     identity.x25519PubRaw(), relayPort,
                     config.rudpPort(), config.role().name());
-            relayServer = new IncomingRelayServer(record, relayPort);
+            relayServer = new IncomingRelayServer(record, relayPort, config.host());
             relayServer.start();
-            LOG.info("IceBridge identity handshake server listening on port " + relayPort + " (TCP)");
+            LOG.info("IceBridge identity handshake server listening on " + config.host() + ":" + relayPort + " (TCP)");
         } catch (Throwable t) {
             LOG.warn("Failed to start identity handshake server on port " + relayPort
                     + "; peers will not be able to authenticate this relay via TCP", t);

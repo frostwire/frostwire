@@ -128,10 +128,10 @@ public final class IceBridgeConfig {
         return role == Role.FORWARDER || role == Role.BOTH;
     }
 
-    /** Default config for a local daemon controlled by FrostWire. */
+    /** Default config for a local daemon controlled by FrostWire (binds publicly by default). */
     public static IceBridgeConfig localDefaults() {
         return newBuilder()
-                .host("127.0.0.1")
+                .host("0.0.0.0")
                 .rudpPort(0)
                 .controlHttpPort(8797)
                 .role(Role.BOTH)

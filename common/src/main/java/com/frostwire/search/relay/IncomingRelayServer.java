@@ -59,6 +59,7 @@ public final class IncomingRelayServer {
     private final int backlog;
     private final int workerPoolSize;
     private final int soTimeoutMs;
+    private final String bindHost;
     private final AtomicInteger connectionCount = new AtomicInteger();
 
     private ServerSocket serverSocket;
@@ -83,6 +84,14 @@ public final class IncomingRelayServer {
         this(null, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
     }
 
+    public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, String bindHost) {
+        this(role, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS, bindHost);
+    }
+
+    public IncomingRelayServer(IdentityRecord identityRecord, int port, String bindHost) {
+        this(null, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS, bindHost);
+    }
+
     public IncomingRelayServer(RelayRole role, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs) {
         this(role, null, port, backlog, workerPoolSize, soTimeoutMs);
@@ -90,6 +99,11 @@ public final class IncomingRelayServer {
 
     public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs) {
+        this(role, identityRecord, port, backlog, workerPoolSize, soTimeoutMs, null);
+    }
+
+    public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, int backlog,
+                               int workerPoolSize, int soTimeoutMs, String bindHost) {
         if (role == null && identityRecord == null) {
             throw new IllegalArgumentException("either role or identityRecord must be non-null");
         }
@@ -111,6 +125,7 @@ public final class IncomingRelayServer {
         this.backlog = backlog;
         this.workerPoolSize = workerPoolSize;
         this.soTimeoutMs = soTimeoutMs;
+        this.bindHost = bindHost;
     }
 
     /**
@@ -123,14 +138,19 @@ public final class IncomingRelayServer {
         }
         serverSocket = new ServerSocket();
         serverSocket.setReuseAddress(true);
-        serverSocket.bind(new InetSocketAddress(port), backlog);
+        if (bindHost != null && !bindHost.isEmpty()) {
+            serverSocket.bind(new InetSocketAddress(bindHost, port), backlog);
+        } else {
+            serverSocket.bind(new InetSocketAddress(port), backlog);
+        }
         running = true;
         workerPool = Executors.newFixedThreadPool(workerPoolSize,
                 new WorkerThreadFactory());
         acceptThread = new Thread(this::acceptLoop, "relay-server-accept");
         acceptThread.setDaemon(true);
         acceptThread.start();
-        LOG.info("IncomingRelayServer listening on port " + port);
+        String listenAddr = (bindHost != null && !bindHost.isEmpty()) ? bindHost : "0.0.0.0";
+        LOG.info("IncomingRelayServer listening on " + listenAddr + ":" + port);
     }
 
     /**
