@@ -77,7 +77,7 @@ public final class OptionsConstructor {
   private static final String KARMA_KEY = "OPTIONS_KARMA_MAIN_TITLE";
   private static final String PEER_DIRECTORY_KEY = "OPTIONS_PEER_DIRECTORY_MAIN_TITLE";
   private static final String SHARED_TORRENTS_DB_KEY = "OPTIONS_SHARED_TORRENTS_DB_MAIN_TITLE";
-  private static final String ICEBRIDGE_KEY = "OPTIONS_ICEBRIDGE_MAIN_TITLE";
+  public static final String ICEBRIDGE_KEY = "OPTIONS_ICEBRIDGE_MAIN_TITLE";
   private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
   private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
 
@@ -218,8 +218,7 @@ public final class OptionsConstructor {
         MaximumSearchesPaneItem.class,
         SmartSearchDBPaneItem.class,
         DetailsPaneItem.class,
-        AutoSearchClipboardURLsPaneItem.class,
-        com.limegroup.gnutella.gui.options.panes.IceBridgeSettingsPaneItem.class);
+        AutoSearchClipboardURLsPaneItem.class);
     // status bar
     addOption(
         OptionsMediator.ROOT_NODE_KEY,
@@ -289,6 +288,11 @@ public final class OptionsConstructor {
 
     addOption(
         OptionsMediator.ROOT_NODE_KEY, MCP_KEY, I18n.tr("MCP Server"), MCPSettingsPaneItem.class);
+    addOption(
+        OptionsMediator.ROOT_NODE_KEY,
+        ICEBRIDGE_KEY,
+        I18n.tr("IceBridge"),
+        IceBridgeSettingsPaneItem.class);
     addOption(
         OptionsMediator.ROOT_NODE_KEY,
         IDENTITY_KEY,
