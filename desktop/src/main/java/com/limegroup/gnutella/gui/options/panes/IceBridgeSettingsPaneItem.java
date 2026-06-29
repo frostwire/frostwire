@@ -11,7 +11,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   private static final String TITLE = I18n.tr("IceBridge");
   private static final String LABEL =
       I18n.tr(
-          "Configure the IceBridge relay for decentralized search. Desktop can use its own local IceBridge daemon or connect to a remote one (e.g. standalone relay).");
+          "Configure the IceBridge relay for decentralized search. Desktop can use its own local IceBridge daemon or connect to a remote one (e.g. standalone relay). For remote mode, use the full base URL of the remote control API (include http:// and the control HTTP port).");
 
   private final JCheckBox ENABLED_CHECKBOX =
       new JCheckBox(I18n.tr("Enable IceBridge (distributed relay)"));
@@ -33,6 +33,13 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   private final JTextField REMOTE_URL_FIELD = new SizedTextField(30, SizePolicy.RESTRICT_HEIGHT);
   private final JTextField REMOTE_TOKEN_FIELD = new SizedTextField(30, SizePolicy.RESTRICT_HEIGHT);
 
+  // Sub panels for local vs remote (visibility toggled so unselected mode doesn't waste vertical
+  // space)
+  private BoxPanel localFieldsPanel;
+  private BoxPanel remoteUrlPanel;
+  private JLabel remoteUrlExampleLabel;
+  private BoxPanel remoteTokenPanel;
+
   public IceBridgeSettingsPaneItem() {
     super(TITLE, LABEL);
 
@@ -43,60 +50,85 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     LOCAL_RADIO.addItemListener(e -> updateRemoteFields());
     REMOTE_RADIO.addItemListener(e -> updateRemoteFields());
 
+    // Prevent components from stretching vertically (the root cause of tall Role dropdown etc.)
+    GUIUtils.restrictSize(ENABLED_CHECKBOX, SizePolicy.RESTRICT_HEIGHT);
+    GUIUtils.restrictSize(LOCAL_RADIO, SizePolicy.RESTRICT_HEIGHT);
+    GUIUtils.restrictSize(REMOTE_RADIO, SizePolicy.RESTRICT_HEIGHT);
+    GUIUtils.restrictSize(ROLE_COMBO, SizePolicy.RESTRICT_HEIGHT);
+
     add(ENABLED_CHECKBOX);
     add(getHorizontalSeparator());
 
     add(LOCAL_RADIO);
-    BoxPanel localPanel = new BoxPanel(BoxPanel.X_AXIS);
-    localPanel.add(
+    localFieldsPanel = new BoxPanel(BoxPanel.X_AXIS);
+    localFieldsPanel.add(
         new LabeledComponent(
                 I18n.tr("Bind host:"),
                 BIND_HOST_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
-    localPanel.addHorizontalComponentGap();
-    localPanel.add(
+    localFieldsPanel.addHorizontalComponentGap();
+    localFieldsPanel.add(
         new LabeledComponent(
                 I18n.tr("rUDP port:"),
                 RUDP_PORT_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
-    localPanel.addHorizontalComponentGap();
-    localPanel.add(
+    localFieldsPanel.addHorizontalComponentGap();
+    localFieldsPanel.add(
         new LabeledComponent(
                 I18n.tr("Relay listen port (identity):"),
                 RELAY_LISTEN_PORT_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
-    localPanel.addHorizontalComponentGap();
-    localPanel.add(
+    localFieldsPanel.addHorizontalComponentGap();
+    localFieldsPanel.add(
         new LabeledComponent(
                 I18n.tr("Role:"), ROLE_COMBO, LabeledComponent.NO_GLUE, LabeledComponent.LEFT)
             .getComponent());
-    add(localPanel);
+    add(localFieldsPanel);
 
     add(REMOTE_RADIO);
-    BoxPanel remotePanel = new BoxPanel(BoxPanel.X_AXIS);
-    remotePanel.add(
+    remoteUrlPanel = new BoxPanel(BoxPanel.X_AXIS);
+    remoteUrlPanel.add(
         new LabeledComponent(
                 I18n.tr("Remote URL:"),
                 REMOTE_URL_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
-    add(remotePanel);
-    BoxPanel tokenPanel = new BoxPanel(BoxPanel.X_AXIS);
-    tokenPanel.add(
+    add(remoteUrlPanel);
+
+    REMOTE_URL_FIELD.setToolTipText(
+        I18n.tr(
+            "Full base URL to the remote IceBridge control HTTP API (scheme + host + control port). No URL path suffix is needed unless you front the API with a proxy."));
+
+    // Example shown under the Remote URL field, roughly indented to sit under the text field
+    remoteUrlExampleLabel =
+        new JLabel(
+            "<html><i>"
+                + I18n.tr(
+                    "Example: http://192.168.1.50:8080   or   http://relay.example.com:8797  (use the control HTTP port)")
+                + "</i></html>");
+    remoteUrlExampleLabel.setFont(remoteUrlExampleLabel.getFont().deriveFont(11f));
+    remoteUrlExampleLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 85, 2, 0));
+    add(remoteUrlExampleLabel);
+    remoteTokenPanel = new BoxPanel(BoxPanel.X_AXIS);
+    remoteTokenPanel.add(
         new LabeledComponent(
                 I18n.tr("Auth token (optional):"),
                 REMOTE_TOKEN_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
-    add(tokenPanel);
+    add(remoteTokenPanel);
+
+    REMOTE_TOKEN_FIELD.setToolTipText(
+        I18n.tr(
+            "Bearer token for X-IceBridge-Token header. Generate one on the remote with --generate-token (or ICEBRIDGE_AUTH_TOKENS_FILE)."));
 
     add(getVerticalSeparator());
     JLabel note =
@@ -107,6 +139,10 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
                 + "</i></html>");
     add(note);
 
+    // Absorb any extra vertical space so all controls stay packed at the top
+    // (prevents tall stretched controls and large empty regions).
+    add(Box.createVerticalGlue());
+
     ENABLED_CHECKBOX.addItemListener(e -> updateState());
     updateState();
   }
@@ -115,20 +151,27 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     boolean enabled = ENABLED_CHECKBOX.isSelected();
     LOCAL_RADIO.setEnabled(enabled);
     REMOTE_RADIO.setEnabled(enabled);
-    BIND_HOST_FIELD.setEnabled(enabled && LOCAL_RADIO.isSelected());
-    RUDP_PORT_FIELD.setEnabled(enabled && LOCAL_RADIO.isSelected());
-    ROLE_COMBO.setEnabled(enabled && LOCAL_RADIO.isSelected());
-    REMOTE_URL_FIELD.setEnabled(enabled && REMOTE_RADIO.isSelected());
-    REMOTE_TOKEN_FIELD.setEnabled(enabled && REMOTE_RADIO.isSelected());
+    updateRemoteFields();
   }
 
   private void updateRemoteFields() {
     boolean remote = REMOTE_RADIO.isSelected();
-    BIND_HOST_FIELD.setEnabled(!remote);
-    RUDP_PORT_FIELD.setEnabled(!remote);
-    ROLE_COMBO.setEnabled(!remote);
-    REMOTE_URL_FIELD.setEnabled(remote);
-    REMOTE_TOKEN_FIELD.setEnabled(remote);
+    boolean enabled = ENABLED_CHECKBOX.isSelected();
+
+    // Hide the controls for the non-selected mode so the pane stays compact
+    // (everything pushed toward the top, like gravity="top").
+    if (localFieldsPanel != null) localFieldsPanel.setVisible(!remote);
+    if (remoteUrlPanel != null) remoteUrlPanel.setVisible(remote);
+    if (remoteUrlExampleLabel != null) remoteUrlExampleLabel.setVisible(remote);
+    if (remoteTokenPanel != null) remoteTokenPanel.setVisible(remote);
+
+    // Field enables (respect both the top-level enabled checkbox and the mode)
+    BIND_HOST_FIELD.setEnabled(enabled && !remote);
+    RUDP_PORT_FIELD.setEnabled(enabled && !remote);
+    RELAY_LISTEN_PORT_FIELD.setEnabled(enabled && !remote);
+    ROLE_COMBO.setEnabled(enabled && !remote);
+    REMOTE_URL_FIELD.setEnabled(enabled && remote);
+    REMOTE_TOKEN_FIELD.setEnabled(enabled && remote);
   }
 
   @Override
@@ -166,18 +209,34 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     // Log the configuration change. The IceBridge child is started only at app launch,
     // so these values take effect after restart.
-    com.frostwire.util.Logger log = com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class);
+    com.frostwire.util.Logger log =
+        com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class);
     log.info("=== IceBridge Configuration (updated via settings; restart required) ===");
-    log.info("  ICEBRIDGE_ENABLED             = " + SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
-    log.info("  ICEBRIDGE_USE_REMOTE          = " + SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue());
-    log.info("  ICEBRIDGE_REMOTE_URL          = " + SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue());
-    boolean hasRemoteToken = !SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue().isEmpty();
+    log.info(
+        "  ICEBRIDGE_ENABLED             = " + SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    log.info(
+        "  ICEBRIDGE_USE_REMOTE          = "
+            + SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue());
+    log.info(
+        "  ICEBRIDGE_REMOTE_URL          = "
+            + SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue());
+    boolean hasRemoteToken =
+        !SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue().isEmpty();
     log.info("  ICEBRIDGE_REMOTE_AUTH_TOKEN   = " + (hasRemoteToken ? "[set]" : "(empty)"));
-    log.info("  ICEBRIDGE_BIND_HOST           = " + SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue());
-    log.info("  ICEBRIDGE_RUDP_PORT           = " + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
-    log.info("  ICEBRIDGE_RELAY_LISTEN_PORT   = " + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
-    log.info("  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
-    log.info("  ICEBRIDGE_CONTROL_HTTP_PORT   = " + SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
+    log.info(
+        "  ICEBRIDGE_BIND_HOST           = "
+            + SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue());
+    log.info(
+        "  ICEBRIDGE_RUDP_PORT           = "
+            + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
+    log.info(
+        "  ICEBRIDGE_RELAY_LISTEN_PORT   = "
+            + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
+    log.info(
+        "  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
+    log.info(
+        "  ICEBRIDGE_CONTROL_HTTP_PORT   = "
+            + SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
     log.info("======================================================================");
     return false;
   }
