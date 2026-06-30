@@ -55,7 +55,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     private Date addedOn;
     private SearchResultActionsHolder actionsHolder;
     private SearchResultNameHolder name;
-    private String seeds;
     private Icon icon;
     private SizeHolder size;
     private SourceHolder source;
@@ -83,8 +82,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         name = new SearchResultNameHolder(sr);
         // Show seeds for non-preliminary results (torrents, etc) that have seed counts
         // Preliminary results (YouTube, etc) have isPreliminary=true and should not show seeds
-        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && !isPreliminaryUI(RESULT);
-        seeds = shouldShowSeeds ? String.valueOf(RESULT.getSeeds()) : "";
         icon = getIcon();
         size = new SizeHolder(getSize());
         source = new SourceHolder(RESULT);
@@ -95,9 +92,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * Updates cached data about this line.
      */
     public void update() {
-        // Use the same shouldShowSeeds logic as initialize() to ensure consistent display
-        boolean shouldShowSeeds = RESULT.getSeeds() > 0 && !isPreliminaryUI(RESULT);
-        seeds = shouldShowSeeds ? String.valueOf(RESULT.getSeeds()) : "";
         computeRankingMetrics();
     }
 
@@ -203,7 +197,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
             case SearchTableColumns.ACTIONS_IDX:
                 return actionsHolder;
             case SearchTableColumns.COUNT_IDX:
-                return seeds;
+                return getSeedsAsInteger();
             case SearchTableColumns.TYPE_IDX:
                 return icon;
             case SearchTableColumns.NAME_IDX:

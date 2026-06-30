@@ -84,11 +84,14 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         //since the Type column returns an Icon, we compare by hand using the file extension.
         if (_activeColumn == SearchTableColumns.TYPE_IDX) {
             return AbstractTableMediator.compare(ta.getExtension(), tb.getExtension()) * _ascending;
-        } else if (!isSorted() || _activeColumn != SearchTableColumns.COUNT_IDX) {
-            return super.compare(ta, tb);
-        } else {
-            return compareScores(ta, tb);
         }
+        if (_activeColumn == SearchTableColumns.COUNT_IDX) {
+            return compareSeeds(ta, tb);
+        }
+        if (_activeColumn == SearchTableColumns.SIZE_IDX) {
+            return Long.compare(ta.getSize(), tb.getSize()) * _ascending;
+        }
+        return super.compare(ta, tb);
     }
 
     /**
@@ -221,23 +224,10 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         return get(idx).getHash();
     }
 
-    /**
-     * Compares the count between two rows.
-     */
-    private int compareScores(SearchResultDataLine a, SearchResultDataLine b) {
-        int relevanceComparison = Double.compare(a.getRelevanceScore(), b.getRelevanceScore());
-        if (relevanceComparison != 0) {
-            return relevanceComparison * _ascending;
-        }
-
+    private int compareSeeds(SearchResultDataLine a, SearchResultDataLine b) {
         Integer aSeeds = a.getSeedsAsInteger();
         Integer bSeeds = b.getSeedsAsInteger();
-        int seedsComparison = Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds);
-        if (seedsComparison != 0) {
-            return seedsComparison * _ascending;
-        }
-
-        return AbstractTableMediator.compare(a.getDisplayName(), b.getDisplayName()) * _ascending;
+        return Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds) * _ascending;
     }
 
     /**

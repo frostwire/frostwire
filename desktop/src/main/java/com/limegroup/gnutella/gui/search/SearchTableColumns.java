@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+import com.limegroup.gnutella.gui.tables.SizeHolder;
 
 import javax.swing.*;
 import java.util.Date;
@@ -47,7 +48,7 @@ final class SearchTableColumns {
     private final LimeTableColumn COUNT_COLUMN = new SearchColumn(COUNT_IDX, "RESULT_PANEL_COUNT", I18n.tr("Seeds"), 24, true, Integer.class);
     private final LimeTableColumn TYPE_COLUMN = new SearchColumn(TYPE_IDX, "RESULT_PANEL_ICON", I18n.tr("Type"), 18, true, Icon.class);
     private final LimeTableColumn NAME_COLUMN = new SearchColumn(NAME_IDX, "RESULT_PANEL_NAME", I18n.tr("Name"), 272, true, SearchResultNameHolder.class);
-    private final LimeTableColumn SIZE_COLUMN = new SearchColumn(SIZE_IDX, "RESULT_PANEL_SIZE", I18n.tr("Size"), 53, true, String.class);
+    private final LimeTableColumn SIZE_COLUMN = new SearchColumn(SIZE_IDX, "RESULT_PANEL_SIZE", I18n.tr("Size"), 53, true, SizeHolder.class);
     private final LimeTableColumn SOURCE_COLUMN = new SearchColumn(SOURCE_IDX, "RESULT_PANEL_SOURCE", I18n.tr("Source"), 220, true, SourceHolder.class);
     private final LimeTableColumn ADDED_COLUMN = new SearchColumn(ADDED_IDX, "RESULT_PANEL_ADDED", I18n.tr("Created"), 55, true, Date.class);
     private final LimeTableColumn EXTENSION_COLUMN = new SearchColumn(EXTENSION_IDX, "RESULT_PANEL_EXTENSION", I18n.tr("Extension"), 55, true, String.class);
