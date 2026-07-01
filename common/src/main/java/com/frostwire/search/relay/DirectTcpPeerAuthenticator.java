@@ -9,6 +9,7 @@ package com.frostwire.search.relay;
 
 import com.frostwire.util.Logger;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -56,6 +57,10 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator {
         } catch (Throwable t) {
             if (t instanceof java.net.ConnectException || t.getCause() instanceof java.net.ConnectException) {
                 LOG.debug("DirectTcp auth connection refused for " + host + ":" + port);
+            } else if (t instanceof IOException && t.getMessage() != null &&
+                    t.getMessage().contains("invalid frame length")) {
+                LOG.debug("DirectTcp auth: remote at " + host + ":" + port +
+                        " does not speak the relay protocol");
             } else {
                 LOG.debug("Authentication failed for " + host + ":" + port, t);
             }

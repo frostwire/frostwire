@@ -107,7 +107,8 @@ public final class RelayWireCodec {
                 | ((b3 & 0xff) << 8)
                 | (b4 & 0xff);
         if (length < 0 || length > MAX_FRAME_BYTES) {
-            throw new IOException("invalid frame length: " + length);
+            throw new IOException("invalid frame length: " + length +
+                    " (peer is not speaking the FrostWire relay protocol)");
         }
         byte[] payload = new byte[length];
         din.readFully(payload);

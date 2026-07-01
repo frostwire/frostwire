@@ -148,6 +148,16 @@ public class OutgoingRelayClient {
         } catch (Throwable t) {
             if (t instanceof java.net.ConnectException || t.getCause() instanceof java.net.ConnectException) {
                 LOG.debug("OutgoingRelayClient.fetchIdentity connection refused for " + host + ":" + port);
+            } else if (t instanceof IOException && t.getMessage() != null &&
+                    t.getMessage().contains("invalid frame length")) {
+                // Common when DHT or host cache gives us a non-FrostWire node or a port
+                // that is no longer running the relay protocol. This is normal noise.
+                LOG.debug("OutgoingRelayClient.fetchIdentity: remote at " + host + ":" + port +
+                        " does not speak the relay protocol");
+            } else if (t instanceof IOException) {
+                // Other I/O problems (reset, timeout after partial read, wrong protocol, etc.)
+                LOG.debug("OutgoingRelayClient.fetchIdentity: I/O error talking to " + host + ":" + port +
+                        " (" + t.getClass().getSimpleName() + ")");
             } else {
                 LOG.debug("OutgoingRelayClient.fetchIdentity failed for " + host + ":" + port, t);
             }
