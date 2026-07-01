@@ -662,6 +662,10 @@ final class Initializer {
         }
 
         effectiveRudpPort = launcher.rudpPort(); // in case auto
+
+        // Now that the child is healthy, add our IceBridge relay endpoint (the one others will
+        // connect to for identity) to the host cache so it appears in the UI table.
+        addSelfToIceBridgeHostCache("127.0.0.1", launcher.relayPort(), role);
       }
 
       // Create the transport and start the background poller.
@@ -769,6 +773,19 @@ final class Initializer {
       PeerAuthenticator authenticator = new DirectTcpPeerAuthenticator();
       byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
       PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
+
+      // Seed PeerDirectory from the IceBridge host cache for faster bootstrapping after restart.
+      // Only entries that were successfully pinged in the past are used as hints.
+      try {
+        for (com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry e :
+            com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                .getPingable(14L * 24 * 60 * 60 * 1000)) {
+          byte[] placeholder = PeerDiscovery.placeholderPubkey(e.host, e.port);
+          directory.upsert(placeholder, e.host, e.port, 0);
+        }
+      } catch (Throwable ignored) {
+      }
+
       // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
       // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
       new PeerDiscoveryScheduler(discovery, 30).start();
@@ -809,6 +826,9 @@ final class Initializer {
       server.start();
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .info("Direct peer-search server listening on 0.0.0.0:" + server.port());
+
+      // Add our direct relay identity listener to the IceBridge host cache for visibility.
+      addSelfToIceBridgeHostCache("127.0.0.1", port, "BOTH");
     } catch (java.io.IOException e) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn(
@@ -816,6 +836,34 @@ final class Initializer {
                   + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue()
                   + "; incoming direct peer-search requests will not be served",
               e);
+    }
+  }
+
+  /**
+   * Adds our own relay endpoint to the IceBridge host cache (so it shows in the settings table) and
+   * attempts a local self-ping. This uses the direct TCP identity handshake protocol on the relay
+   * port, *not* the IceBridge HTTP control API (which is what desktop uses locally to drive its
+   * IceBridge daemon process).
+   */
+  private void addSelfToIceBridgeHostCache(String host, int port, String role) {
+    if (port <= 0) return;
+    try {
+      var cache = com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
+      // Try a quick local TCP identity fetch (self-ping). If it works we mark success.
+      try {
+        com.frostwire.search.relay.OutgoingRelayClient client =
+            new com.frostwire.search.relay.OutgoingRelayClient();
+        var rec = client.fetchIdentity(host, port);
+        if (rec.isPresent() && rec.get().verifySignature()) {
+          cache.markSuccess(host, port, role);
+          return;
+        }
+      } catch (Exception ignored) {
+        // fall through to plain add
+      }
+      cache.addOrUpdate(host, port, role);
+    } catch (Throwable ignored) {
+      // best effort
     }
   }
 
