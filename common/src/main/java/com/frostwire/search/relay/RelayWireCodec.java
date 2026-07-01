@@ -190,7 +190,17 @@ public final class RelayWireCodec {
      * Returns null on any failure.
      */
     public static IdentityRecord readIdentityRecord(InputStream in) throws IOException {
-        byte[] payload = readFrame(in);
+        byte[] payload;
+        try {
+            payload = readFrame(in);
+        } catch (IOException e) {
+            // Treat protocol framing errors (e.g. bogus length from non-FrostWire peer)
+            // as "no identity" rather than propagating scary exceptions to callers.
+            if (e.getMessage() != null && e.getMessage().contains("invalid frame length")) {
+                return null;
+            }
+            throw e;
+        }
         if (payload == null) {
             return null;
         }
