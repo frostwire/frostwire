@@ -3,6 +3,7 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
+import java.awt.*;
 import javax.swing.*;
 
 /** Settings pane for IceBridge (decentralized relay / rUDP mesh for distributed search). */
@@ -32,6 +33,11 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   // Remote settings
   private final JTextField REMOTE_URL_FIELD = new SizedTextField(30, SizePolicy.RESTRICT_HEIGHT);
   private final JTextField REMOTE_TOKEN_FIELD = new SizedTextField(30, SizePolicy.RESTRICT_HEIGHT);
+
+  // IceBridge discovered relays table (populated from icebridge_host_cache.txt, only pingable ones)
+  private final IceBridgeHostsTableModel hostsTableModel = new IceBridgeHostsTableModel();
+  private final JTable hostsTable = new JTable(hostsTableModel);
+  private final JButton hostsRefreshButton = new JButton(I18n.tr("Refresh / Ping"));
 
   // Sub panels for local vs remote (visibility toggled so unselected mode doesn't waste vertical
   // space)
@@ -143,6 +149,26 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     // (prevents tall stretched controls and large empty regions).
     add(Box.createVerticalGlue());
 
+    // Discovered IceBridge servers / relays table
+    JLabel hostsLabel =
+        new JLabel(I18n.tr("Known IceBridge servers (successfully pinged relays):"));
+    hostsLabel.setToolTipText(
+        I18n.tr(
+            "These are remote (or your own) IceBridge relays discovered via DHT. "
+                + "Ping = TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+                + "Desktop controls its local IceBridge daemon over HTTP on localhost."));
+    add(hostsLabel);
+    JScrollPane hostsScroll = new JScrollPane(hostsTable);
+    hostsScroll.setPreferredSize(new Dimension(500, 110));
+    hostsTable.setFillsViewportHeight(true);
+    hostsTable.setRowSelectionAllowed(true);
+    add(hostsScroll);
+
+    hostsRefreshButton.addActionListener(e -> refreshIceBridgeHosts());
+    JPanel hostsBtnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    hostsBtnPanel.add(hostsRefreshButton);
+    add(hostsBtnPanel);
+
     ENABLED_CHECKBOX.addItemListener(e -> updateState());
     updateState();
   }
@@ -194,6 +220,14 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     updateState();
     updateRemoteFields();
+
+    // Populate table from cache (fast, no network). User can hit Refresh to ping.
+    try {
+      java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> current =
+          com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance().getPingable(0);
+      hostsTableModel.setEntries(current);
+    } catch (Throwable ignored) {
+    }
   }
 
   @Override
@@ -262,5 +296,81 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
             .getText()
             .trim()
             .equals(SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue());
+  }
+
+  private void refreshIceBridgeHosts() {
+    hostsRefreshButton.setEnabled(false);
+    new Thread(
+            () -> {
+              try {
+                com.frostwire.search.relay.icebridge.IceBridgeHostCache cache =
+                    com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
+                cache.refreshPings();
+                // Show only those that have a recorded successful ping
+                java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> live =
+                    cache.getPingable(0);
+                javax.swing.SwingUtilities.invokeLater(
+                    () -> {
+                      hostsTableModel.setEntries(live);
+                      hostsRefreshButton.setEnabled(true);
+                    });
+              } catch (Throwable t) {
+                javax.swing.SwingUtilities.invokeLater(() -> hostsRefreshButton.setEnabled(true));
+              }
+            },
+            "icebridge-hosts-ping")
+        .start();
+  }
+
+  /** Simple table model for IceBridge host cache entries. */
+  private static final class IceBridgeHostsTableModel extends javax.swing.table.AbstractTableModel {
+    private final String[] cols = {
+      I18n.tr("Host"), I18n.tr("Port"), I18n.tr("Role"), I18n.tr("Last Successful Ping")
+    };
+    private java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> data =
+        java.util.Collections.emptyList();
+
+    void setEntries(
+        java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> entries) {
+      this.data =
+          (entries != null)
+              ? new java.util.ArrayList<>(entries)
+              : java.util.Collections.emptyList();
+      fireTableDataChanged();
+    }
+
+    @Override
+    public int getRowCount() {
+      return data.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+      return cols.length;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+      return cols[column];
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry e = data.get(rowIndex);
+      switch (columnIndex) {
+        case 0:
+          return e.host;
+        case 1:
+          return e.port;
+        case 2:
+          return (e.role != null && !e.role.isEmpty()) ? e.role : "?";
+        case 3:
+          if (e.lastSuccessfulPingMs <= 0) return I18n.tr("never");
+          java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+          return fmt.format(new java.util.Date(e.lastSuccessfulPingMs));
+        default:
+          return "";
+      }
+    }
   }
 }
