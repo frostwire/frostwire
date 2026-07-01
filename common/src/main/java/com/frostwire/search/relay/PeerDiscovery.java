@@ -119,6 +119,18 @@ public final class PeerDiscovery {
                     }
                     directory.upsertVerified(peerPub, host, port, identity.rudpPort());
                     discovered.add(new DiscoveredEndpoint(host, port));
+
+                    // Feed known IceBridge relays (FORWARDER / BOTH) into the host cache
+                    // for the settings UI table and for faster post-restart bootstrapping.
+                    String role = identity.role();
+                    if ("FORWARDER".equals(role) || "BOTH".equals(role)) {
+                        try {
+                            com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                                    .markSuccess(host, port, role);
+                        } catch (Throwable ignored) {
+                            // cache is best-effort
+                        }
+                    }
                 } else {
                     byte[] placeholderPubkey = placeholderPubkey(host, port);
                     if (alreadyKnown(placeholderPubkey, host, port)) {
