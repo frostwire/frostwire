@@ -221,10 +221,13 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     updateState();
     updateRemoteFields();
 
-    // Populate table from cache (fast, no network). User can hit Refresh to ping.
+    // Populate table from cache (fast, no network). Only recently successful pings are shown.
+    // The cache file keeps history for bootstrapping; the table follows "only show pingable".
     try {
+      long windowMs = 7L * 24 * 60 * 60 * 1000; // last 7 days
       java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> current =
-          com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance().getPingable(0);
+          com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+              .getPingable(windowMs);
       hostsTableModel.setEntries(current);
     } catch (Throwable ignored) {
     }
@@ -306,12 +309,14 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
                 com.frostwire.search.relay.icebridge.IceBridgeHostCache cache =
                     com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
                 cache.refreshPings();
-                // Show only those that have a recorded successful ping
-                java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry> live =
-                    cache.getPingable(0);
+                // After full ping pass, show only recently successful ones (last 7 days)
+                // so the table reflects "we can ping successfully".
+                long windowMs = 7L * 24 * 60 * 60 * 1000;
+                java.util.List<com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry>
+                    recent = cache.getPingable(windowMs);
                 javax.swing.SwingUtilities.invokeLater(
                     () -> {
-                      hostsTableModel.setEntries(live);
+                      hostsTableModel.setEntries(recent);
                       hostsRefreshButton.setEnabled(true);
                     });
               } catch (Throwable t) {
