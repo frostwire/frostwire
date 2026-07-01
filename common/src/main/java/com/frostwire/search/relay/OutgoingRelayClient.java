@@ -113,7 +113,13 @@ public class OutgoingRelayClient {
                 return Optional.of(response);
             }
         } catch (Throwable t) {
-            LOG.debug("OutgoingRelayClient.send failed for " + host + ":" + port, t);
+            if (t instanceof IOException && t.getMessage() != null &&
+                    t.getMessage().contains("invalid frame length")) {
+                LOG.debug("OutgoingRelayClient.send: remote at " + host + ":" + port +
+                        " does not speak the relay protocol");
+            } else {
+                LOG.debug("OutgoingRelayClient.send failed for " + host + ":" + port, t);
+            }
             return Optional.empty();
         } finally {
             try {
