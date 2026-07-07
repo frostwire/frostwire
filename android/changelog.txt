@@ -26,6 +26,7 @@ FrostWire 3.2.0 build 776 UNRELEASED
  - fix:Knaben search query JSON now properly escaped via Gson — backslashes, newlines, and control characters in search keywords no longer produce malformed JSON requests
  - fix:Removed 'Sec-Fetch-Mode: navigate' header from all HTTP requests — API endpoints (Knaben, Soundcloud, etc.) should not receive browser-navigation headers
  - fix:AbstractSearchPerformer 'stopped' and 'listener' fields are now volatile — stop() from the UI thread is now visible to executor threads, preventing search results from being delivered after the user cancels
+ - fix:Search relevance sort ANR — pre-compute normalized sort keys outside listLock and eliminate per-result regex compilation in PerformersHelper.sanitize/normalize (www. stripping and combining-mark removal)
  - fix:SearchManager no longer crawls search results that are already complete — avoids wasting a thread re-fetching data that's already available
  - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields instead of lazy-initialized in constructors — eliminates non-thread-safe lazy-init race and redundant compilation
  - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger — concurrent crawl() calls from the thread pool no longer lose updates, preventing more crawls than configured

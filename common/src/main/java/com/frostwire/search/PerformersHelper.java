@@ -214,8 +214,8 @@ public final class PerformersHelper {
         // Note: These replacements must match the original regex behavior exactly
         str = str.replace(".torrent", " ");
         
-        // Handle www. pattern (must be followed by a dot)
-        str = str.replaceAll("www\\.", " ");
+        // Handle www. prefix without regex (hot path during relevance sort)
+        str = str.replace("www.", " ");
         
         str = str.replace(".com", " ");
         str = str.replace(".net", " ");
@@ -271,10 +271,31 @@ public final class PerformersHelper {
 
     private static String normalize(String token) {
         String norm = Normalizer.normalize(token, Normalizer.Form.NFKD);
-        norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        norm = stripCombiningMarks(norm);
         norm = norm.toLowerCase(Locale.US);
 
         return norm;
+    }
+
+    private static String stripCombiningMarks(String str) {
+        if (str.isEmpty()) {
+            return str;
+        }
+        StringBuilder sb = new StringBuilder(str.length());
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (!isCombiningMark(c)) {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static boolean isCombiningMark(char c) {
+        int type = Character.getType(c);
+        return type == Character.NON_SPACING_MARK
+                || type == Character.COMBINING_SPACING_MARK
+                || type == Character.ENCLOSING_MARK;
     }
 
     private static Set<String> normalizeTokens(Set<String> tokens) {
