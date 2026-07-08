@@ -86,7 +86,20 @@ Firewall: open **UDP rUDP** (and TCP identity if remote peers handshake you). Co
 ### Co-located desktop + standalone
 
 - Point desktop at remote IceBridge **or** change standalone `ICEBRIDGE_RUDP_PORT` / `ICEBRIDGE_RELAY_PORT`.
+- Recommended dual-run pattern (desktop keeps defaults 6888/6889):
+  ```bash
+  ICEBRIDGE_ROLE=FORWARDER ICEBRIDGE_RELAY_PORT=7000 ICEBRIDGE_RUDP_PORT=7001 \
+    ICEBRIDGE_CONTROL_HTTP_PORT=18080 ICEBRIDGE_DHT=true ./gradlew icebridge
+  ```
 - Self-discovery is skipped via own Ed25519 pub + loopback filters; public-IP hairpin can still look like “self”.
+
+### EC2 / pure-forwarder DHT smoke (manual)
+
+1. On the relay host: build jar, generate token, run FORWARDER with `ICEBRIDGE_DHT=true` (default via env).
+2. Open UDP rUDP + TCP identity in security group; keep control HTTP localhost-only (SSH tunnel if needed).
+3. On desktop: enable IceBridge remote (URL + token) **or** leave local child off and rely on DHT discovery of the cloud FORWARDER.
+4. Confirm desktop logs discovery of the EC2 public endpoint and that PeerDirectory has a **verified** peer (identity TCP success) — not only host-cache placeholders.
+5. Optional: `dhtGetPeers` / discovery tools should list the forwarder under `frostwire-relays-v1` after ~1 min.
 
 ## Security model
 
