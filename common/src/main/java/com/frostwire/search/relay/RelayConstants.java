@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -42,6 +43,12 @@ public final class RelayConstants {
     public static final int EVENT_LOG_MAX_ROWS = 10_000;
     public static final String EVENT_LOG_PATH = "distributed_search_log.jsonl";
     public static final String IDENTITY_FILE = "identity.dat";
+    /**
+     * Subdirectory under the platform user settings dir for identity, local
+     * index DB, and related relay state (desktop: FrostWire5 settings;
+     * Android: app files dir when callers pass that root).
+     */
+    public static final String RELAY_HOME_DIR = "libtorrent";
     public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
 
     /**
@@ -51,6 +58,26 @@ public final class RelayConstants {
     public static final int RELAY_LISTEN_PORT = 6888;
 
     private RelayConstants() {
+    }
+
+    /**
+     * {@code userSettingsDir/libtorrent} — shared home for identity + index.
+     *
+     * @param userSettingsDir platform settings root (must not be null)
+     */
+    public static File relayHomeDir(File userSettingsDir) {
+        if (userSettingsDir == null) {
+            throw new IllegalArgumentException("userSettingsDir is null");
+        }
+        return new File(userSettingsDir, RELAY_HOME_DIR);
+    }
+
+    /**
+     * Canonical identity path used by desktop Initializer, Identity settings,
+     * and IceBridge child launch: {@code userSettingsDir/libtorrent/identity.dat}.
+     */
+    public static File identityFile(File userSettingsDir) {
+        return new File(relayHomeDir(userSettingsDir), IDENTITY_FILE);
     }
 
     public static byte[] topicHash(String topic) {
