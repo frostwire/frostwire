@@ -16,27 +16,21 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 /**
- * Background daemon task that keeps the node visible to other
- * peers on the DHT. Each tick:
+ * Background daemon task that keeps the node visible on the DHT. Each tick:
  * <ol>
- *   <li>Re-publishes our {@link IdentityRecord} as a BEP 46 mutable
- *       item so peers can fetch our full identity by our Ed25519
- *       pub key.</li>
- *   <li>Announces our peer port under the BEP 5 peer topic so
- *       others doing a {@code dhtGetPeers} discover our TCP/UTP
- *       endpoint.</li>
+ *   <li>Re-publishes our {@link IdentityRecord} as a BEP 46 mutable item.</li>
+ *   <li>Optionally announces under the BEP 5 peer topic.</li>
+ *   <li>Announces under the BEP 5 relay topic when role is FORWARDER/BOTH
+ *       (or CLIENT auto-elected as connectable).</li>
+ *   <li>Optionally announces under the BEP 5 bootstrap topic.</li>
  * </ol>
  *
- * <p>The interval is
- * {@link RelayConstants#IDENTITY_REPUBLISH_INTERVAL_SEC} which
- * is also used as the throttle inside
- * {@link IdentityRecordPublisher#publishIfNeeded}. The
- * announcement is idempotent so re-running on every tick is
- * safe.
- *
- * <p>Daemon-threaded, no explicit shutdown hook needed.
+ * <p>Session resolution is pluggable via {@link Supplier}{@code <SessionManager>} so
+ * desktop can use {@link BTEngine} while standalone IceBridge uses an embedded
+ * DHT-only session. A null session makes the tick a no-op.
  */
 public final class DhtAdvertiser {
 
@@ -47,6 +41,9 @@ public final class DhtAdvertiser {
     private final IdentityRecordPublisher identityPublisher;
     private final IndexAnnouncementPublisher indexPublisher;
     private final long intervalSec;
+    private final Supplier<SessionManager> sessionSupplier;
+    private final boolean announcePeerTopic;
+    private final boolean announceBootstrapTopic;
     private final AtomicLong lastTickEpochSec = new AtomicLong();
     private final AtomicLong identityPublishes = new AtomicLong();
     private final AtomicLong indexPublishes = new AtomicLong();
@@ -62,6 +59,21 @@ public final class DhtAdvertiser {
     public DhtAdvertiser(IdentityRecordPublisher identityPublisher,
                          IndexAnnouncementPublisher indexPublisher,
                          long intervalSec) {
+        this(identityPublisher, indexPublisher, intervalSec, null, true, false);
+    }
+
+    /**
+     * @param sessionSupplier           resolves the DHT session each tick; null means
+     *                                  {@link BTEngine#getInstance()} when available
+     * @param announcePeerTopic         announce under {@code frostwire-peers-v1}
+     * @param announceBootstrapTopic    announce under {@code frostwire-bootstrap-v1}
+     */
+    public DhtAdvertiser(IdentityRecordPublisher identityPublisher,
+                         IndexAnnouncementPublisher indexPublisher,
+                         long intervalSec,
+                         Supplier<SessionManager> sessionSupplier,
+                         boolean announcePeerTopic,
+                         boolean announceBootstrapTopic) {
         if (identityPublisher == null) {
             throw new IllegalArgumentException("identityPublisher is null");
         }
@@ -71,6 +83,24 @@ public final class DhtAdvertiser {
         this.identityPublisher = identityPublisher;
         this.indexPublisher = indexPublisher;
         this.intervalSec = intervalSec;
+        this.sessionSupplier = sessionSupplier != null
+                ? sessionSupplier
+                : DhtAdvertiser::defaultBtEngineSession;
+        this.announcePeerTopic = announcePeerTopic;
+        this.announceBootstrapTopic = announceBootstrapTopic;
+    }
+
+    private static SessionManager defaultBtEngineSession() {
+        try {
+            // Avoid blocking forever on BTEngine's setup latch when no app
+            // context exists (unit tests, standalone paths without BTEngine).
+            if (BTEngine.ctx == null) {
+                return null;
+            }
+            return BTEngine.getInstance();
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     public void start() {
@@ -81,16 +111,19 @@ public final class DhtAdvertiser {
         executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
         task = executor.scheduleAtFixedRate(this::scheduledTick, 0, intervalSec,
                 TimeUnit.SECONDS);
-        LOG.info("DhtAdvertiser started, interval=" + intervalSec + "s");
+        LOG.info("DhtAdvertiser started, interval=" + intervalSec + "s"
+                + " peerTopic=" + announcePeerTopic
+                + " bootstrapTopic=" + announceBootstrapTopic);
     }
 
-    /**
-     * The scheduled task entry point. Resolves the SessionManager
-     * from {@link BTEngine#getInstance()} and delegates. If the
-     * engine is not yet running, the tick is a no-op.
-     */
     private void scheduledTick() {
-        SessionManager session = BTEngine.getInstance();
+        SessionManager session;
+        try {
+            session = sessionSupplier.get();
+        } catch (Throwable t) {
+            LOG.debug("DhtAdvertiser session supplier failed", t);
+            return;
+        }
         if (session == null) {
             return;
         }
@@ -126,10 +159,8 @@ public final class DhtAdvertiser {
     }
 
     /**
-     * Run a single tick against the given session. The publisher's
-     * own throttle decides whether the identity is actually
-     * re-sent; the BEP 5 announcement is always re-issued. Returns
-     * true if at least one operation completed.
+     * Run a single tick against the given session. Returns true if at least
+     * one operation completed without throwing.
      */
     public boolean tick(SessionManager session) {
         if (session == null) {
@@ -146,14 +177,21 @@ public final class DhtAdvertiser {
                     indexPublishes.incrementAndGet();
                 }
             }
-            DhtRendezvous.announcePeer(session, identityPublisher.utpPort());
+            int announcePort = identityPublisher.utpPort();
+            if (announcePeerTopic) {
+                DhtRendezvous.announcePeer(session, announcePort);
+            }
             String role = identityPublisher.role();
-            boolean connectable = com.frostwire.search.relay.ConnectivityDetector.instance().isConnectable();
-            if ("FORWARDER".equals(role) || "BOTH".equals(role) || (connectable && "CLIENT".equals(role))) {
-                DhtRendezvous.announceRelay(session, identityPublisher.utpPort());
+            boolean connectable = ConnectivityDetector.instance().isConnectable();
+            if ("FORWARDER".equals(role) || "BOTH".equals(role)
+                    || (connectable && "CLIENT".equals(role))) {
+                DhtRendezvous.announceRelay(session, announcePort);
                 if (connectable && "CLIENT".equals(role)) {
                     LOG.info("DhtAdvertiser: auto-electing as forwarder (connectable, was CLIENT)");
                 }
+            }
+            if (announceBootstrapTopic) {
+                DhtRendezvous.announceBootstrap(session, announcePort);
             }
             announceCalls.incrementAndGet();
             lastTickEpochSec.set(System.currentTimeMillis() / 1000L);

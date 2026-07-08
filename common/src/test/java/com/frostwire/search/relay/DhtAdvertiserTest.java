@@ -68,6 +68,41 @@ class DhtAdvertiserTest {
     }
 
     @Test
+    void tickWithBootstrapAndCustomSupplierAnnouncesFourTopics() {
+        RecordingSession custom = new RecordingSession();
+        DhtAdvertiser icebridgeStyle = new DhtAdvertiser(
+                new IdentityRecordPublisher(identity, 6888, 6889, "FORWARDER"),
+                null,
+                60,
+                () -> custom,
+                false,  // pure FORWARDER: no peer topic
+                true);  // bootstrap topic
+        assertTrue(icebridgeStyle.tick(custom));
+        // identity put + relay announce + bootstrap announce
+        assertEquals(3, custom.putItemCalls.size());
+        assertEquals(1, icebridgeStyle.announceCount());
+    }
+
+    @Test
+    void scheduledTickUsesSessionSupplierNotOnlyBtEngine() throws Exception {
+        RecordingSession custom = new RecordingSession();
+        DhtAdvertiser withSupplier = new DhtAdvertiser(
+                publisher, null, 60, () -> custom, true, false);
+        try {
+            withSupplier.start();
+            // Wait for at least one scheduled tick (interval 60s but initial delay 0).
+            long deadline = System.currentTimeMillis() + 3000;
+            while (custom.putItemCalls.isEmpty() && System.currentTimeMillis() < deadline) {
+                Thread.sleep(50);
+            }
+            assertFalse(custom.putItemCalls.isEmpty(),
+                    "scheduled tick must use custom SessionManager supplier");
+        } finally {
+            withSupplier.stop();
+        }
+    }
+
+    @Test
     void tickWithNullSessionIsNoOp() {
         assertFalse(advertiser.tick(null));
         assertEquals(0, session.putItemCalls.size());
