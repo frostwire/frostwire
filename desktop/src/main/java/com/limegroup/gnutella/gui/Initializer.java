@@ -424,8 +424,7 @@ final class Initializer {
     com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
     try {
       File homeDir =
-          new File(
-              CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
+          com.frostwire.search.relay.RelayConstants.relayHomeDir(CommonUtils.getUserSettingsDir());
       relayLog.info("Relay stack home dir: " + homeDir.getAbsolutePath());
 
       // 1. Open the local torrent index (SQLite + FTS5).
@@ -436,7 +435,7 @@ final class Initializer {
 
       // 2. Load or generate the node's Ed25519 / X25519 identity.
       File identityFile =
-          new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+          com.frostwire.search.relay.RelayConstants.identityFile(CommonUtils.getUserSettingsDir());
       relayLog.info("Loading identity from: " + identityFile.getAbsolutePath());
       IdentityKeys identity = IdentityKeys.loadOrCreate(identityFile);
       relayLog.info("Identity loaded, nodeId=" + com.frostwire.util.Hex.encode(identity.nodeId()));
@@ -617,11 +616,9 @@ final class Initializer {
         // Share the relay identity with the IceBridge daemon so that
         // the Ed25519 pubkey used for DHT discovery is the same one
         // the daemon uses for rUDP routing.
-        File homeDir =
-            new File(
-                CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
         File identityFile =
-            new File(homeDir, com.frostwire.search.relay.RelayConstants.IDENTITY_FILE);
+            com.frostwire.search.relay.RelayConstants.identityFile(
+                CommonUtils.getUserSettingsDir());
 
         String bindHost = SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue();
 
@@ -865,7 +862,7 @@ final class Initializer {
     SharingSettings.initTorrentDataDirSetting();
     SharingSettings.initTorrentsDirSetting();
     File homeDir =
-        new File(CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
+        com.frostwire.search.relay.RelayConstants.relayHomeDir(CommonUtils.getUserSettingsDir());
     if (!homeDir.exists()) {
       homeDir.mkdirs();
     }
