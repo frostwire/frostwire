@@ -311,11 +311,14 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         SecureRandom.getInstanceStrong().nextBytes(nonce);
         long timestamp = System.currentTimeMillis() / 1000L;
         byte[] ownPub = identity.ed25519PubRaw();
+        // ttl=0: v1 is direct peer search only. Multi-hop re-sign (forwarder
+        // key + original requesterPub) fails RelaySearchService verification.
+        // Re-enable multi-hop only with a dual-envelope protocol.
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(1)
+                .ttl(0)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
@@ -329,7 +332,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(1)
+                .ttl(0)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)

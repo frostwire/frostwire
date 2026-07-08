@@ -49,13 +49,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link com.frostwire.search.relay.DistributedSearchPerformer}'s transient
  * listener handles those.
  *
- * <p><b>Multi-hop forwarding:</b> after the local response is sent, if the
- * request's {@code ttl > 0} and a {@link PeerDirectory} and {@link IdentityKeys}
- * are configured, the handler forwards the request to up to
- * {@link #MAX_FORWARD_TARGETS} trusted verified peers not already in the
- * request's path. Each forwarded request is re-signed with this node's
- * Ed25519 key. Forwarding is best-effort: failures (no peers, transport
- * errors) do not affect the local response.
+ * <p><b>Multi-hop forwarding (disabled in v1):</b> re-signing a mutated path
+ * with this node's key while keeping the original {@code requesterPub} makes
+ * the next hop fail {@link RelaySearchService} verification (sig is checked
+ * against requesterPub). Until a dual-envelope hop protocol exists,
+ * {@link #MULTI_HOP_FORWARDING_ENABLED} is false and ttl&gt;0 is ignored for
+ * forwarding. Local responses are unaffected.
  *
  * <p>Rate-limits per-source to prevent flood/amplification attacks. Each
  * source public key is limited to {@link #MAX_REQUESTS_PER_MINUTE} search
@@ -64,6 +63,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class IncomingSearchRequestHandler implements DistributedSearchTransport.PayloadListener {
 
     private static final Logger LOG = Logger.getLogger(IncomingSearchRequestHandler.class);
+
+    /**
+     * Multi-hop is disabled until dual-envelope signatures exist.
+     * See DESIGN_RELAY_REGISTRY.md / MentisDB frostwire #848.
+     */
+    public static final boolean MULTI_HOP_FORWARDING_ENABLED = false;
 
     /** Maximum incoming search requests per source per minute. */
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
@@ -134,12 +139,8 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     }
 
     private void handleSearchRequest(RemoteSearchRequest request, byte[] sourcePub) {
-        String sourceKey = Hex.encode(sourcePub);
-        if (!tryAcquire(sourceKey)) {
-            LOG.debug("IncomingSearchRequestHandler: rate-limited request from " + sourceKey);
-            return;
-        }
-
+        // Rate-limit is applied inside RelaySearchService after signature
+        // verify, keyed by requesterPub (not transport sourcePub).
         try {
             Optional<RemoteSearchResponse> response = searchService.handle(request);
             if (response.isEmpty()) {
@@ -151,7 +152,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             LOG.debug("IncomingSearchRequestHandler failed to process request", t);
         }
 
-        if (request.ttl() > 0 && peerDirectory != null && identity != null) {
+        if (MULTI_HOP_FORWARDING_ENABLED
+                && request.ttl() > 0
+                && peerDirectory != null
+                && identity != null) {
             try {
                 forwardRequest(request, sourcePub);
             } catch (Throwable t) {
@@ -166,12 +170,6 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             return;
         }
 
-        String sourceKey = Hex.encode(sourcePub);
-        if (!tryAcquire(sourceKey)) {
-            LOG.debug("IncomingSearchRequestHandler: rate-limited catalog browse from " + sourceKey);
-            return;
-        }
-
         try {
             if (!verifyCatalogBrowseSignature(request)) {
                 LOG.debug("Rejected catalog browse: bad signature");
@@ -181,6 +179,13 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             long skew = Math.abs(nowSec - request.timestamp());
             if (skew > RemoteCatalogBrowseRequest.MAX_TIMESTAMP_SKEW_SEC) {
                 LOG.debug("Rejected catalog browse: timestamp skew " + skew + "s");
+                return;
+            }
+            // Rate-limit only after verify, by requesterPub (authoritative identity).
+            String requesterKey = Hex.encode(request.requesterPub());
+            if (!tryAcquire(requesterKey)) {
+                LOG.debug("IncomingSearchRequestHandler: rate-limited catalog browse from "
+                        + requesterKey);
                 return;
             }
             byte[] responseBytes = buildCatalogBrowseResponse();

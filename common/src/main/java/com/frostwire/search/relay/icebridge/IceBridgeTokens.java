@@ -17,7 +17,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -150,12 +149,13 @@ public final class IceBridgeTokens {
                 w.write("# generated " + java.time.Instant.now() + "\n");
                 w.write(token + "\n");
             }
-            // best effort secure perms on unix
+            // best effort secure perms on unix (no java.nio.file — Android common/)
             try {
-                Files.setPosixFilePermissions(tokensFile.toPath(),
-                    java.util.EnumSet.of(
-                        java.nio.file.attribute.PosixFilePermission.OWNER_READ,
-                        java.nio.file.attribute.PosixFilePermission.OWNER_WRITE));
+                tokensFile.setReadable(false, false);
+                tokensFile.setWritable(false, false);
+                tokensFile.setExecutable(false, false);
+                tokensFile.setReadable(true, true);
+                tokensFile.setWritable(true, true);
             } catch (Exception ignored) {}
         } catch (IOException e) {
             LOG.error("Failed to append generated token to " + tokensFile, e);

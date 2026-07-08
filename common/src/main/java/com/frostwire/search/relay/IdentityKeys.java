@@ -10,8 +10,9 @@ package com.frostwire.search.relay;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -286,7 +287,7 @@ public final class IdentityKeys {
      * Load identity keys from a file previously written by {@link #save}.
      */
     public static IdentityKeys load(File file) throws IOException, GeneralSecurityException {
-        byte[] data = Files.readAllBytes(file.toPath());
+        byte[] data = readAllBytes(file);
         int offset = 0;
 
         int edPrivLen = readInt(data, offset);
@@ -336,7 +337,28 @@ public final class IdentityKeys {
         offset = writeLenAndBytes(out, offset, xPriv);
         writeLenAndBytes(out, offset, xPub);
 
-        Files.write(file.toPath(), out);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(out);
+        }
+    }
+
+    private static byte[] readAllBytes(File file) throws IOException {
+        long len = file.length();
+        if (len < 0 || len > Integer.MAX_VALUE) {
+            throw new IOException("identity file too large: " + file);
+        }
+        byte[] data = new byte[(int) len];
+        try (FileInputStream in = new FileInputStream(file)) {
+            int off = 0;
+            while (off < data.length) {
+                int n = in.read(data, off, data.length - off);
+                if (n < 0) {
+                    throw new IOException("truncated identity file: " + file);
+                }
+                off += n;
+            }
+        }
+        return data;
     }
 
     private static KeyPair reconstruct(String algorithm, byte[] pkcs8, byte[] x509)

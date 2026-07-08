@@ -11,10 +11,18 @@ import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.util.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -91,7 +99,7 @@ public final class IceBridgeHostCache {
             return;
         }
         try (BufferedReader r = new BufferedReader(
-                new InputStreamReader(Files.newInputStream(cacheFile.toPath()), StandardCharsets.UTF_8))) {
+                new InputStreamReader(new FileInputStream(cacheFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = r.readLine()) != null) {
                 line = line.trim();
@@ -134,7 +142,7 @@ public final class IceBridgeHostCache {
                 parent.mkdirs();
             }
             try (BufferedWriter w = new BufferedWriter(
-                    new OutputStreamWriter(Files.newOutputStream(cacheFile.toPath()), StandardCharsets.UTF_8))) {
+                    new OutputStreamWriter(new FileOutputStream(cacheFile), StandardCharsets.UTF_8))) {
                 w.write("# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs\n");
                 for (Entry e : entries) {
                     String role = (e.role != null) ? e.role : "";
