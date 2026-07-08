@@ -33,7 +33,10 @@ class IncomingSearchRequestHandlerTest {
     private static final AtomicInteger HASH_COUNTER = new AtomicInteger();
 
     @Test
-    void forwardsWhenTtlGreaterThanZero() throws Exception {
+    void multiHopForwardingDisabledEvenWhenTtlPositive() throws Exception {
+        assertFalse(IncomingSearchRequestHandler.MULTI_HOP_FORWARDING_ENABLED,
+                "v1 multi-hop must stay off until dual-envelope protocol");
+
         KeyPair requesterKey = generateEd25519KeyPair();
         byte[] requesterPub = rawPub(requesterKey);
 
@@ -42,11 +45,9 @@ class IncomingSearchRequestHandlerTest {
         index.torrents.add(torrent("ubuntu server", 500L, 1));
         RelaySearchService service = new RelaySearchService(index, handlerIdentity);
 
-        KeyPair peerAKey = generateEd25519KeyPair();
-        KeyPair peerBKey = generateEd25519KeyPair();
         PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
-        directory.upsertVerified(rawPub(peerAKey), "host-a", 6881);
-        directory.upsertVerified(rawPub(peerBKey), "host-b", 6882);
+        directory.upsertVerified(rawPub(generateEd25519KeyPair()), "host-a", 6881);
+        directory.upsertVerified(rawPub(generateEd25519KeyPair()), "host-b", 6882);
 
         CapturingTransport transport = new CapturingTransport();
         IncomingSearchRequestHandler handler =
@@ -57,10 +58,11 @@ class IncomingSearchRequestHandlerTest {
         RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
         transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
-        assertFalse(transport.sent.isEmpty(), "local response must be sent");
-        assertTrue(transport.sent.size() >= 2, "response + at least one forwarded request");
-        List<RemoteSearchRequest> forwarded = extractForwardedRequests(transport);
-        assertEquals(2, forwarded.size(), "both peers must receive a forwarded request");
+        assertEquals(1, transport.sent.size(), "only local response; multi-hop disabled");
+        assertTrue(extractForwardedRequests(transport).isEmpty());
+        RemoteSearchResponse response = SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload);
+        assertNotNull(response);
+        assertArrayEquals(request.nonce(), response.nonce());
     }
 
     @Test
@@ -92,105 +94,44 @@ class IncomingSearchRequestHandlerTest {
     }
 
     @Test
-    void forwardSkipsPeersInPath() throws Exception {
+    void reSignedForwardWouldFailRelaySearchServiceVerify() throws Exception {
+        // Documents why multi-hop is disabled: withNextHop + forwarder re-sign
+        // leaves requesterPub as original, so verify against requesterPub fails.
         KeyPair requesterKey = generateEd25519KeyPair();
         byte[] requesterPub = rawPub(requesterKey);
-
-        IdentityKeys handlerIdentity = IdentityKeys.generate();
+        IdentityKeys forwarder = IdentityKeys.generate();
+        IdentityKeys targetIdentity = IdentityKeys.generate();
         InMemoryLocalIndex index = new InMemoryLocalIndex();
         index.torrents.add(torrent("ubuntu server", 500L, 1));
-        RelaySearchService service = new RelaySearchService(index, handlerIdentity);
-
-        byte[] peerAPub = rawPub(generateEd25519KeyPair());
-        byte[] peerBPub = rawPub(generateEd25519KeyPair());
-        PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
-        directory.upsertVerified(peerAPub, "host-a", 6881);
-        directory.upsertVerified(peerBPub, "host-b", 6882);
-
-        CapturingTransport transport = new CapturingTransport();
-        IncomingSearchRequestHandler handler =
-                new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
-        handler.start();
-
-        byte[][] path = {requesterPub, peerAPub};
-        RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
-        transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
-
-        List<RemoteSearchRequest> forwarded = extractForwardedRequests(transport);
-        assertEquals(1, forwarded.size(), "only peerB should receive a forward (peerA is in path)");
-        CapturingTransport.SentPayload sp = findForwardTo(transport, peerBPub);
-        assertNotNull(sp, "forwarded request must be sent to peerB");
-        assertNull(findForwardTo(transport, peerAPub), "peerA is in the path and must be skipped");
-    }
-
-    @Test
-    void forwardSelectsAtMostThreePeers() throws Exception {
-        KeyPair requesterKey = generateEd25519KeyPair();
-        byte[] requesterPub = rawPub(requesterKey);
-
-        IdentityKeys handlerIdentity = IdentityKeys.generate();
-        InMemoryLocalIndex index = new InMemoryLocalIndex();
-        index.torrents.add(torrent("ubuntu server", 500L, 1));
-        RelaySearchService service = new RelaySearchService(index, handlerIdentity);
-
-        PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
-        for (int i = 0; i < 5; i++) {
-            byte[] pub = rawPub(generateEd25519KeyPair());
-            directory.upsertVerified(pub, "host-" + i, 6881 + i);
-        }
-
-        CapturingTransport transport = new CapturingTransport();
-        IncomingSearchRequestHandler handler =
-                new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
-        handler.start();
+        RelaySearchService targetService = new RelaySearchService(index, targetIdentity);
 
         byte[][] path = {requesterPub};
-        RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
-        transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
+        RemoteSearchRequest original = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+        RemoteSearchRequest nextHop = original.withNextHop(forwarder.ed25519PubRaw(), 0);
 
-        List<RemoteSearchRequest> forwarded = extractForwardedRequests(transport);
-        assertEquals(3, forwarded.size(), "at most 3 peers must be selected for forwarding");
-    }
+        Signature signer = Signature.getInstance("Ed25519");
+        signer.initSign(forwarder.ed25519().getPrivate());
+        signer.update(nextHop.canonicalBytes());
+        byte[] fwdSig = signer.sign();
+        RemoteSearchRequest resigned = RemoteSearchRequest.builder()
+                .keywords(nextHop.keywords())
+                .limit(nextHop.limit())
+                .nonce(nextHop.nonce())
+                .ttl(nextHop.ttl())
+                .requesterPub(nextHop.requesterPub())
+                .path(nextHop.path())
+                .timestamp(nextHop.timestamp())
+                .signature(fwdSig)
+                .build();
 
-    @Test
-    void forwardedRequestsAreResignedCorrectly() throws Exception {
-        KeyPair requesterKey = generateEd25519KeyPair();
-        byte[] requesterPub = rawPub(requesterKey);
-
-        IdentityKeys handlerIdentity = IdentityKeys.generate();
-        byte[] handlerPub = handlerIdentity.ed25519PubRaw();
-
-        InMemoryLocalIndex index = new InMemoryLocalIndex();
-        index.torrents.add(torrent("ubuntu server", 500L, 1));
-        RelaySearchService service = new RelaySearchService(index, handlerIdentity);
-
-        byte[] peerPub = rawPub(generateEd25519KeyPair());
-        PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
-        directory.upsertVerified(peerPub, "host", 6881);
-
-        CapturingTransport transport = new CapturingTransport();
-        IncomingSearchRequestHandler handler =
-                new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
-        handler.start();
-
-        byte[] nonce = new byte[32];
-        nonce[0] = 0x42;
-        byte[][] path = {requesterPub};
-        RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path, nonce);
-        transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
-
-        CapturingTransport.SentPayload sp = findForwardTo(transport, peerPub);
-        assertNotNull(sp, "peer must receive a forwarded request");
-        RemoteSearchRequest forwarded = SearchPayloadCodec.decodeRequest(sp.payload);
-        assertNotNull(forwarded);
-        assertEquals(0, forwarded.ttl(), "ttl must be decremented to 0");
-        assertEquals(2, forwarded.pathLength(), "path must contain requester + handler pubkeys");
-        assertArrayEquals(requesterPub, forwarded.path()[0]);
-        assertArrayEquals(handlerPub, forwarded.path()[1]);
-        assertArrayEquals(request.nonce(), forwarded.nonce(),
-                "nonce must match the original request");
-        assertTrue(verifySignature(forwarded, handlerPub),
-                "forwarded request must be signed by the handler's Ed25519 key");
+        assertTrue(verifySignature(resigned, forwarder.ed25519PubRaw()),
+                "signature is valid for forwarder key");
+        assertFalse(verifySignature(resigned, requesterPub),
+                "signature is NOT valid for original requesterPub");
+        assertTrue(targetService.handle(resigned).isEmpty(),
+                "RelaySearchService must reject forwarder-signed hop (checks requesterPub)");
+        assertTrue(targetService.handle(original).isPresent(),
+                "original requester-signed request still accepted");
     }
 
     @Test
@@ -211,7 +152,7 @@ class IncomingSearchRequestHandlerTest {
         handler.start();
 
         byte[][] path = {requesterPub};
-        RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+        RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 0, path);
         transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
         assertEquals(1, transport.sent.size(), "local response must be sent even with no peers");

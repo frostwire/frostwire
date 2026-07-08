@@ -1,4 +1,10 @@
 FrostWire 7.1.0 UNRELEASED
+  - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
+  - fix:IncomingSearchRequestHandler rate-limits catalog browse by verified requesterPub after signature check (not transport sourcePub); search rate-limit owned by RelaySearchService
+  - fix:Desktop IncomingSearchRequestHandler now receives LocalIndex so catalog browse works (parity with Android)
+  - fix:Stop seeding PeerDirectory with unverified IceBridge host-cache placeholders (reduces self/auth spam); host cache remains UI/history only
+  - fix:common/ relay identity and IceBridge file I/O no longer use java.nio.file (Android-safe File streams)
+  - new:ICEBRIDGE.md operator stub (ports, local vs remote, tokens, co-located pitfalls, security model)
   - fix:CRITICAL: matchedFile excluded from RemoteSearchResponse canonical bytes — Ed25519 signature did not cover the matched file path, allowing MITM tampering. Now included in appendRowBencode as "mf" key
   - fix:IP Filter critical blocking bug — add_rule() was passing flags=0 (allow) instead of ip_filter.access_flags.blocked.swigValue()=1, so blocked IP ranges were silently allowed through libtorrent (#1291) — caught by new IPFilterBlockingTest regression suite
   - fix:FragmentReassembler DoS vulnerability — DATA_END with fragIndex=Integer.MAX_VALUE forced a 2-billion-iteration loop; assemble() had int overflow causing NegativeArraySizeException that killed the rUDP channel. Added MAX_FRAGMENTS_PER_GROUP (4096), MAX_ASSEMBLED_SIZE (16MB), and long accumulation
@@ -104,6 +110,7 @@ FrostWire 7.1.0 UNRELEASED
   - fix:SearchMediator stripHtml regex precompiled — two String.replaceAll calls per result were recompiling regex on every search result. Now static final Pattern
   - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger
   - fix:PerformersHelper.reduceHtml no longer double-allocates strings
+  - fix:PerformersHelper relevance-ranking hot path — eliminate per-result regex compilation in sanitize/normalize (www. stripping and combining-mark removal after NFKD), speeding up fuzzy matching and result normalization on large search result sets
   - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional created at accessor boundary only
   - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields
   - fix:Knaben search query JSON now properly escaped via Gson

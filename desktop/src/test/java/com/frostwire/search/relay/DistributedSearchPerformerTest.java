@@ -354,7 +354,7 @@ class DistributedSearchPerformerTest {
 
         assertFalse(transport.sentRequests.isEmpty(), "at least one request must have been sent");
         RemoteSearchRequest sent = transport.sentRequests.get(0);
-        assertEquals(1, sent.ttl(), "ttl must be 1 to allow one forwarding hop");
+        assertEquals(0, sent.ttl(), "ttl must be 0: v1 is direct peer search only (no multi-hop)");
         assertEquals(1, sent.pathLength(), "path must contain the requester's own pubkey");
         assertArrayEquals(requesterKeys.ed25519PubRaw(), sent.path()[0],
                 "path[0] must be this node's own Ed25519 pubkey");

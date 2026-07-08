@@ -676,7 +676,8 @@ final class Initializer {
       // search our local index through IceBridge.
       RelaySearchService searchService = new RelaySearchService(localIndex, identity);
       IncomingSearchRequestHandler incomingHandler =
-          new IncomingSearchRequestHandler(transport, searchService, directory, identity);
+          new IncomingSearchRequestHandler(
+              transport, searchService, directory, identity, localIndex);
       incomingHandler.start();
 
       // Start the peer registry sync so the IceBridge daemon knows
@@ -774,17 +775,10 @@ final class Initializer {
       byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
       PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
 
-      // Seed PeerDirectory from the IceBridge host cache for faster bootstrapping after restart.
-      // Only entries that were successfully pinged in the past are used as hints.
-      try {
-        for (com.frostwire.search.relay.icebridge.IceBridgeHostCache.Entry e :
-            com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                .getPingable(14L * 24 * 60 * 60 * 1000)) {
-          byte[] placeholder = PeerDiscovery.placeholderPubkey(e.host, e.port);
-          directory.upsert(placeholder, e.host, e.port, 0);
-        }
-      } catch (Throwable ignored) {
-      }
+      // Host cache is UI/bootstrap history only. Do NOT upsert unverified
+      // placeholders into PeerDirectory (would drive failed TCP auth spam).
+      // Discovery still uses DHT + authenticators; successful relays re-enter
+      // the host cache via PeerDiscovery.markSuccess.
 
       // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
       // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
