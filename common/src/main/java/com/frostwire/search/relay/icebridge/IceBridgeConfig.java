@@ -40,6 +40,7 @@ public final class IceBridgeConfig {
     private final long peerTtlSec;
     private final double maxQpsPerKey;
     private final boolean bootstrap;
+    private final boolean dhtEnabled;
     private final File authTokensFile;
 
     public IceBridgeConfig(String host,
@@ -53,7 +54,7 @@ public final class IceBridgeConfig {
                            boolean bootstrap) {
         this(host, rudpPort, com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
              controlHttpPort, role, identityFile,
-             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, null);
+             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, false, null);
     }
 
     public IceBridgeConfig(String host,
@@ -67,6 +68,22 @@ public final class IceBridgeConfig {
                            double maxQpsPerKey,
                            boolean bootstrap,
                            File authTokensFile) {
+        this(host, rudpPort, relayPort, controlHttpPort, role, identityFile,
+                maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, false, authTokensFile);
+    }
+
+    public IceBridgeConfig(String host,
+                           int rudpPort,
+                           int relayPort,
+                           int controlHttpPort,
+                           Role role,
+                           File identityFile,
+                           int maxPeers,
+                           long peerTtlSec,
+                           double maxQpsPerKey,
+                           boolean bootstrap,
+                           boolean dhtEnabled,
+                           File authTokensFile) {
         this.host = Objects.requireNonNullElse(host, "0.0.0.0");
         this.rudpPort = requirePositiveOrZero(rudpPort, "rudpPort");
         this.relayPort = requirePositiveOrZero(relayPort, "relayPort");
@@ -77,6 +94,7 @@ public final class IceBridgeConfig {
         this.peerTtlSec = requirePositive(peerTtlSec, "peerTtlSec");
         this.maxQpsPerKey = requirePositive(maxQpsPerKey, "maxQpsPerKey");
         this.bootstrap = bootstrap;
+        this.dhtEnabled = dhtEnabled;
         this.authTokensFile = authTokensFile != null ? authTokensFile : new File("icebridge-tokens.txt");
     }
 
@@ -120,6 +138,16 @@ public final class IceBridgeConfig {
         return bootstrap;
     }
 
+    /**
+     * When true, standalone IceBridge starts an embedded DHT session and
+     * announces under relay/bootstrap topics. Default false for in-process
+     * / test builders (desktop/Android already advertise via BTEngine).
+     * Standalone {@link #fromEnv()} defaults this on for FORWARDER/BOTH.
+     */
+    public boolean dhtEnabled() {
+        return dhtEnabled;
+    }
+
     public File authTokensFile() {
         return authTokensFile;
     }
@@ -151,6 +179,7 @@ public final class IceBridgeConfig {
                 .peerTtlSec(120)
                 .maxQpsPerKey(10.0)
                 .bootstrap(true)
+                .dhtEnabled(true)
                 .build();
     }
 
@@ -169,6 +198,7 @@ public final class IceBridgeConfig {
         private long peerTtlSec = 120;
         private double maxQpsPerKey = 5.0;
         private boolean bootstrap;
+        private boolean dhtEnabled;
         private File authTokensFile;
 
         private Builder() {
@@ -224,6 +254,11 @@ public final class IceBridgeConfig {
             return this;
         }
 
+        public Builder dhtEnabled(boolean dhtEnabled) {
+            this.dhtEnabled = dhtEnabled;
+            return this;
+        }
+
         public Builder authTokensFile(File authTokensFile) {
             this.authTokensFile = authTokensFile;
             return this;
@@ -231,7 +266,8 @@ public final class IceBridgeConfig {
 
         public IceBridgeConfig build() {
             return new IceBridgeConfig(host, rudpPort, relayPort, controlHttpPort, role,
-                    identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, authTokensFile);
+                    identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, dhtEnabled,
+                    authTokensFile);
         }
     }
 
@@ -277,6 +313,8 @@ public final class IceBridgeConfig {
      *   <li>{@code ICEBRIDGE_PEER_TTL_SEC} — peer eviction TTL (default: 300)</li>
      *   <li>{@code ICEBRIDGE_MAX_QPS_PER_KEY} — rate limit per pub key (default: 30.0)</li>
      *   <li>{@code ICEBRIDGE_BOOTSTRAP} — announce on bootstrap DHT topic (default: true)</li>
+     *   <li>{@code ICEBRIDGE_DHT} — embed DHT SessionManager and announce (default: true for
+     *       FORWARDER/BOTH, false for CLIENT)</li>
      *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
      * </ul>
      *
@@ -290,13 +328,16 @@ public final class IceBridgeConfig {
         b.relayPort(envInt("ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
         b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8080));
         String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
-        b.role(Role.valueOf(roleStr.toUpperCase()));
+        Role role = Role.valueOf(roleStr.toUpperCase());
+        b.role(role);
         String identityPath = env("ICEBRIDGE_IDENTITY_FILE", "identity.dat");
         b.identityFile(new File(identityPath));
         b.maxPeers(envInt("ICEBRIDGE_MAX_PEERS", 10000));
         b.peerTtlSec(envLong("ICEBRIDGE_PEER_TTL_SEC", 300));
         b.maxQpsPerKey(envDouble("ICEBRIDGE_MAX_QPS_PER_KEY", 30.0));
         b.bootstrap(envBool("ICEBRIDGE_BOOTSTRAP", true));
+        boolean dhtDefault = role == Role.FORWARDER || role == Role.BOTH;
+        b.dhtEnabled(envBool("ICEBRIDGE_DHT", dhtDefault));
         String tokensFile = env("ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
         b.authTokensFile(new File(tokensFile));
         return b.build();
