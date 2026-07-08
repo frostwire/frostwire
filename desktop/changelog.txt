@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:Standalone IceBridge embedded DHT announce — pure FORWARDER nodes publish on frostwire-relays-v1 (+ optional bootstrap) via minimal jlibtorrent SessionManager without FrostWire desktop; ICEBRIDGE_DHT / --dht / --no-dht; DhtAdvertiser accepts SessionManager supplier
   - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
   - fix:IncomingSearchRequestHandler rate-limits catalog browse by verified requesterPub after signature check (not transport sourcePub); search rate-limit owned by RelaySearchService
   - fix:Desktop IncomingSearchRequestHandler now receives LocalIndex so catalog browse works (parity with Android)

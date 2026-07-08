@@ -1,34 +1,44 @@
 # FrostWire Distributed Search & IceBridge Relay Network
 
-> **Note (2026)**: This document is the original design + evolutionary record. The system has been implemented with a hybrid identity (direct TCP) + data (IceBridge rUDP) architecture, remote IceBridge support, rich configuration, multi-token auth, etc. See the "Current Implementation" and "Note on Future Documentation" sections near the end. A separate comprehensive `ICEBRIDGE.md` user/operator guide is still needed.
+> **Note (2026)**: Evolutionary record. Hybrid identity (direct TCP) + IceBridge rUDP is implemented.
+> Operator guide: `ICEBRIDGE.md`. Revision plan: `desktop/ICEBRIDGE_REVISION_PLAN.md`.
 
-> Corrected design for the FrostWire distributed search network and privacy-preserving relay layer.
-> This version replaces the earlier relay-registry/index-announcement design with primitives that
-> actually exist in BitTorrent DHT (BEP 5, BEP 44, BEP 46) and makes a headless cloud **IceBridge**
-> servent a first-class deployment target.
-> 
-> **IceBridge** = the purpose-agnostic relay/servent layer. **Distributed Search** = the first
-> application that routes search messages through IceBridge.
+> **IceBridge** is an **independent, protocol-agnostic relay network** (mesh + discovery + identity
+> handshake). **FrostWire Distributed Search** is one application that rides on IceBridge; IceBridge
+> must not require desktop UI, LocalIndex, karma, or search to exist or stay visible on the network.
 
 ---
 
-## 0. Goal
+## 0. Layering (MUST)
 
-Every FrostWire user can become part of a global, privacy-preserving search network:
+| Layer | Owns | Does **not** own |
+|-------|------|------------------|
+| **IceBridge network** | Ed25519 node identity for mesh, TCP identity handshake, rUDP mesh, hole-punch, roles CLIENT/FORWARDER/BOTH, control API, **DHT announce/lookup for relays/bootstrap** | Search keywords, torrent indexes, karma scoring, Swing/Android UI |
+| **FrostWire Distributed Search** | LocalIndex, signed search request/response, performer, trust floor for *search*, DHT peer topic for FW peers, BEP 46 index manifests | Must not be required for a pure IceBridge forwarder to be discoverable |
+
+**Hard requirement (2026-07):** A standalone `./gradlew icebridge` process with role FORWARDER/BOTH **must** join the public DHT (minimal jlibtorrent `SessionManager`, no full BT download stack required) and announce under the relay (and optionally bootstrap) BEP 5 topics so pure cloud forwarders appear on the IceBridge network **without any desktop FrostWire peer**.
+
+Until that lands, pure forwarders are only reachable via explicit host/URL/token or host-cache seeds — that is **not** an acceptable production architecture for an independent relay network.
+
+---
+
+## 0.1 Goal (FrostWire app on top of IceBridge)
+
+Every FrostWire user can become part of a global search network that **uses** IceBridge for transport:
 
 1. Each node indexes the torrents it seeds or intentionally shares.
 2. Each node can search its own local index instantly.
-3. Each node can ask trusted peers and relays for matching results.
-4. Well-connected nodes, including headless cloud **IceBridge** servents, help NAT-restricted users reach the mesh.
-5. Every identity, manifest, query result, and trust record is signed with Ed25519.
-6. Search payloads are end-to-end encrypted so IceBridge servents do not learn query text or result content.
+3. Each node can ask trusted peers and relays (via IceBridge) for matching results.
+4. Well-connected **IceBridge** servents (including headless cloud) help NAT-restricted users reach the mesh.
+5. Search-layer identity, manifests, query results, and trust records are signed with Ed25519.
+6. Search payloads should be end-to-end encrypted so IceBridge hops do not learn query text or result content (payload crypto is app-layer; IceBridge remains opaque-byte routing).
 
-Non-goals for v1:
+Non-goals for IceBridge itself:
 
+- Understanding search message schemas (opaque payloads only).
+- Requiring SQLite / media library / GUI.
 - Onion routing.
-- Full-text search inside file contents.
-- Android relay metrics UI.
-- Global keyword DHT indexing. Keyword search is handled by the peer mesh, not by DHT records.
+- Global keyword DHT indexing (search stays on the app mesh, not DHT records).
 
 ---
 
@@ -150,6 +160,13 @@ Desktop also starts its own `IncomingRelayServer` (direct TCP identity handshake
 
 Standalone fat JAR built by `icebridgeJar` task (main = `IceBridgeServer`).
 
+This process is a **first-class IceBridge network node**, not a desktop accessory. It must be able to:
+
+1. Bind identity TCP + rUDP mesh + control API.
+2. Hold an IceBridge node identity (`identity.dat` / Ed25519).
+3. **Announce and (optionally) lookup on DHT** so other IceBridge nodes and FrostWire clients find it under `frostwire-relays-v1` / bootstrap topics without any FrostWire GUI process.
+4. Route opaque payloads for any app protocol (distributed search is the first client).
+
 Run with:
 
 ```bash
@@ -172,6 +189,8 @@ Config sources (all supported):
 - `/health` is unauthenticated.
 
 The child launched by desktop receives its token on the command line and uses it for its local control API.
+
+**Standalone DHT (implemented 2026-07):** `IceBridgeDhtSession` + `DhtAdvertiser(sessionSupplier, …)` wired from `IceBridgeServer` when `dhtEnabled`. Desktop `DhtAdvertiser` still defaults to `BTEngine.getInstance()` supplier. In-process Android/desktop child builders leave `dhtEnabled=false` so they do not double-run DHT.
 
 ### 3.4 Android
 
@@ -683,16 +702,22 @@ Alice starts FrostWire and adds a magnet for `ubuntu-24.04.iso`.
 
 ---
 
-## 14. Open Questions / Future Work
+## 14. Required vs later work
+
+### MUST (IceBridge as independent network)
+
+- ~~**Standalone IceBridge DHT announce**~~ **Done:** `IceBridgeDhtSession`, `DhtAdvertiser` `Supplier<SessionManager>`, `ICEBRIDGE_DHT` / `--dht` / `--no-dht`. FORWARDER announces relay (+ optional bootstrap), not peer topic; BOTH announces peer+relay.
+- EC2 / two-process smoke still recommended (human): pure `./gradlew icebridge` discovered by desktop via DHT.
+
+### Later (app / product)
 
 - **Dual-envelope multi-hop** — original requester sig over immutable query fields + separate forwarder hop signatures; re-enable `ttl>0` only after this.
-- Full end-to-end encryption for search payloads over the rUDP mesh (X25519 keys are present in `IdentityKeys` but not yet used for all paths).
+- Full end-to-end encryption for search payloads over the rUDP mesh (X25519 keys present; IceBridge stays opaque).
 - Richer trust / WoT UI and defaults.
-- When / whether desktop nodes should advertise as forwarders.
-- Metrics, observability, and operations tooling for cloud IceBridge instances.
-- Android device experience and battery impact of the in-process relay stack.
-- Stable public relay discovery / curated bootstrap lists.
-- Standalone IceBridge optional DHT announce (jlibtorrent SessionManager) so pure forwarders appear on `frostwire-relays-v1` without a desktop peer.
+- When / whether desktop nodes should advertise as forwarders by default.
+- Metrics, observability, and ops tooling for cloud IceBridge fleets.
+- Android device experience and battery impact of in-process stack.
+- Curated bootstrap host lists as *supplement* to DHT (not a replacement for DHT announce).
 - Desktop Identity Settings “Initialize Identity” button (PoW generate with progress).
 
 ---

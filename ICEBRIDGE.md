@@ -6,9 +6,18 @@
 
 ## What IceBridge is
 
-IceBridge is FrostWire’s **rUDP mesh transport** for distributed search payloads.
+**IceBridge is an independent relay network** — not a FrostWire-only feature flag.
 
-It is **not** the whole distributed search protocol. Search messages are signed and verified by application code (`DistributedSearchPerformer`, `RelaySearchService`). IceBridge routes **opaque** byte payloads between peers.
+| IceBridge (network layer) | FrostWire Distributed Search (app layer) |
+|---------------------------|------------------------------------------|
+| Node identity, mesh rUDP, NAT/hole-punch, roles | Signed search request/response schemas |
+| Control API (`/send`, `/poll`, …) | LocalIndex, karma, Search UI engines |
+| DHT announce so **pure forwarders are discoverable** | Happens to *use* IceBridge as transport |
+| Protocol-agnostic opaque payloads | One of possibly many app protocols |
+
+FrostWire desktop/Android are **clients and optional co-located nodes** of that network. A cloud `FORWARDER` must be fully useful **without** any FrostWire GUI process.
+
+**DHT announce (MUST):** standalone `./gradlew icebridge` with `ICEBRIDGE_DHT=true` (default for FORWARDER/BOTH via env) embeds a minimal jlibtorrent session and runs `DhtAdvertiser` so pure cloud forwarders appear on `frostwire-relays-v1` (+ optional bootstrap topic). In-process desktop/Android IceBridge leaves DHT to BTEngine (`dhtEnabled` defaults false on builders).
 
 ### Hybrid planes
 
@@ -63,7 +72,8 @@ Useful env vars:
 | `ICEBRIDGE_ROLE` | `FORWARDER` recommended for cloud |
 | `ICEBRIDGE_IDENTITY_FILE` | Identity path |
 | `ICEBRIDGE_AUTH_TOKENS_FILE` | Bearer tokens file |
-| `ICEBRIDGE_BOOTSTRAP` | Advertise bootstrap topic when DHT available |
+| `ICEBRIDGE_BOOTSTRAP` | Also announce `frostwire-bootstrap-v1` (default true with env) |
+| `ICEBRIDGE_DHT` | Embed DHT SessionManager + announcer (default true for FORWARDER/BOTH via env) |
 
 Generate a control token (prints **once** to stdout):
 

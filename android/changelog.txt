@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - new:Standalone IceBridge can embed DHT announce (ICEBRIDGE_DHT); Android in-process IceBridge leaves DHT to BTEngine by default
   - fix:common/ identity+IceBridge file I/O no longer uses java.nio.file (Android-safe)
   - fix:Distributed search multi-hop disabled (ttl=0) until dual-envelope hop protocol
   - new:Distributed Search settings screen (Settings > Distributed Search) — toggle distributed search on/off, view identity info (Node ID, Ed25519 fingerprint, proof-of-work difficulty), see discovered peer count with refresh button

@@ -149,6 +149,20 @@ Sub-agents **must**:
 - X25519 session encryption
 - Public alpha marketing / privacy claims until B1 + E2E crypto decision
 
+### D. MUST — IceBridge as independent network (promoted 2026-07)
+
+User decision: IceBridge is a **protocol-agnostic independent relay network**; FrostWire distributed search is only a consumer. Standalone DHT announce is **not** future polish.
+
+| Task ID | Work | Status |
+|---------|------|--------|
+| **M-DHT-1** | `IceBridgeDhtSession` minimal DHT SessionManager | **Done** |
+| **M-DHT-2** | `DhtAdvertiser` takes `Supplier<SessionManager>` + peer/bootstrap flags | **Done** |
+| **M-DHT-3** | Wire into `IceBridgeServer`; `ICEBRIDGE_DHT` / `--dht` | **Done** (env default on for FORWARDER/BOTH) |
+| **M-DHT-4** | TCP identity plane unchanged; DHT advertises TCP port | **Done** |
+| **M-DHT-5** | Unit tests + EC2 human smoke | Unit tests done; EC2 still human |
+
+Do **not** couple IceBridge visibility to LocalIndex, SearchEngine, or desktop Initializer.
+
 ---
 
 ## 4. Orchestration model
