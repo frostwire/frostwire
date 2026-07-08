@@ -417,11 +417,11 @@ When completing a review, produce a structured report:
 
 ---
 
-## Quick-Reference: Top 15 Most Common Findings
+## Quick-Reference: Top 20 Most Common Findings
 
-Based on the FrostWire codebase history:
+Based on the FrostWire codebase history + MentisDB frostwire chain lessons:
 
-1. **common/ uses desktop-only API** — `java.net.http`, `java.awt`, `java.sql`, `java.nio.file` in code that Android also compiles. BLOCK.
+1. **common/ uses desktop-only API** — `java.net.http`, `java.awt`, `java.sql`, `java.nio.file` in code that Android also compiles. BLOCK. Known offenders to re-check: `IdentityKeys`, `IceBridgeTokens`, `IceBridgeHostCache` (`Files`).
 2. **LIKE wildcard injection** — remote peer sends `%`, matches entire local index. Escape with `ESCAPE '\\'`.
 3. **No transaction in multi-step DB writes** — crash mid-write leaves DB inconsistent. Wrap in `beginTransaction()`.
 4. **`close()` race condition** — close without acquiring the same lock as reads/writes.
@@ -429,13 +429,107 @@ Based on the FrostWire codebase history:
 6. **jlibtorrent on UI thread** — StrictMode violation or EDT freeze. Always background.
 7. **Missing defensive `byte[].clone()`** — shared mutable state across threads.
 8. **Resource leak** — Cursor/Connection not in try-with-resources.
-9. **`System.out` instead of `Logger`** — against house style, no log level control.
+9. **`System.out` instead of `Logger`** — against house style (except intentional headless CLI UX in `IceBridgeServer.main`).
 10. **No regression test for bug fix** — the bug will come back.
-11. **Secrets in logs** — auth tokens, private keys, full JSON payloads logged on error.
+11. **Secrets in logs** — auth tokens, private keys, full JSON payloads logged on error. Use `[set]` / never print tokens after generate-token path is done.
 12. **Spotless violations** — `./gradlew spotlessCheck` fails. Fix with `./gradlew spotlessApply`.
 13. **ScheduledExecutorService on Android** — dies in doze mode. Use WorkManager for periodic tasks.
 14. **Memory leak via static Activity reference** — Android-specific. Use WeakReference or static inner class.
 15. **Wire protocol break** — canonical bytes changed without version bump. Old peers' signatures fail.
+16. **Self-discovery / co-located ports** — PeerDiscovery must skip own Ed25519 pub + loopback; configurable ports for co-located standalone.
+17. **Async transport race** — register response listeners *before* send; async fakes must deliver off-thread.
+18. **rUDP without app-level fragmentation** — IP frags drop whole datagrams; use DATA_FRAG/DATA_END + byte-equal reassembly tests.
+19. **ProcessBuilder.inheritIO under Gradle** — child blocks on full pipes; redirect to temp files. Tests use `IdentityKeys.generate(0)`, never PoW 20.
+20. **Multi-hop re-sign vs requester verify** — re-signing with forwarder key while `verifySignature` checks `requesterPub` makes forwarded hops always fail. Prefer ttl=0 until dual-envelope exists.
+
+---
+
+## 12. Distributed Relay Network / IceBridge Review (MANDATORY for relay code)
+
+Use this section whenever the change touches `common/.../search/relay/**`, IceBridge, DHT advertiser/discovery, karma, or distributed search wiring on desktop/Android.
+
+### Architecture truth (hybrid model)
+
+| Plane | Mechanism | Role |
+|-------|-----------|------|
+| Identity / bootstrap | Direct TCP (`IncomingRelayServer`, port default 6888) + BEP 46 `IdentityRecord` | Learn real Ed25519 pub + rudpPort + role |
+| Discovery | BEP 5 topics `frostwire-peers-v1`, `frostwire-relays-v1`, `frostwire-bootstrap-v1` | Multi-writer rendezvous only |
+| Data / search transport | IceBridge rUDP mesh + HTTP control API | Opaque payload routing for signed search messages |
+| Search application | `DistributedSearchPerformer` + `RelaySearchService` + `SearchResponseVerifier` | Sign/verify keywords & results |
+| Trust | `PeerDirectory.topByTrustVerified` + karma chains | Never query placeholder `SHA-256(host:port)` peers for search |
+
+Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `frostwire` (agent_id `gubatron` for durable writes).
+
+### Checklist — Identity & discovery
+
+- [ ] **Own-pub self-skip** — `PeerDiscovery` receives `ownEd25519Pub`; after identity verify, skip if pub matches own (MentisDB #831).
+- [ ] **Loopback skip** — `isLocalEndpoint` rejects 127.0.0.1 / localhost / ::1 before TCP auth.
+- [ ] **Verified-only search** — `DistributedSearchPerformer` uses `topByTrustVerified`, never raw `topByTrust` / placeholders.
+- [ ] **IdentityRecord v2** — `rudp_port` + `role`; v1 compat (`rudpPort==0` → fallback 6889).
+- [ ] **DHT topics** — peers announce peers topic; FORWARDER/BOTH (or auto-elect when connectable) announce relays; discovery prefers relays first (no `<10 peers` gate — MentisDB #832).
+- [ ] **Placeholder policy** — SHA-256(host:port) allowed only as temporary directory keys; never for trust scoring or search targets.
+- [ ] **Identity file path** — desktop: `CommonUtils.getUserSettingsDir()/libtorrent/identity.dat` (not settings dir alone). Import/export/restore must use the same path as `Initializer`.
+
+### Checklist — IceBridge transport
+
+- [ ] **Control auth** — non-`/health` endpoints require bearer token; multi-token file; no token in logs; `--generate-token` prints once.
+- [ ] **Client HTTP** — OkHttp in `common/` (not `java.net.http`). Defensive copies on `InboundMessage`; response size caps; `close()`.
+- [ ] **Poller model** — single shared `IceBridgeSearchTransport` poller fans out to permanent `IncomingSearchRequestHandler` + transient performer listeners (no dual-poll race).
+- [ ] **Listener-before-send** — performer registers listener + latch before any `transport.send` (MentisDB #809).
+- [ ] **rUDP fragmentation** — payloads > `MAX_FRAGMENT_PAYLOAD` (1024) split into DATA_FRAG/DATA_END; reassembly byte-equal tests; max assembled size / concurrent groups bounded (MentisDB #810).
+- [ ] **Hole punch / connectivity** — unsolicited HELLO marks connectable; hole-punch response parses host:port and `connect()`; auto-elect forwarder when connectable.
+- [ ] **PeerRegistrySync** — uses peer `rudpPort` from directory, not hardcoded 6889.
+- [ ] **Process launcher** — no `inheritIO()`; redirect stdout/stderr to temp files; pass `--relay-port` and configurable rUDP; health wait with process-alive check.
+- [ ] **Local vs remote** — settings: ENABLE, USE_REMOTE, URL, token, bind host, ports, role. Structured config dump at startup without secrets (MentisDB #837).
+- [ ] **CLI System.out** — allowed only in `IceBridgeServer.main` / help / generate-token; library paths use `Logger`.
+
+### Checklist — Search protocol correctness
+
+- [ ] **Request verify** — Ed25519 over canonical bytes; timestamp skew; rate limit by **requesterPub**; fail-closed `Optional.empty()`.
+- [ ] **Response verify** — client checks expected responder pub, nonce, skew, signature (`SearchResponseVerifier`).
+- [ ] **TTL / multi-hop policy** — if `ttl>0` and path mutates, **cannot** re-sign with forwarder key while verifier checks `requesterPub` (signature always fails). Either:
+  - **v1 safe**: `ttl=0`, no multi-hop on IceBridge or TCP; or
+  - **proper envelope**: original requester sig over immutable fields + separate forwarder hop sigs.
+  Flag any re-sign-with-forwarder-key path as **BLOCK** until dual-envelope exists.
+- [ ] **Catalog browse** — signature + skew verified; desktop wiring must pass `LocalIndex` if feature is claimed; Android already passes index.
+- [ ] **FTS5 fixtures** — whole-word match; no kebab-case only names; sanitizer strips non-alnum.
+- [ ] **Trust check on requester** — spam/trust floor evaluated in *target's* directory for the *requester*, not the target (MentisDB #798).
+- [ ] **Canonical path bytes** — `pathLengthBytes()` includes count + each length-prefixed hop; non-empty path signatures must verify.
+
+### Checklist — Karma
+
+- [ ] Load chain from store on writer construct (no genesis reset every launch).
+- [ ] Epoch commitment before endorsements; energy budget enforced in verify.
+- [ ] WoT trust is **BFS with hop decay**, not recursive double-count (MentisDB #795).
+- [ ] BTEngineListener heavy work offloaded via `ThreadExecutor` / chain with dedup (`BTEngineListenerChain`).
+
+### Checklist — Cross-platform module placement
+
+- [ ] MCP Streamable-HTTP / `com.sun.net.httpserver` / virtual threads / BouncyCastle → **desktop only** (`com.frostwire.mcp.desktop.transport`).
+- [ ] IceBridge process launcher → desktop only.
+- [ ] Android in-process `IceBridgeServer` + OkHttp client in common; no subprocess.
+- [ ] JDBC (`LocalIndexTable`, `KarmaChainTable`) → desktop only; Android has `AndroidLocalIndex` / `AndroidKarmaChainStore`.
+- [ ] Prefer abstracting `Files` usage behind injected `File` / streams in common so Android never depends on `java.nio.file`.
+
+### Checklist — Tests required for IceBridge/relay changes
+
+| Area | Minimum tests |
+|------|----------------|
+| Peer discovery | self-skip by pub, local endpoint skip, verified upsert, unauth drop, custom relay port |
+| Transport | listener-before-send race, multi-listener fanout, poll failure isolation |
+| rUDP | fragment reassembly byte equality (pattern `i % 256`), oversize reject, stale group eviction |
+| Search | signed request/response round-trip, bad sig/nonce/stale reject, ttl=0 no forward |
+| Multi-instance | publish → find → unpublish → not-find (TCP or IceBridge fake transport) |
+| Process launcher | redirect IO (not inheritIO), health check, `--relay-port` parse |
+| Identity tests | always `IdentityKeys.generate(0)` |
+| MCP (desktop) | SSE GET body empty + session header; `initialized` → JSON `"accepted"` |
+
+### MentisDB operating rule for reviewers / implementers
+
+1. Chain: `frostwire`. Prefer agent_id **`gubatron`** for durable project memory (do not invent new agent IDs).
+2. `ranked_search` before append; link `refs` to prior lessons (#809 async, #810 frag, #831 self-skip, #832 ports, #795 karma, #769 architecture).
+3. On any non-obvious fix: `LessonLearned` / retrospective immediately.
+4. Checkpoint before handoff/compaction.
 
 ---
 
@@ -444,8 +538,8 @@ Based on the FrostWire codebase history:
 - **`frostwire-engineer`** — defines the code style rules this skill enforces
 - **`systematic-debugging`** — for diagnosing bugs found during review
 - **`verification-before-completion`** — evidence before assertions, always
-- **`mentisdb`** — record lessons learned from review findings as `LessonLearned` thoughts
+- **`mentisdb`** — record lessons learned from review findings as `LessonLearned` thoughts on the `frostwire` chain
 
 ---
 
-*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review.*
+*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review. Last major expansion: IceBridge / distributed relay section from MentisDB frostwire chain (2026-07).*

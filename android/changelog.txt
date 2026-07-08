@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:common/ identity+IceBridge file I/O no longer uses java.nio.file (Android-safe)
+  - fix:Distributed search multi-hop disabled (ttl=0) until dual-envelope hop protocol
   - new:Distributed Search settings screen (Settings > Distributed Search) — toggle distributed search on/off, view identity info (Node ID, Ed25519 fingerprint, proof-of-work difficulty), see discovered peer count with refresh button
   - new:LOCAL and DISTRIBUTED search engines on Android — LOCAL searches the local shared torrent index (enabled by default), DISTRIBUTED sends signed search requests to remote peers via IceBridge rUDP (disabled by default until identity + peers are ready). Both engines plug into the existing SearchMediator automatically — no UI changes needed for basic integration
   - new:AndroidKarmaChainStore — Android SQLite implementation of KarmaChainStore for the Bitcoin-anchored peer karma system. Stores karma chain entries (epoch commitments + endorsements) and aggregate peer scores. Shares the same database file as AndroidLocalIndex (WAL mode allows concurrent access)
