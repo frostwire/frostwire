@@ -7,8 +7,10 @@
 
 package com.frostwire.search.relay.icebridge;
 
+import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
@@ -29,16 +31,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * Main entry point for the IceBridge relay servent.
  *
- * <p>IceBridge is a purpose-agnostic relay layer. It exposes a local HTTP/
- * stdio control interface to FrostWire and an rUDP mesh interface to other
- * IceBridge servents. This class initializes the identity, control server,
- * rUDP listener, peer registry, and housekeeping threads.
+ * <p>IceBridge is an independent, protocol-agnostic relay network. It exposes
+ * a local HTTP control interface and an rUDP mesh to other IceBridge nodes.
+ * Standalone cloud forwarders can embed a DHT session ({@link IceBridgeDhtSession})
+ * so they appear on BEP 5 relay/bootstrap topics without a FrostWire desktop
+ * process. Application protocols (e.g. distributed search) ride as opaque payloads.
  */
 public final class IceBridgeServer implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(IceBridgeServer.class);
     private static final long JANITOR_INITIAL_DELAY_SEC = 10;
     private static final long JANITOR_INTERVAL_SEC = 30;
+    /** DHT re-announce interval for standalone forwarders (seconds). */
+    private static final long DHT_ANNOUNCE_INTERVAL_SEC = 60;
 
     private final IceBridgeConfig config;
     private final IceBridgeTokens authTokens;
@@ -52,6 +57,8 @@ public final class IceBridgeServer implements AutoCloseable {
     private InboundMessageQueue inboundQueue;
     private ScheduledExecutorService janitor;
     private IncomingRelayServer relayServer;
+    private IceBridgeDhtSession dhtSession;
+    private DhtAdvertiser dhtAdvertiser;
 
     public static void main(String[] args) {
         loadDotEnv();
@@ -95,6 +102,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  ICEBRIDGE_PEER_TTL_SEC      = " + config.peerTtlSec());
         System.out.println("  ICEBRIDGE_MAX_QPS_PER_KEY   = " + config.maxQpsPerKey());
         System.out.println("  ICEBRIDGE_BOOTSTRAP         = " + config.bootstrap());
+        System.out.println("  ICEBRIDGE_DHT               = " + config.dhtEnabled());
         System.out.println();
 
         if (!checkPortAvailable(config.host(), config.rudpPort(), true)) {
@@ -223,11 +231,13 @@ public final class IceBridgeServer implements AutoCloseable {
         rudpServer.start();
         startRelayServer();
         startJanitor();
+        startDhtAnnouncer();
 
         LOG.info("IceBridge started: identity=" + Hex.encode(identity.ed25519PubRaw())
                 + " role=" + config.role()
                 + " rudpPort=" + rudpServer.port()
-                + " httpPort=" + controlServer.port());
+                + " httpPort=" + controlServer.port()
+                + " dht=" + (dhtAdvertiser != null));
     }
 
     private IdentityKeys loadIdentity(File file) throws IOException, GeneralSecurityException {
@@ -262,6 +272,66 @@ public final class IceBridgeServer implements AutoCloseable {
             LOG.warn("Failed to start identity handshake server on port " + relayPort
                     + "; peers will not be able to authenticate this relay via TCP", t);
         }
+    }
+
+    /**
+     * Start embedded DHT announce when {@link IceBridgeConfig#dhtEnabled()}.
+     * Fail-closed: mesh stays up if native DHT fails to start.
+     */
+    private void startDhtAnnouncer() {
+        if (!config.dhtEnabled()) {
+            LOG.info("IceBridge DHT announce disabled (ICEBRIDGE_DHT=false or builder default)");
+            return;
+        }
+        try {
+            dhtSession = IceBridgeDhtSession.start(config.host());
+            // BEP 5 advertise TCP identity port; rUDP port is in IdentityRecord (BEP 46).
+            IdentityRecordPublisher publisher = new IdentityRecordPublisher(
+                    identity,
+                    config.relayPort(),
+                    config.rudpPort() > 0 ? config.rudpPort() : rudpServer.port(),
+                    config.role().name());
+            // Pure FORWARDER: relay (+ optional bootstrap) only — not a search peer.
+            // BOTH: also peer topic. CLIENT with DHT is unusual; peer topic only.
+            boolean peerTopic = config.role() != IceBridgeConfig.Role.FORWARDER;
+            boolean bootstrapTopic = config.bootstrap();
+            dhtAdvertiser = new DhtAdvertiser(
+                    publisher,
+                    null,
+                    DHT_ANNOUNCE_INTERVAL_SEC,
+                    () -> dhtSession != null ? dhtSession.session() : null,
+                    peerTopic,
+                    bootstrapTopic);
+            dhtAdvertiser.start();
+            LOG.info("IceBridge DHT announcer started: peerTopic=" + peerTopic
+                    + " bootstrapTopic=" + bootstrapTopic
+                    + " announcePort=" + config.relayPort());
+        } catch (Throwable t) {
+            LOG.warn("IceBridge DHT announcer failed to start; relay mesh continues without DHT visibility", t);
+            stopDhtAnnouncer();
+        }
+    }
+
+    private void stopDhtAnnouncer() {
+        if (dhtAdvertiser != null) {
+            try {
+                dhtAdvertiser.stop();
+            } catch (Throwable ignored) {
+            }
+            dhtAdvertiser = null;
+        }
+        if (dhtSession != null) {
+            try {
+                dhtSession.close();
+            } catch (Throwable ignored) {
+            }
+            dhtSession = null;
+        }
+    }
+
+    /** For tests / diagnostics. */
+    public boolean isDhtAnnouncerRunning() {
+        return dhtAdvertiser != null && dhtAdvertiser.isRunning();
     }
 
     private void runJanitor() {
@@ -330,6 +400,7 @@ public final class IceBridgeServer implements AutoCloseable {
     @Override
     public synchronized void close() {
         LOG.info("Shutting down IceBridge");
+        stopDhtAnnouncer();
         if (janitor != null) {
             janitor.shutdownNow();
         }
@@ -393,6 +464,13 @@ public final class IceBridgeServer implements AutoCloseable {
                     break;
                 case "--bootstrap":
                     b.bootstrap(true);
+                    b.dhtEnabled(true);
+                    break;
+                case "--dht":
+                    b.dhtEnabled(true);
+                    break;
+                case "--no-dht":
+                    b.dhtEnabled(false);
                     break;
                 case "--host":
                     b.host(next(args, ++i, "--host"));
@@ -449,7 +527,9 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  --max-peers N              Maximum tracked peers");
         System.out.println("  --peer-ttl-sec N           Peer eviction TTL");
         System.out.println("  --max-qps-per-key N        Registration rate limit per public key");
-        System.out.println("  --bootstrap                Advertise bootstrap DHT topic");
+        System.out.println("  --bootstrap                Advertise bootstrap DHT topic (enables embedded DHT)");
+        System.out.println("  --dht                      Embed DHT SessionManager and announce on relay topics");
+        System.out.println("  --no-dht                   Disable embedded DHT (default when using CLI without --dht)");
         System.out.println("  --host HOST                Bind host");
         System.out.println("  --auth-tokens-file PATH    File with one bearer token per line (default icebridge-tokens.txt)");
         System.out.println("  --generate-token           Generate + print one new token (only the token to stdout), store it, exit");
