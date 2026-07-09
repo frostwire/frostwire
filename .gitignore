@@ -117,3 +117,11 @@ identity.dat
 **/identity.dat
 icebridge-tokens.txt
 **/icebridge-tokens.txt
+icebridge-tokens.txt.once
+**/icebridge-tokens.txt.once
+icebridge-token.once
+**/icebridge-token.once
+icebridge.log
+**/icebridge.log
+icebridge.pid
+**/icebridge.pid
