@@ -2,19 +2,20 @@
 # Run a standalone IceBridge FORWARDER from the desktop/ tree (laptop or EC2).
 #
 # Defaults: bind 0.0.0.0, role FORWARDER, DHT on, TCP identity 6888, UDP mesh 6889,
-# control HTTP 8081. Builds icebridge.jar if missing, then runs via java -jar
-# (preferred over long-lived Gradle).
+# control HTTP 8081 (loopback only inside the JVM). Builds icebridge.jar if missing,
+# then runs via java -jar (preferred over long-lived Gradle).
 #
 # Usage (from anywhere):
 #   ./scripts/icebridge-run-local.sh
 #   ./scripts/icebridge-run-local.sh --colo          # ports 7000/7001 for dual-run with desktop
-#   ./scripts/icebridge-run-local.sh --gradle        # force ./gradlew icebridge
+#   ./scripts/icebridge-run-local.sh --gradle        # force ./gradlew icebridge (foreground only)
 #   ./scripts/icebridge-run-local.sh --generate-token
-#   ./scripts/icebridge-run-local.sh --background
+#   ./scripts/icebridge-run-local.sh --background    # java -jar only (not --gradle)
 #   ICEBRIDGE_RELAY_PORT=7000 ./scripts/icebridge-run-local.sh
 #
 # Optional desktop/.env is loaded for unset ICEBRIDGE_* keys only (exported env wins).
-# EC2: open TCP 6888 + UDP 6889 (or colo ports) in the security group; keep 8081 private.
+# EC2: open TCP 6888 + UDP 6889 (or colo ports) in the security group; keep control private
+# (already loopback-only). Use SSH -L for /health from elsewhere.
 
 set -euo pipefail
 
@@ -89,14 +90,17 @@ export ICEBRIDGE_MAX_QPS_PER_KEY="${ICEBRIDGE_MAX_QPS_PER_KEY:-30.0}"
 
 JAR="${ROOT}/build/libs/icebridge.jar"
 JAVA_BIN="${JAVA_BIN:-java}"
+if command -v "${JAVA_BIN}" >/dev/null 2>&1; then
+  JAVA_BIN="$(command -v "${JAVA_BIN}")"
+fi
 
 echo "==> IceBridge run-local"
 echo "    host=${ICEBRIDGE_HOST} role=${ICEBRIDGE_ROLE}"
-echo "    relay(TCP)=${ICEBRIDGE_RELAY_PORT} rudp(UDP)=${ICEBRIDGE_RUDP_PORT} control=${ICEBRIDGE_CONTROL_HTTP_PORT}"
+echo "    relay(TCP)=${ICEBRIDGE_RELAY_PORT} rudp(UDP)=${ICEBRIDGE_RUDP_PORT} control=${ICEBRIDGE_CONTROL_HTTP_PORT} (loopback)"
 echo "    dht=${ICEBRIDGE_DHT} bootstrap=${ICEBRIDGE_BOOTSTRAP}"
 echo "    identity=${ICEBRIDGE_IDENTITY_FILE}"
 echo "    tokens=${ICEBRIDGE_AUTH_TOKENS_FILE}"
-echo "    SG / firewall: TCP ${ICEBRIDGE_RELAY_PORT}, UDP ${ICEBRIDGE_RUDP_PORT}; keep TCP ${ICEBRIDGE_CONTROL_HTTP_PORT} private"
+echo "    SG / firewall: TCP ${ICEBRIDGE_RELAY_PORT}, UDP ${ICEBRIDGE_RUDP_PORT}; control is 127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}"
 
 if [[ ! -f "${JAR}" ]]; then
   echo "==> Building icebridge.jar"
@@ -115,7 +119,7 @@ if [[ "${GENERATE_TOKEN}" -eq 1 ]] || [[ ! -f "${ICEBRIDGE_AUTH_TOKENS_FILE}" ]]
     echo "==> Generating additional token (printed once)"
   fi
   token_once="${ICEBRIDGE_AUTH_TOKENS_FILE}.once"
-  ${JAVA_BIN} -jar "${JAR}" \
+  "${JAVA_BIN}" -jar "${JAR}" \
     --generate-token \
     --auth-tokens-file "${ICEBRIDGE_AUTH_TOKENS_FILE}" \
     | tee "${token_once}"
@@ -126,23 +130,25 @@ if [[ "${GENERATE_TOKEN}" -eq 1 ]] || [[ ! -f "${ICEBRIDGE_AUTH_TOKENS_FILE}" ]]
   fi
 fi
 
+if [[ "${BACKGROUND}" -eq 1 && "${USE_GRADLE}" -eq 1 ]]; then
+  echo "ERROR: --background cannot be combined with --gradle (Gradle PID is not the JVM;" >&2
+  echo "       orphans remain after kill). Use java -jar background, or foreground --gradle." >&2
+  exit 1
+fi
+
 run_server() {
   if [[ "${USE_GRADLE}" -eq 1 ]]; then
     echo "==> Starting via ./gradlew icebridge"
     exec ./gradlew icebridge
   fi
   echo "==> Starting via java -jar (foreground)"
-  exec ${JAVA_BIN} -jar "${JAR}"
+  exec "${JAVA_BIN}" -jar "${JAR}"
 }
 
 if [[ "${BACKGROUND}" -eq 1 ]]; then
   LOG="${ROOT}/icebridge.log"
   echo "==> Starting in background; log=${LOG}"
-  if [[ "${USE_GRADLE}" -eq 1 ]]; then
-    nohup ./gradlew icebridge >>"${LOG}" 2>&1 &
-  else
-    nohup ${JAVA_BIN} -jar "${JAR}" >>"${LOG}" 2>&1 &
-  fi
+  nohup "${JAVA_BIN}" -jar "${JAR}" >>"${LOG}" 2>&1 &
   echo $! >"${ROOT}/icebridge.pid"
   echo "    pid=$(cat "${ROOT}/icebridge.pid")"
   echo "    health: curl -sS http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health"
