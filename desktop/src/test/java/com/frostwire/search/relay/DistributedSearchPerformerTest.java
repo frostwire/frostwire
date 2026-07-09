@@ -383,7 +383,7 @@ class DistributedSearchPerformerTest {
   }
 
   @Test
-  void performSetsTtlZeroAndIncludesOwnPubkeyInPath() throws Exception {
+  void performSetsDualEnvelopeTtlAndIncludesOwnPubkeyInPath() throws Exception {
     IdentityKeys peerKeys = IdentityKeys.generate();
     IdentityKeys requesterKeys = IdentityKeys.generate();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
@@ -410,7 +410,10 @@ class DistributedSearchPerformerTest {
 
     assertFalse(transport.sentRequests.isEmpty(), "at least one request must have been sent");
     RemoteSearchRequest sent = transport.sentRequests.get(0);
-    assertEquals(0, sent.ttl(), "ttl must be 0: v1 is direct peer search only (no multi-hop)");
+    assertEquals(
+        RemoteSearchRequest.DEFAULT_TTL,
+        sent.ttl(),
+        "ttl must be DEFAULT_TTL for dual-envelope multi-hop");
     assertEquals(1, sent.pathLength(), "path must contain the requester's own pubkey");
     assertArrayEquals(
         requesterKeys.ed25519PubRaw(),

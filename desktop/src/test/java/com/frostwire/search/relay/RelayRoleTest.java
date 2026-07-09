@@ -178,12 +178,23 @@ class RelayRoleTest {
     }
 
     @Test
-    void forwardResignsWithOwnKey() throws Exception {
+    void forwardPreservesRequesterSignatureDualEnvelope() throws Exception {
         KeyPairBag peerA = new KeyPairBag();
         directory.upsertVerified(peerA.pub, "host-a", 6881);
-        byte[] requesterPub = new byte[32];
-        RemoteSearchRequest req = buildForwardableRequest(requesterPub, 1, new byte[0][]);
-        List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+        KeyPairBag requester = new KeyPairBag();
+        RemoteSearchRequest req = signRequest(requester, "ubuntu", 25);
+        // Give the signed request a positive ttl for hopping.
+        RemoteSearchRequest hopReady = RemoteSearchRequest.builder()
+                .keywords(req.keywords())
+                .limit(req.limit())
+                .nonce(req.nonce())
+                .ttl(1)
+                .requesterPub(req.requesterPub())
+                .path(req.path())
+                .timestamp(req.timestamp())
+                .signature(req.signature())
+                .build();
+        List<RelayRole.ForwardTarget> result = forwardingRole.forward(hopReady);
         assertEquals(1, result.size());
         RelayRole.ForwardTarget target = result.get(0);
         RemoteSearchRequest forwarded = target.request();
@@ -193,8 +204,10 @@ class RelayRoleTest {
                 "path must contain this node's own pubkey");
         assertTrue(Arrays.equals(target.peerPub(), peerA.pub),
                 "target must be the selected peer");
-        assertTrue(verifySignature(forwarded, identity.ed25519PubRaw()),
-                "forwarded request must be signed by this node's key");
+        assertTrue(Arrays.equals(hopReady.signature(), forwarded.signature()),
+                "dual-envelope: requester signature preserved");
+        assertTrue(verifySignature(forwarded, requester.pub),
+                "forwarded request still verifies under original requester key");
     }
 
     @Test

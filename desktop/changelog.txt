@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:Dual-envelope distributed search multi-hop (v2) — requester signature covers query only; hops preserve sig; default ttl=2; PeerRegistrySync registers self and imports IceBridge mesh peers (forwarder-first discovery)
   - fix:IceBridge CLI prints identity load vs proof-of-work mining progress on stdout (first-run no longer looks hung); non-protocol TCP 6888 probes at DEBUG without stack spam
   - fix:IceBridge ops scripts — EC2 push creates writable /opt dir (sudo+chown); control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
   - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-ec2-push.sh + icebridge-ec2-install.sh
