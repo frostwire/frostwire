@@ -58,7 +58,10 @@ Identity file (shared with desktop relay stack):
 ```bash
 cd desktop
 cp .env.example .env   # optional
-./gradlew icebridge
+./scripts/icebridge-run-local.sh              # FORWARDER + DHT, java -jar
+./scripts/icebridge-run-local.sh --colo       # ports 7000/7001 next to desktop
+./scripts/icebridge-run-local.sh --background
+# or: ./gradlew icebridge
 ```
 
 Useful env vars:
