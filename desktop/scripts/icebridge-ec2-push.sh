@@ -37,6 +37,6 @@ echo "On the host, install/restart:"
 echo "  ssh ${HOST} 'sudo INSTALL_DIR=${REMOTE_DIR} bash ${REMOTE_DIR}/icebridge-ec2-install.sh'"
 echo
 echo "Desktop smoke (after SG open):"
-echo "  - Settings → IceBridge: enable, remote URL http://<public-ip>:8080 + token from host icebridge-token.once"
+echo "  - Settings → IceBridge: enable, remote URL http://<public-ip>:8081 + token from host icebridge-token.once"
 echo "  - OR pure DHT discovery: local child OK; wait ~60s for frostwire-relays-v1; verified peer in PeerDirectory"
-echo "  - curl health via tunnel: ssh -L 18080:127.0.0.1:8080 ${HOST} then curl http://127.0.0.1:18080/health"
+echo "  - curl health via tunnel: ssh -L 18081:127.0.0.1:8081 ${HOST} then curl http://127.0.0.1:18081/health"

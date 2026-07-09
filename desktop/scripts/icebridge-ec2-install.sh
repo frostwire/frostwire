@@ -14,9 +14,9 @@ SERVICE_USER="${SERVICE_USER:-icebridge}"
 RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-6889}"
 RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-6888}"
 # One bind host for mesh + control. Use 0.0.0.0 and lock control HTTP with the security group
-# (or SSH tunnel). Do not expose TCP 8080 to the world.
+# (or SSH tunnel). Do not expose TCP 8081 to the world.
 BIND_HOST="${ICEBRIDGE_HOST:-0.0.0.0}"
-CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8080}"
+CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8081}"
 ROLE="${ICEBRIDGE_ROLE:-FORWARDER}"
 JAVA_BIN="${JAVA_BIN:-java}"
 

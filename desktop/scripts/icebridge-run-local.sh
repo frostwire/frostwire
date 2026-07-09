@@ -2,7 +2,7 @@
 # Run a standalone IceBridge FORWARDER from the desktop/ tree (laptop or EC2).
 #
 # Defaults: bind 0.0.0.0, role FORWARDER, DHT on, TCP identity 6888, UDP mesh 6889,
-# control HTTP 8080. Builds icebridge.jar if missing, then runs via java -jar
+# control HTTP 8081. Builds icebridge.jar if missing, then runs via java -jar
 # (preferred over long-lived Gradle).
 #
 # Usage (from anywhere):
@@ -14,7 +14,7 @@
 #   ICEBRIDGE_RELAY_PORT=7000 ./scripts/icebridge-run-local.sh
 #
 # Optional desktop/.env is loaded for unset ICEBRIDGE_* keys only (exported env wins).
-# EC2: open TCP 6888 + UDP 6889 (or colo ports) in the security group; keep 8080 private.
+# EC2: open TCP 6888 + UDP 6889 (or colo ports) in the security group; keep 8081 private.
 
 set -euo pipefail
 
@@ -71,14 +71,14 @@ if [[ "${COLO}" -eq 1 ]]; then
   # Avoid clashing with desktop defaults (identity 6888, child rUDP 6889).
   export ICEBRIDGE_RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-7000}"
   export ICEBRIDGE_RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-7001}"
-  export ICEBRIDGE_CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-18080}"
+  export ICEBRIDGE_CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-18081}"
 fi
 
 export ICEBRIDGE_HOST="${ICEBRIDGE_HOST:-0.0.0.0}"
 export ICEBRIDGE_ROLE="${ICEBRIDGE_ROLE:-FORWARDER}"
 export ICEBRIDGE_RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-6888}"
 export ICEBRIDGE_RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-6889}"
-export ICEBRIDGE_CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8080}"
+export ICEBRIDGE_CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8081}"
 export ICEBRIDGE_BOOTSTRAP="${ICEBRIDGE_BOOTSTRAP:-true}"
 export ICEBRIDGE_DHT="${ICEBRIDGE_DHT:-true}"
 export ICEBRIDGE_IDENTITY_FILE="${ICEBRIDGE_IDENTITY_FILE:-${ROOT}/identity.dat}"
