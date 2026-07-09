@@ -172,8 +172,8 @@ public final class IceBridgeConfig {
     /** Default config for a headless cloud forwarder. */
     public static IceBridgeConfig cloudDefaults() {
         return newBuilder()
-                .rudpPort(6888)
-                .controlHttpPort(8080)
+                .rudpPort(6889)
+                .controlHttpPort(8081)
                 .role(Role.FORWARDER)
                 .maxPeers(10000)
                 .peerTtlSec(120)
@@ -306,7 +306,7 @@ public final class IceBridgeConfig {
      * <ul>
      *   <li>{@code ICEBRIDGE_HOST} — bind address (default: 0.0.0.0)</li>
      *   <li>{@code ICEBRIDGE_RUDP_PORT} — rUDP listen port (default: 6889)</li>
-     *   <li>{@code ICEBRIDGE_CONTROL_HTTP_PORT} — HTTP control port (default: 8080)</li>
+     *   <li>{@code ICEBRIDGE_CONTROL_HTTP_PORT} — HTTP control port, loopback only (default: 8081)</li>
      *   <li>{@code ICEBRIDGE_ROLE} — FORWARDER, CLIENT, or BOTH (default: FORWARDER)</li>
      *   <li>{@code ICEBRIDGE_IDENTITY_FILE} — path to identity.dat (default: ./identity.dat)</li>
      *   <li>{@code ICEBRIDGE_MAX_PEERS} — max tracked peers (default: 10000)</li>
@@ -326,7 +326,7 @@ public final class IceBridgeConfig {
         b.host(host);
         b.rudpPort(envInt("ICEBRIDGE_RUDP_PORT", 6889));
         b.relayPort(envInt("ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
-        b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8080));
+        b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8081));
         String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
         Role role = Role.valueOf(roleStr.toUpperCase());
         b.role(role);
