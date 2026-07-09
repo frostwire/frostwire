@@ -6,6 +6,9 @@
 # Usage:
 #   INSTALL_DIR=/opt/icebridge bash icebridge-ec2-install.sh
 #   TOKEN_FILE=... ICEBRIDGE_RUDP_PORT=6889 ... bash icebridge-ec2-install.sh
+#
+# Control HTTP binds 127.0.0.1 only (see ControlServer). Do not open it in the
+# security group; use SSH -L for ops. Mesh plane: TCP identity + UDP rUDP.
 
 set -euo pipefail
 
@@ -13,20 +16,36 @@ INSTALL_DIR="${INSTALL_DIR:-/opt/icebridge}"
 SERVICE_USER="${SERVICE_USER:-icebridge}"
 RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-6889}"
 RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-6888}"
-# One bind host for mesh + control. Use 0.0.0.0 and lock control HTTP with the security group
-# (or SSH tunnel). Do not expose TCP 8081 to the world.
+# Host for rUDP / identity listeners. Control HTTP ignores this and stays on 127.0.0.1.
 BIND_HOST="${ICEBRIDGE_HOST:-0.0.0.0}"
 CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8081}"
 ROLE="${ICEBRIDGE_ROLE:-FORWARDER}"
-JAVA_BIN="${JAVA_BIN:-java}"
+# Resolve to absolute path for systemd (relative "java" is unreliable under unit PATH).
+JAVA_BIN_RAW="${JAVA_BIN:-java}"
+if command -v "${JAVA_BIN_RAW}" >/dev/null 2>&1; then
+  JAVA_BIN="$(command -v "${JAVA_BIN_RAW}")"
+else
+  JAVA_BIN="${JAVA_BIN_RAW}"
+fi
 
 if [[ ! -f "${INSTALL_DIR}/icebridge.jar" ]]; then
   echo "ERROR: ${INSTALL_DIR}/icebridge.jar not found. scp the multi-arch fat JAR first." >&2
   exit 1
 fi
 
-if ! command -v "${JAVA_BIN}" >/dev/null 2>&1; then
-  echo "ERROR: java not found. Install JDK 17+ (Amazon Corretto / Temurin)." >&2
+if ! command -v "${JAVA_BIN}" >/dev/null 2>&1 && [[ ! -x "${JAVA_BIN}" ]]; then
+  echo "ERROR: java not found (${JAVA_BIN_RAW}). Install JDK 17+ (Amazon Corretto / Temurin)." >&2
+  exit 1
+fi
+
+# Prefer realpath-style absolute for ExecStart
+if [[ "${JAVA_BIN}" != /* ]]; then
+  if command -v "${JAVA_BIN}" >/dev/null 2>&1; then
+    JAVA_BIN="$(command -v "${JAVA_BIN}")"
+  fi
+fi
+if [[ "${JAVA_BIN}" != /* ]]; then
+  echo "ERROR: JAVA_BIN must resolve to an absolute path for systemd (got: ${JAVA_BIN})" >&2
   exit 1
 fi
 
@@ -36,11 +55,13 @@ cd "${INSTALL_DIR}"
 
 if [[ ! -f icebridge-tokens.txt ]]; then
   echo "==> Generating control token (printed once)"
-  ${JAVA_BIN} -jar icebridge.jar --generate-token --auth-tokens-file icebridge-tokens.txt | tee icebridge-token.once
+  "${JAVA_BIN}" -jar icebridge.jar --generate-token --auth-tokens-file icebridge-tokens.txt | tee icebridge-token.once
   chmod 600 icebridge-tokens.txt icebridge-token.once
 fi
 
-cat > "${INSTALL_DIR}/icebridge.env" <<EOF
+ENV_FILE="${INSTALL_DIR}/icebridge.env"
+write_icebridge_env() {
+  cat > "${ENV_FILE}" <<EOF
 ICEBRIDGE_HOST=${BIND_HOST}
 ICEBRIDGE_RUDP_PORT=${RUDP_PORT}
 ICEBRIDGE_RELAY_PORT=${RELAY_PORT}
@@ -54,7 +75,31 @@ ICEBRIDGE_MAX_PEERS=10000
 ICEBRIDGE_PEER_TTL_SEC=300
 ICEBRIDGE_MAX_QPS_PER_KEY=30.0
 EOF
-chmod 600 "${INSTALL_DIR}/icebridge.env"
+  chmod 600 "${ENV_FILE}"
+}
+
+if [[ -f "${ENV_FILE}" ]]; then
+  # Preserve operator edits on upgrade unless FORCE_ENV=1.
+  if [[ "${FORCE_ENV:-0}" == "1" ]]; then
+    echo "==> FORCE_ENV=1 — rewriting ${ENV_FILE}"
+    write_icebridge_env
+  else
+    echo "==> Keeping existing ${ENV_FILE} (FORCE_ENV=1 to replace from current ICEBRIDGE_* / defaults)"
+  fi
+else
+  echo "==> Writing ${ENV_FILE}"
+  write_icebridge_env
+fi
+
+# Source final env so health check uses the active control port
+# shellcheck disable=SC1090
+set -a
+# shellcheck source=/dev/null
+source "${ENV_FILE}"
+set +a
+CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-${CONTROL_HTTP_PORT}}"
+RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-${RELAY_PORT}}"
+RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-${RUDP_PORT}}"
 
 # systemd unit (requires root)
 UNIT=/etc/systemd/system/icebridge.service
@@ -77,7 +122,6 @@ ExecStart=${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65535
-# Fail closed: do not open control to the world via SG; also bind check is app-level.
 
 [Install]
 WantedBy=multi-user.target
@@ -88,18 +132,19 @@ EOF
   systemctl restart icebridge.service
   sleep 2
   systemctl --no-pager -l status icebridge.service || true
-  echo "==> Health (localhost):"
+  echo "==> Health (localhost only — control binds 127.0.0.1):"
   curl -sS "http://127.0.0.1:${CONTROL_HTTP_PORT}/health" || true
   echo
 else
-  echo "==> Not root: wrote ${INSTALL_DIR}/icebridge.env — run with sudo for systemd, or:"
-  echo "    set -a; source ${INSTALL_DIR}/icebridge.env; set +a"
+  echo "==> Not root: wrote ${ENV_FILE} — run with sudo for systemd, or:"
+  echo "    set -a; source ${ENV_FILE}; set +a"
   echo "    nohup ${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar > ${INSTALL_DIR}/icebridge.log 2>&1 &"
 fi
 
 echo "==> Security group checklist (AWS console / CLI):"
 echo "    TCP  ${RELAY_PORT}  from 0.0.0.0/0   # identity handshake"
 echo "    UDP  ${RUDP_PORT}   from 0.0.0.0/0   # rUDP mesh"
-echo "    TCP  ${CONTROL_HTTP_PORT} from your IP only (or none — use SSH tunnel)"
+echo "    DO NOT open control HTTP ${CONTROL_HTTP_PORT} — binds 127.0.0.1 only; use:"
+echo "      ssh -L 18081:127.0.0.1:${CONTROL_HTTP_PORT} <host>"
 echo "    UDP  0-65535 outbound (or at least 6881/25401) for public DHT bootstrap"
 echo "==> Done."
