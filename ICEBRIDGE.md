@@ -93,13 +93,62 @@ Firewall: open **UDP rUDP** (and TCP identity if remote peers handshake you). Co
   ```
 - Self-discovery is skipped via own Ed25519 pub + loopback filters; public-IP hairpin can still look like “self”.
 
-### EC2 / pure-forwarder DHT smoke (manual)
+### EC2 / pure-forwarder DHT smoke
 
-1. On the relay host: build jar, generate token, run FORWARDER with `ICEBRIDGE_DHT=true` (default via env).
-2. Open UDP rUDP + TCP identity in security group; keep control HTTP localhost-only (SSH tunnel if needed).
-3. On desktop: enable IceBridge remote (URL + token) **or** leave local child off and rely on DHT discovery of the cloud FORWARDER.
-4. Confirm desktop logs discovery of the EC2 public endpoint and that PeerDirectory has a **verified** peer (identity TCP success) — not only host-cache placeholders.
-5. Optional: `dhtGetPeers` / discovery tools should list the forwarder under `frostwire-relays-v1` after ~1 min.
+**Critical:** the fat JAR must include **Linux** jlibtorrent natives (`lib/x86_64/*.so`).
+`./gradlew icebridgeJar` packs multi-arch natives (Linux x86_64/arm64 + macOS) so a Mac-built
+`icebridge.jar` works on EC2. Verify before upload:
+
+```bash
+jar tf desktop/build/libs/icebridge.jar | grep 'lib/x86_64/.*\.so'
+```
+
+#### One-liner deploy from laptop
+
+```bash
+cd desktop
+chmod +x scripts/icebridge-ec2-push.sh scripts/icebridge-ec2-install.sh
+# SSH host alias or user@host (see ~/.ssh/config)
+./scripts/icebridge-ec2-push.sh virginia1
+ssh virginia1 'sudo INSTALL_DIR=/opt/icebridge bash /opt/icebridge/icebridge-ec2-install.sh'
+```
+
+#### Manual steps (same outcome)
+
+1. **Build** on laptop: `cd desktop && ./gradlew icebridgeJar`
+2. **Upload** `build/libs/icebridge.jar` to e.g. `/opt/icebridge/` on the instance (Amazon Linux 2/2023 or Ubuntu; JDK 17+).
+3. **Install unit** with `scripts/icebridge-ec2-install.sh` (writes `icebridge.env`, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`).
+4. **Security group** (inbound):
+   | Proto | Port | Source | Why |
+   |-------|------|--------|-----|
+   | TCP | 6888 | `0.0.0.0/0` | Identity handshake |
+   | UDP | 6889 | `0.0.0.0/0` | rUDP mesh |
+   | TCP | 8080 | **your IP only** (or omit) | Control API — prefer SSH tunnel |
+   | TCP | 22 | your IP | SSH |
+   Outbound: allow UDP to public DHT bootstrap (or all outbound UDP).
+5. **Health**: `ssh -L 18080:127.0.0.1:8080 host` then `curl http://127.0.0.1:18080/health` → `{"ok":true,...}`
+6. **Token**: read once from host `icebridge-token.once` (or regenerate with `java -jar icebridge.jar --generate-token`).
+7. **Desktop smoke paths**:
+   - **A. Remote control plane:** Settings → IceBridge enable + USE_REMOTE + `http://PUBLIC_IP:8080` + bearer token. Confirm `/health` and config dump logs.
+   - **B. Pure DHT (the real M-DHT test):** desktop local child OK; do **not** seed host-cache with the EC2 IP. Wait ≥60s. PeerDiscovery should find EC2 via `frostwire-relays-v1`, TCP identity verify succeeds → **verified** peer (not placeholder). Logs: DHT tick / identity auth success for public IP.
+8. **Pass criteria:** desktop PeerDirectory has verified entry whose host is the EC2 public IP (or DNS); optional distributed search to a second peer through the mesh.
+
+#### Logs to expect on the relay
+
+- `IceBridge DHT session started`
+- `IceBridge DHT announcer started: peerTopic=false bootstrapTopic=true announcePort=6888` (FORWARDER)
+- `DhtAdvertiser started, interval=60s peerTopic=false bootstrapTopic=true`
+- No `Failed to load jlibtorrent` / UnsatisfiedLinkError
+
+#### Common failures
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| UnsatisfiedLinkError / no DHT | Mac-only natives in jar | Rebuild with multi-arch `icebridgeJar`; verify `.so` present |
+| Desktop never verifies peer | SG blocks TCP 6888 | Open identity port; check `ss -lntp \| grep 6888` on host |
+| Auth spam / self | Co-located ports / host-cache | Use pure DHT path; host-cache is UI only |
+| Control 401 | Wrong/missing token | `X-IceBridge-Token` from tokens file |
+| DHT up but no peers find relay | Outbound UDP blocked | Open egress; wait 1–2 announce intervals |
 
 ## Security model
 

@@ -139,7 +139,9 @@ dependencies {
     // Netty for IceBridge relay daemon (shared by desktop control path and headless server fat jar)
     implementation 'io.netty:netty-all:4.2.0.Final'
 
-    def jlibtorrent_version = '2.0.12.9'
+    // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
+    ext.jlibtorrent_version = '2.0.12.9'
+    def jlibtorrent_version = ext.jlibtorrent_version
 
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
@@ -266,11 +268,24 @@ jar {
     }
 }
 
+// Extra jlibtorrent natives always packed into icebridge.jar so a Mac-built
+// fat JAR still runs DHT/Ed25519 on Linux EC2 (and vice versa). Paths inside
+// the jars do not collide (lib/arm64/*.dylib vs lib/x86_64/*.so).
+configurations {
+    icebridgeCloudNatives
+}
+dependencies {
+    icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-x86_64:${ext.jlibtorrent_version}"
+    icebridgeCloudNatives "com.frostwire:jlibtorrent-linux-arm64:${ext.jlibtorrent_version}"
+    icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-arm64:${ext.jlibtorrent_version}"
+    icebridgeCloudNatives "com.frostwire:jlibtorrent-macosx-x86_64:${ext.jlibtorrent_version}"
+}
+
 // Fat JAR for the headless IceBridge relay servent.
 // Reuses common/ sources but packages only the classes Netty/JVM need.
 tasks.register('icebridgeJar', Jar) {
     group = 'build'
-    description = 'Builds the standalone IceBridge relay servent fat JAR.'
+    description = 'Builds the standalone IceBridge relay servent fat JAR (multi-arch jlibtorrent natives for EC2).'
 
     archiveFileName = 'icebridge.jar'
 
@@ -283,6 +298,8 @@ tasks.register('icebridgeJar', Jar) {
 
     from sourceSets.main.output
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    // Host OS only pulls one platform native via runtimeClasspath; add cloud targets.
+    from { configurations.icebridgeCloudNatives.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes 'Main-Class': 'com.frostwire.search.relay.icebridge.IceBridgeServer'

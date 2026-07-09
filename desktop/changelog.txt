@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-ec2-push.sh + icebridge-ec2-install.sh
   - new:Identity settings — Initialize Identity button with off-EDT proof-of-work mining (progress bar) and restart; import/restore/export now use the same libtorrent/identity.dat path as the relay stack
   - new:Standalone IceBridge embedded DHT announce — pure FORWARDER nodes publish on frostwire-relays-v1 (+ optional bootstrap) via minimal jlibtorrent SessionManager without FrostWire desktop; ICEBRIDGE_DHT / --dht / --no-dht; DhtAdvertiser accepts SessionManager supplier
   - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
