@@ -25,7 +25,7 @@ FrostWire desktop/Android are **clients and optional co-located nodes** of that 
 |-------|-----------------|---------|
 | Identity / bootstrap | TCP **6888** (`ICEBRIDGE_RELAY_PORT` / settings relay listen) | Direct TCP identity handshake; real Ed25519 pub + `IdentityRecord` v2 |
 | Mesh data | UDP **6889** (`ICEBRIDGE_RUDP_PORT`) | Authenticated rUDP + fragmentation |
-| Control API | TCP **8080** localhost (or auto) | `/health`, `/register`, `/route`, `/send`, `/poll`, `/metrics` |
+| Control API | TCP **8081** bound to **127.0.0.1 only** | `/health`, `/register`, `/route`, `/send`, `/poll`, `/metrics` (SSH tunnel for remote ops) |
 
 Desktop may run **both** an in-app `IncomingRelayServer` (identity TCP) and a **child** IceBridge process (or attach to a **remote** standalone).
 
@@ -71,7 +71,7 @@ Useful env vars:
 | `ICEBRIDGE_HOST` | Bind host (cloud: `0.0.0.0`) |
 | `ICEBRIDGE_RUDP_PORT` | UDP mesh |
 | `ICEBRIDGE_RELAY_PORT` | TCP identity handshake |
-| `ICEBRIDGE_CONTROL_HTTP_PORT` | Control HTTP |
+| `ICEBRIDGE_CONTROL_HTTP_PORT` | Control HTTP (default **8081**, **127.0.0.1 only**) |
 | `ICEBRIDGE_ROLE` | `FORWARDER` recommended for cloud |
 | `ICEBRIDGE_IDENTITY_FILE` | Identity path |
 | `ICEBRIDGE_AUTH_TOKENS_FILE` | Bearer tokens file |
@@ -92,7 +92,8 @@ Firewall: open **UDP rUDP** (and TCP identity if remote peers handshake you). Co
 - Recommended dual-run pattern (desktop keeps defaults 6888/6889):
   ```bash
   ICEBRIDGE_ROLE=FORWARDER ICEBRIDGE_RELAY_PORT=7000 ICEBRIDGE_RUDP_PORT=7001 \
-    ICEBRIDGE_CONTROL_HTTP_PORT=18080 ICEBRIDGE_DHT=true ./gradlew icebridge
+    ICEBRIDGE_CONTROL_HTTP_PORT=18081 ICEBRIDGE_DHT=true ./gradlew icebridge
+  # or: ./scripts/icebridge-run-local.sh --colo
   ```
 - Self-discovery is skipped via own Ed25519 pub + loopback filters; public-IP hairpin can still look like “self”.
 
@@ -103,8 +104,11 @@ Firewall: open **UDP rUDP** (and TCP identity if remote peers handshake you). Co
 `icebridge.jar` works on EC2. Verify before upload:
 
 ```bash
-jar tf desktop/build/libs/icebridge.jar | grep 'lib/x86_64/.*\.so'
+# Prefer unzip (no JDK jar tool required); jar tf also works
+unzip -Z1 desktop/build/libs/icebridge.jar | grep -E 'lib/x86_64/.*\.so'
 ```
+
+Push/install scripts refuse deploy if the Linux x86_64 native is missing; arm64 missing only warns (Graviton).
 
 #### One-liner deploy from laptop
 
@@ -113,6 +117,7 @@ cd desktop
 chmod +x scripts/icebridge-ec2-push.sh scripts/icebridge-ec2-install.sh
 # SSH host alias or user@host (see ~/.ssh/config)
 ./scripts/icebridge-ec2-push.sh virginia1
+# push creates /opt/icebridge with sudo+chown when needed
 ssh virginia1 'sudo INSTALL_DIR=/opt/icebridge bash /opt/icebridge/icebridge-ec2-install.sh'
 ```
 
@@ -120,19 +125,19 @@ ssh virginia1 'sudo INSTALL_DIR=/opt/icebridge bash /opt/icebridge/icebridge-ec2
 
 1. **Build** on laptop: `cd desktop && ./gradlew icebridgeJar`
 2. **Upload** `build/libs/icebridge.jar` to e.g. `/opt/icebridge/` on the instance (Amazon Linux 2/2023 or Ubuntu; JDK 17+).
-3. **Install unit** with `scripts/icebridge-ec2-install.sh` (writes `icebridge.env`, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`).
+3. **Install unit** with `scripts/icebridge-ec2-install.sh` (writes `icebridge.env` once, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`). Re-run preserves env unless `FORCE_ENV=1`.
 4. **Security group** (inbound):
    | Proto | Port | Source | Why |
    |-------|------|--------|-----|
    | TCP | 6888 | `0.0.0.0/0` | Identity handshake |
    | UDP | 6889 | `0.0.0.0/0` | rUDP mesh |
-   | TCP | 8080 | **your IP only** (or omit) | Control API — prefer SSH tunnel |
    | TCP | 22 | your IP | SSH |
+   | ~~Control HTTP~~ | — | **do not open** | Control binds **127.0.0.1 only**; use SSH `-L` |
    Outbound: allow UDP to public DHT bootstrap (or all outbound UDP).
-5. **Health**: `ssh -L 18080:127.0.0.1:8080 host` then `curl http://127.0.0.1:18080/health` → `{"ok":true,...}`
+5. **Health**: `ssh -L 18081:127.0.0.1:8081 host` then `curl http://127.0.0.1:18081/health` → `{"ok":true,...}`
 6. **Token**: read once from host `icebridge-token.once` (or regenerate with `java -jar icebridge.jar --generate-token`).
 7. **Desktop smoke paths**:
-   - **A. Remote control plane:** Settings → IceBridge enable + USE_REMOTE + `http://PUBLIC_IP:8080` + bearer token. Confirm `/health` and config dump logs.
+   - **A. Remote control plane:** control is **loopback-only**. Tunnel first (`ssh -L 18081:127.0.0.1:8081 host`), then Settings → IceBridge enable + USE_REMOTE + `http://127.0.0.1:18081` + bearer token. **Never** `http://PUBLIC_IP:8081`.
    - **B. Pure DHT (the real M-DHT test):** desktop local child OK; do **not** seed host-cache with the EC2 IP. Wait ≥60s. PeerDiscovery should find EC2 via `frostwire-relays-v1`, TCP identity verify succeeds → **verified** peer (not placeholder). Logs: DHT tick / identity auth success for public IP.
 8. **Pass criteria:** desktop PeerDirectory has verified entry whose host is the EC2 public IP (or DNS); optional distributed search to a second peer through the mesh.
 
