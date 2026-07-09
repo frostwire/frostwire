@@ -7,61 +7,71 @@
 
 package com.frostwire.search.relay.icebridge.client;
 
+import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
+import com.frostwire.search.relay.icebridge.control.PeerInfo;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Synchronizes {@link PeerDirectory} entries into the local IceBridge
- * daemon's {@code PeerRegistry} via the HTTP control API.
+ * Synchronizes {@link PeerDirectory} with the IceBridge mesh registry.
  *
- * <p>For distributed search to work over IceBridge, the daemon must know
- * the rUDP endpoint of every peer the desktop wants to query. This class
- * periodically calls {@link IceBridgeClient#register} for every verified
- * peer in the directory, using the peer's known hostname and the well-known
- * IceBridge rUDP port ({@link #ICEBRIDGE_RUDP_PORT}).
+ * <p><b>Push:</b> routes every verified directory peer into the local (or
+ * remote) IceBridge {@code PeerRegistry} so {@code /send} can reach them.
+ * Also registers this node's identity so peers can route back to us.
  *
- * <p>The sync also registers <em>this</em> node's own identity with the
- * local daemon, so that when a remote peer's daemon relays a response back
- * through a forwarder, the forwarder can route it to us.
+ * <p><b>Pull (forwarder-first discovery):</b> imports peers from IceBridge
+ * {@code GET /lookup} into {@link PeerDirectory} as verified entries. Mesh
+ * registration is already Ed25519-signed at the forwarder; this is the path
+ * when direct TCP identity (home NAT) is unreachable — DESIGN_RELAY_REGISTRY
+ * hybrid plane + §8 mesh search.
  */
 public final class PeerRegistrySync implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(PeerRegistrySync.class);
 
-    /**
-     * Well-known rUDP port that every IceBridge daemon listens on.
-     *
-     * <p>In v1, all FrostWire desktop instances run their IceBridge daemon
-     * on this fixed port so peers can reach each other without an
-     * additional discovery round-trip. It is one above the legacy relay
-     * TCP port (6888) to avoid conflicts.
-     */
     public static final int ICEBRIDGE_RUDP_PORT = 6889;
 
     private static final long SYNC_INTERVAL_SEC = 30;
     private static final long INITIAL_DELAY_SEC = 3;
+    private static final int LOOKUP_COUNT = 50;
 
     private final IceBridgeClient client;
     private final PeerDirectory directory;
     private final String localHost;
     private final int rudpPort;
+    private final IdentityKeys identity;
+    private final IceBridgeConfig.Role localRole;
+    private final byte[] ownPub;
     private final ScheduledExecutorService scheduler;
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
                             String localHost) {
-        this(client, directory, localHost, ICEBRIDGE_RUDP_PORT);
+        this(client, directory, localHost, ICEBRIDGE_RUDP_PORT, null, IceBridgeConfig.Role.BOTH);
     }
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
                             String localHost,
                             int rudpPort) {
+        this(client, directory, localHost, rudpPort, null, IceBridgeConfig.Role.BOTH);
+    }
+
+    public PeerRegistrySync(IceBridgeClient client,
+                            PeerDirectory directory,
+                            String localHost,
+                            int rudpPort,
+                            IdentityKeys identity,
+                            IceBridgeConfig.Role localRole) {
         if (client == null) {
             throw new IllegalArgumentException("client is null");
         }
@@ -74,7 +84,10 @@ public final class PeerRegistrySync implements AutoCloseable {
         this.client = client;
         this.directory = directory;
         this.localHost = localHost;
-        this.rudpPort = rudpPort;
+        this.rudpPort = rudpPort > 0 ? rudpPort : ICEBRIDGE_RUDP_PORT;
+        this.identity = identity;
+        this.localRole = localRole != null ? localRole : IceBridgeConfig.Role.BOTH;
+        this.ownPub = identity != null ? identity.ed25519PubRaw() : null;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-peer-sync");
             t.setDaemon(true);
@@ -82,45 +95,109 @@ public final class PeerRegistrySync implements AutoCloseable {
         });
     }
 
-    /**
-     * Start the periodic sync. The first run happens after
-     * {@link #INITIAL_DELAY_SEC} seconds; subsequent runs every
-     * {@link #SYNC_INTERVAL_SEC} seconds.
-     */
     public void start() {
         scheduler.scheduleWithFixedDelay(this::sync,
                 INITIAL_DELAY_SEC, SYNC_INTERVAL_SEC, TimeUnit.SECONDS);
         LOG.info("PeerRegistrySync started: interval=" + SYNC_INTERVAL_SEC + "s"
                 + " localHost=" + localHost
-                + " rudpPort=" + rudpPort);
+                + " rudpPort=" + rudpPort
+                + " registerSelf=" + (identity != null));
     }
 
     /**
-     * Perform a single sync cycle: register all verified peers from the
-     * directory with the local IceBridge daemon using the configured
-     * rUDP port.
+     * One sync cycle: register self, push verified peers to IceBridge, pull
+     * mesh peers into the directory (forwarder-first discovery).
      */
     void sync() {
         try {
-            java.util.List<PeerDirectory.PeerInfo> peers =
-                    directory.topByTrustVerified(100);
-            int registered = 0;
-            for (PeerDirectory.PeerInfo peer : peers) {
-                if (peer.hostname() == null || peer.hostname().isBlank()) {
-                    continue;
-                }
-                int peerRudpPort = peer.rudpPort() > 0 ? peer.rudpPort() : rudpPort;
-                if (client.route(peer.peerPub(), peer.hostname(),
-                        peerRudpPort, IceBridgeConfig.Role.BOTH)) {
-                    registered++;
-                }
-            }
-            if (registered > 0 || !peers.isEmpty()) {
-                LOG.info("PeerRegistrySync: registered " + registered
-                        + "/" + peers.size() + " peers with IceBridge");
-            }
+            registerSelf();
+            pushDirectoryToMesh();
+            pullMeshIntoDirectory();
         } catch (Throwable t) {
             LOG.warn("PeerRegistrySync failed", t);
+        }
+    }
+
+    private void registerSelf() {
+        if (identity == null) {
+            return;
+        }
+        try {
+            boolean ok = client.register(identity, localHost, rudpPort, localRole);
+            if (ok) {
+                LOG.debug("PeerRegistrySync: registered self " + localHost + ":" + rudpPort
+                        + " role=" + localRole);
+            }
+        } catch (Throwable t) {
+            LOG.debug("PeerRegistrySync: self-register failed", t);
+        }
+    }
+
+    private void pushDirectoryToMesh() {
+        List<PeerDirectory.PeerInfo> peers = directory.topByTrustVerified(100);
+        int registered = 0;
+        for (PeerDirectory.PeerInfo peer : peers) {
+            if (peer.hostname() == null || peer.hostname().isBlank()) {
+                continue;
+            }
+            int peerRudpPort = peer.rudpPort() > 0 ? peer.rudpPort() : rudpPort;
+            if (client.route(peer.peerPub(), peer.hostname(),
+                    peerRudpPort, IceBridgeConfig.Role.BOTH)) {
+                registered++;
+            }
+        }
+        if (registered > 0 || !peers.isEmpty()) {
+            LOG.info("PeerRegistrySync: routed " + registered
+                    + "/" + peers.size() + " directory peers to IceBridge");
+        }
+    }
+
+    private void pullMeshIntoDirectory() {
+        List<PeerInfo> mesh;
+        try {
+            mesh = client.lookup(LOOKUP_COUNT);
+        } catch (Throwable t) {
+            LOG.debug("PeerRegistrySync: lookup failed", t);
+            return;
+        }
+        if (mesh == null || mesh.isEmpty()) {
+            return;
+        }
+        int imported = 0;
+        for (PeerInfo info : mesh) {
+            if (info == null || info.pub == null || info.host == null || info.host.isBlank()) {
+                continue;
+            }
+            if (info.rudpPort <= 0 || info.rudpPort > 65535) {
+                continue;
+            }
+            byte[] pub;
+            try {
+                pub = Base64.getUrlDecoder().decode(info.pub);
+            } catch (IllegalArgumentException e) {
+                try {
+                    pub = Base64.getDecoder().decode(info.pub);
+                } catch (IllegalArgumentException e2) {
+                    continue;
+                }
+            }
+            if (pub.length != 32) {
+                continue;
+            }
+            if (ownPub != null && Arrays.equals(pub, ownPub)) {
+                continue;
+            }
+            // Identity TCP port unknown from mesh registry; use rUDP port as
+            // contact hint. Search uses peerPub + rudpPort via IceBridge.
+            // utpPort stores the legacy "identity" port slot — prefer rudp for mesh.
+            directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort);
+            client.route(pub, info.host, info.rudpPort,
+                    info.role != null ? info.role : IceBridgeConfig.Role.BOTH);
+            imported++;
+        }
+        if (imported > 0) {
+            LOG.info("PeerRegistrySync: imported " + imported
+                    + " mesh peers into PeerDirectory (forwarder-first discovery)");
         }
     }
 

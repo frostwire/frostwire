@@ -677,15 +677,40 @@ final class Initializer {
               transport, searchService, directory, identity, localIndex);
       incomingHandler.start();
 
-      // Start the peer registry sync so the IceBridge daemon knows
-      // the rUDP endpoints of all verified peers in our directory.
-      String localHost =
-          com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT > 0
-              ? java.net.InetAddress.getLocalHost().getHostAddress()
-              : "127.0.0.1";
+      // Sync PeerDirectory ↔ IceBridge mesh: push verified peers, pull mesh
+      // registry into directory (forwarder-first discovery), register self.
+      String advertiseHost = System.getenv("ICEBRIDGE_ADVERTISE_HOST");
+      if (advertiseHost == null || advertiseHost.isEmpty()) {
+        advertiseHost = System.getProperty("frostwire.icebridge.advertiseHost", "");
+      }
+      if (advertiseHost == null || advertiseHost.isEmpty()) {
+        advertiseHost =
+            com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT > 0
+                ? java.net.InetAddress.getLocalHost().getHostAddress()
+                : "127.0.0.1";
+      }
+      String roleStr = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
+      com.frostwire.search.relay.icebridge.IceBridgeConfig.Role syncRole =
+          com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.BOTH;
+      try {
+        if (roleStr != null && !roleStr.isEmpty()) {
+          syncRole =
+              com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.valueOf(
+                  roleStr.toUpperCase());
+        }
+      } catch (IllegalArgumentException ignored) {
+      }
       PeerRegistrySync peerSync =
-          new PeerRegistrySync(client, directory, localHost, effectiveRudpPort);
+          new PeerRegistrySync(
+              client, directory, advertiseHost, effectiveRudpPort, identity, syncRole);
       peerSync.start();
+      relayLog.info(
+          "PeerRegistrySync advertiseHost="
+              + advertiseHost
+              + " rudpPort="
+              + effectiveRudpPort
+              + " role="
+              + syncRole);
 
       // Wire the DISTRIBUTED search engine.
       DistributedSearchEngineWire.wire(localIndex, directory, identity, transport);

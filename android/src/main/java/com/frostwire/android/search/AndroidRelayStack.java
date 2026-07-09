@@ -201,9 +201,19 @@ public final class AndroidRelayStack implements AutoCloseable {
             ih.start();
 
             String localHost = "127.0.0.1";
-            prs = new PeerRegistrySync(cl, pd, localHost, srv.rudpPort());
+            try {
+                String adv = System.getProperty("frostwire.icebridge.advertiseHost");
+                if (adv != null && !adv.isEmpty()) {
+                    localHost = adv;
+                } else {
+                    localHost = java.net.InetAddress.getLocalHost().getHostAddress();
+                }
+            } catch (Throwable ignored) {
+            }
+            prs = new PeerRegistrySync(cl, pd, localHost, srv.rudpPort(), ident,
+                    IceBridgeConfig.Role.BOTH);
             prs.start();
-            LOG.info("AndroidRelayStack: PeerRegistrySync started");
+            LOG.info("AndroidRelayStack: PeerRegistrySync started advertiseHost=" + localHost);
 
             DhtPeerDiscoverySource discoverySource = new DhtPeerDiscoverySource(btEngine);
             byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;

@@ -216,7 +216,16 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             } catch (NumberFormatException ignored) {
             }
         }
-        List<PeerRecord> peers = registry.lookupForwarders(Math.max(1, Math.min(count, 100)));
+        // Default: all registered peers (mesh discovery / search targets).
+        // ?forwarders=1 keeps the older forward-capable-only filter.
+        boolean forwardersOnly = false;
+        List<String> fwdParams = decoder.parameters().get("forwarders");
+        if (fwdParams != null && !fwdParams.isEmpty()) {
+            String v = fwdParams.get(0);
+            forwardersOnly = "1".equals(v) || "true".equalsIgnoreCase(v);
+        }
+        List<PeerRecord> peers =
+                registry.lookupPeers(Math.max(1, Math.min(count, 100)), forwardersOnly);
         List<PeerInfo> info = peers.stream()
                 .map(p -> new PeerInfo(
                         Base64.getUrlEncoder().withoutPadding().encodeToString(p.ed25519Pub()),

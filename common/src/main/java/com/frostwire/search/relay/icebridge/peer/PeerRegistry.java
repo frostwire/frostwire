@@ -87,17 +87,28 @@ public final class PeerRegistry {
      * @return an immutable list of forward-capable peers
      */
     public List<PeerRecord> lookupForwarders(int maxResults) {
+        return lookupPeers(maxResults, true);
+    }
+
+    /**
+     * Look up registered peers for mesh discovery / routing.
+     *
+     * @param maxResults   maximum number of records to return
+     * @param forwardersOnly if true, only FORWARDER/BOTH roles
+     */
+    public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly) {
         if (maxResults <= 0) {
             return Collections.emptyList();
         }
         lookups.incrementAndGet();
         List<PeerRecord> result = new ArrayList<>(Math.min(maxResults, byPubHex.size()));
         for (PeerRecord r : byPubHex.values()) {
-            if (r.canForward()) {
-                result.add(r);
-                if (result.size() >= maxResults) {
-                    break;
-                }
+            if (forwardersOnly && !r.canForward()) {
+                continue;
+            }
+            result.add(r);
+            if (result.size() >= maxResults) {
+                break;
             }
         }
         return Collections.unmodifiableList(result);
