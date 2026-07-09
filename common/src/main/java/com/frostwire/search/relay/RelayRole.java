@@ -9,8 +9,7 @@ package com.frostwire.search.relay;
 
 import com.frostwire.util.Logger;
 
-import java.security.GeneralSecurityException;
-import java.security.Signature;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,25 +102,11 @@ public final class RelayRole {
     }
 
     /**
-     * Build signed forwarded requests for up to {@link #MAX_FORWARD_TARGETS}
+     * Build dual-envelope hop requests for up to {@link #MAX_FORWARD_TARGETS}
      * trusted verified peers not already in the request's path.
      *
-     * <p>Each forwarded request has this node's Ed25519 pubkey appended to the
-     * path (via {@link RemoteSearchRequest#withNextHop}), the ttl decremented
-     * by 1, and a fresh signature over the canonical bytes. The returned
-     * {@link ForwardTarget} pairs each signed request with the target peer's
-     * public key so the caller can send it via a transport.
-     *
-     * <p>Returns an empty list when:
-     * <ul>
-     *   <li>{@code request.ttl()} is 0 or negative (no more hops allowed),</li>
-     *   <li>no identity is configured (forwarding requires re-signing),</li>
-     *   <li>no eligible peers are available (all are in the path or the
-     *       directory is empty).</li>
-     * </ul>
-     *
-     * @throws IllegalArgumentException if {@code request} is null
-     * @throws IllegalStateException if no identity is configured
+     * <p>Each hop uses {@link RemoteSearchRequest#withNextHop} (preserves the
+     * original requester query signature; only ttl/path change).
      */
     public List<ForwardTarget> forward(RemoteSearchRequest request) {
         if (request == null) {
@@ -135,15 +120,14 @@ public final class RelayRole {
             return Collections.emptyList();
         }
         try {
-            return selectAndSignForwardTargets(request);
+            return selectForwardTargets(request);
         } catch (Throwable t) {
             LOG.warn("RelayRole.forward failed", t);
             return Collections.emptyList();
         }
     }
 
-    private List<ForwardTarget> selectAndSignForwardTargets(RemoteSearchRequest request)
-            throws GeneralSecurityException {
+    private List<ForwardTarget> selectForwardTargets(RemoteSearchRequest request) {
         byte[] ownPub = identity.ed25519PubRaw();
         int newTtl = request.ttl() - 1;
         List<PeerDirectory.PeerInfo> candidates =
@@ -158,32 +142,13 @@ public final class RelayRole {
                 continue;
             }
             RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);
-            RemoteSearchRequest signed = signForwardedRequest(nextHop);
-            out.add(new ForwardTarget(peerPub, signed));
+            out.add(new ForwardTarget(peerPub, nextHop));
         }
         return out;
     }
 
-    private RemoteSearchRequest signForwardedRequest(RemoteSearchRequest unsigned)
-            throws GeneralSecurityException {
-        Signature signer = Signature.getInstance("Ed25519");
-        signer.initSign(identity.ed25519().getPrivate());
-        signer.update(unsigned.canonicalBytes());
-        byte[] sig = signer.sign();
-        return RemoteSearchRequest.builder()
-                .keywords(unsigned.keywords())
-                .limit(unsigned.limit())
-                .nonce(unsigned.nonce())
-                .ttl(unsigned.ttl())
-                .requesterPub(unsigned.requesterPub())
-                .path(unsigned.path())
-                .timestamp(unsigned.timestamp())
-                .signature(sig)
-                .build();
-    }
-
     /**
-     * A signed forwarded request paired with the target peer's public key.
+     * A dual-envelope hop request paired with the target peer's public key.
      */
     public static final class ForwardTarget {
         private final byte[] peerPub;

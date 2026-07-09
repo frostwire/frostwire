@@ -49,12 +49,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link com.frostwire.search.relay.DistributedSearchPerformer}'s transient
  * listener handles those.
  *
- * <p><b>Multi-hop forwarding (disabled in v1):</b> re-signing a mutated path
- * with this node's key while keeping the original {@code requesterPub} makes
- * the next hop fail {@link RelaySearchService} verification (sig is checked
- * against requesterPub). Until a dual-envelope hop protocol exists,
- * {@link #MULTI_HOP_FORWARDING_ENABLED} is false and ttl&gt;0 is ignored for
- * forwarding. Local responses are unaffected.
+ * <p><b>Multi-hop (dual-envelope):</b> the requester signature covers only the
+ * immutable query envelope. Forwarding uses {@link RemoteSearchRequest#withNextHop}
+ * which preserves that signature and only mutates {@code ttl}/{@code path}.
+ * Do <b>not</b> re-sign with the forwarder key.
  *
  * <p>Rate-limits per-source to prevent flood/amplification attacks. Each
  * source public key is limited to {@link #MAX_REQUESTS_PER_MINUTE} search
@@ -65,10 +63,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private static final Logger LOG = Logger.getLogger(IncomingSearchRequestHandler.class);
 
     /**
-     * Multi-hop is disabled until dual-envelope signatures exist.
-     * See DESIGN_RELAY_REGISTRY.md / MentisDB frostwire #848.
+     * Dual-envelope multi-hop enabled (DESIGN_RELAY_REGISTRY §8.4 / §14).
+     * Forward preserves requester query signature; hop fields only.
      */
-    public static final boolean MULTI_HOP_FORWARDING_ENABLED = false;
+    public static final boolean MULTI_HOP_FORWARDING_ENABLED = true;
 
     /** Maximum incoming search requests per source per minute. */
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
@@ -268,34 +266,22 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             if (Arrays.equals(peerPub, request.requesterPub())) {
                 continue;
             }
+            if (Arrays.equals(peerPub, ownPub)) {
+                continue;
+            }
             try {
+                // Dual-envelope: preserve requester query signature; only hop fields change.
                 RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);
-                RemoteSearchRequest signed = signForwardedRequest(nextHop);
-                byte[] forwardedPayload = SearchPayloadCodec.encodeRequest(signed);
-                transport.send(peerPub, forwardedPayload);
-                forwarded++;
+                byte[] forwardedPayload = SearchPayloadCodec.encodeRequest(nextHop);
+                if (transport.send(peerPub, forwardedPayload)) {
+                    forwarded++;
+                    LOG.debug("Forwarded search hop ttl=" + newTtl + " to "
+                            + Hex.encode(peerPub).substring(0, 12) + "…");
+                }
             } catch (Throwable t) {
                 LOG.debug("Failed to forward search request to peer", t);
             }
         }
-    }
-
-    private RemoteSearchRequest signForwardedRequest(RemoteSearchRequest unsigned)
-            throws GeneralSecurityException {
-        Signature signer = Signature.getInstance("Ed25519");
-        signer.initSign(identity.ed25519().getPrivate());
-        signer.update(unsigned.canonicalBytes());
-        byte[] sig = signer.sign();
-        return RemoteSearchRequest.builder()
-                .keywords(unsigned.keywords())
-                .limit(unsigned.limit())
-                .nonce(unsigned.nonce())
-                .ttl(unsigned.ttl())
-                .requesterPub(unsigned.requesterPub())
-                .path(unsigned.path())
-                .timestamp(unsigned.timestamp())
-                .signature(sig)
-                .build();
     }
 
     private boolean tryAcquire(String sourceKey) {

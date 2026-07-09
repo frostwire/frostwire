@@ -20,32 +20,33 @@ import java.util.Map;
  * another peer in our trust graph) to perform a search and return
  * matching {@link LocalSharedTorrent} rows.
  *
+ * <p><b>Dual-envelope (v2, DESIGN_RELAY_REGISTRY §14):</b>
+ * The requester Ed25519 signature covers only the <em>immutable query
+ * envelope</em> ({@link #queryCanonicalBytes()}): version, keywords, limit,
+ * nonce, requesterPub, timestamp. Hop fields {@code ttl} and {@code path}
+ * are the <em>outer hop envelope</em> — they may change as the request is
+ * forwarded without invalidating the requester signature. Forwarders must
+ * <b>not</b> re-sign with their own key while keeping {@code requesterPub}.
+ *
  * <p>Fields:
  * <ul>
- *   <li>{@code v}: protocol version (currently 1)</li>
+ *   <li>{@code v}: protocol version (2 = dual-envelope)</li>
  *   <li>{@code k}: the requester's keywords (UTF-8 string)</li>
  *   <li>{@code lim}: max results to return</li>
  *   <li>{@code nonce}: 32 random bytes, anti-replay</li>
- *   <li>{@code ttl}: remaining WOT depth, decremented at each hop</li>
+ *   <li>{@code ttl}: remaining hop budget (outer envelope)</li>
  *   <li>{@code pub}: 32-byte raw Ed25519 public key of the requester</li>
- *   <li>{@code path}: list of 32-byte Ed25519 pubkeys this request has traversed
- *       (so peers can avoid loops and bound path length)</li>
+ *   <li>{@code path}: hops traversed (outer envelope, loop detection)</li>
  *   <li>{@code ts}: epoch seconds, anti-replay window</li>
- *   <li>{@code sig}: Ed25519 signature over the canonical bytes
- *       (all fields except {@code sig} itself)</li>
+ *   <li>{@code sig}: Ed25519 signature over {@link #queryCanonicalBytes()}</li>
  * </ul>
- *
- * <p>Canonical bytes: a fixed-order concatenation of
- * {@code v|k|lim|nonce|ttl|pub|path|ts} using length-prefixed
- * encoding (4-byte big-endian length followed by bytes for
- * variable-length fields; fixed-width little endian for ints).
- * The signature signs this canonical form so a relay can
- * reconstruct the exact bytes the requester signed even if
- * field ordering in the wire encoding varies.
  */
 public final class RemoteSearchRequest {
 
-    public static final int VERSION = 1;
+    /** Dual-envelope: requester sig excludes mutable hop fields. */
+    public static final int VERSION = 2;
+    /** Design §8.4 hop limit 2 from the origin (local → direct → behind relay). */
+    public static final int DEFAULT_TTL = 2;
     public static final int MAX_PATH_LENGTH = 8;
     public static final long MAX_TIMESTAMP_SKEW_SEC = 5 * 60;
     public static final int DEFAULT_LIMIT = 25;
@@ -113,39 +114,37 @@ public final class RemoteSearchRequest {
     }
 
     /**
-     * Build the canonical signing bytes for this request. The
-     * signature is over these bytes; relays use them to verify
-     * the requester's identity.
+     * Immutable query envelope signed by the requester. Does <b>not</b>
+     * include {@code ttl} or {@code path} so forwarders can hop without
+     * re-signing.
      */
-    public byte[] canonicalBytes() {
+    public byte[] queryCanonicalBytes() {
         ByteBuffer buf = ByteBuffer.allocate(
                 4                                  // version
                 + 4 + utf8Len(keywords)            // keywords
                 + 4                                 // limit
                 + 4 + nonce.length                 // nonce
-                + 4                                 // ttl
                 + 4 + requesterPub.length          // requester pub
-                + 4 + pathLengthBytes()             // path
                 + 8                                 // timestamp
         );
         buf.putInt(version);
         putLenPrefixedUtf8(buf, keywords);
         buf.putInt(limit);
         putLenPrefixed(buf, nonce);
-        buf.putInt(ttl);
         putLenPrefixed(buf, requesterPub);
-        putLenPrefixedPath(buf, path);
         buf.putLong(timestamp);
         return buf.array();
     }
 
-    private static int utf8Len(String s) {
-        return s.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
+    /**
+     * Alias for {@link #queryCanonicalBytes()} — requester signature domain.
+     */
+    public byte[] canonicalBytes() {
+        return queryCanonicalBytes();
     }
 
-    private int pathLengthBytes() {
-        // 4-byte count + (4-byte length prefix + 32-byte pubkey) per entry.
-        return 4 + path.length * (4 + 32);
+    private static int utf8Len(String s) {
+        return s.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
     }
 
     private static void putLenPrefixed(ByteBuffer buf, byte[] data) {
@@ -180,9 +179,10 @@ public final class RemoteSearchRequest {
     }
 
     /**
-     * Build a new request with {@code nextHopPub} appended to the
-     * path and {@code ttl} decremented by 1. Used by relays that
-     * forward this request to a trusted peer.
+     * Build a new request with {@code nextHopPub} appended to the path and
+     * {@code ttl} set to {@code newTtl}. Dual-envelope: the original
+     * requester {@code signature} is <b>preserved</b> (hop fields are not
+     * covered by the query signature).
      */
     public RemoteSearchRequest withNextHop(byte[] nextHopPub, int newTtl) {
         if (nextHopPub == null || nextHopPub.length != 32) {
@@ -197,9 +197,8 @@ public final class RemoteSearchRequest {
         byte[][] newPath = new byte[path.length + 1][];
         System.arraycopy(path, 0, newPath, 0, path.length);
         newPath[path.length] = nextHopPub.clone();
-        // Signature is invalidated; caller must re-sign.
         return new RemoteSearchRequest(version, keywords, limit, nonce,
-                newTtl, requesterPub, newPath, timestamp, new byte[64]);
+                newTtl, requesterPub, newPath, timestamp, signature);
     }
 
     /**
@@ -232,7 +231,7 @@ public final class RemoteSearchRequest {
         private String keywords = "";
         private int limit = DEFAULT_LIMIT;
         private byte[] nonce;
-        private int ttl = 3;
+        private int ttl = DEFAULT_TTL;
         private byte[] requesterPub;
         private byte[][] path = new byte[0][];
         private long timestamp;
