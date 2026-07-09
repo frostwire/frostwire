@@ -127,6 +127,12 @@ public final class IceBridgeServer implements AutoCloseable {
             server.start();
             System.out.println();
             System.out.println("IceBridge is running. Press Ctrl-C to stop.");
+            System.out.println("  Health:  curl -sS http://127.0.0.1:" + config.controlHttpPort() + "/health");
+            System.out.println("  Metrics: curl -sS -H \"X-IceBridge-Token: <token>\" http://127.0.0.1:"
+                    + config.controlHttpPort() + "/metrics");
+            System.out.println("  (TCP " + config.relayPort()
+                    + " probes that are not FrostWire protocol are ignored at DEBUG — scanners/BT clients are normal.)");
+            System.out.flush();
             Thread.sleep(Long.MAX_VALUE);
         } catch (Throwable t) {
             System.err.println();
@@ -245,7 +251,27 @@ public final class IceBridgeServer implements AutoCloseable {
             File defaultDir = new File(System.getProperty("user.home"), ".frostwire");
             file = new File(defaultDir, "icebridge-identity.dat");
         }
-        return IdentityKeys.loadOrCreate(file);
+        // CLI-visible progress: first-run PoW can take seconds; never leave operators guessing.
+        boolean exists = file.exists() && file.length() > 0;
+        if (exists) {
+            System.out.println("Loading identity from " + file.getAbsolutePath() + " …");
+        } else {
+            System.out.println("No identity file yet — mining proof-of-work identity"
+                    + " (" + com.frostwire.search.relay.KarmaConstants.IDENTITY_DIFFICULTY
+                    + " leading zero bits). This usually takes a few seconds (native Ed25519)."
+                    + " Please wait…");
+            System.out.flush();
+        }
+        long t0 = System.currentTimeMillis();
+        IdentityKeys keys = IdentityKeys.loadOrCreate(file);
+        long ms = System.currentTimeMillis() - t0;
+        if (!exists) {
+            System.out.println("Identity ready in " + ms + " ms → " + file.getAbsolutePath());
+        } else {
+            System.out.println("Identity loaded in " + ms + " ms.");
+        }
+        System.out.flush();
+        return keys;
     }
 
     private void startJanitor() {

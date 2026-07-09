@@ -249,7 +249,15 @@ public final class IncomingRelayServer {
                 RelayWireCodec.writeResponse(out, response.get());
             }
         } catch (Throwable t) {
-            LOG.debug("Connection handler error", t);
+            // Internet scanners / BitTorrent clients often hit TCP 6888 with non-FW frames
+            // (e.g. BT handshake 0x13 'B' 'i' 't'… decodes as a huge length). Expected noise.
+            String msg = t.getMessage();
+            if (msg != null && msg.contains("not speaking the FrostWire relay protocol")) {
+                LOG.debug("Ignoring non-protocol probe on identity port from "
+                        + socket.getRemoteSocketAddress() + ": " + msg);
+            } else {
+                LOG.debug("Connection handler error from " + socket.getRemoteSocketAddress(), t);
+            }
         } finally {
             closeQuietly(socket);
         }

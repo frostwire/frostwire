@@ -154,11 +154,19 @@ public final class IdentityKeys {
             throw new IllegalArgumentException("file is null");
         }
         if (file.exists() && file.length() > 0) {
+            LOG.info("Loading identity from " + file.getAbsolutePath());
             return load(file);
         }
-        IdentityKeys keys = generate(KarmaConstants.IDENTITY_DIFFICULTY);
+        int difficulty = KarmaConstants.IDENTITY_DIFFICULTY;
+        LOG.info("No identity at " + file.getAbsolutePath()
+                + " — mining proof-of-work identity (" + difficulty
+                + " leading zero bits; typically a few seconds with native Ed25519)…");
+        long t0 = System.currentTimeMillis();
+        IdentityKeys keys = generate(difficulty);
         save(keys, file);
-        LOG.info("Generated new identity keys at " + file.getAbsolutePath());
+        long ms = System.currentTimeMillis() - t0;
+        LOG.info("Generated new identity keys at " + file.getAbsolutePath()
+                + " in " + ms + " ms (difficulty=" + difficulty + ")");
         return keys;
     }
 
