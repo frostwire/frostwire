@@ -15,6 +15,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
@@ -111,29 +112,45 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
   private void refreshPeerList() {
     PeerDirectory directory = DistributedSearchEngineWire.getPeerDirectory();
     if (directory == null) {
-      TABLE_MODEL.setPeers(Collections.emptyList());
+      TABLE_MODEL.setPeers(Collections.emptyList(), Collections.emptyList());
       COUNT_LABEL.setText(I18n.tr("(peer directory not available)"));
       return;
     }
-    try {
-      List<PeerDirectory.PeerInfo> peers = directory.topByTrust(100);
-      int total = directory.size();
-      TABLE_MODEL.setPeers(peers);
-      COUNT_LABEL.setText(
-          I18n.tr("Showing")
-              + " "
-              + peers.size()
-              + " "
-              + I18n.tr("of")
-              + " "
-              + total
-              + " "
-              + I18n.tr("peers"));
-    } catch (Throwable t) {
-      LOG.error("Failed to refresh peer list", t);
-      TABLE_MODEL.setPeers(Collections.emptyList());
-      COUNT_LABEL.setText(I18n.tr("(failed to read peer directory)"));
-    }
+    REFRESH_BUTTON.setEnabled(false);
+    BackgroundQueuedExecutorService.schedule(
+        () -> {
+          try {
+            List<PeerDirectory.PeerInfo> peers = directory.topByTrust(100);
+            List<Double> trustScores = new ArrayList<>(peers.size());
+            for (PeerDirectory.PeerInfo peer : peers) {
+              trustScores.add(directory.trustScore(peer.peerPub()));
+            }
+            PeerRefresh refresh = new PeerRefresh(peers, trustScores, directory.size());
+            GUIMediator.safeInvokeLater(
+                () -> {
+                  REFRESH_BUTTON.setEnabled(true);
+                  TABLE_MODEL.setPeers(refresh.peers, refresh.trustScores);
+                  COUNT_LABEL.setText(
+                      I18n.tr("Showing")
+                          + " "
+                          + refresh.peers.size()
+                          + " "
+                          + I18n.tr("of")
+                          + " "
+                          + refresh.total
+                          + " "
+                          + I18n.tr("peers"));
+                });
+          } catch (Throwable t) {
+            GUIMediator.safeInvokeLater(
+                () -> {
+                  REFRESH_BUTTON.setEnabled(true);
+                  LOG.error("Failed to refresh peer list", t);
+                  TABLE_MODEL.setPeers(Collections.emptyList(), Collections.emptyList());
+                  COUNT_LABEL.setText(I18n.tr("(failed to read peer directory)"));
+                });
+          }
+        });
   }
 
   private PeerDirectory.PeerInfo selectedPeer() {
@@ -288,6 +305,18 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
     }
   }
 
+  private static final class PeerRefresh {
+    final List<PeerDirectory.PeerInfo> peers;
+    final List<Double> trustScores;
+    final int total;
+
+    PeerRefresh(List<PeerDirectory.PeerInfo> peers, List<Double> trustScores, int total) {
+      this.peers = peers;
+      this.trustScores = trustScores;
+      this.total = total;
+    }
+  }
+
   private final class PeerTableMouseListener extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
@@ -332,26 +361,22 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
     }
   }
 
-  private static final class PeerTableModel extends AbstractTableModel {
+  static final class PeerTableModel extends AbstractTableModel {
 
     private final List<PeerDirectory.PeerInfo> rows = new ArrayList<>();
     private final List<Double> trustScores = new ArrayList<>();
 
-    void setPeers(List<PeerDirectory.PeerInfo> peers) {
+    void setPeers(List<PeerDirectory.PeerInfo> peers, List<Double> scores) {
       rows.clear();
       trustScores.clear();
       if (peers != null) {
-        PeerDirectory directory = DistributedSearchEngineWire.getPeerDirectory();
-        for (PeerDirectory.PeerInfo p : peers) {
-          rows.add(p);
-          double score = 0;
-          if (directory != null) {
-            try {
-              score = directory.trustScore(p.peerPub());
-            } catch (Throwable ignored) {
-            }
-          }
-          trustScores.add(score);
+        rows.addAll(peers);
+      }
+      if (scores != null && scores.size() == rows.size()) {
+        trustScores.addAll(scores);
+      } else {
+        for (int i = 0; i < rows.size(); i++) {
+          trustScores.add(0.0);
         }
       }
       fireTableDataChanged();
