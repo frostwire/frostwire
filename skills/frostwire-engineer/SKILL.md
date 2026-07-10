@@ -127,6 +127,13 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - **Desktop**: All heavy ops (JNI, I/O, network, parsing, DB writes) on a background executor. Use `GUIMediator.safeInvokeLater()` for UI updates.
 - **Android**: All heavy ops on a background thread. Never network or disk I/O on the main thread. Use `SystemUtils.postToHandler(HandlerThreadName.MISC, runnable)` for non-urgent work, `HandlerThreadName.HIGH_PRIORITY` for user-tap actions (play button, open file) that need <100 ms response.
 - **JNI calls to jlibtorrent must never happen on the EDT.** Always offload to a background executor.
+- **Strict EDT is enabled on desktop**: `StrictEdtMode` installs a timing `EventQueue` at startup and reports any dispatch event exceeding 2 seconds. Treat every report as a defect; never wait on a latch, `Future`, DHT/JNI call, network request, disk operation, or lock with unbounded contention from the EDT.
+
+### Desktop Executor Selection
+
+- `DesktopParallelExecutor.execute(...)` is a four-worker bounded executor for independent, reorder-safe work such as file I/O, network fetches, media resolution, and parallel searches. Its bounded queue may reject bursts; callers that cannot drop work must handle `RejectedExecutionException`. Catch and log failures inside submitted `Runnable`s because `execute` exposes no result.
+- `BackgroundQueuedExecutorService.schedule(...)` is a single-worker FIFO queue. Use it only when serialization is required for correctness: shared torrent/UI model state, ordered restore/mutation, or operations that must not overlap. Keep every task short; one slow task delays every queued GUI-background operation.
+- Neither executor may mutate Swing. Snapshot EDT state before dispatching, perform blocking work in the executor, then use `GUIMediator.safeInvokeLater(...)` for the smallest possible UI update. Do not use `safeInvokeAndWait` from background work unless the call chain is proven not to depend on the waiting executor.
 
 ### Thread-Safe Singletons
 
