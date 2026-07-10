@@ -73,6 +73,7 @@ public final class OptionsConstructor {
   private static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
   private static final String I2P_KEY = "OPTIONS_I2P_MAIN_TITLE";
   private static final String MCP_KEY = "OPTIONS_MCP_MAIN_TITLE";
+  private static final String DISTRIBUTED_SEARCH_KEY = "OPTIONS_DISTRIBUTED_SEARCH_MAIN_TITLE";
   private static final String IDENTITY_KEY = "OPTIONS_IDENTITY_MAIN_TITLE";
   private static final String KARMA_KEY = "OPTIONS_KARMA_MAIN_TITLE";
   private static final String PEER_DIRECTORY_KEY = "OPTIONS_PEER_DIRECTORY_MAIN_TITLE";
@@ -288,25 +289,23 @@ public final class OptionsConstructor {
 
     addOption(
         OptionsMediator.ROOT_NODE_KEY, MCP_KEY, I18n.tr("MCP Server"), MCPSettingsPaneItem.class);
+    addGroupTreeNode(
+        OptionsMediator.ROOT_NODE_KEY, DISTRIBUTED_SEARCH_KEY, I18n.tr("Distributed Search"));
     addOption(
-        OptionsMediator.ROOT_NODE_KEY,
+        DISTRIBUTED_SEARCH_KEY,
         ICEBRIDGE_KEY,
         I18n.tr("IceBridge"),
         IceBridgeSettingsPaneItem.class);
     addOption(
-        OptionsMediator.ROOT_NODE_KEY,
-        IDENTITY_KEY,
-        I18n.tr("Identity"),
-        IdentitySettingsPaneItem.class);
+        DISTRIBUTED_SEARCH_KEY, IDENTITY_KEY, I18n.tr("Identity"), IdentitySettingsPaneItem.class);
+    addOption(DISTRIBUTED_SEARCH_KEY, KARMA_KEY, I18n.tr("Karma"), KarmaSettingsPaneItem.class);
     addOption(
-        OptionsMediator.ROOT_NODE_KEY, KARMA_KEY, I18n.tr("Karma"), KarmaSettingsPaneItem.class);
-    addOption(
-        OptionsMediator.ROOT_NODE_KEY,
+        DISTRIBUTED_SEARCH_KEY,
         PEER_DIRECTORY_KEY,
         I18n.tr("Peers"),
         PeerDirectorySettingsPaneItem.class);
     addOption(
-        OptionsMediator.ROOT_NODE_KEY,
+        DISTRIBUTED_SEARCH_KEY,
         SHARED_TORRENTS_DB_KEY,
         I18n.tr("Shared Torrents"),
         SharedTorrentsDatabasePaneItem.class);
