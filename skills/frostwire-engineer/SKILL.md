@@ -110,6 +110,14 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - A relay-only node should not require SQLite, a media library, a GUI, or large disk. It needs jlibtorrent, keys, rate limits, RAM-bounded caches, and fast networking.
 - Use composition for roles: `RelayRole`, `IndexRole`, `SearchRole`, `UiRole`. Avoid a monolithic `DistributedSearchManager` that owns everything.
 
+### Network Topology Is a Contract
+
+- A control-plane registration is not evidence of data-plane reachability. For every advertised `host:rudpPort`, identify the process that binds that UDP socket and test delivery to it from the sender's network.
+- Remote control mode must not silently remove the local data-plane listener required for inbound traffic. If the remote relay owns delivery instead, define how it preserves source identity, queues inbound payloads, and routes replies.
+- A fallback is real only when its wire type is emitted and handled. Do not call a method `sendRelay` or `holePunch` unless an integration test observes the expected packet type on the wire and the final payload at the target.
+- Model request and response routes separately. NAT, endpoint ownership, and registry state may make one direction work while the reply path fails.
+- Before claiming a multi-node feature works, exercise the exact production roles, not just same-JVM or loopback fixtures.
+
 ---
 
 ## 3. Concurrency & Threading Rules
@@ -255,6 +263,12 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - BEP 44 immutable put (`dhtPutItem(Entry)`) is content-addressed. You cannot choose its key; production discovery needs another channel.
 - BEP 44/46 mutable put (`dhtPutItem(pubkey, privkey, entry, salt)`) is single-writer. The address is derived from the publisher key and salt; it is perfect for "my latest manifest", not for "everyone writes into one registry".
 - DHT targets are 20-byte SHA-1 hashes. If a design says `SHA-256(... )[:32]` for a DHT lookup key, stop and correct it before coding.
+
+### Transport Semantics Must Be Observable
+
+- API success means accepted delivery only when the API can prove it. If `/send` is asynchronous, return an explicit queued status and expose a failure or expiry signal; do not let callers treat HTTP 200 as peer delivery.
+- Test opaque transport payloads with real source and target identities. The application layer must receive the logical requester identity, not accidentally attribute every forwarded packet to the relay.
+- Bound every untrusted transport queue and reassembly buffer by count, bytes, and lifetime. Test eviction under loss, duplicate packets, and a sender that never completes a fragmented message.
 
 ### Lazy Loading
 
