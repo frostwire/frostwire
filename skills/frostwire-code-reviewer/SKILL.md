@@ -481,6 +481,11 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 - [ ] **PeerRegistrySync** — uses peer `rudpPort` from directory, not hardcoded 6889.
 - [ ] **Process launcher** — no `inheritIO()`; redirect stdout/stderr to temp files; pass `--relay-port` and configurable rUDP; health wait with process-alive check.
 - [ ] **Local vs remote** — settings: ENABLE, USE_REMOTE, URL, token, bind host, ports, role. Structured config dump at startup without secrets (MentisDB #837).
+- [ ] **Endpoint ownership** — for each advertised `host:rudpPort`, name the process that binds it in every local/remote mode. A remote HTTP client alone cannot receive rUDP; reject configurations that advertise an endpoint with no listener.
+- [ ] **Control/data-plane alignment** — a peer registered through one control API is routable only by the rUDP server behind that same registry. Verify Android, desktop, and forwarder use the intended registry rather than independent local registries.
+- [ ] **Relay frame reality** — `sendRelay` must serialize `RudpPacket.Type.RELAY`, and the forwarder must receive that type before emitting `RELAY_RESPONSE`. A relay-shaped payload inside `DATA` is not relay fallback.
+- [ ] **Bidirectional route** — test request and response independently through the exact topology. Direct delivery to a known endpoint and fallback relay delivery for an unknown/NATed endpoint are separate cases.
+- [ ] **Delivery semantics** — `/send` returning HTTP success must mean documented queue acceptance only, unless there is an authenticated acknowledgement from the destination. Callers must not count it as a delivered request without an application response.
 - [ ] **CLI System.out** — allowed only in `IceBridgeServer.main` / help / generate-token; library paths use `Logger`.
 
 ### Checklist — Search protocol correctness
@@ -518,6 +523,7 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 | Peer discovery | self-skip by pub, local endpoint skip, verified upsert, unauth drop, custom relay port |
 | Transport | listener-before-send race, multi-listener fanout, poll failure isolation |
 | rUDP | fragment reassembly byte equality (pattern `i % 256`), oversize reject, stale group eviction |
+| Three-node topology | Android requester to desktop index node via cloud forwarder; request and signed response both arrive; assert packet type at forwarder and no LocalIndex use by FORWARDER |
 | Search | signed request/response round-trip, bad sig/nonce/stale reject, ttl=0 no forward |
 | Multi-instance | publish → find → unpublish → not-find (TCP or IceBridge fake transport) |
 | Process launcher | redirect IO (not inheritIO), health check, `--relay-port` parse |
