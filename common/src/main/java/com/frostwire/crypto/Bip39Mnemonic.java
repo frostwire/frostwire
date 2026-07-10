@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,6 +74,22 @@ public final class Bip39Mnemonic {
         return decode(mnemonic);
     }
 
+    /** Normalize a user-entered phrase to the canonical lowercase, single-space form. */
+    public static String normalize(String mnemonic) {
+        if (mnemonic == null) {
+            return null;
+        }
+        return Normalizer.normalize(mnemonic, Normalizer.Form.NFKC)
+                .trim()
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[,;\\s]+", " ");
+    }
+
+    public static int wordCount(String mnemonic) {
+        String normalized = normalize(mnemonic);
+        return normalized == null || normalized.isEmpty() ? 0 : normalized.split(" ").length;
+    }
+
     public static void validate(String mnemonic) {
         decode(mnemonic);
     }
@@ -80,7 +98,7 @@ public final class Bip39Mnemonic {
         if (mnemonic == null) {
             throw new IllegalArgumentException("mnemonic is null");
         }
-        String trimmed = mnemonic.trim();
+        String trimmed = normalize(mnemonic);
         if (trimmed.isEmpty()) {
             throw new IllegalArgumentException("mnemonic is empty");
         }
@@ -89,7 +107,7 @@ public final class Bip39Mnemonic {
         if (wordCount != 12 && wordCount != 15
                 && wordCount != 18 && wordCount != 21 && wordCount != 24) {
             throw new IllegalArgumentException(
-                    "invalid word count: " + wordCount);
+                    "Seed phrase must contain 12, 15, 18, 21, or 24 words; found " + wordCount + ".");
         }
 
         Map<String, Integer> idx = wordIndexMap();
@@ -103,7 +121,7 @@ public final class Bip39Mnemonic {
             Integer wi = idx.get(parts[i]);
             if (wi == null) {
                 throw new IllegalArgumentException(
-                        "invalid word: " + parts[i]);
+                        "Invalid seed word at position " + (i + 1) + ": \"" + parts[i] + "\".");
             }
             int value = wi;
             for (int j = 0; j < 11; j++) {
@@ -122,7 +140,8 @@ public final class Bip39Mnemonic {
         int csFromData = extractBits(combined, entBits, csBits);
         int csExpected = extractBits(hash, 0, csBits);
         if (csFromData != csExpected) {
-            throw new IllegalArgumentException("invalid checksum");
+            throw new IllegalArgumentException(
+                    "Seed phrase checksum is invalid; check the words and their order.");
         }
         return entropy;
     }

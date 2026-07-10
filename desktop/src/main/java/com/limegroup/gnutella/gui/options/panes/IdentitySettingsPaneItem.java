@@ -19,6 +19,7 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -39,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.limewire.util.CommonUtils;
@@ -165,8 +165,10 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
   private void refreshIdentityInfo() {
     IdentityKeys identity = resolveIdentity();
     boolean hasIdentity = identity != null;
-    INITIALIZE_BUTTON.setEnabled(!generating && !hasIdentity);
-    INITIALIZE_BUTTON.setVisible(!hasIdentity);
+    INITIALIZE_BUTTON.setEnabled(!generating);
+    INITIALIZE_BUTTON.setVisible(true);
+    INITIALIZE_BUTTON.setText(
+        hasIdentity ? I18n.tr("Create New Identity") : I18n.tr("Initialize Identity"));
     SHOW_SEED_BUTTON.setEnabled(hasIdentity && !generating);
     EXPORT_BUTTON.setEnabled(hasIdentity && !generating);
     ENTER_SEED_BUTTON.setEnabled(!generating);
@@ -227,24 +229,23 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     if (generating) {
       return;
     }
-    if (resolveIdentity() != null) {
-      GUIMediator.showError(
-          I18n.tr("An identity is already present. Export a backup before replacing it."));
-      refreshIdentityInfo();
-      return;
-    }
+    boolean replacing = resolveIdentity() != null;
 
     int confirm =
         JOptionPane.showConfirmDialog(
             GUIMediator.getAppFrame(),
             "<html>"
                 + I18n.tr(
-                    "Generate a new FrostWire identity with proof-of-work ({0} leading zero bits). "
-                        + "This may take a few seconds. FrostWire will restart when finished so the "
-                        + "relay stack can load the new keys.",
+                    replacing
+                        ? "Creating a new random identity will permanently replace your current node ID and karma identity. "
+                            + "FrostWire will save a backup copy first, but you should also export your identity or seed phrase. "
+                            + "FrostWire will restart when finished."
+                        : "Generate a new FrostWire identity with proof-of-work ({0} leading zero bits). "
+                            + "This may take a few seconds. FrostWire will restart when finished so the "
+                            + "relay stack can load the new keys.",
                     String.valueOf(KarmaConstants.IDENTITY_DIFFICULTY))
                 + "</html>",
-            I18n.tr("Initialize Identity"),
+            I18n.tr(replacing ? "Create New Identity" : "Initialize Identity"),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE);
     if (confirm != JOptionPane.YES_OPTION) {
@@ -255,48 +256,51 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     GENERATE_PROGRESS.setVisible(true);
     refreshIdentityInfo();
 
-    SwingWorker<IdentityKeys, Void> worker =
-        new SwingWorker<IdentityKeys, Void>() {
-          @Override
-          protected IdentityKeys doInBackground() throws Exception {
+    DesktopParallelExecutor.execute(
+        () -> {
+          try {
             IdentityKeys keys = IdentityKeys.generate(KarmaConstants.IDENTITY_DIFFICULTY);
             File file = identityFile();
             File parent = file.getParentFile();
             if (parent != null && !parent.exists() && !parent.mkdirs()) {
               throw new java.io.IOException("Could not create identity directory: " + parent);
             }
-            IdentityKeys.save(keys, file);
-            return keys;
-          }
-
-          @Override
-          protected void done() {
-            generating = false;
-            GENERATE_PROGRESS.setVisible(false);
-            try {
-              IdentityKeys keys = get();
-              LOG.info(
-                  "Identity initialized, nodeId="
-                      + Hex.encode(keys.nodeId())
-                      + " path="
-                      + identityFile().getAbsolutePath());
-              JOptionPane.showMessageDialog(
-                  GUIMediator.getAppFrame(),
-                  I18n.tr(
-                      "Identity created successfully. FrostWire will now restart to load it into the relay stack."),
-                  I18n.tr("Restart Required"),
-                  JOptionPane.INFORMATION_MESSAGE);
-              GUIMediator.shutdown();
-            } catch (Throwable t) {
-              LOG.error("Failed to initialize identity", t);
-              Throwable cause = t.getCause() != null ? t.getCause() : t;
-              GUIMediator.showError(
-                  I18n.tr("Failed to initialize identity: ") + cause.getMessage());
-              refreshIdentityInfo();
+            if (replacing && file.exists()) {
+              Files.copy(
+                  file.toPath(),
+                  new File(parent, RelayConstants.IDENTITY_FILE + ".bak").toPath(),
+                  StandardCopyOption.REPLACE_EXISTING);
             }
+            IdentityKeys.save(keys, file);
+            GUIMediator.safeInvokeLater(
+                () -> {
+                  generating = false;
+                  GENERATE_PROGRESS.setVisible(false);
+                  LOG.info(
+                      "Identity initialized, nodeId="
+                          + Hex.encode(keys.nodeId())
+                          + " path="
+                          + identityFile().getAbsolutePath());
+                  JOptionPane.showMessageDialog(
+                      GUIMediator.getAppFrame(),
+                      I18n.tr(
+                          "Identity created successfully. FrostWire will now restart to load it into the relay stack."),
+                      I18n.tr("Restart Required"),
+                      JOptionPane.INFORMATION_MESSAGE);
+                  GUIMediator.shutdown();
+                });
+          } catch (Throwable t) {
+            GUIMediator.safeInvokeLater(
+                () -> {
+                  generating = false;
+                  GENERATE_PROGRESS.setVisible(false);
+                  LOG.error("Failed to initialize identity", t);
+                  GUIMediator.showError(
+                      I18n.tr("Failed to initialize identity: ") + t.getMessage());
+                  refreshIdentityInfo();
+                });
           }
-        };
-    worker.execute();
+        });
   }
 
   private static String formatFingerprint(byte[] pubRaw) {
@@ -414,16 +418,24 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     String mnemonic =
         JOptionPane.showInputDialog(
             GUIMediator.getAppFrame(),
-            I18n.tr("Enter your 24-word seed phrase:"),
+            I18n.tr(
+                "Enter your 24-word seed phrase. Words may be separated by spaces, commas, or line breaks. "
+                    + "Uppercase letters are accepted."),
             I18n.tr("Restore Identity"),
             JOptionPane.PLAIN_MESSAGE);
     if (mnemonic == null || mnemonic.trim().isEmpty()) {
       return;
     }
 
-    mnemonic = mnemonic.trim().toLowerCase().replaceAll("\\s+", " ");
+    mnemonic = Bip39Mnemonic.normalize(mnemonic);
 
     try {
+      if (Bip39Mnemonic.wordCount(mnemonic) != 24) {
+        throw new IllegalArgumentException(
+            I18n.tr("Seed phrase must contain exactly 24 words; found ")
+                + Bip39Mnemonic.wordCount(mnemonic)
+                + ".");
+      }
       Bip39Mnemonic.validate(mnemonic);
     } catch (IllegalArgumentException e) {
       GUIMediator.showError(I18n.tr("Invalid seed phrase: ") + e.getMessage());
