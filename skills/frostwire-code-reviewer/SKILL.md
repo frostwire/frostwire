@@ -417,7 +417,7 @@ When completing a review, produce a structured report:
 
 ---
 
-## Quick-Reference: Top 20 Most Common Findings
+## Quick-Reference: Top 25 Most Common Findings
 
 Based on the FrostWire codebase history + MentisDB frostwire chain lessons:
 
@@ -435,12 +435,17 @@ Based on the FrostWire codebase history + MentisDB frostwire chain lessons:
 12. **Spotless violations** — `./gradlew spotlessCheck` fails. Fix with `./gradlew spotlessApply`.
 13. **ScheduledExecutorService on Android** — dies in doze mode. Use WorkManager for periodic tasks.
 14. **Memory leak via static Activity reference** — Android-specific. Use WeakReference or static inner class.
-15. **Wire protocol break** — canonical bytes changed without version bump. Old peers' signatures fail.
+15. **Wire protocol break** — canonical bytes changed without version bump / without keeping old decode. IdentityRecord v3 write must still **read** v1/v2.
 16. **Self-discovery / co-located ports** — PeerDiscovery must skip own Ed25519 pub + loopback; configurable ports for co-located standalone.
 17. **Async transport race** — register response listeners *before* send; async fakes must deliver off-thread.
 18. **rUDP without app-level fragmentation** — IP frags drop whole datagrams; use DATA_FRAG/DATA_END + byte-equal reassembly tests.
 19. **ProcessBuilder.inheritIO under Gradle** — child blocks on full pipes; redirect to temp files. Tests use `IdentityKeys.generate(0)`, never PoW 20.
-20. **Multi-hop re-sign vs requester verify** — re-signing with forwarder key while `verifySignature` checks `requesterPub` makes forwarded hops always fail. Prefer ttl=0 until dual-envelope exists.
+20. **App multi-hop re-sign vs requester verify** — re-signing with forwarder key while verify checks `requesterPub` always fails. Dual-envelope (sig over query-only) is the fix; flag re-sign paths as **BLOCK**.
+21. **HELLO_ACK without identity** — initiator `remotePub` stays null; mesh RELAY sourcePub checks fail one way. ACK must be signed HELLO-shaped + `setRemotePub` (MentisDB #875).
+22. **Dual `connect()` overwrite** — second initiator session replaces authenticated responder session on `sessionsByAddress`. `connect` must reuse (MentisDB #875).
+23. **Unauthenticated RELAY_RESPONSE** — spoofable sourcePub into inbound queue / amp. Session + rate limit required; local clients use `/poll` delivery (MentisDB #876).
+24. **Mesh flood without bounds** — fan-out × hop TTL × payload without `MAX_APP_PAYLOAD`, rate limit, or TTL cap is amplification **BLOCK**.
+25. **DHT list ConcurrentModificationException** — never iterate live jlibtorrent `dhtGetPeers` lists; snapshot first.
 
 ---
 
@@ -488,14 +493,28 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 - [ ] **Delivery semantics** — `/send` returning HTTP success must mean documented queue acceptance only, unless there is an authenticated acknowledgement from the destination. Callers must not count it as a delivered request without an application response.
 - [ ] **CLI System.out** — allowed only in `IceBridgeServer.main` / help / generate-token; library paths use `Logger`.
 
+### Checklist — rUDP session auth & multi-hop RELAY (BLOCK-class if violated)
+
+MentisDB frostwire **#873–#876**. Review every change to `RudpSessionManager` / `RelayFrame` / HELLO path against this list.
+
+- [ ] **HELLO_ACK proves responder** — ACK payload is HELLO-shaped (pub + ts + sig over connectionId||ts). Initiator `handleHelloAck` must `setRemotePub`. Empty ACK → initiator `remotePub` stays null forever → **HIGH/BLOCK** for mesh RELAY.
+- [ ] **No dual-session overwrite** — `connect(addr)` reuses existing `sessionsByAddress` entry. Bidirectional warm that creates a second initiator session and overwrites authenticated `remotePub` is a **BLOCK** correctness bug.
+- [ ] **RELAY sourcePub = hop peer** — `frame.sourcePub` must equal `session.remotePub()` for the authenticated sender. Prefer `sessionsByRemoteId.get(connectionId)` then address map. sendRelay rewrites source to **this** node's identity each hop.
+- [ ] **RELAY_RESPONSE authenticated** — session required; rate-limited; attribute to `session.remotePub()`, **never** spoofable header bytes. Unauthenticated `write(RELAY_RESPONSE)` fire-and-forget is **BLOCK** (amp + queue injection).
+- [ ] **Local registry /poll delivery** — client registered on this node's own rUDP host:port → `notifyListener` / local inbound queue, not self-UDP RELAY_RESPONSE loop.
+- [ ] **Amplification bounds all present** —
+  - `RelayFrame.MAX_APP_PAYLOAD` enforced on encode **and** decode
+  - hop TTL default ≤ 3; mesh fan-out ≤ 3
+  - per-peer RELAY / RELAY_RESPONSE rate limit
+- [ ] **No RELAY fragmentation claim** — if app payload can exceed one fragment, either reject (current policy) or implement frag for RELAY; do not silently fail multi-hop for large search frames.
+- [ ] **Auth change ⇒ re-run multi-hop E2E** — after removing unauthenticated paths, `MultiRelayMeshSearchTest` (or 3-forwarder equivalent) must still pass with session warm + topology assert.
+
 ### Checklist — Search protocol correctness
 
 - [ ] **Request verify** — Ed25519 over canonical bytes; timestamp skew; rate limit by **requesterPub**; fail-closed `Optional.empty()`.
 - [ ] **Response verify** — client checks expected responder pub, nonce, skew, signature (`SearchResponseVerifier`).
-- [ ] **TTL / multi-hop policy** — if `ttl>0` and path mutates, **cannot** re-sign with forwarder key while verifier checks `requesterPub` (signature always fails). Either:
-  - **v1 safe**: `ttl=0`, no multi-hop on IceBridge or TCP; or
-  - **proper envelope**: original requester sig over immutable fields + separate forwarder hop sigs.
-  Flag any re-sign-with-forwarder-key path as **BLOCK** until dual-envelope exists.
+- [ ] **TTL / multi-hop policy (app layer)** — dual-envelope is shipped (`RemoteSearchRequest` v2: signature over query-only; hop fields mutable). **BLOCK** any re-sign-with-forwarder-key that still verifies against `requesterPub`. Preserve original requester signature on hop.
+- [ ] **TTL / multi-hop policy (transport layer)** — mesh `Type.RELAY` is separate from app ttl. Transport hop auth rules above still apply even when app dual-envelope is correct.
 - [ ] **Catalog browse** — signature + skew verified; desktop wiring must pass `LocalIndex` if feature is claimed; Android already passes index.
 - [ ] **FTS5 fixtures** — whole-word match; no kebab-case only names; sanitizer strips non-alnum.
 - [ ] **Trust check on requester** — spam/trust floor evaluated in *target's* directory for the *requester*, not the target (MentisDB #798).
@@ -520,11 +539,16 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 
 | Area | Minimum tests |
 |------|----------------|
-| Peer discovery | self-skip by pub, local endpoint skip, verified upsert, unauth drop, custom relay port |
+| Peer discovery | self-skip by pub, local endpoint skip, verified upsert, unauth drop, custom relay port; snapshot DHT endpoint lists before iterate (no CME) |
 | Transport | listener-before-send race, multi-listener fanout, poll failure isolation |
 | rUDP | fragment reassembly byte equality (pattern `i % 256`), oversize reject, stale group eviction |
+| rUDP session | HELLO_ACK sets initiator `remotePub`; connect reuse does not drop auth; RELAY rejected without session / wrong sourcePub |
+| RELAY_RESPONSE | unauthenticated sender dropped; authenticated path delivers; no spoofed header attribution |
+| RelayFrame | encode/decode round-trip; reject app payload > `MAX_APP_PAYLOAD`; hop TTL clamp |
+| Multi-hop mesh E2E | ≥3 FORWARDER + seeder/searcher on different homes; warm HELLO/HELLO_ACK; assert seeder **absent** from searcher home registry; signed search hit arrives (`MultiRelayMeshSearchTest`) |
 | Three-node topology | Android requester to desktop index node via cloud forwarder; request and signed response both arrive; assert packet type at forwarder and no LocalIndex use by FORWARDER |
-| Search | signed request/response round-trip, bad sig/nonce/stale reject, ttl=0 no forward |
+| Search | signed request/response round-trip, bad sig/nonce/stale reject; dual-envelope hop preserves requester sig |
+| Wire versions | IdentityRecord v1/v2 still decode when writing v3; RemoteSearchResponse version covers chunk/final domain |
 | Multi-instance | publish → find → unpublish → not-find (TCP or IceBridge fake transport) |
 | Process launcher | redirect IO (not inheritIO), health check, `--relay-port` parse |
 | Identity tests | always `IdentityKeys.generate(0)` |
@@ -533,9 +557,10 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 ### MentisDB operating rule for reviewers / implementers
 
 1. Chain: `frostwire`. Prefer agent_id **`gubatron`** for durable project memory (do not invent new agent IDs).
-2. `ranked_search` before append; link `refs` to prior lessons (#809 async, #810 frag, #831 self-skip, #832 ports, #795 karma, #769 architecture).
-3. On any non-obvious fix: `LessonLearned` / retrospective immediately.
+2. `ranked_search` before append; link `refs` to prior lessons (#809 async, #810 frag, #831 self-skip, #832 ports, #795 karma, #769 architecture, **#875 dual-session/HELLO_ACK**, **#876 RELAY bounds**).
+3. On any non-obvious fix: `LessonLearned` / `Constraint` immediately; fold durable rules into this skill + `frostwire-engineer` in the same change set when possible.
 4. Checkpoint before handoff/compaction.
+5. After skill updates: granular `[all]` commits; do not mix skill edits with product code unless the user asked for a single docs+code commit.
 
 ---
 
@@ -548,4 +573,4 @@ Design source of truth: repo root `DESIGN_RELAY_REGISTRY.md`. MentisDB chain: `f
 
 ---
 
-*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review. Last major expansion: IceBridge / distributed relay section from MentisDB frostwire chain (2026-07).*
+*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review. Last major expansion: rUDP HELLO_ACK / dual-session / RELAY_RESPONSE auth / mesh amp bounds (MentisDB #873–#876, 2026-07-12).*
