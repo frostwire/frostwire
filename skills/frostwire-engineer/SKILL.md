@@ -56,6 +56,10 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"One util to rule them all"** | Before writing `toHex`/`fromBase64`/etc., grep `com.frostwire.util.*` |
 | **"Check the primitive before designing the abstraction"** | DHT, JNI, SQLite, Android APIs — verify real API semantics first |
 | **"Headless first when the feature is network-native"** | Relay/search protocols must run without Swing/Android UI |
+| **"Authenticate both ends of the handshake"** | HELLO alone proves only the initiator; HELLO_ACK must prove the responder or initiator `remotePub` stays null forever |
+| **"Reuse the session, don't dual-connect"** | `connect()` to an address that already has a session must reuse it — bidirectional mesh warm otherwise wipes authenticated `remotePub` |
+| **"No unauthenticated wire type"** | If a packet type can inject into the app queue, it needs a session (or equivalent auth). Fire-and-forget "bootstrap" paths become amp vectors |
+| **"Green tests before every push"** | When the user requires tests-to-commit: run the affected suite, then one logical commit, then push — never push red |
 
 ---
 
@@ -117,6 +121,25 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - A fallback is real only when its wire type is emitted and handled. Do not call a method `sendRelay` or `holePunch` unless an integration test observes the expected packet type on the wire and the final payload at the target.
 - Model request and response routes separately. NAT, endpoint ownership, and registry state may make one direction work while the reply path fails.
 - Before claiming a multi-node feature works, exercise the exact production roles, not just same-JVM or loopback fixtures.
+
+### rUDP Session & Multi-Hop RELAY Rules (IceBridge)
+
+These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostwire #873–#876).
+
+- **HELLO / HELLO_ACK symmetry**: HELLO payload = Ed25519 pub + timestamp + sig over `(connectionId || timestamp)`. HELLO_ACK must use the **same shape** so the initiator can `setRemotePub`. An empty HELLO_ACK is a silent half-open session.
+- **One session per peer address**: `connect(remote)` reuses `sessionsByAddress` if present. Never create a second initiator session that overwrites a responder session that already has `remotePub`.
+- **RELAY hop auth**: `frame.sourcePub` must equal the authenticated hop peer (`session.remotePub()`). Prefer lookup by `packet.connectionId()` (same as DATA), then address map.
+- **RELAY_RESPONSE**: requires an authenticated session; attribute payload to `session.remotePub()`, never spoofable header bytes. **No** unauthenticated `write()` fire-and-forget.
+- **Local /poll clients**: peers that register with this process's own `host:rudpPort` drain the control inbound queue — deliver with `notifyListener` / `isLocalRudpEndpoint`, not self-UDP RELAY_RESPONSE.
+- **Amplification bounds** (all required for multi-hop flood):
+  - `RelayFrame.MAX_APP_PAYLOAD = RudpPacket.MAX_FRAGMENT_PAYLOAD - HEADER_LENGTH` (encode + decode reject oversized; no RELAY fragmentation yet)
+  - Default hop TTL ≤ 3; mesh fan-out ≤ 3; per-peer RELAY/RELAY_RESPONSE rate limit
+- **Security hardening vs E2E**: removing an unauthenticated path will break tests that depended on it. After any RELAY/HELLO auth change, re-run `MultiRelayMeshSearchTest` (or three-forwarder equivalent): warm HELLO/HELLO_ACK, assert seeder is **not** on the searcher's home relay, assert signed result arrives.
+
+### Wire Version Discipline
+
+- Bumping a signed wire type (`RemoteSearchRequest`, `RemoteSearchResponse`, `IdentityRecord`) requires: version field bump, explicit read-path for older versions you still accept, and a test that old maps still decode (or are cleanly rejected).
+- Example: IdentityRecord **writes v3** (caps) but **reads v1/v2** so live self-ping and older peers do not break.
 
 ---
 
@@ -341,6 +364,24 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 - Android: `./gradlew compilePlus1DebugJavaWithJavac` and `./gradlew testPlus1DebugUnitTest`
 - Fix compiler warnings; don't suppress them.
 
+### Multi-Node / Mesh Tests
+
+- Prefer real multi-process fixtures (multiple `IceBridgeServer` instances on free ports) over same-manager fakes when claiming multi-hop works.
+- After mesh link (`RelayMesh.linkFully`), **warm** sessions (direct `/send` or DATA) so HELLO_ACK settles before RELAY flood.
+- Assert **topology**, not only the end result: e.g. target peer absent from searcher's home registry so the path must multi-hop.
+- DHT discovery: snapshot jlibtorrent peer lists (`toArray` / copy) before iterating — live lists mutate on alert threads (`ConcurrentModificationException`).
+
+### Tests Green Before Each Granular Push
+
+When the user (or task) requires "tests must pass to commit and push":
+
+1. Implement the smallest logical slice.
+2. Run the **narrowest** suite that covers it (e.g. `./gradlew test --tests 'com.frostwire.search.relay.**'`).
+3. Commit that slice only if green.
+4. Push that commit (granular push), then start the next slice.
+
+Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_RESUME_SESSION` or other agent scratch files.
+
 ---
 
 ## 9. Git & Commit Hygiene
@@ -349,6 +390,7 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 
 - **One logical change per commit.** Example: "remove `ip_filter.db` persistence" and "move JNI calls off EDT" were split into two separate commits even though they were done together.
 - A branch with 35+ granular commits is normal for a major sweep. Squash only cosmetic / WIP commits before pushing.
+- Typical mesh security sweep order: protocol primitive → manager policy → wire version → tests → changelog.
 
 ### Commit Message Format
 
@@ -423,6 +465,9 @@ Before claiming a change is complete, walk this list. Most rows are per-change; 
 - [ ] `git diff --cached --stat` reviewed before every commit
 - [ ] Threat model updated if a new attack surface appears
 - [ ] Web-of-Trust root keys stored outside the repo if added
+- [ ] New or changed rUDP packet types: session auth, size/rate bounds, and a rejection test for unauthenticated senders
+- [ ] Multi-hop flood paths: hop TTL, fan-out, payload cap, and rate limit all present
+- [ ] MentisDB `frostwire` chain: `LessonLearned` / `Constraint` for non-obvious security fixes (agent_id `gubatron`)
 
 ---
 
@@ -485,4 +530,4 @@ A reviewer is encouraged to push back on **complexity**, not just correctness. "
 
 ---
 
-*Maintained by `gubatron` on the FrostWire mentisdb chain. Replaces the legacy `AGENTS.md` at the repo root. Update this file in a `[all]` commit; reference it from any new `DESIGN_*.md` so contributors find it.*
+*Maintained by `gubatron` on the FrostWire mentisdb chain. Replaces the legacy `AGENTS.md` at the repo root. Update this file in a `[all]` commit; reference it from any new `DESIGN_*.md` so contributors find it. Last expansion: rUDP session / multi-hop RELAY rules + tests-before-push (MentisDB #875–#877, 2026-07).*
