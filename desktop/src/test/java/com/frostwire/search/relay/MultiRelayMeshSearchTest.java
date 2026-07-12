@@ -73,8 +73,8 @@ class MultiRelayMeshSearchTest {
                         "127.0.0.1", r3.server.rudpPort())));
         assertTrue(linked >= 6, "full mesh should route each pair both ways; got " + linked);
 
-        // Allow HELLO handshakes between forwarders after /route.
-        Thread.sleep(300);
+        // Force HELLO/HELLO_ACK between every forwarder pair (direct DATA to known pubs).
+        warmMeshSessions(r1, r2, r3);
 
         // --- 2. Seeder client on Relay3 (has LocalIndex) ---
         PeerClient seeder = startPeerClient("seeder", r3);
@@ -89,14 +89,19 @@ class MultiRelayMeshSearchTest {
                 searcher.identity, "127.0.0.1", r1.server.rudpPort(), IceBridgeConfig.Role.CLIENT),
                 "searcher must register on Relay1");
 
+        // Multi-hop requirement: seeder is NOT registered on R1 (only on R3).
+        assertTrue(r1.client.lookup(50).stream()
+                        .noneMatch(p -> seeder.identity.ed25519PubRaw().length == 32
+                                && java.util.Base64.getUrlDecoder()
+                                .decode(p.pub).length == 32
+                                && java.util.Arrays.equals(
+                                java.util.Base64.getUrlDecoder().decode(p.pub),
+                                seeder.identity.ed25519PubRaw())),
+                "R1 must not know seeder - path must multi-hop via mesh");
+
         // Searcher "learned" seeder's identity (DHT / mesh import in production).
-        // No direct rUDP route to seeder — only pub in PeerDirectory.
         searcher.directory.upsertVerified(
                 seeder.identity.ed25519PubRaw(), "127.0.0.1", r3.server.rudpPort());
-
-        // Warm routes: tell Relay1 about seeder's home? No — multi-hop must find
-        // seeder via Relay3 registry only. Ensure Relay1 does NOT have seeder.
-        // (register only ran on Relay3)
 
         // --- 4. Distributed search from searcher ---
         RecordingListener listener = new RecordingListener();
@@ -185,6 +190,27 @@ class MultiRelayMeshSearchTest {
             Thread.sleep(50);
         }
         assertTrue(ok, label + " control /health");
+    }
+
+    /**
+     * Direct /send between mesh-routed forwarders triggers HELLO + HELLO_ACK
+     * so initiator sessions learn remotePub before multi-hop RELAY.
+     */
+    private static void warmMeshSessions(RelayNode... nodes) throws Exception {
+        byte[] ping = new byte[] {0x01};
+        for (RelayNode a : nodes) {
+            for (RelayNode b : nodes) {
+                if (a == b) {
+                    continue;
+                }
+                a.client.send(b.server.identity().ed25519PubRaw(),
+                        com.frostwire.search.relay.icebridge.MeshProtocolId.TELEMETRY, ping);
+            }
+        }
+        // Allow HELLO_ACK to settle on all pairs.
+        for (int i = 0; i < 20; i++) {
+            Thread.sleep(25);
+        }
     }
 
     private static int freePort() throws java.io.IOException {

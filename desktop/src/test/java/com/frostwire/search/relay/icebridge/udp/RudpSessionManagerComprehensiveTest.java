@@ -467,7 +467,7 @@ class RudpSessionManagerComprehensiveTest {
     // ---- RELAY_RESPONSE delivery ----
 
     @Test
-    void relayResponseDeliveredToListener() {
+    void relayResponseDeliveredToListener() throws Exception {
         List<byte[]> deliveredPayloads = new CopyOnWriteArrayList<>();
         List<byte[]> deliveredSources = new CopyOnWriteArrayList<>();
         RudpSessionManager mgr = new RudpSessionManager(
@@ -476,10 +476,40 @@ class RudpSessionManagerComprehensiveTest {
                     deliveredPayloads.add(payload);
                 });
 
-        byte[] sourcePub = remote.ed25519PubRaw();
+        // Authenticated session required for RELAY_RESPONSE.
+        long cid = 7070L;
+        InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62070);
+        byte[] helloPayload = RudpAuth.createHelloPayload(remote, cid);
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, helloPayload),
+                sender, new InetSocketAddress("127.0.0.1", 62071)));
+
         byte[] appPayload = "response".getBytes();
         byte[] responsePayload = new byte[32 + appPayload.length];
-        System.arraycopy(sourcePub, 0, responsePayload, 0, 32);
+        System.arraycopy(remote.ed25519PubRaw(), 0, responsePayload, 0, 32);
+        System.arraycopy(appPayload, 0, responsePayload, 32, appPayload.length);
+
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.RELAY_RESPONSE, cid, 1, 0, responsePayload),
+                sender,
+                new InetSocketAddress("127.0.0.1", 62071)));
+
+        assertEquals(1, deliveredPayloads.size());
+        assertArrayEquals(appPayload, deliveredPayloads.get(0));
+        // Attributed to authenticated session peer, not header spoof.
+        assertArrayEquals(remote.ed25519PubRaw(), deliveredSources.get(0));
+        mgr.shutdown();
+    }
+
+    @Test
+    void relayResponseRejectedWithoutSession() {
+        List<byte[]> delivered = new CopyOnWriteArrayList<>();
+        RudpSessionManager mgr = new RudpSessionManager(
+                local, registry, metrics, (pub, payload) -> delivered.add(payload));
+
+        byte[] appPayload = "spoof".getBytes();
+        byte[] responsePayload = new byte[32 + appPayload.length];
+        System.arraycopy(remote.ed25519PubRaw(), 0, responsePayload, 0, 32);
         System.arraycopy(appPayload, 0, responsePayload, 32, appPayload.length);
 
         mgr.onPacket(new RudpPacketEnvelope(
@@ -487,9 +517,35 @@ class RudpSessionManagerComprehensiveTest {
                 new InetSocketAddress("127.0.0.1", 62070),
                 new InetSocketAddress("127.0.0.1", 62071)));
 
-        assertEquals(1, deliveredPayloads.size());
-        assertArrayEquals(appPayload, deliveredPayloads.get(0));
-        assertArrayEquals(sourcePub, deliveredSources.get(0));
+        assertEquals(0, delivered.size(), "unauthenticated RELAY_RESPONSE must be dropped");
+        mgr.shutdown();
+    }
+
+    @Test
+    void helloAckSetsInitiatorRemotePub() throws Exception {
+        List<byte[]> delivered = new CopyOnWriteArrayList<>();
+        RudpSessionManager mgr = new RudpSessionManager(
+                local, registry, metrics, (pub, p) -> delivered.add(p));
+
+        InetSocketAddress peer = new InetSocketAddress("127.0.0.1", 62101);
+        long wireCid = mgr.createInitiatorSessionForTest(peer);
+        assertFalse(mgr.hasRemotePubForTest(peer), "initiator starts without remotePub");
+
+        byte[] ackPayload = RudpAuth.createHelloPayload(remote, wireCid);
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO_ACK, wireCid, 0, 0, ackPayload),
+                peer, new InetSocketAddress("127.0.0.1", 62100)));
+
+        assertTrue(mgr.hasRemotePubForTest(peer), "HELLO_ACK must set initiator remotePub");
+
+        // Bidirectional RELAY now accepted from that peer.
+        byte[] app = "ping".getBytes();
+        byte[] relay = RelayFrame.encode(remote.ed25519PubRaw(), local.ed25519PubRaw(), 1, app);
+        mgr.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.RELAY, wireCid, 1, 0, relay),
+                peer, new InetSocketAddress("127.0.0.1", 62100)));
+        assertEquals(1, delivered.size());
+        assertArrayEquals(app, delivered.get(0));
         mgr.shutdown();
     }
 

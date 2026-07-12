@@ -53,6 +53,9 @@ class RemoteSearchResponseStreamTest {
         assertTrue(parsed.isFinalChunk());
         assertEquals(0, parsed.chunkIndex());
         assertEquals(1, parsed.rows().size());
+        assertEquals(RemoteSearchResponse.VERSION, parsed.version());
+        assertEquals(2, RemoteSearchResponse.VERSION,
+                "wire v2 always covers chunk+final in the signature domain");
     }
 
     @Test
