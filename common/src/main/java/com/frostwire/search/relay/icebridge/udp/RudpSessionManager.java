@@ -43,6 +43,10 @@ public final class RudpSessionManager {
     private static final long RETRANSMIT_TIMEOUT_MS = 5000;
     private static final int MAX_RETRIES = 5;
     private static final long SESSION_IDLE_MS = 120_000;
+    /** Max intermediate IceBridge hops when target is not local. */
+    private static final int DEFAULT_RELAY_HOP_TTL = RelayFrame.DEFAULT_HOP_TTL;
+    /** Fan-out when flooding mesh forwarders for an unknown target. */
+    private static final int MAX_MESH_FANOUT = 5;
 
     /**
      * Fragment header prepended to each DATA_FRAG / DATA_END payload:
@@ -87,11 +91,18 @@ public final class RudpSessionManager {
     /**
      * Send application data to a remote endpoint identified by public key.
      *
-     * <p>If the registry knows the target's rUDP endpoint, a direct packet is
-     * sent; otherwise the data is relayed through the first known forwarder.
+     * <p>If the registry knows the target's rUDP endpoint, a direct DATA
+     * packet is sent. Otherwise the payload is multi-hop RELAYed through
+     * known FORWARDER/BOTH mesh peers (hop TTL
+     * {@link RelayFrame#DEFAULT_HOP_TTL}).
      */
     public void deliver(byte[] targetPub, byte[] payload) {
         if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
+            return;
+        }
+        if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
+            // Local delivery (loopback control plane → same process).
+            notifyListener(identity.ed25519PubRaw(), payload);
             return;
         }
         PeerRecord target = registry.lookup(targetPub);
@@ -99,13 +110,19 @@ public final class RudpSessionManager {
             sendData(new InetSocketAddress(target.host(), target.rudpPort()), payload);
             return;
         }
-        List<PeerRecord> forwarders = registry.lookupForwarders(1);
-        if (forwarders.isEmpty()) {
-            LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
-            return;
+        List<PeerRecord> forwarders = registry.lookupForwarders(MAX_MESH_FANOUT);
+        int sent = 0;
+        for (PeerRecord forwarder : forwarders) {
+            if (isSelf(forwarder)) {
+                continue;
+            }
+            sendRelay(new InetSocketAddress(forwarder.host(), forwarder.rudpPort()),
+                    targetPub, payload, DEFAULT_RELAY_HOP_TTL);
+            sent++;
         }
-        PeerRecord forwarder = forwarders.get(0);
-        sendRelay(new InetSocketAddress(forwarder.host(), forwarder.rudpPort()), targetPub, payload);
+        if (sent == 0) {
+            LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
+        }
     }
 
     /**
@@ -190,18 +207,43 @@ public final class RudpSessionManager {
     }
 
     /**
-     * Send data through a forwarder to a target identified by public key.
+     * Send a multi-hop RELAY packet through a mesh forwarder.
+     *
+     * @param hopTtl remaining intermediate hops (decremented at each hop)
      */
     public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub, byte[] payload) {
-        if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
+        sendRelay(forwarderAddress, targetPub, payload, DEFAULT_RELAY_HOP_TTL);
+    }
+
+    public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub,
+                          byte[] payload, int hopTtl) {
+        if (forwarderAddress == null
+                || targetPub == null || targetPub.length != 32
+                || payload == null || payload.length == 0) {
             return;
         }
-        // Relay frame: [sourcePub 32][targetPub 32][appPayload...]
-        byte[] relayPayload = new byte[32 + 32 + payload.length];
-        System.arraycopy(identity.ed25519PubRaw(), 0, relayPayload, 0, 32);
-        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
-        System.arraycopy(payload, 0, relayPayload, 64, payload.length);
-        sendData(forwarderAddress, relayPayload);
+        RudpSession session = sessionsByAddress.get(forwarderAddress);
+        if (session == null) {
+            connect(forwarderAddress);
+            session = sessionsByAddress.get(forwarderAddress);
+            if (session == null) {
+                return;
+            }
+        }
+        byte[] frame = RelayFrame.encode(
+                identity.ed25519PubRaw(), targetPub, hopTtl, payload);
+        RudpPacket relay = new RudpPacket(
+                RudpPacket.Type.RELAY,
+                session.remoteConnectionId(),
+                session.nextLocalSequence(),
+                session.receivedThroughRemote(),
+                frame);
+        sendReliable(session, relay);
+    }
+
+    private boolean isSelf(PeerRecord record) {
+        return record != null
+                && Arrays.equals(record.ed25519Pub(), identity.ed25519PubRaw());
     }
 
     /**
@@ -467,40 +509,96 @@ public final class RudpSessionManager {
 
     private void handleRelay(RudpPacket packet, InetSocketAddress sender) {
         byte[] payload = packet.payload();
-        if (payload == null || payload.length < 64) {
+        if (payload == null || payload.length <= RelayFrame.HEADER_LENGTH) {
             return;
         }
-        byte[] sourcePub = Arrays.copyOfRange(payload, 0, 32);
-        byte[] targetPub = Arrays.copyOfRange(payload, 32, 64);
-        byte[] appPayload = Arrays.copyOfRange(payload, 64, payload.length);
+        RelayFrame frame;
+        try {
+            frame = RelayFrame.decode(payload);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("RudpSessionManager: dropped malformed RELAY frame");
+            return;
+        }
 
-        // SEC3: Verify that sourcePub matches the sender's authenticated
-        // session identity. Without this check, anyone can claim any
-        // sourcePub and have the forwarder deliver payloads attributed
-        // to that key.
+        // SEC3: sourcePub must match the authenticated rUDP session peer.
         RudpSession senderSession = sessionsByAddress.get(sender);
         if (senderSession == null) {
             LOG.debug("RudpSessionManager: rejected RELAY from unauthenticated " + sender);
             return;
         }
+        // Ack the RELAY so the sender clears retransmit state.
+        if (senderSession.receiveRemote(packet.sequence())) {
+            send(senderSession, senderSession.dataAck());
+        }
         byte[] senderPub = senderSession.remotePub();
-        if (senderPub == null || !Arrays.equals(sourcePub, senderPub)) {
+        if (senderPub == null || !Arrays.equals(frame.sourcePub(), senderPub)) {
             LOG.debug("RudpSessionManager: rejected RELAY — sourcePub does not match sender session");
             return;
         }
 
-        PeerRecord target = registry.lookup(targetPub);
-        if (target == null) {
+        byte[] targetPub = frame.targetPub();
+        byte[] appPayload = frame.appPayload();
+        int hopTtl = frame.hopTtl();
+
+        // Local mesh endpoint for this IceBridge node itself.
+        if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
+            notifyListener(frame.sourcePub(), appPayload);
             return;
         }
-        InetSocketAddress targetAddress = new InetSocketAddress(target.host(), target.rudpPort());
 
-        // Relay response frame: [sourcePub 32][appPayload...]
+        PeerRecord target = registry.lookup(targetPub);
+        if (target != null) {
+            deliverToLocalRegistryTarget(frame.sourcePub(), target, appPayload);
+            return;
+        }
+
+        // Target not here — multi-hop flood to other mesh forwarders.
+        if (hopTtl <= 0) {
+            LOG.debug("RudpSessionManager: RELAY hop TTL exhausted for "
+                    + Hex.encode(targetPub).substring(0, 12) + "…");
+            return;
+        }
+        int nextTtl = hopTtl - 1;
+        List<PeerRecord> forwarders = registry.lookupForwarders(MAX_MESH_FANOUT);
+        for (PeerRecord f : forwarders) {
+            if (isSelf(f)) {
+                continue;
+            }
+            if (Arrays.equals(f.ed25519Pub(), senderPub)) {
+                continue;
+            }
+            InetSocketAddress next = new InetSocketAddress(f.host(), f.rudpPort());
+            sendRelay(next, targetPub, appPayload, nextTtl);
+        }
+    }
+
+    /**
+     * Deliver app payload to a peer that is registered on this IceBridge node
+     * (client or co-located peer endpoint).
+     */
+    private void deliverToLocalRegistryTarget(byte[] logicalSourcePub,
+                                              PeerRecord target,
+                                              byte[] appPayload) {
+        InetSocketAddress targetAddress = new InetSocketAddress(target.host(), target.rudpPort());
+        // RELAY_RESPONSE: [logicalSourcePub 32][appPayload...]
         byte[] responsePayload = new byte[32 + appPayload.length];
-        System.arraycopy(sourcePub, 0, responsePayload, 0, 32);
+        System.arraycopy(logicalSourcePub, 0, responsePayload, 0, 32);
         System.arraycopy(appPayload, 0, responsePayload, 32, appPayload.length);
 
-        RudpPacket forward = new RudpPacket(RudpPacket.Type.RELAY_RESPONSE, 0, 0, 0, responsePayload);
+        RudpSession targetSession = sessionsByAddress.get(targetAddress);
+        if (targetSession != null) {
+            RudpPacket forward = new RudpPacket(
+                    RudpPacket.Type.RELAY_RESPONSE,
+                    targetSession.remoteConnectionId(),
+                    targetSession.nextLocalSequence(),
+                    targetSession.receivedThroughRemote(),
+                    responsePayload);
+            sendReliable(targetSession, forward);
+            return;
+        }
+        // Best-effort unauthenticated delivery (bootstrap / fire-and-forget).
+        RudpPacket forward = new RudpPacket(
+                RudpPacket.Type.RELAY_RESPONSE, 0, 0, 0, responsePayload);
         write(targetAddress, forward);
     }
 

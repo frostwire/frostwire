@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:IceBridge multi-hop mesh RELAY — hop TTL frame, Type.RELAY delivery, forwarder mesh via RelayMesh; MultiRelayMeshSearchTest (3 FORWARDER + seeder/searcher clients)
   - fix:IdentityRecord.fromEntry accepts v1/v2 again (read path) — still writes v3 with caps; fixes self-ping / peer handshake decode after capability bump
   - fix:DHT peer discovery ConcurrentModificationException — snapshot TcpEndpoint lists from dhtGetPeers before iterating (jlibtorrent alert threads can mutate live lists)
   - new:IceBridge multi-protocol fabric — all mesh payloads IBP1-framed with protocolId on /send and /poll (SEARCH=1)

@@ -13,7 +13,8 @@
 | Node identity, mesh rUDP, NAT/hole-punch, roles | Signed search request/response schemas |
 | Control API (`/send`, `/poll`, …) | LocalIndex, karma, Search UI engines |
 | DHT announce so **pure forwarders are discoverable** | Happens to *use* IceBridge as transport |
-| Protocol-agnostic opaque payloads (+ optional `protocolId` / IBP1) | One of possibly many app protocols (SEARCH=1) |
+| Protocol-agnostic opaque payloads (IBP1 `protocolId`) | One of possibly many app protocols (SEARCH=1) |
+| Multi-hop RELAY mesh (hop TTL between FORWARDER nodes) | Dual-envelope signed search requests (app layer) |
 
 FrostWire desktop/Android are **clients and optional co-located nodes** of that network. A cloud `FORWARDER` must be fully useful **without** any FrostWire GUI process.
 

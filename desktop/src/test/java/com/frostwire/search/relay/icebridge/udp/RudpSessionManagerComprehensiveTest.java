@@ -445,14 +445,19 @@ class RudpSessionManagerComprehensiveTest {
         byte[] sourcePub = local.ed25519PubRaw();
         byte[] targetPub = remote.ed25519PubRaw();
         byte[] appPayload = "relayed data".getBytes();
-        byte[] relayPayload = new byte[64 + appPayload.length];
-        System.arraycopy(sourcePub, 0, relayPayload, 0, 32);
-        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
-        System.arraycopy(appPayload, 0, relayPayload, 64, appPayload.length);
+        byte[] relayPayload = RelayFrame.encode(sourcePub, targetPub, 2, appPayload);
+
+        // Authenticated session required for RELAY (HELLO first).
+        long cid = 4242L;
+        InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62061);
+        byte[] helloPayload = RudpAuth.createHelloPayload(local, cid);
+        forwarder.onPacket(new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, helloPayload),
+                sender, new InetSocketAddress("127.0.0.1", 62062)));
 
         forwarder.onPacket(new RudpPacketEnvelope(
-                new RudpPacket(RudpPacket.Type.RELAY, 0, 0, 0, relayPayload),
-                new InetSocketAddress("127.0.0.1", 62061),
+                new RudpPacket(RudpPacket.Type.RELAY, cid, 1, 0, relayPayload),
+                sender,
                 new InetSocketAddress("127.0.0.1", 62062)));
 
         assertEquals(1, registry.size());
@@ -601,10 +606,7 @@ class RudpSessionManagerComprehensiveTest {
         byte[] sourcePub = local.ed25519PubRaw();
         byte[] targetPub = remote.ed25519PubRaw();
         byte[] appPayload = "relayed data".getBytes();
-        byte[] relayPayload = new byte[64 + appPayload.length];
-        System.arraycopy(sourcePub, 0, relayPayload, 0, 32);
-        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
-        System.arraycopy(appPayload, 0, relayPayload, 64, appPayload.length);
+        byte[] relayPayload = RelayFrame.encode(sourcePub, targetPub, 2, appPayload);
 
         // Send RELAY from an address that has no session.
         // The forwarder should reject it (no sessionsByAddress entry).
@@ -646,10 +648,7 @@ class RudpSessionManagerComprehensiveTest {
         spoofedSource[0] = 99;
         byte[] targetPub = remote.ed25519PubRaw();
         byte[] appPayload = "spoofed".getBytes();
-        byte[] relayPayload = new byte[64 + appPayload.length];
-        System.arraycopy(spoofedSource, 0, relayPayload, 0, 32);
-        System.arraycopy(targetPub, 0, relayPayload, 32, 32);
-        System.arraycopy(appPayload, 0, relayPayload, 64, appPayload.length);
+        byte[] relayPayload = RelayFrame.encode(spoofedSource, targetPub, 2, appPayload);
 
         forwarder.onPacket(new RudpPacketEnvelope(
                 new RudpPacket(RudpPacket.Type.RELAY, cid, 0, 0, relayPayload),

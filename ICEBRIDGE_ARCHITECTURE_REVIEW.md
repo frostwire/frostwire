@@ -286,7 +286,7 @@ Status of each recommendation against the FrostWire tree (update when work lands
 | 4 | Stream search results | **Done** | `RemoteSearchResponse` chunk + `final`; handler streams large sets; performer accumulates until final |
 | 5 | Beyond search | **Aligned** | Non-SEARCH protocols framed with IBP1; handlers filter by protocolId |
 | 6 | Control vs data plane | **Aligned** | Control HTTP (`control/`) vs rUDP mesh (`udp/`); identity TCP is bootstrap/control-adjacent |
-| 7 | Route by responsibility | **Foundation** | `KeyspaceRouter` XOR-ranks peers by SHA-1(keywords); full exclusive keyspace ownership still future |
+| 7 | Route by responsibility | **Foundation** | `KeyspaceRouter` XOR-ranks peers by SHA-1(keywords); multi-hop mesh RELAY with hop TTL between FORWARDER nodes; full exclusive keyspace ownership still future |
 | 8 | Reusable infrastructure | **In progress** | Standalone JAR + DHT announce; still branded `frostwire-*` topics / package path |
 
 ## Guardrails (MUST when changing IceBridge)
