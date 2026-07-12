@@ -7,7 +7,6 @@
 
 package com.frostwire.search.relay.icebridge.udp;
 
-import java.net.InetSocketAddress;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Arrays;
@@ -31,31 +30,20 @@ final class RudpAuth {
     /** Maximum acceptable age of a HELLO packet (seconds). */
     static final long MAX_HELLO_SKEW_SEC = 300;
 
+    /** HELLO payload length: pub (32) + timestamp (8) + sig (64). */
+    static final int HELLO_PAYLOAD_LENGTH = 104;
+
     private RudpAuth() {
     }
 
     static boolean verifyHello(long connectionId, byte[] payload) {
-        // New format: 32 (pub) + 8 (timestamp) + 64 (sig) = 104 bytes
-        // Legacy format: 32 (pub) + 64 (sig) = 96 bytes (no timestamp — replay-vulnerable)
-        if (payload == null) {
+        if (payload == null || payload.length != HELLO_PAYLOAD_LENGTH) {
             return false;
         }
-        if (payload.length == 104) {
-            return verifyHelloWithTimestamp(connectionId, payload);
-        }
-        // Legacy 96-byte format: accept but log (backward compat).
-        if (payload.length == 96) {
-            return verifyLegacyHello(connectionId, payload);
-        }
-        return false;
-    }
-
-    private static boolean verifyHelloWithTimestamp(long connectionId, byte[] payload) {
         byte[] pub = Arrays.copyOfRange(payload, 0, 32);
         long timestamp = readLongBE(payload, 32);
         byte[] sig = Arrays.copyOfRange(payload, 40, 104);
 
-        // Reject stale HELLOs to prevent replay.
         long now = System.currentTimeMillis() / 1000L;
         long diff = now - timestamp;
         long skew = diff >= 0 ? diff : -diff;
@@ -68,14 +56,6 @@ final class RudpAuth {
         writeLongBE(message, 0, connectionId);
         writeLongBE(message, 8, timestamp);
 
-        return verifySignature(pub, sig, message);
-    }
-
-    private static boolean verifyLegacyHello(long connectionId, byte[] payload) {
-        byte[] pub = Arrays.copyOfRange(payload, 0, 32);
-        byte[] sig = Arrays.copyOfRange(payload, 32, 96);
-        byte[] message = new byte[8];
-        writeLongBE(message, 0, connectionId);
         return verifySignature(pub, sig, message);
     }
 
@@ -101,13 +81,12 @@ final class RudpAuth {
         long timestamp = System.currentTimeMillis() / 1000L;
         Signature signer = Signature.getInstance("Ed25519");
         signer.initSign(identity.ed25519().getPrivate());
-        // Signed message: connectionId (8 bytes) || timestamp (8 bytes)
         byte[] message = new byte[16];
         writeLongBE(message, 0, connectionId);
         writeLongBE(message, 8, timestamp);
         signer.update(message);
         byte[] sig = signer.sign();
-        byte[] out = new byte[32 + 8 + 64]; // pub + timestamp + sig
+        byte[] out = new byte[HELLO_PAYLOAD_LENGTH];
         System.arraycopy(identity.ed25519PubRaw(), 0, out, 0, 32);
         writeLongBE(out, 32, timestamp);
         System.arraycopy(sig, 0, out, 40, 64);
