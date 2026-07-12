@@ -190,6 +190,35 @@ class DistributedSearchPerformerTest {
   }
 
   @Test
+  void performAcceptsResponseDeliveredDuringSend() throws Exception {
+    IdentityKeys peerKeys = IdentityKeys.generate();
+    PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
+    FakeTransport transport = new FakeTransport();
+    transport.addResponse(peerKeys.ed25519PubRaw(), peerKeys, "peer ubuntu", 200L, 1);
+    transport.deliverResponsesSynchronously();
+
+    RecordingListener listener = new RecordingListener();
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            2L,
+            "ubuntu",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(),
+            transport,
+            5,
+            50,
+            25,
+            1);
+    performer.setListener(listener);
+
+    performer.perform();
+
+    assertEquals(1, listener.results.get(0).size());
+    assertEquals("peer ubuntu", listener.results.get(0).get(0).getDisplayName());
+  }
+
+  @Test
   void performDeduplicatesByInfoHash() throws Exception {
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     LocalSharedTorrent local = torrent("local ubuntu", 100L, 1);
@@ -572,6 +601,11 @@ class DistributedSearchPerformerTest {
     private final Map<String, RelaySearchService> services = new ConcurrentHashMap<>();
     private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     final List<RemoteSearchRequest> sentRequests = new CopyOnWriteArrayList<>();
+    private boolean deliverResponsesSynchronously;
+
+    void deliverResponsesSynchronously() {
+      deliverResponsesSynchronously = true;
+    }
 
     void addResponse(byte[] peerPub, IdentityKeys signer, String name, long size, int fileCount) {
       responses.put(
@@ -605,7 +639,7 @@ class DistributedSearchPerformerTest {
     }
 
     @Override
-    public boolean send(byte[] targetPub, byte[] payload) {
+    public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
       RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
       if (request != null) {
         sentRequests.add(request);
@@ -619,30 +653,32 @@ class DistributedSearchPerformerTest {
       if (request == null) {
         return false;
       }
-      // Deliver the response asynchronously to mimic the real transport.
-      Thread t =
-          new Thread(
-              () -> {
-                try {
-                  byte[] responseBytes;
-                  if (svc != null) {
-                    Optional<RemoteSearchResponse> response = svc.handle(request);
-                    if (response.isEmpty()) {
-                      return;
-                    }
-                    responseBytes = SearchPayloadCodec.encodeResponse(response.get());
-                  } else {
-                    RemoteSearchResponse response = pr.signFor(request);
-                    responseBytes = SearchPayloadCodec.encodeResponse(response);
-                  }
-                  for (PayloadListener l : listeners) {
-                    l.onPayload(targetPub, responseBytes, System.currentTimeMillis());
-                  }
-                } catch (Exception e) {
-                  // swallow — fail-closed
+      Runnable deliverResponse =
+          () -> {
+            try {
+              byte[] responseBytes;
+              if (svc != null) {
+                Optional<RemoteSearchResponse> response = svc.handle(request);
+                if (response.isEmpty()) {
+                  return;
                 }
-              },
-              "fake-transport-" + key.substring(0, 8));
+                responseBytes = SearchPayloadCodec.encodeResponse(response.get());
+              } else {
+                RemoteSearchResponse response = pr.signFor(request);
+                responseBytes = SearchPayloadCodec.encodeResponse(response);
+              }
+              for (PayloadListener l : listeners) {
+                l.onPayload(targetPub, responseBytes, System.currentTimeMillis());
+              }
+            } catch (Exception e) {
+              // swallow — fail-closed
+            }
+          };
+      if (deliverResponsesSynchronously) {
+        deliverResponse.run();
+        return true;
+      }
+      Thread t = new Thread(deliverResponse, "fake-transport-" + key.substring(0, 8));
       t.setDaemon(true);
       t.start();
       return true;

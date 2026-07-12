@@ -135,7 +135,7 @@ class DistributedSearchEngineWireTest {
     /** Minimal no-op transport for wiring tests. */
     private static final class NoopTransport implements DistributedSearchTransport {
         @Override
-        public boolean send(byte[] targetPub, byte[] payload) {
+        public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
             return false;
         }
 

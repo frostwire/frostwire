@@ -91,13 +91,23 @@ class IceBridgeClientTest {
     void sendAndPollRoundTrip() {
         byte[] targetPub = identity.ed25519PubRaw();
         byte[] payload = "search query".getBytes(StandardCharsets.UTF_8);
-        assertTrue(client.send(targetPub, payload));
-
-        inboundQueue.onMessage(targetPub, payload);
+        inboundQueue.onMessage(targetPub,
+                com.frostwire.search.relay.icebridge.MeshEnvelope.encodeForWire(
+                        com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload));
         List<IceBridgeClient.InboundMessage> messages = client.poll(10);
         assertEquals(1, messages.size());
         assertArrayEquals(targetPub, messages.get(0).sourcePub());
         assertArrayEquals(payload, messages.get(0).payload());
+        assertEquals(com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH,
+                messages.get(0).protocolId());
+    }
+
+    @Test
+    void barePayloadIsDroppedByInboundQueue() {
+        byte[] source = identity.ed25519PubRaw();
+        inboundQueue.onMessage(source, "not-framed".getBytes(StandardCharsets.UTF_8));
+        List<IceBridgeClient.InboundMessage> messages = client.poll(10);
+        assertTrue(messages.isEmpty());
     }
 
     @Test

@@ -152,8 +152,11 @@ class ControlServerTest {
     @Test
     void pollRetrievesInboundMessages() throws Exception {
         String pubB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(identity.ed25519PubRaw());
-        String payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString("hello".getBytes(StandardCharsets.UTF_8));
-        inboundQueue.onMessage(identity.ed25519PubRaw(), "hello".getBytes(StandardCharsets.UTF_8));
+        byte[] appPayload = "hello".getBytes(StandardCharsets.UTF_8);
+        String payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(appPayload);
+        inboundQueue.onMessage(identity.ed25519PubRaw(),
+                com.frostwire.search.relay.icebridge.MeshEnvelope.encodeForWire(
+                        com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, appPayload));
 
         HttpResponse<String> response = get("/poll?count=10");
         assertEquals(200, response.statusCode());

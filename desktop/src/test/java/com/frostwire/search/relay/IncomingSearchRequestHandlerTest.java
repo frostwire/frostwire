@@ -278,7 +278,7 @@ class IncomingSearchRequestHandlerTest {
     }
 
     @Override
-    public boolean send(byte[] targetPub, byte[] payload) {
+    public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
       sent.add(new SentPayload(targetPub, payload));
       return true;
     }

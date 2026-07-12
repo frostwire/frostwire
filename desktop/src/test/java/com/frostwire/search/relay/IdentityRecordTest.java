@@ -145,25 +145,38 @@ class IdentityRecordTest {
   }
 
   @Test
-  void backwardCompatV1RecordParsesWithDefaults() throws Exception {
+  void rejectsUnsupportedIdentityVersion() throws Exception {
     KeyPair kp = ed25519();
-    java.util.Map<String, Object> v1Map = new java.util.TreeMap<>();
-    IdentityRecord v2Record =
+    IdentityRecord record =
         IdentityRecord.createSigned(randomBytes(20), kp, randomBytes(32), 49152);
-    java.util.Map<String, Entry> v2Dict = v2Record.toEntry().dictionary();
-    v1Map.put("ed25519_pub", new Entry(v2Dict.get("ed25519_pub").string()));
-    v1Map.put("first_seen", new Entry(v2Dict.get("first_seen").integer()));
-    v1Map.put("last_seen", new Entry(v2Dict.get("last_seen").integer()));
-    v1Map.put("node_id", new Entry(v2Dict.get("node_id").string()));
-    v1Map.put("utp_port", new Entry(49152L));
-    v1Map.put("v", new Entry(1L));
-    v1Map.put("x25519_pub", new Entry(v2Dict.get("x25519_pub").string()));
-    v1Map.put("sig", new Entry(v2Dict.get("sig").string()));
-    Entry v1Entry = Entry.fromMap(v1Map);
-    IdentityRecord parsed = IdentityRecord.fromEntry(v1Entry);
-    assertEquals(49152, parsed.utpPort());
-    assertEquals(0, parsed.rudpPort());
-    assertEquals("BOTH", parsed.role());
+    java.util.Map<String, Entry> dict = record.toEntry().dictionary();
+    java.util.Map<String, Object> map = new java.util.TreeMap<>();
+    map.put("caps", new Entry(dict.get("caps").integer()));
+    map.put("ed25519_pub", new Entry(dict.get("ed25519_pub").string()));
+    map.put("first_seen", new Entry(dict.get("first_seen").integer()));
+    map.put("last_seen", new Entry(dict.get("last_seen").integer()));
+    map.put("node_id", new Entry(dict.get("node_id").string()));
+    map.put("rudp_port", new Entry(dict.get("rudp_port").integer()));
+    map.put("role", new Entry(dict.get("role").string()));
+    map.put("sig", new Entry(dict.get("sig").string()));
+    map.put("utp_port", new Entry(dict.get("utp_port").integer()));
+    map.put("v", new Entry(1L));
+    map.put("x25519_pub", new Entry(dict.get("x25519_pub").string()));
+    assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromEntry(Entry.fromMap(map)));
+  }
+
+  @Test
+  void v3RecordAdvertisesCapabilities() throws Exception {
+    KeyPair kp = ed25519();
+    IdentityRecord record = IdentityRecord.createSigned(
+            randomBytes(20), kp, randomBytes(32), 6888, 6889, "FORWARDER",
+            NodeCapabilities.DEFAULT_FORWARDER);
+    assertEquals(3, record.version());
+    assertTrue(NodeCapabilities.has(record.capabilities(), NodeCapabilities.RELAY));
+    assertFalse(NodeCapabilities.has(record.capabilities(), NodeCapabilities.SEARCH));
+    IdentityRecord parsed = IdentityRecord.fromEntry(record.toEntry());
+    assertEquals(record.capabilities(), parsed.capabilities());
+    assertTrue(parsed.verifySignature());
   }
 
   @Test
