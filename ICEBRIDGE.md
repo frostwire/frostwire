@@ -13,7 +13,7 @@
 | Node identity, mesh rUDP, NAT/hole-punch, roles | Signed search request/response schemas |
 | Control API (`/send`, `/poll`, …) | LocalIndex, karma, Search UI engines |
 | DHT announce so **pure forwarders are discoverable** | Happens to *use* IceBridge as transport |
-| Protocol-agnostic opaque payloads | One of possibly many app protocols |
+| Protocol-agnostic opaque payloads (+ optional `protocolId` / IBP1) | One of possibly many app protocols (SEARCH=1) |
 
 FrostWire desktop/Android are **clients and optional co-located nodes** of that network. A cloud `FORWARDER` must be fully useful **without** any FrostWire GUI process.
 
@@ -189,5 +189,6 @@ In-process IceBridge (no subprocess). Wired via `AndroidRelayStack`. Real-device
 ## Related docs
 
 - `DESIGN_RELAY_REGISTRY.md` — design + evolutionary record  
+- `ICEBRIDGE_ARCHITECTURE_REVIEW.md` — north-star layering review + implementation status matrix  
 - `desktop/ICEBRIDGE_REVISION_PLAN.md` — 2026-07 review findings and task waves  
 - Skills: `skills/frostwire-engineer`, `skills/frostwire-code-reviewer` (§12 IceBridge)

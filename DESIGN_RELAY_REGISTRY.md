@@ -2,6 +2,7 @@
 
 > **Note (2026)**: Evolutionary record. Hybrid identity (direct TCP) + IceBridge rUDP is implemented.
 > Operator guide: `ICEBRIDGE.md`. Revision plan: `desktop/ICEBRIDGE_REVISION_PLAN.md`.
+> Architecture north-star (external review + status matrix): `ICEBRIDGE_ARCHITECTURE_REVIEW.md`.
 
 > **IceBridge** is an **independent, protocol-agnostic relay network** (mesh + discovery + identity
 > handshake). **FrostWire Distributed Search** is one application that rides on IceBridge; IceBridge
@@ -182,7 +183,7 @@ Config sources (all supported):
 - For remote use from desktop: the control URL + one bearer token.
 
 **Auth tokens** (control API):
-- Single `--auth-token` still supported (legacy / local child).
+- Single `--auth-token` still supported (local child process).
 - Preferred: `ICEBRIDGE_AUTH_TOKENS_FILE` (default `icebridge-tokens.txt`). One token per line.
 - `--generate-token` command: prints exactly one new secure token to stdout (for admin to hand to a user), appends it to the tokens file with timestamp comment. Tokens are hot-reloaded on every auth check — no restart needed.
 - Header: `X-IceBridge-Token`.

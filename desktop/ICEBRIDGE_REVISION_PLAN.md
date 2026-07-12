@@ -153,6 +153,8 @@ Sub-agents **must**:
 
 User decision: IceBridge is a **protocol-agnostic independent relay network**; FrostWire distributed search is only a consumer. Standalone DHT announce is **not** future polish.
 
+North-star write-up (messaging fabric, capabilities, streaming search, control/data plane): see repo-root `ICEBRIDGE_ARCHITECTURE_REVIEW.md`.
+
 | Task ID | Work | Status |
 |---------|------|--------|
 | **M-DHT-1** | `IceBridgeDhtSession` minimal DHT SessionManager | **Done** |
