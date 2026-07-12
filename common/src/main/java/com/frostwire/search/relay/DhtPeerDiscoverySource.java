@@ -87,7 +87,16 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
     private static void addEndpoints(ArrayList<TcpEndpoint> endpoints,
                                      List<DiscoveredEndpoint> result,
                                      java.util.Set<String> seen) {
-        for (TcpEndpoint ep : endpoints) {
+        if (endpoints == null || endpoints.isEmpty()) {
+            return;
+        }
+        // Snapshot before iterating — live DHT lists can change mid-walk and
+        // ArrayList's iterator throws ConcurrentModificationException.
+        TcpEndpoint[] snapshot = endpoints.toArray(new TcpEndpoint[0]);
+        for (TcpEndpoint ep : snapshot) {
+            if (ep == null) {
+                continue;
+            }
             String host = ep.address() == null ? null : ep.address().toString();
             int port = ep.port();
             if (host == null || host.isEmpty() || port <= 0) {
@@ -98,6 +107,15 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
                 result.add(new DiscoveredEndpoint(host, port));
             }
         }
+    }
+
+    /**
+     * Package-private helper for unit tests of concurrent-safe collection.
+     */
+    static List<DiscoveredEndpoint> collectEndpointsForTest(ArrayList<TcpEndpoint> endpoints) {
+        List<DiscoveredEndpoint> result = new ArrayList<>();
+        addEndpoints(endpoints, result, new java.util.HashSet<>());
+        return result;
     }
 
     @Override

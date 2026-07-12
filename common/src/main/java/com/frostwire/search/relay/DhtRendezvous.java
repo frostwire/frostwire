@@ -90,6 +90,20 @@ public final class DhtRendezvous {
         if (timeoutSeconds <= 0) {
             throw new IllegalArgumentException("timeoutSeconds must be > 0");
         }
-        return session.dhtGetPeers(topic, timeoutSeconds);
+        ArrayList<TcpEndpoint> peers = session.dhtGetPeers(topic, timeoutSeconds);
+        if (peers == null || peers.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // Snapshot: jlibtorrent alert threads may mutate a live list after return.
+        // toArray() does not fail-fast on concurrent structural changes the way
+        // an Iterator does (which surfaces ConcurrentModificationException).
+        TcpEndpoint[] snapshot = peers.toArray(new TcpEndpoint[0]);
+        ArrayList<TcpEndpoint> copy = new ArrayList<>(snapshot.length);
+        for (TcpEndpoint ep : snapshot) {
+            if (ep != null) {
+                copy.add(ep);
+            }
+        }
+        return copy;
     }
 }
