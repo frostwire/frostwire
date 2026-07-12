@@ -31,7 +31,10 @@ import java.util.TreeMap;
  * {@link #toCanonicalEntry()}, which is the full record without {@code sig}.
  */
 public final class IdentityRecord {
-    /** Wire version (capabilities + rudp/role fields). */
+    /**
+     * Current write version (includes caps). Readers accept v1–v3 so
+     * already-running peers and in-process servers mid-upgrade still verify.
+     */
     public static final int VERSION = 3;
     public static final int NODE_ID_LENGTH = 20;
     public static final int ED25519_PUB_LENGTH = 32;
@@ -172,14 +175,50 @@ public final class IdentityRecord {
     public static IdentityRecord fromEntry(Entry entry) {
         Map<String, Entry> map = entry.dictionary();
         int version = (int) map.get("v").integer();
+        if (version == 1) {
+            IdentityRecord record = new IdentityRecord(
+                    Hex.decode(map.get("node_id").string()),
+                    b64decode(map.get("ed25519_pub").string()),
+                    b64decode(map.get("x25519_pub").string()),
+                    (int) map.get("utp_port").integer(),
+                    0,
+                    "BOTH",
+                    NodeCapabilities.DEFAULT_BOTH,
+                    1,
+                    map.get("first_seen").integer(),
+                    map.get("last_seen").integer(),
+                    b64decode(map.get("sig").string()));
+            if (!record.verifySignature()) {
+                throw new IllegalArgumentException("Invalid identity signature");
+            }
+            return record;
+        }
+        if (version == 2) {
+            String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
+            IdentityRecord record = new IdentityRecord(
+                    Hex.decode(map.get("node_id").string()),
+                    b64decode(map.get("ed25519_pub").string()),
+                    b64decode(map.get("x25519_pub").string()),
+                    (int) map.get("utp_port").integer(),
+                    map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
+                    role,
+                    NodeCapabilities.fromRole(role),
+                    2,
+                    map.get("first_seen").integer(),
+                    map.get("last_seen").integer(),
+                    b64decode(map.get("sig").string()));
+            if (!record.verifySignature()) {
+                throw new IllegalArgumentException("Invalid identity signature");
+            }
+            return record;
+        }
         if (version != VERSION) {
             throw new IllegalArgumentException("Unsupported identity version: " + version);
         }
         String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
-        if (!map.containsKey("caps")) {
-            throw new IllegalArgumentException("identity caps required");
-        }
-        long caps = map.get("caps").integer();
+        long caps = map.containsKey("caps")
+                ? map.get("caps").integer()
+                : NodeCapabilities.fromRole(role);
         IdentityRecord record = new IdentityRecord(
                 Hex.decode(map.get("node_id").string()),
                 b64decode(map.get("ed25519_pub").string()),
@@ -242,16 +281,22 @@ public final class IdentityRecord {
     }
 
     private Map<String, Object> canonicalMap() {
+        // Signature domain must match the wire version that was signed.
+        // v1: no rudp/role/caps. v2: +rudp+role. v3: +caps.
         Map<String, Object> map = new TreeMap<>();
-        map.put("caps", new Entry(capabilities));
         map.put("ed25519_pub", new Entry(b64(ed25519Pub)));
         map.put("first_seen", new Entry(firstSeen));
         map.put("last_seen", new Entry(lastSeen));
         map.put("node_id", new Entry(Hex.encode(nodeId)));
-        map.put("rudp_port", new Entry((long) rudpPort));
-        map.put("role", new Entry(role));
+        if (wireVersion >= 2) {
+            map.put("rudp_port", new Entry((long) rudpPort));
+            map.put("role", new Entry(role));
+        }
+        if (wireVersion >= 3) {
+            map.put("caps", new Entry(capabilities));
+        }
         map.put("utp_port", new Entry((long) utpPort));
-        map.put("v", new Entry((long) VERSION));
+        map.put("v", new Entry((long) wireVersion));
         map.put("x25519_pub", new Entry(b64(x25519Pub)));
         return map;
     }

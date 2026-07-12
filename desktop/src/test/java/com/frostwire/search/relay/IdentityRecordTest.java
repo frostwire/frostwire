@@ -145,7 +145,41 @@ class IdentityRecordTest {
   }
 
   @Test
-  void rejectsUnsupportedIdentityVersion() throws Exception {
+  void readsV2IdentityRecords() throws Exception {
+    KeyPair kp = ed25519();
+    byte[] nodeId = randomBytes(20);
+    byte[] x25519 = randomBytes(32);
+    byte[] rawEd = IdentityRecord.extractRawEd25519(kp.getPublic());
+    long now = java.time.Instant.now().getEpochSecond();
+    java.util.Map<String, Object> canonical = new java.util.TreeMap<>();
+    canonical.put("ed25519_pub", new Entry(java.util.Base64.getEncoder().withoutPadding()
+            .encodeToString(rawEd)));
+    canonical.put("first_seen", new Entry(now));
+    canonical.put("last_seen", new Entry(now));
+    canonical.put("node_id", new Entry(com.frostwire.util.Hex.encode(nodeId)));
+    canonical.put("rudp_port", new Entry(6889L));
+    canonical.put("role", new Entry("BOTH"));
+    canonical.put("utp_port", new Entry(6888L));
+    canonical.put("v", new Entry(2L));
+    canonical.put("x25519_pub", new Entry(java.util.Base64.getEncoder().withoutPadding()
+            .encodeToString(x25519)));
+    byte[] toSign = Entry.fromMap(canonical).bencode();
+    java.security.Signature signer = java.security.Signature.getInstance("Ed25519");
+    signer.initSign(kp.getPrivate());
+    signer.update(toSign);
+    java.util.Map<String, Object> v2Map = new java.util.TreeMap<>(canonical);
+    v2Map.put("sig", new Entry(java.util.Base64.getEncoder().withoutPadding()
+            .encodeToString(signer.sign())));
+    IdentityRecord parsed = IdentityRecord.fromEntry(Entry.fromMap(v2Map));
+    assertEquals(2, parsed.version());
+    assertEquals(6889, parsed.rudpPort());
+    assertEquals("BOTH", parsed.role());
+    assertTrue(NodeCapabilities.has(parsed.capabilities(), NodeCapabilities.SEARCH));
+    assertTrue(parsed.verifySignature());
+  }
+
+  @Test
+  void rejectsUnknownIdentityVersion() throws Exception {
     KeyPair kp = ed25519();
     IdentityRecord record =
         IdentityRecord.createSigned(randomBytes(20), kp, randomBytes(32), 49152);
@@ -160,7 +194,7 @@ class IdentityRecordTest {
     map.put("role", new Entry(dict.get("role").string()));
     map.put("sig", new Entry(dict.get("sig").string()));
     map.put("utp_port", new Entry(dict.get("utp_port").integer()));
-    map.put("v", new Entry(1L));
+    map.put("v", new Entry(99L));
     map.put("x25519_pub", new Entry(dict.get("x25519_pub").string()));
     assertThrows(IllegalArgumentException.class, () -> IdentityRecord.fromEntry(Entry.fromMap(map)));
   }
