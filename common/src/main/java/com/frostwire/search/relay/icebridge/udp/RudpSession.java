@@ -26,7 +26,8 @@ final class RudpSession {
     private final long localConnectionId;
     private final long remoteConnectionId;
     private final InetSocketAddress remoteAddress;
-    private final byte[] remotePub;
+    /** Set on inbound HELLO or when HELLO_ACK proves the peer's pub. */
+    private volatile byte[] remotePub;
     private final boolean weAreInitiator;
 
     private volatile long lastActivityMs;
@@ -68,7 +69,21 @@ final class RudpSession {
     }
 
     byte[] remotePub() {
-        return remotePub == null ? null : remotePub.clone();
+        byte[] p = remotePub;
+        return p == null ? null : p.clone();
+    }
+
+    /**
+     * Record the authenticated peer public key (inbound HELLO or HELLO_ACK).
+     * First non-null value wins; subsequent mismatches are ignored.
+     */
+    void setRemotePub(byte[] pub) {
+        if (pub == null || pub.length != 32) {
+            return;
+        }
+        if (this.remotePub == null) {
+            this.remotePub = pub.clone();
+        }
     }
 
     boolean weAreInitiator() {
@@ -156,9 +171,15 @@ final class RudpSession {
                 nextLocalSequence(), receivedThroughRemote.get(), payload);
     }
 
-    /** Prepare a hello ack for an inbound hello. */
-    RudpPacket helloAck() {
+    /**
+     * Prepare a HELLO_ACK carrying this node's signed identity so the
+     * initiator can learn remotePub (same payload shape as HELLO).
+     */
+    RudpPacket helloAck(byte[] signedHelloPayload) {
+        if (signedHelloPayload == null) {
+            signedHelloPayload = new byte[0];
+        }
         return new RudpPacket(RudpPacket.Type.HELLO_ACK, remoteConnectionId,
-                0, 0, new byte[0]);
+                0, 0, signedHelloPayload);
     }
 }
