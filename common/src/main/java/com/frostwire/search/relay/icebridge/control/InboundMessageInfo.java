@@ -19,10 +19,17 @@ public final class InboundMessageInfo {
     public final String payload;
     @SuppressWarnings("unused")
     public final long receivedMs;
+    @SuppressWarnings("unused")
+    public final int protocolId;
 
     public InboundMessageInfo(String sourcePub, String payload, long receivedMs) {
+        this(sourcePub, payload, receivedMs, com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH);
+    }
+
+    public InboundMessageInfo(String sourcePub, String payload, long receivedMs, int protocolId) {
         this.sourcePub = sourcePub;
         this.payload = payload;
         this.receivedMs = receivedMs;
+        this.protocolId = protocolId;
     }
 }

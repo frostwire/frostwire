@@ -100,7 +100,7 @@ public final class IceBridgeTokens {
     }
 
     /**
-     * Add a token for this runtime only (used for legacy --auth-token single value support
+     * Add a token for this runtime only (used for --auth-token / child-process single value
      * in local child launches). Does not persist to disk.
      */
     public synchronized void addRuntimeToken(String token) {

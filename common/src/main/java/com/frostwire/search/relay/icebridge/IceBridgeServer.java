@@ -72,20 +72,20 @@ public final class IceBridgeServer implements AutoCloseable {
         }
 
         IceBridgeConfig config;
-        String legacySingleToken = null;
+        String cliAuthToken = null;
         if (args.length == 0) {
             config = IceBridgeConfig.fromEnv();
         } else {
             config = parseArgs(args);
-            legacySingleToken = parseAuthToken(args);
+            cliAuthToken = parseAuthToken(args);
         }
 
         File tokensFile = resolveAuthTokensFile(args, config);
         IceBridgeTokens authTokens = new IceBridgeTokens(tokensFile);
 
-        if (legacySingleToken != null && !legacySingleToken.isEmpty()) {
-            authTokens.addRuntimeToken(legacySingleToken);
-            LOG.info("Legacy single --auth-token added for this run (prefer the tokens file for persistence and multiple tokens)");
+        if (cliAuthToken != null && !cliAuthToken.isEmpty()) {
+            authTokens.addRuntimeToken(cliAuthToken);
+            LOG.info("CLI --auth-token added for this run (prefer the tokens file for persistence and multiple tokens)");
         }
 
         System.out.println("IceBridge — FrostWire relay servent");
@@ -399,7 +399,7 @@ public final class IceBridgeServer implements AutoCloseable {
     /**
      * Returns a bearer token for co-located clients (local child launcher, in-process
      * Android stack, tests). Provisioning happens in {@link #start()} when the tokens
-     * file is empty; legacy {@code --auth-token} values are added before start.
+     * file is empty; CLI {@code --auth-token} values are added before start.
      */
     public String authToken() {
         if (runtimeAuthToken != null) {

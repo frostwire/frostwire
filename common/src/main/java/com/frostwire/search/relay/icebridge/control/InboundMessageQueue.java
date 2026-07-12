@@ -7,7 +7,9 @@
 
 package com.frostwire.search.relay.icebridge.control;
 
+import com.frostwire.search.relay.icebridge.MeshEnvelope;
 import com.frostwire.search.relay.icebridge.udp.RudpMessageListener;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +17,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * In-memory queue of payloads received over rUDP.
+ * In-memory queue of application payloads received over rUDP.
  *
- * <p>The local FrostWire process polls this queue through the IceBridge control
- * API to collect remote search requests and results.
+ * <p>Unwraps optional {@link MeshEnvelope} framing so the control API
+ * exposes demuxed {@code protocolId} + bare application payload.
  *
- * <p>Uses an {@link AtomicInteger} counter instead of {@link ConcurrentLinkedQueue#size()}
- * (which is O(n)) for overflow checks.
+ * <p>Uses an {@link AtomicInteger} counter instead of
+ * {@link ConcurrentLinkedQueue#size()} (O(n)) for overflow checks.
  */
 public final class InboundMessageQueue implements RudpMessageListener {
 
+    private static final Logger LOG = Logger.getLogger(InboundMessageQueue.class);
     private static final int DEFAULT_MAX_SIZE = 512;
 
     private final ConcurrentLinkedQueue<InboundMessage> queue = new ConcurrentLinkedQueue<>();
@@ -41,6 +44,16 @@ public final class InboundMessageQueue implements RudpMessageListener {
 
     @Override
     public void onMessage(byte[] sourcePub, byte[] payload) {
+        int protocolId;
+        byte[] appPayload;
+        try {
+            MeshEnvelope env = MeshEnvelope.unwrap(payload);
+            protocolId = env.protocolId();
+            appPayload = env.payload();
+        } catch (Throwable t) {
+            LOG.debug("Dropping malformed mesh envelope", t);
+            return;
+        }
         while (count.get() >= maxSize) {
             if (queue.poll() != null) {
                 count.decrementAndGet();
@@ -48,7 +61,7 @@ public final class InboundMessageQueue implements RudpMessageListener {
                 break;
             }
         }
-        queue.offer(new InboundMessage(sourcePub, payload, System.currentTimeMillis()));
+        queue.offer(new InboundMessage(sourcePub, appPayload, System.currentTimeMillis(), protocolId));
         count.incrementAndGet();
     }
 

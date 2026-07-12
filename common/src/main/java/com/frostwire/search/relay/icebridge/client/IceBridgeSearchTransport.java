@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge.client;
 
 import com.frostwire.search.relay.DistributedSearchTransport;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient.InboundMessage;
 import com.frostwire.util.Logger;
 
@@ -19,14 +20,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Bridges the IceBridge HTTP control API to the {@link DistributedSearchTransport}
- * interface used by the DISTRIBUTED search engine.
+ * interface used by application protocols (first consumer: distributed search).
  *
  * <p>Runs a single daemon poller thread that periodically calls
  * {@link IceBridgeClient#poll(int)} and dispatches every received payload to
- * all registered {@link PayloadListener} instances. This ensures that both the
- * {@link DistributedSearchPerformer} (transient, per-search) and the
- * {@link IncomingSearchRequestHandler} (permanent) receive every inbound
- * message without racing each other on the HTTP endpoint.
+ * all registered {@link PayloadListener} instances.
  */
 public final class IceBridgeSearchTransport implements DistributedSearchTransport, AutoCloseable {
 
@@ -59,8 +57,8 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     }
 
     @Override
-    public boolean send(byte[] targetPub, byte[] payload) {
-        return client.send(targetPub, payload);
+    public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
+        return client.send(targetPub, protocolId, payload);
     }
 
     @Override
@@ -86,9 +84,10 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
         try {
             List<InboundMessage> messages = client.poll(64);
             for (InboundMessage msg : messages) {
+                int protocolId = msg.protocolId() == 0 ? MeshProtocolId.SEARCH : msg.protocolId();
                 for (PayloadListener listener : listeners) {
                     try {
-                        listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs());
+                        listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs(), protocolId);
                     } catch (Throwable t) {
                         LOG.warn("Payload listener threw", t);
                     }

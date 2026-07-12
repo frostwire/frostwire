@@ -7,63 +7,61 @@
 
 package com.frostwire.search.relay;
 
-import java.util.List;
-
 /**
  * Transport-agnostic interface for sending and receiving opaque payloads
- * between FrostWire peers.
+ * between peers on the IceBridge mesh (and any local equivalent).
  *
- * <p>The DISTRIBUTED search engine uses this abstraction instead of a concrete
- * TCP or IceBridge client. Implementations run an internal poller thread that
- * feeds registered listeners; callers never poll directly.
+ * <p>Application protocols (distributed search is Protocol #1) ride as opaque
+ * bytes. Prefer {@link #send(byte[], int, byte[])} with an explicit mesh
+ * protocol id for multi-protocol demux.
  *
- * <h2>Listener model</h2>
- * <ul>
- *   <li>{@link #addListener} registers a listener that receives <em>every</em>
- *       inbound payload. Listeners are responsible for filtering by content
- *       (e.g. decoding as a {@link RemoteSearchResponse} and matching nonce).</li>
- *   <li>The {@link IncomingSearchRequestHandler} (desktop) registers a permanent
- *       listener that processes incoming search requests.</li>
- *   <li>The {@link DistributedSearchPerformer} registers a temporary listener
- *       for the duration of a single search, then removes it.</li>
- * </ul>
- *
- * <p>This design keeps the transport purpose-agnostic: it does not understand
- * search protocol messages, nonces, or signatures. Routing logic lives in the
- * listeners.
+ * <p>Implementations run an internal poller thread that feeds registered
+ * listeners; callers never poll directly.
  */
 public interface DistributedSearchTransport {
 
     /**
+     * Send an opaque payload with protocol SEARCH (Protocol #1).
+     */
+    default boolean send(byte[] targetPub, byte[] payload) {
+        return send(targetPub, com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload);
+    }
+
+    /**
      * Send an opaque payload to a peer identified by raw Ed25519 public key.
      *
-     * @param targetPub 32-byte Ed25519 public key of the recipient
-     * @param payload   opaque application payload
+     * @param targetPub  32-byte Ed25519 public key of the recipient
+     * @param protocolId mesh protocol id (see MeshProtocolId)
+     * @param payload    opaque application payload
      * @return {@code true} if the payload was accepted for delivery
      */
-    boolean send(byte[] targetPub, byte[] payload);
+    boolean send(byte[] targetPub, int protocolId, byte[] payload);
 
-    /**
-     * Register a listener that receives every inbound payload on the
-     * transport's internal poller thread.
-     */
     void addListener(PayloadListener listener);
 
-    /**
-     * Remove a previously registered listener.
-     */
     void removeListener(PayloadListener listener);
 
     /**
      * Functional callback for inbound payloads.
+     *
+     * <p>The three-argument form is the SAM for lambdas. Override
+     * {@link #onPayload(byte[], byte[], long, int)} when protocol demux matters.
      */
     @FunctionalInterface
     interface PayloadListener {
         /**
-         * @param sourcePub   raw Ed25519 public key of the sender
-         * @param payload     opaque application payload
-         * @param receivedMs  epoch millis when the transport received the payload
+         * @param sourcePub  raw Ed25519 public key of the sender
+         * @param payload    opaque application payload (envelope demuxed)
+         * @param receivedMs epoch millis when the transport received the payload
          */
         void onPayload(byte[] sourcePub, byte[] payload, long receivedMs);
+
+        /**
+         * Protocol-aware delivery. Default ignores {@code protocolId} and
+         * delegates to {@link #onPayload(byte[], byte[], long)}.
+         */
+        default void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+            onPayload(sourcePub, payload, receivedMs);
+        }
     }
 }

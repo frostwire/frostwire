@@ -158,15 +158,25 @@ public final class IceBridgeClient implements AutoCloseable {
     }
 
     /**
-     * Send an opaque payload to a target peer identified by public key.
+     * Send an opaque payload to a target peer (protocol SEARCH).
      */
     public boolean send(byte[] targetPub, byte[] payload) {
+        return send(targetPub, com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload);
+    }
+
+    /**
+     * Send an opaque application payload under the given mesh protocol id.
+     *
+     * @param protocolId see {@link com.frostwire.search.relay.icebridge.MeshProtocolId}
+     */
+    public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
         if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
             return false;
         }
         SendRequest req = new SendRequest();
         req.targetPub = Base64.getUrlEncoder().withoutPadding().encodeToString(targetPub);
         req.payload = Base64.getUrlEncoder().withoutPadding().encodeToString(payload);
+        req.protocolId = protocolId;
 
         ApiResponse<?> response = post("/send", req, new TypeToken<ApiResponse<?>>() {
         });
@@ -192,7 +202,8 @@ public final class IceBridgeClient implements AutoCloseable {
             out.add(new InboundMessage(
                     decode(info.sourcePub),
                     decode(info.payload),
-                    info.receivedMs));
+                    info.receivedMs,
+                    info.protocolId));
         }
         return out;
     }
@@ -279,11 +290,18 @@ public final class IceBridgeClient implements AutoCloseable {
         private final byte[] sourcePub;
         private final byte[] payload;
         private final long receivedMs;
+        private final int protocolId;
 
         public InboundMessage(byte[] sourcePub, byte[] payload, long receivedMs) {
+            this(sourcePub, payload, receivedMs,
+                    com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH);
+        }
+
+        public InboundMessage(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
             this.sourcePub = sourcePub == null ? new byte[0] : sourcePub.clone();
             this.payload = payload == null ? new byte[0] : payload.clone();
             this.receivedMs = receivedMs;
+            this.protocolId = protocolId;
         }
 
         public byte[] sourcePub() {
@@ -296,6 +314,10 @@ public final class IceBridgeClient implements AutoCloseable {
 
         public long receivedMs() {
             return receivedMs;
+        }
+
+        public int protocolId() {
+            return protocolId;
         }
     }
 }

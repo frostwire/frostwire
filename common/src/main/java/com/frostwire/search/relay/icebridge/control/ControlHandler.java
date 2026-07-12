@@ -11,6 +11,8 @@ import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTokens;
+import com.frostwire.search.relay.icebridge.MeshEnvelope;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
@@ -259,7 +261,16 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         if (payload.length == 0) {
             return ApiResponse.error("payload must not be empty");
         }
-        rudpSessionManager.deliver(targetPub, payload);
+        int protocolId = req.protocolId == null
+                ? MeshProtocolId.SEARCH
+                : MeshProtocolId.effective(req.protocolId);
+        byte[] wire;
+        try {
+            wire = MeshEnvelope.encodeForWire(protocolId, payload);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid envelope: " + e.getMessage());
+        }
+        rudpSessionManager.deliver(targetPub, wire);
         return ApiResponse.success("queued");
     }
 
@@ -280,7 +291,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 .map(m -> new InboundMessageInfo(
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.sourcePub()),
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.payload()),
-                        m.receivedMs()))
+                        m.receivedMs(),
+                        m.protocolId()))
                 .collect(Collectors.toList());
         return ApiResponse.success(result);
     }
