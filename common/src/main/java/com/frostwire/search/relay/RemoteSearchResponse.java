@@ -42,14 +42,25 @@ public final class RemoteSearchResponse {
 
     public static final int VERSION = 1;
 
+    /**
+     * Default max rows per streamed RESULT frame. Full sets larger than this
+     * are split into multiple signed chunks ending with {@code final=true}.
+     */
+    public static final int DEFAULT_STREAM_CHUNK_SIZE = 5;
+
     private final int version;
     private final byte[] nonce;
     private final long timestamp;
     private final List<Row> rows;
     private final byte[] signature;
+    /** Chunk index within a streamed response (0 for a single-frame reply). */
+    private final int chunkIndex;
+    /** True when this is the last frame for the nonce. */
+    private final boolean finalChunk;
 
     private RemoteSearchResponse(int version, byte[] nonce, long timestamp,
-                                 List<Row> rows, byte[] signature) {
+                                 List<Row> rows, byte[] signature,
+                                 int chunkIndex, boolean finalChunk) {
         this.version = version;
         this.nonce = nonce.clone();
         this.timestamp = timestamp;
@@ -61,6 +72,8 @@ public final class RemoteSearchResponse {
                     r.matchedFile));
         }
         this.signature = signature.clone();
+        this.chunkIndex = chunkIndex;
+        this.finalChunk = finalChunk;
     }
 
     public int version() {
@@ -90,15 +103,27 @@ public final class RemoteSearchResponse {
         return signature.clone();
     }
 
+    public int chunkIndex() {
+        return chunkIndex;
+    }
+
+    public boolean isFinalChunk() {
+        return finalChunk;
+    }
+
     public byte[] canonicalBytes() {
         try {
             byte[] rowsHash = sha256(rowsHashBytes());
-            ByteBuffer buf = ByteBuffer.allocate(4 + 4 + nonce.length + 8 + 32);
+            // v|nonce|ts|rows_hash|chunk|final — chunk/final are part of the
+            // signature domain so stream frames cannot be reordered or forged.
+            ByteBuffer buf = ByteBuffer.allocate(4 + 4 + nonce.length + 8 + 32 + 4 + 1);
             buf.putInt(version);
             buf.putInt(nonce.length);
             buf.put(nonce);
             buf.putLong(timestamp);
             buf.put(rowsHash);
+            buf.putInt(chunkIndex);
+            buf.put((byte) (finalChunk ? 1 : 0));
             return buf.array();
         } catch (Exception e) {
             throw new IllegalStateException("SHA-256 unavailable", e);
@@ -189,6 +214,8 @@ public final class RemoteSearchResponse {
             rowMaps.add(row);
         }
         m.put("rows", rowMaps);
+        m.put("chunk", chunkIndex);
+        m.put("final", finalChunk);
         m.put("sig", Base64.getEncoder().withoutPadding()
                 .encodeToString(signature));
         return m;
@@ -216,9 +243,23 @@ public final class RemoteSearchResponse {
             }
             byte[] nonce = Base64.getDecoder().decode((String) nonceObj);
             byte[] sig = Base64.getDecoder().decode((String) sigObj);
+            int chunk = 0;
+            Object chunkObj = m.get("chunk");
+            if (chunkObj instanceof Number) {
+                chunk = ((Number) chunkObj).intValue();
+            }
+            boolean isFinal = true;
+            Object finalObj = m.get("final");
+            if (finalObj instanceof Boolean) {
+                isFinal = (Boolean) finalObj;
+            } else if (finalObj instanceof Number) {
+                isFinal = ((Number) finalObj).intValue() != 0;
+            }
             RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
                     .nonce(nonce)
                     .timestamp(((Number) tsObj).longValue())
+                    .chunkIndex(chunk)
+                    .finalChunk(isFinal)
                     .signature(sig);
             if (rowsObj instanceof List) {
                 List<?> rlist = (List<?>) rowsObj;
@@ -302,6 +343,8 @@ public final class RemoteSearchResponse {
         private long timestamp;
         private List<Row> rows = new ArrayList<>();
         private byte[] signature;
+        private int chunkIndex = 0;
+        private boolean finalChunk = true;
 
         public Builder nonce(byte[] nonce) {
             this.nonce = nonce;
@@ -310,6 +353,16 @@ public final class RemoteSearchResponse {
 
         public Builder timestamp(long timestamp) {
             this.timestamp = timestamp;
+            return this;
+        }
+
+        public Builder chunkIndex(int chunkIndex) {
+            this.chunkIndex = Math.max(0, chunkIndex);
+            return this;
+        }
+
+        public Builder finalChunk(boolean finalChunk) {
+            this.finalChunk = finalChunk;
             return this;
         }
 
@@ -344,7 +397,8 @@ public final class RemoteSearchResponse {
             if (signature == null || signature.length != 64) {
                 throw new IllegalStateException("signature must be 64 bytes");
             }
-            return new RemoteSearchResponse(version, nonce, timestamp, rows, signature);
+            return new RemoteSearchResponse(version, nonce, timestamp, rows, signature,
+                    chunkIndex, finalChunk);
         }
     }
 }

@@ -189,7 +189,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             }
             // Identity TCP port unknown from mesh registry; use rUDP port as
             // contact hint. Search uses peerPub + rudpPort via IceBridge.
-            // utpPort stores the legacy "identity" port slot — prefer rudp for mesh.
+            // utpPort is the identity-plane port slot; prefer rudp for mesh data.
             directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort);
             client.route(pub, info.host, info.rudpPort,
                     info.role != null ? info.role : IceBridgeConfig.Role.BOTH);

@@ -154,7 +154,17 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 return;
             }
 
-            List<PeerDirectory.PeerInfo> peers = peerDirectory.topByTrustVerified(maxPeers);
+            // Prefer peers that advertise SEARCH/INDEX, then rank by keyspace
+            // XOR distance so eventual responsibility routing has a foundation.
+            List<PeerDirectory.PeerInfo> peers =
+                    peerDirectory.topByTrustVerified(maxPeers * 3, NodeCapabilities.SEARCH);
+            if (peers.isEmpty()) {
+                peers = peerDirectory.topByTrustVerified(maxPeers);
+            }
+            peers = KeyspaceRouter.rankByKeyspace(keywords, peers);
+            if (peers.size() > maxPeers) {
+                peers = peers.subList(0, maxPeers);
+            }
             if (!peers.isEmpty()) {
                 merged.addAll(queryPeers(peers));
             }
@@ -255,21 +265,32 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     if (response == null) {
                         return;
                     }
-                    PendingRequest req = pending.remove(Hex.encode(response.nonce()));
+                    String nonceKey = Hex.encode(response.nonce());
+                    PendingRequest req = pending.get(nonceKey);
                     if (req == null) {
-                        return; // not our response
+                        return; // not our response / already completed
                     }
-                    // Always count down — whether verification succeeds or
-                    // fails, this peer has "responded" and we should not
-                    // wait the full timeout for them.
-                    if (SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
-                        try {
-                            results.addAll(toResults(response));
-                        } catch (Throwable t) {
-                            LOG.debug("Failed to convert search response rows", t);
+                    if (!SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
+                        // Bad frame: drop but keep waiting for a good final
+                        // or timeout unless this claimed to be final.
+                        if (response.isFinalChunk()) {
+                            if (pending.remove(nonceKey, req)) {
+                                latch.countDown();
+                            }
+                        }
+                        return;
+                    }
+                    try {
+                        results.addAll(toResults(response));
+                    } catch (Throwable t) {
+                        LOG.debug("Failed to convert search response rows", t);
+                    }
+                    // Stream: only complete the peer when final=true. Intermediate RESULT chunks accumulate.
+                    if (response.isFinalChunk()) {
+                        if (pending.remove(nonceKey, req)) {
+                            latch.countDown();
                         }
                     }
-                    latch.countDown();
                 };
 
         transport.addListener(responseListener);
@@ -282,10 +303,11 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 try {
                     RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit);
                     byte[] payload = SearchPayloadCodec.encodeRequest(request);
-                    if (transport.send(peer.peerPub(), payload)) {
-                        pending.put(Hex.encode(request.nonce()),
-                                new PendingRequest(peer, request));
-                    } else {
+                    String nonce = Hex.encode(request.nonce());
+                    pending.put(nonce, new PendingRequest(peer, request));
+                    if (!transport.send(peer.peerPub(),
+                            com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload)) {
+                        pending.remove(nonce);
                         latch.countDown(); // send failed — no response expected
                     }
                 } catch (Throwable t) {

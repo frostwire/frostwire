@@ -18,6 +18,7 @@ import com.frostwire.search.relay.RemoteIndexFetcher;
 import com.frostwire.search.relay.RemoteSearchRequest;
 import com.frostwire.search.relay.RemoteSearchResponse;
 import com.frostwire.search.relay.SearchPayloadCodec;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
@@ -123,6 +124,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     @Override
     public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs) {
+        onPayload(sourcePub, payload, receivedMs, MeshProtocolId.SEARCH);
+    }
+
+    @Override
+    public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+        // Only Protocol #1 (search) is handled here; other protocols are ignored.
+        if (MeshProtocolId.effective(protocolId) != MeshProtocolId.SEARCH) {
+            return;
+        }
         RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
         if (request != null) {
             handleSearchRequest(request, sourcePub);
@@ -144,8 +154,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             if (response.isEmpty()) {
                 return;
             }
-            byte[] responseBytes = SearchPayloadCodec.encodeResponse(response.get());
-            transport.send(request.requesterPub(), responseBytes);
+            sendSearchResponse(request.requesterPub(), response.get());
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process request", t);
         }
@@ -158,6 +167,58 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 forwardRequest(request, sourcePub);
             } catch (Throwable t) {
                 LOG.debug("IncomingSearchRequestHandler forwarding failed", t);
+            }
+        }
+    }
+
+    /**
+     * Stream large result sets as signed RESULT chunks ending with
+     * {@code final=true}. Small sets stay a single frame.
+     */
+    private void sendSearchResponse(byte[] requesterPub, RemoteSearchResponse full) {
+        List<RemoteSearchResponse.Row> rows = full.rows();
+        int chunkSize = RemoteSearchResponse.DEFAULT_STREAM_CHUNK_SIZE;
+        if (rows.size() <= chunkSize || identity == null) {
+            byte[] responseBytes = SearchPayloadCodec.encodeResponse(full);
+            if (!transport.send(requesterPub, MeshProtocolId.SEARCH, responseBytes)) {
+                LOG.warn("Could not route search response to requester "
+                        + Hex.encode(requesterPub));
+            }
+            return;
+        }
+        int total = rows.size();
+        int chunks = (total + chunkSize - 1) / chunkSize;
+        long ts = full.timestamp();
+        byte[] nonce = full.nonce();
+        for (int i = 0; i < chunks; i++) {
+            int from = i * chunkSize;
+            int to = Math.min(from + chunkSize, total);
+            boolean isFinal = i == chunks - 1;
+            try {
+                RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
+                        .nonce(nonce)
+                        .timestamp(ts)
+                        .chunkIndex(i)
+                        .finalChunk(isFinal);
+                for (int r = from; r < to; r++) {
+                    RemoteSearchResponse.Row row = rows.get(r);
+                    b.addRow(row.infoHash, row.name, row.sizeBytes, row.fileCount,
+                            row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile);
+                }
+                RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
+                Signature signer = Signature.getInstance("Ed25519");
+                signer.initSign(identity.ed25519().getPrivate());
+                signer.update(unsigned.canonicalBytes());
+                RemoteSearchResponse chunk = b.signature(signer.sign()).build();
+                byte[] bytes = SearchPayloadCodec.encodeResponse(chunk);
+                if (!transport.send(requesterPub, MeshProtocolId.SEARCH, bytes)) {
+                    LOG.warn("Could not route search chunk " + i + " to "
+                            + Hex.encode(requesterPub));
+                    return;
+                }
+            } catch (Throwable t) {
+                LOG.debug("Failed to stream search chunk " + i, t);
+                return;
             }
         }
     }
