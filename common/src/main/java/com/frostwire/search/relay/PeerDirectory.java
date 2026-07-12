@@ -111,10 +111,45 @@ public final class PeerDirectory {
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry existing = entries.get(key);
         int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
+        long caps = existing != null ? existing.capabilities : NodeCapabilities.DEFAULT_PEER;
         entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
-                System.currentTimeMillis(), 0L, false, verified));
+                System.currentTimeMillis(), 0L, false, verified, caps));
         evictIfNeeded();
         version.incrementAndGet();
+    }
+
+    /**
+     * Upsert a verified peer with explicit capability bitflags.
+     */
+    public void upsertVerified(byte[] peerPub, String hostname, int utpPort, int rudpPort,
+                               long capabilities) {
+        if (peerPub == null || peerPub.length != 32) {
+            throw new IllegalArgumentException("peerPub must be 32 bytes");
+        }
+        if (hostname == null) {
+            throw new IllegalArgumentException("hostname is null");
+        }
+        String key = com.frostwire.util.Hex.encode(peerPub);
+        Entry existing = entries.get(key);
+        int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
+        entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
+                System.currentTimeMillis(), 0L, false, true, capabilities));
+        evictIfNeeded();
+        version.incrementAndGet();
+    }
+
+    /**
+     * Update only the capability bitflags for a known peer.
+     */
+    public void setCapabilities(byte[] peerPub, long capabilities) {
+        if (peerPub == null || peerPub.length != 32) {
+            return;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        if (e != null) {
+            e.capabilities = capabilities;
+            version.incrementAndGet();
+        }
     }
 
     /**
@@ -133,7 +168,8 @@ public final class PeerDirectory {
         Entry e = entries.get(key);
         if (e == null) {
             // Implicit registration: target becomes a known peer with no hostname.
-            e = new Entry(targetPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false);
+            e = new Entry(targetPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false,
+                    NodeCapabilities.NONE);
             entries.put(key, e);
         }
         e.addEndorser(endorserPub);
@@ -153,7 +189,8 @@ public final class PeerDirectory {
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry e = entries.get(key);
         if (e == null) {
-            e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, true, false);
+            e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, true, false,
+                    NodeCapabilities.NONE);
             entries.put(key, e);
         } else {
             e.spam = true;
@@ -240,8 +277,7 @@ public final class PeerDirectory {
         if (e == null) {
             return Optional.empty();
         }
-        return Optional.of(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
-                e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
+        return Optional.of(toPeerInfo(e));
     }
 
     /**
@@ -249,21 +285,27 @@ public final class PeerDirectory {
      * Unverified placeholder entries are excluded.
      */
     public List<PeerInfo> topByTrustVerified(int limit) {
+        return topByTrustVerified(limit, NodeCapabilities.NONE);
+    }
+
+    /**
+     * Verified peers with at least {@code requiredCaps} capability flags set.
+     * Pass {@link NodeCapabilities#NONE} to skip capability filtering.
+     */
+    public List<PeerInfo> topByTrustVerified(int limit, long requiredCaps) {
         if (limit <= 0) {
             throw new IllegalArgumentException("limit must be > 0");
         }
         List<Entry> snapshot = new ArrayList<>();
         for (Entry e : entries.values()) {
-            if (e.verified) {
+            if (e.verified && NodeCapabilities.has(e.capabilities, requiredCaps)) {
                 snapshot.add(e);
             }
         }
         snapshot.sort((a, b) -> Double.compare(trustScore(b.peerPub), trustScore(a.peerPub)));
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
-            Entry e = snapshot.get(i);
-            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
-                    e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
+            out.add(toPeerInfo(snapshot.get(i)));
         }
         return out;
     }
@@ -277,11 +319,14 @@ public final class PeerDirectory {
         snapshot.sort((a, b) -> Double.compare(trustScore(b.peerPub), trustScore(a.peerPub)));
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
-            Entry e = snapshot.get(i);
-            out.add(new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
-                    e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified));
+            out.add(toPeerInfo(snapshot.get(i)));
         }
         return out;
+    }
+
+    private static PeerInfo toPeerInfo(Entry e) {
+        return new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
+                e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified, e.capabilities);
     }
 
     public int size() {
@@ -330,10 +375,11 @@ public final class PeerDirectory {
         long localKarmaDelta;
         boolean spam;
         boolean verified;
+        long capabilities;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
         Entry(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
-              long localKarmaDelta, boolean spam, boolean verified) {
+              long localKarmaDelta, boolean spam, boolean verified, long capabilities) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
@@ -342,6 +388,7 @@ public final class PeerDirectory {
             this.localKarmaDelta = localKarmaDelta;
             this.spam = spam;
             this.verified = verified;
+            this.capabilities = capabilities;
         }
 
         void addEndorser(byte[] endorserPub) {
@@ -359,9 +406,16 @@ public final class PeerDirectory {
         private final int endorserCount;
         private final boolean spam;
         private final boolean verified;
+        private final long capabilities;
 
         PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
                  int endorserCount, boolean spam, boolean verified) {
+            this(peerPub, hostname, utpPort, rudpPort, lastUpdatedMs, endorserCount, spam, verified,
+                    NodeCapabilities.DEFAULT_PEER);
+        }
+
+        PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
+                 int endorserCount, boolean spam, boolean verified, long capabilities) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
@@ -370,6 +424,7 @@ public final class PeerDirectory {
             this.endorserCount = endorserCount;
             this.spam = spam;
             this.verified = verified;
+            this.capabilities = capabilities;
         }
 
         public byte[] peerPub() {
@@ -402,6 +457,10 @@ public final class PeerDirectory {
 
         public boolean isVerified() {
             return verified;
+        }
+
+        public long capabilities() {
+            return capabilities;
         }
     }
 }

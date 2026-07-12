@@ -144,10 +144,8 @@ public final class IdentityKeys {
      * leading zero bits) and persist it. The file parent directory is
      * created if missing.
      *
-     * <p>Migration: if an existing identity does not meet the PoW
-     * difficulty, it is accepted as-is. PoW is enforced on new identity
-     * creation only; legacy identities from before the PoW feature
-     * continue to work.
+     * <p>If an existing identity does not meet the PoW difficulty, it is
+     * accepted as-is. PoW is enforced on new identity creation only.
      */
     public static IdentityKeys loadOrCreate(File file) throws IOException, GeneralSecurityException {
         if (file == null) {
