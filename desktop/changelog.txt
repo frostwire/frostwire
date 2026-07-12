@@ -1,4 +1,10 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:IceBridge multi-protocol fabric — all mesh payloads IBP1-framed with protocolId on /send and /poll (SEARCH=1)
+  - new:Node capability advertisement — IdentityRecord v3 caps bitflags (RELAY/SEARCH/INDEX/STORE/DHT/TORRENT/AI); PeerDirectory filters by capability; roles still derived for DHT topics
+  - new:Streaming distributed search responses — RESULT chunks with final flag; large result sets stream multiple signed frames; performer accumulates until final
+  - new:KeyspaceRouter ranks peers by XOR distance of SHA-1(keywords) for future responsibility-based routing (search still fans out trust-ordered peers first)
+  - new:ICEBRIDGE_ARCHITECTURE_REVIEW.md north-star layering + implementation status matrix
+  - cleanup:Drop pre-alpha wire shims — no bare SEARCH payloads, no dual response signature domain, no IdentityRecord v1/v2 parse, no 96-byte HELLO auth
   - new:Dual-envelope distributed search multi-hop (v2) — requester signature covers query only; hops preserve sig; default ttl=2; PeerRegistrySync registers self and imports IceBridge mesh peers (forwarder-first discovery)
   - fix:IceBridge CLI prints identity load vs proof-of-work mining progress on stdout (first-run no longer looks hung); non-protocol TCP 6888 probes at DEBUG without stack spam
   - fix:IceBridge ops scripts — EC2 push creates writable /opt dir (sudo+chown); control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
@@ -16,7 +22,7 @@ FrostWire 7.1.0 UNRELEASED
   - fix:FragmentReassembler DoS vulnerability — DATA_END with fragIndex=Integer.MAX_VALUE forced a 2-billion-iteration loop; assemble() had int overflow causing NegativeArraySizeException that killed the rUDP channel. Added MAX_FRAGMENTS_PER_GROUP (4096), MAX_ASSEMBLED_SIZE (16MB), and long accumulation
   - fix:Timestamp-skew bypass via Math.abs(Long.MIN_VALUE) — Math.abs(Long.MIN_VALUE) returns a negative value, bypassing the >60s skew check in registration and response verification. Replaced with manual sign flip
   - fix:TLS hostname verification now uses proper suffix matching instead of substring contains — prevents attacker-controlled hostnames from matching whitelisted domains
-  - fix:rUDP HELLO replay prevention — 8-byte Unix timestamp added to the signed message. HELLOs with timestamp skew > 300s are rejected. Legacy 96-byte format accepted for backward compat
+  - fix:rUDP HELLO replay prevention — 8-byte Unix timestamp added to the signed message. HELLOs with timestamp skew > 300s are rejected (104-byte format only)
   - fix:IceBridge control API requires auth token (X-IceBridge-Token header) on all endpoints except /health — 32-byte random hex string generated at startup
   - fix:RegisterRequest canonical string uses length-prefixed fields to prevent delimiter injection
   - fix:RudpPacketCodec silent payload truncation — payloads >65535 bytes silently truncated the 2-byte length field, corrupting framing. Now rejected before encoding

@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - new:IceBridge multi-protocol fabric (IBP1 protocolId framing), IdentityRecord v3 capabilities, streaming search RESULT frames, KeyspaceRouter peer ranking (common/)
+  - cleanup:Drop pre-alpha distributed-search wire shims (common/)
   - new:Dual-envelope distributed search multi-hop (v2) + IceBridge mesh peer import (forwarder-first discovery)
   - fix:IceBridgeConfig fromEnv/cloudDefaults control HTTP default 8081 (loopback); cloudDefaults rUDP 6889
   - new:Standalone IceBridge can embed DHT announce (ICEBRIDGE_DHT); Android in-process IceBridge leaves DHT to BTEngine by default
