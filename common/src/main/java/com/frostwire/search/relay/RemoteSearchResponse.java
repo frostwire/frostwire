@@ -40,7 +40,8 @@ import java.util.Map;
  */
 public final class RemoteSearchResponse {
 
-    public static final int VERSION = 1;
+    /** Wire version 2: signature domain always includes chunk + final flags. */
+    public static final int VERSION = 2;
 
     /**
      * Default max rows per streamed RESULT frame. Full sets larger than this
