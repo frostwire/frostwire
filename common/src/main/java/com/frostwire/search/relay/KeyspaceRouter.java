@@ -65,7 +65,16 @@ public final class KeyspaceRouter {
     }
 
     /**
-     * Stable key for a peer: first 20 bytes of Ed25519 pub (or whole if shorter).
+     * Stable keyspace id for a peer: first 20 bytes of {@code peerPub}.
+     *
+     * <p>Always returns a <strong>20-byte</strong> array (same width as
+     * {@link #keyspaceTarget} SHA-1 digests). When {@code peerPub} is shorter
+     * than 20, the remainder is zero-padded — not truncated to
+     * {@code peerPub.length}. Zero-padding keeps XOR distance comparable over
+     * the full target: a variable-length id would make
+     * {@link #compareXorDistance} ignore the unused tail of the target and
+     * change ranking for short keys. Ed25519 pubs are 32 bytes, so production
+     * peers always fill all 20 prefix bytes.
      */
     public static byte[] peerKeyspaceId(byte[] peerPub) {
         if (peerPub == null || peerPub.length == 0) {
