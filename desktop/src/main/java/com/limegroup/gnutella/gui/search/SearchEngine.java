@@ -376,7 +376,13 @@ public abstract class SearchEngine {
                 "Local search engine has no LocalIndex installed; call LocalSearchEngineWire.setIndex(...) before searching.");
           }
           return new LocalSharedTorrentSearchPerformer(
-              token, keywords, LOCAL.localIndex, LOCAL.karmaCache);
+              token,
+              keywords,
+              LOCAL.localIndex,
+              LOCAL.karmaCache,
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE,
+              com.frostwire.search.relay.LocalSharedTorrentSearchPerformer
+                  .DEFAULT_RESULT_LIMIT);
         }
 
         @Override

@@ -15,6 +15,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.settings.SearchEnginesSettings;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -40,6 +41,8 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
 
     private final JLabel TOTAL_LABEL = new JLabel("—");
     private final JLabel DB_SIZE_LABEL = new JLabel("—");
+    private final JCheckBox INCLUDE_INACTIVE =
+            new JCheckBox(I18n.tr("Include inactive / historical shares in Local search"));
     private final JTextField SEARCH_FIELD = new JTextField(20);
     private final JButton REFRESH_BUTTON = new JButton(I18n.tr("Refresh"));
     private final JButton CLEAR_BUTTON = new JButton(I18n.tr("Clear Search"));
@@ -49,7 +52,13 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
     public SharedTorrentsDatabasePaneItem() {
         super(TITLE, LABEL);
 
+        INCLUDE_INACTIVE.setToolTipText(I18n.tr(
+                "When off (default), Local search and answers to remote peers only include "
+                        + "torrents you are still seeding or actively downloading with full "
+                        + "metadata. When on, past index rows may appear even if removed from Transfers."));
         add(buildStatsPanel());
+        add(getVerticalSeparator());
+        add(INCLUDE_INACTIVE);
         add(getVerticalSeparator());
         add(buildSearchPanel());
         add(getVerticalSeparator());
@@ -125,6 +134,8 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
 
     @Override
     public void initOptions() {
+        INCLUDE_INACTIVE.setSelected(
+                SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.getValue());
         refresh();
     }
 
@@ -347,11 +358,14 @@ public final class SharedTorrentsDatabasePaneItem extends AbstractPaneItem {
 
     @Override
     public boolean applyOptions() {
-        return true;
+        SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.setValue(
+                INCLUDE_INACTIVE.isSelected());
+        return false;
     }
 
     @Override
     public boolean isDirty() {
-        return false;
+        return INCLUDE_INACTIVE.isSelected()
+                != SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.getValue();
     }
 }

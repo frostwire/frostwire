@@ -59,6 +59,14 @@ public class SearchEnginesSettings extends LimeProps {
       FACTORY.createBooleanSetting("BITSEARCH_SEARCH_ENABLED", true);
   public static final BooleanSetting LOCAL_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("LOCAL_SEARCH_ENABLED", true);
+  /**
+   * When false (default), Local search and answers to remote distributed
+   * search only include torrents still in the transfer table with metadata
+   * that are seeding or actively downloading (in the swarm). When true,
+   * historical LocalIndex rows may appear even if no longer transferring.
+   */
+  public static final BooleanSetting LOCAL_SEARCH_INCLUDE_INACTIVE =
+      FACTORY.createBooleanSetting("LOCAL_SEARCH_INCLUDE_INACTIVE", false);
   public static final BooleanSetting DISTRIBUTED_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("DISTRIBUTED_SEARCH_ENABLED", false);
 

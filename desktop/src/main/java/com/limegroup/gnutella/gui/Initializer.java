@@ -671,7 +671,11 @@ final class Initializer {
 
       // Register an incoming-request handler so remote peers can
       // search our local index through IceBridge.
-      RelaySearchService searchService = new RelaySearchService(localIndex, identity);
+      RelaySearchService searchService =
+          new RelaySearchService(
+              localIndex,
+              identity,
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
       IncomingSearchRequestHandler incomingHandler =
           new IncomingSearchRequestHandler(
               transport, searchService, directory, identity, localIndex);
@@ -828,7 +832,11 @@ final class Initializer {
     try {
       int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
       int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
-      RelaySearchService service = new RelaySearchService(localIndex, identity);
+      RelaySearchService service =
+          new RelaySearchService(
+              localIndex,
+              identity,
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
       RelayRole role = new RelayRole(service, directory, identity);
       IdentityRecord identityRecord =
           IdentityRecord.createSigned(
