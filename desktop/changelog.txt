@@ -1,4 +1,6 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:Local search (and remote answers from this node) only return actively seeded/swarming transfers with full metadata by default — historical LocalIndex rows excluded unless Options → Shared Torrents Database → "Include inactive / historical shares" is enabled
+  - new:Standalone IceBridge (icebridge-run-local.sh / AWS) logs successful mesh traffic at INFO — HELLO, HELLO_ACK, RELAY, SEARCH, TELEMETRY/PING and other known protocolIds
   - fix:IceBridge mesh security — HELLO_ACK carries signed identity so initiators learn remotePub (fixes rejected multi-hop RELAY); RELAY_RESPONSE requires authenticated session (no fire-and-forget spoof); RELAY app payload capped to single rUDP fragment; hop TTL default 3; mesh fan-out 3; per-peer RELAY rate limit; local registry targets delivered via /poll without self-UDP
   - new:IceBridge multi-hop mesh RELAY — hop TTL frame, Type.RELAY delivery, forwarder mesh via RelayMesh; MultiRelayMeshSearchTest (3 FORWARDER + seeder/searcher clients)
   - fix:IdentityRecord.fromEntry accepts v1/v2 again (read path) — still writes v3 with caps; fixes self-ping / peer handshake decode after capability bump

@@ -23,6 +23,9 @@ class MeshEnvelopeTest {
         MeshEnvelope env = MeshEnvelope.unwrap(wire);
         assertEquals(MeshProtocolId.CHAT, env.protocolId());
         assertArrayEquals(payload, env.payload());
+        assertEquals("CHAT", MeshProtocolId.name(MeshProtocolId.CHAT));
+        assertEquals("TELEMETRY", MeshProtocolId.name(MeshProtocolId.TELEMETRY));
+        assertEquals("SEARCH", MeshProtocolId.name(MeshProtocolId.SEARCH));
     }
 
     @Test
