@@ -454,6 +454,11 @@ test {
     enabled = gradle.startParameter.taskNames.contains("test")
     useJUnitPlatform()
 
+    // Match CI (ubuntu, no display). Avoids flaky AWT init that can poison
+    // SettingsFactory keys (e.g. DOWNLOAD_TABLE_SORT) for the rest of the JVM.
+    systemProperty 'java.awt.headless', 'true'
+    jvmArgs '-Djava.awt.headless=true'
+
     maxParallelForks = Runtime.getRuntime().availableProcessors()
 
     filter {
