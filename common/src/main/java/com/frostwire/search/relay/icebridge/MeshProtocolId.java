@@ -53,4 +53,29 @@ public final class MeshProtocolId {
         int id = effective(protocolId);
         return id >= SEARCH && id <= FILESYNC;
     }
+
+    /**
+     * Human-readable name for logs / ops (unknown ids as {@code PROTO_n}).
+     */
+    public static String name(int protocolId) {
+        int id = effective(protocolId);
+        switch (id) {
+            case SEARCH:
+                return "SEARCH";
+            case CHAT:
+                return "CHAT";
+            case METADATA:
+                return "METADATA";
+            case PUBSUB:
+                return "PUBSUB";
+            case AI:
+                return "AI";
+            case TELEMETRY:
+                return "TELEMETRY";
+            case FILESYNC:
+                return "FILESYNC";
+            default:
+                return "PROTO_" + id;
+        }
+    }
 }

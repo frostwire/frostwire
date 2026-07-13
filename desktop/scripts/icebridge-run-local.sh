@@ -16,6 +16,9 @@
 # Optional desktop/.env is loaded for unset ICEBRIDGE_* keys only (exported env wins).
 # EC2: open TCP 6888 + UDP 6889 (or colo ports) in the security group; keep control private
 # (already loopback-only). Use SSH -L for /health from elsewhere.
+#
+# Logs (stdout): successful mesh events at INFO — HELLO / HELLO_ACK, RELAY hops,
+# SEARCH / TELEMETRY (PING) / other MeshProtocolId traffic.
 
 set -euo pipefail
 

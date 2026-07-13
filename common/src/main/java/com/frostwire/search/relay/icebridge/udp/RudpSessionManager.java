@@ -419,6 +419,8 @@ public final class RudpSessionManager {
             sessionsByAddress.put(sender, session);
         }
         session.markActivity();
+        LOG.info("IceBridge mesh: HELLO ok from=" + sender
+                + " pub=" + Hex.encode(remotePub).substring(0, 12) + "…");
         // HELLO_ACK must use the peer's HELLO connectionId (not necessarily
         // session.remoteConnectionId when we reused an outbound session).
         try {
@@ -458,8 +460,10 @@ public final class RudpSessionManager {
             // Prefer the session that just proved identity on this address.
             sessionsByAddress.put(sender, session);
         }
-        LOG.debug("RudpSessionManager: session " + packet.connectionId()
-                + " acknowledged with " + sender);
+        LOG.info("IceBridge mesh: HELLO_ACK ok peer=" + sender
+                + (session.remotePub() != null
+                ? " pub=" + Hex.encode(session.remotePub()).substring(0, 12) + "…"
+                : " (no remotePub)"));
     }
 
     private void handleData(RudpPacket packet, InetSocketAddress sender) {
@@ -632,12 +636,19 @@ public final class RudpSessionManager {
         int hopTtl = frame.hopTtl();
 
         if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
+            LOG.info("IceBridge mesh: RELAY delivered to self from="
+                    + Hex.encode(frame.sourcePub()).substring(0, 12) + "…"
+                    + " bytes=" + appPayload.length);
             notifyListener(frame.sourcePub(), appPayload);
             return;
         }
 
         PeerRecord target = registry.lookup(targetPub);
         if (target != null) {
+            LOG.info("IceBridge mesh: RELAY local-registry target="
+                    + Hex.encode(targetPub).substring(0, 12) + "…"
+                    + " hop=" + Hex.encode(senderPub).substring(0, 12) + "…"
+                    + " bytes=" + appPayload.length);
             deliverToLocalRegistryTarget(frame.sourcePub(), target, appPayload);
             return;
         }

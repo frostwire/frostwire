@@ -271,6 +271,10 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             return ApiResponse.error("invalid envelope: " + e.getMessage());
         }
         rudpSessionManager.deliver(targetPub, wire);
+        LOG.info("IceBridge mesh: " + MeshProtocolId.name(protocolId)
+                + " send queued target="
+                + com.frostwire.util.Hex.encode(targetPub).substring(0, 12) + "…"
+                + " bytes=" + payload.length);
         return ApiResponse.success("queued");
     }
 

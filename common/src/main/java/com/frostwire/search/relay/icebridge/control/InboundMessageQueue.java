@@ -8,7 +8,9 @@
 package com.frostwire.search.relay.icebridge.control;
 
 import com.frostwire.search.relay.icebridge.MeshEnvelope;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.udp.RudpMessageListener;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -63,6 +65,42 @@ public final class InboundMessageQueue implements RudpMessageListener {
         }
         queue.offer(new InboundMessage(sourcePub, appPayload, System.currentTimeMillis(), protocolId));
         count.incrementAndGet();
+        logSuccessfulProtocol(sourcePub, protocolId, appPayload);
+    }
+
+    /**
+     * Ops-visible trail for standalone forwarders (e.g. AWS
+     * {@code icebridge-run-local.sh}): every demuxed known protocol and
+     * short TELEMETRY/PING probes.
+     */
+    private static void logSuccessfulProtocol(byte[] sourcePub, int protocolId, byte[] appPayload) {
+        int id = MeshProtocolId.effective(protocolId);
+        if (!MeshProtocolId.isKnown(id)) {
+            LOG.info("IceBridge mesh: unknown protocol id=" + id
+                    + " from=" + shortPub(sourcePub)
+                    + " bytes=" + (appPayload == null ? 0 : appPayload.length));
+            return;
+        }
+        String detail = "";
+        if (id == MeshProtocolId.TELEMETRY
+                && appPayload != null
+                && appPayload.length > 0
+                && appPayload.length <= 8) {
+            // Mesh warm / health probes (e.g. single-byte PING).
+            detail = appPayload.length == 1 && appPayload[0] == 0x01
+                    ? " PING"
+                    : " probe";
+        }
+        LOG.info("IceBridge mesh: " + MeshProtocolId.name(id) + detail
+                + " ok from=" + shortPub(sourcePub)
+                + " bytes=" + (appPayload == null ? 0 : appPayload.length));
+    }
+
+    private static String shortPub(byte[] sourcePub) {
+        if (sourcePub == null || sourcePub.length < 4) {
+            return "?";
+        }
+        return Hex.encode(sourcePub).substring(0, 12) + "…";
     }
 
     /**

@@ -61,6 +61,7 @@ public final class IceBridgeServer implements AutoCloseable {
     private DhtAdvertiser dhtAdvertiser;
 
     public static void main(String[] args) {
+        configureStandaloneConsoleLogging();
         loadDotEnv();
 
         // --generate-token support: prints the new token *only* (once) to stdout.
@@ -203,6 +204,32 @@ public final class IceBridgeServer implements AutoCloseable {
             }
         }
         return null;
+    }
+
+    /**
+     * Ensure INFO (and above) mesh/protocol lines appear on stdout when
+     * running {@code java -jar icebridge.jar} / icebridge-run-local.sh on a
+     * cloud host — operators should see HELLO, RELAY, SEARCH, TELEMETRY/PING.
+     */
+    private static void configureStandaloneConsoleLogging() {
+        try {
+            java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+            root.setLevel(java.util.logging.Level.INFO);
+            boolean hasConsole = false;
+            for (java.util.logging.Handler h : root.getHandlers()) {
+                h.setLevel(java.util.logging.Level.INFO);
+                if (h instanceof java.util.logging.ConsoleHandler) {
+                    hasConsole = true;
+                }
+            }
+            if (!hasConsole) {
+                java.util.logging.ConsoleHandler ch = new java.util.logging.ConsoleHandler();
+                ch.setLevel(java.util.logging.Level.INFO);
+                root.addHandler(ch);
+            }
+        } catch (Throwable ignored) {
+            // Never fail start for logging setup.
+        }
     }
 
     public IceBridgeServer(IceBridgeConfig config) {
