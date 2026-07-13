@@ -28,6 +28,7 @@ import com.limegroup.gnutella.gui.tables.SizeHolder;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -100,7 +101,18 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     }
 
     private boolean isDownloading() {
-        return RESULT.getHash() != null && BTDownloadMediator.instance().isDownloading(RESULT.getHash());
+        // Avoid constructing BTDownloadMediator (and its DOWNLOAD_TABLE_*
+        // settings) in headless unit tests / CI — that path needs a display
+        // and partial init leaves duplicate setting keys on retry.
+        if (GraphicsEnvironment.isHeadless()) {
+            return false;
+        }
+        try {
+            return RESULT.getHash() != null
+                    && BTDownloadMediator.instance().isDownloading(RESULT.getHash());
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /**
@@ -117,11 +129,18 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         //gubs: seems like this didn't fly
         //maybe the icon isn't refreshed.
         //see MetadataModel.addProperties()
-        if (isDownloading()) {
-            return GUIMediator.getThemeImage("downloading");
+        if (GraphicsEnvironment.isHeadless()) {
+            return null;
         }
-        String ext = FilenameUtils.getExtension(getFilename());
-        return IconManager.instance().getIconForExtension(ext);
+        try {
+            if (isDownloading()) {
+                return GUIMediator.getThemeImage("downloading");
+            }
+            String ext = FilenameUtils.getExtension(getFilename());
+            return IconManager.instance().getIconForExtension(ext);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     /**

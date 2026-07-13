@@ -44,12 +44,23 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
     }
 
     private static void setupIcons() {
-        if (OSUtils.isMacOSX()) {
-            ASCENDING = AquaSortArrowIcon.getAscendingIcon();
-            DESCENDING = AquaSortArrowIcon.getDescendingIcon();
-        } else {
-            ASCENDING = SortArrowIcon.getAscendingIcon();
-            DESCENDING = SortArrowIcon.getDescendingIcon();
+        try {
+            // CI / headless JVMs: never throw ExceptionInInitializerError.
+            if (GraphicsEnvironment.isHeadless()) {
+                ASCENDING = null;
+                DESCENDING = null;
+                return;
+            }
+            if (OSUtils.isMacOSX()) {
+                ASCENDING = AquaSortArrowIcon.getAscendingIcon();
+                DESCENDING = AquaSortArrowIcon.getDescendingIcon();
+            } else {
+                ASCENDING = SortArrowIcon.getAscendingIcon();
+                DESCENDING = SortArrowIcon.getDescendingIcon();
+            }
+        } catch (Throwable t) {
+            ASCENDING = null;
+            DESCENDING = null;
         }
     }
 
