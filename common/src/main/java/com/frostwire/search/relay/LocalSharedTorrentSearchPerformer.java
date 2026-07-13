@@ -45,7 +45,7 @@ import java.util.List;
 public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer {
 
     public static final String SOURCE_NAME = "Local";
-    static final int DEFAULT_RESULT_LIMIT = 50;
+    public static final int DEFAULT_RESULT_LIMIT = 50;
 
     private static final Logger LOG = Logger.getLogger(LocalSharedTorrentSearchPerformer.class);
 
@@ -53,29 +53,38 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
     private final String keywords;
     private final LocalIndex index;
     private final PeerKarmaCache karmaCache;
+    private final ShareVisibilityPolicy visibility;
     private final int limit;
 
     private boolean stopped;
     private SearchListener listener;
 
     public LocalSharedTorrentSearchPerformer(long token, String keywords, LocalIndex index) {
-        this(token, keywords, index, null, DEFAULT_RESULT_LIMIT);
+        this(token, keywords, index, null, null, DEFAULT_RESULT_LIMIT);
     }
 
     public LocalSharedTorrentSearchPerformer(long token, String keywords,
                                              LocalIndex index, int limit) {
-        this(token, keywords, index, null, limit);
+        this(token, keywords, index, null, null, limit);
     }
 
     public LocalSharedTorrentSearchPerformer(long token, String keywords,
                                              LocalIndex index,
                                              PeerKarmaCache karmaCache) {
-        this(token, keywords, index, karmaCache, DEFAULT_RESULT_LIMIT);
+        this(token, keywords, index, karmaCache, null, DEFAULT_RESULT_LIMIT);
     }
 
     public LocalSharedTorrentSearchPerformer(long token, String keywords,
                                              LocalIndex index,
                                              PeerKarmaCache karmaCache,
+                                             int limit) {
+        this(token, keywords, index, karmaCache, null, limit);
+    }
+
+    public LocalSharedTorrentSearchPerformer(long token, String keywords,
+                                             LocalIndex index,
+                                             PeerKarmaCache karmaCache,
+                                             ShareVisibilityPolicy visibility,
                                              int limit) {
         if (token < 0) {
             throw new IllegalArgumentException("token must be >= 0");
@@ -93,6 +102,7 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
         this.keywords = keywords;
         this.index = index;
         this.karmaCache = karmaCache;
+        this.visibility = visibility;
         this.limit = limit;
     }
 
@@ -172,7 +182,15 @@ public final class LocalSharedTorrentSearchPerformer implements ISearchPerformer
     }
 
     private List<FileSearchResult> queryIndex() {
-        List<LocalSharedTorrent> rows = index.search(keywords, limit);
+        // Over-fetch slightly so active-only filtering still fills the limit.
+        int fetch = visibility == null || visibility == ShareVisibilityPolicy.INCLUDE_ALL
+                ? limit
+                : Math.min(limit * 4, Math.max(limit, 200));
+        List<LocalSharedTorrent> rows = ShareVisibility.filter(
+                index.search(keywords, fetch), visibility);
+        if (rows.size() > limit) {
+            rows = rows.subList(0, limit);
+        }
         if (karmaCache == null) {
             List<FileSearchResult> out = new ArrayList<>(rows.size());
             for (LocalSharedTorrent row : rows) {

@@ -53,15 +53,29 @@ public final class RelaySearchService {
     private final LocalIndex index;
     private final IdentityKeys identity;
     private final RateLimiter rateLimiter;
+    private final ShareVisibilityPolicy visibility;
 
     public RelaySearchService(LocalIndex index, IdentityKeys identity) {
         this(index, identity, new RateLimiter(
                 RelayConstants.DEFAULT_MAX_QPS,
-                RelayConstants.DEFAULT_MAX_QPS));
+                RelayConstants.DEFAULT_MAX_QPS), null);
     }
 
     public RelaySearchService(LocalIndex index, IdentityKeys identity,
                               RateLimiter rateLimiter) {
+        this(index, identity, rateLimiter, null);
+    }
+
+    public RelaySearchService(LocalIndex index, IdentityKeys identity,
+                              ShareVisibilityPolicy visibility) {
+        this(index, identity, new RateLimiter(
+                RelayConstants.DEFAULT_MAX_QPS,
+                RelayConstants.DEFAULT_MAX_QPS), visibility);
+    }
+
+    public RelaySearchService(LocalIndex index, IdentityKeys identity,
+                              RateLimiter rateLimiter,
+                              ShareVisibilityPolicy visibility) {
         if (index == null) {
             throw new IllegalArgumentException("index is null");
         }
@@ -74,6 +88,7 @@ public final class RelaySearchService {
         this.index = index;
         this.identity = identity;
         this.rateLimiter = rateLimiter;
+        this.visibility = visibility;
     }
 
     /**
@@ -101,9 +116,16 @@ public final class RelaySearchService {
                 return Optional.empty();
             }
             int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
-            List<LocalSharedTorrent> rows = index.search(request.keywords(), limit);
+            int fetch = visibility == null || visibility == ShareVisibilityPolicy.INCLUDE_ALL
+                    ? limit
+                    : Math.min(limit * 4, Math.max(limit, 200));
+            List<LocalSharedTorrent> rows = index.search(request.keywords(), fetch);
             if (rows == null) {
                 rows = new ArrayList<>();
+            }
+            rows = ShareVisibility.filter(rows, visibility);
+            if (rows.size() > limit) {
+                rows = new ArrayList<>(rows.subList(0, limit));
             }
             return Optional.of(buildResponse(request, rows));
         } catch (Throwable t) {
