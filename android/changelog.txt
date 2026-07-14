@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - cleanup:Distributed Search identity UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as desktop
   - new:Distributed Search identity settings parity with desktop — create/replace identity, BIP39 seed phrase show/restore, export/import identity.dat, karma & shared counts, tap-to-copy node ID/fingerprint/public key
   - fix:IdentityKeys X25519 generation works on Android Conscrypt (fixes relay stack never starting / "Not initialized")
   - new:IceBridge multi-protocol fabric (IBP1 protocolId framing), IdentityRecord v3 capabilities, streaming search RESULT frames, KeyspaceRouter peer ranking (common/)

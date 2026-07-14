@@ -31,8 +31,8 @@ import com.frostwire.android.search.AndroidKarmaChainStore;
 import com.frostwire.android.search.AndroidLocalIndex;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.crypto.Bip39Mnemonic;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityLifecycle;
 import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
@@ -45,10 +45,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 /**
- * Android parity with desktop {@code IdentitySettingsPaneItem}: identity
- * lifecycle (create, seed phrase, import/export), display/copy of node id,
- * fingerprint, public key, karma, and relay-stack status.
+ * Android UI for identity lifecycle. Business logic is
+ * {@link IdentityLifecycle} (shared with desktop).
  */
 public final class DistributedSearchPreferenceFragment extends AbstractPreferenceFragment {
 
@@ -113,7 +113,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         wireCopyOnClick("frostwire.prefs.distributed.identity.karma", false);
     }
 
-    private void wireCopyOnClick(String key, boolean formatAsHex) {
+    private void wireCopyOnClick(String key, boolean stripSpaces) {
         Preference pref = findPreference(key);
         if (pref == null) {
             return;
@@ -128,7 +128,12 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                     || text.equals(getString(R.string.distributed_identity_not_available))) {
                 return true;
             }
-            if (formatAsHex) {
+            // Drop UI helper line ("Tap to copy") and optional grouping spaces.
+            int nl = text.indexOf('\n');
+            if (nl >= 0) {
+                text = text.substring(0, nl);
+            }
+            if (stripSpaces) {
                 text = text.replace(" ", "");
             }
             copyToClipboard(text);
@@ -190,23 +195,9 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         }
     }
 
-    // ---- identity resolve / display ----
-
     private IdentityKeys resolveIdentity() {
-        IdentityKeys live = SearchEngine.DISTRIBUTED_WIRING.identity();
-        if (live != null) {
-            return live;
-        }
-        File file = identityFile();
-        if (file == null || !file.exists() || file.length() == 0) {
-            return null;
-        }
-        try {
-            return IdentityKeys.load(file);
-        } catch (Throwable t) {
-            LOG.warn("Failed to load identity from disk", t);
-            return null;
-        }
+        return IdentityLifecycle.resolve(
+                SearchEngine.DISTRIBUTED_WIRING.identity(), identityFile());
     }
 
     private static File identityFile() {
@@ -265,27 +256,28 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
 
         String nodeIdHex = Hex.encode(identity.nodeId());
         String pubHex = Hex.encode(identity.ed25519PubRaw());
+        String tap = getString(R.string.distributed_identity_tap_to_copy);
         if (nodeIdPref != null) {
-            nodeIdPref.setSummary(formatHex(nodeIdHex) + "\n" + getString(R.string.distributed_identity_tap_to_copy));
+            nodeIdPref.setSummary(IdentityLifecycle.formatGroupedHex(nodeIdHex) + "\n" + tap);
         }
         if (fingerprintPref != null) {
-            fingerprintPref.setSummary(formatHex(pubHex) + "\n" + getString(R.string.distributed_identity_tap_to_copy));
+            fingerprintPref.setSummary(IdentityLifecycle.formatGroupedHex(pubHex) + "\n" + tap);
         }
         if (pubkeyPref != null) {
-            pubkeyPref.setSummary(pubHex + "\n" + getString(R.string.distributed_identity_tap_to_copy));
+            pubkeyPref.setSummary(pubHex + "\n" + tap);
         }
         if (karmaPref != null) {
             karmaPref.setSummary(getString(R.string.distributed_identity_karma_score, Math.max(0, karma))
-                    + "\n" + getString(R.string.distributed_identity_tap_to_copy));
+                    + "\n" + tap);
         }
         if (difficultyPref != null) {
-            int difficulty = IdentityKeys.countLeadingZeroBits(identity.nodeId());
-            int required = KarmaConstants.IDENTITY_DIFFICULTY;
-            if (difficulty >= required) {
+            int difficulty = IdentityLifecycle.difficultyBits(identity);
+            if (IdentityLifecycle.meetsDifficultyRequirement(identity)) {
                 difficultyPref.setSummary(getString(R.string.distributed_identity_difficulty_meets, difficulty));
             } else {
                 difficultyPref.setSummary(getString(
-                        R.string.distributed_identity_difficulty_below, difficulty, required));
+                        R.string.distributed_identity_difficulty_below,
+                        difficulty, KarmaConstants.IDENTITY_DIFFICULTY));
             }
         }
         if (sharedPref != null) {
@@ -320,8 +312,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         return 0;
     }
 
-    // ---- create / initialize ----
-
     private void onInitializeOrCreateNew() {
         if (busy) {
             return;
@@ -331,38 +321,29 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 replacing
                         ? R.string.distributed_identity_confirm_create_new
                         : R.string.distributed_identity_confirm_initialize,
-                () -> generateAndSaveIdentity(replacing));
+                () -> generateAndSaveIdentity());
     }
 
-    private void generateAndSaveIdentity(boolean replacing) {
+    private void generateAndSaveIdentity() {
         if (busy) {
             return;
         }
         busy = true;
         ProgressDialog progress = ProgressDialog.show(
                 requireContext(),
-                getString(replacing
-                        ? R.string.distributed_identity_create_new
-                        : R.string.distributed_identity_initialize),
+                getString(R.string.distributed_identity_initialize),
                 getString(R.string.distributed_identity_initializing),
                 true,
                 false);
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
-                IdentityKeys keys = IdentityKeys.generate(KarmaConstants.IDENTITY_DIFFICULTY);
                 File file = identityFile();
                 if (file == null) {
                     throw new IllegalStateException("libtorrent homeDir not available");
                 }
-                File parent = file.getParentFile();
-                if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                    throw new java.io.IOException("Could not create " + parent);
-                }
-                if (replacing && file.exists()) {
-                    copyFile(file, new File(parent, RelayConstants.IDENTITY_FILE + ".bak"));
-                }
-                IdentityKeys.save(keys, file);
+                IdentityKeys keys = IdentityLifecycle.generateAndInstall(
+                        file, KarmaConstants.IDENTITY_DIFFICULTY);
                 SearchEngine.DISTRIBUTED_WIRING.identity(keys);
                 restartRelayStack(() -> {
                     dismiss(progress);
@@ -386,8 +367,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         });
     }
 
-    // ---- seed phrase ----
-
     private void showSeedPhrase() {
         IdentityKeys identity = resolveIdentity();
         if (identity == null) {
@@ -395,7 +374,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             return;
         }
         try {
-            String mnemonic = Bip39Mnemonic.entropyToMnemonic(identity.ed25519Seed());
+            String mnemonic = IdentityLifecycle.seedPhrase(identity);
             new AlertDialog.Builder(requireContext())
                     .setTitle(R.string.distributed_identity_seed_title)
                     .setMessage(getString(R.string.distributed_identity_seed_warning)
@@ -433,16 +412,12 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     private void applySeedPhrase(String raw) {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
-                String mnemonic = Bip39Mnemonic.normalize(raw);
-                if (Bip39Mnemonic.wordCount(mnemonic) != 24) {
-                    throw new IllegalArgumentException(
-                            "must contain exactly 24 words; found "
-                                    + Bip39Mnemonic.wordCount(mnemonic));
+                File file = identityFile();
+                if (file == null) {
+                    throw new IllegalStateException("libtorrent homeDir not available");
                 }
-                Bip39Mnemonic.validate(mnemonic);
-                byte[] seed = Bip39Mnemonic.mnemonicToEntropy(mnemonic);
-                IdentityKeys newIdentity = IdentityKeys.fromSeed(seed);
-                writeIdentityReplacing(newIdentity);
+                IdentityKeys keys = IdentityLifecycle.restoreFromSeedPhrase(raw, file);
+                SearchEngine.DISTRIBUTED_WIRING.identity(keys);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         toast(R.string.distributed_identity_restore_ok);
@@ -459,8 +434,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         });
     }
 
-    // ---- export / import ----
-
     private void onExportUri(Uri uri) {
         if (uri == null) {
             return;
@@ -472,7 +445,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                     throw new IllegalStateException(getString(R.string.distributed_identity_no_identity));
                 }
                 File temp = new File(requireContext().getCacheDir(), "export-identity.dat");
-                IdentityKeys.save(identity, temp);
+                IdentityLifecycle.exportToFile(identity, temp);
                 try (InputStream in = new FileInputStream(temp);
                      OutputStream out = requireContext().getContentResolver().openOutputStream(uri)) {
                     if (out == null) {
@@ -509,10 +482,14 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                     }
                     copyStream(in, out);
                 }
-                IdentityKeys imported = IdentityKeys.load(temp);
+                File dest = identityFile();
+                if (dest == null) {
+                    throw new IllegalStateException("libtorrent homeDir not available");
+                }
+                IdentityKeys imported = IdentityLifecycle.importFromFile(temp, dest);
                 //noinspection ResultOfMethodCallIgnored
                 temp.delete();
-                writeIdentityReplacing(imported);
+                SearchEngine.DISTRIBUTED_WIRING.identity(imported);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         toast(R.string.distributed_identity_import_ok);
@@ -529,22 +506,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         });
     }
 
-    private void writeIdentityReplacing(IdentityKeys keys) throws Exception {
-        File file = identityFile();
-        if (file == null) {
-            throw new IllegalStateException("libtorrent homeDir not available");
-        }
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            throw new java.io.IOException("Could not create " + parent);
-        }
-        if (file.exists() && parent != null) {
-            copyFile(file, new File(parent, RelayConstants.IDENTITY_FILE + ".bak"));
-        }
-        IdentityKeys.save(keys, file);
-        SearchEngine.DISTRIBUTED_WIRING.identity(keys);
-    }
-
     private void copyIdentitySummary() {
         IdentityKeys identity = resolveIdentity();
         if (identity == null) {
@@ -554,19 +515,12 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             long karma = readKarmaScore(identity);
             int shared = readSharedCount();
-            String summary = "Node ID: " + Hex.encode(identity.nodeId())
-                    + "\nFingerprint: " + Hex.encode(identity.ed25519PubRaw())
-                    + "\nPublic Key: " + Hex.encode(identity.ed25519PubRaw())
-                    + "\nKarma: " + karma + " endorsements"
-                    + "\nDifficulty: " + IdentityKeys.countLeadingZeroBits(identity.nodeId()) + " bits"
-                    + "\nShared torrents: " + shared;
+            String summary = IdentityLifecycle.summaryText(identity, karma, shared);
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> copyToClipboard(summary));
             }
         });
     }
-
-    // ---- peers / stack ----
 
     private void refreshPeerList() {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
@@ -634,8 +588,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         svc.ensureRelayStack(true, after);
     }
 
-    // ---- helpers ----
-
     private void confirmThen(int messageRes, Runnable onYes) {
         new AlertDialog.Builder(requireContext())
                 .setMessage(messageRes)
@@ -673,25 +625,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     private static void setSummary(Preference pref, int resId) {
         if (pref != null) {
             pref.setSummary(resId);
-        }
-    }
-
-    private static String formatHex(String hex) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < hex.length(); i += 4) {
-            if (i > 0) {
-                sb.append(' ');
-            }
-            int end = Math.min(i + 4, hex.length());
-            sb.append(hex, i, end);
-        }
-        return sb.toString();
-    }
-
-    private static void copyFile(File from, File to) throws java.io.IOException {
-        try (InputStream in = new FileInputStream(from);
-             OutputStream out = new FileOutputStream(to)) {
-            copyStream(in, out);
         }
     }
 
