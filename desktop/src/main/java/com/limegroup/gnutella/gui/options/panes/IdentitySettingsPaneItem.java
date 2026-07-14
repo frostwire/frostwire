@@ -7,8 +7,8 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import com.frostwire.crypto.Bip39Mnemonic;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IdentityLifecycle;
 import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerKarmaCache;
@@ -30,8 +30,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,6 +42,10 @@ import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.limewire.util.CommonUtils;
 
+/**
+ * Desktop UI for identity lifecycle. Business logic lives in
+ * {@link IdentityLifecycle} (shared with Android).
+ */
 public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   private static final Logger LOG = Logger.getLogger(IdentitySettingsPaneItem.class);
@@ -188,41 +190,23 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     byte[] pubRaw = identity.ed25519PubRaw();
 
     NODE_ID_LABEL.setText(Hex.encode(nodeId));
-    FINGERPRINT_LABEL.setText(formatFingerprint(pubRaw));
+    FINGERPRINT_LABEL.setText(IdentityLifecycle.formatGroupedHex(pubRaw));
     PUBKEY_LABEL.setText(Hex.encode(pubRaw));
 
-    int difficulty = IdentityKeys.countLeadingZeroBits(nodeId);
+    int difficulty = IdentityLifecycle.difficultyBits(identity);
     DIFFICULTY_LABEL.setText(
         difficulty
             + " bits"
-            + (difficulty >= KarmaConstants.IDENTITY_DIFFICULTY
+            + (IdentityLifecycle.meetsDifficultyRequirement(identity)
                 ? " (meets requirement)"
                 : " (below required " + KarmaConstants.IDENTITY_DIFFICULTY + ")"));
 
     KARMA_LABEL.setText(getKarmaScore(identity) + " endorsements");
-
     SHARED_COUNT_LABEL.setText(getSharedCount() + " torrents");
   }
 
-  /**
-   * Prefer the live distributed-search engine identity; fall back to the on-disk file (same path as
-   * {@code Initializer}) so the pane reflects disk state when the engine has not been wired yet.
-   */
   private IdentityKeys resolveIdentity() {
-    IdentityKeys live = distributedEngine().identityKeys();
-    if (live != null) {
-      return live;
-    }
-    File file = identityFile();
-    if (!file.exists() || file.length() == 0) {
-      return null;
-    }
-    try {
-      return IdentityKeys.load(file);
-    } catch (Throwable t) {
-      LOG.warn("Failed to load identity from " + file.getAbsolutePath(), t);
-      return null;
-    }
+    return IdentityLifecycle.resolve(distributedEngine().identityKeys(), identityFile());
   }
 
   private void initializeIdentity() {
@@ -259,19 +243,9 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     DesktopParallelExecutor.execute(
         () -> {
           try {
-            IdentityKeys keys = IdentityKeys.generate(KarmaConstants.IDENTITY_DIFFICULTY);
-            File file = identityFile();
-            File parent = file.getParentFile();
-            if (parent != null && !parent.exists() && !parent.mkdirs()) {
-              throw new java.io.IOException("Could not create identity directory: " + parent);
-            }
-            if (replacing && file.exists()) {
-              Files.copy(
-                  file.toPath(),
-                  new File(parent, RelayConstants.IDENTITY_FILE + ".bak").toPath(),
-                  StandardCopyOption.REPLACE_EXISTING);
-            }
-            IdentityKeys.save(keys, file);
+            IdentityKeys keys =
+                IdentityLifecycle.generateAndInstall(
+                    identityFile(), KarmaConstants.IDENTITY_DIFFICULTY);
             GUIMediator.safeInvokeLater(
                 () -> {
                   generating = false;
@@ -301,17 +275,6 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
                 });
           }
         });
-  }
-
-  private static String formatFingerprint(byte[] pubRaw) {
-    String hex = Hex.encode(pubRaw);
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < hex.length(); i += 4) {
-      if (i > 0) sb.append(' ');
-      int end = Math.min(i + 4, hex.length());
-      sb.append(hex, i, end);
-    }
-    return sb.toString();
   }
 
   private long getKarmaScore(IdentityKeys identity) {
@@ -350,8 +313,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     }
 
     try {
-      byte[] seed = identity.ed25519Seed();
-      String mnemonic = Bip39Mnemonic.entropyToMnemonic(seed);
+      String mnemonic = IdentityLifecycle.seedPhrase(identity);
 
       JTextArea textArea = new JTextArea(mnemonic);
       textArea.setEditable(false);
@@ -427,37 +389,8 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
       return;
     }
 
-    mnemonic = Bip39Mnemonic.normalize(mnemonic);
-
     try {
-      if (Bip39Mnemonic.wordCount(mnemonic) != 24) {
-        throw new IllegalArgumentException(
-            I18n.tr("Seed phrase must contain exactly 24 words; found ")
-                + Bip39Mnemonic.wordCount(mnemonic)
-                + ".");
-      }
-      Bip39Mnemonic.validate(mnemonic);
-    } catch (IllegalArgumentException e) {
-      GUIMediator.showError(I18n.tr("Invalid seed phrase: ") + e.getMessage());
-      return;
-    }
-
-    try {
-      byte[] seed = Bip39Mnemonic.mnemonicToEntropy(mnemonic);
-      IdentityKeys newIdentity = IdentityKeys.fromSeed(seed);
-
-      File identityFile = identityFile();
-      File parent = identityFile.getParentFile();
-      if (parent != null && !parent.exists() && !parent.mkdirs()) {
-        throw new java.io.IOException("Could not create identity directory: " + parent);
-      }
-
-      File backup = new File(identityFile.getParentFile(), RelayConstants.IDENTITY_FILE + ".bak");
-      if (identityFile.exists()) {
-        Files.copy(identityFile.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
-      }
-
-      IdentityKeys.save(newIdentity, identityFile);
+      IdentityLifecycle.restoreFromSeedPhrase(mnemonic, identityFile());
 
       JOptionPane.showMessageDialog(
           GUIMediator.getAppFrame(),
@@ -490,7 +423,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     }
 
     try {
-      IdentityKeys.save(identity, selected);
+      IdentityLifecycle.exportToFile(identity, selected);
       JOptionPane.showMessageDialog(
           GUIMediator.getAppFrame(),
           I18n.tr("Identity exported to:") + "\n" + selected.getAbsolutePath(),
@@ -527,20 +460,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
     }
 
     try {
-      IdentityKeys imported = IdentityKeys.load(selected);
-
-      File identityFile = identityFile();
-      File parent = identityFile.getParentFile();
-      if (parent != null && !parent.exists() && !parent.mkdirs()) {
-        throw new java.io.IOException("Could not create identity directory: " + parent);
-      }
-
-      File backup = new File(identityFile.getParentFile(), RelayConstants.IDENTITY_FILE + ".bak");
-      if (identityFile.exists()) {
-        Files.copy(identityFile.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
-      }
-
-      Files.copy(selected.toPath(), identityFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      IdentityLifecycle.importFromFile(selected, identityFile());
 
       JOptionPane.showMessageDialog(
           GUIMediator.getAppFrame(),
