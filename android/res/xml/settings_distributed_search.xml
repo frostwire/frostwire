@@ -14,6 +14,12 @@
             android:summary="@string/distributed_search_summary"
             android:defaultValue="true" />
 
+        <Preference
+            android:key="frostwire.prefs.distributed.stack.status"
+            android:title="@string/distributed_stack_status_title"
+            android:summary="@string/distributed_stack_not_running"
+            android:selectable="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/distributed_identity_header">
@@ -22,13 +28,25 @@
             android:key="frostwire.prefs.distributed.identity.node_id"
             android:title="@string/distributed_identity_node_id"
             android:summary="@string/distributed_identity_not_initialized"
-            android:selectable="false" />
+            android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.fingerprint"
             android:title="@string/distributed_identity_fingerprint"
             android:summary="@string/distributed_identity_not_initialized"
-            android:selectable="false" />
+            android:selectable="true" />
+
+        <Preference
+            android:key="frostwire.prefs.distributed.identity.public_key"
+            android:title="@string/distributed_identity_public_key"
+            android:summary="@string/distributed_identity_not_initialized"
+            android:selectable="true" />
+
+        <Preference
+            android:key="frostwire.prefs.distributed.identity.karma"
+            android:title="@string/distributed_identity_karma"
+            android:summary="@string/distributed_identity_not_available"
+            android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.difficulty"
@@ -37,9 +55,9 @@
             android:selectable="false" />
 
         <Preference
-            android:key="frostwire.prefs.distributed.stack.status"
-            android:title="@string/distributed_search_header"
-            android:summary="@string/distributed_stack_not_running"
+            android:key="frostwire.prefs.distributed.identity.shared_count"
+            android:title="@string/distributed_identity_shared_count"
+            android:summary="@string/distributed_identity_not_available"
             android:selectable="false" />
 
         <com.frostwire.android.gui.views.preference.ButtonActionPreference
@@ -47,6 +65,36 @@
             android:title="@string/distributed_identity_initialize"
             android:summary="@string/distributed_identity_initialize_summary"
             app:button_text="@string/distributed_identity_initialize" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.show_seed"
+            android:title="@string/distributed_identity_show_seed"
+            android:summary="@string/distributed_identity_show_seed_summary"
+            app:button_text="@string/distributed_identity_show_seed" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.restore_seed"
+            android:title="@string/distributed_identity_restore_seed"
+            android:summary="@string/distributed_identity_restore_seed_summary"
+            app:button_text="@string/distributed_identity_restore_seed" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.export"
+            android:title="@string/distributed_identity_export"
+            android:summary="@string/distributed_identity_export_summary"
+            app:button_text="@string/distributed_identity_export" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.import_file"
+            android:title="@string/distributed_identity_import"
+            android:summary="@string/distributed_identity_import_summary"
+            app:button_text="@string/distributed_identity_import" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.copy_all"
+            android:title="@string/distributed_identity_copy_all"
+            android:summary="@string/distributed_identity_copy_all_summary"
+            app:button_text="@string/distributed_identity_copy_all" />
 
     </PreferenceCategory>
 
