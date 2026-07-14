@@ -193,12 +193,7 @@ public final class IdentityKeys {
         byte[] rawPub = pair.first;
 
         KeyPair edPair = buildEd25519KeyPair(seed, rawPub);
-
-        KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
-        xdh.initialize(NamedParameterSpec.X25519);
-        KeyPair xPair = xdh.generateKeyPair();
-
-        return new IdentityKeys(edPair, xPair);
+        return new IdentityKeys(edPair, generateX25519KeyPair());
     }
 
     private static KeyPair buildEd25519KeyPair(byte[] seed, byte[] rawPub) throws GeneralSecurityException {
@@ -250,8 +245,6 @@ public final class IdentityKeys {
         }
         SecureRandom rng = new SecureRandom();
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-        KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
-        xdh.initialize(NamedParameterSpec.X25519);
 
         while (true) {
             byte[] seed = new byte[32];
@@ -261,9 +254,40 @@ public final class IdentityKeys {
             byte[] rawPub = pair.first;
             if (minDifficulty == 0 || countLeadingZeroBits(sha1.digest(rawPub)) >= minDifficulty) {
                 KeyPair edPair = buildEd25519KeyPair(seed, rawPub);
-                return new IdentityKeys(edPair, xdh.generateKeyPair());
+                return new IdentityKeys(edPair, generateX25519KeyPair());
             }
         }
+    }
+
+    /**
+     * Generate an X25519 key pair in a way that works on both desktop JDKs
+     * and Android Conscrypt.
+     *
+     * <p>Desktop: {@code XDH} + {@link NamedParameterSpec#X25519}.
+     * Android Conscrypt's {@code OpenSSLXDHKeyPairGenerator} rejects
+     * {@code AlgorithmParameterSpec} ({@code InvalidAlgorithmParameterException:
+     * No AlgorithmParameterSpec classes are supported}); fall back to plain
+     * {@code generateKeyPair()} (defaults to X25519) or algorithm name
+     * {@code "X25519"}.
+     */
+    static KeyPair generateX25519KeyPair() throws GeneralSecurityException {
+        // Preferred: modern XDH API with NamedParameterSpec (OpenJDK desktop).
+        try {
+            KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
+            xdh.initialize(NamedParameterSpec.X25519);
+            return xdh.generateKeyPair();
+        } catch (GeneralSecurityException ignored) {
+            // Fall through — Android Conscrypt path.
+        }
+        // Android API 33+ / some providers expose the curve by name.
+        try {
+            return KeyPairGenerator.getInstance("X25519").generateKeyPair();
+        } catch (GeneralSecurityException ignored) {
+            // Fall through.
+        }
+        // Conscrypt XDH: initialize with no AlgorithmParameterSpec.
+        KeyPairGenerator xdh = KeyPairGenerator.getInstance("XDH");
+        return xdh.generateKeyPair();
     }
 
     /**
