@@ -135,6 +135,9 @@ public final class AndroidRelayStack implements AutoCloseable {
             IdentityKeys ident = IdentityKeys.loadOrCreate(identityFile);
             LOG.info("AndroidRelayStack: identity loaded: "
                     + com.frostwire.util.Hex.encode(ident.ed25519PubRaw()));
+            // Publish identity as soon as it exists so Settings can show Node ID even
+            // if a later stack step fails (user no longer stuck on "Not initialized").
+            SearchEngine.DISTRIBUTED_WIRING.identity(ident);
 
             SharedTorrentIndexerInstaller.install(btEngine, li, ident);
             LOG.info("AndroidRelayStack: SharedTorrentIndexer installed");

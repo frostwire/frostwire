@@ -36,6 +36,18 @@
             android:summary="@string/distributed_identity_not_initialized"
             android:selectable="false" />
 
+        <Preference
+            android:key="frostwire.prefs.distributed.stack.status"
+            android:title="@string/distributed_search_header"
+            android:summary="@string/distributed_stack_not_running"
+            android:selectable="false" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.identity.initialize"
+            android:title="@string/distributed_identity_initialize"
+            android:summary="@string/distributed_identity_initialize_summary"
+            app:button_text="@string/distributed_identity_initialize" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/distributed_peers_header">

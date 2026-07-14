@@ -253,7 +253,56 @@ public class EngineForegroundService extends Service implements IEngineService {
         });
     }
 
+    /**
+     * Whether the distributed-search / IceBridge stack is running.
+     */
+    public boolean isRelayStackRunning() {
+        return relayStack != null;
+    }
+
+    /**
+     * Start the relay stack if missing, or force-restart it. Runs off the main
+     * thread. Used from Settings when identity shows "Not initialized" or the
+     * peer directory is unavailable.
+     *
+     * @param forceRestart if true, tear down an existing stack first
+     * @param done         optional callback on the main thread (may be null)
+     */
+    public void ensureRelayStack(boolean forceRestart, Runnable done) {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            try {
+                if (forceRestart) {
+                    stopRelayStackBlocking();
+                }
+                if (relayStack == null) {
+                    BTEngine btEngine = BTEngine.getInstance();
+                    File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+                    if (homeDir == null) {
+                        LOG.warn("EngineForegroundService::ensureRelayStack: no libtorrent homeDir");
+                    } else {
+                        // First-run PoW identity mining can take several seconds.
+                        relayStack = AndroidRelayStack.start(this, homeDir, btEngine);
+                        if (relayStack != null) {
+                            LOG.info("EngineForegroundService::ensureRelayStack: started");
+                        } else {
+                            LOG.warn("EngineForegroundService::ensureRelayStack: start returned null");
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                LOG.warn("EngineForegroundService::ensureRelayStack failed", t);
+            }
+            if (done != null) {
+                SystemUtils.postToUIThread(done);
+            }
+        });
+    }
+
     private void stopRelayStack() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::stopRelayStackBlocking);
+    }
+
+    private void stopRelayStackBlocking() {
         AndroidRelayStack stack = relayStack;
         relayStack = null;
         if (stack != null) {

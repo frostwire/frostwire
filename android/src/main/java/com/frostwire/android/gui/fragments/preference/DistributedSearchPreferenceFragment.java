@@ -2,28 +2,19 @@
  *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *     Licensed under GPL v3. See LICENSE file.
  */
 
 package com.frostwire.android.gui.fragments.preference;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.services.EngineForegroundService;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.util.SystemUtils;
@@ -44,8 +35,11 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     @Override
     protected void initComponents() {
         setupDistributedToggle();
-        refreshIdentityInfo();
+        setupInitializeButton();
         setupRefreshButton();
+        refreshIdentityInfo();
+        refreshPeerList();
+        refreshStackStatus();
     }
 
     @Override
@@ -53,6 +47,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         super.onResume();
         refreshIdentityInfo();
         refreshPeerList();
+        refreshStackStatus();
     }
 
     private void setupDistributedToggle() {
@@ -65,6 +60,40 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 return true;
             });
         }
+    }
+
+    private void setupInitializeButton() {
+        ButtonActionPreference initBtn =
+                findPreference("frostwire.prefs.distributed.identity.initialize");
+        if (initBtn == null) {
+            return;
+        }
+        initBtn.setOnPreferenceClickListener(preference -> {
+            EngineForegroundService svc = EngineForegroundService.getInstance();
+            if (svc == null) {
+                Toast.makeText(requireContext(),
+                        R.string.distributed_identity_init_failed, Toast.LENGTH_LONG).show();
+                return true;
+            }
+            Toast.makeText(requireContext(),
+                    R.string.distributed_identity_initializing, Toast.LENGTH_SHORT).show();
+            // Force restart so a previous failed partial start is cleared.
+            svc.ensureRelayStack(true, () -> {
+                if (getActivity() == null) {
+                    return;
+                }
+                boolean ok = SearchEngine.DISTRIBUTED_WIRING.identity() != null
+                        && SearchEngine.DISTRIBUTED_WIRING.searchTransport() != null;
+                Toast.makeText(requireContext(),
+                        ok ? R.string.distributed_identity_init_ok
+                                : R.string.distributed_identity_init_failed,
+                        Toast.LENGTH_LONG).show();
+                refreshIdentityInfo();
+                refreshPeerList();
+                refreshStackStatus();
+            });
+            return true;
+        });
     }
 
     private void refreshIdentityInfo() {
@@ -116,6 +145,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         if (refreshBtn != null) {
             refreshBtn.setOnPreferenceClickListener(preference -> {
                 refreshPeerList();
+                refreshStackStatus();
+                refreshIdentityInfo();
                 return true;
             });
         }
@@ -130,6 +161,27 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             getActivity().runOnUiThread(() -> {
                 if (getActivity() == null) return;
                 updatePeerCountRow(verifiedCount, peerCount);
+            });
+        });
+    }
+
+    private void refreshStackStatus() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            EngineForegroundService svc = EngineForegroundService.getInstance();
+            boolean running = svc != null && svc.isRelayStackRunning();
+            boolean transport = SearchEngine.DISTRIBUTED_WIRING.searchTransport() != null;
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (getActivity() == null) return;
+                Preference statusPref = findPreference("frostwire.prefs.distributed.stack.status");
+                if (statusPref == null) return;
+                if (running && transport) {
+                    statusPref.setSummary(R.string.distributed_stack_running);
+                } else if (SearchEngine.DISTRIBUTED_WIRING.identity() != null && !transport) {
+                    statusPref.setSummary(R.string.distributed_identity_init_failed);
+                } else {
+                    statusPref.setSummary(R.string.distributed_stack_not_running);
+                }
             });
         });
     }
