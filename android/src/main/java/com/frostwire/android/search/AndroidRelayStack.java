@@ -52,6 +52,7 @@ import com.frostwire.search.relay.SharedTorrentIndexer;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
+import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
@@ -178,6 +179,10 @@ public final class AndroidRelayStack implements AutoCloseable {
             kcs.start();
             LOG.info("AndroidRelayStack: Karma chain wired");
 
+            // Persist IceBridge host cache under app-private libtorrent dir (not ~/.frostwire).
+            File hostCacheFile = new File(homeDir, "icebridge_host_cache.txt");
+            IceBridgeHostCache.configure(hostCacheFile);
+
             int controlPort = freeLocalControlPort();
             IceBridgeConfig config = IceBridgeConfig.newBuilder()
                     .host("0.0.0.0")
@@ -217,6 +222,12 @@ public final class AndroidRelayStack implements AutoCloseable {
                 relaySrv2.start();
                 relaySrv = relaySrv2;
                 LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
+                // Self + local control surface for settings "known IceBridge servers".
+                try {
+                    IceBridgeHostCache.getInstance()
+                            .markSuccess("127.0.0.1", relayPort, "BOTH");
+                } catch (Throwable ignored) {
+                }
             } catch (Throwable t) {
                 LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
             }

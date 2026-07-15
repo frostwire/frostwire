@@ -309,6 +309,14 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     /**
+     * Live relay stack, or {@code null} if not started. Used by Distributed Search settings.
+     */
+    @Nullable
+    public AndroidRelayStack getRelayStack() {
+        return relayStack;
+    }
+
+    /**
      * Start the relay stack if missing, or force-restart it. Runs off the main
      * thread. Used from Settings when identity shows "Not initialized" or the
      * peer directory is unavailable.

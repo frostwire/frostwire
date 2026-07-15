@@ -52,6 +52,26 @@ public final class IceBridgeHostCache {
     private final OutgoingRelayClient pingClient;
 
     private static volatile IceBridgeHostCache INSTANCE;
+    /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
+    private static volatile File configuredCacheFile;
+
+    /**
+     * Point the singleton at a specific cache file (e.g. Android app-private
+     * {@code files/libtorrent/icebridge_host_cache.txt}). Reloads if the path
+     * changes. Call early during relay-stack startup.
+     */
+    public static void configure(File cacheFile) {
+        if (cacheFile == null) {
+            throw new IllegalArgumentException("cacheFile is null");
+        }
+        synchronized (IceBridgeHostCache.class) {
+            configuredCacheFile = cacheFile;
+            if (INSTANCE != null
+                    && !INSTANCE.cacheFile.getAbsolutePath().equals(cacheFile.getAbsolutePath())) {
+                INSTANCE = new IceBridgeHostCache(cacheFile);
+            }
+        }
+    }
 
     public static IceBridgeHostCache getInstance() {
         if (INSTANCE == null) {
@@ -84,7 +104,16 @@ public final class IceBridgeHostCache {
         load();
     }
 
+    /** Absolute path of the cache file (for settings UI). */
+    public File cacheFile() {
+        return cacheFile;
+    }
+
     private static File defaultCacheFile() {
+        File configured = configuredCacheFile;
+        if (configured != null) {
+            return configured;
+        }
         File dir = new File(System.getProperty("user.home"), ".frostwire");
         if (!dir.exists()) {
             // best effort
