@@ -276,13 +276,6 @@ public final class AndroidRelayStack implements AutoCloseable {
             tr = new IceBridgeSearchTransport(cl);
             tr.start();
 
-            // Seed known EC2 forwarder into host cache for UI / bootstrap hints.
-            try {
-                IceBridgeHostCache.getInstance()
-                        .addOrUpdate("54.172.26.106", RelayConstants.RELAY_LISTEN_PORT, "FORWARDER");
-            } catch (Throwable ignored) {
-            }
-
             RelaySearchService ss = new RelaySearchService(li, ident);
 
             ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
