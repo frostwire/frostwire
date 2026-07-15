@@ -10,6 +10,7 @@ package com.frostwire.android.gui.fragments.preference;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -213,17 +214,21 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             IdentityKeys identity = resolveIdentity();
             long karma = identity != null ? readKarmaScore(identity) : -1;
             int shared = readSharedCount();
-            if (getActivity() == null) {
-                return;
-            }
-            getActivity().runOnUiThread(() -> {
-                if (getActivity() == null) {
-                    return;
-                }
-                updateIdentityRows(identity, karma, shared);
-                updateActionButtonLabels(identity != null);
-            });
+            SystemUtils.postToUIThread(() -> applyIdentityToUi(identity, karma, shared));
         });
+    }
+
+    /**
+     * Apply identity fields on the UI thread. Prefer calling this with the
+     * freshly generated/imported keys so the screen updates even if a concurrent
+     * stack restart has not yet re-wired {@link SearchEngine#DISTRIBUTED_WIRING}.
+     */
+    private void applyIdentityToUi(IdentityKeys identity, long karma, int shared) {
+        if (!isAdded()) {
+            return;
+        }
+        updateIdentityRows(identity, karma, shared);
+        updateActionButtonLabels(identity != null);
     }
 
     private void updateActionButtonLabels(boolean hasIdentity) {
@@ -357,15 +362,19 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 LOG.info("Identity generate: installed in "
                         + (System.currentTimeMillis() - t0) + " ms nodeId="
                         + Hex.encode(keys.nodeId()));
+                final IdentityKeys installed = keys;
+                final int shared = readSharedCount();
 
-                // Success UI first — do not wait for stack restart.
+                // Success UI first — paint the known keys immediately so the
+                // preference rows never stay stuck on "Not initialized".
                 SystemUtils.postToUIThread(() -> {
                     dismiss(progress);
                     busy = false;
                     toast(R.string.distributed_identity_init_ok);
-                    refreshAll();
+                    applyIdentityToUi(installed, 0, shared);
                 });
-                // Reload IceBridge with the new identity file (best-effort).
+                // Reload IceBridge with the new identity file (best-effort),
+                // then refresh karma / peers / stack status.
                 restartRelayStack(this::refreshAll);
             } catch (Throwable t) {
                 LOG.error("Failed to generate identity", t);
@@ -430,18 +439,16 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 }
                 IdentityKeys keys = IdentityLifecycle.restoreFromSeedPhrase(raw, file);
                 SearchEngine.DISTRIBUTED_WIRING.identity(keys);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        toast(R.string.distributed_identity_restore_ok);
-                        restartRelayStack(this::refreshAll);
-                    });
-                }
+                final IdentityKeys installed = keys;
+                SystemUtils.postToUIThread(() -> {
+                    toast(R.string.distributed_identity_restore_ok);
+                    applyIdentityToUi(installed, 0, readSharedCount());
+                    restartRelayStack(this::refreshAll);
+                });
             } catch (Throwable t) {
                 LOG.error("Failed to restore from seed", t);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                            toast(getString(R.string.distributed_identity_invalid_seed, t.getMessage())));
-                }
+                SystemUtils.postToUIThread(() ->
+                        toast(getString(R.string.distributed_identity_invalid_seed, t.getMessage())));
             }
         });
     }
@@ -450,32 +457,34 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         if (uri == null) {
             return;
         }
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        // Capture resolver on the UI thread; CreateDocument already left a 0-byte
+        // placeholder — we must open with "wt" and write the full payload.
+        final ContentResolver resolver = requireContext().getContentResolver();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             try {
                 IdentityKeys identity = resolveIdentity();
                 if (identity == null) {
                     throw new IllegalStateException(getString(R.string.distributed_identity_no_identity));
                 }
-                File temp = new File(requireContext().getCacheDir(), "export-identity.dat");
-                IdentityLifecycle.exportToFile(identity, temp);
-                try (InputStream in = new FileInputStream(temp);
-                     OutputStream out = requireContext().getContentResolver().openOutputStream(uri)) {
+                byte[] bytes = IdentityLifecycle.exportBytes(identity);
+                if (bytes.length < 64) {
+                    throw new IllegalStateException("encoded identity too small: " + bytes.length);
+                }
+                // "wt" truncates and opens for write — required so SAF Downloads
+                // does not leave the empty CreateDocument stub.
+                try (OutputStream out = resolver.openOutputStream(uri, "wt")) {
                     if (out == null) {
                         throw new java.io.IOException("could not open export destination");
                     }
-                    copyStream(in, out);
+                    out.write(bytes);
+                    out.flush();
                 }
-                //noinspection ResultOfMethodCallIgnored
-                temp.delete();
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> toast(R.string.distributed_identity_export_ok));
-                }
+                LOG.info("Identity export: wrote " + bytes.length + " bytes to " + uri);
+                SystemUtils.postToUIThread(() -> toast(R.string.distributed_identity_export_ok));
             } catch (Throwable t) {
                 LOG.error("Export failed", t);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                            toast(getString(R.string.distributed_identity_failed, t.getMessage())));
-                }
+                SystemUtils.postToUIThread(() ->
+                        toast(getString(R.string.distributed_identity_failed, t.getMessage())));
             }
         });
     }
@@ -484,15 +493,20 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         if (uri == null) {
             return;
         }
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        final ContentResolver resolver = requireContext().getContentResolver();
+        final File cacheDir = requireContext().getCacheDir();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             try {
-                File temp = new File(requireContext().getCacheDir(), "import-identity.dat");
-                try (InputStream in = requireContext().getContentResolver().openInputStream(uri);
+                File temp = new File(cacheDir, "import-identity.dat");
+                try (InputStream in = resolver.openInputStream(uri);
                      OutputStream out = new FileOutputStream(temp)) {
                     if (in == null) {
                         throw new java.io.IOException("could not open import source");
                     }
-                    copyStream(in, out);
+                    long n = copyStream(in, out);
+                    if (n < 64) {
+                        throw new java.io.IOException("import file too small: " + n + " bytes");
+                    }
                 }
                 File dest = identityFile();
                 if (dest == null) {
@@ -502,18 +516,16 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 //noinspection ResultOfMethodCallIgnored
                 temp.delete();
                 SearchEngine.DISTRIBUTED_WIRING.identity(imported);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        toast(R.string.distributed_identity_import_ok);
-                        restartRelayStack(this::refreshAll);
-                    });
-                }
+                final IdentityKeys keys = imported;
+                SystemUtils.postToUIThread(() -> {
+                    toast(R.string.distributed_identity_import_ok);
+                    applyIdentityToUi(keys, 0, readSharedCount());
+                    restartRelayStack(this::refreshAll);
+                });
             } catch (Throwable t) {
                 LOG.error("Import failed", t);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                            toast(getString(R.string.distributed_identity_failed, t.getMessage())));
-                }
+                SystemUtils.postToUIThread(() ->
+                        toast(getString(R.string.distributed_identity_failed, t.getMessage())));
             }
         });
     }
@@ -640,13 +652,17 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         }
     }
 
-    private static void copyStream(InputStream in, OutputStream out) throws java.io.IOException {
+    /** @return total bytes copied */
+    private static long copyStream(InputStream in, OutputStream out) throws java.io.IOException {
         byte[] buf = new byte[8192];
+        long total = 0;
         int n;
         while ((n = in.read(buf)) >= 0) {
             out.write(buf, 0, n);
+            total += n;
         }
         out.flush();
+        return total;
     }
 
     private static void dismiss(ProgressDialog progress) {

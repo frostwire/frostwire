@@ -1,4 +1,7 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Distributed Search identity UI refresh after create/import/restore paints Node ID immediately (no stuck "Not initialized")
+  - fix:BIP39 seed phrase works on Android — package common/src/main/resources (bip39_english.txt) into the APK
+  - fix:Identity export via SAF no longer leaves a 0-byte file — write full encoded payload with openOutputStream(uri, "wt")
   - fix:Initialize Identity no longer hangs — PoW mining on dedicated thread (not MISC queue), progress dismissed as soon as keys are written (stack restart best-effort), avoid InetAddress.getLocalHost hang on Android, PoW progress logs every 100k attempts
   - cleanup:Distributed Search identity UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as desktop
   - new:Distributed Search identity settings parity with desktop — create/replace identity, BIP39 seed phrase show/restore, export/import identity.dat, karma & shared counts, tap-to-copy node ID/fingerprint/public key
