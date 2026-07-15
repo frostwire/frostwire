@@ -54,6 +54,8 @@ public final class IceBridgeClient implements AutoCloseable {
     private final OkHttpClient http;
     private final String baseUrl;
     private volatile String authToken;
+    /** Own Ed25519 pub for multi-client /poll demux (set on successful register). */
+    private volatile byte[] ownPub;
 
     public IceBridgeClient(int controlPort) {
         this("http://127.0.0.1:" + controlPort);
@@ -77,6 +79,14 @@ public final class IceBridgeClient implements AutoCloseable {
     }
 
     /**
+     * Optional own public key so {@link #poll(int)} can request a per-client
+     * demux queue on multi USE_REMOTE forwarders ({@code /poll?pub=}).
+     */
+    public void setOwnPub(byte[] ownPub) {
+        this.ownPub = (ownPub == null || ownPub.length != 32) ? null : ownPub.clone();
+    }
+
+    /**
      * Check that the daemon is alive and responding.
      */
     public boolean health() {
@@ -85,6 +95,7 @@ public final class IceBridgeClient implements AutoCloseable {
             });
             return response != null && response.ok;
         } catch (Exception e) {
+            LOG.warn("IceBridgeClient.health failed for " + baseUrl + ": " + e.getMessage());
             return false;
         }
     }
@@ -121,17 +132,22 @@ public final class IceBridgeClient implements AutoCloseable {
         req.timestamp = timestamp;
 
         try {
-            Signature signer = Signature.getInstance("Ed25519");
+            Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(identity.ed25519().getPrivate());
             signer.update(req.canonicalString().getBytes(StandardCharsets.UTF_8));
             req.signature = Base64.getUrlEncoder().withoutPadding().encodeToString(signer.sign());
         } catch (Exception e) {
+            LOG.warn("IceBridgeClient.register: Ed25519 sign failed", e);
             return false;
         }
 
         ApiResponse<?> response = post("/register", req, new TypeToken<ApiResponse<?>>() {
         });
-        return response != null && response.ok;
+        boolean ok = response != null && response.ok;
+        if (ok) {
+            setOwnPub(identity.ed25519PubRaw());
+        }
+        return ok;
     }
 
     /**
@@ -190,8 +206,13 @@ public final class IceBridgeClient implements AutoCloseable {
         if (count <= 0) {
             return Collections.emptyList();
         }
+        String path = "/poll?count=" + count;
+        byte[] pub = ownPub;
+        if (pub != null && pub.length == 32) {
+            path += "&pub=" + Base64.getUrlEncoder().withoutPadding().encodeToString(pub);
+        }
         ApiResponse<List<com.frostwire.search.relay.icebridge.control.InboundMessageInfo>> response =
-                get("/poll?count=" + count,
+                get(path,
                         new TypeToken<ApiResponse<List<com.frostwire.search.relay.icebridge.control.InboundMessageInfo>>>() {
                         });
         if (response == null || response.data == null) {
@@ -228,6 +249,7 @@ public final class IceBridgeClient implements AutoCloseable {
                 return GSON.fromJson(body, type.getType());
             }
         } catch (Exception e) {
+            LOG.warn("IceBridgeClient GET " + path + " failed: " + e);
             return null;
         }
     }
@@ -247,6 +269,7 @@ public final class IceBridgeClient implements AutoCloseable {
                 return GSON.fromJson(responseBody, type.getType());
             }
         } catch (Exception e) {
+            LOG.warn("IceBridgeClient POST " + path + " failed: " + e);
             return null;
         }
     }

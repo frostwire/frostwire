@@ -7,6 +7,8 @@
 
 package com.frostwire.search.relay.icebridge;
 
+import com.frostwire.search.relay.IdentityKeys;
+
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -47,7 +49,7 @@ public final class IceBridgeAuth {
         byte[] x509 = new byte[ED25519_X509_PREFIX.length + raw.length];
         System.arraycopy(ED25519_X509_PREFIX, 0, x509, 0, ED25519_X509_PREFIX.length);
         System.arraycopy(raw, 0, x509, ED25519_X509_PREFIX.length, raw.length);
-        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        KeyFactory kf = IdentityKeys.softwareKeyFactory("Ed25519");
         return kf.generatePublic(new X509EncodedKeySpec(x509));
     }
 
@@ -70,7 +72,7 @@ public final class IceBridgeAuth {
         }
         try {
             PublicKey pub = publicKeyFromRaw(rawPub);
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(pub);
             verifier.update(message);
             return verifier.verify(signature);

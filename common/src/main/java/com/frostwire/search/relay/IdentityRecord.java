@@ -137,7 +137,7 @@ public final class IdentityRecord {
 
     public boolean verifySignature() {
         try {
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(rawEd25519ToPublicKey(ed25519Pub));
             verifier.update(canonicalBytes());
             return verifier.verify(signature);
@@ -263,7 +263,7 @@ public final class IdentityRecord {
             IdentityRecord unsigned = new IdentityRecord(nodeId, ed25519Pub, x25519Pub,
                     utpPort, rudpPort, role, capabilities, wireVersion, firstSeen, lastSeen,
                     new byte[SIGNATURE_LENGTH]);
-            Signature signer = Signature.getInstance("Ed25519");
+            Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(privateKey);
             signer.update(unsigned.canonicalBytes());
             return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, rudpPort, role, capabilities,
@@ -277,7 +277,8 @@ public final class IdentityRecord {
         byte[] encoded = new byte[ED25519_X509_PREFIX.length + raw.length];
         System.arraycopy(ED25519_X509_PREFIX, 0, encoded, 0, ED25519_X509_PREFIX.length);
         System.arraycopy(raw, 0, encoded, ED25519_X509_PREFIX.length, raw.length);
-        return KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
+        return IdentityKeys.softwareKeyFactory("Ed25519")
+                .generatePublic(new X509EncodedKeySpec(encoded));
     }
 
     private Map<String, Object> canonicalMap() {

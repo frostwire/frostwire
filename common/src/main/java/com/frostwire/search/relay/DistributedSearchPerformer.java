@@ -271,6 +271,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         return; // not our response / already completed
                     }
                     if (!SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
+                        LOG.warn("DistributedSearchPerformer: response verify failed from "
+                                + req.peer.hostname() + " rows=" + response.rows().size()
+                                + " final=" + response.isFinalChunk());
                         // Bad frame: drop but keep waiting for a good final
                         // or timeout unless this claimed to be final.
                         if (response.isFinalChunk()) {
@@ -281,9 +284,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         return;
                     }
                     try {
-                        results.addAll(toResults(response));
+                        List<FileSearchResult> converted = toResults(response);
+                        results.addAll(converted);
+                        LOG.info("DistributedSearchPerformer: accepted " + converted.size()
+                                + " row(s) from " + req.peer.hostname());
                     } catch (Throwable t) {
-                        LOG.debug("Failed to convert search response rows", t);
+                        LOG.warn("Failed to convert search response rows", t);
                     }
                     // Stream: only complete the peer when final=true. Intermediate RESULT chunks accumulate.
                     if (response.isFinalChunk()) {
@@ -345,7 +351,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .timestamp(timestamp)
                 .signature(new byte[64])
                 .build();
-        Signature signer = Signature.getInstance("Ed25519");
+        Signature signer = IdentityKeys.softwareSignature("Ed25519");
         signer.initSign(identity.ed25519().getPrivate());
         signer.update(unsigned.queryCanonicalBytes());
         byte[] sig = signer.sign();

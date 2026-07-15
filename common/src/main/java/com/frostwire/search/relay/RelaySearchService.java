@@ -102,17 +102,20 @@ public final class RelaySearchService {
         }
         try {
             if (!verifySignature(request)) {
-                LOG.debug("Rejected: bad signature");
+                LOG.warn("RelaySearchService: rejected request (bad signature) keywords="
+                        + request.keywords());
                 return Optional.empty();
             }
             long nowMs = System.currentTimeMillis();
             long skew = Math.abs(nowMs - (request.timestamp() * 1000L));
             if (skew > MAX_TIMESTAMP_SKEW_MS) {
-                LOG.debug("Rejected: timestamp skew " + skew + "ms");
+                LOG.warn("RelaySearchService: rejected request (timestamp skew "
+                        + skew + "ms) keywords=" + request.keywords());
                 return Optional.empty();
             }
             if (!rateLimiter.tryAcquire(request.requesterPub())) {
-                LOG.debug("Rejected: rate limit");
+                LOG.warn("RelaySearchService: rejected request (rate limit) keywords="
+                        + request.keywords());
                 return Optional.empty();
             }
             int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
@@ -127,6 +130,8 @@ public final class RelaySearchService {
             if (rows.size() > limit) {
                 rows = new ArrayList<>(rows.subList(0, limit));
             }
+            LOG.info("RelaySearchService: answered keywords=\"" + request.keywords()
+                    + "\" rows=" + rows.size());
             return Optional.of(buildResponse(request, rows));
         } catch (Throwable t) {
             LOG.warn("RelaySearchService.handle failed", t);
@@ -160,9 +165,9 @@ public final class RelaySearchService {
             byte[] encoded = new byte[prefix.length + raw.length];
             System.arraycopy(prefix, 0, encoded, 0, prefix.length);
             System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-            PublicKey pub = KeyFactory.getInstance("Ed25519")
+            PublicKey pub = IdentityKeys.softwareKeyFactory("Ed25519")
                     .generatePublic(new X509EncodedKeySpec(encoded));
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(pub);
             verifier.update(request.canonicalBytes());
             return verifier.verify(request.signature());
@@ -175,7 +180,7 @@ public final class RelaySearchService {
     private byte[] sign(byte[] data) {
         try {
             PrivateKey priv = identity.ed25519().getPrivate();
-            Signature signer = Signature.getInstance("Ed25519");
+            Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(priv);
             signer.update(data);
             return signer.sign();

@@ -206,7 +206,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                             row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile);
                 }
                 RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
-                Signature signer = Signature.getInstance("Ed25519");
+                Signature signer = IdentityKeys.softwareSignature("Ed25519");
                 signer.initSign(identity.ed25519().getPrivate());
                 signer.update(unsigned.canonicalBytes());
                 RemoteSearchResponse chunk = b.signature(signer.sign()).build();
@@ -273,7 +273,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             byte[] canonical = RemoteIndexFetcher.manifestCanonicalBytes(
                     RemoteIndexFetcher.MANIFEST_VERSION, pubB64, ts, entries);
             PrivateKey priv = identity.ed25519().getPrivate();
-            Signature signer = Signature.getInstance("Ed25519");
+            Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(priv);
             signer.update(canonical);
             byte[] sig = signer.sign();
@@ -295,9 +295,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             byte[] encoded = new byte[prefix.length + raw.length];
             System.arraycopy(prefix, 0, encoded, 0, prefix.length);
             System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-            PublicKey pub = KeyFactory.getInstance("Ed25519")
+            PublicKey pub = IdentityKeys.softwareKeyFactory("Ed25519")
                     .generatePublic(new X509EncodedKeySpec(encoded));
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(pub);
             verifier.update(request.canonicalBytes());
             return verifier.verify(request.signature());

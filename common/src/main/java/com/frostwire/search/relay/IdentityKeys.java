@@ -23,6 +23,7 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.Signature;
 import java.security.spec.NamedParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -209,6 +210,64 @@ public final class IdentityKeys {
     }
 
     /**
+     * Resolve a {@link Signature} that can sign/verify with software Ed25519
+     * keys (including BouncyCastle {@code BCEdDSAPrivateKey} on Android).
+     *
+     * <p>Plain {@code Signature.getInstance("Ed25519")} often picks a provider
+     * that does not accept BC keys ({@code InvalidKeyException: No installed
+     * provider supports this key}), which breaks IceBridge register, DHT
+     * identity publish, and distributed search request signing.
+     */
+    public static Signature softwareSignature(String algorithm) throws GeneralSecurityException {
+        Provider bc = bouncyCastleProviderOrNull();
+        if (bc != null) {
+            String[] algs = algorithm.equals("Ed25519")
+                    ? new String[] {"Ed25519", "EdDSA"}
+                    : new String[] {algorithm};
+            for (String alg : algs) {
+                try {
+                    return Signature.getInstance(alg, bc);
+                } catch (GeneralSecurityException e) {
+                    LOG.warn("BC Signature for " + alg + " failed: " + e.getMessage());
+                }
+            }
+        }
+        String[] preferred = {
+                "BC",
+                "AndroidOpenSSL",
+                "Conscrypt",
+                "SunEC",
+        };
+        for (String name : preferred) {
+            try {
+                Signature sig = Signature.getInstance(algorithm, name);
+                if (!isAndroidKeyStore(sig.getProvider())) {
+                    return sig;
+                }
+            } catch (GeneralSecurityException ignored) {
+                // try next
+            }
+        }
+        for (Provider p : Security.getProviders()) {
+            if (isAndroidKeyStore(p)) {
+                continue;
+            }
+            try {
+                return Signature.getInstance(algorithm, p);
+            } catch (GeneralSecurityException ignored) {
+                // try next
+            }
+        }
+        Signature fallback = Signature.getInstance(algorithm);
+        if (isAndroidKeyStore(fallback.getProvider())) {
+            throw new GeneralSecurityException(
+                    "No software Signature for " + algorithm
+                            + ". Ensure BouncyCastle bcprov is on the classpath.");
+        }
+        return fallback;
+    }
+
+    /**
      * Resolve a {@link KeyFactory} that can import software PKCS#8 / X.509
      * material (jlibtorrent-derived keys).
      *
@@ -219,7 +278,7 @@ public final class IdentityKeys {
      * Keystore, use KeyPairGenerator...}. Prefer Conscrypt / AndroidOpenSSL /
      * BC, and skip any provider whose name contains "KeyStore".
      */
-    static KeyFactory softwareKeyFactory(String algorithm) throws GeneralSecurityException {
+    public static KeyFactory softwareKeyFactory(String algorithm) throws GeneralSecurityException {
         // Prefer an explicit Provider instance (does not require Security.insertProviderAt,
         // which some Android policies restrict).
         Provider bc = bouncyCastleProviderOrNull();
