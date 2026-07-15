@@ -19,12 +19,15 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.NamedParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Long-lived cryptographic identity for a FrostWire node.
@@ -199,10 +202,117 @@ public final class IdentityKeys {
     private static KeyPair buildEd25519KeyPair(byte[] seed, byte[] rawPub) throws GeneralSecurityException {
         byte[] pkcs8 = buildEd25519Pkcs8FromSeed(seed);
         byte[] x509 = buildEd25519X509FromRawPub(rawPub);
-        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        KeyFactory kf = softwareKeyFactory("Ed25519");
         PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8));
         PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(x509));
         return new KeyPair(pub, priv);
+    }
+
+    /**
+     * Resolve a {@link KeyFactory} that can import software PKCS#8 / X.509
+     * material (jlibtorrent-derived keys).
+     *
+     * <p>On Android 12+ (especially API 34/35), the default
+     * {@code KeyFactory.getInstance("Ed25519")} may resolve to
+     * {@code AndroidKeyStore}, which rejects external PKCS#8 with
+     * {@code InvalidKeySpecException: To generate a key pair in Android
+     * Keystore, use KeyPairGenerator...}. Prefer Conscrypt / AndroidOpenSSL /
+     * BC, and skip any provider whose name contains "KeyStore".
+     */
+    static KeyFactory softwareKeyFactory(String algorithm) throws GeneralSecurityException {
+        // Prefer an explicit Provider instance (does not require Security.insertProviderAt,
+        // which some Android policies restrict).
+        Provider bc = bouncyCastleProviderOrNull();
+        if (bc != null) {
+            // BC historically exposed Ed25519 under Ed25519 and EdDSA names.
+            String[] algs = algorithm.equals("Ed25519")
+                    ? new String[] {"Ed25519", "EdDSA"}
+                    : new String[] {algorithm};
+            for (String alg : algs) {
+                try {
+                    return KeyFactory.getInstance(alg, bc);
+                } catch (GeneralSecurityException e) {
+                    LOG.warn("BC KeyFactory for " + alg + " failed: " + e.getMessage());
+                }
+            }
+        }
+        String[] preferred = {
+                "BC",
+                "AndroidOpenSSL",
+                "Conscrypt",
+                "SunEC",
+        };
+        for (String name : preferred) {
+            try {
+                KeyFactory kf = KeyFactory.getInstance(algorithm, name);
+                if (!isAndroidKeyStore(kf.getProvider())) {
+                    return kf;
+                }
+            } catch (GeneralSecurityException ignored) {
+                // try next
+            }
+        }
+        for (Provider p : Security.getProviders()) {
+            if (isAndroidKeyStore(p)) {
+                continue;
+            }
+            try {
+                return KeyFactory.getInstance(algorithm, p);
+            } catch (GeneralSecurityException ignored) {
+                // try next
+            }
+        }
+        KeyFactory fallback = KeyFactory.getInstance(algorithm);
+        if (isAndroidKeyStore(fallback.getProvider())) {
+            throw new GeneralSecurityException(
+                    "No software KeyFactory for " + algorithm
+                            + " (AndroidKeyStore cannot import jlibtorrent PKCS#8 material)."
+                            + " Ensure BouncyCastle bcprov is on the classpath.");
+        }
+        return fallback;
+    }
+
+    private static volatile Provider cachedBcProvider;
+
+    /**
+     * Return a BouncyCastle {@link Provider} instance when the library is on the
+     * classpath (Android dependency). Does not require global Security registration.
+     */
+    private static Provider bouncyCastleProviderOrNull() {
+        Provider cached = cachedBcProvider;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (IdentityKeys.class) {
+            if (cachedBcProvider != null) {
+                return cachedBcProvider;
+            }
+            try {
+                Class<?> clazz = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
+                Provider bc = (Provider) clazz.getDeclaredConstructor().newInstance();
+                cachedBcProvider = bc;
+                // Best-effort global registration (optional).
+                if (Security.getProvider("BC") == null) {
+                    try {
+                        Security.insertProviderAt(bc, 1);
+                    } catch (Throwable ignored) {
+                    }
+                }
+                LOG.info("Using BouncyCastle provider for software Ed25519 keys");
+                return bc;
+            } catch (Throwable t) {
+                LOG.warn("BouncyCastle not available for Ed25519 KeyFactory: " + t);
+                return null;
+            }
+        }
+    }
+
+    private static boolean isAndroidKeyStore(Provider p) {
+        if (p == null) {
+            return false;
+        }
+        String n = p.getName();
+        return n != null && n.toLowerCase(Locale.ROOT).contains("keystore");
     }
 
     private static byte[] buildEd25519Pkcs8FromSeed(byte[] seed) {
@@ -430,7 +540,13 @@ public final class IdentityKeys {
 
     private static KeyPair reconstruct(String algorithm, byte[] pkcs8, byte[] x509)
             throws GeneralSecurityException {
-        KeyFactory kf = KeyFactory.getInstance(algorithm);
+        // Ed25519 / XDH may default to AndroidKeyStore on modern Android; use software.
+        KeyFactory kf;
+        if ("Ed25519".equals(algorithm) || "XDH".equals(algorithm) || "X25519".equals(algorithm)) {
+            kf = softwareKeyFactory(algorithm);
+        } else {
+            kf = KeyFactory.getInstance(algorithm);
+        }
         PrivateKey priv = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8));
         PublicKey pub = kf.generatePublic(new X509EncodedKeySpec(x509));
         return new KeyPair(pub, priv);
