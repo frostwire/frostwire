@@ -610,7 +610,7 @@
     <string name="distributed_stack_no_service">Engine service not running</string>
     <string name="distributed_icebridge_header">IceBridge</string>
     <string name="distributed_icebridge_mode_title">Mode</string>
-    <string name="distributed_icebridge_mode_local">In-process local IceBridge (Android always runs mesh inside the app — no subprocess)</string>
+    <string name="distributed_icebridge_mode_local">In-Process local IceBridge</string>
     <string name="distributed_icebridge_config_title">Local ports / role</string>
     <string name="distributed_icebridge_config_summary">rUDP %1$d · identity TCP %2$d · control HTTP %3$d · role %4$s</string>
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
