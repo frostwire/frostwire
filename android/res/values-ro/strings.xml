@@ -315,6 +315,8 @@
     <string name="torrent_preferences_header">Preferințe Torrent</string>
     <string name="distributed_search_header">Căutare Distribuită</string>
     <string name="distributed_search_summary">Caută în rețeaua peer-to-peer FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Căutare Distribuită</string>
     <string name="distributed_identity_header">Identitate</string>
     <string name="distributed_identity_node_id">ID Nod</string>

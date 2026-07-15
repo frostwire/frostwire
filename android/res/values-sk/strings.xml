@@ -317,6 +317,8 @@
     <string name="torrent_preferences_header">Torrent preferencie</string>
     <string name="distributed_search_header">Distribuované vyhľadávanie</string>
     <string name="distributed_search_summary">Prehľadávať peer-to-peer sieť FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Distribuované vyhľadávanie</string>
     <string name="distributed_identity_header">Identita</string>
     <string name="distributed_identity_node_id">ID uzla</string>

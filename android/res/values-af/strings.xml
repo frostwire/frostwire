@@ -66,6 +66,8 @@
     <string name="torrent_preferences_header">Torrent Voorkeure</string>
     <string name="distributed_search_header">Verspreide Soektog</string>
     <string name="distributed_search_summary">Soek die FrostWire eweknie-tot-eweknie netwerk</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Verspreide Soektog</string>
     <string name="distributed_identity_header">Identiteit</string>
     <string name="distributed_identity_node_id">Nodus ID</string>

@@ -58,6 +58,8 @@
     <string name="torrent_preferences_header">Torrent Inställningar</string>
     <string name="distributed_search_header">Distribuerad Sökning</string>
     <string name="distributed_search_summary">Sök i FrostWire peer-to-peer-nätverket</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Distribuerad Sökning</string>
     <string name="distributed_identity_header">Identitet</string>
     <string name="distributed_identity_node_id">Nod-ID</string>

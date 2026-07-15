@@ -317,6 +317,8 @@
     <string name="torrent_preferences_header">Preferensi torrent</string>
     <string name="distributed_search_header">Pencarian Terdistribusi</string>
     <string name="distributed_search_summary">Cari di jaringan peer-to-peer FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Pencarian Terdistribusi</string>
     <string name="distributed_identity_header">Identitas</string>
     <string name="distributed_identity_node_id">ID Node</string>

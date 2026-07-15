@@ -68,6 +68,8 @@
     <string name="torrent_preferences_header">जोरदार प्राधान्ये</string>
     <string name="distributed_search_header">वितरित शोध</string>
     <string name="distributed_search_summary">FrostWire पीयर-टू-पीयर नेटवर्कवर शोधा</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">वितरित शोध</string>
     <string name="distributed_identity_header">ओळख</string>
     <string name="distributed_identity_node_id">नोड ID</string>

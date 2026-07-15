@@ -318,6 +318,8 @@
     <string name="torrent_preferences_header">Keutamaan torrent</string>
     <string name="distributed_search_header">Carian Teragih</string>
     <string name="distributed_search_summary">Cari dalam rangkaian peer-to-peer FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Carian Teragih</string>
     <string name="distributed_identity_header">Identiti</string>
     <string name="distributed_identity_node_id">ID Nod</string>

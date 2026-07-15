@@ -420,6 +420,8 @@
     <string name="torrent_preferences_header">Торрент Предпочтения</string>
     <string name="distributed_search_header">Распределённый Поиск</string>
     <string name="distributed_search_summary">Искать в peer-to-peer сети FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Распределённый Поиск</string>
     <string name="distributed_identity_header">Идентичность</string>
     <string name="distributed_identity_node_id">ID Узла</string>

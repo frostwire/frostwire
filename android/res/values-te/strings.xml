@@ -66,6 +66,8 @@
     <string name="torrent_preferences_header">టొరెంట్ ప్రాధాన్యతలు</string>
     <string name="distributed_search_header">పంపిణీ శోధన</string>
     <string name="distributed_search_summary">FrostWire పీర్-టు-పీర్ నెట్‌వర్క్‌లో శోధించండి</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">పంపిణీ శోధన</string>
     <string name="distributed_identity_header">గుర్తింపు</string>
     <string name="distributed_identity_node_id">నోడ్ ID</string>

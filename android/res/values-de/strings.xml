@@ -322,6 +322,8 @@
     <string name="torrent_preferences_header">Torrent-Einstellungen</string>
     <string name="distributed_search_header">Verteilte Suche</string>
     <string name="distributed_search_summary">Das FrostWire Peer-to-Peer-Netzwerk durchsuchen</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Verteilte Suche</string>
     <string name="distributed_identity_header">Identität</string>
     <string name="distributed_identity_node_id">Knoten-ID</string>

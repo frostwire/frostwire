@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Local shared-torrent search actually runs on Android — register LOCAL SearchEngine (was wired but never added to ALL_ENGINES), default enabled, Search Engines preference checkbox
+  - fix:Populate LocalIndex for existing transfers after relay stack start (reindex); TransferManager chains BTEngineListener instead of setListener so SharedTorrentIndexer is not wiped on reset
   - fix:Identity settings never flash "Not initialized" after force-stop/reboot — preload identity.dat on HIGH_PRIORITY before IceBridge, load identity before LocalIndex.open, settings default to "Loading saved identity…" and resolve off the MISC queue
   - fix:Distributed Search identity UI refresh after create/import/restore paints Node ID immediately (no stuck "Not initialized")
   - fix:BIP39 seed phrase works on Android — package common/src/main/resources (bip39_english.txt) into the APK

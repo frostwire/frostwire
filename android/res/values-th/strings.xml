@@ -317,6 +317,8 @@
     <string name="torrent_preferences_header">การตั้งค่า Torrent</string>
     <string name="distributed_search_header">การค้นหาแบบกระจาย</string>
     <string name="distributed_search_summary">ค้นหาในเครือข่าย peer-to-peer ของ FrostWire</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">การค้นหาแบบกระจาย</string>
     <string name="distributed_identity_header">ตัวตน</string>
     <string name="distributed_identity_node_id">รหัสโหนด</string>

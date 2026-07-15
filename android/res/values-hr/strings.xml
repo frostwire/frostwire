@@ -316,6 +316,8 @@
     <string name="torrent_preferences_header">Torrent preferencije</string>
     <string name="distributed_search_header">Distribuirano Pretraživanje</string>
     <string name="distributed_search_summary">Pretraži FrostWire peer-to-peer mrežu</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Distribuirano Pretraživanje</string>
     <string name="distributed_identity_header">Identitet</string>
     <string name="distributed_identity_node_id">ID Čvora</string>

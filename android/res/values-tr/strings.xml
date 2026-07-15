@@ -315,6 +315,8 @@
     <string name="torrent_preferences_header">Torrent Tercihleri</string>
     <string name="distributed_search_header">Dağıtılmış Arama</string>
     <string name="distributed_search_summary">FrostWire peer-to-peer ağında ara</string>
+        <string name="use_local">Local Shared Torrents</string>
+    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
     <string name="use_distributed">Dağıtılmış Arama</string>
     <string name="distributed_identity_header">Kimlik</string>
     <string name="distributed_identity_node_id">Düğüm ID</string>
