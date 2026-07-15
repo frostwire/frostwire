@@ -447,8 +447,8 @@
     <string name="distributed_identity_initialize">Initialize Identity</string>
     <string name="distributed_identity_create_new">Create New Identity</string>
     <string name="distributed_identity_initialize_summary">Generate a new proof-of-work identity and start the local IceBridge stack</string>
-    <string name="distributed_identity_initializing">Mining proof-of-work identity… this may take several seconds</string>
-    <string name="distributed_identity_init_ok">Identity ready and relay stack started</string>
+    <string name="distributed_identity_initializing">Mining proof-of-work identity… usually 10–60 seconds on phones. Please wait.</string>
+    <string name="distributed_identity_init_ok">Identity created. Restarting relay stack…</string>
     <string name="distributed_identity_init_failed">Could not initialize identity or start the stack. Check logcat for AndroidRelayStack / IdentityKeys.</string>
     <string name="distributed_identity_confirm_create_new">Creating a new identity permanently replaces your current node ID and karma identity. A backup of the current file will be saved first. Continue?</string>
     <string name="distributed_identity_confirm_initialize">Generate a new FrostWire identity with proof-of-work. This may take a few seconds. Continue?</string>

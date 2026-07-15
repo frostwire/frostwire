@@ -245,6 +245,11 @@ public final class IdentityKeys {
         }
         SecureRandom rng = new SecureRandom();
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+        long t0 = System.currentTimeMillis();
+        long attempts = 0;
+        // Log every 100k tries so Android/desktop UIs and logcat show mining is alive
+        // (difficulty 20 ≈ 1M attempts average; phones can take 30–90s).
+        final long logEvery = 100_000L;
 
         while (true) {
             byte[] seed = new byte[32];
@@ -252,9 +257,20 @@ public final class IdentityKeys {
             com.frostwire.jlibtorrent.Pair<byte[], byte[]> pair =
                     com.frostwire.jlibtorrent.Ed25519.createKeypair(seed);
             byte[] rawPub = pair.first;
+            attempts++;
             if (minDifficulty == 0 || countLeadingZeroBits(sha1.digest(rawPub)) >= minDifficulty) {
                 KeyPair edPair = buildEd25519KeyPair(seed, rawPub);
+                long ms = System.currentTimeMillis() - t0;
+                if (minDifficulty > 0) {
+                    LOG.info("PoW identity mined: difficulty=" + minDifficulty
+                            + " attempts=" + attempts + " in " + ms + " ms");
+                }
                 return new IdentityKeys(edPair, generateX25519KeyPair());
+            }
+            if (attempts % logEvery == 0) {
+                long ms = System.currentTimeMillis() - t0;
+                LOG.info("PoW identity mining… difficulty=" + minDifficulty
+                        + " attempts=" + attempts + " elapsedMs=" + ms);
             }
         }
     }

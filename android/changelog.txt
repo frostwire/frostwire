@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Initialize Identity no longer hangs — PoW mining on dedicated thread (not MISC queue), progress dismissed as soon as keys are written (stack restart best-effort), avoid InetAddress.getLocalHost hang on Android, PoW progress logs every 100k attempts
   - cleanup:Distributed Search identity UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as desktop
   - new:Distributed Search identity settings parity with desktop — create/replace identity, BIP39 seed phrase show/restore, export/import identity.dat, karma & shared counts, tap-to-copy node ID/fingerprint/public key
   - fix:IdentityKeys X25519 generation works on Android Conscrypt (fixes relay stack never starting / "Not initialized")

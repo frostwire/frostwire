@@ -329,6 +329,9 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             return;
         }
         busy = true;
+        // Progress text must set expectations: difficulty-20 PoW is ~1M Ed25519
+        // attempts (tens of seconds on phones). Dialog is dismissed as soon as
+        // keys are written — stack restart must not hold the spinner forever.
         ProgressDialog progress = ProgressDialog.show(
                 requireContext(),
                 getString(R.string.distributed_identity_initialize),
@@ -336,33 +339,42 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 true,
                 false);
 
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        // HIGH_PRIORITY: dedicated thread — never queue behind MISC (IceBridge
+        // start/stop, peer discovery glue, etc.).
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             try {
                 File file = identityFile();
                 if (file == null) {
                     throw new IllegalStateException("libtorrent homeDir not available");
                 }
+                LOG.info("Identity generate: mining PoW difficulty="
+                        + KarmaConstants.IDENTITY_DIFFICULTY
+                        + " path=" + file.getAbsolutePath());
+                long t0 = System.currentTimeMillis();
                 IdentityKeys keys = IdentityLifecycle.generateAndInstall(
                         file, KarmaConstants.IDENTITY_DIFFICULTY);
                 SearchEngine.DISTRIBUTED_WIRING.identity(keys);
-                restartRelayStack(() -> {
+                LOG.info("Identity generate: installed in "
+                        + (System.currentTimeMillis() - t0) + " ms nodeId="
+                        + Hex.encode(keys.nodeId()));
+
+                // Success UI first — do not wait for stack restart.
+                SystemUtils.postToUIThread(() -> {
                     dismiss(progress);
                     busy = false;
                     toast(R.string.distributed_identity_init_ok);
                     refreshAll();
                 });
+                // Reload IceBridge with the new identity file (best-effort).
+                restartRelayStack(this::refreshAll);
             } catch (Throwable t) {
                 LOG.error("Failed to generate identity", t);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        dismiss(progress);
-                        busy = false;
-                        toast(getString(R.string.distributed_identity_failed, t.getMessage()));
-                        refreshAll();
-                    });
-                } else {
+                SystemUtils.postToUIThread(() -> {
+                    dismiss(progress);
                     busy = false;
-                }
+                    toast(getString(R.string.distributed_identity_failed, t.getMessage()));
+                    refreshAll();
+                });
             }
         });
     }

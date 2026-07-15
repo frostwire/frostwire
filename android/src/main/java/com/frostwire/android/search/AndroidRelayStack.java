@@ -203,13 +203,14 @@ public final class AndroidRelayStack implements AutoCloseable {
             ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
             ih.start();
 
+            // Never call InetAddress.getLocalHost() on Android — it can block for
+            // tens of seconds (or longer) on DNS/reverse-lookup failure, freezing
+            // the MISC handler that starts the relay stack and identity UI.
             String localHost = "127.0.0.1";
             try {
                 String adv = System.getProperty("frostwire.icebridge.advertiseHost");
                 if (adv != null && !adv.isEmpty()) {
                     localHost = adv;
-                } else {
-                    localHost = java.net.InetAddress.getLocalHost().getHostAddress();
                 }
             } catch (Throwable ignored) {
             }
