@@ -725,25 +725,114 @@ def main():
     run_logcat_tui(serial)
 
 
+def headless_run(
+    avd: Optional[str] = None,
+    serial: Optional[str] = None,
+    skip_build: bool = False,
+    no_launch: bool = False,
+    wipe_data: bool = False,
+) -> str:
+    """
+    Non-interactive build/install/run for CI and agent automation.
+
+    Returns the adb serial of the target device.
+    Raises SystemExit on failure.
+    """
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    target_serial = serial
+    if not target_serial:
+        devices = get_adb_devices()
+        running = [d for d in devices if d.is_emulator and d.state == "device"]
+        if running:
+            target_serial = running[0].serial
+            console.print(f"[bright_cyan]Headless: reusing emulator {target_serial}[/bright_cyan]")
+        elif avd:
+            target_serial = run_emulator(avd, wipe_data=wipe_data)
+            if not target_serial:
+                console.print(f"[red]Failed to boot AVD {avd}[/red]")
+                sys.exit(2)
+        else:
+            avds = get_avds()
+            if not avds:
+                console.print("[red]No AVD and no running emulator. Create one with the interactive TUI.[/red]")
+                sys.exit(2)
+            # Prefer newer AVDs (name sort reverse often puts 15/16 first)
+            preferred = None
+            for name in avds:
+                if "15" in name or "16" in name or "Pixel_9" in name:
+                    preferred = name
+                    break
+            preferred = preferred or avds[0]
+            console.print(f"[bright_cyan]Headless: booting AVD {preferred}[/bright_cyan]")
+            target_serial = run_emulator(preferred, wipe_data=wipe_data)
+            if not target_serial:
+                sys.exit(2)
+
+    if not wait_for_device(target_serial, timeout=120):
+        # May already be booted; continue if adb sees it as device
+        devices = get_adb_devices()
+        if not any(d.serial == target_serial and d.state == "device" for d in devices):
+            console.print(f"[red]Device {target_serial} not ready[/red]")
+            sys.exit(2)
+
+    if skip_build:
+        apk = get_apk_path()
+        if not apk:
+            console.print("[yellow]No existing APK; building…[/yellow]")
+            apk = build_apk()
+    else:
+        apk = build_apk()
+    if not apk:
+        sys.exit(1)
+
+    if not install_apk(apk, target_serial):
+        sys.exit(1)
+
+    if not no_launch:
+        launch_app(target_serial)
+        console.print(f"[bold green]Done! FrostWire running on {target_serial}[/bold green]")
+    else:
+        console.print(f"[bold green]Installed on {target_serial} (not launched)[/bold green]")
+
+    return target_serial
+
+
+def parse_args(argv: list[str]):
+    import argparse
+    p = argparse.ArgumentParser(
+        description="FrostWire Android launcher (interactive TUI or headless automation)",
+    )
+    p.add_argument("--quick", "-q", action="store_true",
+                   help="Build+install+launch on first running emulator (no menu)")
+    p.add_argument("--headless", action="store_true",
+                   help="Non-interactive: boot AVD if needed, build, install, launch")
+    p.add_argument("--avd", type=str, default=None,
+                   help="AVD name for --headless when no emulator is running")
+    p.add_argument("--serial", type=str, default=None,
+                   help="adb serial to use (emulator-5554 or device id)")
+    p.add_argument("--skip-build", action="store_true",
+                   help="Reuse existing plus1Debug APK if present")
+    p.add_argument("--no-launch", action="store_true",
+                   help="Install only; do not start MainActivity")
+    p.add_argument("--wipe-data", action="store_true",
+                   help="Cold boot emulator with -wipe-data")
+    return p.parse_args(argv)
+
+
 if __name__ == "__main__":
     try:
-        # Quick mode: if "--quick" or "-q" flag, skip menu and use first running emulator
-        if len(sys.argv) > 1 and sys.argv[1] in ["--quick", "-q"]:
-            devices = get_adb_devices()
-            running_emulators = [d for d in devices if d.is_emulator and d.state == "device"]
-            if running_emulators:
-                serial = running_emulators[0].serial
-                console.print(f"[bright_cyan]Quick mode: Using running emulator {serial}[/bright_cyan]")
-                apk = build_apk()
-                if apk and install_apk(apk, serial):
-                    launch_app(serial)
-                    console.print(f"[bold green]Done! FrostWire running on {serial}[/bold green]")
-                    console.print("[dim]Run without --quick flag to view logcat[/dim]")
-                    sys.exit(0)
-            else:
-                console.print("[red]No running emulator found. Run without --quick to select device.[/red]")
-                sys.exit(1)
-        
+        args = parse_args(sys.argv[1:])
+        if args.quick or args.headless or args.avd or args.serial:
+            headless_run(
+                avd=args.avd,
+                serial=args.serial,
+                skip_build=args.skip_build,
+                no_launch=args.no_launch,
+                wipe_data=args.wipe_data,
+            )
+            sys.exit(0)
+
         main()
     except KeyboardInterrupt:
         console.print()

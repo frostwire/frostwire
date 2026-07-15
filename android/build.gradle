@@ -371,6 +371,10 @@ dependencies {
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
     implementation 'io.netty:netty-all:4.2.0.Final'
 
+    // Software Ed25519 KeyFactory/Signature — AndroidKeyStore cannot import
+    // jlibtorrent PKCS#8 seeds (API 34+ InvalidKeySpecException).
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'androidx.test:core:1.7.0'
