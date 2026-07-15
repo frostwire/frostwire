@@ -94,10 +94,26 @@ class IdentityLifecycleTest {
         IdentityKeys keys = IdentityKeys.generate(0);
         File exported = new File(tmp, "export.dat");
         IdentityLifecycle.exportToFile(keys, exported);
+        assertTrue(exported.length() >= 64, "export file must not be empty");
+        byte[] encoded = IdentityLifecycle.exportBytes(keys);
+        assertEquals(exported.length(), encoded.length);
+        assertArrayEquals(Files.readAllBytes(exported.toPath()), encoded);
         File installed = new File(tmp, RelayConstants.IDENTITY_FILE);
         IdentityKeys imported = IdentityLifecycle.importFromFile(exported, installed);
         assertArrayEquals(keys.ed25519PubRaw(), imported.ed25519PubRaw());
         assertArrayEquals(keys.ed25519PubRaw(), IdentityKeys.load(installed).ed25519PubRaw());
+    }
+
+    @Test
+    void encodeRoundTripMatchesSaveLoad() throws Exception {
+        IdentityKeys keys = IdentityKeys.generate(0);
+        byte[] encoded = IdentityKeys.encode(keys);
+        assertTrue(encoded.length >= 64);
+        File f = new File(tmp, "enc.dat");
+        Files.write(f.toPath(), encoded);
+        IdentityKeys loaded = IdentityKeys.load(f);
+        assertArrayEquals(keys.ed25519PubRaw(), loaded.ed25519PubRaw());
+        assertArrayEquals(keys.nodeId(), loaded.nodeId());
     }
 
     @Test

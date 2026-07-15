@@ -361,19 +361,21 @@ public final class IdentityKeys {
     }
 
     /**
-     * Persist identity keys to a file. Both private (PKCS#8) and public
-     * (X.509) encodings are stored so round-trip does not depend on
-     * JDK-version-specific ASN.1 layout quirks.
+     * Encode identity keys to the on-disk binary format (same as {@link #save}).
+     * Both private (PKCS#8) and public (X.509) encodings are stored so
+     * round-trip does not depend on JDK-version-specific ASN.1 layout quirks.
+     *
+     * <p>Useful for SAF / content-URI export on Android without an intermediate
+     * empty CreateDocument file write race.
      */
-    public static void save(IdentityKeys keys, File file) throws IOException {
-        File parent = file.getAbsoluteFile().getParentFile();
-        if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            throw new IOException("Could not create directory: " + parent);
+    public static byte[] encode(IdentityKeys keys) {
+        if (keys == null) {
+            throw new IllegalArgumentException("keys is null");
         }
-        byte[] edPriv = keys.ed25519.getPrivate().getEncoded();
-        byte[] edPub = keys.ed25519.getPublic().getEncoded();
-        byte[] xPriv = keys.x25519.getPrivate().getEncoded();
-        byte[] xPub = keys.x25519.getPublic().getEncoded();
+        byte[] edPriv = requireEncoded(keys.ed25519.getPrivate().getEncoded(), "Ed25519 private");
+        byte[] edPub = requireEncoded(keys.ed25519.getPublic().getEncoded(), "Ed25519 public");
+        byte[] xPriv = requireEncoded(keys.x25519.getPrivate().getEncoded(), "X25519 private");
+        byte[] xPub = requireEncoded(keys.x25519.getPublic().getEncoded(), "X25519 public");
 
         byte[] out = new byte[4 + edPriv.length + 4 + edPub.length
                 + 4 + xPriv.length + 4 + xPub.length];
@@ -382,10 +384,29 @@ public final class IdentityKeys {
         offset = writeLenAndBytes(out, offset, edPub);
         offset = writeLenAndBytes(out, offset, xPriv);
         writeLenAndBytes(out, offset, xPub);
+        return out;
+    }
 
+    /**
+     * Persist identity keys to a file. See {@link #encode} for format.
+     */
+    public static void save(IdentityKeys keys, File file) throws IOException {
+        File parent = file.getAbsoluteFile().getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IOException("Could not create directory: " + parent);
+        }
+        byte[] out = encode(keys);
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(out);
+            fos.flush();
         }
+    }
+
+    private static byte[] requireEncoded(byte[] encoded, String label) {
+        if (encoded == null || encoded.length == 0) {
+            throw new IllegalStateException(label + " encoding missing");
+        }
+        return encoded;
     }
 
     private static byte[] readAllBytes(File file) throws IOException {

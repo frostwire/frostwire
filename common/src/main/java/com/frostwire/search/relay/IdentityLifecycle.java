@@ -152,16 +152,37 @@ public final class IdentityLifecycle {
     }
 
     /**
+     * Binary identity payload (same format as {@link IdentityKeys#save}).
+     * Never empty for a valid identity — callers can assert length before export.
+     */
+    public static byte[] exportBytes(IdentityKeys identity) {
+        Objects.requireNonNull(identity, "identity");
+        byte[] bytes = IdentityKeys.encode(identity);
+        if (bytes.length == 0) {
+            throw new IllegalStateException("encoded identity is empty");
+        }
+        return bytes;
+    }
+
+    /**
      * Write identity bytes to {@code destFile} (creates parent dirs).
      */
     public static void exportToFile(IdentityKeys identity, File destFile) throws IOException {
-        Objects.requireNonNull(identity, "identity");
         Objects.requireNonNull(destFile, "destFile");
         File parent = destFile.getParentFile();
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
             throw new IOException("Could not create directory: " + parent);
         }
-        IdentityKeys.save(identity, destFile);
+        byte[] bytes = exportBytes(identity);
+        try (FileOutputStream fos = new FileOutputStream(destFile)) {
+            fos.write(bytes);
+            fos.flush();
+        }
+        if (!destFile.isFile() || destFile.length() != bytes.length) {
+            throw new IOException("export write incomplete: " + destFile
+                    + " expected=" + bytes.length
+                    + " actual=" + (destFile.isFile() ? destFile.length() : -1));
+        }
     }
 
     /**
