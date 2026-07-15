@@ -313,6 +313,12 @@ public final class IceBridgeServer implements AutoCloseable {
 
     private void startRelayServer() {
         int relayPort = config.relayPort();
+        // relayPort=0: embedder owns IncomingRelayServer (Android starts a full
+        // RelayRole server on RELAY_LISTEN_PORT; dual-bind causes EADDRINUSE).
+        if (relayPort <= 0) {
+            LOG.info("IceBridge identity handshake TCP server disabled (relayPort=0; external owner)");
+            return;
+        }
         try {
             IdentityRecord record = IdentityRecord.createSigned(
                     identity.nodeId(), identity.ed25519(),
