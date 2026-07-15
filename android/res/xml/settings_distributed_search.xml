@@ -27,37 +27,37 @@
         <Preference
             android:key="frostwire.prefs.distributed.identity.node_id"
             android:title="@string/distributed_identity_node_id"
-            android:summary="@string/distributed_identity_not_initialized"
+            android:summary="@string/distributed_identity_loading"
             android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.fingerprint"
             android:title="@string/distributed_identity_fingerprint"
-            android:summary="@string/distributed_identity_not_initialized"
+            android:summary="@string/distributed_identity_loading"
             android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.public_key"
             android:title="@string/distributed_identity_public_key"
-            android:summary="@string/distributed_identity_not_initialized"
+            android:summary="@string/distributed_identity_loading"
             android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.karma"
             android:title="@string/distributed_identity_karma"
-            android:summary="@string/distributed_identity_not_available"
+            android:summary="@string/distributed_identity_loading_details"
             android:selectable="true" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.difficulty"
             android:title="@string/distributed_identity_difficulty"
-            android:summary="@string/distributed_identity_not_initialized"
+            android:summary="@string/distributed_identity_loading_details"
             android:selectable="false" />
 
         <Preference
             android:key="frostwire.prefs.distributed.identity.shared_count"
             android:title="@string/distributed_identity_shared_count"
-            android:summary="@string/distributed_identity_not_available"
+            android:summary="@string/distributed_identity_loading_details"
             android:selectable="false" />
 
         <com.frostwire.android.gui.views.preference.ButtonActionPreference

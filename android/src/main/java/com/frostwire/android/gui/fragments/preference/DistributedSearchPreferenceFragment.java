@@ -32,6 +32,7 @@ import com.frostwire.android.search.AndroidKarmaChainStore;
 import com.frostwire.android.search.AndroidLocalIndex;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityLifecycle;
 import com.frostwire.search.relay.KarmaConstants;
@@ -58,6 +59,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     private ActivityResultLauncher<String> exportLauncher;
     private ActivityResultLauncher<String[]> importLauncher;
     private volatile boolean busy;
+    /** Bounded retries when libtorrent homeDir is not ready yet on cold start. */
+    private int identityPathRetries;
 
     public DistributedSearchPreferenceFragment() {
         super(R.xml.settings_distributed_search);
@@ -126,7 +129,9 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             }
             String text = summary.toString();
             if (text.equals(getString(R.string.distributed_identity_not_initialized))
-                    || text.equals(getString(R.string.distributed_identity_not_available))) {
+                    || text.equals(getString(R.string.distributed_identity_not_available))
+                    || text.equals(getString(R.string.distributed_identity_loading))
+                    || text.equals(getString(R.string.distributed_identity_loading_details))) {
                 return true;
             }
             // Drop UI helper line ("Tap to copy") and optional grouping spaces.
@@ -204,17 +209,61 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     private static File identityFile() {
         File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
         if (homeDir == null) {
+            try {
+                homeDir = Platforms.get().systemPaths().libtorrent();
+            } catch (Throwable ignored) {
+                return null;
+            }
+        }
+        if (homeDir == null) {
             return null;
         }
         return new File(homeDir, RelayConstants.IDENTITY_FILE);
     }
 
+    private static boolean identityFilePresent() {
+        File f = identityFile();
+        return f != null && f.isFile() && f.length() > 0;
+    }
+
     private void refreshIdentityInfo() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        // Instant paint from wiring if already preloaded — no flash of empty state.
+        IdentityKeys live = SearchEngine.DISTRIBUTED_WIRING.identity();
+        if (live != null) {
+            applyIdentityToUi(live, -1, -1);
+        } else {
+            // Never show "Not initialized" until disk has been checked.
+            showIdentityLoadingState();
+        }
+
+        // HIGH_PRIORITY: do not queue behind MISC (LocalIndex / IceBridge startup).
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             IdentityKeys identity = resolveIdentity();
-            long karma = identity != null ? readKarmaScore(identity) : -1;
-            int shared = readSharedCount();
-            SystemUtils.postToUIThread(() -> applyIdentityToUi(identity, karma, shared));
+            if (identity != null && SearchEngine.DISTRIBUTED_WIRING.identity() == null) {
+                SearchEngine.DISTRIBUTED_WIRING.identity(identity);
+            }
+            final boolean filePresent = identityFilePresent();
+            final long karma = identity != null ? readKarmaScore(identity) : -1;
+            final int shared = identity != null ? readSharedCount() : -1;
+            final IdentityKeys result = identity;
+            SystemUtils.postToUIThread(() -> {
+                if (result != null) {
+                    identityPathRetries = 0;
+                    applyIdentityToUi(result, karma, shared);
+                } else if (filePresent) {
+                    // File exists but load failed — still not "missing identity".
+                    showIdentityLoadingState();
+                    LOG.warn("identity.dat present but resolve returned null");
+                } else if (identityFile() == null && identityPathRetries < 20) {
+                    // Paths not ready yet — keep loading, schedule a retry.
+                    identityPathRetries++;
+                    showIdentityLoadingState();
+                    SystemUtils.postToUIThreadDelayed(this::refreshIdentityInfo, 300);
+                } else {
+                    identityPathRetries = 0;
+                    applyIdentityToUi(null, -1, -1);
+                }
+            });
         });
     }
 
@@ -222,6 +271,9 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
      * Apply identity fields on the UI thread. Prefer calling this with the
      * freshly generated/imported keys so the screen updates even if a concurrent
      * stack restart has not yet re-wired {@link SearchEngine#DISTRIBUTED_WIRING}.
+     *
+     * @param karma  endorsements, or {@code < 0} to show a loading placeholder
+     * @param shared torrent count, or {@code < 0} to show a loading placeholder
      */
     private void applyIdentityToUi(IdentityKeys identity, long karma, int shared) {
         if (!isAdded()) {
@@ -229,6 +281,24 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         }
         updateIdentityRows(identity, karma, shared);
         updateActionButtonLabels(identity != null);
+    }
+
+    private void showIdentityLoadingState() {
+        if (!isAdded()) {
+            return;
+        }
+        Preference nodeIdPref = findPreference("frostwire.prefs.distributed.identity.node_id");
+        Preference fingerprintPref = findPreference("frostwire.prefs.distributed.identity.fingerprint");
+        Preference pubkeyPref = findPreference("frostwire.prefs.distributed.identity.public_key");
+        Preference karmaPref = findPreference("frostwire.prefs.distributed.identity.karma");
+        Preference difficultyPref = findPreference("frostwire.prefs.distributed.identity.difficulty");
+        Preference sharedPref = findPreference("frostwire.prefs.distributed.identity.shared_count");
+        setSummary(nodeIdPref, R.string.distributed_identity_loading);
+        setSummary(fingerprintPref, R.string.distributed_identity_loading);
+        setSummary(pubkeyPref, R.string.distributed_identity_loading);
+        setSummary(karmaPref, R.string.distributed_identity_loading_details);
+        setSummary(difficultyPref, R.string.distributed_identity_loading_details);
+        setSummary(sharedPref, R.string.distributed_identity_loading_details);
     }
 
     private void updateActionButtonLabels(boolean hasIdentity) {
@@ -272,8 +342,12 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             pubkeyPref.setSummary(pubHex + "\n" + tap);
         }
         if (karmaPref != null) {
-            karmaPref.setSummary(getString(R.string.distributed_identity_karma_score, Math.max(0, karma))
-                    + "\n" + tap);
+            if (karma < 0) {
+                karmaPref.setSummary(R.string.distributed_identity_loading_details);
+            } else {
+                karmaPref.setSummary(getString(R.string.distributed_identity_karma_score, karma)
+                        + "\n" + tap);
+            }
         }
         if (difficultyPref != null) {
             int difficulty = IdentityLifecycle.difficultyBits(identity);
@@ -286,7 +360,11 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             }
         }
         if (sharedPref != null) {
-            sharedPref.setSummary(getString(R.string.distributed_identity_shared_torrents, Math.max(0, shared)));
+            if (shared < 0) {
+                sharedPref.setSummary(R.string.distributed_identity_loading_details);
+            } else {
+                sharedPref.setSummary(getString(R.string.distributed_identity_shared_torrents, shared));
+            }
         }
     }
 

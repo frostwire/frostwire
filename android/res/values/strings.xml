@@ -437,6 +437,8 @@
     <string name="distributed_identity_difficulty">Identity Difficulty</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
     <string name="distributed_identity_not_initialized">Not initialized — start engine or tap Initialize Identity</string>
+    <string name="distributed_identity_loading">Loading saved identity…</string>
+    <string name="distributed_identity_loading_details">Loading…</string>
     <string name="distributed_identity_not_available">Not available</string>
     <string name="distributed_identity_difficulty_meets">%1$d bits (meets requirement)</string>
     <string name="distributed_identity_difficulty_below">%1$d bits (below required %2$d)</string>
