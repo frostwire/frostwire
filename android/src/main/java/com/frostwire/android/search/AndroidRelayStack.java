@@ -129,15 +129,15 @@ public final class AndroidRelayStack implements AutoCloseable {
         KarmaChainCommitScheduler kcs = null;
         IncomingRelayServer relaySrv = null;
         try {
-            li = AndroidLocalIndex.open(context);
-
+            // Identity first — LocalIndex.open can take seconds and must not delay
+            // Settings showing Node ID after a cold start / force-stop.
             File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
             IdentityKeys ident = IdentityKeys.loadOrCreate(identityFile);
             LOG.info("AndroidRelayStack: identity loaded: "
                     + com.frostwire.util.Hex.encode(ident.ed25519PubRaw()));
-            // Publish identity as soon as it exists so Settings can show Node ID even
-            // if a later stack step fails (user no longer stuck on "Not initialized").
             SearchEngine.DISTRIBUTED_WIRING.identity(ident);
+
+            li = AndroidLocalIndex.open(context);
 
             SharedTorrentIndexerInstaller.install(btEngine, li, ident);
             LOG.info("AndroidRelayStack: SharedTorrentIndexer installed");

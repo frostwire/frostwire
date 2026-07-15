@@ -43,12 +43,16 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.workers.TorrentEngineWorker;
 import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.RelayConstants;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OkHttpClientWrapper;
@@ -89,6 +93,10 @@ public class EngineForegroundService extends Service implements IEngineService {
             TransferManager.instance().reset();
         }
         btEngine.resume();
+        // Publish saved identity into DISTRIBUTED_WIRING immediately (dedicated
+        // thread) so Settings never flash "Not initialized" while LocalIndex /
+        // IceBridge spin up on MISC.
+        engineForegroundService.preloadIdentityFromDisk();
         engineForegroundService.startRelayStack(btEngine);
         if (!wasShutdown) {
             TransferManager.instance().forceReannounceTorrents();
@@ -230,6 +238,35 @@ public class EngineForegroundService extends Service implements IEngineService {
         stopRelayStack();
     }
 
+    /**
+     * Load {@code identity.dat} into {@link SearchEngine#DISTRIBUTED_WIRING} on a
+     * dedicated thread as soon as homeDir is known. Does not start IceBridge —
+     * only makes Node ID / fingerprint available to Settings during cold start.
+     */
+    private void preloadIdentityFromDisk() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
+            try {
+                if (SearchEngine.DISTRIBUTED_WIRING.identity() != null) {
+                    return;
+                }
+                File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+                if (homeDir == null) {
+                    return;
+                }
+                File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
+                if (!identityFile.isFile() || identityFile.length() == 0) {
+                    return;
+                }
+                IdentityKeys keys = IdentityKeys.load(identityFile);
+                SearchEngine.DISTRIBUTED_WIRING.identity(keys);
+                LOG.info("EngineForegroundService::preloadIdentityFromDisk: nodeId="
+                        + Hex.encode(keys.nodeId()));
+            } catch (Throwable t) {
+                LOG.warn("EngineForegroundService::preloadIdentityFromDisk failed", t);
+            }
+        });
+    }
+
     private void startRelayStack(BTEngine btEngine) {
         if (relayStack != null) {
             return;
@@ -240,6 +277,17 @@ public class EngineForegroundService extends Service implements IEngineService {
                 if (homeDir == null) {
                     LOG.warn("EngineForegroundService::startRelayStack: no libtorrent homeDir");
                     return;
+                }
+                // Double-check identity is wired even if HIGH_PRIORITY preload lost the race.
+                if (SearchEngine.DISTRIBUTED_WIRING.identity() == null) {
+                    File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
+                    if (identityFile.isFile() && identityFile.length() > 0) {
+                        try {
+                            SearchEngine.DISTRIBUTED_WIRING.identity(IdentityKeys.load(identityFile));
+                        } catch (Throwable t) {
+                            LOG.warn("EngineForegroundService::startRelayStack identity preload", t);
+                        }
+                    }
                 }
                 relayStack = AndroidRelayStack.start(this, homeDir, btEngine);
                 if (relayStack != null) {
