@@ -232,14 +232,15 @@ public final class AndroidRelayStack implements AutoCloseable {
                 relaySrv = null;
             } else {
                 int controlPort = freeLocalControlPort();
-                // relayPort=0: IceBridgeServer must not bind TCP 6888 — Android starts
-                // IncomingRelayServer with full RelayRole (search + identity) below.
+                int configuredRudp = readConfiguredRudpPort();
+                IceBridgeConfig.Role role = readConfiguredRole();
+                // relayPort=0 on IceBridgeServer: identity TCP is owned by IncomingRelayServer below.
                 IceBridgeConfig config = IceBridgeConfig.newBuilder()
                         .host("0.0.0.0")
-                        .rudpPort(PeerRegistrySync.ICEBRIDGE_RUDP_PORT)
+                        .rudpPort(configuredRudp)
                         .relayPort(0)
                         .controlHttpPort(controlPort)
-                        .role(IceBridgeConfig.Role.BOTH)
+                        .role(role)
                         .identityFile(identityFile)
                         .maxPeers(500)
                         .peerTtlSec(180)
@@ -250,24 +251,25 @@ public final class AndroidRelayStack implements AutoCloseable {
                 srv.start();
                 meshRudpPort = srv.rudpPort();
                 LOG.info("AndroidRelayStack: IceBridgeServer started: rudpPort=" + srv.rudpPort()
-                        + " controlPort=" + srv.controlPort());
+                        + " controlPort=" + srv.controlPort() + " role=" + role);
 
                 cl = new IceBridgeClient(srv.controlPort());
                 cl.setAuthToken(srv.authToken());
 
                 try {
-                    int relayPort = RelayConstants.RELAY_LISTEN_PORT;
+                    int relayPort = readConfiguredRelayPort();
+                    String roleLabel = role.name();
                     RelaySearchService relayService = new RelaySearchService(li, ident);
                     RelayRole relayRole = new RelayRole(relayService, pd, ident);
                     IdentityRecord identityRecord = IdentityRecord.createSigned(
                             ident.nodeId(), ident.ed25519(),
-                            ident.x25519PubRaw(), relayPort, meshRudpPort, "BOTH");
+                            ident.x25519PubRaw(), relayPort, meshRudpPort, roleLabel);
                     IncomingRelayServer relaySrv2 =
                             new IncomingRelayServer(relayRole, identityRecord, relayPort);
                     relaySrv2.start();
                     relaySrv = relaySrv2;
                     LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
-                    IceBridgeHostCache.getInstance().markSuccess("127.0.0.1", relayPort, "BOTH");
+                    IceBridgeHostCache.getInstance().markSuccess("127.0.0.1", relayPort, roleLabel);
                 } catch (Throwable t) {
                     LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
                 }
@@ -291,12 +293,13 @@ public final class AndroidRelayStack implements AutoCloseable {
                 }
             } catch (Throwable ignored) {
             }
-            prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident,
-                    IceBridgeConfig.Role.BOTH);
+            IceBridgeConfig.Role syncRole = readConfiguredRole();
+            prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident, syncRole);
             prs.start();
             LOG.info("AndroidRelayStack: PeerRegistrySync started advertiseHost=" + localHost
                     + " rudpPort=" + meshRudpPort
-                    + " remote=" + useRemote);
+                    + " remote=" + useRemote
+                    + " role=" + syncRole);
 
             DhtPeerDiscoverySource discoverySource = new DhtPeerDiscoverySource(btEngine);
             byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
@@ -306,8 +309,10 @@ public final class AndroidRelayStack implements AutoCloseable {
             pds.start();
             LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
 
+            int advertiseRelayPort = readConfiguredRelayPort();
             IdentityRecordPublisher identityPublisher =
-                    new IdentityRecordPublisher(ident, RelayConstants.RELAY_LISTEN_PORT, meshRudpPort, "BOTH");
+                    new IdentityRecordPublisher(ident, advertiseRelayPort, meshRudpPort,
+                            syncRole.name());
             IndexAnnouncementPublisher indexPublisher =
                     new IndexAnnouncementPublisher(li, ident);
             da = new DhtAdvertiser(identityPublisher, indexPublisher, DHT_ADVERTISE_INTERVAL_SEC);
@@ -426,6 +431,43 @@ public final class AndroidRelayStack implements AutoCloseable {
         try (java.net.ServerSocket socket = new java.net.ServerSocket(0)) {
             return socket.getLocalPort();
         }
+    }
+
+    private static int readConfiguredRudpPort() {
+        return readConfiguredPort(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT,
+                PeerRegistrySync.ICEBRIDGE_RUDP_PORT);
+    }
+
+    private static int readConfiguredRelayPort() {
+        return readConfiguredPort(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT,
+                RelayConstants.RELAY_LISTEN_PORT);
+    }
+
+    private static int readConfiguredPort(String prefKey, int fallback) {
+        try {
+            ConfigurationManager cm = ConfigurationManager.instance();
+            String raw = cm.getString(prefKey);
+            if (raw != null && !raw.isEmpty()) {
+                int p = Integer.parseInt(raw.trim());
+                if (p >= 1 && p <= 65535) {
+                    return p;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return fallback;
+    }
+
+    private static IceBridgeConfig.Role readConfiguredRole() {
+        try {
+            String raw = ConfigurationManager.instance()
+                    .getString(Constants.PREF_KEY_ICEBRIDGE_ROLE);
+            if (raw != null && !raw.isEmpty()) {
+                return IceBridgeConfig.Role.valueOf(raw.trim().toUpperCase(java.util.Locale.US));
+            }
+        } catch (Throwable ignored) {
+        }
+        return IceBridgeConfig.Role.BOTH;
     }
 
     /** icebridge-remote.txt: line1=url, line2=token (optional). */

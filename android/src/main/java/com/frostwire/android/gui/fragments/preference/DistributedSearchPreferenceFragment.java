@@ -21,12 +21,17 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.services.EngineForegroundService;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.search.AndroidKarmaChainStore;
@@ -93,6 +98,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         setupActionButtons();
         setupRefreshButton();
         setupIceBridgeActions();
+        setupIceBridgePortAndRolePrefs();
         ensureHostCachePath();
         refreshAll();
     }
@@ -738,16 +744,99 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         });
     }
 
+    /**
+     * Editable rUDP / identity TCP ports and role. Values are stored in prefs;
+     * stack picks them up on Start / restart IceBridge.
+     */
+    private void setupIceBridgePortAndRolePrefs() {
+        EditTextPreference rudpPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT);
+        if (rudpPref != null) {
+            bindPortPreference(rudpPref, Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT,
+                    R.string.distributed_icebridge_rudp_port_summary);
+        }
+        EditTextPreference relayPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT);
+        if (relayPref != null) {
+            bindPortPreference(relayPref, Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT,
+                    R.string.distributed_icebridge_identity_port_summary);
+        }
+        ListPreference rolePref = findPreference(Constants.PREF_KEY_ICEBRIDGE_ROLE);
+        if (rolePref != null) {
+            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH");
+            rolePref.setValue(role);
+            rolePref.setSummary("%s");
+            rolePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String v = newValue != null ? newValue.toString().trim().toUpperCase(Locale.US) : "BOTH";
+                if (!"BOTH".equals(v) && !"FORWARDER".equals(v) && !"CLIENT".equals(v)) {
+                    return false;
+                }
+                ConfigurationManager.instance().setString(Constants.PREF_KEY_ICEBRIDGE_ROLE, v);
+                toast(R.string.distributed_icebridge_ports_changed);
+                return true;
+            });
+        }
+    }
+
+    private void bindPortPreference(EditTextPreference pref, String prefKey, int baseSummaryRes) {
+        String current = safePrefString(prefKey,
+                Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT.equals(prefKey) ? "6889" : "6888");
+        pref.setText(current);
+        pref.setSummary(getString(baseSummaryRes) + "\n" + current);
+        pref.setOnBindEditTextListener(editText -> {
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setSelection(editText.getText() != null ? editText.getText().length() : 0);
+        });
+        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+            int port = parsePort(newValue);
+            if (port <= 0) {
+                UIUtils.showShortMessage(getView(), R.string.distributed_icebridge_port_invalid);
+                return false;
+            }
+            String text = String.valueOf(port);
+            ConfigurationManager.instance().setString(prefKey, text);
+            preference.setSummary(getString(baseSummaryRes) + "\n" + text);
+            toast(R.string.distributed_icebridge_ports_changed);
+            return true;
+        });
+    }
+
+    private static String safePrefString(String key, String def) {
+        try {
+            String v = ConfigurationManager.instance().getString(key);
+            return (v == null || v.isEmpty()) ? def : v;
+        } catch (Throwable t) {
+            return def;
+        }
+    }
+
+    private static int parsePort(Object newValue) {
+        if (newValue == null) {
+            return -1;
+        }
+        try {
+            int p = Integer.parseInt(newValue.toString().trim());
+            return (p >= 1 && p <= 65535) ? p : -1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     private void refreshStackStatus() {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             EngineForegroundService svc = EngineForegroundService.getInstance();
             AndroidRelayStack stack = svc != null ? svc.getRelayStack() : null;
             boolean running = stack != null;
             boolean transport = SearchEngine.DISTRIBUTED_WIRING.searchTransport() != null;
-            int rudp = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+            int configuredRudp = parsePort(safePrefString(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, "6889"));
+            int configuredRelay = parsePort(safePrefString(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT, "6888"));
+            if (configuredRudp <= 0) {
+                configuredRudp = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+            }
+            if (configuredRelay <= 0) {
+                configuredRelay = RelayConstants.RELAY_LISTEN_PORT;
+            }
+            int rudp = configuredRudp;
             int control = 0;
-            int relay = RelayConstants.RELAY_LISTEN_PORT;
-            String role = "BOTH";
+            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH");
             if (stack != null && stack.server() != null) {
                 IceBridgeServer server = stack.server();
                 rudp = server.rudpPort();
@@ -757,7 +846,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             final boolean fTransport = transport;
             final int fRudp = rudp;
             final int fControl = control;
-            final int fRelay = relay;
+            final int fConfiguredRudp = configuredRudp;
+            final int fConfiguredRelay = configuredRelay;
             final String fRole = role;
             final boolean hasIdentity = SearchEngine.DISTRIBUTED_WIRING.identity() != null
                     || resolveIdentity() != null;
@@ -767,7 +857,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                     return;
                 }
                 Preference statusPref = findPreference("frostwire.prefs.distributed.stack.status");
-                Preference configPref = findPreference("frostwire.prefs.distributed.icebridge.config");
                 if (statusPref != null) {
                     if (noService) {
                         statusPref.setSummary(R.string.distributed_stack_no_service);
@@ -782,14 +871,25 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                         statusPref.setSummary(R.string.distributed_stack_not_running);
                     }
                 }
-                if (configPref != null) {
-                    if (fRunning) {
-                        configPref.setSummary(getString(
-                                R.string.distributed_icebridge_config_summary,
-                                fRudp, fRelay, fControl, fRole));
-                    } else {
-                        configPref.setSummary(R.string.distributed_icebridge_config_unknown);
-                    }
+                EditTextPreference rudpPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT);
+                if (rudpPref != null) {
+                    String text = String.valueOf(fConfiguredRudp);
+                    rudpPref.setText(text);
+                    rudpPref.setSummary(getString(R.string.distributed_icebridge_rudp_port_summary)
+                            + "\n" + text
+                            + (fRunning && fRudp != fConfiguredRudp
+                            ? " (live " + fRudp + ")" : ""));
+                }
+                EditTextPreference relayPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT);
+                if (relayPref != null) {
+                    String text = String.valueOf(fConfiguredRelay);
+                    relayPref.setText(text);
+                    relayPref.setSummary(getString(R.string.distributed_icebridge_identity_port_summary)
+                            + "\n" + text);
+                }
+                ListPreference rolePref = findPreference(Constants.PREF_KEY_ICEBRIDGE_ROLE);
+                if (rolePref != null) {
+                    rolePref.setValue(fRole);
                 }
             });
         });

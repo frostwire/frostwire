@@ -32,10 +32,37 @@
             android:summary="@string/distributed_icebridge_mode_local"
             android:selectable="false" />
 
+        <EditTextPreference
+            android:key="frostwire.prefs.icebridge.rudp_port"
+            android:title="@string/distributed_icebridge_rudp_port_title"
+            android:summary="@string/distributed_icebridge_rudp_port_summary"
+            android:dialogTitle="@string/distributed_icebridge_rudp_port_title"
+            android:inputType="number"
+            android:defaultValue="6889"
+            android:singleLine="true" />
+
+        <EditTextPreference
+            android:key="frostwire.prefs.icebridge.relay_port"
+            android:title="@string/distributed_icebridge_identity_port_title"
+            android:summary="@string/distributed_icebridge_identity_port_summary"
+            android:dialogTitle="@string/distributed_icebridge_identity_port_title"
+            android:inputType="number"
+            android:defaultValue="6888"
+            android:singleLine="true" />
+
+        <ListPreference
+            android:key="frostwire.prefs.icebridge.role"
+            android:title="@string/distributed_icebridge_role_title"
+            android:summary="%s"
+            android:dialogTitle="@string/distributed_icebridge_role_title"
+            android:entries="@array/icebridge_role_entries"
+            android:entryValues="@array/icebridge_role_values"
+            android:defaultValue="BOTH" />
+
         <Preference
-            android:key="frostwire.prefs.distributed.icebridge.config"
-            android:title="@string/distributed_icebridge_config_title"
-            android:summary="@string/distributed_identity_loading_details"
+            android:key="frostwire.prefs.distributed.icebridge.restart_hint"
+            android:title="@string/distributed_icebridge_restart_hint_title"
+            android:summary="@string/distributed_icebridge_restart_hint_summary"
             android:selectable="false" />
 
         <com.frostwire.android.gui.views.preference.ButtonActionPreference

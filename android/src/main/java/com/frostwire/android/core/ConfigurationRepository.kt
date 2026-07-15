@@ -381,6 +381,10 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_ICEBRIDGE_USE_REMOTE] = false
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_URL] = ""
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_TOKEN] = ""
+        // Stored as strings so EditTextPreference works with PreferenceDataStore.
+        m[Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT] = "6889"
+        m[Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT] = "6888"
+        m[Constants.PREF_KEY_ICEBRIDGE_ROLE] = "BOTH"
         m[Constants.PREF_KEY_SEARCH_USE_YT] = (Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
         m[Constants.PREF_KEY_SEARCH_USE_KNABEN] = true
         m[Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV] = true

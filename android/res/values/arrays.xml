@@ -28,4 +28,16 @@
         <item>dark</item>
         <item>system</item>
     </string-array>
+
+    <!-- IceBridge role: short labels shown in ListPreference (%s summary). -->
+    <string-array name="icebridge_role_entries">
+        <item>@string/distributed_icebridge_role_both_label</item>
+        <item>@string/distributed_icebridge_role_forwarder_label</item>
+        <item>@string/distributed_icebridge_role_client_label</item>
+    </string-array>
+    <string-array name="icebridge_role_values" translatable="false">
+        <item>BOTH</item>
+        <item>FORWARDER</item>
+        <item>CLIENT</item>
+    </string-array>
 </resources>
