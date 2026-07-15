@@ -184,6 +184,11 @@ android {
                 srcDir 'src/main/java'
                 exclude 'test/**'
             }
+            // Classpath resources used by common/ (BIP39 wordlist, etc.).
+            // Without this, Bip39Mnemonic.getResourceAsStream fails on device.
+            resources {
+                srcDir '../common/src/main/resources'
+            }
             jniLibs.srcDirs = ['libs']
             // Ensure Chaquopy packages our Python code from src/main/python
             python {
