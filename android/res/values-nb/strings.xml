@@ -67,10 +67,10 @@
     <string name="distributed_identity_difficulty_meets">%1$d bits (møter kravet)</string>
     <string name="distributed_identity_difficulty_below">%1$d bits (under nødvendig %2$d)</string>
     <string name="distributed_peers_header">Oppdagede Peers</string>
-    <string name="distributed_peers_count">%1$d av %2$d peers</string>
+    <string name="distributed_peers_count">%1$d of %2$d peers verified / known</string>
     <string name="distributed_peers_empty">Ingen peers oppdaget ennå</string>
     <string name="distributed_peers_not_available">Peer-katalog ikke tilgjengelig</string>
-    <string name="distributed_peers_refresh">Oppdater</string>
+    <string name="distributed_peers_refresh">Refresh peers</string>
     <string name="open_menu_action">Åpen %s</string>
     <string name="wifi_seeding_has_been_turned_off">Ingen Wifi tilgjengelig, Seeding er slått av</string>
     <string name="pause_torrent_menu_action">Bli stående</string>
@@ -599,4 +599,29 @@
     <string name="error_cannot_open_downloads_folder">Ingen app funnet for å se nedlastinger. Sørg for at FrostWire har tillatelser og at en filutforsker er installert</string>
     <string name="_30_minutes">30 minutter</string>
     <string name="ad_free_30_minutes">Annonsefri 30 minutter</string>
+
+    <string name="distributed_peers_list_title">Peer list</string>
+    <string name="distributed_peers_row">%1$s:%2$d · rUDP %3$d</string>
+    <string name="distributed_peers_row_unverified">%1$s:%2$d (unverified)</string>
+    <string name="distributed_stack_starting">Starting IceBridge…</string>
+    <string name="distributed_stack_no_service">Engine service not running</string>
+    <string name="distributed_icebridge_header">IceBridge</string>
+    <string name="distributed_icebridge_mode_title">Mode</string>
+    <string name="distributed_icebridge_mode_local">In-process local IceBridge (Android always runs mesh inside the app — no subprocess)</string>
+    <string name="distributed_icebridge_config_title">Local ports / role</string>
+    <string name="distributed_icebridge_config_summary">rUDP %1$d · identity TCP %2$d · control HTTP %3$d · role %4$s</string>
+    <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
+    <string name="distributed_icebridge_start">Start / restart IceBridge</string>
+    <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
+    <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
+    <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
+    <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>
+    <string name="distributed_icebridge_hosts_list_title">Pingable hosts</string>
+    <string name="distributed_icebridge_hosts_empty">No successfully pinged IceBridge servers yet</string>
+    <string name="distributed_icebridge_hosts_refresh">Refresh / Ping</string>
+    <string name="distributed_icebridge_hosts_refresh_summary">Re-ping all known hosts and update last successful ping times</string>
+    <string name="distributed_icebridge_host_row">%1$s · last ping %2$s</string>
+    <string name="distributed_icebridge_host_never">never</string>
+    <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
+
 </resources>

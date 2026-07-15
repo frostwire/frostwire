@@ -14,13 +14,47 @@
             android:summary="@string/distributed_search_summary"
             android:defaultValue="true" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="frostwire.prefs.distributed.icebridge.category"
+        android:title="@string/distributed_icebridge_header">
+
         <Preference
             android:key="frostwire.prefs.distributed.stack.status"
             android:title="@string/distributed_stack_status_title"
             android:summary="@string/distributed_stack_not_running"
             android:selectable="false" />
 
+        <Preference
+            android:key="frostwire.prefs.distributed.icebridge.mode"
+            android:title="@string/distributed_icebridge_mode_title"
+            android:summary="@string/distributed_icebridge_mode_local"
+            android:selectable="false" />
+
+        <Preference
+            android:key="frostwire.prefs.distributed.icebridge.config"
+            android:title="@string/distributed_icebridge_config_title"
+            android:summary="@string/distributed_identity_loading_details"
+            android:selectable="false" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.icebridge.start"
+            android:title="@string/distributed_icebridge_start"
+            android:summary="@string/distributed_icebridge_start_summary"
+            app:button_text="@string/distributed_icebridge_start" />
+
+        <com.frostwire.android.gui.views.preference.ButtonActionPreference
+            android:key="frostwire.prefs.distributed.icebridge.hosts_refresh"
+            android:title="@string/distributed_icebridge_hosts_refresh"
+            android:summary="@string/distributed_icebridge_hosts_refresh_summary"
+            app:button_text="@string/distributed_icebridge_hosts_refresh" />
+
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="frostwire.prefs.distributed.icebridge.hosts_list"
+        android:title="@string/distributed_icebridge_hosts_list_title" />
 
     <PreferenceCategory android:title="@string/distributed_identity_header">
 
@@ -112,5 +146,9 @@
             app:button_text="@string/distributed_peers_refresh" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="frostwire.prefs.distributed.peers.list"
+        android:title="@string/distributed_peers_list_title" />
 
 </PreferenceScreen>

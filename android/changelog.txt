@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - new:Distributed Search settings IceBridge panel (parity with desktop) — stack status with rUDP/control ports, Start/restart, known IceBridge servers list (host:port, role, last successful ping) with Refresh/Ping, discovered peer list; host cache under app-private libtorrent/
   - fix:Local shared-torrent search actually runs on Android — register LOCAL SearchEngine (was wired but never added to ALL_ENGINES), default enabled, Search Engines preference checkbox
   - fix:Populate LocalIndex for existing transfers after relay stack start (reindex); TransferManager chains BTEngineListener instead of setListener so SharedTorrentIndexer is not wiped on reset
   - fix:Identity settings never flash "Not initialized" after force-stop/reboot — preload identity.dat on HIGH_PRIORITY before IceBridge, load identity before LocalIndex.open, settings default to "Loading saved identity…" and resolve off the MISC queue

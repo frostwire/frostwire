@@ -328,10 +328,10 @@
     <string name="distributed_identity_difficulty_meets">%1$d비트 (요구사항 충족)</string>
     <string name="distributed_identity_difficulty_below">%1$d비트 (필요 %2$d 미만)</string>
     <string name="distributed_peers_header">발견된 피어</string>
-    <string name="distributed_peers_count">%1$d / %2$d 피어</string>
+    <string name="distributed_peers_count">%1$d of %2$d peers verified / known</string>
     <string name="distributed_peers_empty">아직 발견된 피어 없음</string>
     <string name="distributed_peers_not_available">피어 디렉토리를 사용할 수 없음</string>
-    <string name="distributed_peers_refresh">새로고침</string>
+    <string name="distributed_peers_refresh">Refresh peers</string>
     <string name="search_preferences_one_engine_checked_always">기본적으로 한 검색 엔진을 항상 확인해야합니다.</string>
     <string name="switch_off_engine_without_vpn">VPN이 비활성화되어 BitTorrent 엔진이 중지됩니다.</string>
     <string name="notification_other_header">알림 및 기타</string>
@@ -599,4 +599,29 @@
     <string name="error_cannot_open_downloads_folder">사용 다운로드를 볼 수 있는 앱이 없습니다. FrostWire에 권한이 있고 파일 탐색기가 설치되어 있는지 확인하세요.</string>
     <string name="_30_minutes">30분</string>
     <string name="ad_free_30_minutes">광고 없음 30분</string>
+
+    <string name="distributed_peers_list_title">Peer list</string>
+    <string name="distributed_peers_row">%1$s:%2$d · rUDP %3$d</string>
+    <string name="distributed_peers_row_unverified">%1$s:%2$d (unverified)</string>
+    <string name="distributed_stack_starting">Starting IceBridge…</string>
+    <string name="distributed_stack_no_service">Engine service not running</string>
+    <string name="distributed_icebridge_header">IceBridge</string>
+    <string name="distributed_icebridge_mode_title">Mode</string>
+    <string name="distributed_icebridge_mode_local">In-process local IceBridge (Android always runs mesh inside the app — no subprocess)</string>
+    <string name="distributed_icebridge_config_title">Local ports / role</string>
+    <string name="distributed_icebridge_config_summary">rUDP %1$d · identity TCP %2$d · control HTTP %3$d · role %4$s</string>
+    <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
+    <string name="distributed_icebridge_start">Start / restart IceBridge</string>
+    <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
+    <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
+    <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
+    <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>
+    <string name="distributed_icebridge_hosts_list_title">Pingable hosts</string>
+    <string name="distributed_icebridge_hosts_empty">No successfully pinged IceBridge servers yet</string>
+    <string name="distributed_icebridge_hosts_refresh">Refresh / Ping</string>
+    <string name="distributed_icebridge_hosts_refresh_summary">Re-ping all known hosts and update last successful ping times</string>
+    <string name="distributed_icebridge_host_row">%1$s · last ping %2$s</string>
+    <string name="distributed_icebridge_host_never">never</string>
+    <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
+
 </resources>

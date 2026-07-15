@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
@@ -30,6 +31,7 @@ import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.search.AndroidKarmaChainStore;
 import com.frostwire.android.search.AndroidLocalIndex;
+import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -39,6 +41,9 @@ import com.frostwire.search.relay.KarmaConstants;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
+import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
+import com.frostwire.search.relay.icebridge.IceBridgeServer;
+import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
@@ -47,6 +52,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Android UI for identity lifecycle. Business logic is
@@ -83,12 +92,15 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         setupCopyableFields();
         setupActionButtons();
         setupRefreshButton();
+        setupIceBridgeActions();
+        ensureHostCachePath();
         refreshAll();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        ensureHostCachePath();
         refreshAll();
     }
 
@@ -96,6 +108,22 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         refreshIdentityInfo();
         refreshPeerList();
         refreshStackStatus();
+        refreshIceBridgeHosts(false);
+    }
+
+    /** Point host cache at app-private libtorrent dir before reading. */
+    private void ensureHostCachePath() {
+        try {
+            File home = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
+            if (home == null) {
+                home = Platforms.get().systemPaths().libtorrent();
+            }
+            if (home != null) {
+                IceBridgeHostCache.configure(new File(home, "icebridge_host_cache.txt"));
+            }
+        } catch (Throwable t) {
+            LOG.warn("Could not configure IceBridgeHostCache path", t);
+        }
     }
 
     private void setupDistributedToggle() {
@@ -197,7 +225,36 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         ButtonActionPreference refreshBtn =
                 findPreference("frostwire.prefs.distributed.peers.refresh");
         if (refreshBtn != null) {
-            refreshBtn.setOnActionListener(v -> refreshAll());
+            refreshBtn.setOnActionListener(v -> {
+                refreshPeerList();
+                refreshStackStatus();
+            });
+        }
+    }
+
+    private void setupIceBridgeActions() {
+        ButtonActionPreference startBtn =
+                findPreference("frostwire.prefs.distributed.icebridge.start");
+        if (startBtn != null) {
+            startBtn.setOnActionListener(v -> {
+                toast(R.string.distributed_stack_starting);
+                EngineForegroundService svc = EngineForegroundService.getInstance();
+                if (svc == null) {
+                    toast(R.string.distributed_stack_no_service);
+                    return;
+                }
+                // Force restart so a half-dead stack recovers.
+                svc.ensureRelayStack(true, () -> {
+                    toast(R.string.distributed_icebridge_start_ok);
+                    refreshAll();
+                });
+            });
+        }
+
+        ButtonActionPreference hostsRefresh =
+                findPreference("frostwire.prefs.distributed.icebridge.hosts_refresh");
+        if (hostsRefresh != null) {
+            hostsRefresh.setOnActionListener(v -> refreshIceBridgeHosts(true));
         }
     }
 
@@ -625,55 +682,169 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     }
 
     private void refreshPeerList() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             PeerDirectory directory = SearchEngine.DISTRIBUTED_WIRING.peerDirectory();
-            if (getActivity() == null) {
-                return;
-            }
-            int peerCount = directory != null ? directory.size() : -1;
-            int verifiedCount = directory != null ? directory.topByTrustVerified(100).size() : -1;
-            getActivity().runOnUiThread(() -> {
-                if (getActivity() == null) {
+            final int peerCount = directory != null ? directory.size() : -1;
+            final List<PeerDirectory.PeerInfo> verified =
+                    directory != null ? directory.topByTrustVerified(50) : null;
+            final List<PeerDirectory.PeerInfo> all =
+                    directory != null ? directory.topByTrust(50) : null;
+            SystemUtils.postToUIThread(() -> {
+                if (!isAdded()) {
                     return;
                 }
                 Preference countPref = findPreference("frostwire.prefs.distributed.peers.count");
-                if (countPref == null) {
+                if (countPref != null) {
+                    if (peerCount < 0) {
+                        countPref.setSummary(R.string.distributed_peers_not_available);
+                    } else if (peerCount == 0) {
+                        countPref.setSummary(R.string.distributed_peers_empty);
+                    } else {
+                        int v = verified != null ? verified.size() : 0;
+                        countPref.setSummary(getString(
+                                R.string.distributed_peers_count, v, peerCount));
+                    }
+                }
+                PreferenceCategory listCat =
+                        findPreference("frostwire.prefs.distributed.peers.list");
+                if (listCat == null) {
                     return;
                 }
-                if (peerCount < 0) {
-                    countPref.setSummary(R.string.distributed_peers_not_available);
-                } else if (peerCount == 0) {
-                    countPref.setSummary(R.string.distributed_peers_empty);
-                } else {
-                    countPref.setSummary(getString(
-                            R.string.distributed_peers_count, verifiedCount, peerCount));
+                listCat.removeAll();
+                if (all == null || all.isEmpty()) {
+                    Preference empty = new Preference(requireContext());
+                    empty.setTitle(R.string.distributed_peers_empty);
+                    empty.setSelectable(false);
+                    listCat.addPreference(empty);
+                    return;
+                }
+                for (PeerDirectory.PeerInfo p : all) {
+                    Preference row = new Preference(requireContext());
+                    String host = p.hostname() != null && !p.hostname().isEmpty()
+                            ? p.hostname() : "(unknown)";
+                    int utp = p.utpPort();
+                    int rudp = p.rudpPort();
+                    if (p.isVerified()) {
+                        row.setTitle(getString(R.string.distributed_peers_row, host, utp, rudp));
+                    } else {
+                        row.setTitle(getString(R.string.distributed_peers_row_unverified, host, utp));
+                    }
+                    String pub = Hex.encode(p.peerPub());
+                    row.setSummary(pub.substring(0, Math.min(16, pub.length())) + "…");
+                    row.setSelectable(false);
+                    listCat.addPreference(row);
                 }
             });
         });
     }
 
     private void refreshStackStatus() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             EngineForegroundService svc = EngineForegroundService.getInstance();
-            boolean running = svc != null && svc.isRelayStackRunning();
+            AndroidRelayStack stack = svc != null ? svc.getRelayStack() : null;
+            boolean running = stack != null;
             boolean transport = SearchEngine.DISTRIBUTED_WIRING.searchTransport() != null;
-            if (getActivity() == null) {
-                return;
+            int rudp = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
+            int control = 0;
+            int relay = RelayConstants.RELAY_LISTEN_PORT;
+            String role = "BOTH";
+            if (stack != null && stack.server() != null) {
+                IceBridgeServer server = stack.server();
+                rudp = server.rudpPort();
+                control = server.controlPort();
             }
-            getActivity().runOnUiThread(() -> {
-                if (getActivity() == null) {
+            final boolean fRunning = running;
+            final boolean fTransport = transport;
+            final int fRudp = rudp;
+            final int fControl = control;
+            final int fRelay = relay;
+            final String fRole = role;
+            final boolean hasIdentity = SearchEngine.DISTRIBUTED_WIRING.identity() != null
+                    || resolveIdentity() != null;
+            final boolean noService = svc == null;
+            SystemUtils.postToUIThread(() -> {
+                if (!isAdded()) {
                     return;
                 }
                 Preference statusPref = findPreference("frostwire.prefs.distributed.stack.status");
-                if (statusPref == null) {
+                Preference configPref = findPreference("frostwire.prefs.distributed.icebridge.config");
+                if (statusPref != null) {
+                    if (noService) {
+                        statusPref.setSummary(R.string.distributed_stack_no_service);
+                    } else if (fRunning && fTransport) {
+                        statusPref.setSummary(getString(
+                                R.string.distributed_stack_running, fRudp, fControl, fRole));
+                    } else if (hasIdentity && !fRunning) {
+                        statusPref.setSummary(R.string.distributed_stack_starting);
+                    } else if (hasIdentity && !fTransport) {
+                        statusPref.setSummary(R.string.distributed_identity_init_failed);
+                    } else {
+                        statusPref.setSummary(R.string.distributed_stack_not_running);
+                    }
+                }
+                if (configPref != null) {
+                    if (fRunning) {
+                        configPref.setSummary(getString(
+                                R.string.distributed_icebridge_config_summary,
+                                fRudp, fRelay, fControl, fRole));
+                    } else {
+                        configPref.setSummary(R.string.distributed_icebridge_config_unknown);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * @param ping if true, re-ping all cache entries (blocking network); otherwise just display cache
+     */
+    private void refreshIceBridgeHosts(boolean ping) {
+        if (ping) {
+            toast(R.string.distributed_icebridge_pinging);
+        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
+            ensureHostCachePath();
+            IceBridgeHostCache cache = IceBridgeHostCache.getInstance();
+            if (ping) {
+                try {
+                    cache.refreshPings();
+                } catch (Throwable t) {
+                    LOG.warn("IceBridge host refreshPings failed", t);
+                }
+            }
+            long windowMs = 7L * 24 * 60 * 60 * 1000;
+            final List<IceBridgeHostCache.Entry> pingable = cache.getPingable(windowMs);
+            final List<IceBridgeHostCache.Entry> all = cache.getAll();
+            SystemUtils.postToUIThread(() -> {
+                if (!isAdded()) {
                     return;
                 }
-                if (running && transport) {
-                    statusPref.setSummary(R.string.distributed_stack_running);
-                } else if (SearchEngine.DISTRIBUTED_WIRING.identity() != null && !transport) {
-                    statusPref.setSummary(R.string.distributed_identity_init_failed);
-                } else {
-                    statusPref.setSummary(R.string.distributed_stack_not_running);
+                PreferenceCategory listCat =
+                        findPreference("frostwire.prefs.distributed.icebridge.hosts_list");
+                if (listCat == null) {
+                    return;
+                }
+                listCat.removeAll();
+                List<IceBridgeHostCache.Entry> show =
+                        (pingable != null && !pingable.isEmpty()) ? pingable : all;
+                if (show == null || show.isEmpty()) {
+                    Preference empty = new Preference(requireContext());
+                    empty.setTitle(R.string.distributed_icebridge_hosts_empty);
+                    empty.setSelectable(false);
+                    listCat.addPreference(empty);
+                    return;
+                }
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+                for (IceBridgeHostCache.Entry e : show) {
+                    Preference row = new Preference(requireContext());
+                    String role = (e.role != null && !e.role.isEmpty()) ? e.role : "?";
+                    row.setTitle(e.host + ":" + e.port + " · " + role);
+                    String when = e.lastSuccessfulPingMs <= 0
+                            ? getString(R.string.distributed_icebridge_host_never)
+                            : fmt.format(new Date(e.lastSuccessfulPingMs));
+                    row.setSummary(getString(R.string.distributed_icebridge_host_row, role, when));
+                    row.setSelectable(false);
+                    listCat.addPreference(row);
                 }
             });
         });

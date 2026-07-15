@@ -77,10 +77,10 @@
     <string name="distributed_identity_difficulty_meets">%1$d బిట్లు (అవసరాన్ని తీరుస్తుంది)</string>
     <string name="distributed_identity_difficulty_below">%1$d బిట్లు (అవసరం %2$d కంటే తక్కువ)</string>
     <string name="distributed_peers_header">కనుగొన్న పీర్‌లు</string>
-    <string name="distributed_peers_count">%1$d / %2$d పీర్‌లు</string>
+    <string name="distributed_peers_count">%1$d of %2$d peers verified / known</string>
     <string name="distributed_peers_empty">ఇంకా పీర్‌లు కనుగొనబడలేదు</string>
     <string name="distributed_peers_not_available">పీర్ డైరెక్టరీ అందుబాటులో లేదు</string>
-    <string name="distributed_peers_refresh">రిఫ్రెష్</string>
+    <string name="distributed_peers_refresh">Refresh peers</string>
     <string name="seeding_time">విత్తన సమయం</string>
     <string name="open_menu_action">%s ను తెరవండి</string>
     <string name="wifi_seeding_has_been_turned_off">Wi-fi అందుబాటులో లేదు, నాటడం నిలిపివేయబడింది</string>
@@ -599,4 +599,29 @@
     <string name="error_cannot_open_downloads_folder">డౌన్‌లోడ్‌లను వీక్షించడానికి యాప్ ఏదీ కనుగొనబడలేదు. FrostWireకి అనుమతులు ఉన్నాయని మరియు ఫైల్ ఎక్స్‌ప్లోరర్ ఇన్‌స్టాల్ చేయబడిందని నిర్ధారించుకోండి</string>
     <string name="_30_minutes">30 నిమిషాలు</string>
     <string name="ad_free_30_minutes">ప్రకటన రహిత 30 నిమిషాలు</string>
+
+    <string name="distributed_peers_list_title">Peer list</string>
+    <string name="distributed_peers_row">%1$s:%2$d · rUDP %3$d</string>
+    <string name="distributed_peers_row_unverified">%1$s:%2$d (unverified)</string>
+    <string name="distributed_stack_starting">Starting IceBridge…</string>
+    <string name="distributed_stack_no_service">Engine service not running</string>
+    <string name="distributed_icebridge_header">IceBridge</string>
+    <string name="distributed_icebridge_mode_title">Mode</string>
+    <string name="distributed_icebridge_mode_local">In-process local IceBridge (Android always runs mesh inside the app — no subprocess)</string>
+    <string name="distributed_icebridge_config_title">Local ports / role</string>
+    <string name="distributed_icebridge_config_summary">rUDP %1$d · identity TCP %2$d · control HTTP %3$d · role %4$s</string>
+    <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
+    <string name="distributed_icebridge_start">Start / restart IceBridge</string>
+    <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
+    <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
+    <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
+    <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>
+    <string name="distributed_icebridge_hosts_list_title">Pingable hosts</string>
+    <string name="distributed_icebridge_hosts_empty">No successfully pinged IceBridge servers yet</string>
+    <string name="distributed_icebridge_hosts_refresh">Refresh / Ping</string>
+    <string name="distributed_icebridge_hosts_refresh_summary">Re-ping all known hosts and update last successful ping times</string>
+    <string name="distributed_icebridge_host_row">%1$s · last ping %2$s</string>
+    <string name="distributed_icebridge_host_never">never</string>
+    <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
+
 </resources>
