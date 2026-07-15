@@ -20,6 +20,8 @@ package com.frostwire.android.search;
 
 import android.content.Context;
 
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BTEngineListenerChain;
@@ -172,56 +174,113 @@ public final class AndroidRelayStack implements AutoCloseable {
             File hostCacheFile = new File(homeDir, "icebridge_host_cache.txt");
             IceBridgeHostCache.configure(hostCacheFile);
 
-            int controlPort = freeLocalControlPort();
-            // relayPort=0: IceBridgeServer must not bind TCP 6888 — Android starts
-            // IncomingRelayServer with full RelayRole (search + identity) below.
-            IceBridgeConfig config = IceBridgeConfig.newBuilder()
-                    .host("0.0.0.0")
-                    .rudpPort(PeerRegistrySync.ICEBRIDGE_RUDP_PORT)
-                    .relayPort(0)
-                    .controlHttpPort(controlPort)
-                    .role(IceBridgeConfig.Role.BOTH)
-                    .identityFile(identityFile)
-                    .maxPeers(500)
-                    .peerTtlSec(180)
-                    .maxQpsPerKey(5.0)
-                    .build();
+            // Optional remote IceBridge (same mesh as desktop USE_REMOTE / EC2 forwarder).
+            // Priority: system props → libtorrent/icebridge-remote.txt → prefs.
+            String remoteUrl = System.getProperty("frostwire.icebridge.remoteUrl", "");
+            String remoteToken = System.getProperty("frostwire.icebridge.remoteToken", "");
+            boolean useRemote = false;
+            File remoteCfg = new File(homeDir, "icebridge-remote.txt");
+            if ((remoteUrl == null || remoteUrl.isEmpty()) && remoteCfg.isFile()) {
+                try {
+                    String[] lines = readRemoteConfigLines(remoteCfg);
+                    if (lines.length >= 1 && lines[0] != null && !lines[0].isEmpty()) {
+                        remoteUrl = lines[0].trim();
+                    }
+                    if (lines.length >= 2 && lines[1] != null) {
+                        remoteToken = lines[1].trim();
+                    }
+                    LOG.info("AndroidRelayStack: loaded remote IceBridge config from "
+                            + remoteCfg.getAbsolutePath());
+                } catch (Throwable t) {
+                    LOG.warn("AndroidRelayStack: failed reading " + remoteCfg, t);
+                }
+            }
+            try {
+                ConfigurationManager cm = ConfigurationManager.instance();
+                if (remoteUrl == null || remoteUrl.isEmpty()) {
+                    useRemote = cm.getBoolean(Constants.PREF_KEY_ICEBRIDGE_USE_REMOTE);
+                    remoteUrl = cm.getString(Constants.PREF_KEY_ICEBRIDGE_REMOTE_URL, "");
+                    remoteToken = cm.getString(Constants.PREF_KEY_ICEBRIDGE_REMOTE_TOKEN, "");
+                } else {
+                    useRemote = true;
+                }
+            } catch (Throwable t) {
+                LOG.warn("AndroidRelayStack: config read for remote IceBridge failed", t);
+            }
+            if (remoteUrl != null && !remoteUrl.isEmpty()) {
+                useRemote = true;
+            }
 
-            srv = new IceBridgeServer(config);
-            srv.start();
-            LOG.info("AndroidRelayStack: IceBridgeServer started: rudpPort=" + srv.rudpPort()
-                    + " controlPort=" + srv.controlPort());
-
-            cl = new IceBridgeClient(srv.controlPort());
-            cl.setAuthToken(srv.authToken());
-
-            tr = new IceBridgeSearchTransport(cl);
-            tr.start();
-
+            int meshRudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
             PeerKarmaCache karmaCache = new PeerKarmaCache(
                     new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
             pd = new PeerDirectory(karmaCache);
 
-            IncomingRelayServer relaySrv2 = null;
-            try {
-                int relayPort = RelayConstants.RELAY_LISTEN_PORT;
-                RelaySearchService relayService = new RelaySearchService(li, ident);
-                RelayRole relayRole = new RelayRole(relayService, pd, ident);
-                IdentityRecord identityRecord = IdentityRecord.createSigned(
-                        ident.nodeId(), ident.ed25519(),
-                        ident.x25519PubRaw(), relayPort, srv.rudpPort(), "BOTH");
-                relaySrv2 = new IncomingRelayServer(relayRole, identityRecord, relayPort);
-                relaySrv2.start();
-                relaySrv = relaySrv2;
-                LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
-                // Self + local control surface for settings "known IceBridge servers".
-                try {
-                    IceBridgeHostCache.getInstance()
-                            .markSuccess("127.0.0.1", relayPort, "BOTH");
-                } catch (Throwable ignored) {
+            if (useRemote) {
+                LOG.info("AndroidRelayStack: using remote IceBridge at " + remoteUrl);
+                cl = new IceBridgeClient(remoteUrl);
+                if (remoteToken != null && !remoteToken.isEmpty()) {
+                    cl.setAuthToken(remoteToken);
                 }
-            } catch (Throwable t) {
-                LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
+                // Demux /poll by own pub before first register completes.
+                cl.setOwnPub(ident.ed25519PubRaw());
+                if (!cl.health()) {
+                    LOG.warn("AndroidRelayStack: remote IceBridge health check failed: " + remoteUrl);
+                }
+                // No in-process IceBridgeServer / identity TCP when remote — forwarder owns mesh.
+                srv = null;
+                relaySrv = null;
+            } else {
+                int controlPort = freeLocalControlPort();
+                // relayPort=0: IceBridgeServer must not bind TCP 6888 — Android starts
+                // IncomingRelayServer with full RelayRole (search + identity) below.
+                IceBridgeConfig config = IceBridgeConfig.newBuilder()
+                        .host("0.0.0.0")
+                        .rudpPort(PeerRegistrySync.ICEBRIDGE_RUDP_PORT)
+                        .relayPort(0)
+                        .controlHttpPort(controlPort)
+                        .role(IceBridgeConfig.Role.BOTH)
+                        .identityFile(identityFile)
+                        .maxPeers(500)
+                        .peerTtlSec(180)
+                        .maxQpsPerKey(5.0)
+                        .build();
+
+                srv = new IceBridgeServer(config);
+                srv.start();
+                meshRudpPort = srv.rudpPort();
+                LOG.info("AndroidRelayStack: IceBridgeServer started: rudpPort=" + srv.rudpPort()
+                        + " controlPort=" + srv.controlPort());
+
+                cl = new IceBridgeClient(srv.controlPort());
+                cl.setAuthToken(srv.authToken());
+
+                try {
+                    int relayPort = RelayConstants.RELAY_LISTEN_PORT;
+                    RelaySearchService relayService = new RelaySearchService(li, ident);
+                    RelayRole relayRole = new RelayRole(relayService, pd, ident);
+                    IdentityRecord identityRecord = IdentityRecord.createSigned(
+                            ident.nodeId(), ident.ed25519(),
+                            ident.x25519PubRaw(), relayPort, meshRudpPort, "BOTH");
+                    IncomingRelayServer relaySrv2 =
+                            new IncomingRelayServer(relayRole, identityRecord, relayPort);
+                    relaySrv2.start();
+                    relaySrv = relaySrv2;
+                    LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
+                    IceBridgeHostCache.getInstance().markSuccess("127.0.0.1", relayPort, "BOTH");
+                } catch (Throwable t) {
+                    LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
+                }
+            }
+
+            tr = new IceBridgeSearchTransport(cl);
+            tr.start();
+
+            // Seed known EC2 forwarder into host cache for UI / bootstrap hints.
+            try {
+                IceBridgeHostCache.getInstance()
+                        .addOrUpdate("54.172.26.106", RelayConstants.RELAY_LISTEN_PORT, "FORWARDER");
+            } catch (Throwable ignored) {
             }
 
             RelaySearchService ss = new RelaySearchService(li, ident);
@@ -229,9 +288,8 @@ public final class AndroidRelayStack implements AutoCloseable {
             ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
             ih.start();
 
-            // Never call InetAddress.getLocalHost() on Android — it can block for
-            // tens of seconds (or longer) on DNS/reverse-lookup failure, freezing
-            // the MISC handler that starts the relay stack and identity UI.
+            // USE_REMOTE clients register as local rUDP endpoint of the forwarder so
+            // inbound mesh traffic is delivered to /poll (see RudpSessionManager).
             String localHost = "127.0.0.1";
             try {
                 String adv = System.getProperty("frostwire.icebridge.advertiseHost");
@@ -240,10 +298,12 @@ public final class AndroidRelayStack implements AutoCloseable {
                 }
             } catch (Throwable ignored) {
             }
-            prs = new PeerRegistrySync(cl, pd, localHost, srv.rudpPort(), ident,
+            prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident,
                     IceBridgeConfig.Role.BOTH);
             prs.start();
-            LOG.info("AndroidRelayStack: PeerRegistrySync started advertiseHost=" + localHost);
+            LOG.info("AndroidRelayStack: PeerRegistrySync started advertiseHost=" + localHost
+                    + " rudpPort=" + meshRudpPort
+                    + " remote=" + useRemote);
 
             DhtPeerDiscoverySource discoverySource = new DhtPeerDiscoverySource(btEngine);
             byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
@@ -254,7 +314,7 @@ public final class AndroidRelayStack implements AutoCloseable {
             LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
 
             IdentityRecordPublisher identityPublisher =
-                    new IdentityRecordPublisher(ident, RelayConstants.RELAY_LISTEN_PORT, srv.rudpPort(), "BOTH");
+                    new IdentityRecordPublisher(ident, RelayConstants.RELAY_LISTEN_PORT, meshRudpPort, "BOTH");
             IndexAnnouncementPublisher indexPublisher =
                     new IndexAnnouncementPublisher(li, ident);
             da = new DhtAdvertiser(identityPublisher, indexPublisher, DHT_ADVERTISE_INTERVAL_SEC);
@@ -274,9 +334,8 @@ public final class AndroidRelayStack implements AutoCloseable {
                     .searchTransport(tr);
             LOG.info("AndroidRelayStack: LOCAL and DISTRIBUTED search engines wired"
                     + " LocalIndex.size=" + li.size()
-                    + " relayTcp=" + (relaySrv != null ? RelayConstants.RELAY_LISTEN_PORT : "down")
-                    + " rudp=" + srv.rudpPort()
-                    + " control=" + srv.controlPort());
+                    + " remoteIceBridge=" + useRemote
+                    + " meshRudp=" + meshRudpPort);
 
             AndroidRelayStack stack = new AndroidRelayStack(li, ident, srv, cl, tr, ss, ih,
                     pd, prs, pds, da, ks, kcs, relaySrv);
@@ -369,6 +428,24 @@ public final class AndroidRelayStack implements AutoCloseable {
         try (java.net.ServerSocket socket = new java.net.ServerSocket(0)) {
             return socket.getLocalPort();
         }
+    }
+
+    /** icebridge-remote.txt: line1=url, line2=token (optional). */
+    private static String[] readRemoteConfigLines(File file) throws java.io.IOException {
+        java.util.ArrayList<String> lines = new java.util.ArrayList<>();
+        try (java.io.BufferedReader r = new java.io.BufferedReader(
+                new java.io.InputStreamReader(new java.io.FileInputStream(file),
+                        java.nio.charset.StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+                lines.add(line);
+            }
+        }
+        return lines.toArray(new String[0]);
     }
 
     /**

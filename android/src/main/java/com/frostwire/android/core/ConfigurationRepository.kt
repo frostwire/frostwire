@@ -376,6 +376,9 @@ object ConfigurationRepository {
         // Off by default so normal search is web + Distributed only.
         m[Constants.PREF_KEY_SEARCH_USE_LOCAL] = false
         m[Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED] = true
+        m[Constants.PREF_KEY_ICEBRIDGE_USE_REMOTE] = false
+        m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_URL] = ""
+        m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_TOKEN] = ""
         m[Constants.PREF_KEY_SEARCH_USE_YT] = (Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
         m[Constants.PREF_KEY_SEARCH_USE_KNABEN] = true
         m[Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV] = true

@@ -598,6 +598,18 @@ final class Initializer {
         if (token != null && !token.isEmpty()) {
           client.setAuthToken(token);
         }
+        // Multi USE_REMOTE demux: /poll?pub= needs own identity before first register.
+        try {
+          File idFile =
+              com.frostwire.search.relay.RelayConstants.identityFile(
+                  CommonUtils.getUserSettingsDir());
+          if (idFile != null && idFile.isFile()) {
+            client.setOwnPub(
+                com.frostwire.search.relay.IdentityKeys.load(idFile).ed25519PubRaw());
+          }
+        } catch (Throwable t) {
+          relayLog.debug("Could not preload identity for IceBridge poll demux: " + t);
+        }
         relayLog.info("Using remote IceBridge at " + remoteUrl + " (no local subprocess)");
         relayLog.info(
             "  (remote auth token "
