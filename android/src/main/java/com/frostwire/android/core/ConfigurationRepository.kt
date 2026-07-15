@@ -372,6 +372,8 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_SEARCH_USE_MAGNETDL] = true
         m[Constants.PREF_KEY_SEARCH_USE_ONE337X] = true
         m[Constants.PREF_KEY_SEARCH_USE_BITSEARCH] = true
+        m[Constants.PREF_KEY_SEARCH_USE_BTDIGG] = true
+        m[Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS] = true
         // Local is a diagnostic: same LocalIndex path as inbound IceBridge answers.
         // Off by default so normal search is web + Distributed only.
         m[Constants.PREF_KEY_SEARCH_USE_LOCAL] = false

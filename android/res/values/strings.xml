@@ -517,7 +517,7 @@
     <string name="changelog">Changelog</string>
     <string name="pro" translatable="false">PRO</string>
     <string name="unlimited">Unlimited</string>
-    <string name="search_preferences_one_engine_checked_always">By default, one search engine needs to be checked at all times</string>
+    <string name="search_preferences_one_engine_checked_always">When Distributed search is off, at least one search engine must stay checked</string>
     <string name="cannot_start_engine_without_vpn">BitTorrent can\'t start unless a VPN is available. (Check your settings)</string>
     <string name="switch_off_engine_without_vpn">VPN is inactive, stopping the BitTorrent engine.</string>
     <string name="vpn_drop_protection_title">VPN-Drop Protection</string>

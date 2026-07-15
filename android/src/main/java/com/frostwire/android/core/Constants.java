@@ -95,6 +95,9 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_TORRENTSCSV = "frostwire.prefs.search.use_torrentscsv";
     public static final String PREF_KEY_SEARCH_USE_KNABEN = "frostwire.prefs.search.use_knaben";
     public static final String PREF_KEY_SEARCH_USE_BITSEARCH = "frostwire.prefs.search.use_bitsearch";
+    /** Preference key must match settings_search_engines.xml (use_bt_digg). */
+    public static final String PREF_KEY_SEARCH_USE_BTDIGG = "frostwire.prefs.search.use_bt_digg";
+    public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
     public static final String PREF_KEY_SEARCH_USE_LOCAL = "frostwire.prefs.search.use_local";
     public static final String PREF_KEY_SEARCH_USE_DISTRIBUTED = "frostwire.prefs.search.use_distributed";
     /** When true, Android uses a remote IceBridge control URL instead of in-process mesh. */

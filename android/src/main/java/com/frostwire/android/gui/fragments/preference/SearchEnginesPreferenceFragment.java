@@ -27,6 +27,8 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
@@ -39,6 +41,11 @@ import java.util.Map;
 /**
  * NOTE: If you want a search engine to not appear on the list for the basic/google play version see
  * SoftwareUpdater.checkUpdateAsyncPost(), there such engines are de-activated when Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG
+ *
+ * <p>Selection rule: all web engines may be unchecked when
+ * {@link Constants#PREF_KEY_SEARCH_USE_DISTRIBUTED Distributed search} is enabled.
+ * If Distributed is off, at least one engine on this screen must stay checked
+ * (enforced on click and when leaving the screen).
  *
  * @author gubatron
  * @author aldenml
@@ -62,6 +69,13 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         setupSearchEngines();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        // If Distributed is off, leaving with zero engines selected is not allowed.
+        ensureMinimumEngineSelectionIfNeeded();
+    }
+
     private void setupSearchEngines() {
         final CheckBoxPreference selectAllCheckbox = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
 
@@ -74,8 +88,9 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
 
             if (!cb.isChecked()) {
                 setChecked(selectAllCheckbox, false, false);
-                if (areAllEnginesChecked(false)) {
-                    cb.setChecked(true); // always keep one checked
+                if (areAllEnginesChecked(false) && !isDistributedSearchEnabled()) {
+                    // Distributed off: keep at least one web/local engine selected.
+                    cb.setChecked(true);
                     UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                 }
                 selectAllCheckbox.setTitle(R.string.select_all);
@@ -130,15 +145,6 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         }
     }
 
-    private boolean areAllEnginesChecked(Map<CheckBoxPreference, SearchEngine> map, boolean checked) {
-        for (CheckBoxPreference preference : map.keySet()) {
-            if (checked != preference.isChecked()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private boolean areAllEnginesChecked(boolean checked) {
         for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
             if (checked != preference.isChecked()) {
@@ -148,18 +154,66 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         return true;
     }
 
-    private void checkAllEngines(boolean checked) {
-        CheckBoxPreference archivePreference = visibleSearchEnginePreferences.get(com.frostwire.android.core.Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG);
+    private boolean isAnyEngineChecked() {
+        for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
+            if (preference.isChecked()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    private static boolean isDistributedSearchEnabled() {
+        try {
+            return ConfigurationManager.instance()
+                    .getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private void checkAllEngines(boolean checked) {
         for (CheckBoxPreference preference : visibleSearchEnginePreferences.values()) {
             setChecked(preference, checked, false);
         }
 
-        // always leave one checked.
-        if (!checked && archivePreference != null) {
-            setChecked(archivePreference, true, false);
+        // Deselect-all with Distributed off: leave one engine on.
+        if (!checked && !isDistributedSearchEnabled()) {
+            ensureOneEngineChecked(true);
+        }
+    }
+
+    /**
+     * When Distributed search is disabled, force at least one engine checkbox on.
+     *
+     * @param showMessage toast when a forced re-check happens
+     * @return true if a selection was forced
+     */
+    private boolean ensureOneEngineChecked(boolean showMessage) {
+        if (isAnyEngineChecked()) {
+            return false;
+        }
+        CheckBoxPreference fallback = visibleSearchEnginePreferences.get(
+                Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG);
+        if (fallback == null && !visibleSearchEnginePreferences.isEmpty()) {
+            fallback = visibleSearchEnginePreferences.values().iterator().next();
+        }
+        if (fallback == null) {
+            return false;
+        }
+        setChecked(fallback, true, false);
+        updateSelectAllCheckBox();
+        if (showMessage && getView() != null) {
             UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
         }
+        return true;
+    }
+
+    private void ensureMinimumEngineSelectionIfNeeded() {
+        if (isDistributedSearchEnabled()) {
+            return;
+        }
+        ensureOneEngineChecked(true);
     }
 
     private void collectVisibleSearchEnginePreferences() {

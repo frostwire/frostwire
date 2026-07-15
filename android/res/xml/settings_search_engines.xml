@@ -30,57 +30,71 @@
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_archiveorg" />
+        android:title="@string/use_archiveorg"
+        android:defaultValue="true" />
     <CheckBoxPreference
             android:key="frostwire.prefs.search.use_bt_digg"
             android:layout="@layout/view_preference_search_engine"
-            android:title="@string/use_btdigg" />
+            android:title="@string/use_btdigg"
+            android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentscsv"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_torrentscsv" />
+        android:title="@string/use_torrentscsv"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_frostclick" />
+        android:title="@string/use_frostclick"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_soundcloud"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_soundcloud" />
+        android:title="@string/use_soundcloud"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_tpb" />
+        android:title="@string/use_tpb"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_torrentdownloads" />
+        android:title="@string/use_torrentdownloads"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentz2"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_torrentz2" />
+        android:title="@string/use_torrentz2"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_magnetdl"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_magnetdl" />
+        android:title="@string/use_magnetdl"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_nyaa"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_nyaa" />
+        android:title="@string/use_nyaa"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_one337x"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_one337x" />
+        android:title="@string/use_one337x"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_knaben"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_knaben" />
+        android:title="@string/use_knaben"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_bitsearch"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_bitsearch" />
+        android:title="@string/use_bitsearch"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_yt"
         android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_yt" />
+        android:title="@string/use_yt"
+        android:defaultValue="true" />
 </PreferenceScreen>
