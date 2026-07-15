@@ -26,7 +26,7 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_local"
         android:summary="@string/use_local_summary"
-        android:defaultValue="true" />
+        android:defaultValue="false" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:layout="@layout/view_preference_search_engine"
