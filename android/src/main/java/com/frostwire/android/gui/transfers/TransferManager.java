@@ -34,6 +34,8 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
+import com.frostwire.bittorrent.BTEngineListener;
+import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.SearchResult;
@@ -79,6 +81,64 @@ public final class TransferManager {
     private static final Object instanceLock = new Object();
     private final ConfigurationRepository.OnPreferenceChangeListener onPreferenceChangeListener;
     private volatile static TransferManager instance;
+
+    /**
+     * Stable BTEngine listener instance so {@link BTEngineListenerChain#install}
+     * can chain SharedTorrentIndexer without {@code setListener} wiping it on
+     * every {@link #reset()} / loadTorrents cycle.
+     */
+    private final BTEngineListener engineListener = new BTEngineAdapter() {
+        @Override
+        public void downloadAdded(BTEngine engine, BTDownload dl) {
+            if (dl.getInfoHash() == null) {
+                LOG.error("BTEngineAdapter.downloadAdded()@TransferManager: BTDownload infoHash is null");
+                return;
+            }
+            String name = dl.getName();
+            if (name != null && name.contains("fetch_magnet")) {
+                return;
+            }
+            File savePath = dl.getSavePath();
+            if (savePath != null && savePath.toString().contains("fetch_magnet")) {
+                return;
+            }
+            if (dl.getListener() == null) {
+                dl.setListener(new UIBTDownloadListener());
+            }
+            UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
+            synchronized (downloadsListMonitor) {
+                if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
+                    bittorrentDownloadsList.add(uiBittorrentDownload);
+                }
+            }
+            synchronized (downloadsMapMonitor) {
+                if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
+                    bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                }
+            }
+        }
+
+        @Override
+        public void downloadUpdate(BTEngine engine, BTDownload dl) {
+            try {
+                if (dl.getInfoHash() == null) {
+                    LOG.error("BTEngineAdapter.downloadUpdate()@TransferManager: null infoHash");
+                    return;
+                }
+                if (dl.getListener() == null) {
+                    dl.setListener(new UIBTDownloadListener());
+                }
+
+                BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
+                if (bittorrentDownload instanceof UIBittorrentDownload) {
+                    UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
+                    bt.updateUI(dl);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error updating bittorrent download", e);
+            }
+        }
+    };
 
 
     public static TransferManager instance() {
@@ -761,58 +821,9 @@ public final class TransferManager {
         UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
 
         try {
-            btEngine.setListener(new BTEngineAdapter() {
-                @Override
-                public void downloadAdded(BTEngine engine, BTDownload dl) {
-                    if (dl.getInfoHash() == null) {
-                        LOG.error("BTEngineAdapter.downloadAdded()@TransferManager::loadTorrentsTask: Check your logic, BTDownload's infoHash is null");
-                        return;
-                    }
-                    String name = dl.getName();
-                    if (name != null && name.contains("fetch_magnet")) {
-                        return;
-                    }
-                    File savePath = dl.getSavePath();
-                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
-                        return;
-                    }
-                    if (dl.getListener() == null) {
-                        dl.setListener(new UIBTDownloadListener());
-                    }
-                    UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
-                    synchronized (downloadsListMonitor) {
-                        if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
-                            bittorrentDownloadsList.add(uiBittorrentDownload);
-                        }
-                    }
-                    synchronized (downloadsMapMonitor) {
-                        if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
-                            bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
-                        }
-                    }
-                }
-
-                @Override
-                public void downloadUpdate(BTEngine engine, BTDownload dl) {
-                    try {
-                        if (dl.getInfoHash() == null) {
-                            LOG.error("BTEngineAdapter.downloadUpdate()@TransferManager::loadTorrentsTask: Check your logic, cannot update BTDownload with null infoHash");
-                            return;
-                        }
-                        if (dl.getListener() == null) {
-                            dl.setListener(new UIBTDownloadListener());
-                        }
-
-                        BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
-                        if (bittorrentDownload instanceof UIBittorrentDownload) {
-                            UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
-                            bt.updateUI(dl);
-                        }
-                    } catch (Throwable e) {
-                        LOG.error("Error updating bittorrent download", e);
-                    }
-                }
-            });
+            // Chain, do not setListener — preserves SharedTorrentIndexer and other
+            // relay listeners installed by AndroidRelayStack.
+            BTEngineListenerChain.install(btEngine, engineListener);
             btEngine.restoreDownloads();
         } catch (Throwable t) {
             MainApplication.recordBTEngineInitializationFailure(t);

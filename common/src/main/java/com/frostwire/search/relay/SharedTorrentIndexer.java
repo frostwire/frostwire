@@ -92,6 +92,27 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         scheduleIndex(dl, IndexTrigger.UPDATE);
     }
 
+    /**
+     * Index downloads that were restored before this listener was installed.
+     * Safe to call multiple times (upsert is idempotent).
+     */
+    public void indexExisting(Iterable<? extends BTDownload> downloads) {
+        if (downloads == null) {
+            return;
+        }
+        int n = 0;
+        for (BTDownload dl : downloads) {
+            if (dl == null) {
+                continue;
+            }
+            scheduleIndex(dl, IndexTrigger.ADDED);
+            n++;
+        }
+        if (n > 0) {
+            LOG.info("Scheduled reindex of " + n + " existing download(s)");
+        }
+    }
+
     private void scheduleIndex(BTDownload dl, IndexTrigger trigger) {
         if (dl == null) {
             return;

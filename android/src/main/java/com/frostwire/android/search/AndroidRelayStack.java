@@ -45,7 +45,12 @@ import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
+import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.search.relay.SharedTorrentIndexer;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
@@ -139,8 +144,26 @@ public final class AndroidRelayStack implements AutoCloseable {
 
             li = AndroidLocalIndex.open(context);
 
-            SharedTorrentIndexerInstaller.install(btEngine, li, ident);
-            LOG.info("AndroidRelayStack: SharedTorrentIndexer installed");
+            SharedTorrentIndexer indexer =
+                    SharedTorrentIndexerInstaller.install(btEngine, li, ident);
+            // Torrents restored before this listener was chained never fired
+            // downloadAdded — reindex them so Local search is not empty.
+            try {
+                java.util.ArrayList<BTDownload> existing = new java.util.ArrayList<>();
+                for (Transfer t : TransferManager.instance().getTransfers()) {
+                    if (t instanceof UIBittorrentDownload) {
+                        BTDownload dl = ((UIBittorrentDownload) t).getDl();
+                        if (dl != null) {
+                            existing.add(dl);
+                        }
+                    }
+                }
+                indexer.indexExisting(existing);
+                LOG.info("AndroidRelayStack: SharedTorrentIndexer installed; reindex scheduled for "
+                        + existing.size() + " transfer(s)");
+            } catch (Throwable t) {
+                LOG.warn("AndroidRelayStack: SharedTorrentIndexer installed; reindex failed", t);
+            }
 
             ks = new AndroidKarmaChainStore(context, AndroidLocalIndex.DEFAULT_DB_NAME);
             File bitcoinCacheDir = new File(homeDir, RelayConstants.BITCOIN_HEADER_CACHE_DIR);
