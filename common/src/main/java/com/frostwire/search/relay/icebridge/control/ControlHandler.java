@@ -291,7 +291,25 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             } catch (NumberFormatException ignored) {
             }
         }
-        List<InboundMessageInfo> result = inboundQueue.poll(Math.max(1, Math.min(count, 256))).stream()
+        int max = Math.max(1, Math.min(count, 256));
+        // Optional ?pub= base64url client identity for multi USE_REMOTE demux.
+        byte[] clientPub = null;
+        List<String> pubParams = decoder.parameters().get("pub");
+        if (pubParams != null && !pubParams.isEmpty() && pubParams.get(0) != null
+                && !pubParams.get(0).isEmpty()) {
+            try {
+                clientPub = IceBridgeAuth.decodeBase64(pubParams.get(0));
+                if (clientPub.length != 32) {
+                    clientPub = null;
+                }
+            } catch (IllegalArgumentException ignored) {
+                clientPub = null;
+            }
+        }
+        List<InboundMessage> drained = clientPub != null
+                ? inboundQueue.pollForTarget(clientPub, max)
+                : inboundQueue.poll(max);
+        List<InboundMessageInfo> result = drained.stream()
                 .map(m -> new InboundMessageInfo(
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.sourcePub()),
                         Base64.getUrlEncoder().withoutPadding().encodeToString(m.payload()),

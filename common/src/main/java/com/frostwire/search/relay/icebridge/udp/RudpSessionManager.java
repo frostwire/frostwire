@@ -122,7 +122,14 @@ public final class RudpSessionManager {
         }
         PeerRecord target = registry.lookup(targetPub);
         if (target != null) {
-            sendData(new InetSocketAddress(target.host(), target.rudpPort()), payload);
+            InetSocketAddress addr = new InetSocketAddress(target.host(), target.rudpPort());
+            // USE_REMOTE clients register at this process's own rUDP endpoint and
+            // drain /poll — never self-UDP (would black-hole multi-client meshes).
+            if (isLocalRudpEndpoint(addr)) {
+                deliverToLocalPollClient(targetPub, new byte[0], payload);
+                return;
+            }
+            sendData(addr, payload);
             return;
         }
         List<PeerRecord> forwarders = registry.lookupForwarders(MAX_MESH_FANOUT);
@@ -689,7 +696,9 @@ public final class RudpSessionManager {
         }
         InetSocketAddress targetAddress = new InetSocketAddress(target.host(), target.rudpPort());
         if (isLocalRudpEndpoint(targetAddress)) {
-            notifyListener(logicalSourcePub, appPayload);
+            // Prefer wire-shaped delivery so InboundMessageQueue can unwrap;
+            // bare app payloads are still accepted as SEARCH fallback.
+            deliverToLocalPollClient(target.ed25519Pub(), logicalSourcePub, appPayload);
             return;
         }
         RudpSession targetSession = sessionsByAddress.get(targetAddress);
@@ -726,13 +735,19 @@ public final class RudpSessionManager {
         if (local.getPort() != addr.getPort()) {
             return false;
         }
-        if (addr.getAddress() == null || local.getAddress() == null) {
+        if (addr.getAddress() == null) {
+            return false;
+        }
+        // USE_REMOTE clients register as 127.0.0.1:rudpPort (or 0.0.0.0).
+        // Do NOT treat every host on our rUDP port as local when bound to
+        // 0.0.0.0 — that would black-hole real remote mesh peers.
+        if (addr.getAddress().isLoopbackAddress() || addr.getAddress().isAnyLocalAddress()) {
             return true;
         }
-        return addr.getAddress().isAnyLocalAddress()
-                || addr.getAddress().isLoopbackAddress()
-                || local.getAddress().isAnyLocalAddress()
-                || local.getAddress().equals(addr.getAddress());
+        if (local.getAddress() != null && local.getAddress().equals(addr.getAddress())) {
+            return true;
+        }
+        return false;
     }
 
     private void handleRelayResponse(RudpPacket packet, InetSocketAddress sender) {
@@ -774,6 +789,23 @@ public final class RudpSessionManager {
                 LOG.warn("RudpSessionManager: message listener failed", t);
             }
         }
+    }
+
+    /**
+     * Deliver to a USE_REMOTE client registered on our rUDP host:port.
+     * Demuxes into a per-target inbound queue when the listener supports it.
+     */
+    private void deliverToLocalPollClient(byte[] targetPub, byte[] sourcePub, byte[] payload) {
+        if (messageListener instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
+            try {
+                ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
+                        .offerForTarget(targetPub, sourcePub == null ? new byte[0] : sourcePub, payload);
+            } catch (Throwable t) {
+                LOG.warn("RudpSessionManager: local poll client delivery failed", t);
+            }
+            return;
+        }
+        notifyListener(sourcePub, payload);
     }
 
     // ---- maintenance ----
