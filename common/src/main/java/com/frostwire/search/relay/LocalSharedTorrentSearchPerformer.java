@@ -25,8 +25,14 @@ import java.util.List;
  * Search performer that reads from the local {@link LocalIndex} and
  * surfaces matching rows as FrostWire search results.
  *
- * <p>This is the user-facing "Local" search engine: it queries the
- * {@code shared_torrents} FTS5 table populated by
+ * <p><b>Purpose:</b> Local search is a <em>self-test / diagnostic</em> of the
+ * same shared-torrent index that {@link RelaySearchService} uses to answer
+ * inbound distributed searches over IceBridge. Enabling it in the search UI
+ * does <strong>not</strong> query peers — it only proves that this node would
+ * return these hits to a remote requester. Production discovery of other
+ * nodes' shares is {@link DistributedSearchPerformer} via IceBridge.
+ *
+ * <p>It queries the {@code shared_torrents} table populated by
  * {@link SharedTorrentIndexer} and returns each row as a magnet-bearing
  * {@link CompositeFileSearchResult}. It performs no network I/O and
  * reports itself as a non-crawler performer so {@code SearchManager}

@@ -372,7 +372,9 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_SEARCH_USE_MAGNETDL] = true
         m[Constants.PREF_KEY_SEARCH_USE_ONE337X] = true
         m[Constants.PREF_KEY_SEARCH_USE_BITSEARCH] = true
-        m[Constants.PREF_KEY_SEARCH_USE_LOCAL] = true
+        // Local is a diagnostic: same LocalIndex path as inbound IceBridge answers.
+        // Off by default so normal search is web + Distributed only.
+        m[Constants.PREF_KEY_SEARCH_USE_LOCAL] = false
         m[Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED] = true
         m[Constants.PREF_KEY_SEARCH_USE_YT] = (Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
         m[Constants.PREF_KEY_SEARCH_USE_KNABEN] = true

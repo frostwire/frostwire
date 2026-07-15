@@ -366,9 +366,13 @@ public abstract class SearchEngine {
         }
       };
 
+  /** Diagnostic: same LocalIndex as inbound IceBridge answers; not peer search. */
   private static final SearchEngine LOCAL =
       new SearchEngine(
-          SearchEngineID.LOCAL_ID, "Local", SearchEnginesSettings.LOCAL_SEARCH_ENABLED, "local") {
+          SearchEngineID.LOCAL_ID,
+          "Local (test)",
+          SearchEnginesSettings.LOCAL_SEARCH_ENABLED,
+          "local") {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
           if (!isReady()) {

@@ -318,8 +318,8 @@
     <string name="torrent_preferences_header">トレント環境設定</string>
     <string name="distributed_search_header">分散検索</string>
     <string name="distributed_search_summary">FrostWireのピアツーピアネットワークを検索</string>
-        <string name="use_local">Local Shared Torrents</string>
-    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
+        <string name="use_local">Local index (test)</string>
+    <string name="use_local_summary">Diagnostic only: query this device\'s shared-torrent index (same data IceBridge serves to remote peers). Does not search other nodes — use Distributed Search for that.</string>
     <string name="use_distributed">分散検索</string>
     <string name="distributed_identity_header">アイデンティティ</string>
     <string name="distributed_identity_node_id">ノードID</string>

@@ -318,8 +318,8 @@
     <string name="torrent_preferences_header">Tùy chọn torrent</string>
     <string name="distributed_search_header">Tìm Kiếm Phân Tán</string>
     <string name="distributed_search_summary">Tìm kiếm trong mạng peer-to-peer FrostWire</string>
-        <string name="use_local">Local Shared Torrents</string>
-    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
+        <string name="use_local">Local index (test)</string>
+    <string name="use_local_summary">Diagnostic only: query this device\'s shared-torrent index (same data IceBridge serves to remote peers). Does not search other nodes — use Distributed Search for that.</string>
     <string name="use_distributed">Tìm Kiếm Phân Tán</string>
     <string name="distributed_identity_header">Danh Tính</string>
     <string name="distributed_identity_node_id">ID Nút</string>

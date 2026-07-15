@@ -317,8 +317,8 @@
     <string name="torrent_preferences_header">Torrent preferencí</string>
     <string name="distributed_search_header">Distribuované hledání</string>
     <string name="distributed_search_summary">Prohledávat peer-to-peer síť FrostWire</string>
-        <string name="use_local">Local Shared Torrents</string>
-    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
+        <string name="use_local">Local index (test)</string>
+    <string name="use_local_summary">Diagnostic only: query this device\'s shared-torrent index (same data IceBridge serves to remote peers). Does not search other nodes — use Distributed Search for that.</string>
     <string name="use_distributed">Distribuované hledání</string>
     <string name="distributed_identity_header">Identita</string>
     <string name="distributed_identity_node_id">ID uzlu</string>

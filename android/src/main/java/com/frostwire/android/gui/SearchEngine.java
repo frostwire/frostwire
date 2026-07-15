@@ -395,10 +395,11 @@ public abstract class SearchEngine {
     public static final RelaySearchWiring DISTRIBUTED_WIRING = new RelaySearchWiring();
 
     /**
-     * Local shared-torrent index search (same performer as desktop LOCAL).
-     * Ready once {@link #LOCAL_WIRING} has a {@link LocalIndex} from the relay stack.
+     * Diagnostic LocalIndex search (same performer as desktop LOCAL).
+     * Same index {@link RelaySearchService} uses for inbound IceBridge answers —
+     * not a peer search. Ready once {@link #LOCAL_WIRING} has a {@link LocalIndex}.
      */
-    public static final SearchEngine LOCAL = new SearchEngine("Local", Constants.PREF_KEY_SEARCH_USE_LOCAL) {
+    public static final SearchEngine LOCAL = new SearchEngine("Local (test)", Constants.PREF_KEY_SEARCH_USE_LOCAL) {
         @Override
         public ISearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {

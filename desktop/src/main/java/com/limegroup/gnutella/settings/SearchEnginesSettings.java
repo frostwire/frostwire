@@ -57,8 +57,14 @@ public class SearchEnginesSettings extends LimeProps {
       FACTORY.createBooleanSetting("KNABEN_SEARCH_ENABLED", false);
   public static final BooleanSetting BITSEARCH_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("BITSEARCH_SEARCH_ENABLED", true);
+  /**
+   * Diagnostic only: Local search queries this node's {@code LocalIndex} — the
+   * same index that answers inbound IceBridge distributed search requests. It
+   * does not contact peers. Default off; enable when testing what this node
+   * would serve remotely.
+   */
   public static final BooleanSetting LOCAL_SEARCH_ENABLED =
-      FACTORY.createBooleanSetting("LOCAL_SEARCH_ENABLED", true);
+      FACTORY.createBooleanSetting("LOCAL_SEARCH_ENABLED", false);
   /**
    * When false (default), Local search and answers to remote distributed
    * search only include torrents still in the transfer table with metadata

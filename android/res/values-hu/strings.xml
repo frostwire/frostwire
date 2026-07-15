@@ -317,8 +317,8 @@
     <string name="torrent_preferences_header">Torrent preferenciák</string>
     <string name="distributed_search_header">Elosztott Keresés</string>
     <string name="distributed_search_summary">Keresés a FrostWire peer-to-peer hálózatában</string>
-        <string name="use_local">Local Shared Torrents</string>
-    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
+        <string name="use_local">Local index (test)</string>
+    <string name="use_local_summary">Diagnostic only: query this device\'s shared-torrent index (same data IceBridge serves to remote peers). Does not search other nodes — use Distributed Search for that.</string>
     <string name="use_distributed">Elosztott Keresés</string>
     <string name="distributed_identity_header">Identitás</string>
     <string name="distributed_identity_node_id">Csomópont ID</string>

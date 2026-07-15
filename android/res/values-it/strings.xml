@@ -319,8 +319,8 @@
     <string name="torrent_preferences_header">Preferenze Torrent</string>
     <string name="distributed_search_header">Ricerca Distribuita</string>
     <string name="distributed_search_summary">Cerca nella rete peer-to-peer di FrostWire</string>
-        <string name="use_local">Local Shared Torrents</string>
-    <string name="use_local_summary">Search torrents you have downloaded or are seeding on this device</string>
+        <string name="use_local">Local index (test)</string>
+    <string name="use_local_summary">Diagnostic only: query this device\'s shared-torrent index (same data IceBridge serves to remote peers). Does not search other nodes — use Distributed Search for that.</string>
     <string name="use_distributed">Ricerca Distribuita</string>
     <string name="distributed_identity_header">Identità</string>
     <string name="distributed_identity_node_id">ID Nodo</string>
