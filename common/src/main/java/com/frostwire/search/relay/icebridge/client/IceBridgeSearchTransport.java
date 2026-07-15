@@ -47,6 +47,11 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
         });
     }
 
+    /** Control-plane client (for host refresh / mesh TELEMETRY warm). */
+    public IceBridgeClient client() {
+        return client;
+    }
+
     /**
      * Start the background poller thread.
      */

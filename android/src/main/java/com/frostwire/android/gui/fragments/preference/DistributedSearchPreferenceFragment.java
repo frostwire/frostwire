@@ -807,9 +807,24 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             IceBridgeHostCache cache = IceBridgeHostCache.getInstance();
             if (ping) {
                 try {
+                    // TCP identity handshake (relay port) — remote logs:
+                    // "IceBridge identity handshake OK from …"
                     cache.refreshPings();
                 } catch (Throwable t) {
                     LOG.warn("IceBridge host refreshPings failed", t);
+                }
+                try {
+                    // Control /health + mesh TELEMETRY PING — remote logs:
+                    // "TELEMETRY PING" / "TELEMETRY send queued"
+                    EngineForegroundService svc = EngineForegroundService.getInstance();
+                    AndroidRelayStack stack = svc != null ? svc.getRelayStack() : null;
+                    if (stack != null && stack.client() != null) {
+                        cache.refreshMeshTelemetry(stack.client());
+                    } else {
+                        LOG.info("IceBridge mesh refresh skipped: relay stack not running");
+                    }
+                } catch (Throwable t) {
+                    LOG.warn("IceBridge mesh refresh failed", t);
                 }
             }
             long windowMs = 7L * 24 * 60 * 60 * 1000;

@@ -191,14 +191,40 @@ public final class PeerRegistrySync implements AutoCloseable {
             // contact hint. Search uses peerPub + rudpPort via IceBridge.
             // utpPort is the identity-plane port slot; prefer rudp for mesh data.
             directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort);
-            client.route(pub, info.host, info.rudpPort,
-                    info.role != null ? info.role : IceBridgeConfig.Role.BOTH);
+            IceBridgeConfig.Role role =
+                    info.role != null ? info.role : IceBridgeConfig.Role.BOTH;
+            client.route(pub, info.host, info.rudpPort, role);
+            // Seed host cache for Settings → Refresh/Ping (TCP identity on 6888).
+            // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.
+            if (!isLoopbackHost(info.host)
+                    && (role == IceBridgeConfig.Role.FORWARDER
+                    || role == IceBridgeConfig.Role.BOTH)) {
+                try {
+                    com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                            .addOrUpdate(info.host,
+                                    com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
+                                    role.name());
+                } catch (Throwable ignored) {
+                }
+            }
             imported++;
         }
         if (imported > 0) {
             LOG.info("PeerRegistrySync: imported " + imported
                     + " mesh peers into PeerDirectory (forwarder-first discovery)");
         }
+    }
+
+    private static boolean isLoopbackHost(String host) {
+        if (host == null || host.isEmpty()) {
+            return true;
+        }
+        String h = host.trim().toLowerCase(java.util.Locale.ROOT);
+        return "127.0.0.1".equals(h)
+                || "localhost".equals(h)
+                || "::1".equals(h)
+                || "0.0.0.0".equals(h)
+                || h.startsWith("127.");
     }
 
     @Override

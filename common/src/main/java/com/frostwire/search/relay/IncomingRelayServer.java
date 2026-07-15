@@ -230,7 +230,7 @@ public final class IncomingRelayServer {
                     return;
                 }
                 if (RelayWireCodec.isIdentityRequest(frame)) {
-                    handleIdentityRequest(out);
+                    handleIdentityRequest(out, socket.getRemoteSocketAddress());
                     return;
                 }
                 if (role == null) {
@@ -263,12 +263,19 @@ public final class IncomingRelayServer {
         }
     }
 
-    private void handleIdentityRequest(OutputStream out) throws IOException {
+    private void handleIdentityRequest(OutputStream out,
+                                       java.net.SocketAddress remote) throws IOException {
         if (identityRecord == null) {
             LOG.debug("Identity request received but no identity record configured");
             return;
         }
         RelayWireCodec.writeIdentityRecord(out, identityRecord);
+        // Operator-visible: Settings → Refresh/Ping uses this TCP identity path
+        // (not control HTTP / mesh TELEMETRY). Without this line, cloud hosts look silent.
+        LOG.info("IceBridge identity handshake OK from " + remote
+                + " role=" + (identityRecord.role() != null ? identityRecord.role() : "?")
+                + " nodeId=" + com.frostwire.util.Hex.encode(identityRecord.nodeId()).substring(0, 12)
+                + "…");
     }
 
     private static void closeQuietly(Socket socket) {

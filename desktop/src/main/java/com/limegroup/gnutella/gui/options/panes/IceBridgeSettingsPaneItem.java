@@ -308,7 +308,30 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
               try {
                 com.frostwire.search.relay.icebridge.IceBridgeHostCache cache =
                     com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
+                // 1) TCP identity handshake on relay port (default 6888) — shows as
+                //    "IceBridge identity handshake OK" on the remote IncomingRelayServer.
                 cache.refreshPings();
+                // 2) Control /health + mesh TELEMETRY PING via IceBridgeClient (USE_REMOTE
+                //    or local child) so standalone forwarder logs show TELEMETRY lines.
+                try {
+                  com.frostwire.search.relay.DistributedSearchTransport tr =
+                      com.limegroup.gnutella.gui.search.SearchEngine
+                          .getDistributedSearchTransport();
+                  if (tr
+                      instanceof
+                      com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport) {
+                    cache.refreshMeshTelemetry(
+                        ((com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport) tr)
+                            .client());
+                  } else {
+                    com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class)
+                        .info(
+                            "IceBridge mesh refresh skipped: distributed transport not ready");
+                  }
+                } catch (Throwable meshEx) {
+                  com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class)
+                      .warn("IceBridge mesh refresh failed", meshEx);
+                }
                 // After full ping pass, show only recently successful ones (last 7 days)
                 // so the table reflects "we can ping successfully".
                 long windowMs = 7L * 24 * 60 * 60 * 1000;

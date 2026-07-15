@@ -240,12 +240,25 @@ public final class IceBridgeHostCache {
     }
 
     /**
-     * Attempt to ping every known entry. Successful pings update lastSuccessfulPingMs
-     * and role (if obtained). Failures leave the entry in the cache (for retry later).
-     * This is blocking; call from a background thread.
+     * Attempt to ping every known entry via TCP identity handshake on the
+     * relay/identity port (default 6888). This is <em>not</em> the IceBridge
+     * control HTTP API and is not mesh TELEMETRY — operators watching a pure
+     * FORWARDER should look for {@code IceBridge identity handshake OK} on the
+     * identity TCP listener.
+     *
+     * <p>Successful pings update lastSuccessfulPingMs and role. Failures leave
+     * the entry in the cache (for retry later). Blocking; call from a
+     * background thread.
      */
     public void refreshPings() {
         List<Entry> snapshot = new ArrayList<>(entries);
+        if (snapshot.isEmpty()) {
+            LOG.info("IceBridge host refresh: cache empty (nothing to TCP-ping)");
+            return;
+        }
+        int ok = 0;
+        int fail = 0;
+        LOG.info("IceBridge host refresh: TCP identity ping of " + snapshot.size() + " host(s)");
         for (Entry e : snapshot) {
             try {
                 Optional<IdentityRecord> rec = pingClient.fetchIdentity(e.host, e.port);
@@ -253,19 +266,93 @@ public final class IceBridgeHostCache {
                     IdentityRecord r = rec.get();
                     if (r.verifySignature()) {
                         markSuccess(e.host, e.port, r.role());
+                        ok++;
+                        LOG.info("IceBridge host ping OK " + e.host + ":" + e.port
+                                + " role=" + (r.role() != null ? r.role() : "?"));
+                        continue;
+                    }
+                    fail++;
+                    LOG.warn("IceBridge host ping bad signature " + e.host + ":" + e.port);
+                } else {
+                    fail++;
+                    LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
+                            + " (no identity record)");
+                }
+            } catch (Exception ex) {
+                fail++;
+                String msg = ex.getMessage();
+                if (msg != null && msg.contains("invalid frame length")) {
+                    LOG.warn("IceBridge host ping: " + e.host + ":" + e.port
+                            + " does not speak the relay protocol (stale entry?)");
+                } else {
+                    LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
+                            + ": " + (msg != null ? msg : ex.getClass().getSimpleName()));
+                }
+            }
+        }
+        LOG.info("IceBridge host refresh done: ok=" + ok + " fail=" + fail
+                + " total=" + snapshot.size());
+    }
+
+    /**
+     * Optional second half of "Refresh / Ping" for USE_REMOTE / in-process
+     * clients that have an {@link com.frostwire.search.relay.icebridge.client.IceBridgeClient}:
+     * control {@code /health} plus mesh {@link MeshProtocolId#TELEMETRY} PING
+     * (single-byte {@code 0x01}) to every looked-up peer. That is what produces
+     * {@code TELEMETRY PING} lines on a standalone forwarder's control/mesh logs.
+     *
+     * @param client live control client, or null to no-op
+     */
+    public void refreshMeshTelemetry(
+            com.frostwire.search.relay.icebridge.client.IceBridgeClient client) {
+        if (client == null) {
+            LOG.info("IceBridge mesh refresh: no control client (stack not running?)");
+            return;
+        }
+        try {
+            if (!client.health()) {
+                LOG.warn("IceBridge mesh refresh: control /health failed");
+                return;
+            }
+            LOG.info("IceBridge mesh refresh: control /health OK");
+            java.util.List<com.frostwire.search.relay.icebridge.control.PeerInfo> peers =
+                    client.lookup(50);
+            if (peers == null || peers.isEmpty()) {
+                LOG.info("IceBridge mesh refresh: lookup empty (no registered peers yet)");
+                return;
+            }
+            int sent = 0;
+            int failed = 0;
+            byte[] ping = new byte[]{0x01};
+            for (com.frostwire.search.relay.icebridge.control.PeerInfo info : peers) {
+                if (info == null || info.pub == null || info.pub.isEmpty()) {
+                    continue;
+                }
+                byte[] pub;
+                try {
+                    pub = java.util.Base64.getUrlDecoder().decode(info.pub);
+                } catch (IllegalArgumentException e) {
+                    try {
+                        pub = java.util.Base64.getDecoder().decode(info.pub);
+                    } catch (IllegalArgumentException e2) {
+                        failed++;
                         continue;
                     }
                 }
-                // ping failed or bad sig: keep entry, do not update success time
-            } catch (Exception ex) {
-                String msg = ex.getMessage();
-                if (msg != null && msg.contains("invalid frame length")) {
-                    LOG.debug("IceBridge host ping: " + e.host + ":" + e.port +
-                            " does not speak the relay protocol (stale entry?)");
+                if (pub.length != 32) {
+                    failed++;
+                    continue;
+                }
+                if (client.send(pub, MeshProtocolId.TELEMETRY, ping)) {
+                    sent++;
                 } else {
-                    LOG.debug("Ping failed for IceBridge host " + e.host + ":" + e.port, ex);
+                    failed++;
                 }
             }
+            LOG.info("IceBridge mesh refresh: TELEMETRY PING sent=" + sent
+                    + " failed=" + failed + " peers=" + peers.size());
+        } catch (Throwable t) {
+            LOG.warn("IceBridge mesh refresh failed", t);
         }
     }
 

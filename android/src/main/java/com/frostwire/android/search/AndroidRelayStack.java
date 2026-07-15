@@ -405,6 +405,11 @@ public final class AndroidRelayStack implements AutoCloseable {
         return server;
     }
 
+    /** Control client (local embedded or USE_REMOTE). May be null after close. */
+    public IceBridgeClient client() {
+        return client;
+    }
+
     public IceBridgeSearchTransport transport() {
         return transport;
     }
