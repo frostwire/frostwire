@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Android IceBridge no longer double-binds TCP 6888 (IceBridgeServer relayPort=0; full RelayRole IncomingRelayServer owns identity+search)
+  - fix:LocalIndex reindex on stack start + delayed retry so existing transfers are available for inbound Distributed search answers
   - cleanup:Local search labeled as diagnostic test of the shared-torrent index IceBridge serves to peers (default off); Distributed Search is peer discovery
   - new:Distributed Search settings IceBridge panel (parity with desktop) — stack status with rUDP/control ports, Start/restart, known IceBridge servers list (host:port, role, last successful ping) with Refresh/Ping, discovered peer list; host cache under app-private libtorrent/
   - fix:Local shared-torrent search actually runs on Android — register LOCAL SearchEngine (was wired but never added to ALL_ENGINES), default enabled, Search Engines preference checkbox

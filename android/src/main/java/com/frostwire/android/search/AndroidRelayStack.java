@@ -47,6 +47,7 @@ import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.search.relay.SharedTorrentIndexer;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
@@ -95,6 +96,8 @@ public final class AndroidRelayStack implements AutoCloseable {
 
     private static final long PEER_DISCOVERY_INTERVAL_SEC = 5 * 60;
     private static final long DHT_ADVERTISE_INTERVAL_SEC = RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC;
+    /** Second reindex after TransferManager.restoreDownloads may still be settling. */
+    private static final long DELAYED_REINDEX_MS = 5_000L;
 
     private final AndroidLocalIndex localIndex;
     private final IdentityKeys identity;
@@ -148,23 +151,9 @@ public final class AndroidRelayStack implements AutoCloseable {
             SharedTorrentIndexer indexer =
                     SharedTorrentIndexerInstaller.install(btEngine, li, ident);
             // Torrents restored before this listener was chained never fired
-            // downloadAdded — reindex them so Local search is not empty.
-            try {
-                java.util.ArrayList<BTDownload> existing = new java.util.ArrayList<>();
-                for (Transfer t : TransferManager.instance().getTransfers()) {
-                    if (t instanceof UIBittorrentDownload) {
-                        BTDownload dl = ((UIBittorrentDownload) t).getDl();
-                        if (dl != null) {
-                            existing.add(dl);
-                        }
-                    }
-                }
-                indexer.indexExisting(existing);
-                LOG.info("AndroidRelayStack: SharedTorrentIndexer installed; reindex scheduled for "
-                        + existing.size() + " transfer(s)");
-            } catch (Throwable t) {
-                LOG.warn("AndroidRelayStack: SharedTorrentIndexer installed; reindex failed", t);
-            }
+            // downloadAdded — reindex now + once more after TransferManager settles.
+            reindexExistingTransfers(indexer, "immediate");
+            scheduleDelayedReindex(indexer);
 
             ks = new AndroidKarmaChainStore(context, AndroidLocalIndex.DEFAULT_DB_NAME);
             File bitcoinCacheDir = new File(homeDir, RelayConstants.BITCOIN_HEADER_CACHE_DIR);
@@ -184,9 +173,12 @@ public final class AndroidRelayStack implements AutoCloseable {
             IceBridgeHostCache.configure(hostCacheFile);
 
             int controlPort = freeLocalControlPort();
+            // relayPort=0: IceBridgeServer must not bind TCP 6888 — Android starts
+            // IncomingRelayServer with full RelayRole (search + identity) below.
             IceBridgeConfig config = IceBridgeConfig.newBuilder()
                     .host("0.0.0.0")
                     .rudpPort(PeerRegistrySync.ICEBRIDGE_RUDP_PORT)
+                    .relayPort(0)
                     .controlHttpPort(controlPort)
                     .role(IceBridgeConfig.Role.BOTH)
                     .identityFile(identityFile)
@@ -280,7 +272,11 @@ public final class AndroidRelayStack implements AutoCloseable {
                     .peerDirectory(pd)
                     .identity(ident)
                     .searchTransport(tr);
-            LOG.info("AndroidRelayStack: LOCAL and DISTRIBUTED search engines wired");
+            LOG.info("AndroidRelayStack: LOCAL and DISTRIBUTED search engines wired"
+                    + " LocalIndex.size=" + li.size()
+                    + " relayTcp=" + (relaySrv != null ? RelayConstants.RELAY_LISTEN_PORT : "down")
+                    + " rudp=" + srv.rudpPort()
+                    + " control=" + srv.controlPort());
 
             AndroidRelayStack stack = new AndroidRelayStack(li, ident, srv, cl, tr, ss, ih,
                     pd, prs, pds, da, ks, kcs, relaySrv);
@@ -375,6 +371,46 @@ public final class AndroidRelayStack implements AutoCloseable {
         }
     }
 
+    /**
+     * Schedule {@link SharedTorrentIndexer#indexExisting} for every transfer
+     * currently known to {@link TransferManager}. Safe to call multiple times.
+     */
+    private static void reindexExistingTransfers(SharedTorrentIndexer indexer, String phase) {
+        if (indexer == null) {
+            return;
+        }
+        try {
+            java.util.ArrayList<BTDownload> existing = new java.util.ArrayList<>();
+            for (Transfer t : TransferManager.instance().getTransfers()) {
+                if (t instanceof UIBittorrentDownload) {
+                    BTDownload dl = ((UIBittorrentDownload) t).getDl();
+                    if (dl != null) {
+                        existing.add(dl);
+                    }
+                }
+            }
+            indexer.indexExisting(existing);
+            int indexSize = -1;
+            try {
+                if (SearchEngine.LOCAL_WIRING.localIndex() != null) {
+                    indexSize = SearchEngine.LOCAL_WIRING.localIndex().size();
+                }
+            } catch (Throwable ignored) {
+            }
+            LOG.info("AndroidRelayStack: reindex (" + phase + ") scheduled for "
+                    + existing.size() + " transfer(s); LocalIndex.size=" + indexSize);
+        } catch (Throwable t) {
+            LOG.warn("AndroidRelayStack: reindex (" + phase + ") failed", t);
+        }
+    }
+
+    private static void scheduleDelayedReindex(SharedTorrentIndexer indexer) {
+        SystemUtils.postToHandlerDelayed(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> reindexExistingTransfers(indexer, "delayed+" + DELAYED_REINDEX_MS + "ms"),
+                DELAYED_REINDEX_MS);
+    }
+
     @Override
     public void close() {
         LOG.info("AndroidRelayStack: shutting down...");
@@ -388,7 +424,18 @@ public final class AndroidRelayStack implements AutoCloseable {
         try { if (client != null) client.close(); } catch (Throwable t) { LOG.warn("Error closing client", t); }
         try { if (server != null) server.close(); } catch (Throwable t) { LOG.warn("Error closing server", t); }
         try { if (karmaStore != null) karmaStore.close(); } catch (Throwable t) { LOG.warn("Error closing karmaStore", t); }
+        // Keep LocalIndex open if wiring still points at it for UI; only clear transport.
+        try {
+            SearchEngine.DISTRIBUTED_WIRING.searchTransport(null);
+            SearchEngine.DISTRIBUTED_WIRING.peerDirectory(null);
+        } catch (Throwable ignored) {
+        }
         try { if (localIndex != null) localIndex.close(); } catch (Throwable t) { LOG.warn("Error closing localIndex", t); }
+        try {
+            SearchEngine.LOCAL_WIRING.localIndex(null);
+            SearchEngine.DISTRIBUTED_WIRING.localIndex(null);
+        } catch (Throwable ignored) {
+        }
         LOG.info("AndroidRelayStack: shutdown complete");
     }
 }
