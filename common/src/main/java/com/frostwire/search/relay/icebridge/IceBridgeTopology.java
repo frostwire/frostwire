@@ -12,27 +12,20 @@ import com.frostwire.util.Logger;
 /**
  * Configurable fan-out and hop limits for IceBridge mesh and distributed search.
  *
- * <p>Defaults mirror <b>LimeWire ultrapeer</b> Gnutella settings (LimeWire 5.x /
- * Pro-era core, SIMPP-remoteable):
- * <ul>
- *   <li><b>N = mesh broadcast fanout</b> — {@value #DEFAULT_MESH_BROADCAST_FANOUT}
- *       ({@code ConnectionSettings.NUM_CONNECTIONS} ultrapeer–ultrapeer degree)</li>
- *   <li><b>M = search peer fanout</b> — {@value #DEFAULT_SEARCH_PEER_FANOUT}
- *       ({@code UltrapeerSettings.MAX_LEAVES} last-hop leaf fanout)</li>
- *   <li><b>mesh hop TTL</b> — {@value #DEFAULT_MESH_HOP_TTL}
- *       ({@code ConnectionSettings.SOFT_MAX} hops+ttl horizon)</li>
- *   <li><b>search TTL</b> — {@value #DEFAULT_SEARCH_TTL}
- *       (soft-max horizon; LimeWire also had start {@code TTL=4} with soft clamp)</li>
- *   <li><b>leaf ultrapeer attachments</b> — {@value #DEFAULT_LEAF_ULTRAPEER_CONNECTIONS}
- *       (hardwired leaf preferred count in {@code ConnectionManagerImpl})</li>
- * </ul>
+ * <p><b>Production shape:</b> hybrid network of <em>high-speed EC2 IceBridge
+ * hubs</em> we operate (fat backbone) plus FrostWire clients as leaves.
+ * Unlike residential LimeWire ultrapeers, EC2 hubs are not uplink-starved, so
+ * N can stay high for mesh coverage while auto-research tunes M/TTLs for
+ * hit-rate vs last-hop cost.
  *
- * <p>Process-wide singleton so {@code update.frostwire.com} can call
- * {@link #applyRemote(int, int, int, int)} (SIMPP analog). Env overrides:
- * {@code ICEBRIDGE_MESH_FANOUT}, {@code ICEBRIDGE_SEARCH_PEER_FANOUT},
- * {@code ICEBRIDGE_MESH_HOP_TTL}, {@code ICEBRIDGE_SEARCH_TTL}.
+ * <p>Compiled defaults start from the LimeWire ultrapeer baseline
+ * (NUM_CONNECTIONS=32, MAX_LEAVES=30, SOFT_MAX=3) and can be replaced by
+ * {@link #applyHybridEc2Profile()} after benchmark research, or by remote
+ * config via {@link #applyRemote}.
  *
- * <p>Hard caps match LimeWire remote setting ceilings (96 for degree/leaves).
+ * <p>Env: {@code ICEBRIDGE_MESH_FANOUT}, {@code ICEBRIDGE_SEARCH_PEER_FANOUT},
+ * {@code ICEBRIDGE_MESH_HOP_TTL}, {@code ICEBRIDGE_SEARCH_TTL},
+ * {@code ICEBRIDGE_SOFT_MAX}, {@code ICEBRIDGE_LEAF_UP_CONNECTIONS}.
  */
 public final class IceBridgeTopology {
 
@@ -40,39 +33,45 @@ public final class IceBridgeTopology {
 
     /**
      * N — max IceBridge peers for mesh RELAY broadcast.
-     * LimeWire: {@code ConnectionSettings.NUM_CONNECTIONS = 32}.
+     * Hybrid EC2 research default (small fat hub fleet; full coverage with N≪32).
+     * LimeWire ultrapeer baseline was 32 ({@link #LIMEWIRE_MESH_FANOUT}).
      */
-    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 32;
+    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 8;
 
     /**
      * M — max FrostWire peers queried / forwarded per search hop.
-     * LimeWire: {@code UltrapeerSettings.MAX_LEAVES = 30}.
+     * Hybrid research keeps LimeWire MAX_LEAVES=30 for rare-content recall.
      */
     public static final int DEFAULT_SEARCH_PEER_FANOUT = 30;
 
     /**
-     * Intermediate IceBridge hops for mesh RELAY.
-     * LimeWire: {@code ConnectionSettings.SOFT_MAX = 3}.
+     * Intermediate IceBridge hops for mesh RELAY (SOFT_MAX horizon).
      */
     public static final int DEFAULT_MESH_HOP_TTL = 3;
 
     /**
      * Dual-envelope search hop TTL (app layer).
-     * Soft-max horizon (LimeWire start TTL=4 is clamped by SOFT_MAX=3 in practice).
      */
     public static final int DEFAULT_SEARCH_TTL = 3;
 
     /**
-     * How many ultrapeer-class IceBridges a leaf-class FrostWire client
-     * attaches to. LimeWire leaf preferred connections = 3.
+     * How many IceBridge hubs a FrostWire client multi-homes to.
      */
     public static final int DEFAULT_LEAF_ULTRAPEER_CONNECTIONS = 3;
 
     /**
-     * LimeWire soft-max: if hops + remaining_ttl &gt; softMax, clamp remaining.
-     * Same numeric default as {@link #DEFAULT_MESH_HOP_TTL}.
+     * Soft-max: if hops + remaining_ttl &gt; softMax, clamp remaining.
      */
     public static final int DEFAULT_SOFT_MAX = 3;
+
+    /** LimeWire ConnectionSettings.NUM_CONNECTIONS. */
+    public static final int LIMEWIRE_MESH_FANOUT = 32;
+    /** LimeWire UltrapeerSettings.MAX_LEAVES. */
+    public static final int LIMEWIRE_SEARCH_PEER_FANOUT = 30;
+    public static final int LIMEWIRE_MESH_HOP_TTL = 3;
+    public static final int LIMEWIRE_SEARCH_TTL = 3;
+    public static final int LIMEWIRE_SOFT_MAX = 3;
+    public static final int LIMEWIRE_LEAF_UP_CONNECTIONS = 3;
 
     /** LimeWire remote ceilings (NUM_CONNECTIONS / MAX_LEAVES max 96). */
     public static final int MAX_MESH_BROADCAST_FANOUT = 96;
@@ -203,16 +202,40 @@ public final class IceBridgeTopology {
     }
 
     /**
-     * Force LimeWire ultrapeer profile (compiled defaults).
+     * Force LimeWire ultrapeer profile (residential-supernode baseline).
      */
     public void applyLimeWireUltrapeerProfile() {
         applyRemote(
-                DEFAULT_MESH_BROADCAST_FANOUT,
-                DEFAULT_SEARCH_PEER_FANOUT,
-                DEFAULT_MESH_HOP_TTL,
-                DEFAULT_SEARCH_TTL,
-                DEFAULT_SOFT_MAX,
-                DEFAULT_LEAF_ULTRAPEER_CONNECTIONS);
+                LIMEWIRE_MESH_FANOUT,
+                LIMEWIRE_SEARCH_PEER_FANOUT,
+                LIMEWIRE_MESH_HOP_TTL,
+                LIMEWIRE_SEARCH_TTL,
+                LIMEWIRE_SOFT_MAX,
+                LIMEWIRE_LEAF_UP_CONNECTIONS);
+    }
+
+    /**
+     * Hybrid EC2 hub profile from TopologyAutoResearch (high-speed backbone
+     * we operate + FrostWire leaves). Defaults match compiled
+     * {@code DEFAULT_*} (research winner on hybrid benchmark).
+     *
+     * <p>N={@value #HYBRID_EC2_MESH_FANOUT}, M={@value #HYBRID_EC2_SEARCH_PEER_FANOUT}.
+     */
+    public static final int HYBRID_EC2_MESH_FANOUT = DEFAULT_MESH_BROADCAST_FANOUT;
+    public static final int HYBRID_EC2_SEARCH_PEER_FANOUT = DEFAULT_SEARCH_PEER_FANOUT;
+    public static final int HYBRID_EC2_MESH_HOP_TTL = DEFAULT_MESH_HOP_TTL;
+    public static final int HYBRID_EC2_SEARCH_TTL = DEFAULT_SEARCH_TTL;
+    public static final int HYBRID_EC2_SOFT_MAX = DEFAULT_SOFT_MAX;
+    public static final int HYBRID_EC2_LEAF_UP_CONNECTIONS = DEFAULT_LEAF_ULTRAPEER_CONNECTIONS;
+
+    public void applyHybridEc2Profile() {
+        applyRemote(
+                HYBRID_EC2_MESH_FANOUT,
+                HYBRID_EC2_SEARCH_PEER_FANOUT,
+                HYBRID_EC2_MESH_HOP_TTL,
+                HYBRID_EC2_SEARCH_TTL,
+                HYBRID_EC2_SOFT_MAX,
+                HYBRID_EC2_LEAF_UP_CONNECTIONS);
     }
 
     /**

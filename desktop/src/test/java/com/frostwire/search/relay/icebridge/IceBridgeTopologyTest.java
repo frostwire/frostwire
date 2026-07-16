@@ -24,19 +24,25 @@ class IceBridgeTopologyTest {
   }
 
   @Test
-  void defaultsMatchLimeWireUltrapeer() {
+  void defaultsMatchHybridEc2Research() {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.resetToDefaults();
-    // ConnectionSettings.NUM_CONNECTIONS = 32
-    assertEquals(32, t.meshBroadcastFanout());
-    // UltrapeerSettings.MAX_LEAVES = 30
+    // TopologyAutoResearch winner on hybrid EC2 benchmark
+    assertEquals(8, t.meshBroadcastFanout());
     assertEquals(30, t.searchPeerFanout());
-    // ConnectionSettings.SOFT_MAX = 3
     assertEquals(3, t.meshHopTtl());
     assertEquals(3, t.searchTtl());
     assertEquals(3, t.softMax());
-    // Leaf preferred ultrapeers = 3
     assertEquals(3, t.leafUltrapeerConnections());
+  }
+
+  @Test
+  void limeWireProfileMatchesHistoricalUltrapeer() {
+    IceBridgeTopology t = IceBridgeTopology.get();
+    t.applyLimeWireUltrapeerProfile();
+    assertEquals(32, t.meshBroadcastFanout());
+    assertEquals(30, t.searchPeerFanout());
+    assertEquals(3, t.softMax());
   }
 
   @Test
@@ -62,7 +68,7 @@ class IceBridgeTopologyTest {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.resetToDefaults();
     t.applyRemote(0, 10, 0, 0);
-    assertEquals(32, t.meshBroadcastFanout());
+    assertEquals(8, t.meshBroadcastFanout());
     assertEquals(10, t.searchPeerFanout());
     assertEquals(3, t.meshHopTtl());
   }
@@ -76,11 +82,11 @@ class IceBridgeTopologyTest {
   }
 
   @Test
-  void applyLimeWireUltrapeerProfileRestoresDefaults() {
+  void applyHybridEc2ProfileRestoresDefaults() {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.applyRemote(6, 8, 2, 2);
-    t.applyLimeWireUltrapeerProfile();
-    assertEquals(32, t.meshBroadcastFanout());
+    t.applyHybridEc2Profile();
+    assertEquals(8, t.meshBroadcastFanout());
     assertEquals(30, t.searchPeerFanout());
     assertEquals(3, t.softMax());
   }

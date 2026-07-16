@@ -1,6 +1,6 @@
 FrostWire 7.1.0 UNRELEASED
-  - new:IceBridge topology defaults match LimeWire ultrapeer (N=32 mesh fanout, M=30 search peers, softMax=3, leaf UPs=3) + soft-max TTL clamp; complex network simulator (IB mesh + FW leaves) for traffic/hit-rate tuning
-  - new:IceBridge topology limits (Gnutella-inspired) — configurable via IceBridgeTopology + ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready, hard-capped to LimeWire SIMPP ceilings)
+  - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=40; LimeWire ultrapeer baseline retained
+  - new:IceBridge topology limits — IceBridgeTopology + env ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready)
   - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
   - cleanup:Local search is diagnostic only (default off) — same LocalIndex path as inbound IceBridge answers; peer discovery is Distributed Search
   - cleanup:Identity settings UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as Android

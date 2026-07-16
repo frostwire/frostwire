@@ -13,13 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.AggregateReport;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.Config;
+import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.Profile;
 import com.frostwire.util.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Complex hierarchical network simulation: IceBridge ultrapeer mesh +
- * FrostWire leaves under LimeWire-pro-like topology defaults.
+ * Hierarchical network simulation benchmarks (uniform LimeWire-style mesh
+ * and hybrid EC2 hub mesh + FrostWire leaves).
  */
 class IceBridgeNetworkSimulationTest {
 
@@ -35,6 +36,7 @@ class IceBridgeNetworkSimulationTest {
     IceBridgeTopology.get().applyLimeWireUltrapeerProfile();
 
     Config cfg = new Config();
+    cfg.profile = Profile.LIMEWIRE_UNIFORM;
     cfg.useLiveTopology = true;
     cfg.iceBridgeCount = 80;
     cfg.frostWireCount = 1_500;
@@ -75,6 +77,7 @@ class IceBridgeNetworkSimulationTest {
   @Test
   void conservativeProfile_usesLessTrafficThanUltrapeer() {
     Config ultra = new Config();
+    ultra.profile = Profile.LIMEWIRE_UNIFORM;
     ultra.useLiveTopology = false;
     ultra.meshFanout = 32;
     ultra.searchPeerFanout = 30;
@@ -89,6 +92,7 @@ class IceBridgeNetworkSimulationTest {
     ultra.seed = 99L;
 
     Config mild = new Config();
+    mild.profile = Profile.LIMEWIRE_UNIFORM;
     mild.useLiveTopology = false;
     mild.meshFanout = 6;
     mild.searchPeerFanout = 8;
@@ -124,9 +128,10 @@ class IceBridgeNetworkSimulationTest {
   }
 
   @Test
-  void largeScaleSketch_30kLeaves_staysBounded() {
-    // Scaled: fewer IBs than real, but leaf mass ≈ 30k for fanout stress.
+  void largeScaleSketch_hybridEc2_staysBounded() {
+    // Hybrid: fat EC2 hub mesh + many leaves (scaled for unit test time).
     Config cfg = new Config();
+    cfg.profile = Profile.HYBRID_EC2;
     cfg.useLiveTopology = false;
     cfg.meshFanout = 32;
     cfg.searchPeerFanout = 30;
@@ -134,11 +139,14 @@ class IceBridgeNetworkSimulationTest {
     cfg.searchTtl = 3;
     cfg.softMax = 3;
     cfg.leafUpConnections = 3;
-    cfg.iceBridgeCount = 120;
-    cfg.frostWireCount = 8_000; // heavy but still unit-testable
+    cfg.iceBridgeCount = 48;
+    cfg.ec2HubCount = 16;
+    cfg.frostWireCount = 8_000;
     cfg.contentHolders = 200;
+    cfg.rareContentFraction = 0.25;
     cfg.searchTrials = 40;
     cfg.seed = 7L;
+    cfg.preferEc2Hubs = 0.9;
 
     AggregateReport report = new IceBridgeNetworkSimulator(cfg).runAggregate();
     LOG.info("30k-scale sketch: " + report);
