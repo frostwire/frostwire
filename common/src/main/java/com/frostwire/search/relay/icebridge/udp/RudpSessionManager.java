@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.udp;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.RateLimiter;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.util.Hex;
@@ -44,12 +45,18 @@ public final class RudpSessionManager {
     private static final long RETRANSMIT_TIMEOUT_MS = 5000;
     private static final int MAX_RETRIES = 5;
     private static final long SESSION_IDLE_MS = 120_000;
-    /** Max intermediate IceBridge hops when target is not local. */
-    private static final int DEFAULT_RELAY_HOP_TTL = RelayFrame.DEFAULT_HOP_TTL;
-    /** Fan-out when flooding mesh forwarders for an unknown target. */
-    private static final int MAX_MESH_FANOUT = 3;
     /** Max RELAY / RELAY_RESPONSE accepts per peer key per second (sustained). */
     private static final double RELAY_MAX_QPS = 20.0;
+
+    /** N — mesh broadcast fanout; live-tunable via {@link IceBridgeTopology}. */
+    private int meshBroadcastFanout() {
+        return IceBridgeTopology.get().meshBroadcastFanout();
+    }
+
+    /** Default mesh hop TTL; live-tunable via {@link IceBridgeTopology}. */
+    private int meshHopTtl() {
+        return IceBridgeTopology.get().meshHopTtl();
+    }
 
     /**
      * Fragment header prepended to each DATA_FRAG / DATA_END payload:
@@ -98,8 +105,9 @@ public final class RudpSessionManager {
      *
      * <p>If the registry knows the target's rUDP endpoint, a direct DATA
      * packet is sent. Otherwise the payload is multi-hop RELAYed through
-     * known FORWARDER/BOTH mesh peers (hop TTL
-     * {@link RelayFrame#DEFAULT_HOP_TTL}).
+     * known FORWARDER/BOTH mesh peers (hop TTL from
+     * {@link IceBridgeTopology#meshHopTtl()}, fanout N from
+     * {@link IceBridgeTopology#meshBroadcastFanout()}).
      */
     public void deliver(byte[] targetPub, byte[] payload) {
         if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
@@ -132,14 +140,19 @@ public final class RudpSessionManager {
             sendData(addr, payload);
             return;
         }
-        List<PeerRecord> forwarders = registry.lookupForwarders(MAX_MESH_FANOUT);
+        int n = meshBroadcastFanout();
+        List<PeerRecord> forwarders = registry.lookupForwarders(n);
         int sent = 0;
+        int hopTtl = meshHopTtl();
         for (PeerRecord forwarder : forwarders) {
             if (isSelf(forwarder)) {
                 continue;
             }
+            if (sent >= n) {
+                break;
+            }
             sendRelay(new InetSocketAddress(forwarder.host(), forwarder.rudpPort()),
-                    targetPub, payload, DEFAULT_RELAY_HOP_TTL);
+                    targetPub, payload, hopTtl);
             sent++;
         }
         if (sent == 0) {
@@ -246,7 +259,7 @@ public final class RudpSessionManager {
      * @param hopTtl remaining intermediate hops (decremented at each hop)
      */
     public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub, byte[] payload) {
-        sendRelay(forwarderAddress, targetPub, payload, DEFAULT_RELAY_HOP_TTL);
+        sendRelay(forwarderAddress, targetPub, payload, meshHopTtl());
     }
 
     public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub,
@@ -666,8 +679,13 @@ public final class RudpSessionManager {
             return;
         }
         int nextTtl = hopTtl - 1;
-        List<PeerRecord> forwarders = registry.lookupForwarders(MAX_MESH_FANOUT);
+        int n = meshBroadcastFanout();
+        List<PeerRecord> forwarders = registry.lookupForwarders(n);
+        int sent = 0;
         for (PeerRecord f : forwarders) {
+            if (sent >= n) {
+                break;
+            }
             if (isSelf(f)) {
                 continue;
             }
@@ -676,6 +694,7 @@ public final class RudpSessionManager {
             }
             InetSocketAddress next = new InetSocketAddress(f.host(), f.rudpPort());
             sendRelay(next, targetPub, appPayload, nextTtl);
+            sent++;
         }
     }
 

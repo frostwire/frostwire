@@ -18,6 +18,7 @@ import com.frostwire.search.relay.RemoteIndexFetcher;
 import com.frostwire.search.relay.RemoteSearchRequest;
 import com.frostwire.search.relay.RemoteSearchResponse;
 import com.frostwire.search.relay.SearchPayloadCodec;
+import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -72,8 +73,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     /** Maximum incoming search requests per source per minute. */
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
 
-    /** Maximum peers a single request is forwarded to (anti-amplification). */
-    private static final int MAX_FORWARD_TARGETS = 3;
+    /**
+     * Maximum peers a single request is forwarded to (M — anti-amplification).
+     * Live value: {@link IceBridgeTopology#searchPeerFanout()}.
+     */
+    private static final int MAX_FORWARD_TARGETS =
+            IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT;
 
     private final DistributedSearchTransport transport;
     private final RelaySearchService searchService;
@@ -310,11 +315,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private void forwardRequest(RemoteSearchRequest request, byte[] sourcePub) {
         byte[] ownPub = identity.ed25519PubRaw();
         int newTtl = request.ttl() - 1;
+        int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
-                peerDirectory.topByTrustVerified(MAX_FORWARD_TARGETS * 3);
+                peerDirectory.topByTrustVerified(m * 3);
         int forwarded = 0;
         for (PeerDirectory.PeerInfo peer : candidates) {
-            if (forwarded >= MAX_FORWARD_TARGETS) {
+            if (forwarded >= m) {
                 break;
             }
             byte[] peerPub = peer.peerPub();

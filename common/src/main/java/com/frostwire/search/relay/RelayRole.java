@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.util.Logger;
 
 
@@ -41,8 +42,13 @@ public final class RelayRole {
 
     private static final Logger LOG = Logger.getLogger(RelayRole.class);
 
-    /** Maximum number of peers a single request is forwarded to. */
-    public static final int MAX_FORWARD_TARGETS = 3;
+    /**
+     * Maximum number of peers a single request is forwarded to (M).
+     * Prefer live {@link IceBridgeTopology#searchPeerFanout()}; constant kept
+     * for tests that reference the compiled default.
+     */
+    public static final int MAX_FORWARD_TARGETS =
+            IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT;
 
     private final RelaySearchService service;
     private final PeerDirectory directory;
@@ -130,11 +136,12 @@ public final class RelayRole {
     private List<ForwardTarget> selectForwardTargets(RemoteSearchRequest request) {
         byte[] ownPub = identity.ed25519PubRaw();
         int newTtl = request.ttl() - 1;
+        int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
-                directory.topByTrustVerified(MAX_FORWARD_TARGETS * 3);
-        List<ForwardTarget> out = new ArrayList<>(MAX_FORWARD_TARGETS);
+                directory.topByTrustVerified(m * 3);
+        List<ForwardTarget> out = new ArrayList<>(m);
         for (PeerDirectory.PeerInfo peer : candidates) {
-            if (out.size() >= MAX_FORWARD_TARGETS) {
+            if (out.size() >= m) {
                 break;
             }
             byte[] peerPub = peer.peerPub();

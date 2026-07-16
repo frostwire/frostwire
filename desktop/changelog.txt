@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:IceBridge topology limits (Gnutella-inspired) — N=6 mesh RELAY broadcast fanout, M=8 search peer fanout, configurable via IceBridgeTopology + ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL (remote-config ready, hard-capped)
   - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
   - cleanup:Local search is diagnostic only (default off) — same LocalIndex path as inbound IceBridge answers; peer discovery is Distributed Search
   - cleanup:Identity settings UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as Android

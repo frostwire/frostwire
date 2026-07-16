@@ -316,7 +316,14 @@ public final class IceBridgeConfig {
      *   <li>{@code ICEBRIDGE_DHT} — embed DHT SessionManager and announce (default: true for
      *       FORWARDER/BOTH, false for CLIENT)</li>
      *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
+     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY broadcast (default: 6)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 8)</li>
+     *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 2)</li>
      * </ul>
+     *
+     * <p>Topology limits are applied via {@link IceBridgeTopology} (process-wide,
+     * remote-config ready).
      *
      * @return config built from env vars, with cloud defaults for unset vars
      */
@@ -340,6 +347,14 @@ public final class IceBridgeConfig {
         b.dhtEnabled(envBool("ICEBRIDGE_DHT", dhtDefault));
         String tokensFile = env("ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
         b.authTokensFile(new File(tokensFile));
+        // Topology is process-wide (IceBridgeTopology reads the same env keys
+        // in its constructor); re-apply here so fromEnv() after startup still
+        // refreshes live limits.
+        IceBridgeTopology.get().applyRemote(
+                envInt("ICEBRIDGE_MESH_FANOUT", 0),
+                envInt("ICEBRIDGE_SEARCH_PEER_FANOUT", 0),
+                envInt("ICEBRIDGE_MESH_HOP_TTL", 0),
+                envInt("ICEBRIDGE_SEARCH_TTL", 0));
         return b.build();
     }
 

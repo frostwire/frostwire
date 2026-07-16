@@ -45,8 +45,12 @@ public final class RemoteSearchRequest {
 
     /** Dual-envelope: requester sig excludes mutable hop fields. */
     public static final int VERSION = 2;
-    /** Design §8.4 hop limit 2 from the origin (local → direct → behind relay). */
-    public static final int DEFAULT_TTL = 2;
+    /**
+     * Design §8.4 hop limit from the origin (local → direct → behind relay).
+     * Live value: {@link com.frostwire.search.relay.icebridge.IceBridgeTopology#searchTtl()}.
+     */
+    public static final int DEFAULT_TTL =
+            com.frostwire.search.relay.icebridge.IceBridgeTopology.DEFAULT_SEARCH_TTL;
     public static final int MAX_PATH_LENGTH = 8;
     public static final long MAX_TIMESTAMP_SKEW_SEC = 5 * 60;
     public static final int DEFAULT_LIMIT = 25;

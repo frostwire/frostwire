@@ -24,8 +24,12 @@ import java.util.Arrays;
 public final class RelayFrame {
 
     public static final int HEADER_LENGTH = 32 + 32 + 1;
-    /** Default hop budget for mesh multi-hop delivery (kept small vs amplification). */
-    public static final int DEFAULT_HOP_TTL = 3;
+    /**
+     * Default hop budget for mesh multi-hop delivery (kept small vs amplification).
+     * Prefer live value from {@link com.frostwire.search.relay.icebridge.IceBridgeTopology#meshHopTtl()}.
+     */
+    public static final int DEFAULT_HOP_TTL =
+            com.frostwire.search.relay.icebridge.IceBridgeTopology.DEFAULT_MESH_HOP_TTL;
     /**
      * Max application payload inside a RELAY frame so the whole frame fits a
      * single rUDP datagram without fragmentation (header + app <= 1024).

@@ -14,6 +14,7 @@ import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
@@ -53,7 +54,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     public static final String SOURCE_NAME = "Distributed";
 
     private static final Logger LOG = Logger.getLogger(DistributedSearchPerformer.class);
-    private static final int DEFAULT_MAX_PEERS = 5;
+    /** M — default search peer fanout from {@link IceBridgeTopology}. */
+    private static final int DEFAULT_MAX_PEERS =
+            IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT;
     private static final int DEFAULT_LOCAL_LIMIT = 50;
     private static final int DEFAULT_PEER_LIMIT = 25;
     private static final int DEFAULT_PEER_TIMEOUT_SEC = 10;
@@ -340,12 +343,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         long timestamp = System.currentTimeMillis() / 1000L;
         byte[] ownPub = identity.ed25519PubRaw();
         // Dual-envelope (v2): sign query envelope only; ttl/path may hop.
-        // DEFAULT_TTL=2 matches DESIGN_RELAY_REGISTRY §8.4 hop limit.
+        int searchTtl = IceBridgeTopology.get().searchTtl();
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(RemoteSearchRequest.DEFAULT_TTL)
+                .ttl(searchTtl)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
@@ -359,7 +362,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
-                .ttl(RemoteSearchRequest.DEFAULT_TTL)
+                .ttl(searchTtl)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)

@@ -103,11 +103,17 @@ class IceBridgeClientTest {
     }
 
     @Test
-    void barePayloadIsDroppedByInboundQueue() {
+    void barePayloadIsAcceptedAsSearchFallback() {
+        // Intentional: local RELAY delivery may hand bare app payloads;
+        // InboundMessageQueue treats them as SEARCH (MeshProtocolId.SEARCH).
         byte[] source = identity.ed25519PubRaw();
-        inboundQueue.onMessage(source, "not-framed".getBytes(StandardCharsets.UTF_8));
+        byte[] bare = "not-framed".getBytes(StandardCharsets.UTF_8);
+        inboundQueue.onMessage(source, bare);
         List<IceBridgeClient.InboundMessage> messages = client.poll(10);
-        assertTrue(messages.isEmpty());
+        assertEquals(1, messages.size());
+        assertArrayEquals(bare, messages.get(0).payload());
+        assertEquals(com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH,
+                messages.get(0).protocolId());
     }
 
     @Test
