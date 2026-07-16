@@ -93,10 +93,15 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  software version           = " + IceBridgeConstants.SOFTWARE_VERSION
                 + " (code " + IceBridgeConstants.SOFTWARE_VERSION_CODE + ")");
         System.out.println("  protocol version           = " + IceBridgeConstants.PROTOCOL_VERSION);
-        System.out.println("  topology N (mesh fanout)   = " + IceBridgeTopology.get().meshBroadcastFanout());
-        System.out.println("  topology M (search peers)  = " + IceBridgeTopology.get().searchPeerFanout());
+        System.out.println("  topology N (mesh fanout)   = " + IceBridgeTopology.get().meshBroadcastFanout()
+                + "  [LimeWire NUM_CONNECTIONS]");
+        System.out.println("  topology M (search peers)  = " + IceBridgeTopology.get().searchPeerFanout()
+                + "  [LimeWire MAX_LEAVES]");
         System.out.println("  topology mesh hop TTL      = " + IceBridgeTopology.get().meshHopTtl());
         System.out.println("  topology search TTL        = " + IceBridgeTopology.get().searchTtl());
+        System.out.println("  topology soft max          = " + IceBridgeTopology.get().softMax()
+                + "  [LimeWire SOFT_MAX]");
+        System.out.println("  topology leaf UP links     = " + IceBridgeTopology.get().leafUltrapeerConnections());
         System.out.println();
         System.out.println("Configuration (from .env / ICEBRIDGE_* env vars):");
         System.out.println("  ICEBRIDGE_HOST              = " + config.host());

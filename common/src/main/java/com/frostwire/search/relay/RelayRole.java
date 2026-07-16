@@ -135,7 +135,11 @@ public final class RelayRole {
 
     private List<ForwardTarget> selectForwardTargets(RemoteSearchRequest request) {
         byte[] ownPub = identity.ed25519PubRaw();
-        int newTtl = request.ttl() - 1;
+        int hopsSoFar = request.path() != null ? request.path().length : 0;
+        int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
+        if (newTtl <= 0) {
+            return Collections.emptyList();
+        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
                 directory.topByTrustVerified(m * 3);

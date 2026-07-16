@@ -343,7 +343,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         long timestamp = System.currentTimeMillis() / 1000L;
         byte[] ownPub = identity.ed25519PubRaw();
         // Dual-envelope (v2): sign query envelope only; ttl/path may hop.
-        int searchTtl = IceBridgeTopology.get().searchTtl();
+        // Soft-max clamp at origin (LimeWire SOFT_MAX).
+        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(
+                0, IceBridgeTopology.get().searchTtl());
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)

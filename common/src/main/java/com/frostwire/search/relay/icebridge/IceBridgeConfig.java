@@ -316,10 +316,12 @@ public final class IceBridgeConfig {
      *   <li>{@code ICEBRIDGE_DHT} — embed DHT SessionManager and announce (default: true for
      *       FORWARDER/BOTH, false for CLIENT)</li>
      *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
-     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY broadcast (default: 6)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 8)</li>
-     *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 2)</li>
+     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY (default: 32, LimeWire NUM_CONNECTIONS)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 30, MAX_LEAVES)</li>
+     *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3, SOFT_MAX)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 3)</li>
+     *   <li>{@code ICEBRIDGE_SOFT_MAX} — hops+remaining_ttl clamp (default: 3)</li>
+     *   <li>{@code ICEBRIDGE_LEAF_UP_CONNECTIONS} — leaf attachments to IceBridges (default: 3)</li>
      * </ul>
      *
      * <p>Topology limits are applied via {@link IceBridgeTopology} (process-wide,

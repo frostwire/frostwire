@@ -143,7 +143,8 @@ public final class RudpSessionManager {
         int n = meshBroadcastFanout();
         List<PeerRecord> forwarders = registry.lookupForwarders(n);
         int sent = 0;
-        int hopTtl = meshHopTtl();
+        // LimeWire soft-max: remaining TTL at hop 0 is clamped to softMax.
+        int hopTtl = IceBridgeTopology.get().clampRemainingTtl(0, meshHopTtl());
         for (PeerRecord forwarder : forwarders) {
             if (isSelf(forwarder)) {
                 continue;
@@ -678,7 +679,14 @@ public final class RudpSessionManager {
                     + Hex.encode(targetPub).substring(0, 12) + "...");
             return;
         }
-        int nextTtl = hopTtl - 1;
+        // hops already spent ≈ initial soft horizon - remaining (approx).
+        int hopsSoFar = Math.max(0, IceBridgeTopology.get().softMax() - hopTtl);
+        int nextTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar + 1, hopTtl - 1);
+        if (nextTtl <= 0) {
+            LOG.debug("RudpSessionManager: RELAY soft-max exhausted for "
+                    + Hex.encode(targetPub).substring(0, 12) + "...");
+            return;
+        }
         int n = meshBroadcastFanout();
         List<PeerRecord> forwarders = registry.lookupForwarders(n);
         int sent = 0;

@@ -314,7 +314,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     private void forwardRequest(RemoteSearchRequest request, byte[] sourcePub) {
         byte[] ownPub = identity.ed25519PubRaw();
-        int newTtl = request.ttl() - 1;
+        int hopsSoFar = request.path() != null ? request.path().length : 0;
+        int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
+        if (newTtl <= 0) {
+            return;
+        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
                 peerDirectory.topByTrustVerified(m * 3);
