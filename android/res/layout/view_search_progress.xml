@@ -31,6 +31,18 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/view_search_progress_text_searching"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:text="@string/searching_feedback"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/view_search_progress_text_no_results_feedback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

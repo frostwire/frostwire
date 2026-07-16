@@ -41,6 +41,7 @@ public class SearchProgressView extends LinearLayout {
     private ProgressBar progressbar;
     private Button buttonCancel;
     private TextView textNoResults;
+    private TextView textSearching;
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
     private TextView textNoDataConnection;
@@ -51,7 +52,9 @@ public class SearchProgressView extends LinearLayout {
 
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.progressEnabled = true;
+        // Start "off" so the first setProgressEnabled(true) always runs startProgress()
+        // and shows the spinner (previously defaulted true and no-op'd the first call).
+        this.progressEnabled = false;
     }
 
     public void setDataUp(boolean value) {
@@ -59,13 +62,17 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void setProgressEnabled(boolean enabled) {
-        if (this.progressEnabled != enabled) {
-            this.progressEnabled = enabled;
-            if (enabled) {
-                startProgress();
-            } else {
-                stopProgress();
-            }
+        // Always re-apply UI when enabling so a second search after Retry/Cancel
+        // reliably shows the spinner even if the flag was already true.
+        if (enabled) {
+            this.progressEnabled = true;
+            startProgress();
+        } else if (this.progressEnabled) {
+            this.progressEnabled = false;
+            stopProgress();
+        } else {
+            // Already stopped — still refresh no-results labels if inflated.
+            stopProgress();
         }
     }
 
@@ -110,6 +117,7 @@ public class SearchProgressView extends LinearLayout {
         progressbar = findViewById(R.id.view_search_progress_progressbar);
         buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
         textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
+        textSearching = findViewById(R.id.view_search_progress_text_searching);
         textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
         textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
         textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
@@ -118,6 +126,13 @@ public class SearchProgressView extends LinearLayout {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
         }
+        // Hidden idle state until a search starts.
+        if (progressbar != null) {
+            progressbar.setVisibility(View.GONE);
+        }
+        if (textSearching != null) {
+            textSearching.setVisibility(View.GONE);
+        }
     }
 
     private void initTryFrostWirePlusListener() {
@@ -125,18 +140,34 @@ public class SearchProgressView extends LinearLayout {
     }
 
     private void startProgress() {
+        if (progressbar == null) {
+            return;
+        }
         progressbar.setVisibility(View.VISIBLE);
         buttonCancel.setText(android.R.string.cancel);
-        textNoResults.setVisibility(View.GONE);
+        if (textNoResults != null) {
+            textNoResults.setVisibility(View.GONE);
+        }
+        if (textSearching != null) {
+            textSearching.setVisibility(View.VISIBLE);
+        }
         hideRetryViews();
     }
 
     private void stopProgress() {
+        if (progressbar == null) {
+            return;
+        }
         progressbar.setVisibility(View.GONE);
         buttonCancel.setText(R.string.retry);
-        textNoResults.setVisibility(View.VISIBLE);
+        if (textSearching != null) {
+            textSearching.setVisibility(View.GONE);
+        }
+        if (textNoResults != null) {
+            textNoResults.setVisibility(View.VISIBLE);
+        }
 
-        if (currentQueryReporter.getCurrentQuery() != null) {
+        if (currentQueryReporter != null && currentQueryReporter.getCurrentQuery() != null) {
             showRetryViews();
         } else {
             hideRetryViews();

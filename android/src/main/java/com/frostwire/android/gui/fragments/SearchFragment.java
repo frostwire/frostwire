@@ -355,18 +355,33 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
 
     /**
-     * Call only after search starts
+     * Call on the UI thread as soon as the user submits a query — before background
+     * performSearch — so promotions are replaced by a searching spinner immediately.
      */
     private void prepareUIForSearch(int fileType) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::prepareForSearch");
         currentQuery = searchInput.getText();
-        adapter.clear();
+        if (adapter != null) {
+            adapter.clear();
+        }
         fileTypeCounter.clear();
-        adapter.setFileType(fileType, false, () -> {
-            refreshFileTypeCounters(false, fileTypeCounter.fsr);
-            showSearchView(getView());
-        });
+        refreshFileTypeCounters(false, fileTypeCounter.fsr);
+        // Immediate feedback: leave promos, show spinner + Cancel (not Retry / no-results).
+        if (searchProgress != null) {
+            searchProgress.setProgressEnabled(true);
+        }
+        if (deepSearchProgress != null) {
+            deepSearchProgress.setVisibility(View.VISIBLE);
+        }
+        switchView(getView(), R.id.fragment_search_search_progress);
         showSupportBanner();
+        if (adapter != null) {
+            adapter.setFileType(fileType, false, () -> {
+                refreshFileTypeCounters(false, fileTypeCounter.fsr);
+                // Keep progress/list in sync after filter setup; do not flash promos.
+                showSearchView(getView());
+            });
+        }
     }
 
     private void startMagnetDownload(String magnet) {
@@ -509,20 +524,37 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
         boolean searchFinished = SearchMediator.instance().isSearchFinished();
         boolean searchStopped = SearchMediator.instance().isSearchStopped();
-        boolean searchCancelled = cancelling.get() || (searchStopped && adapter.getTotalCount() == 0);
+        // Only treat as cancelled when the user (or cancelSearch) actively stopped —
+        // not when a finished empty search should show the no-results/Retry screen.
+        boolean searchCancelled = cancelling.get() || (searchStopped && !searchFinished && adapter.getTotalCount() == 0);
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
 
-        if (searchCancelled) {
+        if (searchCancelled && currentQuery == null) {
             switchView(view, R.id.fragment_search_promos);
+            if (searchProgress != null) {
+                searchProgress.setProgressEnabled(false);
+            }
+            if (deepSearchProgress != null) {
+                deepSearchProgress.setVisibility(View.GONE);
+            }
             return;
         }
 
         if (adapterHasResults) {
             switchView(view, R.id.fragment_search_list);
+            if (deepSearchProgress != null) {
+                deepSearchProgress.setVisibility(searchFinished ? View.GONE : View.VISIBLE);
+            }
         } else {
             switchView(view, R.id.fragment_search_search_progress);
+            if (deepSearchProgress != null) {
+                deepSearchProgress.setVisibility(searchFinished || searchStopped ? View.GONE : View.VISIBLE);
+            }
         }
-        searchProgress.setEnabled(!searchFinished);
+        // Progress spinner vs "No results" + Retry — must use setProgressEnabled (not View.setEnabled).
+        if (searchProgress != null) {
+            searchProgress.setProgressEnabled(!searchFinished && !searchStopped);
+        }
     }
 
     private void switchView(View v, int id) {
@@ -749,29 +781,35 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
         @Override
         public void onStopped(long token) {
-            if (searchFragment.isAdded()) {
-                searchFragment.getActivity().runOnUiThread(() -> {
-                    try {
-                        searchFragment.searchProgress.setProgressEnabled(false);
-                        searchFragment.deepSearchProgress.setVisibility(View.GONE);
-
-                        if (searchFragment.adapter.getTotalCount() == 0) {
-                            Context context = searchFragment.getContext();
-                            if (context != null) {
-                                UIUtils.showLongMessage(context, R.string.no_results_feedback);
-                                //searchFragment.switchView(searchFragment.getView(), R.id.fragment_search_promos);
-                                searchFragment.cancelSearch();
-                                searchFragment.searchInput.setText("");
-                            }
-                        }
-                    } catch (Throwable t) {
-                        if (BuildConfig.DEBUG) {
-                            throw t;
-                        }
-                        LOG.error("onStopped() " + t.getMessage(), t);
-                    }
-                });
+            if (!searchFragment.isAdded()) {
+                return;
             }
+            // Ignore stale tokens from a previous search that was superseded.
+            if (token != SearchMediator.instance().getCurrentSearchToken()
+                    && SearchMediator.instance().getCurrentSearchToken() != 0) {
+                return;
+            }
+            searchFragment.getActivity().runOnUiThread(() -> {
+                try {
+                    if (searchFragment.searchProgress != null) {
+                        searchFragment.searchProgress.setProgressEnabled(false);
+                    }
+                    if (searchFragment.deepSearchProgress != null) {
+                        searchFragment.deepSearchProgress.setVisibility(View.GONE);
+                    }
+                    // Keep the query and show No results / Retry — do NOT cancelSearch()
+                    // (which wiped the query and snapped back to promotions, so users
+                    // thought search never started while Distributed was still in flight).
+                    if (searchFragment.adapter != null && searchFragment.adapter.getTotalCount() == 0) {
+                        searchFragment.showSearchView(searchFragment.getView());
+                    }
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("onStopped() " + t.getMessage(), t);
+                }
+            });
         }
     }
 
@@ -803,10 +841,10 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 // URls that are no torrents, Telluride Search
                 fragment.performTellurideSearch(query);
             } else {
-                postToHandler(SEARCH_PERFORMER, () -> {
-                    SearchMediator.instance().performSearch(query);
-                    postToUIThread(() -> fragment.prepareUIForSearch(mediaTypeId));
-                });
+                // UI first so promotions disappear and the spinner shows immediately;
+                // Distributed / mesh results can take many seconds.
+                fragment.prepareUIForSearch(mediaTypeId);
+                postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
             }
         }
 
@@ -895,11 +933,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             // retry
             if (SearchMediator.instance().isSearchFinished()) {
                 final String query = searchInput.getText();
-                searchProgress.setProgressEnabled(true);
-                postToHandler(SEARCH_PERFORMER, () -> {
-                    SearchMediator.instance().performSearch(query);
-                    postToUIThread(() -> searchFragment.prepareUIForSearch(adapter.getFileType()));
-                });
+                if (query == null || query.trim().isEmpty()) {
+                    return;
+                }
+                searchFragment.prepareUIForSearch(adapter.getFileType());
+                postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performSearch(query));
             }
             // cancel
             else {

@@ -111,15 +111,24 @@ public final class SearchMediator {
             return;
         }
         manager.stop();
-        currentSearchToken = Math.abs(System.nanoTime());
+        currentSearchToken = nextSearchToken();
         currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
         searchFinished = false;
         ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
+        int started = 0;
         for (SearchEngine se : shuffledEngines) {
             if (se.isEnabled() && se.isReady()) {
                 ISearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
+                started++;
+            }
+        }
+        if (started == 0) {
+            // No engines ran — finish immediately so UI can leave the spinner.
+            searchFinished = true;
+            if (searchListener != null) {
+                searchListener.onStopped(currentSearchToken);
             }
         }
     }
@@ -130,7 +139,7 @@ public final class SearchMediator {
             return;
         }
         manager.stop();
-        currentSearchToken = Math.abs(System.nanoTime());
+        currentSearchToken = nextSearchToken();
         currentSearchTokens = new ArrayList<>();
         currentSearchTokens.add(pageUrl);
         searchFinished = false;
@@ -156,6 +165,24 @@ public final class SearchMediator {
 
     public boolean isSearchFinished() {
         return searchFinished;
+    }
+
+    /** Active search token, or 0 when cancelled / never started. */
+    public long getCurrentSearchToken() {
+        return currentSearchToken;
+    }
+
+    /**
+     * Positive token for SearchManager (rejects token &lt; 0). Avoids
+     * {@code Math.abs(Long.MIN_VALUE)} which stays negative.
+     */
+    private static long nextSearchToken() {
+        long t = System.nanoTime();
+        if (t == Long.MIN_VALUE) {
+            t = 1L;
+        }
+        long abs = t >= 0 ? t : -t;
+        return abs == 0 ? 1L : abs;
     }
 
     public void clearCache() {

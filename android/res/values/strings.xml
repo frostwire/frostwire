@@ -239,6 +239,7 @@
     <string name="deleted_crawl_cache">Deleted crawl cache</string>
     <string name="clear_search_cache">Clear search cache</string>
     <string name="clear_search_cache_summary">Clear search cache entries</string>
+    <string name="searching_feedback">Searching…</string>
     <string name="no_results_feedback">No results were found.</string>
     <string name="use_frostclick">Use FrostClick</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>

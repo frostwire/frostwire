@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Search UX — show Searching… spinner immediately on submit (no stuck promotions); keep query + Retry on empty results instead of auto-clearing to promos; use setProgressEnabled correctly; top indeterminate bar while search in flight
   - fix:IdentityKeys Ed25519 on Android 14+ — use software KeyFactory (BouncyCastle) instead of AndroidKeyStore which rejects jlibtorrent PKCS#8 (fixes relay stack never starting on emulators/API 34+)
   - new:Headless emulator smoke — frostwire_launcher.py --headless/--avd and scripts/icebridge_emulator_smoke.py (build, boot AVD, assert IceBridge stack + identity)
   - fix:Android IceBridge no longer double-binds TCP 6888 (IceBridgeServer relayPort=0; full RelayRole IncomingRelayServer owns identity+search)
