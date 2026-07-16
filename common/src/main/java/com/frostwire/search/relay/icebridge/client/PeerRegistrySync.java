@@ -190,9 +190,12 @@ public final class PeerRegistrySync implements AutoCloseable {
             // Identity TCP port unknown from mesh registry; use rUDP port as
             // contact hint. Search uses peerPub + rudpPort via IceBridge.
             // utpPort is the identity-plane port slot; prefer rudp for mesh data.
-            directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort);
             IceBridgeConfig.Role role =
                     info.role != null ? info.role : IceBridgeConfig.Role.BOTH;
+            long caps = com.frostwire.search.relay.NodeCapabilities.fromRole(
+                    role != null ? role.name() : "BOTH");
+            directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort,
+                    caps, info.icebridgeVersion);
             client.route(pub, info.host, info.rudpPort, role);
             // Seed host cache for Settings → Refresh/Ping (TCP identity on 6888).
             // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.

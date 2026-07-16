@@ -8,9 +8,9 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.search.relay.icebridge.IceBridgeConstants;
 import com.frostwire.util.Hex;
 
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -29,13 +29,21 @@ import java.util.TreeMap;
  *
  * <p>The canonical signature payload is the bencoded dictionary returned by
  * {@link #toCanonicalEntry()}, which is the full record without {@code sig}.
+ *
+ * <p>Wire schema versions:
+ * <ul>
+ *   <li>v1 — node_id, keys, utp_port, first/last_seen</li>
+ *   <li>v2 — + rudp_port, role</li>
+ *   <li>v3 — + caps</li>
+ *   <li>v4 — + ib_ver (IceBridge software version string)</li>
+ * </ul>
  */
 public final class IdentityRecord {
     /**
-     * Current write version (includes caps). Readers accept v1–v3 so
-     * already-running peers and in-process servers mid-upgrade still verify.
+     * Current write version (includes IceBridge software version).
+     * Readers accept v1–v4 so already-running peers still verify.
      */
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
     public static final int NODE_ID_LENGTH = 20;
     public static final int ED25519_PUB_LENGTH = 32;
     public static final int X25519_PUB_LENGTH = 32;
@@ -53,6 +61,8 @@ public final class IdentityRecord {
     private final int rudpPort;
     private final String role;
     private final long capabilities;
+    /** IceBridge software version (empty when unknown / pre-v4 peer). */
+    private final String icebridgeVersion;
     /** Wire schema version used for canonical signature domain. */
     private final int wireVersion;
     private final long firstSeen;
@@ -61,7 +71,7 @@ public final class IdentityRecord {
 
     private IdentityRecord(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
                            int utpPort, int rudpPort, String role, long capabilities,
-                           int wireVersion,
+                           String icebridgeVersion, int wireVersion,
                            long firstSeen, long lastSeen, byte[] signature) {
         validate(nodeId, ed25519Pub, x25519Pub, signature, firstSeen, lastSeen);
         this.nodeId = nodeId.clone();
@@ -71,6 +81,7 @@ public final class IdentityRecord {
         this.rudpPort = rudpPort;
         this.role = role != null ? role : "BOTH";
         this.capabilities = capabilities;
+        this.icebridgeVersion = icebridgeVersion != null ? icebridgeVersion : "";
         this.wireVersion = wireVersion;
         this.firstSeen = firstSeen;
         this.lastSeen = lastSeen;
@@ -103,6 +114,14 @@ public final class IdentityRecord {
 
     public long capabilities() {
         return capabilities;
+    }
+
+    /**
+     * IceBridge software version advertised by this peer (e.g. {@code 1.1.0}).
+     * Empty string when the peer is pre-v4 or did not announce one.
+     */
+    public String icebridgeVersion() {
+        return icebridgeVersion;
     }
 
     public int version() {
@@ -151,7 +170,7 @@ public final class IdentityRecord {
             throw new IllegalArgumentException("last_seen must be >= first_seen");
         }
         return signed(nodeId, ed25519Pub, x25519Pub, utpPort, rudpPort, role, capabilities,
-                VERSION, firstSeen, ts, privateKey);
+                icebridgeVersion, VERSION, firstSeen, ts, privateKey);
     }
 
     public static IdentityRecord createSigned(byte[] nodeId, KeyPair ed25519, byte[] x25519, int utpPort) {
@@ -169,7 +188,7 @@ public final class IdentityRecord {
         long now = Instant.now().getEpochSecond();
         byte[] rawEd25519 = extractRawEd25519(ed25519.getPublic());
         return signed(nodeId, rawEd25519, x25519, utpPort, rudpPort, role, capabilities,
-                VERSION, now, now, ed25519.getPrivate());
+                IceBridgeConstants.SOFTWARE_VERSION, VERSION, now, now, ed25519.getPrivate());
     }
 
     public static IdentityRecord fromEntry(Entry entry) {
@@ -184,6 +203,7 @@ public final class IdentityRecord {
                     0,
                     "BOTH",
                     NodeCapabilities.DEFAULT_BOTH,
+                    "",
                     1,
                     map.get("first_seen").integer(),
                     map.get("last_seen").integer(),
@@ -203,7 +223,31 @@ public final class IdentityRecord {
                     map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
                     role,
                     NodeCapabilities.fromRole(role),
+                    "",
                     2,
+                    map.get("first_seen").integer(),
+                    map.get("last_seen").integer(),
+                    b64decode(map.get("sig").string()));
+            if (!record.verifySignature()) {
+                throw new IllegalArgumentException("Invalid identity signature");
+            }
+            return record;
+        }
+        if (version == 3) {
+            String role = map.containsKey("role") ? map.get("role").string() : "BOTH";
+            long caps = map.containsKey("caps")
+                    ? map.get("caps").integer()
+                    : NodeCapabilities.fromRole(role);
+            IdentityRecord record = new IdentityRecord(
+                    Hex.decode(map.get("node_id").string()),
+                    b64decode(map.get("ed25519_pub").string()),
+                    b64decode(map.get("x25519_pub").string()),
+                    (int) map.get("utp_port").integer(),
+                    map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
+                    role,
+                    caps,
+                    "",
+                    3,
                     map.get("first_seen").integer(),
                     map.get("last_seen").integer(),
                     b64decode(map.get("sig").string()));
@@ -219,6 +263,7 @@ public final class IdentityRecord {
         long caps = map.containsKey("caps")
                 ? map.get("caps").integer()
                 : NodeCapabilities.fromRole(role);
+        String ibVer = map.containsKey("ib_ver") ? map.get("ib_ver").string() : "";
         IdentityRecord record = new IdentityRecord(
                 Hex.decode(map.get("node_id").string()),
                 b64decode(map.get("ed25519_pub").string()),
@@ -227,6 +272,7 @@ public final class IdentityRecord {
                 map.containsKey("rudp_port") ? (int) map.get("rudp_port").integer() : 0,
                 role,
                 caps,
+                ibVer != null ? ibVer : "",
                 VERSION,
                 map.get("first_seen").integer(),
                 map.get("last_seen").integer(),
@@ -256,18 +302,18 @@ public final class IdentityRecord {
 
     private static IdentityRecord signed(byte[] nodeId, byte[] ed25519Pub, byte[] x25519Pub,
                                          int utpPort, int rudpPort, String role, long capabilities,
-                                         int wireVersion,
+                                         String icebridgeVersion, int wireVersion,
                                          long firstSeen, long lastSeen, PrivateKey privateKey) {
         validate(nodeId, ed25519Pub, x25519Pub, new byte[SIGNATURE_LENGTH], firstSeen, lastSeen);
         try {
             IdentityRecord unsigned = new IdentityRecord(nodeId, ed25519Pub, x25519Pub,
-                    utpPort, rudpPort, role, capabilities, wireVersion, firstSeen, lastSeen,
-                    new byte[SIGNATURE_LENGTH]);
+                    utpPort, rudpPort, role, capabilities, icebridgeVersion, wireVersion,
+                    firstSeen, lastSeen, new byte[SIGNATURE_LENGTH]);
             Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(privateKey);
             signer.update(unsigned.canonicalBytes());
             return new IdentityRecord(nodeId, ed25519Pub, x25519Pub, utpPort, rudpPort, role, capabilities,
-                    wireVersion, firstSeen, lastSeen, signer.sign());
+                    icebridgeVersion, wireVersion, firstSeen, lastSeen, signer.sign());
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Unable to sign identity record", e);
         }
@@ -283,10 +329,13 @@ public final class IdentityRecord {
 
     private Map<String, Object> canonicalMap() {
         // Signature domain must match the wire version that was signed.
-        // v1: no rudp/role/caps. v2: +rudp+role. v3: +caps.
+        // v1: no rudp/role/caps/ib_ver. v2: +rudp+role. v3: +caps. v4: +ib_ver.
         Map<String, Object> map = new TreeMap<>();
         map.put("ed25519_pub", new Entry(b64(ed25519Pub)));
         map.put("first_seen", new Entry(firstSeen));
+        if (wireVersion >= 4) {
+            map.put("ib_ver", new Entry(icebridgeVersion != null ? icebridgeVersion : ""));
+        }
         map.put("last_seen", new Entry(lastSeen));
         map.put("node_id", new Entry(Hex.encode(nodeId)));
         if (wireVersion >= 2) {
@@ -343,6 +392,7 @@ public final class IdentityRecord {
                 && firstSeen == that.firstSeen
                 && lastSeen == that.lastSeen
                 && role.equals(that.role)
+                && icebridgeVersion.equals(that.icebridgeVersion)
                 && wireVersion == that.wireVersion
                 && Arrays.equals(nodeId, that.nodeId)
                 && Arrays.equals(ed25519Pub, that.ed25519Pub)
@@ -359,6 +409,7 @@ public final class IdentityRecord {
         result = 31 * result + rudpPort;
         result = 31 * result + (int) (capabilities ^ (capabilities >>> 32));
         result = 31 * result + role.hashCode();
+        result = 31 * result + icebridgeVersion.hashCode();
         result = 31 * result + wireVersion;
         result = 31 * result + (int) (firstSeen ^ (firstSeen >>> 32));
         result = 31 * result + (int) (lastSeen ^ (lastSeen >>> 32));

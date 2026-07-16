@@ -16,8 +16,9 @@ import java.util.Objects;
  * Immutable record of an authenticated peer known to an IceBridge servent.
  *
  * <p>Identity is the raw 32-byte Ed25519 public key. The record tracks the
- * peer's last known rUDP endpoint, advertised role, and freshness so stale
- * entries can be evicted without disk I/O.
+ * peer's last known rUDP endpoint, advertised role, IceBridge software
+ * version (when known), and freshness so stale entries can be evicted without
+ * disk I/O.
  */
 public final class PeerRecord {
 
@@ -26,12 +27,22 @@ public final class PeerRecord {
     private final int rudpPort;
     private final IceBridgeConfig.Role role;
     private final long lastSeenMs;
+    private final String icebridgeVersion;
 
     public PeerRecord(byte[] ed25519Pub,
                       String host,
                       int rudpPort,
                       IceBridgeConfig.Role role,
                       long lastSeenMs) {
+        this(ed25519Pub, host, rudpPort, role, lastSeenMs, null);
+    }
+
+    public PeerRecord(byte[] ed25519Pub,
+                      String host,
+                      int rudpPort,
+                      IceBridgeConfig.Role role,
+                      long lastSeenMs,
+                      String icebridgeVersion) {
         if (ed25519Pub == null || ed25519Pub.length != 32) {
             throw new IllegalArgumentException("ed25519Pub must be 32 bytes");
         }
@@ -46,6 +57,7 @@ public final class PeerRecord {
         this.rudpPort = rudpPort;
         this.role = Objects.requireNonNull(role, "role");
         this.lastSeenMs = lastSeenMs;
+        this.icebridgeVersion = icebridgeVersion != null ? icebridgeVersion : "";
     }
 
     public byte[] ed25519Pub() {
@@ -72,16 +84,21 @@ public final class PeerRecord {
         return lastSeenMs;
     }
 
+    /** Empty when the peer did not announce a software version. */
+    public String icebridgeVersion() {
+        return icebridgeVersion;
+    }
+
     public boolean canForward() {
         return role == IceBridgeConfig.Role.FORWARDER || role == IceBridgeConfig.Role.BOTH;
     }
 
     public PeerRecord withLastSeen(long lastSeenMs) {
-        return new PeerRecord(ed25519Pub, host, rudpPort, role, lastSeenMs);
+        return new PeerRecord(ed25519Pub, host, rudpPort, role, lastSeenMs, icebridgeVersion);
     }
 
     public PeerRecord withEndpoint(String host, int rudpPort) {
-        return new PeerRecord(ed25519Pub, host, rudpPort, role, lastSeenMs);
+        return new PeerRecord(ed25519Pub, host, rudpPort, role, lastSeenMs, icebridgeVersion);
     }
 
     @Override

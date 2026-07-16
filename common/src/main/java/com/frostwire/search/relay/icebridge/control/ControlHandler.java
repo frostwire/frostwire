@@ -166,7 +166,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
 
         PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
                 req.role == null ? IceBridgeConfig.Role.CLIENT : req.role,
-                System.currentTimeMillis());
+                System.currentTimeMillis(),
+                req.icebridgeVersion);
         boolean accepted = registry.register(record);
         return accepted
                 ? ApiResponse.success("registered")
@@ -234,7 +235,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                         p.host(),
                         p.rudpPort(),
                         p.role(),
-                        p.lastSeenMs()))
+                        p.lastSeenMs(),
+                        p.icebridgeVersion()))
                 .collect(Collectors.toList());
         return ApiResponse.success(info);
     }

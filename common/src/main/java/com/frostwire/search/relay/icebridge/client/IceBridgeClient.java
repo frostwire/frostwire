@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.client;
 
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
+import com.frostwire.search.relay.icebridge.IceBridgeConstants;
 import com.frostwire.search.relay.icebridge.control.ApiResponse;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
 import com.frostwire.search.relay.icebridge.control.RegisterRequest;
@@ -130,6 +131,7 @@ public final class IceBridgeClient implements AutoCloseable {
         req.rudpPort = rudpPort;
         req.role = role;
         req.timestamp = timestamp;
+        req.icebridgeVersion = IceBridgeConstants.SOFTWARE_VERSION;
 
         try {
             Signature signer = IdentityKeys.softwareSignature("Ed25519");

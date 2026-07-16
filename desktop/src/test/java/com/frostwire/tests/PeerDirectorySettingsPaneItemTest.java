@@ -52,6 +52,8 @@ class PeerDirectorySettingsPaneItemTest {
         Collections.singletonList(directory.get(peerPub).get()),
         Collections.singletonList(7.5));
 
-    assertEquals("7.50", model.getValueAt(0, 3));
+    // Trust Score is column 4 after IceBridge version column was added.
+    assertEquals("7.50", model.getValueAt(0, 4));
+    assertEquals("-", model.getValueAt(0, 2));
   }
 }

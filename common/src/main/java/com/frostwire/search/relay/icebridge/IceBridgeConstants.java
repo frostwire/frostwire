@@ -19,6 +19,20 @@ public final class IceBridgeConstants {
     /** Protocol version for inter-servent rUDP framing. */
     public static final int PROTOCOL_VERSION = 1;
 
+    /**
+     * Monotonic software release code advertised by this IceBridge build.
+     * Crawlers / stats jobs can histogram this for network penetration.
+     * Bump on every IceBridge-facing release that changes wire behavior or
+     * identity/registry fields.
+     */
+    public static final int SOFTWARE_VERSION_CODE = 1;
+
+    /**
+     * Human-readable IceBridge software version (semver). Announced in
+     * {@code IdentityRecord} ({@code ib_ver}) and control-plane register/lookup.
+     */
+    public static final String SOFTWARE_VERSION = "1.1.0";
+
     /** Default Ed25519 public-key length in bytes. */
     public static final int ED25519_PUB_LENGTH = 32;
 

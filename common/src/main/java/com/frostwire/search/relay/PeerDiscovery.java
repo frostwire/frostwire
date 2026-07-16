@@ -117,7 +117,8 @@ public final class PeerDiscovery {
                     if (alreadyKnown(peerPub, host, port)) {
                         continue;
                     }
-                    directory.upsertVerified(peerPub, host, port, identity.rudpPort());
+                    directory.upsertVerified(peerPub, host, port, identity.rudpPort(),
+                            identity.capabilities(), identity.icebridgeVersion());
                     discovered.add(new DiscoveredEndpoint(host, port));
 
                     // Feed known IceBridge relays (FORWARDER / BOTH) into the host cache

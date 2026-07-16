@@ -99,6 +99,11 @@ public final class PeerDirectory {
     }
 
     private void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort, boolean verified) {
+        upsert(peerPub, hostname, utpPort, rudpPort, verified, null, null);
+    }
+
+    private void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort, boolean verified,
+                        Long capabilitiesOrNull, String icebridgeVersionOrNull) {
         if (peerPub == null || peerPub.length != 32) {
             throw new IllegalArgumentException("peerPub must be 32 bytes");
         }
@@ -111,9 +116,13 @@ public final class PeerDirectory {
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry existing = entries.get(key);
         int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
-        long caps = existing != null ? existing.capabilities : NodeCapabilities.DEFAULT_PEER;
+        long caps = capabilitiesOrNull != null
+                ? capabilitiesOrNull
+                : (existing != null ? existing.capabilities : NodeCapabilities.DEFAULT_PEER);
+        String ibVer = coalesceIcebridgeVersion(icebridgeVersionOrNull,
+                existing != null ? existing.icebridgeVersion : null);
         entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
-                System.currentTimeMillis(), 0L, false, verified, caps));
+                System.currentTimeMillis(), 0L, false, verified, caps, ibVer));
         evictIfNeeded();
         version.incrementAndGet();
     }
@@ -123,19 +132,25 @@ public final class PeerDirectory {
      */
     public void upsertVerified(byte[] peerPub, String hostname, int utpPort, int rudpPort,
                                long capabilities) {
-        if (peerPub == null || peerPub.length != 32) {
-            throw new IllegalArgumentException("peerPub must be 32 bytes");
+        upsertVerified(peerPub, hostname, utpPort, rudpPort, capabilities, null);
+    }
+
+    /**
+     * Upsert a verified peer with capabilities and IceBridge software version.
+     */
+    public void upsertVerified(byte[] peerPub, String hostname, int utpPort, int rudpPort,
+                               long capabilities, String icebridgeVersion) {
+        upsert(peerPub, hostname, utpPort, rudpPort, true, capabilities, icebridgeVersion);
+    }
+
+    private static String coalesceIcebridgeVersion(String incoming, String existing) {
+        if (incoming != null && !incoming.isBlank()) {
+            return incoming.trim();
         }
-        if (hostname == null) {
-            throw new IllegalArgumentException("hostname is null");
+        if (existing != null && !existing.isBlank()) {
+            return existing;
         }
-        String key = com.frostwire.util.Hex.encode(peerPub);
-        Entry existing = entries.get(key);
-        int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
-        entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
-                System.currentTimeMillis(), 0L, false, true, capabilities));
-        evictIfNeeded();
-        version.incrementAndGet();
+        return "";
     }
 
     /**
@@ -169,7 +184,7 @@ public final class PeerDirectory {
         if (e == null) {
             // Implicit registration: target becomes a known peer with no hostname.
             e = new Entry(targetPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false,
-                    NodeCapabilities.NONE);
+                    NodeCapabilities.NONE, "");
             entries.put(key, e);
         }
         e.addEndorser(endorserPub);
@@ -190,7 +205,7 @@ public final class PeerDirectory {
         Entry e = entries.get(key);
         if (e == null) {
             e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, true, false,
-                    NodeCapabilities.NONE);
+                    NodeCapabilities.NONE, "");
             entries.put(key, e);
         } else {
             e.spam = true;
@@ -326,7 +341,8 @@ public final class PeerDirectory {
 
     private static PeerInfo toPeerInfo(Entry e) {
         return new PeerInfo(e.peerPub.clone(), e.hostname, e.utpPort, e.rudpPort,
-                e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified, e.capabilities);
+                e.lastUpdatedMs, e.endorsers.size(), e.spam, e.verified, e.capabilities,
+                e.icebridgeVersion);
     }
 
     public int size() {
@@ -376,10 +392,12 @@ public final class PeerDirectory {
         boolean spam;
         boolean verified;
         long capabilities;
+        String icebridgeVersion;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
         Entry(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
-              long localKarmaDelta, boolean spam, boolean verified, long capabilities) {
+              long localKarmaDelta, boolean spam, boolean verified, long capabilities,
+              String icebridgeVersion) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
@@ -389,6 +407,7 @@ public final class PeerDirectory {
             this.spam = spam;
             this.verified = verified;
             this.capabilities = capabilities;
+            this.icebridgeVersion = icebridgeVersion != null ? icebridgeVersion : "";
         }
 
         void addEndorser(byte[] endorserPub) {
@@ -407,15 +426,23 @@ public final class PeerDirectory {
         private final boolean spam;
         private final boolean verified;
         private final long capabilities;
+        private final String icebridgeVersion;
 
         PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
                  int endorserCount, boolean spam, boolean verified) {
             this(peerPub, hostname, utpPort, rudpPort, lastUpdatedMs, endorserCount, spam, verified,
-                    NodeCapabilities.DEFAULT_PEER);
+                    NodeCapabilities.DEFAULT_PEER, "");
         }
 
         PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
                  int endorserCount, boolean spam, boolean verified, long capabilities) {
+            this(peerPub, hostname, utpPort, rudpPort, lastUpdatedMs, endorserCount, spam, verified,
+                    capabilities, "");
+        }
+
+        PeerInfo(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
+                 int endorserCount, boolean spam, boolean verified, long capabilities,
+                 String icebridgeVersion) {
             this.peerPub = peerPub.clone();
             this.hostname = hostname;
             this.utpPort = utpPort;
@@ -425,6 +452,7 @@ public final class PeerDirectory {
             this.spam = spam;
             this.verified = verified;
             this.capabilities = capabilities;
+            this.icebridgeVersion = icebridgeVersion != null ? icebridgeVersion : "";
         }
 
         public byte[] peerPub() {
@@ -461,6 +489,11 @@ public final class PeerDirectory {
 
         public long capabilities() {
             return capabilities;
+        }
+
+        /** IceBridge software version (empty if unknown / pre-announce peer). */
+        public String icebridgeVersion() {
+            return icebridgeVersion;
         }
     }
 }

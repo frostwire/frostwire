@@ -29,6 +29,13 @@ public final class RegisterRequest {
     /** Unix timestamp (seconds) when the request was formed. */
     public long timestamp;
 
+    /**
+     * Optional IceBridge software version (e.g. {@code 1.1.0}).
+     * When non-empty it is included in the signed canonical string so
+     * peers cannot spoof versions of other identities.
+     */
+    public String icebridgeVersion;
+
     /** Ed25519 signature of the canonical registration string, base64url-no-padding. */
     public String signature;
 
@@ -38,12 +45,21 @@ public final class RegisterRequest {
      * <p>Uses length-prefixed fields to prevent delimiter injection —
      * a host containing {@code |} cannot produce the same canonical
      * string as a different (pub, host, port, role, timestamp) tuple.
+     *
+     * <p>When {@link #icebridgeVersion} is non-blank, it is appended as a
+     * final length-prefixed field. Pre-1.1.0 clients omit it and sign the
+     * legacy 5-field form — both verify correctly on the server.
      */
     public String canonicalString() {
-        return pub.length() + ":" + pub + "|"
+        String base = pub.length() + ":" + pub + "|"
                 + host.length() + ":" + host + "|"
                 + rudpPort + "|"
                 + (role == null ? "null" : role.name()) + "|"
                 + timestamp;
+        if (icebridgeVersion != null && !icebridgeVersion.isBlank()) {
+            String v = icebridgeVersion.trim();
+            return base + "|" + v.length() + ":" + v;
+        }
+        return base;
     }
 }

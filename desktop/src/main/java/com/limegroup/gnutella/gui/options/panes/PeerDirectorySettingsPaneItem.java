@@ -41,6 +41,7 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
   private static final String[] COLUMN_NAMES = {
     I18n.tr("Peer Public Key"),
     I18n.tr("Hostname"),
+    I18n.tr("IceBridge"),
     I18n.tr("uTP Port"),
     I18n.tr("Trust Score"),
     I18n.tr("Verified"),
@@ -414,16 +415,19 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
           String host = p.hostname();
           return host == null ? "" : host;
         case 2:
-          return p.utpPort();
+          String ib = p.icebridgeVersion();
+          return (ib == null || ib.isBlank()) ? "-" : ib;
         case 3:
-          return String.format("%.2f", trustScores.get(row));
+          return p.utpPort();
         case 4:
-          return p.isVerified() ? I18n.tr("Yes") : I18n.tr("No");
+          return String.format("%.2f", trustScores.get(row));
         case 5:
-          return p.isSpam() ? I18n.tr("Yes") : I18n.tr("No");
+          return p.isVerified() ? I18n.tr("Yes") : I18n.tr("No");
         case 6:
-          return p.endorserCount();
+          return p.isSpam() ? I18n.tr("Yes") : I18n.tr("No");
         case 7:
+          return p.endorserCount();
+        case 8:
           return formatTimestamp(p.lastUpdatedMs());
         default:
           return "";

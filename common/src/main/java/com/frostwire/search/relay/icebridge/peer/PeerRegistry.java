@@ -71,10 +71,22 @@ public final class PeerRegistry {
 
         byPubHex.merge(key, record, (existing, incoming) -> {
             // Fresher endpoint wins; otherwise keep existing.
-            if (incoming.lastSeenMs() >= existing.lastSeenMs()) {
-                return incoming;
+            if (incoming.lastSeenMs() < existing.lastSeenMs()) {
+                return existing;
             }
-            return existing;
+            // Preserve a previously advertised IceBridge version when the
+            // refresh omitted it (e.g. /route without version).
+            String ver = (incoming.icebridgeVersion() != null
+                    && !incoming.icebridgeVersion().isBlank())
+                    ? incoming.icebridgeVersion()
+                    : existing.icebridgeVersion();
+            return new PeerRecord(
+                    incoming.ed25519Pub(),
+                    incoming.host(),
+                    incoming.rudpPort(),
+                    incoming.role(),
+                    incoming.lastSeenMs(),
+                    ver);
         });
         registrations.incrementAndGet();
         return true;

@@ -19,12 +19,20 @@ public final class PeerInfo {
     public int rudpPort;
     public IceBridgeConfig.Role role;
     public long lastSeenMs;
+    /** IceBridge software version when advertised; may be null/empty. */
+    public String icebridgeVersion;
 
     public PeerInfo(String pub, String host, int rudpPort, IceBridgeConfig.Role role, long lastSeenMs) {
+        this(pub, host, rudpPort, role, lastSeenMs, null);
+    }
+
+    public PeerInfo(String pub, String host, int rudpPort, IceBridgeConfig.Role role, long lastSeenMs,
+                    String icebridgeVersion) {
         this.pub = pub;
         this.host = host;
         this.rudpPort = rudpPort;
         this.role = role;
         this.lastSeenMs = lastSeenMs;
+        this.icebridgeVersion = icebridgeVersion;
     }
 }

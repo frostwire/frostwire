@@ -90,6 +90,9 @@ public final class IceBridgeServer implements AutoCloseable {
         }
 
         System.out.println("IceBridge — FrostWire relay servent");
+        System.out.println("  software version           = " + IceBridgeConstants.SOFTWARE_VERSION
+                + " (code " + IceBridgeConstants.SOFTWARE_VERSION_CODE + ")");
+        System.out.println("  protocol version           = " + IceBridgeConstants.PROTOCOL_VERSION);
         System.out.println();
         System.out.println("Configuration (from .env / ICEBRIDGE_* env vars):");
         System.out.println("  ICEBRIDGE_HOST              = " + config.host());

@@ -200,16 +200,19 @@ class IdentityRecordTest {
   }
 
   @Test
-  void v3RecordAdvertisesCapabilities() throws Exception {
+  void v4RecordAdvertisesCapabilitiesAndIceBridgeVersion() throws Exception {
     KeyPair kp = ed25519();
     IdentityRecord record = IdentityRecord.createSigned(
             randomBytes(20), kp, randomBytes(32), 6888, 6889, "FORWARDER",
             NodeCapabilities.DEFAULT_FORWARDER);
-    assertEquals(3, record.version());
+    assertEquals(4, record.version());
+    assertEquals(com.frostwire.search.relay.icebridge.IceBridgeConstants.SOFTWARE_VERSION,
+            record.icebridgeVersion());
     assertTrue(NodeCapabilities.has(record.capabilities(), NodeCapabilities.RELAY));
     assertFalse(NodeCapabilities.has(record.capabilities(), NodeCapabilities.SEARCH));
     IdentityRecord parsed = IdentityRecord.fromEntry(record.toEntry());
     assertEquals(record.capabilities(), parsed.capabilities());
+    assertEquals(record.icebridgeVersion(), parsed.icebridgeVersion());
     assertTrue(parsed.verifySignature());
   }
 
@@ -221,6 +224,7 @@ class IdentityRecordTest {
     IdentityRecord r2 = r1.withUpdatedLastSeen(r1.lastSeen() + 100, kp.getPrivate());
     assertEquals(6889, r2.rudpPort());
     assertEquals("FORWARDER", r2.role());
+    assertEquals(r1.icebridgeVersion(), r2.icebridgeVersion());
     assertTrue(r2.verifySignature());
   }
 
