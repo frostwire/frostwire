@@ -38,6 +38,7 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -260,6 +261,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
             // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
             ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+            for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
+                ct.add_tracker(tracker, 0);
+            }
             ct.set_priv(false);
             final error_code ec = new error_code();
             libtorrent.set_piece_hashes_ex(ct, Objects.requireNonNull(saveDir).getAbsolutePath(), new set_piece_hashes_listener(), ec);

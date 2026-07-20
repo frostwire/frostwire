@@ -24,6 +24,7 @@ import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.create_torrent;
@@ -125,6 +126,9 @@ public final class TorrentUtils {
             fs.set_name(file.getName());
             create_torrent ct = new create_torrent(fs);
             ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+            for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
+                ct.add_tracker(tracker, 0);
+            }
             ct.set_priv(false);
             final error_code ec = new error_code();
             libtorrent.set_piece_hashes_ex(ct, Objects.requireNonNull(saveDir).getAbsolutePath(), new set_piece_hashes_listener(), ec);
