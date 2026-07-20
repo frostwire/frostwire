@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.AggregateReport;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.Config;
-import com.frostwire.search.relay.icebridge.sim.IceBridgeNetworkSimulator.Profile;
 import com.frostwire.search.relay.icebridge.sim.TopologyAutoResearch;
 import com.frostwire.search.relay.icebridge.sim.TopologyAutoResearch.Candidate;
 import com.frostwire.search.relay.icebridge.sim.TopologyAutoResearch.Result;
@@ -24,8 +23,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Benchmark profile + auto-research loop for hybrid EC2 IceBridge topology.
  *
- * <p>Goal: find (N, M, TTLs) so users find content (hit rate) while EC2
- * backbone and last-hop leaf queries stay within performance budgets.
+ * <p>Goal: find (N, M, TTLs) so users find content (hit rate) while EC2 backbone and last-hop leaf
+ * queries stay within performance budgets.
  */
 class TopologyAutoResearchTest {
 
@@ -61,25 +60,39 @@ class TopologyAutoResearchTest {
     }
 
     // At least the score-best should have solid common-content recall
-    assertTrue(result.best.report.hitRate >= 0.90,
+    assertTrue(
+        result.best.report.hitRate >= 0.90,
         "best candidate hitRate too low: " + result.best.report.hitRate);
 
     // Prefer a SLO winner when the grid can produce one
     Candidate apply = result.bestMeetingSlos != null ? result.bestMeetingSlos : result.best;
     assertTrue(apply.report.score > -1.0, "winner score should not be pathological");
 
-    // Applying winner updates process topology for subsequent production use
+    // Applying updates process topology only when a SLO winner exists
     boolean sloApplied = TopologyAutoResearch.applyWinner(result);
     IceBridgeTopology t = IceBridgeTopology.get();
-    assertTrue(t.meshBroadcastFanout() == apply.meshFanout);
-    assertTrue(t.searchPeerFanout() == apply.searchPeerFanout);
-    LOG.info("Applied topology: N=" + t.meshBroadcastFanout()
-            + " M=" + t.searchPeerFanout()
-            + " meshTTL=" + t.meshHopTtl()
-            + " searchTTL=" + t.searchTtl()
-            + " softMax=" + t.softMax()
-            + " leafUPs=" + t.leafUltrapeerConnections()
-            + " sloApplied=" + sloApplied);
+    if (result.bestMeetingSlos != null) {
+      assertTrue(sloApplied, "SLO winner must be applied");
+      assertTrue(t.meshBroadcastFanout() == apply.meshFanout);
+      assertTrue(t.searchPeerFanout() == apply.searchPeerFanout);
+    } else {
+      assertTrue(!sloApplied, "no SLO winner: topology must stay untouched");
+    }
+    LOG.info(
+        "Applied topology: N="
+            + t.meshBroadcastFanout()
+            + " M="
+            + t.searchPeerFanout()
+            + " meshTTL="
+            + t.meshHopTtl()
+            + " searchTTL="
+            + t.searchTtl()
+            + " softMax="
+            + t.softMax()
+            + " leafUPs="
+            + t.leafUltrapeerConnections()
+            + " sloApplied="
+            + sloApplied);
   }
 
   @Test
@@ -114,10 +127,12 @@ class TopologyAutoResearchTest {
     LOG.info("compare hybrid: " + rHybrid);
 
     // Research hybrid should keep hit rate competitive on EC2 backbone.
-    assertTrue(rHybrid.hitRate + 0.05 >= rLime.hitRate,
+    assertTrue(
+        rHybrid.hitRate + 0.05 >= rLime.hitRate,
         "hybrid hit rate should be within 5pp of LimeWire profile");
     // Prefer hybrid score when budgets matter (lower N on fat hubs).
-    assertTrue(rHybrid.score + 0.05 >= rLime.score
+    assertTrue(
+        rHybrid.score + 0.05 >= rLime.score
             || rHybrid.meanMeshMessages <= rLime.meanMeshMessages + 1,
         "hybrid should score competitively or use no more mesh traffic");
   }
