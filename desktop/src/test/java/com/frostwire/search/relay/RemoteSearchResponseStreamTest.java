@@ -54,7 +54,9 @@ class RemoteSearchResponseStreamTest {
         assertEquals(0, parsed.chunkIndex());
         assertEquals(1, parsed.rows().size());
         assertEquals(RemoteSearchResponse.VERSION, parsed.version());
-        assertEquals(2, RemoteSearchResponse.VERSION,
+        assertEquals(3, RemoteSearchResponse.VERSION,
+                "wire v3 rows may carry optional bt seeder endpoints");
+        assertEquals(2, RemoteSearchResponse.VERSION_2,
                 "wire v2 always covers chunk+final in the signature domain");
     }
 

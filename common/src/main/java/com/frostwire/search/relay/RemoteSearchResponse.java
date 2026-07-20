@@ -30,6 +30,9 @@ import java.util.Map;
  *   fc:   file count
  *   pub:  base64url raw Ed25519 pub of the publisher (32 bytes)
  *   nid:  hex SHA-1 node id of the publisher (20 bytes, optional)
+ *   bt:   comma-separated host:port BT listen endpoints of the responder
+ *         (optional, v3+; signed inside the row domain so mesh hops
+ *         cannot rewrite where the requester fetches the torrent from)
  * }
  * </pre>
  *
@@ -41,7 +44,9 @@ import java.util.Map;
 public final class RemoteSearchResponse {
 
     /** Wire version 2: signature domain always includes chunk + final flags. */
-    public static final int VERSION = 2;
+    public static final int VERSION_2 = 2;
+    /** Wire version 3: rows may carry optional {@code bt} seeder endpoints. */
+    public static final int VERSION = 3;
 
     /**
      * Default max rows per streamed RESULT frame. Full sets larger than this
@@ -70,7 +75,7 @@ public final class RemoteSearchResponse {
             this.rows.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
                     r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
-                    r.matchedFile));
+                    r.matchedFile, r.seederEndpoints));
         }
         this.signature = signature.clone();
         this.chunkIndex = chunkIndex;
@@ -95,7 +100,7 @@ public final class RemoteSearchResponse {
             out.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
                     r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
-                    r.matchedFile));
+                    r.matchedFile, r.seederEndpoints));
         }
         return out;
     }
@@ -142,8 +147,12 @@ public final class RemoteSearchResponse {
     }
 
     private static void appendRowBencode(java.io.ByteArrayOutputStream out, Row r) {
-        // Bencode a dict with sorted keys: fc, ih, mf?, n, nid?, pub, s
+        // Bencode a dict with sorted keys: bt?, fc, ih, mf?, n, nid?, pub, s
         java.util.Map<String, byte[]> parts = new java.util.TreeMap<>();
+        if (!r.seederEndpoints.isEmpty()) {
+            parts.put("bt", String.join(",", r.seederEndpoints)
+                    .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
         parts.put("fc", Long.toString(r.fileCount).getBytes(java.nio.charset.StandardCharsets.UTF_8));
         parts.put("ih", Hex.encode(r.infoHash).getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if (r.matchedFile != null) {
@@ -212,6 +221,9 @@ public final class RemoteSearchResponse {
             if (r.matchedFile != null) {
                 row.put("mf", r.matchedFile);
             }
+            if (!r.seederEndpoints.isEmpty()) {
+                row.put("bt", new ArrayList<>(r.seederEndpoints));
+            }
             rowMaps.add(row);
         }
         m.put("rows", rowMaps);
@@ -257,6 +269,7 @@ public final class RemoteSearchResponse {
                 isFinal = ((Number) finalObj).intValue() != 0;
             }
             RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
+                    .version(((Number) vObj).intValue())
                     .nonce(nonce)
                     .timestamp(((Number) tsObj).longValue())
                     .chunkIndex(chunk)
@@ -290,8 +303,21 @@ public final class RemoteSearchResponse {
                     if (mfObj != null) {
                         matchedFile = (String) mfObj;
                     }
+                    List<String> seederEndpoints = new ArrayList<>();
+                    Object btObj = row.get("bt");
+                    if (btObj instanceof List) {
+                        for (Object ep : (List<?>) btObj) {
+                            if (ep instanceof String
+                                    && !((String) ep).isEmpty()
+                                    && ((String) ep).length() <= 256
+                                    && seederEndpoints.size() < Row.MAX_SEEDER_ENDPOINTS) {
+                                seederEndpoints.add((String) ep);
+                            }
+                        }
+                    }
                     b.addRow(ih, (String) nObj, ((Number) sObj).longValue(),
-                            ((Number) fcObj).intValue(), pub, nid, matchedFile);
+                            ((Number) fcObj).intValue(), pub, nid, matchedFile,
+                            seederEndpoints);
                 }
             }
             return b.build();
@@ -302,6 +328,9 @@ public final class RemoteSearchResponse {
 
     /** Immutable search result row. */
     public static final class Row {
+        /** Max seeder endpoints carried per row (anti-bloat on untrusted wire data). */
+        public static final int MAX_SEEDER_ENDPOINTS = 8;
+
         public final byte[] infoHash;
         public final String name;
         public final long sizeBytes;
@@ -310,6 +339,8 @@ public final class RemoteSearchResponse {
         public final byte[] publisherNodeId; // nullable
         /** File path within the torrent that matched the search, or null if matched on name. */
         public final String matchedFile;
+        /** Responder BT listen endpoints (host:port, v3+; empty when none advertised). */
+        public final List<String> seederEndpoints;
 
         public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
                   byte[] publisherEd25519Pub, byte[] publisherNodeId) {
@@ -318,6 +349,13 @@ public final class RemoteSearchResponse {
 
         public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
                   byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile) {
+            this(infoHash, name, sizeBytes, fileCount, publisherEd25519Pub, publisherNodeId,
+                    matchedFile, null);
+        }
+
+        public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                  byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile,
+                  List<String> seederEndpoints) {
             if (infoHash == null || infoHash.length != 20) {
                 throw new IllegalArgumentException("infoHash must be 20 bytes");
             }
@@ -334,6 +372,18 @@ public final class RemoteSearchResponse {
             this.publisherEd25519Pub = publisherEd25519Pub.clone();
             this.publisherNodeId = publisherNodeId == null ? null : publisherNodeId.clone();
             this.matchedFile = matchedFile;
+            if (seederEndpoints == null || seederEndpoints.isEmpty()) {
+                this.seederEndpoints = java.util.Collections.emptyList();
+            } else {
+                List<String> copy = new ArrayList<>(seederEndpoints.size());
+                for (String ep : seederEndpoints) {
+                    if (ep != null && !ep.isEmpty() && ep.length() <= 256
+                            && copy.size() < MAX_SEEDER_ENDPOINTS) {
+                        copy.add(ep);
+                    }
+                }
+                this.seederEndpoints = java.util.Collections.unmodifiableList(copy);
+            }
         }
     }
 
@@ -349,6 +399,17 @@ public final class RemoteSearchResponse {
 
         public Builder nonce(byte[] nonce) {
             this.nonce = nonce;
+            return this;
+        }
+
+        /**
+         * Carry the transmitted wire version when decoding. Responses are
+         * re-canonicalized for signature verification, so a parsed response
+         * must keep its original version or older responses fail verification
+         * after a version bump.
+         */
+        public Builder version(int version) {
+            this.version = version;
             return this;
         }
 
@@ -383,6 +444,14 @@ public final class RemoteSearchResponse {
                               byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile) {
             rows.add(new Row(infoHash, name, sizeBytes, fileCount,
                     publisherEd25519Pub, publisherNodeId, matchedFile));
+            return this;
+        }
+
+        public Builder addRow(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                              byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile,
+                              List<String> seederEndpoints) {
+            rows.add(new Row(infoHash, name, sizeBytes, fileCount,
+                    publisherEd25519Pub, publisherNodeId, matchedFile, seederEndpoints));
             return this;
         }
 
