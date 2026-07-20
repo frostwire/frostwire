@@ -680,13 +680,11 @@ public final class RudpSessionManager {
             return;
         }
         // hops already spent ≈ initial soft horizon - remaining (approx).
+        // hopTtl > 0 is guaranteed above; clamping may reduce the remaining
+        // ttl to 0, and this node still floods once — the next hop's ttl
+        // guard stops further forwarding (soft-max horizon).
         int hopsSoFar = Math.max(0, IceBridgeTopology.get().softMax() - hopTtl);
         int nextTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar + 1, hopTtl - 1);
-        if (nextTtl <= 0) {
-            LOG.debug("RudpSessionManager: RELAY soft-max exhausted for "
-                    + Hex.encode(targetPub).substring(0, 12) + "...");
-            return;
-        }
         int n = meshBroadcastFanout();
         List<PeerRecord> forwarders = registry.lookupForwarders(n);
         int sent = 0;

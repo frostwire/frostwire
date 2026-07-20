@@ -136,10 +136,10 @@ public final class RelayRole {
     private List<ForwardTarget> selectForwardTargets(RemoteSearchRequest request) {
         byte[] ownPub = identity.ed25519PubRaw();
         int hopsSoFar = request.path() != null ? request.path().length : 0;
+        // forward() guarantees ttl > 0. Clamping may reduce the remaining
+        // ttl to 0; this hop still forwards, and the next hop's ttl guard
+        // stops further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
-        if (newTtl <= 0) {
-            return Collections.emptyList();
-        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
                 directory.topByTrustVerified(m * 3);

@@ -315,10 +315,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private void forwardRequest(RemoteSearchRequest request, byte[] sourcePub) {
         byte[] ownPub = identity.ed25519PubRaw();
         int hopsSoFar = request.path() != null ? request.path().length : 0;
+        // Caller guarantees ttl > 0. Clamping may reduce the remaining ttl
+        // to 0; this hop still forwards, and the next hop's ttl guard stops
+        // further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
-        if (newTtl <= 0) {
-            return;
-        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         List<PeerDirectory.PeerInfo> candidates =
                 peerDirectory.topByTrustVerified(m * 3);
