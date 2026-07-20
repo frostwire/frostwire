@@ -1,5 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
-  - new:IceBridge hybrid EC2 topology profile (N=16 M=40) + LimeWire ultrapeer baseline; env-tunable / auto-research ready
+  - new:IceBridge hybrid EC2 topology profile (N=16 M=30) + LimeWire ultrapeer baseline; env-tunable / auto-research ready
   - new:IceBridge software version announce (IdentityRecord v4 ib_ver + register/lookup) for mesh peers and future penetration stats
   - fix:Search UX — show Searching… spinner immediately on submit (no stuck promotions); keep query + Retry on empty results instead of auto-clearing to promos; use setProgressEnabled correctly; top indeterminate bar while search in flight
   - fix:Navigation drawer no longer re-wraps its inset listener on every resume — NavigationViewSafety guard is now idempotent (stops repeated warnings and listener chain growth)
