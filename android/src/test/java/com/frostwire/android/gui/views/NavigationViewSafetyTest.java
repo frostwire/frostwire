@@ -21,7 +21,9 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -72,6 +74,28 @@ public class NavigationViewSafetyTest {
         } catch (IllegalStateException actual) {
             assertSame(expected, actual);
         }
+    }
+
+    @Test
+    public void installInsetListenerGuard_isIdempotent_doesNotWrapTwice() throws Exception {
+        NavigationView navigationView = new NavigationView(themedContext());
+        AtomicInteger invocations = new AtomicInteger(0);
+        ViewTreeObserver.OnGlobalLayoutListener original = invocations::incrementAndGet;
+        Field field = setListenerField(navigationView, original);
+
+        NavigationViewSafety.installInsetListenerGuard(navigationView);
+        ViewTreeObserver.OnGlobalLayoutListener firstGuard =
+                (ViewTreeObserver.OnGlobalLayoutListener) field.get(navigationView);
+
+        // MainActivity.onResume installs on every resume; must be a no-op once guarded
+        NavigationViewSafety.installInsetListenerGuard(navigationView);
+        ViewTreeObserver.OnGlobalLayoutListener secondGuard =
+                (ViewTreeObserver.OnGlobalLayoutListener) field.get(navigationView);
+
+        assertSame(firstGuard, secondGuard);
+
+        secondGuard.onGlobalLayout();
+        assertEquals(1, invocations.get());
     }
 
     private static Field setListenerField(

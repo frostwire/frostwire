@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.views;
 
 import android.os.DeadSystemException;
-import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.frostwire.util.Logger;
@@ -35,14 +34,11 @@ import java.lang.reflect.Field;
 public final class NavigationViewSafety {
     private static final Logger LOG = Logger.getLogger(NavigationViewSafety.class);
 
-    private static final int KEY_GUARD_INSTALLED = View.generateViewId();
-
     private NavigationViewSafety() {
     }
 
     public static void installInsetListenerGuard(NavigationView navigationView) {
-        if (navigationView == null
-                || navigationView.getTag(KEY_GUARD_INSTALLED) instanceof ViewTreeObserver.OnGlobalLayoutListener) {
+        if (navigationView == null) {
             return;
         }
 
@@ -50,7 +46,8 @@ public final class NavigationViewSafety {
             Field field = NavigationView.class.getDeclaredField("onGlobalLayoutListener");
             field.setAccessible(true);
             Object listenerObject = field.get(navigationView);
-            if (!(listenerObject instanceof ViewTreeObserver.OnGlobalLayoutListener)) {
+            if (!(listenerObject instanceof ViewTreeObserver.OnGlobalLayoutListener)
+                    || listenerObject instanceof GuardedInsetLayoutListener) {
                 return;
             }
 
@@ -62,21 +59,8 @@ public final class NavigationViewSafety {
                 viewTreeObserver.removeOnGlobalLayoutListener(originalListener);
             }
 
-            ViewTreeObserver.OnGlobalLayoutListener guardedListener = () -> {
-                try {
-                    originalListener.onGlobalLayout();
-                } catch (RuntimeException e) {
-                    if (containsDeadSystemException(e)) {
-                        LOG.warn("Disabling NavigationView inset listener after DeadSystemException", e);
-                        ViewTreeObserver currentObserver = navigationView.getViewTreeObserver();
-                        if (currentObserver.isAlive()) {
-                            currentObserver.removeOnGlobalLayoutListener((ViewTreeObserver.OnGlobalLayoutListener) navigationView.getTag(KEY_GUARD_INSTALLED));
-                        }
-                        return;
-                    }
-                    throw e;
-                }
-            };
+            GuardedInsetLayoutListener guardedListener =
+                    new GuardedInsetLayoutListener(navigationView, originalListener);
 
             field.set(navigationView, guardedListener);
 
@@ -84,10 +68,36 @@ public final class NavigationViewSafety {
             if (viewTreeObserver.isAlive()) {
                 viewTreeObserver.addOnGlobalLayoutListener(guardedListener);
             }
-
-            navigationView.setTag(KEY_GUARD_INSTALLED, guardedListener);
         } catch (Throwable t) {
             LOG.warn("Could not wrap NavigationView inset listener safely", t);
+        }
+    }
+
+    private static final class GuardedInsetLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+        private final NavigationView navigationView;
+        private final ViewTreeObserver.OnGlobalLayoutListener originalListener;
+
+        GuardedInsetLayoutListener(NavigationView navigationView,
+                                   ViewTreeObserver.OnGlobalLayoutListener originalListener) {
+            this.navigationView = navigationView;
+            this.originalListener = originalListener;
+        }
+
+        @Override
+        public void onGlobalLayout() {
+            try {
+                originalListener.onGlobalLayout();
+            } catch (RuntimeException e) {
+                if (containsDeadSystemException(e)) {
+                    LOG.warn("Disabling NavigationView inset listener after DeadSystemException", e);
+                    ViewTreeObserver currentObserver = navigationView.getViewTreeObserver();
+                    if (currentObserver.isAlive()) {
+                        currentObserver.removeOnGlobalLayoutListener(this);
+                    }
+                    return;
+                }
+                throw e;
+            }
         }
     }
 
