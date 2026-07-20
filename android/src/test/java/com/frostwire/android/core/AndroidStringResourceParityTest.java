@@ -18,8 +18,11 @@ import java.util.regex.Pattern;
 
 public class AndroidStringResourceParityTest {
 
+    // [^>]*? must be non-greedy: a greedy [^>]* swallows the '/' of a
+    // self-closing "<string ... />" tag, the match then continues to the next
+    // </string>, and every key after a self-closing string becomes invisible.
     private static final Pattern STRING_NAME_PATTERN = Pattern.compile(
-            "<string\\s+name=\"([^\"]+)\"[^>]*/>|<string\\s+name=\"([^\"]+)\"[^>]*>.*?</string>",
+            "<string\\s+name=\"([^\"]+)\"[^>]*?/>|<string\\s+name=\"([^\"]+)\"[^>]*?>.*?</string>",
             Pattern.DOTALL);
 
     @Test
