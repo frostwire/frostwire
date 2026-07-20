@@ -88,6 +88,32 @@ public final class UrlUtils {
         return "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
     }
 
+    /**
+     * Magnet with explicit peer endpoints ({@code &x.pe=host:port}, BEP 9
+     * peer-address parameter) so the torrent can be fetched directly from
+     * known seeders — used for Distributed search results, whose content is
+     * often trackerless and unknown to the public swarm. At most 4 endpoints
+     * are appended; blank entries are skipped.
+     */
+    public static String buildMagnetUrl(String infoHash, String displayFilename,
+                                        String trackerParameters,
+                                        java.util.List<String> peerEndpoints) {
+        String base = buildMagnetUrl(infoHash, displayFilename, trackerParameters);
+        if (peerEndpoints == null || peerEndpoints.isEmpty()) {
+            return base;
+        }
+        StringBuilder sb = new StringBuilder(base);
+        int added = 0;
+        for (String ep : peerEndpoints) {
+            if (ep == null || ep.isEmpty() || ep.length() > 256 || added >= 4) {
+                continue;
+            }
+            sb.append("&x.pe=").append(ep);
+            added++;
+        }
+        return sb.toString();
+    }
+
 
     // can't use java records yet because of android 11 being the max compatible version
     private static class

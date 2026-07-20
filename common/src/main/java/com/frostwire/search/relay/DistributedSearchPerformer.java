@@ -396,7 +396,8 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         }
         String name = row.name;
         String infoHashHex = Hex.encode(row.infoHash);
-        String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name, DefaultTrackers.MAGNET_URL_PARAMETERS);
+        String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name,
+                DefaultTrackers.MAGNET_URL_PARAMETERS, row.seederEndpoints);
         // Validate matchedFile: reject null, empty, or pathologically long values.
         String matchedFile = row.matchedFile;
         if (matchedFile != null) {
