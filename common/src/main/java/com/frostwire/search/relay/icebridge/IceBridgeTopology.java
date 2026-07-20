@@ -34,9 +34,11 @@ public final class IceBridgeTopology {
     /**
      * N — max IceBridge peers for mesh RELAY broadcast.
      * Hybrid EC2 research default (small fat hub fleet; full coverage with N≪32).
+     * Winner of TopologyAutoResearch.runHybridEc2Research with common random
+     * numbers (N=16 M=30 meshTTL=3 searchTTL=3 softMax=3 leafUPs=3, 2026-07).
      * LimeWire ultrapeer baseline was 32 ({@link #LIMEWIRE_MESH_FANOUT}).
      */
-    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 8;
+    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 16;
 
     /**
      * M — max FrostWire peers queried / forwarded per search hop.
@@ -284,7 +286,7 @@ public final class IceBridgeTopology {
         return total;
     }
 
-    /** Reset to compiled LimeWire-ultrapeer defaults (tests). */
+    /** Reset to compiled hybrid-EC2 research defaults (tests). */
     public void resetToDefaults() {
         meshBroadcastFanout = DEFAULT_MESH_BROADCAST_FANOUT;
         searchPeerFanout = DEFAULT_SEARCH_PEER_FANOUT;
