@@ -84,6 +84,8 @@ Before reviewing, determine which module(s) the change touches. Each module has 
 | Background tasks | **WorkManager** (not `ScheduledExecutorService` for periodic work) |
 | `Build.VERSION.SDK_INT < 24/26` guards | **DEAD CODE** — minSdk is 26 |
 | `EditTextPreference` values | Stored as **String**, not Integer |
+| `View.setTag(int, …)` keys | Must be **application resource ids** — `generateViewId()` keys throw `IllegalArgumentException` |
+| Base `strings.xml` keys | Must be copied to **all** `values-*` locales in the same commit (parity test gates CI) |
 
 ---
 
@@ -369,6 +371,12 @@ Code must compile and tests must pass on all affected targets.
 
 These are external service issues, not code regressions.
 
+### Deploy & Artifact Verification
+
+- [ ] **"up-to-date" ≠ latest commit** — gradle up-to-date only means the artifact matches that checkout's sources. Verify the deploy host's `git rev-parse HEAD` and the artifact's own version banner (e.g. IceBridge `software version = 1.1.0` line); a missing banner block once proved a stale jar despite a "successful" build (MentisDB #896).
+- [ ] **Suite width matches change width** — for `common/` constants, shared helpers, or wire behavior, require the FULL module suite, not only the package suite. Deterministic failures shipped to CI because only the relay package ran (MentisDB #902).
+- [ ] **Constant/label changes audit** — when a public constant value or user-visible label changes, grep every test asserting the old value before approving.
+
 ---
 
 ## Review Output Format
@@ -417,7 +425,7 @@ When completing a review, produce a structured report:
 
 ---
 
-## Quick-Reference: Top 25 Most Common Findings
+## Quick-Reference: Top 30 Most Common Findings
 
 Based on the FrostWire codebase history + MentisDB frostwire chain lessons:
 
@@ -446,6 +454,11 @@ Based on the FrostWire codebase history + MentisDB frostwire chain lessons:
 23. **Unauthenticated RELAY_RESPONSE** — spoofable sourcePub into inbound queue / amp. Session + rate limit required; local clients use `/poll` delivery (MentisDB #876).
 24. **Mesh flood without bounds** — fan-out × hop TTL × payload without `MAX_APP_PAYLOAD`, rate limit, or TTL cap is amplification **BLOCK**.
 25. **DHT list ConcurrentModificationException** — never iterate live jlibtorrent `dhtGetPeers` lists; snapshot first.
+26. **TTL boundary early-return** — shared clamp + `newTtl<=0 → drop` kills ttl=1 forwards; old contract forwards once with ttl=0 and lets the next hop's guard stop it. Boundary values are the contract (MentisDB #902).
+27. **Constant/label change with stale assertions** — `MAX_FORWARD_TARGETS` 3→30, `"Local"`→`"Local (test)"`; grep tests for the old value before push (MentisDB #902).
+28. **Test extraction blind spot** — greedy regex `[^>]*` swallows the `/` of self-closing XML tags and hides keys from parity checks; use `[^>]*?` and test the extractor (MentisDB #902).
+29. **Singleton leakage across test classes** — process-wide topology/settings mutated by one class, asserted by another; reset in `@BeforeEach`/`@AfterEach` or CI becomes order-dependent.
+30. **Benchmark ranking without CRN** — per-candidate seeds = each candidate on a different random network; the winner is seed luck (±30pp rare-hit swings on identical configs). Common random numbers, or replications with confidence intervals (MentisDB #903).
 
 ---
 
@@ -515,6 +528,7 @@ MentisDB frostwire **#873–#876**. Review every change to `RudpSessionManager` 
 - [ ] **Response verify** — client checks expected responder pub, nonce, skew, signature (`SearchResponseVerifier`).
 - [ ] **TTL / multi-hop policy (app layer)** — dual-envelope is shipped (`RemoteSearchRequest` v2: signature over query-only; hop fields mutable). **BLOCK** any re-sign-with-forwarder-key that still verifies against `requesterPub`. Preserve original requester signature on hop.
 - [ ] **TTL / multi-hop policy (transport layer)** — mesh `Type.RELAY` is separate from app ttl. Transport hop auth rules above still apply even when app dual-envelope is correct.
+- [ ] **TTL boundary contract** — a request with ttl=1 must be forwarded ONCE with ttl=0; the next hop's `ttl>0` guard stops it. `clampRemainingTtl(...) == 0` is a valid forward, not exhaustion — an early-return on `newTtl<=0` silently kills single-hop forwarding (MentisDB #902).
 - [ ] **Catalog browse** — signature + skew verified; desktop wiring must pass `LocalIndex` if feature is claimed; Android already passes index.
 - [ ] **FTS5 fixtures** — whole-word match; no kebab-case only names; sanitizer strips non-alnum.
 - [ ] **Trust check on requester** — spam/trust floor evaluated in *target's* directory for the *requester*, not the target (MentisDB #798).
@@ -573,4 +587,4 @@ MentisDB frostwire **#873–#876**. Review every change to `RudpSessionManager` 
 
 ---
 
-*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review. Last major expansion: rUDP HELLO_ACK / dual-session / RELAY_RESPONSE auth / mesh amp bounds (MentisDB #873–#876, 2026-07-12).*
+*When a review finds a new class of bug not covered here, add it to the checklist. This skill is a living document — it improves with every review. Last major expansion: TTL boundary contract, constant-change audit, test extraction blind spots, singleton test isolation, CRN benchmarks, deploy artifact verification (MentisDB #896–#903, 2026-07-20).*

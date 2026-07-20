@@ -60,6 +60,10 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 | **"Reuse the session, don't dual-connect"** | `connect()` to an address that already has a session must reuse it — bidirectional mesh warm otherwise wipes authenticated `remotePub` |
 | **"No unauthenticated wire type"** | If a packet type can inject into the app queue, it needs a session (or equivalent auth). Fire-and-forget "bootstrap" paths become amp vectors |
 | **"Green tests before every push"** | When the user requires tests-to-commit: run the affected suite, then one logical commit, then push — never push red |
+| **"Boundary values are the contract"** | Clamps, decrements, TTLs, page sizes — a shared helper must reproduce the OLD behavior at ttl=1/0/MAX, not just the common case. `remaining==0` after decrement was a valid forward, and an early-return killed it (2026-07) |
+| **"Change the constant, audit the assertions"** | Public constant or user-visible label changed → grep every test asserting the old value/label BEFORE push (`MAX_FORWARD_TARGETS` 3→30, `"Local"`→`"Local (test)"` both broke CI) |
+| **"Suite width matches change width"** | Narrow changes get narrow suites; `common/` constants or shared helpers get the FULL module suite. The ttl-clamp regression passed the relay package suite and failed CI deterministically elsewhere |
+| **"Same seed, same network"** | Comparative benchmarks/simulations: common random numbers for every candidate, or the ranking is seed luck. Rare-hit swung ±30pp across seeds on identical configs (2026-07) |
 
 ---
 
@@ -263,6 +267,14 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 - EditTextPreference ALWAYS reads/writes its value as `String` via `SharedPreferences.putString()`/`getString()`. If a corresponding key is stored as `Integer` anywhere (`ConfigurationDefaults`, etc.), the preference will crash with `ClassCastException` at inflation time.
 - **Rule**: numeric defaults for EditTextPreference keys are stored as `String` (e.g. `"7656"` not `7656`). Read with `Integer.parseInt(cm.getString(key))` + safe fallback.
 
+### View Tags
+
+- `View.setTag(int, Object)` keys must be application resource ids — a key from `View.generateViewId()` throws `IllegalArgumentException("The key must be an application-specific resource id")` (generated ids have top package byte 0x00). For idempotence/installed markers use a named wrapper class + `instanceof` on the owner field, never a generated-id tag key (NavigationViewSafety, 2026-07).
+
+### String Resources
+
+- New base `res/values/strings.xml` keys must be copied to **all** `values-*/strings.xml` in the same commit (English base text is the project placeholder practice; translators replace later). `AndroidStringResourceParityTest` enforces key parity across 36+ locales — 56 unpropagated IceBridge keys broke CI (2026-07).
+
 ### Native Init
 
 - Wrap `try/catch` around native initialization (Python, ffmpeg, custom `.so`) because corrupted native binaries on user devices are a real-world occurrence. Catch, log, fall back — never crash on every startup.
@@ -382,6 +394,17 @@ When the user (or task) requires "tests must pass to commit and push":
 
 Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_RESUME_SESSION` or other agent scratch files.
 
+### Test Isolation & Test-Code Quality
+
+- **Process-wide singletons** (`IceBridgeTopology`, settings factories) must be reset in `@BeforeEach`/`@AfterEach` (`resetToDefaults()`). JVM forks run many test classes; leaked singleton state = order-dependent failures that only appear on CI.
+- **A test's extractor is code too** — a greedy regex `[^>]*` swallows the `/` of self-closing XML tags and hides every following key from parity checks (AndroidStringResourceParityTest blind spot, 2026-07). Use `[^>]*?` and test the extractor itself.
+- **Spotless ratchet expectation** — `spotlessCheck` only gates files changed since `origin/master`, but touching a legacy file formats the WHOLE file. Expect large diffs; keep the reformat inside test/docs commits, never mixed into product logic.
+
+### Benchmarks & Simulations
+
+- **Common random numbers** — every candidate in a comparative run gets the SAME seed(s) so the parameter is the only variable. Per-candidate seeds put each candidate on a different random network and the winner becomes seed luck (TopologyAutoResearch, 2026-07).
+- **Check saturation before trusting rankings** — if every candidate visits the whole network, the parameter only discriminates cost, not coverage; draw recall conclusions only from networks big enough for the parameter to gate coverage.
+
 ---
 
 ## 9. Git & Commit Hygiene
@@ -416,6 +439,10 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
   git checkout my-branch
   git rebase origin/master
   ```
+
+### Build Artifacts Lie by Omission
+
+- `./gradlew` "up-to-date" means the artifact matches THAT checkout's sources — not that the checkout is current, and not that a rebuild happened. When verifying a deploy, the artifact's own version banner/output is the witness: a stale EC2 icebridge.jar was caught by its missing software-version banner block despite "BUILD SUCCESSFUL, 3 up-to-date" (2026-07). Pull, rebuild, and re-check the banner.
 
 ### Feature Branches
 
@@ -530,4 +557,4 @@ A reviewer is encouraged to push back on **complexity**, not just correctness. "
 
 ---
 
-*Maintained by `gubatron` on the FrostWire mentisdb chain. Replaces the legacy `AGENTS.md` at the repo root. Update this file in a `[all]` commit; reference it from any new `DESIGN_*.md` so contributors find it. Last expansion: rUDP session / multi-hop RELAY rules + tests-before-push (MentisDB #875–#877, 2026-07).*
+*Maintained by `gubatron` on the FrostWire mentisdb chain. Replaces the legacy `AGENTS.md` at the repo root. Update this file in a `[all]` commit; reference it from any new `DESIGN_*.md` so contributors find it. Last expansion: boundary-value contracts, constant-change audit, suite-width rule, CRN benchmarks, Android setTag/strings rules, test isolation, artifact-banner verification (MentisDB #899–#903, 2026-07).*
