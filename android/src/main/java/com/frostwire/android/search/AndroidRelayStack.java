@@ -260,6 +260,8 @@ public final class AndroidRelayStack implements AutoCloseable {
                     int relayPort = readConfiguredRelayPort();
                     String roleLabel = role.name();
                     RelaySearchService relayService = new RelaySearchService(li, ident);
+                    relayService.setSeederEndpointProvider(
+                            new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
                     RelayRole relayRole = new RelayRole(relayService, pd, ident);
                     IdentityRecord identityRecord = IdentityRecord.createSigned(
                             ident.nodeId(), ident.ed25519(),
@@ -279,6 +281,8 @@ public final class AndroidRelayStack implements AutoCloseable {
             tr.start();
 
             RelaySearchService ss = new RelaySearchService(li, ident);
+            ss.setSeederEndpointProvider(
+                    new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
 
             ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
             ih.start();

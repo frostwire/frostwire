@@ -54,6 +54,7 @@ public final class RelaySearchService {
     private final IdentityKeys identity;
     private final RateLimiter rateLimiter;
     private final ShareVisibilityPolicy visibility;
+    private volatile SeederEndpointProvider seederEndpointProvider = SeederEndpointProvider.NONE;
 
     public RelaySearchService(LocalIndex index, IdentityKeys identity) {
         this(index, identity, new RateLimiter(
@@ -89,6 +90,15 @@ public final class RelaySearchService {
         this.identity = identity;
         this.rateLimiter = rateLimiter;
         this.visibility = visibility;
+    }
+
+    /**
+     * Advertise this node's BT listen endpoints inside signed response rows
+     * (v3 {@code bt} field) so requesters can fetch the torrent directly.
+     * Default {@link SeederEndpointProvider#NONE} advertises nothing.
+     */
+    public void setSeederEndpointProvider(SeederEndpointProvider provider) {
+        this.seederEndpointProvider = provider != null ? provider : SeederEndpointProvider.NONE;
     }
 
     /**
@@ -144,10 +154,11 @@ public final class RelaySearchService {
         RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
                 .nonce(request.nonce())
                 .timestamp(System.currentTimeMillis() / 1000L);
+        List<String> endpoints = seederEndpointProvider.seederEndpoints();
         for (LocalSharedTorrent t : rows) {
             byte[] nodeId = t.publisherNodeId();
             b.addRow(t.infoHash(), t.name(), t.sizeBytes(), t.fileCount(),
-                    t.publisherEd25519Pub(), nodeId, t.matchedFile());
+                    t.publisherEd25519Pub(), nodeId, t.matchedFile(), endpoints);
         }
         RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
         byte[] sig = sign(unsigned.canonicalBytes());

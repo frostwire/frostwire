@@ -688,6 +688,8 @@ final class Initializer {
               localIndex,
               identity,
               com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
+      searchService.setSeederEndpointProvider(
+          new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
       IncomingSearchRequestHandler incomingHandler =
           new IncomingSearchRequestHandler(
               transport, searchService, directory, identity, localIndex);
@@ -849,6 +851,8 @@ final class Initializer {
               localIndex,
               identity,
               com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
+      service.setSeederEndpointProvider(
+          new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
       RelayRole role = new RelayRole(service, directory, identity);
       IdentityRecord identityRecord =
           IdentityRecord.createSigned(
