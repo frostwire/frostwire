@@ -25,10 +25,12 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BTEngineListenerChain;
+import com.frostwire.search.relay.CompositePeerDiscoverySource;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
 import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
+import com.frostwire.search.relay.HostCachePeerDiscoverySource;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.IdentityRecordPublisher;
@@ -42,6 +44,7 @@ import com.frostwire.search.relay.KarmaEndorsementTrigger;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
+import com.frostwire.search.relay.PeerDiscoverySource;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayConstants;
 import com.frostwire.search.relay.RelayRole;
@@ -305,8 +308,11 @@ public final class AndroidRelayStack implements AutoCloseable {
                     + " remote=" + useRemote
                     + " role=" + syncRole);
 
-            DhtPeerDiscoverySource discoverySource = new DhtPeerDiscoverySource(btEngine);
+            DhtPeerDiscoverySource dhtDiscoverySource = new DhtPeerDiscoverySource(btEngine);
             byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
+            PeerDiscoverySource discoverySource =
+                    new CompositePeerDiscoverySource(
+                            new HostCachePeerDiscoverySource(), dhtDiscoverySource);
             PeerDiscovery discovery = new PeerDiscovery(discoverySource, pd,
                     new DirectTcpPeerAuthenticator(), ownPub);
             pds = new PeerDiscoveryScheduler(discovery, PEER_DISCOVERY_INTERVAL_SEC);

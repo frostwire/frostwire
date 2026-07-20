@@ -44,6 +44,7 @@ import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
+import com.frostwire.search.relay.PeerDiscoverySource;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
@@ -604,8 +605,7 @@ final class Initializer {
               com.frostwire.search.relay.RelayConstants.identityFile(
                   CommonUtils.getUserSettingsDir());
           if (idFile != null && idFile.isFile()) {
-            client.setOwnPub(
-                com.frostwire.search.relay.IdentityKeys.load(idFile).ed25519PubRaw());
+            client.setOwnPub(com.frostwire.search.relay.IdentityKeys.load(idFile).ed25519PubRaw());
           }
         } catch (Throwable t) {
           relayLog.debug("Could not preload identity for IceBridge poll demux: " + t);
@@ -810,16 +810,17 @@ final class Initializer {
   private void startPeerDiscovery(
       PeerDirectory directory, BTEngine btEngine, IdentityKeys ownIdentity) {
     try {
-      DhtPeerDiscoverySource source = new DhtPeerDiscoverySource(btEngine);
+      DhtPeerDiscoverySource dhtSource = new DhtPeerDiscoverySource(btEngine);
       PeerAuthenticator authenticator = new DirectTcpPeerAuthenticator();
       byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
+      // Previously verified servers from the host cache get a fast re-join
+      // path through the SAME identity authenticator as DHT endpoints — no
+      // unverified placeholder upserts (those would drive failed TCP auth
+      // spam). DHT remains the discovery workhorse for new peers.
+      PeerDiscoverySource source =
+          new com.frostwire.search.relay.CompositePeerDiscoverySource(
+              new com.frostwire.search.relay.HostCachePeerDiscoverySource(), dhtSource);
       PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
-
-      // Host cache is UI/bootstrap history only. Do NOT upsert unverified
-      // placeholders into PeerDirectory (would drive failed TCP auth spam).
-      // Discovery still uses DHT + authenticators; successful relays re-enter
-      // the host cache via PeerDiscovery.markSuccess.
-
       // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
       // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
       new PeerDiscoveryScheduler(discovery, 30).start();
