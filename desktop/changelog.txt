@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:Distributed search answers advertise seeder BT endpoints (RemoteSearchResponse v3 bt) and result magnets carry x.pe — mesh-found trackerless content (auto-seeded finished downloads) downloads straight from the seeder; auto-created torrents now include the default tracker list
   - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=30; LimeWire ultrapeer baseline retained
   - new:IceBridge topology limits — IceBridgeTopology + env ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready)
   - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
