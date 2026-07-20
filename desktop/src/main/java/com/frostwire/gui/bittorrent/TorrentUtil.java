@@ -165,18 +165,19 @@ public final class TorrentUtil {
     }
 
     /**
-     * Creates a DHT based torrent (no trackers set) and optionally shows the share dialog.
+     * Creates a torrent with the default tracker list (plus DHT) and optionally shows the share dialog.
+     * Trackers help the public swarm bootstrap content the mesh advertises via x.pe endpoints.
      *
      * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
      * @param showShareTorrentDialog - show the share dialog when done
      */
     public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog) {
-        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true);
+        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, false);
     }
 
     /**
-     * Creates a DHT based torrent with specified type and optionally shows the share dialog.
+     * Creates a torrent with the default tracker list (plus DHT), with specified type, and optionally shows the share dialog.
      *
      * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
@@ -184,7 +185,7 @@ public final class TorrentUtil {
      * @param torrentType           - the type of torrent to create (v1, v2, or hybrid)
      */
     public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, TorrentType torrentType) {
-        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true, torrentType);
+        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, false, torrentType);
     }
 
     public static info_hash_t infoHashTFromTorrentInfo(TorrentInfo ti) {
