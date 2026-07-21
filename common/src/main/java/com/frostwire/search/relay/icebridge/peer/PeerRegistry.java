@@ -93,6 +93,26 @@ public final class PeerRegistry {
     }
 
     /**
+     * Learn a peer endpoint observed on the wire (authenticated inbound
+     * HELLO). Observed proof of life at this endpoint wins over stale
+     * registrations (e.g. a client that moved from USE_REMOTE 127.0.0.1
+     * demux to in-process rUDP). Peers known only from observation are
+     * recorded as CLIENT: deliverable, but never used as mesh forwarders.
+     */
+    public void learnObservedEndpoint(byte[] pub, String host, int rudpPort) {
+        if (pub == null || pub.length != 32 || host == null || host.isBlank()
+                || rudpPort <= 0 || rudpPort > 65535) {
+            return;
+        }
+        String key = Hex.encode(pub);
+        byPubHex.compute(key, (k, existing) -> existing != null
+                ? new PeerRecord(existing.ed25519Pub(), host, rudpPort,
+                        existing.role(), System.currentTimeMillis(), existing.icebridgeVersion())
+                : new PeerRecord(pub, host, rudpPort, IceBridgeConfig.Role.CLIENT,
+                        System.currentTimeMillis(), null));
+    }
+
+    /**
      * Look up recent peers that advertise relay/forward capability.
      *
      * @param maxResults maximum number of records to return

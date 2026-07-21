@@ -440,6 +440,12 @@ public final class RudpSessionManager {
             sessionsByAddress.put(sender, session);
         }
         session.markActivity();
+        if (sender.getAddress() != null
+                && !sender.getAddress().isAnyLocalAddress()
+                && !sender.getAddress().isLoopbackAddress()) {
+            registry.learnObservedEndpoint(remotePub,
+                    sender.getAddress().getHostAddress(), sender.getPort());
+        }
         LOG.info("IceBridge mesh: HELLO ok from=" + sender
                 + " pub=" + Hex.encode(remotePub).substring(0, 12) + "…");
         // HELLO_ACK must use the peer's HELLO connectionId (not necessarily

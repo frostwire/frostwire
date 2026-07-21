@@ -84,6 +84,8 @@ final class RudpPacketCodec extends MessageToMessageCodec<DatagramPacket, RudpPa
             buf.readBytes(payload);
         }
         RudpPacket packet = new RudpPacket(type, connectionId, sequence, ackThrough, payload);
-        out.add(new RudpPacketEnvelope(packet, datagram.recipient(), datagram.sender()));
+        // (packet, sender, recipient) — the sender is who we reply to; getting
+        // this backwards addressed every inbound-learned session to ourselves.
+        out.add(new RudpPacketEnvelope(packet, datagram.sender(), datagram.recipient()));
     }
 }
