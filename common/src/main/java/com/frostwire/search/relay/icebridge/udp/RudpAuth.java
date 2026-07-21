@@ -67,7 +67,7 @@ final class RudpAuth {
             return false;
         }
         try {
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = com.frostwire.search.relay.IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(key);
             verifier.update(message);
             return verifier.verify(sig);
@@ -79,7 +79,7 @@ final class RudpAuth {
     static byte[] createHelloPayload(com.frostwire.search.relay.IdentityKeys identity, long connectionId)
             throws Exception {
         long timestamp = System.currentTimeMillis() / 1000L;
-        Signature signer = Signature.getInstance("Ed25519");
+        Signature signer = com.frostwire.search.relay.IdentityKeys.softwareSignature("Ed25519");
         signer.initSign(identity.ed25519().getPrivate());
         byte[] message = new byte[16];
         writeLongBE(message, 0, connectionId);
