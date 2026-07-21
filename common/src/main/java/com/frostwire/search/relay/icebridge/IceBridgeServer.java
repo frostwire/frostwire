@@ -138,15 +138,27 @@ public final class IceBridgeServer implements AutoCloseable {
 
         try (IceBridgeServer server = new IceBridgeServer(config, authTokens)) {
             server.start();
-            System.out.println();
-            System.out.println("IceBridge is running. Press Ctrl-C to stop.");
-            System.out.println("  Health:  curl -sS http://127.0.0.1:" + config.controlHttpPort() + "/health");
-            System.out.println("  Metrics: curl -sS -H \"X-IceBridge-Token: <token>\" http://127.0.0.1:"
-                    + config.controlHttpPort() + "/metrics");
-            System.out.println("  (TCP " + config.relayPort()
-                    + " probes that are not FrostWire protocol are ignored at DEBUG — scanners/BT clients are normal.)");
-            System.out.flush();
-            Thread.sleep(Long.MAX_VALUE);
+            com.frostwire.search.relay.SearchRelayApp searchApp = null;
+            try {
+                if (config.role() != IceBridgeConfig.Role.CLIENT && searchAppEnabled()) {
+                    searchApp = com.frostwire.search.relay.SearchRelayApp.start(server);
+                    System.out.println("Search relay app started (Protocol #1 dual-envelope forward, empty index)");
+                    System.out.flush();
+                }
+                System.out.println();
+                System.out.println("IceBridge is running. Press Ctrl-C to stop.");
+                System.out.println("  Health:  curl -sS http://127.0.0.1:" + config.controlHttpPort() + "/health");
+                System.out.println("  Metrics: curl -sS -H \"X-IceBridge-Token: <token>\" http://127.0.0.1:"
+                        + config.controlHttpPort() + "/metrics");
+                System.out.println("  (TCP " + config.relayPort()
+                        + " probes that are not FrostWire protocol are ignored at DEBUG — scanners/BT clients are normal.)");
+                System.out.flush();
+                Thread.sleep(Long.MAX_VALUE);
+            } finally {
+                if (searchApp != null) {
+                    searchApp.close();
+                }
+            }
         } catch (Throwable t) {
             System.err.println();
             System.err.println("FATAL: IceBridge failed to start: " + t.getMessage());
@@ -154,6 +166,16 @@ public final class IceBridgeServer implements AutoCloseable {
             t.printStackTrace(System.err);
             System.exit(1);
         }
+    }
+
+    /** Search app layer (dual-envelope forward) is on unless ICEBRIDGE_SEARCH_APP=false. */
+    private static boolean searchAppEnabled() {
+        String v = System.getenv("ICEBRIDGE_SEARCH_APP");
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty("ICEBRIDGE_SEARCH_APP");
+        }
+        return v == null || v.isEmpty()
+                || !(v.equalsIgnoreCase("false") || v.equals("0") || v.equalsIgnoreCase("no"));
     }
 
     private static boolean checkPortAvailable(String host, int port, boolean udp) {
