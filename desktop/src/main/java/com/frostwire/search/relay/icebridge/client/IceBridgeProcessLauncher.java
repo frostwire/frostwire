@@ -78,7 +78,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     this.identityFile = identityFile;
     this.controlHttpPort = controlHttpPort <= 0 ? freePort() : controlHttpPort;
     this.rudpPort = rudpPort <= 0 ? freePort() : rudpPort;
-    this.relayPort = relayPort <= 0 ? 6888 : relayPort;
+    // relayPort=0 disables the child's identity TCP listener (embedder owns it).
+    this.relayPort = relayPort;
     this.role = role == null || role.isEmpty() ? "BOTH" : role;
     this.host = host == null || host.isEmpty() ? "127.0.0.1" : host;
     // Generate a random auth token for the control API.

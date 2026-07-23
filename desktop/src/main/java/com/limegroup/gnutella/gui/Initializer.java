@@ -641,7 +641,9 @@ final class Initializer {
         int relayListenPort = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
         IceBridgeProcessLauncher launcher =
             new IceBridgeProcessLauncher(
-                jarPath, identityFile, 0, effectiveRudpPort, relayListenPort, role, bindHost);
+                // relayPort=0: the app's own IncomingRelayServer already owns
+                // the identity TCP port (dual-bind causes EADDRINUSE).
+                jarPath, identityFile, 0, effectiveRudpPort, 0, role, bindHost);
         launcher.start();
         relayLog.info("IceBridge daemon (local child) started:");
         relayLog.info("  controlPort=" + launcher.controlPort() + " (auto-assigned)");
@@ -674,7 +676,7 @@ final class Initializer {
 
         // Now that the child is healthy, add our IceBridge relay endpoint (the one others will
         // connect to for identity) to the host cache so it appears in the UI table.
-        addSelfToIceBridgeHostCache("127.0.0.1", launcher.relayPort(), role);
+        addSelfToIceBridgeHostCache("127.0.0.1", relayListenPort, role);
       }
 
       // Create the transport and start the background poller.
