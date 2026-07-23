@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -43,6 +44,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private static final long SYNC_INTERVAL_SEC = 30;
     private static final long INITIAL_DELAY_SEC = 3;
     private static final int LOOKUP_COUNT = 50;
+    private static final byte[] WARM_PING = {0x01};
 
     private final IceBridgeClient client;
     private final PeerDirectory directory;
@@ -144,11 +146,25 @@ public final class PeerRegistrySync implements AutoCloseable {
             if (client.route(peer.peerPub(), peer.hostname(),
                     peerRudpPort, IceBridgeConfig.Role.BOTH)) {
                 registered++;
+                warmMeshPeer(peer.peerPub());
             }
         }
         if (registered > 0 || !peers.isEmpty()) {
             LOG.info("PeerRegistrySync: routed " + registered
                     + "/" + peers.size() + " directory peers to IceBridge");
+        }
+    }
+
+    /**
+     * One-byte TELEMETRY ping to a routed peer. Forces the rUDP session
+     * (HELLO/HELLO_ACK) so the far side learns our observed endpoint, and
+     * doubles as a NAT-mapping keepalive for inbound responses.
+     */
+    private void warmMeshPeer(byte[] peerPub) {
+        try {
+            client.send(peerPub, MeshProtocolId.TELEMETRY, WARM_PING);
+        } catch (Throwable t) {
+            LOG.debug("PeerRegistrySync: mesh warm failed", t);
         }
     }
 
@@ -197,6 +213,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort,
                     caps, info.icebridgeVersion);
             client.route(pub, info.host, info.rudpPort, role);
+            warmMeshPeer(pub);
             // Seed host cache for Settings → Refresh/Ping (TCP identity on 6888).
             // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.
             if (!isLoopbackHost(info.host)

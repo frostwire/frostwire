@@ -34,6 +34,8 @@ class PeerRegistrySyncTest {
   private ControlServer server;
   private IceBridgeClient client;
   private PeerRegistrySync sync;
+  private String authToken;
+  private IceBridgeMetrics metrics;
 
   @BeforeEach
   void setUp() throws Exception {
@@ -48,12 +50,12 @@ class PeerRegistrySyncTest {
             .maxQpsPerKey(100.0)
             .build();
     registry = new PeerRegistry(config);
-    IceBridgeMetrics metrics = new IceBridgeMetrics();
+    metrics = new IceBridgeMetrics();
     InboundMessageQueue queue = new InboundMessageQueue();
     RudpSessionManager rudp = new RudpSessionManager(identity, registry, metrics, queue);
     byte[] tokenBytes = new byte[32];
     new java.security.SecureRandom().nextBytes(tokenBytes);
-    String authToken = com.frostwire.util.Hex.encode(tokenBytes);
+    authToken = com.frostwire.util.Hex.encode(tokenBytes);
     java.io.File tmpTokens = java.io.File.createTempFile("peer-registry-sync-tokens-", ".txt");
     tmpTokens.deleteOnExit();
     IceBridgeTokens tokens = new IceBridgeTokens(tmpTokens);
@@ -120,6 +122,19 @@ class PeerRegistrySyncTest {
         directory.get(peer.ed25519PubRaw()).isPresent(),
         "mesh lookup peer must be imported as verified");
     assertTrue(directory.topByTrustVerified(10).size() >= 1);
+  }
+
+  @Test
+  void syncWarmsRoutedPeersWithTelemetryPing() throws Exception {
+    IdentityKeys other = IdentityKeys.generate(0);
+    directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 6889);
+    sync = new PeerRegistrySync(client, directory, "127.0.0.1");
+    sync.sync();
+    // push: /route + warm /send; pull: /lookup; import of that same peer: /route + warm /send.
+    assertEquals(
+        5,
+        metrics.controlRequests(),
+        "routing a verified peer must warm its rUDP session with a TELEMETRY ping");
   }
 
   private static int freePort() throws IOException {
