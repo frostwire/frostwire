@@ -140,9 +140,21 @@ public final class IceBridgeServer implements AutoCloseable {
             server.start();
             com.frostwire.search.relay.SearchRelayApp searchApp = null;
             try {
-                if (config.role() != IceBridgeConfig.Role.CLIENT && searchAppEnabled()) {
+                // Embedder mode (relayPort=0): the parent FrostWire process owns Protocol #1
+                // (IncomingSearchRequestHandler + real LocalIndex). SearchRelayApp uses an
+                // EmptyLocalIndex and its own /poll consumer — if started here it races the
+                // parent and answers every mesh search with rows=0.
+                // Standalone forwarders (EC2, relayPort>0) still need SearchRelayApp for
+                // dual-envelope forward.
+                if (config.role() != IceBridgeConfig.Role.CLIENT
+                        && config.relayPort() > 0
+                        && searchAppEnabled()) {
                     searchApp = com.frostwire.search.relay.SearchRelayApp.start(server);
                     System.out.println("Search relay app started (Protocol #1 dual-envelope forward, empty index)");
+                    System.out.flush();
+                } else if (config.relayPort() <= 0) {
+                    System.out.println(
+                            "Search relay app skipped (relayPort=0 embedder mode; parent owns Protocol #1)");
                     System.out.flush();
                 }
                 System.out.println();
