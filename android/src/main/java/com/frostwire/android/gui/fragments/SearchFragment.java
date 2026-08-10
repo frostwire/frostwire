@@ -215,6 +215,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true, fileTypeCounter.fsr);
             searchInput.selectTabByMediaType((byte) CM.getLastMediaTypeFilter());
+            // Resume with results: never leave the query box stuck GONE after a prior
+            // distraction-free scroll hide (clear / re-search would be unreachable).
+            showSearchBox();
         } else {
             setupPromoSlides();
         }
@@ -360,6 +363,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
      */
     private void prepareUIForSearch(int fileType) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::prepareForSearch");
+        // Ensure the box is visible for clear / edit after a prior distraction-free hide.
+        showSearchBox();
         currentQuery = searchInput.getText();
         if (adapter != null) {
             adapter.clear();
@@ -448,6 +453,21 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void onSearchScrollDown() {
+        // Never hide when the list does not scroll — the user cannot scroll up
+        // to recover the search box / clear control (stuck after IA or short result sets).
+        if (list != null) {
+            int first = list.getFirstVisiblePosition();
+            int last = list.getLastVisiblePosition();
+            int total = list.getCount();
+            if (total > 0 && first == 0 && last >= total - 1) {
+                return;
+            }
+            // Already at top: keep the search box visible so clear / new search work.
+            if (first == 0) {
+                showSearchBox();
+                return;
+            }
+        }
         hideSearchBox();
     }
 
@@ -456,11 +476,15 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void showSearchBox() {
-        searchInput.showTextInput();
+        if (searchInput != null) {
+            searchInput.showTextInput();
+        }
     }
 
     private void hideSearchBox() {
-        searchInput.hideTextInput();
+        if (searchInput != null) {
+            searchInput.hideTextInput();
+        }
     }
 
     public void refreshFileTypeCounters(boolean fileTypeCountersVisible, FilteredSearchResults fsr) {
@@ -490,6 +514,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         searchProgress.setProgressEnabled(false);
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
+        showSearchBox();
         showSearchView(getView());
         UIUtils.forceShowKeyboard(getContext());
         cancelling.set(false);
@@ -853,6 +878,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 return;
             }
             SearchFragment fragment = fragmentRef.get();
+            // File-type tabs remain visible after distraction-free hide of the text
+            // field — tapping a tab should restore the query box for clear / re-search.
+            fragment.showSearchBox();
             if (fragment.adapter.getFileType() != mediaTypeId) {
                 postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
                 fragment.adapter.setFileType(mediaTypeId, false, () -> fragment.showSearchView(rootViewRef.get()));

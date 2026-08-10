@@ -105,6 +105,19 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
         if (!enabled.get() || scrollDirectionListener == null) {
             return;
         }
+        // Returning to the top must always re-show chrome (e.g. search box). Do not
+        // require vote thresholds — otherwise a short list leaves the UI stuck after hide.
+        if (firstVisibleItem == 0 && lastFirstVisibleItem > 0) {
+            lastFirstVisibleItem = firstVisibleItem;
+            votes.reset();
+            scrollDirectionListener.onScrollUp();
+            return;
+        }
+        // Content fits on one screen: user cannot scroll back up to recover hidden chrome.
+        if (totalItemCount > 0 && visibleItemCount >= totalItemCount) {
+            lastFirstVisibleItem = firstVisibleItem;
+            return;
+        }
         boolean scrollingDown = firstVisibleItem > lastFirstVisibleItem;
         boolean scrollingUp = firstVisibleItem < lastFirstVisibleItem;
         lastFirstVisibleItem = firstVisibleItem;
