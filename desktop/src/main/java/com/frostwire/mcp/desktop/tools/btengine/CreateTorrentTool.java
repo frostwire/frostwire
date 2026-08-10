@@ -1,5 +1,6 @@
 package com.frostwire.mcp.desktop.tools.btengine;
 
+import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentBuilder;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -13,7 +14,6 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.List;
 
 public final class CreateTorrentTool implements MCPTool {
 
@@ -24,7 +24,8 @@ public final class CreateTorrentTool implements MCPTool {
 
     @Override
     public String description() {
-        return "Create a .torrent file from a local file or directory. Returns the torrent path, magnet URI, and info hash.";
+        return "Create a .torrent file from a local file or directory. Returns the torrent path, magnet URI, and info hash. "
+                + "When trackers are omitted, embeds FrostWire DefaultTrackers so peers can find the seeder without DHT.";
     }
 
     @Override
@@ -38,7 +39,8 @@ public final class CreateTorrentTool implements MCPTool {
         props.add("path", pathProp);
         JsonObject trackersProp = new JsonObject();
         trackersProp.addProperty("type", "array");
-        trackersProp.addProperty("description", "List of tracker URLs");
+        trackersProp.addProperty("description",
+                "Optional list of tracker URLs. If omitted or empty, DefaultTrackers.ANNOUNCE_URLS are used.");
         JsonObject trackerItems = new JsonObject();
         trackerItems.addProperty("type", "string");
         trackersProp.add("items", trackerItems);
@@ -100,13 +102,22 @@ public final class CreateTorrentTool implements MCPTool {
             if (flags != null) {
                 builder.flags(flags);
             }
+            // Match desktop/Android auto-seed: always embed trackers so mesh/search
+            // peers can reach the seeder without relying solely on DHT (often NAT'd).
+            boolean addedAnyTracker = false;
             if (arguments.has("trackers") && arguments.get("trackers").isJsonArray()) {
                 JsonArray trackers = arguments.getAsJsonArray("trackers");
                 for (int i = 0; i < trackers.size(); i++) {
                     String tracker = trackers.get(i).getAsString();
                     if (tracker != null && !tracker.isEmpty()) {
                         builder.addTracker(tracker);
+                        addedAnyTracker = true;
                     }
+                }
+            }
+            if (!addedAnyTracker) {
+                for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
+                    builder.addTracker(tracker);
                 }
             }
             if (arguments.has("webSeeds") && arguments.get("webSeeds").isJsonArray()) {
