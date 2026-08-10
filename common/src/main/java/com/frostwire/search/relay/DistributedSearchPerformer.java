@@ -273,17 +273,25 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     if (req == null) {
                         return; // not our response / already completed
                     }
-                    if (!SearchResponseVerifier.verify(response, req.request, req.peer.peerPub())) {
+                    // Prefer the hop we dialed; multi-hop answers are signed by the
+                    // index holder behind a forwarder (SearchRelayApp dual-envelope).
+                    boolean verified =
+                            SearchResponseVerifier.verify(
+                                    response, req.request, req.peer.peerPub());
+                    if (!verified) {
+                        byte[] holderPub = holderPubFromRows(response);
+                        verified =
+                                holderPub != null
+                                        && SearchResponseVerifier.verify(
+                                                response, req.request, holderPub);
+                    }
+                    if (!verified) {
                         LOG.warn("DistributedSearchPerformer: response verify failed from "
                                 + req.peer.hostname() + " rows=" + response.rows().size()
                                 + " final=" + response.isFinalChunk());
-                        // Bad frame: drop but keep waiting for a good final
-                        // or timeout unless this claimed to be final.
-                        if (response.isFinalChunk()) {
-                            if (pending.remove(nonceKey, req)) {
-                                latch.countDown();
-                            }
-                        }
+                        // Bad frame: drop but keep waiting — do NOT complete on a
+                        // failed final (poison empty finals were a separate bug on
+                        // pure forwarders; keep latch open for the real answer).
                         return;
                     }
                     try {
@@ -370,6 +378,28 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .timestamp(timestamp)
                 .signature(sig)
                 .build();
+    }
+
+    /**
+     * When a response is dual-envelope-forwarded, it is signed by the index
+     * holder (not the first hop we dialed). All rows share that holder's
+     * {@code publisherEd25519Pub}; use it as the verification key.
+     */
+    private static byte[] holderPubFromRows(RemoteSearchResponse response) {
+        if (response == null || response.rows().isEmpty()) {
+            return null;
+        }
+        byte[] pub = response.rows().get(0).publisherEd25519Pub;
+        if (pub == null || pub.length != 32) {
+            return null;
+        }
+        for (RemoteSearchResponse.Row row : response.rows()) {
+            if (row.publisherEd25519Pub == null
+                    || !java.util.Arrays.equals(pub, row.publisherEd25519Pub)) {
+                return null;
+            }
+        }
+        return pub;
     }
 
     private static List<FileSearchResult> toResults(RemoteSearchResponse response) {
