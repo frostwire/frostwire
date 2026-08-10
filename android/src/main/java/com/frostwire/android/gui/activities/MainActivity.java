@@ -530,7 +530,12 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     }
 
     private void onLastDialogButtonPositive() {
-        moveTaskToBack(true);
+        StrictMode.ThreadPolicy previousPolicy = StrictMode.allowThreadDiskWrites();
+        try {
+            moveTaskToBack(true);
+        } finally {
+            StrictMode.setThreadPolicy(previousPolicy);
+        }
     }
 
     private void onShutdownDialogButtonPositive() {

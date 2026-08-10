@@ -18,6 +18,7 @@ public class MainActivityShutdownStructureTest {
         String shutdownBlock = blockStartingAt(source, "public void shutdown()");
         String finishForShutdownBlock = blockStartingAt(source, "private void finishForShutdown()");
         String finishOverrideBlock = blockStartingAt(source, "public void finish()");
+        String onLastDialogButtonPositiveBlock = blockStartingAt(source, "private void onLastDialogButtonPositive()");
 
         assertTrue(shutdownBlock.contains("finishForShutdown();"));
         assertFalse(shutdownBlock.contains("finish();"));
@@ -27,6 +28,9 @@ public class MainActivityShutdownStructureTest {
         assertTrue(finishForShutdownBlock.contains("StrictMode.setThreadPolicy(previousPolicy);"));
         assertFalse(finishForShutdownBlock.contains("finishAndRemoveTask"));
         assertTrue(finishOverrideBlock.contains("super.finishAndRemoveTask();"));
+        assertTrue(onLastDialogButtonPositiveBlock.contains("StrictMode.ThreadPolicy previousPolicy = StrictMode.allowThreadDiskWrites();"));
+        assertTrue(onLastDialogButtonPositiveBlock.contains("moveTaskToBack(true);"));
+        assertTrue(onLastDialogButtonPositiveBlock.contains("StrictMode.setThreadPolicy(previousPolicy);"));
     }
 
     private static String blockStartingAt(String source, String marker) {
