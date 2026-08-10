@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@code "tr=<url>&"} projection of the underlying list — so a
  * caller can rely on the two constants being consistent.
  *
- * <p>Each entry was probed with a BEP 15 connect_request on 2026-06-08
- * and responded within 3s. When a tracker goes dead, add it to
- * {@link #DEAD_TRACKERS} (so future regressions are caught) and remove
+ * <p>Each entry was probed with a BEP 15 connect_request on 2026-08-10
+ * and responded within 4s (double-probe). When a tracker goes dead, add it
+ * to {@link #DEAD_TRACKERS} (so future regressions are caught) and remove
  * it from {@link DefaultTrackers#ANNOUNCE_URLS}.
  */
 public class DefaultTrackerListTest {
@@ -43,15 +43,20 @@ public class DefaultTrackerListTest {
             "udp://[A-Za-z0-9.\\-]+(?::\\d{1,5})?/announce");
 
     private static final List<String> DEAD_TRACKERS = List.of(
-            "udp://tracker.opentrackr.org:1337/announce",
+            // Long-dead classics
             "udp://tracker.openbittorrent.com:6969/announce",
-            "udp://exodus.desync.com:6969/announce",
             "udp://tracker.moeking.me:6969/announce",
-            "udp://explodie.org:6969/announce",
             "udp://tracker.coppersurfer.tk:6969/announce",
             "udp://zer0day.ch:1337/announce",
             "udp://tracker.flatuslifir.is:6969/announce",
-            "udp://tracker.bluefrog.pw:2710/announce"
+            "udp://tracker.bluefrog.pw:2710/announce",
+            // Removed from DefaultTrackers after 2026-08-10 BEP-15 probe
+            "udp://wepzone.net:6969/announce",
+            "udp://uabits.today:6990/announce",
+            "udp://tracker.t-1.org:6969/announce",
+            "udp://tracker.opentorrent.top:6969/announce",
+            "udp://tracker.publictracker.xyz:6969/announce",
+            "udp://tracker.tryhackx.org:6969/announce"
     );
 
     @Test
