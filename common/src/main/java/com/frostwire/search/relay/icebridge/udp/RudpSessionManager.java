@@ -666,6 +666,11 @@ public final class RudpSessionManager {
             LOG.info("IceBridge mesh: RELAY delivered to self from="
                     + Hex.encode(frame.sourcePub()).substring(0, 12) + "…"
                     + " bytes=" + appPayload.length);
+            // Dual-deliver: shared queue (poll without pub) AND demux by own
+            // identity (poll?pub= after IceBridgeClient.register sets ownPub).
+            // Desktop parent local-mode registerSelf() enables ownPub; without
+            // demux, SEARCH sat forever in the shared queue while the parent
+            // only drained the empty demux queue → empty Android results.
             notifyListener(frame.sourcePub(), appPayload);
             return;
         }
@@ -813,11 +818,28 @@ public final class RudpSessionManager {
     }
 
     private void notifyListener(byte[] sourcePub, byte[] payload) {
+        byte[] src = sourcePub == null ? new byte[0] : sourcePub;
+        // 1) Shared queue — consumers that poll without ?pub= (SearchRelayApp
+        //    on pure FORWARDER, legacy clients).
         if (messageListener != null) {
             try {
-                messageListener.onMessage(sourcePub == null ? new byte[0] : sourcePub, payload);
+                messageListener.onMessage(src, payload);
             } catch (Throwable t) {
                 LOG.warn("RudpSessionManager: message listener failed", t);
+            }
+        }
+        // 2) Per-identity demux — IceBridgeClient.register() sets ownPub and
+        //    subsequent /poll?pub= only reads this queue. Local-mode desktop
+        //    and Android parents call registerSelf then poll with ownPub; they
+        //    would never see shared-queue SEARCH without this mirror.
+        if (identity != null
+                && messageListener
+                        instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
+            try {
+                ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
+                        .offerForTarget(identity.ed25519PubRaw(), src, payload);
+            } catch (Throwable t) {
+                LOG.warn("RudpSessionManager: own-pub demux delivery failed", t);
             }
         }
     }
