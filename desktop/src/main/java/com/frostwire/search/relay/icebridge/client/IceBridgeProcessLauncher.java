@@ -152,6 +152,9 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     File stdout = new File(logDir, "stdout.log");
     File stderr = new File(logDir, "stderr.log");
     ProcessBuilder pb = new ProcessBuilder(command);
+    // Embedder: parent FrostWire owns Protocol #1 + LocalIndex. Child must not start
+    // SearchRelayApp (empty index + competing /poll) — see IceBridgeServer.main.
+    pb.environment().put("ICEBRIDGE_SEARCH_APP", "false");
     pb.redirectOutput(stdout);
     pb.redirectError(stderr);
     LOG.info("Starting IceBridge: " + String.join(" ", command));
