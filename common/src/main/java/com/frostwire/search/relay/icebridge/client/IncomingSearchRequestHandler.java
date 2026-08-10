@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge.client;
 
 import com.frostwire.search.relay.DistributedSearchTransport;
+import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
@@ -156,10 +157,22 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         // verify, keyed by requesterPub (not transport sourcePub).
         try {
             Optional<RemoteSearchResponse> response = searchService.handle(request);
-            if (response.isEmpty()) {
-                return;
+            if (response.isPresent()) {
+                RemoteSearchResponse r = response.get();
+                // Pure FORWARDER / EmptyLocalIndex: never send 0-row finals. An empty
+                // final from the hub completes DistributedSearchPerformer's latch for
+                // that peer and discards the later signed answer from index holders
+                // (3-node topology: Android → EC2 → desktop). Still forward below.
+                boolean pureForwarder = localIndex instanceof EmptyLocalIndex;
+                if (!pureForwarder || !r.rows().isEmpty()) {
+                    sendSearchResponse(request.requesterPub(), r);
+                } else {
+                    LOG.debug(
+                            "Suppressing empty search response from pure forwarder keywords=\""
+                                    + request.keywords()
+                                    + "\"");
+                }
             }
-            sendSearchResponse(request.requesterPub(), response.get());
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process request", t);
         }
