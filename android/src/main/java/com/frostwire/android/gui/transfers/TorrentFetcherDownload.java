@@ -22,7 +22,11 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.add_torrent_params;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
@@ -31,6 +35,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -252,7 +257,22 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return null;
     }
 
-    private void downloadTorrent(final byte[] data) {
+    private static List<TcpEndpoint> parsePeers(String magnet) {
+        if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
+            return Collections.emptyList();
+        }
+        error_code ec = new error_code();
+        add_torrent_params params = add_torrent_params.parse_magnet_uri(magnet, ec);
+        tcp_endpoint_vector v = params.get_peers();
+        int size = (int) v.size();
+        ArrayList<TcpEndpoint> l = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            l.add(new TcpEndpoint(v.get(i)));
+        }
+        return l;
+    }
+
+    private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
         try {
             TorrentInfo ti = TorrentInfo.bdecode(data);
             boolean[] selection = null;
@@ -260,7 +280,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                 selection = calculateSelection(ti, info.getRelativePath());
             }
 
-            BTEngine.getInstance().download(ti, null, selection, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
+            BTEngine.getInstance().download(ti, null, selection, peers, TransferManager.instance().isDeleteStartedTorrentEnabled());
         } catch (Throwable e) {
             LOG.error("Error downloading torrent", e);
         }
@@ -313,7 +333,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     }
 
                     try {
-                        downloadTorrent(data);
+                        // re-inject x.pe peers: fetchMagnet's temp torrent (which used them)
+                        // is removed right after metadata arrives; without them a fresh
+                        // trackerless mesh torrent has no way to reach its only seeder.
+                        downloadTorrent(data, parsePeers(uri));
                     } finally {
                         remove(false);
                     }
