@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Magnet/search-result downloads re-inject x.pe seeder endpoints into the actual transfer (metadata fetch used them, final add did not) — desktop-created trackerless mesh torrents no longer stall at 0% when the desktop is their only seeder
   - fix:MISC HTTP (promos, config, image cache) no longer hangs on stale OkHttp HTTP/2 connections — HTTP/1.1 for MISC + 5s HTTP/2 pings on shared clients
   - new:Distributed search results carry the seeder's signed BT endpoints (RemoteSearchResponse v3 bt) and magnets include x.pe — mesh-found torrents download directly from the seeder, fixing Android unable to download desktop-created/auto-seeded torrents; created torrents now include the default tracker list
   - new:IceBridge hybrid EC2 topology profile (N=16 M=30) + LimeWire ultrapeer baseline; env-tunable / auto-research ready
