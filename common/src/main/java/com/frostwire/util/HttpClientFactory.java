@@ -59,7 +59,7 @@ public class HttpClientFactory {
         }
         synchronized (okHTTPClientLock) {
             if (!fwOKHTTPClients.containsKey(context)) {
-                fwOKHTTPClients.put(context, new OkHttpClientWrapper(okHttpClientPools.get(context)));
+                fwOKHTTPClients.put(context, new OkHttpClientWrapper(okHttpClientPools.get(context), context == HttpContext.MISC));
             }
         }
         return fwOKHTTPClients.get(context);
