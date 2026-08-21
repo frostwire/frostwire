@@ -23,10 +23,12 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -137,7 +139,7 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
   private void load(final String url) {
     try {
       HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-      String jsonString = client.get(url);
+      String jsonString = fetchSlideshowJson(client, url);
       if (jsonString != null) {
         final SlideList slideList = JsonUtils.toObject(jsonString, SlideList.class);
         try {
@@ -145,7 +147,6 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
         } catch (Exception e) {
           LOG.info("Failed load of Slide Show:" + url, e);
           setup(fallbackSlides);
-          // nothing happens
         }
       } else {
         setup(fallbackSlides);
@@ -153,7 +154,16 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
     } catch (Exception e) {
       LOG.info("Failed load of Slide Show:" + url, e);
       setup(fallbackSlides);
-      // nothing happens
+    }
+  }
+
+  private String fetchSlideshowJson(HttpClient client, String url) throws IOException {
+    try {
+      return client.get(url);
+    } catch (IOException first) {
+      LOG.info("Retrying Slide Show after " + first.getClass().getSimpleName() + ": " + url);
+      OkHttpClientWrapper.CONNECTION_POOL.evictAll();
+      return client.get(url);
     }
   }
 
