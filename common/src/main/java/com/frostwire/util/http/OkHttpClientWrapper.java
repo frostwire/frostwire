@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -67,8 +68,16 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     private final OkHttpClient sharedClient;
 
     public OkHttpClientWrapper(final ThreadPool pool) {
+        this(pool, false);
+    }
+
+    public OkHttpClientWrapper(final ThreadPool pool, boolean http1Only) {
         this.pool = pool;
-        this.sharedClient = newOkHttpClient(pool).build();
+        OkHttpClient.Builder builder = newOkHttpClient(pool);
+        if (http1Only) {
+            builder.protocols(Collections.singletonList(Protocol.HTTP_1_1));
+        }
+        this.sharedClient = builder.build();
     }
 
     public static void cancelAllRequests() {
@@ -95,6 +104,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         searchClient.connectionPool(CONNECTION_POOL);
         searchClient.followRedirects(true);
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        searchClient.pingInterval(5, TimeUnit.SECONDS);
         searchClient = configNullSsl(searchClient);
         return searchClient;
     }
