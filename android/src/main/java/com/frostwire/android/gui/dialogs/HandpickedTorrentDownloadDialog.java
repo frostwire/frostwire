@@ -37,9 +37,7 @@ import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.swig.add_torrent_params;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
+import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -50,7 +48,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -369,7 +366,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                             HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
 
                             String magnet = dlg.getMagnetUri();
-                            List<TcpEndpoint> peers = parsePeers(magnet);
+                            List<TcpEndpoint> peers = LibTorrentMagnetDownloader.parsePeers(magnet);
                             TorrentInfo torrentInfo = dlg.getTorrentInfo();
                             BTEngine.getInstance().download(torrentInfo,
                                     null,
@@ -387,25 +384,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                     });
 
             TransferManager.instance().incrementStartedTransfers();
-        }
-
-        private static List<TcpEndpoint> parsePeers(String magnet) {
-            if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
-                return Collections.emptyList();
-            }
-
-            // TODO: replace this with the public API
-            error_code ec = new error_code();
-            add_torrent_params params = add_torrent_params.parse_magnet_uri(magnet, ec);
-            tcp_endpoint_vector v = params.get_peers();
-            int size = (int) v.size();
-            ArrayList<TcpEndpoint> l = new ArrayList<>();
-
-            for (int i = 0; i < size; i++) {
-                l.add(new TcpEndpoint(v.get(i)));
-            }
-
-            return l;
         }
     }
 
