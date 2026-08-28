@@ -435,6 +435,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     void updateUI(BTDownload dl) {
         displayName = dl.getDisplayName();
         size = calculateSize(dl);
+        updateCachedState();
         // Recalculate items only if they're already loaded (avoid forcing large list into memory)
         if (items != null) {
             items = calculateItems(dl);
