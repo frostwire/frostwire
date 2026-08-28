@@ -33,7 +33,7 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.transfers.ExistingDownload;
 import com.frostwire.android.gui.transfers.InvalidDownload;
 import com.frostwire.android.gui.transfers.InvalidTransfer;
-import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
+import com.frostwire.android.gui.transfers.TorrentFetcherListener;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
@@ -120,8 +120,13 @@ public class AsyncStartDownload {
             }
 
             if (isTorrent && torrentUrl != null) {
-                transfer = TransferManager.instance().downloadTorrent(torrentUrl,
-                        new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) ctx, false), sr.getDisplayName());
+                boolean directMeshMagnet = torrentUrl.startsWith("magnet:")
+                        && torrentUrl.contains("&x.pe=");
+                TorrentFetcherListener listener = directMeshMagnet
+                        ? null
+                        : new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) ctx, false);
+                transfer = TransferManager.instance().downloadTorrent(
+                        torrentUrl, listener, sr.getDisplayName());
             } else {
                 transfer = TransferManager.instance().download(sr);
                 if (!(transfer instanceof InvalidDownload)) {
