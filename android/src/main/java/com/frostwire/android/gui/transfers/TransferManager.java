@@ -400,7 +400,10 @@ public final class TransferManager {
     public boolean remove(Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
             synchronized (downloadsMapMonitor) {
-                bittorrentDownloadsMap.remove(((BittorrentDownload) transfer).getInfoHash());
+                String infoHash = ((BittorrentDownload) transfer).getInfoHash();
+                if (bittorrentDownloadsMap.get(infoHash) == transfer) {
+                    bittorrentDownloadsMap.remove(infoHash);
+                }
             }
             boolean removed;
             synchronized (downloadsListMonitor) {
