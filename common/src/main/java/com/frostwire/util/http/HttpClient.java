@@ -87,6 +87,8 @@ public interface HttpClient {
 
     void cancel();
 
+    void resetCancellation();
+
     boolean isCanceled();
 
     interface HttpClientListener {
@@ -134,8 +136,8 @@ public interface HttpClient {
 
     final class HttpRangeOutOfBoundsException extends HttpRangeException {
 
-        HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
-            super("HttpRange Out of Bounds error: start=" + rangeStart + " expected file size=" + expectedFileSize);
+        HttpRangeOutOfBoundsException(long rangeStart, long expectedRangeStart) {
+            super("HttpRange Out of Bounds error: start=" + rangeStart + " expected start=" + expectedRangeStart);
         }
     }
 
