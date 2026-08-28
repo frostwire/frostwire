@@ -1,4 +1,6 @@
 FrostWire 7.1.0 UNRELEASED
+  - fix:IceBridge rUDP HELLO authentication is retransmitted until signed acknowledgement, and authenticated sessions follow changing mobile carrier NAT endpoints instead of replying to stale addresses
+  - fix:Desktop-created hybrid/v2 torrents found through Distributed Search now download correctly on Android peers — x.pe connects directly to the desktop seeder without invalid .torrent piece-layer reconstruction
   - fix:Slideshow / MISC HTTP no longer dies on OkHttp HTTP/2 stream header timeout (o2.php) — MISC client is HTTP/1.1, shared clients send HTTP/2 pings, slideshow retries once after evicting a stale pool
   - new:Distributed search answers advertise seeder BT endpoints (RemoteSearchResponse v3 bt) and result magnets carry x.pe — mesh-found trackerless content (auto-seeded finished downloads) downloads straight from the seeder; auto-created torrents now include the default tracker list
   - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=30; LimeWire ultrapeer baseline retained
