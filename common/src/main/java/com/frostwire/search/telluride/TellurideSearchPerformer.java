@@ -30,8 +30,11 @@ import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -190,11 +193,40 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                     result.thumbnail,
                     format.filesize,
                     result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
-                    format.http_headers));
+                    withFullRange(format.http_headers)));
         }
 
         return results;
     }
+
+    private static final Set<String> MEDIA_HEADER_ALLOWLIST = Set.of(
+            "user-agent",
+            "referer",
+            "cookie",
+            "origin",
+            "accept",
+            "accept-language",
+            "authorization",
+            "x-youtube-client-name",
+            "x-youtube-client-version",
+            "sec-fetch-mode");
+
+    static Map<String, String> withFullRange(Map<String, String> headers) {
+        Map<String, String> result = new HashMap<>();
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                if (entry.getKey() == null || entry.getValue() == null) {
+                    continue;
+                }
+                if (MEDIA_HEADER_ALLOWLIST.contains(entry.getKey().toLowerCase(Locale.ROOT))) {
+                    result.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        result.put("Range", "bytes=0-");
+        return result;
+    }
+
 
 public static List<TellurideSearchResult> getValidPlaylistResults(String jsonMeta, Gson gson, TellurideSearchPerformerListener performerListener, long token, String debugUrl) {
         TellurideJSONPlaylist playlist = gson.fromJson(jsonMeta, TellurideJSONPlaylist.class);
