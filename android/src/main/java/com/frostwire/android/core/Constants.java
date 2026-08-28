@@ -145,6 +145,8 @@ public final class Constants {
     // Incoming connection port range settings
     public static final String PREF_KEY_TORRENT_INCOMING_PORT_START = "frostwire.prefs.torrent.incoming_port_start";
     public static final String PREF_KEY_TORRENT_INCOMING_PORT_END = "frostwire.prefs.torrent.incoming_port_end";
+    public static final int DEFAULT_TORRENT_INCOMING_PORT_START = 1024;
+    public static final int DEFAULT_TORRENT_INCOMING_PORT_END = 57000;
 
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
 
