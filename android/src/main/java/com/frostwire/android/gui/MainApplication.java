@@ -243,11 +243,20 @@ public class MainApplication extends Application implements Configuration.Provid
 
                 // Get configured port range or use default range [1024, 57000]
                 ConfigurationManager cm = ConfigurationManager.instance();
-                int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
-                int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
+                int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START,
+                        Constants.DEFAULT_TORRENT_INCOMING_PORT_START);
+                int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END,
+                        Constants.DEFAULT_TORRENT_INCOMING_PORT_END);
+                if (configuredStartPort < 1
+                        || configuredEndPort < configuredStartPort
+                        || configuredEndPort > 65535) {
+                    configuredStartPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_START;
+                    configuredEndPort = Constants.DEFAULT_TORRENT_INCOMING_PORT_END;
+                }
 
                 int port0, port1;
-                if (configuredStartPort == 1024 && configuredEndPort == 57000) {
+                if (configuredStartPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_START
+                        && configuredEndPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_END) {
                     // Use default port range [37000, 57000] when user hasn't configured specific ports
                     port0 = 37000 + new Random().nextInt(20000);
                     port1 = port0 + 10; // 10 retries
