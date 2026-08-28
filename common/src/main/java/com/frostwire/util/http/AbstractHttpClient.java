@@ -38,7 +38,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     protected static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
     private static final Logger LOG = Logger.getLogger(AbstractHttpClient.class);
     protected HttpClientListener listener;
-    protected boolean canceled = false;
+    protected volatile boolean canceled = false;
 
     protected static void closeQuietly(Closeable closeable) {
         try {
@@ -201,6 +201,11 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public void cancel() {
         canceled = true;
+    }
+
+    @Override
+    public void resetCancellation() {
+        canceled = false;
     }
 
     @Override
