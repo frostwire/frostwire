@@ -52,6 +52,7 @@ public abstract class BaseHttpDownload implements Transfer {
     protected TransferState state;
     protected SpeedStat stat;
     protected boolean complete;
+    private volatile HttpClient httpClient;
     protected final List<TransferStateListener> listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     protected BaseHttpDownload(Info info) {
@@ -206,6 +207,10 @@ public abstract class BaseHttpDownload implements Transfer {
         if (complete) {
             return;
         }
+        HttpClient client = httpClient;
+        if (client != null) {
+            client.cancel();
+        }
         complete(state = TransferState.CANCELED);
         FileSystem fs = Platforms.fileSystem();
         if (fs.delete(tempPath)) {
@@ -232,20 +237,21 @@ public abstract class BaseHttpDownload implements Transfer {
             public void run() {
                 int attempt = 0;
                 boolean resumeAttempt = resume;
+                HttpClient client = HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+                httpClient = client;
+                client.setListener(new DownloadListener());
                 while (attempt <= MAX_RETRIES_ON_CONNECTION_RESET) {
                     try {
-                        if (complete) {
+                        if (complete || client.isCanceled()) {
                             return;
                         }
                         TransferState oldState = state;
                         state = TransferState.DOWNLOADING;
                         notifyStateChanged(oldState, TransferState.DOWNLOADING);
-                        HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
-                        client.setListener(new DownloadListener());
                         client.save(url, temp, resumeAttempt, httpHeaders);
                         return; // success
                     } catch (SocketException e) {
-                        if (complete) {
+                        if (complete || client.isCanceled()) {
                             return;
                         }
                         boolean isConnectionReset = e.getMessage() != null && e.getMessage().contains("Connection reset");
