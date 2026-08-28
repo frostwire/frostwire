@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Disabling every web search engine now persists when Distributed Search is enabled; startup no longer turns Archive.org back on before the distributed runtime is ready
   - fix:IceBridge search works reliably on cellular networks — rUDP HELLO authentication is retransmitted until signed acknowledgement and sessions follow changing carrier NAT endpoints
   - fix:Distributed-search hybrid/v2 magnets now use one real libtorrent transfer for x.pe peers, metadata, piece layers, and payload — fixes invalid piece-layer errors; transfer progress/state now refresh promptly, retries reconnect explicit peers, and invalid incoming port 0 falls back to a valid range
   - fix:MISC HTTP (promos, config, image cache) no longer hangs on stale OkHttp HTTP/2 connections — HTTP/1.1 for MISC + 5s HTTP/2 pings on shared clients
