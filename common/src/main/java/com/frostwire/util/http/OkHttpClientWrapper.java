@@ -37,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * COMMON
@@ -63,6 +65,8 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     private static final long MAX_STRING_RESPONSE_BYTES = 16L * 1024 * 1024;
     /** Maximum response body size for getBytes() (32 MB — allows large .torrent files). */
     private static final long MAX_BYTES_RESPONSE_BYTES = 32L * 1024 * 1024;
+    private static final Pattern CONTENT_RANGE_PATTERN =
+            Pattern.compile("^bytes (\\d+)-\\d+/(?:\\d+|\\*)$", Pattern.CASE_INSENSITIVE);
 
     private final ThreadPool pool;
     private final OkHttpClient sharedClient;
@@ -231,7 +235,6 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         FileOutputStream fos;
         BufferedOutputStream bos = null;
         long rangeStart;
-        canceled = false;
         if (resume && file.exists()) {
             fos = new FileOutputStream(file, true);
             rangeStart = file.length();
@@ -248,33 +251,52 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         final Request.Builder builder = prepareRequestBuilder(url, userAgent, referrer, null);
         addCustomHeaders(extraHeaders, builder);
         addRangeHeader(rangeStart, -1, builder);
-        final Response response = getSyncResponse(client, builder);
-        LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + url);
-        if (!response.isSuccessful()) {
+        Response response = null;
+        long totalBytesWritten = 0;
+        try {
+            response = getSyncResponse(client, builder);
+            LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + url);
+            if (!response.isSuccessful()) {
+                if (!resume) {
+                    closeQuietly(bos);
+                    closeQuietly(fos);
+                    file.delete(); // remove the 0-byte file created by FileOutputStream before the request
+                }
+                throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + url);
+            }
+            if (rangeStart >= 0 && response.code() != HttpURLConnection.HTTP_PARTIAL) {
+                throw new RangeNotSupportedException(
+                        "Server ignored bytes range request for " + url);
+            }
+            if (rangeStart >= 0) {
+                long responseRangeStart = contentRangeStart(response.header("Content-Range"));
+                if (responseRangeStart != rangeStart) {
+                    throw new HttpRangeOutOfBoundsException(responseRangeStart, rangeStart);
+                }
+            }
+            final Headers headers = response.headers();
+            onHeaders(headers);
+            ResponseBody responseBody = response.body();
+            if (responseBody == null) {
+                throw new IOException("Empty HTTP response body for " + url);
+            }
+            final InputStream in = responseBody.byteStream();
+            byte[] b = new byte[32768]; // 32 KiB buffer
+            int n;
+            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
+                if (!canceled) {
+                    bos.write(b, 0, n);
+                    totalBytesWritten += n;
+                    onData(b, 0, n);
+                }
+            }
+        } finally {
             closeQuietly(bos);
             closeQuietly(fos);
-            closeQuietly(response.body());
-            if (!resume) {
-                file.delete(); // remove the 0-byte file created by FileOutputStream before the request
-            }
-            throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + url);
-        }
-        final Headers headers = response.headers();
-        onHeaders(headers);
-        final InputStream in = response.body().byteStream();
-        byte[] b = new byte[32768]; // 32 KiB buffer
-        int n;
-        long totalBytesWritten = 0;
-        while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
-            if (!canceled) {
-                bos.write(b, 0, n);
-                totalBytesWritten += n;
-                onData(b, 0, n);
+            if (response != null) {
+                closeQuietly(response.body());
             }
         }
-        closeQuietly(bos);
-        closeQuietly(fos);
-        closeQuietly(response.body());
         LOG.info("OkHttpClientWrapper::save - finished, totalBytesWritten=" + totalBytesWritten + " file=" + file.getAbsolutePath());
         if (canceled) {
             onCancel();
@@ -351,7 +373,22 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         if (rangeEnd > 0 && rangeEnd > rangeStart) {
             sb.append(rangeEnd);
         }
-        builderRef.addHeader("Range", sb.toString());
+        builderRef.header("Range", sb.toString());
+    }
+
+    private long contentRangeStart(String contentRange) {
+        if (contentRange == null) {
+            return -1;
+        }
+        Matcher matcher = CONTENT_RANGE_PATTERN.matcher(contentRange);
+        if (!matcher.matches()) {
+            return -1;
+        }
+        try {
+            return Long.parseLong(matcher.group(1));
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
     }
 
     private Request.Builder prepareRequestBuilder(String url, String userAgent, String referrer, String cookie) {
