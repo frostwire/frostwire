@@ -65,6 +65,19 @@ public class HttpClientFactory {
         return fwOKHTTPClients.get(context);
     }
 
+    public static HttpClient newInstance(HttpContext context) {
+        if (FORCE_JDK_HTTP_CLIENT || isWindowsXP()) {
+            return new JdkHttpClient();
+        }
+        synchronized (okHTTPClientLock) {
+            if (okHttpClientPools == null) {
+                okHttpClientPools = buildThreadPools();
+            }
+            return new OkHttpClientWrapper(
+                    okHttpClientPools.get(context), context == HttpContext.MISC);
+        }
+    }
+
     private static Map<HttpContext, ThreadPool> buildThreadPools() {
         final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
         map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 2, 2, 2, new LinkedBlockingQueue<>(), true));
