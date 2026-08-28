@@ -451,6 +451,31 @@ public final class BTEngine extends SessionManager {
         }
     }
 
+    @Override
+    public void download(String magnetUri, File saveDir, torrent_flags_t flags) {
+        if (swig() == null) {
+            return;
+        }
+        saveDir = setupSaveDir(saveDir);
+        if (saveDir == null) {
+            return;
+        }
+
+        AddTorrentParams params = AddTorrentParams.parseMagnetUri(magnetUri);
+        InfoHash infoHash = params.getInfoHashes();
+        LOG.info("BTEngine.download(magnet): explicit peer count=" + params.peers().size());
+        TorrentHandle handle = infoHash.hasV1() ? find(infoHash.getV1()) : find(infoHash.getV2());
+        if (handle != null && handle.isValid()) {
+            for (TcpEndpoint peer : params.peers()) {
+                handle.swig().connect_peer(peer.swig());
+            }
+            handle.resume();
+            fireDownloadUpdate(handle);
+            return;
+        }
+        super.download(magnetUri, saveDir, flags);
+    }
+
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
         download(sr, saveDir, false);
     }
