@@ -194,7 +194,7 @@ public final class RudpSessionManager {
             return -1;
         }
         RudpPacket hello = new RudpPacket(RudpPacket.Type.HELLO, remoteCid, 0, 0, payload);
-        send(session, hello);
+        sendReliable(session, hello);
         return localCid;
     }
 
@@ -369,6 +369,21 @@ public final class RudpSessionManager {
         return s != null && s.remotePub() != null;
     }
 
+    long remoteConnectionIdForTest(InetSocketAddress remoteAddress) {
+        RudpSession s = sessionsByAddress.get(remoteAddress);
+        return s == null ? -1 : s.remoteConnectionId();
+    }
+
+    int pendingCountForTest(InetSocketAddress remoteAddress) {
+        RudpSession s = sessionsByAddress.get(remoteAddress);
+        return s == null ? 0 : s.pending().size();
+    }
+
+    InetSocketAddress remoteAddressForTest(long remoteConnectionId) {
+        RudpSession s = sessionsByRemoteId.get(remoteConnectionId);
+        return s == null ? null : s.remoteAddress();
+    }
+
     // ---- outbound helpers ----
 
     private void send(RudpSession session, RudpPacket packet) {
@@ -437,8 +452,8 @@ public final class RudpSessionManager {
             }
         } else {
             session.setRemotePub(remotePub);
-            sessionsByAddress.put(sender, session);
         }
+        rebindSessionAddress(session, sender);
         session.markActivity();
         if (sender.getAddress() != null
                 && !sender.getAddress().isAnyLocalAddress()
@@ -484,8 +499,9 @@ public final class RudpSessionManager {
                 && RudpAuth.verifyHello(packet.connectionId(), ackPayload)) {
             byte[] peerPub = Arrays.copyOfRange(ackPayload, 0, 32);
             session.setRemotePub(peerPub);
+            session.pending().remove(0);
             // Prefer the session that just proved identity on this address.
-            sessionsByAddress.put(sender, session);
+            rebindSessionAddress(session, sender);
         }
         LOG.info("IceBridge mesh: HELLO_ACK ok peer=" + sender
                 + (session.remotePub() != null
@@ -498,6 +514,7 @@ public final class RudpSessionManager {
         if (session == null) {
             return;
         }
+        rebindSessionAddress(session, sender);
         if (session.receiveRemote(packet.sequence())) {
             notifyListener(session.remotePub(), packet.payload());
         }
@@ -509,6 +526,7 @@ public final class RudpSessionManager {
         if (session == null) {
             return;
         }
+
         session.ackLocal(packet.ackThrough());
         session.markActivity();
     }
@@ -523,6 +541,7 @@ public final class RudpSessionManager {
         if (session == null) {
             return;
         }
+        rebindSessionAddress(session, sender);
 
         // Validate the fragment header BEFORE acking so that malformed
         // fragments are not silently dropped after the sender believes
@@ -891,6 +910,25 @@ public final class RudpSessionManager {
             }
         }
         reassembler.evictStale();
+    }
+
+    private void rebindSessionAddress(RudpSession session, InetSocketAddress sender) {
+        InetSocketAddress previous = session.remoteAddress();
+        if (sender == null || sender.equals(previous)) {
+            return;
+        }
+        sessionsByAddress.remove(previous, session);
+        session.setRemoteAddress(sender);
+        sessionsByAddress.put(sender, session);
+        byte[] remotePub = session.remotePub();
+        if (remotePub != null
+                && sender.getAddress() != null
+                && !sender.getAddress().isAnyLocalAddress()
+                && !sender.getAddress().isLoopbackAddress()) {
+            registry.learnObservedEndpoint(
+                    remotePub, sender.getAddress().getHostAddress(), sender.getPort());
+        }
+        LOG.info("IceBridge mesh: session endpoint changed " + previous + " -> " + sender);
     }
 
     // ---- utilities ----
