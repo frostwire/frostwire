@@ -24,6 +24,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.torrent_flags_t;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
@@ -293,6 +294,15 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                 byte[] data;
                 String uri = info.getTorrentUrl();
                 String referrer = info.getReferrerUrl();
+                if (uri.startsWith("magnet:") && fetcherListener == null) {
+                    // A hybrid/v2 magnet cannot always be reconstructed as .torrent bytes:
+                    // BEP 9 metadata does not include the top-level piece-layer dictionary.
+                    // Add it directly so libtorrent keeps x.pe peers and fetches piece layers.
+                    LOG.info("Starting x.pe magnet directly in BTEngine");
+                    BTEngine.getInstance().download(uri, null, new torrent_flags_t());
+                    remove(false);
+                    return;
+                }
                 if (uri.startsWith("http")) {
                     // use our http client, since we can handle referer
                     data = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(uri, 30000, referrer);
