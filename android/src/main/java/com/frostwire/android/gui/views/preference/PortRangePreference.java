@@ -63,11 +63,20 @@ public final class PortRangePreference extends DialogPreference {
     private void loadCurrentValuesAsync() {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
             ConfigurationManager cm = ConfigurationManager.instance();
-            int start = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
-            int end = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
-            
+            int start = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START,
+                    Constants.DEFAULT_TORRENT_INCOMING_PORT_START);
+            int end = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END,
+                    Constants.DEFAULT_TORRENT_INCOMING_PORT_END);
+            if (start < 1 || end < start || end > 65535) {
+                start = Constants.DEFAULT_TORRENT_INCOMING_PORT_START;
+                end = Constants.DEFAULT_TORRENT_INCOMING_PORT_END;
+            }
+            int normalizedStart = start;
+            int normalizedEnd = end;
+
             // Post back to UI thread to update the values
-            SystemUtils.postToUIThread(() -> onConfigurationManagerPortRange(start, end));
+            SystemUtils.postToUIThread(
+                    () -> onConfigurationManagerPortRange(normalizedStart, normalizedEnd));
         });
     }
     
@@ -172,7 +181,8 @@ public final class PortRangePreference extends DialogPreference {
             int configuredEndPort = endPort;
             
             int port0, port1;
-            if (configuredStartPort == 1024 && configuredEndPort == 57000) {
+            if (configuredStartPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_START
+                    && configuredEndPort == Constants.DEFAULT_TORRENT_INCOMING_PORT_END) {
                 // Use default port range [37000, 57000] when user hasn't configured specific ports
                 port0 = 37000 + new Random().nextInt(20000);
                 port1 = port0 + 10; // 10 retries
