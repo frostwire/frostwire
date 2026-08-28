@@ -25,7 +25,7 @@ final class RudpSession {
 
     private final long localConnectionId;
     private final long remoteConnectionId;
-    private final InetSocketAddress remoteAddress;
+    private volatile InetSocketAddress remoteAddress;
     /** Set on inbound HELLO or when HELLO_ACK proves the peer's pub. */
     private volatile byte[] remotePub;
     private final boolean weAreInitiator;
@@ -66,6 +66,12 @@ final class RudpSession {
 
     InetSocketAddress remoteAddress() {
         return remoteAddress;
+    }
+
+    void setRemoteAddress(InetSocketAddress remoteAddress) {
+        if (remoteAddress != null) {
+            this.remoteAddress = remoteAddress;
+        }
     }
 
     byte[] remotePub() {
