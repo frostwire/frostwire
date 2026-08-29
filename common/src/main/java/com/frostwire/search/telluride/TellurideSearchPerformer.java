@@ -127,76 +127,86 @@ public class TellurideSearchPerformer implements ISearchPerformer {
             performerListener.onTellurideJSONResult(token, result);
         }
 
-        // From these formats we pick the best video and best audio available to always return 2 search results.
+        // YouTube no longer offers muxed progressive MP4. Video is DASH
+        // video-only (acodec=none) and audio is separate. Skip neither:
+        // pick the best of each so a pasted watch URL shows video AND audio.
         ArrayList<TellurideSearchResult> results = new ArrayList<>();
         if (result.formats == null) {
             LOG.info("getValidResults formats are null, no valid search results for " + debugUrl);
             return results;
         }
         int originalResultCount = result.formats.size();
+        TellurideJSONMediaFormat bestVideo = null;
+        TellurideJSONMediaFormat bestAudio = null;
         for (TellurideJSONMediaFormat format : result.formats) {
-            if (format.url.contains(".m3u8")) {
-                // skip playlists for now
-                // TODO: Implement .m3u8 telluride downloader
-                //LOG.info("getValidResults format.url contains .m3u8");
+            if (format == null || format.url == null || format.url.isEmpty()) {
+                continue;
+            }
+            if (format.url.contains(".m3u8") || "mhtml".equals(format.ext)) {
                 continue;
             }
             if (originalResultCount > 1 && format.height != 0 && format.width > format.height && format.width < 320) {
-                // skip low quality horizontal videos
-                //LOG.info("getValidResults very low quality horizontal video, skipped");
                 continue;
             }
-
             if (originalResultCount > 1 && format.height > format.width && format.height < 480) {
-                // skip too low quality vertical videos
-                //LOG.info("getValidResults very low quality vertical video, skipped");
                 continue;
             }
-
-            String videoFormatParenthesis = "";
-            if (result.webpage_url.contains("youtu")) {
-                if (noCodec(format.acodec)) {
-                    //LOG.info("getValidResults acodec is null, skipped");
-                    continue;
+            if (noCodec(format.vcodec) && noCodec(format.acodec)) {
+                continue;
+            }
+            boolean audioOnly = !noCodec(format.acodec) && noCodec(format.vcodec);
+            if (audioOnly) {
+                if (bestAudio == null || format.filesize > bestAudio.filesize) {
+                    bestAudio = format;
                 }
-
-                if (noCodec(format.vcodec) && noCodec(format.acodec)) {
-                    //LOG.info("getValidResults acodec + vcodec are null, skipped");
-                    continue;
+            } else if (!noCodec(format.vcodec)) {
+                if (bestVideo == null
+                        || format.height > bestVideo.height
+                        || (format.height == bestVideo.height && format.filesize > bestVideo.filesize)) {
+                    bestVideo = format;
                 }
             }
+        }
+        if (bestVideo != null) {
+            results.add(toSearchResult(result, bestVideo));
+        }
+        if (bestAudio != null) {
+            results.add(toSearchResult(result, bestAudio));
+        }
+        return results;
+    }
 
-            if (!noCodec(format.acodec) && noCodec(format.vcodec)) {
-                videoFormatParenthesis = "(audio)";
-            } else if (!noCodec(format.vcodec)) {
-                if (format.width != 0 && format.height != 0) {
-                    videoFormatParenthesis = "(" + format.width + "x" + format.height + ")";
-                } else if (format.width == 0 && format.height != 0) {
-                    videoFormatParenthesis = "(" + format.height + "p)";
-                }
-            } else if (noCodec(format.acodec) && noCodec(format.vcodec) && format.height > 240) {
+    private static TellurideSearchResult toSearchResult(
+            TellurideJSONResult result, TellurideJSONMediaFormat format) {
+        String videoFormatParenthesis = "";
+        if (!noCodec(format.acodec) && noCodec(format.vcodec)) {
+            videoFormatParenthesis = "(audio)";
+        } else if (!noCodec(format.vcodec)) {
+            if (format.width != 0 && format.height != 0) {
+                videoFormatParenthesis = "(" + format.width + "x" + format.height + ")";
+            } else if (format.width == 0 && format.height != 0) {
                 videoFormatParenthesis = "(" + format.height + "p)";
             }
-            LOG.info("getValidResults acodec=" + format.acodec + ", vcodec=" + format.vcodec + ", ext=" + result.ext + ", url=" + format.url);
-            String domainName = UrlUtils.extractDomainName(format.url);
-            if (domainName != null) {
-                Ssl.addValidDomain(domainName);
-            }
-            LOG.info("TellurideSearchPerformer.getValidResults format.url added: " + format.url);
-            results.add(new TellurideSearchResult(
-                    result.id,
-                    videoFormatParenthesis + " " + result.title,
-                    result.title + " " + videoFormatParenthesis + "." + format.ext,
-                    "Cloud:" + result.extractor,
-                    result.webpage_url,
-                    format.url,
-                    result.thumbnail,
-                    format.filesize,
-                    result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
-                    withFullRange(format.http_headers)));
+        } else if (format.height > 240) {
+            videoFormatParenthesis = "(" + format.height + "p)";
         }
-
-        return results;
+        LOG.info("getValidResults acodec=" + format.acodec + ", vcodec=" + format.vcodec
+                + ", ext=" + format.ext + ", url=" + format.url);
+        String domainName = UrlUtils.extractDomainName(format.url);
+        if (domainName != null) {
+            Ssl.addValidDomain(domainName);
+        }
+        return new TellurideSearchResult(
+                result.id,
+                videoFormatParenthesis + " " + result.title,
+                result.title + " " + videoFormatParenthesis + "." + format.ext,
+                "Cloud:" + result.extractor,
+                result.webpage_url,
+                format.url,
+                result.thumbnail,
+                format.filesize,
+                result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
+                withFullRange(format.http_headers));
     }
 
     private static final Set<String> MEDIA_HEADER_ALLOWLIST = Set.of(
