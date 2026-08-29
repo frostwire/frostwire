@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Performing a search restarts IceBridge if it was shut down, so distributed search never silently no-ops
   - fix:Distributed search keeps working after Android reaps the engine foreground service — IceBridge is no longer torn down with the FGS, and startServices restarts a missing relay stack instead of aborting as "already started"
   - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
   - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead

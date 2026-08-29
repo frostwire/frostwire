@@ -74,7 +74,7 @@ public abstract class SearchEngine {
     postInitWork();
   }
 
-  protected boolean isReady() {
+  public boolean isReady() {
     return true;
   }
 
@@ -271,7 +271,7 @@ public abstract class SearchEngine {
         }
 
         @Override
-        protected boolean isReady() {
+        public boolean isReady() {
           return domainName != null;
         }
       };
@@ -423,7 +423,7 @@ public abstract class SearchEngine {
         }
 
         @Override
-        protected boolean isReady() {
+        public boolean isReady() {
           return LOCAL_WIRING.localIndex() != null;
         }
       };
@@ -445,7 +445,7 @@ public abstract class SearchEngine {
         }
 
         @Override
-        protected boolean isReady() {
+        public boolean isReady() {
           return DISTRIBUTED_WIRING.localIndex() != null
               && DISTRIBUTED_WIRING.peerDirectory() != null
               && DISTRIBUTED_WIRING.identity() != null

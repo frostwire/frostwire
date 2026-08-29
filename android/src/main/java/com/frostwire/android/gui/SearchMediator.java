@@ -20,6 +20,7 @@ package com.frostwire.android.gui;
 
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlCacheManager;
 import com.frostwire.search.CrawledSearchResult;
@@ -110,6 +111,7 @@ public final class SearchMediator {
         if (StringUtils.isNullOrEmpty(query, true)) {
             return;
         }
+        Engine.instance().ensureDistributedSearchReady(15_000);
         manager.stop();
         currentSearchToken = nextSearchToken();
         currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);

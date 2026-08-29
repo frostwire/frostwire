@@ -37,12 +37,14 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gubatron
@@ -159,6 +161,46 @@ public final class Engine implements IEngineService {
     public boolean isDisconnected() {
         EngineForegroundService service = getForegroundService();
         return service != null && service.isDisconnected();
+    }
+
+    /**
+     * If distributed search is enabled but IceBridge is down, start/restart it
+     * and wait until the search transport is wired (or {@code timeoutMs} elapses).
+     * Call from a background thread — never the UI thread.
+     */
+    public void ensureDistributedSearchReady(long timeoutMs) {
+        if (!SearchEngine.DISTRIBUTED.isEnabled() || SearchEngine.DISTRIBUTED.isReady()) {
+            return;
+        }
+        LOG.info("Engine: IceBridge down at search time — restarting");
+        startServices();
+        EngineForegroundService svc = getForegroundService();
+        if (svc != null && !svc.isRelayStackRunning()) {
+            CountDownLatch latch = new CountDownLatch(1);
+            svc.ensureRelayStack(false, latch::countDown);
+            try {
+                if (!latch.await(Math.max(1_000L, timeoutMs), TimeUnit.MILLISECONDS)) {
+                    LOG.warn("Engine: IceBridge restart timed out");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        long deadline = System.currentTimeMillis() + Math.max(0L, timeoutMs);
+        while (!SearchEngine.DISTRIBUTED.isReady() && System.currentTimeMillis() < deadline) {
+            if (getForegroundService() == null) {
+                startServices();
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        if (!SearchEngine.DISTRIBUTED.isReady()) {
+            LOG.warn("Engine: IceBridge still not ready after " + timeoutMs + "ms");
+        }
     }
 
     @Override
