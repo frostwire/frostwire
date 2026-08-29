@@ -234,8 +234,10 @@ public class EngineForegroundService extends Service implements IEngineService {
             cancelAllNotificationsTask(this);
             notificationUpdateDaemon.stop();
         }
-
-        stopRelayStack();
+        // Do not stop IceBridge here. Android reaps this FGS while the process
+        // (and BTEngine) stay alive; tearing down the mesh then makes search
+        // silently do nothing until a force-stop. Explicit Engine.shutdown()
+        // / stopServices() still close the stack.
     }
 
     /**
@@ -612,7 +614,12 @@ public class EngineForegroundService extends Service implements IEngineService {
         }
 
         if (isStarted()) {
-            LOG.info("startServices() - aborting, it's already started", true);
+            if (relayStack == null) {
+                LOG.info("startServices() - engine up but IceBridge down, restarting relay stack");
+                startRelayStack(BTEngine.getInstance());
+            } else {
+                LOG.info("startServices() - aborting, it's already started", true);
+            }
             return;
         }
 
@@ -635,6 +642,7 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("EngineForegroundService::stopServices() - Pausing BTEngine");
         TransferManager.instance().onShutdown(disconnected);
         BTEngine.getInstance().pause();
+        stopRelayStack();
 
         // maybe here we do something with disconnected
         updateState(STATE_STOPPED);
