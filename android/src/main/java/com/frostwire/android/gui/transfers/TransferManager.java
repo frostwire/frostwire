@@ -239,6 +239,24 @@ public final class TransferManager {
     }
 
     private boolean isAlreadyDownloadingTorrentByUri(String uri) {
+        if (uri == null || uri.isEmpty()) {
+            return false;
+        }
+        String uriLower = uri.toLowerCase();
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (d instanceof TorrentFetcherDownload) {
+                    String torrentUri = ((TorrentFetcherDownload) d).getTorrentUri();
+                    if (uri.equals(torrentUri)) {
+                        return true;
+                    }
+                }
+                String hash = d.getInfoHash();
+                if (hash != null && !hash.isEmpty() && uriLower.contains(hash.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
         synchronized (alreadyDownloadingMonitor) {
             for (Transfer dt : httpDownloads) {
                 if (dt instanceof TorrentFetcherDownload) {
@@ -516,6 +534,27 @@ public final class TransferManager {
 
     private BittorrentDownload newBittorrentDownload(TorrentSearchResult sr) {
         try {
+            String existingHash = sr.getHash();
+            if (existingHash != null && !existingHash.isEmpty()) {
+                BittorrentDownload existing = getBittorrentDownload(existingHash.toLowerCase());
+                if (existing == null) {
+                    existing = getBittorrentDownload(existingHash);
+                }
+                if (existing != null) {
+                    return existing;
+                }
+            }
+            if (sr.getTorrentUrl() != null && isAlreadyDownloadingTorrentByUri(sr.getTorrentUrl())) {
+                synchronized (downloadsListMonitor) {
+                    for (BittorrentDownload d : bittorrentDownloadsList) {
+                        if (d instanceof TorrentFetcherDownload
+                                && sr.getTorrentUrl().equals(((TorrentFetcherDownload) d).getTorrentUri())) {
+                            return d;
+                        }
+                    }
+                }
+                return null;
+            }
             BittorrentDownload bittorrentDownload = createBittorrentDownload(this, sr);
             if (bittorrentDownload != null) {
                 synchronized (downloadsListMonitor) {
