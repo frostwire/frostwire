@@ -116,6 +116,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
    * Start the IceBridge process. Daemon stdout/stderr are redirected to files under a temporary
    * directory so the subprocess cannot block on a shared Gradle worker pipe.
    *
+   * <p>First kills any stale child left over by a previous crashed/killed FrostWire session
+   * (pidfile next to the identity file) so it cannot steal the rUDP port — the recurring orphan
+   * failure where a fresh Main gets EADDRINUSE and silently loses its answerer.
+   *
    * @throws IOException if the jar is missing or the process cannot start
    */
   public synchronized void start() throws IOException {
@@ -125,6 +129,9 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     if (!jarPath.isFile()) {
       throw new IOException("IceBridge jar not found: " + jarPath.getAbsolutePath());
     }
+
+    killStaleIceBridgeChild();
+    waitForRudpPortFree();
 
     String java = ProcessHandle.current().info().command().orElse("java");
     List<String> command = new ArrayList<>();
@@ -147,6 +154,9 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       command.add("--identity-file");
       command.add(identityFile.getAbsolutePath());
     }
+    // Child exits when this process dies — no orphan can survive a crash/kill -9.
+    command.add("--parent-pid");
+    command.add(String.valueOf(ProcessHandle.current().pid()));
 
     logDir = Files.createTempDirectory("icebridge-launcher-" + controlHttpPort).toFile();
     File stdout = new File(logDir, "stdout.log");
@@ -159,6 +169,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     pb.redirectError(stderr);
     LOG.info("Starting IceBridge: " + String.join(" ", command));
     process = pb.start();
+    writePidFile(process.pid());
     client = new IceBridgeClient(controlHttpPort);
     client.setAuthToken(authToken);
   }
@@ -181,7 +192,96 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     }
     process = null;
     client = null;
+    clearPidFile();
     deleteLogDir();
+  }
+
+  private File pidFile() {
+    File dir = identityFile != null ? identityFile.getParentFile() : null;
+    if (dir == null) {
+      dir = new File(System.getProperty("java.io.tmpdir"));
+    }
+    return new File(dir, "icebridge-child.pid");
+  }
+
+  private long childPid = -1;
+
+  private void writePidFile(long pid) {
+    childPid = pid;
+    try {
+      Files.writeString(pidFile().toPath(), String.valueOf(pid));
+    } catch (Throwable t) {
+      LOG.warn("Could not write IceBridge pid file", t);
+    }
+  }
+
+  private void clearPidFile() {
+    try {
+      File f = pidFile();
+      if (f.isFile() && childPid > 0) {
+        String content = Files.readString(f.toPath()).trim();
+        if (content.equals(String.valueOf(childPid))) {
+          f.delete();
+        }
+      }
+    } catch (Throwable ignored) {
+    }
+  }
+
+  /**
+   * Kill a stale child left by a previous FrostWire session: the pidfile next to the identity file
+   * names an icebridge.jar process; if it is alive and is not this process, terminate it.
+   * Fail-safe: unknown/dead/foreign pids are ignored.
+   */
+  private void killStaleIceBridgeChild() {
+    File f = pidFile();
+    if (!f.isFile()) {
+      return;
+    }
+    try {
+      long pid = Long.parseLong(Files.readString(f.toPath()).trim());
+      if (pid <= 0 || pid == ProcessHandle.current().pid()) {
+        return;
+      }
+      ProcessHandle stale = ProcessHandle.of(pid).orElse(null);
+      if (stale == null || !stale.isAlive()) {
+        return;
+      }
+      String commandLine = stale.info().commandLine().orElse("");
+      if (!commandLine.contains("icebridge.jar")) {
+        return; // never kill a process we did not spawn
+      }
+      LOG.warn("Killing stale IceBridge child pid " + pid + " left by a previous session");
+      stale.destroy();
+      if (!stale
+          .onExit()
+          .handle((p, t) -> p.isAlive())
+          .get(5, java.util.concurrent.TimeUnit.SECONDS)) {
+        return;
+      }
+      stale.destroyForcibly();
+      stale.onExit().get(2, java.util.concurrent.TimeUnit.SECONDS);
+    } catch (Throwable t) {
+      LOG.warn("Stale IceBridge child cleanup failed (continuing)", t);
+    }
+  }
+
+  /** Wait until our configured rUDP port is bindable again after a stale kill. */
+  private void waitForRudpPortFree() {
+    long deadline = System.currentTimeMillis() + 5000;
+    while (System.currentTimeMillis() < deadline) {
+      try (java.net.DatagramSocket probe = new java.net.DatagramSocket(rudpPort)) {
+        return; // port is free
+      } catch (IOException notYetFree) {
+        try {
+          Thread.sleep(200);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          return;
+        }
+      }
+    }
+    LOG.warn("rUDP port " + rudpPort + " still busy after stale-child cleanup; starting anyway");
   }
 
   private void deleteLogDir() {
