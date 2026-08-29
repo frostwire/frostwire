@@ -1,5 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
-  - fix:Distributed search no longer silently breaks after a crash or restart — stale IceBridge children from dead sessions are killed at startup and the child exits when its FrostWire parent dies, so the next session always owns its relay port
+  - fix:Distributed search no longer silently breaks after a crash or restart — stale IceBridge children from dead sessions are killed at startup, the child exits when its FrostWire parent dies, and a supervisor respawns the child automatically if it is ever lost at runtime
   - new:Desktop answers TORRENT_FETCH requests over IceBridge — peers behind NAT fetch a shared torrent's full metadata (piece layers included) through the mesh instead of hanging on "Downloading metadata"
   - new:About window shows the current Telluride build number
   - fix:YouTube downloads pass yt-dlp's HTTP headers, request complete byte ranges, resume transient resets safely, and use isolated cancel state per transfer; Telluride build 47 updates yt-dlp to 2026.8.19, restores direct-m4a “Faster Download,” and pasted watch URLs open the requested video
