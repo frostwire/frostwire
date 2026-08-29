@@ -672,6 +672,10 @@ final class Initializer {
           return;
         }
 
+        // Self-heal: if the child dies or stops answering (orphaned port,
+        // crash, anything), the supervisor respawns it — no restart needed.
+        launcher.startSupervision(10_000);
+
         effectiveRudpPort = launcher.rudpPort(); // in case auto
 
         // Now that the child is healthy, add our IceBridge relay endpoint (the one others will
