@@ -1,4 +1,9 @@
-FrostWire 7.1.0 UNRELEASED
+ FrostWire 7.1.0 UNRELEASED
+  - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
+  - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead
+  - fix:IceBridge RELAY replies follow the live rUDP session after a cellular NAT rebind instead of the first-seen registry address
+  - fix:TORRENT_FETCH accepts metadata chunks relayed through the EC2 hop (holder signature still required) so cellular downloads no longer time out to a stuck magnet
+  - fix:A metadata-less magnet left in the engine is replaced when full .torrent bytes arrive over the mesh, so the transfer appears in the list
   - fix:Distributed search no longer silently breaks after a crash or restart — stale IceBridge children from dead sessions are killed at startup, the child exits when its FrostWire parent dies, and a supervisor respawns the child automatically if it is ever lost at runtime
   - new:Desktop answers TORRENT_FETCH requests over IceBridge — peers behind NAT fetch a shared torrent's full metadata (piece layers included) through the mesh instead of hanging on "Downloading metadata"
   - new:About window shows the current Telluride build number
