@@ -117,6 +117,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
      */
     public void updateCachedState() {
         try {
+            TransferState oldState = cachedState;
+            int oldProgress = cachedProgress;
             cachedState = dl.getState();
             cachedProgress = dl.getProgress();
             cachedConnectedSeeds = dl.getConnectedSeeds();
@@ -134,6 +136,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             cachedDownloadRateLimit = dl.getDownloadRateLimit();
             cachedUploadRateLimit = dl.getUploadRateLimit();
             updateCachedStaticMetadata();
+            if (oldState != cachedState) {
+                notifyStateChanged(oldState, cachedState);
+            }
+            if (oldProgress != cachedProgress
+                    && (Math.abs(oldProgress - cachedProgress) >= 5
+                    || cachedProgress == 100
+                    || cachedProgress == 0)) {
+                notifyProgressChanged(cachedProgress);
+            }
         } catch (Throwable e) {
             LOG.error("Error updating cached state", e);
         }
