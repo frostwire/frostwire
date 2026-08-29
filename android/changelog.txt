@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - new:Distributed torrents now fetch their metadata over the IceBridge mesh (TORRENT_FETCH) when the seeder is behind an unreachable NAT — cellular downloads no longer hang at "Downloading metadata" when the desktop's ports aren't forwarded; Android also answers TORRENT_FETCH for its own seeded torrents, so desktops can pull metadata from phone-seeded YouTube downloads
   - fix:Disabling every web search engine now persists when Distributed Search is enabled; startup no longer turns Archive.org back on before the distributed runtime is ready
   - fix:IceBridge search works reliably on cellular networks — rUDP HELLO authentication is retransmitted until signed acknowledgement and sessions follow changing carrier NAT endpoints
   - fix:Distributed-search hybrid/v2 magnets now use one real libtorrent transfer for x.pe peers, metadata, piece layers, and payload — fixes invalid piece-layer errors; transfer progress/state now refresh promptly, retries reconnect explicit peers, and invalid incoming port 0 falls back to a valid range
