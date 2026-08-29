@@ -332,6 +332,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private TransfersHolder sortSelectedStatusTransfersInBackground() {
         List<Transfer> allTransfers = TransferManager.instance().getTransfers();
+        for (Transfer t : allTransfers) {
+            if (t instanceof UIBittorrentDownload) {
+                ((UIBittorrentDownload) t).updateCachedState();
+            }
+        }
         final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
         selectedStatusTransfers.sort(transferComparator);
         return new TransfersHolder(allTransfers, selectedStatusTransfers);
@@ -393,21 +398,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 LOG.error("onTime() " + t.getMessage(), t);
                                 Ref.free(contextRef);
                                 return;
-                            }
-
-                            // Refresh cached BT state asynchronously so it does not delay
-                            // sorting and UI updates on the critical path.
-                            if (transfersHolder != null && transfersHolder.allTransfers != null) {
-                                final List<Transfer> transfersToCache = transfersHolder.allTransfers;
-                                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                                    long cacheStart = System.currentTimeMillis();
-                                    for (Transfer t : transfersToCache) {
-                                        if (t instanceof UIBittorrentDownload) {
-                                            ((UIBittorrentDownload) t).updateCachedState();
-                                        }
-                                    }
-                                    android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
-                                });
                             }
 
                             if (!Ref.alive(contextRef)) {
@@ -473,21 +463,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 LOG.error("onTime() " + t.getMessage(), t);
                                 Ref.free(contextRef);
                                 return;
-                            }
-
-                            // Refresh cached BT state asynchronously so it does not delay
-                            // sorting and UI updates on the critical path.
-                            if (transfersHolder != null && transfersHolder.allTransfers != null) {
-                                final List<Transfer> transfersToCache = transfersHolder.allTransfers;
-                                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                                    long cacheStart = System.currentTimeMillis();
-                                    for (Transfer t : transfersToCache) {
-                                        if (t instanceof UIBittorrentDownload) {
-                                            ((UIBittorrentDownload) t).updateCachedState();
-                                        }
-                                    }
-                                    android.util.Log.d("TransfersFragment.onTime", "updateCachedState for BT downloads took " + (System.currentTimeMillis() - cacheStart) + "ms");
-                                });
                             }
 
                             if (!Ref.alive(contextRef)) {
