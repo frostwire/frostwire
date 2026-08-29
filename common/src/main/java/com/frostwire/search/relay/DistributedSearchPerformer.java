@@ -428,6 +428,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         String infoHashHex = Hex.encode(row.infoHash);
         String magnet = UrlUtils.buildMagnetUrl(infoHashHex, name,
                 DefaultTrackers.MAGNET_URL_PARAMETERS, row.seederEndpoints);
+        if (row.publisherEd25519Pub != null && row.publisherEd25519Pub.length == 32) {
+            // x.hp = holder pub: mesh return address for TORRENT_FETCH metadata
+            // when the seeder's x.pe endpoints are unreachable (cellular/NAT).
+            magnet += "&x.hp=" + java.util.Base64.getUrlEncoder().withoutPadding()
+                    .encodeToString(row.publisherEd25519Pub);
+        }
         // Validate matchedFile: reject null, empty, or pathologically long values.
         String matchedFile = row.matchedFile;
         if (matchedFile != null) {
