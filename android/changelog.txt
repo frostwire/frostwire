@@ -1,4 +1,9 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
+  - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead
+  - fix:IceBridge RELAY replies follow the live rUDP session after a cellular NAT rebind instead of the first-seen registry address
+  - fix:TORRENT_FETCH accepts metadata chunks relayed through the EC2 hop (holder signature still required) so cellular downloads no longer time out to a stuck magnet
+  - fix:A metadata-less magnet left in the engine is replaced when full .torrent bytes arrive over the mesh, so the transfer appears in the list
   - new:Distributed torrents now fetch their metadata over the IceBridge mesh (TORRENT_FETCH) when the seeder is behind an unreachable NAT — cellular downloads no longer hang at "Downloading metadata" when the desktop's ports aren't forwarded; Android also answers TORRENT_FETCH for its own seeded torrents, so desktops can pull metadata from phone-seeded YouTube downloads
   - fix:Disabling every web search engine now persists when Distributed Search is enabled; startup no longer turns Archive.org back on before the distributed runtime is ready
   - fix:IceBridge search works reliably on cellular networks — rUDP HELLO authentication is retransmitted until signed acknowledgement and sessions follow changing carrier NAT endpoints
