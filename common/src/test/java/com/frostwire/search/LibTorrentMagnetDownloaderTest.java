@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LibTorrentMagnetDownloaderTest {
@@ -47,5 +48,31 @@ public class LibTorrentMagnetDownloaderTest {
     @Test
     public void malformedMagnetFailsClosed() {
         assertTrue(LibTorrentMagnetDownloader.parsePeers("magnet:?not-a-valid-uri").isEmpty());
+    }
+
+    @Test
+    public void parsesHolderPubFromDistributedMagnet() {
+        byte[] pub = new byte[32];
+        pub[0] = 7;
+        pub[31] = 42;
+        String b64 = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(pub);
+        String magnet = "magnet:?xt=urn:btih:" + INFOHASH
+                + "&dn=test.bin"
+                + "&x.pe=192.168.1.10:45321"
+                + "&x.hp=" + b64;
+        byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(magnet);
+        assertTrue(java.util.Arrays.equals(pub, holderPub));
+    }
+
+    @Test
+    public void holderPubAbsentOrInvalidFailsClosed() {
+        assertNull(LibTorrentMagnetDownloader.parseHolderPub(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&dn=test.bin"));
+        assertNull(LibTorrentMagnetDownloader.parseHolderPub(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hp="));
+        assertNull(LibTorrentMagnetDownloader.parseHolderPub(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hp=short"));
+        assertNull(LibTorrentMagnetDownloader.parseHolderPub(null));
+        assertNull(LibTorrentMagnetDownloader.parseHolderPub("http://example.com/f.torrent"));
     }
 }
