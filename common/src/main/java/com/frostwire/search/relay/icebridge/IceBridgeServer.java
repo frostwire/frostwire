@@ -64,6 +64,11 @@ public final class IceBridgeServer implements AutoCloseable {
         configureStandaloneConsoleLogging();
         loadDotEnv();
 
+        long parentPid = parseParentPid(args);
+        if (parentPid > 0) {
+            startParentWatchdog(parentPid);
+        }
+
         // --generate-token support: prints the new token *only* (once) to stdout.
         // New tokens are appended to the tokens file and take effect immediately (no restart).
         if (containsGenerateToken(args)) {
@@ -584,6 +589,10 @@ public final class IceBridgeServer implements AutoCloseable {
                     // Parsed separately by parseAuthToken(); skip value.
                     i++;
                     break;
+                case "--parent-pid":
+                    // Parsed separately by parseParentPid(); skip value.
+                    i++;
+                    break;
                 case "--auth-tokens-file":
                     // Handled early in main; skip value here.
                     i++;
@@ -638,6 +647,46 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  --host HOST                Bind host");
         System.out.println("  --auth-tokens-file PATH    File with one bearer token per line (default icebridge-tokens.txt)");
         System.out.println("  --generate-token           Generate + print one new token (only the token to stdout), store it, exit");
+        System.out.println("  --parent-pid PID           Exit when the parent process dies (child mode; prevents orphans)");
+    }
+
+    /**
+     * Parent watchdog: when spawned as a child process with {@code
+     * --parent-pid}, exit as soon as the parent FrostWire dies. Prevents
+     * orphaned children from surviving a crashed/killed parent and stealing
+     * the rUDP port from the next session (#917/#937/#944).
+     */
+    private static long parseParentPid(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if ("--parent-pid".equals(args[i]) && i + 1 < args.length) {
+                try {
+                    return Long.parseLong(args[i + 1]);
+                } catch (NumberFormatException ignored) {
+                    return 0;
+                }
+            }
+        }
+        return 0;
+    }
+
+    private static void startParentWatchdog(long parentPid) {
+        Thread watchdog = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                if (!ProcessHandle.of(parentPid).isPresent()) {
+                    System.err.println("Parent process " + parentPid
+                            + " is gone — exiting to avoid becoming an orphan relay.");
+                    System.exit(0);
+                }
+            }
+        }, "icebridge-parent-watchdog");
+        watchdog.setDaemon(true);
+        watchdog.start();
+        System.out.println("Parent watchdog active: exiting if parent pid " + parentPid + " dies.");
     }
 
     private static boolean containsGenerateToken(String[] args) {
