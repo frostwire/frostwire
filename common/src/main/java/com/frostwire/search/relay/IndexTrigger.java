@@ -14,5 +14,6 @@ package com.frostwire.search.relay;
  */
 public enum IndexTrigger {
     ADDED,
-    UPDATE
+    UPDATE,
+    CREATED
 }

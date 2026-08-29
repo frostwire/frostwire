@@ -126,6 +126,54 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                 THREAD_NAME_PREFIX + infoHashHex);
     }
 
+    /**
+     * Index a torrent we just created (YouTube/HTTP complete → .torrent)
+     * without waiting for BTEngine downloadAdded.
+     */
+    public IndexResult indexTorrentInfo(TorrentInfo ti, String displayName) {
+        if (ti == null) {
+            return IndexResult.NULL_INPUT;
+        }
+        String infoHashHex = infoHashHex(ti);
+        if (infoHashHex == null) {
+            return IndexResult.NO_METADATA;
+        }
+        try {
+            String name = displayName;
+            if (name == null || name.isEmpty()) {
+                try {
+                    name = ti.name();
+                } catch (Throwable ignored) {
+                    name = null;
+                }
+            }
+            if (name == null || name.isEmpty()) {
+                name = resolveName(null, ti);
+            }
+            long size = safeSize(ti);
+            int fileCount = safeFileCount(ti);
+            long now = Instant.now().getEpochSecond();
+            LocalSharedTorrent torrent = new LocalSharedTorrent.Builder()
+                    .infoHash(Hex.decode(infoHashHex))
+                    .name(name)
+                    .sizeBytes(size)
+                    .fileCount(fileCount)
+                    .filesJson(buildFilesJson(ti, fileCount, size))
+                    .publisherNodeId(publisherNodeId)
+                    .publisherEd25519Pub(publisherEd25519Pub)
+                    .publisherUtpPort(0)
+                    .addedAt(now)
+                    .lastSeenAt(now)
+                    .build();
+            index.upsert(torrent);
+            LOG.info("Indexed torrent " + infoHashHex + " from " + IndexTrigger.CREATED.name());
+            return IndexResult.UPSERTED;
+        } catch (Throwable t) {
+            LOG.warn("Failed to index torrent from " + IndexTrigger.CREATED.name(), t);
+            return IndexResult.ERROR;
+        }
+    }
+
     IndexResult indexIfReady(BTDownload dl, String infoHashHex, IndexTrigger trigger) {
         if (dl == null || infoHashHex == null) {
             return IndexResult.NULL_INPUT;
@@ -275,6 +323,18 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             }
         }
         return UNKNOWN_NAME;
+    }
+
+    private static String infoHashHex(TorrentInfo ti) {
+        try {
+            Sha1Hash v1 = ti.infoHashV1();
+            if (v1 != null) {
+                return v1.toHex().toLowerCase();
+            }
+        } catch (Throwable t) {
+            LOG.debug("TorrentInfo.infoHashV1() lookup failed", t);
+        }
+        return null;
     }
 
     private static String safeInfoHash(BTDownload dl) {
