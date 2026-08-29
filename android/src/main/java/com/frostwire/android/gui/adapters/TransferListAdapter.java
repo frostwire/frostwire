@@ -194,9 +194,13 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
 
     @Override
     public void onTransferProgressChanged(Transfer transfer, int progress) {
-        // Called frequently - only update if progress changed significantly (every 5%)
-        // to avoid excessive updates
-        // Not implemented yet - keeping submitList(null) for progress updates for now
+        android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        mainHandler.post(() -> {
+            int position = getPositionOfTransfer(transfer);
+            if (position >= 0) {
+                notifyItemChanged(position);
+            }
+        });
     }
 
     private int getPositionOfTransfer(Transfer transfer) {
@@ -222,9 +226,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         if (!removedTransferIds.isEmpty()) {
             newList.removeIf(t -> removedTransferIds.contains(resolveTransferId(t)));
         }
-        LOG.debug("updateList() called with " + newList.size() + " transfers");
-        
-        // Unsubscribe from old transfers that are no longer in the list
+
         List<Transfer> oldList = getCurrentList();
         Set<String> newIds = new HashSet<>();
         for (Transfer t : newList) {
@@ -235,9 +237,26 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                 unsubscribeFromTransfer(oldTransfer);
             }
         }
-        
-        submitList(newList, this::notifyDataSetChanged);
-        LOG.debug("updateList() submitList called");
+
+        if (sameIdsInOrder(oldList, newList)) {
+            for (int i = 0; i < newList.size(); i++) {
+                notifyItemChanged(i);
+            }
+            return;
+        }
+        submitList(newList);
+    }
+
+    private static boolean sameIdsInOrder(List<Transfer> a, List<Transfer> b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.size(); i++) {
+            if (!resolveTransferId(a.get(i)).equals(resolveTransferId(b.get(i)))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -255,41 +274,26 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         public boolean areContentsTheSame(Transfer oldItem, Transfer newItem) {
             TransferUiState oldState = new TransferUiState(oldItem);
             TransferUiState newState = new TransferUiState(newItem);
-            boolean same = oldState.hasSameContent(newState);
-            if (!same) {
-                LOG.debug("areContentsTheSame: CHANGED for " + oldItem.getDisplayName() +
-                    " oldState=(" + oldState.state + ", progress=" + oldState.progress + ", speed=" + oldState.downloadSpeed + ")" +
-                    " newState=(" + newState.state + ", progress=" + newState.progress + ", speed=" + newState.downloadSpeed + ")");
-            }
-            return same;
+            return oldState.hasSameContent(newState);
         }
     }
 
     private static String resolveTransferId(Transfer transfer) {
-        String id;
         if (transfer instanceof BittorrentDownload) {
             String hash = ((BittorrentDownload) transfer).getInfoHash();
             if (hash != null && !hash.isEmpty()) {
-                id = "bt:" + hash;
-                LOG.debug("resolveTransferId() BT: " + id + " for " + transfer.getDisplayName());
-                return id;
+                return "bt:" + hash;
             }
         }
         File savePath = transfer.getSavePath();
         if (savePath != null) {
-            id = "path:" + savePath.getAbsolutePath();
-            LOG.debug("resolveTransferId() PATH: " + id + " for " + transfer.getDisplayName());
-            return id;
+            return "path:" + savePath.getAbsolutePath();
         }
         String displayName = transfer.getDisplayName();
         if (displayName != null && !displayName.isEmpty()) {
-            id = "name:" + displayName;
-            LOG.debug("resolveTransferId() NAME: " + id + " for " + displayName);
-            return id;
+            return "name:" + displayName;
         }
-        id = "instance:" + System.identityHashCode(transfer);
-        LOG.debug("resolveTransferId() INSTANCE: " + id + " for " + displayName);
-        return id;
+        return "instance:" + System.identityHashCode(transfer);
     }
 
     private static final class TransferUiState {
