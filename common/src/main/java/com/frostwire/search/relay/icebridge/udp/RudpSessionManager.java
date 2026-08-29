@@ -20,6 +20,7 @@ import io.netty.channel.Channel;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +217,10 @@ public final class RudpSessionManager {
             if (session == null) {
                 return;
             }
+        }
+        if (!session.isAuthenticated()) {
+            session.holdAppPayload(payload);
+            return;
         }
         if (payload.length <= RudpPacket.MAX_FRAGMENT_PAYLOAD) {
             // Single packet — no fragmentation needed.
@@ -503,6 +508,7 @@ public final class RudpSessionManager {
             session.pending().remove(0);
             // Prefer the session that just proved identity on this address.
             rebindSessionAddress(session, sender);
+            flushHeldAppPayloads(session);
         }
         LOG.info("IceBridge mesh: HELLO_ACK ok peer=" + sender
                 + (session.remotePub() != null
@@ -903,8 +909,29 @@ public final class RudpSessionManager {
 
     // ---- maintenance ----
 
+    private void flushHeldAppPayloads(RudpSession session) {
+        if (session == null || !session.isAuthenticated()) {
+            return;
+        }
+        byte[] held;
+        while ((held = session.pollHeldAppPayload()) != null) {
+            sendData(session.remoteAddress(), held);
+        }
+    }
+
+    private void dropSession(RudpSession session) {
+        if (session == null) {
+            return;
+        }
+        sessionsByRemoteId.remove(session.remoteConnectionId(), session);
+        sessionsByAddress.remove(session.remoteAddress(), session);
+        LOG.warn("IceBridge mesh: dropped session " + session.remoteAddress()
+                + " after reliable send timeout — next send will reconnect");
+    }
+
     private void retransmitAndEvict() {
         long now = System.currentTimeMillis();
+        List<RudpSession> dead = new ArrayList<>();
         for (RudpSession session : sessionsByRemoteId.values()) {
             // Retransmit unacked packets that are due, and purge packets
             // that have exhausted retries or exceeded the timeout.
@@ -917,6 +944,7 @@ public final class RudpSessionManager {
                         || (now - pp.firstSentMs) >= RETRANSMIT_TIMEOUT_MS;
                 if (exhausted) {
                     iter.remove();
+                    dead.add(session);
                     continue;
                 }
                 if (now - pp.lastSentMs > RETRANSMIT_INTERVAL_MS) {
@@ -929,6 +957,9 @@ public final class RudpSessionManager {
                 sessionsByRemoteId.remove(session.remoteConnectionId());
                 sessionsByAddress.remove(session.remoteAddress());
             }
+        }
+        for (RudpSession session : dead) {
+            dropSession(session);
         }
         reassembler.evictStale();
     }

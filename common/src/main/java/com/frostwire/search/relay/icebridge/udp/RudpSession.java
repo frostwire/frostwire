@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge.udp;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,6 +43,7 @@ final class RudpSession {
      */
     private final ConcurrentNavigableMap<Integer, PendingPacket> pending =
             new ConcurrentSkipListMap<>(Integer::compareUnsigned);
+    private final ConcurrentLinkedQueue<byte[]> heldAppPayloads = new ConcurrentLinkedQueue<>();
 
     RudpSession(long localConnectionId,
                 long remoteConnectionId,
@@ -94,6 +96,20 @@ final class RudpSession {
 
     boolean weAreInitiator() {
         return weAreInitiator;
+    }
+
+    boolean isAuthenticated() {
+        return remotePub != null;
+    }
+
+    void holdAppPayload(byte[] payload) {
+        if (payload != null && payload.length > 0) {
+            heldAppPayloads.add(payload);
+        }
+    }
+
+    byte[] pollHeldAppPayload() {
+        return heldAppPayloads.poll();
     }
 
     void markActivity() {
