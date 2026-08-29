@@ -146,18 +146,9 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
         if (MeshProtocolId.effective(protocolId) != MeshProtocolId.METADATA) {
             return;
         }
-        if (!Arrays.equals(sourcePub, holderPub)) {
-            return;
-        }
         TorrentMetadataResponse response = SearchPayloadCodec.decodeTorrentMetadataResponse(payload);
         if (response == null) {
-            LOG.warn("MeshTorrentMetadataFetcher: undecodable metadata frame from "
-                    + Hex.encode(sourcePub).substring(0, 12));
-            return;
-        }
-        if (!Arrays.equals(sourcePub, holderPub)) {
-            LOG.warn("MeshTorrentMetadataFetcher: metadata frame from unexpected source "
-                    + Hex.encode(sourcePub).substring(0, 12));
+            LOG.warn("MeshTorrentMetadataFetcher: undecodable metadata frame");
             return;
         }
         if (!Arrays.equals(response.nonce(), nonce) || !Arrays.equals(response.infoHash(), infoHash)) {
