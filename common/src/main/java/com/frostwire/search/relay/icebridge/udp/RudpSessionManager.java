@@ -672,6 +672,7 @@ public final class RudpSessionManager {
             LOG.debug("RudpSessionManager: rejected RELAY from unauthenticated " + sender);
             return;
         }
+        rebindSessionAddress(senderSession, sender);
         if (senderSession.receiveRemote(packet.sequence())) {
             send(senderSession, senderSession.dataAck());
         }
@@ -765,14 +766,25 @@ public final class RudpSessionManager {
             deliverToLocalPollClient(target.ed25519Pub(), logicalSourcePub, appPayload);
             return;
         }
-        RudpSession targetSession = sessionsByAddress.get(targetAddress);
+        // CGNAT rebinds the UDP tuple while the registry still holds the
+        // first-seen mapping. Inbound SEARCH is keyed by connectionId so it
+        // still arrives; replies must follow the live session, not the stale
+        // host:port, or they black-hole and the phone shows zero results.
+        RudpSession targetSession = findSessionByPub(target.ed25519Pub());
         if (targetSession == null) {
-            connect(targetAddress);
             targetSession = sessionsByAddress.get(targetAddress);
         }
         if (targetSession == null) {
-            LOG.debug("RudpSessionManager: no session to local registry target "
-                    + target.host() + ":" + target.rudpPort());
+            connect(targetAddress);
+            targetSession = findSessionByPub(target.ed25519Pub());
+            if (targetSession == null) {
+                targetSession = sessionsByAddress.get(targetAddress);
+            }
+        }
+        if (targetSession == null) {
+            LOG.warn("RudpSessionManager: no live session to local registry target "
+                    + Hex.encode(target.ed25519Pub()).substring(0, 12) + "…"
+                    + " registry=" + target.host() + ":" + target.rudpPort());
             return;
         }
         byte[] responsePayload = new byte[32 + appPayload.length];
@@ -919,6 +931,19 @@ public final class RudpSessionManager {
             }
         }
         reassembler.evictStale();
+    }
+
+    private RudpSession findSessionByPub(byte[] pub) {
+        if (pub == null || pub.length != 32) {
+            return null;
+        }
+        for (RudpSession session : sessionsByRemoteId.values()) {
+            byte[] remotePub = session.remotePub();
+            if (remotePub != null && Arrays.equals(remotePub, pub)) {
+                return session;
+            }
+        }
+        return null;
     }
 
     private void rebindSessionAddress(RudpSession session, InetSocketAddress sender) {
