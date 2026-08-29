@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
   - fix:Torrent transfer details are hidden until metadata has arrived — tapping a "Downloading metadata" row no longer shows Invalid Infohash
   - fix:Tapping a mesh search result that is already in Transfers does not add a duplicate TorrentFetcherDownload
   - fix:Performing a search restarts IceBridge if it was shut down, so distributed search never silently no-ops

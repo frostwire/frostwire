@@ -38,6 +38,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadListener;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
@@ -57,6 +58,10 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         // this method will be called for all finished transfers even right after the app has been opened the first
         // time, right after it's done resuming transfers
         pauseSeedingIfNecessary(dl);
+        BittorrentDownload ui = TransferManager.instance().getBittorrentDownload(dl.getInfoHash());
+        if (ui instanceof UIBittorrentDownload) {
+            ((UIBittorrentDownload) ui).updateCachedState();
+        }
         TransferManager.instance().incrementDownloadsToReview();
         File savePath = dl.getSavePath().getAbsoluteFile(); // e.g. "Downloads/FrostWire"
         Engine engine = Engine.instance();
