@@ -174,9 +174,15 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     client.setAuthToken(authToken);
   }
 
-  /** Gracefully stop the IceBridge process. */
+  /** Gracefully stop the IceBridge process and its supervision. */
   @Override
   public synchronized void close() {
+    stopSupervision();
+    stopProcess();
+  }
+
+  /** Kill the child process and clean up its pidfile/log dir (keeps supervision). */
+  private synchronized void stopProcess() {
     if (process != null && process.isAlive()) {
       LOG.info("Stopping IceBridge process");
       process.destroy();
@@ -303,6 +309,67 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
   public boolean isAlive() {
     return process != null && process.isAlive();
   }
+
+  /**
+   * Supervise the child: periodically verify it is alive and its control endpoint answers; respawn
+   * (stale-kill included) when it is not. Makes the desktop self-heal after orphaned-port
+   * collisions, child crashes, and any other runtime loss — no restart required.
+   */
+  public synchronized void startSupervision(long periodMs) {
+    if (periodMs <= 0) {
+      throw new IllegalArgumentException("periodMs must be > 0");
+    }
+    if (supervisor != null) {
+      return; // already supervised
+    }
+    supervisor =
+        new Thread(
+            () -> {
+              while (supervising) {
+                try {
+                  Thread.sleep(periodMs);
+                } catch (InterruptedException e) {
+                  return;
+                }
+                if (!supervising) {
+                  return;
+                }
+                try {
+                  if (isAlive() && client != null && client.health()) {
+                    continue;
+                  }
+                  if (!supervising) {
+                    return;
+                  }
+                  LOG.warn(
+                      "IceBridge child unhealthy (alive="
+                          + isAlive()
+                          + ") — respawning under supervision");
+                  stopProcess();
+                  start();
+                } catch (Throwable t) {
+                  LOG.warn("IceBridge supervision respawn failed (will retry)", t);
+                }
+              }
+            },
+            "icebridge-child-supervisor");
+    supervisor.setDaemon(true);
+    supervising = true;
+    supervisor.start();
+    LOG.info("IceBridge child supervision started (period " + periodMs + "ms)");
+  }
+
+  /** Stop supervision (does not stop the child). */
+  public synchronized void stopSupervision() {
+    supervising = false;
+    if (supervisor != null) {
+      supervisor.interrupt();
+      supervisor = null;
+    }
+  }
+
+  private Thread supervisor;
+  private volatile boolean supervising;
 
   public File logDir() {
     return logDir;
