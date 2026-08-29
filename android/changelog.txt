@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Torrent transfer details are hidden until metadata has arrived — tapping a "Downloading metadata" row no longer shows Invalid Infohash
+  - fix:Tapping a mesh search result that is already in Transfers does not add a duplicate TorrentFetcherDownload
   - fix:Performing a search restarts IceBridge if it was shut down, so distributed search never silently no-ops
   - fix:Distributed search keeps working after Android reaps the engine foreground service — IceBridge is no longer torn down with the FGS, and startServices restarts a missing relay stack instead of aborting as "already started"
   - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared

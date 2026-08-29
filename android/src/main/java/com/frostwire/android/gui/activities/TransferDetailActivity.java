@@ -29,6 +29,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.fragments.TransferDetailDetailsFragment;
 import com.frostwire.android.gui.fragments.TransferDetailFilesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailFragment;
@@ -123,6 +124,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             } else if (bittorrentDownload instanceof BTDownload) {
                 uiBittorrentDownload = new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload);
             }
+        }
+        if (uiBittorrentDownload != null
+                && !TransferListAdapter.canOpenTorrentDetails(uiBittorrentDownload)) {
+            uiBittorrentDownload = null;
         }
         return uiBittorrentDownload != null;
     }

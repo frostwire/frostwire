@@ -464,11 +464,24 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
                     items.add(new SendBitcoinTipAction(context, po.bitcoin));
                 }
             }
-            if (bittorrentDownload.getInfoHash() != null && !"".equals(bittorrentDownload.getInfoHash())) {
+            if (canOpenTorrentDetails(bittorrentDownload)) {
                 items.add(new TransferDetailsMenuAction(context, R.string.show_torrent_details, bittorrentDownload.getInfoHash()));
             }
         }
         return title;
+    }
+
+    public static boolean canOpenTorrentDetails(BittorrentDownload download) {
+        if (!(download instanceof UIBittorrentDownload)) {
+            return false;
+        }
+        TransferState state = download.getState();
+        if (state == TransferState.DOWNLOADING_METADATA
+                || state == TransferState.DOWNLOADING_TORRENT) {
+            return false;
+        }
+        String hash = download.getInfoHash();
+        return hash != null && !hash.isEmpty();
     }
 
     private String extractMime(Transfer download) {
@@ -650,7 +663,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             title.setText(download.getDisplayName());
             setProgress(progress, download.getProgress());
             title.setCompoundDrawables(null, null, null, null);
-            if (download instanceof UIBittorrentDownload && download.getInfoHash() != null && !"".equals(download.getInfoHash())) {
+            if (canOpenTorrentDetails(download)) {
                 buttonDetails.setTag(download);
                 buttonDetails.setVisibility(View.VISIBLE);
                 buttonDetails.setOnClickListener(transferDetailsClickListener);
