@@ -1,4 +1,5 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Transfer list updates in place instead of DiffUtil+notifyDataSetChanged on the same objects, so Finished/Seeding show immediately and the list is less laggy
   - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
   - fix:Torrent transfer details are hidden until metadata has arrived — tapping a "Downloading metadata" row no longer shows Invalid Infohash
   - fix:Tapping a mesh search result that is already in Transfers does not add a duplicate TorrentFetcherDownload
