@@ -270,21 +270,6 @@ public final class SearchMediator {
                     tsr.getCreationTime(),
                     tsr.getHttpHeaders());
             ui = new TellurideUISearchResult(fasterAudio, engine, query, false);
-          } else if (extension.equals("mp4")) {
-            TellurideSearchResult tsr2 =
-                new TellurideSearchResult(
-                    tsr.getId(),
-                    "(Faster audio download) " + tsr.getDisplayName() + " (.m4a)",
-                    ui.getFilename(),
-                    tsr.getSource(),
-                    tsr.getDetailsUrl(),
-                    tsr.getDownloadUrl(),
-                    tsr.getThumbnailUrl(),
-                    tsr.getSize(),
-                    tsr.getCreationTime(),
-                    tsr.getHttpHeaders());
-            UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
-            result.add(ui2);
           }
         }
       } else if (sr instanceof CompositeFileSearchResult) {
