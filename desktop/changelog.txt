@@ -1,4 +1,5 @@
 FrostWire 7.1.0 UNRELEASED
+  - new:Desktop answers TORRENT_FETCH requests over IceBridge — peers behind NAT fetch a shared torrent's full metadata (piece layers included) through the mesh instead of hanging on "Downloading metadata"
   - new:About window shows the current Telluride build number
   - fix:YouTube downloads pass yt-dlp's HTTP headers, request complete byte ranges, resume transient resets safely, and use isolated cancel state per transfer; Telluride build 47 updates yt-dlp to 2026.8.19, restores direct-m4a “Faster Download,” and pasted watch URLs open the requested video
   - fix:IceBridge rUDP HELLO authentication is retransmitted until signed acknowledgement, and authenticated sessions follow changing mobile carrier NAT endpoints instead of replying to stale addresses
