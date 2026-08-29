@@ -518,6 +518,14 @@ public final class RudpSessionManager {
         rebindSessionAddress(session, sender);
         if (session.receiveRemote(packet.sequence())) {
             notifyListener(session.remotePub(), packet.payload());
+        } else {
+            // Out-of-window or duplicate sequence — a peer that rebuilt its
+            // session (NAT rebind, app restart) resets its send sequence while
+            // this session expects the old one; without this log the ensuing
+            // silent drops are invisible and searches just die.
+            LOG.warn("RudpSessionManager: dropped out-of-window DATA seq="
+                    + packet.sequence() + " from " + sender
+                    + " — possible session reset by peer");
         }
         send(session, session.dataAck());
     }
