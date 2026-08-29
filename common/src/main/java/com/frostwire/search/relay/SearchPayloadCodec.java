@@ -111,4 +111,58 @@ public final class SearchPayloadCodec {
             return null;
         }
     }
+
+    /**
+     * Encode a signed torrent metadata request to UTF-8 JSON bytes.
+     */
+    public static byte[] encodeTorrentMetadataRequest(TorrentMetadataRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request is null");
+        }
+        return GSON.toJson(request.toBencodeableMap()).getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Decode a torrent metadata request from JSON bytes.
+     *
+     * @return the request, or {@code null} if the bytes are empty or malformed
+     */
+    public static TorrentMetadataRequest decodeTorrentMetadataRequest(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        try {
+            Map<String, Object> map = GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), MAP_TYPE);
+            return TorrentMetadataRequest.fromBencodeableMap(map);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
+     * Encode a signed torrent metadata response chunk to UTF-8 JSON bytes.
+     */
+    public static byte[] encodeTorrentMetadataResponse(TorrentMetadataResponse response) {
+        if (response == null) {
+            throw new IllegalArgumentException("response is null");
+        }
+        return GSON.toJson(response.toBencodeableMap()).getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Decode a torrent metadata response chunk from JSON bytes.
+     *
+     * @return the response, or {@code null} if the bytes are empty or malformed
+     */
+    public static TorrentMetadataResponse decodeTorrentMetadataResponse(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        try {
+            Map<String, Object> map = GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), MAP_TYPE);
+            return TorrentMetadataResponse.fromBencodeableMap(map);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }
