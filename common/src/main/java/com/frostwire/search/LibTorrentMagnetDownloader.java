@@ -60,6 +60,34 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
         }
     }
 
+    /**
+     * Extracts the {@code x.hp} holder Ed25519 pub (base64url, 32 bytes) from
+     * a Distributed search magnet — the mesh return address for TORRENT_FETCH
+     * metadata requests when the seeder is not directly reachable (NAT).
+     * Fails closed: absent/invalid values yield null.
+     */
+    public static byte[] parseHolderPub(String magnetUri) {
+        if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
+            return null;
+        }
+        try {
+            int i = magnetUri.indexOf("x.hp=");
+            if (i < 0) {
+                return null;
+            }
+            int start = i + "x.hp=".length();
+            int end = magnetUri.indexOf('&', start);
+            String b64 = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
+            if (b64.isEmpty()) {
+                return null;
+            }
+            byte[] pub = java.util.Base64.getUrlDecoder().decode(b64);
+            return pub.length == 32 ? pub : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     public static File getTempDir() {
         File fwDummy = null;
         try {
