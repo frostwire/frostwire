@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
   - fix:Newly created torrents (YouTube/HTTP downloads that auto-seed) are written to the mesh LocalIndex as soon as the .torrent is generated, not after a later BTEngine callback
   - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
   - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead

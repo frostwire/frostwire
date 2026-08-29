@@ -179,14 +179,14 @@ public final class BTDownload implements BittorrentDownload {
             return TransferState.DOWNLOADING;  // Default for new torrents, not ERROR
         }
         final boolean isPaused = isPaused(status);
-        if (isPaused && status.isFinished()) {
-            return TransferState.FINISHED;
+        final boolean done = status.isFinished()
+                || Float.compare(status.progress(), 1f) >= 0
+                || (status.totalWanted() > 0 && status.totalWantedDone() >= status.totalWanted());
+        if (done) {
+            return isPaused ? TransferState.FINISHED : TransferState.SEEDING;
         }
-        if (isPaused && !status.isFinished()) {
+        if (isPaused) {
             return TransferState.PAUSED;
-        }
-        if (!isPaused && status.isFinished()) { // see the docs of isFinished
-            return TransferState.SEEDING;
         }
         final TorrentStatus.State state = status.state();
         switch (state) {
@@ -915,7 +915,14 @@ public final class BTDownload implements BittorrentDownload {
             AlertType type = alert.type();
             switch (type) {
                 case TORRENT_FINISHED:
-                    invalidateStatusCache();
+                    try {
+                        if (th.isValid()) {
+                            cachedStatus = th.status();
+                            lastStatusUpdateTime = System.currentTimeMillis();
+                        }
+                    } catch (Throwable t) {
+                        invalidateStatusCache();
+                    }
                     torrentFinished();
                     break;
                 case TORRENT_REMOVED:
