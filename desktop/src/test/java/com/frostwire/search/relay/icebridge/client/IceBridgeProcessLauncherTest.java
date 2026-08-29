@@ -204,6 +204,62 @@ class IceBridgeProcessLauncherTest {
         "child must exit after its parent dies (watchdog interval is 3s)");
   }
 
+  /**
+   * Supervision: when the child dies at runtime, the supervisor respawns a healthy replacement
+   * without any caller action — the self-heal that makes restart-orphan scenarios impossible to
+   * notice.
+   */
+  @Test
+  void supervisorRespawnsChildAfterExternalKill() throws Exception {
+    File jar = new File(System.getProperty("user.dir"), "build/libs/icebridge.jar");
+    assertTrue(jar.isFile(), "icebridge.jar must be built first (run icebridgeJar)");
+
+    Path tmp = Files.createTempDirectory("icebridge-test-supervision");
+    File identityFile = new File(tmp.toFile(), "identity.dat");
+    IdentityKeys keys = IdentityKeys.generate(0);
+    IdentityKeys.save(keys, identityFile);
+
+    launcher = new IceBridgeProcessLauncher(jar, identityFile, 0, 0, "BOTH");
+    launcher.start();
+    assertTrue(waitForHealthy(launcher, 30_000), "initial child never became healthy");
+    long firstPid = readPidFile(tmp.toFile());
+
+    launcher.startSupervision(1_000);
+
+    // Kill the child from outside (simulates a crash / third-party kill).
+    ProcessHandle.of(firstPid).ifPresent(ProcessHandle::destroyForcibly);
+    long killDeadline = System.currentTimeMillis() + 5000;
+    while (launcher.isAlive() && System.currentTimeMillis() < killDeadline) {
+      Thread.sleep(100);
+    }
+    assertFalse(launcher.isAlive(), "child should die after external kill");
+
+    // The supervisor must bring a new healthy child back.
+    assertTrue(waitForHealthy(launcher, 30_000), "supervisor did not respawn a healthy child");
+    long secondPid = readPidFile(tmp.toFile());
+    assertTrue(secondPid > 0 && secondPid != firstPid, "respawned child must be a new process");
+  }
+
+  private static boolean waitForHealthy(IceBridgeProcessLauncher l, long timeoutMs)
+      throws InterruptedException {
+    long deadline = System.currentTimeMillis() + timeoutMs;
+    while (System.currentTimeMillis() < deadline) {
+      if (l.isAlive() && l.client() != null && l.client().health()) {
+        return true;
+      }
+      Thread.sleep(100);
+    }
+    return false;
+  }
+
+  private static long readPidFile(File dir) throws IOException {
+    File pidFile = new File(dir, "icebridge-child.pid");
+    if (!pidFile.isFile()) {
+      return -1;
+    }
+    return Long.parseLong(java.nio.file.Files.readString(pidFile.toPath()).trim());
+  }
+
   private static int freePort() throws IOException {
     try (java.net.ServerSocket s = new java.net.ServerSocket(0)) {
       return s.getLocalPort();
