@@ -132,7 +132,7 @@ class TorrentFetchOverMeshTest {
   @Test
   void wireSmokeChunkDataFitsRelayFrame() {
     byte[] chunk = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES];
-    byte[] wire =
+    byte[] chunkJson =
         SearchPayloadCodec.encodeTorrentMetadataResponse(
             TorrentMetadataResponse.builder()
                 .nonce(new byte[32])
@@ -144,8 +144,17 @@ class TorrentFetchOverMeshTest {
                 .data(chunk)
                 .signature(new byte[64])
                 .build());
+    int wireLength =
+        com.frostwire.search.relay.icebridge.MeshEnvelope.encodeForWire(
+                com.frostwire.search.relay.icebridge.MeshProtocolId.METADATA, chunkJson)
+            .length;
     assertTrue(
-        wire.length < 1024, "chunk wire frame must fit the ~1KB mesh RELAY cap: " + wire.length);
+        wireLength <= com.frostwire.search.relay.icebridge.udp.RelayFrame.MAX_APP_PAYLOAD,
+        "envelope-wrapped chunk wire ("
+            + wireLength
+            + "B) must fit the mesh RELAY cap ("
+            + com.frostwire.search.relay.icebridge.udp.RelayFrame.MAX_APP_PAYLOAD
+            + "B)");
   }
 
   // --- helpers ---

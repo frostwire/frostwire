@@ -43,8 +43,12 @@ import java.util.Map;
 public final class TorrentMetadataResponse {
     public static final int VERSION = 1;
 
-    /** Chunk payload bytes; base64 + JSON envelope must fit the ~1 KB mesh RELAY frame cap. */
-    public static final int CHUNK_DATA_BYTES = 512;
+    /**
+     * Chunk payload bytes sized so the base64 + JSON envelope + 65-byte
+     * {@code MeshEnvelope} header stays under {@code RelayFrame.MAX_APP_PAYLOAD}
+     * (959 B) — larger frames are silently unroutable over the mesh RELAY path.
+     */
+    public static final int CHUNK_DATA_BYTES = 448;
 
     /** Maximum .torrent size we will relay (anti-amplification). */
     public static final long MAX_TORRENT_BYTES = 256L * 1024;

@@ -114,8 +114,9 @@ public final class RudpSessionManager {
             return;
         }
         if (payload.length > RelayFrame.MAX_APP_PAYLOAD) {
-            LOG.debug("RudpSessionManager: deliver payload too large for mesh ("
-                    + payload.length + " > " + RelayFrame.MAX_APP_PAYLOAD + ")");
+            LOG.warn("RudpSessionManager: deliver payload too large for mesh ("
+                    + payload.length + " > " + RelayFrame.MAX_APP_PAYLOAD + ")"
+                    + " target=" + Hex.encode(targetPub));
             // Direct DATA path can still fragment; only mesh RELAY is capped.
             PeerRecord direct = registry.lookup(targetPub);
             if (direct != null) {
