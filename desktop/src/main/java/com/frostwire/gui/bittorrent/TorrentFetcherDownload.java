@@ -306,6 +306,33 @@ public class TorrentFetcherDownload implements BTDownload {
     return selection;
   }
 
+  /**
+   * TORRENT_FETCH (Protocol #3 METADATA) over the IceBridge mesh: ask the holder whose pub rides
+   * the magnet as {@code x.hp} for the full .torrent bytes — e.g. a phone-seeded YouTube download
+   * whose BT ports are unreachable behind CGNAT. Returns null fast when the magnet carries no
+   * holder or the relay stack is not up.
+   */
+  private byte[] fetchMeshTorrentMetadata() {
+    try {
+      byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(uri);
+      if (holderPub == null
+          || hash == null
+          || hash.length() != 40
+          || !com.frostwire.search.relay.MeshRequestContext.isReady()) {
+        return null;
+      }
+      return com.frostwire.search.relay.MeshTorrentMetadataFetcher.fetch(
+          com.frostwire.search.relay.MeshRequestContext.transport(),
+          com.frostwire.search.relay.MeshRequestContext.identity(),
+          holderPub,
+          com.frostwire.util.Hex.decode(hash),
+          com.frostwire.search.relay.MeshTorrentMetadataFetcher.DEFAULT_TIMEOUT_SEC * 1000L);
+    } catch (Throwable t) {
+      LOG.warn("Mesh torrent metadata fetch failed for " + uri, t);
+      return null;
+    }
+  }
+
   private class FetcherRunnable implements Runnable {
     @Override
     public void run() {
@@ -319,8 +346,14 @@ public class TorrentFetcherDownload implements BTDownload {
               HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD)
                   .getBytes(uri, 15000, UserAgentGenerator.getUserAgent(), referer, cookie);
         } else {
-          LibTorrentMagnetDownloader magnetDownloader = new LibTorrentMagnetDownloader();
-          data = magnetDownloader.download(uri, 90);
+          // NAT-proof metadata path first: TORRENT_FETCH the full .torrent
+          // (piece layers included) from the holder over IceBridge; fall back
+          // to direct magnet metadata when the mesh can't answer.
+          data = fetchMeshTorrentMetadata();
+          if (data == null) {
+            LibTorrentMagnetDownloader magnetDownloader = new LibTorrentMagnetDownloader();
+            data = magnetDownloader.download(uri, 90);
+          }
         }
         if (state == TransferState.CANCELED) {
           return;
