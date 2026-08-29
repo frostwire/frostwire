@@ -677,7 +677,7 @@ public final class IceBridgeServer implements AutoCloseable {
                 } catch (InterruptedException e) {
                     return;
                 }
-                if (!ProcessHandle.of(parentPid).isPresent()) {
+                if (!isProcessAlive(parentPid)) {
                     System.err.println("Parent process " + parentPid
                             + " is gone — exiting to avoid becoming an orphan relay.");
                     System.exit(0);
@@ -687,6 +687,24 @@ public final class IceBridgeServer implements AutoCloseable {
         watchdog.setDaemon(true);
         watchdog.start();
         System.out.println("Parent watchdog active: exiting if parent pid " + parentPid + " dies.");
+    }
+
+    /**
+     * Parent liveness via {@code java.lang.ProcessHandle}, accessed
+     * reflectively so this common source compiles on Android (no
+     * ProcessHandle in the Android bootclasspath). The watchdog itself only
+     * runs in spawned child processes (desktop/EC2 JVMs); on platforms
+     * without ProcessHandle we conservatively report the parent alive.
+     */
+    private static boolean isProcessAlive(long pid) {
+        try {
+            Class<?> processHandle = Class.forName("java.lang.ProcessHandle");
+            Object optional = processHandle.getMethod("of", long.class).invoke(null, pid);
+            Object handle = ((java.util.Optional<?>) optional).orElse(null);
+            return handle != null && (boolean) handle.getClass().getMethod("isAlive").invoke(handle);
+        } catch (Throwable t) {
+            return true;
+        }
     }
 
     private static boolean containsGenerateToken(String[] args) {
