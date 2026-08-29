@@ -638,6 +638,30 @@ class RudpSessionManagerComprehensiveTest {
   }
 
   @Test
+  void sendDataBeforeHelloAckIsHeldThenFlushed() throws Exception {
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, (pub, payload) -> {});
+    InetSocketAddress peer = new InetSocketAddress("127.0.0.1", 62111);
+    mgr.connect(peer);
+    assertEquals(1, mgr.pendingCountForTest(peer), "HELLO is pending");
+    assertFalse(mgr.hasRemotePubForTest(peer));
+
+    mgr.sendData(peer, "search-before-handshake".getBytes());
+    assertEquals(1, mgr.pendingCountForTest(peer), "DATA must wait for HELLO_ACK");
+
+    long wireCid = mgr.remoteConnectionIdForTest(peer);
+    byte[] ackPayload = RudpAuth.createHelloPayload(remote, wireCid);
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.HELLO_ACK, wireCid, 0, 0, ackPayload),
+            peer,
+            new InetSocketAddress("127.0.0.1", 62110)));
+
+    assertTrue(mgr.hasRemotePubForTest(peer));
+    assertEquals(1, mgr.pendingCountForTest(peer), "held DATA is flushed after HELLO_ACK");
+    mgr.shutdown();
+  }
+
+  @Test
   void helloRemainsPendingUntilValidSignedAck() throws Exception {
     RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, (pub, payload) -> {});
     InetSocketAddress peer = new InetSocketAddress("127.0.0.1", 62089);
