@@ -695,7 +695,11 @@ final class Initializer {
       IncomingSearchRequestHandler incomingHandler =
           new IncomingSearchRequestHandler(
               transport, searchService, directory, identity, localIndex);
+      incomingHandler.setTorrentMetadataProvider(
+          new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider());
       incomingHandler.start();
+      // Expose the wiring to download paths (TORRENT_FETCH metadata requests).
+      com.frostwire.search.relay.MeshRequestContext.init(transport, identity);
 
       // Sync PeerDirectory ↔ IceBridge mesh: push verified peers, pull mesh
       // registry into directory (forwarder-first discovery), register self.
