@@ -19,6 +19,9 @@ import com.frostwire.search.relay.RemoteIndexFetcher;
 import com.frostwire.search.relay.RemoteSearchRequest;
 import com.frostwire.search.relay.RemoteSearchResponse;
 import com.frostwire.search.relay.SearchPayloadCodec;
+import com.frostwire.search.relay.TorrentMetadataProvider;
+import com.frostwire.search.relay.TorrentMetadataRequest;
+import com.frostwire.search.relay.TorrentMetadataResponse;
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
@@ -86,6 +89,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private final PeerDirectory peerDirectory;
     private final IdentityKeys identity;
     private final LocalIndex localIndex;
+    private volatile TorrentMetadataProvider torrentMetadataProvider;
     private final ConcurrentHashMap<String, RateBucket> rateMap = new ConcurrentHashMap<>();
 
     public IncomingSearchRequestHandler(DistributedSearchTransport transport,
@@ -123,6 +127,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         LOG.info("IncomingSearchRequestHandler started");
     }
 
+    /** Answerer for TORRENT_FETCH (Protocol #3 METADATA) requests, or null. */
+    public void setTorrentMetadataProvider(TorrentMetadataProvider provider) {
+        this.torrentMetadataProvider = provider;
+    }
+
     public void stop() {
         transport.removeListener(this);
         LOG.info("IncomingSearchRequestHandler stopped");
@@ -135,6 +144,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     @Override
     public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+        if (MeshProtocolId.effective(protocolId) == MeshProtocolId.METADATA) {
+            handleTorrentMetadataPayload(sourcePub, payload);
+            return;
+        }
         // Only Protocol #1 (search) is handled here; other protocols are ignored.
         if (MeshProtocolId.effective(protocolId) != MeshProtocolId.SEARCH) {
             return;
@@ -149,6 +162,88 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 SearchPayloadCodec.decodeCatalogBrowseRequest(payload);
         if (browseRequest != null) {
             handleCatalogBrowseRequest(browseRequest, sourcePub);
+        }
+    }
+
+    private void handleTorrentMetadataPayload(byte[] sourcePub, byte[] payload) {
+        TorrentMetadataRequest request = SearchPayloadCodec.decodeTorrentMetadataRequest(payload);
+        if (request == null) {
+            return;
+        }
+        if (identity == null) {
+            return;
+        }
+        try {
+            if (!request.verifySignature()) {
+                LOG.debug("Rejected torrent metadata request: bad signature ih="
+                        + request.infoHashHex());
+                return;
+            }
+            long nowSec = System.currentTimeMillis() / 1000L;
+            long skew = Math.abs(nowSec - request.timestamp());
+            if (skew > TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC) {
+                LOG.debug("Rejected torrent metadata request: timestamp skew " + skew + "s");
+                return;
+            }
+            String requesterKey = Hex.encode(request.requesterPub());
+            if (!tryAcquire(requesterKey)) {
+                LOG.debug("Rate-limited torrent metadata request from " + requesterKey);
+                return;
+            }
+            sendTorrentMetadataResponse(request);
+        } catch (Throwable t) {
+            LOG.debug("Failed to process torrent metadata request", t);
+        }
+    }
+
+    /**
+     * Answer a verified {@link TorrentMetadataRequest} with the holder-signed
+     * full .torrent bytes in chunks sized for the ~1 KB mesh RELAY frame, or
+     * a signed error frame the requester can fast-fallback on.
+     */
+    private void sendTorrentMetadataResponse(TorrentMetadataRequest request) throws GeneralSecurityException {
+        TorrentMetadataProvider provider = torrentMetadataProvider;
+        byte[] torrentBytes = provider == null ? null : provider.torrentBytes(request.infoHash());
+        long ts = System.currentTimeMillis() / 1000L;
+        if (torrentBytes == null) {
+            sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
+                    request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_NOT_FOUND),
+                    request.requesterPub());
+            return;
+        }
+        if (torrentBytes.length > TorrentMetadataResponse.MAX_TORRENT_BYTES) {
+            sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
+                    request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_TOO_LARGE),
+                    request.requesterPub());
+            return;
+        }
+        for (TorrentMetadataResponse chunk :
+                TorrentMetadataResponse.buildChunks(request.nonce(), request.infoHash(), ts, torrentBytes)) {
+            sendSignedMetadataChunk(chunk, request.requesterPub());
+        }
+    }
+
+    private void sendSignedMetadataChunk(TorrentMetadataResponse unsigned, byte[] requesterPub)
+            throws GeneralSecurityException {
+        Signature signer = IdentityKeys.softwareSignature("Ed25519");
+        signer.initSign(identity.ed25519().getPrivate());
+        signer.update(unsigned.canonicalBytes());
+        TorrentMetadataResponse signed = TorrentMetadataResponse.builder()
+                .version(unsigned.version())
+                .nonce(unsigned.nonce())
+                .infoHash(unsigned.infoHash())
+                .payloadDigest(unsigned.payloadDigest())
+                .chunkIndex(unsigned.chunkIndex())
+                .finalChunk(unsigned.isFinalChunk())
+                .timestamp(unsigned.timestamp())
+                .data(unsigned.data())
+                .error(unsigned.error())
+                .signature(signer.sign())
+                .build();
+        byte[] bytes = SearchPayloadCodec.encodeTorrentMetadataResponse(signed);
+        if (!transport.send(requesterPub, MeshProtocolId.METADATA, bytes)) {
+            LOG.warn("Could not route torrent metadata chunk to requester "
+                    + Hex.encode(requesterPub));
         }
     }
 
