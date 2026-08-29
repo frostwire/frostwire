@@ -430,7 +430,25 @@ public final class BTEngine extends SessionManager {
         if (torrentHandleExists) {
             try {
                 if (th.isValid()) {
-                    priorities = th.filePriorities();
+                    // Rescue metadata-less zombies (e.g. a magnet added while the
+                    // seeder was unreachable): now that we hold the full .torrent
+                    // (piece layers included), the zombie must go — merging into it
+                    // leaves a handle that can never announce torrent_added, so the
+                    // UI shows nothing and the download stays invisible.
+                    TorrentInfo existingInfo = null;
+                    try {
+                        existingInfo = th.torrentFile();
+                    } catch (Throwable ignored) {
+                        // no metadata yet — torrentFile() throws on some handles
+                    }
+                    if (existingInfo == null) {
+                        LOG.info("BTEngine.download(TorrentInfo): replacing metadata-less handle for "
+                                + infoHashV1 + " with full .torrent bytes");
+                        remove(th);
+                        torrentHandleExists = false;
+                    } else {
+                        priorities = th.filePriorities();
+                    }
                 }
             } catch (Throwable t) {
                 LOG.error("Error loading session state", t);
