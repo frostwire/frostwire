@@ -175,24 +175,28 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         }
         try {
             if (!request.verifySignature()) {
-                LOG.debug("Rejected torrent metadata request: bad signature ih="
-                        + request.infoHashHex());
+                LOG.warn("Rejected torrent metadata request: bad signature ih="
+                        + request.infoHashHex() + " requester=" + Hex.encode(request.requesterPub())
+                        + " timeWindowSkewUnknown");
                 return;
             }
             long nowSec = System.currentTimeMillis() / 1000L;
             long skew = Math.abs(nowSec - request.timestamp());
             if (skew > TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC) {
-                LOG.debug("Rejected torrent metadata request: timestamp skew " + skew + "s");
+                LOG.warn("Rejected torrent metadata request: timestamp skew " + skew
+                        + "s (max " + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
+                        + "s) ih=" + request.infoHashHex()
+                        + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
                 return;
             }
             String requesterKey = Hex.encode(request.requesterPub());
             if (!tryAcquire(requesterKey)) {
-                LOG.debug("Rate-limited torrent metadata request from " + requesterKey);
+                LOG.warn("Rate-limited torrent metadata request from " + requesterKey);
                 return;
             }
             sendTorrentMetadataResponse(request);
         } catch (Throwable t) {
-            LOG.debug("Failed to process torrent metadata request", t);
+            LOG.warn("Failed to process torrent metadata request", t);
         }
     }
 
@@ -206,17 +210,24 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         byte[] torrentBytes = provider == null ? null : provider.torrentBytes(request.infoHash());
         long ts = System.currentTimeMillis() / 1000L;
         if (torrentBytes == null) {
+            LOG.info("TORRENT_FETCH miss ih=" + request.infoHashHex()
+                    + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
             sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
                     request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_NOT_FOUND),
                     request.requesterPub());
             return;
         }
         if (torrentBytes.length > TorrentMetadataResponse.MAX_TORRENT_BYTES) {
+            LOG.info("TORRENT_FETCH too large ih=" + request.infoHashHex()
+                    + " bytes=" + torrentBytes.length);
             sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
                     request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_TOO_LARGE),
                     request.requesterPub());
             return;
         }
+        LOG.info("TORRENT_FETCH answer ih=" + request.infoHashHex()
+                + " bytes=" + torrentBytes.length
+                + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
         for (TorrentMetadataResponse chunk :
                 TorrentMetadataResponse.buildChunks(request.nonce(), request.infoHash(), ts, torrentBytes)) {
             sendSignedMetadataChunk(chunk, request.requesterPub());
@@ -242,8 +253,8 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 .build();
         byte[] bytes = SearchPayloadCodec.encodeTorrentMetadataResponse(signed);
         if (!transport.send(requesterPub, MeshProtocolId.METADATA, bytes)) {
-            LOG.warn("Could not route torrent metadata chunk to requester "
-                    + Hex.encode(requesterPub));
+            LOG.warn("Could not route torrent metadata chunk ci=" + unsigned.chunkIndex()
+                    + " to requester " + Hex.encode(requesterPub));
         }
     }
 

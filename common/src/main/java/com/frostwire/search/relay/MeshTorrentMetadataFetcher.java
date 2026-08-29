@@ -150,11 +150,22 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
             return;
         }
         TorrentMetadataResponse response = SearchPayloadCodec.decodeTorrentMetadataResponse(payload);
-        if (response == null
-                || !Arrays.equals(response.nonce(), nonce)
-                || !Arrays.equals(response.infoHash(), infoHash)
-                || !response.verifySignature(holderPub)) {
-            LOG.debug("MeshTorrentMetadataFetcher: dropped unverified metadata frame");
+        if (response == null) {
+            LOG.warn("MeshTorrentMetadataFetcher: undecodable metadata frame from "
+                    + Hex.encode(sourcePub).substring(0, 12));
+            return;
+        }
+        if (!Arrays.equals(sourcePub, holderPub)) {
+            LOG.warn("MeshTorrentMetadataFetcher: metadata frame from unexpected source "
+                    + Hex.encode(sourcePub).substring(0, 12));
+            return;
+        }
+        if (!Arrays.equals(response.nonce(), nonce) || !Arrays.equals(response.infoHash(), infoHash)) {
+            LOG.warn("MeshTorrentMetadataFetcher: metadata frame nonce/ih mismatch — stale or crossed fetch");
+            return;
+        }
+        if (!response.verifySignature(holderPub)) {
+            LOG.warn("MeshTorrentMetadataFetcher: metadata frame failed holder signature verification");
             return;
         }
         if (response.isError()) {
