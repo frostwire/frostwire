@@ -72,8 +72,11 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
                 continue;
             }
             if (isWildcardHost(hostOf(e))) {
-                if (wildcardPort <= 0) {
-                    wildcardPort = portOf(e);
+                int p = portOf(e);
+                // Android logs a perpetual listen on 0.0.0.0:0 (enum_route);
+                // advertising that port makes same-LAN mesh downloads time out.
+                if (p > 0 && wildcardPort <= 0) {
+                    wildcardPort = p;
                 }
                 continue;
             }
