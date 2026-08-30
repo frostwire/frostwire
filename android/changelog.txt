@@ -1,7 +1,8 @@
 FrostWire 3.2.0 build 776 UNRELEASED
   - fix:YouTube search always offers an audio row even when yt-dlp only returns muxed itag-18 MP4
   - fix:Same-WiFi desktop search now gets Android hits — replies go through EC2 when there is no live rUDP session (WAN hairpin used to swallow them)
-  - fix:Previous-session torrents are restored after the engine is actually up — IceBridge no longer starves restore off the queue
+  - fix:Previous-session torrents restore on the downloader thread, not behind IceBridge on MISC
+  - fix:Replacing a torrent-fetcher row with the real download no longer leaves Transfers stuck on Cancelled
   - fix:A mesh magnet no longer vanishes from Transfers when IceBridge metadata times out — the BTEngine download is shown
   - fix:Session restore loads only torrents from the previous session, not every file in the Torrents folder
   - fix:Download-complete notification no longer NPEs when NotifiedStorage is still loading
