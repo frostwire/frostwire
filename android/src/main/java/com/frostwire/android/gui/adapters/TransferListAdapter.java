@@ -241,7 +241,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             }
         }
 
-        if (sameIdsInOrder(oldList, newList)) {
+        if (sameIdsInOrder(oldList, newList) && sameInstances(oldList, newList)) {
             for (int i = 0; i < newList.size(); i++) {
                 Transfer t = newList.get(i);
                 String id = resolveTransferId(t);
@@ -255,6 +255,18 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
             return;
         }
         submitList(newList);
+    }
+
+    private static boolean sameInstances(List<Transfer> a, List<Transfer> b) {
+        if (a.size() != b.size()) {
+            return false;
+        }
+        for (int i = 0; i < a.size(); i++) {
+            if (a.get(i) != b.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean sameIdsInOrder(List<Transfer> a, List<Transfer> b) {
