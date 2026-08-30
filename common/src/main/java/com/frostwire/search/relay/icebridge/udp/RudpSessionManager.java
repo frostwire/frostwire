@@ -141,21 +141,25 @@ public final class RudpSessionManager {
             return;
         }
         PeerRecord target = registry.lookup(targetPub);
+        InetSocketAddress registryAddr = null;
         if (target != null) {
-            InetSocketAddress addr = new InetSocketAddress(target.host(), target.rudpPort());
-            // USE_REMOTE clients register at this process's own rUDP endpoint and
-            // drain /poll — never self-UDP (would black-hole multi-client meshes).
-            if (isLocalRudpEndpoint(addr)) {
+            registryAddr = new InetSocketAddress(target.host(), target.rudpPort());
+            if (isLocalRudpEndpoint(registryAddr)) {
                 deliverToLocalPollClient(targetPub, new byte[0], payload);
                 return;
             }
-            sendData(addr, payload);
-            return;
+            RudpSession live = findSessionByPub(targetPub);
+            if (live == null) {
+                live = sessionsByAddress.get(registryAddr);
+            }
+            if (live != null && live.isAuthenticated()) {
+                sendData(live.remoteAddress(), payload);
+                return;
+            }
         }
         int n = meshBroadcastFanout();
         List<PeerRecord> forwarders = registry.lookupForwarders(n);
         int sent = 0;
-        // LimeWire soft-max: remaining TTL at hop 0 is clamped to softMax.
         int hopTtl = IceBridgeTopology.get().clampRemainingTtl(0, meshHopTtl());
         for (PeerRecord forwarder : forwarders) {
             if (isSelf(forwarder)) {
@@ -168,7 +172,9 @@ public final class RudpSessionManager {
                     targetPub, payload, hopTtl);
             sent++;
         }
-        if (sent == 0) {
+        if (sent == 0 && registryAddr != null) {
+            sendData(registryAddr, payload);
+        } else if (sent == 0) {
             LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
         }
     }
