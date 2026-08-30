@@ -235,11 +235,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             }
         } else {
             final Transfer toClear = transferToClear;
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                if (buildTorrentAndSeedIt(fd) && toClear != null) {
-                    TransferManager.instance().remove(toClear);
-                }
-            });
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () ->
+                    com.frostwire.android.util.TorrentUtils.seedFile(
+                            new File(fd.filePath), fd.title, TransferManager.instance(), toClear));
         }
     }
 
@@ -248,35 +246,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         final Object torrentHandle = BTEngine.getInstance().find(new Sha1Hash(btDownload.getInfoHash()));
         if (torrentHandle == null) {
             LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
-        }
-    }
-
-    private boolean buildTorrentAndSeedIt(final FWFileDescriptor fd) {
-        try {
-            // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
-            File file = new File(fd.filePath);
-            File saveDir = file.getParentFile();
-            file_storage fs = new file_storage();
-            libtorrent.add_files(fs, file.getAbsolutePath());
-            fs.set_name(file.getName());
-            create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-            // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-            // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-            ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-            for (String tracker : DefaultTrackers.ANNOUNCE_URLS) {
-                ct.add_tracker(tracker, 0);
-            }
-            ct.set_priv(false);
-            final error_code ec = new error_code();
-            libtorrent.set_piece_hashes_ex(ct, Objects.requireNonNull(saveDir).getAbsolutePath(), new set_piece_hashes_listener(), ec);
-            final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-            final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
-            // so the TorrentHandle object is created and added to the libtorrent session.
-            BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
-            return true;
-        } catch (Throwable e) {
-            LOG.error("Error creating torrent for seed", e);
-            return false;
         }
     }
 
