@@ -172,6 +172,10 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         }
         if (bestAudio != null) {
             results.add(toSearchResult(result, bestAudio));
+        } else if (bestVideo != null && !noCodec(bestVideo.acodec)) {
+            // Progressive muxed MP4 (itag 18): no separate DASH m4a. Still
+            // offer an audio-labeled row so the user can pick audio.
+            results.add(toAudioLabeledResult(result, bestVideo));
         }
         return results;
     }
@@ -207,6 +211,27 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                 format.filesize,
                 result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
                 withFullRange(format.http_headers));
+    }
+
+    private static TellurideSearchResult toAudioLabeledResult(
+            TellurideJSONResult result, TellurideJSONMediaFormat muxed) {
+        LOG.info("getValidResults muxed fallback audio acodec=" + muxed.acodec
+                + ", ext=" + muxed.ext + ", url=" + muxed.url);
+        String domainName = UrlUtils.extractDomainName(muxed.url);
+        if (domainName != null) {
+            Ssl.addValidDomain(domainName);
+        }
+        return new TellurideSearchResult(
+                result.id,
+                "(audio) " + result.title,
+                result.title + " (audio)." + muxed.ext,
+                "Cloud:" + result.extractor,
+                result.webpage_url,
+                muxed.url,
+                result.thumbnail,
+                muxed.filesize,
+                result.upload_date == null ? calendar.getTimeInMillis() : dateStringToTimestamp(result.upload_date),
+                withFullRange(muxed.http_headers));
     }
 
     private static final Set<String> MEDIA_HEADER_ALLOWLIST = Set.of(
