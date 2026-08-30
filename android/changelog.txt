@@ -1,5 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
   - fix:YouTube search always offers an audio row even when yt-dlp only returns muxed itag-18 MP4
+  - fix:Finished YouTube/HTTP downloads become a Seeding torrent in Transfers — the HTTP row is only removed after the torrent is on the list
   - fix:Finished YouTube/HTTP downloads stay in Transfers until the torrent is actually hashing/seeding — Seed no longer wipes the row first
   - fix:Seed on a finished YouTube/HTTP download now hashes that file (empty SeedAction used to no-op); auto-seed indexes the torrent for mesh search
   - fix:YouTube downloads no longer 403 — yt-dlp 2026.8.19 and web/android player clients instead of ANDROID_VR
