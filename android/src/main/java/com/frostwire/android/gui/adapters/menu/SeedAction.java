@@ -220,9 +220,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             } else if (fd == null) {
                 seedBTDownload();
             }
-            if (transferToClear != null) {
-                TransferManager.instance().remove(transferToClear);
-            }
         }
     }
 
@@ -237,7 +234,12 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // due to the android providers getting out of sync.
             }
         } else {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> buildTorrentAndSeedIt(fd));
+            final Transfer toClear = transferToClear;
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                if (buildTorrentAndSeedIt(fd) && toClear != null) {
+                    TransferManager.instance().remove(toClear);
+                }
+            });
         }
     }
 
@@ -249,7 +251,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         }
     }
 
-    private void buildTorrentAndSeedIt(final FWFileDescriptor fd) {
+    private boolean buildTorrentAndSeedIt(final FWFileDescriptor fd) {
         try {
             // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
             File file = new File(fd.filePath);
@@ -271,9 +273,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
             // so the TorrentHandle object is created and added to the libtorrent session.
             BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
+            return true;
         } catch (Throwable e) {
-            // TODO: better handling of this error
             LOG.error("Error creating torrent for seed", e);
+            return false;
         }
     }
 
