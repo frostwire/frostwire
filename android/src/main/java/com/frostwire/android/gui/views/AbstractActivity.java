@@ -23,7 +23,6 @@ import androidx.fragment.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
@@ -131,13 +130,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
                 }
             }
         }, false);
-        StrictMode.ThreadPolicy previousPolicy = StrictMode.getThreadPolicy();
-        StrictMode.allowThreadDiskReads();
-        try {
-            setContentView(layoutResId);
-        } finally {
-            StrictMode.setThreadPolicy(previousPolicy);
-        }
+        setContentView(layoutResId);
         initComponents(savedInstanceState);
         setToolbar();
     }
