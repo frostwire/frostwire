@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:Mesh magnets no longer advertise BitTorrent port 0 from a failed 0.0.0.0:0 listen, so same-LAN downloads from an Android seeder can connect
   - fix:IceBridge child supervision keeps distributed search and TORRENT_FETCH alive hours after launch — dead/orphan children are respawned; rUDP reconnects after a timed-out session
   - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
   - fix:Newly created torrents (YouTube/HTTP downloads that auto-seed) are written to the mesh LocalIndex as soon as the .torrent is generated, not after a later BTEngine callback
