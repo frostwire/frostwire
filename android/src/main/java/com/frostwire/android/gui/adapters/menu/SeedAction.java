@@ -211,15 +211,19 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void seedEm() {
-        if (!TransferManager.instance().isMobileAndDataSavingsOn() &&
-                !TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
-            if (fd == null && btDownload == null) {
-                TransferManager.instance().seedFinishedTransfers();
-            } else if (fd != null && btDownload == null) {
-                seedFileDescriptor(fd);
-            } else if (fd == null) {
-                seedBTDownload();
-            }
+        if (fd != null && btDownload == null) {
+            seedFileDescriptor(fd);
+            return;
+        }
+        if (TransferManager.instance().isMobileAndDataSavingsOn() ||
+                TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
+            LOG.warn("seedEm skipped: mobile data savings or VPN-only");
+            return;
+        }
+        if (fd == null && btDownload == null) {
+            TransferManager.instance().seedFinishedTransfers();
+        } else if (fd == null) {
+            seedBTDownload();
         }
     }
 
@@ -235,7 +239,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             }
         } else {
             final Transfer toClear = transferToClear;
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () ->
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () ->
                     com.frostwire.android.util.TorrentUtils.seedFile(
                             new File(fd.filePath), fd.title, TransferManager.instance(), toClear));
         }
