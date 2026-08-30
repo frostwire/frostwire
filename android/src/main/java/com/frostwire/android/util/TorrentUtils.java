@@ -136,6 +136,17 @@ public final class TorrentUtils {
             final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
             // Create the TorrentHandle object and add it to the libtorrent session
             BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, manager.isDeleteStartedTorrentEnabled());
+            try {
+                com.frostwire.android.gui.RelaySearchWiring wiring =
+                        com.frostwire.android.gui.SearchEngine.DISTRIBUTED_WIRING;
+                if (wiring.localIndex() != null) {
+                    new com.frostwire.search.relay.SharedTorrentIndexer(
+                            wiring.localIndex(), wiring.identity())
+                            .indexTorrentInfo(tinfo, fd.title);
+                }
+            } catch (Throwable indexErr) {
+                LOG.warn("Seeded HTTP download but mesh index failed: " + fd.filePath, indexErr);
+            }
             LOG.info("Successfully created and started seeding torrent for HTTP download: " + fd.filePath);
         } catch (Throwable e) {
             LOG.error("Error creating torrent for HTTP download seed: " + fd.filePath, e);
