@@ -18,12 +18,12 @@ def query_video(page_url):
     query_video: queries metadata for the video in page_url using yt_dlp
     Returns 'None' on error
     '''
-    # Do not pin bestaudio — Java picks best video + best audio from formats.
-    # ANDROID_VR player URLs 403; web/android clients match Telluride 47 / yt-dlp 2026.8.19.
+    # Do not pin bestaudio or ANDROID_VR — Java picks best video + best audio.
+    # yt-dlp 2026.8.19 defaults skip ANDROID_VR (403). Pinning android-only
+    # dropped DASH m4a and left only muxed itag 18.
     ydl_opts = {'nocheckcertificate' : True,
                 'quiet': True,
                 'restrictfilenames': True,
-                'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
                }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
