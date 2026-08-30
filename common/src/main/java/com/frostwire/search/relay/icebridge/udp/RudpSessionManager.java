@@ -37,6 +37,16 @@ import java.util.concurrent.TimeUnit;
  * manager maintains a table of sessions keyed by remote connection id, sends
  * acknowledgements and retransmissions, and uses the {@link PeerRegistry} to
  * resolve relay/hole-punch targets.
+ *
+ * <p><b>Distributed search / TORRENT_FETCH must keep working after hours idle
+ * or a peer restart.</b> Invariants:
+ * <ul>
+ *   <li>Never send DATA before HELLO_ACK — hold it ({@link #sendData}).
+ *   <li>After reliable-send timeout, drop the session so the next SEARCH can
+ *       HELLO again ({@link #dropSession}).
+ *   <li>Deliver RELAY replies via the live session keyed by pub, not the
+ *       first-seen CGNAT host:port ({@link #findSessionByPub}).
+ * </ul>
  */
 public final class RudpSessionManager {
 
@@ -218,6 +228,9 @@ public final class RudpSessionManager {
                 return;
             }
         }
+        // SEARCH / TORRENT_FETCH before HELLO_ACK used to go out unauthenticated
+        // and die; hold until the session is proven so a resume-hours-later
+        // reconnect still delivers the first query.
         if (!session.isAuthenticated()) {
             session.holdAppPayload(payload);
             return;
