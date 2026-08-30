@@ -111,6 +111,8 @@ public final class SearchMediator {
         if (StringUtils.isNullOrEmpty(query, true)) {
             return;
         }
+        // Core feature: never skip distributed search because IceBridge died
+        // overnight. Restart the stack before starting engines.
         Engine.instance().ensureDistributedSearchReady(15_000);
         manager.stop();
         currentSearchToken = nextSearchToken();
