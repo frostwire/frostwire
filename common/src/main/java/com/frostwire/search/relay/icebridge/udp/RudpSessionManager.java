@@ -860,9 +860,9 @@ public final class RudpSessionManager {
             LOG.debug("RudpSessionManager: drop oversized RELAY_RESPONSE");
             return;
         }
-        RudpSession senderSession = sessionsByAddress.get(sender);
+        RudpSession senderSession = sessionForIncoming(packet, sender);
         if (senderSession == null) {
-            LOG.debug("RudpSessionManager: rejected RELAY_RESPONSE from unauthenticated " + sender);
+            LOG.warn("RudpSessionManager: rejected RELAY_RESPONSE from unauthenticated " + sender);
             return;
         }
         if (senderSession.receiveRemote(packet.sequence())) {
@@ -981,6 +981,59 @@ public final class RudpSessionManager {
             dropSession(session);
         }
         reassembler.evictStale();
+    }
+
+    private RudpSession sessionForIncoming(RudpPacket packet, InetSocketAddress sender) {
+        RudpSession byAddr = sessionsByAddress.get(sender);
+        if (byAddr != null) {
+            return byAddr;
+        }
+        long cid = packet.connectionId();
+        for (RudpSession session : sessionsByRemoteId.values()) {
+            if (session.localConnectionId() == cid) {
+                rebindSessionAddress(session, sender);
+                return session;
+            }
+            if (sameUdpEndpoint(session.remoteAddress(), sender)) {
+                return session;
+            }
+        }
+        return null;
+    }
+
+    private static boolean sameUdpEndpoint(InetSocketAddress a, InetSocketAddress b) {
+        if (a == null || b == null || a.getPort() != b.getPort()) {
+            return false;
+        }
+        java.net.InetAddress ia = a.getAddress();
+        java.net.InetAddress ib = b.getAddress();
+        if (ia == null || ib == null) {
+            return false;
+        }
+        if (ia.equals(ib)) {
+            return true;
+        }
+        byte[] va = ipv4Bytes(ia);
+        byte[] vb = ipv4Bytes(ib);
+        return va != null && vb != null && Arrays.equals(va, vb);
+    }
+
+    private static byte[] ipv4Bytes(java.net.InetAddress addr) {
+        byte[] raw = addr.getAddress();
+        if (raw.length == 4) {
+            return raw;
+        }
+        if (raw.length == 16) {
+            for (int i = 0; i < 10; i++) {
+                if (raw[i] != 0) {
+                    return null;
+                }
+            }
+            if (raw[10] == (byte) 0xff && raw[11] == (byte) 0xff) {
+                return Arrays.copyOfRange(raw, 12, 16);
+            }
+        }
+        return null;
     }
 
     private RudpSession findSessionByPub(byte[] pub) {
