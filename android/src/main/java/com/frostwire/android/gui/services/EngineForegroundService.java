@@ -77,6 +77,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
     private volatile AndroidRelayStack relayStack;
+    private volatile boolean relayStackStarting;
 
     public static EngineForegroundService getInstance() {
         return instance;
@@ -270,17 +271,17 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private void startRelayStack(BTEngine btEngine) {
-        if (relayStack != null) {
-            return;
-        }
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            if (relayStack != null || relayStackStarting) {
+                return;
+            }
+            relayStackStarting = true;
             try {
                 File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
                 if (homeDir == null) {
                     LOG.warn("EngineForegroundService::startRelayStack: no libtorrent homeDir");
                     return;
                 }
-                // Double-check identity is wired even if HIGH_PRIORITY preload lost the race.
                 if (SearchEngine.DISTRIBUTED_WIRING.identity() == null) {
                     File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
                     if (identityFile.isFile() && identityFile.length() > 0) {
@@ -299,6 +300,8 @@ public class EngineForegroundService extends Service implements IEngineService {
                 }
             } catch (Throwable t) {
                 LOG.warn("EngineForegroundService::startRelayStack failed", t);
+            } finally {
+                relayStackStarting = false;
             }
         });
     }
@@ -332,7 +335,7 @@ public class EngineForegroundService extends Service implements IEngineService {
                 if (forceRestart) {
                     stopRelayStackBlocking();
                 }
-                if (relayStack == null) {
+                if (relayStack == null && !relayStackStarting) {
                     BTEngine btEngine = BTEngine.getInstance();
                     File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
                     if (homeDir == null) {
