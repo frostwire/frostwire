@@ -631,7 +631,7 @@ public class EngineForegroundService extends Service implements IEngineService {
 
         LOG.info("startServices() - invoking resumeBTEngineTask, wasShutdown=" + wasShutdown);
         TaskThrottle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> resumeBTEngineTask(this, wasShutdown));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> resumeBTEngineTask(this, wasShutdown));
     }
 
     public void stopServices(boolean disconnected) {
