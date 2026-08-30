@@ -808,6 +808,33 @@ class RudpSessionManagerComprehensiveTest {
     mgr.shutdown();
   }
 
+  @Test
+  void searchReconnectsAfterDeadSessionTimeout() throws Exception {
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, (pub, payload) -> {});
+    InetSocketAddress peer = new InetSocketAddress("127.0.0.1", 62121);
+    mgr.connect(peer);
+    assertEquals(1, mgr.sessionCount());
+    mgr.sendData(peer, "search-before-timeout".getBytes());
+
+    Thread.sleep(6500);
+    assertEquals(0, mgr.sessionCount(), "timed-out session must drop so a later SEARCH can HELLO");
+
+    mgr.connect(peer);
+    assertEquals(1, mgr.sessionCount());
+    mgr.sendData(peer, "search-hours-later".getBytes());
+    assertEquals(1, mgr.pendingCountForTest(peer), "DATA held until HELLO_ACK after reconnect");
+
+    long wireCid = mgr.remoteConnectionIdForTest(peer);
+    byte[] ackPayload = RudpAuth.createHelloPayload(remote, wireCid);
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.HELLO_ACK, wireCid, 0, 0, ackPayload),
+            peer,
+            new InetSocketAddress("127.0.0.1", 62120)));
+    assertTrue(mgr.hasRemotePubForTest(peer));
+    mgr.shutdown();
+  }
+
   // ---- SEC3: Relay source spoofing ----
 
   @Test
