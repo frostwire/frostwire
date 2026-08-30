@@ -134,7 +134,7 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     private void initializeNotifiedStorage() {
         LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initializing in background thread");
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             notifiedStorage = new NotifiedStorage(this);
             LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initialization complete");
         });
@@ -654,11 +654,12 @@ public class EngineForegroundService extends Service implements IEngineService {
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void notifyDownloadFinished(String displayName, File file, String infoHash) {
         try {
-            if (notifiedStorage.contains(infoHash)) {
-                // already notified
+            NotifiedStorage storage = notifiedStorage;
+            if (storage != null && storage.contains(infoHash)) {
                 return;
-            } else {
-                notifiedStorage.add(infoHash);
+            }
+            if (storage != null) {
+                storage.add(infoHash);
             }
 
             Context context = getApplicationContext();
