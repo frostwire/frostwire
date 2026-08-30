@@ -672,8 +672,9 @@ final class Initializer {
           return;
         }
 
-        // Self-heal: if the child dies or stops answering (orphaned port,
-        // crash, anything), the supervisor respawns it — no restart needed.
+        // Core feature: distributed search/TORRENT_FETCH must still work hours
+        // after launch. If the child dies, holds UDP 6889 as an orphan, or
+        // stops answering /health, the supervisor respawns it — no app restart.
         launcher.startSupervision(10_000);
 
         effectiveRudpPort = launcher.rudpPort(); // in case auto
