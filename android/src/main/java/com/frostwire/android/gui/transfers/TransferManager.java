@@ -109,6 +109,7 @@ public final class TransferManager {
             synchronized (downloadsListMonitor) {
                 if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
                     bittorrentDownloadsList.add(uiBittorrentDownload);
+                    LOG.info("downloadAdded: " + dl.getDisplayName() + " hash=" + dl.getInfoHash());
                 }
             }
             synchronized (downloadsMapMonitor) {
@@ -737,6 +738,28 @@ public final class TransferManager {
 
     public int startedTransfers() {
         return startedTransfers;
+    }
+
+    public BittorrentDownload ensureUiDownload(TorrentHandle torrentHandle) {
+        if (torrentHandle == null || !torrentHandle.isValid()) {
+            return null;
+        }
+        String hash = torrentHandle.infoHash().toHex();
+        BittorrentDownload existing = getBittorrentDownload(hash);
+        if (existing != null) {
+            return existing;
+        }
+        UIBittorrentDownload ui = new UIBittorrentDownload(this, new BTDownload(BTEngine.getInstance(), torrentHandle));
+        synchronized (downloadsListMonitor) {
+            if (!bittorrentDownloadsList.contains(ui)) {
+                bittorrentDownloadsList.add(ui);
+            }
+        }
+        synchronized (downloadsMapMonitor) {
+            bittorrentDownloadsMap.put(hash, ui);
+        }
+        LOG.info("ensureUiDownload: " + ui.getDisplayName() + " hash=" + hash);
+        return ui;
     }
 
     public void updateUIBittorrentDownload(TorrentHandle torrentHandle) {
