@@ -94,9 +94,7 @@ public class EngineForegroundService extends Service implements IEngineService {
             TransferManager.instance().reset();
         }
         btEngine.resume();
-        // Publish saved identity into DISTRIBUTED_WIRING immediately (dedicated
-        // thread) so Settings never flash "Not initialized" while LocalIndex /
-        // IceBridge spin up on MISC.
+        TransferManager.instance().ensureTorrentsRestored();
         engineForegroundService.preloadIdentityFromDisk();
         engineForegroundService.startRelayStack(btEngine);
         if (!wasShutdown) {
