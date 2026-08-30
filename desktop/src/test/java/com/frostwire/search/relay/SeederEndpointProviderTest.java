@@ -43,6 +43,14 @@ class SeederEndpointProviderTest {
     }
 
     @Test
+    void buildEndpointsIgnoresPortZeroWildcard() {
+        List<String> out = LibtorrentSeederEndpointProvider.buildEndpoints(
+                Arrays.asList("0.0.0.0:0", "0.0.0.0:45321"),
+                Collections.singletonList("192.168.1.10"));
+        assertEquals(Collections.singletonList("192.168.1.10:45321"), out);
+    }
+
+    @Test
     void buildEndpointsWithoutWildcardKeepsOnlyUsableEntries() {
         List<String> out = LibtorrentSeederEndpointProvider.buildEndpoints(
                 Arrays.asList("76.130.145.63:45321", "192.168.1.10:45321"),
