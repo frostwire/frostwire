@@ -34,12 +34,9 @@ public final class LibtorrentTorrentMetadataProvider implements TorrentMetadataP
                 return null;
             }
             TorrentHandle handle = engine.find(new Sha1Hash(infoHashV1));
-            if (handle == null || !handle.isValid()) {
-                return null;
-            }
-            TorrentInfo info = handle.torrentFile();
+            TorrentInfo info = torrentInfoOf(handle);
             if (info == null) {
-                return null; // metadata not available (yet)
+                return null;
             }
             return info.bencode();
         } catch (Throwable t) {
@@ -47,5 +44,12 @@ public final class LibtorrentTorrentMetadataProvider implements TorrentMetadataP
                     + com.frostwire.util.Hex.encode(infoHashV1), t);
             return null;
         }
+    }
+
+    private static TorrentInfo torrentInfoOf(TorrentHandle handle) {
+        if (handle == null || !handle.isValid()) {
+            return null;
+        }
+        return handle.torrentFile();
     }
 }

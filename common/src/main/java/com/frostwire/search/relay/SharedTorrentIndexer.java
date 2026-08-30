@@ -100,13 +100,35 @@ public final class SharedTorrentIndexer implements BTEngineListener {
         if (downloads == null) {
             return;
         }
+        java.util.HashSet<String> live = new java.util.HashSet<>();
         int n = 0;
         for (BTDownload dl : downloads) {
             if (dl == null) {
                 continue;
             }
+            String hex = safeInfoHash(dl);
+            if (hex != null) {
+                live.add(hex);
+            }
             scheduleIndex(dl, IndexTrigger.ADDED);
             n++;
+        }
+        try {
+            int removed = 0;
+            for (LocalSharedTorrent t : index.listAll()) {
+                if (t == null || t.infoHashHex() == null) {
+                    continue;
+                }
+                if (!live.contains(t.infoHashHex().toLowerCase())) {
+                    index.delete(t.infoHashHex());
+                    removed++;
+                }
+            }
+            if (removed > 0) {
+                LOG.info("Pruned " + removed + " stale LocalIndex row(s) not in the live session");
+            }
+        } catch (Throwable t) {
+            LOG.warn("Failed to prune stale LocalIndex rows", t);
         }
         if (n > 0) {
             LOG.info("Scheduled reindex of " + n + " existing download(s)");
