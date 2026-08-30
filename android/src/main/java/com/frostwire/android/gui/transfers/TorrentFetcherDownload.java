@@ -39,6 +39,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Placeholder transfer while torrent metadata is obtained.
+ *
+ * <p>For mesh magnets, try IceBridge TORRENT_FETCH first (cellular/NAT), then
+ * fall back to a direct magnet add. IceBridge must already be up — search
+ * and {@code MainActivity} resume restart it if a stale process killed the
+ * stack.
+ *
  * @author gubatron
  * @author aldenml
  */
