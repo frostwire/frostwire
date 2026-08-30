@@ -91,8 +91,10 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -119,6 +121,7 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
      * during updateList() — ListAdapter is now the single source of truth for the list.
      */
     private final Set<String> removedTransferIds = Collections.synchronizedSet(new HashSet<>());
+    private final Map<String, TransferUiState> lastUiState = new HashMap<>();
 
     public TransferListAdapter(Context context, List<Transfer> list) {
         super(new TransferItemCallback());
@@ -240,7 +243,14 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
 
         if (sameIdsInOrder(oldList, newList)) {
             for (int i = 0; i < newList.size(); i++) {
-                notifyItemChanged(i);
+                Transfer t = newList.get(i);
+                String id = resolveTransferId(t);
+                TransferUiState now = new TransferUiState(t);
+                TransferUiState last = lastUiState.get(id);
+                if (last == null || !last.hasSameContent(now)) {
+                    lastUiState.put(id, now);
+                    notifyItemChanged(i);
+                }
             }
             return;
         }
