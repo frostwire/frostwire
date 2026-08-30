@@ -1,7 +1,7 @@
 FrostWire 3.2.0 build 776 UNRELEASED
   - fix:YouTube search always offers an audio row even when yt-dlp only returns muxed itag-18 MP4
   - fix:Same-WiFi desktop search now gets Android hits — replies go through EC2 when there is no live rUDP session (WAN hairpin used to swallow them)
-  - fix:IceBridge no longer starts twice and closes the torrent index
+  - fix:IceBridge can only start once per process; a failed second bind cannot close the torrent index
   - fix:YouTube/HTTP Complete now auto-seeds on a dedicated thread instead of waiting behind the MISC/config queues
   - fix:Transfer list no longer flickers while a Complete download sits idle
   - fix:Finished YouTube/HTTP downloads become a Seeding torrent in Transfers — the HTTP row is only removed after the torrent is on the list
