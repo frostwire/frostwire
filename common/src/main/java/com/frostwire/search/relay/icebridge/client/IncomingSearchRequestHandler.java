@@ -63,6 +63,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Rate-limits per-source to prevent flood/amplification attacks. Each
  * source public key is limited to {@link #MAX_REQUESTS_PER_MINUTE} search
  * requests per minute.
+ *
+ * <p>Also demuxes {@link MeshProtocolId#METADATA} (TORRENT_FETCH). Dropping
+ * non-SEARCH frames here would make mesh metadata fetch time out and fall
+ * back to a magnet that cannot complete over cellular.
  */
 public final class IncomingSearchRequestHandler implements DistributedSearchTransport.PayloadListener {
 
