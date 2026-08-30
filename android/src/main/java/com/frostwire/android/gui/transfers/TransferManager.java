@@ -94,29 +94,7 @@ public final class TransferManager {
                 LOG.error("BTEngineAdapter.downloadAdded()@TransferManager: BTDownload infoHash is null");
                 return;
             }
-            String name = dl.getName();
-            if (name != null && name.contains("fetch_magnet")) {
-                return;
-            }
-            File savePath = dl.getSavePath();
-            if (savePath != null && savePath.toString().contains("fetch_magnet")) {
-                return;
-            }
-            if (dl.getListener() == null) {
-                dl.setListener(new UIBTDownloadListener());
-            }
-            UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
-            synchronized (downloadsListMonitor) {
-                if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
-                    bittorrentDownloadsList.add(uiBittorrentDownload);
-                    LOG.info("downloadAdded: " + dl.getDisplayName() + " hash=" + dl.getInfoHash());
-                }
-            }
-            synchronized (downloadsMapMonitor) {
-                if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
-                    bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
-                }
-            }
+            addOrUpdateUiDownload(dl);
         }
 
         @Override
@@ -134,6 +112,8 @@ public final class TransferManager {
                 if (bittorrentDownload instanceof UIBittorrentDownload) {
                     UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
                     bt.updateUI(dl);
+                } else {
+                    addOrUpdateUiDownload(dl);
                 }
             } catch (Throwable e) {
                 LOG.error("Error updating bittorrent download", e);
@@ -141,6 +121,30 @@ public final class TransferManager {
         }
     };
 
+
+    private void addOrUpdateUiDownload(BTDownload dl) {
+        if (dl.getListener() == null) {
+            dl.setListener(new UIBTDownloadListener());
+        }
+        String hash = dl.getInfoHash();
+        synchronized (downloadsMapMonitor) {
+            BittorrentDownload existing = bittorrentDownloadsMap.get(hash);
+            if (existing instanceof UIBittorrentDownload) {
+                ((UIBittorrentDownload) existing).updateUI(dl);
+                return;
+            }
+        }
+        UIBittorrentDownload ui = new UIBittorrentDownload(this, dl);
+        synchronized (downloadsListMonitor) {
+            if (!bittorrentDownloadsList.contains(ui)) {
+                bittorrentDownloadsList.add(ui);
+                LOG.info("downloadAdded: " + dl.getDisplayName() + " hash=" + hash);
+            }
+        }
+        synchronized (downloadsMapMonitor) {
+            bittorrentDownloadsMap.put(hash, ui);
+        }
+    }
 
     public static TransferManager instance() {
         if (instance == null) {
