@@ -18,16 +18,21 @@
 
 package com.frostwire.android.util;
 
+import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.transfers.Transfer;
 import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.jlibtorrent.swig.create_torrent;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.file_storage;
@@ -85,11 +90,8 @@ public final class TorrentUtils {
             if (savePath != null && savePath.exists()) {
                 FWFileDescriptor fd = createFileDescriptor(savePath, displayName, fileType);
                 if (fd != null) {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                        if (buildTorrentAndSeedIt(fd, manager) && httpTransfer != null) {
-                            manager.remove(httpTransfer);
-                        }
-                    });
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> buildTorrentAndSeedIt(fd, manager, httpTransfer));
                 }
             } else {
                 LOG.warn("Auto-seed skipped: save path missing " + savePath);
@@ -118,10 +120,15 @@ public final class TorrentUtils {
         return fd;
     }
     
-    /**
-     * Creates a torrent from the file and starts seeding it
-     */
-    private static boolean buildTorrentAndSeedIt(final FWFileDescriptor fd, TransferManager manager) {
+    public static boolean seedFile(File file, String displayName, TransferManager manager, Transfer httpTransfer) {
+        FWFileDescriptor fd = createFileDescriptor(file, displayName != null ? displayName : file.getName(), Constants.FILE_TYPE_DOCUMENTS);
+        if (fd == null) {
+            return false;
+        }
+        return buildTorrentAndSeedIt(fd, manager, httpTransfer);
+    }
+
+    private static boolean buildTorrentAndSeedIt(final FWFileDescriptor fd, TransferManager manager, Transfer httpTransfer) {
         try {
             File file = new File(fd.filePath);
             File saveDir = file.getParentFile();
@@ -138,8 +145,20 @@ public final class TorrentUtils {
             libtorrent.set_piece_hashes_ex(ct, Objects.requireNonNull(saveDir).getAbsolutePath(), new set_piece_hashes_listener(), ec);
             final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
             final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
-            // Create the TorrentHandle object and add it to the libtorrent session
-            BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, manager.isDeleteStartedTorrentEnabled());
+            String hash = tinfo.infoHashV1().toString().toLowerCase();
+            BittorrentDownload existing = manager.getBittorrentDownload(hash);
+            if (existing == null) {
+                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, manager.isDeleteStartedTorrentEnabled());
+                TorrentHandle th = BTEngine.getInstance().find(tinfo.infoHashV1());
+                if (th != null && th.isValid()) {
+                    th.resume();
+                    existing = manager.ensureUiDownload(th);
+                }
+            }
+            if (existing == null) {
+                LOG.error("Torrent created but not in TransferManager, keeping HTTP row: " + fd.filePath);
+                return false;
+            }
             try {
                 com.frostwire.android.gui.RelaySearchWiring wiring =
                         com.frostwire.android.gui.SearchEngine.DISTRIBUTED_WIRING;
@@ -151,11 +170,32 @@ public final class TorrentUtils {
             } catch (Throwable indexErr) {
                 LOG.warn("Seeded HTTP download but mesh index failed: " + fd.filePath, indexErr);
             }
-            LOG.info("Successfully created and started seeding torrent for HTTP download: " + fd.filePath);
+            if (httpTransfer != null) {
+                manager.remove(httpTransfer);
+            }
+            refreshTransfersUi();
+            LOG.info("Successfully created and started seeding torrent for HTTP download: " + fd.filePath + " hash=" + hash);
             return true;
         } catch (Throwable e) {
             LOG.error("Error creating torrent for HTTP download seed: " + fd.filePath, e);
             return false;
         }
+    }
+
+    private static void refreshTransfersUi() {
+        SystemUtils.postToUIThread(() -> {
+            try {
+                MainActivity activity = MainActivity.instance();
+                if (activity == null) {
+                    return;
+                }
+                Object fragment = activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
+                if (fragment instanceof TransfersFragment) {
+                    ((TransfersFragment) fragment).onTime(true);
+                }
+            } catch (Throwable t) {
+                LOG.warn("Could not refresh transfers UI after seed", t);
+            }
+        });
     }
 }
