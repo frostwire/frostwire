@@ -44,7 +44,7 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
     private static final Logger LOG = Logger.getLogger(MeshTorrentMetadataFetcher.class);
 
     /** How long to wait for the holder's full chunked answer. */
-    public static final int DEFAULT_TIMEOUT_SEC = 5;
+    public static final int DEFAULT_TIMEOUT_SEC = 15;
 
     private final DistributedSearchTransport transport;
     private final IdentityKeys identity;
@@ -109,7 +109,8 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
                 return null;
             }
             if (!done.await(timeoutMs, TimeUnit.MILLISECONDS)) {
-                LOG.info("MeshTorrentMetadataFetcher: timed out ih=" + Hex.encode(infoHash));
+                LOG.info("MeshTorrentMetadataFetcher: timed out ih=" + Hex.encode(infoHash)
+                        + " chunks=" + chunks.size());
                 return null;
             }
             return result.get();
