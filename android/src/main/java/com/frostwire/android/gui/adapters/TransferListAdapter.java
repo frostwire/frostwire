@@ -388,8 +388,14 @@ public class TransferListAdapter extends ListAdapter<Transfer, TransferListAdapt
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             File savePath = download.getSavePath();
-            if (!AndroidPlatform.saf(savePath)) {
-                items.add(new SeedAction(context));
+            if (!AndroidPlatform.saf(savePath) && savePath != null && savePath.isFile()) {
+                FWFileDescriptor fd = new FWFileDescriptor();
+                fd.filePath = savePath.getAbsolutePath();
+                fd.fileSize = savePath.length();
+                fd.dateModified = savePath.lastModified();
+                fd.title = download.getDisplayName();
+                fd.deletable = true;
+                items.add(new SeedAction(context, fd, download));
             }
             String mime = extractMime(download);
             items.add(new OpenMenuAction(context, download.getDisplayName(), savePath.getAbsolutePath(), mime));
