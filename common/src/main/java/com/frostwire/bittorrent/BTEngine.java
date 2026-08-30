@@ -539,6 +539,7 @@ public final class BTEngine extends SessionManager {
             return;
         }
         File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
+        LOG.info("restoreDownloads: " + (torrents == null ? 0 : torrents.length) + " session torrent file(s) in " + ctx.homeDir);
         if (torrents != null) {
             for (File t : torrents) {
                 try {
