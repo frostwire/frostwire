@@ -73,7 +73,8 @@ public final class TorrentUtils {
     }
 
     public static void seedFinishedHttpDownloadIfEnabled(File savePath, String displayName, byte fileType, TransferManager manager, Transfer httpTransfer) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
+        LOG.info("Auto-seed requested for " + savePath);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
             ConfigurationManager cm = ConfigurationManager.instance();
             if (!cm.isSeedFinishedTorrents()) {
                 LOG.info("Auto-seed skipped: seeding disabled in settings");
@@ -90,8 +91,9 @@ public final class TorrentUtils {
             if (savePath != null && savePath.exists()) {
                 FWFileDescriptor fd = createFileDescriptor(savePath, displayName, fileType);
                 if (fd != null) {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> buildTorrentAndSeedIt(fd, manager, httpTransfer));
+                    buildTorrentAndSeedIt(fd, manager, httpTransfer);
+                } else {
+                    LOG.warn("Auto-seed skipped: could not build file descriptor for " + savePath);
                 }
             } else {
                 LOG.warn("Auto-seed skipped: save path missing " + savePath);
@@ -121,14 +123,17 @@ public final class TorrentUtils {
     }
     
     public static boolean seedFile(File file, String displayName, TransferManager manager, Transfer httpTransfer) {
+        LOG.info("seedFile " + file);
         FWFileDescriptor fd = createFileDescriptor(file, displayName != null ? displayName : file.getName(), Constants.FILE_TYPE_DOCUMENTS);
         if (fd == null) {
+            LOG.warn("seedFile skipped, file missing: " + file);
             return false;
         }
         return buildTorrentAndSeedIt(fd, manager, httpTransfer);
     }
 
     private static boolean buildTorrentAndSeedIt(final FWFileDescriptor fd, TransferManager manager, Transfer httpTransfer) {
+        LOG.info("buildTorrentAndSeedIt start " + fd.filePath);
         try {
             File file = new File(fd.filePath);
             File saveDir = file.getParentFile();
