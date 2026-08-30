@@ -151,7 +151,7 @@ android {
                 }
             }
             pip {
-                install "yt_dlp[default]==2026.3.17"
+                install "yt_dlp[default]==2026.8.19"
                 // helps a lot with debugging
                 //options "--verbose"
             }
