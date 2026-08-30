@@ -470,6 +470,10 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
         if (Engine.instance().wasShutdown()) {
             Engine.instance().startServices();
         }
+        // Hours-later resume: FGS may have been reaped while the process lived.
+        // Search/TORRENT_FETCH must not wait for the user to notice empty results.
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                () -> Engine.instance().ensureDistributedSearchReady(15_000));
         SoftwareUpdater.getInstance().checkForUpdate(this);
     }
 
