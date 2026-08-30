@@ -24,6 +24,7 @@ import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -63,32 +64,35 @@ public final class TorrentUtils {
      * @param manager The TransferManager instance
      */
     public static void seedFinishedHttpDownloadIfEnabled(File savePath, String displayName, byte fileType, TransferManager manager) {
-        // Move configuration checks to CONFIG_MANAGER thread to avoid strict mode violations
+        seedFinishedHttpDownloadIfEnabled(savePath, displayName, fileType, manager, null);
+    }
+
+    public static void seedFinishedHttpDownloadIfEnabled(File savePath, String displayName, byte fileType, TransferManager manager, Transfer httpTransfer) {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
             ConfigurationManager cm = ConfigurationManager.instance();
-            
-            // Only proceed if seeding is enabled
             if (!cm.isSeedFinishedTorrents()) {
+                LOG.info("Auto-seed skipped: seeding disabled in settings");
                 return;
             }
-            
-            // Check WiFi-only restriction
             if (cm.isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp()) {
+                LOG.info("Auto-seed skipped: WiFi-only seeding and WiFi is down");
                 return;
             }
-            
-            // Don't seed if mobile data savings are on
             if (manager.isMobileAndDataSavingsOn()) {
+                LOG.info("Auto-seed skipped: mobile data savings on");
                 return;
             }
-            
-            // Create FWFileDescriptor for the downloaded file
             if (savePath != null && savePath.exists()) {
                 FWFileDescriptor fd = createFileDescriptor(savePath, displayName, fileType);
                 if (fd != null) {
-                    // Use background thread to create torrent and seed it
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> buildTorrentAndSeedIt(fd, manager));
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        if (buildTorrentAndSeedIt(fd, manager) && httpTransfer != null) {
+                            manager.remove(httpTransfer);
+                        }
+                    });
                 }
+            } else {
+                LOG.warn("Auto-seed skipped: save path missing " + savePath);
             }
         });
     }
@@ -117,7 +121,7 @@ public final class TorrentUtils {
     /**
      * Creates a torrent from the file and starts seeding it
      */
-    private static void buildTorrentAndSeedIt(final FWFileDescriptor fd, TransferManager manager) {
+    private static boolean buildTorrentAndSeedIt(final FWFileDescriptor fd, TransferManager manager) {
         try {
             File file = new File(fd.filePath);
             File saveDir = file.getParentFile();
@@ -148,8 +152,10 @@ public final class TorrentUtils {
                 LOG.warn("Seeded HTTP download but mesh index failed: " + fd.filePath, indexErr);
             }
             LOG.info("Successfully created and started seeding torrent for HTTP download: " + fd.filePath);
+            return true;
         } catch (Throwable e) {
             LOG.error("Error creating torrent for HTTP download seed: " + fd.filePath, e);
+            return false;
         }
     }
 }
