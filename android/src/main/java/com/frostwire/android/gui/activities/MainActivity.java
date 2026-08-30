@@ -138,6 +138,10 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
         return lastInstance;
     }
 
+    public void switchToTransfers() {
+        controller.showTransfers(TransfersFragment.TransferStatus.ALL);
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
