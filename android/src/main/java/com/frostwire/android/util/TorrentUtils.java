@@ -153,7 +153,7 @@ public final class TorrentUtils {
             String hash = tinfo.infoHashV1().toString().toLowerCase();
             BittorrentDownload existing = manager.getBittorrentDownload(hash);
             if (existing == null) {
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, manager.isDeleteStartedTorrentEnabled());
+                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, true);
                 TorrentHandle th = BTEngine.getInstance().find(tinfo.infoHashV1());
                 if (th != null && th.isValid()) {
                     th.resume();
