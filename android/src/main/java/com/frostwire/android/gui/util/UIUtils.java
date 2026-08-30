@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -509,11 +510,18 @@ public final class UIUtils {
      * This should probably be moved elsewhere (similar to GUIMediator on the desktop)
      */
     public static void showTransfersOnDownloadStart(Context context) {
-        if (ConfigurationManager.instance().showTransfersOnDownloadStart() && context != null) {
-            Intent i = new Intent(context, MainActivity.class);
-            i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.getApplicationContext().startActivity(i);
+        StrictMode.ThreadPolicy previousPolicy = StrictMode.getThreadPolicy();
+        StrictMode.allowThreadDiskReads();
+        StrictMode.allowThreadDiskWrites();
+        try {
+            if (ConfigurationManager.instance().showTransfersOnDownloadStart() && context != null) {
+                Intent i = new Intent(context, MainActivity.class);
+                i.setAction(Constants.ACTION_SHOW_TRANSFERS);
+                i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.getApplicationContext().startActivity(i);
+            }
+        } finally {
+            StrictMode.setThreadPolicy(previousPolicy);
         }
     }
 
