@@ -541,30 +541,43 @@ public final class BTEngine extends SessionManager {
         File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
         if (torrents != null) {
             for (File t : torrents) {
-                try {
-                    String infoHash = FilenameUtils.getBaseName(t.getName());
-                    if (infoHash != null) {
-                        File resumeFile = resumeDataFile(infoHash);
-                        File savePath = readSavePath(infoHash);
-                        File checked = setupSaveDir(savePath);
-                        if (checked == null) {
-                            // fallback to default data dir
-                            checked = setupSaveDir(ctx.dataDir);
-                        }
-                        if (checked == null) {
-                            LOG.warn("Can't create data dir or mount point is not accessible for infoHash=" + infoHash);
-                            continue;
-                        }
-                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, checked, null, resumeFile));
-                    }
-                } catch (Throwable e) {
-                    LOG.error("Error restoring torrent download: " + t, e);
-                }
-                runNextRestoreDownloadTask();
+                queueRestore(t, true);
             }
         }
+        if (ctx.torrentsDir != null && ctx.torrentsDir.isDirectory()) {
+            File[] published = ctx.torrentsDir.listFiles((dir, name) ->
+                    name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
+            if (published != null) {
+                for (File t : published) {
+                    queueRestore(t, false);
+                }
+            }
+        }
+    }
 
-
+    private void queueRestore(File torrentFile, boolean basenameIsInfoHash) {
+        try {
+            File resumeFile = null;
+            File checked = null;
+            if (basenameIsInfoHash) {
+                String infoHash = FilenameUtils.getBaseName(torrentFile.getName());
+                if (infoHash != null) {
+                    resumeFile = resumeDataFile(infoHash);
+                    checked = setupSaveDir(readSavePath(infoHash));
+                }
+            }
+            if (checked == null) {
+                checked = setupSaveDir(ctx.dataDir);
+            }
+            if (checked == null) {
+                LOG.warn("Can't create data dir for restore of " + torrentFile);
+                return;
+            }
+            restoreDownloadsQueue.add(new RestoreDownloadTask(torrentFile, checked, null, resumeFile));
+            runNextRestoreDownloadTask();
+        } catch (Throwable e) {
+            LOG.error("Error restoring torrent download: " + torrentFile, e);
+        }
     }
 
     File settingsFile() {
@@ -612,6 +625,10 @@ public final class BTEngine extends SessionManager {
         try {
             String name = getEscapedFilename(ti);
             torrentFile = torrentFile(name);
+            File parent = torrentFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
             byte[] arr = ti.toEntry().bencode();
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
