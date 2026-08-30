@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -67,7 +68,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class TransferManager {
 
     private static final Logger LOG = Logger.getLogger(TransferManager.class);
-    private static final int LOAD_TORRENTS_MAX_RETRIES = 20;
+    private static final int LOAD_TORRENTS_MAX_RETRIES = 120;
     private static final long LOAD_TORRENTS_RETRY_DELAY_MS = 500L;
 
     private final List<Transfer> httpDownloads;
@@ -81,6 +82,7 @@ public final class TransferManager {
     private static final Object instanceLock = new Object();
     private final ConfigurationRepository.OnPreferenceChangeListener onPreferenceChangeListener;
     private volatile static TransferManager instance;
+    private final AtomicBoolean sessionTorrentsRestored = new AtomicBoolean(false);
 
     /**
      * Stable BTEngine listener instance so {@link BTEngineListenerChain#install}
@@ -168,8 +170,12 @@ public final class TransferManager {
     public void reset() {
         registerPreferencesChangeListener();
         clearTransfers();
+        sessionTorrentsRestored.set(false);
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> loadTorrentsTask(0));
+    }
 
+    public void ensureTorrentsRestored() {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> loadTorrentsTask(0));
     }
 
     public void onShutdown(boolean disconnected) {
@@ -866,7 +872,8 @@ public final class TransferManager {
             btEngine = BTEngine.getInstance();
             if (!Engine.instance().isStarted() || btEngine.swig() == null) {
                 if (retryCount >= LOAD_TORRENTS_MAX_RETRIES) {
-                    LOG.warn("Timed out waiting for engine startup/session before restoring previous-session torrents");
+                    LOG.warn("Timed out waiting for engine startup/session before restoring previous-session torrents (retries="
+                            + retryCount + ")");
                     return;
                 }
                 SystemUtils.postToHandlerDelayed(
@@ -880,6 +887,11 @@ public final class TransferManager {
             LOG.warn("Skipping torrent restore because BTEngine is unavailable", t);
             return;
         }
+        if (!sessionTorrentsRestored.compareAndSet(false, true)) {
+            LOG.info("Previous-session torrents already restored");
+            return;
+        }
+        LOG.info("Restoring previous-session torrents");
         synchronized (downloadsListMonitor) {
             bittorrentDownloadsList.clear();
         }
@@ -895,6 +907,7 @@ public final class TransferManager {
             BTEngineListenerChain.install(btEngine, engineListener);
             btEngine.restoreDownloads();
         } catch (Throwable t) {
+            sessionTorrentsRestored.set(false);
             MainApplication.recordBTEngineInitializationFailure(t);
             LOG.warn("Could not restore previous-session torrents", t);
         }
