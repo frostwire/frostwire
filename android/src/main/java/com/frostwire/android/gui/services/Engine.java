@@ -164,9 +164,11 @@ public final class Engine implements IEngineService {
     }
 
     /**
-     * If distributed search is enabled but IceBridge is down, start/restart it
-     * and wait until the search transport is wired (or {@code timeoutMs} elapses).
-     * Call from a background thread — never the UI thread.
+     * IceBridge distributed search and TORRENT_FETCH must work after the user
+     * leaves and comes back hours later. If the stack was reaped or never
+     * started, bring it up and wait until the search transport is wired
+     * (or {@code timeoutMs} elapses). Call from a background thread — never
+     * the UI thread. No-op when already ready.
      */
     public void ensureDistributedSearchReady(long timeoutMs) {
         if (!SearchEngine.DISTRIBUTED.isEnabled() || SearchEngine.DISTRIBUTED.isReady()) {
