@@ -76,7 +76,7 @@ public class UIHttpDownload extends HttpDownload {
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
         
         // Seed the finished HTTP download if seeding is enabled
-        TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_DOCUMENTS, manager);
+        TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_DOCUMENTS, manager, this);
     }
 
     @Override
