@@ -44,6 +44,7 @@ import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainStore;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
+import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
@@ -102,6 +103,9 @@ public final class AndroidRelayStack implements AutoCloseable {
   /** Second reindex after TransferManager.restoreDownloads may still be settling. */
   private static final long DELAYED_REINDEX_MS = 5_000L;
 
+  private static final Object START_LOCK = new Object();
+  private static volatile AndroidRelayStack live;
+
   private final AndroidLocalIndex localIndex;
   private final IdentityKeys identity;
   private final IceBridgeServer server;
@@ -127,6 +131,20 @@ public final class AndroidRelayStack implements AutoCloseable {
    * @return the started stack, or {@code null} on failure
    */
   public static AndroidRelayStack start(Context context, File homeDir, BTEngine btEngine) {
+    synchronized (START_LOCK) {
+      if (live != null) {
+        LOG.info("AndroidRelayStack: already running — refusing second start");
+        return live;
+      }
+      AndroidRelayStack started = startNew(context, homeDir, btEngine);
+      if (started != null) {
+        live = started;
+      }
+      return started;
+    }
+  }
+
+  private static AndroidRelayStack startNew(Context context, File homeDir, BTEngine btEngine) {
     AndroidLocalIndex li = null;
     IceBridgeServer srv = null;
     IceBridgeClient cl = null;
@@ -149,7 +167,13 @@ public final class AndroidRelayStack implements AutoCloseable {
               + com.frostwire.util.Hex.encode(ident.ed25519PubRaw()));
       SearchEngine.DISTRIBUTED_WIRING.identity(ident);
 
-      li = AndroidLocalIndex.open(context);
+      LocalIndex existingIndex = SearchEngine.LOCAL_WIRING.localIndex();
+      if (existingIndex instanceof AndroidLocalIndex
+          && ((AndroidLocalIndex) existingIndex).isOpen()) {
+        li = (AndroidLocalIndex) existingIndex;
+      } else {
+        li = AndroidLocalIndex.open(context);
+      }
 
       SharedTorrentIndexer indexer = SharedTorrentIndexerInstaller.install(btEngine, li, ident);
       // Torrents restored before this listener was chained never fired
@@ -427,16 +451,6 @@ public final class AndroidRelayStack implements AutoCloseable {
           srv.close();
         } catch (Throwable ignored) {
         }
-      if (ks != null)
-        try {
-          ks.close();
-        } catch (Throwable ignored) {
-        }
-      if (li != null)
-        try {
-          li.close();
-        } catch (Throwable ignored) {
-        }
       return null;
     }
   }
@@ -609,6 +623,13 @@ public final class AndroidRelayStack implements AutoCloseable {
 
   @Override
   public void close() {
+    synchronized (START_LOCK) {
+      if (live != this) {
+        LOG.warn("AndroidRelayStack.close() ignored — not the live instance");
+        return;
+      }
+      live = null;
+    }
     LOG.info("AndroidRelayStack: shutting down...");
     try {
       if (karmaScheduler != null) karmaScheduler.stop();
@@ -656,26 +677,10 @@ public final class AndroidRelayStack implements AutoCloseable {
       LOG.warn("Error closing server", t);
     }
     try {
-      if (karmaStore != null) karmaStore.close();
-    } catch (Throwable t) {
-      LOG.warn("Error closing karmaStore", t);
-    }
-    // Keep LocalIndex open if wiring still points at it for UI; only clear transport.
-    try {
       SearchEngine.DISTRIBUTED_WIRING.searchTransport(null);
       SearchEngine.DISTRIBUTED_WIRING.peerDirectory(null);
     } catch (Throwable ignored) {
     }
-    try {
-      if (localIndex != null) localIndex.close();
-    } catch (Throwable t) {
-      LOG.warn("Error closing localIndex", t);
-    }
-    try {
-      SearchEngine.LOCAL_WIRING.localIndex(null);
-      SearchEngine.DISTRIBUTED_WIRING.localIndex(null);
-    } catch (Throwable ignored) {
-    }
-    LOG.info("AndroidRelayStack: shutdown complete");
+    LOG.info("AndroidRelayStack: shutdown complete (LocalIndex kept open)");
   }
 }
