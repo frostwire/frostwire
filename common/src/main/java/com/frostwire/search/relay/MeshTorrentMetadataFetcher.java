@@ -34,6 +34,10 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * <p>Fail-fast: a signed holder error frame (NOT_FOUND/TOO_LARGE) returns
  * null immediately instead of waiting out the timeout.
+ *
+ * <p>Chunks arriving via EC2 RELAY_RESPONSE are attributed to the hop pub, not
+ * the holder. Auth is the holder Ed25519 signature on each chunk — never
+ * require {@code sourcePub == holderPub} or cellular TORRENT_FETCH times out.
  */
 public final class MeshTorrentMetadataFetcher implements DistributedSearchTransport.PayloadListener {
 
