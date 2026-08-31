@@ -1,33 +1,18 @@
 FrostWire 3.2.0 build 776 UNRELEASED
-  - fix:YouTube search always offers an audio row even when yt-dlp only returns muxed itag-18 MP4
-  - fix:Same-WiFi desktop search now gets Android hits — replies go through EC2 when there is no live rUDP session (WAN hairpin used to swallow them)
-  - fix:Previous-session torrents restore on the downloader thread, not behind IceBridge on MISC
-  - fix:Replacing a torrent-fetcher row with the real download no longer leaves Transfers stuck on Cancelled
-  - fix:A mesh magnet no longer vanishes from Transfers when IceBridge metadata times out — the BTEngine download is shown
-  - fix:Session restore loads only torrents from the previous session, not every file in the Torrents folder
-  - fix:Download-complete notification no longer NPEs when NotifiedStorage is still loading
-  - fix:Mesh search no longer advertises torrents that are not in the live libtorrent session
-  - fix:IceBridge can only start once per process; a failed second bind cannot close the torrent index
-  - fix:Show-transfers after a download switches the existing MainActivity instead of startActivity
-  - fix:YouTube/HTTP Complete now auto-seeds on a dedicated thread instead of waiting behind the MISC/config queues
-  - fix:Transfer list no longer flickers while a Complete download sits idle
-  - fix:Finished YouTube/HTTP downloads become a Seeding torrent in Transfers — the HTTP row is only removed after the torrent is on the list
-  - fix:Finished YouTube/HTTP downloads stay in Transfers until the torrent is actually hashing/seeding — Seed no longer wipes the row first
-  - fix:Seed on a finished YouTube/HTTP download now hashes that file (empty SeedAction used to no-op); auto-seed indexes the torrent for mesh search
+  - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
+  - fix:IceBridge starts only once per process; failed binds cannot close the local torrent index or create competing relay instances
+  - fix:Previous-session torrents restore after the engine is ready, continue past malformed files, and never restore every file from the public Torrents folder
+  - fix:Distributed search and TORRENT_FETCH recover after engine/relay restarts without silently losing the active transport
+  - fix:TORRENT_FETCH accepts holder-signed metadata through EC2 relay hops, and metadata-less magnets are replaced by the real libtorrent transfer
+  - fix:Mesh search advertises only live libtorrent torrents, preventing stale results that cannot answer metadata requests
+  - fix:Same-WiFi and cellular search replies follow live rUDP sessions after NAT changes instead of stale registry endpoints
+  - fix:Finished YouTube/HTTP downloads auto-seed on a dedicated thread and remain in Transfers until the real torrent is registered
+  - fix:Torrent fetcher rows are replaced by the real transfer instead of becoming stuck on Cancelled or disappearing
+  - fix:Download-complete notification is safe while NotifiedStorage is still loading
+  - fix:YouTube search always offers an audio row, including muxed progressive-only responses
   - fix:YouTube downloads no longer 403 — yt-dlp 2026.8.19 and web/android player clients instead of ANDROID_VR
-  - fix:Coming back hours later still runs distributed search and TORRENT_FETCH — resume restarts IceBridge if the stack was reaped
-  - fix:Transfer list updates in place instead of DiffUtil+notifyDataSetChanged on the same objects, so Finished/Seeding show immediately and the list is less laggy
-  - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
-  - fix:Torrent transfer details are hidden until metadata has arrived — tapping a "Downloading metadata" row no longer shows Invalid Infohash
-  - fix:Tapping a mesh search result that is already in Transfers does not add a duplicate TorrentFetcherDownload
-  - fix:Performing a search restarts IceBridge if it was shut down, so distributed search never silently no-ops
-  - fix:Distributed search keeps working after Android reaps the engine foreground service — IceBridge is no longer torn down with the FGS, and startServices restarts a missing relay stack instead of aborting as "already started"
-  - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
-  - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead
-  - fix:IceBridge RELAY replies follow the live rUDP session after a cellular NAT rebind instead of the first-seen registry address
-  - fix:TORRENT_FETCH accepts metadata chunks relayed through the EC2 hop (holder signature still required) so cellular downloads no longer time out to a stuck magnet
-  - fix:A metadata-less magnet left in the engine is replaced when full .torrent bytes arrive over the mesh, so the transfer appears in the list
-  - new:Distributed torrents now fetch their metadata over the IceBridge mesh (TORRENT_FETCH) when the seeder is behind an unreachable NAT — cellular downloads no longer hang at "Downloading metadata" when the desktop's ports aren't forwarded; Android also answers TORRENT_FETCH for its own seeded torrents, so desktops can pull metadata from phone-seeded YouTube downloads
+  - fix:Transfer list no longer flickers while an idle Complete download is refreshed
+  - fix:Show-transfers switches the existing MainActivity instead of starting another activity
   - fix:Disabling every web search engine now persists when Distributed Search is enabled; startup no longer turns Archive.org back on before the distributed runtime is ready
   - fix:IceBridge search works reliably on cellular networks — rUDP HELLO authentication is retransmitted until signed acknowledgement and sessions follow changing carrier NAT endpoints
   - fix:Distributed-search hybrid/v2 magnets now use one real libtorrent transfer for x.pe peers, metadata, piece layers, and payload — fixes invalid piece-layer errors; transfer progress/state now refresh promptly, retries reconnect explicit peers, and invalid incoming port 0 falls back to a valid range
