@@ -320,18 +320,22 @@ public abstract class BaseHttpDownload implements Transfer {
 
     protected final void error(Throwable e) {
         if (state != TransferState.CANCELED) {
-            complete(TransferState.ERROR);
             LOG.error("General error in download " + info, e);
-            if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
-                complete(TransferState.ERROR_DISK_FULL);
-            }
-            if (e instanceof SSLException || e instanceof SocketTimeoutException) {
-                complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
-            }
-            if (e instanceof UnknownHostException) {
-                complete(TransferState.ERROR_NO_INTERNET);
-            }
+            complete(downloadErrorState(e));
         }
+    }
+
+    static TransferState downloadErrorState(Throwable e) {
+        if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
+            return TransferState.ERROR_DISK_FULL;
+        }
+        if (e instanceof SSLException || e instanceof SocketTimeoutException) {
+            return TransferState.ERROR_CONNECTION_TIMED_OUT;
+        }
+        if (e instanceof UnknownHostException) {
+            return TransferState.ERROR_NO_INTERNET;
+        }
+        return TransferState.ERROR;
     }
 
     protected void moveAndComplete(File src, File dst) {
@@ -355,8 +359,23 @@ public abstract class BaseHttpDownload implements Transfer {
             state = TransferState.SCANNING;
             complete(TransferState.COMPLETE);
         } else {
-            complete(TransferState.ERROR_MOVING_INCOMPLETE);
+            complete(failedMoveState(src.length(), usableSpaceFor(dst)));
         }
+    }
+
+    static TransferState failedMoveState(long bytesNeeded, long usableSpace) {
+        if (usableSpace >= 0 && usableSpace < bytesNeeded) {
+            return TransferState.ERROR_DISK_FULL;
+        }
+        return TransferState.ERROR_MOVING_INCOMPLETE;
+    }
+
+    static long usableSpaceFor(File dest) {
+        File dir = dest.getParentFile();
+        if (dir == null || !dir.isDirectory()) {
+            return Long.MAX_VALUE;
+        }
+        return dir.getUsableSpace();
     }
 
     protected void onHttpComplete() {
