@@ -1,21 +1,17 @@
  FrostWire 7.1.0 UNRELEASED
-  - fix:Mesh magnets no longer advertise BitTorrent port 0 from a failed 0.0.0.0:0 listen, so same-LAN downloads from an Android seeder can connect
-  - fix:IceBridge child supervision keeps distributed search and TORRENT_FETCH alive hours after launch — dead/orphan children are respawned; rUDP reconnects after a timed-out session
-  - fix:A finished torrent no longer stays on "Downloading" — complete progress / TORRENT_FINISHED now maps to Seeding or Finished
-  - fix:Newly created torrents (YouTube/HTTP downloads that auto-seed) are written to the mesh LocalIndex as soon as the .torrent is generated, not after a later BTEngine callback
-  - fix:YouTube watch-URL search lists the best video stream and the best audio stream — YouTube no longer ships muxed progressive MP4, so video-only DASH was being skipped and only audio appeared
-  - fix:IceBridge holds SEARCH/DATA until rUDP HELLO is acknowledged, and drops a session that exhausts reliable retries so the next search reconnects instead of staying dead
-  - fix:IceBridge RELAY replies follow the live rUDP session after a cellular NAT rebind instead of the first-seen registry address
-  - fix:TORRENT_FETCH accepts metadata chunks relayed through the EC2 hop (holder signature still required) so cellular downloads no longer time out to a stuck magnet
-  - fix:A metadata-less magnet left in the engine is replaced when full .torrent bytes arrive over the mesh, so the transfer appears in the list
-  - fix:Distributed search no longer silently breaks after a crash or restart — stale IceBridge children from dead sessions are killed at startup, the child exits when its FrostWire parent dies, and a supervisor respawns the child automatically if it is ever lost at runtime
-  - new:Desktop answers TORRENT_FETCH requests over IceBridge — peers behind NAT fetch a shared torrent's full metadata (piece layers included) through the mesh instead of hanging on "Downloading metadata"
+  - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
+  - fix:IceBridge child supervision prevents orphan processes and preserves distributed search/TORRENT_FETCH across crashes and restarts
+  - fix:Standalone IceBridge forwarders launch with DHT and bootstrap discovery enabled, while release packages include icebridge.jar
+  - fix:Desktop release distributions no longer expose unauthenticated JMX or JDWP listeners
+  - fix:TORRENT_FETCH returns holder-signed full torrent metadata through EC2 relay hops, including piece layers for hybrid torrents
+  - fix:Distributed search and relay responses follow live rUDP sessions after cellular NAT rebinding instead of stale registry endpoints
+  - fix:Metadata-less magnets are replaced by the real libtorrent transfer, preserving x.pe peers and avoiding invalid piece-layer reconstruction
+  - fix:Mesh magnets no longer advertise BitTorrent port 0 from failed listeners
+  - fix:Newly created YouTube/HTTP torrents are indexed immediately after auto-seeding
+  - fix:YouTube downloads preserve headers, ranges, cancellation, and resume behavior; Telluride build 47 uses yt-dlp 2026.8.19
+  - fix:YouTube search returns both best video and best audio streams, including muxed-only responses
   - new:About window shows the current Telluride build number
-  - fix:YouTube downloads pass yt-dlp's HTTP headers, request complete byte ranges, resume transient resets safely, and use isolated cancel state per transfer; Telluride build 47 updates yt-dlp to 2026.8.19, restores direct-m4a “Faster Download,” and pasted watch URLs open the requested video
-  - fix:IceBridge rUDP HELLO authentication is retransmitted until signed acknowledgement, and authenticated sessions follow changing mobile carrier NAT endpoints instead of replying to stale addresses
-  - fix:Desktop-created hybrid/v2 torrents found through Distributed Search now download correctly on Android peers — x.pe connects directly to the desktop seeder without invalid .torrent piece-layer reconstruction
   - fix:Slideshow / MISC HTTP no longer dies on OkHttp HTTP/2 stream header timeout (o2.php) — MISC client is HTTP/1.1, shared clients send HTTP/2 pings, slideshow retries once after evicting a stale pool
-  - new:Distributed search answers advertise seeder BT endpoints (RemoteSearchResponse v3 bt) and result magnets carry x.pe — mesh-found trackerless content (auto-seeded finished downloads) downloads straight from the seeder; auto-created torrents now include the default tracker list
   - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=30; LimeWire ultrapeer baseline retained
   - new:IceBridge topology limits — IceBridgeTopology + env ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready)
   - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
