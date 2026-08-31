@@ -30,6 +30,8 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
 
     private static final Logger LOG = Logger.getLogger(IceBridgeSearchTransport.class);
     private static final long POLL_INTERVAL_MS = 300;
+    private static final int POLL_BATCH_SIZE = 256;
+    private static final int MAX_DRAIN_BATCHES = 16;
 
     private final IceBridgeClient client;
     private final CopyOnWriteArrayList<PayloadListener> listeners = new CopyOnWriteArrayList<>();
@@ -87,15 +89,20 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
 
     private void pollAndDispatch() {
         try {
-            List<InboundMessage> messages = client.poll(64);
-            for (InboundMessage msg : messages) {
-                int protocolId = msg.protocolId() == 0 ? MeshProtocolId.SEARCH : msg.protocolId();
-                for (PayloadListener listener : listeners) {
-                    try {
-                        listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs(), protocolId);
-                    } catch (Throwable t) {
-                        LOG.warn("Payload listener threw", t);
+            for (int batch = 0; batch < MAX_DRAIN_BATCHES; batch++) {
+                List<InboundMessage> messages = client.poll(POLL_BATCH_SIZE);
+                for (InboundMessage msg : messages) {
+                    int protocolId = msg.protocolId() == 0 ? MeshProtocolId.SEARCH : msg.protocolId();
+                    for (PayloadListener listener : listeners) {
+                        try {
+                            listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs(), protocolId);
+                        } catch (Throwable t) {
+                            LOG.warn("Payload listener threw", t);
+                        }
                     }
+                }
+                if (messages.size() < POLL_BATCH_SIZE) {
+                    break;
                 }
             }
         } catch (Throwable t) {
