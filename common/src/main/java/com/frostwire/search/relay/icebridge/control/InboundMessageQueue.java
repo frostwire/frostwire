@@ -69,15 +69,14 @@ public final class InboundMessageQueue implements RudpMessageListener {
      * @param sourcePub sender public key if known, else empty/null
      * @param wireOrAppPayload MeshEnvelope wire bytes or bare payload
      */
-    public void offerForTarget(byte[] targetPub, byte[] sourcePub, byte[] wireOrAppPayload) {
+    public boolean offerForTarget(byte[] targetPub, byte[] sourcePub, byte[] wireOrAppPayload) {
         if (targetPub == null || targetPub.length != 32) {
-            onMessage(sourcePub, wireOrAppPayload);
-            return;
+            return offerUnwrapped(SHARED_KEY, sourcePub, wireOrAppPayload);
         }
-        offerUnwrapped(Hex.encode(targetPub), sourcePub, wireOrAppPayload);
+        return offerUnwrapped(Hex.encode(targetPub), sourcePub, wireOrAppPayload);
     }
 
-    private void offerUnwrapped(String targetKey, byte[] sourcePub, byte[] payload) {
+    private boolean offerUnwrapped(String targetKey, byte[] sourcePub, byte[] payload) {
         int protocolId;
         byte[] appPayload;
         try {
@@ -90,22 +89,21 @@ public final class InboundMessageQueue implements RudpMessageListener {
             appPayload = payload;
             if (payload == null || payload.length == 0) {
                 LOG.debug("Dropping empty inbound payload");
-                return;
+                return false;
             }
         }
         ConcurrentLinkedQueue<InboundMessage> queue =
                 queues.computeIfAbsent(targetKey, k -> new ConcurrentLinkedQueue<>());
         AtomicInteger count = counts.computeIfAbsent(targetKey, k -> new AtomicInteger(0));
-        while (count.get() >= maxSizePerQueue) {
-            if (queue.poll() != null) {
-                count.decrementAndGet();
-            } else {
-                break;
+        synchronized (queue) {
+            if (count.get() >= maxSizePerQueue) {
+                return false;
             }
+            queue.offer(new InboundMessage(sourcePub, appPayload, System.currentTimeMillis(), protocolId));
+            count.incrementAndGet();
         }
-        queue.offer(new InboundMessage(sourcePub, appPayload, System.currentTimeMillis(), protocolId));
-        count.incrementAndGet();
         logSuccessfulProtocol(sourcePub, protocolId, appPayload, targetKey);
+        return true;
     }
 
     private static void logSuccessfulProtocol(byte[] sourcePub, int protocolId, byte[] appPayload,
@@ -172,13 +170,15 @@ public final class InboundMessageQueue implements RudpMessageListener {
             return result;
         }
         AtomicInteger count = counts.computeIfAbsent(key, k -> new AtomicInteger(0));
-        for (int i = 0; i < n; i++) {
-            InboundMessage m = queue.poll();
-            if (m == null) {
-                break;
+        synchronized (queue) {
+            for (int i = 0; i < n; i++) {
+                InboundMessage m = queue.poll();
+                if (m == null) {
+                    break;
+                }
+                count.decrementAndGet();
+                result.add(m);
             }
-            count.decrementAndGet();
-            result.add(m);
         }
         return result;
     }

@@ -120,9 +120,9 @@ public final class RudpSessionManager {
      * {@link IceBridgeTopology#meshHopTtl()}, fanout N from
      * {@link IceBridgeTopology#meshBroadcastFanout()}).
      */
-    public void deliver(byte[] targetPub, byte[] payload) {
+    public boolean deliver(byte[] targetPub, byte[] payload) {
         if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
-            return;
+            return false;
         }
         if (payload.length > RelayFrame.MAX_APP_PAYLOAD) {
             LOG.warn("RudpSessionManager: deliver payload too large for mesh ("
@@ -132,21 +132,21 @@ public final class RudpSessionManager {
             PeerRecord direct = registry.lookup(targetPub);
             if (direct != null) {
                 sendData(new InetSocketAddress(direct.host(), direct.rudpPort()), payload);
+                return true;
             }
-            return;
+            return false;
         }
         if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
             // Local delivery (loopback control plane → same process).
             notifyListener(identity.ed25519PubRaw(), payload);
-            return;
+            return true;
         }
         PeerRecord target = registry.lookup(targetPub);
         InetSocketAddress registryAddr = null;
         if (target != null) {
             registryAddr = new InetSocketAddress(target.host(), target.rudpPort());
             if (isLocalRudpEndpoint(registryAddr)) {
-                deliverToLocalPollClient(targetPub, new byte[0], payload);
-                return;
+                return deliverToLocalPollClient(targetPub, new byte[0], payload);
             }
             RudpSession live = findSessionByPub(targetPub);
             if (live == null) {
@@ -154,7 +154,7 @@ public final class RudpSessionManager {
             }
             if (live != null && live.isAuthenticated()) {
                 sendData(live.remoteAddress(), payload);
-                return;
+                return true;
             }
         }
         int n = meshBroadcastFanout();
@@ -174,9 +174,12 @@ public final class RudpSessionManager {
         }
         if (sent == 0 && registryAddr != null) {
             sendData(registryAddr, payload);
+            return true;
         } else if (sent == 0) {
             LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
+            return false;
         }
+        return true;
     }
 
     /**
@@ -913,17 +916,18 @@ public final class RudpSessionManager {
      * Deliver to a USE_REMOTE client registered on our rUDP host:port.
      * Demuxes into a per-target inbound queue when the listener supports it.
      */
-    private void deliverToLocalPollClient(byte[] targetPub, byte[] sourcePub, byte[] payload) {
+    private boolean deliverToLocalPollClient(byte[] targetPub, byte[] sourcePub, byte[] payload) {
         if (messageListener instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
             try {
-                ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
+                return ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
                         .offerForTarget(targetPub, sourcePub == null ? new byte[0] : sourcePub, payload);
             } catch (Throwable t) {
                 LOG.warn("RudpSessionManager: local poll client delivery failed", t);
+                return false;
             }
-            return;
         }
         notifyListener(sourcePub, payload);
+        return true;
     }
 
     // ---- maintenance ----
