@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -24,10 +24,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
@@ -38,23 +36,13 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.bittorrent.DefaultTrackers;
-import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.swig.create_torrent;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.file_storage;
-import com.frostwire.jlibtorrent.swig.libtorrent;
-import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 
 /**
  * @author gubatron
@@ -63,268 +51,276 @@ import java.util.Objects;
  */
 public class SeedAction extends MenuAction implements AbstractDialog.OnDialogClickListener {
 
-    private static final Logger LOG = Logger.getLogger(SeedAction.class);
+  private static final Logger LOG = Logger.getLogger(SeedAction.class);
 
-    private static final String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
-    private static final String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
+  private static final String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
+  private static final String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
 
-    private final FWFileDescriptor fd;
-    private final BittorrentDownload btDownload;
-    private final Transfer transferToClear;
-    private final OnBittorrentConnectRunnable onBittorrentConnectRunnable;
+  private final FWFileDescriptor fd;
+  private final BittorrentDownload btDownload;
+  private final Transfer transferToClear;
+  private final OnBittorrentConnectRunnable onBittorrentConnectRunnable;
 
-    private SeedAction(Context context,
-                       FWFileDescriptor fd,
-                       BittorrentDownload existingBittorrentDownload,
-                       Transfer transferToClear) {
-        super(context, R.drawable.contextmenu_icon_seed, R.string.seed, UIUtils.getAppIconPrimaryColor(context));
-        this.fd = fd;
-        this.btDownload = existingBittorrentDownload;
-        this.transferToClear = transferToClear;
-        this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
+  private SeedAction(
+      Context context,
+      FWFileDescriptor fd,
+      BittorrentDownload existingBittorrentDownload,
+      Transfer transferToClear) {
+    super(
+        context,
+        R.drawable.contextmenu_icon_seed,
+        R.string.seed,
+        UIUtils.getAppIconPrimaryColor(context));
+    this.fd = fd;
+    this.btDownload = existingBittorrentDownload;
+    this.transferToClear = transferToClear;
+    this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
+  }
+
+  /** Seeds a file that's not a torrent yet. Reminder: Currently disabled when using SD Card. */
+  public SeedAction(Context context, FWFileDescriptor fd) {
+    this(context, fd, null, null);
+  }
+
+  /**
+   * Seeds a file that's not a torrent yet but was an existing transfer. Pass the transfer object so
+   * we're able to replace it with the new BittorrentDownload that will be created
+   *
+   * <p>Reminder: Currently disabled when using SD Card.
+   */
+  public SeedAction(Context context, FWFileDescriptor fd, Transfer transferToClear) {
+    this(context, fd, null, transferToClear);
+  }
+
+  /**
+   * Seed an existing torrent transfer that's finished and paused. It's not disabled since it exists
+   * for existing torrent transfers.
+   */
+  public SeedAction(Context context, BittorrentDownload download) {
+    this(context, null, download, null);
+  }
+
+  public SeedAction(Context context) {
+    this(context, null, null, null);
+  }
+
+  @Override
+  public void onClick(Context context) {
+    if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
+      UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+      return;
+    }
+    // NOTES.
+    // Performance note: (specially when creating a .torrent of a big video)
+    // wish we could know in advance if we've already created it
+    // and have a .torrent already for this file on disk.
+    // I think we could keep them in a db table(filepath -> sha1_hash)
+    // and then we could just look it up on the session.
+    // For now we just create the <file-name>-<infohash>.torrent after
+    // we've added the TorrentInfo to the session.
+    // Note: Let's try Merkle torrents to keep them small and use less
+    // storage on the android device.
+    // if BitTorrent is turned off
+    if (TransferManager.instance().isBittorrentDisconnected()) {
+      showBittorrentDisconnectedDialog();
+      return;
+    }
+    // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
+    if (seedingOnlyOnWifiButNoWifi()) {
+      showNoWifiInformationDialog();
+      return;
+    } else if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+      showMobileDataProtectionInformationDialog();
+    }
+    // 1. If Seeding is turned off let's ask the user if they want to
+    //    turn seeding on, or else cancel this.
+    if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
+      showSeedingDialog();
+    } else {
+      seedEm();
+      if (context instanceof TimerObserver) {
+        ((TimerObserver) context).onTime();
+      }
+      UIUtils.showTransfersOnDownloadStart(getContext());
+    }
+  }
+
+  private void showNoWifiInformationDialog() {
+    ShowNoWifiInformationDialog.newInstance().show(getFragmentManager());
+  }
+
+  private void showMobileDataProtectionInformationDialog() {
+    ShowMobileDataProtectionInformationDialog.newInstance().show(getFragmentManager());
+  }
+
+  private void showBittorrentDisconnectedDialog() {
+    YesNoDialog dlg =
+        YesNoDialog.newInstance(
+            DLG_TURN_BITTORRENT_BACK_ON,
+            R.string.bittorrent_off,
+            R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
+            YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
+    dlg.setOnDialogClickListener(this);
+    dlg.show(getFragmentManager());
+  }
+
+  private void showSeedingDialog() {
+    YesNoDialog dlg =
+        YesNoDialog.newInstance(
+            DLG_SEEDING_OFF_TAG,
+            R.string.enable_seeding,
+            R.string.seeding_is_currently_disabled_in_settings,
+            YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
+    dlg.setOnDialogClickListener(this);
+    dlg.show(getFragmentManager());
+  }
+
+  @Override
+  public void onDialogClick(String tag, int which) {
+    if (tag.equals(DLG_SEEDING_OFF_TAG)) {
+      if (which == Dialog.BUTTON_NEGATIVE) {
+        UIUtils.showLongMessage(getContext(), R.string.the_file_could_not_be_seeded_enable_seeding);
+      } else if (which == Dialog.BUTTON_POSITIVE) {
+        onSeedingEnabled();
+      }
+    }
+    if (tag.equals(DLG_TURN_BITTORRENT_BACK_ON)) {
+      if (which == Dialog.BUTTON_NEGATIVE) {
+        UIUtils.showLongMessage(
+            getContext(),
+            R.string.the_file_could_not_be_seeded_bittorrent_will_remain_disconnected);
+      } else if (which == Dialog.BUTTON_POSITIVE) {
+        onBittorrentConnectRunnable.onBittorrentConnect(getContext());
+      }
+    }
+  }
+
+  private boolean seedingOnlyOnWifiButNoWifi() {
+    ConfigurationManager CM = ConfigurationManager.instance();
+    return CM.isSeedFinishedTorrents()
+        && CM.isSeedingEnabledOnlyForWifi()
+        && !NetworkManager.instance().isDataWIFIUp();
+  }
+
+  private void seedEm() {
+    boolean vpnAllowed = !TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn();
+    if (TransferManager.instance().isMobileAndDataSavingsOn() || !vpnAllowed) {
+      LOG.warn("seedEm skipped: mobile data savings or VPN-only");
+      return;
+    }
+    if (fd != null && btDownload == null) {
+      seedFileDescriptor(fd);
+      return;
+    }
+    if (fd == null && btDownload == null) {
+      TransferManager.instance().seedFinishedTransfers();
+    } else if (fd == null) {
+      seedBTDownload();
+    }
+  }
+
+  private void seedFileDescriptor(FWFileDescriptor fd) {
+    if (fd.filePath.endsWith(".torrent")) {
+      try {
+        BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[] {true});
+      } catch (Throwable e) {
+        // TODO: better user notification
+        LOG.error("Error starting download from file descriptor", e);
+        // sometimes a file descriptor could be visible in the UI but does not exist
+        // due to the android providers getting out of sync.
+      }
+    } else {
+      final Transfer toClear = transferToClear;
+      SystemUtils.postToHandler(
+          SystemUtils.HandlerThreadName.HIGH_PRIORITY,
+          () ->
+              com.frostwire.android.util.TorrentUtils.seedFile(
+                  new File(fd.filePath), fd.title, TransferManager.instance(), toClear));
+    }
+  }
+
+  private void seedBTDownload() {
+    btDownload.resume();
+    final Object torrentHandle =
+        BTEngine.getInstance().find(new Sha1Hash(btDownload.getInfoHash()));
+    if (torrentHandle == null) {
+      LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
+    }
+  }
+
+  private void onSeedingEnabled() {
+    ConfigurationManager.instance().setSeedFinishedTorrents(true);
+    if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
+      UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+      return;
+    }
+    seedEm();
+    UIUtils.showTransfersOnDownloadStart(getContext());
+  }
+
+  // important to keep class public so it can be instantiated when the dialog is re-created on
+  // orientation changes.
+  @SuppressWarnings("WeakerAccess")
+  public static final class ShowNoWifiInformationDialog extends AbstractDialog {
+
+    public static ShowNoWifiInformationDialog newInstance() {
+      return new ShowNoWifiInformationDialog();
     }
 
-    /**
-     * Seeds a file that's not a torrent yet.
-     * Reminder: Currently disabled when using SD Card.
-     */
-    public SeedAction(Context context, FWFileDescriptor fd) {
-        this(context, fd, null, null);
-    }
-
-    /**
-     * Seeds a file that's not a torrent yet but was an existing transfer. Pass the transfer
-     * object so we're able to replace it with the new BittorrentDownload that will be created
-     * <p>
-     * Reminder: Currently disabled when using SD Card.
-     */
-    public SeedAction(Context context, FWFileDescriptor fd, Transfer transferToClear) {
-        this(context, fd, null, transferToClear);
-    }
-
-    /**
-     * Seed an existing torrent transfer that's finished and paused.
-     * It's not disabled since it exists for existing torrent transfers.
-     */
-    public SeedAction(Context context, BittorrentDownload download) {
-        this(context, null, download, null);
-    }
-
-    public SeedAction(Context context) {
-        this(context, null, null, null);
+    // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
+    // otherwise, the app crashes when you turn the screen and the dialog can't
+    public ShowNoWifiInformationDialog() {
+      super(R.layout.dialog_default_info);
     }
 
     @Override
-    public void onClick(Context context) {
-        if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
-            UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
-            return;
-        }
-        // NOTES.
-        // Performance note: (specially when creating a .torrent of a big video)
-        // wish we could know in advance if we've already created it
-        // and have a .torrent already for this file on disk.
-        // I think we could keep them in a db table(filepath -> sha1_hash)
-        // and then we could just look it up on the session.
-        // For now we just create the <file-name>-<infohash>.torrent after
-        // we've added the TorrentInfo to the session.
-        // Note: Let's try Merkle torrents to keep them small and use less
-        // storage on the android device.
-        // if BitTorrent is turned off
-        if (TransferManager.instance().isBittorrentDisconnected()) {
-            showBittorrentDisconnectedDialog();
-            return;
-        }
-        // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
-        if (seedingOnlyOnWifiButNoWifi()) {
-            showNoWifiInformationDialog();
-            return;
-        } else if (TransferManager.instance().isMobileAndDataSavingsOn()) {
-            showMobileDataProtectionInformationDialog();
-        }
-        // 1. If Seeding is turned off let's ask the user if they want to
-        //    turn seeding on, or else cancel this.
-        if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
-            showSeedingDialog();
-        } else {
-            seedEm();
-            if (context instanceof TimerObserver) {
-                ((TimerObserver) context).onTime();
-            }
-            UIUtils.showTransfersOnDownloadStart(getContext());
-        }
+    protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+      TextView title = findView(dlg, R.id.dialog_default_info_title);
+      title.setText(R.string.wifi_network_unavailable);
+      TextView text = findView(dlg, R.id.dialog_default_info_text);
+      text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
+      Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
+      okButton.setText(android.R.string.ok);
+      okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
+    }
+  }
+
+  public static final class ShowMobileDataProtectionInformationDialog extends AbstractDialog {
+
+    public static ShowMobileDataProtectionInformationDialog newInstance() {
+      return new ShowMobileDataProtectionInformationDialog();
     }
 
-    private void showNoWifiInformationDialog() {
-        ShowNoWifiInformationDialog.newInstance().show(getFragmentManager());
-    }
-
-    private void showMobileDataProtectionInformationDialog() {
-        ShowMobileDataProtectionInformationDialog.newInstance().show(getFragmentManager());
-    }
-
-    private void showBittorrentDisconnectedDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(
-                DLG_TURN_BITTORRENT_BACK_ON,
-                R.string.bittorrent_off,
-                R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
-                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.setOnDialogClickListener(this);
-        dlg.show(getFragmentManager());
-    }
-
-    private void showSeedingDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(
-                DLG_SEEDING_OFF_TAG,
-                R.string.enable_seeding,
-                R.string.seeding_is_currently_disabled_in_settings,
-                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.setOnDialogClickListener(this);
-        dlg.show(getFragmentManager());
+    // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
+    // otherwise, the app crashes when you turn the screen and the dialog can't
+    public ShowMobileDataProtectionInformationDialog() {
+      super(R.layout.dialog_default_info);
     }
 
     @Override
-    public void onDialogClick(String tag, int which) {
-        if (tag.equals(DLG_SEEDING_OFF_TAG)) {
-            if (which == Dialog.BUTTON_NEGATIVE) {
-                UIUtils.showLongMessage(getContext(),
-                        R.string.the_file_could_not_be_seeded_enable_seeding);
-            } else if (which == Dialog.BUTTON_POSITIVE) {
-                onSeedingEnabled();
-            }
-        }
-        if (tag.equals(DLG_TURN_BITTORRENT_BACK_ON)) {
-            if (which == Dialog.BUTTON_NEGATIVE) {
-                UIUtils.showLongMessage(getContext(),
-                        R.string.the_file_could_not_be_seeded_bittorrent_will_remain_disconnected);
-            } else if (which == Dialog.BUTTON_POSITIVE) {
-                onBittorrentConnectRunnable.onBittorrentConnect(getContext());
-            }
-        }
+    protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+      TextView title = findView(dlg, R.id.dialog_default_info_title);
+      title.setText(R.string.mobile_data_saving);
+      TextView text = findView(dlg, R.id.dialog_default_info_text);
+      text.setText(R.string.according_to_settings_i_cant_seed_due_to_data_savings);
+      Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
+      okButton.setText(android.R.string.ok);
+      okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
+    }
+  }
+
+  private static final class OkButtonOnClickListener implements View.OnClickListener {
+    private final WeakReference<Dialog> newNoWifiInformationDialogRef;
+
+    OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
+      this.newNoWifiInformationDialogRef = Ref.weak(newNoWifiInformationDialog);
     }
 
-    private boolean seedingOnlyOnWifiButNoWifi() {
-        ConfigurationManager CM = ConfigurationManager.instance();
-        return CM.isSeedFinishedTorrents() &&
-                CM.isSeedingEnabledOnlyForWifi() &&
-                !NetworkManager.instance().isDataWIFIUp();
+    @Override
+    public void onClick(View view) {
+      if (Ref.alive(newNoWifiInformationDialogRef)) {
+        newNoWifiInformationDialogRef.get().dismiss();
+      }
     }
-
-    private void seedEm() {
-        if (fd != null && btDownload == null) {
-            seedFileDescriptor(fd);
-            return;
-        }
-        if (TransferManager.instance().isMobileAndDataSavingsOn() ||
-                TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
-            LOG.warn("seedEm skipped: mobile data savings or VPN-only");
-            return;
-        }
-        if (fd == null && btDownload == null) {
-            TransferManager.instance().seedFinishedTransfers();
-        } else if (fd == null) {
-            seedBTDownload();
-        }
-    }
-
-    private void seedFileDescriptor(FWFileDescriptor fd) {
-        if (fd.filePath.endsWith(".torrent")) {
-            try {
-                BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
-            } catch (Throwable e) {
-                // TODO: better user notification
-                LOG.error("Error starting download from file descriptor", e);
-                // sometimes a file descriptor could be visible in the UI but does not exist
-                // due to the android providers getting out of sync.
-            }
-        } else {
-            final Transfer toClear = transferToClear;
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () ->
-                    com.frostwire.android.util.TorrentUtils.seedFile(
-                            new File(fd.filePath), fd.title, TransferManager.instance(), toClear));
-        }
-    }
-
-    private void seedBTDownload() {
-        btDownload.resume();
-        final Object torrentHandle = BTEngine.getInstance().find(new Sha1Hash(btDownload.getInfoHash()));
-        if (torrentHandle == null) {
-            LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
-        }
-    }
-
-    private void onSeedingEnabled() {
-        ConfigurationManager.instance().setSeedFinishedTorrents(true);
-        if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
-            UIUtils.showLongMessage(getContext(), R.string.cannot_start_engine_without_vpn);
-            return;
-        }
-        seedEm();
-        UIUtils.showTransfersOnDownloadStart(getContext());
-    }
-
-    // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
-    @SuppressWarnings("WeakerAccess")
-    public final static class ShowNoWifiInformationDialog extends AbstractDialog {
-
-        public static ShowNoWifiInformationDialog newInstance() {
-            return new ShowNoWifiInformationDialog();
-        }
-
-        // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
-        // otherwise, the app crashes when you turn the screen and the dialog can't
-        public ShowNoWifiInformationDialog() {
-            super(R.layout.dialog_default_info);
-        }
-
-        @Override
-        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-            TextView title = findView(dlg, R.id.dialog_default_info_title);
-            title.setText(R.string.wifi_network_unavailable);
-            TextView text = findView(dlg, R.id.dialog_default_info_text);
-            text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
-            Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
-            okButton.setText(android.R.string.ok);
-            okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
-        }
-    }
-
-    public final static class ShowMobileDataProtectionInformationDialog extends AbstractDialog {
-
-        public static ShowMobileDataProtectionInformationDialog newInstance() {
-            return new ShowMobileDataProtectionInformationDialog();
-        }
-
-        // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
-        // otherwise, the app crashes when you turn the screen and the dialog can't
-        public ShowMobileDataProtectionInformationDialog() {
-            super(R.layout.dialog_default_info);
-        }
-
-        @Override
-        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-            TextView title = findView(dlg, R.id.dialog_default_info_title);
-            title.setText(R.string.mobile_data_saving);
-            TextView text = findView(dlg, R.id.dialog_default_info_text);
-            text.setText(R.string.according_to_settings_i_cant_seed_due_to_data_savings);
-            Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
-            okButton.setText(android.R.string.ok);
-            okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
-        }
-    }
-
-    private final static class OkButtonOnClickListener implements View.OnClickListener {
-        private final WeakReference<Dialog> newNoWifiInformationDialogRef;
-
-        OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
-            this.newNoWifiInformationDialogRef = Ref.weak(newNoWifiInformationDialog);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (Ref.alive(newNoWifiInformationDialogRef)) {
-                newNoWifiInformationDialogRef.get().dismiss();
-            }
-        }
-    }
+  }
 }

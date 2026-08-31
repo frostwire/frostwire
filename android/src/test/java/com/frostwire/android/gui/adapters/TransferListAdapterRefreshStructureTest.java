@@ -30,7 +30,8 @@ public class TransferListAdapterRefreshStructureTest {
             .replaceAll("\\s+", "");
 
     assertFalse(adapter.contains("submitList(newList,this::notifyDataSetChanged)"));
-    assertTrue(adapter.contains("if(sameIdsInOrder(oldList,newList))"));
+    assertTrue(
+        adapter.contains("if(sameIdsInOrder(oldList,newList)&&sameInstances(oldList,newList))"));
     assertTrue(adapter.contains("notifyItemChanged(i)"));
     assertTrue(
         fragment.contains("((UIBittorrentDownload)t).updateCachedState();")
