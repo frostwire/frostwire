@@ -101,6 +101,14 @@ Then run the project with:
 
 `./gradlew run`
 
+Developer debugging (JMX on localhost:9595 and JDWP on localhost:9696) is opt-in:
+
+`./gradlew run -Pdebug`
+
+Release distributions do not enable either unauthenticated listener. Build one with
+`./gradlew installDist` or `./gradlew assembleDist`; the standalone `icebridge.jar` is included
+under `lib/` and is launched automatically by the installed desktop application.
+
 On Windows, use `gradlew.bat run` instead.
 
 # HAVING ISSUES BUILDING?

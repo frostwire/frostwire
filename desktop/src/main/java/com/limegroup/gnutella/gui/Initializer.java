@@ -760,7 +760,8 @@ final class Initializer {
    * <ol>
    *   <li>{@code frostwire.icebridge.jar} system property
    *   <li>{@code build/libs/icebridge.jar} relative to the working directory (dev mode)
-   *   <li>{@code icebridge.jar} in the user settings directory (production)
+   *   <li>{@code lib/icebridge.jar} beside the installed FrostWire JAR
+   *   <li>{@code icebridge.jar} in the user settings directory (production fallback)
    * </ol>
    *
    * @return the jar file, or {@code null} if not found
@@ -776,6 +777,16 @@ final class Initializer {
     File devJar = new File("build/libs/icebridge.jar");
     if (devJar.isFile()) {
       return devJar;
+    }
+    try {
+      File applicationJar =
+          new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+      File installedJar = new File(applicationJar.getParentFile(), "icebridge.jar");
+      if (installedJar.isFile()) {
+        return installedJar;
+      }
+    } catch (Exception ignored) {
+      // Fall through to the user settings location when running from an unusual class loader.
     }
     File prodJar = new File(CommonUtils.getUserSettingsDir(), "icebridge.jar");
     if (prodJar.isFile()) {

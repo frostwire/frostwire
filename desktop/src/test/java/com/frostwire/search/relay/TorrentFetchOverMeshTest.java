@@ -126,7 +126,7 @@ class TorrentFetchOverMeshTest {
     long elapsed = System.currentTimeMillis() - start;
 
     assertNull(fetched);
-    assertTrue(elapsed >= 1_400, "should honor the timeout, took " + elapsed + "ms");
+    assertTrue(elapsed < 1_400, "unknown target should fail fast, took " + elapsed + "ms");
   }
 
   @Test

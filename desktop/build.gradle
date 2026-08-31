@@ -76,19 +76,27 @@ application {
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
                                  //'-Xss768k', // 768k stack (development)
                                  '-Xss256k', // 256k stack (production)
-                                 '-Dcom.sun.management.jmxremote.port=9595',
-                                 '-Dcom.sun.management.jmxremote.ssl=false',
-                                 '-Dcom.sun.management.jmxremote.authenticate=false',
-                                 '-Djava.rmi.server.hostname=127.0.0.1',
-                                 '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
-                                 '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
-                                 '-Ddebug=1',
+                                  '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
+                                  '-Ddebug=1',
 				 //'-XX:NativeMemoryTracking=detail',
     ]
 
     // Add IDE flag when running from IDE
     if (isRunningFromIDE) {
         applicationDefaultJvmArgs.add('-Dfw.running.from.ide=true')
+    }
+
+    // Remote management and JDWP are deliberately opt-in. Release distributions must not
+    // expose unauthenticated listeners, while developers can retain the existing workflow with
+    // ./gradlew run -Pdebug.
+    if (project.hasProperty('debug')) {
+        applicationDefaultJvmArgs += [
+                '-Dcom.sun.management.jmxremote.port=9595',
+                '-Dcom.sun.management.jmxremote.ssl=false',
+                '-Dcom.sun.management.jmxremote.authenticate=false',
+                '-Djava.rmi.server.hostname=127.0.0.1',
+                '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
+        ]
     }
 
     def flight_recorder = false
@@ -336,6 +344,18 @@ tasks.register('icebridge', JavaExec) {
     standardInput = System.in
 }
 
+// The standalone daemon is part of the desktop runtime, not just a developer convenience.
+// Put it beside frostwire.jar in distributions so the installed application can launch it.
+distributions {
+    main {
+        contents {
+            from(icebridgeJar) {
+                into 'lib'
+            }
+        }
+    }
+}
+
 // Configure distribution tasks to handle duplicate jar files
 tasks.withType(Tar).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -459,7 +479,9 @@ test {
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-Djava.awt.headless=true'
 
-    maxParallelForks = Runtime.getRuntime().availableProcessors()
+    // Keep the full suite deterministic and within the memory budget on developer
+    // machines and CI hosts with many logical CPUs.
+    maxParallelForks = Math.min(2, Runtime.getRuntime().availableProcessors())
 
     filter {
         //include specific method in any of the tests        
@@ -475,7 +497,7 @@ test {
     }
 
     testLogging {
-        events "passed", "failed", "standardError"
+        events "passed", "failed"
         showExceptions = true
         showCauses = true
         showStackTraces = false
