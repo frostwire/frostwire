@@ -118,7 +118,7 @@ Type=simple
 User=${SERVICE_USER}
 WorkingDirectory=${INSTALL_DIR}
 EnvironmentFile=${INSTALL_DIR}/icebridge.env
-ExecStart=${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar
+ExecStart=${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar --host ${ICEBRIDGE_HOST} --rudp-port ${ICEBRIDGE_RUDP_PORT} --relay-port ${ICEBRIDGE_RELAY_PORT} --control-http-port ${ICEBRIDGE_CONTROL_HTTP_PORT} --role ${ICEBRIDGE_ROLE} --identity-file ${ICEBRIDGE_IDENTITY_FILE} --auth-tokens-file ${ICEBRIDGE_AUTH_TOKENS_FILE} --max-peers ${ICEBRIDGE_MAX_PEERS} --peer-ttl-sec ${ICEBRIDGE_PEER_TTL_SEC} --max-qps-per-key ${ICEBRIDGE_MAX_QPS_PER_KEY} --dht --bootstrap
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65535
@@ -138,7 +138,7 @@ EOF
 else
   echo "==> Not root: wrote ${ENV_FILE} — run with sudo for systemd, or:"
   echo "    set -a; source ${ENV_FILE}; set +a"
-  echo "    nohup ${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar > ${INSTALL_DIR}/icebridge.log 2>&1 &"
+  echo "    nohup ${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar --host ${ICEBRIDGE_HOST} --rudp-port ${ICEBRIDGE_RUDP_PORT} --relay-port ${ICEBRIDGE_RELAY_PORT} --control-http-port ${ICEBRIDGE_CONTROL_HTTP_PORT} --role ${ICEBRIDGE_ROLE} --identity-file ${ICEBRIDGE_IDENTITY_FILE} --auth-tokens-file ${ICEBRIDGE_AUTH_TOKENS_FILE} --max-peers ${ICEBRIDGE_MAX_PEERS} --peer-ttl-sec ${ICEBRIDGE_PEER_TTL_SEC} --max-qps-per-key ${ICEBRIDGE_MAX_QPS_PER_KEY} --dht --bootstrap > ${INSTALL_DIR}/icebridge.log 2>&1 &"
 fi
 
 echo "==> Security group checklist (AWS console / CLI):"
