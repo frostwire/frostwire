@@ -84,6 +84,7 @@ public final class RudpSessionManager {
 
     private final Map<Long, RudpSession> sessionsByRemoteId = new ConcurrentHashMap<>();
     private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new ConcurrentHashMap<>();
+    private final Map<String, byte[]> blockedFragmentDeliveries = new ConcurrentHashMap<>();
     private final SecureRandom random = new SecureRandom();
     private final ScheduledExecutorService scheduler;
 
@@ -138,8 +139,7 @@ public final class RudpSessionManager {
         }
         if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
             // Local delivery (loopback control plane → same process).
-            notifyListener(identity.ed25519PubRaw(), payload);
-            return true;
+            return notifyListener(identity.ed25519PubRaw(), payload);
         }
         PeerRecord target = registry.lookup(targetPub);
         InetSocketAddress registryAddr = null;
@@ -540,22 +540,23 @@ public final class RudpSessionManager {
 
     private void handleData(RudpPacket packet, InetSocketAddress sender) {
         RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null) {
+        if (session == null || !session.isAuthenticated()) {
+            LOG.debug("RudpSessionManager: rejected DATA from unauthenticated " + sender);
             return;
         }
         rebindSessionAddress(session, sender);
-        if (session.receiveRemote(packet.sequence())) {
-            notifyListener(session.remotePub(), packet.payload());
-        } else {
-            // Out-of-window or duplicate sequence — a peer that rebuilt its
-            // session (NAT rebind, app restart) resets its send sequence while
-            // this session expects the old one; without this log the ensuing
-            // silent drops are invisible and searches just die.
-            LOG.warn("RudpSessionManager: dropped out-of-window DATA seq="
-                    + packet.sequence() + " from " + sender
-                    + " — possible session reset by peer");
+        synchronized (session) {
+            if (packet.sequence() == session.receivedThroughRemote() + 1) {
+                if (notifyListener(session.remotePub(), packet.payload())) {
+                    session.receiveRemote(packet.sequence());
+                    send(session, session.dataAck());
+                }
+            } else {
+                LOG.warn("RudpSessionManager: dropped out-of-window DATA seq="
+                        + packet.sequence() + " from " + sender
+                        + " — possible session reset by peer");
+            }
         }
-        send(session, session.dataAck());
     }
 
     private void handleDataAck(RudpPacket packet) {
@@ -575,7 +576,8 @@ public final class RudpSessionManager {
      */
     private void handleDataFrag(RudpPacket packet, InetSocketAddress sender, boolean isLast) {
         RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null) {
+        if (session == null || !session.isAuthenticated()) {
+            LOG.debug("RudpSessionManager: rejected fragment from unauthenticated " + sender);
             return;
         }
         rebindSessionAddress(session, sender);
@@ -589,15 +591,6 @@ public final class RudpSessionManager {
             return; // do not ack — sender will retransmit
         }
 
-        // Ack every fragment so the sender can clear its pending queue.
-        if (session.receiveRemote(packet.sequence())) {
-            send(session, session.dataAck());
-        } else {
-            // Duplicate — re-ack so the sender stops retransmitting.
-            send(session, session.dataAck());
-            return;
-        }
-
         int groupId = readIntBE(raw, 0);
         int fragIndex = readIntBE(raw, 4);
         int totalFrags = readIntBE(raw, 8);
@@ -606,9 +599,28 @@ public final class RudpSessionManager {
 
         // Key by sender address + groupId to prevent cross-session collision.
         String groupKey = sender.toString() + ":" + groupId;
-        byte[] assembled = reassembler.addFragment(groupKey, fragIndex, isLast, chunk);
-        if (assembled != null) {
-            notifyListener(session.remotePub(), assembled);
+        synchronized (session) {
+            if (packet.sequence() != session.receivedThroughRemote() + 1) {
+                byte[] blocked = blockedFragmentDeliveries.get(groupKey);
+                if (blocked != null && isLast && notifyListener(session.remotePub(), blocked)) {
+                    blockedFragmentDeliveries.remove(groupKey, blocked);
+                    session.receiveRemote(packet.sequence());
+                    send(session, session.dataAck());
+                }
+                return;
+            }
+            byte[] assembled = reassembler.addFragment(groupKey, fragIndex, isLast, chunk);
+            if (assembled == null) {
+                session.receiveRemote(packet.sequence());
+                send(session, session.dataAck());
+                return;
+            }
+            if (notifyListener(session.remotePub(), assembled)) {
+                session.receiveRemote(packet.sequence());
+                send(session, session.dataAck());
+            } else {
+                blockedFragmentDeliveries.put(groupKey, assembled);
+            }
         }
     }
 
@@ -868,9 +880,6 @@ public final class RudpSessionManager {
             LOG.warn("RudpSessionManager: rejected RELAY_RESPONSE from unauthenticated " + sender);
             return;
         }
-        if (senderSession.receiveRemote(packet.sequence())) {
-            send(senderSession, senderSession.dataAck());
-        }
         byte[] sessionPub = senderSession.remotePub();
         if (sessionPub == null) {
             LOG.debug("RudpSessionManager: rejected RELAY_RESPONSE - session has no remotePub");
@@ -880,20 +889,34 @@ public final class RudpSessionManager {
             LOG.debug("RudpSessionManager: rate-limited RELAY_RESPONSE");
             return;
         }
-        // Attribute to authenticated peer, not spoofable header bytes.
         byte[] appPayload = Arrays.copyOfRange(payload, 32, payload.length);
-        notifyListener(sessionPub, appPayload);
+        synchronized (senderSession) {
+            if (packet.sequence() == senderSession.receivedThroughRemote() + 1) {
+                if (!notifyListener(sessionPub, appPayload)) {
+                    return;
+                }
+                senderSession.receiveRemote(packet.sequence());
+                send(senderSession, senderSession.dataAck());
+            }
+        }
     }
 
-    private void notifyListener(byte[] sourcePub, byte[] payload) {
+    private boolean notifyListener(byte[] sourcePub, byte[] payload) {
         byte[] src = sourcePub == null ? new byte[0] : sourcePub;
         // 1) Shared queue — consumers that poll without ?pub= (SearchRelayApp
         //    on pure FORWARDER, legacy clients).
         if (messageListener != null) {
             try {
+                if (messageListener
+                        instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
+                    return ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
+                            .offerFromRudp(identity.ed25519PubRaw(), src, payload);
+                }
                 messageListener.onMessage(src, payload);
+                return true;
             } catch (Throwable t) {
                 LOG.warn("RudpSessionManager: message listener failed", t);
+                return false;
             }
         }
         // 2) Per-identity demux — IceBridgeClient.register() sets ownPub and
@@ -910,6 +933,7 @@ public final class RudpSessionManager {
                 LOG.warn("RudpSessionManager: own-pub demux delivery failed", t);
             }
         }
+        return true;
     }
 
     /**

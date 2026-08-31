@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
+import com.frostwire.search.relay.icebridge.control.InboundMessage;
+import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import java.net.InetSocketAddress;
@@ -705,6 +707,134 @@ class RudpSessionManagerComprehensiveTest {
 
     assertEquals(newEndpoint, mgr.remoteAddressForTest(wireCid));
     mgr.shutdown();
+  }
+
+  @Test
+  void unauthenticatedDataAndFragmentsAreDroppedBeforeSequenceAdvance() throws Exception {
+    InboundMessageQueue queue = new InboundMessageQueue(4);
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, queue);
+    InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62093);
+    long cid = mgr.createInitiatorSessionForTest(sender);
+
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 1, 0, new byte[] {1}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62094)));
+    byte[] fragment = fragmentPayload(42, 0, 1, new byte[] {2});
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA_FRAG, cid, 1, 0, fragment),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62094)));
+
+    byte[] ackPayload = RudpAuth.createHelloPayload(remote, cid);
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.HELLO_ACK, cid, 0, 0, ackPayload),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62094)));
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 1, 0, new byte[] {3}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62094)));
+
+    List<InboundMessage> received = queue.poll(4);
+    assertEquals(1, received.size());
+    assertArrayEquals(new byte[] {3}, received.get(0).payload());
+    mgr.shutdown();
+  }
+
+  @Test
+  void fullInboundQueueDoesNotAckOrAdvanceDataUntilRetrySucceeds() throws Exception {
+    InboundMessageQueue queue = new InboundMessageQueue(1);
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, queue);
+    InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62095);
+    long cid = 993344L;
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(
+                RudpPacket.Type.HELLO, cid, 0, 0, RudpAuth.createHelloPayload(remote, cid)),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62096)));
+
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 1, 0, new byte[] {1}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62096)));
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 2, 0, new byte[] {2}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62096)));
+    assertEquals(1, queue.poll(1).size());
+
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 2, 0, new byte[] {2}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62096)));
+    List<InboundMessage> retried = queue.poll(1);
+    assertEquals(1, retried.size());
+    assertArrayEquals(new byte[] {2}, retried.get(0).payload());
+    mgr.shutdown();
+  }
+
+  @Test
+  void fullInboundQueueDoesNotLoseCompletedFragmentOnRetry() throws Exception {
+    InboundMessageQueue queue = new InboundMessageQueue(1);
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, queue);
+    InetSocketAddress sender = new InetSocketAddress("127.0.0.1", 62097);
+    long cid = 993345L;
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(
+                RudpPacket.Type.HELLO, cid, 0, 0, RudpAuth.createHelloPayload(remote, cid)),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62098)));
+
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA, cid, 1, 0, new byte[] {1}),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62098)));
+    byte[] end = fragmentPayload(43, 0, 1, new byte[] {2});
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA_END, cid, 2, 0, end),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62098)));
+    assertEquals(1, queue.poll(1).size());
+
+    mgr.onPacket(
+        new RudpPacketEnvelope(
+            new RudpPacket(RudpPacket.Type.DATA_END, cid, 2, 0, end),
+            sender,
+            new InetSocketAddress("127.0.0.1", 62098)));
+    List<InboundMessage> retried = queue.poll(1);
+    assertEquals(1, retried.size());
+    assertArrayEquals(new byte[] {2}, retried.get(0).payload());
+    mgr.shutdown();
+  }
+
+  @Test
+  void localDeliverReportsBoundedQueueRejection() throws Exception {
+    InboundMessageQueue queue = new InboundMessageQueue(1);
+    RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, queue);
+    assertTrue(mgr.deliver(local.ed25519PubRaw(), new byte[] {1}));
+    assertFalse(mgr.deliver(local.ed25519PubRaw(), new byte[] {2}));
+    mgr.shutdown();
+  }
+
+  private static byte[] fragmentPayload(int groupId, int index, int total, byte[] payload) {
+    byte[] result = new byte[12 + payload.length];
+    writeIntBE(result, 0, groupId);
+    writeIntBE(result, 4, index);
+    writeIntBE(result, 8, total);
+    System.arraycopy(payload, 0, result, 12, payload.length);
+    return result;
   }
 
   // ---- Metrics ----

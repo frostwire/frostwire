@@ -62,6 +62,21 @@ public final class InboundMessageQueue implements RudpMessageListener {
     }
 
     /**
+     * Offers an inbound rUDP message to the legacy shared queue and, when
+     * possible, mirrors it to the local identity queue. The shared offer is
+     * the delivery decision used for rUDP backpressure.
+     */
+    public boolean offerFromRudp(byte[] targetPub, byte[] sourcePub, byte[] payload) {
+        boolean accepted = offerUnwrapped(SHARED_KEY, sourcePub, payload);
+        if (accepted && targetPub != null) {
+            // The mirror is best effort; the shared queue remains the
+            // authoritative bounded delivery queue for reliable rUDP.
+            offerForTarget(targetPub, sourcePub, payload);
+        }
+        return accepted;
+    }
+
+    /**
      * Control-plane / local-endpoint delivery: message is for a specific
      * registered client (USE_REMOTE peer whose host:port is this process).
      *
