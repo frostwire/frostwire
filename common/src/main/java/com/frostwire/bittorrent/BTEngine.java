@@ -968,6 +968,8 @@ public final class BTEngine extends SessionManager {
                 download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
             } catch (Throwable e) {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
+                // A corrupt or unloadable session file must not block later restores.
+                runNextRestoreDownloadTask();
             }
         }
     }
