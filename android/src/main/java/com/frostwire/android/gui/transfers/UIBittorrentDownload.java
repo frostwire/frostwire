@@ -98,7 +98,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         // This prevents TransactionTooLargeException when fragments are destroyed.
         this.items = null;
 
-        if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
+        if (manager.isBittorrentOnVpnOnlyAndNoVpn()) {
+            dl.pause();
+        } else if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
             dl.resume();
         }
 
