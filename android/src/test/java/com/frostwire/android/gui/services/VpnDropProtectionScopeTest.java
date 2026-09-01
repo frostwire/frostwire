@@ -35,6 +35,27 @@ public class VpnDropProtectionScopeTest {
   }
 
   @Test
+  public void startupGuardPausesRestoredTransfersBeforeShowingWarning() throws Exception {
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/activities/MainActivity.java");
+    String resumeBlock = blockStartingAt(source, "private void mainResume()");
+
+    assertTrue(resumeBlock.contains("TransferManager.instance().pauseTorrents();"));
+  }
+
+  @Test
+  public void foregroundServiceGuardPausesBeforeAnyServiceStartPath() throws Exception {
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
+    String startBlock = blockStartingAt(source, "public synchronized void startServices(boolean wasShutdown)");
+
+    assertTrue(startBlock.contains("TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()"));
+    assertTrue(startBlock.contains("TransferManager.instance().pauseTorrents();"));
+  }
+
+  @Test
   public void enablingVpnGuardDoesNotDisconnectEngineServices() throws Exception {
     String source =
         readProjectFile(
