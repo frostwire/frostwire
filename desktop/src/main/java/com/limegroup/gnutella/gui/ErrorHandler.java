@@ -36,6 +36,7 @@ public final class ErrorHandler implements ErrorCallback {
      * Displays the error to the user with a specific message.
      */
     public void error(Throwable problem, String msg) {
+        CrashReportSpooler.record(problem);
         Runnable doWorkRunnable = new Error(problem, msg);
         GUIMediator.safeInvokeLater(doWorkRunnable);
     }
