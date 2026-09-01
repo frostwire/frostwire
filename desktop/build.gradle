@@ -494,6 +494,7 @@ test {
         includeTestsMatching "com.frostwire.crypto.*"
         includeTestsMatching "com.frostwire.mcp.*"
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
+        includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
     }
 
     testLogging {
