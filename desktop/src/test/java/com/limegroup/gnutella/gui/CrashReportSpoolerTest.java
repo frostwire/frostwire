@@ -84,4 +84,14 @@ class CrashReportSpoolerTest {
         JsonParser.parseString(first).getAsJsonObject().get("report_nonce"),
         JsonParser.parseString(second).getAsJsonObject().get("report_nonce"));
   }
+
+  @Test
+  void presenceHeartbeatUsesOnlyAnEphemeralSessionId() {
+    String sessionId =
+        JsonParser.parseString(LivePresenceHeartbeat.payload())
+            .getAsJsonObject()
+            .get("session_id")
+            .getAsString();
+    assertTrue(sessionId.matches("[0-9a-f]{32}"));
+  }
 }
