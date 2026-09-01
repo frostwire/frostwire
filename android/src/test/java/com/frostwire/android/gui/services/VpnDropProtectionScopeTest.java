@@ -20,7 +20,18 @@ public class VpnDropProtectionScopeTest {
         blockStartingAt(source, "VPN guard enabled but no VPN detected. Pausing torrents.");
 
     assertTrue(vpnGuardBlock.contains("TransferManager.instance().pauseTorrents();"));
+    assertTrue(vpnGuardBlock.contains("Pausing torrents."));
     assertFalse(vpnGuardBlock.contains("Engine.instance().stopServices(true);"));
+  }
+
+  @Test
+  public void pausingTorrentsIncludesSeedingTransfers() throws Exception {
+    String source =
+        readProjectFile("src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
+    String pauseBlock = blockStartingAt(source, "public void pauseTorrents()");
+
+    assertTrue(pauseBlock.contains("d.pause();"));
+    assertFalse(pauseBlock.contains("if (!d.isSeeding())"));
   }
 
   @Test
