@@ -215,6 +215,38 @@ public final class  JdkHttpClient extends AbstractHttpClient {
         return result;
     }
 
+    @Override
+    public String post(String url, int timeout, String content, String postContentType) throws IOException {
+        final URL u;
+        try {
+            u = new URI(url).toURL();
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
+        HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+        conn.setDoOutput(true);
+        conn.setConnectTimeout(timeout);
+        conn.setReadTimeout(timeout);
+        conn.setInstanceFollowRedirects(false);
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", postContentType);
+        conn.setUseCaches(false);
+        try {
+            try (OutputStream out = conn.getOutputStream()) {
+                out.write(content.getBytes(StandardCharsets.UTF_8));
+            }
+            int responseCode = getResponseCode(conn);
+            if (responseCode < 200 || responseCode >= 300) {
+                throw new ResponseCodeNotSupportedException(responseCode);
+            }
+            try (InputStream in = conn.getInputStream()) {
+                return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } finally {
+            conn.disconnect();
+        }
+    }
+
     private String buildRange(long rangeStart, long rangeLength) {
         String prefix = "bytes=" + rangeStart + "-";
         return prefix + ((rangeLength > -1) ? (rangeStart + rangeLength) : "");
