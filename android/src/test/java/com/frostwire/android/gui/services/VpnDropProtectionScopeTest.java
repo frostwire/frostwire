@@ -35,24 +35,24 @@ public class VpnDropProtectionScopeTest {
   }
 
   @Test
-  public void startupGuardPausesRestoredTransfersBeforeShowingWarning() throws Exception {
+  public void startupGuardStillStartsEngineSoTransfersCanBeRestored() throws Exception {
     String source =
         readProjectFile(
             "src/main/java/com/frostwire/android/gui/activities/MainActivity.java");
     String resumeBlock = blockStartingAt(source, "private void mainResume()");
 
-    assertTrue(resumeBlock.contains("TransferManager.instance().pauseTorrents();"));
+    assertTrue(resumeBlock.contains("Engine.instance().startServices();"));
   }
 
   @Test
-  public void foregroundServiceGuardPausesBeforeAnyServiceStartPath() throws Exception {
+  public void restoredTransfersArePausedAfterSessionRestoreWhenGuardIsActive() throws Exception {
     String source =
         readProjectFile(
-            "src/main/java/com/frostwire/android/gui/services/EngineForegroundService.java");
-    String startBlock = blockStartingAt(source, "public synchronized void startServices(boolean wasShutdown)");
+            "src/main/java/com/frostwire/android/gui/transfers/TransferManager.java");
+    String restoreBlock = blockStartingAt(source, "BTEngineListenerChain.install(btEngine, engineListener)");
 
-    assertTrue(startBlock.contains("TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()"));
-    assertTrue(startBlock.contains("TransferManager.instance().pauseTorrents();"));
+    assertTrue(restoreBlock.contains("isBittorrentOnVpnOnlyAndNoVpn()"));
+    assertTrue(restoreBlock.contains("pauseTorrents();"));
   }
 
   @Test
@@ -65,7 +65,7 @@ public class VpnDropProtectionScopeTest {
     assertTrue(
         vpnPreferenceBlock.contains(
             "ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, newVal);"));
-    assertTrue(vpnPreferenceBlock.contains("TransferManager.instance().pauseTorrents();"));
+    assertTrue(vpnPreferenceBlock.contains("() -> TransferManager.instance().pauseTorrents()"));
     assertTrue(
         vpnPreferenceBlock.contains(
             "SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,"));
