@@ -320,18 +320,33 @@ public abstract class BaseHttpDownload implements Transfer {
 
     protected final void error(Throwable e) {
         if (state != TransferState.CANCELED) {
-            complete(TransferState.ERROR);
             LOG.error("General error in download " + info, e);
-            if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
-                complete(TransferState.ERROR_DISK_FULL);
-            }
-            if (e instanceof SSLException || e instanceof SocketTimeoutException) {
-                complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
-            }
-            if (e instanceof UnknownHostException) {
-                complete(TransferState.ERROR_NO_INTERNET);
-            }
+            complete(downloadErrorState(e));
         }
+    }
+
+    static boolean isNoSpaceLeft(Throwable e) {
+        while (e != null) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("No space left on device")) {
+                return true;
+            }
+            e = e.getCause();
+        }
+        return false;
+    }
+
+    static TransferState downloadErrorState(Throwable e) {
+        if (isNoSpaceLeft(e)) {
+            return TransferState.ERROR_DISK_FULL;
+        }
+        if (e instanceof SSLException || e instanceof SocketTimeoutException) {
+            return TransferState.ERROR_CONNECTION_TIMED_OUT;
+        }
+        if (e instanceof UnknownHostException) {
+            return TransferState.ERROR_NO_INTERNET;
+        }
+        return TransferState.ERROR;
     }
 
     protected void moveAndComplete(File src, File dst) {
@@ -355,8 +370,15 @@ public abstract class BaseHttpDownload implements Transfer {
             state = TransferState.SCANNING;
             complete(TransferState.COMPLETE);
         } else {
-            complete(TransferState.ERROR_MOVING_INCOMPLETE);
+            complete(failedMoveState(fs.lastCopyError()));
         }
+    }
+
+    static TransferState failedMoveState(Throwable copyError) {
+        if (isNoSpaceLeft(copyError)) {
+            return TransferState.ERROR_DISK_FULL;
+        }
+        return TransferState.ERROR_MOVING_INCOMPLETE;
     }
 
     protected void onHttpComplete() {

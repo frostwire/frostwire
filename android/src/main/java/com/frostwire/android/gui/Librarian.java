@@ -57,6 +57,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +65,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okio.BufferedSink;
 import okio.Okio;
@@ -420,11 +422,19 @@ public final class Librarian {
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads, boolean copyBytesToMediaStore) {
+        return mediaStoreSaveToDownloads(src, destInDownloads, copyBytesToMediaStore, null);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads,
+                                                    boolean copyBytesToMediaStore,
+                                                    AtomicReference<Throwable> error) {
         LOG.info("Librarian::mediaStoreSaveToDownloads trying to save " + src.getAbsolutePath() + " into " + destInDownloads.getAbsolutePath());
 
         Context context = SystemUtils.getApplicationContext();
         if (context == null) {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. ApplicationContext reference is null, not ready yet.");
+            setCopyError(error, new IOException("Application context is unavailable"));
             return false;
         }
 
@@ -432,10 +442,17 @@ public final class Librarian {
 
         if (Librarian.mediaStoreFileExists(destInDownloads)) {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. " + relativePath + "/" + destInDownloads.getName() + " already exists on the media store db");
+            setCopyError(error, new IOException("MediaStore destination already exists: " + destInDownloads));
             return false;
         }
 
-        return mediaStoreInsert(context, src, relativePath, copyBytesToMediaStore);
+        return mediaStoreInsert(context, src, relativePath, copyBytesToMediaStore, error);
+    }
+
+    private static void setCopyError(AtomicReference<Throwable> error, Throwable value) {
+        if (error != null) {
+            error.set(value);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -459,8 +476,11 @@ public final class Librarian {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath, boolean copyBytesToMediaStore) {
+    private static boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath,
+                                            boolean copyBytesToMediaStore,
+                                            AtomicReference<Throwable> error) {
         if (srcFile.isDirectory()) {
+            setCopyError(error, new IOException("MediaStore source is a directory: " + srcFile));
             return false;
         }
         // Add to MediaStore
@@ -526,13 +546,15 @@ public final class Librarian {
             Uri insertedUri = resolver.insert(downloadsExternalUri, values);
             if (insertedUri == null) {
                 LOG.error("mediaStoreInsert -> could not perform media store insertion");
+                setCopyError(error, new IOException("MediaStore insertion returned null"));
                 return false;
             }
             LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
             if (copyBytesToMediaStore) {
-                return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
+                return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri, error);
             }
         } catch (Throwable t) {
+            setCopyError(error, t);
             return false;
         }
         return true;
@@ -540,9 +562,10 @@ public final class Librarian {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean copyFileBytesToMediaStore(ContentResolver contentResolver,
-                                                     File srcFile,
-                                                     ContentValues values,
-                                                     Uri insertedUri) {
+                                                      File srcFile,
+                                                      ContentValues values,
+                                                      Uri insertedUri,
+                                                      AtomicReference<Throwable> error) {
         try {
             OutputStream outputStream = contentResolver.openOutputStream(insertedUri);
             if (outputStream == null) {
@@ -555,6 +578,7 @@ public final class Librarian {
             sink.close();
         } catch (Throwable t) {
             LOG.error("Librarian::copyFileBytesToMediaStore error: " + t.getMessage(), t);
+            setCopyError(error, t);
             return false;
         }
         values.clear();
