@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Sends an anonymous, memory-only presence heartbeat while FrostWire is running. */
 public final class LivePresenceHeartbeat {
@@ -23,6 +24,7 @@ public final class LivePresenceHeartbeat {
             return thread;
           });
   private static final String SESSION_ID = newSessionId();
+  private static final AtomicBoolean SUCCESS_LOGGED = new AtomicBoolean();
   private static volatile boolean started;
 
   private LivePresenceHeartbeat() {}
@@ -54,6 +56,9 @@ public final class LivePresenceHeartbeat {
   private static void send(HttpClient client) {
     try {
       client.post(ENDPOINT, 6000, payload(), "application/json; charset=utf-8");
+      if (SUCCESS_LOGGED.compareAndSet(false, true)) {
+        LOG.info("Anonymous live presence heartbeat sent to Icebase");
+      }
     } catch (Throwable ignored) {
       LOG.debug("Unable to send anonymous live presence heartbeat");
     }
