@@ -325,6 +325,21 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         return post(url, timeout, userAgent, postContentType, content.getBytes(StandardCharsets.UTF_8), gzip);
     }
 
+    @Override
+    public String post(String url, int timeout, String content, String postContentType) throws IOException {
+        canceled = false;
+        OkHttpClient client = sharedClient.newBuilder()
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .followRedirects(false)
+                .build();
+        Request.Builder request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(content.getBytes(StandardCharsets.UTF_8), MediaType.parse(postContentType)));
+        return getPostSyncResponse(client, request);
+    }
+
     private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
         canceled = false;
         OkHttpClient.Builder clientBuilder = sharedClient.newBuilder()
@@ -347,7 +362,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         final Response response = this.getSyncResponse(client, builder);
         try {
             int httpResponseCode = response.code();
-            if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
+            if (httpResponseCode < 200 || httpResponseCode >= 300) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
             if (canceled) {
