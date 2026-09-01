@@ -200,6 +200,7 @@ final class Initializer {
 
   /** Installs all callbacks & listeners. */
   private void setupCallbacksAndListeners() {
+    CrashReportSpooler.start();
     // Set the error handler so we can receive core errors.
     ErrorService.setErrorCallback(new ErrorHandler());
     // Set the messaging handler so we can receive core messages
