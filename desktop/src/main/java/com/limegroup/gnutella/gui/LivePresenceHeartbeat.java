@@ -25,6 +25,7 @@ public final class LivePresenceHeartbeat {
           });
   private static final String SESSION_ID = newSessionId();
   private static final AtomicBoolean SUCCESS_LOGGED = new AtomicBoolean();
+  private static final AtomicBoolean FAILURE_LOGGED = new AtomicBoolean();
   private static volatile boolean started;
 
   private LivePresenceHeartbeat() {}
@@ -60,7 +61,9 @@ public final class LivePresenceHeartbeat {
         LOG.info("Anonymous live presence heartbeat sent to Icebase");
       }
     } catch (Throwable ignored) {
-      LOG.debug("Unable to send anonymous live presence heartbeat");
+      if (FAILURE_LOGGED.compareAndSet(false, true)) {
+        LOG.info("Unable to send anonymous live presence heartbeat", ignored);
+      }
     }
   }
 
