@@ -325,8 +325,19 @@ public abstract class BaseHttpDownload implements Transfer {
         }
     }
 
+    static boolean isNoSpaceLeft(Throwable e) {
+        while (e != null) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("No space left on device")) {
+                return true;
+            }
+            e = e.getCause();
+        }
+        return false;
+    }
+
     static TransferState downloadErrorState(Throwable e) {
-        if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
+        if (isNoSpaceLeft(e)) {
             return TransferState.ERROR_DISK_FULL;
         }
         if (e instanceof SSLException || e instanceof SocketTimeoutException) {
@@ -359,23 +370,15 @@ public abstract class BaseHttpDownload implements Transfer {
             state = TransferState.SCANNING;
             complete(TransferState.COMPLETE);
         } else {
-            complete(failedMoveState(src.length(), usableSpaceFor(dst)));
+            complete(failedMoveState(fs.lastCopyError()));
         }
     }
 
-    static TransferState failedMoveState(long bytesNeeded, long usableSpace) {
-        if (usableSpace >= 0 && usableSpace < bytesNeeded) {
+    static TransferState failedMoveState(Throwable copyError) {
+        if (isNoSpaceLeft(copyError)) {
             return TransferState.ERROR_DISK_FULL;
         }
         return TransferState.ERROR_MOVING_INCOMPLETE;
-    }
-
-    static long usableSpaceFor(File dest) {
-        File dir = dest.getParentFile();
-        if (dir == null || !dir.isDirectory()) {
-            return Long.MAX_VALUE;
-        }
-        return dir.getUsableSpace();
     }
 
     protected void onHttpComplete() {

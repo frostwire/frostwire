@@ -47,6 +47,10 @@ public interface FileSystem {
 
     boolean copy(File src, File dest);
 
+    default Throwable lastCopyError() {
+        return null;
+    }
+
     boolean write(File file, byte[] data);
 
     void walk(File file, FileFilter filter);

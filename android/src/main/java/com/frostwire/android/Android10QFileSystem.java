@@ -38,6 +38,16 @@ public class Android10QFileSystem extends DefaultFileSystem {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public boolean copy(File src, File dest) {
-        return Librarian.mediaStoreSaveToDownloads(src, dest, SystemUtils.hasAndroid10());
+        lastCopyError = null;
+        try {
+            boolean saved = Librarian.mediaStoreSaveToDownloads(src, dest, SystemUtils.hasAndroid10());
+            if (!saved) {
+                lastCopyError = new java.io.IOException("MediaStore save failed for " + dest);
+            }
+            return saved;
+        } catch (Throwable e) {
+            lastCopyError = e;
+            return false;
+        }
     }
 }

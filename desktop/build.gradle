@@ -488,6 +488,7 @@ test {
         includeTestsMatching "com.frostwire.util.*"
         includeTestsMatching "com.frostwire.mp4.*"
         includeTestsMatching "com.frostwire.platform.*"
+        includeTestsMatching "com.frostwire.transfers.*"
         includeTestsMatching "com.frostwire.search.*"
         includeTestsMatching "com.frostwire.util.*"
         includeTestsMatching "com.frostwire.tests.*"

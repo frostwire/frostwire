@@ -68,6 +68,7 @@ public final class LollipopFileSystem implements FileSystem {
     private static final List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
 
     private final Application app;
+    private volatile Throwable lastCopyError;
 
     public LollipopFileSystem(Application app) {
         this.app = app;
@@ -219,12 +220,18 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
+    public Throwable lastCopyError() {
+        return lastCopyError;
+    }
+
+    @Override
     public boolean copy(File src, File dest) {
+        lastCopyError = null;
         try {
             FileUtils.copyFile(src, dest);
             return true;
         } catch (Throwable e) {
-            // ignore
+            lastCopyError = e;
             LOG.error(e.getMessage(), e);
         }
 
@@ -233,15 +240,21 @@ public final class LollipopFileSystem implements FileSystem {
 
         if (srcF == null) {
             LOG.error("Unable to obtain document for file: " + src);
+            if (lastCopyError == null) {
+                lastCopyError = new IOException("Unable to obtain document for file: " + src);
+            }
             return false;
         }
 
         if (destF == null) {
             LOG.error("Unable to obtain or create document for file: " + dest);
+            if (lastCopyError == null) {
+                lastCopyError = new IOException("Unable to obtain or create document for file: " + dest);
+            }
             return false;
         }
 
-        return copy(app, srcF, destF);
+        return copyDocuments(app, srcF, destF);
     }
 
     @Override
@@ -684,7 +697,7 @@ public final class LollipopFileSystem implements FileSystem {
 
     //------------ more tools methods
 
-    private static boolean copy(Context context, DocumentFile source, DocumentFile target) {
+    private boolean copyDocuments(Context context, DocumentFile source, DocumentFile target) {
         InputStream inStream = null;
         OutputStream outStream = null;
         try {
@@ -698,6 +711,7 @@ public final class LollipopFileSystem implements FileSystem {
             }
 
         } catch (Throwable e) {
+            lastCopyError = e;
             LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
             return false;
         } finally {

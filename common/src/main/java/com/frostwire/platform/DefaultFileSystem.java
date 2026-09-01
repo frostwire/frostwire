@@ -32,6 +32,7 @@ import java.util.LinkedList;
  */
 public class DefaultFileSystem implements FileSystem {
     private static final Logger LOG = Logger.getLogger(DefaultFileSystem.class);
+    protected volatile Throwable lastCopyError;
 
     public static void walkFiles(FileSystem fs, File file, FileFilter filter) {
         File[] arr = fs.listFiles(file, filter);
@@ -105,14 +106,21 @@ public class DefaultFileSystem implements FileSystem {
 
     @Override
     public boolean copy(File src, File dest) {
+        lastCopyError = null;
         try {
             FileUtils.copyFile(src, dest);
             LOG.info("Success: DefaultFileSystem.copy(src=" + src + ", dest=" + dest + ")");
             return true;
         } catch (Throwable e) {
+            lastCopyError = e;
             LOG.error("Error in copy file: " + src + " -> " + dest, e);
         }
         return false;
+    }
+
+    @Override
+    public Throwable lastCopyError() {
+        return lastCopyError;
     }
 
     @Override
