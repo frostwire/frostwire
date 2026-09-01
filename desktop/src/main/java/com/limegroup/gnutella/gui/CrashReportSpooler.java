@@ -59,6 +59,14 @@ public final class CrashReportSpooler {
     UPLOAD_QUEUE.execute(spooler::uploadPending);
   }
 
+  /** Queues a synthetic anonymous report for verifying the Icebase pipeline. */
+  public static void submitTestReport() {
+    start();
+    CrashReportSpooler spooler = INSTANCE;
+    spooler.spool(new Throwable());
+    UPLOAD_QUEUE.execute(spooler::uploadPending);
+  }
+
   static void record(Throwable problem) {
     CrashReportSpooler spooler = INSTANCE;
     if (spooler != null) {
