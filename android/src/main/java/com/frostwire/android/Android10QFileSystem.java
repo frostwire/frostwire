@@ -28,6 +28,8 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.DefaultFileSystem;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Android10QFileSystem extends DefaultFileSystem {
     private final Application app;
@@ -38,15 +40,18 @@ public class Android10QFileSystem extends DefaultFileSystem {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public boolean copy(File src, File dest) {
-        lastCopyError = null;
+        lastCopyError.remove();
+        AtomicReference<Throwable> copyError = new AtomicReference<>();
         try {
-            boolean saved = Librarian.mediaStoreSaveToDownloads(src, dest, SystemUtils.hasAndroid10());
+            boolean saved = Librarian.mediaStoreSaveToDownloads(
+                    src, dest, SystemUtils.hasAndroid10(), copyError);
             if (!saved) {
-                lastCopyError = new java.io.IOException("MediaStore save failed for " + dest);
+                Throwable error = copyError.get();
+                lastCopyError.set(error != null ? error : new IOException("MediaStore save failed for " + dest));
             }
             return saved;
         } catch (Throwable e) {
-            lastCopyError = e;
+            lastCopyError.set(e);
             return false;
         }
     }

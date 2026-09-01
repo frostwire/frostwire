@@ -68,7 +68,7 @@ public final class LollipopFileSystem implements FileSystem {
     private static final List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
 
     private final Application app;
-    private volatile Throwable lastCopyError;
+    private final ThreadLocal<Throwable> lastCopyError = new ThreadLocal<>();
 
     public LollipopFileSystem(Application app) {
         this.app = app;
@@ -221,17 +221,17 @@ public final class LollipopFileSystem implements FileSystem {
 
     @Override
     public Throwable lastCopyError() {
-        return lastCopyError;
+        return lastCopyError.get();
     }
 
     @Override
     public boolean copy(File src, File dest) {
-        lastCopyError = null;
+        lastCopyError.remove();
         try {
             FileUtils.copyFile(src, dest);
             return true;
         } catch (Throwable e) {
-            lastCopyError = e;
+            lastCopyError.set(e);
             LOG.error(e.getMessage(), e);
         }
 
@@ -240,16 +240,16 @@ public final class LollipopFileSystem implements FileSystem {
 
         if (srcF == null) {
             LOG.error("Unable to obtain document for file: " + src);
-            if (lastCopyError == null) {
-                lastCopyError = new IOException("Unable to obtain document for file: " + src);
+            if (lastCopyError.get() == null) {
+                lastCopyError.set(new IOException("Unable to obtain document for file: " + src));
             }
             return false;
         }
 
         if (destF == null) {
             LOG.error("Unable to obtain or create document for file: " + dest);
-            if (lastCopyError == null) {
-                lastCopyError = new IOException("Unable to obtain or create document for file: " + dest);
+            if (lastCopyError.get() == null) {
+                lastCopyError.set(new IOException("Unable to obtain or create document for file: " + dest));
             }
             return false;
         }
@@ -711,7 +711,7 @@ public final class LollipopFileSystem implements FileSystem {
             }
 
         } catch (Throwable e) {
-            lastCopyError = e;
+            lastCopyError.set(e);
             LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
             return false;
         } finally {
