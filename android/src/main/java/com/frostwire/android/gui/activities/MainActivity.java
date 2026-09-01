@@ -495,13 +495,11 @@ public class MainActivity extends AbstractActivity
       if (ConfigurationManager.instance()
               .getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY)
           && !NetworkManager.instance().isTunnelUp()) {
-        TransferManager.instance().pauseTorrents();
         UIUtils.showDismissableMessage(
             findView(R.id.activity_main_parent_layout), R.string.cannot_start_engine_without_vpn);
-      } else {
-        firstTime = false;
-        Engine.instance().startServices();
       }
+      firstTime = false;
+      Engine.instance().startServices();
     }
     if (Engine.instance().wasShutdown()) {
       Engine.instance().startServices();
