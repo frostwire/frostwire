@@ -614,12 +614,6 @@ public class EngineForegroundService extends Service implements IEngineService {
             return;
         }
 
-        if (TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
-            TransferManager.instance().pauseTorrents();
-            LOG.info("VPN guard enabled without VPN. Pausing torrents before service start.");
-            return;
-        }
-
         if (isStarted()) {
             if (relayStack == null) {
                 LOG.info("startServices() - engine up but IceBridge down, restarting relay stack");
