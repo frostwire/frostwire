@@ -56,6 +56,17 @@ public class VpnDropProtectionScopeTest {
   }
 
   @Test
+  public void restoredTransferCannotAutoResumeWhenVpnGuardIsActive() throws Exception {
+    String source =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/transfers/UIBittorrentDownload.java");
+    String constructorBlock = blockStartingAt(source, "public UIBittorrentDownload(TransferManager manager, BTDownload dl)");
+
+    assertTrue(constructorBlock.contains("manager.isBittorrentOnVpnOnlyAndNoVpn()"));
+    assertTrue(constructorBlock.contains("dl.pause();"));
+  }
+
+  @Test
   public void enablingVpnGuardDoesNotDisconnectEngineServices() throws Exception {
     String source =
         readProjectFile(
