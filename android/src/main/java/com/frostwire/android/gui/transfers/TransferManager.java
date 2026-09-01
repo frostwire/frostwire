@@ -448,9 +448,7 @@ public final class TransferManager {
     public void pauseTorrents() {
         synchronized (downloadsListMonitor) {
             for (BittorrentDownload d : bittorrentDownloadsList) {
-                if (!d.isSeeding()) {
-                    d.pause();
-                }
+                d.pause();
             }
         }
     }
