@@ -3,6 +3,8 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
+import com.frostwire.jlibtorrent.LibTorrent;
+import com.frostwire.search.telluride.TellurideBuild;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -47,30 +49,46 @@ public final class CrashReportSpooler {
   }
 
   public static void start() {
-    if (INSTANCE == null) {
-      INSTANCE =
-          new CrashReportSpooler(
-              new File(CommonUtils.getUserSettingsDir(), "crash-reports"),
-              HttpClientFactory.newInstance(HttpClientFactory.HttpContext.MISC),
-              FrostWireUtils.getFrostWireVersion(),
-              FrostWireUtils.getBuildNumber());
+    try {
+      if (INSTANCE == null) {
+        INSTANCE =
+            new CrashReportSpooler(
+                new File(CommonUtils.getUserSettingsDir(), "crash-reports"),
+                HttpClientFactory.newInstance(HttpClientFactory.HttpContext.MISC),
+                FrostWireUtils.getFrostWireVersion(),
+                FrostWireUtils.getBuildNumber());
+      }
+      CrashReportSpooler spooler = INSTANCE;
+      UPLOAD_QUEUE.execute(spooler::uploadPending);
+    } catch (Throwable ignored) {
+      LOG.info("Unable to initialize anonymous crash reporting", ignored);
     }
-    CrashReportSpooler spooler = INSTANCE;
-    UPLOAD_QUEUE.execute(spooler::uploadPending);
   }
 
   /** Queues a synthetic anonymous report for verifying the Icebase pipeline. */
   public static void submitTestReport() {
-    start();
-    CrashReportSpooler spooler = INSTANCE;
-    spooler.spool(new Throwable());
-    UPLOAD_QUEUE.execute(spooler::uploadPending);
+    try {
+      start();
+      CrashReportSpooler spooler = INSTANCE;
+      if (spooler != null) {
+        spooler.spool(new Throwable());
+        UPLOAD_QUEUE.execute(spooler::uploadPending);
+      }
+    } catch (Throwable ignored) {
+      LOG.info("Unable to submit anonymous test crash report", ignored);
+    }
   }
 
   static void record(Throwable problem) {
-    CrashReportSpooler spooler = INSTANCE;
-    if (spooler != null) {
-      spooler.spool(problem);
+    try {
+      CrashReportSpooler spooler = INSTANCE;
+      if (spooler != null) {
+        spooler.spool(problem);
+        UPLOAD_QUEUE.execute(spooler::uploadPending);
+        LOG.info("Automatically queued anonymous crash report for Icebase");
+      }
+    } catch (Throwable ignored) {
+      LOG.info("Unable to queue anonymous crash report", ignored);
     }
   }
 
@@ -106,12 +124,37 @@ public final class CrashReportSpooler {
     return new CrashReport(
         appVersion,
         appBuild,
+        System.getProperty("os.name", "unknown"),
         System.getProperty("os.version", "unknown"),
+        System.getProperty("os.arch", "unknown"),
         System.getProperty("java.version", "unknown"),
+        System.getProperty("java.runtime.version", "unknown"),
+        System.getProperty("java.vendor", "unknown"),
+        jlibtorrentVersion(),
+        tellurideBuild(),
+        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
         problem.getClass().getName(),
         frames,
         UUID.randomUUID().toString().replace("-", ""));
+  }
+
+  private String jlibtorrentVersion() {
+    try {
+      return LibTorrent.jlibtorrentVersion();
+    } catch (Throwable ignored) {
+      return "unavailable";
+    }
+  }
+
+  private String tellurideBuild() {
+    try {
+      Integer build = TellurideBuild.detect(FrostWireUtils.getTellurideLauncherFile());
+      return build == null ? "unavailable" : Integer.toString(build);
+    } catch (Throwable ignored) {
+      return "unavailable";
+    }
   }
 
   private void prune() throws Exception {
@@ -167,8 +210,16 @@ public final class CrashReportSpooler {
     private final String platform = "desktop";
     private final String app_version;
     private final String app_build;
+    private final String os_name;
     private final String os_version;
+    private final String os_arch;
     private final String runtime_version;
+    private final String jre_version;
+    private final String java_vendor;
+    private final String jlibtorrent_version;
+    private final String telluride_build;
+    private final String cpu_count;
+    private final String max_memory_mb;
     private final String memory_bucket;
     private final String exception_class;
     private final Frame[] stack_frames;
@@ -177,16 +228,32 @@ public final class CrashReportSpooler {
     private CrashReport(
         String appVersion,
         int appBuild,
+        String osName,
         String osVersion,
+        String osArch,
         String runtimeVersion,
+        String jreVersion,
+        String javaVendor,
+        String jlibtorrentVersion,
+        String tellurideBuild,
+        int cpuCount,
+        long maxMemoryMb,
         String memoryBucket,
         String exceptionClass,
         Frame[] stackFrames,
         String nonce) {
-      this.app_version = appVersion;
-      this.app_build = Integer.toString(appBuild);
-      this.os_version = osVersion;
-      this.runtime_version = runtimeVersion;
+        this.app_version = appVersion;
+        this.app_build = Integer.toString(appBuild);
+        this.os_name = osName;
+        this.os_version = osVersion;
+        this.os_arch = osArch;
+        this.runtime_version = runtimeVersion;
+        this.jre_version = jreVersion;
+        this.java_vendor = javaVendor;
+        this.jlibtorrent_version = jlibtorrentVersion;
+        this.telluride_build = tellurideBuild;
+        this.cpu_count = Integer.toString(cpuCount);
+        this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
       this.exception_class = exceptionClass;
       this.stack_frames = stackFrames;
