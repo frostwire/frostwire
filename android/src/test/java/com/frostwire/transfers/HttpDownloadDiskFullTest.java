@@ -23,6 +23,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,7 +68,15 @@ public class HttpDownloadDiskFullTest {
     };
     for (Path file : candidates) {
       if (Files.isRegularFile(file)) {
-        return Files.readString(file, StandardCharsets.UTF_8);
+        try (FileInputStream input = new FileInputStream(file.toFile());
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+          byte[] buffer = new byte[4096];
+          int count;
+          while ((count = input.read(buffer)) != -1) {
+            output.write(buffer, 0, count);
+          }
+          return output.toString(StandardCharsets.UTF_8.name());
+        }
       }
     }
     throw new IOException("missing " + relativePath + " from " + cwd);
