@@ -904,6 +904,10 @@ public final class TransferManager {
             // relay listeners installed by AndroidRelayStack.
             BTEngineListenerChain.install(btEngine, engineListener);
             btEngine.restoreDownloads();
+            if (isBittorrentOnVpnOnlyAndNoVpn()) {
+                pauseTorrents();
+                LOG.info("VPN guard enabled without VPN. Paused restored torrents.");
+            }
         } catch (Throwable t) {
             sessionTorrentsRestored.set(false);
             MainApplication.recordBTEngineInitializationFailure(t);
