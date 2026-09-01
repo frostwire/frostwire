@@ -3,7 +3,6 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.search.telluride.TellurideBuild;
-import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
@@ -55,7 +54,7 @@ final class AboutWindow {
           @Override
           public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e);
-            ErrorService.error(new Throwable(""), "Hi there you curious friend. Send us feedback!");
+            CrashReportSpooler.submitTestReport();
           }
         });
     // set up java version label
