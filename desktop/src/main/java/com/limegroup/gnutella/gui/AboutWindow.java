@@ -55,6 +55,11 @@ final class AboutWindow {
           public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e);
             CrashReportSpooler.submitTestReport();
+            JOptionPane.showMessageDialog(
+                DIALOG,
+                I18n.tr("An anonymous test report was queued for Icebase."),
+                I18n.tr("Test Report"),
+                JOptionPane.INFORMATION_MESSAGE);
           }
         });
     // set up java version label
