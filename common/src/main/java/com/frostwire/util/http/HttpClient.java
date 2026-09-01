@@ -85,6 +85,9 @@ public interface HttpClient {
 
     String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
 
+    /** Posts content without adding a User-Agent or other request metadata. */
+    String post(String url, int timeout, String content, String postContentType) throws IOException;
+
     void cancel();
 
     void resetCancellation();
