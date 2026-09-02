@@ -277,6 +277,17 @@ def launch_app(serial: str) -> None:
     console.print("[green]App launched.[/green]")
 
 
+def rebuild_and_relaunch(serial: str) -> bool:
+    """Build the selected APK, reinstall it, and relaunch on the same device."""
+    apk = build_apk()
+    if not apk:
+        return False
+    if not install_apk(apk, serial):
+        return False
+    launch_app(serial)
+    return True
+
+
 def run_emulator(avd: str, wipe_data: bool = False) -> Optional[str]:
     console.print(f"[dim]Booting emulator: {avd}[/dim]")
     
@@ -552,13 +563,18 @@ def run_logcat_tui(serial: str):
         console.print("[yellow]Logcat stopped.[/yellow]")
         console.print()
         prompt = Prompt.ask(
-            "[bold]Select action:[/bold] [r]efresh list  [q]uit",
-            choices=["r", "q"],
+            "[bold]Select action:[/bold] [r]efresh list  [b]uild/relaunch  [q]uit",
+            choices=["r", "b", "q"],
             default="r"
         )
         if prompt == "q":
             console.print("[dim]Exiting.[/dim]")
             sys.exit(0)
+        if prompt == "b":
+            if rebuild_and_relaunch(serial):
+                console.print(f"[bold green]FrostWire rebuilt and relaunched on {serial}[/bold green]")
+                run_logcat_tui(serial)
+            return
 
 
 def main():
