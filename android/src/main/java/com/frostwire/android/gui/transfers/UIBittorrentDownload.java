@@ -98,7 +98,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         // This prevents TransactionTooLargeException when fragments are destroyed.
         this.items = null;
 
-        if (manager.isBittorrentOnVpnOnlyAndNoVpn()) {
+        boolean vpnGuardBlocksTorrent = manager.isBittorrentOnVpnOnlyAndNoVpn();
+        if (vpnGuardBlocksTorrent) {
             dl.pause();
         } else if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
             dl.resume();
@@ -111,6 +112,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         // Initialize cached state (may block briefly, but only during construction)
         updateCachedState();
+        if (vpnGuardBlocksTorrent) {
+            cachedPaused = true;
+            cachedState = TransferState.PAUSED;
+        }
     }
 
     /**
@@ -275,7 +280,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public void pause() {
-        dl.pause();
+        if (!dl.wasPaused()) {
+            dl.pause();
+        }
+        cachedPaused = true;
+        cachedState = TransferState.PAUSED;
     }
 
     @Override
