@@ -83,6 +83,8 @@ public class VpnDropProtectionScopeTest {
             "SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,"));
     assertTrue(
         vpnPreferenceBlock.contains("TransferManager.instance().resumeResumableTransfers()"));
+    assertTrue(
+        vpnPreferenceBlock.contains("TransferManager.instance().seedFinishedTransfers()"));
     assertFalse(vpnPreferenceBlock.contains("disconnect();"));
     assertFalse(
         vpnPreferenceBlock.contains(
