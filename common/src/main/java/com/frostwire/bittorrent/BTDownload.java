@@ -170,14 +170,14 @@ public final class BTDownload implements BittorrentDownload {
             return TransferState.DOWNLOADING;
         }
         final boolean isPaused = isPaused(status);
+        if (isPaused) {
+            return TransferState.PAUSED;
+        }
         final boolean done = status.isFinished()
                 || Float.compare(status.progress(), 1f) >= 0
                 || (status.totalWanted() > 0 && status.totalWantedDone() >= status.totalWanted());
         if (done) {
-            return isPaused ? TransferState.FINISHED : TransferState.SEEDING;
-        }
-        if (isPaused) {
-            return TransferState.PAUSED;
+            return TransferState.SEEDING;
         }
         final TorrentStatus.State state = status.state();
         switch (state) {
