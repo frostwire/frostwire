@@ -65,6 +65,10 @@ public class VpnDropProtectionScopeTest {
     assertTrue(constructorBlock.contains("manager.isBittorrentOnVpnOnlyAndNoVpn()"));
     assertTrue(constructorBlock.contains("dl.pause();"));
     assertTrue(constructorBlock.contains("cachedState = TransferState.PAUSED;"));
+
+    String updateBlock = blockStartingAt(source, "public void updateCachedState()");
+    assertTrue(updateBlock.contains("boolean explicitlyPaused = dl.wasPaused();"));
+    assertTrue(updateBlock.contains("cachedState = explicitlyPaused ? TransferState.PAUSED : dl.getState();"));
   }
 
   @Test
