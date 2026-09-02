@@ -18,14 +18,15 @@ import org.junit.jupiter.api.Test;
 class BTDownloadFinishedStateStructureTest {
 
   @Test
-  void finishedProgressMapsToSeedingOrFinishedNotDownloading() throws Exception {
+  void pausedFinishedProgressMapsToPausedNotFinished() throws Exception {
     String source =
         read("../common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
     String compact = source.replaceAll("\\s+", "");
     assertTrue(compact.contains("status.isFinished()"));
     assertTrue(compact.contains("Float.compare(status.progress(),1f)>=0"));
     assertTrue(compact.contains("totalWantedDone()>=status.totalWanted()"));
-    assertTrue(compact.contains("returnisPaused?TransferState.FINISHED:TransferState.SEEDING;"));
+    assertTrue(compact.contains("if(isPaused){returnTransferState.PAUSED;}"));
+    assertTrue(compact.contains("returnTransferState.SEEDING;"));
     assertTrue(
         compact.contains("caseTORRENT_FINISHED:try{if(th.isValid()){cachedStatus=th.status();"));
   }
