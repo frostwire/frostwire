@@ -64,6 +64,7 @@ public class VpnDropProtectionScopeTest {
 
     assertTrue(constructorBlock.contains("manager.isBittorrentOnVpnOnlyAndNoVpn()"));
     assertTrue(constructorBlock.contains("dl.pause();"));
+    assertTrue(constructorBlock.contains("cachedState = TransferState.PAUSED;"));
   }
 
   @Test
