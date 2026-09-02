@@ -163,7 +163,10 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                 UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
             } else if (!newVal) {
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                        () -> TransferManager.instance().resumeResumableTransfers());
+                        () -> {
+                            TransferManager.instance().resumeResumableTransfers();
+                            TransferManager.instance().seedFinishedTransfers();
+                        });
             }
             return true;
         });
