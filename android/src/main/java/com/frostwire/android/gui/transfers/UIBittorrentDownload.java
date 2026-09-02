@@ -126,7 +126,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         try {
             TransferState oldState = cachedState;
             int oldProgress = cachedProgress;
-            cachedState = dl.getState();
+            boolean explicitlyPaused = dl.wasPaused();
+            cachedState = explicitlyPaused ? TransferState.PAUSED : dl.getState();
             cachedProgress = dl.getProgress();
             cachedConnectedSeeds = dl.getConnectedSeeds();
             cachedTotalSeeds = dl.getTotalSeeds();
@@ -136,7 +137,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             cachedUploadSpeed = dl.getUploadSpeed();
             cachedEta = dl.getETA();
             cachedSeeding = dl.isSeeding();
-            cachedPaused = dl.isPaused();
+            cachedPaused = explicitlyPaused || dl.isPaused();
             cachedFinished = dl.isFinished();
             cachedComplete = dl.isComplete();
             cachedSequentialDownload = dl.isSequentialDownload();
