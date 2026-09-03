@@ -14,9 +14,12 @@ import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -118,8 +121,93 @@ public final class PeerRegistry {
      * @param maxResults maximum number of records to return
      * @return an immutable list of forward-capable peers
      */
+    /**
+     * Mesh forwarders for a RELAY flood: eligible peers (FORWARDER/BOTH roles)
+     * in shuffled order with a best-effort per-/24 diversity cap, so repeated
+     * floods against a large registry spread load instead of hammering the
+     * same first-N peers or collapsing onto one hosting subnet. Stale peers
+     * are handled by periodic {@link #evictStale(long)}, not here.
+     */
     public List<PeerRecord> lookupForwarders(int maxResults) {
-        return lookupPeers(maxResults, true);
+        return lookupForwarders(maxResults, ThreadLocalRandom.current());
+    }
+
+    /**
+     * Deterministic overload for tests: same selection driven by the given
+     * source of randomness.
+     */
+    public List<PeerRecord> lookupForwarders(int maxResults, Random random) {
+        if (maxResults <= 0) {
+            return Collections.emptyList();
+        }
+        if (random == null) {
+            throw new IllegalArgumentException("random is null");
+        }
+        lookups.incrementAndGet();
+        List<PeerRecord> eligible = new ArrayList<>();
+        for (PeerRecord r : byPubHex.values()) {
+            if (r.canForward()) {
+                eligible.add(r);
+            }
+        }
+        Collections.shuffle(eligible, random);
+        List<PeerRecord> result = new ArrayList<>(Math.min(maxResults, eligible.size()));
+        Map<String, Integer> perSubnet = new HashMap<>();
+        for (PeerRecord r : eligible) {
+            if (result.size() >= maxResults) {
+                break;
+            }
+            String subnet = subnet24(r.host());
+            if (subnet != null && perSubnet.getOrDefault(subnet, 0) >= MAX_FORWARD_PER_SUBNET) {
+                continue;
+            }
+            if (subnet != null) {
+                perSubnet.put(subnet, perSubnet.getOrDefault(subnet, 0) + 1);
+            }
+            result.add(r);
+        }
+        // Never shrink coverage: if the cap starved the result, fill up ignoring it.
+        for (PeerRecord r : eligible) {
+            if (result.size() >= maxResults) {
+                break;
+            }
+            if (!result.contains(r)) {
+                result.add(r);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    /** Max flood targets per /24 subnet before the diversity cap fills up elsewhere. */
+    private static final int MAX_FORWARD_PER_SUBNET = 2;
+
+    /**
+     * Best-effort /24 of a literal IPv4 host, or null for hostnames/IPv6.
+     * Non-IP hosts bypass the diversity cap rather than being excluded.
+     */
+    private static String subnet24(String host) {
+        if (host == null) {
+            return null;
+        }
+        String[] parts = host.split("\\.", -1);
+        if (parts.length != 4) {
+            return null;
+        }
+        for (String part : parts) {
+            if (!part.matches("\\d{1,3}")) {
+                return null;
+            }
+            int octet;
+            try {
+                octet = Integer.parseInt(part);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+            if (octet < 0 || octet > 255) {
+                return null;
+            }
+        }
+        return parts[0] + "." + parts[1] + "." + parts[2];
     }
 
     /**
