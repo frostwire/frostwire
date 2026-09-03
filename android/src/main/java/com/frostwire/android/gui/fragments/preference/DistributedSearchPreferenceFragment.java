@@ -7,7 +7,6 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -16,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -478,12 +478,10 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         // Progress text must set expectations: difficulty-20 PoW is ~1M Ed25519
         // attempts (tens of seconds on phones). Dialog is dismissed as soon as
         // keys are written — stack restart must not hold the spinner forever.
-        ProgressDialog progress = ProgressDialog.show(
-                requireContext(),
-                getString(R.string.distributed_identity_initialize),
-                getString(R.string.distributed_identity_initializing),
-                true,
-                false);
+        AlertDialog progress =
+                showProgress(
+                        R.string.distributed_identity_initialize,
+                        R.string.distributed_identity_initializing);
 
         // HIGH_PRIORITY: dedicated thread — never queue behind MISC (IceBridge
         // start/stop, peer discovery glue, etc.).
@@ -1029,10 +1027,26 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         return total;
     }
 
-    private static void dismiss(ProgressDialog progress) {
+    private AlertDialog showProgress(int titleResId, int messageResId) {
+        Context context = requireContext();
+        ProgressBar bar = new ProgressBar(context);
+        int pad = (int) (24 * context.getResources().getDisplayMetrics().density);
+        bar.setPadding(pad, pad, pad, pad);
+        AlertDialog dialog =
+                new AlertDialog.Builder(context)
+                        .setTitle(titleResId)
+                        .setMessage(messageResId)
+                        .setView(bar)
+                        .setCancelable(false)
+                        .create();
+        dialog.show();
+        return dialog;
+    }
+
+    private static void dismiss(AlertDialog dialog) {
         try {
-            if (progress != null && progress.isShowing()) {
-                progress.dismiss();
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
             }
         } catch (Throwable ignored) {
         }
