@@ -25,11 +25,11 @@ class IceBridgeTopologyTest {
   void defaultsMatchHybridEc2Research() {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.resetToDefaults();
-    // TopologyAutoResearch winner on hybrid EC2 benchmark (common random numbers)
-    assertEquals(16, t.meshBroadcastFanout());
-    assertEquals(30, t.searchPeerFanout());
+    // Budget-scan defaults near the Pareto front (common random numbers)
+    assertEquals(6, t.meshBroadcastFanout());
+    assertEquals(8, t.searchPeerFanout());
     assertEquals(3, t.meshHopTtl());
-    assertEquals(3, t.searchTtl());
+    assertEquals(2, t.searchTtl());
     assertEquals(3, t.softMax());
     assertEquals(3, t.leafUltrapeerConnections());
   }
@@ -66,7 +66,7 @@ class IceBridgeTopologyTest {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.resetToDefaults();
     t.applyRemote(0, 10, 0, 0);
-    assertEquals(16, t.meshBroadcastFanout());
+    assertEquals(6, t.meshBroadcastFanout());
     assertEquals(10, t.searchPeerFanout());
     assertEquals(3, t.meshHopTtl());
   }
@@ -80,12 +80,15 @@ class IceBridgeTopologyTest {
   }
 
   @Test
-  void applyHybridEc2ProfileRestoresDefaults() {
+  void applyHybridEc2ProfileRestoresHubFanout() {
     IceBridgeTopology t = IceBridgeTopology.get();
     t.applyRemote(6, 8, 2, 2);
     t.applyHybridEc2Profile();
-    assertEquals(16, t.meshBroadcastFanout());
+    // Standalone cloud hubs run full ultrapeer fanout; leaves use lean DEFAULT_*.
+    assertEquals(32, t.meshBroadcastFanout());
     assertEquals(30, t.searchPeerFanout());
+    assertEquals(3, t.meshHopTtl());
+    assertEquals(3, t.searchTtl());
     assertEquals(3, t.softMax());
   }
 }

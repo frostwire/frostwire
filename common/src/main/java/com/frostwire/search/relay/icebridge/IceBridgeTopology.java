@@ -34,17 +34,19 @@ public final class IceBridgeTopology {
     /**
      * N — max IceBridge peers for mesh RELAY broadcast.
      * Hybrid EC2 research default (small fat hub fleet; full coverage with N≪32).
-     * Winner of TopologyAutoResearch.runHybridEc2Research with common random
-     * numbers (N=16 M=30 meshTTL=3 searchTTL=3 softMax=3 leafUPs=3, 2026-07).
+     * Winner of the budget scan near the Pareto front with common random
+     * numbers (N=6 M=8 meshTTL=3 searchTTL=2 softMax=3 leafUPs=3; 258 mesh +
+     * 72 search worst-case).
      * LimeWire ultrapeer baseline was 32 ({@link #LIMEWIRE_MESH_FANOUT}).
      */
-    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 16;
+    public static final int DEFAULT_MESH_BROADCAST_FANOUT = 6;
 
     /**
      * M — max FrostWire peers queried / forwarded per search hop.
-     * Hybrid research keeps LimeWire MAX_LEAVES=30 for rare-content recall.
+     * Budget scan keeps M=8 near the Pareto front (72 search requests
+     * worst-case at TTL=2 vs ~32k at M=30 TTL=3).
      */
-    public static final int DEFAULT_SEARCH_PEER_FANOUT = 30;
+    public static final int DEFAULT_SEARCH_PEER_FANOUT = 8;
 
     /**
      * Intermediate IceBridge hops for mesh RELAY (SOFT_MAX horizon).
@@ -54,7 +56,7 @@ public final class IceBridgeTopology {
     /**
      * Dual-envelope search hop TTL (app layer).
      */
-    public static final int DEFAULT_SEARCH_TTL = 3;
+    public static final int DEFAULT_SEARCH_TTL = 2;
 
     /**
      * How many IceBridge hubs a FrostWire client multi-homes to.
@@ -217,18 +219,20 @@ public final class IceBridgeTopology {
     }
 
     /**
-     * Hybrid EC2 hub profile from TopologyAutoResearch (high-speed backbone
-     * we operate + FrostWire leaves). Defaults match compiled
-     * {@code DEFAULT_*} (research winner on hybrid benchmark).
+     * Hybrid EC2 hub profile: the always-on, well-provisioned forwarders we
+     * operate (standalone cloud nodes) run full ultrapeer fanout, while
+     * leaves use the lean {@code DEFAULT_*} budget profile above. Standalone
+     * FORWARDER processes apply this automatically for topology keys not set
+     * in the environment (see {@code IceBridgeConfig.fromEnv}).
      *
      * <p>N={@value #HYBRID_EC2_MESH_FANOUT}, M={@value #HYBRID_EC2_SEARCH_PEER_FANOUT}.
      */
-    public static final int HYBRID_EC2_MESH_FANOUT = DEFAULT_MESH_BROADCAST_FANOUT;
-    public static final int HYBRID_EC2_SEARCH_PEER_FANOUT = DEFAULT_SEARCH_PEER_FANOUT;
-    public static final int HYBRID_EC2_MESH_HOP_TTL = DEFAULT_MESH_HOP_TTL;
-    public static final int HYBRID_EC2_SEARCH_TTL = DEFAULT_SEARCH_TTL;
-    public static final int HYBRID_EC2_SOFT_MAX = DEFAULT_SOFT_MAX;
-    public static final int HYBRID_EC2_LEAF_UP_CONNECTIONS = DEFAULT_LEAF_ULTRAPEER_CONNECTIONS;
+    public static final int HYBRID_EC2_MESH_FANOUT = LIMEWIRE_MESH_FANOUT;
+    public static final int HYBRID_EC2_SEARCH_PEER_FANOUT = LIMEWIRE_SEARCH_PEER_FANOUT;
+    public static final int HYBRID_EC2_MESH_HOP_TTL = LIMEWIRE_MESH_HOP_TTL;
+    public static final int HYBRID_EC2_SEARCH_TTL = LIMEWIRE_SEARCH_TTL;
+    public static final int HYBRID_EC2_SOFT_MAX = LIMEWIRE_SOFT_MAX;
+    public static final int HYBRID_EC2_LEAF_UP_CONNECTIONS = LIMEWIRE_LEAF_UP_CONNECTIONS;
 
     public void applyHybridEc2Profile() {
         applyRemote(

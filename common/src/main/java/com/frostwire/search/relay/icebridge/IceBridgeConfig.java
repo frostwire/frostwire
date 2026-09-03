@@ -316,10 +316,10 @@ public final class IceBridgeConfig {
      *   <li>{@code ICEBRIDGE_DHT} — embed DHT SessionManager and announce (default: true for
      *       FORWARDER/BOTH, false for CLIENT)</li>
      *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
-     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY (default: 32, LimeWire NUM_CONNECTIONS)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 30, MAX_LEAVES)</li>
+     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY (default: 6)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 8)</li>
      *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3, SOFT_MAX)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 3)</li>
+     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 2)</li>
      *   <li>{@code ICEBRIDGE_SOFT_MAX} — hops+remaining_ttl clamp (default: 3)</li>
      *   <li>{@code ICEBRIDGE_LEAF_UP_CONNECTIONS} — leaf attachments to IceBridges (default: 3)</li>
      * </ul>
@@ -351,12 +351,19 @@ public final class IceBridgeConfig {
         b.authTokensFile(new File(tokensFile));
         // Topology is process-wide (IceBridgeTopology reads the same env keys
         // in its constructor); re-apply here so fromEnv() after startup still
-        // refreshes live limits.
+        // refreshes live limits. Standalone FORWARDER hubs (e.g. EC2) default
+        // to the fat hub profile for unset keys; leaves keep the lean
+        // compiled defaults. Explicit env always wins on every role.
+        boolean cloudHub = role == Role.FORWARDER;
         IceBridgeTopology.get().applyRemote(
-                envInt("ICEBRIDGE_MESH_FANOUT", 0),
-                envInt("ICEBRIDGE_SEARCH_PEER_FANOUT", 0),
-                envInt("ICEBRIDGE_MESH_HOP_TTL", 0),
-                envInt("ICEBRIDGE_SEARCH_TTL", 0));
+                envInt("ICEBRIDGE_MESH_FANOUT",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_FANOUT : 0),
+                envInt("ICEBRIDGE_SEARCH_PEER_FANOUT",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT : 0),
+                envInt("ICEBRIDGE_MESH_HOP_TTL",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_HOP_TTL : 0),
+                envInt("ICEBRIDGE_SEARCH_TTL",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_TTL : 0));
         return b.build();
     }
 

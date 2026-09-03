@@ -135,6 +135,26 @@ class TopologyAutoResearchTest {
         rHybrid.score + 0.05 >= rLime.score
             || rHybrid.meanMeshMessages <= rLime.meanMeshMessages + 1,
         "hybrid should score competitively or use no more mesh traffic");
+
+    // Lean leaf defaults trade single-shot recall for traffic: pin the win.
+    // Recall is recovered by fat hubs (above) + phased dynamic querying.
+    // (Mesh messages saturate on this small benchmark's 123 edges; the
+    // fanout difference shows in search peer messages: ~1050 vs ~240.)
+    Config lean = net.copy();
+    lean.useLiveTopology = false;
+    lean.meshFanout = IceBridgeTopology.DEFAULT_MESH_BROADCAST_FANOUT;
+    lean.searchPeerFanout = IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT;
+    lean.meshHopTtl = IceBridgeTopology.DEFAULT_MESH_HOP_TTL;
+    lean.searchTtl = IceBridgeTopology.DEFAULT_SEARCH_TTL;
+    lean.softMax = IceBridgeTopology.DEFAULT_SOFT_MAX;
+    lean.leafUpConnections = IceBridgeTopology.DEFAULT_LEAF_ULTRAPEER_CONNECTIONS;
+    lean.seed = 11L;
+    AggregateReport rLean =
+        new IceBridgeNetworkSimulator(lean).runAggregate(TopologyAutoResearch.hybridEc2Budgets());
+    LOG.info("compare lean:   " + rLean);
+    assertTrue(
+        rLean.meanSearchPeerMessages * 2 <= rLime.meanSearchPeerMessages,
+        "lean leaf defaults should use well under half the search traffic");
   }
 
   @Test
