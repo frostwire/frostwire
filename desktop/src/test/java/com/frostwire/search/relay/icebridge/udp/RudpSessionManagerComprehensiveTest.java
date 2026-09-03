@@ -1082,35 +1082,43 @@ class RudpSessionManagerComprehensiveTest {
   // ---- SEC2: Max session limit ----
 
   @Test
-  void helloRejectedWhenMaxSessionsReached() throws Exception {
+  void sessionCapDefaultsTo1024AndRejectsPastCap() throws Exception {
     RudpSessionManager mgr = new RudpSessionManager(local, registry, metrics, (pub, payload) -> {});
+    try {
+      assertEquals(IceBridgeConfig.DEFAULT_MAX_SESSIONS, mgr.maxSessions());
+      assertEquals(1024, mgr.maxSessions());
+      assertThrows(IllegalArgumentException.class, () -> mgr.setMaxSessions(0));
 
-    // Create 256 sessions (the MAX_SESSIONS limit).
-    for (int i = 0; i < 256; i++) {
-      IdentityKeys peer = IdentityKeys.generate(0);
-      long cid = 1000L + i;
-      InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 63000 + i);
-      byte[] hello = RudpAuth.createHelloPayload(peer, cid);
+      mgr.setMaxSessions(4);
+      assertEquals(4, mgr.maxSessions());
+      // Create 4 sessions (the configured cap).
+      for (int i = 0; i < 4; i++) {
+        IdentityKeys peer = IdentityKeys.generate(0);
+        long cid = 1000L + i;
+        InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 63000 + i);
+        byte[] hello = RudpAuth.createHelloPayload(peer, cid);
+        mgr.onPacket(
+            new RudpPacketEnvelope(
+                new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, hello),
+                addr,
+                new InetSocketAddress("127.0.0.1", 63999)));
+      }
+      assertEquals(4, mgr.sessionCount());
+
+      // The 5th session should be rejected.
+      IdentityKeys extraPeer = IdentityKeys.generate(0);
+      long extraCid = 9999L;
+      InetSocketAddress extraAddr = new InetSocketAddress("127.0.0.1", 63998);
+      byte[] extraHello = RudpAuth.createHelloPayload(extraPeer, extraCid);
       mgr.onPacket(
           new RudpPacketEnvelope(
-              new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, hello),
-              addr,
+              new RudpPacket(RudpPacket.Type.HELLO, extraCid, 0, 0, extraHello),
+              extraAddr,
               new InetSocketAddress("127.0.0.1", 63999)));
+
+      assertEquals(4, mgr.sessionCount(), "5th session should be rejected at maxSessions");
+    } finally {
+      mgr.shutdown();
     }
-    assertEquals(256, mgr.sessionCount());
-
-    // The 257th session should be rejected.
-    IdentityKeys extraPeer = IdentityKeys.generate(0);
-    long extraCid = 9999L;
-    InetSocketAddress extraAddr = new InetSocketAddress("127.0.0.1", 63998);
-    byte[] extraHello = RudpAuth.createHelloPayload(extraPeer, extraCid);
-    mgr.onPacket(
-        new RudpPacketEnvelope(
-            new RudpPacket(RudpPacket.Type.HELLO, extraCid, 0, 0, extraHello),
-            extraAddr,
-            new InetSocketAddress("127.0.0.1", 63999)));
-
-    assertEquals(256, mgr.sessionCount(), "257th session should be rejected at MAX_SESSIONS");
-    mgr.shutdown();
   }
 }

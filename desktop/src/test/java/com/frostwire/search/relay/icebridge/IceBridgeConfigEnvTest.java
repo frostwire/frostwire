@@ -23,7 +23,8 @@ class IceBridgeConfigEnvTest {
     "ICEBRIDGE_MESH_FANOUT",
     "ICEBRIDGE_SEARCH_PEER_FANOUT",
     "ICEBRIDGE_MESH_HOP_TTL",
-    "ICEBRIDGE_SEARCH_TTL"
+    "ICEBRIDGE_SEARCH_TTL",
+    "ICEBRIDGE_MAX_SESSIONS"
   };
 
   @AfterEach
@@ -66,11 +67,35 @@ class IceBridgeConfigEnvTest {
     IceBridgeTopology.get().resetToDefaults();
     System.setProperty("ICEBRIDGE_ROLE", "BOTH");
 
-    IceBridgeConfig.fromEnv();
+    IceBridgeConfig config = IceBridgeConfig.fromEnv();
 
     IceBridgeTopology topo = IceBridgeTopology.get();
     assertEquals(IceBridgeTopology.DEFAULT_MESH_BROADCAST_FANOUT, topo.meshBroadcastFanout());
     assertEquals(IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT, topo.searchPeerFanout());
     assertEquals(IceBridgeTopology.DEFAULT_SEARCH_TTL, topo.searchTtl());
+    assertEquals(IceBridgeConfig.DEFAULT_MAX_SESSIONS, config.maxSessions());
+    assertEquals(1024, config.maxSessions());
+  }
+
+  @Test
+  void forwarderRoleDefaultsToCloudSessions() {
+    IceBridgeTopology.get().resetToDefaults();
+    System.setProperty("ICEBRIDGE_ROLE", "FORWARDER");
+
+    IceBridgeConfig config = IceBridgeConfig.fromEnv();
+
+    assertEquals(IceBridgeConfig.CLOUD_MAX_SESSIONS, config.maxSessions());
+    assertEquals(4096, config.maxSessions());
+  }
+
+  @Test
+  void explicitMaxSessionsBeatsRoleDefault() {
+    IceBridgeTopology.get().resetToDefaults();
+    System.setProperty("ICEBRIDGE_ROLE", "FORWARDER");
+    System.setProperty("ICEBRIDGE_MAX_SESSIONS", "512");
+
+    IceBridgeConfig config = IceBridgeConfig.fromEnv();
+
+    assertEquals(512, config.maxSessions());
   }
 }

@@ -37,11 +37,17 @@ public final class IceBridgeConfig {
     private final Role role;
     private final File identityFile;
     private final int maxPeers;
+    private final int maxSessions;
     private final long peerTtlSec;
     private final double maxQpsPerKey;
     private final boolean bootstrap;
     private final boolean dhtEnabled;
     private final File authTokensFile;
+
+    /** Default cap on concurrent rUDP sessions per node (cheap UDP state). */
+    public static final int DEFAULT_MAX_SESSIONS = 1024;
+    /** Standalone cloud forwarders serve thousands of clients per node. */
+    public static final int CLOUD_MAX_SESSIONS = 4096;
 
     public IceBridgeConfig(String host,
                            int rudpPort,
@@ -54,7 +60,7 @@ public final class IceBridgeConfig {
                            boolean bootstrap) {
         this(host, rudpPort, com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
              controlHttpPort, role, identityFile,
-             maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, false, null);
+             maxPeers, DEFAULT_MAX_SESSIONS, peerTtlSec, maxQpsPerKey, bootstrap, false, null);
     }
 
     public IceBridgeConfig(String host,
@@ -69,7 +75,8 @@ public final class IceBridgeConfig {
                            boolean bootstrap,
                            File authTokensFile) {
         this(host, rudpPort, relayPort, controlHttpPort, role, identityFile,
-                maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, false, authTokensFile);
+                maxPeers, DEFAULT_MAX_SESSIONS, peerTtlSec, maxQpsPerKey, bootstrap, false,
+                authTokensFile);
     }
 
     public IceBridgeConfig(String host,
@@ -79,6 +86,7 @@ public final class IceBridgeConfig {
                            Role role,
                            File identityFile,
                            int maxPeers,
+                           int maxSessions,
                            long peerTtlSec,
                            double maxQpsPerKey,
                            boolean bootstrap,
@@ -91,6 +99,7 @@ public final class IceBridgeConfig {
         this.role = Objects.requireNonNullElse(role, Role.CLIENT);
         this.identityFile = identityFile;
         this.maxPeers = requirePositive(maxPeers, "maxPeers");
+        this.maxSessions = requirePositive(maxSessions, "maxSessions");
         this.peerTtlSec = requirePositive(peerTtlSec, "peerTtlSec");
         this.maxQpsPerKey = requirePositive(maxQpsPerKey, "maxQpsPerKey");
         this.bootstrap = bootstrap;
@@ -124,6 +133,10 @@ public final class IceBridgeConfig {
 
     public int maxPeers() {
         return maxPeers;
+    }
+
+    public int maxSessions() {
+        return maxSessions;
     }
 
     public long peerTtlSec() {
@@ -195,6 +208,7 @@ public final class IceBridgeConfig {
         private Role role = Role.CLIENT;
         private File identityFile;
         private int maxPeers = 1000;
+        private int maxSessions = DEFAULT_MAX_SESSIONS;
         private long peerTtlSec = 120;
         private double maxQpsPerKey = 5.0;
         private boolean bootstrap;
@@ -239,6 +253,11 @@ public final class IceBridgeConfig {
             return this;
         }
 
+        public Builder maxSessions(int maxSessions) {
+            this.maxSessions = maxSessions;
+            return this;
+        }
+
         public Builder peerTtlSec(long peerTtlSec) {
             this.peerTtlSec = peerTtlSec;
             return this;
@@ -266,8 +285,8 @@ public final class IceBridgeConfig {
 
         public IceBridgeConfig build() {
             return new IceBridgeConfig(host, rudpPort, relayPort, controlHttpPort, role,
-                    identityFile, maxPeers, peerTtlSec, maxQpsPerKey, bootstrap, dhtEnabled,
-                    authTokensFile);
+                    identityFile, maxPeers, maxSessions, peerTtlSec, maxQpsPerKey, bootstrap,
+                    dhtEnabled, authTokensFile);
         }
     }
 
@@ -342,6 +361,8 @@ public final class IceBridgeConfig {
         String identityPath = env("ICEBRIDGE_IDENTITY_FILE", "identity.dat");
         b.identityFile(new File(identityPath));
         b.maxPeers(envInt("ICEBRIDGE_MAX_PEERS", 10000));
+        b.maxSessions(envInt("ICEBRIDGE_MAX_SESSIONS",
+                role == Role.FORWARDER ? CLOUD_MAX_SESSIONS : DEFAULT_MAX_SESSIONS));
         b.peerTtlSec(envLong("ICEBRIDGE_PEER_TTL_SEC", 300));
         b.maxQpsPerKey(envDouble("ICEBRIDGE_MAX_QPS_PER_KEY", 30.0));
         b.bootstrap(envBool("ICEBRIDGE_BOOTSTRAP", true));

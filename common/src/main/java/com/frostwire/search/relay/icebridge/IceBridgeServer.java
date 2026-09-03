@@ -117,6 +117,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
         System.out.println("  ICEBRIDGE_AUTH_TOKENS_FILE  = " + tokensFile.getAbsolutePath());
         System.out.println("  ICEBRIDGE_MAX_PEERS         = " + config.maxPeers());
+        System.out.println("  ICEBRIDGE_MAX_SESSIONS      = " + config.maxSessions());
         System.out.println("  ICEBRIDGE_PEER_TTL_SEC      = " + config.peerTtlSec());
         System.out.println("  ICEBRIDGE_MAX_QPS_PER_KEY   = " + config.maxQpsPerKey());
         System.out.println("  ICEBRIDGE_BOOTSTRAP         = " + config.bootstrap());
@@ -308,6 +309,7 @@ public final class IceBridgeServer implements AutoCloseable {
         this.registry = new PeerRegistry(config);
         this.inboundQueue = new InboundMessageQueue();
         this.rudpSessionManager = new RudpSessionManager(identity, registry, metrics, inboundQueue);
+        this.rudpSessionManager.setMaxSessions(config.maxSessions());
         this.controlServer = new ControlServer(registry, metrics, config, rudpSessionManager, inboundQueue, this.authTokens);
         this.rudpServer = new RudpServer(config, rudpSessionManager);
 
@@ -565,6 +567,9 @@ public final class IceBridgeServer implements AutoCloseable {
                     break;
                 case "--max-peers":
                     b.maxPeers(parseInt(next(args, ++i, "--max-peers")));
+                    break;
+                case "--max-sessions":
+                    b.maxSessions(parseInt(next(args, ++i, "--max-sessions")));
                     break;
                 case "--peer-ttl-sec":
                     b.peerTtlSec(parseLong(next(args, ++i, "--peer-ttl-sec")));

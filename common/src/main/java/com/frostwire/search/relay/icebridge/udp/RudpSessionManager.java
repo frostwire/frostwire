@@ -443,7 +443,24 @@ public final class RudpSessionManager {
         return id;
     }
 
-    private static final int MAX_SESSIONS = 256;
+    private volatile int maxSessions =
+            com.frostwire.search.relay.icebridge.IceBridgeConfig.DEFAULT_MAX_SESSIONS;
+
+    /**
+     * Caps concurrent rUDP sessions (cheap UDP state; idle sessions are
+     * reaped after {@code SESSION_IDLE_MS}). Values come from
+     * {@link com.frostwire.search.relay.icebridge.IceBridgeConfig#maxSessions()}.
+     */
+    public void setMaxSessions(int maxSessions) {
+        if (maxSessions <= 0) {
+            throw new IllegalArgumentException("maxSessions must be > 0");
+        }
+        this.maxSessions = maxSessions;
+    }
+
+    public int maxSessions() {
+        return maxSessions;
+    }
 
     // ---- packet handlers ----
 
@@ -456,9 +473,9 @@ public final class RudpSessionManager {
         byte[] remotePub = Arrays.copyOfRange(packet.payload(), 0, 32);
         RudpSession session = sessionsByRemoteId.get(remoteCid);
         if (session == null) {
-            if (sessionsByRemoteId.size() >= MAX_SESSIONS) {
+            if (sessionsByRemoteId.size() >= maxSessions) {
                 LOG.warn("RudpSessionManager: rejected HELLO from " + sender
-                        + " — max sessions (" + MAX_SESSIONS + ") reached");
+                        + " — max sessions (" + maxSessions + ") reached");
                 return;
             }
             if (!sessionInitiatedByUs(sender)) {
