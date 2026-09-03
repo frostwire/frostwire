@@ -1,4 +1,6 @@
 FrostWire 3.2.0 build 776 UNRELEASED
+  - fix:Cloud/HTTP downloads now report disk-full when no space prevents a file move or download; permission, read-only, SAF, quota, and other copy failures retain the appropriate generic error state
+  - fix:Android 10+ MediaStore copy failures preserve their underlying filesystem cause, and concurrent cloud-download copy errors remain isolated per download
   - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
   - fix:IceBridge starts only once per process; failed binds cannot close the local torrent index or create competing relay instances
   - fix:Previous-session torrents restore after the engine is ready, continue past malformed files, and never restore every file from the public Torrents folder
