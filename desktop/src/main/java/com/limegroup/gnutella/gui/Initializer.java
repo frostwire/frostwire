@@ -731,6 +731,9 @@ final class Initializer {
         }
       } catch (IllegalArgumentException ignored) {
       }
+      // Gnutella leaf model: CLIENT answers from its local index but never forwards.
+      incomingHandler.setForwardingEnabled(
+          syncRole != com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.CLIENT);
       PeerRegistrySync peerSync =
           new PeerRegistrySync(
               client, directory, advertiseHost, effectiveRudpPort, identity, syncRole);
@@ -879,6 +882,14 @@ final class Initializer {
       service.setSeederEndpointProvider(
           new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
       RelayRole role = new RelayRole(service, directory, identity);
+      // Gnutella leaf model: CLIENT answers from its local index but never forwards.
+      // Unknown/unparseable role keeps historical behavior (forwarding enabled).
+      try {
+        String relayRole = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
+        role.setForwardingEnabled(
+            relayRole == null || !relayRole.trim().equalsIgnoreCase("CLIENT"));
+      } catch (Throwable ignored) {
+      }
       IdentityRecord identityRecord =
           IdentityRecord.createSigned(
               identity.nodeId(),

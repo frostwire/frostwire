@@ -57,7 +57,7 @@
             android:dialogTitle="@string/distributed_icebridge_role_title"
             android:entries="@array/icebridge_role_entries"
             android:entryValues="@array/icebridge_role_values"
-            android:defaultValue="BOTH" />
+            android:defaultValue="CLIENT" />
 
         <Preference
             android:key="frostwire.prefs.distributed.icebridge.restart_hint"

@@ -295,6 +295,8 @@ public final class AndroidRelayStack implements AutoCloseable {
           relayService.setSeederEndpointProvider(
               new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
           RelayRole relayRole = new RelayRole(relayService, pd, ident);
+          // Gnutella leaf model: CLIENT answers locally but never forwards.
+          relayRole.setForwardingEnabled(role != IceBridgeConfig.Role.CLIENT);
           IdentityRecord identityRecord =
               IdentityRecord.createSigned(
                   ident.nodeId(),
@@ -322,6 +324,9 @@ public final class AndroidRelayStack implements AutoCloseable {
           new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
 
       ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li);
+      // Gnutella leaf model: CLIENT answers locally but never forwards.
+      // Applies to both in-process and USE_REMOTE paths.
+      ih.setForwardingEnabled(readConfiguredRole() != IceBridgeConfig.Role.CLIENT);
       // Symmetric holder: answer TORRENT_FETCH (Protocol #3 METADATA) for
       // torrents this device seeds (e.g. auto-seeded YouTube downloads).
       ih.setTorrentMetadataProvider(
@@ -554,7 +559,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
     } catch (Throwable ignored) {
     }
-    return IceBridgeConfig.Role.BOTH;
+    // Gnutella leaf model: phones answer locally + originate, never forward.
+    return IceBridgeConfig.Role.CLIENT;
   }
 
   /** icebridge-remote.txt: line1=url, line2=token (optional). */

@@ -761,11 +761,11 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         }
         ListPreference rolePref = findPreference(Constants.PREF_KEY_ICEBRIDGE_ROLE);
         if (rolePref != null) {
-            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH");
+            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "CLIENT");
             rolePref.setValue(role);
             rolePref.setSummary("%s");
             rolePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                String v = newValue != null ? newValue.toString().trim().toUpperCase(Locale.US) : "BOTH";
+                String v = newValue != null ? newValue.toString().trim().toUpperCase(Locale.US) : "CLIENT";
                 if (!"BOTH".equals(v) && !"FORWARDER".equals(v) && !"CLIENT".equals(v)) {
                     return false;
                 }
@@ -836,7 +836,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             }
             int rudp = configuredRudp;
             int control = 0;
-            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH");
+            String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "CLIENT");
             if (stack != null && stack.server() != null) {
                 IceBridgeServer server = stack.server();
                 rudp = server.rudpPort();
