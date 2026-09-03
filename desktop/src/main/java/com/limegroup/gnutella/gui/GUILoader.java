@@ -63,6 +63,7 @@ class GUILoader {
         } catch (Throwable err) {
             hideSplash(frame);
             try {
+                CrashReportSpooler.recordSync(err);
                 FatalBugManager.handleFatalBug(err);
             } catch (Throwable t) {
                 Throwable error = err;

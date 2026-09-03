@@ -79,6 +79,7 @@ public class Main {
             System.out.println("Main: Strict EDT mode is OFF while stepping through code to avoid false positives.");
         } else {
             System.out.println("FrostWire is running in a PRODUCTION environment.");
+            com.frostwire.util.StrictEdtMode.installProduction(java.time.Duration.ofMillis(5000));
         }
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -103,6 +104,7 @@ public class Main {
                 e.printStackTrace();
             }
         } catch (Throwable e) {
+            CrashReportSpooler.recordSync(e);
             e.printStackTrace();
             System.exit(1);
         }

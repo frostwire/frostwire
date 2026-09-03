@@ -2,6 +2,7 @@ package com.limegroup.gnutella.gui.bugs;
 
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.CrashReportSpooler;
 import com.limegroup.gnutella.gui.LimeWireModule;
 import com.limegroup.gnutella.gui.LocalClientInfoFactory;
 import com.limegroup.gnutella.gui.MultiLineLabel;
@@ -25,6 +26,7 @@ public final class FatalBugManager {
      * Handles a fatal bug.
      */
     public static void handleFatalBug(Throwable bug) {
+        CrashReportSpooler.recordSync(bug);
         bug.printStackTrace();
         // Build the LocalClientInfo out of the info ...
         LocalClientInfoFactory factoryToUse = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
