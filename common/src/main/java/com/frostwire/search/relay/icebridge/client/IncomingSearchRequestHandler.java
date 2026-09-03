@@ -12,6 +12,7 @@ import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
+import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteCatalogBrowseRequest;
@@ -36,9 +37,12 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Listens for incoming search requests on a {@link DistributedSearchTransport}
@@ -463,26 +467,32 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         // further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
         int m = IceBridgeTopology.get().searchPeerFanout();
-        List<PeerDirectory.PeerInfo> candidates =
-                peerDirectory.topByTrustVerified(m * 3);
+        Set<String> excludeHex = new HashSet<>();
+        if (request.path() != null) {
+            for (byte[] hop : request.path()) {
+                if (hop != null) {
+                    excludeHex.add(Hex.encode(hop));
+                }
+            }
+        }
+        if (sourcePub != null) {
+            excludeHex.add(Hex.encode(sourcePub));
+        }
+        if (request.requesterPub() != null) {
+            excludeHex.add(Hex.encode(request.requesterPub()));
+        }
+        if (ownPub != null) {
+            excludeHex.add(Hex.encode(ownPub));
+        }
+        List<PeerDirectory.PeerInfo> sampled =
+                peerDirectory.sampleVerified(m, excludeHex, NodeCapabilities.NONE,
+                        ThreadLocalRandom.current());
         int forwarded = 0;
-        for (PeerDirectory.PeerInfo peer : candidates) {
+        for (PeerDirectory.PeerInfo peer : sampled) {
             if (forwarded >= m) {
                 break;
             }
             byte[] peerPub = peer.peerPub();
-            if (request.isLoop(peerPub)) {
-                continue;
-            }
-            if (Arrays.equals(peerPub, sourcePub)) {
-                continue;
-            }
-            if (Arrays.equals(peerPub, request.requesterPub())) {
-                continue;
-            }
-            if (Arrays.equals(peerPub, ownPub)) {
-                continue;
-            }
             try {
                 // Dual-envelope: preserve requester query signature; only hop fields change.
                 RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);

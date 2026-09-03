@@ -8,13 +8,17 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Composable "relay" role for a node. Wires the {@link RelaySearchService}
@@ -160,17 +164,23 @@ public final class RelayRole {
         // stops further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
         int m = IceBridgeTopology.get().searchPeerFanout();
-        List<PeerDirectory.PeerInfo> candidates =
-                directory.topByTrustVerified(m * 3);
+        Set<String> excludeHex = new HashSet<>();
+        if (request.path() != null) {
+            for (byte[] hop : request.path()) {
+                if (hop != null) {
+                    excludeHex.add(Hex.encode(hop));
+                }
+            }
+        }
+        List<PeerDirectory.PeerInfo> sampled =
+                directory.sampleVerified(m, excludeHex, NodeCapabilities.NONE,
+                        ThreadLocalRandom.current());
         List<ForwardTarget> out = new ArrayList<>(m);
-        for (PeerDirectory.PeerInfo peer : candidates) {
+        for (PeerDirectory.PeerInfo peer : sampled) {
             if (out.size() >= m) {
                 break;
             }
             byte[] peerPub = peer.peerPub();
-            if (request.isLoop(peerPub)) {
-                continue;
-            }
             RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);
             out.add(new ForwardTarget(peerPub, nextHop));
         }

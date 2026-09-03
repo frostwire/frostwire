@@ -11,8 +11,11 @@ import com.frostwire.jlibtorrent.Entry;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -360,5 +363,92 @@ class PeerDirectoryTest {
         PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
         assertThrows(IllegalArgumentException.class, () -> d.topByTrustVerified(0));
         assertThrows(IllegalArgumentException.class, () -> d.topByTrustVerified(-1));
+    }
+
+    @Test
+    void sampleVerifiedPrefersHighTrustButExplores() {
+        FakeKarmaCache karma = new FakeKarmaCache();
+        PeerDirectory d = new PeerDirectory(karma);
+        byte[] star = samplePub(1);
+        byte[] extra = samplePub(2);
+        d.upsertVerified(star, "10.0.0.1", 6888);
+        d.upsertVerified(extra, "10.0.0.2", 6888);
+        karma.setScore(star, 200);
+
+        int starCount = 0;
+        int extraCount = 0;
+        for (int i = 0; i < 1000; i++) {
+            var picked =
+                    d.sampleVerified(
+                            1,
+                            new HashSet<>(),
+                            com.frostwire.search.relay.NodeCapabilities.NONE,
+                            new Random(11 + i));
+            assertEquals(1, picked.size());
+            if (java.util.Arrays.equals(star, picked.get(0).peerPub())) {
+                starCount++;
+            } else {
+                extraCount++;
+            }
+        }
+        assertTrue(starCount > extraCount, "high trust should win most draws");
+        assertTrue(extraCount >= 1, "baseline peer should be explored sometimes");
+    }
+
+    @Test
+    void sampleVerifiedExcludesSpamUnverifiedAndListed() {
+        FakeKarmaCache karma = new FakeKarmaCache();
+        PeerDirectory d = new PeerDirectory(karma);
+        byte[] star = samplePub(11);
+        byte[] baseline = samplePub(12);
+        byte[] listed = samplePub(13);
+        byte[] unverified = samplePub(14);
+        byte[] spam = samplePub(15);
+        d.upsertVerified(star, "10.0.1.1", 6888);
+        d.upsertVerified(baseline, "10.0.1.2", 6888);
+        d.upsertVerified(listed, "10.0.1.3", 6888);
+        d.upsert(unverified, "10.0.1.4", 6888);
+        d.upsertVerified(spam, "10.0.1.5", 6888);
+        d.markSpam(spam);
+        karma.setScore(star, 50);
+
+        Set<String> exclude = new HashSet<>();
+        exclude.add(com.frostwire.util.Hex.encode(listed));
+        var picked =
+                d.sampleVerified(
+                        10,
+                        exclude,
+                        com.frostwire.search.relay.NodeCapabilities.NONE,
+                        new Random(5));
+
+        assertEquals(2, picked.size());
+        Set<String> hexes = new HashSet<>();
+        for (var info : picked) {
+            hexes.add(com.frostwire.util.Hex.encode(info.peerPub()));
+        }
+        assertTrue(hexes.contains(com.frostwire.util.Hex.encode(star)));
+        assertTrue(hexes.contains(com.frostwire.util.Hex.encode(baseline)));
+    }
+
+    @Test
+    void sampleVerifiedRejectsBadInputs() {
+        PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> d.sampleVerified(
+                        0, new HashSet<>(),
+                        com.frostwire.search.relay.NodeCapabilities.NONE, new Random(1)));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> d.sampleVerified(
+                        1, new HashSet<>(),
+                        com.frostwire.search.relay.NodeCapabilities.NONE, null));
+    }
+
+    private static byte[] samplePub(int id) {
+        byte[] pub = new byte[32];
+        pub[0] = (byte) id;
+        pub[1] = 0x5A;
+        return pub;
     }
 }

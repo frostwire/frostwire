@@ -12,6 +12,8 @@ import com.frostwire.util.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -337,6 +339,61 @@ public final class PeerDirectory {
             out.add(toPeerInfo(snapshot.get(i)));
         }
         return out;
+    }
+
+    /**
+     * Trust-weighted random sample of verified peers for search forwarding
+     * (Efraimidis-Spirakis: key = uniform()^(1/weight), weight = 1 + positive
+     * trust). High-trust peers are preferred, but every verified non-spam
+     * peer keeps a baseline chance, so repeated forwards spread load across
+     * the directory instead of hammering the same top-M peers, and newcomers
+     * still get explored. Spam entries are never sampled.
+     *
+     * @param limit maximum peers to return
+     * @param excludeHex hex-encoded pubs to skip (request path, sender, self)
+     * @param requiredCaps capability flags, {@link NodeCapabilities#NONE} to skip
+     * @param random source of randomness (pass a seed in tests)
+     */
+    public List<PeerInfo> sampleVerified(int limit, Set<String> excludeHex, long requiredCaps,
+                                         Random random) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit must be > 0");
+        }
+        if (random == null) {
+            throw new IllegalArgumentException("random is null");
+        }
+        List<Entry> eligible = new ArrayList<>();
+        for (Entry e : entries.values()) {
+            if (!e.verified || e.spam || !NodeCapabilities.has(e.capabilities, requiredCaps)) {
+                continue;
+            }
+            if (excludeHex != null
+                    && excludeHex.contains(com.frostwire.util.Hex.encode(e.peerPub))) {
+                continue;
+            }
+            eligible.add(e);
+        }
+        List<ScoredEntry> keyed = new ArrayList<>(eligible.size());
+        for (Entry e : eligible) {
+            double weight = 1.0 + Math.max(0.0, trustScore(e.peerPub));
+            keyed.add(new ScoredEntry(e, Math.pow(random.nextDouble(), 1.0 / weight)));
+        }
+        keyed.sort((a, b) -> Double.compare(b.key, a.key));
+        List<PeerInfo> out = new ArrayList<>(Math.min(limit, keyed.size()));
+        for (int i = 0; i < Math.min(limit, keyed.size()); i++) {
+            out.add(toPeerInfo(keyed.get(i).entry));
+        }
+        return out;
+    }
+
+    private static final class ScoredEntry {
+        final Entry entry;
+        final double key;
+
+        ScoredEntry(Entry entry, double key) {
+            this.entry = entry;
+            this.key = key;
+        }
     }
 
     private static PeerInfo toPeerInfo(Entry e) {
