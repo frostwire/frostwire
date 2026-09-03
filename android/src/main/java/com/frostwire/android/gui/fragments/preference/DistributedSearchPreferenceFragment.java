@@ -75,6 +75,23 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     private volatile boolean busy;
     /** Bounded retries when libtorrent homeDir is not ready yet on cold start. */
     private int identityPathRetries;
+    /** Live refresh of stack/identity/peer state while the screen is visible. */
+    private static final long STATUS_REFRESH_MS = 3000L;
+    private final android.os.Handler statusRefreshHandler =
+            new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable statusRefresher =
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (isAdded()) {
+                            refreshAll();
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                    statusRefreshHandler.postDelayed(this, STATUS_REFRESH_MS);
+                }
+            };
 
     public DistributedSearchPreferenceFragment() {
         super(R.xml.settings_distributed_search);
@@ -108,6 +125,14 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         super.onResume();
         ensureHostCachePath();
         refreshAll();
+        statusRefreshHandler.removeCallbacks(statusRefresher);
+        statusRefreshHandler.postDelayed(statusRefresher, STATUS_REFRESH_MS);
+    }
+
+    @Override
+    public void onPause() {
+        statusRefreshHandler.removeCallbacks(statusRefresher);
+        super.onPause();
     }
 
     private void refreshAll() {
