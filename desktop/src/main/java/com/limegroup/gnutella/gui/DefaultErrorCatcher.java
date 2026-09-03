@@ -18,7 +18,11 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.service.ErrorService;
+
 import java.awt.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author jum, gubatron
@@ -30,6 +34,30 @@ class DefaultErrorCatcher {
     static void install() {
         System.setProperty("sun.awt.exception.handler",
                 DefaultErrorCatcher.class.getName());
+    }
+
+    /**
+     * Entry point invoked by the AWT event dispatch thread for uncaught
+     * exceptions (via the "sun.awt.exception.handler" property).
+     * Trivial exceptions are dropped; everything else is forwarded to the
+     * ErrorService, which queues a silent Icebase report and shows the
+     * usual error dialog.
+     */
+    public void handle(Throwable bug) {
+        try {
+            if (bug == null || isIgnorable(bug, stackTraceToString(bug))) {
+                return;
+            }
+            ErrorService.error(bug);
+        } catch (Throwable ignored) {
+            // Reporting must never break event dispatch.
+        }
+    }
+
+    private static String stackTraceToString(Throwable bug) {
+        StringWriter out = new StringWriter();
+        bug.printStackTrace(new PrintWriter(out));
+        return out.toString();
     }
 
     /**
