@@ -19,6 +19,9 @@
 package com.frostwire.android.search;
 
 import android.content.Context;
+import android.os.SystemClock;
+import com.frostwire.search.relay.ConnectivityDetector;
+import com.frostwire.search.relay.LeafPromotionManager;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
@@ -120,6 +123,7 @@ public final class AndroidRelayStack implements AutoCloseable {
   private final KarmaChainStore karmaStore;
   private final KarmaChainCommitScheduler karmaScheduler;
   private final IncomingRelayServer relayServer;
+  private final LeafPromotionManager leafPromotion;
 
   /**
    * Start the relay stack. All heavy work is done on the calling thread. If startup fails partway
@@ -150,6 +154,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     IceBridgeClient cl = null;
     IceBridgeSearchTransport tr = null;
     IncomingSearchRequestHandler ih = null;
+    RelayRole relayRole = null;
     PeerDirectory pd = null;
     PeerRegistrySync prs = null;
     PeerDiscoveryScheduler pds = null;
@@ -294,7 +299,7 @@ public final class AndroidRelayStack implements AutoCloseable {
           RelaySearchService relayService = new RelaySearchService(li, ident);
           relayService.setSeederEndpointProvider(
               new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
-          RelayRole relayRole = new RelayRole(relayService, pd, ident);
+          relayRole = new RelayRole(relayService, pd, ident);
           // Gnutella leaf model: CLIENT answers locally but never forwards.
           relayRole.setForwardingEnabled(role != IceBridgeConfig.Role.CLIENT);
           IdentityRecord identityRecord =
@@ -392,9 +397,34 @@ public final class AndroidRelayStack implements AutoCloseable {
               + " meshRudp="
               + meshRudpPort);
 
-      AndroidRelayStack stack =
+      AndroidRelayStack stack = null;
+      // Healthy CLIENT leaves promote to capped forwarders (Gnutella ultrapeer
+      // promotion); USE_REMOTE stacks have no local sessions and stay leaves.
+      LeafPromotionManager promotion = null;
+      if (syncRole == IceBridgeConfig.Role.CLIENT
+          && LeafPromotionManager.promotionEnabledByEnv()) {
+        final IceBridgeServer promotionServer = srv;
+        final RelayRole promotionRelay = relayRole;
+        final IncomingSearchRequestHandler promotionHandler = ih;
+        final long promotionStartMs = SystemClock.elapsedRealtime();
+        promotion =
+            new LeafPromotionManager(
+                ConnectivityDetector.instance()::isConnectable,
+                () ->
+                    promotionServer != null
+                        ? promotionServer.rudpSessionManager().sessionCount()
+                        : 0,
+                () -> SystemClock.elapsedRealtime() - promotionStartMs,
+                () -> true);
+        promotion.addTarget(promotionRelay);
+        promotion.addTarget(promotionHandler);
+        promotion.start();
+      }
+
+      stack =
           new AndroidRelayStack(
-              li, ident, srv, cl, tr, ss, ih, pd, prs, pds, da, ks, kcs, relaySrv);
+              li, ident, srv, cl, tr, ss, ih, pd, prs, pds, da, ks, kcs, relaySrv,
+              promotion);
       li = null;
       srv = null;
       cl = null;
@@ -407,6 +437,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       ks = null;
       kcs = null;
       relaySrv = null;
+      relayRole = null;
+      promotion = null;
       LOG.info("AndroidRelayStack: started successfully");
       return stack;
     } catch (Throwable t) {
@@ -474,7 +506,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       DhtAdvertiser dhtAdvertiser,
       KarmaChainStore karmaStore,
       KarmaChainCommitScheduler karmaScheduler,
-      IncomingRelayServer relayServer) {
+      IncomingRelayServer relayServer,
+      LeafPromotionManager leafPromotion) {
     this.localIndex = localIndex;
     this.identity = identity;
     this.server = server;
@@ -489,6 +522,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.karmaStore = karmaStore;
     this.karmaScheduler = karmaScheduler;
     this.relayServer = relayServer;
+    this.leafPromotion = leafPromotion;
   }
 
   public AndroidLocalIndex localIndex() {
@@ -637,6 +671,11 @@ public final class AndroidRelayStack implements AutoCloseable {
       live = null;
     }
     LOG.info("AndroidRelayStack: shutting down...");
+    try {
+      if (leafPromotion != null) leafPromotion.stop();
+    } catch (Throwable t) {
+      LOG.warn("Error stopping LeafPromotionManager", t);
+    }
     try {
       if (karmaScheduler != null) karmaScheduler.stop();
     } catch (Throwable t) {
