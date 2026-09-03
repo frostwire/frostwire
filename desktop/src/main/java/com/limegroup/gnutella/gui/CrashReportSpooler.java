@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.limewire.util.CommonUtils;
@@ -27,6 +28,12 @@ public final class CrashReportSpooler {
   private static final String ENDPOINT = "https://icebase.frostwire.com/";
   private static final int MAX_REPORTS = 5;
   private static final int MAX_FRAMES = 64;
+  // Per-key flood control on the Icebase path: at most THROTTLE_MAX_PER_KEY reports
+  // per key per rolling THROTTLE_WINDOW_MILLIS window. Fail open on any internal error.
+  private static final int THROTTLE_MAX_PER_KEY = 5;
+  private static final long THROTTLE_WINDOW_MILLIS = 60L * 60L * 1000L;
+  private static final int THROTTLE_MAX_KEYS = 1000;
+  private static final ConcurrentHashMap<String, Slot> THROTTLE_SLOTS = new ConcurrentHashMap<>();
   private static final ExecutorService UPLOAD_QUEUE =
       Executors.newSingleThreadExecutor(
           r -> {
@@ -81,6 +88,11 @@ public final class CrashReportSpooler {
 
   static void record(Throwable problem) {
     try {
+      String throttleKey = throttleKeyFor(problem);
+      if (!tryAcquire(throttleKey)) {
+        LOG.debug("Throttled anonymous crash report for " + throttleKey);
+        return;
+      }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
         spooler.spool(problem);
@@ -92,6 +104,109 @@ public final class CrashReportSpooler {
     }
   }
 
+  /**
+   * Synchronously spools a crash report without requiring {@link #start()} to have run and
+   * without attempting any upload. Intended for fatal paths that exit immediately after.
+   * Deliberately unthrottled: a fatal report must never be dropped.
+   */
+  public static void recordSync(Throwable problem) {
+    try {
+      CrashReportSpooler spooler =
+          new CrashReportSpooler(
+              new File(CommonUtils.getUserSettingsDir(), "crash-reports"),
+              null,
+              FrostWireUtils.getFrostWireVersion(),
+              FrostWireUtils.getBuildNumber());
+      spooler.spool(problem);
+    } catch (Throwable ignored) {
+      LOG.info("Unable to synchronously spool anonymous crash report", ignored);
+    }
+  }
+
+  static String throttleKeyFor(Throwable problem) {
+    try {
+      return problem == null ? "unknown" : problem.getClass().getName();
+    } catch (Throwable ignored) {
+      return "unknown";
+    }
+  }
+
+  static boolean tryAcquire(String key) {
+    return tryAcquire(key, System.currentTimeMillis());
+  }
+
+  static boolean tryAcquire(String key, long nowMillis) {
+    try {
+      String slotKey = key == null ? "unknown" : key;
+      if (THROTTLE_SLOTS.size() > THROTTLE_MAX_KEYS) {
+        THROTTLE_SLOTS.clear();
+      }
+      Slot slot =
+          THROTTLE_SLOTS.computeIfAbsent(
+              slotKey,
+              k -> {
+                Slot created = new Slot();
+                created.windowStartMillis = nowMillis;
+                return created;
+              });
+      synchronized (slot) {
+        if (nowMillis < slot.windowStartMillis
+            || nowMillis - slot.windowStartMillis >= THROTTLE_WINDOW_MILLIS) {
+          slot.windowStartMillis = nowMillis;
+          slot.count = 0;
+        }
+        if (slot.count < THROTTLE_MAX_PER_KEY) {
+          slot.count++;
+          return true;
+        }
+        return false;
+      }
+    } catch (Throwable ignored) {
+      return true;
+    }
+  }
+
+  private static final class Slot {
+    long windowStartMillis;
+    int count;
+  }
+
+  /** Queues an anonymous StrictMode violation report for Icebase. No-op until {@link #start()}. */
+  public static void recordStrictMode(String violationClass, int violationCount) {
+    try {
+      if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
+        LOG.debug("Throttled anonymous strictmode report");
+        return;
+      }
+      CrashReportSpooler spooler = INSTANCE;
+      if (spooler != null) {
+        spooler.spoolStrictMode(violationClass, violationCount);
+        UPLOAD_QUEUE.execute(spooler::uploadPending);
+        LOG.info("Automatically queued anonymous strictmode report for Icebase");
+      }
+    } catch (Throwable ignored) {
+      LOG.info("Unable to queue anonymous strictmode report", ignored);
+    }
+  }
+
+  /** Queues an anonymous EDT watchdog report for Icebase. No-op until {@link #start()}. */
+  public static void recordWatchdog(int missedHeartbeats) {
+    try {
+      if (!tryAcquire("watchdog")) {
+        LOG.debug("Throttled anonymous watchdog report");
+        return;
+      }
+      CrashReportSpooler spooler = INSTANCE;
+      if (spooler != null) {
+        spooler.spoolWatchdog(missedHeartbeats);
+        UPLOAD_QUEUE.execute(spooler::uploadPending);
+        LOG.info("Automatically queued anonymous watchdog report for Icebase");
+      }
+    } catch (Throwable ignored) {
+      LOG.info("Unable to queue anonymous watchdog report", ignored);
+    }
+  }
+
   void spool(Throwable problem) {
     if (problem == null) {
       return;
@@ -100,6 +215,35 @@ public final class CrashReportSpooler {
       Files.createDirectories(directory.toPath());
       Path temporary = Files.createTempFile(directory.toPath(), "crash-", ".tmp");
       Files.writeString(temporary, GSON.toJson(reportFor(problem)), StandardCharsets.UTF_8);
+      Path report =
+          directory.toPath().resolve(temporary.getFileName().toString().replace(".tmp", ".json"));
+      try {
+        Files.move(temporary, report, StandardCopyOption.ATOMIC_MOVE);
+      } catch (AtomicMoveNotSupportedException ignored) {
+        Files.move(temporary, report);
+      }
+      prune();
+    } catch (Throwable ignored) {
+      LOG.debug("Unable to spool crash report");
+    }
+  }
+
+  void spoolStrictMode(String violationClass, int violationCount) {
+    spoolPayload(strictModeReportFor(violationClass, violationCount));
+  }
+
+  void spoolWatchdog(int missedHeartbeats) {
+    spoolPayload(watchdogReportFor(missedHeartbeats));
+  }
+
+  private void spoolPayload(Object payload) {
+    if (payload == null) {
+      return;
+    }
+    try {
+      Files.createDirectories(directory.toPath());
+      Path temporary = Files.createTempFile(directory.toPath(), "crash-", ".tmp");
+      Files.writeString(temporary, GSON.toJson(payload), StandardCharsets.UTF_8);
       Path report =
           directory.toPath().resolve(temporary.getFileName().toString().replace(".tmp", ".json"));
       try {
@@ -138,6 +282,61 @@ public final class CrashReportSpooler {
         problem.getClass().getName(),
         frames,
         UUID.randomUUID().toString().replace("-", ""));
+  }
+
+  private StrictModeReport strictModeReportFor(String violationClass, int violationCount) {
+    return new StrictModeReport(
+        appVersion,
+        appBuild,
+        System.getProperty("os.name", "unknown"),
+        System.getProperty("os.version", "unknown"),
+        System.getProperty("os.arch", "unknown"),
+        System.getProperty("java.version", "unknown"),
+        System.getProperty("java.runtime.version", "unknown"),
+        System.getProperty("java.vendor", "unknown"),
+        jlibtorrentVersion(),
+        tellurideBuild(),
+        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().maxMemory() / (1024 * 1024),
+        memoryBucket(),
+        sanitizeViolationClass(violationClass),
+        clamp(violationCount, 1, 1000),
+        UUID.randomUUID().toString().replace("-", ""));
+  }
+
+  private WatchdogReport watchdogReportFor(int missedHeartbeats) {
+    return new WatchdogReport(
+        appVersion,
+        appBuild,
+        System.getProperty("os.name", "unknown"),
+        System.getProperty("os.version", "unknown"),
+        System.getProperty("os.arch", "unknown"),
+        System.getProperty("java.version", "unknown"),
+        System.getProperty("java.runtime.version", "unknown"),
+        System.getProperty("java.vendor", "unknown"),
+        jlibtorrentVersion(),
+        tellurideBuild(),
+        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().maxMemory() / (1024 * 1024),
+        memoryBucket(),
+        clamp(missedHeartbeats, 1, 100),
+        UUID.randomUUID().toString().replace("-", ""));
+  }
+
+  private static String sanitizeViolationClass(String violationClass) {
+    if (violationClass == null) {
+      return "unknown";
+    }
+    StringBuilder ascii = new StringBuilder(Math.min(violationClass.length(), 200));
+    for (int i = 0; i < violationClass.length() && ascii.length() < 200; i++) {
+      char c = violationClass.charAt(i);
+      ascii.append(c >= 0x20 && c <= 0x7E ? c : '?');
+    }
+    return ascii.length() == 0 ? "unknown" : ascii.toString();
+  }
+
+  private static int clamp(int value, int min, int max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   private String jlibtorrentVersion() {
@@ -272,6 +471,117 @@ public final class CrashReportSpooler {
       this.className = className;
       this.method = method;
       this.line = line;
+    }
+  }
+
+  private static final class StrictModeReport {
+    private final int schema_version = 1;
+    private final String report_type = "strictmode";
+    private final String platform = "desktop";
+    private final String app_version;
+    private final String app_build;
+    private final String os_name;
+    private final String os_version;
+    private final String os_arch;
+    private final String runtime_version;
+    private final String jre_version;
+    private final String java_vendor;
+    private final String jlibtorrent_version;
+    private final String telluride_build;
+    private final String cpu_count;
+    private final String max_memory_mb;
+    private final String memory_bucket;
+    private final String violation_class;
+    private final int violation_count;
+    private final String report_nonce;
+
+    private StrictModeReport(
+        String appVersion,
+        int appBuild,
+        String osName,
+        String osVersion,
+        String osArch,
+        String runtimeVersion,
+        String jreVersion,
+        String javaVendor,
+        String jlibtorrentVersion,
+        String tellurideBuild,
+        int cpuCount,
+        long maxMemoryMb,
+        String memoryBucket,
+        String violationClass,
+        int violationCount,
+        String nonce) {
+      this.app_version = appVersion;
+      this.app_build = Integer.toString(appBuild);
+      this.os_name = osName;
+      this.os_version = osVersion;
+      this.os_arch = osArch;
+      this.runtime_version = runtimeVersion;
+      this.jre_version = jreVersion;
+      this.java_vendor = javaVendor;
+      this.jlibtorrent_version = jlibtorrentVersion;
+      this.telluride_build = tellurideBuild;
+      this.cpu_count = Integer.toString(cpuCount);
+      this.max_memory_mb = Long.toString(maxMemoryMb);
+      this.memory_bucket = memoryBucket;
+      this.violation_class = violationClass;
+      this.violation_count = violationCount;
+      this.report_nonce = nonce;
+    }
+  }
+
+  private static final class WatchdogReport {
+    private final int schema_version = 1;
+    private final String report_type = "watchdog";
+    private final String platform = "desktop";
+    private final String app_version;
+    private final String app_build;
+    private final String os_name;
+    private final String os_version;
+    private final String os_arch;
+    private final String runtime_version;
+    private final String jre_version;
+    private final String java_vendor;
+    private final String jlibtorrent_version;
+    private final String telluride_build;
+    private final String cpu_count;
+    private final String max_memory_mb;
+    private final String memory_bucket;
+    private final int missed_heartbeats;
+    private final String report_nonce;
+
+    private WatchdogReport(
+        String appVersion,
+        int appBuild,
+        String osName,
+        String osVersion,
+        String osArch,
+        String runtimeVersion,
+        String jreVersion,
+        String javaVendor,
+        String jlibtorrentVersion,
+        String tellurideBuild,
+        int cpuCount,
+        long maxMemoryMb,
+        String memoryBucket,
+        int missedHeartbeats,
+        String nonce) {
+      this.app_version = appVersion;
+      this.app_build = Integer.toString(appBuild);
+      this.os_name = osName;
+      this.os_version = osVersion;
+      this.os_arch = osArch;
+      this.runtime_version = runtimeVersion;
+      this.jre_version = jreVersion;
+      this.java_vendor = javaVendor;
+      this.jlibtorrent_version = jlibtorrentVersion;
+      this.telluride_build = tellurideBuild;
+      this.cpu_count = Integer.toString(cpuCount);
+      this.max_memory_mb = Long.toString(maxMemoryMb);
+      this.memory_bucket = memoryBucket;
+      this.missed_heartbeats = missedHeartbeats;
+      this.report_nonce = nonce;
     }
   }
 }
