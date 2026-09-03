@@ -1,4 +1,4 @@
-FrostWire 3.2.0 build 776 UNRELEASED
+FrostWire 3.2.0 build 776 SEP/03/2026
   - fix:Cloud/HTTP downloads now report disk-full when no space prevents a file move or download; permission, read-only, SAF, quota, and other copy failures retain the appropriate generic error state
   - fix:Android 10+ MediaStore copy failures preserve their underlying filesystem cause, and concurrent cloud-download copy errors remain isolated per download
   - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
