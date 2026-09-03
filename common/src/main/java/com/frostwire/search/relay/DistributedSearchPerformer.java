@@ -71,6 +71,11 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private final int localLimit;
     private final int peerLimit;
     private final int peerTimeoutSec;
+    /**
+     * Dynamic querying parameters, or {@code null} for the legacy
+     * single-shot search (full fanout x full TTL in one round).
+     */
+    private final DynamicQueryConfig dynamicQuery;
 
     private volatile boolean stopped;
     private volatile SearchListener listener;
@@ -93,6 +98,40 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                                        int localLimit,
                                        int peerLimit,
                                        int peerTimeoutSec) {
+        this(token, keywords, localIndex, peerDirectory, identity, transport,
+                maxPeers, localLimit, peerLimit, peerTimeoutSec, null);
+    }
+
+    /**
+     * Dynamic querying overload: phased originator search that starts
+     * narrow/shallow and expands only while results are thin. A
+     * {@code null} config keeps the legacy single-shot behavior.
+     */
+    public DistributedSearchPerformer(long token, String keywords,
+                                       LocalIndex localIndex,
+                                       PeerDirectory peerDirectory,
+                                       IdentityKeys identity,
+                                       DistributedSearchTransport transport,
+                                       DynamicQueryConfig dynamicQuery) {
+        this(token, keywords, localIndex, peerDirectory, identity, transport,
+                DEFAULT_MAX_PEERS, DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT,
+                DEFAULT_PEER_TIMEOUT_SEC, dynamicQuery);
+    }
+
+    /**
+     * Dynamic querying overload with full limits. A {@code null} config
+     * keeps the legacy single-shot behavior.
+     */
+    public DistributedSearchPerformer(long token, String keywords,
+                                       LocalIndex localIndex,
+                                       PeerDirectory peerDirectory,
+                                       IdentityKeys identity,
+                                       DistributedSearchTransport transport,
+                                       int maxPeers,
+                                       int localLimit,
+                                       int peerLimit,
+                                       int peerTimeoutSec,
+                                       DynamicQueryConfig dynamicQuery) {
         if (token < 0) {
             throw new IllegalArgumentException("token must be >= 0");
         }
@@ -134,6 +173,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         this.localLimit = localLimit;
         this.peerLimit = peerLimit;
         this.peerTimeoutSec = peerTimeoutSec;
+        this.dynamicQuery = dynamicQuery;
+    }
+
+    /**
+     * @return the dynamic querying config, or {@code null} when this
+     * performer uses the legacy single-shot search.
+     */
+    public DynamicQueryConfig dynamicQueryConfig() {
+        return dynamicQuery;
     }
 
     @Override
@@ -157,19 +205,13 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 return;
             }
 
-            // Prefer peers that advertise SEARCH/INDEX, then rank by keyspace
-            // XOR distance so eventual responsibility routing has a foundation.
-            List<PeerDirectory.PeerInfo> peers =
-                    peerDirectory.topByTrustVerified(maxPeers * 3, NodeCapabilities.SEARCH);
-            if (peers.isEmpty()) {
-                peers = peerDirectory.topByTrustVerified(maxPeers);
-            }
-            peers = KeyspaceRouter.rankByKeyspace(keywords, peers);
-            if (peers.size() > maxPeers) {
-                peers = peers.subList(0, maxPeers);
-            }
+            List<PeerDirectory.PeerInfo> peers = selectPeers();
             if (!peers.isEmpty()) {
-                merged.addAll(queryPeers(peers));
+                if (dynamicQuery != null) {
+                    merged.addAll(queryPeersPhased(peers, merged));
+                } else {
+                    merged.addAll(queryPeers(peers));
+                }
             }
             if (stopped) {
                 return;
@@ -242,6 +284,68 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     }
 
     /**
+     * Rank queryable peers once: prefer SEARCH-capable peers, then keyspace
+     * XOR order, capped to {@code maxPeers} first-hop contacts (the total
+     * budget shared by every dynamic query phase).
+     */
+    private List<PeerDirectory.PeerInfo> selectPeers() {
+        // Prefer peers that advertise SEARCH/INDEX, then rank by keyspace
+        // XOR distance so eventual responsibility routing has a foundation.
+        List<PeerDirectory.PeerInfo> peers =
+                peerDirectory.topByTrustVerified(maxPeers * 3, NodeCapabilities.SEARCH);
+        if (peers.isEmpty()) {
+            peers = peerDirectory.topByTrustVerified(maxPeers);
+        }
+        peers = KeyspaceRouter.rankByKeyspace(keywords, peers);
+        if (peers.size() > maxPeers) {
+            peers = peers.subList(0, maxPeers);
+        }
+        return peers;
+    }
+
+    /**
+     * Gnutella-style dynamic querying over a pre-ranked peer list.
+     *
+     * <p>Phase 1 probes a small subset with TTL=1 and a short timeout;
+     * later phases contact disjoint follow-up slices with larger TTLs
+     * only while the deduped hit count is below the target. The final
+     * phase covers every remaining peer with the full topology TTL, so
+     * worst-case coverage equals the legacy single-shot search.
+     *
+     * @param ranked pre-ranked peers, already capped to {@code maxPeers}
+     * @param local  local results collected before any peer query
+     */
+    private List<FileSearchResult> queryPeersPhased(List<PeerDirectory.PeerInfo> ranked,
+                                                    List<FileSearchResult> local) {
+        List<FileSearchResult> peerResults = new ArrayList<>();
+        List<FileSearchResult> merged = new ArrayList<>(local);
+        int searchTtl = IceBridgeTopology.get().searchTtl();
+        int phases = Math.min(dynamicQuery.maxPhases(), DynamicQueryConfig.MAX_PHASES);
+        int offset = 0;
+        for (int phase = 0; phase < phases && !stopped; phase++) {
+            if (dedupeByInfoHash(merged).size() >= dynamicQuery.desiredResults()) {
+                break;
+            }
+            int cap = dynamicQuery.cumulativePeerCap(phase, maxPeers);
+            int end = Math.min(cap, ranked.size());
+            if (end <= offset) {
+                break;
+            }
+            int ttl = IceBridgeTopology.get().clampRemainingTtl(
+                    0, dynamicQuery.phaseTtl(phase, searchTtl));
+            int timeoutSec = dynamicQuery.phaseTimeoutSec(phase, peerTimeoutSec);
+            List<PeerDirectory.PeerInfo> slice = ranked.subList(offset, end);
+            offset = end;
+            LOG.info("DistributedSearchPerformer: dynamic query phase " + (phase + 1)
+                    + "/" + phases + " peers=" + slice.size() + " ttl=" + ttl);
+            List<FileSearchResult> sliceResults = queryPeers(slice, ttl, timeoutSec);
+            peerResults.addAll(sliceResults);
+            merged.addAll(sliceResults);
+        }
+        return peerResults;
+    }
+
+    /**
      * Send signed requests to all peers in parallel, then wait for responses
      * to arrive on the transport within the timeout window.
      *
@@ -252,6 +356,16 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
      * public key, and collects verified rows.
      */
     private List<FileSearchResult> queryPeers(List<PeerDirectory.PeerInfo> peers) {
+        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(
+                0, IceBridgeTopology.get().searchTtl());
+        return queryPeers(peers, searchTtl, peerTimeoutSec);
+    }
+
+    /**
+     * Phased/single-shot worker: same fan-out as {@link #queryPeers(List)}
+     * but with an explicit hop TTL and wait budget per dynamic query phase.
+     */
+    private List<FileSearchResult> queryPeers(List<PeerDirectory.PeerInfo> peers, int ttl, int timeoutSec) {
         // The latch covers every peer: successful sends will be counted down
         // when a response arrives (or times out); failed sends are counted
         // down immediately. The listener is registered BEFORE any sends so
@@ -318,7 +432,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     continue;
                 }
                 try {
-                    RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit);
+                    RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit, ttl);
                     byte[] payload = SearchPayloadCodec.encodeRequest(request);
                     String nonce = Hex.encode(request.nonce());
                     pending.put(nonce, new PendingRequest(peer, request));
@@ -334,7 +448,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     latch.countDown();
                 }
             }
-            latch.await(peerTimeoutSec, TimeUnit.SECONDS);
+            latch.await(timeoutSec, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
@@ -346,14 +460,19 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     }
 
     private RemoteSearchRequest buildSignedRequest(String keywords, int limit) throws GeneralSecurityException {
+        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(
+                0, IceBridgeTopology.get().searchTtl());
+        return buildSignedRequest(keywords, limit, searchTtl);
+    }
+
+    private RemoteSearchRequest buildSignedRequest(String keywords, int limit, int ttl) throws GeneralSecurityException {
         byte[] nonce = new byte[32];
         SecureRandom.getInstanceStrong().nextBytes(nonce);
         long timestamp = System.currentTimeMillis() / 1000L;
         byte[] ownPub = identity.ed25519PubRaw();
         // Dual-envelope (v2): sign query envelope only; ttl/path may hop.
         // Soft-max clamp at origin (LimeWire SOFT_MAX).
-        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(
-                0, IceBridgeTopology.get().searchTtl());
+        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(0, ttl);
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)
