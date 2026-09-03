@@ -144,6 +144,38 @@ class RelayRoleTest {
   }
 
   @Test
+  void forwardingDisabledReturnsEmptyWhileHandleStillAnswers() throws Exception {
+    index.torrents.add(torrent("ubuntu", 1000, 1));
+    KeyPairBag requester = new KeyPairBag();
+    directory.upsert(requester.pub, "host", 6881);
+    KeyPairBag peerA = new KeyPairBag();
+    directory.upsertVerified(peerA.pub, "host-a", 6881);
+    RemoteSearchRequest signed = signRequest(requester, "ubuntu", 5);
+    assertTrue(forwardingRole.handleRequest(signed).isPresent());
+    RemoteSearchRequest hopReady =
+        RemoteSearchRequest.builder()
+            .keywords(signed.keywords())
+            .limit(signed.limit())
+            .nonce(signed.nonce())
+            .ttl(2)
+            .requesterPub(signed.requesterPub())
+            .path(signed.path())
+            .timestamp(signed.timestamp())
+            .signature(signed.signature())
+            .build();
+    assertFalse(forwardingRole.forward(hopReady).isEmpty());
+    // CLIENT leaf: no forwards, local answers unaffected.
+    forwardingRole.setForwardingEnabled(false);
+    try {
+      assertTrue(forwardingRole.forward(hopReady).isEmpty());
+      assertTrue(forwardingRole.handleRequest(signed).isPresent());
+    } finally {
+      forwardingRole.setForwardingEnabled(true);
+    }
+    assertFalse(forwardingRole.forward(hopReady).isEmpty());
+  }
+
+  @Test
   void forward_fewerPeersThanFanout_returnsAllAvailable() {
     for (int i = 1; i <= 5; i++) {
       directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);

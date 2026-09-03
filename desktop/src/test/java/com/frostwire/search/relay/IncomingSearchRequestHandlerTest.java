@@ -105,6 +105,40 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void forwardingDisabledStillAnswersButDoesNotForward() throws Exception {
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+
+    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    index.torrents.add(torrent("ubuntu server", 500L, 1));
+    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+
+    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    byte[] peerA = rawPub(generateEd25519KeyPair());
+    byte[] peerB = rawPub(generateEd25519KeyPair());
+    directory.upsertVerified(peerA, "host-a", 6881);
+    directory.upsertVerified(peerB, "host-b", 6882);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
+    // CLIENT leaf: answer locally, never forward.
+    handler.setForwardingEnabled(false);
+    handler.start();
+
+    byte[][] path = {requesterPub};
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+    transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
+
+    assertEquals(1, transport.sent.size(), "local response only, no dual-envelope forwards");
+    RemoteSearchResponse response =
+        SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload);
+    assertNotNull(response, "the single sent payload must be the response");
+    assertArrayEquals(request.nonce(), response.nonce(), "response nonce must match request nonce");
+  }
+
+  @Test
   void dualEnvelopeHopPreservesRequesterVerify() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);

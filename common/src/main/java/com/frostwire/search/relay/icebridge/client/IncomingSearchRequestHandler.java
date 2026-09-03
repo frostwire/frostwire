@@ -93,6 +93,13 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private final PeerDirectory peerDirectory;
     private final IdentityKeys identity;
     private final LocalIndex localIndex;
+    /**
+     * Role-gated forwarding (Gnutella leaf model). When false, this node
+     * answers from its local index but {@link #forwardRequest} drops every
+     * forward. Defaults to true (historical behavior); wiring sets it from
+     * the configured node role ({@code forwardingEnabled = role != CLIENT}).
+     */
+    private volatile boolean forwardingEnabled = true;
     private volatile TorrentMetadataProvider torrentMetadataProvider;
     private final ConcurrentHashMap<String, RateBucket> rateMap = new ConcurrentHashMap<>();
 
@@ -134,6 +141,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     /** Answerer for TORRENT_FETCH (Protocol #3 METADATA) requests, or null. */
     public void setTorrentMetadataProvider(TorrentMetadataProvider provider) {
         this.torrentMetadataProvider = provider;
+    }
+
+    /**
+     * Enables or disables multi-hop forwarding. A CLIENT-role (leaf) node
+     * calls {@code setForwardingEnabled(false)} so incoming requests are
+     * still answered locally but never forwarded.
+     */
+    public void setForwardingEnabled(boolean forwardingEnabled) {
+        this.forwardingEnabled = forwardingEnabled;
     }
 
     public void stop() {
@@ -436,6 +452,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     }
 
     private void forwardRequest(RemoteSearchRequest request, byte[] sourcePub) {
+        if (!forwardingEnabled) {
+            LOG.debug("Dropping search forward: forwarding disabled (CLIENT leaf role)");
+            return;
+        }
         byte[] ownPub = identity.ed25519PubRaw();
         int hopsSoFar = request.path() != null ? request.path().length : 0;
         // Caller guarantees ttl > 0. Clamping may reduce the remaining ttl

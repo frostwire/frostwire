@@ -54,6 +54,13 @@ public final class RelayRole {
     private final PeerDirectory directory;
     private final int defaultTrustFloor;
     private final IdentityKeys identity;
+    /**
+     * Role-gated forwarding (Gnutella leaf model). When false, this node
+     * answers from its local index but never forwards. Defaults to true
+     * (historical behavior); wiring sets it from the configured node role
+     * ({@code forwardingEnabled = role != CLIENT}).
+     */
+    private volatile boolean forwardingEnabled = true;
 
     public RelayRole(RelaySearchService service, PeerDirectory directory) {
         this(service, directory, 0, null);
@@ -114,7 +121,19 @@ public final class RelayRole {
      * <p>Each hop uses {@link RemoteSearchRequest#withNextHop} (preserves the
      * original requester query signature; only ttl/path change).
      */
+    /**
+     * Enables or disables multi-hop forwarding. A CLIENT-role (leaf) node
+     * calls {@code setForwardingEnabled(false)} so {@link #forward} always
+     * returns empty while {@link #handleRequest} keeps answering locally.
+     */
+    public void setForwardingEnabled(boolean forwardingEnabled) {
+        this.forwardingEnabled = forwardingEnabled;
+    }
+
     public List<ForwardTarget> forward(RemoteSearchRequest request) {
+        if (!forwardingEnabled) {
+            return Collections.emptyList();
+        }
         if (request == null) {
             throw new IllegalArgumentException("request is null");
         }
