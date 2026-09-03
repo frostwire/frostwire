@@ -42,7 +42,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * <p>Fail-closed: any error returns empty and is logged.
  */
-public final class RelayRole {
+public final class RelayRole implements LeafPromotionManager.ForwardingTarget {
 
     private static final Logger LOG = Logger.getLogger(RelayRole.class);
 
@@ -65,6 +65,29 @@ public final class RelayRole {
      * ({@code forwardingEnabled = role != CLIENT}).
      */
     private volatile boolean forwardingEnabled = true;
+    /**
+     * Forward fanout cap for promoted leaves. Non-positive means the live
+     * topology default; promoted leaves get a small fixed cap so they help
+     * without fan-out risk.
+     */
+    private volatile int maxForwardTargets;
+
+    @Override
+    public void setForwardingEnabled(boolean forwardingEnabled) {
+        this.forwardingEnabled = forwardingEnabled;
+    }
+
+    /**
+     * Caps forward targets below the topology default. Non-positive restores
+     * the live topology value.
+     */
+    @Override
+    public void setMaxForwardTargets(int maxForwardTargets) {
+        if (maxForwardTargets < 0) {
+            throw new IllegalArgumentException("maxForwardTargets must be >= 0");
+        }
+        this.maxForwardTargets = maxForwardTargets;
+    }
 
     public RelayRole(RelaySearchService service, PeerDirectory directory) {
         this(service, directory, 0, null);
@@ -125,15 +148,6 @@ public final class RelayRole {
      * <p>Each hop uses {@link RemoteSearchRequest#withNextHop} (preserves the
      * original requester query signature; only ttl/path change).
      */
-    /**
-     * Enables or disables multi-hop forwarding. A CLIENT-role (leaf) node
-     * calls {@code setForwardingEnabled(false)} so {@link #forward} always
-     * returns empty while {@link #handleRequest} keeps answering locally.
-     */
-    public void setForwardingEnabled(boolean forwardingEnabled) {
-        this.forwardingEnabled = forwardingEnabled;
-    }
-
     public List<ForwardTarget> forward(RemoteSearchRequest request) {
         if (!forwardingEnabled) {
             return Collections.emptyList();
@@ -164,6 +178,9 @@ public final class RelayRole {
         // stops further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
         int m = IceBridgeTopology.get().searchPeerFanout();
+        if (maxForwardTargets > 0) {
+            m = Math.min(m, maxForwardTargets);
+        }
         Set<String> excludeHex = new HashSet<>();
         if (request.path() != null) {
             for (byte[] hop : request.path()) {

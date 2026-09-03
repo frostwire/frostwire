@@ -197,6 +197,28 @@ class RelayRoleTest {
   }
 
   @Test
+  void forward_capBelowFanout_limitsTargets() {
+    for (int i = 1; i <= 5; i++) {
+      directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
+    }
+    forwardingRole.setMaxForwardTargets(2);
+    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
+    assertEquals(2, result.size(), "promoted-leaf cap should bound forwards");
+  }
+
+  @Test
+  void setMaxForwardTargetsRejectsNegativeRestoresDefaultOnZero() {
+    assertThrows(IllegalArgumentException.class, () -> forwardingRole.setMaxForwardTargets(-1));
+    for (int i = 1; i <= 5; i++) {
+      directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
+    }
+    forwardingRole.setMaxForwardTargets(0);
+    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    assertEquals(5, forwardingRole.forward(req).size());
+  }
+
+  @Test
   void forwardSkipsPeersInPath() throws Exception {
     KeyPairBag peerA = new KeyPairBag();
     KeyPairBag peerB = new KeyPairBag();

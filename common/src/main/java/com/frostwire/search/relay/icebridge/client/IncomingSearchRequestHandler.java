@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.LeafPromotionManager;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.NodeCapabilities;
@@ -72,7 +73,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * non-SEARCH frames here would make mesh metadata fetch time out and fall
  * back to a magnet that cannot complete over cellular.
  */
-public final class IncomingSearchRequestHandler implements DistributedSearchTransport.PayloadListener {
+public final class IncomingSearchRequestHandler implements DistributedSearchTransport.PayloadListener,
+        LeafPromotionManager.ForwardingTarget {
 
     private static final Logger LOG = Logger.getLogger(IncomingSearchRequestHandler.class);
 
@@ -104,6 +106,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      * the configured node role ({@code forwardingEnabled = role != CLIENT}).
      */
     private volatile boolean forwardingEnabled = true;
+    /**
+     * Forward fanout cap for promoted leaves. Non-positive means the live
+     * topology default.
+     */
+    private volatile int maxForwardTargets;
     private volatile TorrentMetadataProvider torrentMetadataProvider;
     private final ConcurrentHashMap<String, RateBucket> rateMap = new ConcurrentHashMap<>();
 
@@ -150,10 +157,24 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     /**
      * Enables or disables multi-hop forwarding. A CLIENT-role (leaf) node
      * calls {@code setForwardingEnabled(false)} so incoming requests are
-     * still answered locally but never forwarded.
+     * still answered locally but never forwarded. Promoted leaves re-enable
+     * with {@link #setMaxForwardTargets} capped.
      */
+    @Override
     public void setForwardingEnabled(boolean forwardingEnabled) {
         this.forwardingEnabled = forwardingEnabled;
+    }
+
+    /**
+     * Caps forward targets below the topology default. Non-positive restores
+     * the live topology value.
+     */
+    @Override
+    public void setMaxForwardTargets(int maxForwardTargets) {
+        if (maxForwardTargets < 0) {
+            throw new IllegalArgumentException("maxForwardTargets must be >= 0");
+        }
+        this.maxForwardTargets = maxForwardTargets;
     }
 
     public void stop() {
@@ -467,6 +488,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         // further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
         int m = IceBridgeTopology.get().searchPeerFanout();
+        if (maxForwardTargets > 0) {
+            m = Math.min(m, maxForwardTargets);
+        }
         Set<String> excludeHex = new HashSet<>();
         if (request.path() != null) {
             for (byte[] hop : request.path()) {

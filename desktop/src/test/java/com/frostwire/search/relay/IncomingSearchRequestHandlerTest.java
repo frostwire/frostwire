@@ -76,6 +76,35 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void forwardCapLimitsDualEnvelopeForwards() throws Exception {
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+
+    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    index.torrents.add(torrent("ubuntu server", 500L, 1));
+    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+
+    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    byte[] peerA = rawPub(generateEd25519KeyPair());
+    byte[] peerB = rawPub(generateEd25519KeyPair());
+    directory.upsertVerified(peerA, "host-a", 6881);
+    directory.upsertVerified(peerB, "host-b", 6882);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
+    handler.setMaxForwardTargets(1);
+    handler.start();
+
+    byte[][] path = {requesterPub};
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+    transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
+
+    assertEquals(2, transport.sent.size(), "local response plus exactly one capped forward");
+  }
+
+  @Test
   void doesNotForwardWhenTtlZero() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
