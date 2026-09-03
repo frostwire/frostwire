@@ -497,6 +497,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.DefaultErrorCatcherTest"
     }
 
     testLogging {
