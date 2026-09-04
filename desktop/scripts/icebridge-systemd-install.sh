@@ -59,12 +59,42 @@ else
   JAVA_BIN="${JAVA_BIN_RAW}"
 fi
 
+# Self-elevate: the install (INSTALL_DIR + systemd unit) needs root. Re-exec
+# under sudo, passing our config through explicitly (sudoers may strip the
+# environment), preserving args and working directory. No sudo binary, or
+# already root: continue as-is (non-root falls back to env-file + manual
+# nohup instructions at the end).
+if [[ "$(id -u)" -ne 0 ]] && command -v sudo >/dev/null 2>&1 && [[ -f "$0" ]]; then
+  echo "==> Need root for ${INSTALL_DIR} + systemd; re-running under sudo (may ask for your password)."
+  exec sudo \
+    "INSTALL_DIR=${INSTALL_DIR}" \
+    "SERVICE_USER=${SERVICE_USER}" \
+    "JAVA_BIN=${JAVA_BIN:-java}" \
+    "FORCE_ENV=${FORCE_ENV:-0}" \
+    "ICEBRIDGE_HOST=${ICEBRIDGE_HOST:-}" \
+    "ICEBRIDGE_RUDP_PORT=${ICEBRIDGE_RUDP_PORT:-}" \
+    "ICEBRIDGE_RELAY_PORT=${ICEBRIDGE_RELAY_PORT:-}" \
+    "ICEBRIDGE_CONTROL_HTTP_PORT=${ICEBRIDGE_CONTROL_HTTP_PORT:-}" \
+    "ICEBRIDGE_ROLE=${ICEBRIDGE_ROLE:-}" \
+    "ICEBRIDGE_IDENTITY_FILE=${ICEBRIDGE_IDENTITY_FILE:-}" \
+    "ICEBRIDGE_AUTH_TOKENS_FILE=${ICEBRIDGE_AUTH_TOKENS_FILE:-}" \
+    "ICEBRIDGE_MAX_PEERS=${ICEBRIDGE_MAX_PEERS:-}" \
+    "ICEBRIDGE_PEER_TTL_SEC=${ICEBRIDGE_PEER_TTL_SEC:-}" \
+    "ICEBRIDGE_MAX_QPS_PER_KEY=${ICEBRIDGE_MAX_QPS_PER_KEY:-}" \
+    "ICEBRIDGE_BOOTSTRAP=${ICEBRIDGE_BOOTSTRAP:-}" \
+    "ICEBRIDGE_DHT=${ICEBRIDGE_DHT:-}" \
+    bash "$0" "$@"
+fi
+
 # One-step: build the jar from the enclosing checkout (skipped with --no-build
 # or an explicit --jar=...). Falls back to a jar already in INSTALL_DIR.
 if [[ -z "${JAR_SRC}" && "${NO_BUILD}" -eq 0 && -x "${DESKTOP_ROOT}/gradlew" ]]; then
   echo "==> Building icebridge.jar from ${DESKTOP_ROOT}"
   (cd "${DESKTOP_ROOT}" && ./gradlew icebridgeJar)
   JAR_SRC="${DESKTOP_ROOT}/build/libs/icebridge.jar"
+  if [[ -n "${SUDO_USER:-}" ]]; then
+    chown -R "${SUDO_USER}" "${DESKTOP_ROOT}/build" 2>/dev/null || true
+  fi
 fi
 if [[ -z "${JAR_SRC}" ]]; then
   JAR_SRC="${INSTALL_DIR}/icebridge.jar"
