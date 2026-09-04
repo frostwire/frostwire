@@ -270,11 +270,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         try {
             String requesterKey = Hex.encode(request.requesterPub());
             if (!tryAcquire(requesterKey)) {
-                LOG.warn("Rate-limited torrent metadata request from " + requesterKey);
+                LOG.debug("Rate-limited torrent metadata request from " + requesterKey);
                 return;
             }
             if (!request.verifySignature()) {
-                LOG.warn("Rejected torrent metadata request: bad signature ih="
+                LOG.debug("Rejected torrent metadata request: bad signature ih="
                         + request.infoHashHex() + " requester=" + Hex.encode(request.requesterPub())
                         + " timeWindowSkewUnknown");
                 return;
@@ -282,7 +282,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             long nowSec = System.currentTimeMillis() / 1000L;
             long skew = Math.abs(nowSec - request.timestamp());
             if (skew > TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC) {
-                LOG.warn("Rejected torrent metadata request: timestamp skew " + skew
+                LOG.debug("Rejected torrent metadata request: timestamp skew " + skew
                         + "s (max " + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
                         + "s) ih=" + request.infoHashHex()
                         + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
@@ -401,7 +401,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private void sendPresignedChunk(TorrentMetadataResponse signed, byte[] requesterPub) {
         byte[] bytes = SearchPayloadCodec.encodeTorrentMetadataResponse(signed);
         if (!transport.send(requesterPub, MeshProtocolId.METADATA, bytes)) {
-            LOG.warn("Could not route torrent metadata chunk ci=" + signed.chunkIndex()
+            LOG.debug("Could not route torrent metadata chunk ci=" + signed.chunkIndex()
                     + " to requester " + Hex.encode(requesterPub));
         }
     }
@@ -487,7 +487,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         if (rows.size() <= chunkSize || identity == null) {
             byte[] responseBytes = SearchPayloadCodec.encodeResponse(full);
             if (!transport.send(requesterPub, MeshProtocolId.SEARCH, responseBytes)) {
-                LOG.warn("Could not route search response to requester "
+                LOG.debug("Could not route search response to requester "
                         + Hex.encode(requesterPub));
             }
             return;
@@ -516,12 +516,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 signer.initSign(identity.ed25519().getPrivate());
                 signer.update(unsigned.canonicalBytes());
                 RemoteSearchResponse chunk = b.signature(signer.sign()).build();
-                byte[] bytes = SearchPayloadCodec.encodeResponse(chunk);
-                if (!transport.send(requesterPub, MeshProtocolId.SEARCH, bytes)) {
-                    LOG.warn("Could not route search chunk " + i + " to "
-                            + Hex.encode(requesterPub));
-                    return;
-                }
+            byte[] bytes = SearchPayloadCodec.encodeResponse(chunk);
+            if (!transport.send(requesterPub, MeshProtocolId.SEARCH, bytes)) {
+                LOG.debug("Could not route search chunk " + i + " to "
+                        + Hex.encode(requesterPub));
+                return;
+            }
             } catch (Throwable t) {
                 LOG.debug("Failed to stream search chunk " + i, t);
                 return;

@@ -514,7 +514,7 @@ public final class RudpSessionManager {
                 return;
             }
             if (isSubnetFull(sender)) {
-                LOG.warn("RudpSessionManager: rejected HELLO from " + sender
+                LOG.debug("RudpSessionManager: rejected HELLO from " + sender
                         + " — max sessions per /24 (" + MAX_SESSIONS_PER_SUBNET_24 + ") reached");
                 metrics.helloRejected();
                 return;
@@ -697,7 +697,7 @@ public final class RudpSessionManager {
                     send(session, session.dataAck());
                 }
             } else {
-                LOG.warn("RudpSessionManager: dropped out-of-window DATA seq="
+                LOG.debug("RudpSessionManager: dropped out-of-window DATA seq="
                         + packet.sequence() + " from " + sender
                         + " — possible session reset by peer");
             }

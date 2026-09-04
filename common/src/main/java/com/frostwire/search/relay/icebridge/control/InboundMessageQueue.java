@@ -140,7 +140,7 @@ public final class InboundMessageQueue implements RudpMessageListener {
                     ? " PING"
                     : " probe";
         }
-        LOG.info("IceBridge mesh: " + MeshProtocolId.name(id) + detail
+        LOG.debug("IceBridge mesh: " + MeshProtocolId.name(id) + detail
                 + " ok from=" + shortPub(sourcePub)
                 + " target=" + shortTarget(targetKey)
                 + " bytes=" + (appPayload == null ? 0 : appPayload.length));

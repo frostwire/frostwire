@@ -132,31 +132,31 @@ public final class RelaySearchService {
         try {
             int ttl = request.ttl();
             if (ttl < 0 || ttl > RemoteSearchRequest.MAX_PATH_LENGTH) {
-                LOG.warn("RelaySearchService: rejected request (ttl out of range "
+                LOG.debug("RelaySearchService: rejected request (ttl out of range "
                         + ttl + ") keywords=" + request.keywords());
                 return Optional.empty();
             }
             byte[] requesterPub = request.requesterPub();
             Predicate<byte[]> spamChecker = this.spamChecker;
             if (spamChecker != null && spamChecker.test(requesterPub)) {
-                LOG.warn("RelaySearchService: rejected request (spam) keywords="
+                LOG.debug("RelaySearchService: rejected request (spam) keywords="
                         + request.keywords());
                 return Optional.empty();
             }
             if (!rateLimiter.tryAcquire(requesterPub)) {
-                LOG.warn("RelaySearchService: rejected request (rate limit) keywords="
+                LOG.debug("RelaySearchService: rejected request (rate limit) keywords="
                         + request.keywords());
                 return Optional.empty();
             }
             if (!verifySignature(request)) {
-                LOG.warn("RelaySearchService: rejected request (bad signature) keywords="
+                LOG.debug("RelaySearchService: rejected request (bad signature) keywords="
                         + request.keywords());
                 return Optional.empty();
             }
             long nowMs = System.currentTimeMillis();
             long skew = Math.abs(nowMs - (request.timestamp() * 1000L));
             if (skew > MAX_TIMESTAMP_SKEW_MS) {
-                LOG.warn("RelaySearchService: rejected request (timestamp skew "
+                LOG.debug("RelaySearchService: rejected request (timestamp skew "
                         + skew + "ms) keywords=" + request.keywords());
                 return Optional.empty();
             }

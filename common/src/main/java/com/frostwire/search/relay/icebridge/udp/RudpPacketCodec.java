@@ -27,7 +27,7 @@ final class RudpPacketCodec extends MessageToMessageCodec<DatagramPacket, RudpPa
         RudpPacket packet = envelope.packet();
         byte[] payload = packet.payload();
         if (payload.length > 65535) {
-            LOG.warn("RudpPacketCodec: dropping packet with payload > 65535 bytes (" + payload.length + ")");
+            LOG.debug("RudpPacketCodec: dropping packet with payload > 65535 bytes (" + payload.length + ")");
             return;
         }
         ByteBuf buf = ctx.alloc().buffer(RudpPacket.HEADER_SIZE + payload.length);
