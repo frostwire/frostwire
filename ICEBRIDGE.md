@@ -116,7 +116,7 @@ arm64 only matters for Graviton hosts.
 
 1. **Build** on laptop: `cd desktop && ./gradlew icebridgeJar`
 2. **Upload** `build/libs/icebridge.jar` to e.g. `/opt/icebridge/` on the instance (Amazon Linux 2/2023 or Ubuntu; JDK 17+).
-3. **Install unit** with `scripts/icebridge-ec2-install.sh` (writes `icebridge.env` once, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`). Re-run preserves env unless `FORCE_ENV=1`.
+3. **Install unit** with `scripts/icebridge-systemd-install.sh` (writes `icebridge.env` once, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`). Re-run preserves env unless `FORCE_ENV=1`.
 4. **Security group** (inbound):
    | Proto | Port | Source | Why |
    |-------|------|--------|-----|

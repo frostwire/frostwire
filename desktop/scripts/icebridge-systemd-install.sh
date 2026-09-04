@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Install / upgrade a standalone IceBridge FORWARDER on a Linux host.
-# Run ON the EC2 instance (or via: ssh host 'bash -s' < scripts/icebridge-ec2-install.sh)
+# Run ON the EC2 instance (or via: ssh host 'bash -s' < scripts/icebridge-systemd-install.sh)
 # Expects icebridge.jar already uploaded to $INSTALL_DIR (default /opt/icebridge).
 #
 # Usage:
-#   INSTALL_DIR=/opt/icebridge bash icebridge-ec2-install.sh
-#   TOKEN_FILE=... ICEBRIDGE_RUDP_PORT=6889 ... bash icebridge-ec2-install.sh
+#   INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh
+#   TOKEN_FILE=... ICEBRIDGE_RUDP_PORT=6889 ... bash icebridge-systemd-install.sh
 #
 # Control HTTP binds 127.0.0.1 only (see ControlServer). Do not open it in the
 # security group; use SSH -L for ops. Mesh plane: TCP identity + UDP rUDP.
