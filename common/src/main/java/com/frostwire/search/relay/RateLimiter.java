@@ -72,6 +72,32 @@ public final class RateLimiter {
     }
 
     /**
+     * Try to consume 1 token for an already-string key (e.g. a sender IP
+     * literal). Buckets are keyed by String internally, so this avoids the
+     * byte[]-encode round trip. Null/empty keys fail open (return true) —
+     * unkeyable traffic must never break the app.
+     */
+    public boolean tryAcquire(String key) {
+        if (key == null || key.isEmpty()) {
+            return true;
+        }
+        try {
+            Bucket bucket = buckets.computeIfAbsent(key, k -> new Bucket(capacity));
+            long now = System.currentTimeMillis();
+            boolean allowed = bucket.tryConsume(now, capacity, refillPerSec);
+            if (allowed) {
+                totalAllowed.incrementAndGet();
+            } else {
+                totalRejected.incrementAndGet();
+            }
+            return allowed;
+        } catch (Throwable t) {
+            LOG.warn("RateLimiter: failed open for key of length " + key.length(), t);
+            return true;
+        }
+    }
+
+    /**
      * Remove buckets that haven't been touched in {@code idleMs}
      * milliseconds. Returns the number of buckets removed.
      */

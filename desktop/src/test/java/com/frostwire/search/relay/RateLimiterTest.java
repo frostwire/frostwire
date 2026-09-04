@@ -24,7 +24,7 @@ class RateLimiterTest {
     @Test
     void tryAcquireRejectsBadInputs() {
         RateLimiter rl = new RateLimiter(1.0, 1.0);
-        assertFalse(rl.tryAcquire(null));
+        assertFalse(rl.tryAcquire((byte[]) null));
         assertFalse(rl.tryAcquire(new byte[31]));
         assertEquals(0, rl.bucketCount());
     }
