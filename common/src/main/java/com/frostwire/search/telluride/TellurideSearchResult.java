@@ -38,6 +38,17 @@ public class TellurideSearchResult implements HttpSearchResult {
     private final long fileSize;
     private final long creationTime;
     private final Map<String, String> httpHeaders;
+    /**
+     * Hidden DASH mux sibling: best MP4-container audio (m4a/AAC) for this
+     * video row, fetched automatically at download time and muxed into the
+     * video so DASH video-only results play with sound. Null when the video
+     * is already muxed or no MP4 audio exists. Never shown as its own row
+     * (the visible audio row keeps the best audio regardless of container).
+     */
+    private String muxAudioUrl;
+    private String muxAudioExt;
+    private long muxAudioFilesize;
+    private Map<String, String> muxAudioHeaders;
 
     public TellurideSearchResult(
             String _id,
@@ -132,6 +143,36 @@ public class TellurideSearchResult implements HttpSearchResult {
 
     public Map<String, String> getHttpHeaders() {
         return httpHeaders;
+    }
+
+    /** Hidden mux sibling setter, called once by the performer for DASH video rows. */
+    public void setMuxAudio(String url, String ext, long filesize, Map<String, String> headers) {
+        muxAudioUrl = url;
+        muxAudioExt = ext;
+        muxAudioFilesize = filesize;
+        muxAudioHeaders = copyHttpHeaders(headers);
+    }
+
+    /** Null unless this video row carries a hidden MP4-container audio sibling. */
+    public String getMuxAudioUrl() {
+        return muxAudioUrl;
+    }
+
+    public String getMuxAudioExt() {
+        return muxAudioExt;
+    }
+
+    public long getMuxAudioFilesize() {
+        return muxAudioFilesize;
+    }
+
+    public Map<String, String> getMuxAudioHeaders() {
+        return muxAudioHeaders;
+    }
+
+    /** True when downloading this result should also fetch + mux the sibling audio. */
+    public boolean needsAudioMux() {
+        return muxAudioUrl != null && !muxAudioUrl.isEmpty();
     }
 
     private static Map<String, String> copyHttpHeaders(Map<String, String> headers) {

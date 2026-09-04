@@ -138,6 +138,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         int originalResultCount = result.formats.size();
         TellurideJSONMediaFormat bestVideo = null;
         TellurideJSONMediaFormat bestAudio = null;
+        TellurideJSONMediaFormat bestM4aAudio = null;
         for (TellurideJSONMediaFormat format : result.formats) {
             if (format == null || format.url == null || format.url.isEmpty()) {
                 continue;
@@ -159,6 +160,13 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                 if (bestAudio == null || format.filesize > bestAudio.filesize) {
                     bestAudio = format;
                 }
+                // Hidden mux sibling: best MP4-container audio (m4a/AAC), so a
+                // DASH video-only row can be muxed with sound at download time
+                // by the pure-Java MP4 restitcher (no WebM/Opus parsing needed).
+                if (isMp4Audio(format)
+                        && (bestM4aAudio == null || format.filesize > bestM4aAudio.filesize)) {
+                    bestM4aAudio = format;
+                }
             } else if (!noCodec(format.vcodec)) {
                 if (bestVideo == null
                         || format.height > bestVideo.height
@@ -168,7 +176,12 @@ public class TellurideSearchPerformer implements ISearchPerformer {
             }
         }
         if (bestVideo != null) {
-            results.add(toSearchResult(result, bestVideo));
+            TellurideSearchResult videoResult = toSearchResult(result, bestVideo);
+            if (noCodec(bestVideo.acodec) && bestM4aAudio != null) {
+                videoResult.setMuxAudio(bestM4aAudio.url, bestM4aAudio.ext,
+                        bestM4aAudio.filesize, withFullRange(bestM4aAudio.http_headers));
+            }
+            results.add(videoResult);
         }
         if (bestAudio != null) {
             results.add(toSearchResult(result, bestAudio));
@@ -381,6 +394,14 @@ public static List<TellurideSearchResult> getValidPlaylistResults(String jsonMet
 
     private static boolean noCodec(String codec) {
         return codec == null || "none".equals(codec);
+    }
+
+    /** MP4-container audio (m4a/AAC, e.g. itag 140): muxable without WebM parsing. */
+    static boolean isMp4Audio(TellurideJSONMediaFormat format) {
+        if (format == null || noCodec(format.acodec) || !noCodec(format.vcodec)) {
+            return false;
+        }
+        return "m4a".equalsIgnoreCase(format.ext) || "mp4".equalsIgnoreCase(format.ext);
     }
 
     public static class TellurideJSONResult {

@@ -52,8 +52,7 @@ class TellurideSearchPerformerBestFormatsTest {
   }
 
   @Test
-  void muxedProgressiveStillOffersAudioRow() {
-    String json =
+  void muxedProgressiveStillOffersAudioRow() {    String json =
         "{"
             + "\"id\":\"abc\","
             + "\"title\":\"LAGOS\","
@@ -71,5 +70,84 @@ class TellurideSearchPerformerBestFormatsTest {
     assertEquals(2, results.size());
     assertTrue(results.get(0).getFilename().contains("360x360"));
     assertTrue(results.get(1).getFilename().contains("(audio)"));
+  }
+
+  @Test
+  void dashVideoCarriesHiddenM4aSibling() {
+    String json =
+        "{"
+            + "\"id\":\"abc\","
+            + "\"title\":\"Test Video\","
+            + "\"extractor\":\"youtube\","
+            + "\"webpage_url\":\"https://www.youtube.com/watch?v=abc\","
+            + "\"thumbnail\":\"https://i.ytimg.com/x.jpg\","
+            + "\"upload_date\":\"20240101\","
+            + "\"formats\":["
+            + "{\"url\":\"https://ex/audio-opus.webm\",\"ext\":\"webm\",\"acodec\":\"opus\","
+            + "\"vcodec\":\"none\",\"filesize\":99999,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/audio-mid.m4a\",\"ext\":\"m4a\",\"acodec\":\"mp4a.40.2\","
+            + "\"vcodec\":\"none\",\"filesize\":4000,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/v1080.mp4\",\"ext\":\"mp4\",\"acodec\":\"none\","
+            + "\"vcodec\":\"avc1\",\"filesize\":8000,\"height\":1080,\"width\":1920}"
+            + "]}";
+    List<TellurideSearchResult> results =
+        TellurideSearchPerformer.getValidResults(
+            json, new GsonBuilder().create(), null, -1, "https://www.youtube.com/watch?v=abc");
+
+    assertEquals(2, results.size());
+    // Visible audio row keeps the best audio regardless of container (opus here).
+    assertTrue(results.get(1).getDownloadUrl().contains("audio-opus.webm"));
+    // Hidden mux sibling is the best MP4-container audio, not the shown row.
+    TellurideSearchResult video = results.get(0);
+    assertTrue(video.needsAudioMux());
+    assertTrue(video.getMuxAudioUrl().contains("audio-mid.m4a"));
+    assertEquals("m4a", video.getMuxAudioExt());
+    assertEquals(4000, video.getMuxAudioFilesize());
+    assertTrue(video.getMuxAudioHeaders().containsKey("Range"));
+  }
+
+  @Test
+  void muxedVideoCarriesNoSibling() {
+    String json =
+        "{"
+            + "\"id\":\"abc\","
+            + "\"title\":\"LAGOS\","
+            + "\"extractor\":\"youtube\","
+            + "\"webpage_url\":\"https://www.youtube.com/watch?v=abc\","
+            + "\"thumbnail\":\"https://i.ytimg.com/x.jpg\","
+            + "\"upload_date\":\"20240101\","
+            + "\"formats\":["
+            + "{\"url\":\"https://ex/itag18.mp4\",\"ext\":\"mp4\",\"acodec\":\"mp4a.40.2\","
+            + "\"vcodec\":\"avc1.42001E\",\"filesize\":4494476,\"height\":360,\"width\":360}"
+            + "]}";
+    List<TellurideSearchResult> results =
+        TellurideSearchPerformer.getValidResults(
+            json, new GsonBuilder().create(), null, -1, "https://www.youtube.com/watch?v=abc");
+    assertEquals(2, results.size());
+    assertTrue(!results.get(0).needsAudioMux());
+  }
+
+  @Test
+  void dashVideoWithoutM4aCarriesNoSibling() {
+    String json =
+        "{"
+            + "\"id\":\"abc\","
+            + "\"title\":\"Test Video\","
+            + "\"extractor\":\"youtube\","
+            + "\"webpage_url\":\"https://www.youtube.com/watch?v=abc\","
+            + "\"thumbnail\":\"https://i.ytimg.com/x.jpg\","
+            + "\"upload_date\":\"20240101\","
+            + "\"formats\":["
+            + "{\"url\":\"https://ex/audio-opus.webm\",\"ext\":\"webm\",\"acodec\":\"opus\","
+            + "\"vcodec\":\"none\",\"filesize\":99999,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/v1080.mp4\",\"ext\":\"mp4\",\"acodec\":\"none\","
+            + "\"vcodec\":\"avc1\",\"filesize\":8000,\"height\":1080,\"width\":1920}"
+            + "]}";
+    List<TellurideSearchResult> results =
+        TellurideSearchPerformer.getValidResults(
+            json, new GsonBuilder().create(), null, -1, "https://www.youtube.com/watch?v=abc");
+    assertEquals(2, results.size());
+    assertTrue(!results.get(0).needsAudioMux());
+    assertTrue(results.get(1).getDownloadUrl().contains("audio-opus.webm"));
   }
 }
