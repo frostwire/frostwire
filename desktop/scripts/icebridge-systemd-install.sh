@@ -186,6 +186,83 @@ CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-${CONTROL_HTTP_PORT}}"
 RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-${RELAY_PORT}}"
 RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-${RUDP_PORT}}"
 
+# PIDs bound to a local port (TCP listeners, or UDP sockets), one per line.
+# lsof covers both; ss needs -t/-u variants. Empty when free or when
+# neither tool exists (caller falls back to the jar's own pre-flight error).
+pids_on_tcp_port() {
+  local port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -tiTCP:"${port}" -sTCP:LISTEN 2>/dev/null || true
+    return 0
+  fi
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnp 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
+    return 0
+  fi
+  return 1
+}
+
+pids_on_udp_port() {
+  local port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -tiUDP:"${port}" 2>/dev/null || true
+    return 0
+  fi
+  if command -v ss >/dev/null 2>&1; then
+    ss -lnup 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
+    return 0
+  fi
+  return 1
+}
+
+# Stop strays from previous runs (hand-launched java -jar, old run-local
+# background) that would collide with the unit on relay/control TCP or rUDP.
+# Scoped to our three ports. Fails fast when a squatter won't die, so we
+# never install a crash-looping unit.
+stop_strays() {
+  local victims="" p=""
+  for p in $(pids_on_tcp_port "${RELAY_PORT}" || true) \
+           $(pids_on_tcp_port "${CONTROL_HTTP_PORT}" || true) \
+           $(pids_on_udp_port "${RUDP_PORT}" || true); do
+    [[ "${p}" != "$$" ]] && victims="${victims} ${p}"
+  done
+  victims="$(echo ${victims} | tr ' ' '\n' | sort -nu | tr '\n' ' ')"
+  if [[ -z "${victims// }" ]]; then
+    return 0
+  fi
+  echo "==> Stopping stray icebridge process(es) on our ports:${victims}"
+  # shellcheck disable=SC2086
+  kill ${victims} 2>/dev/null || true
+  local i="" alive=""
+  for i in $(seq 1 25); do
+    alive=""
+    for p in ${victims}; do
+      kill -0 "${p}" 2>/dev/null && alive="${alive} ${p}"
+    done
+    [[ -z "${alive// }" ]] && break
+    sleep 0.2
+  done
+  local still=""
+  for p in ${victims}; do
+    kill -0 "${p}" 2>/dev/null && still="${still} ${p}"
+  done
+  if [[ -n "${still// }" ]]; then
+    echo "    TERM ignored, escalating to KILL:${still}"
+    # shellcheck disable=SC2086
+    kill -9 ${still} 2>/dev/null || true
+    sleep 1
+  fi
+  local remain=""
+  for p in ${victims}; do
+    kill -0 "${p}" 2>/dev/null && remain="${remain} ${p}"
+  done
+  if [[ -n "${remain// }" ]]; then
+    echo "ERROR: port squatter(s) won't die:${remain}; refusing to install a crash-loop." >&2
+    return 1
+  fi
+  echo "    stopped."
+}
+
 # systemd unit (requires root)
 UNIT=/etc/systemd/system/icebridge.service
 if [[ "$(id -u)" -eq 0 ]]; then
@@ -219,7 +296,9 @@ EOF
 
   systemctl daemon-reload
   systemctl enable icebridge.service
-  systemctl restart icebridge.service
+  systemctl stop icebridge.service 2>/dev/null || true
+  stop_strays || exit 1
+  systemctl start icebridge.service
   sleep 2
   systemctl --no-pager -l status icebridge.service || true
   echo "==> Health (localhost only — control binds 127.0.0.1):"
