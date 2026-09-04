@@ -80,6 +80,41 @@ class PeerDiscoveryTest {
   }
 
   @Test
+  void discoverSkipsSelfHairpinEndpoint() {
+    discovery.setSelfEndpoint(() -> "203.0.113.7", 6888);
+    source.endpoints.add(new DiscoveredEndpoint("203.0.113.7", 6888));
+    source.endpoints.add(new DiscoveredEndpoint("198.51.100.9", 6888));
+    List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
+    assertEquals(1, result.size());
+    assertEquals("198.51.100.9", result.get(0).host);
+  }
+
+  @Test
+  void discoverTriesSameIpOnDifferentPort() {
+    discovery.setSelfEndpoint(() -> "203.0.113.7", 6888);
+    source.endpoints.add(new DiscoveredEndpoint("203.0.113.7", 7000));
+    List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
+    assertEquals(1, result.size());
+    assertEquals(7000, result.get(0).port);
+  }
+
+  @Test
+  void selfSkipOffWhenUnset() {
+    source.endpoints.add(new DiscoveredEndpoint("203.0.113.7", 6888));
+    assertEquals(1, discovery.discoverAndRegister().size());
+    discovery.setSelfEndpoint(null, 6888);
+    source.endpoints.add(new DiscoveredEndpoint("203.0.113.8", 6888));
+    assertEquals(1, discovery.discoverAndRegister().size());
+  }
+
+  @Test
+  void selfSkipFailsOpenOnSupplierThrow() {
+    discovery.setSelfEndpoint(() -> { throw new RuntimeException("no network"); }, 6888);
+    source.endpoints.add(new DiscoveredEndpoint("203.0.113.7", 6888));
+    assertEquals(1, discovery.discoverAndRegister().size());
+  }
+
+  @Test
   void discoverFailsClosedOnSourceException() {
     source.throwOnFetch = true;
     assertTrue(discovery.discoverAndRegister().isEmpty());

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Discovers other FrostWire nodes on the DHT and registers them
@@ -56,6 +57,13 @@ public final class PeerDiscovery {
     private final PeerDirectory directory;
     private final PeerAuthenticator authenticator;
     private final byte[] ownEd25519Pub;
+    /**
+     * Our currently-visible external IP supplier (e.g. BTEngine's latest
+     * external_ip alert) plus our own relay port, for hairpin self-skip.
+     * Evaluated per candidate so carrier rebinds are picked up. Unset = off.
+     */
+    private volatile Supplier<String> externalIpSupplier;
+    private volatile int selfRelayPort;
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory) {
         this(source, directory, null, null);
@@ -81,6 +89,19 @@ public final class PeerDiscovery {
     }
 
     /**
+     * Configure hairpin self-skip: candidates matching our currently-visible
+     * external IP *and* our own relay port are skipped without a handshake.
+     * A candidate at our carrier-NAT public IP is either ourselves (hairpin
+     * always fails) or a carrier-mate we cannot reach directly anyway; a mate
+     * on a different port is still tried. The supplier is read per candidate
+     * so IP rebinds take effect immediately. Pass a null supplier to disable.
+     */
+    public void setSelfEndpoint(Supplier<String> externalIpSupplier, int selfRelayPort) {
+        this.externalIpSupplier = externalIpSupplier;
+        this.selfRelayPort = selfRelayPort;
+    }
+
+    /**
      * Run one discovery pass. Returns the list of endpoints
      * that were newly registered in the directory (i.e., not
      * already known).
@@ -100,6 +121,10 @@ public final class PeerDiscovery {
                 }
                 if (isLocalEndpoint(host)) {
                     LOG.debug("Skipping likely local/self endpoint " + host + ":" + port);
+                    continue;
+                }
+                if (isSelfHairpin(host, port)) {
+                    LOG.debug("Skipping self hairpin endpoint " + host + ":" + port);
                     continue;
                 }
                 if (authenticator != null) {
@@ -189,6 +214,22 @@ public final class PeerDiscovery {
             return sha256.digest();
         } catch (Exception e) {
             throw new IllegalStateException("SHA-256 unavailable", e);
+        }
+    }
+
+    private boolean isSelfHairpin(String host, int port) {
+        try {
+            Supplier<String> supplier = externalIpSupplier;
+            if (supplier == null || selfRelayPort <= 0
+                    || host == null || host.isEmpty()) {
+                return false;
+            }
+            String ext = supplier.get();
+            return ext != null && !ext.isEmpty()
+                    && port == selfRelayPort
+                    && (ext.equals(host) || ext.equalsIgnoreCase(host));
+        } catch (Throwable ignored) {
+            return false;
         }
     }
 
