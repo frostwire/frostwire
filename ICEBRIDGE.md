@@ -109,18 +109,8 @@ Firewall: open **UDP rUDP** (and TCP identity if remote peers handshake you). Co
 unzip -Z1 desktop/build/libs/icebridge.jar | grep -E 'lib/x86_64/.*\.so'
 ```
 
-Push/install scripts refuse deploy if the Linux x86_64 native is missing; arm64 missing only warns (Graviton).
-
-#### One-liner deploy from laptop
-
-```bash
-cd desktop
-chmod +x scripts/icebridge-ec2-push.sh scripts/icebridge-ec2-install.sh
-# SSH host alias or user@host (see ~/.ssh/config)
-./scripts/icebridge-ec2-push.sh virginia1
-# push creates /opt/icebridge with sudo+chown when needed
-ssh virginia1 'sudo INSTALL_DIR=/opt/icebridge bash /opt/icebridge/icebridge-ec2-install.sh'
-```
+Do not deploy a jar missing the Linux x86_64 native (it will fail on EC2);
+arm64 only matters for Graviton hosts.
 
 #### Manual steps (same outcome)
 
