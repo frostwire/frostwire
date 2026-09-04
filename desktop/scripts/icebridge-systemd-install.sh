@@ -1,16 +1,47 @@
 #!/usr/bin/env bash
 # Install / upgrade a standalone IceBridge FORWARDER on a Linux host.
-# Run ON the EC2 instance (or via: ssh host 'bash -s' < scripts/icebridge-systemd-install.sh)
-# Expects icebridge.jar already uploaded to $INSTALL_DIR (default /opt/icebridge).
+# One step: rebuilds icebridge.jar from the enclosing checkout (unless
+# --no-build), copies it to $INSTALL_DIR (default /opt/icebridge), then
+# installs/restarts the systemd unit.
+# Run ON the EC2 instance from the frostwire checkout, e.g.:
+#   sudo INSTALL_DIR=/opt/icebridge bash desktop/scripts/icebridge-systemd-install.sh
+# (or via: ssh host 'bash -s' < scripts/icebridge-systemd-install.sh)
 #
 # Usage:
-#   INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh
+#   sudo INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh [--no-build] [--jar=/path/to/icebridge.jar]
 #   TOKEN_FILE=... ICEBRIDGE_RUDP_PORT=6889 ... bash icebridge-systemd-install.sh
 #
 # Control HTTP binds 127.0.0.1 only (see ControlServer). Do not open it in the
 # security group; use SSH -L for ops. Mesh plane: TCP identity + UDP rUDP.
 
 set -euo pipefail
+
+NO_BUILD=0
+JAR_SRC=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --no-build) NO_BUILD=1 ;;
+    --jar=*)
+      JAR_SRC="${1#--jar=}"
+      # Resolve now: the script cd's into INSTALL_DIR later.
+      if [[ "${JAR_SRC}" != /* ]]; then
+        JAR_SRC="$(pwd)/${JAR_SRC}"
+      fi
+      ;;
+    -h|--help)
+      echo "Usage: INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh [--no-build] [--jar=/path/to/icebridge.jar]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DESKTOP_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 INSTALL_DIR="${INSTALL_DIR:-/opt/icebridge}"
 SERVICE_USER="${SERVICE_USER:-icebridge}"
@@ -28,8 +59,20 @@ else
   JAVA_BIN="${JAVA_BIN_RAW}"
 fi
 
-if [[ ! -f "${INSTALL_DIR}/icebridge.jar" ]]; then
-  echo "ERROR: ${INSTALL_DIR}/icebridge.jar not found. scp the multi-arch fat JAR first." >&2
+# One-step: build the jar from the enclosing checkout (skipped with --no-build
+# or an explicit --jar=...). Falls back to a jar already in INSTALL_DIR.
+if [[ -z "${JAR_SRC}" && "${NO_BUILD}" -eq 0 && -x "${DESKTOP_ROOT}/gradlew" ]]; then
+  echo "==> Building icebridge.jar from ${DESKTOP_ROOT}"
+  (cd "${DESKTOP_ROOT}" && ./gradlew icebridgeJar)
+  JAR_SRC="${DESKTOP_ROOT}/build/libs/icebridge.jar"
+fi
+if [[ -z "${JAR_SRC}" ]]; then
+  JAR_SRC="${INSTALL_DIR}/icebridge.jar"
+fi
+if [[ ! -f "${JAR_SRC}" ]]; then
+  echo "ERROR: no icebridge.jar (tried ${JAR_SRC}). Re-run without --no-build" >&2
+  echo "  from a frostwire checkout, pass --jar=/path/to/icebridge.jar," >&2
+  echo "  or scp one to ${INSTALL_DIR}/ first." >&2
   exit 1
 fi
 
@@ -52,6 +95,11 @@ fi
 echo "==> Layout under ${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 cd "${INSTALL_DIR}"
+
+if [[ "${JAR_SRC}" != "${INSTALL_DIR}/icebridge.jar" ]]; then
+  echo "==> Installing jar -> ${INSTALL_DIR}/icebridge.jar"
+  cp -f "${JAR_SRC}" "${INSTALL_DIR}/icebridge.jar"
+fi
 
 if [[ ! -f icebridge-tokens.txt ]]; then
   echo "==> Generating control token (printed once)"
