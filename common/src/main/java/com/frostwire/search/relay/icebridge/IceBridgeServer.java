@@ -164,7 +164,7 @@ public final class IceBridgeServer implements AutoCloseable {
                     System.out.flush();
                 }
                 System.out.println();
-                System.out.println("IceBridge is running. Press Ctrl-C to stop.");
+                System.out.println("IceBridge is running. (Ctrl-C stops it only when attached to a terminal.)");
                 System.out.println("  Health:  curl -sS http://127.0.0.1:" + config.controlHttpPort() + "/health");
                 System.out.println("  Metrics: curl -sS -H \"X-IceBridge-Token: <token>\" http://127.0.0.1:"
                         + config.controlHttpPort() + "/metrics");
