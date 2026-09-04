@@ -36,12 +36,22 @@ import java.util.Map;
  * concatenated bytes equals the signed digest: forwarders cannot substitute,
  * reorder, or truncate chunks without failing verification.
  *
+ * <p>Deliberately OUTSIDE the signature domain: the per-request {@code nonce}
+ * and the {@code timestamp}. The nonce is plaintext request correlation only,
+ * and the .torrent bytes are immutable per infohash — so a signed chunk may
+ * be served to any requester asking for the same torrent (holder-side caching
+ * without re-signing) and replaying recorded chunks can only ever deliver the
+ * identical, correct bytes. Cross-torrent injection still fails (infohash +
+ * payload digest are signed), as do reorder/truncation (index + final flag
+ * are signed). Use {@link #withNonceTimestamp(byte[], long)} to restamp a
+ * cached signed chunk for a new request without invalidating its signature.
+ *
  * <p>Wire map: {@code {v, nonce, ih, pd, ci, fin, ts, data?, err?, sig}} —
  * {@code data} (base64 .torrent chunk) and {@code err} (error code) are
  * mutually exclusive.
  */
 public final class TorrentMetadataResponse {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     /**
      * Chunk payload bytes sized so the base64 + JSON envelope + 65-byte
@@ -130,21 +140,44 @@ public final class TorrentMetadataResponse {
     }
 
     /**
-     * Signature domain: {@code v|nonce|ih|pd|ci|fin|ts}.
+     * Signature domain: {@code v|ih|pd|ci|fin}.
+     *
+     * <p>Nonce and timestamp are intentionally excluded so a signed chunk is
+     * reusable across requests (see class javadoc). They are still transmitted
+     * for request correlation.
      */
     public byte[] canonicalBytes() {
         ByteBuffer buf = ByteBuffer.allocate(
-                4 + 4 + nonce.length + 4 + infoHash.length + 32 + 4 + 1 + 8);
+                4 + 4 + infoHash.length + 32 + 4 + 1);
         buf.putInt(version);
-        buf.putInt(nonce.length);
-        buf.put(nonce);
         buf.putInt(infoHash.length);
         buf.put(infoHash);
         buf.put(payloadDigest);
         buf.putInt(chunkIndex);
         buf.put((byte) (finalChunk ? 1 : 0));
-        buf.putLong(timestamp);
         return buf.array();
+    }
+
+    /**
+     * Restamp a signed chunk for a new request: copies every field including
+     * the holder signature, replacing only nonce and timestamp. Valid exactly
+     * because neither field is in the signature domain — the copy verifies
+     * under the holder pub for the new request. Used to serve cached signed
+     * templates without re-signing.
+     */
+    public TorrentMetadataResponse withNonceTimestamp(byte[] nonce, long timestamp) {
+        return TorrentMetadataResponse.builder()
+                .version(version)
+                .nonce(nonce)
+                .infoHash(infoHash)
+                .payloadDigest(payloadDigest)
+                .chunkIndex(chunkIndex)
+                .finalChunk(finalChunk)
+                .timestamp(timestamp)
+                .data(data)
+                .error(error)
+                .signature(signature)
+                .build();
     }
 
     /**
@@ -308,6 +341,9 @@ public final class TorrentMetadataResponse {
             if (vObj == null || nonceObj == null || ihObj == null || pdObj == null
                     || ciObj == null || finObj == null || tsObj == null || sigObj == null) {
                 return null;
+            }
+            if (((Number) vObj).intValue() != VERSION) {
+                return null; // stale pre-v2 peer (v1 domain bound nonce/ts) — fail fast
             }
             byte[] payloadDigest = Base64.getDecoder().decode((String) pdObj);
             if (payloadDigest.length != 32) {
