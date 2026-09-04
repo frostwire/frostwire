@@ -38,8 +38,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,10 +93,14 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     /**
      * Maximum total .torrent bytes served per metadata request
      * (anti-amplification: bounds chunked RELAY sends per request).
-     * Over-cap responses are REJECTED (fail closed, no response frame —
-     * truncate-vs-reject is an open user decision).
+     * Search responses are naturally tiny (rows capped by request limit) and
+     * never approach this; only full .torrent payloads (Protocol #3 METADATA)
+     * are measured against it. Over-cap responses are REJECTED with a single
+     * signed TOO_LARGE error frame (fail closed) — matches
+     * {@link TorrentMetadataResponse#MAX_TORRENT_BYTES} (256KB) so legitimate
+     * large torrents flow while unbounded amplification stays capped.
      */
-    public static final int METADATA_MAX_BYTES = 65536;
+    public static final int METADATA_MAX_BYTES = 256 * 1024;
 
     /**
      * Maximum peers a single request is forwarded to (M — anti-amplification).
@@ -121,6 +128,40 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private volatile int maxForwardTargets;
     private volatile TorrentMetadataProvider torrentMetadataProvider;
     private final ConcurrentHashMap<String, RateBucket> rateMap = new ConcurrentHashMap<>();
+
+    /**
+     * Bounded LRU of fully-signed .torrent responses keyed by infohash hex.
+     * Signed chunks are reusable across requests because the v2 signature
+     * domain excludes the per-request nonce and timestamp (content is
+     * immutable per infohash — replay can only deliver identical bytes).
+     * A hit serves without provider I/O, re-splitting, re-signing, or
+     * re-encoding the signature: templates are restamped with the live nonce
+     * via {@link TorrentMetadataResponse#withNonceTimestamp} and re-encoded.
+     * Only hits and over-cap templates are cached. Misses are never cached —
+     * a torrent may arrive after the first miss. Max 32 x 256KB = 8MB.
+     */
+    private static final int TORRENT_CACHE_MAX_ENTRIES = 32;
+    private final Map<String, CachedMetadata> torrentCache =
+            Collections.synchronizedMap(new LinkedHashMap<String, CachedMetadata>(
+                    TORRENT_CACHE_MAX_ENTRIES, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, CachedMetadata> eldest) {
+                    return size() > TORRENT_CACHE_MAX_ENTRIES;
+                }
+            });
+
+    /** Cached fully-signed response template. Misses are not cached. */
+    private static final class CachedMetadata {
+        final List<TorrentMetadataResponse> signedChunks; // 1 frame when tooLarge
+        final boolean tooLarge;
+        final int length;
+
+        CachedMetadata(List<TorrentMetadataResponse> signedChunks, boolean tooLarge, int length) {
+            this.signedChunks = signedChunks;
+            this.tooLarge = tooLarge;
+            this.length = length;
+        }
+    }
 
     public IncomingSearchRequestHandler(DistributedSearchTransport transport,
                                         RelaySearchService searchService) {
@@ -259,11 +300,26 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      * a signed error frame the requester can fast-fallback on.
      */
     private void sendTorrentMetadataResponse(TorrentMetadataRequest request) throws GeneralSecurityException {
+        String ihHex = request.infoHashHex();
+        long ts = System.currentTimeMillis() / 1000L;
+        CachedMetadata cached = torrentCache.get(ihHex);
+        if (cached != null) {
+            if (cached.tooLarge) {
+                LOG.info("TORRENT_FETCH over cap (cached) ih=" + ihHex
+                        + " bytes=" + cached.length);
+            } else {
+                LOG.info("TORRENT_FETCH answer (cached) ih=" + ihHex
+                        + " bytes=" + cached.length
+                        + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
+            }
+            sendCachedTemplates(cached, request, ts);
+            return;
+        }
         TorrentMetadataProvider provider = torrentMetadataProvider;
         byte[] torrentBytes = provider == null ? null : provider.torrentBytes(request.infoHash());
-        long ts = System.currentTimeMillis() / 1000L;
         if (torrentBytes == null) {
-            LOG.info("TORRENT_FETCH miss ih=" + request.infoHashHex()
+            // Never cache misses: the torrent may arrive after this request.
+            LOG.info("TORRENT_FETCH miss ih=" + ihHex
                     + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
             sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
                     request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_NOT_FOUND),
@@ -271,28 +327,64 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             return;
         }
         if (torrentBytes.length > METADATA_MAX_BYTES) {
-            LOG.info("TORRENT_FETCH over cap ih=" + request.infoHashHex()
+            // Safe to cache: infohash is the content hash, so these bytes
+            // are immutable and every future request for ihHex is over cap.
+            CachedMetadata overCap = new CachedMetadata(
+                    java.util.Collections.singletonList(signMetadataChunk(
+                            TorrentMetadataResponse.buildError(
+                                    request.nonce(), request.infoHash(), ts,
+                                    TorrentMetadataResponse.ERR_TOO_LARGE))),
+                    true, torrentBytes.length);
+            torrentCache.put(ihHex, overCap);
+            LOG.info("TORRENT_FETCH over cap ih=" + ihHex
                     + " bytes=" + torrentBytes.length);
-            sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
-                    request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_TOO_LARGE),
-                    request.requesterPub());
+            sendCachedTemplates(overCap, request, ts);
             return;
         }
-        LOG.info("TORRENT_FETCH answer ih=" + request.infoHashHex()
-                + " bytes=" + torrentBytes.length
-                + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
+        List<TorrentMetadataResponse> signed = new ArrayList<>();
         for (TorrentMetadataResponse chunk :
                 TorrentMetadataResponse.buildChunks(request.nonce(), request.infoHash(), ts, torrentBytes)) {
-            sendSignedMetadataChunk(chunk, request.requesterPub());
+            signed.add(signMetadataChunk(chunk));
+        }
+        CachedMetadata hit = new CachedMetadata(
+                java.util.Collections.unmodifiableList(signed), false, torrentBytes.length);
+        torrentCache.put(ihHex, hit);
+        LOG.info("TORRENT_FETCH answer ih=" + ihHex
+                + " bytes=" + torrentBytes.length
+                + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
+        sendCachedTemplates(hit, request, ts);
+    }
+
+    /** Visible for tests: current torrent payload cache size. */
+    public int torrentCacheSize() {
+        return torrentCache.size();
+    }
+
+    /**
+     * Serve cached signed templates to a new request: restamp each with the
+     * live nonce/timestamp (free — outside the v2 signature domain), encode,
+     * and send. Zero Ed25519 SIGNs on a hit.
+     */
+    private void sendCachedTemplates(
+            CachedMetadata cached, TorrentMetadataRequest request, long ts) {
+        for (TorrentMetadataResponse template : cached.signedChunks) {
+            sendPresignedChunk(
+                    template.withNonceTimestamp(request.nonce(), ts), request.requesterPub());
         }
     }
 
+    /** Sign one unsigned chunk and send it (cache-miss path only). */
     private void sendSignedMetadataChunk(TorrentMetadataResponse unsigned, byte[] requesterPub)
+            throws GeneralSecurityException {
+        sendPresignedChunk(signMetadataChunk(unsigned), requesterPub);
+    }
+
+    private TorrentMetadataResponse signMetadataChunk(TorrentMetadataResponse unsigned)
             throws GeneralSecurityException {
         Signature signer = IdentityKeys.softwareSignature("Ed25519");
         signer.initSign(identity.ed25519().getPrivate());
         signer.update(unsigned.canonicalBytes());
-        TorrentMetadataResponse signed = TorrentMetadataResponse.builder()
+        return TorrentMetadataResponse.builder()
                 .version(unsigned.version())
                 .nonce(unsigned.nonce())
                 .infoHash(unsigned.infoHash())
@@ -304,9 +396,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 .error(unsigned.error())
                 .signature(signer.sign())
                 .build();
+    }
+
+    private void sendPresignedChunk(TorrentMetadataResponse signed, byte[] requesterPub) {
         byte[] bytes = SearchPayloadCodec.encodeTorrentMetadataResponse(signed);
         if (!transport.send(requesterPub, MeshProtocolId.METADATA, bytes)) {
-            LOG.warn("Could not route torrent metadata chunk ci=" + unsigned.chunkIndex()
+            LOG.warn("Could not route torrent metadata chunk ci=" + signed.chunkIndex()
                     + " to requester " + Hex.encode(requesterPub));
         }
     }
