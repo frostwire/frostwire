@@ -66,10 +66,17 @@ fi
 # nohup instructions at the end).
 if [[ "$(id -u)" -ne 0 ]] && command -v sudo >/dev/null 2>&1 && [[ -f "$0" ]]; then
   echo "==> Need root for ${INSTALL_DIR} + systemd; re-running under sudo (may ask for your password)."
+  # Gradle needs JAVA_HOME (sudo resets PATH and strips the environment);
+  # derive it from the resolved java binary when the caller didn't export one.
+  ELEVATED_JAVA_HOME="${JAVA_HOME:-}"
+  if [[ -z "${ELEVATED_JAVA_HOME}" && "${JAVA_BIN:-}" == */* ]]; then
+    ELEVATED_JAVA_HOME="$(cd "$(dirname "${JAVA_BIN}")/.." 2>/dev/null && pwd)"
+  fi
   exec sudo \
     "INSTALL_DIR=${INSTALL_DIR}" \
     "SERVICE_USER=${SERVICE_USER}" \
     "JAVA_BIN=${JAVA_BIN:-java}" \
+    "JAVA_HOME=${ELEVATED_JAVA_HOME}" \
     "FORCE_ENV=${FORCE_ENV:-0}" \
     "ICEBRIDGE_HOST=${ICEBRIDGE_HOST:-}" \
     "ICEBRIDGE_RUDP_PORT=${ICEBRIDGE_RUDP_PORT:-}" \
