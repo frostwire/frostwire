@@ -3,7 +3,8 @@
 #
 # Defaults: bind 0.0.0.0, role FORWARDER, DHT on, TCP identity 6888, UDP mesh 6889,
 # control HTTP 8081 (loopback only inside the JVM). Builds icebridge.jar if missing,
-# then runs via java -jar (preferred over long-lived Gradle).
+# kills any previous icebridge process bound to the same relay/control ports
+# (pidfile + port sweep), then runs via java -jar (preferred over long-lived Gradle).
 #
 # Usage (from anywhere):
 #   ./scripts/icebridge-run-local.sh
@@ -91,6 +92,12 @@ export ICEBRIDGE_MAX_PEERS="${ICEBRIDGE_MAX_PEERS:-10000}"
 export ICEBRIDGE_PEER_TTL_SEC="${ICEBRIDGE_PEER_TTL_SEC:-300}"
 export ICEBRIDGE_MAX_QPS_PER_KEY="${ICEBRIDGE_MAX_QPS_PER_KEY:-30.0}"
 
+# Mode-specific pidfile so default and --colo background runs track separately.
+PIDFILE="${ROOT}/icebridge.pid"
+if [[ "${COLO}" -eq 1 ]]; then
+  PIDFILE="${ROOT}/icebridge-colo.pid"
+fi
+
 JAR="${ROOT}/build/libs/icebridge.jar"
 JAVA_BIN="${JAVA_BIN:-java}"
 if command -v "${JAVA_BIN}" >/dev/null 2>&1; then
@@ -148,12 +155,90 @@ run_server() {
   exec "${JAVA_BIN}" -jar "${JAR}"
 }
 
+# PIDs listening on a local TCP port (one per line; empty when free).
+# lsof covers macOS + most Linux; ss covers Linux iproute2. No match when
+# neither tool exists (caller warns once).
+pids_on_tcp_port() {
+  local port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -tiTCP:"${port}" -sTCP:LISTEN 2>/dev/null || true
+    return 0
+  fi
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnp 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
+    return 0
+  fi
+  return 1
+}
+
+# Stop anything from a previous run before we bind: our mode-specific pidfile
+# first, then any stray still bound to OUR relay/control TCP ports (e.g. a
+# forwarder launched by hand). Scoped to our ports, so a --colo instance on
+# 7000/7001 is never touched by a default-ports run and vice versa.
+kill_existing() {
+  local victims="" pid=""
+  if [[ -f "${PIDFILE}" ]]; then
+    pid="$(tr -cd '0-9' < "${PIDFILE}" 2>/dev/null || true)"
+    if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null \
+        && ps -p "${pid}" -o args= 2>/dev/null | grep -q "icebridge"; then
+      victims="${victims} ${pid}"
+    fi
+    rm -f "${PIDFILE}"
+  fi
+  if ! command -v lsof >/dev/null 2>&1 && ! command -v ss >/dev/null 2>&1; then
+    echo "    WARNING: neither lsof nor ss found; cannot sweep strays by port." >&2
+  else
+    local port="" p=""
+    for port in "${ICEBRIDGE_RELAY_PORT}" "${ICEBRIDGE_CONTROL_HTTP_PORT}"; do
+      for p in $(pids_on_tcp_port "${port}" || true); do
+        [[ "${p}" != "$$" ]] && victims="${victims} ${p}"
+      done
+    done
+  fi
+  victims="$(echo ${victims} | tr ' ' '\n' | sort -nu | tr '\n' ' ')"
+  if [[ -z "${victims// }" ]]; then
+    return 0
+  fi
+  echo "==> Stopping existing icebridge process(es):${victims}"
+  # shellcheck disable=SC2086
+  kill ${victims} 2>/dev/null || true
+  local i="" alive="" p="" still="" remain=""
+  for i in $(seq 1 25); do
+    alive=""
+    for p in ${victims}; do
+      kill -0 "${p}" 2>/dev/null && alive="${alive} ${p}"
+    done
+    [[ -z "${alive// }" ]] && break
+    sleep 0.2
+  done
+  for p in ${victims}; do
+    kill -0 "${p}" 2>/dev/null && still="${still} ${p}"
+  done
+  if [[ -n "${still// }" ]]; then
+    echo "    TERM ignored, escalating to KILL:${still}"
+    # shellcheck disable=SC2086
+    kill -9 ${still} 2>/dev/null || true
+    sleep 1
+  fi
+  for p in ${victims}; do
+    kill -0 "${p}" 2>/dev/null && remain="${remain} ${p}"
+  done
+  if [[ -n "${remain// }" ]]; then
+    echo "ERROR: could not stop icebridge pid(s):${remain}; ports may still be bound." >&2
+    return 1
+  fi
+  echo "    stopped."
+}
+
+# Free our ports before binding (skipped for --generate-token-only runs above).
+kill_existing
+
 if [[ "${BACKGROUND}" -eq 1 ]]; then
   LOG="${ROOT}/icebridge.log"
   echo "==> Starting in background; log=${LOG}"
   nohup "${JAVA_BIN}" -jar "${JAR}" >>"${LOG}" 2>&1 &
-  echo $! >"${ROOT}/icebridge.pid"
-  echo "    pid=$(cat "${ROOT}/icebridge.pid")"
+  echo $! >"${PIDFILE}"
+  echo "    pid=$(cat "${PIDFILE}")"
   echo "    health: curl -sS http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health"
   exit 0
 fi
