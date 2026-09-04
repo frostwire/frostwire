@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages rUDP sessions, hole punching, and relay forwarding for an IceBridge
@@ -59,6 +60,18 @@ public final class RudpSessionManager {
     /** Max RELAY / RELAY_RESPONSE accepts per peer key per second (sustained). */
     private static final double RELAY_MAX_QPS = 20.0;
 
+    // HELLO gating (DDoS slice B). STARTING VALUES to validate from EC2 logs
+    // before freezing: per-IP burst is generous on purpose — many legit
+    // phones share one carrier IP behind CGNAT, so a tight per-IP budget
+    // would reject honest users. The global budget is the backstop.
+    private static final double HELLO_PER_IP_CAPACITY = 10.0;
+    private static final double HELLO_PER_IP_REFILL_PER_SEC = 2.0;
+    private static final double HELLO_GLOBAL_CAPACITY = 200.0;
+    private static final double HELLO_GLOBAL_REFILL_PER_SEC = 50.0;
+    private static final String HELLO_GLOBAL_KEY = "hello";
+    /** STARTING VALUE: max responder sessions per IPv4 /24 (validate from EC2 logs). */
+    private static final int MAX_SESSIONS_PER_SUBNET_24 = 256;
+
     /** N — mesh broadcast fanout; live-tunable via {@link IceBridgeTopology}. */
     private int meshBroadcastFanout() {
         return IceBridgeTopology.get().meshBroadcastFanout();
@@ -81,6 +94,16 @@ public final class RudpSessionManager {
     private final RudpMessageListener messageListener;
     private final FragmentReassembler reassembler = new FragmentReassembler();
     private final RateLimiter relayRateLimiter;
+    private final RateLimiter helloPerIp;
+    private final RateLimiter helloGlobal;
+    /** Live responder-session count per IPv4 /24 (first 3 bytes as int key). */
+    private final Map<Integer, AtomicLong> sessionsPerSubnet = new ConcurrentHashMap<>();
+    /**
+     * Creation-/24 of each counted session (RudpSession is identity-keyed).
+     * Lets eviction decrement the exact creation subnet even if the session
+     * later rebound across /24s on CGNAT.
+     */
+    private final Map<RudpSession, Integer> subnetOfCountedSession = new ConcurrentHashMap<>();
 
     private final Map<Long, RudpSession> sessionsByRemoteId = new ConcurrentHashMap<>();
     private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new ConcurrentHashMap<>();
@@ -99,6 +122,8 @@ public final class RudpSessionManager {
         this.metrics = metrics;
         this.messageListener = messageListener;
         this.relayRateLimiter = new RateLimiter(RELAY_MAX_QPS, RELAY_MAX_QPS);
+        this.helloPerIp = new RateLimiter(HELLO_PER_IP_CAPACITY, HELLO_PER_IP_REFILL_PER_SEC);
+        this.helloGlobal = new RateLimiter(HELLO_GLOBAL_CAPACITY, HELLO_GLOBAL_REFILL_PER_SEC);
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-rudp-manager");
             t.setDaemon(true);
@@ -466,16 +491,32 @@ public final class RudpSessionManager {
 
     private void handleHello(RudpPacket packet, InetSocketAddress sender) {
         long remoteCid = packet.connectionId();
+        // Gate only genuinely new handshakes: retransmits and re-HELLOs for
+        // known sessions must never burn the Sybil budget, or congestion
+        // would throttle exactly the retries that must succeed.
+        RudpSession known = sessionsByRemoteId.get(remoteCid);
+        RudpSession outbound = known == null ? sessionsByAddress.get(sender) : null;
+        if (known == null && outbound == null && !allowHello(sender)) {
+            metrics.helloRejected();
+            return;
+        }
         if (!RudpAuth.verifyHello(remoteCid, packet.payload())) {
             LOG.debug("RudpSessionManager: dropped HELLO with bad auth from " + sender);
             return;
         }
         byte[] remotePub = Arrays.copyOfRange(packet.payload(), 0, 32);
-        RudpSession session = sessionsByRemoteId.get(remoteCid);
+        RudpSession session = known;
         if (session == null) {
             if (sessionsByRemoteId.size() >= maxSessions) {
                 LOG.warn("RudpSessionManager: rejected HELLO from " + sender
                         + " — max sessions (" + maxSessions + ") reached");
+                metrics.helloRejected();
+                return;
+            }
+            if (isSubnetFull(sender)) {
+                LOG.warn("RudpSessionManager: rejected HELLO from " + sender
+                        + " — max sessions per /24 (" + MAX_SESSIONS_PER_SUBNET_24 + ") reached");
+                metrics.helloRejected();
                 return;
             }
             if (!sessionInitiatedByUs(sender)) {
@@ -494,6 +535,7 @@ public final class RudpSessionManager {
                 session = new RudpSession(localCid, remoteCid, sender, remotePub, false);
                 sessionsByRemoteId.put(remoteCid, session);
                 sessionsByAddress.put(sender, session);
+                trackSubnetSession(session, sender);
             }
         } else {
             session.setRemotePub(remotePub);
@@ -517,8 +559,94 @@ public final class RudpSessionManager {
             write(sender, ack);
         } catch (Exception e) {
             LOG.error("Failed to sign HELLO_ACK", e);
-            write(sender, new RudpPacket(
-                    RudpPacket.Type.HELLO_ACK, remoteCid, 0, 0, new byte[0]));
+            metrics.helloRejected();
+        }
+    }
+
+    /**
+     * HELLO rate gate: per-IP bucket first (an abusive IP burns only its own
+     * budget), then the global budget. Fail open — a limiter failure must
+     * never drop honest handshakes. No regex/split: the key is the sender IP
+     * string, the global key is a constant.
+     */
+    private boolean allowHello(InetSocketAddress sender) {
+        try {
+            String ip = senderIp(sender);
+            if (ip != null && !helloPerIp.tryAcquire(ip)) {
+                LOG.debug("RudpSessionManager: rate-limited HELLO from " + sender);
+                return false;
+            }
+            if (!helloGlobal.tryAcquire(HELLO_GLOBAL_KEY)) {
+                LOG.debug("RudpSessionManager: HELLO global budget exhausted, dropped from " + sender);
+                return false;
+            }
+            return true;
+        } catch (Throwable t) {
+            LOG.warn("RudpSessionManager: HELLO limiter failed open", t);
+            return true;
+        }
+    }
+
+    /** Sender IP string, or null when unresolvable (caller fails open). */
+    private static String senderIp(InetSocketAddress sender) {
+        if (sender == null || sender.getAddress() == null) {
+            return null;
+        }
+        return sender.getAddress().getHostAddress();
+    }
+
+    /**
+     * IPv4 /24 key (first 3 address bytes) or null when unavailable
+     * (unresolvable, non-IPv4) — callers fail open on null. Derived from
+     * raw address bytes: no string parsing, no allocation on the probe path.
+     */
+    private static Integer subnet24Key(InetSocketAddress sender) {
+        if (sender == null || sender.getAddress() == null) {
+            return null;
+        }
+        byte[] v4 = ipv4Bytes(sender.getAddress());
+        if (v4 == null) {
+            return null;
+        }
+        return Integer.valueOf(((v4[0] & 0xff) << 16) | ((v4[1] & 0xff) << 8) | (v4[2] & 0xff));
+    }
+
+    private boolean isSubnetFull(InetSocketAddress sender) {
+        try {
+            Integer subnet = subnet24Key(sender);
+            if (subnet == null) {
+                return false;
+            }
+            AtomicLong count = sessionsPerSubnet.get(subnet);
+            return count != null && count.get() >= MAX_SESSIONS_PER_SUBNET_24;
+        } catch (Throwable t) {
+            LOG.warn("RudpSessionManager: subnet check failed open", t);
+            return false;
+        }
+    }
+
+    private void trackSubnetSession(RudpSession session, InetSocketAddress sender) {
+        try {
+            Integer subnet = subnet24Key(sender);
+            if (subnet == null) {
+                return;
+            }
+            subnetOfCountedSession.put(session, subnet);
+            sessionsPerSubnet.computeIfAbsent(subnet, k -> new AtomicLong()).incrementAndGet();
+        } catch (Throwable t) {
+            LOG.warn("RudpSessionManager: subnet tracking failed open", t);
+        }
+    }
+
+    private void untrackSubnetSession(RudpSession session) {
+        try {
+            Integer subnet = subnetOfCountedSession.remove(session);
+            if (subnet == null) {
+                return;
+            }
+            sessionsPerSubnet.computeIfPresent(subnet, (k, v) -> v.decrementAndGet() <= 0 ? null : v);
+        } catch (Throwable t) {
+            LOG.warn("RudpSessionManager: subnet untrack failed", t);
         }
     }
 
@@ -989,6 +1117,7 @@ public final class RudpSessionManager {
         }
         sessionsByRemoteId.remove(session.remoteConnectionId(), session);
         sessionsByAddress.remove(session.remoteAddress(), session);
+        untrackSubnetSession(session);
         LOG.warn("IceBridge mesh: dropped session " + session.remoteAddress()
                 + " after reliable send timeout — next send will reconnect");
     }
@@ -1020,6 +1149,7 @@ public final class RudpSessionManager {
             if (now - session.lastActivityMs() > SESSION_IDLE_MS) {
                 sessionsByRemoteId.remove(session.remoteConnectionId());
                 sessionsByAddress.remove(session.remoteAddress());
+                untrackSubnetSession(session);
             }
         }
         for (RudpSession session : dead) {
