@@ -838,7 +838,21 @@ final class Initializer {
       PeerDirectory directory, BTEngine btEngine, IdentityKeys ownIdentity) {
     try {
       DhtPeerDiscoverySource dhtSource = new DhtPeerDiscoverySource(btEngine);
-      PeerAuthenticator authenticator = new DirectTcpPeerAuthenticator();
+      PeerAuthenticator baseAuthenticator = new DirectTcpPeerAuthenticator();
+      // Count failed handshakes against the host cache so dead entries are
+      // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
+      PeerAuthenticator authenticator = (host, port) -> {
+        java.util.Optional<IdentityRecord> rec = baseAuthenticator.authenticate(host, port);
+        if (rec.isEmpty()) {
+          try {
+            com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                .markFailure(host, port);
+          } catch (Throwable ignored) {
+            // cache is best-effort
+          }
+        }
+        return rec;
+      };
       byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
       // Previously verified servers from the host cache get a fast re-join
       // path through the SAME identity authenticator as DHT endpoints — no
@@ -848,6 +862,16 @@ final class Initializer {
           new com.frostwire.search.relay.CompositePeerDiscoverySource(
               new com.frostwire.search.relay.HostCachePeerDiscoverySource(), dhtSource);
       PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
+      // Skip our own externally-visible endpoint (multi-homed hosts, VPN
+      // egress) the same way Android skips the carrier-NAT hairpin.
+      final BTEngine engineForIp = btEngine;
+      discovery.setSelfEndpoint(() -> {
+        try {
+          return engineForIp != null ? engineForIp.getExternalIp() : null;
+        } catch (Throwable ignored) {
+          return null;
+        }
+      }, SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
       // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
       // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
       new PeerDiscoveryScheduler(discovery, 30).start();
