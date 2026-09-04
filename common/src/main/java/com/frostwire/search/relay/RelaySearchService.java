@@ -19,16 +19,20 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * In-process handler for incoming {@link RemoteSearchRequest}s.
- * Performs the four steps needed to turn a request into a signed
- * response:
+ * Performs the steps needed to turn a request into a signed
+ * response, cheap rejects first (DDoS hardening — never pay
+ * Ed25519 verify before the O(1) gates):
  * <ol>
+ *   <li>TTL-range sanity (fail closed on absurd hop budgets).</li>
+ *   <li>Known-spam drop (cheap directory read, no crypto).</li>
+ *   <li>Rate-limit per requester (token bucket).</li>
  *   <li>Verify the requester's Ed25519 signature over the
  *       request's canonical bytes.</li>
  *   <li>Check timestamp skew (anti-replay).</li>
- *   <li>Rate-limit per requester (token bucket).</li>
  *   <li>Query the local {@link LocalIndex} and build a
  *       {@link RemoteSearchResponse} signed by this node's key.</li>
  * </ol>
@@ -55,6 +59,13 @@ public final class RelaySearchService {
     private final RateLimiter rateLimiter;
     private final ShareVisibilityPolicy visibility;
     private volatile SeederEndpointProvider seederEndpointProvider = SeederEndpointProvider.NONE;
+    /**
+     * Cheap pre-verify spam gate. Defaults to always-false (accept unknowns,
+     * same as before); wire a directory-backed predicate to drop known
+     * spammers before paying Ed25519 verify. Never null (null resets to
+     * always-false). The predicate must not retain the passed array.
+     */
+    private volatile Predicate<byte[]> spamChecker = k -> false;
 
     public RelaySearchService(LocalIndex index, IdentityKeys identity) {
         this(index, identity, new RateLimiter(
@@ -102,6 +113,14 @@ public final class RelaySearchService {
     }
 
     /**
+     * Additive spam gate for cheap-reject-first ordering. A null argument
+     * resets to always-false (never null internally).
+     */
+    public void setSpamChecker(Predicate<byte[]> spamChecker) {
+        this.spamChecker = spamChecker != null ? spamChecker : k -> false;
+    }
+
+    /**
      * Handle an incoming request. Returns empty if the request
      * is rejected for any reason (bad signature, stale timestamp,
      * rate limit, internal error).
@@ -111,6 +130,24 @@ public final class RelaySearchService {
             return Optional.empty();
         }
         try {
+            int ttl = request.ttl();
+            if (ttl < 0 || ttl > RemoteSearchRequest.MAX_PATH_LENGTH) {
+                LOG.warn("RelaySearchService: rejected request (ttl out of range "
+                        + ttl + ") keywords=" + request.keywords());
+                return Optional.empty();
+            }
+            byte[] requesterPub = request.requesterPub();
+            Predicate<byte[]> spamChecker = this.spamChecker;
+            if (spamChecker != null && spamChecker.test(requesterPub)) {
+                LOG.warn("RelaySearchService: rejected request (spam) keywords="
+                        + request.keywords());
+                return Optional.empty();
+            }
+            if (!rateLimiter.tryAcquire(requesterPub)) {
+                LOG.warn("RelaySearchService: rejected request (rate limit) keywords="
+                        + request.keywords());
+                return Optional.empty();
+            }
             if (!verifySignature(request)) {
                 LOG.warn("RelaySearchService: rejected request (bad signature) keywords="
                         + request.keywords());
@@ -121,11 +158,6 @@ public final class RelaySearchService {
             if (skew > MAX_TIMESTAMP_SKEW_MS) {
                 LOG.warn("RelaySearchService: rejected request (timestamp skew "
                         + skew + "ms) keywords=" + request.keywords());
-                return Optional.empty();
-            }
-            if (!rateLimiter.tryAcquire(request.requesterPub())) {
-                LOG.warn("RelaySearchService: rejected request (rate limit) keywords="
-                        + request.keywords());
                 return Optional.empty();
             }
             int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
