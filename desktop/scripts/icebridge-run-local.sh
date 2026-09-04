@@ -5,6 +5,8 @@
 # control HTTP 8081 (loopback only inside the JVM). Builds icebridge.jar if missing,
 # kills any previous icebridge process bound to the same relay/control ports
 # (pidfile + port sweep), then runs via java -jar (preferred over long-lived Gradle).
+# Default (no flags) starts the server detached and tails the log — Ctrl+C
+# stops the tail only; the server keeps running.
 #
 # Usage (from anywhere):
 #   ./scripts/icebridge-run-local.sh
@@ -147,12 +149,47 @@ if [[ "${BACKGROUND}" -eq 1 && "${USE_GRADLE}" -eq 1 ]]; then
 fi
 
 run_server() {
-  if [[ "${USE_GRADLE}" -eq 1 ]]; then
-    echo "==> Starting via ./gradlew icebridge"
-    exec ./gradlew icebridge
+  echo "==> Starting via ./gradlew icebridge (foreground — Ctrl+C stops it)"
+  exec ./gradlew icebridge
+}
+
+# Launch the JVM detached from this terminal: its own process group (job
+# control) + nohup, so Ctrl+C or closing the terminal never reaches it.
+# Sets SERVER_PID and LOG. Fails fast when the JVM dies on startup.
+start_detached() {
+  LOG="${ROOT}/icebridge.log"
+  set -m
+  # shellcheck disable=SC2086
+  nohup "${JAVA_BIN}" -jar "${JAR}" >>"${LOG}" 2>&1 &
+  SERVER_PID=$!
+  set +m
+  echo "${SERVER_PID}" >"${PIDFILE}"
+  sleep 1
+  if ! kill -0 "${SERVER_PID}" 2>/dev/null; then
+    echo "ERROR: server (pid ${SERVER_PID}) died on startup; last log lines:" >&2
+    tail -n 30 "${LOG}" >&2 || true
+    rm -f "${PIDFILE}"
+    return 1
   fi
-  echo "==> Starting via java -jar (foreground)"
-  exec "${JAVA_BIN}" -jar "${JAR}"
+}
+
+server_started_notice() {
+  echo "==> Server running (pid ${SERVER_PID}); log=${LOG}"
+  echo "==> Safe to press Ctrl+C or close this terminal — the server keeps running."
+  echo "    reattach log: tail -f ${LOG}"
+  echo "    health: curl -sS http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health"
+}
+
+wait_for_health() {
+  local i=""
+  for i in $(seq 1 10); do
+    if curl -sf --max-time 1 \
+        "http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  return 1
 }
 
 # PIDs listening on a local TCP port (one per line; empty when free).
@@ -233,14 +270,37 @@ kill_existing() {
 # Free our ports before binding (skipped for --generate-token-only runs above).
 kill_existing
 
+if [[ "${USE_GRADLE}" -eq 1 ]]; then
+  run_server
+fi
+
+# Default and --background: detached start, so terminal Ctrl+C / close never
+# reaches the server. Default then follows the log; Ctrl+C stops the tail only.
+start_detached || exit 1
+server_started_notice
+if wait_for_health; then
+  echo "    health: OK"
+else
+  echo "    health: not yet responding; showing log anyway"
+fi
+
 if [[ "${BACKGROUND}" -eq 1 ]]; then
-  LOG="${ROOT}/icebridge.log"
-  echo "==> Starting in background; log=${LOG}"
-  nohup "${JAVA_BIN}" -jar "${JAR}" >>"${LOG}" 2>&1 &
-  echo $! >"${PIDFILE}"
-  echo "    pid=$(cat "${PIDFILE}")"
-  echo "    health: curl -sS http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health"
   exit 0
 fi
 
-run_server
+echo "==> Following log (Ctrl+C detaches; server keeps running):"
+TAIL_PID=""
+detach_and_exit() {
+  kill "${TAIL_PID}" 2>/dev/null || true
+  echo ""
+  echo "==> Detached (Ctrl+C). Server keeps running (pid ${SERVER_PID})."
+  echo "    reattach log: tail -f ${LOG}"
+  echo "    health: curl -sS http://127.0.0.1:${ICEBRIDGE_CONTROL_HTTP_PORT}/health"
+  exit 0
+}
+trap detach_and_exit INT
+tail -n 30 -F "${LOG}" &
+TAIL_PID=$!
+wait "${TAIL_PID}" || true
+trap - INT
+detach_and_exit
