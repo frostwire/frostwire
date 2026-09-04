@@ -207,6 +207,11 @@ ExecStart=${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar --host ${ICEBRIDGE_HOST}
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65535
+# Bound journal volume under flood: per-packet drops already log at DEBUG,
+# this caps any residual spam (~66 lines/sec) so one flooder can't evict
+# the log history inside the 200M journal budget. Tune after EC2 baseline.
+LogRateLimitIntervalSec=30s
+LogRateLimitBurst=2000
 
 [Install]
 WantedBy=multi-user.target
