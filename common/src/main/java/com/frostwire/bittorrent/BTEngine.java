@@ -68,6 +68,11 @@ public final class BTEngine extends SessionManager {
     // Cached paused state to avoid blocking EDT calls
     private volatile boolean cachedPausedState = false;
 
+    // Last externally-visible IP reported by libtorrent (external_ip alert).
+    // Used to skip our own hairpinned endpoint during peer discovery. Null
+    // until the first alert; can change on network rebinding (read fresh).
+    private volatile String lastExternalIp;
+
     // Store priorities for V2-only torrents that are added as paused and need priority application when ADD_TORRENT alert fires
     private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
 
@@ -753,7 +758,19 @@ public final class BTEngine extends SessionManager {
         String s = "endpoint: " + endp + " type:" + alert.socketType();
         ErrorCode error = alert.error();
         String message = error.message() + "/value=" + error.value();
-        LOG.info("Listen failed on " + s + " (error: " + message + ")");
+        String op;
+        String iface;
+        try {
+            op = String.valueOf(alert.operation());
+        } catch (Throwable ignored) {
+            op = "?";
+        }
+        try {
+            iface = String.valueOf(alert.listenInterface());
+        } catch (Throwable ignored) {
+            iface = "?";
+        }
+        LOG.info("Listen failed on " + s + " op=" + op + " iface=" + iface + " (error: " + message + ")");
     }
 
     private File setupSaveDir(File saveDir) {
@@ -866,9 +883,20 @@ public final class BTEngine extends SessionManager {
             // to avoid non-usable addresses
             String address = alert.externalAddress().toString();
             LOG.info("External IP: " + address);
+            if (address != null && !address.isEmpty()) {
+                lastExternalIp = address;
+            }
         } catch (Throwable e) {
             LOG.error("Error saving reported external ip", e);
         }
+    }
+
+    /**
+     * Last external IP reported by libtorrent, or null if unknown yet. Read
+     * fresh on every call — carriers rebind it (CGNAT), so never cache it.
+     */
+    public String getExternalIp() {
+        return lastExternalIp;
     }
 
     private void onFastresumeRejected(FastresumeRejectedAlert alert) {
