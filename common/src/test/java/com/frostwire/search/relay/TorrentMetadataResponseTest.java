@@ -172,6 +172,61 @@ class TorrentMetadataResponseTest {
     }
 
     @Test
+    void restampedCopyVerifiesForNewNonce() throws Exception {
+        KeyPair holder = ed25519();
+        byte[] nonceA = new byte[32];
+        byte[] nonceB = new byte[32];
+        new SecureRandom().nextBytes(nonceA);
+        new SecureRandom().nextBytes(nonceB);
+        byte[] infoHash = new byte[20];
+        new SecureRandom().nextBytes(infoHash);
+        byte[] torrent = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES + 7];
+        new SecureRandom().nextBytes(torrent);
+
+        List<TorrentMetadataResponse> chunks =
+                signAll(TorrentMetadataResponse.buildChunks(nonceA, infoHash, 1000L, torrent), holder);
+        TorrentMetadataResponse restamped = chunks.get(0).withNonceTimestamp(nonceB, 2000L);
+
+        // Same holder signature, new correlation fields — must verify for request B.
+        assertArrayEquals(nonceB, restamped.nonce());
+        assertEquals(2000L, restamped.timestamp());
+        assertTrue(restamped.verifySignature(holderPub(holder)));
+        // And the restamped frame still round-trips through the wire codec.
+        TorrentMetadataResponse decoded = SearchPayloadCodec.decodeTorrentMetadataResponse(
+                SearchPayloadCodec.encodeTorrentMetadataResponse(restamped));
+        assertNotNull(decoded);
+        assertTrue(decoded.verifySignature(holderPub(holder)));
+
+        // Same-domain tampering (chunk index) must still fail verification.
+        TorrentMetadataResponse reindexed = TorrentMetadataResponse.builder()
+                .version(restamped.version())
+                .nonce(restamped.nonce())
+                .infoHash(restamped.infoHash())
+                .payloadDigest(restamped.payloadDigest())
+                .chunkIndex(restamped.chunkIndex() + 1)
+                .finalChunk(restamped.isFinalChunk())
+                .timestamp(restamped.timestamp())
+                .data(restamped.data())
+                .signature(restamped.signature())
+                .build();
+        assertFalse(reindexed.verifySignature(holderPub(holder)));
+    }
+
+    @Test
+    void fromMapRejectsStaleV1Frames() throws Exception {
+        KeyPair holder = ed25519();
+        byte[] nonce = new byte[32];
+        byte[] infoHash = new byte[20];
+        TorrentMetadataResponse err = sign(
+                TorrentMetadataResponse.buildError(nonce, infoHash, 1000L, TorrentMetadataResponse.ERR_NOT_FOUND),
+                holder);
+        Map<String, Object> stale = err.toBencodeableMap();
+        stale.put("v", 1);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(stale),
+                "v1 frames (nonce-bound domain) must fail fast on v2 peers");
+    }
+
+    @Test
     void builderEnforcesExactlyOneOfDataOrError() {
         byte[] nonce = new byte[32];
         byte[] infoHash = new byte[20];
@@ -200,7 +255,7 @@ class TorrentMetadataResponseTest {
         String ihHex = com.frostwire.util.Hex.encode(ih);
         String sig = java.util.Base64.getEncoder().withoutPadding().encodeToString(new byte[64]);
         Map<String, Object> badDigest = new java.util.HashMap<>();
-        badDigest.put("v", 1);
+        badDigest.put("v", TorrentMetadataResponse.VERSION);
         badDigest.put("nonce", nonceB64);
         badDigest.put("ih", ihHex);
         badDigest.put("pd", "short");
