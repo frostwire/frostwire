@@ -365,8 +365,33 @@ public final class AndroidRelayStack implements AutoCloseable {
       byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
       PeerDiscoverySource discoverySource =
           new CompositePeerDiscoverySource(new HostCachePeerDiscoverySource(), dhtDiscoverySource);
+      // Count failed handshakes against the host cache so dead entries are
+      // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
+      DirectTcpPeerAuthenticator tcpAuthenticator = new DirectTcpPeerAuthenticator();
+      com.frostwire.search.relay.PeerAuthenticator authenticator = (host, port) -> {
+        java.util.Optional<com.frostwire.search.relay.IdentityRecord> rec =
+            tcpAuthenticator.authenticate(host, port);
+        if (rec.isEmpty()) {
+          try {
+            IceBridgeHostCache.getInstance().markFailure(host, port);
+          } catch (Throwable ignored) {
+            // cache is best-effort
+          }
+        }
+        return rec;
+      };
       PeerDiscovery discovery =
-          new PeerDiscovery(discoverySource, pd, new DirectTcpPeerAuthenticator(), ownPub);
+          new PeerDiscovery(discoverySource, pd, authenticator, ownPub);
+      // Skip our own carrier-NAT hairpin: candidates at BTEngine's latest
+      // external IP on our own relay port are us (or unreachable mates).
+      final com.frostwire.bittorrent.BTEngine engineForIp = btEngine;
+      discovery.setSelfEndpoint(() -> {
+        try {
+          return engineForIp != null ? engineForIp.getExternalIp() : null;
+        } catch (Throwable ignored) {
+          return null;
+        }
+      }, readConfiguredRelayPort());
       pds = new PeerDiscoveryScheduler(discovery, PEER_DISCOVERY_INTERVAL_SEC);
       pds.start();
       LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
