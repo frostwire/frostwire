@@ -32,20 +32,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <p>Format (text, one entry per line):
  * <pre>
  * # icebridge host cache
- * host:port,ROLE,lastSuccessfulPingMs
- * 1.2.3.4:6888,BOTH,1712345678900
- * relay.example.com:6888,FORWARDER,1712345678900
+ * host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures
+ * 1.2.3.4:6888,BOTH,1712345678900,0
+ * relay.example.com:6888,FORWARDER,1712345678900,2
  * </pre>
  *
  * <p>Only entries that have successfully pinged (via identity handshake)
- * are considered "live" for display. Failed pings do not remove entries
- * (they are maintained for retry / future bootstrapping).
+ * are considered "live" for display. Entries that fail
+ * {@link #MAX_CONSECUTIVE_FAILURES} consecutive pings are evicted so dead
+ * hosts (and our own un-hairpinnable external IP) stop being retried every
+ * discovery tick. Any success resets the streak.
  */
 public final class IceBridgeHostCache {
 
     private static final Logger LOG = Logger.getLogger(IceBridgeHostCache.class);
 
     private static final String DEFAULT_FILE_NAME = "icebridge_host_cache.txt";
+
+    /**
+     * Consecutive ping failures after which a dead entry is evicted. Success
+     * resets the streak, so a brief outage (reboot, redeploy) never evicts a
+     * live host: at most ~1 strike accrues per discovery tick.
+     */
+    public static final int MAX_CONSECUTIVE_FAILURES = 5;
 
     private final File cacheFile;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
@@ -158,7 +167,12 @@ public final class IceBridgeHostCache {
             if (parts.length > 2) {
                 try { lastSuccess = Long.parseLong(parts[2].trim()); } catch (NumberFormatException ignored) {}
             }
-            return new Entry(host, port, role, lastSuccess);
+            int failures = 0;
+            if (parts.length > 3) {
+                try { failures = Integer.parseInt(parts[3].trim()); } catch (NumberFormatException ignored) {}
+                if (failures < 0) failures = 0;
+            }
+            return new Entry(host, port, role, lastSuccess, failures);
         } catch (Exception ignored) {
             return null;
         }
@@ -172,10 +186,11 @@ public final class IceBridgeHostCache {
             }
             try (BufferedWriter w = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(cacheFile), StandardCharsets.UTF_8))) {
-                w.write("# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs\n");
+                w.write("# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures\n");
                 for (Entry e : entries) {
                     String role = (e.role != null) ? e.role : "";
-                    w.write(e.host + ":" + e.port + "," + role + "," + e.lastSuccessfulPingMs + "\n");
+                    w.write(e.host + ":" + e.port + "," + role + "," + e.lastSuccessfulPingMs
+                            + "," + e.consecutiveFailures + "\n");
                 }
             }
         } catch (Exception e) {
@@ -185,7 +200,8 @@ public final class IceBridgeHostCache {
 
     /**
      * Add or update a known relay host. If it was previously known we keep the
-     * most recent success timestamp (unless a newer one is provided).
+     * most recent success timestamp and failure streak (unless a newer success
+     * is provided via {@link #markSuccess}).
      */
     public synchronized void addOrUpdate(String host, int port, String role) {
         if (host == null || host.isEmpty() || port <= 0) return;
@@ -194,16 +210,16 @@ public final class IceBridgeHostCache {
             if (e.host.equals(host) && e.port == port) {
                 String newRole = (role != null && !role.isEmpty()) ? role : e.role;
                 long ts = e.lastSuccessfulPingMs; // keep existing success time
-                entries.set(i, new Entry(host, port, newRole, ts));
+                entries.set(i, new Entry(host, port, newRole, ts, e.consecutiveFailures));
                 save();
                 return;
             }
         }
-        entries.add(new Entry(host, port, role, 0));
+        entries.add(new Entry(host, port, role, 0, 0));
         save();
     }
 
-    /** Mark a successful ping for the given host (updates timestamp and role). */
+    /** Mark a successful ping for the given host (updates timestamp and role, resets failures). */
     public synchronized void markSuccess(String host, int port, String role) {
         if (host == null || host.isEmpty() || port <= 0) return;
         long now = System.currentTimeMillis();
@@ -211,13 +227,41 @@ public final class IceBridgeHostCache {
             Entry e = entries.get(i);
             if (e.host.equals(host) && e.port == port) {
                 String newRole = (role != null && !role.isEmpty()) ? role : e.role;
-                entries.set(i, new Entry(host, port, newRole, now));
+                entries.set(i, new Entry(host, port, newRole, now, 0));
                 save();
                 return;
             }
         }
-        entries.add(new Entry(host, port, role, now));
+        entries.add(new Entry(host, port, role, now, 0));
         save();
+    }
+
+    /**
+     * Record one failed ping for a known host. Unknown hosts are ignored
+     * (never cache pure failures). At {@link #MAX_CONSECUTIVE_FAILURES} the
+     * entry is evicted so discovery stops retrying corpses.
+     *
+     * @return true when this failure evicted the entry
+     */
+    public synchronized boolean markFailure(String host, int port) {
+        if (host == null || host.isEmpty() || port <= 0) return false;
+        for (int i = 0; i < entries.size(); i++) {
+            Entry e = entries.get(i);
+            if (e.host.equals(host) && e.port == port) {
+                int failures = e.consecutiveFailures + 1;
+                if (failures >= MAX_CONSECUTIVE_FAILURES) {
+                    entries.remove(i);
+                    LOG.info("IceBridge host cache: evicting " + host + ":" + port
+                            + " after " + failures + " consecutive failures");
+                } else {
+                    entries.set(i, new Entry(host, port, e.role,
+                            e.lastSuccessfulPingMs, failures));
+                }
+                save();
+                return failures >= MAX_CONSECUTIVE_FAILURES;
+            }
+        }
+        return false;
     }
 
     public List<Entry> getAll() {
@@ -246,8 +290,9 @@ public final class IceBridgeHostCache {
      * FORWARDER should look for {@code IceBridge identity handshake OK} on the
      * identity TCP listener.
      *
-     * <p>Successful pings update lastSuccessfulPingMs and role. Failures leave
-     * the entry in the cache (for retry later). Blocking; call from a
+     * <p>Successful pings update lastSuccessfulPingMs and role. Failed pings
+     * accrue a consecutive-failure streak ({@link #markFailure}) and evict
+     * after {@link #MAX_CONSECUTIVE_FAILURES}. Blocking; call from a
      * background thread.
      */
     public void refreshPings() {
@@ -272,14 +317,17 @@ public final class IceBridgeHostCache {
                         continue;
                     }
                     fail++;
+                    markFailure(e.host, e.port);
                     LOG.warn("IceBridge host ping bad signature " + e.host + ":" + e.port);
                 } else {
                     fail++;
+                    markFailure(e.host, e.port);
                     LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
                             + " (no identity record)");
                 }
             } catch (Exception ex) {
                 fail++;
+                markFailure(e.host, e.port);
                 String msg = ex.getMessage();
                 if (msg != null && msg.contains("invalid frame length")) {
                     LOG.warn("IceBridge host ping: " + e.host + ":" + e.port
@@ -361,12 +409,18 @@ public final class IceBridgeHostCache {
         public final int port;
         public final String role; // "BOTH", "FORWARDER", "CLIENT", or null
         public final long lastSuccessfulPingMs;
+        public final int consecutiveFailures;
 
         public Entry(String host, int port, String role, long lastSuccessfulPingMs) {
+            this(host, port, role, lastSuccessfulPingMs, 0);
+        }
+
+        public Entry(String host, int port, String role, long lastSuccessfulPingMs, int consecutiveFailures) {
             this.host = host;
             this.port = port;
             this.role = role;
             this.lastSuccessfulPingMs = lastSuccessfulPingMs;
+            this.consecutiveFailures = Math.max(0, consecutiveFailures);
         }
 
         @Override
