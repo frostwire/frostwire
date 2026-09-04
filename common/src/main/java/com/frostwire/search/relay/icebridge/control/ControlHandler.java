@@ -335,6 +335,9 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 metrics.rudpPacketsIn(), metrics.rudpPacketsOut(),
                 metrics.rudpBytesIn(), metrics.rudpBytesOut(),
                 metrics.controlRequests(), metrics.controlErrors(),
+                metrics.helloRejectedCount(), metrics.relayRateLimitedCount(),
+                metrics.searchRateLimitedCount(), metrics.powRejectedCount(),
+                metrics.spamMarkedDroppedCount(),
                 registry.size(), registry.registrations(), registry.lookups(), registry.evicted());
         return ApiResponse.success(snapshot);
     }
@@ -378,6 +381,16 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         @SuppressWarnings("unused")
         final long controlErrors;
         @SuppressWarnings("unused")
+        final long helloRejected;
+        @SuppressWarnings("unused")
+        final long relayRateLimited;
+        @SuppressWarnings("unused")
+        final long searchRateLimited;
+        @SuppressWarnings("unused")
+        final long powRejected;
+        @SuppressWarnings("unused")
+        final long spamMarkedDropped;
+        @SuppressWarnings("unused")
         final int registrySize;
         @SuppressWarnings("unused")
         final long registrations;
@@ -389,6 +402,9 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         MetricsSnapshot(long rudpPacketsIn, long rudpPacketsOut,
                         long rudpBytesIn, long rudpBytesOut,
                         long controlRequests, long controlErrors,
+                        long helloRejected, long relayRateLimited,
+                        long searchRateLimited, long powRejected,
+                        long spamMarkedDropped,
                         int registrySize, long registrations,
                         long lookups, long evicted) {
             this.rudpPacketsIn = rudpPacketsIn;
@@ -397,6 +413,11 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             this.rudpBytesOut = rudpBytesOut;
             this.controlRequests = controlRequests;
             this.controlErrors = controlErrors;
+            this.helloRejected = helloRejected;
+            this.relayRateLimited = relayRateLimited;
+            this.searchRateLimited = searchRateLimited;
+            this.powRejected = powRejected;
+            this.spamMarkedDropped = spamMarkedDropped;
             this.registrySize = registrySize;
             this.registrations = registrations;
             this.lookups = lookups;
