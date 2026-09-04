@@ -88,6 +88,14 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
 
     /**
+     * Maximum total .torrent bytes served per metadata request
+     * (anti-amplification: bounds chunked RELAY sends per request).
+     * Over-cap responses are REJECTED (fail closed, no response frame —
+     * truncate-vs-reject is an open user decision).
+     */
+    public static final int METADATA_MAX_BYTES = 65536;
+
+    /**
      * Maximum peers a single request is forwarded to (M — anti-amplification).
      * Live value: {@link IceBridgeTopology#searchPeerFanout()}.
      */
@@ -219,6 +227,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             return;
         }
         try {
+            String requesterKey = Hex.encode(request.requesterPub());
+            if (!tryAcquire(requesterKey)) {
+                LOG.warn("Rate-limited torrent metadata request from " + requesterKey);
+                return;
+            }
             if (!request.verifySignature()) {
                 LOG.warn("Rejected torrent metadata request: bad signature ih="
                         + request.infoHashHex() + " requester=" + Hex.encode(request.requesterPub())
@@ -232,11 +245,6 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                         + "s (max " + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
                         + "s) ih=" + request.infoHashHex()
                         + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
-                return;
-            }
-            String requesterKey = Hex.encode(request.requesterPub());
-            if (!tryAcquire(requesterKey)) {
-                LOG.warn("Rate-limited torrent metadata request from " + requesterKey);
                 return;
             }
             sendTorrentMetadataResponse(request);
@@ -262,8 +270,8 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     request.requesterPub());
             return;
         }
-        if (torrentBytes.length > TorrentMetadataResponse.MAX_TORRENT_BYTES) {
-            LOG.info("TORRENT_FETCH too large ih=" + request.infoHashHex()
+        if (torrentBytes.length > METADATA_MAX_BYTES) {
+            LOG.info("TORRENT_FETCH over cap ih=" + request.infoHashHex()
                     + " bytes=" + torrentBytes.length);
             sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
                     request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_TOO_LARGE),
@@ -303,8 +311,42 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         }
     }
 
+    /**
+     * Cheap pre-verify spam drop via the peer directory (null-guarded —
+     * constructors allow a null directory, which means no spam knowledge).
+     * Unknown peers are never spam.
+     */
+    private boolean isKnownSpam(RemoteSearchRequest request) {
+        PeerDirectory directory = this.peerDirectory;
+        if (directory == null) {
+            return false;
+        }
+        byte[] requesterPub = request.requesterPub();
+        if (requesterPub == null) {
+            return false;
+        }
+        Optional<PeerDirectory.PeerInfo> info = directory.get(requesterPub);
+        return info.isPresent() && info.get().isSpam();
+    }
+
     private void handleSearchRequest(RemoteSearchRequest request, byte[] sourcePub) {
-        // Rate-limit is applied inside RelaySearchService after signature
+        if (request == null) {
+            return;
+        }
+        // Cheap rejects first: a ttl-exhausted request can neither be
+        // answered usefully nor forwarded, and a known spammer is dropped
+        // before paying verify + index work.
+        if (request.ttl() <= 0) {
+            LOG.debug("Dropping search request: ttl exhausted keywords=\""
+                    + request.keywords() + "\"");
+            return;
+        }
+        if (isKnownSpam(request)) {
+            LOG.debug("Dropping search request from known spam peer keywords=\""
+                    + request.keywords() + "\"");
+            return;
+        }
+        // Rate-limit is applied inside RelaySearchService before signature
         // verify, keyed by requesterPub (not transport sourcePub).
         try {
             Optional<RemoteSearchResponse> response = searchService.handle(request);

@@ -85,7 +85,9 @@ class SearchRelayAppTest {
     searcher.transport.addListener((sourcePub, payload, receivedMs) -> inbox.add(payload));
 
     // --- 4. Signed request addressed TO THE FORWARDER ---
-    RemoteSearchRequest req = signRequest(searcherKeys, "mesh-only", 5, 1);
+    // ttl=2: the forwarder consumes one hop and the holder still answers
+    // (ttl=0 requests are dropped, not answered).
+    RemoteSearchRequest req = signRequest(searcherKeys, "mesh-only", 5, 2);
     boolean sent =
         searcher.transport.send(
             server.identity().ed25519PubRaw(),

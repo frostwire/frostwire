@@ -105,7 +105,7 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
-  void doesNotForwardWhenTtlZero() throws Exception {
+  void dropsRequestWhenTtlZero() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
 
@@ -127,10 +127,7 @@ class IncomingSearchRequestHandlerTest {
     RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 0, path);
     transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
-    assertEquals(1, transport.sent.size(), "only the local response, no forwards");
-    RemoteSearchResponse response =
-        SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload);
-    assertNotNull(response, "the single sent payload must be the response");
+    assertEquals(0, transport.sent.size(), "ttl=0 requests are dropped, not answered");
   }
 
   @Test
@@ -215,7 +212,7 @@ class IncomingSearchRequestHandlerTest {
     handler.start();
 
     byte[][] path = {requesterPub};
-    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 0, path);
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
     transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
     assertEquals(1, transport.sent.size(), "local response must be sent even with no peers");
