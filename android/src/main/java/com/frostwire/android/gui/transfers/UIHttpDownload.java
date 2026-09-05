@@ -106,26 +106,35 @@ public class UIHttpDownload extends HttpDownload {
         String suffix = (muxAudioExt != null && !muxAudioExt.isEmpty()) ? muxAudioExt : "m4a";
         File audioTmp = new File(video.getParentFile(), ".mux-" + video.getName() + "." + suffix);
         File mergedTmp = new File(video.getParentFile(), ".mux-" + video.getName() + ".merged.mp4");
-        try {
-            fetchSiblingAudio(muxAudioUrl, muxAudioHeaders, audioTmp);
-            String videoExt = FilenameUtils.getExtension(video.getName());
-            boolean muxed = com.frostwire.search.telluride.DashMux.muxIfSupported(
-                    video, audioTmp, videoExt, suffix, mergedTmp);
-            if (!muxed) {
-                LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
-                        + "; keeping silent video " + video.getName());
-                return;
+        // googlevideo throttles long responses shut; resume across attempts.
+        boolean done = false;
+        for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+            try {
+                com.frostwire.util.http.HttpClient client =
+                        com.frostwire.util.HttpClientFactory.newInstance(
+                                com.frostwire.util.HttpClientFactory.HttpContext.DOWNLOAD);
+                client.save(muxAudioUrl, audioTmp, attempt > 1, muxAudioHeaders);
+                String videoExt = FilenameUtils.getExtension(video.getName());
+                if (!com.frostwire.search.telluride.DashMux.muxIfSupported(
+                        video, audioTmp, videoExt, suffix, mergedTmp)) {
+                    LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
+                            + "; keeping silent video " + video.getName());
+                    break;
+                }
+                java.nio.file.Files.move(mergedTmp.toPath(), video.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                LOG.info("Muxed DASH audio into " + video.getAbsolutePath());
+                rescanMedia(video);
+                done = true;
+            } catch (Throwable t) {
+                LOG.warn("DASH audio fetch/mux attempt " + attempt + "/3 for "
+                        + video.getName() + " failed: " + t.getMessage());
             }
-            java.nio.file.Files.move(mergedTmp.toPath(), video.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            LOG.info("Muxed DASH audio into " + video.getAbsolutePath());
-            rescanMedia(video);
-        } catch (Throwable t) {
-            LOG.warn("Could not mux DASH audio into " + video.getName()
-                    + " (keeping silent video): " + t.getMessage());
-        } finally {
-            deleteQuietly(audioTmp);
-            deleteQuietly(mergedTmp);
+        }
+        deleteQuietly(audioTmp);
+        deleteQuietly(mergedTmp);
+        if (!done) {
+            LOG.warn("Could not mux DASH audio into " + video.getName() + " (keeping silent video)");
         }
     }
 
@@ -135,41 +144,6 @@ public class UIHttpDownload extends HttpDownload {
                 f.deleteOnExit();
             }
         } catch (Throwable ignored) {
-        }
-    }
-
-    private static void fetchSiblingAudio(String url, java.util.Map<String, String> headers, File dst)
-            throws java.io.IOException {
-        java.net.HttpURLConnection conn =
-                (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
-        conn.setConnectTimeout(15000);
-        conn.setReadTimeout(30000);
-        conn.setRequestProperty("User-Agent", "FrostWire");
-        if (headers != null) {
-            for (java.util.Map.Entry<String, String> e : headers.entrySet()) {
-                if (e.getKey() != null && e.getValue() != null) {
-                    conn.setRequestProperty(e.getKey(), e.getValue());
-                }
-            }
-        }
-        java.io.InputStream in = null;
-        java.io.FileOutputStream out = null;
-        try {
-            in = conn.getInputStream();
-            out = new java.io.FileOutputStream(dst);
-            byte[] buf = new byte[32768];
-            int n;
-            while ((n = in.read(buf)) != -1) {
-                out.write(buf, 0, n);
-            }
-            out.flush();
-        } finally {
-            if (in != null) try { in.close(); } catch (Exception ignored) {}
-            if (out != null) try { out.close(); } catch (Exception ignored) {}
-            conn.disconnect();
-        }
-        if (!dst.exists() || dst.length() == 0) {
-            throw new java.io.IOException("sibling audio download came back empty");
         }
     }
 
