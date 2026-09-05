@@ -108,7 +108,14 @@ public class UIHttpDownload extends HttpDownload {
         File mergedTmp = new File(video.getParentFile(), ".mux-" + video.getName() + ".merged.mp4");
         try {
             fetchSiblingAudio(muxAudioUrl, muxAudioHeaders, audioTmp);
-            com.frostwire.mp4.Mp4Muxer.mux(video, audioTmp, mergedTmp);
+            String videoExt = FilenameUtils.getExtension(video.getName());
+            boolean muxed = com.frostwire.search.telluride.DashMux.muxIfSupported(
+                    video, audioTmp, videoExt, suffix, mergedTmp);
+            if (!muxed) {
+                LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
+                        + "; keeping silent video " + video.getName());
+                return;
+            }
             java.nio.file.Files.move(mergedTmp.toPath(), video.toPath(),
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             LOG.info("Muxed DASH audio into " + video.getAbsolutePath());
