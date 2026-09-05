@@ -1098,28 +1098,37 @@ public final class BTDownloadMediator
         new File(mp4.getParentFile(), ".mux-" + mp4.getName() + "." + suffix).getAbsoluteFile();
     File mergedTmp =
         new File(mp4.getParentFile(), ".mux-" + mp4.getName() + ".merged.mp4").getAbsoluteFile();
-    try {
-      HttpClient client =
-          HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
-      client.save(audioUrl, audioTmp, false, audioHeaders);
-      String videoExt = FilenameUtils.getExtension(mp4.getName());
-      boolean muxed =
-          com.frostwire.search.telluride.DashMux.muxIfSupported(
-              mp4, audioTmp, videoExt, suffix, mergedTmp);
-      if (!muxed) {
-        LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
-            + "; keeping silent video " + mp4.getAbsolutePath());
-        return;
+    // googlevideo throttles long responses shut; resume across attempts.
+    boolean done = false;
+    for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+      try {
+        HttpClient client =
+            HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+        client.save(audioUrl, audioTmp, attempt > 1, audioHeaders);
+        String videoExt = FilenameUtils.getExtension(mp4.getName());
+        if (!com.frostwire.search.telluride.DashMux.muxIfSupported(
+            mp4, audioTmp, videoExt, suffix, mergedTmp)) {
+          LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
+              + "; keeping silent video " + mp4.getAbsolutePath());
+          break;
+        }
+        java.nio.file.Files.move(
+            mergedTmp.toPath(), mp4.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        LOG.info("Muxed DASH audio into " + mp4.getAbsolutePath());
+        done = true;
+      } catch (Throwable t) {
+        LOG.warn("DASH audio fetch/mux attempt " + attempt + "/3 for "
+            + mp4.getName() + " failed: " + t.getMessage());
       }
-      java.nio.file.Files.move(
-          mergedTmp.toPath(), mp4.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-      LOG.info("Muxed DASH audio into " + mp4.getAbsolutePath());
-    } catch (Throwable t) {
-      LOG.error("Could not mux DASH audio into " + mp4.getAbsolutePath()
-          + " (keeping silent video): " + t.getMessage());
-    } finally {
+    }
+    try {
       deleteQuietly(audioTmp);
       deleteQuietly(mergedTmp);
+    } catch (Throwable ignored) {
+    }
+    if (!done) {
+      LOG.error("Could not mux DASH audio into " + mp4.getAbsolutePath()
+          + " (keeping silent video)");
     }
   }
 
