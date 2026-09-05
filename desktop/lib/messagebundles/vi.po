@@ -99,9 +99,8 @@ msgstr "Tạm dừng tải xuống đã chọn"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java:167
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java:168
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java:169
-#, fuzzy
 msgid "Retry Transfer"
-msgstr "Thoát sau khi Chuyển giao"
+msgstr "Thử lại Truyền tải"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java:205
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadActions.java:206
@@ -338,9 +337,8 @@ msgid "License"
 msgstr "Bản quyền"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:106
-#, fuzzy
 msgid "Checking..."
-msgstr "Các kết nối"
+msgstr "Đang kiểm tra..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:107
 msgid "Downloading metadata"
@@ -428,7 +426,7 @@ msgstr "Nén nén"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:126
 msgid "Demuxing"
-msgstr ""
+msgstr "Đang tách luồng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:127
 msgid "Error: Disk full - Change default save location."
@@ -444,7 +442,7 @@ msgstr "Trạng thái không xác định"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:326
 msgid "ETA"
-msgstr ""
+msgstr "ETA"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:306
 msgid "Loading Download Window..."
@@ -457,7 +455,6 @@ msgstr "Tải về"
 #. *
 #. * Constant for when the user selects the cancel button
 #. * in a message giving the user a cancel option.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:586
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:398
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:123
@@ -483,15 +480,15 @@ msgstr "Chạy tập tin được chọn"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:779
 #, java-format
 msgid ""
-"FrostWire was unable to load the torrent file \"{0}\", - it may be malformed "
-"or FrostWire does not have permission to access this file."
+"FrostWire was unable to load the torrent file \"{0}\", - it may be malformed"
+" or FrostWire does not have permission to access this file."
 msgstr ""
 "FrostWire không thể tải tập tin torrent \"{0}\", - Nó có thể bị thay đổi "
 "hoặc FrostWire không có quyền truy cập tệp này."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:977
 msgid "Sorry, Couldn't find a valid download location at"
-msgstr ""
+msgstr "Xin lỗi, Không tìm thấy vị trí tải về hợp lệ tại"
 
 #. advanced options
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:112
@@ -543,12 +540,11 @@ msgstr "Cập nhật trình theo dõi"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:340
 msgid "Scrape Tracker"
-msgstr ""
+msgstr "Quét Tracker"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:354
-#, fuzzy
 msgid "Check Local Data"
-msgstr "Kiểm tra cập nhật"
+msgstr "Kiểm tra Dữ liệu Cục bộ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:375
 msgid "Edit trackers"
@@ -576,7 +572,7 @@ msgstr "URL của Người theo dõi không hợp lệ\n"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:40
 msgid "Creative Commons"
-msgstr ""
+msgstr "Creative Commons"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:41
 msgid "Open Source"
@@ -595,8 +591,8 @@ msgid ""
 "I am the Content Creator of this work or I have been granted the rights to "
 "share this content under the following license by the Content Creator(s)."
 msgstr ""
-"Tôi là Người tạo Nội dung của tác phẩm này hoặc tôi đã được cấp phép để chia "
-"sẻ nội dung này theo Giấy phép sau đây của Người tạo Nội dung."
+"Tôi là Người tạo Nội dung của tác phẩm này hoặc tôi đã được cấp phép để chia"
+" sẻ nội dung này theo Giấy phép sau đây của Người tạo Nội dung."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:82
 msgid "Author's Name"
@@ -631,8 +627,8 @@ msgid ""
 "The Content Creator's website to give attribution about this work if shared "
 "by others."
 msgstr ""
-"Trang web Nhà sáng tạo nội dung để cung cấp ghi nhận tác giả về tác phẩm này "
-"nếu được chia sẻ bởi những người khác."
+"Trang web Nhà sáng tạo nội dung để cung cấp ghi nhận tác giả về tác phẩm này"
+" nếu được chia sẻ bởi những người khác."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:100
 msgid ""
@@ -650,8 +646,8 @@ msgid ""
 "You let others copy, distribute, display, and perform your copyrighted work "
 "but only if they give credit the way you request."
 msgstr ""
-"Bạn cho phép những người khác sao chép, phân phối, hiển thị và thực hiện tác "
-"phẩm có bản quyền của bạn nhưng chỉ khi họ cung cấp tín dụng theo cách bạn "
+"Bạn cho phép những người khác sao chép, phân phối, hiển thị và thực hiện tác"
+" phẩm có bản quyền của bạn nhưng chỉ khi họ cung cấp tín dụng theo cách bạn "
 "yêu cầu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:104
@@ -661,15 +657,15 @@ msgid ""
 "based upon it &mdash; but for noncommercial purposes only."
 msgstr ""
 "<strong>Không cho phép sử dụng thương mại.</strong><br>Bạn cho phép người "
-"khác sao chép, phân phối, hiển thị và thực hiện công việc của bạn &mdash; Và "
-"các tác phẩm phái sinh dựa trên nó &mdash; Nhưng chỉ vì mục đích phi thương "
-"mại."
+"khác sao chép, phân phối, hiển thị và thực hiện công việc của bạn &mdash; Và"
+" các tác phẩm phái sinh dựa trên nó &mdash; Nhưng chỉ vì mục đích phi thương"
+" mại."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:106
 msgid ""
 "<strong>No remixing allowed.</strong><br>You let others copy, distribute, "
-"display, and perform only verbatim copies of your work, not derivative works "
-"based upon it."
+"display, and perform only verbatim copies of your work, not derivative works"
+" based upon it."
 msgstr ""
 "<strong>Không cho phép remix.</strong><br>Bạn cho phép người khác sao chép, "
 "phân phối, trưng bày, và chỉ thực hiện các bản sao nguyên bản của tác phẩm "
@@ -700,8 +696,8 @@ msgid ""
 msgstr ""
 "Người liên kết tác phẩm với hành vi này đã dành phần công trình cho miền "
 "công cộng bằng cách từ bỏ tất cả các quyền của mình đối với tác phẩm trên "
-"toàn thế giới theo luật bản quyền, bao gồm tất cả các quyền liên quan và lân "
-"cận trong phạm vi pháp luật cho phép."
+"toàn thế giới theo luật bản quyền, bao gồm tất cả các quyền liên quan và lân"
+" cận trong phạm vi pháp luật cho phép."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:205
 msgid "You have selected the following License"
@@ -759,11 +755,11 @@ msgstr "Chọn tập tin"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:189
 msgid ""
-"Click here to select a single file as the content indexed by your "
-"new .torrent"
+"Click here to select a single file as the content indexed by your new "
+".torrent"
 msgstr ""
-"Nhấp vào đây để chọn một tệp là nội dung được lập chỉ mục bởi tệp "
-"tin .torrent mới của bạn."
+"Nhấp vào đây để chọn một tệp là nội dung được lập chỉ mục bởi tệp tin "
+".torrent mới của bạn."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:190
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/FileChooserHandler.java:83
@@ -775,8 +771,8 @@ msgstr "Chọn thư mục"
 msgid ""
 "Click here to select a folder as the content indexed by your new .torrent"
 msgstr ""
-"Nhấp vào đây để chọn một thư mục như nội dung được lập chỉ mục bởi tệp "
-"tin .torrent mới của bạn."
+"Nhấp vào đây để chọn một thư mục như nội dung được lập chỉ mục bởi tệp tin "
+".torrent mới của bạn."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:200
 msgid "Torrent Properties"
@@ -799,15 +795,12 @@ msgid "Start seeding"
 msgstr "Bắt đầu gieo hạt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:206
-#, fuzzy
 msgid ""
-"Announce yourself as a seed for the content indexed by this torrent as soon "
-"as it's created.\n"
+"Announce yourself as a seed for the content indexed by this torrent as soon as it's created.\n"
 "If nobody is seeding the torrent, it won't work. (Recommended)"
 msgstr ""
-"Thông báo bản thân bạn như một hạt giống cho nội dung được lập chỉ mục bởi "
-"torrent này ngay khi nó được tạo ra.\n"
-"Nếu không ai đang seeding torrent sẽ không hoạt động. (Đề nghị)"
+"Thông báo bản thân bạn như một hạt giống cho nội dung được lập chỉ mục bởi torrent này ngay khi nó được tạo ra.\n"
+"Nếu không ai đang seed torrent sẽ không hoạt động. (Khuyến nghị)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:208
 msgid "Tracker Announce URLs"
@@ -820,12 +813,10 @@ msgstr "Một bộ theo dõi trên mỗi dòng"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:209
 msgid ""
 "Enter a list of valid BitTorrent Tracker Server URLs.\n"
-"Your new torrent will be announced to these trackers if you start seeding "
-"the torrent."
+"Your new torrent will be announced to these trackers if you start seeding the torrent."
 msgstr ""
 "Nhập một danh sách các URL máy chủ BitTorrent Tracker hợp lệ.\n"
-"Torrent mới của bạn sẽ được thông báo cho những tracker nếu bạn bắt đầu seed "
-"torrent."
+"Torrent mới của bạn sẽ được thông báo cho những tracker nếu bạn bắt đầu seed torrent."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:218
 msgid "Web Seeds Mirror URLs"
@@ -836,8 +827,8 @@ msgid ""
 "If these files can be downloaded from the web, enter the URLs of each "
 "possible mirror, one per line (GetRight style)."
 msgstr ""
-"Nếu những tệp tin này có thể được tải xuống từ web, hãy nhập URL của mỗi máy "
-"nhân bản có thể, mỗi tệp trên mỗi dòng (kiểu GetRight)."
+"Nếu những tệp tin này có thể được tải xuống từ web, hãy nhập URL của mỗi máy"
+" nhân bản có thể, mỗi tệp trên mỗi dòng (kiểu GetRight)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:224
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:69
@@ -846,19 +837,17 @@ msgid "Piece Size"
 msgstr "Kích thước"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:229
-#, fuzzy
 msgid "Torrent Type"
-msgstr "Tệp Torrent"
+msgstr "Loại Torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:230
-#, fuzzy
 msgid "Select the torrent format type to create"
-msgstr "Tìm và Tải về Dữ liệu"
+msgstr "Chọn loại định dạng torrent để tạo"
 
 #. Default to hybrid
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:234
 msgid "Hybrid torrents support both v1 and v2 protocols and are recommended"
-msgstr ""
+msgstr "Torrent lai hỗ trợ cả giao thức v1 và v2 và được khuyến nghị"
 
 #. first button will dock all the way east,
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:246
@@ -870,7 +859,6 @@ msgstr "Lưu torrent như..."
 #. set up close closeButton
 #. *
 #. * 'Close'.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:249
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:81
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:68
@@ -985,23 +973,20 @@ msgid "Download Selected Files Only"
 msgstr "Xoá tập tin được chọn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:155
-#, fuzzy
 msgid "Save to:"
-msgstr "Lưu tệp .torrent"
+msgstr "Lưu tới:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:173
 msgid "Change..."
-msgstr ""
+msgstr "Thay đổi..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:182
-#, fuzzy
 msgid "Reset to Default"
-msgstr "Hoàn nguyên về Mặc định:"
+msgstr "Đặt lại về Mặc định"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:204
-#, fuzzy
 msgid "Select Download Folder"
-msgstr "Chọn thư mục"
+msgstr "Chọn Thư mục Tải về"
 
 #. checkbox
 #. icon
@@ -1035,13 +1020,13 @@ msgid ""
 "I am the content creator or I have the right to collect financial "
 "contributions for this work."
 msgstr ""
-"Tôi là người sáng tạo nội dung hoặc tôi có quyền thu thập đóng góp tài chính "
-"cho tác phẩm này."
+"Tôi là người sáng tạo nội dung hoặc tôi có quyền thu thập đóng góp tài chính"
+" cho tác phẩm này."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:42
 msgid ""
-"I understand that incurring in financial gains from unauthorized copyrighted "
-"works can make me liable for counterfeiting and criminal copyright "
+"I understand that incurring in financial gains from unauthorized copyrighted"
+" works can make me liable for counterfeiting and criminal copyright "
 "infringement."
 msgstr ""
 "Tôi hiểu rằng thu nhập từ các hoạt động có bản quyền trái phép có thể khiến "
@@ -1059,7 +1044,8 @@ msgstr "<strong>Paypal</strong> Địa chỉ trang thanh toán/quyên góp"
 msgid "\"Name your price\", \"Tips\", \"Donations\" payment options"
 msgstr "\"Đặt tên giá của bạn\", \"Mẹo vặt\", \"Đóng góp\" tùy chọn thanh toán"
 
-#. We use "Bitcoin" for the protocol (upper case B), and "bitcoins" for the units of currency (lower case b)
+#. We use "Bitcoin" for the protocol (upper case B), and "bitcoins" for the
+#. units of currency (lower case b)
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:85
 msgid "Name your price, Send a Tip or Donation in"
 msgstr "Đặt tên cho giá của bạn, Gửi Mẹo hoặc Đóng góp trong"
@@ -1140,18 +1126,18 @@ msgid ""
 "<strong>The more, the merrier.</strong> The more people sharing the faster "
 "it can be downloaded by others."
 msgstr ""
-"<strong>Càng nhiều càng tốt.</strong> Càng nhiều người chia sẻ nhanh hơn thì "
-"người khác có thể tải xuống."
+"<strong>Càng nhiều càng tốt.</strong> Càng nhiều người chia sẻ nhanh hơn thì"
+" người khác có thể tải xuống."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:169
 msgid ""
-"<strong>Your files can be discovered by others.</strong> Once you share this "
-"link and you seed the files they will be available to everybody on the "
+"<strong>Your files can be discovered by others.</strong> Once you share this"
+" link and you seed the files they will be available to everybody on the "
 "BitTorrent network."
 msgstr ""
-"<strong>Các tệp của bạn có thể được phát hiện bởi những người khác.</strong> "
-"Một khi bạn chia sẻ liên kết này và bạn hạt các tập tin họ sẽ có sẵn cho tất "
-"cả mọi người trên mạng BitTorrent."
+"<strong>Các tệp của bạn có thể được phát hiện bởi những người khác.</strong>"
+" Một khi bạn chia sẻ liên kết này và bạn hạt các tập tin họ sẽ có sẵn cho "
+"tất cả mọi người trên mạng BitTorrent."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:180
 msgid "Feedback here to clipboard"
@@ -1202,19 +1188,16 @@ msgid "Magnet copied to clipboard."
 msgstr "Magnet được sao chép vào khay nhớ tạm."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentFilesFolderComponent.java:46
-#, fuzzy
 msgid "Torrent Files (.torrent) Folder"
-msgstr "Gửi tệp hoặc thư mục..."
+msgstr "Thư mục Tệp Torrent (.torrent)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentFilesFolderComponent.java:75
-#, fuzzy
 msgid "Please enter a valid path for the Torrent Files Folder"
-msgstr "Vui lòng nhập một đường dẫn hợp lệ cho Thư mục Dữ liệu Torrent"
+msgstr "Vui lòng nhập đường dẫn hợp lệ cho Thư mục Tệp Torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentFilesFolderComponent.java:96
-#, fuzzy
 msgid "You forgot to enter a path for the Torrent Files Folder."
-msgstr "Bạn quên nhập đường dẫn cho Thư mục Dữ liệu Torrent."
+msgstr "Bạn quên nhập đường dẫn cho Thư mục Tệp Torrent."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentFilesFolderComponent.java:107
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:108
@@ -1283,7 +1266,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentUtil.java:162
 msgid ""
-"This transfer is already complete, resuming it will cause it to start seeding"
+"This transfer is already complete, resuming it will cause it to start "
+"seeding"
 msgstr ""
 "Quá trình chuyển đổi này đã hoàn tất, tiếp tục lại nó sẽ làm cho nó bắt đầu "
 "gieo hạt"
@@ -1309,15 +1293,15 @@ msgstr "Chơi"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:235
 msgid "Start downloading this file"
-msgstr ""
+msgstr "Bắt đầu tải về tệp này"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferSeedingRenderer.java:80
 msgid ""
 "SEED this torrent transfer so others can download it. The more seeds, the "
 "faster the downloads."
 msgstr ""
-"Hạt giống chuyển torrent này để những người khác có thể tải xuống. Hạt giống "
-"càng nhiều thì tốc độ tải xuống càng nhanh."
+"Hạt giống chuyển torrent này để những người khác có thể tải xuống. Hạt giống"
+" càng nhiều thì tốc độ tải xuống càng nhanh."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/slides/SlideControlsOverlay.java:128
 msgid "Leave a tip"
@@ -1381,51 +1365,48 @@ msgid "Pieces"
 msgstr "Miếng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFiles.java:57
-#, fuzzy
 msgid "Show skipped files"
-msgstr "Hiển thị tất cả các mục được gắn dấu sao"
+msgstr "Hiện tệp đã bỏ qua"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:45
 msgid "Priority"
-msgstr ""
+msgstr "Ưu tiên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:106
-#, fuzzy
 msgid "Don't Download"
-msgstr "Tải về"
+msgstr "Không Tải về"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:107
 msgid "Normal"
-msgstr ""
+msgstr "Bình thường"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:108
 msgid "Low"
-msgstr ""
+msgstr "Thấp"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:109
 msgid "Low+"
-msgstr ""
+msgstr "Thấp+"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:110
 msgid "Below Normal"
-msgstr ""
+msgstr "Dưới bình thường"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:111
 msgid "Above Normal"
-msgstr ""
+msgstr "Trên bình thường"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:112
 msgid "High"
-msgstr ""
+msgstr "Cao"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:113
-#, fuzzy
 msgid "Maximum"
-msgstr "Tìm kiếm tối đa"
+msgstr "Tối đa"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesTableMediator.java:178
 msgid "Set Priority"
-msgstr ""
+msgstr "Đặt mức ưu tiên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:123
 msgid "complete"
@@ -1449,9 +1430,8 @@ msgid "Download limit"
 msgstr "Giới hạn tải xuống"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:147
-#, fuzzy
 msgid "Adjust download speed limit"
-msgstr "Tốc độ tải về"
+msgstr "Điều chỉnh giới hạn tốc độ tải về"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:155
 msgid "Upload speed"
@@ -1472,7 +1452,7 @@ msgstr "Giới hạn tải lên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:165
 msgid "Adjust upload speed limit"
-msgstr ""
+msgstr "Điều chỉnh giới hạn tốc độ tải lên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:178
 msgid "Save location"
@@ -1480,7 +1460,7 @@ msgstr "Lưu vị trí"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:183
 msgid "InfoHash"
-msgstr ""
+msgstr "InfoHash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:186
 msgid "Magnet URL"
@@ -1512,27 +1492,25 @@ msgstr "toàn bộ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:385
 msgid "Enter download speed limit in KB/s (0 = unlimited):"
-msgstr ""
+msgstr "Nhập giới hạn tốc độ tải về theo KB/s (0 = không giới hạn):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:386
-#, fuzzy
 msgid "Download Speed Limit"
-msgstr "Tốc độ tải về:"
+msgstr "Giới hạn Tốc độ Tải về"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:410
 msgid "Enter upload speed limit in KB/s (0 = unlimited):"
-msgstr ""
+msgstr "Nhập giới hạn tốc độ tải lên theo KB/s (0 = không giới hạn):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:411
-#, fuzzy
 msgid "Upload Speed Limit"
-msgstr "Tốc độ tải lên:"
+msgstr "Giới hạn Tốc độ Tải lên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:69
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:87
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:103
 msgid "IP"
-msgstr ""
+msgstr "IP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:311
@@ -1558,7 +1536,6 @@ msgstr "Đến"
 
 #. *
 #. * The copy action.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:72
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:87
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:103
@@ -1572,20 +1549,18 @@ msgstr "Chép"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:72
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:87
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:103
-#, fuzzy
 msgid "Peer's"
-msgstr "Đồng nghiệp"
+msgstr "Peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:72
 msgid "Address"
-msgstr ""
+msgstr "Địa chỉ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPeersTableMediator.java:103
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:363
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:340
-#, fuzzy
 msgid "Port"
-msgstr "Hải cảng:"
+msgstr "Cổng:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:122
@@ -1594,7 +1569,7 @@ msgstr "Tổng số mảnh"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:34
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:74
 msgid "Active"
@@ -1680,7 +1655,6 @@ msgstr "Di chuyển vào thùng rác"
 
 #. *
 #. * The delete action.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java:113
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java:115
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java:714
@@ -1729,8 +1703,8 @@ msgid ""
 "The following files could not be deleted. They may be in use by another "
 "application or are currently being downloaded to."
 msgstr ""
-"Không thể xóa các tệp sau. Chúng có thể được ứng dụng khác sử dụng hoặc hiện "
-"đang được tải xuống."
+"Không thể xóa các tệp sau. Chúng có thể được ứng dụng khác sử dụng hoặc hiện"
+" đang được tải xuống."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java:634
 msgid "Launch"
@@ -1825,7 +1799,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/RecursiveLibraryDirectoryPanel.java:338
 msgid "Folder's files and some subfolders are included in the Library."
-msgstr "Các tệp của thư mục và một số thư mục con được bao gồm trong Thư viện."
+msgstr ""
+"Các tệp của thư mục và một số thư mục con được bao gồm trong Thư viện."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/library/TorrentDirectoryHolder.java:33
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/MediaType.java:38
@@ -1834,9 +1809,8 @@ msgid "Torrents"
 msgstr "Torrents"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/GoogleSearchField.java:58
-#, fuzzy
 msgid "Search or enter target URL"
-msgstr "Tìm kiếm hoặc nhập URL có nguồn gốc từ đám mây"
+msgstr "Tìm kiếm hoặc nhập URL đích"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/GoogleSearchField.java:62
 msgid "Hints by Google"
@@ -1844,25 +1818,22 @@ msgstr "Gợi ý của Google"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/RecentSearches.java:259
 msgid "SearchField.noRecentsText"
-msgstr ""
+msgstr "SearchField.noRecentsText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/RecentSearches.java:263
 msgid "SearchField.recentsMenuTitle"
-msgstr ""
+msgstr "SearchField.recentsMenuTitle"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/RecentSearches.java:272
 msgid "SearchField.clearRecentsText"
-msgstr ""
+msgstr "SearchField.clearRecentsText"
 
 #. *
 #. * The undo action.
-#.
 #. *
 #. *
-#.
 #. *
 #. * The undo action.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/SearchField.java:51
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/LimeTextField.java:46
 msgid "Undo"
@@ -1870,7 +1841,6 @@ msgstr "Hoàn tác"
 
 #. *
 #. * The cut action
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/SearchField.java:59
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/LimeTextField.java:58
 msgid "Cut"
@@ -1878,7 +1848,6 @@ msgstr "Cắt"
 
 #. *
 #. * The paste action.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/SearchField.java:75
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/LimeTextField.java:82
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:188
@@ -1887,7 +1856,6 @@ msgstr "Dán"
 
 #. *
 #. * The select all action.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/SearchField.java:91
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/CheckBoxList.java:539
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/LimeTextField.java:106
@@ -1900,7 +1868,7 @@ msgstr "Xóa lịch sử"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/searchfield/SearchFieldUI.java:378
 msgid "SearchField.popupSource"
-msgstr ""
+msgstr "SearchField.popupSource"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/tabs/LibraryTab.java:44
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:211
@@ -1925,7 +1893,8 @@ msgid "filter transfers here"
 msgstr "lọc chuyển ở đây"
 
 #. removed last parameter: rowConstraints="[][grow]"
-#. it was causing the entire transfer tab not to grow vertically on bigger screens
+#. it was causing the entire transfer tab not to grow vertically on bigger
+#. screens
 #. Transfers [ text filter]           [filter buttons] row
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/tabs/TransfersTab.java:59
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/tabs/TransfersTab.java:87
@@ -1942,106 +1911,106 @@ msgstr "Tất cả các"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:368
 msgid "FileChooser.lookInLabelText"
-msgstr ""
+msgstr "FileChooser.lookInLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:369
 msgid "FileChooser.saveInLabelText"
-msgstr ""
+msgstr "FileChooser.saveInLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:371
 msgid "FileChooser.fileNameLabelText"
-msgstr ""
+msgstr "FileChooser.fileNameLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:373
 msgid "FileChooser.folderNameLabelText"
-msgstr ""
+msgstr "FileChooser.folderNameLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:375
 msgid "FileChooser.filesOfTypeLabelText"
-msgstr ""
+msgstr "FileChooser.filesOfTypeLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:376
 msgid "FileChooser.upFolderToolTipText"
-msgstr ""
+msgstr "FileChooser.upFolderToolTipText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:377
 msgid "FileChooser.upFolderAccessibleName"
-msgstr ""
+msgstr "FileChooser.upFolderAccessibleName"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:378
 msgid "FileChooser.homeFolderToolTipText"
-msgstr ""
+msgstr "FileChooser.homeFolderToolTipText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:379
 msgid "FileChooser.homeFolderAccessibleName"
-msgstr ""
+msgstr "FileChooser.homeFolderAccessibleName"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:380
 msgid "FileChooser.newFolderToolTipText"
-msgstr ""
+msgstr "FileChooser.newFolderToolTipText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:381
 msgid "FileChooser.newFolderAccessibleName"
-msgstr ""
+msgstr "FileChooser.newFolderAccessibleName"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:382
 msgid "FileChooser.listViewButtonToolTipText"
-msgstr ""
+msgstr "FileChooser.listViewButtonToolTipText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:383
 msgid "FileChooser.listViewButtonAccessibleName"
-msgstr ""
+msgstr "FileChooser.listViewButtonAccessibleName"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:384
 msgid "FileChooser.detailsViewButtonToolTipText"
-msgstr ""
+msgstr "FileChooser.detailsViewButtonToolTipText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/BaseFileChooserUI.java:385
 msgid "FileChooser.detailsViewButtonAccessibleName"
-msgstr ""
+msgstr "FileChooser.detailsViewButtonAccessibleName"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:439
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePaneEx.java:44
 msgid "FileChooser.viewMenuLabelText"
-msgstr ""
+msgstr "FileChooser.viewMenuLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:441
 msgid "FileChooser.refreshActionLabelText"
-msgstr ""
+msgstr "FileChooser.refreshActionLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:443
 msgid "FileChooser.newFolderActionLabelText"
-msgstr ""
+msgstr "FileChooser.newFolderActionLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:446
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePaneEx.java:46
 msgid "FileChooser.listViewActionLabelText"
-msgstr ""
+msgstr "FileChooser.listViewActionLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:448
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePaneEx.java:47
 msgid "FileChooser.detailsViewActionLabelText"
-msgstr ""
+msgstr "FileChooser.detailsViewActionLabelText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:449
 msgid "FileChooser.fileSizeKiloBytes"
-msgstr ""
+msgstr "FileChooser.fileSizeKiloBytes"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:450
 msgid "FileChooser.fileSizeMegaBytes"
-msgstr ""
+msgstr "FileChooser.fileSizeMegaBytes"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:451
 msgid "FileChooser.fileSizeGigaBytes"
-msgstr ""
+msgstr "FileChooser.fileSizeGigaBytes"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:453
 msgid "FileChooser.renameErrorTitleText"
-msgstr ""
+msgstr "FileChooser.renameErrorTitleText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FilePane.java:454
 msgid "FileChooser.renameErrorText"
-msgstr ""
+msgstr "FileChooser.renameErrorText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/theme/FrostwireInputDialog.java:93
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropGuard.java:96
@@ -2053,6 +2022,8 @@ msgid ""
 "The new theme has been applied partially.\n"
 "For the full theme to load please restart FrostWire."
 msgstr ""
+"Giao diện mới đã được áp dụng một phần.\n"
+"Để tải đầy đủ giao diện vui lòng khởi động lại FrostWire."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/updates/InstallerUpdater.java:330
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/updates/UpdateMediator.java:216
@@ -2067,11 +2038,11 @@ msgstr "Thời gian trôi! Bạn đã bỏ lỡ {0} bản cập nhật cuối c�
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/updates/ProgressMonitor.java:131
 msgid "OptionPane.cancelButtonText"
-msgstr ""
+msgstr "OptionPane.cancelButtonText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/updates/ProgressMonitor.java:183
 msgid "ProgressMonitor.progressText"
-msgstr ""
+msgstr "ProgressMonitor.progressText"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/updates/UpdateManager.java:321
 msgid "New FrostWire Update Available"
@@ -2095,29 +2066,27 @@ msgstr "Đi tới trang web"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:490
 msgid "matched_file"
-msgstr ""
+msgstr "matched_file"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:601
-#, fuzzy
 msgid "info_hash"
-msgstr "Sao chép Infohash"
+msgstr "info_hash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:602
-#, fuzzy
 msgid "name"
-msgstr "Đổi tên thư mục"
+msgstr "tên"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:605
 msgid "files_json"
-msgstr ""
+msgstr "files_json"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:606
 msgid "tags"
-msgstr ""
+msgstr "tags"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/search/relay/LocalIndexTable.java:607
 msgid "publisher_node_id"
-msgstr ""
+msgstr "publisher_node_id"
 
 #. These are used as resource keys to retreive descriptions in the GUI
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/MediaType.java:32
@@ -2150,12 +2119,11 @@ msgstr "Giới thiệu FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:60
 msgid "An anonymous test report was queued for Icebase."
-msgstr ""
+msgstr "Báo cáo kiểm tra ẩn danh đã được xếp hàng cho Icebase."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:61
-#, fuzzy
 msgid "Test Report"
-msgstr "Sao chép Báo cáo"
+msgstr "Báo cáo Kiểm tra"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:77
 msgid "End User License Agreement"
@@ -2188,15 +2156,15 @@ msgstr "Nhờ cộng đồng Chat FrostWire!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:186
 msgid ""
-"Thanks to everybody that has helped us everyday in the forums and chatrooms, "
-"you not only help new users but you also warn the FrostWire team of any "
-"problem that occur on our networks. Thank you all, without you this wouldn't "
-"be possible!"
+"Thanks to everybody that has helped us everyday in the forums and chatrooms,"
+" you not only help new users but you also warn the FrostWire team of any "
+"problem that occur on our networks. Thank you all, without you this wouldn't"
+" be possible!"
 msgstr ""
 "Nhờ tất cả mọi người đã giúp chúng tôi hàng ngày trong các diễn đàn và "
 "chatroom, bạn không chỉ giúp người dùng mới mà còn cảnh báo nhóm FrostWire "
-"về bất kỳ vấn đề nào xảy ra trên mạng của chúng tôi. Cảm ơn tất cả, không có "
-"bạn điều này sẽ không thể!"
+"về bất kỳ vấn đề nào xảy ra trên mạng của chúng tôi. Cảm ơn tất cả, không có"
+" bạn điều này sẽ không thể!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:191
 msgid ""
@@ -2262,11 +2230,11 @@ msgstr "Nhờ Nhóm Ubuntu/Kubuntu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:284
 msgid ""
-"For making the world a better place with such an excellent distro, you'll be "
-"the ones to make a difference on the desktop."
+"For making the world a better place with such an excellent distro, you'll be"
+" the ones to make a difference on the desktop."
 msgstr ""
-"Để làm cho thế giới trở nên tốt hơn với một distro tuyệt vời như vậy, bạn sẽ "
-"là những người tạo ra sự khác biệt trên desktop."
+"Để làm cho thế giới trở nên tốt hơn với một distro tuyệt vời như vậy, bạn sẽ"
+" là những người tạo ra sự khác biệt trên desktop."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:286
 msgid "Thanks to the NSIS Project"
@@ -2290,8 +2258,8 @@ msgid ""
 "BitTorrent, the BitTorrent Logo, and Torrent are trademarks of BitTorrent, "
 "Inc."
 msgstr ""
-"BitTorrent, logo của BitTorrent, và Torrent là các nhãn hiệu của BitTorrent, "
-"Inc."
+"BitTorrent, logo của BitTorrent, và Torrent là các nhãn hiệu của BitTorrent,"
+" Inc."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/ApplicationHeader.java:174
 msgid "A new update has been downloaded."
@@ -2313,7 +2281,6 @@ msgstr "Bỏ chọn tất cả các mục trong Danh sách"
 #. *
 #. * Constant for when the user selects the yes button
 #. * in a message.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DialogOption.java:12
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:425
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:427
@@ -2326,7 +2293,6 @@ msgstr "Có"
 #. *
 #. * Constant for when the user selects the no button
 #. * in a message.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DialogOption.java:17
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:425
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:427
@@ -2337,9 +2303,8 @@ msgid "No"
 msgstr "Không"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
-#, fuzzy
 msgid "Support FrostWire development with a donation"
-msgstr "Hỗ trợ phát triển FrostWire với sự đóng góp 10 Đô la Mỹ"
+msgstr "Ủng hộ phát triển FrostWire bằng quyên góp"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/FileChooserHandler.java:453
 msgid "All Folders"
@@ -2364,43 +2329,43 @@ msgid "FrostWire: Share Big Files"
 msgstr "FrostWire: Chia sẻ tệp lớn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:470
-#, fuzzy
 msgid "Failed to restart FrostWire: "
-msgstr "&Bạn đã trả tiền cho FrostWire?"
+msgstr "Khởi động lại FrostWire thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:478
 msgid "Restart Now"
-msgstr ""
+msgstr "Khởi động lại Ngay"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:478
-#, fuzzy
 msgid "Restart Later"
-msgstr "Khôi phục"
+msgstr "Khởi động lại Sau"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:483
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:262
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:399
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:468
 msgid "Restart Required"
-msgstr ""
+msgstr "Yêu cầu Khởi động lại"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:805
 msgid ""
 "Cannot open URLs. Try installing GVFS and restarting FrostWire to solve the "
 "issue."
 msgstr ""
+"Không thể mở URL. Hãy thử cài đặt GVFS và khởi động lại FrostWire để khắc "
+"phục sự cố."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:807
 msgid "ERROR: Opening URLs isn't supported on this platform!"
-msgstr ""
+msgstr "LỖI: Mở URL không được hỗ trợ trên nền tảng này!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:814
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "FrostWire could not locate your web browser to display the following web "
 "page: {0}."
 msgstr ""
-"FrostWire không tìm thấy trình duyệt  Web của bạn để hiển thị trang web :  "
+"FrostWire không tìm thấy trình duyệt web của bạn để hiển thị trang web sau: "
 "{0}."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:832
@@ -2495,19 +2460,13 @@ msgstr "Đang tải các bản tải xuống cũ..."
 msgid ""
 "FrostWire could not create a temporary preferences folder.\n"
 "\n"
-"This is generally caused by a lack of permissions.  Please make sure that "
-"FrostWire (and you) have access to create files/folders on your computer.  "
-"If the problem persists, please visit www.frostwire.com and click the "
-"'Support' link.\n"
+"This is generally caused by a lack of permissions.  Please make sure that FrostWire (and you) have access to create files/folders on your computer.  If the problem persists, please visit www.frostwire.com and click the 'Support' link.\n"
 "\n"
 "FrostWire will now exit.  Thank You."
 msgstr ""
 "FrostWire không thể tạo thư mục ưu tiên tạm thời.\n"
 "\n"
-"Điều này thường gây ra bởi thiếu giấy phép. Hãy chắc chắn rằng FrostWire (và "
-"bạn) có quyền truy cập để tạo tệp / thư mục trên máy tính của bạn. Nếu sự cố "
-"vẫn tiếp diễn, vui lòng truy cập vào trang web www.frostwire.com và nhấp vào "
-"liên kết 'Hỗ trợ'.\n"
+"Điều này thường gây ra bởi thiếu giấy phép. Hãy chắc chắn rằng FrostWire (và bạn) có quyền truy cập để tạo tệp / thư mục trên máy tính của bạn. Nếu sự cố vẫn tiếp diễn, vui lòng truy cập vào trang web www.frostwire.com và nhấp vào liên kết 'Hỗ trợ'.\n"
 "\n"
 "FrostWire bây giờ sẽ thoát. Cảm ơn bạn."
 
@@ -2524,7 +2483,7 @@ msgstr "Đổi ngôn ngữ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:451
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsButtonPanel.java:32
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/LanguageWindow.java:159
 msgid "Help Translate FrostWire"
@@ -2587,19 +2546,19 @@ msgstr "Cảm ơn bạn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/SettingsWarningManager.java:32
 msgid ""
-"FrostWire has encountered problems in managing your settings.  Your settings "
-"changes may not be saved on shutdown."
+"FrostWire has encountered problems in managing your settings.  Your settings"
+" changes may not be saved on shutdown."
 msgstr ""
 "FrostWire đã gặp sự cố trong việc quản lý cài đặt của bạn. Thay đổi cài đặt "
 "của bạn có thể không được lưu khi tắt máy."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/SettingsWarningManager.java:35
 msgid ""
-"FrostWire has encountered problems in loading your settings.  FrostWire will "
-"attempt to use the default values; however, may behave unexpectedly."
+"FrostWire has encountered problems in loading your settings.  FrostWire will"
+" attempt to use the default values; however, may behave unexpectedly."
 msgstr ""
-"FrostWire đã gặp sự cố khi tải cài đặt của bạn. FrostWire sẽ cố gắng sử dụng "
-"các giá trị mặc định; Tuy nhiên, có thể hành xử bất ngờ."
+"FrostWire đã gặp sự cố khi tải cài đặt của bạn. FrostWire sẽ cố gắng sử dụng"
+" các giá trị mặc định; Tuy nhiên, có thể hành xử bất ngờ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/ShutdownWindow.java:44
 msgid "Shutting down FrostWire..."
@@ -2671,9 +2630,8 @@ msgstr ""
 "giúp và Trợ giúp Người khác."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:281
-#, fuzzy
 msgid "Join the FrostWire community on Discord"
-msgstr "Nhờ cộng đồng Chat FrostWire!"
+msgstr "Tham gia cộng đồng FrostWire trên Discord"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:304
 msgid "<b>Seeding</b><p>completed torrent downloads.</p>"
@@ -2684,7 +2642,8 @@ msgid ""
 "<b>Not Seeding</b><p>File chunks might be shared only during a torrent "
 "download.</p>"
 msgstr ""
-"<b>Không Hạt giống</b><p>Tệp tệp có thể chỉ được chia sẻ khi tải torrent.</p>"
+"<b>Không Hạt giống</b><p>Tệp tệp có thể chỉ được chia sẻ khi tải "
+"torrent.</p>"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:310
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:609
@@ -2692,9 +2651,8 @@ msgid "Not Seeding"
 msgstr "Không Hạt giống"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:563
-#, fuzzy
 msgid "Preparing FrostWire..."
-msgstr "Đang tải FrostWire..."
+msgstr "Đang chuẩn bị FrostWire..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:644
 msgid "FrostWire has detected a firewall"
@@ -2714,7 +2672,7 @@ msgstr "Kiểm tra kết nối internet của bạn, FrostWire không thể kế
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:734
 msgid "Turbo-Charged"
-msgstr ""
+msgstr "Tăng tốc Turbo"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:735
 msgid "Your connection to the network is extremely strong"
@@ -2749,17 +2707,15 @@ msgid "Show Donation Buttons"
 msgstr "Hiển thị nút tặng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:850
-#, fuzzy
 msgid "Show VPN-Drop Protection"
-msgstr "Hoạt động VPN bảo vệ tự động"
+msgstr "Hiện Bảo vệ Ngắt VPN"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:861
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:862
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:863
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:864
-#, fuzzy
 msgid "Settings"
-msgstr "Cài đặt Giống"
+msgstr "Cài đặt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/StatusLine.java:894
 msgid "Downloads:"
@@ -2779,35 +2735,30 @@ msgstr "Tổng số thượng nguồn:"
 
 #. *
 #. * The title for the TOTD window.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:48
 msgid "Tip of the Day"
 msgstr "Lời khuyên hàng ngày"
 
 #. *
 #. * The 'Did You Know' intro.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:52
 msgid "Did You Know..."
 msgstr "Bạn đã biết..."
 
 #. *
 #. * The 'Show Tips At Startup' string
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:56
 msgid "Show Tips At Startup"
 msgstr "Hiển thị lời khuyên khi khởi động"
 
 #. *
 #. * 'Next'.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:60
 msgid "Next Tip"
 msgstr "Lời khuyên kế"
 
 #. *
 #. * 'Previous'.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:64
 msgid "Previous Tip"
 msgstr "Lời khuyên trước"
@@ -2822,41 +2773,48 @@ msgid ""
 "<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire "
 "installer features no bundled offers or advertisement and you can download "
 "it for free. You can help support the continued development of FrostWire "
-"with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:"
-"<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">ETH/EVM "
+"with your <a href=\"{0}\">donations</a>.<br><br>You can donate "
+"via:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">ETH/EVM "
 "compatible or ERC-20 tokens like USDC/USDT</a></li></ul><br>Thank you for "
 "your continued support."
 msgstr ""
+"<a href=\"{0}\"><h2>Ủng hộ FrostWire Hôm nay</h2></a><br>Bộ cài FrostWire "
+"không kèm ưu đãi hay quảng cáo và bạn có thể tải miễn phí. Bạn có thể giúp "
+"duy trì phát triển FrostWire bằng <a href=\"{0}\">quyên góp</a>.<br><br>Bạn "
+"có thể quyên góp qua:<ul><li><a href=\"{1}\">Paypal</a></li><li><a "
+"href=\"{2}\">ETH/tương thích EVM hoặc token ERC-20 như "
+"USDC/USDT</a></li></ul><br>Cảm ơn sự ủng hộ của bạn."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:27
 msgid ""
 "Use the search box to enter search keywords or to paste video urls so that "
 "you can backup your video content from social media posts or to archive and "
-"time-shift free and legal video content for offline use. Always make sure to "
-"respect your local copyright laws."
+"time-shift free and legal video content for offline use. Always make sure to"
+" respect your local copyright laws."
 msgstr ""
+"Dùng ô tìm kiếm để nhập từ khóa hoặc dán url video để sao lưu nội dung video"
+" từ bài đăng mạng xã hội hoặc lưu trữ và xem lại nội dung video miễn phí, "
+"hợp pháp để xem ngoại tuyến. Luôn tôn trọng luật bản quyền địa phương."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:29
-#, fuzzy
 msgid "Try FrostWire Plus for Android free today"
-msgstr "FrostWire dành cho Android"
+msgstr "Dùng thử FrostWire Plus cho Android miễn phí hôm nay"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:30
-#, fuzzy
 msgid "Keep FrostWire Free"
-msgstr "Sử dụng FrostWire cho ..."
+msgstr "Giữ FrostWire Miễn phí"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:31
 msgid ""
-"Tired of downloads stopping halfway through? It helps to pick search results "
-"with a higher number in the 'Seeds' column. The Seeds are the amount of "
+"Tired of downloads stopping halfway through? It helps to pick search results"
+" with a higher number in the 'Seeds' column. The Seeds are the amount of "
 "unique places on the network that are hosting the file. The more sources, "
 "the better the chance of getting your torrent file!"
 msgstr ""
 "Mệt mỏi của tải dừng lại nửa chừng? Nó giúp để chọn kết quả tìm kiếm với số "
-"lượng cao hơn trong cột 'Hạt giống'. Hạt giống là số lượng địa điểm duy nhất "
-"trên mạng đang lưu trữ các tập tin. Các nguồn nhiều hơn, tốt hơn cơ hội nhận "
-"được tập tin torrent của bạn!"
+"lượng cao hơn trong cột 'Hạt giống'. Hạt giống là số lượng địa điểm duy nhất"
+" trên mạng đang lưu trữ các tập tin. Các nguồn nhiều hơn, tốt hơn cơ hội "
+"nhận được tập tin torrent của bạn!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:32
 #, java-format
@@ -2864,6 +2822,9 @@ msgid ""
 "<h2>Follow us</h2> We are on <a href=\"{0}\">Twitter</a>, <a "
 "href=\"{1}\">Instagram</a> and <a href=\"{2}\">Facebook</a>"
 msgstr ""
+"<h2>Theo dõi chúng tôi</h2> Chúng tôi có mặt trên <a "
+"href=\"{0}\">Twitter</a>, <a href=\"{1}\">Instagram</a> và <a "
+"href=\"{2}\">Facebook</a>"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:33
 msgid ""
@@ -2871,15 +2832,17 @@ msgid ""
 "Small Icons, Show Icon Text and Increase-Decrease the Font Size."
 msgstr ""
 "Bạn có thể thay đổi giao diện của FrostWire bằng cách đi tới View &gt; Sử "
-"dụng các biểu tượng nhỏ, Hiển thị Văn bản Biểu tượng và Tăng-Giảm Kích thước "
-"Phông chữ."
+"dụng các biểu tượng nhỏ, Hiển thị Văn bản Biểu tượng và Tăng-Giảm Kích thước"
+" Phông chữ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:34
 #, java-format
 msgid ""
-"<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord Chat</"
-"a></li><li><a href=\"{1}\">Reddit</a></li></ul>"
+"<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord "
+"Chat</a></li><li><a href=\"{1}\">Reddit</a></li></ul>"
 msgstr ""
+"<h2>Tham gia Cộng đồng FrostWire</h2><ul><li><a href=\"{0}\">Trò chuyện "
+"Discord</a></li><li><a href=\"{1}\">Reddit</a></li></ul>"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:35
 msgid ""
@@ -2895,8 +2858,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:36
 msgid ""
-"It helps the network if you keep your FrostWire running. Others will connect "
-"to the network easier and searches will perform better."
+"It helps the network if you keep your FrostWire running. Others will connect"
+" to the network easier and searches will perform better."
 msgstr ""
 "Nó giúp mạng nếu bạn giữ FrostWire chạy. Những người khác sẽ kết nối với "
 "mạng dễ dàng hơn và các tìm kiếm sẽ hoạt động tốt hơn."
@@ -2908,6 +2871,8 @@ msgid ""
 "privacy and anonymity to prevent any outside party from monitoring what you "
 "download"
 msgstr ""
+"<h2><a href=\"{0}\">Dùng kết nối mã hóa VPN</a></h2>Đảm bảo quyền riêng tư "
+"và ẩn danh để ngăn mọi bên ngoài theo dõi nội dung bạn tải"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:38
 #, java-format
@@ -2915,6 +2880,8 @@ msgid ""
 "Passionate about digital rights? Visit the <a href=\"{0}\">Electronic "
 "Frontier Foundation</a> and see what you can do to help."
 msgstr ""
+"Đam mê quyền số? Hãy ghé <a href=\"{0}\">Electronic Frontier Foundation</a> "
+"và xem bạn có thể giúp gì."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:39
 msgid ""
@@ -2922,9 +2889,9 @@ msgid ""
 "buddy is sharing 'Frosty' but you searched for 'My Frosty', your buddy's "
 "file will still be found."
 msgstr ""
-"Các biến thể nhỏ trong tiêu đề tìm kiếm sẽ vẫn hoạt động. Ví dụ: nếu bạn của "
-"bạn đang chia sẻ 'Frosty' nhưng bạn đã tìm kiếm 'My Frosty', tệp của bạn của "
-"bạn vẫn sẽ được tìm thấy."
+"Các biến thể nhỏ trong tiêu đề tìm kiếm sẽ vẫn hoạt động. Ví dụ: nếu bạn của"
+" bạn đang chia sẻ 'Frosty' nhưng bạn đã tìm kiếm 'My Frosty', tệp của bạn "
+"của bạn vẫn sẽ được tìm thấy."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:40
 #, java-format
@@ -2934,6 +2901,9 @@ msgid ""
 "charging you different prices and displaying intrusive advertising based on "
 "your IP address’ browsing history"
 msgstr ""
+"<h2><a href=\"{0}\">Dùng kết nối mã hóa VPN</a></h2>Khiến bên thứ ba khó "
+"theo dõi hoạt động trực tuyến của bạn và ngăn họ tính giá khác nhau hay hiển"
+" thị quảng cáo xâm phạm dựa trên lịch sử duyệt IP của bạn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:41
 msgid ""
@@ -2964,8 +2934,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:46
 msgid ""
-"Be careful not to share sensitive information like tax documents, passwords, "
-"etc. The torrents you are seeding are accesible by everyone on the network "
+"Be careful not to share sensitive information like tax documents, passwords,"
+" etc. The torrents you are seeding are accesible by everyone on the network "
 "as long as they have the .torrent or a (magnet) link to it."
 msgstr ""
 "Cẩn thận không chia sẻ thông tin nhạy cảm như tài liệu thuế, mật khẩu, vv "
@@ -2979,8 +2949,8 @@ msgid ""
 "anything extra because it happens automatically!"
 msgstr ""
 "Không giống như các chương trình chia sẻ tập tin ngang hàng khác, FrostWire "
-"có thể chuyển các tập tin ngay cả khi cả hai bên đứng sau bức tường lửa. Bạn "
-"không phải làm bất cứ điều gì thêm bởi vì nó xảy ra tự động!"
+"có thể chuyển các tập tin ngay cả khi cả hai bên đứng sau bức tường lửa. Bạn"
+" không phải làm bất cứ điều gì thêm bởi vì nó xảy ra tự động!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:48
 msgid ""
@@ -2989,10 +2959,10 @@ msgid ""
 "your friend(s) are downloading. They can pause and resume the download all "
 "they want as long as you or somebody else is seeding the same content."
 msgstr ""
-"Bạn muốn chia sẻ một tệp lớn? Gửi hàng trăm gigabyte mà không gặp bất kỳ vấn "
-"đề gì, chỉ cần đảm bảo bạn để FrostWire chạy và gieo hạt khi bạn bè của bạn "
-"đang tải xuống. Họ có thể tạm dừng và tiếp tục tải xuống tất cả những gì họ "
-"muốn miễn là bạn hoặc người khác đang gieo cùng một nội dung."
+"Bạn muốn chia sẻ một tệp lớn? Gửi hàng trăm gigabyte mà không gặp bất kỳ vấn"
+" đề gì, chỉ cần đảm bảo bạn để FrostWire chạy và gieo hạt khi bạn bè của bạn"
+" đang tải xuống. Họ có thể tạm dừng và tiếp tục tải xuống tất cả những gì họ"
+" muốn miễn là bạn hoặc người khác đang gieo cùng một nội dung."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:49
 msgid ""
@@ -3011,13 +2981,13 @@ msgid ""
 "Don't want to seed? Go to Tools &gt; Options &gt; Bittorrent or select the "
 "Seeding - No Seeding icon at the bottom bar"
 msgstr ""
-"Không muốn hạt giống? Đi tới Công cụ &gt; Tùy chọn &gt; Bittorrent hoặc chọn "
-"biểu tượng Seeding - No Seeding ở thanh dưới cùng"
+"Không muốn hạt giống? Đi tới Công cụ &gt; Tùy chọn &gt; Bittorrent hoặc chọn"
+" biểu tượng Seeding - No Seeding ở thanh dưới cùng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:61
 msgid ""
-"You can find out which version of FrostWire you are using by choosing 'About "
-"FrostWire' from the Help menu."
+"You can find out which version of FrostWire you are using by choosing 'About"
+" FrostWire' from the Help menu."
 msgstr ""
 "Bạn có thể tìm ra phiên bản FrostWire nào bạn đang sử dụng bằng cách chọn "
 "'About FrostWire' từ trình đơn Help."
@@ -3025,15 +2995,16 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:62
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:78
 msgid ""
-"Be a good network participant, don't close FrostWire if someone is uploading "
-"from you."
+"Be a good network participant, don't close FrostWire if someone is uploading"
+" from you."
 msgstr ""
-"Là người tham gia mạng tốt, không đóng FrostWire nếu có ai đó tải lên từ bạn."
+"Là người tham gia mạng tốt, không đóng FrostWire nếu có ai đó tải lên từ "
+"bạn."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:63
 msgid ""
-"You can turn autocomplete for searching on or off by choosing 'Options' from "
-"the 'Tools' menu, and selecting the option 'Text Autocompletion'."
+"You can turn autocomplete for searching on or off by choosing 'Options' from"
+" the 'Tools' menu, and selecting the option 'Text Autocompletion'."
 msgstr ""
 "Bạn có thể bật tính năng tự động điền để tìm kiếm hoặc tắt bằng cách chọn "
 "'Tùy chọn' từ trình đơn 'Công cụ' và chọn tùy chọn 'Tự động hoàn thành văn "
@@ -3063,14 +3034,14 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:66
 msgid ""
 "Hate tool tips? Love tool tips? You can turn them on or off in most tables "
-"by right-clicking on the column headers and choosing 'More Options'. You can "
-"toggle other options here too, like whether or not to sort tables "
+"by right-clicking on the column headers and choosing 'More Options'. You can"
+" toggle other options here too, like whether or not to sort tables "
 "automatically and if you prefer the rows to be striped."
 msgstr ""
 "Ghét công cụ lời khuyên? Mẹo về công cụ tình yêu? Bạn có thể bật hoặc tắt "
 "chúng trong hầu hết các bảng bằng cách nhấp chuột phải vào các tiêu đề cột "
-"và chọn 'Tùy chọn khác'. Bạn cũng có thể bật các tùy chọn khác ở đây, như tự "
-"động sắp xếp bảng và nếu bạn thích các hàng được sọc."
+"và chọn 'Tùy chọn khác'. Bạn cũng có thể bật các tùy chọn khác ở đây, như tự"
+" động sắp xếp bảng và nếu bạn thích các hàng được sọc."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:67
 msgid ""
@@ -3095,8 +3066,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:77
 msgid ""
-"You can find out which version of FrostWire you are using by choosing 'About "
-"FrostWire' from the FrostWire menu."
+"You can find out which version of FrostWire you are using by choosing 'About"
+" FrostWire' from the FrostWire menu."
 msgstr ""
 "Bạn có thể tìm ra phiên bản FrostWire nào bạn đang sử dụng bằng cách chọn "
 "'About FrostWire' từ thực đơn FrostWire."
@@ -3126,8 +3097,8 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:81
 msgid ""
 "You can ban certain words from appearing in your search results by choosing "
-"'Tools' from the 'FrostWire' menu and adding new words to those listed under "
-"Filters &gt; Keywords."
+"'Tools' from the 'FrostWire' menu and adding new words to those listed under"
+" Filters &gt; Keywords."
 msgstr ""
 "Bạn có thể cấm những từ nhất định xuất hiện trong kết quả tìm kiếm của bạn "
 "bằng cách chọn 'Tools' từ trình đơn 'FrostWire' và thêm từ mới vào những từ "
@@ -3174,8 +3145,8 @@ msgid ""
 "to 'Tools' on FrostWire menu and select the option 'Play with native media "
 "player'."
 msgstr ""
-"Bạn muốn phát nhạc trong máy nghe nhạc mặc định thay vì trong FrostWire? Vào "
-"'Tools' trên menu FrostWire và chọn tùy chọn 'Play with media player'."
+"Bạn muốn phát nhạc trong máy nghe nhạc mặc định thay vì trong FrostWire? Vào"
+" 'Tools' trên menu FrostWire và chọn tùy chọn 'Play with media player'."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:86
 msgid ""
@@ -3193,8 +3164,8 @@ msgid ""
 "the program associated with a file, go to the 'Folder Options' in Windows "
 "Control Panel. This is a Windows setting, not a FrostWire setting."
 msgstr ""
-"Các biểu tượng mà bạn thấy bên cạnh kết quả tìm kiếm của mình trong phần '?' "
-"Cột là các ký hiệu của chương trình được sử dụng để mở các loại tập tin cụ "
+"Các biểu tượng mà bạn thấy bên cạnh kết quả tìm kiếm của mình trong phần '?'"
+" Cột là các ký hiệu của chương trình được sử dụng để mở các loại tập tin cụ "
 "thể. Để thay đổi chương trình liên kết với một tệp tin, hãy đi tới 'Folder "
 "Options' trong Windows Control Panel. Đây là cài đặt Windows, không phải là "
 "cài đặt FrostWire."
@@ -3203,7 +3174,8 @@ msgstr ""
 msgid ""
 "FrostWire's Library is a file manager, not just an MP3 Playlist. That means "
 "that when you delete a file from the Library, you have the option to either "
-"permanently delete the file from your computer or move it to the Recycle Bin."
+"permanently delete the file from your computer or move it to the Recycle "
+"Bin."
 msgstr ""
 "Thư viện của FrostWire là một trình quản lý tập tin, không chỉ là một danh "
 "sách MP3. Điều đó có nghĩa là khi bạn xóa một tệp khỏi Thư viện, bạn có tùy "
@@ -3217,9 +3189,9 @@ msgid ""
 "change this behavior by going to Tools &gt; Options &gt; System Tray."
 msgstr ""
 "Khi bạn đóng FrostWire, nó giảm thiểu đến khay hệ thống. Để thoát, hãy nhấp "
-"chuột phải vào biểu tượng khay hệ thống (bên cạnh thời gian), và chọn Thoát. "
-"Bạn có thể thay đổi hành vi này bằng cách đi tới Công cụ &gt; Tùy chọn & gt; "
-"Khay hệ thống."
+"chuột phải vào biểu tượng khay hệ thống (bên cạnh thời gian), và chọn Thoát."
+" Bạn có thể thay đổi hành vi này bằng cách đi tới Công cụ &gt; Tùy chọn & "
+"gt; Khay hệ thống."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:123
 msgid "Thank you for using FrostWire"
@@ -3262,18 +3234,16 @@ msgstr "Tự động vô hiệu hóa bảo vệ VPN. Khởi động lại công 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:73
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:87
 msgid "VPN"
-msgstr ""
+msgstr "VPN"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:97
-#, fuzzy
 msgid "-Drop protection"
-msgstr "Vô hiệu hoá bảo vệ tự động VPN"
+msgstr "bảo vệ ngắt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:101
-#, fuzzy
 msgid ""
 "When enabled, BitTorrent transfers will pause if your VPN is disconnected"
-msgstr "BitTorrent tắt bởi vì VPN của bạn bị ngắt kết nối"
+msgstr "Khi bật, truyền tải BitTorrent sẽ tạm dừng nếu VPN bị ngắt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNStatusButton.java:80
 msgid ""
@@ -3297,25 +3267,23 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNStatusButton.java:124
 msgid ""
-"FrostWire can't detect an encrypted VPN connection, your privacy is at risk. "
-"Click icon to set up an encrypted VPN connection."
+"FrostWire can't detect an encrypted VPN connection, your privacy is at risk."
+" Click icon to set up an encrypted VPN connection."
 msgstr ""
 "FrostWire không thể phát hiện được kết nối VPN mã hóa, sự riêng tư của bạn "
 "có nguy cơ. Nhấp vào biểu tượng để thiết lập một kết nối VPN mật mã."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:88
-#, fuzzy
 msgid "O&pen .Torrent, Magnet or Video URL"
-msgstr "Mở tệp .Torrent hoặc Magnet"
+msgstr "Mở .Torrent, Magnet hoặc URL Video"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:90
 msgid "Opens a magnet link or torrent file"
 msgstr "Mở một liên kết nam châm hoặc tập tin torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:105
-#, fuzzy
 msgid "Download .Torrent or Magnet link"
-msgstr "Tải xuống tệp .Torrent hoặc Magnet hoặc liên kết video trên YouTube"
+msgstr "Tải liên kết .Torrent hoặc Magnet"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:133
 msgid ""
@@ -3334,8 +3302,8 @@ msgid ""
 "FrostWire cannot download this address. Make sure you typed it correctly, "
 "and then try again."
 msgstr ""
-"FrostWire không thể tải xuống địa chỉ này. Đảm bảo bạn đã gõ đúng, và sau đó "
-"thử lại."
+"FrostWire không thể tải xuống địa chỉ này. Đảm bảo bạn đã gõ đúng, và sau đó"
+" thử lại."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/actions/FileMenuActions.java:248
 msgid "&Close"
@@ -3373,9 +3341,9 @@ msgid ""
 "FrostWire was unable to write a necessary file because your hard drive is "
 "full. To continue using FrostWire you must free up space on your hard drive."
 msgstr ""
-"FrostWire không thể khởi động bởi vì đĩa cứng của ban không còn chỗ trống để "
-"FrostWire chép những tập tin cần thiết.  Bạn phải  làm cho đĩa cứng của bạn "
-"không còn đầy nữa để có thể tiếp tục sử dụng FrostWire."
+"FrostWire không thể khởi động bởi vì đĩa cứng của ban không còn chỗ trống để"
+" FrostWire chép những tập tin cần thiết.  Bạn phải  làm cho đĩa cứng của bạn"
+" không còn đầy nữa để có thể tiếp tục sử dụng FrostWire."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:69
 msgid ""
@@ -3383,8 +3351,8 @@ msgid ""
 "locked the file. FrostWire may act unexpectedly until this file is released."
 msgstr ""
 "FrostWire không thể truy cập những tập tin cần thiết bởi vì những tập tin "
-"này đã bị khóa bởi nhũng chương trình khác. FrostWire có thể hoạt động không "
-"bình thường đến khi những tập tin bị khóa được mở khóa."
+"này đã bị khóa bởi nhũng chương trình khác. FrostWire có thể hoạt động không"
+" bình thường đến khi những tập tin bị khóa được mở khóa."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:71
 msgid ""
@@ -3408,8 +3376,8 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:75
 msgid ""
-"FrostWire cannot download the selected file because your hard drive is full. "
-"To download more files, you must free up space on your hard drive."
+"FrostWire cannot download the selected file because your hard drive is full."
+" To download more files, you must free up space on your hard drive."
 msgstr ""
 "FrostWire không thể tải tập tin bạn đã chọn bởi vì đĩa cứng của bạn đã đầy. "
 "Để tải thêm nhiều tập tin, đĩa cứng của bạn phải có đủ chỗ trống."
@@ -3431,8 +3399,8 @@ msgid ""
 "different Save Folder."
 msgstr ""
 "FrostWire không thể tạo hoặc tiếp tục viết một tệp không đầy đủ cho tải đã "
-"chọn vì bạn không có quyền ghi các tệp vào thư mục không đầy đủ. Để tiếp tục "
-"sử dụng FrostWire, vui lòng chọn một Thư mục Lưu khác."
+"chọn vì bạn không có quyền ghi các tệp vào thư mục không đầy đủ. Để tiếp tục"
+" sử dụng FrostWire, vui lòng chọn một Thư mục Lưu khác."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:81
 msgid ""
@@ -3449,15 +3417,15 @@ msgstr "Lỗi nội bộ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:277
 msgid ""
-"FrostWire has encountered an internal error. It is possible for FrostWire to "
-"recover and continue running normally. To aid with debugging, please click "
+"FrostWire has encountered an internal error. It is possible for FrostWire to"
+" recover and continue running normally. To aid with debugging, please click "
 "'Send' to notify FrostWire about the problem. If desired, you can click "
 "'Review' to look at the information that will be sent. Thank you."
 msgstr ""
-"FrostWire đã gặp lỗi nội bộ. Có thể FrostWire phục hồi và tiếp tục chạy bình "
-"thường. Để hỗ trợ gỡ lỗi, vui lòng nhấp vào 'Gửi' để thông báo cho FrostWire "
-"về vấn đề này. Nếu muốn, bạn có thể nhấp vào 'Xem lại' để xem thông tin sẽ "
-"được gửi đi. Cảm ơn bạn."
+"FrostWire đã gặp lỗi nội bộ. Có thể FrostWire phục hồi và tiếp tục chạy bình"
+" thường. Để hỗ trợ gỡ lỗi, vui lòng nhấp vào 'Gửi' để thông báo cho "
+"FrostWire về vấn đề này. Nếu muốn, bạn có thể nhấp vào 'Xem lại' để xem "
+"thông tin sẽ được gửi đi. Cảm ơn bạn."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:289
 msgid ""
@@ -3492,8 +3460,8 @@ msgstr "Luôn Hủy bỏ Mọi lỗi"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/bugs/BugManager.java:418
 msgid ""
-"FrostWire was unable to connect to the bug server in order to send the below "
-"bug report. For further help and to aid with debugging, please visit "
+"FrostWire was unable to connect to the bug server in order to send the below"
+" bug report. For further help and to aid with debugging, please visit "
 "www.frostwire.com and click 'Support'. Thank you."
 msgstr ""
 "FrostWire không thể kết nối với máy chủ lỗi để gửi báo cáo lỗi dưới đây. Để "
@@ -3551,14 +3519,11 @@ msgstr "Cài đặt Chia sẻ BitTorrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/BitTorrentSettingsWindow.java:52
 msgid ""
-"Choose a folder where files downloaded from the BitTorrent network should be "
-"saved to.\n"
-"Please select if you want to \"Seed\" or to not \"Seed\" finished downloads. "
-"The link below has more information about \"Seeding\"."
+"Choose a folder where files downloaded from the BitTorrent network should be saved to.\n"
+"Please select if you want to \"Seed\" or to not \"Seed\" finished downloads. The link below has more information about \"Seeding\"."
 msgstr ""
 "Chọn một thư mục mà các tập tin tải về từ mạng BitTorrent sẽ được lưu vào.\n"
-"Vui lòng chọn nếu bạn muốn \"hạt giống\" hoặc không tải \"Seed\" hoàn tất. "
-"Liên kết dưới đây có thêm thông tin về \"Hạt giống\"."
+"Vui lòng chọn nếu bạn muốn \"hạt giống\" hoặc không tải \"Seed\" hoàn tất. Liên kết dưới đây có thêm thông tin về \"Hạt giống\"."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/BitTorrentSettingsWindow.java:98
 msgid "You forgot to select your finished downloads \"Seeding\" setting."
@@ -3573,7 +3538,8 @@ msgstr "\"Hạt giống\" là gì?"
 #, java-format
 msgid "FrostWire could not create the Torrent Data Folder {0}"
 msgstr ""
-"FrostWire không tìm thấy trình duyệt  Web của bạn để hiển thị trang web:  {0}"
+"FrostWire không tìm thấy trình duyệt  Web của bạn để hiển thị trang web:  "
+"{0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/IntentPanel.java:50
 msgid "You're almost done!"
@@ -3586,26 +3552,28 @@ msgstr "Nêu rõ ý định của bạn dưới đây để bắt đầu sử d�
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/IntentPanel.java:53
 msgid ""
 "FrostWire is a peer-to-peer program for sharing authorized files only.  "
-"Installing and using the program does not constitute a license for obtaining "
-"or distributing unauthorized content."
+"Installing and using the program does not constitute a license for obtaining"
+" or distributing unauthorized content."
 msgstr ""
 "FrostWire là một chương trình peer-to-peer chỉ để chia sẻ các tập tin được "
-"ủy quyền. Việc cài đặt và sử dụng chương trình không phải là giấy phép để có "
-"được hoặc phân phối nội dung trái phép."
+"ủy quyền. Việc cài đặt và sử dụng chương trình không phải là giấy phép để có"
+" được hoặc phân phối nội dung trái phép."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/IntentPanel.java:54
 msgid "Find out more..."
 msgstr "Bạn đã biết..."
 
 #. Defer HTML content to avoid EDT violation
-#. HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+#. HTML rendering triggers expensive font metrics calculations (>2 second EDT
+#. block)
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/IntentPanel.java:64
 #, java-format
 msgid "I <b>will not</b> use FrostWire {0} for copyright infringement."
 msgstr "Tôi <b>sẽ không sử</b> dụng FrostWire {0} vì vi phạm bản quyền."
 
 #. Defer HTML content to avoid EDT violation
-#. HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+#. HTML rendering triggers expensive font metrics calculations (>2 second EDT
+#. block)
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/IntentPanel.java:74
 #, java-format
 msgid "I <b>might use</b> FrostWire {0} for copyright infringement."
@@ -3642,15 +3610,15 @@ msgstr "Tự động cuộn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/MiscWindow.java:59
 msgid ""
-"Would you like FrostWire to start when you log into your computer? This will "
-"cause FrostWire to start faster when you use it later."
+"Would you like FrostWire to start when you log into your computer? This will"
+" cause FrostWire to start faster when you use it later."
 msgstr ""
 "Bạn có muốn FrostWire bắt đầu khi bạn đăng nhập vào máy tính của bạn? Điều "
 "này sẽ làm cho FrostWire bắt đầu nhanh hơn khi bạn sử dụng nó sau."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SetupManager.java:185
 msgid "FrostWire Setup Wizard"
-msgstr ""
+msgstr "Trình hướng dẫn Cài đặt FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SetupManager.java:380
 msgid "Next >>"
@@ -3697,11 +3665,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/WelcomeWindow.java:36
 msgid ""
-"Installing and using the program does not constitute a license for obtaining "
-"or distributing unauthorized content."
+"Installing and using the program does not constitute a license for obtaining"
+" or distributing unauthorized content."
 msgstr ""
-"Việc cài đặt và sử dụng chương trình không phải là giấy phép để có được hoặc "
-"phân phối nội dung trái phép."
+"Việc cài đặt và sử dụng chương trình không phải là giấy phép để có được hoặc"
+" phân phối nội dung trái phép."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/WelcomeWindow.java:42
 msgid "Welcome"
@@ -3710,8 +3678,8 @@ msgstr "Chào mừng"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/WelcomeWindow.java:42
 msgid ""
 "Welcome to the FrostWire setup wizard. FrostWire has recently added new "
-"features that require your configuration. FrostWire will guide you through a "
-"series of steps to configure these new features."
+"features that require your configuration. FrostWire will guide you through a"
+" series of steps to configure these new features."
 msgstr ""
 "Chào mừng đến với thuật sĩ thiết lập FrostWire. FrostWire gần đây đã thêm "
 "các tính năng mới yêu cầu cấu hình của bạn. FrostWire sẽ hướng dẫn bạn qua "
@@ -3763,7 +3731,8 @@ msgstr "Tìm hiểu về Hạt giống BitTorrent"
 msgid ""
 "Learn about how to protect your internet connection and your privacy online"
 msgstr ""
-"Tìm hiểu về cách bảo vệ kết nối internet và quyền riêng tư của bạn trực tuyến"
+"Tìm hiểu về cách bảo vệ kết nối internet và quyền riêng tư của bạn trực "
+"tuyến"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:56
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultMediator.java:681
@@ -3776,58 +3745,57 @@ msgstr "Hỗ trợ tiền điện tử"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Bitcoin"
-msgstr ""
+msgstr "Bitcoin"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:59
 msgid "Bitcoin Cash"
-msgstr ""
+msgstr "Bitcoin Cash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:60
 msgid "Ethereum"
-msgstr ""
+msgstr "Ethereum"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:61
 msgid "Dash"
-msgstr ""
+msgstr "Dash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:62
 msgid "LiteCoin"
-msgstr ""
+msgstr "LiteCoin"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:63
 msgid "ZCash"
-msgstr ""
+msgstr "ZCash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:66
 msgid "Free Legal Downloads"
 msgstr "Tải về pháp luật miễn phí"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:68
-#, fuzzy
 msgid "Discord Chat"
-msgstr "Hủy"
+msgstr "Trò chuyện Discord"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:68
 msgid "Talk to other users, get help and help others, talk to developers"
 msgstr ""
+"Trò chuyện với người dùng khác, nhận trợ giúp và giúp người khác, trò chuyện"
+" với nhà phát triển"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:69
 msgid "Reddit"
-msgstr ""
+msgstr "Reddit"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:69
-#, fuzzy
 msgid "Access the FrostWire Subreddit"
-msgstr "Truy cập Diễn đàn Người sử dụng FrostWire"
+msgstr "Truy cập Subreddit FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:70
 msgid "Follow us on Twitter"
 msgstr "Theo dõi chúng tối trên Twitter"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:71
-#, fuzzy
 msgid "Follow us on Facebook"
-msgstr "FrostWire trên Facebook"
+msgstr "Theo dõi chúng tôi trên Facebook"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/HelpMenu.java:71
 msgid "Come and say hi to the community on Facebook"
@@ -3898,22 +3866,21 @@ msgstr "&Công cụ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:47
 msgid "Switch Theme"
-msgstr ""
+msgstr "Đổi Giao diện"
 
 #. Default theme
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:50
-#, fuzzy
 msgid "&Default"
-msgstr "Sử dụng Mặc định"
+msgstr "&Mặc định"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:61
 msgid "&Light Flat (beta)"
-msgstr ""
+msgstr "&Sáng Phẳng (beta)"
 
 #. Dark theme
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:72
 msgid "&Dark Flat (beta)"
-msgstr ""
+msgstr "&Tối Phẳng (beta)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:91
 msgid "&Options"
@@ -3996,9 +3963,8 @@ msgid "Select your Language Prefereces"
 msgstr "Chọn Ngôn Ngữ của bạn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ViewMenu.java:101
-#, fuzzy
 msgid "This preference will take effect next time you restart FrostWire"
-msgstr "Một hoặc vài tùy chọn sẽ có hiệu lực sau khi khởi động lại FrostWire"
+msgstr "Tùy chọn này sẽ có hiệu lực lần tới khi bạn khởi động lại FrostWire"
 
 #. restore
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/notify/TrayNotifier.java:57
@@ -4050,7 +4016,7 @@ msgstr "Tìm kiếm ở đây"
 #. bittorrent
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:190
 msgid "BitTorrent"
-msgstr ""
+msgstr "BitTorrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:194
 msgid "Basic"
@@ -4076,9 +4042,8 @@ msgstr "Tập tin"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:252
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:66
-#, fuzzy
 msgid "IP Filter"
-msgstr "Tập tin"
+msgstr "Lọc IP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:253
 msgid "Keywords"
@@ -4098,7 +4063,7 @@ msgstr "Người đại diện"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:264
 msgid "I2P"
-msgstr ""
+msgstr "I2P"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:268
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/NetworkInterfacePaneItem.java:39
@@ -4127,35 +4092,33 @@ msgstr "Báo cáo Lỗi"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:291
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:36
 msgid "MCP Server"
-msgstr ""
+msgstr "Máy chủ MCP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:293
-#, fuzzy
 msgid "Distributed Search"
-msgstr "Tìm kiếm thông minh"
+msgstr "Tìm kiếm Phân tán"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:297
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:19
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:44
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:437
 msgid "IceBridge"
-msgstr ""
+msgstr "IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:300
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:68
 msgid "Identity"
-msgstr ""
+msgstr "Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:301
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:44
 msgid "Karma"
-msgstr ""
+msgstr "Karma"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:310
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:222
-#, fuzzy
 msgid "Shared Torrents"
-msgstr "Lưu tệp .torrent"
+msgstr "Torrent Chia sẻ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsMediator.java:70
 msgid "Loading Options Window..."
@@ -4196,23 +4159,23 @@ msgid "You can enable or disable autocompletion of text fields."
 msgstr ""
 "Bạn có thể bật hoặc tắt tính năng tự động hoàn thành các trường văn bản."
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. autocompletion enabled check box label..
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/AutoCompletePaneItem.java:33
 msgid "Enable Autocompletion of Text Fields:"
 msgstr "Bật Tự động hoàn thành các trường văn bản:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/AutoSearchClipboardURLsPaneItem.java:34
 msgid "Auto-search URLs in Clipboard"
-msgstr ""
+msgstr "Tự tìm URL trong Khay nhớ tạm"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/AutoSearchClipboardURLsPaneItem.java:35
 msgid ""
 "If there is an URL or magnet URL in your system's clipboard FrostWire will "
 "automatically paste and start a search with it"
 msgstr ""
+"Nếu có URL hoặc URL magnet trong khay nhớ tạm hệ thống, FrostWire sẽ tự dán "
+"và bắt đầu tìm kiếm"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/AutomaticInstallerDownloadPaneItem.java:9
 msgid "Automatic Installer Download"
@@ -4242,16 +4205,14 @@ msgid ""
 "All Errors' will cause FrostWire to ignore all bugs (this is not "
 "recommended)."
 msgstr ""
-"Bạn có thể chọn cách gửi báo cáo lỗi. Để xem một báo cáo lỗi ví dụ, hãy nhấp "
-"vào 'Xem Ví dụ'. Chọn 'Always Send Instant' ngay lập tức sẽ liên lạc với máy "
-"chủ lỗi khi FrostWire gặp một lỗi nội bộ. Chọn 'Always Ask for Review' sẽ "
-"cho FrostWire yêu cầu sự chấp thuận của bạn trước khi gửi một lỗi cho máy "
-"chủ lỗi. Chọn 'Luôn Xử lý Tất cả lỗi' sẽ làm cho FrostWire bỏ qua tất cả các "
-"lỗi (điều này không được khuyến khích)."
+"Bạn có thể chọn cách gửi báo cáo lỗi. Để xem một báo cáo lỗi ví dụ, hãy nhấp"
+" vào 'Xem Ví dụ'. Chọn 'Always Send Instant' ngay lập tức sẽ liên lạc với "
+"máy chủ lỗi khi FrostWire gặp một lỗi nội bộ. Chọn 'Always Ask for Review' "
+"sẽ cho FrostWire yêu cầu sự chấp thuận của bạn trước khi gửi một lỗi cho máy"
+" chủ lỗi. Chọn 'Luôn Xử lý Tất cả lỗi' sẽ làm cho FrostWire bỏ qua tất cả "
+"các lỗi (điều này không được khuyến khích)."
 
-#.
 #. The 'View Example Bug' string
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/BugsPaneItem.java:55
 msgid "View Example"
 msgstr "Xem ví dụ"
@@ -4277,42 +4238,39 @@ msgid ""
 "You can choose whether to be warned about downloading a file without a "
 "license."
 msgstr ""
-"Bạn có thể chọn để được cảnh báo về việc tải xuống tệp mà không có giấy phép."
+"Bạn có thể chọn để được cảnh báo về việc tải xuống tệp mà không có giấy "
+"phép."
 
-#.
 #. Constant for the key of the locale-specific <code>String</code> for the
 #. download pane check box label in the options window.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/DownloadLicenseWarningPaneItem.java:58
 msgid "Show License Warning:"
 msgstr "Hiển thị cảnh báo giấy phép:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:35
-#, fuzzy
 msgid "I2P Options"
-msgstr "Tuỳ chọn"
+msgstr "Tùy chọn I2P"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:36
 msgid ""
 "Configure I2P for anonymous BitTorrent. Requires I2P router running locally."
 msgstr ""
+"Cấu hình I2P cho BitTorrent ẩn danh. Yêu cầu bộ định tuyến I2P chạy cục bộ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:38
 msgid "Enable I2P Support"
-msgstr ""
+msgstr "Bật Hỗ trợ I2P"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:39
 msgid "Allow mixed mode (I2P + regular peers)"
-msgstr ""
+msgstr "Cho phép chế độ hỗn hợp (I2P + peer thường)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:63
 msgid "SAM Bridge Host:"
-msgstr ""
+msgstr "Máy chủ SAM Bridge:"
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. label on the port text field.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:78
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ProxyPaneItem.java:91
@@ -4322,91 +4280,95 @@ msgstr "Hải cảng:"
 #. Tunnel settings
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:81
 msgid "Tunnel Settings (Advanced):"
-msgstr ""
+msgstr "Cài đặt Hầm (Nâng cao):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:85
 msgid "Inbound Tunnels:"
-msgstr ""
+msgstr "Hầm vào:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:91
 msgid "Outbound Tunnels:"
-msgstr ""
+msgstr "Hầm ra:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:98
 msgid "Inbound Hops:"
-msgstr ""
+msgstr "Số Hop vào:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:104
 msgid "Outbound Hops:"
-msgstr ""
+msgstr "Số Hop ra:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:112
 msgid ""
 "Note: Tunnels [1-16], Hops [0-7]. Higher values = more anonymity, slower "
 "speed."
 msgstr ""
+"Ghi chú: Hầm [1-16], Hop [0-7]. Giá trị càng cao = càng ẩn danh, càng chậm."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:149
 msgid "Tunnel quantities must be between 1 and 16"
-msgstr ""
+msgstr "Số lượng hầm phải từ 1 đến 16"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:153
 msgid "Tunnel hop lengths must be between 0 and 7"
-msgstr ""
+msgstr "Độ dài hop hầm phải từ 0 đến 7"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:67
 msgid ""
 "You can manually enter IP addresses ranges to filter out, you can also "
-"import bulk addresses from an IP block list file or URL "
-"(.p2p, .dat, .cidr, .hosts — compressed as .gz or .zip)"
+"import bulk addresses from an IP block list file or URL (.p2p, .dat, .cidr, "
+".hosts — compressed as .gz or .zip)"
 msgstr ""
+"Bạn có thể nhập thủ công dải địa chỉ IP để lọc, cũng có thể nhập hàng loạt "
+"địa chỉ từ tệp danh sách chặn IP hoặc URL (.p2p, .dat, .cidr, .hosts — nén "
+"dạng .gz hoặc .zip)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:70
-#, fuzzy
 msgid "Decompressing"
-msgstr "Nén nén"
+msgstr "Đang giải nén"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:129
 msgid ""
 "Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or "
 "Hosts format)"
 msgstr ""
+"Nhập URL hoặc đường dẫn tệp cục bộ của danh sách chặn IP (định dạng P2P, "
+"DAT, CIDR hoặc Hosts)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:143
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:464
-#, fuzzy
 msgid "Import"
-msgstr "Nhập khẩu"
+msgstr "Nhập"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:150
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:50
 msgid "Add IP Range Manually"
-msgstr ""
+msgstr "Thêm Dải IP Thủ công"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:153
 msgid "Clear IP Block List"
-msgstr ""
+msgstr "Xóa Danh sách Chặn IP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:157
 msgid "Find free IP block lists at:"
-msgstr ""
+msgstr "Tìm danh sách chặn IP miễn phí tại:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:160
 msgid "Community-maintained P2P, DAT, CIDR lists"
-msgstr ""
+msgstr "Danh sách P2P, DAT, CIDR do cộng đồng duy trì"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:201
 #, java-format
 msgid "Failed to download block list: {0}"
-msgstr ""
+msgstr "Tải danh sách chặn thất bại: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:210
 msgid "Invalid URI or file path"
-msgstr ""
+msgstr "URI hoặc đường dẫn tệp không hợp lệ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:278
 msgid "Invalid IP Filter file format. Supported: P2P, DAT, CIDR, Hosts"
-msgstr ""
+msgstr "Định dạng tệp Lọc IP không hợp lệ. Hỗ trợ: P2P, DAT, CIDR, Hosts"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:310
 msgid "Importing"
@@ -4414,32 +4376,29 @@ msgstr "Nhập khẩu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:423
 msgid "Select the IP filter file (P2P, DAT, CIDR, or Hosts format)"
-msgstr ""
+msgstr "Chọn tệp lọc IP (định dạng P2P, DAT, CIDR hoặc Hosts)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:464
-#, fuzzy
 msgid "Importing..."
-msgstr "Nhập khẩu"
+msgstr "Đang nhập..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:86
 msgid "Edit"
-msgstr ""
+msgstr "Sửa"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:106
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:54
-#, fuzzy
 msgid "Description"
-msgstr "Các kết nối"
+msgstr "Mô tả"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:107
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:41
-#, fuzzy
 msgid "Start"
-msgstr "Bắt Đầu Lúc"
+msgstr "Bắt đầu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:108
 msgid "End"
-msgstr ""
+msgstr "Kết thúc"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:22
 msgid ""
@@ -4448,44 +4407,46 @@ msgid ""
 "relay). For remote mode, use the full base URL of the remote control API "
 "(include http:// and the control HTTP port)."
 msgstr ""
+"Cấu hình relay IceBridge cho tìm kiếm phi tập trung. Desktop có thể dùng "
+"daemon IceBridge cục bộ hoặc kết nối tới relay từ xa (vd. relay độc lập). "
+"Với chế độ từ xa, dùng URL gốc đầy đủ của API điều khiển từ xa (gồm http:// "
+"và cổng HTTP điều khiển)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:25
 msgid "Enable IceBridge (distributed relay)"
-msgstr ""
+msgstr "Bật IceBridge (relay phân tán)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
-msgstr ""
+msgstr "Dùng daemon IceBridge cục bộ (tiến trình fork)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:29
 msgid "Use remote IceBridge relay"
-msgstr ""
+msgstr "Dùng relay IceBridge từ xa"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:47
-#, fuzzy
 msgid "Refresh / Ping"
-msgstr "Làm mới lại"
+msgstr "Làm mới / Ping"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:79
 msgid "Bind host:"
-msgstr ""
+msgstr "Hô kết nối:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:87
-#, fuzzy
 msgid "rUDP port:"
-msgstr "Hải cảng:"
+msgstr "cổng rUDP:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:95
 msgid "Relay listen port (identity):"
-msgstr ""
+msgstr "Cổng lắng nghe relay (danh tính):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:103
 msgid "Role:"
-msgstr ""
+msgstr "Vai trò:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:111
 msgid "Remote URL:"
-msgstr ""
+msgstr "URL Từ xa:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:120
 msgid ""
@@ -4493,33 +4454,40 @@ msgid ""
 "control port). No URL path suffix is needed unless you front the API with a "
 "proxy."
 msgstr ""
+"URL gốc đầy đủ tới API HTTP điều khiển IceBridge từ xa (scheme + hô + cổng "
+"điều khiển). Không cần hậu tố đường dẫn URL trừ khi bạn đặt API sau proxy."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:127
 msgid ""
-"Example: http://192.168.1.50:8080   or   http://relay.example.com:8797  (use "
-"the control HTTP port)"
+"Example: http://192.168.1.50:8080   or   http://relay.example.com:8797  (use"
+" the control HTTP port)"
 msgstr ""
+"Ví dụ: http://192.168.1.50:8080   hoặc   http://relay.example.com:8797  "
+"(dùng cổng HTTP điều khiển)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:135
-#, fuzzy
 msgid "Auth token (optional):"
-msgstr "Tên của bạn (Tùy chọn)"
+msgstr "Token xác thực (tùy chọn):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:144
 msgid ""
-"Bearer token for X-IceBridge-Token header. Generate one on the remote with --"
-"generate-token (or ICEBRIDGE_AUTH_TOKENS_FILE)."
+"Bearer token for X-IceBridge-Token header. Generate one on the remote with "
+"--generate-token (or ICEBRIDGE_AUTH_TOKENS_FILE)."
 msgstr ""
+"Token bearer cho tiêu đề X-IceBridge-Token. Tạo một cái trên máy từ xa bằng "
+"--generate-token (hoặc ICEBRIDGE_AUTH_TOKENS_FILE)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:151
 msgid ""
 "Changes require restarting FrostWire. Use remote mode to point desktop at a "
 "standalone IceBridge (launched via ./gradlew icebridge)."
 msgstr ""
+"Thay đổi yêu cầu khởi động lại FrostWire. Dùng chế độ từ xa để trỏ desktop "
+"tới IceBridge độc lập (chạy qua ./gradlew icebridge)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:161
 msgid "Known IceBridge servers (successfully pinged relays):"
-msgstr ""
+msgstr "Máy chủ IceBridge đã biết (relay ping thành công):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:164
 msgid ""
@@ -4527,22 +4495,26 @@ msgid ""
 "TCP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
+"Đây là các relay IceBridge từ xa (hoặc của bạn) phát hiện qua DHT. Ping = "
+"bắt tay danh tính TCP trên cổng relay (không phải HTTP điều khiển "
+"IceBridge). Desktop điều khiển daemon IceBridge cục bộ qua HTTP trên "
+"localhost."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:363
 msgid "Host"
-msgstr ""
+msgstr "Hô"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:363
 msgid "Role"
-msgstr ""
+msgstr "Vai trò"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:363
 msgid "Last Successful Ping"
-msgstr ""
+msgstr "Lần Ping Thành công Cuối"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:403
 msgid "never"
-msgstr ""
+msgstr "không bao giờ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:71
 msgid ""
@@ -4550,73 +4522,71 @@ msgid ""
 "you on the distributed search network. Back it up using the seed phrase to "
 "avoid losing your identity and karma reputation."
 msgstr ""
+"Danh tính FrostWire của bạn là cặp khóa mật mã định danh duy nhất bạn trên "
+"mạng tìm kiếm phân tán. Sao lưu nó bằng cụm từ hạt giống để tránh mất danh "
+"tính và uy tín karma."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:81
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:173
 msgid "Initialize Identity"
-msgstr ""
+msgstr "Khởi tạo Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:82
-#, fuzzy
 msgid "Show Seed Phrase"
-msgstr "Thoát sau khi Chuyển giao"
+msgstr "Hiện Cụm từ Hạt giống"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:83
 msgid "Restore from Seed Phrase"
-msgstr ""
+msgstr "Khôi phục từ Cụm từ Hạt giống"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:84
-#, fuzzy
 msgid "Export Identity File"
-msgstr "Tệp Torrent"
+msgstr "Xuất Tệp Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:85
-#, fuzzy
 msgid "Import Identity File"
-msgstr "Tệp Torrent"
+msgstr "Nhập Tệp Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:107
 msgid "Mining proof-of-work identity…"
-msgstr ""
+msgstr "Đang đào danh tính bằng chứng công việc…"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:117
 msgid "Node ID:"
-msgstr ""
+msgstr "ID Nút:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:118
 msgid "Fingerprint:"
-msgstr ""
+msgstr "Dấu vân tay:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:126
 msgid "Public Key:"
-msgstr ""
+msgstr "Khóa Công khai:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:127
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:112
 msgid "Karma Score:"
-msgstr ""
+msgstr "Điểm Karma:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:128
 msgid "Identity Difficulty:"
-msgstr ""
+msgstr "Độ khó Danh tính:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:129
-#, fuzzy
 msgid "Shared Torrents:"
-msgstr "Lưu tệp .torrent"
+msgstr "Torrent Chia sẻ:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:173
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:232
-#, fuzzy
 msgid "Create New Identity"
-msgstr "Tạo mới Torrent"
+msgstr "Tạo Danh tính Mới"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:180
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:181
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:182
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:160
 msgid "(not initialized)"
-msgstr ""
+msgstr "(chưa khởi tạo)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:183
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:184
@@ -4624,36 +4594,40 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:161
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:162
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:163
-#, fuzzy
 msgid "(not available)"
-msgstr "Cập nhật FrostWire Mới Có sẵn"
+msgstr "(không khả dụng)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:224
 msgid ""
-"Creating a new random identity will permanently replace your current node ID "
-"and karma identity. FrostWire will save a backup copy first, but you should "
-"also export your identity or seed phrase. FrostWire will restart when "
+"Creating a new random identity will permanently replace your current node ID"
+" and karma identity. FrostWire will save a backup copy first, but you should"
+" also export your identity or seed phrase. FrostWire will restart when "
 "finished."
 msgstr ""
+"Tạo danh tính ngẫu nhiên mới sẽ thay thế vĩnh viễn ID nút và danh tính karma"
+" hiện tại của bạn. FrostWire sẽ lưu bản sao lưu trước, nhưng bạn cũng nên "
+"xuất danh tính hoặc cụm từ hạt giống. FrostWire sẽ khởi động lại khi xong."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:261
 msgid ""
 "Identity created successfully. FrostWire will now restart to load it into "
 "the relay stack."
 msgstr ""
+"Tạo danh tính thành công. FrostWire sẽ khởi động lại để nạp vào ngăn xếp "
+"relay."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:273
 msgid "Failed to initialize identity: "
-msgstr ""
+msgstr "Khởi tạo danh tính thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:311
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:412
 msgid "No identity loaded."
-msgstr ""
+msgstr "Chưa nạp danh tính."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:328
 msgid "WARNING:"
-msgstr ""
+msgstr "CẢNH BÁO:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:331
 msgid ""
@@ -4661,78 +4635,84 @@ msgid ""
 "reputation. Write it down on paper and store it securely. Never share it "
 "with anyone."
 msgstr ""
+"Bất kỳ ai có cụm từ này đều có thể mạo danh bạn và truy cập uy tín karma của"
+" bạn. Ghi ra giấy và cất giữ an toàn. Không chia sẻ với bất kỳ ai."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:339
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "Sao chép liên kết tới khay nhớ tạm"
+msgstr "Sao chép vào Khay nhớ tạm"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:345
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:483
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:238
 msgid "Copied!"
-msgstr ""
+msgstr "Đã sao chép!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:354
 msgid "Your Seed Phrase (24 words)"
-msgstr ""
+msgstr "Cụm từ Hạt giống của Bạn (24 từ)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:358
 msgid "Failed to generate seed phrase: "
-msgstr ""
+msgstr "Tạo cụm từ hạt giống thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:368
 msgid ""
 "Restoring from a seed phrase will <b>permanently replace</b> your current "
-"identity, including your karma reputation and node ID. This cannot be undone."
-"<br><br>Make sure you have backed up your current identity first."
-"<br><br>FrostWire will need to restart after restoring."
+"identity, including your karma reputation and node ID. This cannot be "
+"undone.<br><br>Make sure you have backed up your current identity "
+"first.<br><br>FrostWire will need to restart after restoring."
 msgstr ""
+"Khôi phục từ cụm từ hạt giống sẽ <b>thay thế vĩnh viễn</b> danh tính hiện "
+"tại của bạn, gồm uy tín karma và ID nút. Không thể hoàn tác.<br><br>Hãy sao "
+"lưu danh tính hiện tại trước.<br><br>FrostWire cần khởi động lại sau khi "
+"khôi phục."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:373
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:447
 msgid "Confirm Identity Replacement"
-msgstr ""
+msgstr "Xác nhận Thay thế Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:384
 msgid ""
-"Enter your 24-word seed phrase. Words may be separated by spaces, commas, or "
-"line breaks. Uppercase letters are accepted."
+"Enter your 24-word seed phrase. Words may be separated by spaces, commas, or"
+" line breaks. Uppercase letters are accepted."
 msgstr ""
+"Nhập cụm từ hạt giống 24 từ của bạn. Các từ cách nhau bằng dấu cách, phẩy "
+"hoặc xuống dòng. Chấp nhận chữ hoa."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:386
-#, fuzzy
 msgid "Restore Identity"
-msgstr "Trở Lại Mặc Định"
+msgstr "Khôi phục Danh tính"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:398
 msgid ""
 "Identity restored successfully. FrostWire will now restart to apply the new "
 "identity."
 msgstr ""
+"Khôi phục danh tính thành công. FrostWire sẽ khởi động lại để áp dụng danh "
+"tính mới."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:405
 msgid "Failed to restore identity: "
-msgstr ""
+msgstr "Khôi phục danh tính thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:420
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:457
-#, fuzzy
 msgid "FrostWire Identity File"
-msgstr "FrostWire: Chia sẻ tệp lớn"
+msgstr "Tệp Danh tính FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:429
 msgid "Identity exported to:"
-msgstr ""
+msgstr "Đã xuất danh tính tới:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:430
-#, fuzzy
 msgid "Export Complete"
-msgstr "Hoàn thành"
+msgstr "Xuất Hoàn tất"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:434
 msgid "Failed to export identity: "
-msgstr ""
+msgstr "Xuất danh tính thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:444
 msgid ""
@@ -4740,14 +4720,16 @@ msgid ""
 "identity. This cannot be undone. FrostWire will need to restart after "
 "importing."
 msgstr ""
+"Nhập tệp danh tính sẽ <b>thay thế vĩnh viễn</b> danh tính hiện tại của bạn. "
+"Không thể hoàn tác. FrostWire cần khởi động lại sau khi nhập."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:467
 msgid "Identity imported successfully. FrostWire will now restart."
-msgstr ""
+msgstr "Nhập danh tính thành công. FrostWire sẽ khởi động lại."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:474
 msgid "Failed to import identity: "
-msgstr ""
+msgstr "Nhập danh tính thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IgnoreResultsPaneItem.java:36
 msgid "Filter Results"
@@ -4757,105 +4739,109 @@ msgstr "Lọc kết quả"
 msgid "You can filter out search results containing specific words."
 msgstr "Bạn có thể lọc kết quả tìm kiếm có chứa từ cụ thể."
 
-#.
 #. Key for the locale-specifics string for the adult content check box
 #. label.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IgnoreResultsPaneItem.java:59
 msgid "Ignore Adult Content"
 msgstr "Bỏ qua nội dung dành cho người lớn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:46
 msgid ""
-"Your karma reputation is anchored to a hash-linked chain of endorsements you "
-"issue to peers after completing downloads from them. Endorsements are "
+"Your karma reputation is anchored to a hash-linked chain of endorsements you"
+" issue to peers after completing downloads from them. Endorsements are "
 "created automatically when a download finishes."
 msgstr ""
+"Uy tín karma của bạn được neo vào chuỗi băm-liên kết các xác nhận bạn cấp "
+"cho peer sau khi hoàn tất tải về từ họ. Xác nhận được tạo tự động khi tải về"
+" xong."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:57
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:42
 msgid "Peer Public Key"
-msgstr ""
+msgstr "Khóa Công khai Peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:58
 msgid "Score"
-msgstr ""
+msgstr "Điểm"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:59
-#, fuzzy
 msgid "Endorsements"
-msgstr "Torrents"
+msgstr "Lượt Xác nhận"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:60
 msgid "Last Endorsed At"
-msgstr ""
+msgstr "Xác nhận Cuối Lúc"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:249
 msgid "Endorse Peer"
-msgstr ""
+msgstr "Xác nhận Peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:109
 msgid "Current Epoch:"
-msgstr ""
+msgstr "Kỷ nguyên Hiện tại:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:110
 msgid "Available Endorsement Energy:"
-msgstr ""
+msgstr "Năng lượng Xác nhận Khả dụng:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:111
-#, fuzzy
 msgid "Total Endorsements Given:"
-msgstr "Tổng torrents lập chỉ mục"
+msgstr "Tổng Lượt Xác nhận Đã cho:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:130
 msgid "Top Peers by Karma"
-msgstr ""
+msgstr "Peer Hàng đầu theo Karma"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:169
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:170
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:171
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:172
 msgid "(no karma database)"
-msgstr ""
+msgstr "(chưa có cơ sở dữ liệu karma)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:194
-#, fuzzy
 msgid "endorsements"
-msgstr "Torrents"
+msgstr "lượt xác nhận"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:234
 msgid "Copy Full Public Key"
-msgstr ""
+msgstr "Sao chép Toàn bộ Khóa Công khai"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+"Endorsements are automatically created when a download from a peer "
+"completes."
 msgstr ""
+"Xác nhận thủ công yêu cầu một lượt tải về hoàn tất từ peer này. Xác nhận "
+"được tạo tự động khi tải về từ peer hoàn tất."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:45
 msgid "Library Included Folders"
 msgstr "Mở thư mục trong thư viện"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:46
-msgid "You can choose the folders for include files when browsing the library."
-msgstr "Bạn có thể chọn các thư mục để bao gồm các tập tin khi duyệt thư viện."
+msgid ""
+"You can choose the folders for include files when browsing the library."
+msgstr ""
+"Bạn có thể chọn các thư mục để bao gồm các tập tin khi duyệt thư viện."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:37
 msgid ""
 "Configure the FrostWire MCP (Model Context Protocol) server to allow AI "
 "agents to control FrostWire programmatically."
 msgstr ""
+"Cấu hình máy chủ FrostWire MCP (Model Context Protocol) để cho phép tác nhân"
+" AI điều khiển FrostWire theo chương trình."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:39
-#, fuzzy
 msgid "Enable MCP Server"
-msgstr "Bật tính năng ALPHA"
+msgstr "Bật Máy chủ MCP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:40
 msgid "Start MCP server when FrostWire starts"
-msgstr ""
+msgstr "Khởi động máy chủ MCP khi FrostWire khởi động"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:42
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchButtons.java:39
@@ -4863,88 +4849,80 @@ msgid "Stop"
 msgstr "Dừng lại"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:43
-#, fuzzy
 msgid "Restart"
-msgstr "Khôi phục"
+msgstr "Khởi động lại"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:48
 msgid "Enable HTTPS (TLS)"
-msgstr ""
+msgstr "Bật HTTPS (TLS)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:74
 msgid "Host:"
-msgstr ""
+msgstr "Hô:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:85
 msgid ""
-"When HTTPS is enabled, a self-signed certificate is auto-generated for local "
-"use."
-msgstr ""
+"When HTTPS is enabled, a self-signed certificate is auto-generated for local"
+" use."
+msgstr "Khi bật HTTPS, chứng chỉ tự ký được tự tạo cho dùng cục bộ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:91
 msgid "MCP Clients/Harnesses"
-msgstr ""
+msgstr "Máy khách/Bộ khai thác MCP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:137
 msgid "Port must be between 1 and 65535"
-msgstr ""
+msgstr "Cổng phải từ 1 đến 65535"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:142
 msgid "Host cannot be empty"
-msgstr ""
+msgstr "Hô không được để trống"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:188
 msgid "Running on "
-msgstr ""
+msgstr "Đang chạy trên "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:202
-#, fuzzy
 msgid "Starting..."
-msgstr "Nhập khẩu"
+msgstr "Đang bắt đầu..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:212
 msgid "Failed to start MCP server: "
-msgstr ""
+msgstr "Khởi động máy chủ MCP thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:222
-#, fuzzy
 msgid "Stopping..."
-msgstr "Nhập khẩu"
+msgstr "Đang dừng..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:240
-#, fuzzy
 msgid "Restarting..."
-msgstr "Nhập khẩu"
+msgstr "Đang khởi động lại..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:250
 msgid "Failed to restart MCP server: "
-msgstr ""
+msgstr "Khởi động lại máy chủ MCP thất bại: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:347
-#, fuzzy
 msgid "Configured"
-msgstr "Thêm Tuỳ Chọn"
+msgstr "Đã cấu hình"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:347
 msgid "Not configured"
-msgstr ""
+msgstr "Chưa cấu hình"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:349
-#, fuzzy
 msgid "Not installed"
-msgstr "Cập nhật FrostWire Mới Có sẵn"
+msgstr "Chưa cài đặt"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:397
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:431
-#, fuzzy
 msgid "Configure"
-msgstr "Thêm Tuỳ Chọn"
+msgstr "Cấu hình"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:399
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:433
-#, fuzzy
 msgid "Open Config"
-msgstr "Thêm Tuỳ Chọn"
+msgstr "Mở Cấu hình"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MaximumSearchesPaneItem.java:35
 msgid "Maximum Searches"
@@ -4957,11 +4935,9 @@ msgstr ""
 "Bạn có thể đặt số lượng tối đa các tìm kiếm đồng thời mà bạn có thể thực "
 "hiện."
 
-#.
 #. Constant for the key of the locale-specific <code>String</code> for the
 #. label on the component that allows to user to change the setting for
 #. this `PaneItem`.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MaximumSearchesPaneItem.java:60
 msgid "Maximum Searches:"
 msgstr "Tìm kiếm tối đa:"
@@ -4980,9 +4956,9 @@ msgid ""
 msgstr ""
 "Bạn có thể nói với FrostWire để ràng buộc kết nối đi đến một địa chỉ IP từ "
 "một giao diện mạng cụ thể. Lõi nghe vẫn sẽ lắng nghe trên tất cả các giao "
-"diện có sẵn. Điều này rất hữu ích trên các máy chủ đa nhiệm. Nếu sau này bạn "
-"vô hiệu hóa giao diện này, FrostWire sẽ trở lại để ràng buộc với một địa chỉ "
-"tùy ý."
+"diện có sẵn. Điều này rất hữu ích trên các máy chủ đa nhiệm. Nếu sau này bạn"
+" vô hiệu hóa giao diện này, FrostWire sẽ trở lại để ràng buộc với một địa "
+"chỉ tùy ý."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/NetworkInterfacePaneItem.java:48
 msgid "Use a specific network interface."
@@ -4993,8 +4969,8 @@ msgid ""
 "FrostWire was unable to determine which network interfaces are available on "
 "this machine. Outgoing connections will bind to any arbitrary interface."
 msgstr ""
-"FrostWire không thể xác định giao diện mạng nào có trên máy này. Các kết nối "
-"gửi đi sẽ ràng buộc với bất kỳ giao diện tùy ý nào."
+"FrostWire không thể xác định giao diện mạng nào có trên máy này. Các kết nối"
+" gửi đi sẽ ràng buộc với bất kỳ giao diện tùy ý nào."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/NotificationsPaneItem.java:15
 msgid "Notifications"
@@ -5024,10 +5000,8 @@ msgstr ""
 "Bạn có thể chọn có hoặc không tự động chia sẻ tệp tin được tải xuống một "
 "phần."
 
-#.
 #. Constant for the key of the locale-specific <code>String</code> for the
 #. upload pane check box label in the options window.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PartialFileSharingPaneItem.java:50
 msgid "Allow Partial Sharing:"
 msgstr "Cho phép chia sẻ một phần:"
@@ -5038,115 +5012,106 @@ msgid ""
 "Right-click a peer to copy its key, block it, remove it, or browse its "
 "shared torrents."
 msgstr ""
+"Peer phát hiện trên mạng tìm kiếm phân tán, xếp theo điểm tin cậy. Nhấp phải"
+" vào peer để sao chép khóa, chặn, xóa hoặc duyệt torrent chia sẻ của họ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:43
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:339
 msgid "Hostname"
-msgstr ""
+msgstr "Tên hô"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:45
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:364
-#, fuzzy
 msgid "uTP Port"
-msgstr "Hải cảng:"
+msgstr "Cổng uTP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:46
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:345
 msgid "Trust Score"
-msgstr ""
+msgstr "Điểm Tin cậy"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:47
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:341
 msgid "Verified"
-msgstr ""
+msgstr "Đã xác minh"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:48
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:343
 msgid "Spam"
-msgstr ""
+msgstr "Rác"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:49
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:342
 msgid "Endorsers"
-msgstr ""
+msgstr "Người xác nhận"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:50
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:344
-#, fuzzy
 msgid "Last Updated"
-msgstr "Cập nhật"
+msgstr "Cập nhật Lần cuối"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:55
 msgid "Showing 0 of 0 peers"
-msgstr ""
+msgstr "Đang hiện 0 trong 0 peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:117
 msgid "(peer directory not available)"
-msgstr ""
+msgstr "(thư mục peer không khả dụng)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:135
-#, fuzzy
 msgid "Showing"
-msgstr "Hiển thị"
+msgstr "Đang hiện"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:143
-#, fuzzy
 msgid "peers"
-msgstr "Đồng nghiệp"
+msgstr "peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:151
-#, fuzzy
 msgid "(failed to read peer directory)"
-msgstr "Chọn một thư mục"
+msgstr "(đọc thư mục peer thất bại)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:189
 msgid "Could not block peer: "
-msgstr ""
+msgstr "Không thể chặn peer: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:207
-#, fuzzy
 msgid "Could not remove peer: "
-msgstr "Không thể giải quyết đường dẫn thư mục."
+msgstr "Không thể xóa peer: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:226
-#, fuzzy
 msgid "Fetching peer catalog..."
-msgstr "Tạo bảng điều khiển trung tâm..."
+msgstr "Đang lấy danh mục peer..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:270
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:278
 msgid "Could not fetch peer catalog (peer may be offline)"
-msgstr ""
+msgstr "Không thể lấy danh mục peer (peer có thể ngoại tuyến)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:275
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:151
-#, fuzzy
 msgid "torrents"
-msgstr "Torrents"
+msgstr "torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:343
 msgid "Copy Public Key"
-msgstr ""
+msgstr "Sao chép Khóa Công khai"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:347
 msgid "Block Peer (mark as spam)"
-msgstr ""
+msgstr "Chặn Peer (đánh dấu rác)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:351
-#, fuzzy
 msgid "Remove Peer"
-msgstr "Khôi phục"
+msgstr "Xóa Peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:357
-#, fuzzy
 msgid "Browse Shared Torrents"
-msgstr "FrostWire Torrent"
+msgstr "Duyệt Torrent Chia sẻ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:446
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:293
-#, fuzzy
 msgid "Info Hash"
-msgstr "Chép"
+msgstr "Info Hash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PopupsPaneItem.java:15
 msgid "FrostWire Popups"
@@ -5157,13 +5122,11 @@ msgid ""
 "Redisplay messages for which you have chosen 'Do not display this message "
 "again' or 'Always use this answer'."
 msgstr ""
-"Hiển thị lại tin nhắn mà bạn đã chọn 'Không hiển thị lại thông báo này' hoặc "
-"'Luôn sử dụng câu trả lời này'."
+"Hiển thị lại tin nhắn mà bạn đã chọn 'Không hiển thị lại thông báo này' hoặc"
+" 'Luôn sử dụng câu trả lời này'."
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. chat enabled check box label in the options window.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PopupsPaneItem.java:34
 msgid "Revert to Default:"
 msgstr "Hoàn nguyên về Mặc định:"
@@ -5176,27 +5139,21 @@ msgstr "Thông tin thêm về đăng nhập"
 msgid "Configure username and password to be used for the proxy."
 msgstr "Cấu hình username và password để sử dụng cho proxy."
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. check box that enables / disables password authentification at the
 #. proxy.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:69
 msgid "Enable Authentication:"
 msgstr "Bật xác thực:"
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. label on the username field.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:77
 msgid "Username:"
 msgstr "Tên đăng nhập:"
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. label on the password field.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:85
 msgid "Password:"
 msgstr "Mật khẩu:"
@@ -5213,10 +5170,8 @@ msgstr "Cấu hình Tùy chọn Proxy cho FrostWire."
 msgid "No Proxy"
 msgstr "Không có Proxy"
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. label on the proxy host field.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ProxyPaneItem.java:81
 msgid "Proxy:"
 msgstr "Proxy:"
@@ -5235,13 +5190,13 @@ msgid ""
 "router if you choose manual configuration, but FrostWire will try its best "
 "so you don't have to.)"
 msgstr ""
-"FrostWire có thể cấu hình chính nó để làm việc từ phía sau một bức tường lửa "
-"hoặc router. Sử dụng Universal Plug 'n Play (UPnP) và các kỹ thuật chuyển "
+"FrostWire có thể cấu hình chính nó để làm việc từ phía sau một bức tường lửa"
+" hoặc router. Sử dụng Universal Plug 'n Play (UPnP) và các kỹ thuật chuyển "
 "tiếp NAT khác FrostWire có thể tự động định cấu hình router hoặc tường lửa "
-"cho hiệu năng tối ưu. Nếu bộ định tuyến của bạn không hỗ trợ UPnP, FrostWire "
-"có thể được thiết lập để quảng cáo một cổng bên ngoài bằng tay. (Bạn cũng có "
-"thể phải cấu hình router nếu bạn chọn cấu hình thủ công, nhưng FrostWire sẽ "
-"cố gắng hết sức vì vậy bạn không phải làm.)"
+"cho hiệu năng tối ưu. Nếu bộ định tuyến của bạn không hỗ trợ UPnP, FrostWire"
+" có thể được thiết lập để quảng cáo một cổng bên ngoài bằng tay. (Bạn cũng "
+"có thể phải cấu hình router nếu bạn chọn cấu hình thủ công, nhưng FrostWire "
+"sẽ cố gắng hết sức vì vậy bạn không phải làm.)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:52
 msgid "Use random port (Recommended)"
@@ -5253,28 +5208,28 @@ msgstr "Phạm vi cổng thủ công"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:80
 msgid "TCP port start:"
-msgstr ""
+msgstr "Cổng TCP bắt đầu:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:89
 msgid "TCP port end:"
-msgstr ""
+msgstr "Cổng TCP kết thúc:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:98
 msgid "NAT-PMP Settings (Advanced):"
-msgstr ""
+msgstr "Cài đặt NAT-PMP (Nâng cao):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:104
 msgid "Gateway override:"
-msgstr ""
+msgstr "Ghi đè cổng:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:113
 msgid "Lease duration (seconds):"
-msgstr ""
+msgstr "Thời gian thuê (giây):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:168
-#, fuzzy, java-format
+#, java-format
 msgid "You must enter a port between {0} and {1} when manually forcing port."
-msgstr "Bạn phải nhập một cổng từ 1 đến 65535 khi thủ công buộc cổng."
+msgstr "Bạn phải nhập cổng từ {0} đến {1} khi buộc cổng thủ công."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:173
 msgid "You must enter a valid port range."
@@ -5282,7 +5237,7 @@ msgstr "Bạn phải nhập một phạm vi cổng hợp lệ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:183
 msgid "NAT-PMP lease duration must be greater than 0 seconds."
-msgstr ""
+msgstr "Thời gian thuê NAT-PMP phải lớn hơn 0 giây."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:36
 msgid "Search Engines"
@@ -5297,9 +5252,8 @@ msgid "Check/Uncheck all"
 msgstr "Kiểm tra/Bỏ chọn tất cả"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:36
-#, fuzzy
 msgid "Shared Torrents Database"
-msgstr "Hiển thị kết quả chọn lọc"
+msgstr "Cơ sở dữ liệu Torrent Chia sẻ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:38
 msgid ""
@@ -5307,15 +5261,17 @@ msgid ""
 "Search by name or file path, inspect info hashes and publisher keys, and "
 "copy magnet links for any shared torrent."
 msgstr ""
+"Duyệt nội dung cơ sở dữ liệu torrent chia sẻ cục bộ (LocalIndex). Tìm theo "
+"tên hoặc đường dẫn tệp, xem info hash và khóa nhà xuất bản, sao chép liên "
+"kết magnet cho torrent chia sẻ."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:45
 msgid "Include inactive / historical shares in Local search"
-msgstr ""
+msgstr "Gồm lượt chia sẻ không hoạt động / lịch sử trong tìm kiếm Cục bộ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:48
-#, fuzzy
 msgid "Clear Search"
-msgstr "Tìm kiếm thông minh"
+msgstr "Xóa Tìm kiếm"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:56
 msgid ""
@@ -5323,58 +5279,55 @@ msgid ""
 "torrents you are still seeding or actively downloading with full metadata. "
 "When on, past index rows may appear even if removed from Transfers."
 msgstr ""
+"Khi tắt (mặc định), tìm kiếm Cục bộ và trả lời cho peer từ xa chỉ gồm "
+"torrent bạn vẫn đang seed hoặc tải tích cực với đầy đủ metadata. Khi bật, "
+"hàng chỉ mục cũ có thể hiện dù đã xóa khỏi Transfers."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:84
-#, fuzzy
 msgid "Total shared torrents:"
-msgstr "Tổng torrents lập chỉ mục"
+msgstr "Tổng torrent chia sẻ:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:93
 msgid "Database file size:"
-msgstr ""
+msgstr "Kích thước tệp cơ sở dữ liệu:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:107
-#, fuzzy
 msgid "Search:"
-msgstr "Tìm kiếm"
+msgstr "Tìm kiếm:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:145
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:168
 msgid "Database not initialized"
-msgstr ""
+msgstr "Cơ sở dữ liệu chưa khởi tạo"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:272
-#, fuzzy
 msgid "Copy Info Hash"
-msgstr "Sao chép Infohash"
+msgstr "Sao chép Info Hash"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:276
-#, fuzzy
 msgid "Copy Magnet Link"
-msgstr "Sao chép Magnet"
+msgstr "Sao chép Liên kết Magnet"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:280
 msgid "Copy Publisher Key"
-msgstr ""
+msgstr "Sao chép Khóa Nhà xuất bản"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:294
 msgid "Publisher"
-msgstr ""
+msgstr "Nhà xuất bản"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:295
 msgid "Added At"
-msgstr ""
+msgstr "Đã Thêm Lúc"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:296
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:366
-#, fuzzy
 msgid "Last Seen"
-msgstr "Không Hạt giống"
+msgstr "Thấy Lần cuối"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:297
-#, fuzzy
 msgid "Matched File"
-msgstr "Chạy tập tin được chọn"
+msgstr "Tệp Khớp"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:31
 msgid "FrostWire Recommendations"
@@ -5386,13 +5339,11 @@ msgid ""
 "offers and software recommendations to complement your experience."
 msgstr ""
 "Bằng cách kích hoạt tính năng này, bạn sẽ đủ điều kiện để nhận được các đề "
-"xuất phần mềm được FrostWire tài trợ và đề xuất phần mềm để bổ sung cho trải "
-"nghiệm của bạn."
+"xuất phần mềm được FrostWire tài trợ và đề xuất phần mềm để bổ sung cho trải"
+" nghiệm của bạn."
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. frostclick promotions enabled check box label..
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:50
 msgid "Enable FrostWire Recommendations (highly recommended):"
 msgstr "Bật Đề xuất FrostWire (được khuyến nghị):"
@@ -5405,20 +5356,18 @@ msgstr "FrostClick Khuyến mãi"
 msgid ""
 "You can enable or disable the FrostClick Promotion on the welcome screen. "
 "FrostClick promotions help artists and content creators distribute their "
-"content legally and freely to hundreds of thousands of people via FrostWire, "
-"BitTorrent and Gnutella. Keep this option on to support file sharing and the "
-"future of content distribution."
+"content legally and freely to hundreds of thousands of people via FrostWire,"
+" BitTorrent and Gnutella. Keep this option on to support file sharing and "
+"the future of content distribution."
 msgstr ""
 "Bạn có thể bật hoặc tắt FrostClick Promotion trên màn hình chào mừng. Quảng "
-"cáo của FrostClick giúp các nghệ sỹ và người sáng tạo nội dung phân phối nội "
-"dung của họ một cách hợp pháp và tự do tới hàng trăm nghìn người thông qua "
+"cáo của FrostClick giúp các nghệ sỹ và người sáng tạo nội dung phân phối nội"
+" dung của họ một cách hợp pháp và tự do tới hàng trăm nghìn người thông qua "
 "FrostWire, BitTorrent và Gnutella. Giữ lựa chọn này để hỗ trợ chia sẻ tập "
 "tin và tương lai của việc phân phối nội dung."
 
-#.
 #. Constant for the key of the locale-specific `String` for the
 #. frostclick promotions enabled check box label..
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ShowPromoOverlaysPaneItem.java:50
 msgid "Enable FrostClick Promotions (highly recommended):"
 msgstr "Kích hoạt FrostClick Promotions (được khuyến khích):"
@@ -5449,8 +5398,8 @@ msgstr "Tìm kiếm thông minh"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:35
 msgid ""
-"The Smart Search database is used to speed up individual file searches, it's "
-"how FrostWire remembers information about .torrent contents."
+"The Smart Search database is used to speed up individual file searches, it's"
+" how FrostWire remembers information about .torrent contents."
 msgstr ""
 "Cơ sở dữ liệu Tìm kiếm thông minh được sử dụng để tăng tốc độ tìm kiếm tệp "
 "cá nhân, đó là cách FrostWire ghi nhớ thông tin về nội dung .torrent."
@@ -5486,10 +5435,8 @@ msgstr ""
 "Bạn có thể chọn có hay không tự động chạy FrostWire khi máy tính của bạn "
 "khởi động."
 
-#.
 #. Constant for the key of the locale-specific <code>String</code> for the
 #. upload pane check box label in the options window.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/StartupPaneItem.java:38
 msgid "Run on System Startup:"
 msgstr "Chạy trên Khởi động Hệ thống:"
@@ -5500,12 +5447,11 @@ msgstr "Chỉ số băng thông"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/StatusBarBandwidthPaneItem.java:34
 msgid "You can display your bandwidth consumption in the status bar."
-msgstr "Bạn có thể hiển thị tiêu thụ băng thông của bạn trên thanh trạng thái."
+msgstr ""
+"Bạn có thể hiển thị tiêu thụ băng thông của bạn trên thanh trạng thái."
 
-#.
 #. Constant for the key of the locale-specific `String` for whether
 #. the firewall status should be displayed in the status bar.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/StatusBarBandwidthPaneItem.java:48
 msgid "Show Bandwidth Indicator:"
 msgstr "Hiển thị chỉ số băng thông:"
@@ -5518,13 +5464,11 @@ msgstr "Chỉ số chất lượng kết nối"
 msgid ""
 "You can display a measurement of your connection quality in the status bar."
 msgstr ""
-"Bạn có thể hiển thị một phép đo chất lượng kết nối của bạn trong thanh trạng "
-"thái."
+"Bạn có thể hiển thị một phép đo chất lượng kết nối của bạn trong thanh trạng"
+" thái."
 
-#.
 #. Constant for the key of the locale-specific `String` for whether
 #. the connection quality status should be displayed in the status bar.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/StatusBarConnectionQualityPaneItem.java:31
 msgid "Show Connection Quality Indicator:"
 msgstr "Hiển thị chỉ số chất lượng kết nối:"
@@ -5538,10 +5482,8 @@ msgid "You can display your firewall status in the status bar."
 msgstr ""
 "Bạn có thể hiển thị trạng thái tường lửa của bạn trong thanh trạng thái."
 
-#.
 #. Constant for the key of the locale-specific `String` for whether
 #. the firewall status should be displayed in the status bar.
-#.
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/StatusBarFirewallPaneItem.java:31
 msgid "Show Firewall Indicator:"
 msgstr "Hiển thị Chỉ báo Tường lửa:"
@@ -5553,7 +5495,8 @@ msgstr "Cài đặt Kết nối BitTorrent"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:31
 msgid ""
 "Adjust connection settings to make better use of your internet connection"
-msgstr "Điều chỉnh cài đặt kết nối để sử dụng tốt hơn kết nối internet của bạn"
+msgstr ""
+"Điều chỉnh cài đặt kết nối để sử dụng tốt hơn kết nối internet của bạn"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:32
 msgid "Maximum active downloads"
@@ -5581,17 +5524,15 @@ msgstr "VPN bảo vệ tự động. Yêu cầu kết nối VPN cho BitTorrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:38
 msgid "Allow multiple connections from the same peer ID"
-msgstr ""
+msgstr "Cho phép nhiều kết nối từ cùng một ID peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentFilesFolderPaneItem.java:34
-#, fuzzy
 msgid "Torrent Files Folder"
-msgstr "Tệp Torrent"
+msgstr "Thư mục Tệp Torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentFilesFolderPaneItem.java:38
-#, fuzzy
 msgid "Choose the folder where .torrent files will be saved to"
-msgstr "Chọn thư mục mà tải sẽ được lưu vào"
+msgstr "Chọn thư mục nơi tệp .torrent sẽ được lưu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:31
 msgid "BitTorrent Global Tranfer Speeds"
@@ -5652,168 +5593,167 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:50
 msgid "Edit IP Range"
-msgstr ""
+msgstr "Sửa Dải IP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:57
 msgid "Starting IP address"
-msgstr ""
+msgstr "Địa chỉ IP bắt đầu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:61
 msgid "Ending IP address"
-msgstr ""
+msgstr "Địa chỉ IP kết thúc"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:63
 msgid "Leave blank or repeat 'Starting IP address' to block a single one"
-msgstr ""
+msgstr "Để trống hoặc lặp lại 'Địa chỉ IP bắt đầu' để chặn một địa chỉ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:130
-#, fuzzy
 msgid "Not available"
-msgstr "Cập nhật FrostWire Mới Có sẵn"
+msgstr "Không khả dụng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:73
 msgid "Invalid IceBridge URL: must start with icebridge://"
-msgstr ""
+msgstr "URL IceBridge không hợp lệ: phải bắt đầu bằng icebridge://"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:79
 msgid "Invalid IceBridge URL: missing command"
-msgstr ""
+msgstr "URL IceBridge không hợp lệ: thiếu lệnh"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:85
 msgid ""
 "Invalid IceBridge URL: peer public key must be 64 hex characters (32 bytes)"
 msgstr ""
+"URL IceBridge không hợp lệ: khóa công khai peer phải gồm 64 ký tự hex (32 "
+"byte)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:92
 msgid "Invalid IceBridge URL: could not decode peer public key"
-msgstr ""
+msgstr "URL IceBridge không hợp lệ: không thể giải mã khóa công khai peer"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:96
 msgid "Invalid IceBridge URL: peer public key must decode to 32 bytes"
 msgstr ""
+"URL IceBridge không hợp lệ: khóa công khai peer phải giải mã thành 32 byte"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:120
 #, java-format
 msgid "Unknown IceBridge command: {0}"
-msgstr ""
+msgstr "Lệnh IceBridge không rõ: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:152
 msgid "Browsing peer catalog..."
-msgstr ""
+msgstr "Đang duyệt danh mục peer..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:175
 #, java-format
 msgid "Failed to fetch catalog from DHT for peer {0}"
-msgstr ""
+msgstr "Lấy danh mục từ DHT cho peer {0} thất bại"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:180
 #, java-format
 msgid "Peer {0} has no shared torrents catalog published."
-msgstr ""
+msgstr "Peer {0} không có danh mục torrent chia sẻ nào được xuất bản."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:181
 msgid "IceBridge Browse"
-msgstr ""
+msgstr "Duyệt IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:200
 #, java-format
 msgid "IceBridge Browse - {0} torrents"
-msgstr ""
+msgstr "Duyệt IceBridge - {0} torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:204
 #, java-format
 msgid "Error processing browse results: {0}"
-msgstr ""
+msgstr "Xử lý kết quả duyệt lỗi: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:219
 msgid "IceBridge search requires keywords in the URL path"
-msgstr ""
+msgstr "Tìm kiếm IceBridge yêu cầu từ khóa trong đường dẫn URL"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:224
 msgid ""
 "Distributed search engine is not ready. Please wait for IceBridge to start."
 msgstr ""
+"Công cụ tìm kiếm phân tán chưa sẵn sàng. Vui lòng đợi IceBridge khởi động."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:230
 msgid "Distributed search transport or identity is not available."
-msgstr ""
+msgstr "Phương thức tìm kiếm phân tán hoặc danh tính không khả dụng."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:233
-#, fuzzy, java-format
+#, java-format
 msgid "Searching peer {0}..."
-msgstr "Tìm kiếm: {0}"
+msgstr "Đang tìm kiếm peer {0}..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:289
 #, java-format
 msgid "Failed to send search request to peer {0}. The peer may be offline."
-msgstr ""
+msgstr "Gửi yêu cầu tìm kiếm tới peer {0} thất bại. Peer có thể ngoại tuyến."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:294
 #, java-format
 msgid "No results from peer {0} for \"{1}\"."
-msgstr ""
+msgstr "Không có kết quả từ peer {0} cho \"{1}\"."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:295
-#, fuzzy
 msgid "IceBridge Search"
-msgstr "Lặp lại Tìm kiếm"
+msgstr "Tìm kiếm IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:314
 #, java-format
 msgid "IceBridge Search - {0} results"
-msgstr ""
+msgstr "Tìm kiếm IceBridge - {0} kết quả"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:318
 #, java-format
 msgid "Error processing search results: {0}"
-msgstr ""
+msgstr "Xử lý kết quả tìm kiếm lỗi: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:326
-#, fuzzy
 msgid "Fetching peer info..."
-msgstr "Tạo bảng điều khiển trung tâm..."
+msgstr "Đang lấy thông tin peer..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:338
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:362
-#, fuzzy
 msgid "Public Key"
-msgstr "Phạm vi công cộng"
+msgstr "Khóa Công khai"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:363
 msgid "Node ID"
-msgstr ""
+msgstr "ID Nút"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:365
 msgid "First Seen"
-msgstr ""
+msgstr "Thấy Lần đầu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:367
 msgid "Signature Valid"
-msgstr ""
+msgstr "Chữ ký Hợp lệ"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:368
 msgid "(Fetched from DHT; peer not in local directory)"
-msgstr ""
+msgstr "(Lấy từ DHT; peer không trong thư mục cục bộ)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:384
 #, java-format
 msgid "Peer {0} is not known and no identity record was found in the DHT."
-msgstr ""
+msgstr "Peer {0} không rõ và không tìm thấy bản ghi danh tính nào trong DHT."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:385
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:391
 msgid "IceBridge Peer Info"
-msgstr ""
+msgstr "Thông tin Peer IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:395
 #, java-format
 msgid "Error fetching peer info: {0}"
-msgstr ""
+msgstr "Lấy thông tin peer lỗi: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:473
-#, fuzzy
 msgid "IceBridge Error"
-msgstr "Lỗi nội bộ"
+msgstr "Lỗi IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/LabeledRangeSlider.java:47
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:103
@@ -5859,8 +5799,8 @@ msgstr ""
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SchemaBox.java:144
 #, java-printf-format
 msgid ""
-"%s Torrent files found (includes only .torrent files. Torrent files point to "
-"collections of files shared on the BitTorrent network.)"
+"%s Torrent files found (includes only .torrent files. Torrent files point to"
+" collections of files shared on the BitTorrent network.)"
 msgstr ""
 "%s Các tệp tin Torrent được tìm thấy (chỉ bao gồm các tệp .torrent. Các tập "
 "tin Torrent trỏ đến tập hợp các tệp được chia sẻ trên mạng BitTorrent.)"
@@ -5905,9 +5845,8 @@ msgid "View in Archive.org"
 msgstr "Xem trong Archive.org"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchMediator.java:70
-#, fuzzy
 msgid "View in"
-msgstr "Hiển thị"
+msgstr "Xem trong"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchMediator.java:71
 msgid "Close Tab"
@@ -5937,18 +5876,19 @@ msgid ""
 msgstr "Tìm kiếm của bạn phải có ít nhất ba ký tự để tránh tắc nghẽn mạng."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchMediator.java:199
-msgid "Your search is too long. Please make your search smaller and try again."
+msgid ""
+"Your search is too long. Please make your search smaller and try again."
 msgstr ""
 "Tìm kiếm của bạn quá dài. Hãy làm cho tìm kiếm của bạn nhỏ hơn và thử lại."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:119
 msgid "Name|Source|Ext."
-msgstr ""
+msgstr "Name|Source|Ext."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:158
 msgid ""
-"has been disabled on your FrostWire Search Options. (Go to Tools > Options > "
-"Search to enable)"
+"has been disabled on your FrostWire Search Options. (Go to Tools > Options >"
+" Search to enable)"
 msgstr ""
 "Đã bị tắt trên các tùy chọn tìm kiếm FrostWire của bạn. (Vào Công cụ > Tùy "
 "chọn > Search để kích hoạt)"
@@ -5979,11 +5919,12 @@ msgid ""
 "Search something or paste a torrent URL, magnet URL or video page URL. "
 "(Search hints provided by Google)"
 msgstr ""
+"Tìm gì đó hoặc dán URL torrent, URL magnet hay URL trang video. (Gợi ý tìm "
+"kiếm do Google cung cấp)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchResultMediator.java:699
-#, fuzzy
 msgid "FrostWire Plus for Android"
-msgstr "FrostWire dành cho Android"
+msgstr "FrostWire Plus cho Android"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchTableColumns.java:53
 msgid "Created"
@@ -5994,24 +5935,24 @@ msgid ""
 "telluride component not found.<br><br>Please check your installation or "
 "contact support@frostwire.com letting them know about this issue with your"
 msgstr ""
+"không tìm thấy thành phần telluride.<br><br>Vui lòng kiểm tra cài đặt hoặc "
+"liên hệ support@frostwire.com báo cho họ về sự cố này với"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/TellurideSearchPerformerDesktopListener.java:35
 msgid "build"
-msgstr ""
+msgstr "bản dựng"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/TellurideSearchPerformerDesktopListener.java:35
-#, fuzzy
 msgid "for"
-msgstr "thư mục"
+msgstr "cho"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/TellurideSearchPerformerDesktopListener.java:46
 msgid "Right click"
-msgstr ""
+msgstr "Nhấp phải"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/TellurideUISearchResult.java:72
-#, fuzzy
 msgid "Copy Download URL"
-msgstr "Tải về"
+msgstr "Sao chép URL Tải về"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/shell/FrostAssociations.java:88
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/shell/FrostAssociations.java:100
@@ -6282,14 +6223,14 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgstr "danh sách phát"
 
 #~ msgid ""
-#~ "<b>FrostWire requires Mplayer to play your media</b> but I could not find "
-#~ "it in your computer.<br><br>If you want to use FrostWire as a media "
-#~ "player <b>Please install mplayer and restart FrostWire.</b>"
+#~ "<b>FrostWire requires Mplayer to play your media</b> but I could not find it"
+#~ " in your computer.<br><br>If you want to use FrostWire as a media player "
+#~ "<b>Please install mplayer and restart FrostWire.</b>"
 #~ msgstr ""
-#~ "<b>FrostWire yêu cầu Mplayer chơi phương tiện truyền thông của bạn</b> "
-#~ "nhưng tôi không thể tìm thấy nó trong máy tính của bạn.<br><br>Nếu bạn "
-#~ "muốn sử dụng FrostWire làm trình phát đa phương tiện <b>Vui lòng cài đặt "
-#~ "mplayer và khởi động lại FrostWire.</b>"
+#~ "<b>FrostWire yêu cầu Mplayer chơi phương tiện truyền thông của bạn</b> nhưng"
+#~ " tôi không thể tìm thấy nó trong máy tính của bạn.<br><br>Nếu bạn muốn sử "
+#~ "dụng FrostWire làm trình phát đa phương tiện <b>Vui lòng cài đặt mplayer và "
+#~ "khởi động lại FrostWire.</b>"
 
 #~ msgid "Support FrostWire development with a Bitcoin donation"
 #~ msgstr "Hỗ trợ phát triển FrostWire với khoản đóng góp Bitcoin"
@@ -6304,52 +6245,48 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgstr "Tặng"
 
 #~ msgid ""
-#~ "FrostWire has encountered a problem during startup and cannot proceed. "
-#~ "You may be able to fix this problem by changing FrostWire's Windows "
-#~ "Compatibility. Right-click on the FrostWire icon on your Desktop and "
-#~ "select 'Properties' from the popup menu. Click the 'Compatibility' tab at "
-#~ "the top, then click the 'Run this program in compatibility mode for' "
-#~ "check box, and then select 'Windows 2000' in the box below the check box. "
-#~ "Then click the 'OK' button at the bottom and restart FrostWire."
+#~ "FrostWire has encountered a problem during startup and cannot proceed. You "
+#~ "may be able to fix this problem by changing FrostWire's Windows "
+#~ "Compatibility. Right-click on the FrostWire icon on your Desktop and select "
+#~ "'Properties' from the popup menu. Click the 'Compatibility' tab at the top, "
+#~ "then click the 'Run this program in compatibility mode for' check box, and "
+#~ "then select 'Windows 2000' in the box below the check box. Then click the "
+#~ "'OK' button at the bottom and restart FrostWire."
 #~ msgstr ""
-#~ "FrostWire đã gặp sự cố khi khởi động và không thể tiến hành. Bạn có thể "
-#~ "khắc phục sự cố này bằng cách thay đổi Windows Compatibility của "
-#~ "FrostWire. Nhấp chuột phải vào biểu tượng FrostWire trên Desktop của bạn "
-#~ "và chọn 'Thuộc tính' từ trình đơn bật lên. Nhấp vào tab 'Compatibility' ở "
-#~ "trên cùng, sau đó nhấp vào hộp kiểm 'Chạy chương trình này ở chế độ tương "
-#~ "thích cho' và sau đó chọn 'Windows 2000' trong hộp bên dưới hộp kiểm. Sau "
-#~ "đó nhấp vào nút 'OK' ở dưới cùng và khởi động lại FrostWire."
+#~ "FrostWire đã gặp sự cố khi khởi động và không thể tiến hành. Bạn có thể khắc"
+#~ " phục sự cố này bằng cách thay đổi Windows Compatibility của FrostWire. Nhấp"
+#~ " chuột phải vào biểu tượng FrostWire trên Desktop của bạn và chọn 'Thuộc "
+#~ "tính' từ trình đơn bật lên. Nhấp vào tab 'Compatibility' ở trên cùng, sau đó"
+#~ " nhấp vào hộp kiểm 'Chạy chương trình này ở chế độ tương thích cho' và sau "
+#~ "đó chọn 'Windows 2000' trong hộp bên dưới hộp kiểm. Sau đó nhấp vào nút 'OK'"
+#~ " ở dưới cùng và khởi động lại FrostWire."
 
 #~ msgid "Rebuild Apple Music \"FrostWire\" Playlist"
-#~ msgstr ""
-#~ "Xây dựng lại danh sách phát Apple Music \"FrostWire\" của Apple Music"
+#~ msgstr "Xây dựng lại danh sách phát Apple Music \"FrostWire\" của Apple Music"
 
-#, fuzzy
 #~ msgid "Rebuild iTunes \"FrostWire\" Playlist"
-#~ msgstr ""
-#~ "Xây dựng lại danh sách phát Apple Music \"FrostWire\" của Apple Music"
+#~ msgstr "Xây dựng lại danh sách phát iTunes \"FrostWire\""
 
 #~ msgid ""
-#~ "Deletes and re-builds the \"FrostWire\" playlist on Apple Music with all "
-#~ "the audio files found on your Torrent Data Folder."
+#~ "Deletes and re-builds the \"FrostWire\" playlist on Apple Music with all the"
+#~ " audio files found on your Torrent Data Folder."
 #~ msgstr ""
-#~ "Xóa và xây dựng lại danh sách phát \"FrostWire\" trên Apple Music với tất "
-#~ "cả các tệp âm thanh được tìm thấy trên Thư mục dữ liệu Torrent của bạn."
+#~ "Xóa và xây dựng lại danh sách phát \"FrostWire\" trên Apple Music với tất cả"
+#~ " các tệp âm thanh được tìm thấy trên Thư mục dữ liệu Torrent của bạn."
 
 #~ msgid ""
 #~ "Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the "
 #~ "audio files found on your Torrent Data Folder."
 #~ msgstr ""
-#~ "Xóa và xây dựng lại danh sách phát \"FrostWire\" trên iTunes với tất cả "
-#~ "các tệp âm thanh được tìm thấy trên Thư mục dữ liệu Torrent của bạn."
+#~ "Xóa và xây dựng lại danh sách phát \"FrostWire\" trên iTunes với tất cả các "
+#~ "tệp âm thanh được tìm thấy trên Thư mục dữ liệu Torrent của bạn."
 
 #~ msgid ""
 #~ "This will remove your \"FrostWire\" playlist in Apple Music and replace\n"
 #~ "it with one containing all the Apple Music compatible files in your \n"
 #~ "Frostwire \"Torrent Data Folder\"\n"
 #~ "\n"
-#~ "Please note that it will add the files to the Apple Music library as "
-#~ "well\n"
+#~ "Please note that it will add the files to the Apple Music library as well\n"
 #~ "and this could result in duplicate files on your Apple Music library\n"
 #~ "\n"
 #~ "Are you sure you want to continue?"
@@ -6358,8 +6295,7 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ "it with one containing all the Apple Music compatible files in your \n"
 #~ "Frostwire \"Torrent Data Folder\"\n"
 #~ "\n"
-#~ "Please note that it will add the files to the Apple Music library as "
-#~ "well\n"
+#~ "Please note that it will add the files to the Apple Music library as well\n"
 #~ "and this could result in duplicate files on your Apple Music library\n"
 #~ "\n"
 #~ "Are you sure you want to continue?"
@@ -6417,21 +6353,20 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgstr "Tính năng Thử nghiệm"
 
 #~ msgid ""
-#~ "Warning: These experimental features may change, break, or disappear at "
-#~ "any time. We make absolutely no guarantees about what may happen if you "
-#~ "turn one of these experiments on. FrostWire may delete all your data, or "
-#~ "your security and privacy could be compromised in unexpected ways. Please "
-#~ "procede with caution."
+#~ "Warning: These experimental features may change, break, or disappear at any "
+#~ "time. We make absolutely no guarantees about what may happen if you turn one"
+#~ " of these experiments on. FrostWire may delete all your data, or your "
+#~ "security and privacy could be compromised in unexpected ways. Please procede"
+#~ " with caution."
 #~ msgstr ""
-#~ "Cảnh báo: Các tính năng thử nghiệm này có thể thay đổi, phá vỡ hoặc biến "
-#~ "mất bất cứ lúc nào. Chúng tôi hoàn toàn không đảm bảo về những gì có thể "
-#~ "xảy ra nếu bạn bật một trong những thí nghiệm này. FrostWire có thể xóa "
-#~ "tất cả dữ liệu của bạn, hoặc bảo mật của bạn và sự riêng tư có thể bị tổn "
-#~ "hại theo những cách bất ngờ. Hãy thận trọng khi làm thủ tục."
+#~ "Cảnh báo: Các tính năng thử nghiệm này có thể thay đổi, phá vỡ hoặc biến mất"
+#~ " bất cứ lúc nào. Chúng tôi hoàn toàn không đảm bảo về những gì có thể xảy ra"
+#~ " nếu bạn bật một trong những thí nghiệm này. FrostWire có thể xóa tất cả dữ "
+#~ "liệu của bạn, hoặc bảo mật của bạn và sự riêng tư có thể bị tổn hại theo "
+#~ "những cách bất ngờ. Hãy thận trọng khi làm thủ tục."
 
 #~ msgid ""
-#~ "Note: All features are enabled by default when running FrostWire from "
-#~ "source"
+#~ "Note: All features are enabled by default when running FrostWire from source"
 #~ msgstr ""
 #~ "Lưu ý: Tất cả các tính năng được kích hoạt mặc định khi chạy FrostWire từ "
 #~ "nguồn"
@@ -6489,9 +6424,8 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgid "Enable iTunes importing:"
 #~ msgstr "Bật iTunes nhập:"
 
-#, fuzzy
 #~ msgid "Allocating"
-#~ msgstr "Tuỳ chọn"
+#~ msgstr "Đang cấp phát"
 
 #~ msgid "Support FrostWire development with a Bitcoin Cash donation"
 #~ msgstr "Hỗ trợ phát triển FrostWire với khoản đóng góp Bitcoin Cash"
@@ -6507,14 +6441,14 @@ msgstr "Bạn không thể tắt tất cả các cột."
 
 #~ msgid ""
 #~ "FrostWire is translated into many different languages including Chinese, "
-#~ "French, German, Japanese, Italian, Spanish and many more. Visit "
-#~ "FrostWire's <a href=\"{0}\">internationalization page</a> for information "
-#~ "on how you can help translation efforts!"
+#~ "French, German, Japanese, Italian, Spanish and many more. Visit FrostWire's "
+#~ "<a href=\"{0}\">internationalization page</a> for information on how you can"
+#~ " help translation efforts!"
 #~ msgstr ""
-#~ "FrostWire được dịch sang nhiều ngôn ngữ khác nhau bao gồm tiếng Trung, "
-#~ "tiếng Pháp, tiếng Đức, tiếng Nhật, tiếng Ý, tiếng Tây Ban Nha và nhiều "
-#~ "ngôn ngữ khác. Truy cập <a href=\"{0}\"> trang quốc tế hóa của FrostWire</"
-#~ "a> để biết thông tin về cách bạn có thể giúp các nỗ lực dịch thuật!"
+#~ "FrostWire được dịch sang nhiều ngôn ngữ khác nhau bao gồm tiếng Trung, tiếng"
+#~ " Pháp, tiếng Đức, tiếng Nhật, tiếng Ý, tiếng Tây Ban Nha và nhiều ngôn ngữ "
+#~ "khác. Truy cập <a href=\"{0}\"> trang quốc tế hóa của FrostWire</a> để biết "
+#~ "thông tin về cách bạn có thể giúp các nỗ lực dịch thuật!"
 
 #~ msgid "Foru&m"
 #~ msgstr "Diễn đàn"
@@ -6534,9 +6468,8 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgid "Open YouTube source page"
 #~ msgstr "Mở trang nguồn YouTube"
 
-#, fuzzy
 #~ msgid "Uncompressing files"
-#~ msgstr "Xoá tập tin"
+#~ msgstr "Đang giải nén tệp"
 
 #~ msgid "Support FrostWire development with a Bitcoin Gold donation"
 #~ msgstr "Hỗ trợ phát triển FrostWire với khoản đóng góp Bitcoin Gold"
@@ -6546,8 +6479,8 @@ msgstr "Bạn không thể tắt tất cả các cột."
 
 #~ msgid ""
 #~ "You are currently using a beta or pre-release version of Java 1.6.0. This "
-#~ "version is known to have caused problems with FrostWire. Please upgrade "
-#~ "to the final 1.6.0 release.\n"
+#~ "version is known to have caused problems with FrostWire. Please upgrade to "
+#~ "the final 1.6.0 release.\n"
 #~ msgstr ""
 #~ "Bạn hiện đang sử dụng phiên bản beta hoặc trước khi phát hành của Java "
 #~ "1.6.0. Phiên bản này được biết là đã gây ra sự cố với FrostWire. Hãy nâng "
@@ -6557,12 +6490,10 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgstr "Nâng cấp Java"
 
 #~ msgid ""
-#~ "FrostWire requires Java %s or higher in order to run. You are currently "
-#~ "running an out-of-date version of Java \n"
+#~ "FrostWire requires Java %s or higher in order to run. You are currently running an out-of-date version of Java \n"
 #~ "Please visit %s in order to upgrade your version of Java"
 #~ msgstr ""
-#~ "FrostWire yêu cầu Java %s hoặc cao hơn để chạy. Bạn hiện đang chạy một "
-#~ "phiên bản Java lỗi thời\n"
+#~ "FrostWire yêu cầu Java %s hoặc cao hơn để chạy. Bạn hiện đang chạy một phiên bản Java lỗi thời\n"
 #~ "Vui lòng truy cập %s để nâng cấp phiên bản Java của bạn"
 
 #~ msgid "Current Java Version:"
@@ -6619,14 +6550,14 @@ msgstr "Bạn không thể tắt tất cả các cột."
 
 #~ msgid ""
 #~ "Send anonymous usage statistics so that FrostWire can be improved more "
-#~ "effectively. No information regarding content searched, shared or played "
-#~ "nor any information that can personally identify you will be stored on "
-#~ "disk or sent through the network."
+#~ "effectively. No information regarding content searched, shared or played nor"
+#~ " any information that can personally identify you will be stored on disk or "
+#~ "sent through the network."
 #~ msgstr ""
-#~ "Gửi số liệu thống kê sử dụng vô danh để FrostWire có thể được cải thiện "
-#~ "hiệu quả hơn. Không có thông tin liên quan đến nội dung tìm kiếm, chia sẻ "
-#~ "hoặc phát hay bất kỳ thông tin nào có thể nhận dạng cá nhân bạn sẽ được "
-#~ "lưu trữ trên đĩa hoặc được gửi qua mạng."
+#~ "Gửi số liệu thống kê sử dụng vô danh để FrostWire có thể được cải thiện hiệu"
+#~ " quả hơn. Không có thông tin liên quan đến nội dung tìm kiếm, chia sẻ hoặc "
+#~ "phát hay bất kỳ thông tin nào có thể nhận dạng cá nhân bạn sẽ được lưu trữ "
+#~ "trên đĩa hoặc được gửi qua mạng."
 
 #~ msgid "Send anonymous usage statistics"
 #~ msgstr "Gửi thống kê sử dụng ẩn danh"
@@ -6640,9 +6571,8 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgid "Stripe Rows"
 #~ msgstr "Dải Sọc"
 
-#, fuzzy
 #~ msgid "Name:"
-#~ msgstr "Tên"
+#~ msgstr "Tên:"
 
 #~ msgid "Show in Library"
 #~ msgstr "Thư viện"
@@ -6657,14 +6587,14 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgstr "Hỗ trợ phát triển FrostWire với sự đóng góp 25 Đô la Mỹ"
 
 #~ msgid ""
-#~ "FrostWire has encountered an internal error. It is possible for FrostWire "
-#~ "to recover and continue running normally. To continue using FrostWire, "
-#~ "click 'Discard'. If desired, you can click 'Review' to look at the "
-#~ "information about the error."
+#~ "FrostWire has encountered an internal error. It is possible for FrostWire to"
+#~ " recover and continue running normally. To continue using FrostWire, click "
+#~ "'Discard'. If desired, you can click 'Review' to look at the information "
+#~ "about the error."
 #~ msgstr ""
-#~ "FrostWire đã gặp lỗi nội bộ. Có thể FrostWire phục hồi và tiếp tục chạy "
-#~ "bình thường. Để tiếp tục sử dụng FrostWire, hãy nhấp vào 'Hủy'. Nếu muốn, "
-#~ "bạn có thể nhấp vào 'Xem lại' để xem thông tin về lỗi."
+#~ "FrostWire đã gặp lỗi nội bộ. Có thể FrostWire phục hồi và tiếp tục chạy bình"
+#~ " thường. Để tiếp tục sử dụng FrostWire, hãy nhấp vào 'Hủy'. Nếu muốn, bạn có"
+#~ " thể nhấp vào 'Xem lại' để xem thông tin về lỗi."
 
 #~ msgid "Order FrostWire Stickers"
 #~ msgstr "Đặt hàng FrostWire Stickers"
@@ -6678,17 +6608,14 @@ msgstr "Bạn không thể tắt tất cả các cột."
 #~ msgid "Get a T-shirt, support the project. You'll get also 10 free stickers"
 #~ msgstr "Nhận áo thun, hỗ trợ dự án. Bạn sẽ nhận được 10 nhãn miễn phí"
 
-#, fuzzy
 #~ msgid "Torrent File Created with FrostWire http://www.frostwire.com"
-#~ msgstr "Kết nối vào Mạng"
+#~ msgstr "Tệp torrent được tạo bằng FrostWire http://www.frostwire.com"
 
-#, fuzzy
 #~ msgid "Tracking"
-#~ msgstr "Rãnh"
+#~ msgstr "Theo dõi"
 
-#, fuzzy
 #~ msgid "<b>Seeding</b>"
-#~ msgstr "Tải đi"
+#~ msgstr "<b>Đang seeding</b>"
 
 #~ msgid "Hide Seeding Transfers"
 #~ msgstr "Thoát sau khi Chuyển giao"
