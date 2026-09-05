@@ -32,6 +32,10 @@ public final class TrackExtendsBox extends FullBox {
     protected int default_sample_size;
     protected int default_sample_flags;
 
+    public int trackId() {
+        return track_ID;
+    }
+
     TrackExtendsBox() {
         super(trex);
     }
