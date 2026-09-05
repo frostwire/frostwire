@@ -33,6 +33,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
+import com.frostwire.mp4.Mp4Muxer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudUtils;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
@@ -1015,8 +1016,7 @@ public final class BTDownloadMediator
       final String saveFileAs,
       final long fileSize,
       boolean extractAudio,
-      final Map<String, String> httpHeaders) {
-    GUIMediator.safeInvokeLater(
+      final Map<String, String> httpHeaders) {    GUIMediator.safeInvokeLater(
         () -> {
           final HttpDownload downloader =
               new HttpDownload(
@@ -1054,6 +1054,75 @@ public final class BTDownloadMediator
               };
           add(downloader);
         });
+  }
+
+  /**
+   * Download a DASH video-only file, then fetch its hidden m4a sibling and
+   * mux both into the saved file so it plays with sound. Runs on the HTTP
+   * thread before library scan. On any failure the silent video is kept and
+   * the temp audio removed (status quo, never worse).
+   */
+  public void openHttpWithMuxAudio(
+      final String httpUrl,
+      final String title,
+      final String saveFileAs,
+      final long fileSize,
+      final Map<String, String> httpHeaders,
+      final String muxAudioUrl,
+      final String muxAudioExt,
+      final long muxAudioFilesize,
+      final Map<String, String> muxAudioHeaders) {
+    GUIMediator.safeInvokeLater(
+        () -> {
+          final HttpDownload downloader =
+              new HttpDownload(
+                  httpUrl, title, saveFileAs, fileSize, null, false, true, httpHeaders) {
+                @Override
+                protected void onComplete() {
+                  final File savedFile = getSaveLocation();
+                  if (savedFile.exists()
+                      && muxAudioUrl != null
+                      && !muxAudioUrl.isEmpty()) {
+                    muxDashAudio(savedFile, muxAudioUrl, muxAudioExt, muxAudioHeaders);
+                  }
+                }
+              };
+          add(downloader);
+        });
+  }
+
+  private void muxDashAudio(
+      File videoMp4, String audioUrl, String audioExt, Map<String, String> audioHeaders) {
+    File mp4 = videoMp4.getAbsoluteFile();
+    String suffix = (audioExt != null && !audioExt.isEmpty()) ? audioExt : "m4a";
+    File audioTmp =
+        new File(mp4.getParentFile(), ".mux-" + mp4.getName() + "." + suffix).getAbsoluteFile();
+    File mergedTmp =
+        new File(mp4.getParentFile(), ".mux-" + mp4.getName() + ".merged.mp4").getAbsoluteFile();
+    try {
+      HttpClient client =
+          HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+      client.save(audioUrl, audioTmp, false, audioHeaders);
+      Mp4Muxer.mux(mp4, audioTmp, mergedTmp);
+      java.nio.file.Files.move(
+          mergedTmp.toPath(), mp4.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+      LOG.info("Muxed DASH audio into " + mp4.getAbsolutePath());
+    } catch (Throwable t) {
+      LOG.error("Could not mux DASH audio into " + mp4.getAbsolutePath()
+          + " (keeping silent video): " + t.getMessage());
+    } finally {
+      deleteQuietly(audioTmp);
+      deleteQuietly(mergedTmp);
+    }
+  }
+
+  private static void deleteQuietly(File f) {
+    try {
+      if (f != null && f.exists() && !f.delete()) {
+        f.deleteOnExit();
+      }
+    } catch (Throwable ignored) {
+    }
   }
 
   private File extractAudio(File videoMp4) {

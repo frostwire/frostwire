@@ -39,14 +39,28 @@ public class TellurideUISearchResult extends AbstractUISearchResult {
   public void download(boolean partial) {
     TellurideSearchResult sr = (TellurideSearchResult) getSearchResult();
     GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-    GUIMediator.instance()
-        .openHttp(
-            sr.getDownloadUrl(),
-            sr.getDisplayName(),
-            sr.getFilename(),
-            sr.getSize(),
-            extractAudio,
-            sr.getHttpHeaders());
+    if (sr.needsAudioMux()) {
+      GUIMediator.instance()
+          .openHttpWithMuxAudio(
+              sr.getDownloadUrl(),
+              sr.getDisplayName(),
+              sr.getFilename(),
+              sr.getSize(),
+              sr.getHttpHeaders(),
+              sr.getMuxAudioUrl(),
+              sr.getMuxAudioExt(),
+              sr.getMuxAudioFilesize(),
+              sr.getMuxAudioHeaders());
+    } else {
+      GUIMediator.instance()
+          .openHttp(
+              sr.getDownloadUrl(),
+              sr.getDisplayName(),
+              sr.getFilename(),
+              sr.getSize(),
+              extractAudio,
+              sr.getHttpHeaders());
+    }
     showSearchResultWebPage(false);
   }
 

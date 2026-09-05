@@ -1302,6 +1302,26 @@ public final class GUIMediator {
         .openHttp(httpUrl, title, saveFileAs, fileSize, extractAudioAndDeleteOriginal, httpHeaders);
   }
 
+  /**
+   * Download a DASH video-only result and automatically fetch its hidden m4a
+   * sibling, muxing both into the saved file so it plays with sound.
+   */
+  public void openHttpWithMuxAudio(
+      final String httpUrl,
+      final String title,
+      final String saveFileAs,
+      final long fileSize,
+      final Map<String, String> httpHeaders,
+      final String muxAudioUrl,
+      final String muxAudioExt,
+      final long muxAudioFilesize,
+      final Map<String, String> muxAudioHeaders) {
+    showTransfers(TransfersTab.FilterMode.ALL);
+    getBTDownloadMediator()
+        .openHttpWithMuxAudio(httpUrl, title, saveFileAs, fileSize, httpHeaders,
+            muxAudioUrl, muxAudioExt, muxAudioFilesize, muxAudioHeaders);
+  }
+
   public void startSearch(String query) {
     getMainFrame().getApplicationHeader().startSearch(query);
   }
