@@ -487,6 +487,7 @@ test {
         //include specific method in any of the tests        
         includeTestsMatching "com.frostwire.util.*"
         includeTestsMatching "com.frostwire.mp4.*"
+        includeTestsMatching "com.frostwire.webm.*"
         includeTestsMatching "com.frostwire.platform.*"
         includeTestsMatching "com.frostwire.transfers.*"
         includeTestsMatching "com.frostwire.search.*"
