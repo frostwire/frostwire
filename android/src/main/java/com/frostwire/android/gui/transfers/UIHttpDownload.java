@@ -47,10 +47,19 @@ public class UIHttpDownload extends HttpDownload {
 
     private final TransferManager manager;
     private final Logger LOG = Logger.getLogger(UIHttpDownload.class);
+    /** Hidden DASH mux sibling (m4a/AAC) for video-only Telluride rows; null otherwise. */
+    private String muxAudioUrl;
+    private String muxAudioExt;
+    private java.util.Map<String, String> muxAudioHeaders;
 
     public UIHttpDownload(TransferManager manager, HttpSearchResult sr) {
         super(convert(sr));
         this.manager = manager;
+        TellurideSearchResult telluride = (sr instanceof TellurideSearchResult)
+                && ((TellurideSearchResult) sr).needsAudioMux() ? (TellurideSearchResult) sr : null;
+        this.muxAudioUrl = telluride != null ? telluride.getMuxAudioUrl() : null;
+        this.muxAudioExt = telluride != null ? telluride.getMuxAudioExt() : null;
+        this.muxAudioHeaders = telluride != null ? telluride.getMuxAudioHeaders() : null;
     }
 
     public UIHttpDownload(TransferManager manager, CompositeFileSearchResult sr) {
@@ -72,11 +81,107 @@ public class UIHttpDownload extends HttpDownload {
 
     @Override
     protected void onComplete() {
+        muxDashAudioIfNeeded();
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
-        
+
         // Seed the finished HTTP download if seeding is enabled
         TorrentUtils.seedFinishedHttpDownloadIfEnabled(savePath, getDisplayName(), Constants.FILE_TYPE_DOCUMENTS, manager, this);
+    }
+
+    /**
+     * DASH video-only results play silent unless the hidden m4a sibling is
+     * fetched and muxed in. Runs on the transfer thread before notify/seed;
+     * the media scan below re-runs so the gallery sees final metadata.
+     * On any failure the silent video is kept (status quo, never worse).
+     */
+    private void muxDashAudioIfNeeded() {
+        if (muxAudioUrl == null || muxAudioUrl.isEmpty() || savePath == null) {
+            return;
+        }
+        File video = savePath.getAbsoluteFile();
+        if (!video.exists()) {
+            return;
+        }
+        String suffix = (muxAudioExt != null && !muxAudioExt.isEmpty()) ? muxAudioExt : "m4a";
+        File audioTmp = new File(video.getParentFile(), ".mux-" + video.getName() + "." + suffix);
+        File mergedTmp = new File(video.getParentFile(), ".mux-" + video.getName() + ".merged.mp4");
+        try {
+            fetchSiblingAudio(muxAudioUrl, muxAudioHeaders, audioTmp);
+            com.frostwire.mp4.Mp4Muxer.mux(video, audioTmp, mergedTmp);
+            java.nio.file.Files.move(mergedTmp.toPath(), video.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            LOG.info("Muxed DASH audio into " + video.getAbsolutePath());
+            rescanMedia(video);
+        } catch (Throwable t) {
+            LOG.warn("Could not mux DASH audio into " + video.getName()
+                    + " (keeping silent video): " + t.getMessage());
+        } finally {
+            deleteQuietly(audioTmp);
+            deleteQuietly(mergedTmp);
+        }
+    }
+
+    private static void deleteQuietly(File f) {
+        try {
+            if (f != null && f.exists() && !f.delete()) {
+                f.deleteOnExit();
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void fetchSiblingAudio(String url, java.util.Map<String, String> headers, File dst)
+            throws java.io.IOException {
+        java.net.HttpURLConnection conn =
+                (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+        conn.setConnectTimeout(15000);
+        conn.setReadTimeout(30000);
+        conn.setRequestProperty("User-Agent", "FrostWire");
+        if (headers != null) {
+            for (java.util.Map.Entry<String, String> e : headers.entrySet()) {
+                if (e.getKey() != null && e.getValue() != null) {
+                    conn.setRequestProperty(e.getKey(), e.getValue());
+                }
+            }
+        }
+        java.io.InputStream in = null;
+        java.io.FileOutputStream out = null;
+        try {
+            in = conn.getInputStream();
+            out = new java.io.FileOutputStream(dst);
+            byte[] buf = new byte[32768];
+            int n;
+            while ((n = in.read(buf)) != -1) {
+                out.write(buf, 0, n);
+            }
+            out.flush();
+        } finally {
+            if (in != null) try { in.close(); } catch (Exception ignored) {}
+            if (out != null) try { out.close(); } catch (Exception ignored) {}
+            conn.disconnect();
+        }
+        if (!dst.exists() || dst.length() == 0) {
+            throw new java.io.IOException("sibling audio download came back empty");
+        }
+    }
+
+    private void rescanMedia(File dst) {
+        try {
+            if (!SystemUtils.hasAndroid11OrNewer()) {
+                return;
+            }
+            Context context = SystemUtils.getApplicationContext();
+            if (context == null) {
+                return;
+            }
+            MediaScannerConnection.scanFile(context,
+                    new String[]{dst.getAbsolutePath()},
+                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
+                    (path, uri) -> LOG.info("UIHttpDownload::muxDashAudioIfNeeded() -> mediaScan refreshed " + dst));
+        } catch (Throwable t) {
+            LOG.warn("rescanMedia after mux failed: " + t.getMessage());
+        }
     }
 
     @Override
