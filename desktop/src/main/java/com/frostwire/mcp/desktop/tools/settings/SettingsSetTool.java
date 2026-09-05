@@ -1,3 +1,10 @@
+/*
+ *     Created by Angel Leon (@gubatron)
+ *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
+ *
+ *     Licensed under GPL v3. See LICENSE file.
+ */
+
 package com.frostwire.mcp.desktop.tools.settings;
 
 import com.frostwire.mcp.MCPTool;
