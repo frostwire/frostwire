@@ -1,4 +1,10 @@
 FrostWire 3.2.0 build 776 SEP/03/2026
+  - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
+  - fix:Peer discovery stops retrying dead hosts — host-cache entries are evicted after 5 consecutive ping/handshake failures (any success resets the streak)
+  - fix:Discovery skips our own carrier-NAT endpoint (hairpin self-skip via BTEngine's live external IP)
+  - fix:IceBridge P0 hardening — cheap-reject-first ingress (rate-limit before Ed25519 verify), per-IP + global HELLO budgets, per-/24 session caps, empty HELLO_ACK removed; helloRejected/relayRateLimited/searchRateLimited/powRejected/spamMarkedDropped counters in /metrics
+  - fix:TORRENT_FETCH serves torrents up to 256KB (was 64KB) with signed TOO_LARGE above; holder-signed chunks are cached and restamped per request nonce (metadata protocol v2)
+  - fix:BTEngine listen failures log operation + interface for diagnosis
   - fix:Cloud/HTTP downloads now report disk-full when no space prevents a file move or download; permission, read-only, SAF, quota, and other copy failures retain the appropriate generic error state
   - fix:Android 10+ MediaStore copy failures preserve their underlying filesystem cause, and concurrent cloud-download copy errors remain isolated per download
   - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered

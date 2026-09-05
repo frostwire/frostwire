@@ -1,4 +1,11 @@
  FrostWire 7.1.0 UNRELEASED
+  - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
+  - new:Transfers default columns — Actions, Name, Seeding, Size, Status, Progress, Down Speed, Downloaded, Uploaded, Up Speed, Time, Seeds; Tips/Donations hidden, Uploaded shown (existing custom layouts untouched)
+  - fix:IceBridge P0 hardening — cheap-reject-first ingress (rate-limit before Ed25519 verify), per-IP + global HELLO budgets, per-/24 session caps, empty HELLO_ACK removed; helloRejected/relayRateLimited/searchRateLimited/powRejected/spamMarkedDropped counters in /metrics
+  - fix:TORRENT_FETCH serves torrents up to 256KB (was 64KB) with signed TOO_LARGE above; holder-signed chunks are cached and restamped per request nonce (metadata protocol v2)
+  - fix:Mesh log volume — per-packet/per-rejection logs demoted to DEBUG (metrics counters carry the signal); systemd unit caps journal spam (LogRateLimit 2000/30s)
+  - fix:IceBridge ops scripts — run-local kills previous instances and detaches safely on Ctrl+C; systemd install is one-step (builds the jar, sudo self-elevation with JAVA_HOME passthrough, stops port strays, no crash-loops)
+  - cleanup:GPL header on all post-2020 Java files missing it (79 files)
   - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
   - fix:IceBridge child supervision prevents orphan processes and preserves distributed search/TORRENT_FETCH across crashes and restarts
   - fix:Standalone IceBridge forwarders launch with DHT and bootstrap discovery enabled, while release packages include icebridge.jar
@@ -31,8 +38,8 @@
   - cleanup:Drop pre-alpha wire shims — no bare SEARCH payloads, no dual response signature domain, no IdentityRecord v1/v2 parse, no 96-byte HELLO auth
   - new:Dual-envelope distributed search multi-hop (v2) — requester signature covers query only; hops preserve sig; default ttl=2; PeerRegistrySync registers self and imports IceBridge mesh peers (forwarder-first discovery)
   - fix:IceBridge CLI prints identity load vs proof-of-work mining progress on stdout (first-run no longer looks hung); non-protocol TCP 6888 probes at DEBUG without stack spam
-  - fix:IceBridge ops scripts — EC2 push creates writable /opt dir (sudo+chown); control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
-  - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-ec2-push.sh + icebridge-ec2-install.sh
+  - fix:IceBridge ops scripts — systemd install creates writable /opt dir; control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
+  - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-systemd-install.sh
   - new:Identity settings — Initialize Identity button with off-EDT proof-of-work mining (progress bar) and restart; import/restore/export now use the same libtorrent/identity.dat path as the relay stack
   - new:Standalone IceBridge embedded DHT announce — pure FORWARDER nodes publish on frostwire-relays-v1 (+ optional bootstrap) via minimal jlibtorrent SessionManager without FrostWire desktop; ICEBRIDGE_DHT / --dht / --no-dht; DhtAdvertiser accepts SessionManager supplier
   - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
