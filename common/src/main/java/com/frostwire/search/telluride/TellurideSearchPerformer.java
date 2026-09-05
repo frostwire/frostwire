@@ -139,6 +139,7 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         TellurideJSONMediaFormat bestVideo = null;
         TellurideJSONMediaFormat bestAudio = null;
         TellurideJSONMediaFormat bestM4aAudio = null;
+        TellurideJSONMediaFormat bestWebmAudio = null;
         for (TellurideJSONMediaFormat format : result.formats) {
             if (format == null || format.url == null || format.url.isEmpty()) {
                 continue;
@@ -167,6 +168,13 @@ public class TellurideSearchPerformer implements ISearchPerformer {
                         && (bestM4aAudio == null || format.filesize > bestM4aAudio.filesize)) {
                     bestM4aAudio = format;
                 }
+                // Hidden mux sibling for WebM video rows: best WebM audio
+                // (usually Opus). The WebM muxer copies codec bytes verbatim,
+                // so any WebM-contained audio works.
+                if (isWebmAudio(format)
+                        && (bestWebmAudio == null || format.filesize > bestWebmAudio.filesize)) {
+                    bestWebmAudio = format;
+                }
             } else if (!noCodec(format.vcodec)) {
                 if (bestVideo == null
                         || format.height > bestVideo.height
@@ -177,9 +185,20 @@ public class TellurideSearchPerformer implements ISearchPerformer {
         }
         if (bestVideo != null) {
             TellurideSearchResult videoResult = toSearchResult(result, bestVideo);
-            if (noCodec(bestVideo.acodec) && bestM4aAudio != null) {
-                videoResult.setMuxAudio(bestM4aAudio.url, bestM4aAudio.ext,
-                        bestM4aAudio.filesize, withFullRange(bestM4aAudio.http_headers));
+            // Sibling only for pairs the muxers handle (single authority:
+            // DashMux). Anything else downloads silent (status quo) rather
+            // than fetching a sibling that would fail the mux.
+            TellurideJSONMediaFormat sibling = null;
+            if (noCodec(bestVideo.acodec)) {
+                if ("mp4".equalsIgnoreCase(bestVideo.ext)) {
+                    sibling = bestM4aAudio;
+                } else if ("webm".equalsIgnoreCase(bestVideo.ext)) {
+                    sibling = bestWebmAudio;
+                }
+            }
+            if (sibling != null && DashMux.supportsPair(bestVideo.ext, sibling.ext)) {
+                videoResult.setMuxAudio(sibling.url, sibling.ext,
+                        sibling.filesize, withFullRange(sibling.http_headers));
             }
             results.add(videoResult);
         }
@@ -402,6 +421,14 @@ public static List<TellurideSearchResult> getValidPlaylistResults(String jsonMet
             return false;
         }
         return "m4a".equalsIgnoreCase(format.ext) || "mp4".equalsIgnoreCase(format.ext);
+    }
+
+    /** WebM-container audio (usually Opus): muxable into WebM output verbatim. */
+    static boolean isWebmAudio(TellurideJSONMediaFormat format) {
+        if (format == null || noCodec(format.acodec) || !noCodec(format.vcodec)) {
+            return false;
+        }
+        return "webm".equalsIgnoreCase(format.ext);
     }
 
     public static class TellurideJSONResult {

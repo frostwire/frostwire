@@ -128,8 +128,7 @@ class TellurideSearchPerformerBestFormatsTest {
   }
 
   @Test
-  void dashVideoWithoutM4aCarriesNoSibling() {
-    String json =
+  void dashVideoWithoutM4aCarriesNoSibling() {    String json =
         "{"
             + "\"id\":\"abc\","
             + "\"title\":\"Test Video\","
@@ -149,5 +148,58 @@ class TellurideSearchPerformerBestFormatsTest {
     assertEquals(2, results.size());
     assertTrue(!results.get(0).needsAudioMux());
     assertTrue(results.get(1).getDownloadUrl().contains("audio-opus.webm"));
+  }
+
+  @Test
+  void webmVideoCarriesNoSibling() {    String json =
+        "{"
+            + "\"id\":\"abc\","
+            + "\"title\":\"Test Video\","
+            + "\"extractor\":\"youtube\","
+            + "\"webpage_url\":\"https://www.youtube.com/watch?v=abc\","
+            + "\"thumbnail\":\"https://i.ytimg.com/x.jpg\","
+            + "\"upload_date\":\"20240101\","
+            + "\"formats\":["
+            + "{\"url\":\"https://ex/audio-mid.m4a\",\"ext\":\"m4a\",\"acodec\":\"mp4a.40.2\","
+            + "\"vcodec\":\"none\",\"filesize\":4000,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/v2160.webm\",\"ext\":\"webm\",\"acodec\":\"none\","
+            + "\"vcodec\":\"vp09\",\"filesize\":90000,\"height\":2160,\"width\":3840}"
+            + "]}";
+    List<TellurideSearchResult> results =
+        TellurideSearchPerformer.getValidResults(
+            json, new GsonBuilder().create(), null, -1, "https://www.youtube.com/watch?v=abc");
+    assertEquals(2, results.size());
+    // No WebM audio in the format list: m4a can't pair with WebM video.
+    assertTrue(!results.get(0).needsAudioMux());
+  }
+
+  @Test
+  void webmVideoCarriesOpusSibling() {
+    String json =
+        "{"
+            + "\"id\":\"abc\","
+            + "\"title\":\"Test Video\","
+            + "\"extractor\":\"youtube\","
+            + "\"webpage_url\":\"https://www.youtube.com/watch?v=abc\","
+            + "\"thumbnail\":\"https://i.ytimg.com/x.jpg\","
+            + "\"upload_date\":\"20240101\","
+            + "\"formats\":["
+            + "{\"url\":\"https://ex/audio-mid.m4a\",\"ext\":\"m4a\",\"acodec\":\"mp4a.40.2\","
+            + "\"vcodec\":\"none\",\"filesize\":4000,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/audio-opus.webm\",\"ext\":\"webm\",\"acodec\":\"opus\","
+            + "\"vcodec\":\"none\",\"filesize\":8000,\"height\":0,\"width\":0},"
+            + "{\"url\":\"https://ex/v2160.webm\",\"ext\":\"webm\",\"acodec\":\"none\","
+            + "\"vcodec\":\"vp09\",\"filesize\":90000,\"height\":2160,\"width\":3840}"
+            + "]}";
+    List<TellurideSearchResult> results =
+        TellurideSearchPerformer.getValidResults(
+            json, new GsonBuilder().create(), null, -1, "https://www.youtube.com/watch?v=abc");
+    assertEquals(2, results.size());
+    // Visible audio row keeps the best audio; hidden sibling is the WebM one.
+    assertTrue(results.get(1).getDownloadUrl().contains("audio-opus.webm"));
+    TellurideSearchResult video = results.get(0);
+    assertTrue(video.needsAudioMux());
+    assertTrue(video.getMuxAudioUrl().contains("audio-opus.webm"));
+    assertEquals("webm", video.getMuxAudioExt());
   }
 }
