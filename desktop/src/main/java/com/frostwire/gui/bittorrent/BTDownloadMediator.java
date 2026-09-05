@@ -33,7 +33,6 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
-import com.frostwire.mp4.Mp4Muxer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudUtils;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
@@ -1103,7 +1102,15 @@ public final class BTDownloadMediator
       HttpClient client =
           HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
       client.save(audioUrl, audioTmp, false, audioHeaders);
-      Mp4Muxer.mux(mp4, audioTmp, mergedTmp);
+      String videoExt = FilenameUtils.getExtension(mp4.getName());
+      boolean muxed =
+          com.frostwire.search.telluride.DashMux.muxIfSupported(
+              mp4, audioTmp, videoExt, suffix, mergedTmp);
+      if (!muxed) {
+        LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
+            + "; keeping silent video " + mp4.getAbsolutePath());
+        return;
+      }
       java.nio.file.Files.move(
           mergedTmp.toPath(), mp4.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
       LOG.info("Muxed DASH audio into " + mp4.getAbsolutePath());
