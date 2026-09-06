@@ -134,7 +134,7 @@ cd desktop
 ```
 
 For an EC2 systemd install, `./scripts/icebridge-systemd-install.sh --build`
-builds it as the current user and prints the follow-up `sudo --jar=...` command.
+builds it as the current user and prints root-owned staging plus install commands.
 
 #### Running IceBridge standalone
 
