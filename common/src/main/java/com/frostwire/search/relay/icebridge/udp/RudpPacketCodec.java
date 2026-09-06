@@ -26,9 +26,8 @@ final class RudpPacketCodec extends MessageToMessageCodec<DatagramPacket, RudpPa
     protected void encode(ChannelHandlerContext ctx, RudpPacketEnvelope envelope, List<Object> out) {
         RudpPacket packet = envelope.packet();
         byte[] payload = packet.payload();
-        if (payload.length > 65535) {
-            LOG.debug("RudpPacketCodec: dropping packet with payload > 65535 bytes (" + payload.length + ")");
-            return;
+        if (payload.length > RudpPacket.MAX_WIRE_PAYLOAD) {
+            throw new IllegalArgumentException("rUDP payload exceeds wire limit");
         }
         ByteBuf buf = ctx.alloc().buffer(RudpPacket.HEADER_SIZE + payload.length);
         buf.writeShort(RudpPacket.MAGIC);
@@ -74,7 +73,7 @@ final class RudpPacketCodec extends MessageToMessageCodec<DatagramPacket, RudpPa
         int sequence = buf.readInt();
         int ackThrough = buf.readInt();
         int payloadLen = buf.readUnsignedShort();
-        if (buf.readableBytes() < payloadLen) {
+        if (payloadLen > RudpPacket.MAX_WIRE_PAYLOAD || buf.readableBytes() != payloadLen) {
             buf.readerIndex(readerIndex);
             LOG.debug("RudpPacketCodec: incomplete payload");
             return;

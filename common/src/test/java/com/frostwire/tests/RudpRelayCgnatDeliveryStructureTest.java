@@ -30,11 +30,13 @@ class RudpRelayCgnatDeliveryStructureTest {
     String compact = source.replaceAll("\\s+", "");
 
     assertTrue(
-        compact.contains("RudpSessiontargetSession=findSessionByPub(target.ed25519Pub());"),
+        compact.contains("RudpSessionnext=findSessionByPub(frame.targetPub());"),
         "RELAY delivery must locate the live session by pub, not registry host:port");
     assertTrue(
-        compact.contains("rebindSessionAddress(senderSession,sender);"),
-        "handleRelay must migrate the sender endpoint on CGNAT rebind");
+        compact.contains("Arrays.equals(packet.payload(),session.pathChallenge)")
+            && compact.contains("sender.equals(session.candidateAddress)")
+            && compact.contains("rebindSessionAddress(session,sender);"),
+        "v2 migration requires fresh path response, not merely a known CID");
     assertTrue(
         compact.contains("privateRudpSessionfindSessionByPub(byte[]pub)"),
         "findSessionByPub must exist");

@@ -8,12 +8,40 @@
 package com.frostwire.search.relay.icebridge.peer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import org.junit.jupiter.api.Test;
 
 class PeerRegistryLearnTest {
+
+  @Test
+  void registrationLimiterSupportsTheConfiguredPeerCapacity() {
+    int capacity = 10_000;
+    PeerRegistry registry =
+        new PeerRegistry(
+            IceBridgeConfig.newBuilder().controlHttpPort(8081).maxPeers(capacity).build());
+    for (int i = 0; i <= capacity; i++) {
+      byte[] pub = new byte[32];
+      pub[0] = (byte) i;
+      pub[1] = (byte) (i >>> 8);
+      PeerRecord record =
+          new PeerRecord(
+              pub,
+              "192.0.2.1",
+              6889,
+              IceBridgeConfig.Role.CLIENT,
+              System.currentTimeMillis(),
+              null);
+      if (i < capacity) {
+        assertTrue(registry.register(record), "configured peer slot " + i);
+      } else {
+        assertFalse(registry.register(record));
+      }
+    }
+    assertEquals(capacity, registry.size());
+  }
 
   @Test
   void learnedEndpointReplacesStaleRegistrationButPreservesRoleAndVersion() {
@@ -61,5 +89,22 @@ class PeerRegistryLearnTest {
     registry.learnObservedEndpoint(new byte[32], "", 6889);
     registry.learnObservedEndpoint(new byte[32], "1.2.3.4", 0);
     assertEquals(0, registry.size());
+  }
+
+  @Test
+  void observedEndpointsCannotBypassCapacityButKnownPeerCanMove() {
+    PeerRegistry registry =
+        new PeerRegistry(IceBridgeConfig.newBuilder().controlHttpPort(8797).maxPeers(1).build());
+    byte[] first = new byte[32];
+    byte[] second = new byte[32];
+    second[0] = 1;
+    registry.learnObservedEndpoint(first, "192.0.2.1", 6889);
+    registry.learnObservedEndpoint(second, "192.0.2.2", 6889);
+    assertEquals(1, registry.size());
+    org.junit.jupiter.api.Assertions.assertNull(registry.lookup(second));
+    registry.learnObservedEndpoint(first, "192.0.2.3", 6890);
+    assertEquals("192.0.2.3", registry.lookup(first).host());
+    assertEquals(6890, registry.lookup(first).rudpPort());
+    assertEquals(1, registry.size());
   }
 }

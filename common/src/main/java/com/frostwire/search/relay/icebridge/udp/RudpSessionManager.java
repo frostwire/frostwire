@@ -9,83 +9,52 @@ package com.frostwire.search.relay.icebridge.udp;
 
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.RateLimiter;
+import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
+import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRecord;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
-import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import io.netty.channel.Channel;
+import io.netty.util.NetUtil;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Manages rUDP sessions, hole punching, and relay forwarding for an IceBridge
- * servent.
+ * Bounded version-2 signed rUDP transport; see {@link RudpAuth} for the wire
+ * security contract and limitations. All mutation is serialized by this manager.
+ * Listener callbacks MUST be bounded/nonblocking; the built-in listener only
+ * reserves a queue slot. Netty writes are nonblocking, never waited on here.
  *
- * <p>All packets received by {@link RudpServer} are dispatched here. The
- * manager maintains a table of sessions keyed by remote connection id, sends
- * acknowledgements and retransmissions, and uses the {@link PeerRegistry} to
- * resolve relay/hole-punch targets.
- *
- * <p><b>Distributed search / TORRENT_FETCH must keep working after hours idle
- * or a peer restart.</b> Invariants:
- * <ul>
- *   <li>Never send DATA before HELLO_ACK — hold it ({@link #sendData}).
- *   <li>After reliable-send timeout, drop the session so the next SEARCH can
- *       HELLO again ({@link #dropSession}).
- *   <li>Deliver RELAY replies via the live session keyed by pub, not the
- *       first-seen CGNAT host:port ({@link #findSessionByPub}).
- * </ul>
+ * <p>A transport ACK means bounded next-hop ownership, not application processing
+ * or HTTP recipient delivery. New work is acknowledged only after admission;
+ * accepted duplicates are re-ACKed without delivery. A flood is accepted when at
+ * least one next hop owns it (not a promise that every candidate accepted it).
+ * Retry/assembly timeout terminates the entire association, never just an ACKed
+ * prefix. End-to-end requests still need application deadlines and retry policy.
  */
 public final class RudpSessionManager {
-
     private static final Logger LOG = Logger.getLogger(RudpSessionManager.class);
-
     private static final long RETRANSMIT_INTERVAL_MS = 500;
-    private static final long RETRANSMIT_TIMEOUT_MS = 5000;
-    private static final int MAX_RETRIES = 5;
+    private static final long RETRANSMIT_TIMEOUT_MS = 15_000;
     private static final long SESSION_IDLE_MS = 120_000;
-    /** Max RELAY / RELAY_RESPONSE accepts per peer key per second (sustained). */
-    private static final double RELAY_MAX_QPS = 20.0;
-
-    // HELLO gating (DDoS slice B). STARTING VALUES to validate from EC2 logs
-    // before freezing: per-IP burst is generous on purpose — many legit
-    // phones share one carrier IP behind CGNAT, so a tight per-IP budget
-    // would reject honest users. The global budget is the backstop.
-    private static final double HELLO_PER_IP_CAPACITY = 10.0;
-    private static final double HELLO_PER_IP_REFILL_PER_SEC = 2.0;
-    private static final double HELLO_GLOBAL_CAPACITY = 200.0;
-    private static final double HELLO_GLOBAL_REFILL_PER_SEC = 50.0;
-    private static final String HELLO_GLOBAL_KEY = "hello";
-    /** STARTING VALUE: max responder sessions per IPv4 /24 (validate from EC2 logs). */
+    private static final int MAX_RETRIES = 5;
+    private static final int SEND_WINDOW = 32;
     private static final int MAX_SESSIONS_PER_SUBNET_24 = 256;
-
-    /** N — mesh broadcast fanout; live-tunable via {@link IceBridgeTopology}. */
-    private int meshBroadcastFanout() {
-        return IceBridgeTopology.get().meshBroadcastFanout();
-    }
-
-    /** Default mesh hop TTL; live-tunable via {@link IceBridgeTopology}. */
-    private int meshHopTtl() {
-        return IceBridgeTopology.get().meshHopTtl();
-    }
-
-    /**
-     * Fragment header prepended to each DATA_FRAG / DATA_END payload:
-     * [groupId(4)][fragIndex(4)][totalFrags(4)].
-     */
+    private static final long MAX_PENDING_BYTES = 16L * 1024 * 1024;
+    private static final int MAX_PENDING_PACKETS = 16_384;
+    private static final int MAX_GLOBAL_SESSIONS = 4096;
     private static final int FRAG_HEADER_SIZE = 12;
 
     private final IdentityKeys identity;
@@ -93,1169 +62,805 @@ public final class RudpSessionManager {
     private final IceBridgeMetrics metrics;
     private final RudpMessageListener messageListener;
     private final FragmentReassembler reassembler = new FragmentReassembler();
-    private final RateLimiter relayRateLimiter;
-    private final RateLimiter helloPerIp;
-    private final RateLimiter helloGlobal;
-    /** Live responder-session count per IPv4 /24 (first 3 bytes as int key). */
-    private final Map<Integer, AtomicLong> sessionsPerSubnet = new ConcurrentHashMap<>();
-    /**
-     * Creation-/24 of each counted session (RudpSession is identity-keyed).
-     * Lets eviction decrement the exact creation subnet even if the session
-     * later rebound across /24s on CGNAT.
-     */
-    private final Map<RudpSession, Integer> subnetOfCountedSession = new ConcurrentHashMap<>();
-
-    private final Map<Long, RudpSession> sessionsByRemoteId = new ConcurrentHashMap<>();
-    private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new ConcurrentHashMap<>();
-    private final Map<String, byte[]> blockedFragmentDeliveries = new ConcurrentHashMap<>();
+    private final RateLimiter helloPerIp = new RateLimiter(10, 2, 4096, 60_000);
+    private final RateLimiter helloGlobal = new RateLimiter(200, 50, 2, 60_000);
+    private final RateLimiter packetGlobal = new RateLimiter(2000, 2000, 1, 60_000);
+    // A CID has exactly one owner and exactly one map entry, including simultaneous open.
+    private final Map<Long, RudpSession> sessionsByRemoteId = new HashMap<>();
+    private final Map<InetSocketAddress, RudpSession> sessionsByAddress = new HashMap<>();
     private final SecureRandom random = new SecureRandom();
     private final ScheduledExecutorService scheduler;
-
     private Channel channel;
+    private boolean closed;
+    private int maxSessions = IceBridgeConfig.DEFAULT_MAX_SESSIONS;
 
-    public RudpSessionManager(IdentityKeys identity,
-                              PeerRegistry registry,
-                              IceBridgeMetrics metrics,
-                              RudpMessageListener messageListener) {
+    public RudpSessionManager(IdentityKeys identity, PeerRegistry registry,
+                              IceBridgeMetrics metrics, RudpMessageListener listener) {
         this.identity = identity;
         this.registry = registry;
         this.metrics = metrics;
-        this.messageListener = messageListener;
-        this.relayRateLimiter = new RateLimiter(RELAY_MAX_QPS, RELAY_MAX_QPS);
-        this.helloPerIp = new RateLimiter(HELLO_PER_IP_CAPACITY, HELLO_PER_IP_REFILL_PER_SEC);
-        this.helloGlobal = new RateLimiter(HELLO_GLOBAL_CAPACITY, HELLO_GLOBAL_REFILL_PER_SEC);
-        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        this.messageListener = listener;
+        scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-rudp-manager");
             t.setDaemon(true);
             return t;
         });
-        this.scheduler.scheduleWithFixedDelay(this::retransmitAndEvict,
+        scheduler.scheduleWithFixedDelay(this::retransmitAndEvict,
                 RETRANSMIT_INTERVAL_MS, RETRANSMIT_INTERVAL_MS, TimeUnit.MILLISECONDS);
     }
 
-    public void setChannel(Channel channel) {
+    public synchronized void setChannel(Channel channel) {
         this.channel = channel;
     }
 
-    /**
-     * Send application data to a remote endpoint identified by public key.
-     *
-     * <p>If the registry knows the target's rUDP endpoint, a direct DATA
-     * packet is sent. Otherwise the payload is multi-hop RELAYed through
-     * known FORWARDER/BOTH mesh peers (hop TTL from
-     * {@link IceBridgeTopology#meshHopTtl()}, fanout N from
-     * {@link IceBridgeTopology#meshBroadcastFanout()}).
-     */
-    public boolean deliver(byte[] targetPub, byte[] payload) {
-        if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
-            return false;
-        }
-        if (payload.length > RelayFrame.MAX_APP_PAYLOAD) {
-            LOG.warn("RudpSessionManager: deliver payload too large for mesh ("
-                    + payload.length + " > " + RelayFrame.MAX_APP_PAYLOAD + ")"
-                    + " target=" + Hex.encode(targetPub));
-            // Direct DATA path can still fragment; only mesh RELAY is capped.
-            PeerRecord direct = registry.lookup(targetPub);
-            if (direct != null) {
-                sendData(new InetSocketAddress(direct.host(), direct.rudpPort()), payload);
-                return true;
-            }
+    /** True reserves bounded next-hop ownership; false means no work was accepted. */
+    public synchronized boolean deliver(byte[] targetPub, byte[] payload) {
+        if (closed || targetPub == null || targetPub.length != 32 || !validPayload(payload)) {
             return false;
         }
         if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
-            // Local delivery (loopback control plane → same process).
             return notifyListener(identity.ed25519PubRaw(), payload);
         }
         PeerRecord target = registry.lookup(targetPub);
-        InetSocketAddress registryAddr = null;
         if (target != null) {
-            registryAddr = new InetSocketAddress(target.host(), target.rudpPort());
-            if (isLocalRudpEndpoint(registryAddr)) {
+            InetSocketAddress address = literalAddress(target.host(), target.rudpPort());
+            if (isLocalRudpEndpoint(address)) {
                 return deliverToLocalPollClient(targetPub, new byte[0], payload);
             }
             RudpSession live = findSessionByPub(targetPub);
-            if (live == null) {
-                live = sessionsByAddress.get(registryAddr);
+            if (live != null) {
+                return queueData(live, payload);
             }
-            if (live != null && live.isAuthenticated()) {
-                sendData(live.remoteAddress(), payload);
-                return true;
+            if (address != null) {
+                RudpSession session = connectSession(address, targetPub);
+                return session != null && queueData(session, payload);
             }
         }
-        int n = meshBroadcastFanout();
-        List<PeerRecord> forwarders = registry.lookupForwarders(n);
-        int sent = 0;
-        int hopTtl = IceBridgeTopology.get().clampRemainingTtl(0, meshHopTtl());
-        for (PeerRecord forwarder : forwarders) {
-            if (isSelf(forwarder)) {
-                continue;
-            }
-            if (sent >= n) {
-                break;
-            }
-            sendRelay(new InetSocketAddress(forwarder.host(), forwarder.rudpPort()),
-                    targetPub, payload, hopTtl);
-            sent++;
-        }
-        if (sent == 0 && registryAddr != null) {
-            sendData(registryAddr, payload);
-            return true;
-        } else if (sent == 0) {
-            LOG.debug("RudpSessionManager: no route to target " + Hex.encode(targetPub));
+        if (payload.length > RelayFrame.MAX_APP_PAYLOAD) {
             return false;
         }
+        return forward(targetPub, payload, IceBridgeTopology.get().meshHopTtl(), null);
+    }
+
+    /**
+     * Explicit identity discovery when no expected peer is known. Callers with a
+     * known identity use deliver(), which pins that identity in the transcript.
+     * Unresolved addresses are rejected: no DNS executes on the receive loop.
+     */
+    public synchronized long connect(InetSocketAddress remoteAddress) {
+        RudpSession session = connectSession(remoteAddress, expectedPeer(remoteAddress));
+        return session == null ? -1 : session.localConnectionId();
+    }
+
+    private RudpSession connectSession(InetSocketAddress address, byte[] expectedPub) {
+        if (closed || !validAddress(address)) {
+            return null;
+        }
+        RudpSession existing = sessionsByAddress.get(address);
+        if (existing != null && !existing.hasSequenceCapacity(1) && existing.pending().isEmpty()) {
+            dropSession(existing);
+            existing = null;
+        }
+        if (existing != null) {
+            byte[] peer = existing.remotePub();
+            if (expectedPub != null && (peer == null || !Arrays.equals(peer, expectedPub))) {
+                return null;
+            }
+            return existing;
+        }
+        if (!canCreate(address) || !canQueue(null, 1, 2L * (RudpAuth.HELLO_PAYLOAD_LENGTH + 128))
+                || !helloGlobal.tryAcquire("outbound")) {
+            return null;
+        }
+        long cid;
+        do {
+            cid = random.nextLong();
+        } while (cid == 0 || cid == -1 || sessionsByRemoteId.containsKey(cid));
+        RudpSession session = new RudpSession(cid, cid, address, expectedPub, true);
+        try {
+            session.helloPayload = RudpAuth.createHelloPayload(identity, cid, expectedPub);
+            sessionsByRemoteId.put(cid, session);
+            sessionsByAddress.put(address, session);
+            enqueue(session, new RudpPacket(RudpPacket.Type.HELLO, cid, 0, 0, session.helloPayload));
+            flush(session);
+            return session;
+        } catch (Exception e) {
+            dropSession(session);
+            LOG.warn("Unable to create rUDP handshake", e);
+            return null;
+        }
+    }
+
+    public synchronized boolean sendData(InetSocketAddress address, byte[] payload) {
+        if (!validPayload(payload)) {
+            return false;
+        }
+        RudpSession session = connectSession(address, expectedPeer(address));
+        return session != null && queueData(session, payload);
+    }
+
+    private boolean queueData(RudpSession session, byte[] payload) {
+        int count = (payload.length + RudpPacket.MAX_FRAGMENT_PAYLOAD - 1) / RudpPacket.MAX_FRAGMENT_PAYLOAD;
+        long bytes = 2L * (payload.length + (long) count * (RudpPacket.HEADER_SIZE + FRAG_HEADER_SIZE + RudpAuth.SIGNATURE_LENGTH));
+        if (!canQueue(session, count, bytes)) {
+            return false;
+        }
+        if (count == 1) {
+            enqueue(session, session.data(payload));
+        } else {
+            int group = random.nextInt();
+            for (int i = 0; i < count; i++) {
+                int offset = i * RudpPacket.MAX_FRAGMENT_PAYLOAD;
+                int length = Math.min(RudpPacket.MAX_FRAGMENT_PAYLOAD, payload.length - offset);
+                byte[] part = ByteBuffer.allocate(FRAG_HEADER_SIZE + length)
+                        .putInt(group).putInt(i).putInt(count).put(payload, offset, length).array();
+                enqueue(session, new RudpPacket(i == count - 1 ? RudpPacket.Type.DATA_END : RudpPacket.Type.DATA_FRAG,
+                        session.remoteConnectionId(), session.nextLocalSequence(), session.receivedThroughRemote(), part));
+            }
+        }
+        flush(session);
         return true;
     }
 
-    /**
-     * Initiate a direct rUDP session with a remote servent.
-     *
-     * <p>If a session already exists for {@code remoteAddress} (e.g. the peer
-     * HELLO'd us first, or we already connected), it is reused. Creating a
-     * second initiator session would overwrite the address map and drop the
-     * authenticated {@code remotePub} needed for RELAY hop validation.
-     *
-     * @return the local connection id, or {@code -1} on failure
-     */
-    public long connect(InetSocketAddress remoteAddress) {
-        if (remoteAddress == null) {
-            return -1;
+    public boolean sendRelay(InetSocketAddress address, byte[] targetPub, byte[] payload) {
+        return sendRelay(address, targetPub, payload, IceBridgeTopology.get().meshHopTtl());
+    }
+
+    public synchronized boolean sendRelay(InetSocketAddress address, byte[] targetPub, byte[] payload, int ttl) {
+        if (targetPub == null || targetPub.length != 32 || !validPayload(payload)
+                || payload.length > RelayFrame.MAX_APP_PAYLOAD || ttl < 0
+                || ttl > IceBridgeTopology.MAX_MESH_HOP_TTL) {
+            return false;
         }
-        RudpSession existing = sessionsByAddress.get(remoteAddress);
-        if (existing != null) {
-            return existing.localConnectionId();
-        }
-        long localCid = randomConnectionId();
-        long remoteCid = randomConnectionId();
-        RudpSession session = new RudpSession(localCid, remoteCid, remoteAddress, null, true);
-        sessionsByRemoteId.put(remoteCid, session);
-        sessionsByAddress.put(remoteAddress, session);
-        byte[] payload;
+        byte[] frame;
         try {
-            payload = RudpAuth.createHelloPayload(identity, remoteCid);
-        } catch (Exception e) {
-            LOG.error("Failed to sign rUDP hello", e);
-            sessionsByRemoteId.remove(remoteCid);
-            sessionsByAddress.remove(remoteAddress);
-            return -1;
-        }
-        RudpPacket hello = new RudpPacket(RudpPacket.Type.HELLO, remoteCid, 0, 0, payload);
-        sendReliable(session, hello);
-        return localCid;
-    }
-
-    /**
-     * Send application data reliably to a remote endpoint. Payloads larger
-     * than {@link RudpPacket#MAX_FRAGMENT_PAYLOAD} are split into chunks,
-     * each sent as a separate reliable {@code DATA_FRAG} packet followed by
-     * a {@code DATA_END} packet. The receiver reassembles them.
-     */
-    public void sendData(InetSocketAddress remoteAddress, byte[] payload) {
-        if (payload == null || payload.length == 0) {
-            return;
-        }
-        RudpSession session = sessionsByAddress.get(remoteAddress);
-        if (session == null) {
-            connect(remoteAddress);
-            session = sessionsByAddress.get(remoteAddress);
-            if (session == null) {
-                return;
-            }
-        }
-        // SEARCH / TORRENT_FETCH before HELLO_ACK used to go out unauthenticated
-        // and die; hold until the session is proven so a resume-hours-later
-        // reconnect still delivers the first query.
-        if (!session.isAuthenticated()) {
-            session.holdAppPayload(payload);
-            return;
-        }
-        if (payload.length <= RudpPacket.MAX_FRAGMENT_PAYLOAD) {
-            // Single packet — no fragmentation needed.
-            RudpPacket packet = session.data(payload);
-            sendReliable(session, packet);
-        } else {
-            sendFragmented(session, payload);
-        }
-    }
-
-    /**
-     * Split a payload into fragments and send each as a reliable packet.
-     * Each fragment payload carries a 12-byte header:
-     * [groupId(4)][fragIndex(4)][totalFrags(4)] followed by the chunk bytes.
-     * Intermediate fragments use type {@code DATA_FRAG}; the last uses
-     * {@code DATA_END}.
-     */
-    private void sendFragmented(RudpSession session, byte[] payload) {
-        int totalFrags = (payload.length + RudpPacket.MAX_FRAGMENT_PAYLOAD - 1)
-                / RudpPacket.MAX_FRAGMENT_PAYLOAD;
-        int groupId = random.nextInt();
-        int offset = 0;
-        for (int i = 0; i < totalFrags; i++) {
-            int chunkLen = Math.min(RudpPacket.MAX_FRAGMENT_PAYLOAD, payload.length - offset);
-            byte[] fragPayload = new byte[FRAG_HEADER_SIZE + chunkLen];
-            writeIntBE(fragPayload, 0, groupId);
-            writeIntBE(fragPayload, 4, i);
-            writeIntBE(fragPayload, 8, totalFrags);
-            System.arraycopy(payload, offset, fragPayload, FRAG_HEADER_SIZE, chunkLen);
-            offset += chunkLen;
-
-            boolean isLast = (i == totalFrags - 1);
-            RudpPacket.Type type = isLast ? RudpPacket.Type.DATA_END : RudpPacket.Type.DATA_FRAG;
-            RudpPacket packet = new RudpPacket(type, session.remoteConnectionId(),
-                    session.nextLocalSequence(), session.receivedThroughRemote(), fragPayload);
-            sendReliable(session, packet);
-        }
-    }
-
-    /**
-     * Send a multi-hop RELAY packet through a mesh forwarder.
-     *
-     * @param hopTtl remaining intermediate hops (decremented at each hop)
-     */
-    public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub, byte[] payload) {
-        sendRelay(forwarderAddress, targetPub, payload, meshHopTtl());
-    }
-
-    public void sendRelay(InetSocketAddress forwarderAddress, byte[] targetPub,
-                          byte[] payload, int hopTtl) {
-        if (forwarderAddress == null
-                || targetPub == null || targetPub.length != 32
-                || payload == null || payload.length == 0) {
-            return;
-        }
-        RudpSession session = sessionsByAddress.get(forwarderAddress);
-        if (session == null) {
-            connect(forwarderAddress);
-            session = sessionsByAddress.get(forwarderAddress);
-            if (session == null) {
-                return;
-            }
-        }
-        try {
-            byte[] frame = RelayFrame.encode(
-                    identity.ed25519PubRaw(), targetPub, hopTtl, payload);
-            RudpPacket relay = new RudpPacket(
-                    RudpPacket.Type.RELAY,
-                    session.remoteConnectionId(),
-                    session.nextLocalSequence(),
-                    session.receivedThroughRemote(),
-                    frame);
-            sendReliable(session, relay);
+            frame = RelayFrame.encode(identity.ed25519PubRaw(), targetPub, ttl, payload);
         } catch (IllegalArgumentException e) {
-            LOG.debug("RudpSessionManager: sendRelay rejected: " + e.getMessage());
+            return false;
+        }
+        RudpSession session = connectSession(address, expectedPeer(address));
+        return session != null && queueReliable(session, RudpPacket.Type.RELAY, frame);
+    }
+
+    private boolean queueReliable(RudpSession session, RudpPacket.Type type, byte[] payload) {
+        if (payload.length + RudpAuth.SIGNATURE_LENGTH > RudpPacket.MAX_WIRE_PAYLOAD
+                || !canQueue(session, 1, 2L * (payload.length + RudpPacket.HEADER_SIZE + RudpAuth.SIGNATURE_LENGTH))) {
+            return false;
+        }
+        enqueue(session, new RudpPacket(type, session.remoteConnectionId(), session.nextLocalSequence(),
+                session.receivedThroughRemote(), payload));
+        flush(session);
+        return true;
+    }
+
+    private boolean canQueue(RudpSession session, int count, long bytes) {
+        if (closed || (session != null && (!session.hasSequenceCapacity(count)
+                || session.pending().size() + count > RudpSession.MAX_PENDING_PACKETS
+                || session.retainedBytes() > RudpSession.MAX_RETAINED_BYTES - bytes))) {
+            return false;
+        }
+        long retained = 0;
+        int packets = 0;
+        for (RudpSession current : sessionsByRemoteId.values()) {
+            retained += current.retainedBytes();
+            packets += current.pending().size();
+        }
+        return retained <= MAX_PENDING_BYTES - bytes && packets <= MAX_PENDING_PACKETS - count;
+    }
+
+    private void enqueue(RudpSession session, RudpPacket packet) {
+        if (!session.addPending(packet.sequence(), new PendingPacket(packet, session.remoteAddress(), nowMs()))) {
+            throw new IllegalStateException("rUDP reservation invariant");
         }
     }
 
-    private boolean isSelf(PeerRecord record) {
-        return record != null
-                && Arrays.equals(record.ed25519Pub(), identity.ed25519PubRaw());
+    private void flush(RudpSession session) {
+        if (channel == null || !channel.isOpen() || !channel.isWritable()) {
+            return;
+        }
+        int window = 0;
+        for (PendingPacket pending : session.pending().values()) {
+            if (pending.packet.sequence() != 0 && !session.isAuthenticated()) {
+                continue;
+            }
+            if (window++ >= SEND_WINDOW) {
+                break;
+            }
+            if (!pending.sent) {
+                try {
+                    pending.wirePacket = handshakeUnsigned(pending.packet.type()) ? pending.packet
+                            : RudpAuth.protect(identity, session.remotePub(), session.transcript, pending.packet);
+                    pending.sent = true;
+                    pending.lastSentMs = nowMs();
+                    session.markSent(pending.packet.sequence());
+                    write(session.remoteAddress(), pending.wirePacket);
+                } catch (Exception e) {
+                    LOG.warn("Unable to sign rUDP packet", e);
+                    dropSession(session);
+                    return;
+                }
+            }
+        }
     }
 
-    /**
-     * Process an inbound packet from the UDP channel.
-     */
-    public void onPacket(RudpPacketEnvelope envelope) {
+    public synchronized void onPacket(RudpPacketEnvelope envelope) {
+        if (closed || envelope == null || envelope.packet() == null || !validAddress(envelope.sender())) {
+            return;
+        }
         RudpPacket packet = envelope.packet();
         InetSocketAddress sender = envelope.sender();
+        if (packet.size() > RudpPacket.HEADER_SIZE + RudpPacket.MAX_WIRE_PAYLOAD) {
+            return;
+        }
         metrics.rudpPacketIn(packet.size());
-
-        switch (packet.type()) {
-            case HELLO:
+        // Introductions are disabled in v2. There is no authenticated request/
+        // target-consent protocol yet; never resolve or dial an unsolicited hint.
+        if (packet.type() == RudpPacket.Type.HOLE_PUNCH || packet.type() == RudpPacket.Type.HOLE_PUNCH_RESPONSE) {
+            return;
+        }
+        if (handshakeUnsigned(packet.type())) {
+            if (packet.sequence() != 0 || packet.ackThrough() != 0 || !allowHello(sender)) {
+                return;
+            }
+            if (packet.type() == RudpPacket.Type.HELLO) {
                 handleHello(packet, sender);
-                break;
-            case HELLO_ACK:
+            } else {
                 handleHelloAck(packet, sender);
-                break;
+            }
+            return;
+        }
+        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
+        if (session == null || session.transcript == null || !session.validAck(packet.ackThrough())
+                || !packetGlobal.tryAcquire("packets")) {
+            return;
+        }
+        packet = RudpAuth.unprotect(session.remotePub(), identity.ed25519PubRaw(), session.transcript, packet);
+        if (packet == null) {
+            return;
+        }
+        if (packet.type() == RudpPacket.Type.HELLO_FINISH || packet.type() == RudpPacket.Type.HELLO_READY) {
+            finishHandshake(session, packet, sender);
+            return;
+        }
+        if (!session.isAuthenticated()) {
+            return;
+        }
+        if (packet.type() == RudpPacket.Type.PATH_RESPONSE) {
+            if (packet.sequence() == 0 && packet.ackThrough() == 0 && sender.equals(session.candidateAddress)
+                    && Arrays.equals(packet.payload(), session.pathChallenge)
+                    && System.nanoTime() - session.pathChallengeNanos < TimeUnit.SECONDS.toNanos(5)) {
+                rebindSessionAddress(session, sender);
+                session.candidateAddress = null;
+                session.pathChallenge = null;
+            }
+            return;
+        }
+        if (!sender.equals(session.remoteAddress())) {
+            challengePath(session, sender);
+            return;
+        }
+        if (packet.type() == RudpPacket.Type.PATH_CHALLENGE) {
+            if (packet.sequence() == 0 && packet.ackThrough() == 0 && packet.payload().length == 32) {
+                sendProtected(session, sender, new RudpPacket(RudpPacket.Type.PATH_RESPONSE,
+                        packet.connectionId(), 0, 0, packet.payload()));
+            }
+            return;
+        }
+        if (packet.type() == RudpPacket.Type.DATA_ACK) {
+            int previous = session.ackedThroughLocal();
+            if (packet.sequence() == 0 && packet.payload().length == 0 && session.ackLocal(packet.ackThrough())) {
+                if (Integer.compareUnsigned(packet.ackThrough(), previous) > 0) {
+                    session.markActivity();
+                }
+                flush(session);
+            }
+            return;
+        }
+        if (packet.sequence() == 0) {
+            return;
+        }
+        if (Integer.compareUnsigned(packet.sequence(), session.receivedThroughRemote()) <= 0) {
+            sendProtected(session, sender, session.dataAck());
+            return;
+        }
+        if (packet.sequence() != session.receivedThroughRemote() + 1) {
+            return;
+        }
+        if (session.fragmentKey != null && packet.type() != RudpPacket.Type.DATA_FRAG
+                && packet.type() != RudpPacket.Type.DATA_END) {
+            return;
+        }
+        boolean accepted = false;
+        switch (packet.type()) {
             case DATA:
-                handleData(packet, sender);
-                break;
-            case DATA_ACK:
-                handleDataAck(packet);
+                accepted = validPayload(packet.payload()) && notifyListener(session.remotePub(), packet.payload());
                 break;
             case DATA_FRAG:
-                handleDataFrag(packet, sender, false);
-                break;
             case DATA_END:
-                handleDataFrag(packet, sender, true);
-                break;
-            case HOLE_PUNCH:
-                handleHolePunch(packet, sender);
-                break;
-            case HOLE_PUNCH_RESPONSE:
-                handleHolePunchResponse(packet, sender);
+                accepted = handleFragment(session, packet);
                 break;
             case RELAY:
-                handleRelay(packet, sender);
+                accepted = handleRelay(session, packet.payload());
                 break;
             case RELAY_RESPONSE:
-                handleRelayResponse(packet, sender);
+                byte[] response = packet.payload();
+                if (response.length > 32 && response.length - 32 <= RelayFrame.MAX_APP_PAYLOAD) {
+                    // Preserve authenticated hop attribution. Origin identity is
+                    // carried and verified independently by the application.
+                    accepted = notifyListener(session.remotePub(), Arrays.copyOfRange(response, 32, response.length));
+                }
                 break;
             default:
-                LOG.debug("RudpSessionManager: unknown packet type " + packet.type());
+                return;
+        }
+        if (accepted) {
+            session.receiveRemote(packet.sequence());
+            session.ackLocal(packet.ackThrough());
+            sendProtected(session, sender, session.dataAck());
+            flush(session);
         }
     }
 
-    public void shutdown() {
-        scheduler.shutdownNow();
+    private void handleHello(RudpPacket packet, InetSocketAddress sender) {
+        byte[] hello = packet.payload();
+        RudpSession known = sessionsByRemoteId.get(packet.connectionId());
+        if (known != null) {
+            if (!known.weAreInitiator() && sender.equals(known.remoteAddress())
+                    && Arrays.equals(known.helloPayload, hello)) {
+                write(sender, new RudpPacket(RudpPacket.Type.HELLO_ACK, packet.connectionId(), 0, 0, known.ackPayload));
+            }
+            return;
+        }
+        if (!RudpAuth.verifyHello(packet.connectionId(), hello) || !RudpAuth.intendedFor(hello, identity.ed25519PubRaw())) {
+            return;
+        }
+        byte[] peer = Arrays.copyOf(hello, 32);
+        if (Arrays.equals(peer, identity.ed25519PubRaw())) {
+            return;
+        }
+        RudpSession outbound = sessionsByAddress.get(sender);
+        if (outbound != null) {
+            // Simultaneous open deterministically keeps the lower pub as initiator.
+            // The responder transfers queued work, never discards it or adds aliases.
+            if (outbound.isAuthenticated() || !outbound.weAreInitiator()
+                    || (outbound.remotePub() != null && !Arrays.equals(outbound.remotePub(), peer))
+                    || comparePub(identity.ed25519PubRaw(), peer) < 0) {
+                return;
+            }
+        }
+        if (outbound == null && !canCreate(sender)) {
+            metrics.helloRejected();
+            return;
+        }
+        RudpSession session = new RudpSession(packet.connectionId(), packet.connectionId(), sender, peer, false);
+        try {
+            session.helloPayload = hello;
+            session.ackPayload = RudpAuth.createAckPayload(identity, packet.connectionId(), hello);
+            session.transcript = RudpAuth.transcript(hello, session.ackPayload);
+            if (outbound != null) {
+                for (PendingPacket pending : outbound.pending().values()) {
+                    if (pending.packet.sequence() != 0) {
+                        RudpPacket old = pending.packet;
+                        RudpPacket transferred = new RudpPacket(old.type(), packet.connectionId(),
+                                session.nextLocalSequence(), 0, old.payload());
+                        if (!session.addPending(transferred.sequence(), new PendingPacket(transferred,
+                                sender, pending.firstSentMs))) {
+                            throw new IllegalStateException("rUDP transfer reservation invariant");
+                        }
+                    }
+                }
+                dropSession(outbound);
+            }
+            sessionsByRemoteId.put(packet.connectionId(), session);
+            sessionsByAddress.put(sender, session);
+            write(sender, new RudpPacket(RudpPacket.Type.HELLO_ACK, packet.connectionId(), 0, 0, session.ackPayload));
+        } catch (Exception e) {
+            dropSession(session);
+            LOG.warn("Unable to sign rUDP response", e);
+        }
     }
 
-    public int sessionCount() {
-        return sessionsByRemoteId.size();
+    private void handleHelloAck(RudpPacket packet, InetSocketAddress sender) {
+        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
+        byte[] ack = packet.payload();
+        if (session == null || !session.weAreInitiator() || !sender.equals(session.remoteAddress())
+                || session.isAuthenticated() || !RudpAuth.verifyAck(packet.connectionId(), session.helloPayload, ack)) {
+            return;
+        }
+        byte[] peer = Arrays.copyOf(ack, 32);
+        if (session.remotePub() != null && !Arrays.equals(session.remotePub(), peer)) {
+            return;
+        }
+        if (session.ackPayload != null && !Arrays.equals(session.ackPayload, ack)) {
+            return;
+        }
+        session.setRemotePub(peer);
+        session.ackPayload = ack;
+        session.transcript = RudpAuth.transcript(session.helloPayload, ack);
+        if (session.pending().get(0) != null && session.pending().get(0).packet.type() == RudpPacket.Type.HELLO_FINISH) {
+            return;
+        }
+        session.pending().remove(0);
+        enqueue(session, new RudpPacket(RudpPacket.Type.HELLO_FINISH, packet.connectionId(), 0, 0, new byte[0]));
+        flush(session);
     }
 
-    /**
-     * Test helper: create an initiator session (remotePub unset) and return
-     * the connection id used on the wire for HELLO/HELLO_ACK.
-     */
-    long createInitiatorSessionForTest(InetSocketAddress remoteAddress) {
-        long localCid = randomConnectionId();
-        long remoteCid = randomConnectionId();
-        RudpSession session = new RudpSession(localCid, remoteCid, remoteAddress, null, true);
-        sessionsByRemoteId.put(remoteCid, session);
-        sessionsByAddress.put(remoteAddress, session);
-        return remoteCid;
+    private void finishHandshake(RudpSession session, RudpPacket packet, InetSocketAddress sender) {
+        if (!sender.equals(session.remoteAddress()) || packet.sequence() != 0 || packet.ackThrough() != 0
+                || packet.payload().length != 0) {
+            return;
+        }
+        if (packet.type() == RudpPacket.Type.HELLO_FINISH && !session.weAreInitiator()) {
+            if (!session.isAuthenticated()) {
+                session.authenticate();
+                learnEndpoint(session);
+            }
+            sendProtected(session, sender, new RudpPacket(RudpPacket.Type.HELLO_READY, packet.connectionId(), 0, 0, new byte[0]));
+            flush(session);
+        } else if (packet.type() == RudpPacket.Type.HELLO_READY && session.weAreInitiator()) {
+            if (!session.isAuthenticated()) {
+                session.authenticate();
+                session.pending().remove(0);
+                learnEndpoint(session);
+            }
+            flush(session);
+        }
     }
 
-    /** Test helper: whether the session to {@code remote} has learned remotePub. */
-    boolean hasRemotePubForTest(InetSocketAddress remoteAddress) {
-        RudpSession s = sessionsByAddress.get(remoteAddress);
-        return s != null && s.remotePub() != null;
+    private boolean handleFragment(RudpSession session, RudpPacket packet) {
+        byte[] raw = packet.payload();
+        if (raw.length <= FRAG_HEADER_SIZE) {
+            return false;
+        }
+        ByteBuffer header = ByteBuffer.wrap(raw);
+        int groupId = header.getInt();
+        int index = header.getInt();
+        int total = header.getInt();
+        String key = groupPrefix(session) + groupId;
+        if ((session.fragmentKey != null && !session.fragmentKey.equals(key))
+                || index != session.nextFragmentIndex) {
+            return false;
+        }
+        FragmentReassembler.Result result = reassembler.accept(key, index, total,
+                packet.type() == RudpPacket.Type.DATA_END, Arrays.copyOfRange(raw, FRAG_HEADER_SIZE, raw.length));
+        if (result.state == FragmentReassembler.State.REJECTED) {
+            return false;
+        }
+        session.fragmentKey = key;
+        if (result.state == FragmentReassembler.State.RETAINED) {
+            session.nextFragmentIndex++;
+            return true;
+        }
+        // Final sequence remains unadvanced while blocked. Its ordinary retry
+        // finds the retained COMPLETE result, not a new prefix-less assembly.
+        if (!notifyListener(session.remotePub(), result.payload)) {
+            return false;
+        }
+        reassembler.release(key);
+        session.fragmentKey = null;
+        session.nextFragmentIndex = 0;
+        return true;
     }
 
-    long remoteConnectionIdForTest(InetSocketAddress remoteAddress) {
-        RudpSession s = sessionsByAddress.get(remoteAddress);
-        return s == null ? -1 : s.remoteConnectionId();
+    private boolean handleRelay(RudpSession sender, byte[] bytes) {
+        RelayFrame frame;
+        try {
+            frame = RelayFrame.decode(bytes);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        if (!Arrays.equals(frame.sourcePub(), sender.remotePub())
+                || frame.hopTtl() > IceBridgeTopology.MAX_MESH_HOP_TTL) {
+            return false;
+        }
+        if (Arrays.equals(frame.targetPub(), identity.ed25519PubRaw())) {
+            return notifyListener(sender.remotePub(), frame.appPayload());
+        }
+        PeerRecord target = registry.lookup(frame.targetPub());
+        if (target != null) {
+            InetSocketAddress address = literalAddress(target.host(), target.rudpPort());
+            if (isLocalRudpEndpoint(address)) {
+                return deliverToLocalPollClient(frame.targetPub(), sender.remotePub(), frame.appPayload());
+            }
+            RudpSession next = findSessionByPub(frame.targetPub());
+            if (next == null) {
+                next = connectSession(address, frame.targetPub());
+            }
+            return next != null && queueReliable(next, RudpPacket.Type.RELAY_RESPONSE,
+                    ByteBuffer.allocate(32 + frame.appPayload().length).put(frame.sourcePub()).put(frame.appPayload()).array());
+        }
+        // TTL counts additional forwarding edges. A terminal recipient still
+        // accepts its own target at zero; non-target nodes never forward zero.
+        return frame.hopTtl() > 0 && forward(frame.targetPub(), frame.appPayload(), frame.hopTtl() - 1, sender.remotePub());
     }
 
-    int pendingCountForTest(InetSocketAddress remoteAddress) {
-        RudpSession s = sessionsByAddress.get(remoteAddress);
-        return s == null ? 0 : s.pending().size();
+    private boolean forward(byte[] target, byte[] payload, int ttl, byte[] exclude) {
+        int accepted = 0;
+        int fanout = IceBridgeTopology.get().meshBroadcastFanout();
+        for (PeerRecord peer : registry.lookupForwarders(fanout)) {
+            if (Arrays.equals(peer.ed25519Pub(), identity.ed25519PubRaw()) || Arrays.equals(peer.ed25519Pub(), exclude)) {
+                continue;
+            }
+            if (sendRelay(literalAddress(peer.host(), peer.rudpPort()), target, payload, ttl)) {
+                accepted++;
+            }
+        }
+        return accepted > 0;
     }
 
-    InetSocketAddress remoteAddressForTest(long remoteConnectionId) {
-        RudpSession s = sessionsByRemoteId.get(remoteConnectionId);
-        return s == null ? null : s.remoteAddress();
+    private boolean notifyListener(byte[] source, byte[] payload) {
+        if (messageListener == null) {
+            return false;
+        }
+        try {
+            if (messageListener instanceof InboundMessageQueue) {
+                return ((InboundMessageQueue) messageListener).offerFromRudp(identity.ed25519PubRaw(), source, payload);
+            }
+            messageListener.onMessage(source.clone(), payload.clone());
+            return true;
+        } catch (RuntimeException e) {
+            LOG.warn("rUDP listener rejected delivery", e);
+            return false;
+        }
     }
 
-    // ---- outbound helpers ----
-
-    private void send(RudpSession session, RudpPacket packet) {
-        write(session.remoteAddress(), packet);
+    private boolean deliverToLocalPollClient(byte[] target, byte[] source, byte[] payload) {
+        return messageListener instanceof InboundMessageQueue
+                && ((InboundMessageQueue) messageListener).offerForTarget(target, source, payload);
     }
 
-    private void sendReliable(RudpSession session, RudpPacket packet) {
-        PendingPacket pending = new PendingPacket(packet, session.remoteAddress(), System.currentTimeMillis());
-        session.addPending(packet.sequence(), pending);
-        send(session, packet);
+    private boolean allowHello(InetSocketAddress sender) {
+        // Global budget before allocating an IP bucket, including known-peer
+        // retries. Limiter exceptions fail closed rather than bypassing crypto admission.
+        try {
+            boolean allowed = helloGlobal.tryAcquire("inbound") && helloPerIp.tryAcquire(sender.getAddress().getHostAddress());
+            if (!allowed) {
+                metrics.helloRejected();
+            }
+            return allowed;
+        } catch (RuntimeException e) {
+            metrics.helloRejected();
+            return false;
+        }
+    }
+
+    private boolean canCreate(InetSocketAddress address) {
+        if (sessionsByRemoteId.size() >= Math.min(maxSessions, MAX_GLOBAL_SESSIONS)) {
+            return false;
+        }
+        return withinSubnetLimit(address, null);
+    }
+
+    private boolean withinSubnetLimit(InetSocketAddress address, RudpSession migrating) {
+        byte[] ip = address.getAddress().getAddress();
+        int count = 0;
+        for (RudpSession session : sessionsByRemoteId.values()) {
+            if (session == migrating) {
+                continue;
+            }
+            byte[] other = session.remoteAddress().getAddress().getAddress();
+            // IPv4 /24 or IPv6 /64, same cap on every creation path.
+            int prefix = ip.length == 4 ? 3 : 8;
+            if (ip.length == other.length && Arrays.equals(Arrays.copyOf(ip, prefix), Arrays.copyOf(other, prefix))) {
+                count++;
+            }
+        }
+        return count < MAX_SESSIONS_PER_SUBNET_24;
+    }
+
+    private void challengePath(RudpSession session, InetSocketAddress candidate) {
+        long now = System.nanoTime();
+        if (session.pathChallenge != null && now - session.pathChallengeNanos < TimeUnit.SECONDS.toNanos(5)) {
+            return;
+        }
+        if (sessionsByAddress.containsKey(candidate) || !withinSubnetLimit(candidate, session)) {
+            return;
+        }
+        session.pathChallenge = new byte[32];
+        random.nextBytes(session.pathChallenge);
+        session.candidateAddress = candidate;
+        session.pathChallengeNanos = now;
+        sendProtected(session, candidate, new RudpPacket(RudpPacket.Type.PATH_CHALLENGE,
+                session.remoteConnectionId(), 0, 0, session.pathChallenge));
+    }
+
+    private void rebindSessionAddress(RudpSession session, InetSocketAddress address) {
+        RudpSession owner = sessionsByAddress.get(address);
+        if ((owner != null && owner != session) || !withinSubnetLimit(address, session)) {
+            return;
+        }
+        sessionsByAddress.remove(session.remoteAddress(), session);
+        session.setRemoteAddress(address);
+        sessionsByAddress.put(address, session);
+        learnEndpoint(session);
+    }
+
+    private void learnEndpoint(RudpSession session) {
+        InetSocketAddress address = session.remoteAddress();
+        if (!address.getAddress().isLoopbackAddress()) {
+            registry.learnObservedEndpoint(session.remotePub(), address.getAddress().getHostAddress(), address.getPort());
+        }
+    }
+
+    private void sendProtected(RudpSession session, InetSocketAddress recipient, RudpPacket packet) {
+        try {
+            write(recipient, RudpAuth.protect(identity, session.remotePub(), session.transcript, packet));
+        } catch (Exception e) {
+            LOG.warn("Unable to sign rUDP control packet", e);
+        }
     }
 
     private void write(InetSocketAddress recipient, RudpPacket packet) {
-        metrics.rudpPacketOut(packet.size());
-        Channel ch = channel;
-        if (ch == null || !ch.isOpen()) {
+        if (channel != null && channel.isOpen() && channel.isWritable()) {
+            metrics.rudpPacketOut(packet.size());
+            channel.writeAndFlush(new RudpPacketEnvelope(packet, null, recipient));
+        }
+    }
+
+    private synchronized void retransmitAndEvict() {
+        if (closed) {
             return;
         }
-        ch.writeAndFlush(new RudpPacketEnvelope(packet, null, recipient));
-    }
-
-    private long randomConnectionId() {
-        byte[] bytes = new byte[8];
-        random.nextBytes(bytes);
-        long id = 0;
-        for (int i = 0; i < 8; i++) {
-            id = (id << 8) | (bytes[i] & 0xffL);
+        long now = nowMs();
+        for (RudpSession session : new ArrayList<>(sessionsByRemoteId.values())) {
+            if (now - session.lastActivityMs() > (session.isAuthenticated() ? SESSION_IDLE_MS : RETRANSMIT_TIMEOUT_MS)
+                    || reassembler.hasExpired(groupPrefix(session))) {
+                dropSession(session);
+                continue;
+            }
+            boolean expired = false;
+            for (PendingPacket pending : session.pending().values()) {
+                if (now - pending.firstSentMs >= RETRANSMIT_TIMEOUT_MS || pending.retries >= MAX_RETRIES) {
+                    expired = true;
+                    break;
+                }
+                long backoff = RETRANSMIT_INTERVAL_MS << Math.min(pending.retries, 3);
+                if (pending.sent && now - pending.lastSentMs >= backoff
+                        && channel != null && channel.isOpen() && channel.isWritable()) {
+                    pending.retries++;
+                    pending.lastSentMs = now;
+                    // Current path, never the stale tuple stored at enqueue time.
+                    write(session.remoteAddress(), pending.wirePacket);
+                }
+            }
+            if (expired) {
+                dropSession(session);
+            } else {
+                flush(session);
+            }
         }
-        return id;
+        helloPerIp.evictIdle(60_000);
+        helloGlobal.evictIdle(60_000);
+        packetGlobal.evictIdle(60_000);
     }
 
-    private volatile int maxSessions =
-            com.frostwire.search.relay.icebridge.IceBridgeConfig.DEFAULT_MAX_SESSIONS;
+    private void dropSession(RudpSession session) {
+        sessionsByRemoteId.values().removeIf(value -> value == session);
+        sessionsByAddress.values().removeIf(value -> value == session);
+        reassembler.removeSession(groupPrefix(session));
+        session.clear();
+    }
 
-    /**
-     * Caps concurrent rUDP sessions (cheap UDP state; idle sessions are
-     * reaped after {@code SESSION_IDLE_MS}). Values come from
-     * {@link com.frostwire.search.relay.icebridge.IceBridgeConfig#maxSessions()}.
-     */
-    public void setMaxSessions(int maxSessions) {
+    public synchronized void shutdown() {
+        closed = true;
+        scheduler.shutdownNow();
+        for (RudpSession session : new ArrayList<>(sessionsByRemoteId.values())) {
+            dropSession(session);
+        }
+    }
+
+    public synchronized int sessionCount() {
+        return sessionsByRemoteId.size();
+    }
+
+    public synchronized void setMaxSessions(int maxSessions) {
         if (maxSessions <= 0) {
             throw new IllegalArgumentException("maxSessions must be > 0");
         }
         this.maxSessions = maxSessions;
     }
 
-    public int maxSessions() {
+    public synchronized int maxSessions() {
         return maxSessions;
     }
 
-    // ---- packet handlers ----
-
-    private void handleHello(RudpPacket packet, InetSocketAddress sender) {
-        long remoteCid = packet.connectionId();
-        // Gate only genuinely new handshakes: retransmits and re-HELLOs for
-        // known sessions must never burn the Sybil budget, or congestion
-        // would throttle exactly the retries that must succeed.
-        RudpSession known = sessionsByRemoteId.get(remoteCid);
-        RudpSession outbound = known == null ? sessionsByAddress.get(sender) : null;
-        if (known == null && outbound == null && !allowHello(sender)) {
-            metrics.helloRejected();
-            return;
-        }
-        if (!RudpAuth.verifyHello(remoteCid, packet.payload())) {
-            LOG.debug("RudpSessionManager: dropped HELLO with bad auth from " + sender);
-            return;
-        }
-        byte[] remotePub = Arrays.copyOfRange(packet.payload(), 0, 32);
-        RudpSession session = known;
-        if (session == null) {
-            if (sessionsByRemoteId.size() >= maxSessions) {
-                LOG.warn("RudpSessionManager: rejected HELLO from " + sender
-                        + " — max sessions (" + maxSessions + ") reached");
-                metrics.helloRejected();
-                return;
-            }
-            if (isSubnetFull(sender)) {
-                LOG.debug("RudpSessionManager: rejected HELLO from " + sender
-                        + " — max sessions per /24 (" + MAX_SESSIONS_PER_SUBNET_24 + ") reached");
-                metrics.helloRejected();
-                return;
-            }
-            if (!sessionInitiatedByUs(sender)) {
-                com.frostwire.search.relay.ConnectivityDetector.instance().markConnectable();
-            }
-            // Prefer keeping an existing address-mapped session (our outbound
-            // connect) and just learn remotePub — avoids dual sessions that
-            // drop hop auth for RELAY. Still index under the peer connection id.
-            RudpSession byAddr = sessionsByAddress.get(sender);
-            if (byAddr != null && byAddr.remotePub() == null) {
-                byAddr.setRemotePub(remotePub);
-                sessionsByRemoteId.put(remoteCid, byAddr);
-                session = byAddr;
-            } else {
-                long localCid = randomConnectionId();
-                session = new RudpSession(localCid, remoteCid, sender, remotePub, false);
-                sessionsByRemoteId.put(remoteCid, session);
-                sessionsByAddress.put(sender, session);
-                trackSubnetSession(session, sender);
-            }
-        } else {
-            session.setRemotePub(remotePub);
-        }
-        rebindSessionAddress(session, sender);
-        session.markActivity();
-        if (sender.getAddress() != null
-                && !sender.getAddress().isAnyLocalAddress()
-                && !sender.getAddress().isLoopbackAddress()) {
-            registry.learnObservedEndpoint(remotePub,
-                    sender.getAddress().getHostAddress(), sender.getPort());
-        }
-        LOG.info("IceBridge mesh: HELLO ok from=" + sender
-                + " pub=" + Hex.encode(remotePub).substring(0, 12) + "…");
-        // HELLO_ACK must use the peer's HELLO connectionId (not necessarily
-        // session.remoteConnectionId when we reused an outbound session).
-        try {
-            byte[] ackPayload = RudpAuth.createHelloPayload(identity, remoteCid);
-            RudpPacket ack = new RudpPacket(
-                    RudpPacket.Type.HELLO_ACK, remoteCid, 0, 0, ackPayload);
-            write(sender, ack);
-        } catch (Exception e) {
-            LOG.error("Failed to sign HELLO_ACK", e);
-            metrics.helloRejected();
-        }
-    }
-
-    /**
-     * HELLO rate gate: per-IP bucket first (an abusive IP burns only its own
-     * budget), then the global budget. Fail open — a limiter failure must
-     * never drop honest handshakes. No regex/split: the key is the sender IP
-     * string, the global key is a constant.
-     */
-    private boolean allowHello(InetSocketAddress sender) {
-        try {
-            String ip = senderIp(sender);
-            if (ip != null && !helloPerIp.tryAcquire(ip)) {
-                LOG.debug("RudpSessionManager: rate-limited HELLO from " + sender);
-                return false;
-            }
-            if (!helloGlobal.tryAcquire(HELLO_GLOBAL_KEY)) {
-                LOG.debug("RudpSessionManager: HELLO global budget exhausted, dropped from " + sender);
-                return false;
-            }
-            return true;
-        } catch (Throwable t) {
-            LOG.warn("RudpSessionManager: HELLO limiter failed open", t);
-            return true;
-        }
-    }
-
-    /** Sender IP string, or null when unresolvable (caller fails open). */
-    private static String senderIp(InetSocketAddress sender) {
-        if (sender == null || sender.getAddress() == null) {
-            return null;
-        }
-        return sender.getAddress().getHostAddress();
-    }
-
-    /**
-     * IPv4 /24 key (first 3 address bytes) or null when unavailable
-     * (unresolvable, non-IPv4) — callers fail open on null. Derived from
-     * raw address bytes: no string parsing, no allocation on the probe path.
-     */
-    private static Integer subnet24Key(InetSocketAddress sender) {
-        if (sender == null || sender.getAddress() == null) {
-            return null;
-        }
-        byte[] v4 = ipv4Bytes(sender.getAddress());
-        if (v4 == null) {
-            return null;
-        }
-        return Integer.valueOf(((v4[0] & 0xff) << 16) | ((v4[1] & 0xff) << 8) | (v4[2] & 0xff));
-    }
-
-    private boolean isSubnetFull(InetSocketAddress sender) {
-        try {
-            Integer subnet = subnet24Key(sender);
-            if (subnet == null) {
-                return false;
-            }
-            AtomicLong count = sessionsPerSubnet.get(subnet);
-            return count != null && count.get() >= MAX_SESSIONS_PER_SUBNET_24;
-        } catch (Throwable t) {
-            LOG.warn("RudpSessionManager: subnet check failed open", t);
-            return false;
-        }
-    }
-
-    private void trackSubnetSession(RudpSession session, InetSocketAddress sender) {
-        try {
-            Integer subnet = subnet24Key(sender);
-            if (subnet == null) {
-                return;
-            }
-            subnetOfCountedSession.put(session, subnet);
-            sessionsPerSubnet.computeIfAbsent(subnet, k -> new AtomicLong()).incrementAndGet();
-        } catch (Throwable t) {
-            LOG.warn("RudpSessionManager: subnet tracking failed open", t);
-        }
-    }
-
-    private void untrackSubnetSession(RudpSession session) {
-        try {
-            Integer subnet = subnetOfCountedSession.remove(session);
-            if (subnet == null) {
-                return;
-            }
-            sessionsPerSubnet.computeIfPresent(subnet, (k, v) -> v.decrementAndGet() <= 0 ? null : v);
-        } catch (Throwable t) {
-            LOG.warn("RudpSessionManager: subnet untrack failed", t);
-        }
-    }
-
-    /**
-     * Check whether we have an outbound session to the given address,
-     * meaning we initiated the connection. If not, an inbound HELLO
-     * from this address indicates we are connectable.
-     */
-    private boolean sessionInitiatedByUs(InetSocketAddress sender) {
-        RudpSession existing = sessionsByAddress.get(sender);
-        return existing != null && existing.weAreInitiator();
-    }
-
-    private void handleHelloAck(RudpPacket packet, InetSocketAddress sender) {
-        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null) {
-            return;
-        }
-        session.markActivity();
-        // Initiator learns peer pub from signed HELLO_ACK (same shape as HELLO).
-        byte[] ackPayload = packet.payload();
-        if (ackPayload != null && ackPayload.length == RudpAuth.HELLO_PAYLOAD_LENGTH
-                && RudpAuth.verifyHello(packet.connectionId(), ackPayload)) {
-            byte[] peerPub = Arrays.copyOfRange(ackPayload, 0, 32);
-            session.setRemotePub(peerPub);
-            session.pending().remove(0);
-            // Prefer the session that just proved identity on this address.
-            rebindSessionAddress(session, sender);
-            flushHeldAppPayloads(session);
-        }
-        LOG.info("IceBridge mesh: HELLO_ACK ok peer=" + sender
-                + (session.remotePub() != null
-                ? " pub=" + Hex.encode(session.remotePub()).substring(0, 12) + "…"
-                : " (no remotePub)"));
-    }
-
-    private void handleData(RudpPacket packet, InetSocketAddress sender) {
-        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null || !session.isAuthenticated()) {
-            LOG.debug("RudpSessionManager: rejected DATA from unauthenticated " + sender);
-            return;
-        }
-        rebindSessionAddress(session, sender);
-        synchronized (session) {
-            if (packet.sequence() == session.receivedThroughRemote() + 1) {
-                if (notifyListener(session.remotePub(), packet.payload())) {
-                    session.receiveRemote(packet.sequence());
-                    send(session, session.dataAck());
-                }
-            } else {
-                LOG.debug("RudpSessionManager: dropped out-of-window DATA seq="
-                        + packet.sequence() + " from " + sender
-                        + " — possible session reset by peer");
-            }
-        }
-    }
-
-    private void handleDataAck(RudpPacket packet) {
-        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null) {
-            return;
-        }
-
-        session.ackLocal(packet.ackThrough());
-        session.markActivity();
-    }
-
-    /**
-     * Handle a fragment packet (DATA_FRAG or DATA_END). Ack the packet,
-     * feed it to the reassembler, and deliver the completed payload to the
-     * listener when all fragments have arrived.
-     */
-    private void handleDataFrag(RudpPacket packet, InetSocketAddress sender, boolean isLast) {
-        RudpSession session = sessionsByRemoteId.get(packet.connectionId());
-        if (session == null || !session.isAuthenticated()) {
-            LOG.debug("RudpSessionManager: rejected fragment from unauthenticated " + sender);
-            return;
-        }
-        rebindSessionAddress(session, sender);
-
-        // Validate the fragment header BEFORE acking so that malformed
-        // fragments are not silently dropped after the sender believes
-        // they were delivered.
-        byte[] raw = packet.payload();
-        if (raw == null || raw.length < FRAG_HEADER_SIZE) {
-            LOG.debug("RudpSessionManager: dropping fragment with invalid header");
-            return; // do not ack — sender will retransmit
-        }
-
-        int groupId = readIntBE(raw, 0);
-        int fragIndex = readIntBE(raw, 4);
-        int totalFrags = readIntBE(raw, 8);
-        byte[] chunk = new byte[raw.length - FRAG_HEADER_SIZE];
-        System.arraycopy(raw, FRAG_HEADER_SIZE, chunk, 0, chunk.length);
-
-        // Key by sender address + groupId to prevent cross-session collision.
-        String groupKey = sender.toString() + ":" + groupId;
-        synchronized (session) {
-            if (packet.sequence() != session.receivedThroughRemote() + 1) {
-                byte[] blocked = blockedFragmentDeliveries.get(groupKey);
-                if (blocked != null && isLast && notifyListener(session.remotePub(), blocked)) {
-                    blockedFragmentDeliveries.remove(groupKey, blocked);
-                    session.receiveRemote(packet.sequence());
-                    send(session, session.dataAck());
-                }
-                return;
-            }
-            byte[] assembled = reassembler.addFragment(groupKey, fragIndex, isLast, chunk);
-            if (assembled == null) {
-                session.receiveRemote(packet.sequence());
-                send(session, session.dataAck());
-                return;
-            }
-            if (notifyListener(session.remotePub(), assembled)) {
-                session.receiveRemote(packet.sequence());
-                send(session, session.dataAck());
-            } else {
-                blockedFragmentDeliveries.put(groupKey, assembled);
-            }
-        }
-    }
-
-    private void handleHolePunch(RudpPacket packet, InetSocketAddress sender) {
-        // SEC4: Require an authenticated session — only peers who have
-        // completed a HELLO handshake can initiate hole punching.
-        RudpSession senderSession = sessionsByAddress.get(sender);
-        if (senderSession == null) {
-            LOG.debug("RudpSessionManager: rejected HOLE_PUNCH from unauthenticated " + sender);
-            return;
-        }
-        byte[] payload = packet.payload();
-        if (payload == null || payload.length < 32) {
-            return;
-        }
-        byte[] targetPub = Arrays.copyOfRange(payload, 0, 32);
-        PeerRecord target = registry.lookup(targetPub);
-        if (target == null) {
-            return;
-        }
-        InetSocketAddress targetAddress = new InetSocketAddress(target.host(), target.rudpPort());
-
-        // Tell target about initiator.
-        byte[] initiatorInfo = (sender.getHostString() + ":" + sender.getPort())
-                .getBytes(StandardCharsets.UTF_8);
-        RudpPacket toTarget = new RudpPacket(RudpPacket.Type.HOLE_PUNCH_RESPONSE,
-                0, 0, 0, initiatorInfo);
-        write(targetAddress, toTarget);
-
-        // Tell initiator about target.
-        byte[] targetInfo = (target.host() + ":" + target.rudpPort())
-                .getBytes(StandardCharsets.UTF_8);
-        RudpPacket toInitiator = new RudpPacket(RudpPacket.Type.HOLE_PUNCH_RESPONSE,
-                0, 0, 0, targetInfo);
-        write(sender, toInitiator);
-    }
-
-    private void handleHolePunchResponse(RudpPacket packet, InetSocketAddress sender) {
-        LOG.debug("RudpSessionManager: received hole-punch response from " + sender);
-        byte[] payload = packet.payload();
-        if (payload == null || payload.length == 0) {
-            return;
-        }
-        String info = new String(payload, StandardCharsets.UTF_8);
-        int colon = info.lastIndexOf(':');
-        if (colon < 0) {
-            LOG.warn("RudpSessionManager: malformed hole-punch response: " + info);
-            return;
-        }
-        String host = info.substring(0, colon);
-        int port;
-        try {
-            port = Integer.parseInt(info.substring(colon + 1));
-        } catch (NumberFormatException e) {
-            LOG.warn("RudpSessionManager: bad port in hole-punch response: " + info);
-            return;
-        }
-        if (port <= 0 || port > 65535) {
-            return;
-        }
-        InetSocketAddress targetAddress = new InetSocketAddress(host, port);
-        if (sessionsByAddress.containsKey(targetAddress)) {
-            LOG.debug("RudpSessionManager: already have session to " + targetAddress);
-            return;
-        }
-        LOG.info("RudpSessionManager: hole-punch — connecting to introduced peer at " + targetAddress);
-        connect(targetAddress);
-    }
-
-    private void handleRelay(RudpPacket packet, InetSocketAddress sender) {
-        byte[] payload = packet.payload();
-        if (payload == null || payload.length <= RelayFrame.HEADER_LENGTH) {
-            return;
-        }
-        RelayFrame frame;
-        try {
-            frame = RelayFrame.decode(payload);
-        } catch (IllegalArgumentException e) {
-            LOG.debug("RudpSessionManager: dropped malformed RELAY frame");
-            return;
-        }
-
-        // Prefer connection-id map (same as DATA); fall back to address.
-        RudpSession senderSession = sessionsByRemoteId.get(packet.connectionId());
-        if (senderSession == null) {
-            senderSession = sessionsByAddress.get(sender);
-        }
-        if (senderSession == null) {
-            LOG.debug("RudpSessionManager: rejected RELAY from unauthenticated " + sender);
-            return;
-        }
-        rebindSessionAddress(senderSession, sender);
-        if (senderSession.receiveRemote(packet.sequence())) {
-            send(senderSession, senderSession.dataAck());
-        }
-        byte[] senderPub = senderSession.remotePub();
-        if (senderPub == null || !Arrays.equals(frame.sourcePub(), senderPub)) {
-            LOG.debug("RudpSessionManager: rejected RELAY - sourcePub does not match sender session");
-            return;
-        }
-        if (!relayRateLimiter.tryAcquire(senderPub)) {
-            LOG.debug("RudpSessionManager: rate-limited RELAY from "
-                    + Hex.encode(senderPub).substring(0, 12) + "...");
-            return;
-        }
-
-        byte[] targetPub = frame.targetPub();
-        byte[] appPayload = frame.appPayload();
-        int hopTtl = frame.hopTtl();
-
-        if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
-            LOG.info("IceBridge mesh: RELAY delivered to self from="
-                    + Hex.encode(frame.sourcePub()).substring(0, 12) + "…"
-                    + " bytes=" + appPayload.length);
-            // Dual-deliver: shared queue (poll without pub) AND demux by own
-            // identity (poll?pub= after IceBridgeClient.register sets ownPub).
-            // Desktop parent local-mode registerSelf() enables ownPub; without
-            // demux, SEARCH sat forever in the shared queue while the parent
-            // only drained the empty demux queue → empty Android results.
-            notifyListener(frame.sourcePub(), appPayload);
-            return;
-        }
-
-        PeerRecord target = registry.lookup(targetPub);
-        if (target != null) {
-            LOG.info("IceBridge mesh: RELAY local-registry target="
-                    + Hex.encode(targetPub).substring(0, 12) + "…"
-                    + " hop=" + Hex.encode(senderPub).substring(0, 12) + "…"
-                    + " bytes=" + appPayload.length);
-            deliverToLocalRegistryTarget(frame.sourcePub(), target, appPayload);
-            return;
-        }
-
-        if (hopTtl <= 0) {
-            LOG.debug("RudpSessionManager: RELAY hop TTL exhausted for "
-                    + Hex.encode(targetPub).substring(0, 12) + "...");
-            return;
-        }
-        // hops already spent ≈ initial soft horizon - remaining (approx).
-        // hopTtl > 0 is guaranteed above; clamping may reduce the remaining
-        // ttl to 0, and this node still floods once — the next hop's ttl
-        // guard stops further forwarding (soft-max horizon).
-        int hopsSoFar = Math.max(0, IceBridgeTopology.get().softMax() - hopTtl);
-        int nextTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar + 1, hopTtl - 1);
-        int n = meshBroadcastFanout();
-        List<PeerRecord> forwarders = registry.lookupForwarders(n);
-        int sent = 0;
-        for (PeerRecord f : forwarders) {
-            if (sent >= n) {
-                break;
-            }
-            if (isSelf(f)) {
-                continue;
-            }
-            if (Arrays.equals(f.ed25519Pub(), senderPub)) {
-                continue;
-            }
-            InetSocketAddress next = new InetSocketAddress(f.host(), f.rudpPort());
-            sendRelay(next, targetPub, appPayload, nextTtl);
-            sent++;
-        }
-    }
-
-    /**
-     * Deliver app payload to a peer registered on this node.
-     *
-     * <p>Clients of a pure FORWARDER typically register with this process's
-     * own rUDP host:port and drain {@code /poll}. In that case deliver
-     * straight to the local inbound queue (no self-UDP). Remote endpoints
-     * get an authenticated reliable RELAY_RESPONSE.
-     */
-    private void deliverToLocalRegistryTarget(byte[] logicalSourcePub,
-                                              PeerRecord target,
-                                              byte[] appPayload) {
-        if (appPayload.length > RelayFrame.MAX_APP_PAYLOAD) {
-            LOG.debug("RudpSessionManager: drop oversized local RELAY delivery");
-            return;
-        }
-        InetSocketAddress targetAddress = new InetSocketAddress(target.host(), target.rudpPort());
-        if (isLocalRudpEndpoint(targetAddress)) {
-            // Prefer wire-shaped delivery so InboundMessageQueue can unwrap;
-            // bare app payloads are still accepted as SEARCH fallback.
-            deliverToLocalPollClient(target.ed25519Pub(), logicalSourcePub, appPayload);
-            return;
-        }
-        // CGNAT rebinds the UDP tuple while the registry still holds the
-        // first-seen mapping. Inbound SEARCH is keyed by connectionId so it
-        // still arrives; replies must follow the live session, not the stale
-        // host:port, or they black-hole and the phone shows zero results.
-        RudpSession targetSession = findSessionByPub(target.ed25519Pub());
-        if (targetSession == null) {
-            targetSession = sessionsByAddress.get(targetAddress);
-        }
-        if (targetSession == null) {
-            connect(targetAddress);
-            targetSession = findSessionByPub(target.ed25519Pub());
-            if (targetSession == null) {
-                targetSession = sessionsByAddress.get(targetAddress);
-            }
-        }
-        if (targetSession == null) {
-            LOG.warn("RudpSessionManager: no live session to local registry target "
-                    + Hex.encode(target.ed25519Pub()).substring(0, 12) + "…"
-                    + " registry=" + target.host() + ":" + target.rudpPort());
-            return;
-        }
-        byte[] responsePayload = new byte[32 + appPayload.length];
-        System.arraycopy(logicalSourcePub, 0, responsePayload, 0, 32);
-        System.arraycopy(appPayload, 0, responsePayload, 32, appPayload.length);
-        RudpPacket forward = new RudpPacket(
-                RudpPacket.Type.RELAY_RESPONSE,
-                targetSession.remoteConnectionId(),
-                targetSession.nextLocalSequence(),
-                targetSession.receivedThroughRemote(),
-                responsePayload);
-        sendReliable(targetSession, forward);
-    }
-
-    private boolean isLocalRudpEndpoint(InetSocketAddress addr) {
-        if (addr == null) {
-            return false;
-        }
-        Channel ch = channel;
-        if (ch == null || ch.localAddress() == null) {
-            return false;
-        }
-        InetSocketAddress local = (InetSocketAddress) ch.localAddress();
-        if (local.getPort() != addr.getPort()) {
-            return false;
-        }
-        if (addr.getAddress() == null) {
-            return false;
-        }
-        // USE_REMOTE clients register as 127.0.0.1:rudpPort (or 0.0.0.0).
-        // Do NOT treat every host on our rUDP port as local when bound to
-        // 0.0.0.0 — that would black-hole real remote mesh peers.
-        if (addr.getAddress().isLoopbackAddress() || addr.getAddress().isAnyLocalAddress()) {
-            return true;
-        }
-        if (local.getAddress() != null && local.getAddress().equals(addr.getAddress())) {
-            return true;
-        }
-        return false;
-    }
-
-    private void handleRelayResponse(RudpPacket packet, InetSocketAddress sender) {
-        byte[] payload = packet.payload();
-        if (payload == null || payload.length <= 32) {
-            return;
-        }
-        if (payload.length - 32 > RelayFrame.MAX_APP_PAYLOAD) {
-            LOG.debug("RudpSessionManager: drop oversized RELAY_RESPONSE");
-            return;
-        }
-        RudpSession senderSession = sessionForIncoming(packet, sender);
-        if (senderSession == null) {
-            LOG.warn("RudpSessionManager: rejected RELAY_RESPONSE from unauthenticated " + sender);
-            return;
-        }
-        byte[] sessionPub = senderSession.remotePub();
-        if (sessionPub == null) {
-            LOG.debug("RudpSessionManager: rejected RELAY_RESPONSE - session has no remotePub");
-            return;
-        }
-        if (!relayRateLimiter.tryAcquire(sessionPub)) {
-            LOG.debug("RudpSessionManager: rate-limited RELAY_RESPONSE");
-            return;
-        }
-        byte[] appPayload = Arrays.copyOfRange(payload, 32, payload.length);
-        synchronized (senderSession) {
-            if (packet.sequence() == senderSession.receivedThroughRemote() + 1) {
-                if (!notifyListener(sessionPub, appPayload)) {
-                    return;
-                }
-                senderSession.receiveRemote(packet.sequence());
-                send(senderSession, senderSession.dataAck());
-            }
-        }
-    }
-
-    private boolean notifyListener(byte[] sourcePub, byte[] payload) {
-        byte[] src = sourcePub == null ? new byte[0] : sourcePub;
-        // 1) Shared queue — consumers that poll without ?pub= (SearchRelayApp
-        //    on pure FORWARDER, legacy clients).
-        if (messageListener != null) {
-            try {
-                if (messageListener
-                        instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
-                    return ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
-                            .offerFromRudp(identity.ed25519PubRaw(), src, payload);
-                }
-                messageListener.onMessage(src, payload);
-                return true;
-            } catch (Throwable t) {
-                LOG.warn("RudpSessionManager: message listener failed", t);
-                return false;
-            }
-        }
-        // 2) Per-identity demux — IceBridgeClient.register() sets ownPub and
-        //    subsequent /poll?pub= only reads this queue. Local-mode desktop
-        //    and Android parents call registerSelf then poll with ownPub; they
-        //    would never see shared-queue SEARCH without this mirror.
-        if (identity != null
-                && messageListener
-                        instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
-            try {
-                ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
-                        .offerForTarget(identity.ed25519PubRaw(), src, payload);
-            } catch (Throwable t) {
-                LOG.warn("RudpSessionManager: own-pub demux delivery failed", t);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Deliver to a USE_REMOTE client registered on our rUDP host:port.
-     * Demuxes into a per-target inbound queue when the listener supports it.
-     */
-    private boolean deliverToLocalPollClient(byte[] targetPub, byte[] sourcePub, byte[] payload) {
-        if (messageListener instanceof com.frostwire.search.relay.icebridge.control.InboundMessageQueue) {
-            try {
-                return ((com.frostwire.search.relay.icebridge.control.InboundMessageQueue) messageListener)
-                        .offerForTarget(targetPub, sourcePub == null ? new byte[0] : sourcePub, payload);
-            } catch (Throwable t) {
-                LOG.warn("RudpSessionManager: local poll client delivery failed", t);
-                return false;
-            }
-        }
-        notifyListener(sourcePub, payload);
-        return true;
-    }
-
-    // ---- maintenance ----
-
-    private void flushHeldAppPayloads(RudpSession session) {
-        if (session == null || !session.isAuthenticated()) {
-            return;
-        }
-        byte[] held;
-        while ((held = session.pollHeldAppPayload()) != null) {
-            sendData(session.remoteAddress(), held);
-        }
-    }
-
-    private void dropSession(RudpSession session) {
-        if (session == null) {
-            return;
-        }
-        sessionsByRemoteId.remove(session.remoteConnectionId(), session);
-        sessionsByAddress.remove(session.remoteAddress(), session);
-        untrackSubnetSession(session);
-        LOG.warn("IceBridge mesh: dropped session " + session.remoteAddress()
-                + " after reliable send timeout — next send will reconnect");
-    }
-
-    private void retransmitAndEvict() {
-        long now = System.currentTimeMillis();
-        List<RudpSession> dead = new ArrayList<>();
-        for (RudpSession session : sessionsByRemoteId.values()) {
-            // Retransmit unacked packets that are due, and purge packets
-            // that have exhausted retries or exceeded the timeout.
-            var pendingMap = session.pending();
-            var iter = pendingMap.entrySet().iterator();
-            while (iter.hasNext()) {
-                var entry = iter.next();
-                PendingPacket pp = entry.getValue();
-                boolean exhausted = pp.retries >= MAX_RETRIES
-                        || (now - pp.firstSentMs) >= RETRANSMIT_TIMEOUT_MS;
-                if (exhausted) {
-                    iter.remove();
-                    dead.add(session);
-                    continue;
-                }
-                if (now - pp.lastSentMs > RETRANSMIT_INTERVAL_MS) {
-                    pp.retries++;
-                    pp.lastSentMs = now;
-                    write(pp.recipient, pp.packet);
-                }
-            }
-            if (now - session.lastActivityMs() > SESSION_IDLE_MS) {
-                sessionsByRemoteId.remove(session.remoteConnectionId());
-                sessionsByAddress.remove(session.remoteAddress());
-                untrackSubnetSession(session);
-            }
-        }
-        for (RudpSession session : dead) {
-            dropSession(session);
-        }
-        reassembler.evictStale();
-    }
-
-    private RudpSession sessionForIncoming(RudpPacket packet, InetSocketAddress sender) {
-        RudpSession byAddr = sessionsByAddress.get(sender);
-        if (byAddr != null) {
-            return byAddr;
-        }
-        long cid = packet.connectionId();
-        for (RudpSession session : sessionsByRemoteId.values()) {
-            if (session.localConnectionId() == cid) {
-                rebindSessionAddress(session, sender);
-                return session;
-            }
-            if (sameUdpEndpoint(session.remoteAddress(), sender)) {
-                return session;
-            }
-        }
-        return null;
-    }
-
-    private static boolean sameUdpEndpoint(InetSocketAddress a, InetSocketAddress b) {
-        if (a == null || b == null || a.getPort() != b.getPort()) {
-            return false;
-        }
-        java.net.InetAddress ia = a.getAddress();
-        java.net.InetAddress ib = b.getAddress();
-        if (ia == null || ib == null) {
-            return false;
-        }
-        if (ia.equals(ib)) {
-            return true;
-        }
-        byte[] va = ipv4Bytes(ia);
-        byte[] vb = ipv4Bytes(ib);
-        return va != null && vb != null && Arrays.equals(va, vb);
-    }
-
-    private static byte[] ipv4Bytes(java.net.InetAddress addr) {
-        byte[] raw = addr.getAddress();
-        if (raw.length == 4) {
-            return raw;
-        }
-        if (raw.length == 16) {
-            for (int i = 0; i < 10; i++) {
-                if (raw[i] != 0) {
-                    return null;
-                }
-            }
-            if (raw[10] == (byte) 0xff && raw[11] == (byte) 0xff) {
-                return Arrays.copyOfRange(raw, 12, 16);
-            }
-        }
-        return null;
-    }
-
     private RudpSession findSessionByPub(byte[] pub) {
-        if (pub == null || pub.length != 32) {
-            return null;
-        }
         for (RudpSession session : sessionsByRemoteId.values()) {
-            byte[] remotePub = session.remotePub();
-            if (remotePub != null && Arrays.equals(remotePub, pub)) {
+            if (Arrays.equals(pub, session.remotePub())) {
                 return session;
             }
         }
         return null;
     }
 
-    private void rebindSessionAddress(RudpSession session, InetSocketAddress sender) {
-        InetSocketAddress previous = session.remoteAddress();
-        if (sender == null || sender.equals(previous)) {
-            return;
+    private byte[] expectedPeer(InetSocketAddress address) {
+        if (address != null) {
+            for (PeerRecord peer : registry.lookupPeers(Integer.MAX_VALUE, false)) {
+                if (address.equals(literalAddress(peer.host(), peer.rudpPort()))) {
+                    return peer.ed25519Pub();
+                }
+            }
         }
-        sessionsByAddress.remove(previous, session);
-        session.setRemoteAddress(sender);
-        sessionsByAddress.put(sender, session);
-        byte[] remotePub = session.remotePub();
-        if (remotePub != null
-                && sender.getAddress() != null
-                && !sender.getAddress().isAnyLocalAddress()
-                && !sender.getAddress().isLoopbackAddress()) {
-            registry.learnObservedEndpoint(
-                    remotePub, sender.getAddress().getHostAddress(), sender.getPort());
-        }
-        LOG.info("IceBridge mesh: session endpoint changed " + previous + " -> " + sender);
+        return null;
     }
 
-    // ---- utilities ----
-
-    private static void writeIntBE(byte[] buf, int offset, int value) {
-        buf[offset] = (byte) (value >>> 24);
-        buf[offset + 1] = (byte) (value >>> 16);
-        buf[offset + 2] = (byte) (value >>> 8);
-        buf[offset + 3] = (byte) value;
+    private boolean isLocalRudpEndpoint(InetSocketAddress address) {
+        if (address == null || channel == null || !(channel.localAddress() instanceof InetSocketAddress)) {
+            return false;
+        }
+        InetSocketAddress local = (InetSocketAddress) channel.localAddress();
+        return local.getPort() == address.getPort() && (address.getAddress().isLoopbackAddress()
+                || address.getAddress().isAnyLocalAddress() || address.getAddress().equals(local.getAddress()));
     }
 
-    private static int readIntBE(byte[] buf, int offset) {
-        return ((buf[offset] & 0xff) << 24)
-                | ((buf[offset + 1] & 0xff) << 16)
-                | ((buf[offset + 2] & 0xff) << 8)
-                | (buf[offset + 3] & 0xff);
+    private static InetSocketAddress literalAddress(String host, int port) {
+        if (host == null || port <= 0 || port > 65535) {
+            return null;
+        }
+        byte[] bytes = NetUtil.createByteArrayFromIpAddressString(host);
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            return new InetSocketAddress(InetAddress.getByAddress(bytes), port);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static boolean validAddress(InetSocketAddress address) {
+        return address != null && address.getAddress() != null && address.getPort() > 0
+                && !address.getAddress().isAnyLocalAddress() && !address.getAddress().isMulticastAddress();
+    }
+
+    private static boolean validPayload(byte[] payload) {
+        return payload != null && payload.length > 0 && payload.length <= FragmentReassembler.MAX_ASSEMBLED_SIZE;
+    }
+
+    private static boolean handshakeUnsigned(RudpPacket.Type type) {
+        return type == RudpPacket.Type.HELLO || type == RudpPacket.Type.HELLO_ACK;
+    }
+
+    private static String groupPrefix(RudpSession session) {
+        return session.remoteConnectionId() + ":";
+    }
+
+    private static int comparePub(byte[] a, byte[] b) {
+        for (int i = 0; i < a.length; i++) {
+            int difference = (a[i] & 255) - (b[i] & 255);
+            if (difference != 0) {
+                return difference;
+            }
+        }
+        return 0;
+    }
+
+    private static long nowMs() {
+        return System.nanoTime() / 1_000_000;
+    }
+
+    synchronized long createInitiatorSessionForTest(InetSocketAddress address) {
+        RudpSession session = connectSession(address, null);
+        return session == null ? -1 : session.remoteConnectionId();
+    }
+
+    synchronized boolean hasRemotePubForTest(InetSocketAddress address) {
+        RudpSession session = sessionsByAddress.get(address);
+        return session != null && session.isAuthenticated();
+    }
+
+    synchronized long remoteConnectionIdForTest(InetSocketAddress address) {
+        RudpSession session = sessionsByAddress.get(address);
+        return session == null ? -1 : session.remoteConnectionId();
+    }
+
+    synchronized int pendingCountForTest(InetSocketAddress address) {
+        RudpSession session = sessionsByAddress.get(address);
+        return session == null ? 0 : session.pending().size();
+    }
+
+    synchronized InetSocketAddress remoteAddressForTest(long cid) {
+        RudpSession session = sessionsByRemoteId.get(cid);
+        return session == null ? null : session.remoteAddress();
     }
 }

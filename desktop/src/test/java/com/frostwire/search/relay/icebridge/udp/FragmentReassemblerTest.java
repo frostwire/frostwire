@@ -4,127 +4,90 @@
  *
  *     Licensed under GPL v3. See LICENSE file.
  */
-
 package com.frostwire.search.relay.icebridge.udp;
+
+import static com.frostwire.search.relay.icebridge.udp.FragmentReassembler.State.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class FragmentReassemblerTest {
+  @Test
+  void reassemblesInOrderAndRetainsCompletionUntilRelease() {
+    FragmentReassembler r = new FragmentReassembler();
+    assertEquals(RETAINED, r.accept("a:1", 0, 2, false, new byte[] {1}).state);
+    FragmentReassembler.Result complete = r.accept("a:1", 1, 2, true, new byte[] {2});
+    assertEquals(COMPLETE, complete.state);
+    assertArrayEquals(new byte[] {1, 2}, complete.payload);
+    assertArrayEquals(complete.payload, r.accept("a:1", 1, 2, true, new byte[] {2}).payload);
+    assertEquals(1, r.pendingGroupCount());
+    r.release("a:1");
+    assertEquals(0, r.pendingGroupCount());
+  }
 
-    @Test
-    void reassemblesInOrderFragments() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("127.0.0.1:1", 0, false, "Hello ".getBytes()));
-        byte[] result = r.addFragment("127.0.0.1:1", 1, true, "World".getBytes());
-        assertNotNull(result);
-        assertEquals("Hello World", new String(result));
-    }
+  @Test
+  void reassemblesOutOfOrder() {
+    FragmentReassembler r = new FragmentReassembler();
+    assertEquals(RETAINED, r.accept("a", 1, 2, true, new byte[] {2}).state);
+    assertArrayEquals(new byte[] {1, 2}, r.accept("a", 0, 2, false, new byte[] {1}).payload);
+  }
 
-    @Test
-    void reassemblesOutOfOrderFragments() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("127.0.0.1:1", 1, true, "World".getBytes()));
-        byte[] result = r.addFragment("127.0.0.1:1", 0, false, "Hello ".getBytes());
-        assertNotNull(result, "should complete when missing fragment arrives");
-        assertEquals("Hello World", new String(result));
+  @Test
+  void rejectsInvalidIndicesTotalsShapesAndPayloadsWithoutAllocation() {
+    FragmentReassembler r = new FragmentReassembler();
+    for (int index : new int[] {-1, 256, Integer.MAX_VALUE}) {
+      assertEquals(REJECTED, r.accept("a", index, 256, true, new byte[] {1}).state);
     }
+    for (int total : new int[] {-1, 0, 257, Integer.MAX_VALUE}) {
+      assertEquals(REJECTED, r.accept("a", 0, total, true, new byte[] {1}).state);
+    }
+    assertEquals(REJECTED, r.accept("a", 0, 2, true, new byte[] {1}).state);
+    assertEquals(REJECTED, r.accept("a", 0, 1, false, new byte[] {1}).state);
+    assertEquals(REJECTED, r.accept("a", 0, 1, true, null).state);
+    assertEquals(REJECTED, r.accept("a", 0, 1, true, new byte[0]).state);
+    assertEquals(REJECTED, r.accept("a", 0, 1, true, new byte[1025]).state);
+    assertEquals(
+        REJECTED,
+        r.accept("a", 0, 1, true, new byte[(int) FragmentReassembler.MAX_ASSEMBLED_SIZE + 1])
+            .state);
+    assertEquals(0, r.pendingGroupCount());
+    assertEquals(RETAINED, r.accept("a", 255, 256, true, new byte[] {1}).state);
+  }
 
-    @Test
-    void rejectsNegativeFragIndex() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", -1, true, "data".getBytes()));
-        assertEquals(0, r.pendingGroupCount());
-    }
+  @Test
+  void duplicateAndConflictingFragmentsDoNotCorruptAcceptedPrefix() {
+    FragmentReassembler r = new FragmentReassembler();
+    assertEquals(RETAINED, r.accept("a", 0, 2, false, new byte[] {1}).state);
+    assertEquals(RETAINED, r.accept("a", 0, 2, false, new byte[] {1}).state);
+    assertEquals(REJECTED, r.accept("a", 0, 2, false, new byte[] {9}).state);
+    assertEquals(REJECTED, r.accept("a", 1, 3, false, new byte[] {2}).state);
+    assertArrayEquals(new byte[] {1, 2}, r.accept("a", 1, 2, true, new byte[] {2}).payload);
+  }
 
-    @Test
-    void rejectsHugeFragIndex() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", Integer.MAX_VALUE, true, "data".getBytes()));
-        assertEquals(0, r.pendingGroupCount());
-    }
+  @Test
+  void independentSessionsAndGroupsNeverCollide() {
+    FragmentReassembler r = new FragmentReassembler();
+    assertEquals(RETAINED, r.accept("a:1", 0, 2, false, new byte[] {1}).state);
+    assertEquals(RETAINED, r.accept("b:1", 0, 2, false, new byte[] {2}).state);
+    assertArrayEquals(new byte[] {1, 3}, r.accept("a:1", 1, 2, true, new byte[] {3}).payload);
+    assertArrayEquals(new byte[] {2, 4}, r.accept("b:1", 1, 2, true, new byte[] {4}).payload);
+    assertFalse(r.hasExpired("a:"));
+    r.removeSession("a:");
+    assertEquals(1, r.pendingGroupCount());
+    r.removeSession("b:");
+    assertEquals(0, r.pendingGroupCount());
+  }
 
-    @Test
-    void rejectsFragIndexAtMaxLimit() {
-        FragmentReassembler r = new FragmentReassembler();
-        int maxIdx = FragmentReassembler.MAX_FRAGMENTS_PER_GROUP - 1;
-        assertNull(r.addFragment("k1", maxIdx, true, "data".getBytes()));
-        assertEquals(1, r.pendingGroupCount());
+  @Test
+  void groupCapacityRejectsWithoutEvictingAcceptedWork() {
+    FragmentReassembler r = new FragmentReassembler();
+    for (int i = 0; i < 64; i++) {
+      assertEquals(RETAINED, r.accept(i + ":1", 0, 2, false, new byte[] {1}).state);
     }
-
-    @Test
-    void rejectsFragIndexAboveMaxLimit() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", FragmentReassembler.MAX_FRAGMENTS_PER_GROUP, true, "data".getBytes()));
-        assertEquals(0, r.pendingGroupCount());
-    }
-
-    @Test
-    void rejectsOversizedAssembly() {
-        FragmentReassembler r = new FragmentReassembler();
-        byte[] huge = new byte[(int) FragmentReassembler.MAX_ASSEMBLED_SIZE + 1];
-        assertNull(r.addFragment("k1", 0, true, huge));
-        assertEquals(0, r.pendingGroupCount());
-    }
-
-    @Test
-    void duplicateFragmentDoesNotCorrupt() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", 0, false, "Hello ".getBytes()));
-        assertNull(r.addFragment("k1", 0, false, "HELLO ".getBytes()));
-        byte[] result = r.addFragment("k1", 1, true, "World".getBytes());
-        assertNotNull(result);
-        assertEquals("Hello World", new String(result));
-    }
-
-    @Test
-    void nullPayloadRejected() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", 0, false, null));
-        assertEquals(0, r.pendingGroupCount());
-    }
-
-    @Test
-    void emptyPayloadRejected() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("k1", 0, false, new byte[0]));
-        assertEquals(0, r.pendingGroupCount());
-    }
-
-    @Test
-    void evictStaleRemovesOldGroups() {
-        FragmentReassembler r = new FragmentReassembler();
-        r.addFragment("k1", 0, false, "partial".getBytes());
-        assertEquals(1, r.pendingGroupCount());
-        r.evictStale();
-        assertEquals(1, r.pendingGroupCount());
-    }
-
-    @Test
-    void multipleGroupsReassembledIndependently() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("peerA:100", 0, false, "A0".getBytes()));
-        assertNull(r.addFragment("peerB:200", 0, false, "B0".getBytes()));
-        byte[] aResult = r.addFragment("peerA:100", 1, true, "A1".getBytes());
-        assertNotNull(aResult);
-        assertEquals("A0A1", new String(aResult));
-        byte[] bResult = r.addFragment("peerB:200", 1, true, "B1".getBytes());
-        assertNotNull(bResult);
-        assertEquals("B0B1", new String(bResult));
-        assertEquals(0, r.pendingGroupCount());
-    }
-
-    @Test
-    void sameGroupIdFromDifferentSendersDoNotCollide() {
-        FragmentReassembler r = new FragmentReassembler();
-        assertNull(r.addFragment("127.0.0.1:1000:1", 0, false, "A0".getBytes()));
-        assertNull(r.addFragment("127.0.0.1:2000:1", 0, false, "B0".getBytes()));
-        byte[] aResult = r.addFragment("127.0.0.1:1000:1", 1, true, "A1".getBytes());
-        assertNotNull(aResult);
-        assertEquals("A0A1", new String(aResult));
-        byte[] bResult = r.addFragment("127.0.0.1:2000:1", 1, true, "B1".getBytes());
-        assertNotNull(bResult);
-        assertEquals("B0B1", new String(bResult));
-    }
+    assertEquals(REJECTED, r.accept("extra", 0, 2, false, new byte[] {1}).state);
+    assertEquals(64, r.pendingGroupCount());
+    assertArrayEquals(new byte[] {1, 2}, r.accept("0:1", 1, 2, true, new byte[] {2}).payload);
+    r.release("0:1");
+    assertEquals(RETAINED, r.accept("extra", 0, 2, false, new byte[] {1}).state);
+  }
 }

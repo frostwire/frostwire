@@ -14,10 +14,12 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * In-memory queues of application payloads received over rUDP or control-plane
@@ -39,10 +41,16 @@ public final class InboundMessageQueue implements RudpMessageListener {
     /** Shared queue for messages without an explicit control-plane target. */
     private static final String SHARED_KEY = "";
 
-    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<InboundMessage>> queues =
-            new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, AtomicInteger> counts = new ConcurrentHashMap<>();
+    private static final int MAX_CONSUMERS = 256;
+    private static final int MAX_MESSAGES = 4096;
+    private static final int MAX_PAYLOAD_BYTES = 256 * 1024;
+    private static final long MAX_BYTES = 16L * 1024 * 1024;
+    private final Map<String, ArrayDeque<InboundMessage>> queues = new HashMap<>();
+    private final Set<String> consumers = new HashSet<>();
     private final int maxSizePerQueue;
+    private boolean sharedConsumerEnabled = true;
+    private int messageCount;
+    private long retainedBytes;
 
     public InboundMessageQueue() {
         this(DEFAULT_MAX_SIZE);
@@ -50,6 +58,41 @@ public final class InboundMessageQueue implements RudpMessageListener {
 
     public InboundMessageQueue(int maxSize) {
         this.maxSizePerQueue = Math.max(1, maxSize);
+    }
+
+    /** Register the sole queue owner before accepting targeted work. Administrator API. */
+    public synchronized boolean registerConsumer(byte[] pub) {
+        if (pub == null || pub.length != 32) {
+            return false;
+        }
+        String key = Hex.encode(pub);
+        if (!consumers.contains(key) && consumers.size() >= MAX_CONSUMERS) {
+            return false;
+        }
+        consumers.add(key);
+        return true;
+    }
+
+    /** Refuses to orphan accepted work; drain before unregistering. */
+    public synchronized boolean unregisterConsumer(byte[] pub) {
+        if (pub == null || pub.length != 32) {
+            return false;
+        }
+        String key = Hex.encode(pub);
+        if (queues.containsKey(key)) {
+            return false;
+        }
+        consumers.remove(key);
+        return true;
+    }
+
+    /** Server lifecycle owner disables this unless an actual shared poller is installed. */
+    public synchronized boolean setSharedConsumerEnabled(boolean enabled) {
+        if (!enabled && queues.containsKey(SHARED_KEY)) {
+            return false;
+        }
+        sharedConsumerEnabled = enabled;
+        return true;
     }
 
     /**
@@ -62,18 +105,12 @@ public final class InboundMessageQueue implements RudpMessageListener {
     }
 
     /**
-     * Offers an inbound rUDP message to the legacy shared queue and, when
-     * possible, mirrors it to the local identity queue. The shared offer is
-     * the delivery decision used for rUDP backpressure.
+     * A registered identity owns delivery exclusively. Otherwise the installed
+     * shared consumer owns it. No mirrors are retained or allowed to gate ACKs.
      */
-    public boolean offerFromRudp(byte[] targetPub, byte[] sourcePub, byte[] payload) {
-        boolean accepted = offerUnwrapped(SHARED_KEY, sourcePub, payload);
-        if (accepted && targetPub != null) {
-            // The mirror is best effort; the shared queue remains the
-            // authoritative bounded delivery queue for reliable rUDP.
-            offerForTarget(targetPub, sourcePub, payload);
-        }
-        return accepted;
+    public synchronized boolean offerFromRudp(byte[] targetPub, byte[] sourcePub, byte[] payload) {
+        String key = targetPub != null && targetPub.length == 32 ? Hex.encode(targetPub) : SHARED_KEY;
+        return offerUnwrapped(consumers.contains(key) ? key : SHARED_KEY, sourcePub, payload);
     }
 
     /**
@@ -86,19 +123,25 @@ public final class InboundMessageQueue implements RudpMessageListener {
      */
     public boolean offerForTarget(byte[] targetPub, byte[] sourcePub, byte[] wireOrAppPayload) {
         if (targetPub == null || targetPub.length != 32) {
-            return offerUnwrapped(SHARED_KEY, sourcePub, wireOrAppPayload);
+            return false;
         }
         return offerUnwrapped(Hex.encode(targetPub), sourcePub, wireOrAppPayload);
     }
 
-    private boolean offerUnwrapped(String targetKey, byte[] sourcePub, byte[] payload) {
+    private synchronized boolean offerUnwrapped(String targetKey, byte[] sourcePub, byte[] payload) {
+        if ((SHARED_KEY.equals(targetKey) ? !sharedConsumerEnabled : !consumers.contains(targetKey))
+                || payload == null || payload.length == 0 || payload.length > MAX_PAYLOAD_BYTES
+                || (sourcePub != null && sourcePub.length != 0 && sourcePub.length != 32)
+                || messageCount >= MAX_MESSAGES || retainedBytes > MAX_BYTES - payload.length - 32) {
+            return false;
+        }
         int protocolId;
         byte[] appPayload;
         try {
             MeshEnvelope env = MeshEnvelope.unwrap(payload);
             protocolId = env.protocolId();
             appPayload = env.payload();
-        } catch (Throwable t) {
+        } catch (IllegalArgumentException t) {
             // Bare app payloads (some RELAY local paths) — treat as SEARCH.
             protocolId = MeshProtocolId.SEARCH;
             appPayload = payload;
@@ -107,16 +150,18 @@ public final class InboundMessageQueue implements RudpMessageListener {
                 return false;
             }
         }
-        ConcurrentLinkedQueue<InboundMessage> queue =
-                queues.computeIfAbsent(targetKey, k -> new ConcurrentLinkedQueue<>());
-        AtomicInteger count = counts.computeIfAbsent(targetKey, k -> new AtomicInteger(0));
-        synchronized (queue) {
-            if (count.get() >= maxSizePerQueue) {
-                return false;
-            }
-            queue.offer(new InboundMessage(sourcePub, appPayload, System.currentTimeMillis(), protocolId));
-            count.incrementAndGet();
+        ArrayDeque<InboundMessage> queue = queues.get(targetKey);
+        if (queue != null && queue.size() >= maxSizePerQueue) {
+            return false;
         }
+        if (queue == null) {
+            queue = new ArrayDeque<>();
+            queues.put(targetKey, queue);
+        }
+        byte[] source = sourcePub == null ? new byte[0] : sourcePub.clone();
+        queue.offer(new InboundMessage(source, appPayload.clone(), System.currentTimeMillis(), protocolId));
+        messageCount++;
+        retainedBytes += source.length + appPayload.length;
         logSuccessfulProtocol(sourcePub, protocolId, appPayload, targetKey);
         return true;
     }
@@ -161,7 +206,9 @@ public final class InboundMessageQueue implements RudpMessageListener {
     }
 
     /**
-     * Legacy poll: drain the shared (non-targeted) queue.
+     * Transfers ownership to the shared caller. HTTP polling is at-most-once,
+     * not application delivery confirmation: a disconnected response can lose
+     * this batch. Reliable HTTP delivery requires a separately negotiated lease.
      */
     public List<InboundMessage> poll(int max) {
         return pollKey(SHARED_KEY, max);
@@ -172,37 +219,37 @@ public final class InboundMessageQueue implements RudpMessageListener {
      */
     public List<InboundMessage> pollForTarget(byte[] targetPub, int max) {
         if (targetPub == null || targetPub.length != 32) {
-            return poll(max);
+            return new ArrayList<>();
         }
         return pollKey(Hex.encode(targetPub), max);
     }
 
-    private List<InboundMessage> pollKey(String key, int max) {
-        int n = Math.max(0, max);
+    private synchronized List<InboundMessage> pollKey(String key, int max) {
+        int n = Math.max(0, Math.min(max, 256));
         List<InboundMessage> result = new ArrayList<>();
-        ConcurrentLinkedQueue<InboundMessage> queue = queues.get(key);
+        ArrayDeque<InboundMessage> queue = queues.get(key);
         if (queue == null) {
             return result;
         }
-        AtomicInteger count = counts.computeIfAbsent(key, k -> new AtomicInteger(0));
-        synchronized (queue) {
-            for (int i = 0; i < n; i++) {
-                InboundMessage m = queue.poll();
-                if (m == null) {
-                    break;
-                }
-                count.decrementAndGet();
-                result.add(m);
+        int bytes = 0;
+        for (int i = 0; i < n; i++) {
+            InboundMessage m = queue.peek();
+            if (m == null || bytes + m.payload().length > MAX_PAYLOAD_BYTES) {
+                break;
             }
+            queue.poll();
+            messageCount--;
+            retainedBytes -= m.sourcePub().length + m.payload().length;
+            bytes += m.payload().length;
+            result.add(m);
+        }
+        if (queue.isEmpty()) {
+            queues.remove(key);
         }
         return result;
     }
 
-    public int size() {
-        int total = 0;
-        for (AtomicInteger c : counts.values()) {
-            total += Math.max(0, c.get());
-        }
-        return total;
+    public synchronized int size() {
+        return messageCount;
     }
 }

@@ -7,164 +7,102 @@
 
 package com.frostwire.search.relay.icebridge.udp;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-/**
- * Reassembles fragmented rUDP payloads.
- *
- * <p>Each fragment group is identified by a 32-bit id (stored in the
- * {@code ackThrough} field of {@link RudpPacket}). Fragments arrive with
- * a 0-based index in the {@code sequence} field. {@link RudpPacket.Type#DATA_FRAG}
- * marks intermediate fragments; {@link RudpPacket.Type#DATA_END} marks the
- * final fragment. When the final fragment arrives and all preceding fragments
- * are present, the reassembled payload is returned.
- *
- * <p>Thread-safety: all methods are synchronized. The session manager calls
- * these from the Netty event loop thread, so contention is minimal.
- */
+/** Bounded retained assemblies. A completed group remains owned until release. */
 final class FragmentReassembler {
-
-    /** Maximum number of concurrent incomplete fragment groups. */
     private static final int MAX_PENDING_GROUPS = 64;
-
-    /** Maximum age of an incomplete fragment group before eviction (ms). */
     private static final long GROUP_TIMEOUT_MS = 30_000;
+    static final int MAX_FRAGMENTS_PER_GROUP = 256;
+    static final long MAX_ASSEMBLED_SIZE = 256L * 1024;
+    // Each slot reserves up to 256 KiB of fragments plus a completed copy.
+    // Thus retained payload bytes are bounded by 32 MiB, including blocked delivery.
+    private final Map<String, Group> groups = new HashMap<>();
 
-    /** Maximum number of fragments per group. Prevents DoS via huge fragIndex. */
-    static final int MAX_FRAGMENTS_PER_GROUP = 4096;
+    enum State { REJECTED, RETAINED, COMPLETE }
 
-    /** Maximum total reassembled payload size (16 MB). */
-    static final long MAX_ASSEMBLED_SIZE = 16L * 1024 * 1024;
+    static final class Result {
+        final State state;
+        final byte[] payload;
 
-    private final Map<String, FragmentGroup> groups = new TreeMap<>();
-
-    /**
-     * Add a fragment. Returns the fully reassembled payload if this fragment
-     * completes the group, or {@code null} if more fragments are needed.
-     *
-     * <p>Rejects fragments with negative indices or indices exceeding
-     * {@link #MAX_FRAGMENTS_PER_GROUP}. Rejects groups whose total
-     * assembled size would exceed {@link #MAX_ASSEMBLED_SIZE}.
-     *
-     * @param groupKey   unique key identifying the fragment group (should include sender identity to prevent cross-session collision)
-     * @param fragIndex  0-based fragment index (from packet.sequence)
-     * @param isLast     true if this is the DATA_END fragment
-     * @param payload    the fragment payload bytes
-     * @return reassembled payload, or null if incomplete or rejected
-     */
-    synchronized byte[] addFragment(String groupKey, int fragIndex, boolean isLast, byte[] payload) {
-        if (fragIndex < 0 || fragIndex >= MAX_FRAGMENTS_PER_GROUP) {
-            return null;
+        Result(State state, byte[] payload) {
+            this.state = state;
+            this.payload = payload;
         }
-        if (payload == null || payload.length == 0) {
-            return null;
-        }
-
-        if (groups.size() >= MAX_PENDING_GROUPS && !groups.containsKey(groupKey)) {
-            evictOldest();
-        }
-        FragmentGroup group = groups.computeIfAbsent(groupKey, k -> new FragmentGroup());
-
-        // Reject if total size would exceed the cap.
-        long projectedSize = (long) group.totalFragmentBytes() + (long) payload.length;
-        if (projectedSize > MAX_ASSEMBLED_SIZE) {
-            groups.remove(groupKey);
-            return null;
-        }
-
-        group.add(fragIndex, payload, isLast);
-        group.lastUpdatedMs = System.currentTimeMillis();
-
-        if (group.isComplete()) {
-            byte[] assembled = group.assemble();
-            groups.remove(groupKey);
-            return assembled;
-        }
-        return null;
     }
 
-    /**
-     * Evict incomplete groups that have exceeded the timeout.
-     */
-    synchronized void evictStale() {
-        long now = System.currentTimeMillis();
-        groups.entrySet().removeIf(e -> now - e.getValue().lastUpdatedMs > GROUP_TIMEOUT_MS);
-    }
-
-    private void evictOldest() {
-        long oldest = Long.MAX_VALUE;
-        String oldestKey = null;
-        for (Map.Entry<String, FragmentGroup> e : groups.entrySet()) {
-            if (e.getValue().lastUpdatedMs < oldest) {
-                oldest = e.getValue().lastUpdatedMs;
-                oldestKey = e.getKey();
+    synchronized Result accept(String key, int index, int total, boolean last, byte[] payload) {
+        if (key == null || total <= 0 || total > MAX_FRAGMENTS_PER_GROUP || index < 0 || index >= total
+                || last != (index == total - 1) || payload == null || payload.length == 0
+                || payload.length > RudpPacket.MAX_FRAGMENT_PAYLOAD) {
+            return new Result(State.REJECTED, null);
+        }
+        Group group = groups.get(key);
+        if (group == null) {
+            if (groups.size() >= MAX_PENDING_GROUPS) {
+                return new Result(State.REJECTED, null);
             }
+            group = new Group(total);
+            groups.put(key, group);
         }
-        if (oldestKey != null) {
-            groups.remove(oldestKey);
+        if (group.fragments.length != total) {
+            return new Result(State.REJECTED, null);
         }
+        byte[] existing = group.fragments[index];
+        if (existing != null && !Arrays.equals(existing, payload)) {
+            return new Result(State.REJECTED, null);
+        }
+        if (existing == null) {
+            if (group.bytes > MAX_ASSEMBLED_SIZE - payload.length) {
+                return new Result(State.REJECTED, null);
+            }
+            group.fragments[index] = payload.clone();
+            group.bytes += payload.length;
+            group.count++;
+        }
+        if (group.count == total) {
+            if (group.completed == null) {
+                group.completed = new byte[group.bytes];
+                int offset = 0;
+                for (byte[] fragment : group.fragments) {
+                    System.arraycopy(fragment, 0, group.completed, offset, fragment.length);
+                    offset += fragment.length;
+                }
+            }
+            return new Result(State.COMPLETE, group.completed);
+        }
+        return new Result(State.RETAINED, null);
+    }
+
+    synchronized void release(String key) {
+        groups.remove(key);
+    }
+
+    synchronized void removeSession(String prefix) {
+        groups.keySet().removeIf(key -> key.startsWith(prefix));
+    }
+
+    synchronized boolean hasExpired(String prefix) {
+        long now = System.nanoTime();
+        return groups.entrySet().stream().anyMatch(e -> e.getKey().startsWith(prefix)
+                && (now - e.getValue().createdNanos) / 1_000_000 > GROUP_TIMEOUT_MS);
     }
 
     synchronized int pendingGroupCount() {
         return groups.size();
     }
 
-    private static final class FragmentGroup {
-        private final TreeMap<Integer, byte[]> fragments = new TreeMap<>();
-        private boolean lastReceived = false;
-        private int lastIndex = -1;
-        private long totalBytes = 0;
-        private volatile long lastUpdatedMs = System.currentTimeMillis();
+    private static final class Group {
+        final byte[][] fragments;
+        final long createdNanos = System.nanoTime();
+        int count;
+        int bytes;
+        byte[] completed;
 
-        void add(int index, byte[] payload, boolean isLast) {
-            if (!fragments.containsKey(index)) {
-                fragments.put(index, payload);
-                totalBytes += payload.length;
-            }
-            if (isLast) {
-                lastReceived = true;
-                lastIndex = index;
-            }
-        }
-
-        long totalFragmentBytes() {
-            return totalBytes;
-        }
-
-        boolean isComplete() {
-            if (!lastReceived || fragments.isEmpty()) {
-                return false;
-            }
-            if (lastIndex >= MAX_FRAGMENTS_PER_GROUP) {
-                return false;
-            }
-            // All indices 0..lastIndex must be present.
-            for (int i = 0; i <= lastIndex; i++) {
-                if (!fragments.containsKey(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        byte[] assemble() {
-            // Use long to detect overflow before allocating.
-            long total = totalBytes;
-            if (total > MAX_ASSEMBLED_SIZE || total < 0) {
-                return null;
-            }
-            byte[] out = new byte[(int) total];
-            int offset = 0;
-            for (int i = 0; i <= lastIndex; i++) {
-                byte[] frag = fragments.get(i);
-                if (frag == null) {
-                    return null;
-                }
-                System.arraycopy(frag, 0, out, offset, frag.length);
-                offset += frag.length;
-            }
-            return out;
+        Group(int total) {
+            fragments = new byte[total][];
         }
     }
 }

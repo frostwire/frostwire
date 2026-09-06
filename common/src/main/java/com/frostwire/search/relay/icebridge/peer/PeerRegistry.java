@@ -43,7 +43,8 @@ public final class PeerRegistry {
     public PeerRegistry(IceBridgeConfig config) {
         this.maxPeers = config.maxPeers();
         // Capacity = max burst in one second; refill = sustained QPS.
-        this.rateLimiter = new RateLimiter(config.maxQpsPerKey(), config.maxQpsPerKey());
+        this.rateLimiter = new RateLimiter(
+                config.maxQpsPerKey(), config.maxQpsPerKey(), maxPeers, 10 * 60_000L);
     }
 
     /**
@@ -52,25 +53,24 @@ public final class PeerRegistry {
      *
      * @return true if the record was accepted
      */
-    public boolean register(PeerRecord record) {
+    public synchronized boolean register(PeerRecord record) {
         if (record == null) {
             return false;
         }
         byte[] pub = record.ed25519Pub();
+        if (pub == null || pub.length != 32 || record.host() == null || record.host().isBlank()
+                || record.host().length() > 253 || record.rudpPort() <= 0 || record.rudpPort() > 65535
+                || (record.icebridgeVersion() != null && record.icebridgeVersion().length() > 64)) {
+            return false;
+        }
+        if (!byPubHex.containsKey(Hex.encode(pub)) && byPubHex.size() >= maxPeers) {
+            return false;
+        }
         if (!rateLimiter.tryAcquire(pub)) {
             LOG.debug("PeerRegistry: rate-limited registration from " + record.ed25519PubHex());
             return false;
         }
         String key = Hex.encode(pub);
-        boolean isNewPeer = !byPubHex.containsKey(key);
-
-        // Reject new identities once we are at capacity. Refreshes of
-        // existing peers are always allowed.
-        if (isNewPeer && byPubHex.size() >= maxPeers) {
-            LOG.warn("PeerRegistry: at capacity (" + maxPeers
-                    + "); dropped new peer " + record.ed25519PubHex());
-            return false;
-        }
 
         byPubHex.merge(key, record, (existing, incoming) -> {
             // Fresher endpoint wins; otherwise keep existing.
@@ -102,12 +102,15 @@ public final class PeerRegistry {
      * demux to in-process rUDP). Peers known only from observation are
      * recorded as CLIENT: deliverable, but never used as mesh forwarders.
      */
-    public void learnObservedEndpoint(byte[] pub, String host, int rudpPort) {
+    public synchronized void learnObservedEndpoint(byte[] pub, String host, int rudpPort) {
         if (pub == null || pub.length != 32 || host == null || host.isBlank()
                 || rudpPort <= 0 || rudpPort > 65535) {
             return;
         }
         String key = Hex.encode(pub);
+        if (host.length() > 253 || (!byPubHex.containsKey(key) && byPubHex.size() >= maxPeers)) {
+            return;
+        }
         byPubHex.compute(key, (k, existing) -> existing != null
                 ? new PeerRecord(existing.ed25519Pub(), host, rudpPort,
                         existing.role(), System.currentTimeMillis(), existing.icebridgeVersion())

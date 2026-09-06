@@ -8,7 +8,6 @@
 package com.frostwire.search.relay.icebridge.udp;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,6 +29,18 @@ final class RudpSession {
     /** Set on inbound HELLO or when HELLO_ACK proves the peer's pub. */
     private volatile byte[] remotePub;
     private final boolean weAreInitiator;
+    private volatile boolean authenticated;
+    byte[] helloPayload;
+    byte[] ackPayload;
+    byte[] transcript;
+    String fragmentKey;
+    int nextFragmentIndex;
+    InetSocketAddress candidateAddress;
+    byte[] pathChallenge;
+    long pathChallengeNanos;
+    private int highestSent;
+    static final int MAX_PENDING_PACKETS = 512;
+    static final int MAX_RETAINED_BYTES = 1024 * 1024;
 
     private volatile long lastActivityMs;
     private final AtomicInteger nextLocalSeq = new AtomicInteger(1);
@@ -43,7 +54,6 @@ final class RudpSession {
      */
     private final ConcurrentNavigableMap<Integer, PendingPacket> pending =
             new ConcurrentSkipListMap<>(Integer::compareUnsigned);
-    private final ConcurrentLinkedQueue<byte[]> heldAppPayloads = new ConcurrentLinkedQueue<>();
 
     RudpSession(long localConnectionId,
                 long remoteConnectionId,
@@ -55,7 +65,7 @@ final class RudpSession {
         this.remoteAddress = remoteAddress;
         this.remotePub = remotePub == null ? null : remotePub.clone();
         this.weAreInitiator = weAreInitiator;
-        this.lastActivityMs = System.currentTimeMillis();
+        this.lastActivityMs = System.nanoTime() / 1_000_000;
     }
 
     long localConnectionId() {
@@ -99,21 +109,19 @@ final class RudpSession {
     }
 
     boolean isAuthenticated() {
-        return remotePub != null;
+        return authenticated;
     }
 
-    void holdAppPayload(byte[] payload) {
-        if (payload != null && payload.length > 0) {
-            heldAppPayloads.add(payload);
+    void authenticate() {
+        if (remotePub == null || transcript == null) {
+            throw new IllegalStateException("Incomplete transcript");
         }
-    }
-
-    byte[] pollHeldAppPayload() {
-        return heldAppPayloads.poll();
+        authenticated = true;
+        markActivity();
     }
 
     void markActivity() {
-        lastActivityMs = System.currentTimeMillis();
+        lastActivityMs = System.nanoTime() / 1_000_000;
     }
 
     long lastActivityMs() {
@@ -121,7 +129,15 @@ final class RudpSession {
     }
 
     int nextLocalSequence() {
+        if (nextLocalSeq.get() == 0) {
+            throw new IllegalStateException("Sequence space exhausted; reconnect required");
+        }
         return nextLocalSeq.getAndIncrement();
+    }
+
+    boolean hasSequenceCapacity(int count) {
+        long next = Integer.toUnsignedLong(nextLocalSeq.get());
+        return count > 0 && next != 0 && count <= 0x1_0000_0000L - next;
     }
 
     int ackedThroughLocal() {
@@ -133,15 +149,19 @@ final class RudpSession {
      * {@code ackThrough} (unsigned comparison). Removes acknowledged
      * entries from the pending map.
      */
-    void ackLocal(int ackThrough) {
+    synchronized boolean ackLocal(int ackThrough) {
+        if (Integer.compareUnsigned(ackThrough, highestSent) > 0) {
+            return false;
+        }
         int current;
         do {
             current = ackedThroughLocal.get();
             if (Integer.compareUnsigned(ackThrough, current) <= 0) {
-                return;
+                return true;
             }
         } while (!ackedThroughLocal.compareAndSet(current, ackThrough));
         pending.headMap(ackThrough, true).clear();
+        return true;
     }
 
     int receivedThroughRemote() {
@@ -166,15 +186,50 @@ final class RudpSession {
             // Integer overflow wraps MAX_VALUE+1 → MIN_VALUE, which is
             // the correct "next" value under unsigned semantics.
             if (sequence != current + 1) {
-                return false; // gap — v1 requires in-order
+                return false; // gap; retry when the prefix has been admitted
             }
         } while (!receivedThroughRemote.compareAndSet(current, sequence));
         markActivity();
         return true;
     }
 
-    void addPending(int sequence, PendingPacket packet) {
+    synchronized boolean addPending(int sequence, PendingPacket packet) {
+        if (pending.size() >= MAX_PENDING_PACKETS
+                || retainedBytes() > MAX_RETAINED_BYTES - 2L * (packet.packet.size() + RudpAuth.SIGNATURE_LENGTH)) {
+            return false;
+        }
         pending.put(sequence, packet);
+        return true;
+    }
+
+    synchronized long retainedBytes() {
+        long bytes = 0;
+        for (PendingPacket packet : pending.values()) {
+            // Pending owns both the plaintext packet and its cached signed wire copy.
+            bytes += 2L * (packet.packet.size() + RudpAuth.SIGNATURE_LENGTH);
+        }
+        return bytes;
+    }
+
+    synchronized void markSent(int sequence) {
+        if (Integer.compareUnsigned(sequence, highestSent) > 0) {
+            highestSent = sequence;
+        }
+    }
+
+    synchronized boolean validAck(int ackThrough) {
+        return Integer.compareUnsigned(ackThrough, highestSent) <= 0;
+    }
+
+    synchronized void clear() {
+        pending.clear();
+        authenticated = false;
+        transcript = null;
+        helloPayload = null;
+        ackPayload = null;
+        fragmentKey = null;
+        candidateAddress = null;
+        pathChallenge = null;
     }
 
     ConcurrentNavigableMap<Integer, PendingPacket> pending() {
@@ -193,15 +248,4 @@ final class RudpSession {
                 nextLocalSequence(), receivedThroughRemote.get(), payload);
     }
 
-    /**
-     * Prepare a HELLO_ACK carrying this node's signed identity so the
-     * initiator can learn remotePub (same payload shape as HELLO).
-     */
-    RudpPacket helloAck(byte[] signedHelloPayload) {
-        if (signedHelloPayload == null) {
-            signedHelloPayload = new byte[0];
-        }
-        return new RudpPacket(RudpPacket.Type.HELLO_ACK, remoteConnectionId,
-                0, 0, signedHelloPayload);
-    }
 }

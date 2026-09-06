@@ -7,111 +7,154 @@
 
 package com.frostwire.search.relay.icebridge.udp;
 
-import java.security.PublicKey;
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.icebridge.IceBridgeAuth;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.util.Arrays;
 
 /**
- * Authentication helpers for rUDP session setup.
+ * Version 2 migration: Ed25519 signatures provide integrity, NOT encryption or
+ * forward secrecy. This is a versioned application protocol, not TLS/DTLS and
+ * not a claim of a formally verified secure channel. Do not accept v1 fallback.
  *
- * <p>A {@link RudpPacket.Type#HELLO} payload is expected to contain:
- * <pre>
- *   [32 bytes] Ed25519 public key (raw)
- *   [8 bytes]  Unix timestamp (big-endian, seconds)
- *   [64 bytes] Ed25519 signature over (connectionId || timestamp)
- * </pre>
- *
- * <p>The timestamp prevents indefinite replay of captured HELLO packets.
- * A HELLO with a timestamp older than {@link #MAX_HELLO_SKEW_SEC} seconds
- * is rejected.
+ * <p>HELLO contains initiator pub, intended responder (zero only for explicit
+ * identity discovery), fresh 32-byte challenge and timestamp. HELLO_ACK binds
+ * both peers, the complete HELLO digest and a fresh responder challenge. FINISH
+ * proves the initiator saw that response; READY confirms responder acceptance.
+ * Every later packet signs the transcript digest, sender, recipient, version,
+ * type, CID, sequence, ACK and exact payload. No session or routing mutation may
+ * precede verification. Addresses are deliberately not signed (NAT); replayed
+ * packets must never authorize migration. Discovery without an expected key
+ * proves possession only, not an externally trusted identity.
  */
 final class RudpAuth {
-
-    /** Maximum acceptable age of a HELLO packet (seconds). */
-    static final long MAX_HELLO_SKEW_SEC = 300;
-
-    /** HELLO payload length: pub (32) + timestamp (8) + sig (64). */
-    static final int HELLO_PAYLOAD_LENGTH = 104;
+    static final long MAX_HELLO_SKEW_SEC = 60;
+    static final int SIGNATURE_LENGTH = 64;
+    static final int HELLO_PAYLOAD_LENGTH = 168;
+    static final int ACK_PAYLOAD_LENGTH = 192;
+    private static final byte[] DOMAIN = "FrostWire-IceBridge-rUDP-v2".getBytes(StandardCharsets.US_ASCII);
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private RudpAuth() {
     }
 
-    static boolean verifyHello(long connectionId, byte[] payload) {
+    static byte[] createHelloPayload(IdentityKeys identity, long cid) throws Exception {
+        return createHelloPayload(identity, cid, null);
+    }
+
+    static byte[] createHelloPayload(IdentityKeys identity, long cid, byte[] expectedPub) throws Exception {
+        byte[] nonce = new byte[32];
+        RANDOM.nextBytes(nonce);
+        byte[] body = ByteBuffer.allocate(104).put(identity.ed25519PubRaw())
+                .put(expectedPub == null ? new byte[32] : expectedPub).put(nonce)
+                .putLong(System.currentTimeMillis() / 1000L).array();
+        return signBody(identity, RudpPacket.Type.HELLO, cid, body);
+    }
+
+    static boolean verifyHello(long cid, byte[] payload) {
         if (payload == null || payload.length != HELLO_PAYLOAD_LENGTH) {
             return false;
         }
-        byte[] pub = Arrays.copyOfRange(payload, 0, 32);
-        long timestamp = readLongBE(payload, 32);
-        byte[] sig = Arrays.copyOfRange(payload, 40, 104);
-
         long now = System.currentTimeMillis() / 1000L;
-        long diff = now - timestamp;
-        long skew = diff >= 0 ? diff : -diff;
-        if (skew > MAX_HELLO_SKEW_SEC) {
-            return false;
-        }
-
-        // Signed message: connectionId (8 bytes) || timestamp (8 bytes)
-        byte[] message = new byte[16];
-        writeLongBE(message, 0, connectionId);
-        writeLongBE(message, 8, timestamp);
-
-        return verifySignature(pub, sig, message);
+        long timestamp = ByteBuffer.wrap(payload, 96, 8).getLong();
+        return timestamp >= now - MAX_HELLO_SKEW_SEC && timestamp <= now + MAX_HELLO_SKEW_SEC
+                && verifyBody(RudpPacket.Type.HELLO, cid, payload);
     }
 
-    private static boolean verifySignature(byte[] pub, byte[] sig, byte[] message) {
-        PublicKey key;
-        try {
-            key = com.frostwire.search.relay.icebridge.IceBridgeAuth.publicKeyFromRaw(pub);
-        } catch (Throwable t) {
-            return false;
-        }
-        try {
-            Signature verifier = com.frostwire.search.relay.IdentityKeys.softwareSignature("Ed25519");
-            verifier.initVerify(key);
-            verifier.update(message);
-            return verifier.verify(sig);
-        } catch (Throwable t) {
-            return false;
-        }
+    static boolean intendedFor(byte[] hello, byte[] pub) {
+        byte[] expected = Arrays.copyOfRange(hello, 32, 64);
+        return Arrays.equals(expected, new byte[32]) || Arrays.equals(expected, pub);
     }
 
-    static byte[] createHelloPayload(com.frostwire.search.relay.IdentityKeys identity, long connectionId)
+    static byte[] createAckPayload(IdentityKeys identity, long cid, byte[] hello) throws Exception {
+        byte[] nonce = new byte[32];
+        RANDOM.nextBytes(nonce);
+        byte[] body = ByteBuffer.allocate(128).put(identity.ed25519PubRaw())
+                .put(hello, 0, 32).put(digest(hello)).put(nonce).array();
+        return signBody(identity, RudpPacket.Type.HELLO_ACK, cid, body);
+    }
+
+    static boolean verifyAck(long cid, byte[] hello, byte[] ack) {
+        return hello != null && ack != null && ack.length == ACK_PAYLOAD_LENGTH
+                && Arrays.equals(Arrays.copyOfRange(hello, 0, 32), Arrays.copyOfRange(ack, 32, 64))
+                && Arrays.equals(digest(hello), Arrays.copyOfRange(ack, 64, 96))
+                && intendedFor(hello, Arrays.copyOfRange(ack, 0, 32))
+                && verifyBody(RudpPacket.Type.HELLO_ACK, cid, ack);
+    }
+
+    static byte[] transcript(byte[] hello, byte[] ack) {
+        return digest(ByteBuffer.allocate(hello.length + ack.length).put(hello).put(ack).array());
+    }
+
+    static RudpPacket protect(IdentityKeys identity, byte[] peer, byte[] transcript, RudpPacket packet)
             throws Exception {
-        long timestamp = System.currentTimeMillis() / 1000L;
-        Signature signer = com.frostwire.search.relay.IdentityKeys.softwareSignature("Ed25519");
+        byte[] body = packet.payload();
+        Signature signer = IdentityKeys.softwareSignature("Ed25519");
         signer.initSign(identity.ed25519().getPrivate());
-        byte[] message = new byte[16];
-        writeLongBE(message, 0, connectionId);
-        writeLongBE(message, 8, timestamp);
-        signer.update(message);
-        byte[] sig = signer.sign();
-        byte[] out = new byte[HELLO_PAYLOAD_LENGTH];
-        System.arraycopy(identity.ed25519PubRaw(), 0, out, 0, 32);
-        writeLongBE(out, 32, timestamp);
-        System.arraycopy(sig, 0, out, 40, 64);
-        return out;
+        signer.update(packetBytes(identity.ed25519PubRaw(), peer, transcript, packet));
+        byte[] payload = ByteBuffer.allocate(body.length + SIGNATURE_LENGTH).put(body).put(signer.sign()).array();
+        return new RudpPacket(packet.type(), packet.connectionId(), packet.sequence(), packet.ackThrough(), payload);
     }
 
-    private static void writeLongBE(byte[] buf, int offset, long value) {
-        buf[offset] = (byte) (value >>> 56);
-        buf[offset + 1] = (byte) (value >>> 48);
-        buf[offset + 2] = (byte) (value >>> 40);
-        buf[offset + 3] = (byte) (value >>> 32);
-        buf[offset + 4] = (byte) (value >>> 24);
-        buf[offset + 5] = (byte) (value >>> 16);
-        buf[offset + 6] = (byte) (value >>> 8);
-        buf[offset + 7] = (byte) value;
+    static RudpPacket unprotect(byte[] peer, byte[] local, byte[] transcript, RudpPacket packet) {
+        byte[] payload = packet.payload();
+        if (peer == null || transcript == null || payload.length < SIGNATURE_LENGTH) {
+            return null;
+        }
+        byte[] body = Arrays.copyOf(payload, payload.length - SIGNATURE_LENGTH);
+        RudpPacket plain = new RudpPacket(packet.type(), packet.connectionId(), packet.sequence(), packet.ackThrough(), body);
+        return verify(peer, Arrays.copyOfRange(payload, body.length, payload.length),
+                packetBytes(peer, local, transcript, plain)) ? plain : null;
     }
 
-    private static long readLongBE(byte[] buf, int offset) {
-        return ((long) (buf[offset] & 0xff) << 56)
-                | ((long) (buf[offset + 1] & 0xff) << 48)
-                | ((long) (buf[offset + 2] & 0xff) << 40)
-                | ((long) (buf[offset + 3] & 0xff) << 32)
-                | ((long) (buf[offset + 4] & 0xff) << 24)
-                | ((long) (buf[offset + 5] & 0xff) << 16)
-                | ((long) (buf[offset + 6] & 0xff) << 8)
-                | (buf[offset + 7] & 0xff);
+    private static byte[] packetBytes(byte[] sender, byte[] recipient, byte[] transcript, RudpPacket packet) {
+        byte[] body = packet.payload();
+        return ByteBuffer.allocate(DOMAIN.length + 2 + 32 + 32 + 32 + 8 + 4 + 4 + 4 + body.length)
+                .put(DOMAIN).put((byte) RudpPacket.VERSION).put((byte) packet.type().code())
+                .put(sender).put(recipient).put(transcript).putLong(packet.connectionId())
+                .putInt(packet.sequence()).putInt(packet.ackThrough()).putInt(body.length).put(body).array();
+    }
+
+    private static byte[] signBody(IdentityKeys identity, RudpPacket.Type role, long cid, byte[] body)
+            throws Exception {
+        Signature signer = IdentityKeys.softwareSignature("Ed25519");
+        signer.initSign(identity.ed25519().getPrivate());
+        signer.update(handshakeBytes(role, cid, body));
+        return ByteBuffer.allocate(body.length + SIGNATURE_LENGTH).put(body).put(signer.sign()).array();
+    }
+
+    private static boolean verifyBody(RudpPacket.Type role, long cid, byte[] payload) {
+        int length = payload.length - SIGNATURE_LENGTH;
+        return verify(Arrays.copyOf(payload, 32), Arrays.copyOfRange(payload, length, payload.length),
+                handshakeBytes(role, cid, Arrays.copyOf(payload, length)));
+    }
+
+    private static byte[] handshakeBytes(RudpPacket.Type role, long cid, byte[] body) {
+        return ByteBuffer.allocate(DOMAIN.length + 2 + 8 + body.length).put(DOMAIN)
+                .put((byte) RudpPacket.VERSION).put((byte) role.code()).putLong(cid).put(body).array();
+    }
+
+    private static boolean verify(byte[] pub, byte[] signature, byte[] bytes) {
+        try {
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
+            verifier.initVerify(IceBridgeAuth.publicKeyFromRaw(pub));
+            verifier.update(bytes);
+            return verifier.verify(signature);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static byte[] digest(byte[] bytes) {
+        try {
+            return MessageDigest.getInstance("SHA-256").digest(bytes);
+        } catch (Exception e) {
+            throw new IllegalStateException("SHA-256 unavailable", e);
+        }
     }
 }

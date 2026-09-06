@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * <p>Endpoints:
  * <ul>
  *   <li>{@code POST /register} — register or refresh a peer identity and endpoint (signed).</li>
+ *   <li>{@code POST /consumer} — enable/disable an authoritative identity queue (administrator).</li>
  *   <li>{@code POST /route} — add a peer to the registry without a signature (localhost-only trust).</li>
  *   <li>{@code GET /lookup?count=N} — return up to N forward-capable peers.</li>
  *   <li>{@code POST /send} — send an opaque payload to a target peer.</li>
@@ -57,6 +58,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private static final Gson GSON = new Gson();
     private static final int DEFAULT_LOOKUP_COUNT = 10;
     private static final int DEFAULT_POLL_COUNT = 64;
+    private static final int MAX_BODY_BYTES = 64 * 1024;
 
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
@@ -99,8 +101,15 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
 
         try {
             ApiResponse<?> response;
+            if (request.content().readableBytes() > MAX_BODY_BYTES) {
+                sendJson(ctx, request, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE,
+                        ApiResponse.error("request body too large"));
+                return;
+            }
             if (method == HttpMethod.POST && "/register".equals(path)) {
                 response = handleRegister(request);
+            } else if (method == HttpMethod.POST && "/consumer".equals(path)) {
+                response = handleConsumer(request);
             } else if (method == HttpMethod.POST && "/route".equals(path)) {
                 response = handleRoute(request);
             } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
@@ -117,7 +126,9 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = ApiResponse.error("unknown endpoint: " + method + " " + path);
             }
             sendJson(ctx, request, response.ok ? HttpResponseStatus.OK : HttpResponseStatus.BAD_REQUEST, response);
-        } catch (Throwable t) {
+        } catch (com.google.gson.JsonParseException | IllegalArgumentException e) {
+            sendJson(ctx, request, HttpResponseStatus.BAD_REQUEST, ApiResponse.error("invalid request"));
+        } catch (RuntimeException t) {
             LOG.warn("Control handler error", t);
             metrics.controlError();
             sendJson(ctx, request, HttpResponseStatus.INTERNAL_SERVER_ERROR,
@@ -158,9 +169,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         }
 
         long nowSec = System.currentTimeMillis() / 1000L;
-        long diff = nowSec - req.timestamp;
-        long tsSkew = diff >= 0 ? diff : -diff;
-        if (tsSkew > 60) {
+        if (req.timestamp < nowSec - 60 || req.timestamp > nowSec + 60) {
             return ApiResponse.error("timestamp skew too large");
         }
 
@@ -178,10 +187,32 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         return req.canonicalString().getBytes(StandardCharsets.UTF_8);
     }
 
+    private ApiResponse<String> handleConsumer(FullHttpRequest request) {
+        ConsumerRequest req = decodeBody(request, ConsumerRequest.class);
+        if (inboundQueue == null || req == null || req.pub == null || req.enabled == null) {
+            return ApiResponse.error("pub and enabled required");
+        }
+        byte[] pub;
+        try {
+            pub = IceBridgeAuth.decodeBase64(req.pub);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid pub");
+        }
+        boolean accepted = req.enabled ? inboundQueue.registerConsumer(pub)
+                : inboundQueue.unregisterConsumer(pub);
+        return accepted ? ApiResponse.success("consumer updated")
+                : ApiResponse.error("invalid identity, capacity, or pending work");
+    }
+
+    private static final class ConsumerRequest {
+        String pub;
+        Boolean enabled;
+    }
+
     /**
-     * Localhost-trusted endpoint that adds a peer to the registry without
-     * requiring a signature. Only the co-located FrostWire process can
-     * call this (the control server binds to 127.0.0.1).
+     * Administrator-authorized endpoint that adds a routing hint without an
+     * identity signature. A hint is not endpoint proof; rUDP pins and challenges
+     * the expected identity before sending application data.
      */
     private ApiResponse<String> handleRoute(FullHttpRequest request) {
         RouteRequest req = decodeBody(request, RouteRequest.class);
@@ -299,15 +330,17 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         // Optional ?pub= base64url client identity for multi USE_REMOTE demux.
         byte[] clientPub = null;
         List<String> pubParams = decoder.parameters().get("pub");
-        if (pubParams != null && !pubParams.isEmpty() && pubParams.get(0) != null
-                && !pubParams.get(0).isEmpty()) {
+        if (pubParams != null) {
+            if (pubParams.size() != 1 || pubParams.get(0) == null || pubParams.get(0).isEmpty()) {
+                return ApiResponse.error("invalid pub");
+            }
             try {
                 clientPub = IceBridgeAuth.decodeBase64(pubParams.get(0));
                 if (clientPub.length != 32) {
-                    clientPub = null;
+                    return ApiResponse.error("invalid pub");
                 }
             } catch (IllegalArgumentException ignored) {
-                clientPub = null;
+                return ApiResponse.error("invalid pub");
             }
         }
         List<InboundMessage> drained = clientPub != null

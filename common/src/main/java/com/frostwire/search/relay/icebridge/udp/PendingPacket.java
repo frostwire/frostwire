@@ -19,6 +19,8 @@ final class PendingPacket {
     volatile long firstSentMs;
     volatile long lastSentMs;
     volatile int retries;
+    RudpPacket wirePacket;
+    boolean sent;
 
     PendingPacket(RudpPacket packet, InetSocketAddress recipient, long nowMs) {
         this.packet = packet;

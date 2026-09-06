@@ -17,7 +17,7 @@ public final class IceBridgeConstants {
     }
 
     /** Protocol version for inter-servent rUDP framing. */
-    public static final int PROTOCOL_VERSION = 1;
+    public static final int PROTOCOL_VERSION = 2;
 
     /**
      * Monotonic software release code advertised by this IceBridge build.

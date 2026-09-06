@@ -7,7 +7,6 @@
 
 package com.frostwire.search.relay.icebridge.udp;
 
-import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -21,18 +20,14 @@ import java.util.Objects;
  *   payload(n)
  * </pre>
  *
- * <p>For fragmented data ({@link Type#DATA_FRAG} and {@link Type#DATA_END}),
- * the fields are repurposed:
- * <ul>
- *   <li>{@code sequence} — fragment index within the group (0-based)</li>
- *   <li>{@code ackThrough} — fragment group id (random, shared by all
- *       fragments of the same logical payload)</li>
- * </ul>
+ * <p>Fragmented data retains ordinary sequence/ACK semantics. Its signed payload
+ * starts with group id, fragment index and total count (three big-endian ints).
  */
 public final class RudpPacket {
 
     public static final short MAGIC = (short) 0x4677; // "Fw"
-    public static final int VERSION = 1;
+    /** Incompatible with unauthenticated v1; no downgrade is supported. */
+    public static final int VERSION = com.frostwire.search.relay.icebridge.IceBridgeConstants.PROTOCOL_VERSION;
     public static final int HEADER_SIZE = 2 + 1 + 1 + 8 + 4 + 4 + 2; // 22
 
     /**
@@ -42,6 +37,7 @@ public final class RudpPacket {
      * path MTU after tunneling overhead.
      */
     public static final int MAX_FRAGMENT_PAYLOAD = 1024;
+    public static final int MAX_WIRE_PAYLOAD = MAX_FRAGMENT_PAYLOAD + 128;
 
     public enum Type {
         HELLO(0x01),
@@ -53,7 +49,11 @@ public final class RudpPacket {
         RELAY(0x07),
         RELAY_RESPONSE(0x08),
         DATA_FRAG(0x09),
-        DATA_END(0x0A);
+        DATA_END(0x0A),
+        HELLO_FINISH(0x0B),
+        HELLO_READY(0x0C),
+        PATH_CHALLENGE(0x0D),
+        PATH_RESPONSE(0x0E);
 
         private final int code;
 
