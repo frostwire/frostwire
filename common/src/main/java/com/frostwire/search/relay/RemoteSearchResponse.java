@@ -11,7 +11,9 @@ import com.frostwire.util.Hex;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,8 @@ public final class RemoteSearchResponse {
      * are split into multiple signed chunks ending with {@code final=true}.
      */
     public static final int DEFAULT_STREAM_CHUNK_SIZE = 5;
+    public static final int MAX_STREAM_CHUNKS = 128;
+    public static final int MAX_STREAM_BYTES = 256 * 1024;
 
     private final int version;
     private final byte[] nonce;
@@ -251,7 +255,8 @@ public final class RemoteSearchResponse {
             Object rowsObj = m.get("rows");
             Object sigObj = m.get("sig");
             if (vObj == null || nonceObj == null || tsObj == null
-                    || sigObj == null || rowsObj == null) {
+                    || sigObj == null || !(rowsObj instanceof List)
+                    || ((String) nonceObj).length() > 88 || ((String) sigObj).length() > 88) {
                 return null;
             }
             byte[] nonce = Base64.getDecoder().decode((String) nonceObj);
@@ -259,14 +264,26 @@ public final class RemoteSearchResponse {
             int chunk = 0;
             Object chunkObj = m.get("chunk");
             if (chunkObj instanceof Number) {
+                if (((Number) chunkObj).longValue() < 0
+                        || ((Number) chunkObj).longValue() >= MAX_STREAM_CHUNKS
+                        || ((Number) chunkObj).doubleValue() != ((Number) chunkObj).longValue()) {
+                    return null;
+                }
                 chunk = ((Number) chunkObj).intValue();
+            } else if (chunkObj != null) {
+                return null;
             }
             boolean isFinal = true;
             Object finalObj = m.get("final");
             if (finalObj instanceof Boolean) {
                 isFinal = (Boolean) finalObj;
             } else if (finalObj instanceof Number) {
+                if (((Number) finalObj).doubleValue() != 0 && ((Number) finalObj).doubleValue() != 1) {
+                    return null;
+                }
                 isFinal = ((Number) finalObj).intValue() != 0;
+            } else if (finalObj != null) {
+                return null;
             }
             RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
                     .version(((Number) vObj).intValue())
@@ -277,6 +294,9 @@ public final class RemoteSearchResponse {
                     .signature(sig);
             if (rowsObj instanceof List) {
                 List<?> rlist = (List<?>) rowsObj;
+                if (rlist.size() > RemoteSearchRequest.MAX_LIMIT) {
+                    return null;
+                }
                 for (Object ro : rlist) {
                     if (!(ro instanceof Map)) {
                         return null;
@@ -291,11 +311,17 @@ public final class RemoteSearchResponse {
                             || fcObj == null || pubObj == null) {
                         return null;
                     }
+                    if (((String) ihObj).length() != 40 || ((String) pubObj).length() > 44) {
+                        return null;
+                    }
                     byte[] ih = Hex.decode((String) ihObj);
                     byte[] pub = Base64.getDecoder().decode((String) pubObj);
                     byte[] nid = null;
                     Object nidObj = row.get("nid");
                     if (nidObj != null) {
+                        if (((String) nidObj).length() != 40) {
+                            return null;
+                        }
                         nid = Hex.decode((String) nidObj);
                     }
                     String matchedFile = null;
@@ -359,8 +385,9 @@ public final class RemoteSearchResponse {
             if (infoHash == null || infoHash.length != 20) {
                 throw new IllegalArgumentException("infoHash must be 20 bytes");
             }
-            if (name == null) {
-                throw new IllegalArgumentException("name is null");
+            if (name == null || name.length() > 2048
+                    || matchedFile != null && matchedFile.length() > 8192) {
+                throw new IllegalArgumentException("row text exceeds bounds");
             }
             if (publisherEd25519Pub == null || publisherEd25519Pub.length != 32) {
                 throw new IllegalArgumentException("publisherEd25519Pub must be 32 bytes");
@@ -370,6 +397,9 @@ public final class RemoteSearchResponse {
             this.sizeBytes = sizeBytes;
             this.fileCount = fileCount;
             this.publisherEd25519Pub = publisherEd25519Pub.clone();
+            if (publisherNodeId != null && publisherNodeId.length != 20) {
+                throw new IllegalArgumentException("publisherNodeId must be 20 bytes");
+            }
             this.publisherNodeId = publisherNodeId == null ? null : publisherNodeId.clone();
             this.matchedFile = matchedFile;
             if (seederEndpoints == null || seederEndpoints.isEmpty()) {
@@ -384,6 +414,90 @@ public final class RemoteSearchResponse {
                 }
                 this.seederEndpoints = java.util.Collections.unmodifiableList(copy);
             }
+        }
+    }
+
+    /**
+     * Bounded single-holder stream. Callers authenticate and correlate before add.
+     * An identical duplicate is harmless; conflicts permanently invalidate the
+     * stream. Results become available only after every index through final.
+     */
+    public static final class Collector {
+        private final int maxRows;
+        private final int maxBytes;
+        private final Map<Integer, RemoteSearchResponse> chunks = new LinkedHashMap<>();
+        private int finalIndex = -1;
+        private int rowCount;
+        private int byteCount;
+        private byte[] nonce;
+        private boolean failed;
+
+        public Collector(int maxRows, int maxBytes) {
+            if (maxRows <= 0 || maxRows > RemoteSearchRequest.MAX_LIMIT
+                    || maxBytes <= 0 || maxBytes > MAX_STREAM_BYTES) {
+                throw new IllegalArgumentException("invalid stream budget");
+            }
+            this.maxRows = maxRows;
+            this.maxBytes = maxBytes;
+        }
+
+        public synchronized boolean add(RemoteSearchResponse response, int encodedBytes) {
+            if (failed || response == null) {
+                return false;
+            }
+            int index = response.chunkIndex;
+            RemoteSearchResponse prior = chunks.get(index);
+            if (prior != null) {
+                if (Arrays.equals(prior.canonicalBytes(), response.canonicalBytes())) {
+                    return true;
+                }
+                failed = true;
+            } else if (index < 0 || index >= MAX_STREAM_CHUNKS
+                    || encodedBytes <= 0 || encodedBytes > maxBytes - byteCount
+                    || response.rows.size() > maxRows - rowCount
+                    || nonce != null && !Arrays.equals(nonce, response.nonce)
+                    || finalIndex >= 0 && (index > finalIndex || response.finalChunk && index != finalIndex)
+                    || response.finalChunk && chunks.keySet().stream().anyMatch(i -> i > index)) {
+                failed = true;
+            } else {
+                nonce = response.nonce;
+                chunks.put(index, response);
+                byteCount += encodedBytes;
+                rowCount += response.rows.size();
+                if (response.finalChunk) {
+                    finalIndex = index;
+                }
+                return true;
+            }
+            chunks.clear();
+            return false;
+        }
+
+        public synchronized boolean isComplete() {
+            return !failed && finalIndex >= 0 && chunks.size() == finalIndex + 1;
+        }
+
+        public synchronized boolean isFailed() {
+            return failed;
+        }
+
+        public synchronized int byteCount() {
+            return byteCount;
+        }
+
+        public synchronized int rowCount() {
+            return rowCount;
+        }
+
+        public synchronized List<RemoteSearchResponse> responses() {
+            if (!isComplete()) {
+                return Collections.emptyList();
+            }
+            List<RemoteSearchResponse> ordered = new ArrayList<>(chunks.size());
+            for (int i = 0; i <= finalIndex; i++) {
+                ordered.add(chunks.get(i));
+            }
+            return ordered;
         }
     }
 
@@ -419,7 +533,7 @@ public final class RemoteSearchResponse {
         }
 
         public Builder chunkIndex(int chunkIndex) {
-            this.chunkIndex = Math.max(0, chunkIndex);
+            this.chunkIndex = chunkIndex;
             return this;
         }
 
@@ -461,7 +575,11 @@ public final class RemoteSearchResponse {
         }
 
         public RemoteSearchResponse build() {
-            if (nonce == null || nonce.length == 0) {
+            if (chunkIndex < 0 || chunkIndex >= MAX_STREAM_CHUNKS
+                    || rows.size() > RemoteSearchRequest.MAX_LIMIT) {
+                throw new IllegalStateException("response exceeds stream bounds");
+            }
+            if (nonce == null || nonce.length == 0 || nonce.length > 64) {
                 throw new IllegalStateException("nonce is required");
             }
             if (signature == null || signature.length != 64) {

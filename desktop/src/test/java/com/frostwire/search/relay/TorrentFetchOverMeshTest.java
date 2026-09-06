@@ -48,12 +48,14 @@ class TorrentFetchOverMeshTest {
 
   @AfterEach
   void tearDown() {
+    java.util.Collections.reverse(resources);
     for (AutoCloseable r : resources) {
       try {
         r.close();
       } catch (Throwable ignored) {
       }
     }
+    resources.clear();
   }
 
   @Test
@@ -63,11 +65,9 @@ class TorrentFetchOverMeshTest {
 
     crossRegister(requester, holder);
 
-    byte[] infoHash = new byte[20];
-    new SecureRandom().nextBytes(infoHash);
-    // > 1 chunk to force multi-frame streaming
-    byte[] torrentBytes = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES * 2 + 123];
-    new SecureRandom().nextBytes(torrentBytes);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    // Genuine bounded metadata with a comment large enough to exercise streaming.
+    byte[] torrentBytes = TestTorrentMetadata.bytes(1000);
     holder.provider.delegate = infoHash1 -> infoHash1 == null ? null : torrentBytes;
 
     byte[] fetched =
@@ -105,6 +105,72 @@ class TorrentFetchOverMeshTest {
 
     assertNull(fetched, "NOT_FOUND must yield null");
     assertTrue(elapsed < 8_000, "signed NOT_FOUND should fast-fallback, took " + elapsed + "ms");
+  }
+
+  @Test
+  void cachedMetadataIsWithdrawnWithoutRestartingHolder() throws Exception {
+    Instance requester = startInstance("withdraw-requester");
+    Instance holder = startInstance("withdraw-holder");
+    crossRegister(requester, holder);
+    byte[] torrent = TestTorrentMetadata.bytes(500);
+    java.util.concurrent.atomic.AtomicInteger reads =
+        new java.util.concurrent.atomic.AtomicInteger();
+    holder.provider.delegate =
+        hash -> {
+          reads.incrementAndGet();
+          return torrent;
+        };
+    assertArrayEquals(
+        torrent,
+        MeshTorrentMetadataFetcher.fetch(
+            requester.transport,
+            requester.identity,
+            holder.identity.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            10_000));
+    holder.provider.publiclyShared = false;
+    int beforeWithdrawal = reads.get();
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            requester.transport,
+            requester.identity,
+            holder.identity.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            10_000));
+    org.junit.jupiter.api.Assertions.assertEquals(
+        beforeWithdrawal,
+        reads.get(),
+        "revoked metadata must not access the provider or its positive cache");
+    holder.provider.publiclyShared = true;
+    holder.provider.handlerPublic = false;
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            requester.transport,
+            requester.identity,
+            holder.identity.ed25519PubRaw(),
+            TestTorrentMetadata.infoHash(),
+            10_000));
+    org.junit.jupiter.api.Assertions.assertEquals(
+        beforeWithdrawal,
+        reads.get(),
+        "direct handler policy must deny even when the provider authorizes metadata");
+  }
+
+  @Test
+  void signedMetadataWithWrongActualHashIsRejectedOverRudp() throws Exception {
+    Instance requester = startInstance("wrong-requester");
+    Instance holder = startInstance("wrong-holder");
+    crossRegister(requester, holder);
+    holder.provider.delegate = hash -> TestTorrentMetadata.bytes(500);
+    byte[] selected = TestTorrentMetadata.infoHash();
+    selected[0] ^= 1;
+    assertNull(
+        MeshTorrentMetadataFetcher.fetch(
+            requester.transport,
+            requester.identity,
+            holder.identity.ed25519PubRaw(),
+            selected,
+            10_000));
   }
 
   @Test
@@ -205,16 +271,22 @@ class TorrentFetchOverMeshTest {
     assertTrue(healthy, "Instance " + label + " did not become healthy");
 
     IdentityKeys identity = server.identity();
-    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    assertTrue(
+        client.register(identity, "127.0.0.1", server.rudpPort(), IceBridgeConfig.Role.BOTH));
+    resources.add(client);
+    NoOpKarmaCache karma = new NoOpKarmaCache();
+    resources.add(karma);
+    PeerDirectory directory = new PeerDirectory(karma);
 
     IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
     transport.start();
     resources.add(transport);
 
-    RelaySearchService searchService = new RelaySearchService(new EmptyLocalIndex(), identity);
+    MutableProvider provider = new MutableProvider();
+    RelaySearchService searchService =
+        new RelaySearchService(new EmptyLocalIndex(), identity, hash -> provider.handlerPublic);
     IncomingSearchRequestHandler incomingHandler =
         new IncomingSearchRequestHandler(transport, searchService, directory, identity);
-    MutableProvider provider = new MutableProvider();
     incomingHandler.setTorrentMetadataProvider(provider);
     incomingHandler.start();
     resources.add(() -> incomingHandler.stop());
@@ -230,6 +302,13 @@ class TorrentFetchOverMeshTest {
 
   private static final class MutableProvider implements TorrentMetadataProvider {
     volatile TorrentMetadataProvider delegate = infoHashV1 -> null;
+    volatile boolean publiclyShared = true;
+    volatile boolean handlerPublic = true;
+
+    @Override
+    public boolean isPubliclyShared(byte[] infoHashV1) {
+      return publiclyShared;
+    }
 
     @Override
     public byte[] torrentBytes(byte[] infoHashV1) {

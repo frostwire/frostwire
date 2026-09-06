@@ -313,7 +313,9 @@ class DistributedSearchPerformerTest {
     InMemoryLocalIndex responderIndex = new InMemoryLocalIndex();
     responderIndex.upsert(torrent("ubuntu server", 500L, 1));
 
-    RelaySearchService service = new RelaySearchService(responderIndex, responderKeys);
+    RelaySearchService service =
+        new RelaySearchService(
+            responderIndex, responderKeys, hash -> responderIndex.get(hash).isPresent());
 
     PeerDirectory directory = directoryWithVerifiedPeer(responderKeys, "127.0.0.1", 6888);
 
@@ -448,9 +450,207 @@ class DistributedSearchPerformerTest {
         requesterKeys.ed25519PubRaw(),
         sent.path()[0],
         "path[0] must be this node's own Ed25519 pubkey");
+    assertEquals(sent.ttl() + sent.pathLength(), sent.maxTtl());
+  }
+
+  @Test
+  void originBudgetIncludesItsOwnPathEntryAtMaximumTtl() throws Exception {
+    IdentityKeys identity = IdentityKeys.generate(0);
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            15, "row", new InMemoryLocalIndex(), emptyDirectory(), identity, new FakeTransport());
+    java.lang.reflect.Method build =
+        DistributedSearchPerformer.class.getDeclaredMethod(
+            "buildSignedRequest", String.class, int.class, int.class);
+    build.setAccessible(true);
+    RemoteSearchRequest request =
+        (RemoteSearchRequest)
+            build.invoke(performer, "row", 10, RemoteSearchRequest.MAX_PATH_LENGTH);
+    assertTrue(request.maxTtl() <= RemoteSearchRequest.MAX_PATH_LENGTH);
+    assertEquals(request.ttl() + 1, request.maxTtl());
+    Signature verifier = IdentityKeys.softwareSignature("Ed25519");
+    verifier.initVerify(identity.ed25519().getPublic());
+    verifier.update(request.queryCanonicalBytes());
+    assertTrue(verifier.verify(request.signature()));
   }
 
   // --- helpers ---
+
+  @Test
+  void emptyForwarderFinalDoesNotDiscardMultipleHolderStreams() throws Exception {
+    IdentityKeys hub = IdentityKeys.generate(0);
+    IdentityKeys first = IdentityKeys.generate(0);
+    IdentityKeys second = IdentityKeys.generate(0);
+    FakeTransport transport = new FakeTransport();
+    transport.stream =
+        request ->
+            List.of(
+                signedChunk(request, hub, 0, true, null),
+                signedChunk(request, first, 0, true, "first holder"),
+                signedChunk(request, second, 1, true, "second suffix"),
+                signedChunk(request, second, 0, false, "second prefix"));
+    RecordingListener listener = new RecordingListener();
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            20,
+            "holder",
+            new InMemoryLocalIndex(),
+            directoryWithVerifiedPeer(hub, "127.0.0.1", 6888),
+            IdentityKeys.generate(0),
+            transport,
+            1,
+            10,
+            10,
+            1);
+    performer.setListener(listener);
+    performer.perform();
+    assertEquals(3, listener.results.get(0).size());
+    assertTrue(transport.listeners.isEmpty());
+  }
+
+  @Test
+  void directCompleteStreamReturnsWithoutWaitingForOverallDeadline() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate(0);
+    FakeTransport transport = new FakeTransport();
+    transport.stream = request -> List.of(signedChunk(request, holder, 0, true, "direct"));
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            21,
+            "direct",
+            new InMemoryLocalIndex(),
+            directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
+            IdentityKeys.generate(0),
+            transport,
+            1,
+            10,
+            10,
+            10,
+            DynamicQueryConfig.withDesiredResults(1));
+    RecordingListener listener = new RecordingListener();
+    performer.setListener(listener);
+    assertTimeoutPreemptively(java.time.Duration.ofSeconds(2), performer::perform);
+    assertEquals(1, listener.results.get(0).size());
+    assertEquals(1, transport.sentRequests.get(0).ttl());
+  }
+
+  @Test
+  void gapAndConflictingDuplicateNeverPublishPartialRows() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate(0);
+    FakeTransport transport = new FakeTransport();
+    transport.stream =
+        request ->
+            List.of(
+                signedChunk(request, holder, 0, false, "first"),
+                signedChunk(request, holder, 0, false, "conflict"),
+                signedChunk(request, holder, 2, true, "last with gap"));
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            22,
+            "row",
+            new InMemoryLocalIndex(),
+            directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
+            IdentityKeys.generate(0),
+            transport,
+            1,
+            10,
+            10,
+            1);
+    RecordingListener listener = new RecordingListener();
+    performer.setListener(listener);
+    performer.perform();
+    assertTrue(listener.results.get(0).isEmpty());
+  }
+
+  @Test
+  void stopCancelsOwnedSendAndWakesSearchWait() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate(0);
+    java.util.concurrent.CountDownLatch entered = new java.util.concurrent.CountDownLatch(1);
+    java.util.concurrent.CountDownLatch cancelled = new java.util.concurrent.CountDownLatch(1);
+    DistributedSearchTransport transport =
+        new DistributedSearchTransport() {
+          @Override
+          public boolean send(byte[] pub, int protocol, byte[] payload) {
+            return false;
+          }
+
+          @Override
+          public SendOperation createSend(byte[] pub, int protocol, byte[] payload, long deadline) {
+            return new SendOperation() {
+              public boolean execute() {
+                entered.countDown();
+                try {
+                  cancelled.await();
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                }
+                return false;
+              }
+
+              public void cancel() {
+                cancelled.countDown();
+              }
+            };
+          }
+
+          public void addListener(PayloadListener listener) {}
+
+          public void removeListener(PayloadListener listener) {}
+        };
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            23,
+            "row",
+            new InMemoryLocalIndex(),
+            directoryWithVerifiedPeer(holder, "127.0.0.1", 6888),
+            IdentityKeys.generate(0),
+            transport,
+            1,
+            10,
+            10,
+            10);
+    RecordingListener listener = new RecordingListener();
+    performer.setListener(listener);
+    Thread worker = new Thread(performer::perform);
+    worker.start();
+    try {
+      assertTrue(entered.await(2, java.util.concurrent.TimeUnit.SECONDS));
+      performer.stop();
+      worker.join(1000);
+      assertFalse(worker.isAlive());
+      assertEquals(0, cancelled.getCount());
+      assertTrue(listener.results.isEmpty());
+    } finally {
+      performer.stop();
+      worker.interrupt();
+      worker.join(1000);
+    }
+  }
+
+  private static RemoteSearchResponse signedChunk(
+      RemoteSearchRequest request, IdentityKeys identity, int index, boolean last, String name)
+      throws Exception {
+    RemoteSearchResponse.Builder builder =
+        RemoteSearchResponse.builder()
+            .nonce(request.nonce())
+            .timestamp(System.currentTimeMillis() / 1000)
+            .chunkIndex(index)
+            .finalChunk(last)
+            .signature(new byte[64]);
+    if (name != null) {
+      byte[] hash =
+          java.security.MessageDigest.getInstance("SHA-1")
+              .digest(name.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+      builder.addRow(hash, name, 1, 1, identity.ed25519PubRaw());
+    }
+    Signature signature = IdentityKeys.softwareSignature("Ed25519");
+    signature.initSign(identity.ed25519().getPrivate());
+    signature.update(builder.build().canonicalBytes());
+    return builder.signature(signature.sign()).build();
+  }
+
+  private interface StreamResponses {
+    List<RemoteSearchResponse> responses(RemoteSearchRequest request) throws Exception;
+  }
 
   private static PeerDirectory emptyDirectory() {
     return new PeerDirectory(new NoOpKarmaCache());
@@ -602,6 +802,7 @@ class DistributedSearchPerformerTest {
     private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     final List<RemoteSearchRequest> sentRequests = new CopyOnWriteArrayList<>();
     private boolean deliverResponsesSynchronously;
+    private StreamResponses stream;
 
     void deliverResponsesSynchronously() {
       deliverResponsesSynchronously = true;
@@ -643,6 +844,21 @@ class DistributedSearchPerformerTest {
       RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
       if (request != null) {
         sentRequests.add(request);
+      }
+      if (stream != null && request != null) {
+        try {
+          for (RemoteSearchResponse response : stream.responses(request)) {
+            for (PayloadListener listener : listeners) {
+              listener.onPayload(
+                  targetPub,
+                  SearchPayloadCodec.encodeResponse(response),
+                  System.currentTimeMillis());
+            }
+          }
+          return true;
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
       }
       String key = Hex.encode(targetPub);
       PeerResponse pr = responses.get(key);

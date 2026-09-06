@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -15,11 +16,13 @@ import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Fetches a torrent's full .torrent bytes from its holder over the IceBridge
@@ -45,6 +48,12 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
 
     /** How long to wait for the holder's full chunked answer. */
     public static final int DEFAULT_TIMEOUT_SEC = 15;
+    private static final ThreadPoolExecutor SENDERS = new ThreadPoolExecutor(
+            4, 4, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(32), r -> {
+                Thread thread = new Thread(r, "mesh-metadata-send");
+                thread.setDaemon(true);
+                return thread;
+            });
 
     private final DistributedSearchTransport transport;
     private final IdentityKeys identity;
@@ -54,8 +63,13 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
 
     private final byte[] nonce;
     private final CountDownLatch done = new CountDownLatch(1);
-    private final ConcurrentMap<Integer, TorrentMetadataResponse> chunks = new ConcurrentHashMap<>();
-    private final AtomicReference<byte[]> result = new AtomicReference<>();
+    private final Map<Integer, TorrentMetadataResponse> chunks = new HashMap<>();
+    private int finalIndex = -1;
+    private int retainedBytes;
+    private byte[] payloadDigest;
+    private boolean failed;
+    private volatile boolean closed;
+    private long deadlineNanos;
 
     private MeshTorrentMetadataFetcher(DistributedSearchTransport transport,
                                         IdentityKeys identity,
@@ -86,7 +100,8 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
                                long timeoutMs) {
         if (transport == null || identity == null
                 || holderPub == null || holderPub.length != 32
-                || infoHash == null || infoHash.length != 20) {
+                || infoHash == null || infoHash.length != 20 || timeoutMs <= 0
+                || Thread.currentThread().isInterrupted()) {
             return null;
         }
         MeshTorrentMetadataFetcher fetcher = new MeshTorrentMetadataFetcher(
@@ -95,6 +110,10 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
     }
 
     private byte[] fetchNow() {
+        deadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(Math.min(timeoutMs, 60_000));
+        DistributedSearchTransport.SendOperation operation = null;
+        Future<Boolean> sent = null;
+        Future<Boolean> verified = null;
         transport.addListener(this);
         try {
             TorrentMetadataRequest request = buildSignedRequest();
@@ -102,23 +121,96 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
                 return null;
             }
             byte[] payload = SearchPayloadCodec.encodeTorrentMetadataRequest(request);
-            boolean sent = transport.send(holderPub, MeshProtocolId.METADATA, payload);
-            if (!sent) {
+            operation = transport.createSend(holderPub, MeshProtocolId.METADATA, payload, deadlineNanos);
+            DistributedSearchTransport.SendOperation send = operation;
+            sent = SENDERS.submit(send::execute);
+            if (!sent.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
                 LOG.info("MeshTorrentMetadataFetcher: send failed to holder "
                         + Hex.encode(holderPub).substring(0, 8) + " ih=" + Hex.encode(infoHash));
                 return null;
             }
-            if (!done.await(timeoutMs, TimeUnit.MILLISECONDS)) {
-                LOG.info("MeshTorrentMetadataFetcher: timed out ih=" + Hex.encode(infoHash)
-                        + " chunks=" + chunks.size());
+            if (!done.await(Math.max(0, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
+                LOG.info("MeshTorrentMetadataFetcher: timed out ih=" + Hex.encode(infoHash));
                 return null;
             }
-            return result.get();
-        } catch (Throwable t) {
+            List<TorrentMetadataResponse> ordered;
+            synchronized (this) {
+                if (failed || closed || finalIndex < 0) {
+                    return null;
+                }
+                ordered = new ArrayList<>(chunks.values());
+            }
+            ordered.sort(java.util.Comparator.comparingInt(TorrentMetadataResponse::chunkIndex));
+            byte[] assembled = TorrentMetadataResponse.assemble(ordered);
+            if (assembled == null || Thread.currentThread().isInterrupted()
+                    || System.nanoTime() >= deadlineNanos) {
+                return null;
+            }
+            // JNI cannot be interrupted, so bound both its admission and the caller's wait.
+            verified = SENDERS.submit(() -> !Thread.currentThread().isInterrupted()
+                    && System.nanoTime() < deadlineNanos && matchesInfoHash(assembled, infoHash));
+            return verified.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)
+                    && !Thread.currentThread().isInterrupted() && System.nanoTime() < deadlineNanos
+                    ? assembled : null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (Exception | LinkageError t) {
             LOG.warn("MeshTorrentMetadataFetcher failed ih=" + Hex.encode(infoHash), t);
             return null;
         } finally {
+            closed = true;
+            if (operation != null) {
+                operation.cancel();
+            }
+            if (sent != null) {
+                sent.cancel(true);
+            }
+            if (verified != null) {
+                verified.cancel(true);
+            }
+            SENDERS.purge();
             transport.removeListener(this);
+            synchronized (this) {
+                chunks.clear();
+            }
+        }
+    }
+
+    /**
+     * Validate bounded metadata against the originally selected hash off the UI/poller.
+     * A 20-byte request matches v1 or the BEP 52 truncated v2 hash; a 32-byte
+     * request matches the full v2 hash. Hybrid torrents may match either identity.
+     */
+    public static boolean matchesInfoHash(byte[] torrentBytes, byte[] selectedHash) {
+        if (torrentBytes == null || torrentBytes.length == 0
+                || torrentBytes.length > TorrentMetadataResponse.MAX_TORRENT_BYTES
+                || selectedHash == null || (selectedHash.length != 20 && selectedHash.length != 32)) {
+            return false;
+        }
+        TorrentInfo info = null;
+        try {
+            info = TorrentInfo.bdecode(torrentBytes);
+            if (!info.isValid()) {
+                return false;
+            }
+            String expected = Hex.encode(selectedHash);
+            com.frostwire.jlibtorrent.swig.info_hash_t hashes = info.infoHashType();
+            try {
+                return selectedHash.length == 20 && hashes.has_v1()
+                        && expected.equals(hashes.getV1().to_hex())
+                        || hashes.has_v2()
+                        && expected.equals(hashes.getV2().to_hex().substring(0, expected.length()));
+            } finally {
+                hashes.delete();
+            }
+        } catch (Exception | LinkageError e) {
+            LOG.warn("Invalid torrent metadata", e);
+            return false;
+        } finally {
+            if (info != null) {
+                info.swig().delete();
+            }
         }
     }
 
@@ -147,8 +239,10 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
     }
 
     @Override
-    public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
-        if (MeshProtocolId.effective(protocolId) != MeshProtocolId.METADATA) {
+    public synchronized void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+        if (closed || failed || done.getCount() == 0 || System.nanoTime() >= deadlineNanos
+                || payload == null || payload.length > 2048
+                || MeshProtocolId.effective(protocolId) != MeshProtocolId.METADATA) {
             return;
         }
         TorrentMetadataResponse response = SearchPayloadCodec.decodeTorrentMetadataResponse(payload);
@@ -165,21 +259,44 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
             return;
         }
         if (response.isError()) {
+            long now = System.currentTimeMillis() / 1000L;
+            if (response.timestamp() < now - TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || response.timestamp() > now + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC) {
+                return;
+            }
             LOG.info("MeshTorrentMetadataFetcher: holder error " + response.error()
                     + " ih=" + Hex.encode(infoHash));
+            failed = true;
             done.countDown();
             return;
         }
-        chunks.put(response.chunkIndex(), response);
-        if (response.isFinalChunk()) {
-            List<TorrentMetadataResponse> ordered = new ArrayList<>(chunks.values());
-            ordered.sort(java.util.Comparator.comparingInt(TorrentMetadataResponse::chunkIndex));
-            byte[] assembled = TorrentMetadataResponse.assemble(ordered);
-            if (assembled != null) {
-                result.set(assembled);
-            } else {
-                LOG.warn("MeshTorrentMetadataFetcher: assembly failed ih=" + Hex.encode(infoHash));
+        int index = response.chunkIndex();
+        TorrentMetadataResponse previous = chunks.get(index);
+        if (previous != null) {
+            if (!Arrays.equals(previous.canonicalBytes(), response.canonicalBytes())
+                    || !Arrays.equals(previous.data(), response.data())) {
+                failed = true;
+                done.countDown();
             }
+            return;
+        }
+        byte[] data = response.data();
+        if (index >= TorrentMetadataResponse.MAX_CHUNKS
+                || (payloadDigest != null && !Arrays.equals(payloadDigest, response.payloadDigest()))
+                || data.length > TorrentMetadataResponse.MAX_TORRENT_BYTES - retainedBytes
+                || (finalIndex >= 0 && (index > finalIndex || response.isFinalChunk() && index != finalIndex))
+                || response.isFinalChunk() && chunks.keySet().stream().anyMatch(i -> i > index)) {
+            failed = true;
+            done.countDown();
+            return;
+        }
+        payloadDigest = response.payloadDigest();
+        retainedBytes += data.length;
+        chunks.put(index, response);
+        if (response.isFinalChunk()) {
+            finalIndex = index;
+        }
+        if (finalIndex >= 0 && chunks.size() == finalIndex + 1) {
             done.countDown();
         }
     }

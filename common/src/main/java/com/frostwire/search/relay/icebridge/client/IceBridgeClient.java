@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge.client;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeConstants;
 import com.frostwire.search.relay.icebridge.control.ApiResponse;
@@ -20,14 +21,21 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
+import okhttp3.Call;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -57,17 +65,30 @@ public final class IceBridgeClient implements AutoCloseable {
     private volatile String authToken;
     /** Own Ed25519 pub for multi-client /poll demux (set on successful register). */
     private volatile byte[] ownPub;
+    private volatile boolean identityPolling;
+    private volatile boolean closed;
 
     public IceBridgeClient(int controlPort) {
         this("http://127.0.0.1:" + controlPort);
     }
 
     public IceBridgeClient(String baseUrl) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        HttpUrl url = HttpUrl.get(baseUrl);
+        String host = url.host();
+        boolean loopback = "localhost".equals(host) || "::1".equals(host)
+                || host.matches("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+        if (!url.isHttps() && !loopback || !url.username().isEmpty() || !url.password().isEmpty()
+                || url.query() != null || url.fragment() != null) {
+            throw new IllegalArgumentException("control URL requires TLS outside loopback and no URL credentials/query");
+        }
+        String normalized = url.toString();
+        this.baseUrl = normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized;
         this.http = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT_SEC, TimeUnit.SECONDS)
                 .callTimeout(CALL_TIMEOUT_SEC, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(false)
+                .followRedirects(false)
+                .followSslRedirects(false)
                 .build();
     }
 
@@ -82,18 +103,55 @@ public final class IceBridgeClient implements AutoCloseable {
     /**
      * Optional own public key so {@link #poll(int)} can request a per-client
      * demux queue on multi USE_REMOTE forwarders ({@code /poll?pub=}).
+     * Subscribes synchronously before changing poll mode; call off the UI thread.
      */
-    public void setOwnPub(byte[] ownPub) {
-        this.ownPub = (ownPub == null || ownPub.length != 32) ? null : ownPub.clone();
+    public synchronized void setOwnPub(byte[] ownPub) {
+        if (closed) {
+            return;
+        }
+        if (ownPub != null && ownPub.length != 32) {
+            throw new IllegalArgumentException("ownPub must be 32 bytes");
+        }
+        byte[] next = ownPub == null ? null : ownPub.clone();
+        if (next != null) {
+            identityPolling = true;
+        }
+        if (Arrays.equals(this.ownPub, next)) {
+            if (next != null && !consumer(next, true)) {
+                this.ownPub = null;
+            }
+            return;
+        }
+        if (this.ownPub != null && !consumer(this.ownPub, false)) {
+            return; // Accepted messages must be drained before changing queue ownership.
+        }
+        this.ownPub = next != null && consumer(next, true) ? next : null;
+        identityPolling = next != null;
+    }
+
+    private boolean consumer(byte[] pub, boolean enabled) {
+        Map<String, Object> request = new LinkedHashMap<>();
+        request.put("pub", Base64.getUrlEncoder().withoutPadding().encodeToString(pub));
+        request.put("enabled", enabled);
+        ApiResponse<?> response = post("/consumer", request, new TypeToken<ApiResponse<?>>() {});
+        return response != null && response.ok;
     }
 
     /**
      * Check that the daemon is alive and responding.
      */
     public boolean health() {
+        return health(TimeUnit.SECONDS.toMillis(CALL_TIMEOUT_SEC));
+    }
+
+    /** Synchronous health probe bounded by the caller's remaining budget in milliseconds. */
+    public boolean health(long timeoutMs) {
+        if (timeoutMs <= 0) {
+            return false;
+        }
         try {
             ApiResponse<?> response = get("/health", new TypeToken<ApiResponse<?>>() {
-            });
+            }, timeoutMs);
             return response != null && response.ok;
         } catch (Exception e) {
             LOG.warn("IceBridgeClient.health failed for " + baseUrl + ": " + e.getMessage());
@@ -116,11 +174,13 @@ public final class IceBridgeClient implements AutoCloseable {
     /**
      * Register this node's identity and endpoint with the local IceBridge.
      */
-    public boolean register(IdentityKeys identity, String host, int rudpPort,
+    public synchronized boolean register(IdentityKeys identity, String host, int rudpPort,
                             IceBridgeConfig.Role role) {
-        if (identity == null || host == null || host.isEmpty() || rudpPort <= 0 || role == null) {
+        if (closed || identity == null || host == null || host.isEmpty() || rudpPort <= 0 || role == null) {
             return false;
         }
+        // Identity registration is an explicit mode choice, even if the daemon is unavailable.
+        identityPolling = true;
         String pubB64 = Base64.getUrlEncoder().withoutPadding()
                 .encodeToString(identity.ed25519PubRaw());
         long timestamp = System.currentTimeMillis() / 1000;
@@ -148,6 +208,7 @@ public final class IceBridgeClient implements AutoCloseable {
         boolean ok = response != null && response.ok;
         if (ok) {
             setOwnPub(identity.ed25519PubRaw());
+            ok = Arrays.equals(ownPub, identity.ed25519PubRaw());
         }
         return ok;
     }
@@ -191,25 +252,67 @@ public final class IceBridgeClient implements AutoCloseable {
         if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
             return false;
         }
+        DistributedSearchTransport.SendOperation operation = createSend(targetPub, protocolId, payload,
+                System.nanoTime() + TimeUnit.SECONDS.toNanos(CALL_TIMEOUT_SEC));
+        try {
+            return operation.execute();
+        } finally {
+            operation.cancel();
+        }
+    }
+
+    /** Owns one cancellable HTTP send; deadline is absolute System.nanoTime(), including queue time. */
+    public DistributedSearchTransport.SendOperation createSend(byte[] targetPub, int protocolId,
+                                                               byte[] payload, long deadlineNanos) {
+        if (targetPub == null || targetPub.length != 32 || payload == null || payload.length == 0) {
+            throw new IllegalArgumentException("invalid send payload or target");
+        }
         SendRequest req = new SendRequest();
         req.targetPub = Base64.getUrlEncoder().withoutPadding().encodeToString(targetPub);
         req.payload = Base64.getUrlEncoder().withoutPadding().encodeToString(payload);
         req.protocolId = protocolId;
 
-        ApiResponse<?> response = post("/send", req, new TypeToken<ApiResponse<?>>() {
-        });
-        return response != null && response.ok;
+        Request.Builder builder = new Request.Builder().url(baseUrl + "/send")
+                .post(RequestBody.create(GSON.toJson(req), JSON));
+        addAuthHeader(builder);
+        Call call = http.newCall(builder.build());
+        call.timeout().deadlineNanoTime(deadlineNanos);
+        return new DistributedSearchTransport.SendOperation() {
+            @Override
+            public boolean execute() {
+                if (closed || call.isCanceled() || Thread.currentThread().isInterrupted()
+                        || System.nanoTime() >= deadlineNanos) {
+                    call.cancel();
+                    return false;
+                }
+                try (Response response = call.execute()) {
+                    String body = readBody(response);
+                    ApiResponse<?> decoded = body == null ? null : GSON.fromJson(body, ApiResponse.class);
+                    return !call.isCanceled() && decoded != null && decoded.ok;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            @Override
+            public void cancel() {
+                call.cancel();
+            }
+        };
     }
 
     /**
      * Poll the local IceBridge for payloads addressed to us.
      */
     public List<InboundMessage> poll(int count) {
-        if (count <= 0) {
-            return Collections.emptyList();
+        byte[] pub;
+        synchronized (this) {
+            if (closed || count <= 0 || identityPolling && ownPub == null) {
+                return Collections.emptyList();
+            }
+            pub = ownPub;
         }
-        String path = "/poll?count=" + count;
-        byte[] pub = ownPub;
+        String path = "/poll?count=" + Math.min(count, 256);
         if (pub != null && pub.length == 32) {
             path += "&pub=" + Base64.getUrlEncoder().withoutPadding().encodeToString(pub);
         }
@@ -217,33 +320,56 @@ public final class IceBridgeClient implements AutoCloseable {
                 get(path,
                         new TypeToken<ApiResponse<List<com.frostwire.search.relay.icebridge.control.InboundMessageInfo>>>() {
                         });
-        if (response == null || response.data == null) {
+        if (response == null || response.data == null || response.data.size() > Math.min(count, 256)) {
             return Collections.emptyList();
         }
         List<InboundMessage> out = new ArrayList<>(response.data.size());
-        for (com.frostwire.search.relay.icebridge.control.InboundMessageInfo info : response.data) {
-            out.add(new InboundMessage(
-                    decode(info.sourcePub),
-                    decode(info.payload),
-                    info.receivedMs,
-                    info.protocolId));
+        try {
+            for (com.frostwire.search.relay.icebridge.control.InboundMessageInfo info : response.data) {
+                byte[] source = decode(info.sourcePub);
+                if (source.length != 0 && source.length != 32) {
+                    return Collections.emptyList();
+                }
+                out.add(new InboundMessage(source, decode(info.payload), info.receivedMs, info.protocolId));
+            }
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Collections.emptyList();
         }
         return out;
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
+        if (closed) {
+            return;
+        }
+        http.dispatcher().cancelAll();
+        if (ownPub != null) {
+            consumer(ownPub, false);
+            ownPub = null;
+        }
+        closed = true;
+        http.dispatcher().cancelAll();
         http.dispatcher().executorService().shutdown();
         http.connectionPool().evictAll();
     }
 
     private <T> T get(String path, TypeToken<T> type) {
+        return get(path, type, TimeUnit.SECONDS.toMillis(CALL_TIMEOUT_SEC));
+    }
+
+    private <T> T get(String path, TypeToken<T> type, long timeoutMs) {
+        if (closed) {
+            return null;
+        }
         try {
             Request.Builder builder = new Request.Builder()
                     .url(baseUrl + path)
                     .get();
             addAuthHeader(builder);
-            try (Response response = http.newCall(builder.build()).execute()) {
+            Call call = http.newCall(builder.build());
+            call.timeout().timeout(Math.max(1, Math.min(timeoutMs, 10_000)), TimeUnit.MILLISECONDS);
+            try (Response response = call.execute()) {
                 String body = readBody(response);
                 if (body == null) {
                     return null;
@@ -257,6 +383,9 @@ public final class IceBridgeClient implements AutoCloseable {
     }
 
     private <T> T post(String path, Object body, TypeToken<T> type) {
+        if (closed) {
+            return null;
+        }
         try {
             RequestBody requestBody = RequestBody.create(GSON.toJson(body), JSON);
             Request.Builder builder = new Request.Builder()
@@ -277,6 +406,9 @@ public final class IceBridgeClient implements AutoCloseable {
     }
 
     private static String readBody(Response response) throws java.io.IOException {
+        if (!response.isSuccessful()) {
+            return null;
+        }
         if (response.body() == null) {
             return "";
         }
@@ -286,12 +418,19 @@ public final class IceBridgeClient implements AutoCloseable {
             LOG.warn("Control API response too large: " + len + " bytes");
             return null;
         }
-        String body = rb.string();
-        if (body.length() > MAX_RESPONSE_BYTES) {
-            LOG.warn("Control API response too large: " + body.length() + " chars");
-            return null;
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        try (InputStream input = rb.byteStream()) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = input.read(buffer, 0, Math.min(buffer.length,
+                    MAX_RESPONSE_BYTES - body.size() + 1))) != -1) {
+                if (read > MAX_RESPONSE_BYTES - body.size()) {
+                    return null;
+                }
+                body.write(buffer, 0, read);
+            }
         }
-        return body;
+        return new String(body.toByteArray(), StandardCharsets.UTF_8);
     }
 
     private void addAuthHeader(Request.Builder builder) {

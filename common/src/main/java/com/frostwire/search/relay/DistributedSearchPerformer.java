@@ -23,13 +23,18 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Search performer that merges local {@link LocalIndex} results with
@@ -60,6 +65,14 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private static final int DEFAULT_LOCAL_LIMIT = 50;
     private static final int DEFAULT_PEER_LIMIT = 25;
     private static final int DEFAULT_PEER_TIMEOUT_SEC = 10;
+    private static final int MAX_HOLDERS = 32;
+    private static final int MAX_SEARCH_BYTES = 2 * 1024 * 1024;
+    private static final ThreadPoolExecutor SENDERS = new ThreadPoolExecutor(
+            4, 4, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(128), r -> {
+                Thread thread = new Thread(r, "distributed-search-send");
+                thread.setDaemon(true);
+                return thread;
+            });
 
     private final long token;
     private final String keywords;
@@ -79,6 +92,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
 
     private volatile boolean stopped;
     private volatile SearchListener listener;
+    private volatile CountDownLatch activeWait;
+    private volatile long deadlineNanos;
+    private final List<DistributedSearchTransport.SendOperation> activeSends = new CopyOnWriteArrayList<>();
 
     public DistributedSearchPerformer(long token, String keywords,
                                        LocalIndex localIndex,
@@ -150,8 +166,8 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         if (transport == null) {
             throw new IllegalArgumentException("transport is null");
         }
-        if (maxPeers <= 0) {
-            throw new IllegalArgumentException("maxPeers must be > 0");
+        if (maxPeers <= 0 || maxPeers > 64) {
+            throw new IllegalArgumentException("maxPeers must be in (0, 64]");
         }
         if (localLimit <= 0) {
             throw new IllegalArgumentException("localLimit must be > 0");
@@ -200,6 +216,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             return;
         }
         try {
+            deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(peerTimeoutSec);
             List<FileSearchResult> merged = new ArrayList<>(queryLocal());
             if (stopped) {
                 return;
@@ -236,6 +253,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     @Override
     public void stop() {
         stopped = true;
+        for (DistributedSearchTransport.SendOperation send : activeSends) {
+            send.cancel();
+        }
+        CountDownLatch wait = activeWait;
+        if (wait != null) {
+            while (wait.getCount() != 0) {
+                wait.countDown();
+            }
+        }
         try {
             if (listener != null) {
                 listener.onStopped(token);
@@ -322,7 +348,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         int searchTtl = IceBridgeTopology.get().searchTtl();
         int phases = Math.min(dynamicQuery.maxPhases(), DynamicQueryConfig.MAX_PHASES);
         int offset = 0;
-        for (int phase = 0; phase < phases && !stopped; phase++) {
+        for (int phase = 0; phase < phases && !stopped && System.nanoTime() < deadlineNanos; phase++) {
             if (dedupeByInfoHash(merged).size() >= dynamicQuery.desiredResults()) {
                 break;
             }
@@ -366,18 +392,24 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
      * but with an explicit hop TTL and wait budget per dynamic query phase.
      */
     private List<FileSearchResult> queryPeers(List<PeerDirectory.PeerInfo> peers, int ttl, int timeoutSec) {
-        // The latch covers every peer: successful sends will be counted down
-        // when a response arrives (or times out); failed sends are counted
-        // down immediately. The listener is registered BEFORE any sends so
-        // that responses delivered by the transport's poller thread are not
-        // missed.
-        int totalPeers = peers.size();
+        long phaseDeadline = Math.min(deadlineNanos,
+                System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSec));
         Map<String, PendingRequest> pending = new ConcurrentHashMap<>();
-        List<FileSearchResult> results = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch latch = new CountDownLatch(totalPeers);
+        List<FileSearchResult> results = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(peers.size());
+        activeWait = latch;
+        Object lock = new Object();
+        int[] totals = new int[3]; // holder count, retained bytes, completed rows
+        int rowBudget = Math.min(1000, maxPeers * peerLimit);
+        List<Future<?>> sends = new ArrayList<>();
+        boolean[] accepting = {true};
 
         DistributedSearchTransport.PayloadListener responseListener =
                 (sourcePub, payload, receivedMs) -> {
+                    if (stopped || System.nanoTime() >= phaseDeadline || payload == null
+                            || payload.length > RemoteSearchResponse.MAX_STREAM_BYTES) {
+                        return;
+                    }
                     RemoteSearchResponse response = SearchPayloadCodec.decodeResponse(payload);
                     if (response == null) {
                         return;
@@ -387,13 +419,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     if (req == null) {
                         return; // not our response / already completed
                     }
-                    // Prefer the hop we dialed; multi-hop answers are signed by the
-                    // index holder behind a forwarder (SearchRelayApp dual-envelope).
-                    boolean verified =
-                            SearchResponseVerifier.verify(
-                                    response, req.request, req.peer.peerPub());
+                    byte[] holderPub = req.peer.peerPub();
+                    long now = System.currentTimeMillis() / 1000L;
+                    if (response.timestamp() < now - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
+                            || response.timestamp() > now + RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC) {
+                        return;
+                    }
+                    boolean verified = SearchResponseVerifier.verify(response, req.request, holderPub);
                     if (!verified) {
-                        byte[] holderPub = holderPubFromRows(response);
+                        holderPub = holderPubFromRows(response);
                         verified =
                                 holderPub != null
                                         && SearchResponseVerifier.verify(
@@ -408,18 +442,44 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         // pure forwarders; keep latch open for the real answer).
                         return;
                     }
-                    try {
-                        List<FileSearchResult> converted = toResults(response);
-                        results.addAll(converted);
-                        LOG.info("DistributedSearchPerformer: accepted " + converted.size()
-                                + " row(s) from " + req.peer.hostname());
-                    } catch (Throwable t) {
-                        LOG.warn("Failed to convert search response rows", t);
-                    }
-                    // Stream: only complete the peer when final=true. Intermediate RESULT chunks accumulate.
-                    if (response.isFinalChunk()) {
-                        if (pending.remove(nonceKey, req)) {
-                            latch.countDown();
+                    synchronized (lock) {
+                        if (!accepting[0] || stopped || System.nanoTime() >= phaseDeadline) {
+                            return;
+                        }
+                        String holder = Hex.encode(holderPub);
+                        RemoteSearchResponse.Collector collector = req.holders.get(holder);
+                        if (collector == null) {
+                            if (totals[0] >= MAX_HOLDERS || totals[1] >= MAX_SEARCH_BYTES) {
+                                return;
+                            }
+                            collector = new RemoteSearchResponse.Collector(peerLimit,
+                                    Math.min(RemoteSearchResponse.MAX_STREAM_BYTES, MAX_SEARCH_BYTES - totals[1]));
+                            req.holders.put(holder, collector);
+                            totals[0]++;
+                        }
+                        if (payload.length > MAX_SEARCH_BYTES - totals[1]) {
+                            return;
+                        }
+                        int oldBytes = collector.byteCount();
+                        int oldRows = collector.rowCount();
+                        boolean wasComplete = collector.isComplete();
+                        collector.add(response, payload.length);
+                        totals[1] += collector.byteCount() - oldBytes;
+                        if (!wasComplete && collector.isComplete()) {
+                            totals[2] += collector.rowCount();
+                        } else if (wasComplete && !collector.isComplete()) {
+                            totals[2] -= oldRows;
+                        }
+                        // TTL=1 has no downstream branch. A forwarded request has
+                        // no branch-completion signal, so one holder cannot close it.
+                        if (ttl <= 1 && Arrays.equals(holderPub, req.peer.peerPub())
+                                && collector.isComplete()) {
+                            req.complete(latch);
+                        }
+                        if (totals[2] >= rowBudget) {
+                            while (latch.getCount() != 0) {
+                                latch.countDown();
+                            }
                         }
                     }
                 };
@@ -427,7 +487,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         transport.addListener(responseListener);
         try {
             for (PeerDirectory.PeerInfo peer : peers) {
-                if (stopped) {
+                if (stopped || System.nanoTime() >= phaseDeadline) {
                     latch.countDown();
                     continue;
                 }
@@ -435,12 +495,30 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     RemoteSearchRequest request = buildSignedRequest(keywords, peerLimit, ttl);
                     byte[] payload = SearchPayloadCodec.encodeRequest(request);
                     String nonce = Hex.encode(request.nonce());
-                    pending.put(nonce, new PendingRequest(peer, request));
-                    if (!transport.send(peer.peerPub(),
-                            com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload)) {
-                        pending.remove(nonce);
-                        latch.countDown(); // send failed — no response expected
+                    PendingRequest pendingRequest = new PendingRequest(peer, request);
+                    pending.put(nonce, pendingRequest);
+                    DistributedSearchTransport.SendOperation operation = transport.createSend(peer.peerPub(),
+                            com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, payload, phaseDeadline);
+                    activeSends.add(operation);
+                    if (stopped) {
+                        operation.cancel();
+                        pendingRequest.complete(latch);
+                        continue;
                     }
+                    sends.add(SENDERS.submit(() -> {
+                        try {
+                            if (!operation.execute()) {
+                                pending.remove(nonce);
+                                pendingRequest.complete(latch);
+                            }
+                        } catch (Exception e) {
+                            pending.remove(nonce);
+                            pendingRequest.complete(latch);
+                        } finally {
+                            operation.cancel();
+                            activeSends.remove(operation);
+                        }
+                    }));
                 } catch (Throwable t) {
                     LOG.debug("Failed to send search request to peer "
                             + peer.hostname() + ":" + peer.utpPort()
@@ -448,13 +526,37 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     latch.countDown();
                 }
             }
-            latch.await(timeoutSec, TimeUnit.SECONDS);
+            latch.await(Math.max(0, phaseDeadline - System.nanoTime()), TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
+            synchronized (lock) {
+                accepting[0] = false;
+            }
             transport.removeListener(responseListener);
-            // Clear any unresponded entries to prevent memory leak.
-            pending.clear();
+            for (DistributedSearchTransport.SendOperation send : activeSends) {
+                send.cancel();
+            }
+            activeSends.clear();
+            for (Future<?> send : sends) {
+                send.cancel(true);
+            }
+            SENDERS.purge();
+            activeWait = null;
+            synchronized (lock) {
+                for (PendingRequest request : pending.values()) {
+                    for (RemoteSearchResponse.Collector collector : request.holders.values()) {
+                        for (RemoteSearchResponse response : collector.responses()) {
+                            for (FileSearchResult result : toResults(response)) {
+                                if (results.size() < rowBudget) {
+                                    results.add(result);
+                                }
+                            }
+                        }
+                    }
+                }
+                pending.clear();
+            }
         }
         return results;
     }
@@ -470,14 +572,16 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         SecureRandom.getInstanceStrong().nextBytes(nonce);
         long timestamp = System.currentTimeMillis() / 1000L;
         byte[] ownPub = identity.ed25519PubRaw();
-        // Dual-envelope (v2): sign query envelope only; ttl/path may hop.
+        // Sign the immutable v3 query envelope including the maximum hop budget.
         // Soft-max clamp at origin (LimeWire SOFT_MAX).
-        int searchTtl = IceBridgeTopology.get().clampRemainingTtl(0, ttl);
+        int searchTtl = Math.min(RemoteSearchRequest.MAX_PATH_LENGTH - 1,
+                IceBridgeTopology.get().clampRemainingTtl(0, ttl));
         RemoteSearchRequest unsigned = RemoteSearchRequest.builder()
                 .keywords(keywords)
                 .limit(limit)
                 .nonce(nonce)
                 .ttl(searchTtl)
+                .maxTtl(searchTtl + 1)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
@@ -492,6 +596,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .limit(limit)
                 .nonce(nonce)
                 .ttl(searchTtl)
+                .maxTtl(searchTtl + 1)
                 .requesterPub(ownPub)
                 .path(new byte[][]{ownPub})
                 .timestamp(timestamp)
@@ -598,6 +703,21 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     }
 
     /** Associates a sent request with the peer it was sent to. */
-    private record PendingRequest(PeerDirectory.PeerInfo peer, RemoteSearchRequest request) {
+    private static final class PendingRequest {
+        final PeerDirectory.PeerInfo peer;
+        final RemoteSearchRequest request;
+        final Map<String, RemoteSearchResponse.Collector> holders = new LinkedHashMap<>();
+        final AtomicBoolean complete = new AtomicBoolean();
+
+        PendingRequest(PeerDirectory.PeerInfo peer, RemoteSearchRequest request) {
+            this.peer = peer;
+            this.request = request;
+        }
+
+        void complete(CountDownLatch latch) {
+            if (complete.compareAndSet(false, true)) {
+                latch.countDown();
+            }
+        }
     }
 }

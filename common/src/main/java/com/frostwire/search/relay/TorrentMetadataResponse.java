@@ -10,6 +10,7 @@ package com.frostwire.search.relay;
 import com.frostwire.util.Hex;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -36,12 +37,12 @@ import java.util.Map;
  * concatenated bytes equals the signed digest: forwarders cannot substitute,
  * reorder, or truncate chunks without failing verification.
  *
- * <p>Deliberately OUTSIDE the signature domain: the per-request {@code nonce}
- * and the {@code timestamp}. The nonce is plaintext request correlation only,
+ * <p>For positive content only, the per-request {@code nonce}
+ * and {@code timestamp} are outside the signature domain. The nonce is request correlation only,
  * and the .torrent bytes are immutable per infohash — so a signed chunk may
  * be served to any requester asking for the same torrent (holder-side caching
  * without re-signing) and replaying recorded chunks can only ever deliver the
- * identical, correct bytes. Cross-torrent injection still fails (infohash +
+ * identical bytes, whose actual infohash the consumer must independently verify. Cross-torrent injection fails (infohash +
  * payload digest are signed), as do reorder/truncation (index + final flag
  * are signed). Use {@link #withNonceTimestamp(byte[], long)} to restamp a
  * cached signed chunk for a new request without invalidating its signature.
@@ -51,7 +52,8 @@ import java.util.Map;
  * mutually exclusive.
  */
 public final class TorrentMetadataResponse {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
+    private static final byte[] DOMAIN = "FW-METADATA-3".getBytes(StandardCharsets.US_ASCII);
 
     /**
      * Chunk payload bytes sized so the base64 + JSON envelope + 65-byte
@@ -62,6 +64,7 @@ public final class TorrentMetadataResponse {
 
     /** Maximum .torrent size we will relay (anti-amplification). */
     public static final long MAX_TORRENT_BYTES = 256L * 1024;
+    public static final int MAX_CHUNKS = (int) ((MAX_TORRENT_BYTES + CHUNK_DATA_BYTES - 1) / CHUNK_DATA_BYTES);
 
     public static final String ERR_NOT_FOUND = "NOT_FOUND";
     public static final String ERR_TOO_LARGE = "TOO_LARGE";
@@ -140,21 +143,26 @@ public final class TorrentMetadataResponse {
     }
 
     /**
-     * Signature domain: {@code v|ih|pd|ci|fin}.
-     *
-     * <p>Nonce and timestamp are intentionally excluded so a signed chunk is
-     * reusable across requests (see class javadoc). They are still transmitted
-     * for request correlation.
+     * Domain-separated v3 content signature; errors additionally bind nonce and
+     * timestamp. Positive templates alone can be reused across requests.
      */
     public byte[] canonicalBytes() {
         ByteBuffer buf = ByteBuffer.allocate(
-                4 + 4 + infoHash.length + 32 + 4 + 1);
+                DOMAIN.length + 4 + 4 + infoHash.length + 32 + 4 + 2
+                        + (isError() ? 4 + nonce.length + 8 : 0));
+        buf.put(DOMAIN);
         buf.putInt(version);
         buf.putInt(infoHash.length);
         buf.put(infoHash);
         buf.put(payloadDigest);
         buf.putInt(chunkIndex);
         buf.put((byte) (finalChunk ? 1 : 0));
+        buf.put((byte) (isError() ? 1 : 0));
+        if (isError()) {
+            buf.putInt(nonce.length);
+            buf.put(nonce);
+            buf.putLong(timestamp);
+        }
         return buf.array();
     }
 
@@ -166,6 +174,9 @@ public final class TorrentMetadataResponse {
      * templates without re-signing.
      */
     public TorrentMetadataResponse withNonceTimestamp(byte[] nonce, long timestamp) {
+        if (isError()) {
+            throw new IllegalStateException("error responses must be signed for each request");
+        }
         return TorrentMetadataResponse.builder()
                 .version(version)
                 .nonce(nonce)
@@ -185,7 +196,7 @@ public final class TorrentMetadataResponse {
      * (32-byte raw Ed25519).
      */
     public boolean verifySignature(byte[] holderPub) {
-        if (holderPub == null || holderPub.length != 32) {
+        if (version != VERSION || holderPub == null || holderPub.length != 32) {
             return false;
         }
         try {
@@ -219,6 +230,9 @@ public final class TorrentMetadataResponse {
         if (fullTorrentBytes == null || fullTorrentBytes.length == 0) {
             throw new IllegalArgumentException("fullTorrentBytes is empty");
         }
+        if (fullTorrentBytes.length > MAX_TORRENT_BYTES) {
+            throw new IllegalArgumentException("torrent exceeds metadata byte budget");
+        }
         byte[] digest = sha256(fullTorrentBytes);
         List<TorrentMetadataResponse> chunks = new ArrayList<>();
         int total = fullTorrentBytes.length;
@@ -249,7 +263,7 @@ public final class TorrentMetadataResponse {
      * mismatch across the set).
      */
     public static byte[] assemble(List<TorrentMetadataResponse> chunks) {
-        if (chunks == null || chunks.isEmpty()) {
+        if (chunks == null || chunks.isEmpty() || chunks.size() > MAX_CHUNKS) {
             return null;
         }
         TorrentMetadataResponse last = chunks.get(chunks.size() - 1);
@@ -264,12 +278,16 @@ public final class TorrentMetadataResponse {
         for (int i = 0; i < chunks.size(); i++) {
             TorrentMetadataResponse c = chunks.get(i);
             if (c.isError() || c.chunkIndex() != i
+                    || c.version != VERSION || c.finalChunk != (i == chunks.size() - 1)
                     || !Arrays.equals(c.nonce(), last.nonce())
                     || !Arrays.equals(c.infoHash(), last.infoHash())
                     || !Arrays.equals(c.payloadDigest(), last.payloadDigest())) {
                 return null;
             }
             byte[] d = c.data();
+            if (d == null || d.length > MAX_TORRENT_BYTES - out.size()) {
+                return null;
+            }
             out.write(d, 0, d.length);
         }
         byte[] full = out.toByteArray();
@@ -342,8 +360,18 @@ public final class TorrentMetadataResponse {
                     || ciObj == null || finObj == null || tsObj == null || sigObj == null) {
                 return null;
             }
-            if (((Number) vObj).intValue() != VERSION) {
-                return null; // stale pre-v2 peer (v1 domain bound nonce/ts) — fail fast
+            if (((Number) vObj).doubleValue() != VERSION) {
+                return null; // No downgrade to the unbound negative-response domain.
+            }
+            if (((Number) ciObj).longValue() < 0 || ((Number) ciObj).longValue() >= MAX_CHUNKS
+                    || ((Number) ciObj).doubleValue() != ((Number) ciObj).longValue()) {
+                return null;
+            }
+            if (((String) nonceObj).length() > 88 || ((String) ihObj).length() != 40
+                    || ((String) pdObj).length() > 44 || ((String) sigObj).length() > 88
+                    || dataObj != null && !(dataObj instanceof String)
+                    || errObj != null && !(errObj instanceof String)) {
+                return null;
             }
             byte[] payloadDigest = Base64.getDecoder().decode((String) pdObj);
             if (payloadDigest.length != 32) {
@@ -351,6 +379,9 @@ public final class TorrentMetadataResponse {
             }
             byte[] data = null;
             if (dataObj instanceof String) {
+                if (((String) dataObj).length() > ((CHUNK_DATA_BYTES + 2) / 3) * 4) {
+                    return null;
+                }
                 data = Base64.getDecoder().decode((String) dataObj);
                 if (data.length == 0 || data.length > CHUNK_DATA_BYTES) {
                     return null;
@@ -364,6 +395,9 @@ public final class TorrentMetadataResponse {
             if (finObj instanceof Boolean) {
                 isFinal = (Boolean) finObj;
             } else if (finObj instanceof Number) {
+                if (((Number) finObj).doubleValue() != 0 && ((Number) finObj).doubleValue() != 1) {
+                    return null;
+                }
                 isFinal = ((Number) finObj).intValue() != 0;
             } else {
                 return null;
@@ -426,7 +460,7 @@ public final class TorrentMetadataResponse {
         }
 
         public Builder chunkIndex(int chunkIndex) {
-            this.chunkIndex = Math.max(0, chunkIndex);
+            this.chunkIndex = chunkIndex;
             return this;
         }
 
@@ -456,7 +490,10 @@ public final class TorrentMetadataResponse {
         }
 
         public TorrentMetadataResponse build() {
-            if (nonce == null || nonce.length == 0) {
+            if (version != VERSION || chunkIndex < 0 || chunkIndex >= MAX_CHUNKS) {
+                throw new IllegalStateException("unsupported version or chunk index");
+            }
+            if (nonce == null || nonce.length == 0 || nonce.length > 64) {
                 throw new IllegalStateException("nonce is required");
             }
             if (infoHash == null || infoHash.length != 20) {
@@ -474,8 +511,10 @@ public final class TorrentMetadataResponse {
             if (data != null && (data.length == 0 || data.length > CHUNK_DATA_BYTES)) {
                 throw new IllegalStateException("chunk data must be in (0, " + CHUNK_DATA_BYTES + "] bytes");
             }
-            if (error != null && error.length() > 64) {
-                throw new IllegalStateException("error code too long");
+            if (error != null && (chunkIndex != 0 || !finalChunk
+                    || !(ERR_NOT_FOUND.equals(error) || ERR_TOO_LARGE.equals(error))
+                    || !Arrays.equals(payloadDigest, sha256(error.getBytes(StandardCharsets.UTF_8))))) {
+                throw new IllegalStateException("invalid error response");
             }
             return new TorrentMetadataResponse(version, nonce, infoHash, payloadDigest,
                     chunkIndex, finalChunk, timestamp, data, error, signature);

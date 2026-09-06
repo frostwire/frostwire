@@ -69,14 +69,60 @@ class TorrentMetadataResponseTest {
     }
 
     @Test
+    void errorsAreRequestBoundAndCannotBeRestamped() throws Exception {
+        KeyPair holder = ed25519();
+        TorrentMetadataResponse error = sign(TorrentMetadataResponse.buildError(
+                new byte[32], new byte[20], 1000L, TorrentMetadataResponse.ERR_NOT_FOUND), holder);
+        assertThrows(IllegalStateException.class,
+                () -> error.withNonceTimestamp(new byte[32], 2000L));
+        Map<String, Object> changed = error.toBencodeableMap();
+        changed.put("ts", 2000L);
+        assertFalse(TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
+        changed = error.toBencodeableMap();
+        changed.put("err", TorrentMetadataResponse.ERR_TOO_LARGE);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
+        changed = error.toBencodeableMap();
+        changed.put("v", 2);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
+        changed = error.toBencodeableMap();
+        byte[] otherNonce = new byte[32];
+        otherNonce[0] = 1;
+        changed.put("nonce", java.util.Base64.getEncoder().encodeToString(otherNonce));
+        assertFalse(TorrentMetadataResponse.fromBencodeableMap(changed).verifySignature(holderPub(holder)));
+        for (Map.Entry<String, Object> invalid : Map.<String, Object>of(
+                "ci", 1, "fin", false, "err", "UNKNOWN", "data", "AQ==").entrySet()) {
+            changed = error.toBencodeableMap();
+            changed.put(invalid.getKey(), invalid.getValue());
+            assertNull(TorrentMetadataResponse.fromBencodeableMap(changed));
+        }
+    }
+
+    @Test
+    void enforcesAggregateAndIndexBounds() {
+        assertThrows(IllegalArgumentException.class, () -> TorrentMetadataResponse.buildChunks(
+                new byte[32], new byte[20], 1L,
+                new byte[(int) TorrentMetadataResponse.MAX_TORRENT_BYTES + 1]));
+        TorrentMetadataResponse first = TorrentMetadataResponse.buildChunks(
+                new byte[32], new byte[20], 1L, new byte[1]).get(0);
+        Map<String, Object> bad = first.toBencodeableMap();
+        bad.put("ci", -1);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+        bad.put("ci", Integer.MAX_VALUE);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+        bad.put("ci", 0.5);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+        bad.put("ci", 0);
+        bad.put("fin", 2);
+        assertNull(TorrentMetadataResponse.fromBencodeableMap(bad));
+    }
+
+    @Test
     void chunkSplitAssembleAndVerifyRoundTrip() throws Exception {
         KeyPair holder = ed25519();
         byte[] nonce = new byte[32];
         new SecureRandom().nextBytes(nonce);
-        byte[] infoHash = new byte[20];
-        new SecureRandom().nextBytes(infoHash);
-        byte[] torrent = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES * 3 + 137];
-        new SecureRandom().nextBytes(torrent);
+        byte[] infoHash = TestTorrentMetadata.infoHash();
+        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 3);
 
         List<TorrentMetadataResponse> chunks =
                 signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
@@ -98,9 +144,8 @@ class TorrentMetadataResponseTest {
     void tamperedChunkDataFailsAssembleDigestCheck() throws Exception {
         KeyPair holder = ed25519();
         byte[] nonce = new byte[32];
-        byte[] infoHash = new byte[20];
-        byte[] torrent = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES + 5];
-        new SecureRandom().nextBytes(torrent);
+        byte[] infoHash = TestTorrentMetadata.infoHash();
+        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
 
         List<TorrentMetadataResponse> chunks =
                 signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
@@ -134,9 +179,8 @@ class TorrentMetadataResponseTest {
     void assembleRejectsMissingAndReorderedChunks() throws Exception {
         KeyPair holder = ed25519();
         byte[] nonce = new byte[32];
-        byte[] infoHash = new byte[20];
-        byte[] torrent = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES * 2 + 10];
-        new SecureRandom().nextBytes(torrent);
+        byte[] infoHash = TestTorrentMetadata.infoHash();
+        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES * 2);
 
         List<TorrentMetadataResponse> chunks =
                 signAll(TorrentMetadataResponse.buildChunks(nonce, infoHash, 1000L, torrent), holder);
@@ -178,10 +222,8 @@ class TorrentMetadataResponseTest {
         byte[] nonceB = new byte[32];
         new SecureRandom().nextBytes(nonceA);
         new SecureRandom().nextBytes(nonceB);
-        byte[] infoHash = new byte[20];
-        new SecureRandom().nextBytes(infoHash);
-        byte[] torrent = new byte[TorrentMetadataResponse.CHUNK_DATA_BYTES + 7];
-        new SecureRandom().nextBytes(torrent);
+        byte[] infoHash = TestTorrentMetadata.infoHash();
+        byte[] torrent = TestTorrentMetadata.bytes(TorrentMetadataResponse.CHUNK_DATA_BYTES);
 
         List<TorrentMetadataResponse> chunks =
                 signAll(TorrentMetadataResponse.buildChunks(nonceA, infoHash, 1000L, torrent), holder);
