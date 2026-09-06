@@ -16,6 +16,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,9 +48,10 @@ class KarmaChainCommitSchedulerTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws InterruptedException {
         if (scheduler != null) {
             scheduler.stop();
+            assertTrue(scheduler.awaitStopped(3, TimeUnit.SECONDS));
         }
         if (table != null) {
             table.close();
@@ -98,10 +103,12 @@ class KarmaChainCommitSchedulerTest {
     }
 
     @Test
-    void stopWithoutStartIsNoOp() {
+    void stopBeforeStartPermanentlyRevokes() throws Exception {
         scheduler = new KarmaChainCommitScheduler(writer, publisher, 60);
         scheduler.stop();
+        scheduler.start();
         assertFalse(scheduler.isRunning());
+        assertTrue(scheduler.awaitStopped(0, TimeUnit.NANOSECONDS));
     }
 
     @Test
@@ -119,6 +126,90 @@ class KarmaChainCommitSchedulerTest {
 
         assertEquals(1L, writer.chain().currentEpoch(),
                 "scheduler should have committed epoch 1 within 4s");
+    }
+
+    @Test
+    void stopDuringTipReadPreventsBlockReadCommitAndPublish() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicInteger blockReads = new AtomicInteger();
+        AtomicInteger sessionReads = new AtomicInteger();
+        BlockHeaderSource source = new BlockHeaderSource() {
+            @Override
+            public long getChainTipHeight() {
+                entered.countDown();
+                awaitBarrier(release);
+                return 144;
+            }
+
+            @Override
+            public BitcoinBlockReference getBlock(long height) {
+                blockReads.incrementAndGet();
+                return new BitcoinBlockReference(height, hashForHeight(height));
+            }
+        };
+        writer = new KarmaChainWriter(identity, source, table);
+        scheduler = new KarmaChainCommitScheduler(writer, new KarmaChainPublisher(writer, identity),
+                1, () -> { sessionReads.incrementAndGet(); return null; }, () -> true);
+        try {
+            scheduler.start();
+            assertTrue(entered.await(3, TimeUnit.SECONDS));
+            assertTimeoutPreemptively(java.time.Duration.ofSeconds(1), scheduler::stop);
+            assertFalse(scheduler.awaitStopped(20, TimeUnit.MILLISECONDS));
+            scheduler.start();
+            assertFalse(scheduler.isRunning());
+            release.countDown();
+            assertTrue(scheduler.awaitStopped(3, TimeUnit.SECONDS));
+            assertEquals(0, blockReads.get());
+            assertEquals(0, sessionReads.get());
+            assertTrue(writer.chain().entries().isEmpty());
+        } finally {
+            release.countDown();
+        }
+    }
+
+    @Test
+    void identityReplacementDuringSessionReadPreventsPublication() throws Exception {
+        blockSource.withTip(144L).withBlock(144L, hashForHeight(144L));
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicBoolean permitted = new AtomicBoolean(true);
+        AtomicInteger puts = new AtomicInteger();
+        com.frostwire.jlibtorrent.SessionManager session = new com.frostwire.jlibtorrent.SessionManager() {
+            @Override
+            public void dhtPutItem(byte[] pub, byte[] key,
+                                   com.frostwire.jlibtorrent.Entry entry, byte[] salt) {
+                puts.incrementAndGet();
+            }
+        };
+        scheduler = new KarmaChainCommitScheduler(writer, publisher, 1, () -> {
+            entered.countDown();
+            awaitBarrier(release);
+            return session;
+        }, permitted::get);
+        try {
+            scheduler.start();
+            assertTrue(entered.await(3, TimeUnit.SECONDS));
+            permitted.set(false);
+            release.countDown();
+            assertTrue(scheduler.awaitStopped(3, TimeUnit.SECONDS));
+            permitted.set(true);
+            scheduler.start();
+            assertFalse(scheduler.isRunning());
+            assertEquals(1, writer.chain().entries().size());
+            assertEquals(0, puts.get());
+        } finally {
+            release.countDown();
+        }
+    }
+
+    private static void awaitBarrier(CountDownLatch latch) {
+        try {
+            assertTrue(latch.await(5, TimeUnit.SECONDS), "barrier timed out");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        }
     }
 
     // --- helpers ---

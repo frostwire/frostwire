@@ -10,7 +10,9 @@ package com.frostwire.search.relay;
 import com.frostwire.util.Logger;
 
 import java.security.PrivateKey;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 
 /**
  * Bridges the in-memory {@link KarmaChain} to download-completion events
@@ -27,8 +29,9 @@ import java.util.concurrent.locks.ReentrantLock;
  *       entries to the {@link KarmaChainStore}.</li>
  * </ol>
  *
- * <p>Thread-safety: all mutating operations are serialized through a
- * {@link ReentrantLock}. The in-memory {@link KarmaChain} already
+ * <p>Thread-safety: chain/store mutations are serialized through a
+ * {@link ReentrantLock}; provider reads run outside that lock. The in-memory
+ * {@link KarmaChain} already
  * synchronizes internally; the additional lock prevents a download
  * completion and a periodic epoch commit from racing.
  *
@@ -36,11 +39,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * persisting is logged and swallowed. The download itself is never
  * affected by karma bookkeeping failures.
  *
- * <p><b>Scope of this build:</b> the in-memory chain is reconstructed
- * from genesis on each app startup. Loading persisted entries on
- * startup is a future feature; see {@link KarmaChainStore#loadChain}.
+ * <p>The chain is restored through {@link KarmaChainStore#loadChain} on construction.
+ * Construct and invoke on workers; the store and block source are borrowed.
  */
-public final class KarmaChainWriter implements KarmaEndorsementSink {
+public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(KarmaChainWriter.class);
 
@@ -50,10 +52,19 @@ public final class KarmaChainWriter implements KarmaEndorsementSink {
     private final KarmaChainStore table;
     private final KarmaChain chain;
     private final ReentrantLock writeLock = new ReentrantLock();
+    private final DhtAdvertiser.Lifecycle lifecycle;
 
     public KarmaChainWriter(IdentityKeys identity,
                             BlockHeaderSource blockSource,
                             KarmaChainStore table) {
+        this(identity, blockSource, table, () -> true);
+    }
+
+    /** The nonblocking predicate permanently revokes this writer when its identity is replaced. */
+    public KarmaChainWriter(IdentityKeys identity,
+                            BlockHeaderSource blockSource,
+                            KarmaChainStore table,
+                            BooleanSupplier permitted) {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
@@ -67,6 +78,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink {
         this.signingKey = identity.ed25519().getPrivate();
         this.blockSource = blockSource;
         this.table = table;
+        this.lifecycle = new DhtAdvertiser.Lifecycle(permitted);
         this.chain = table.loadChain(ownerPub);
     }
 
@@ -84,67 +96,111 @@ public final class KarmaChainWriter implements KarmaEndorsementSink {
      * the block source cannot resolve a tip.
      */
     public void commitEpochIfNeeded() {
-        writeLock.lock();
+        commitEpochIfNeeded(() -> true);
+    }
+
+    void commitEpochIfNeeded(BooleanSupplier permitted) {
+        if (!lifecycle.enter()) {
+            return;
+        }
         try {
+            if (!isPermitted(permitted)) {
+                return;
+            }
             long tip = blockSource.getChainTipHeight();
-            if (tip < 0) {
+            if (tip < 0 || !isPermitted(permitted)) {
                 return;
             }
             BitcoinBlockReference block = blockSource.getBlock(tip);
-            if (block == null) {
+            if (block == null || !isPermitted(permitted)) {
                 return;
             }
-            if (block.epoch() <= chain.currentEpoch()) {
-                return;
+            writeLock.lock();
+            try {
+                if (isPermitted(permitted) && block.epoch() > chain.currentEpoch()) {
+                    appendCommitment(block);
+                }
+            } finally {
+                writeLock.unlock();
             }
-            appendCommitment(block);
         } catch (Throwable t) {
             LOG.warn("KarmaChainWriter.commitEpochIfNeeded failed", t);
         } finally {
-            writeLock.unlock();
+            lifecycle.leave();
         }
     }
 
     @Override
     public void onDownloadCompletedFromPeer(byte[] peerEd25519Pub, byte[] infoHash) {
+        onDownloadCompletedFromPeer(peerEd25519Pub, infoHash, () -> true);
+    }
+
+    void onDownloadCompletedFromPeer(byte[] peerEd25519Pub, byte[] infoHash,
+                                     BooleanSupplier permitted) {
         if (peerEd25519Pub == null) {
             return;
         }
         if (infoHash == null) {
             return;
         }
-        writeLock.lock();
+        if (!lifecycle.enter()) {
+            return;
+        }
         try {
+            peerEd25519Pub = peerEd25519Pub.clone();
+            infoHash = infoHash.clone();
+            if (!isPermitted(permitted)) {
+                return;
+            }
             long tip = blockSource.getChainTipHeight();
-            if (tip < 0) {
+            if (tip < 0 || !isPermitted(permitted)) {
                 LOG.debug("Skipping endorsement: no Bitcoin chain tip available");
                 return;
             }
             BitcoinBlockReference block = blockSource.getBlock(tip);
-            if (block == null) {
+            if (block == null || !isPermitted(permitted)) {
                 LOG.debug("Skipping endorsement: could not resolve tip block " + tip);
                 return;
             }
-            if (block.epoch() > chain.currentEpoch()) {
-                appendCommitment(block);
-            }
-            if (chain.availableEnergy() <= 0) {
-                LOG.debug("Skipping endorsement: energy budget exhausted for epoch " +
-                        chain.currentEpoch());
-                return;
-            }
+            writeLock.lock();
             try {
+                if (!isPermitted(permitted)) {
+                    return;
+                }
+                if (block.epoch() > chain.currentEpoch()) {
+                    appendCommitment(block);
+                }
+                if (!isPermitted(permitted) || chain.availableEnergy() <= 0) {
+                    return;
+                }
                 KarmaChainEntry endorsement = chain.endorse(
                         peerEd25519Pub, infoHash, block, signingKey);
                 table.append(endorsement);
             } catch (IllegalStateException e) {
                 LOG.debug("Endorsement rejected by chain: " + e.getMessage());
+            } finally {
+                writeLock.unlock();
             }
         } catch (Throwable t) {
             LOG.warn("KarmaChainWriter.onDownloadCompletedFromPeer failed", t);
         } finally {
-            writeLock.unlock();
+            lifecycle.leave();
         }
+    }
+
+    private boolean isPermitted(BooleanSupplier permitted) {
+        return lifecycle.getAsBoolean() && permitted.getAsBoolean() && !lifecycle.isClosed();
+    }
+
+    /** Non-waiting permanent revocation; does not close borrowed resources or interrupt providers. */
+    @Override
+    public void close() {
+        lifecycle.close();
+    }
+
+    /** Worker-only bounded drain after close, including calls waiting to mutate the chain. */
+    public boolean awaitStopped(long timeout, TimeUnit unit) throws InterruptedException {
+        return lifecycle.awaitStopped(timeout, unit);
     }
 
     private void appendCommitment(BitcoinBlockReference block) {

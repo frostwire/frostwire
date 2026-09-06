@@ -14,6 +14,9 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -185,6 +188,90 @@ class KarmaChainWriterTest {
 
         long score = table.getPeerKarma(FAKE_PEER_PUB);
         assertEquals(1L, score, "endorsement score delta is +1");
+    }
+
+    @Test
+    void closeDuringBlockReadPreventsCommitmentAndEndorsement() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        BlockHeaderSource source = new BlockHeaderSource() {
+            @Override
+            public long getChainTipHeight() { return 144; }
+
+            @Override
+            public BitcoinBlockReference getBlock(long height) {
+                entered.countDown();
+                awaitBarrier(release);
+                return new BitcoinBlockReference(height, hashForHeight(height));
+            }
+        };
+        KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
+        Thread worker = new Thread(() -> writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        try {
+            worker.start();
+            assertTrue(entered.await(3, TimeUnit.SECONDS));
+            assertTimeoutPreemptively(java.time.Duration.ofSeconds(1), writer::close);
+            assertFalse(writer.awaitStopped(20, TimeUnit.MILLISECONDS));
+            release.countDown();
+            assertTrue(writer.awaitStopped(3, TimeUnit.SECONDS));
+            writer.commitEpochIfNeeded();
+            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+            assertTrue(writer.chain().entries().isEmpty());
+        } finally {
+            release.countDown();
+            writer.close();
+            worker.join(3000);
+            assertFalse(worker.isAlive());
+        }
+    }
+
+    @Test
+    void replacementDuringCommitmentPersistencePreventsLaterEndorsement() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicBoolean permitted = new AtomicBoolean(true);
+        KarmaChainStore store = new KarmaChainStore() {
+            @Override
+            public KarmaChain loadChain(byte[] owner) { return table.loadChain(owner); }
+
+            @Override
+            public void append(KarmaChainEntry entry) {
+                table.append(entry);
+                entered.countDown();
+                awaitBarrier(release);
+            }
+
+            @Override
+            public void close() {}
+        };
+        KarmaChainWriter writer = new KarmaChainWriter(identity,
+                new FakeBlockSource().withTip(144).withBlock(144, hashForHeight(144)), store, permitted::get);
+        Thread worker = new Thread(() -> writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        try {
+            worker.start();
+            assertTrue(entered.await(3, TimeUnit.SECONDS));
+            permitted.set(false);
+            release.countDown();
+            assertTrue(writer.awaitStopped(3, TimeUnit.SECONDS));
+            permitted.set(true);
+            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+            assertEquals(1, writer.chain().entries().size());
+            assertEquals(0, table.endorsementCountInEpoch(identity.ed25519PubRaw(), 1));
+        } finally {
+            release.countDown();
+            writer.close();
+            worker.join(3000);
+            assertFalse(worker.isAlive());
+        }
+    }
+
+    private static void awaitBarrier(CountDownLatch latch) {
+        try {
+            assertTrue(latch.await(5, TimeUnit.SECONDS), "barrier timed out");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        }
     }
 
     /**

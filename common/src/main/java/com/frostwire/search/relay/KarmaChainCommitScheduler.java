@@ -8,12 +8,14 @@
 package com.frostwire.search.relay;
 
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
+import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.util.Logger;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * Background task that keeps the karma chain advancing and visible
@@ -39,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * download completions. Both paths call the writer, which serializes
  * its own mutations through an internal lock.
  */
-public final class KarmaChainCommitScheduler {
+public final class KarmaChainCommitScheduler implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(KarmaChainCommitScheduler.class);
 
@@ -48,13 +50,37 @@ public final class KarmaChainCommitScheduler {
     private final KarmaChainWriter writer;
     private final KarmaChainPublisher publisher;
     private final long intervalSec;
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final DhtAdvertiser.Lifecycle lifecycle;
+    private final Supplier<SessionManager> sessionSupplier;
+    private volatile boolean running;
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> task;
 
     public KarmaChainCommitScheduler(KarmaChainWriter writer,
                                      KarmaChainPublisher publisher,
                                      long intervalSec) {
+        this(writer, publisher, intervalSec, () -> true);
+    }
+
+    /** The nonblocking predicate must identify this generation, not general network availability. */
+    public KarmaChainCommitScheduler(KarmaChainWriter writer,
+                                     KarmaChainPublisher publisher,
+                                     long intervalSec,
+                                     BooleanSupplier permitted) {
+        this(writer, publisher, intervalSec, () -> {
+            if (com.frostwire.bittorrent.BTEngine.ctx == null) {
+                return null;
+            }
+            return com.frostwire.bittorrent.BTEngine.getInstance();
+        }, permitted);
+    }
+
+    /** Resolve the borrowed session on the worker, checking permission again after resolution. */
+    public KarmaChainCommitScheduler(KarmaChainWriter writer,
+                                     KarmaChainPublisher publisher,
+                                     long intervalSec,
+                                     Supplier<SessionManager> sessionSupplier,
+                                     BooleanSupplier permitted) {
         if (writer == null) {
             throw new IllegalArgumentException("writer is null");
         }
@@ -67,67 +93,87 @@ public final class KarmaChainCommitScheduler {
         this.writer = writer;
         this.publisher = publisher;
         this.intervalSec = intervalSec;
+        if (sessionSupplier == null) {
+            throw new IllegalArgumentException("sessionSupplier is null");
+        }
+        this.sessionSupplier = sessionSupplier;
+        this.lifecycle = new DhtAdvertiser.Lifecycle(permitted);
     }
 
     /**
      * Start the periodic commit-and-publish task. No-op if already
-     * started.
+     * started or permanently stopped. Use a fresh instance for a new generation.
      */
     public void start() {
-        if (!running.compareAndSet(false, true)) {
+        if (!lifecycle.getAsBoolean()) {
             return;
         }
-        executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
-        task = executor.scheduleAtFixedRate(this::tick, 0, intervalSec, TimeUnit.SECONDS);
+        synchronized (lifecycle) {
+            if (running || lifecycle.isClosed()) {
+                return;
+            }
+            running = true;
+            executor = ExecutorsHelper.newScheduledThreadPool(1, THREAD_NAME);
+            task = executor.scheduleAtFixedRate(this::tick, 0, intervalSec, TimeUnit.SECONDS);
+        }
         LOG.info("Karma commit scheduler started, interval=" + intervalSec + "s");
     }
 
     /**
-     * Stop the periodic task. Safe to call multiple times. Does not
-     * interrupt an in-flight tick (lets the current Bitcoin fetch
-     * finish so the executor can shut down cleanly).
+     * Permanently revoke the task without waiting. An admitted provider call may
+     * finish, but the writer and later publication stages recheck permission.
+     * This does not close the borrowed writer, publisher, store or session.
      */
     public void stop() {
-        if (!running.compareAndSet(true, false)) {
-            return;
-        }
-        if (task != null) {
-            task.cancel(false);
-            task = null;
-        }
-        if (executor != null) {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                executor.shutdownNow();
+        synchronized (lifecycle) {
+            lifecycle.close();
+            running = false;
+            if (task != null) {
+                task.cancel(false);
+                task = null;
             }
-            executor = null;
+            if (executor != null) {
+                executor.shutdown();
+            }
         }
-        LOG.info("Karma commit scheduler stopped");
+    }
+
+    @Override
+    public void close() {
+        stop();
+    }
+
+    /** Worker-only bounded drain after stop; false means a provider may still be using resources. */
+    public boolean awaitStopped(long timeout, TimeUnit unit) throws InterruptedException {
+        return lifecycle.awaitStopped(timeout, unit);
     }
 
     /** True between a successful start and stop. */
     public boolean isRunning() {
-        return running.get();
+        return running && !lifecycle.isClosed();
     }
 
     private void tick() {
-        try {
-            writer.commitEpochIfNeeded();
-        } catch (Throwable t) {
-            LOG.warn("Karma commit tick: commitEpochIfNeeded failed", t);
+        if (!lifecycle.enter()) {
+            stop();
+            return;
         }
         try {
-            com.frostwire.bittorrent.BTEngine engine = com.frostwire.bittorrent.BTEngine.getInstance();
-            if (engine != null) {
-                publisher.publishIfNeeded(engine);
+            writer.commitEpochIfNeeded(lifecycle);
+            if (!lifecycle.getAsBoolean()) {
+                return;
+            }
+            SessionManager session = sessionSupplier.get();
+            if (session != null && lifecycle.getAsBoolean()) {
+                publisher.publishIfNeeded(new DhtAdvertiser.PublicationSession(session, lifecycle));
             }
         } catch (Throwable t) {
-            LOG.warn("Karma commit tick: publishIfNeeded failed", t);
+            LOG.warn("Karma commit tick failed", t);
+        } finally {
+            lifecycle.leave();
+            if (lifecycle.isClosed()) {
+                stop();
+            }
         }
     }
 }
