@@ -12,8 +12,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Starts and stops the IceBridge daemon as an external process for the FrostWire desktop client.
@@ -34,9 +43,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
   private final String host;
   private final String authToken;
 
-  private Process process;
-  private IceBridgeClient client;
+  private volatile Process process;
+  private volatile IceBridgeClient client;
   private File logDir;
+  private Path tokenFile;
 
   /** Construct a launcher with explicit ports (use 0 to auto-select). */
   public IceBridgeProcessLauncher(
@@ -123,15 +133,28 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
    * @throws IOException if the jar is missing or the process cannot start
    */
   public synchronized void start() throws IOException {
+    startUntil(System.nanoTime() + TimeUnit.SECONDS.toNanos(15));
+  }
+
+  private synchronized void startUntil(long deadline) throws IOException {
+    if (Thread.currentThread().isInterrupted() || deadline - System.nanoTime() <= 0) {
+      throw new java.io.InterruptedIOException("IceBridge startup cancelled or timed out");
+    }
     if (process != null && process.isAlive()) {
       return;
     }
     if (!jarPath.isFile()) {
       throw new IOException("IceBridge jar not found: " + jarPath.getAbsolutePath());
     }
+    if (process != null || logDir != null) {
+      stopProcess();
+    }
 
-    killStaleIceBridgeChild();
-    waitForRudpPortFree();
+    killStaleIceBridgeChild(deadline);
+    waitForRudpPortFree(deadline);
+    if (Thread.currentThread().isInterrupted() || deadline - System.nanoTime() <= 0) {
+      throw new java.io.InterruptedIOException("IceBridge startup cancelled or timed out");
+    }
 
     String java = ProcessHandle.current().info().command().orElse("java");
     List<String> command = new ArrayList<>();
@@ -148,8 +171,6 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     command.add(role);
     command.add("--host");
     command.add(host);
-    command.add("--auth-token");
-    command.add(authToken);
     if (identityFile != null) {
       command.add("--identity-file");
       command.add(identityFile.getAbsolutePath());
@@ -159,25 +180,140 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     command.add(String.valueOf(ProcessHandle.current().pid()));
 
     logDir = Files.createTempDirectory("icebridge-launcher-" + controlHttpPort).toFile();
-    File stdout = new File(logDir, "stdout.log");
-    File stderr = new File(logDir, "stderr.log");
-    ProcessBuilder pb = new ProcessBuilder(command);
-    // Embedder: parent FrostWire owns Protocol #1 + LocalIndex. Child must not start
-    // SearchRelayApp (empty index + competing /poll) — see IceBridgeServer.main.
-    pb.environment().put("ICEBRIDGE_SEARCH_APP", "false");
-    pb.redirectOutput(stdout);
-    pb.redirectError(stderr);
-    LOG.info("Starting IceBridge: " + String.join(" ", command));
-    process = pb.start();
-    writePidFile(process.pid());
-    client = new IceBridgeClient(controlHttpPort);
-    client.setAuthToken(authToken);
+    try {
+      tokenFile = createTokenFile(logDir.toPath());
+      if (Thread.currentThread().isInterrupted() || deadline - System.nanoTime() <= 0) {
+        throw new java.io.InterruptedIOException("IceBridge startup cancelled or timed out");
+      }
+      command.add("--auth-tokens-file");
+      command.add(tokenFile.toString());
+      File stdout = new File(logDir, "stdout.log");
+      File stderr = new File(logDir, "stderr.log");
+      ProcessBuilder pb = new ProcessBuilder(command);
+      // Parent owns the local index and application polling; the child only transports.
+      pb.environment().put("ICEBRIDGE_SEARCH_APP", "false");
+      // Never inherit another control credential or let it override this launch's file.
+      pb.environment().remove("ICEBRIDGE_AUTH_TOKEN");
+      pb.environment().remove("ICEBRIDGE_AUTH_TOKEN_FILE");
+      pb.environment().remove("ICEBRIDGE_AUTH_TOKENS_FILE");
+      pb.environment().remove("ICEBRIDGE_TOKENS_FILE");
+      pb.redirectOutput(stdout);
+      pb.redirectError(stderr);
+      LOG.info("Starting IceBridge: " + String.join(" ", command));
+      process = pb.start();
+      Path launchTokenFile = tokenFile;
+      process.onExit().thenRun(() -> deleteTokenFile(launchTokenFile));
+      writePidFile(process.pid());
+      if (client == null) {
+        client = new IceBridgeClient(controlHttpPort);
+        client.setAuthToken(authToken);
+      }
+    } catch (IOException | RuntimeException e) {
+      stopProcess();
+      throw e;
+    }
+  }
+
+  private Path createTokenFile(Path directory) throws IOException {
+    Path path;
+    if (Files.getFileAttributeView(directory, PosixFileAttributeView.class) != null) {
+      path =
+          Files.createTempFile(
+              directory,
+              "auth-tokens-",
+              ".txt",
+              PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
+    } else {
+      path = Files.createTempFile(directory, "auth-tokens-", ".txt");
+      try {
+        AclFileAttributeView acl = Files.getFileAttributeView(path, AclFileAttributeView.class);
+        if (acl == null) {
+          throw new IOException("Cannot restrict IceBridge token file permissions");
+        }
+        acl.setAcl(
+            List.of(
+                AclEntry.newBuilder()
+                    .setType(AclEntryType.ALLOW)
+                    .setPrincipal(Files.getOwner(path))
+                    .setPermissions(EnumSet.allOf(AclEntryPermission.class))
+                    .build()));
+      } catch (IOException | RuntimeException e) {
+        Files.deleteIfExists(path);
+        throw e;
+      }
+    }
+    try {
+      // No credential bytes are written until permissions have been restricted.
+      Files.writeString(path, authToken + "\n");
+      return path;
+    } catch (IOException | RuntimeException e) {
+      Files.deleteIfExists(path);
+      throw e;
+    }
+  }
+
+  private static void deleteTokenFile(Path path) {
+    if (path == null) {
+      return;
+    }
+    try {
+      Files.deleteIfExists(path);
+    } catch (IOException e) {
+      LOG.warn("Failed to delete IceBridge launch credential file", e);
+    }
+  }
+
+  /** Wait for readiness within one monotonic deadline, including each health request. */
+  public boolean awaitHealthy(long timeoutMs) throws InterruptedException {
+    if (timeoutMs <= 0) {
+      throw new IllegalArgumentException("timeoutMs must be > 0");
+    }
+    return awaitHealthyUntil(System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs));
+  }
+
+  /** Start the child and await readiness using one budget, in milliseconds. */
+  public boolean startAndAwaitHealthy(long timeoutMs) throws IOException, InterruptedException {
+    if (timeoutMs <= 0) {
+      throw new IllegalArgumentException("timeoutMs must be > 0");
+    }
+    long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+    startUntil(deadline);
+    return awaitHealthyUntil(deadline);
+  }
+
+  private boolean awaitHealthyUntil(long deadline) throws InterruptedException {
+    if (Thread.currentThread().isInterrupted()) {
+      throw new InterruptedException();
+    }
+    while (isAlive()) {
+      if (Thread.currentThread().isInterrupted()) {
+        throw new InterruptedException();
+      }
+      long remainingMs = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
+      if (remainingMs <= 0) {
+        return false;
+      }
+      IceBridgeClient currentClient = client;
+      if (currentClient != null && currentClient.health(remainingMs)) {
+        return System.nanoTime() - deadline < 0;
+      }
+      long remainingNanos = deadline - System.nanoTime();
+      if (remainingNanos <= 0) {
+        return false;
+      }
+      TimeUnit.NANOSECONDS.sleep(Math.min(TimeUnit.MILLISECONDS.toNanos(100), remainingNanos));
+    }
+    return false;
   }
 
   /** Gracefully stop the IceBridge process and its supervision. */
   @Override
   public synchronized void close() {
     stopSupervision();
+    if (client != null) {
+      client.close();
+      client = null;
+    }
     stopProcess();
   }
 
@@ -197,7 +333,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       }
     }
     process = null;
-    client = null;
+    deleteTokenFile(tokenFile);
+    tokenFile = null;
     clearPidFile();
     deleteLogDir();
   }
@@ -236,10 +373,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
   /**
    * Kill a stale child left by a previous FrostWire session: the pidfile next to the identity file
-   * names an icebridge.jar process; if it is alive and is not this process, terminate it.
+   * names our JAR and identity; never terminate a child whose recorded parent is still alive.
    * Fail-safe: unknown/dead/foreign pids are ignored.
    */
-  private void killStaleIceBridgeChild() {
+  private void killStaleIceBridgeChild(long deadline) {
     File f = pidFile();
     if (!f.isFile()) {
       return;
@@ -253,34 +390,73 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       if (stale == null || !stale.isAlive()) {
         return;
       }
-      String commandLine = stale.info().commandLine().orElse("");
-      if (!commandLine.contains("icebridge.jar")) {
-        return; // never kill a process we did not spawn
+      List<String> arguments = List.of(stale.info().arguments().orElse(new String[0]));
+      int jarArgument = arguments.indexOf("-jar");
+      int identityArgument = arguments.indexOf("--identity-file");
+      if (jarArgument < 0
+          || jarArgument + 1 >= arguments.size()
+          || identityArgument < 0
+          || identityArgument + 1 >= arguments.size()
+          || !new File(arguments.get(jarArgument + 1))
+              .getCanonicalFile()
+              .equals(jarPath.getCanonicalFile())
+          || !new File(arguments.get(identityArgument + 1))
+              .getCanonicalFile()
+              .equals(identityFile.getCanonicalFile())) {
+        return;
+      }
+      int parentArgument = arguments.indexOf("--parent-pid");
+      if (parentArgument >= 0) {
+        if (parentArgument + 1 >= arguments.size()) {
+          return;
+        }
+        long parentPid = Long.parseLong(arguments.get(parentArgument + 1));
+        if (parentPid <= 0
+            || ProcessHandle.of(parentPid).map(ProcessHandle::isAlive).orElse(false)) {
+          return;
+        }
+      }
+      if (Thread.currentThread().isInterrupted() || deadline - System.nanoTime() <= 0) {
+        return;
       }
       LOG.warn("Killing stale IceBridge child pid " + pid + " left by a previous session");
       stale.destroy();
       if (!stale
           .onExit()
           .handle((p, t) -> p.isAlive())
-          .get(5, java.util.concurrent.TimeUnit.SECONDS)) {
+          .get(
+              Math.max(1, Math.min(TimeUnit.SECONDS.toNanos(5), deadline - System.nanoTime())),
+              TimeUnit.NANOSECONDS)) {
         return;
       }
       stale.destroyForcibly();
-      stale.onExit().get(2, java.util.concurrent.TimeUnit.SECONDS);
+      stale
+          .onExit()
+          .get(
+              Math.max(1, Math.min(TimeUnit.SECONDS.toNanos(2), deadline - System.nanoTime())),
+              TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     } catch (Throwable t) {
       LOG.warn("Stale IceBridge child cleanup failed (continuing)", t);
     }
   }
 
   /** Wait until our configured rUDP port is bindable again after a stale kill. */
-  private void waitForRudpPortFree() {
-    long deadline = System.currentTimeMillis() + 5000;
-    while (System.currentTimeMillis() < deadline) {
+  private void waitForRudpPortFree(long startupDeadline) {
+    long deadline =
+        System.nanoTime()
+            + Math.min(
+                TimeUnit.SECONDS.toNanos(5), Math.max(0, startupDeadline - System.nanoTime()));
+    while (deadline - System.nanoTime() > 0) {
       try (java.net.DatagramSocket probe = new java.net.DatagramSocket(rudpPort)) {
         return; // port is free
       } catch (IOException notYetFree) {
         try {
-          Thread.sleep(200);
+          long remaining = deadline - System.nanoTime();
+          if (remaining > 0) {
+            TimeUnit.NANOSECONDS.sleep(Math.min(TimeUnit.MILLISECONDS.toNanos(200), remaining));
+          }
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
           return;
@@ -294,8 +470,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     if (logDir == null) {
       return;
     }
-    try {
-      Files.walk(logDir.toPath())
+    try (var paths = Files.walk(logDir.toPath())) {
+      paths
           .sorted(java.util.Comparator.reverseOrder())
           .map(java.nio.file.Path::toFile)
           .forEach(File::delete);
@@ -307,7 +483,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
   }
 
   public boolean isAlive() {
-    return process != null && process.isAlive();
+    Process current = process;
+    return current != null && current.isAlive();
   }
 
   /**
@@ -335,18 +512,21 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
                   return;
                 }
                 try {
-                  if (isAlive() && client != null && client.health()) {
+                  IceBridgeClient currentClient = client;
+                  if (isAlive() && currentClient != null && currentClient.health()) {
                     continue;
                   }
-                  if (!supervising) {
-                    return;
+                  synchronized (IceBridgeProcessLauncher.this) {
+                    if (!supervising || supervisor != Thread.currentThread()) {
+                      return;
+                    }
+                    LOG.warn(
+                        "IceBridge child unhealthy (alive="
+                            + isAlive()
+                            + ") - respawning under supervision");
+                    stopProcess();
+                    start();
                   }
-                  LOG.warn(
-                      "IceBridge child unhealthy (alive="
-                          + isAlive()
-                          + ") — respawning under supervision");
-                  stopProcess();
-                  start();
                 } catch (Throwable t) {
                   LOG.warn("IceBridge supervision respawn failed (will retry)", t);
                 }

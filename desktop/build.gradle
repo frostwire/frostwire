@@ -499,6 +499,10 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DefaultErrorCatcherTest"
+        includeTestsMatching "com.limegroup.gnutella.LifecycleManagerImplTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.DesktopRelayLifecycleTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.RelayParticipationSettingsTest"
+        includeTestsMatching "com.frostwire.gui.bittorrent.*"
     }
 
     testLogging {

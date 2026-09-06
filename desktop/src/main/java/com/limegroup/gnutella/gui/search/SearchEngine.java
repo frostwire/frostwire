@@ -384,9 +384,8 @@ public abstract class SearchEngine {
               keywords,
               LOCAL.localIndex,
               LOCAL.karmaCache,
-              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE,
-              com.frostwire.search.relay.LocalSharedTorrentSearchPerformer
-                  .DEFAULT_RESULT_LIMIT);
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.LOCAL,
+              com.frostwire.search.relay.LocalSharedTorrentSearchPerformer.DEFAULT_RESULT_LIMIT);
         }
 
         @Override

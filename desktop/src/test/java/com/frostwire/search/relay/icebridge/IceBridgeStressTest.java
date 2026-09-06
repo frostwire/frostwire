@@ -35,6 +35,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Stress / load tests for the IceBridge mesh and control plane.
@@ -59,7 +60,9 @@ class IceBridgeStressTest {
 
   private static final String LOOPBACK = "127.0.0.1";
 
-  private final List<AutoCloseable> resources = new ArrayList<>();
+  private final List<AutoCloseable> resources = Collections.synchronizedList(new ArrayList<>());
+
+  @TempDir Path tempDir;
 
   @AfterEach
   void tearDown() {
@@ -141,9 +144,10 @@ class IceBridgeStressTest {
               return;
             }
             String key = new String(payload, StandardCharsets.UTF_8);
-            received.put(key, payload);
-            done.countDown();
-            inFlight.release();
+            if (received.putIfAbsent(key, payload) == null) {
+              done.countDown();
+              inFlight.release();
+            }
           }
         });
 
@@ -321,6 +325,17 @@ class IceBridgeStressTest {
 
     CountDownLatch done = new CountDownLatch(rounds);
     AtomicInteger okBytes = new AtomicInteger();
+    AtomicInteger deliveries = new AtomicInteger();
+    ConcurrentHashMap<Integer, Boolean> received = new ConcurrentHashMap<>();
+    List<byte[]> bodies = new ArrayList<>(rounds);
+    for (int i = 0; i < rounds; i++) {
+      byte[] body = new byte[payloadBytes];
+      Arrays.fill(body, (byte) 0x11);
+      body[0] = (byte) 0xAB;
+      body[body.length - 1] = (byte) 0xCD;
+      body[4] = (byte) i;
+      bodies.add(body);
+    }
     b.transport.addListener(
         new DistributedSearchTransport.PayloadListener() {
           @Override
@@ -333,49 +348,68 @@ class IceBridgeStressTest {
             if (protocolId != MeshProtocolId.FILESYNC) {
               return;
             }
-            if (payload != null
-                && payload.length == payloadBytes
-                && payload[0] == (byte) 0xAB
-                && payload[payload.length - 1] == (byte) 0xCD) {
-              okBytes.incrementAndGet();
+            deliveries.incrementAndGet();
+            if (payload != null && payload.length == payloadBytes) {
+              int id = payload[4] & 0xFF;
+              if (id < rounds
+                  && Arrays.equals(source, a.identity.ed25519PubRaw())
+                  && Arrays.equals(payload, bodies.get(id))) {
+                okBytes.incrementAndGet();
+                if (received.putIfAbsent(id, Boolean.TRUE) == null) {
+                  done.countDown();
+                }
+              }
             }
-            done.countDown();
           }
         });
 
     long t0 = System.nanoTime();
+    long deadline = t0 + TimeUnit.SECONDS.toNanos(45);
+    int attempts = 0;
+    int rejected = 0;
+    int accepted = 0;
     for (int i = 0; i < rounds; i++) {
-      byte[] body = new byte[payloadBytes];
-      Arrays.fill(body, (byte) 0x11);
-      body[0] = (byte) 0xAB;
-      body[body.length - 1] = (byte) 0xCD;
-      body[4] = (byte) (i & 0xFF);
-      assertTrue(
-          a.client.send(b.identity.ed25519PubRaw(), MeshProtocolId.FILESYNC, body),
-          "send round " + i);
+      boolean admitted = false;
+      // Never retry a reported success; unique-delivery checks also catch ambiguous HTTP failures.
+      while (!admitted && System.nanoTime() < deadline) {
+        attempts++;
+        DistributedSearchTransport.SendOperation send =
+            a.client.createSend(
+                b.identity.ed25519PubRaw(), MeshProtocolId.FILESYNC, bodies.get(i), deadline);
+        try {
+          admitted = send.execute();
+        } finally {
+          send.cancel();
+        }
+        if (!admitted) {
+          rejected++;
+          Thread.sleep(2);
+        }
+      }
+      assertTrue(admitted, "send round " + i + " rejected until deadline; accepted=" + accepted);
+      accepted++;
     }
 
+    assertEquals(rounds, accepted, "every logical payload must be accepted");
+    assertEquals(attempts, accepted + rejected, "account for every admission attempt");
     assertTrue(
-        done.await(45, TimeUnit.SECONDS),
+        done.await(Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS),
         "all large payloads should arrive; ok=" + okBytes.get() + "/" + rounds);
     assertEquals(rounds, okBytes.get(), "all payloads must match sentinel bytes");
+    assertEquals(rounds, received.size(), "every unique payload must arrive byte-equal");
+    assertEquals(rounds, deliveries.get(), "no corrupted or duplicate application deliveries");
     System.out.printf(
-        "IceBridgeStress largePayload: rounds=%d size=%d elapsedMs=%d%n",
-        rounds, payloadBytes, msSince(t0));
+        "IceBridgeStress largePayload: rounds=%d size=%d attempts=%d rejected=%d accepted=%d delivered=%d elapsedMs=%d%n",
+        rounds, payloadBytes, attempts, rejected, accepted, received.size(), msSince(t0));
   }
 
   /**
-   * Multi-hop: searcher on R1, seeder on R2, opaque METADATA blast across two pure forwarders
-   * (protocol-agnostic path, not SEARCH schema).
-   */
-  /**
-   * Multi-hop RELAY path is rate-limited (~20 QPS per key on intermediate hops). Pace sends so
-   * stress measures sustained mesh delivery, not token-bucket drops.
+   * Multi-hop: searcher on R1, seeder on R2, opaque METADATA across two pure forwarders. Keeps the
+   * existing ~12 msg/s offered load; this is a delivery test, not saturation evidence.
    */
   @Test
   @Timeout(value = 90, unit = TimeUnit.SECONDS)
   void multiHopOpaqueMetadataUnderLoad() throws Exception {
-    // Stay under RELAY_MAX_QPS (~20) with headroom; still enough for load.
     int n = Math.min(40, Math.max(20, stressMessages() / 5));
 
     Forwarder r1 = startForwarder("r1");
@@ -397,14 +431,43 @@ class IceBridgeStressTest {
                     r2.server.rudpPort())));
     assertTrue(linked >= 2, "relays should route each other");
 
-    // Warm HELLO/ACK between relays so RELAY can hop.
+    CountDownLatch warmAtR1 = new CountDownLatch(3);
+    CountDownLatch warmAtR2 = new CountDownLatch(3);
+    AtomicInteger warmDelivered = new AtomicInteger();
+    for (Forwarder receiver : Arrays.asList(r1, r2)) {
+      byte[] expectedSource = (receiver == r1 ? r2 : r1).server.identity().ed25519PubRaw();
+      CountDownLatch warmDone = receiver == r1 ? warmAtR1 : warmAtR2;
+      receiver.transport.addListener(
+          new DistributedSearchTransport.PayloadListener() {
+            @Override
+            public void onPayload(byte[] source, byte[] payload, long receivedMs) {
+              onPayload(source, payload, receivedMs, MeshProtocolId.SEARCH);
+            }
+
+            @Override
+            public void onPayload(byte[] source, byte[] payload, long receivedMs, int protocolId) {
+              if (protocolId == MeshProtocolId.TELEMETRY
+                  && Arrays.equals(source, expectedSource)
+                  && Arrays.equals(payload, new byte[] {0x01})) {
+                warmDelivered.incrementAndGet();
+                warmDone.countDown();
+              }
+            }
+          });
+    }
+    // Observe delivery through the challenged, signed data path, not only /send acceptance.
     for (int w = 0; w < 3; w++) {
-      r1.client.send(
-          r2.server.identity().ed25519PubRaw(), MeshProtocolId.TELEMETRY, new byte[] {0x01});
-      r2.client.send(
-          r1.server.identity().ed25519PubRaw(), MeshProtocolId.TELEMETRY, new byte[] {0x01});
+      assertTrue(
+          r1.client.send(
+              r2.server.identity().ed25519PubRaw(), MeshProtocolId.TELEMETRY, new byte[] {0x01}));
+      assertTrue(
+          r2.client.send(
+              r1.server.identity().ed25519PubRaw(), MeshProtocolId.TELEMETRY, new byte[] {0x01}));
       Thread.sleep(80);
     }
+    assertTrue(warmAtR1.await(10, TimeUnit.SECONDS), "R1 must consume all warm-up DATA");
+    assertTrue(warmAtR2.await(10, TimeUnit.SECONDS), "R2 must consume all warm-up DATA");
+    assertEquals(6, warmDelivered.get());
 
     ClientEndpoint searcher = startRemoteClient("searcher", r1);
     ClientEndpoint seeder = startRemoteClient("seeder", r2);
@@ -420,6 +483,8 @@ class IceBridgeStressTest {
 
     CountDownLatch done = new CountDownLatch(n);
     ConcurrentHashMap<Integer, Boolean> got = new ConcurrentHashMap<>();
+    AtomicInteger deliveries = new AtomicInteger();
+    AtomicInteger invalidPayloads = new AtomicInteger();
     seeder.transport.addListener(
         new DistributedSearchTransport.PayloadListener() {
           @Override
@@ -432,22 +497,33 @@ class IceBridgeStressTest {
             if (protocolId != MeshProtocolId.METADATA) {
               return;
             }
-            if (payload != null && payload.length >= 4) {
+            deliveries.incrementAndGet();
+            if (payload != null
+                && payload.length == 64
+                && Arrays.equals(source, r1.server.identity().ed25519PubRaw())) {
               int id =
                   ((payload[0] & 0xFF) << 24)
                       | ((payload[1] & 0xFF) << 16)
                       | ((payload[2] & 0xFF) << 8)
                       | (payload[3] & 0xFF);
-              if (got.putIfAbsent(id, Boolean.TRUE) == null) {
+              boolean valid = id >= 0 && id < n;
+              for (int j = 4; j < payload.length; j++) {
+                valid &= payload[j] == (byte) 0x5A;
+              }
+              if (!valid) {
+                invalidPayloads.incrementAndGet();
+              } else if (got.putIfAbsent(id, Boolean.TRUE) == null) {
                 done.countDown();
               }
+            } else {
+              invalidPayloads.incrementAndGet();
             }
           }
         });
 
     long t0 = System.nanoTime();
     int sendOk = 0;
-    // ~12 msg/s — below intermediate RELAY rate limit so packets are not dropped.
+    // Preserve the existing offered load; acceptance and end delivery are asserted separately.
     final long paceNanos = 80_000_000L; // 80ms
     for (int i = 0; i < n; i++) {
       long tick = System.nanoTime();
@@ -471,9 +547,11 @@ class IceBridgeStressTest {
         done.await(45, TimeUnit.SECONDS),
         "seeder should get multi-hop METADATA; got=" + got.size() + "/" + n);
     assertEquals(n, got.size());
+    assertEquals(0, invalidPayloads.get(), "opaque payload bytes and authenticated hop must match");
+    assertEquals(n, deliveries.get(), "no duplicate or invalid application deliveries");
     System.out.printf(
-        "IceBridgeStress multiHopOpaque: n=%d elapsedMs=%d (paced for RELAY QPS)%n",
-        n, msSince(t0));
+        "IceBridgeStress multiHopOpaque: attempted=%d accepted=%d delivered=%d elapsedMs=%d (80ms pacing)%n",
+        n, sendOk, got.size(), msSince(t0));
   }
 
   private static boolean pubEquals(String b64url, byte[] raw) {
@@ -519,7 +597,7 @@ class IceBridgeStressTest {
   // ---- fixtures ----
 
   private Forwarder startForwarder(String label) throws Exception {
-    Path tmp = Files.createTempDirectory("icebridge-stress-fw-" + label + "-");
+    Path tmp = Files.createTempDirectory(tempDir, "icebridge-stress-fw-" + label + "-");
     Path idFile = tmp.resolve("identity.dat");
     IdentityKeys.save(IdentityKeys.generate(0), idFile.toFile());
 
@@ -534,20 +612,26 @@ class IceBridgeStressTest {
             .peerTtlSec(180)
             .maxQpsPerKey(10_000.0)
             .identityFile(idFile.toFile())
+            .authTokensFile(tmp.resolve("tokens.txt").toFile())
             .build();
 
     IceBridgeServer server = new IceBridgeServer(config);
-    server.start();
     resources.add(server);
+    server.start(true);
 
     IceBridgeClient client = new IceBridgeClient(server.controlPort());
+    resources.add(client);
     client.setAuthToken(server.authToken());
     waitHealthy(client, label);
-    return new Forwarder(server, client);
+    // This poller owns node-addressed warm-up DATA; identity clients remain separately demuxed.
+    IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
+    resources.add(transport);
+    transport.start();
+    return new Forwarder(server, client, transport);
   }
 
   private BothNode startBoth(String label) throws Exception {
-    Path tmp = Files.createTempDirectory("icebridge-stress-both-" + label + "-");
+    Path tmp = Files.createTempDirectory(tempDir, "icebridge-stress-both-" + label + "-");
     Path idFile = tmp.resolve("identity.dat");
     IdentityKeys.save(IdentityKeys.generate(0), idFile.toFile());
 
@@ -562,13 +646,15 @@ class IceBridgeStressTest {
             .peerTtlSec(180)
             .maxQpsPerKey(10_000.0)
             .identityFile(idFile.toFile())
+            .authTokensFile(tmp.resolve("tokens.txt").toFile())
             .build();
 
     IceBridgeServer server = new IceBridgeServer(config);
-    server.start();
     resources.add(server);
+    server.start(true);
 
     IceBridgeClient client = new IceBridgeClient(server.controlPort());
+    resources.add(client);
     client.setAuthToken(server.authToken());
     waitHealthy(client, label);
 
@@ -582,6 +668,7 @@ class IceBridgeStressTest {
   private ClientEndpoint startRemoteClient(String label, Forwarder fw) throws Exception {
     IdentityKeys identity = IdentityKeys.generate(0);
     IceBridgeClient client = new IceBridgeClient(fw.server.controlPort());
+    resources.add(client);
     client.setAuthToken(fw.server.authToken());
     client.setOwnPub(identity.ed25519PubRaw());
     waitHealthy(client, label);
@@ -619,10 +706,12 @@ class IceBridgeStressTest {
   private static final class Forwarder {
     final IceBridgeServer server;
     final IceBridgeClient client;
+    final IceBridgeSearchTransport transport;
 
-    Forwarder(IceBridgeServer server, IceBridgeClient client) {
+    Forwarder(IceBridgeServer server, IceBridgeClient client, IceBridgeSearchTransport transport) {
       this.server = server;
       this.client = client;
+      this.transport = transport;
     }
   }
 

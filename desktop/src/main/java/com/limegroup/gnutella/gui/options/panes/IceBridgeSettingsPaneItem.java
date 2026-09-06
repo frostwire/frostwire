@@ -117,14 +117,14 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     REMOTE_URL_FIELD.setToolTipText(
         I18n.tr(
-            "Full base URL to the remote IceBridge control HTTP API (scheme + host + control port). No URL path suffix is needed unless you front the API with a proxy."));
+            "Full base URL to the IceBridge control API. Remote hosts require HTTPS; HTTP is allowed only for loopback addresses (including a local authenticated tunnel)."));
 
     // Example shown under the Remote URL field, roughly indented to sit under the text field
     remoteUrlExampleLabel =
         new JLabel(
             "<html><i>"
                 + I18n.tr(
-                    "Example: http://192.168.1.50:8080   or   http://relay.example.com:8797  (use the control HTTP port)")
+                    "Example: http://127.0.0.1:8080   or   https://relay.example.com  (use a TLS proxy for remote access)")
                 + "</i></html>");
     remoteUrlExampleLabel.setFont(remoteUrlExampleLabel.getFont().deriveFont(11f));
     remoteUrlExampleLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 85, 2, 0));
@@ -332,8 +332,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
                             .client());
                   } else {
                     com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class)
-                        .info(
-                            "IceBridge mesh refresh skipped: distributed transport not ready");
+                        .info("IceBridge mesh refresh skipped: distributed transport not ready");
                   }
                 } catch (Throwable meshEx) {
                   com.frostwire.util.Logger.getLogger(IceBridgeSettingsPaneItem.class)

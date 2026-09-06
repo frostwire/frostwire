@@ -68,6 +68,7 @@ import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.search.DistributedSearchEngineWire;
 import com.limegroup.gnutella.gui.search.IceBridgeUrlHandler;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.MacOSXUtils;
@@ -84,6 +85,11 @@ import org.limewire.util.NetworkUtils;
 final class Initializer {
   /** True if is running from a system startup. */
   private volatile boolean isStartup = false;
+
+  private final java.util.List<AutoCloseable> relayResources = new java.util.ArrayList<>();
+  private KarmaChainTable relayKarmaTable;
+  private final DesktopRelayLifecycle relayLifecycle =
+      new DesktopRelayLifecycle(this::closeRelayResources, this::closeRelayStore);
 
   Initializer() {}
 
@@ -171,9 +177,17 @@ final class Initializer {
     loadLateTasksForUI();
     // Start the core & run any queued control requests, and load DAAP.
     // System.out.println("Initializer.initialize() start core");
-    startRelayStack();
+    Runnable startRelay = prepareRelayStack();
     IceBridgeUrlHandler.register();
     startCore(limeWireCore);
+    if (startRelay != null) {
+      try {
+        DesktopParallelExecutor.execute(startRelay);
+      } catch (java.util.concurrent.RejectedExecutionException e) {
+        com.frostwire.util.Logger.getLogger(Initializer.class)
+            .warn("Relay startup rejected; distributed search disabled", e);
+      }
+    }
     runQueuedRequests(limeWireCore);
     if (OSUtils.isMacOSX()) {
       GURLHandler.getInstance().register();
@@ -411,19 +425,15 @@ final class Initializer {
   }
 
   /**
-   * Wires the distributed-search direct peer-search stack: opens the local torrent index, loads (or
-   * generates) the node's cryptographic identity, installs the auto-indexer on BTEngine, opens the
-   * karma chain table, wires download-completion endorsements to a Bitcoin-anchored karma chain,
-   * starts the periodic commit-and-publish scheduler, hands the index to the LOCAL search engine so
-   * user searches can query it, and starts the direct peer-search server so peers can query our
-   * index over plain TCP.
+   * Opens the local index and installs its auto-indexer. Returns optional public-network startup
+   * work to run on a worker only after saved downloads have been restored.
    *
    * <p>Runs before {@link #startCore(LimeWireCore)} so the indexer is already installed when saved
    * downloads are restored and their {@code downloadAdded} events fire. {@code
    * BTEngineListenerChain.install} appends the {@code DownloadManagerImpl} listener later without
    * disturbing the indexer.
    */
-  private void startRelayStack() {
+  private Runnable prepareRelayStack() {
     com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
     try {
       File homeDir =
@@ -449,35 +459,102 @@ final class Initializer {
       SharedTorrentIndexerInstaller.install(btEngine, localIndex, identity);
       relayLog.info("SharedTorrentIndexer installed");
 
+      LocalSearchEngineWire.setIndex(localIndex);
+      // Public networking must not delay saved-transfer restoration. Recheck settings
+      // on the worker before constructing any listener, advertiser or discovery job.
+      return () -> startRelayParticipation(() -> startRelayServices(localIndex, identity));
+    } catch (Exception e) {
+      relayLog.warn("Failed to prepare local index; distributed search disabled", e);
+      return null;
+    }
+  }
+
+  static void startRelayParticipation(Runnable start) {
+    if (!SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
+        || !SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue()) {
+      com.frostwire.util.Logger.getLogger(Initializer.class)
+          .info("Public relay participation disabled via settings; local index remains available");
+      return;
+    }
+    start.run();
+  }
+
+  private void startRelayServices(LocalIndex localIndex, IdentityKeys identity) {
+    com.frostwire.util.Logger relayLog = com.frostwire.util.Logger.getLogger(Initializer.class);
+    try {
+      if (!relayLifecycle.beginStartup(LimeWireCore.instance().getLifecycleManager())) {
+        return;
+      }
+    } catch (RuntimeException e) {
+      relayLog.warn("Relay startup refused because shutdown ownership could not be registered", e);
+      return;
+    }
+    try {
+      Runtime.getRuntime()
+          .addShutdownHook(
+              new Thread(
+                  () -> {
+                    stopRelayServices();
+                    try {
+                      if (!relayLifecycle.awaitDisposed(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                        relayLog.warn(
+                            "Relay shutdown still draining; borrowed store has not been disposed");
+                      }
+                    } catch (InterruptedException e) {
+                      Thread.currentThread().interrupt();
+                    }
+                  },
+                  "relay-shutdown"));
+      File homeDir =
+          com.frostwire.search.relay.RelayConstants.relayHomeDir(CommonUtils.getUserSettingsDir());
+      File dbFile = new File(homeDir, LocalIndexTable.DEFAULT_DB_NAME);
+      BTEngine btEngine = BTEngine.getInstance();
+      if (!relayLifecycle.getAsBoolean()) return;
+
       // 4. Open the karma chain table and wire download-completion
       //    endorsements to a Bitcoin-anchored chain.
       KarmaChainTable karmaTable = KarmaChainTable.open(dbFile);
+      relayKarmaTable = karmaTable;
+      if (!relayLifecycle.getAsBoolean()) return;
       File bitcoinCacheDir =
           new File(homeDir, com.frostwire.search.relay.RelayConstants.BITCOIN_HEADER_CACHE_DIR);
       BlockHeaderSource blockSource = new HttpBlockHeaderFetcher(bitcoinCacheDir);
-      KarmaChainWriter karmaWriter = new KarmaChainWriter(identity, blockSource, karmaTable);
-      BTEngineListenerChain.install(
-          btEngine, new KarmaEndorsementTrigger(localIndex, identity.ed25519PubRaw(), karmaWriter));
+      KarmaChainWriter karmaWriter =
+          new KarmaChainWriter(identity, blockSource, karmaTable, relayLifecycle);
+      relayLifecycle.own(karmaWriter, karmaWriter::awaitStopped);
+      if (!relayLifecycle.getAsBoolean()) return;
+      KarmaEndorsementTrigger endorsementTrigger =
+          new KarmaEndorsementTrigger(
+              localIndex, identity.ed25519PubRaw(), karmaWriter, relayLifecycle);
+      relayLifecycle.own(endorsementTrigger, endorsementTrigger::awaitStopped);
+      BTEngineListenerChain.install(btEngine, endorsementTrigger);
+      relayResources.add(() -> BTEngineListenerChain.remove(btEngine, endorsementTrigger));
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // 5. Start the periodic commit-and-publish scheduler so the
       //    chain advances and stays visible to peers even when no
       //    downloads are happening.
       KarmaChainPublisher karmaPublisher = new KarmaChainPublisher(karmaWriter, identity);
-      new KarmaChainCommitScheduler(
+      KarmaChainCommitScheduler karmaScheduler =
+          new KarmaChainCommitScheduler(
               karmaWriter,
               karmaPublisher,
-              com.frostwire.search.relay.RelayConstants.KARMA_COMMIT_INTERVAL_SEC)
-          .start();
+              com.frostwire.search.relay.RelayConstants.KARMA_COMMIT_INTERVAL_SEC,
+              () -> btEngine,
+              relayLifecycle);
+      relayLifecycle.own(karmaScheduler, karmaScheduler::awaitStopped);
+      karmaScheduler.start();
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // 6. Wire the karma cache into the LOCAL search engine so
       //    user searches can weight results by the publisher's karma.
       RemoteKarmaChainFetcher karmaFetcher =
           new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine));
       PeerKarmaCache karmaCache = new PeerKarmaCache(karmaFetcher);
+      relayResources.add(karmaCache);
       LocalSearchEngineWire.setKarmaCache(karmaCache);
-
-      // 7. Hand the index to the LOCAL search engine.
-      LocalSearchEngineWire.setIndex(localIndex);
+      relayResources.add(() -> LocalSearchEngineWire.setKarmaCache(null));
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // 8. Construct the shared peer directory (used by both
       //    the direct peer-search server's role and the discovery scheduler)
@@ -485,11 +562,13 @@ final class Initializer {
       //    will be registered into this same directory.
       PeerDirectory directory = new PeerDirectory(karmaCache);
       startRelayServer(identity, localIndex, directory);
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // 9. Start the DHT advertiser so other FrostWire nodes can
       //    discover us: re-publishes our IdentityRecord (BEP 46)
       //    and announces under the BEP 5 peer topic.
       startDhtAdvertiser(btEngine, identity, localIndex);
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // 10. Start the peer discovery scheduler so we can
       //     discover other FrostWire nodes via BEP 5. Newly
@@ -499,6 +578,7 @@ final class Initializer {
       //     sends us a request, we learn their real pubkey
       //     and can upgrade the entry.
       startPeerDiscovery(directory, btEngine, identity);
+      if (!relayLifecycle.getAsBoolean()) return;
 
       // Log IceBridge configuration (from settings) early. This shows what will be used
       // for any IceBridge child process launched this session. Env vars can still override.
@@ -508,15 +588,37 @@ final class Initializer {
       //     transport, and wire the DISTRIBUTED search engine so the
       //     user can search both the local index and authenticated
       //     peers from the normal Search UI.
-      if (SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
-          && SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue()) {
-        startIceBridgeSearch(localIndex, directory, identity, relayLog);
-      } else {
-        relayLog.info("IceBridge disabled via settings.");
-      }
-    } catch (Exception e) {
+      startIceBridgeSearch(localIndex, directory, identity, relayLog);
+    } catch (Throwable e) {
       // Non-fatal: the relay stack is optional; the app can run without it.
       relayLog.warn("Failed to start relay stack; distributed search disabled", e);
+      stopRelayServices();
+    } finally {
+      relayLifecycle.finishStartup();
+    }
+  }
+
+  private void stopRelayServices() {
+    relayLifecycle.close();
+  }
+
+  /** Called only on the cleanup worker, after startup has relinquished resource ownership. */
+  private void closeRelayResources() {
+    for (int i = relayResources.size() - 1; i >= 0; i--) {
+      try {
+        relayResources.get(i).close();
+      } catch (Exception e) {
+        com.frostwire.util.Logger.getLogger(Initializer.class)
+            .warn("Failed to close relay resource", e);
+      }
+    }
+    relayResources.clear();
+  }
+
+  private void closeRelayStore() {
+    if (relayKarmaTable != null) {
+      relayKarmaTable.close();
+      relayKarmaTable = null;
     }
   }
 
@@ -527,7 +629,7 @@ final class Initializer {
    * index, and wire everything into the DISTRIBUTED search engine.
    *
    * <p>If the IceBridge jar is not found or the daemon fails to start, the DISTRIBUTED engine is
-   * left un-wired (not ready). The rest of FrostWire — LOCAL search, karma, DHT — still works.
+   * left un-wired (not ready). Local search remains available; public services are rolled back.
    */
   /**
    * Logs the current IceBridge configuration from settings (and notes env override potential).
@@ -570,7 +672,9 @@ final class Initializer {
       PeerDirectory directory,
       IdentityKeys identity,
       com.frostwire.util.Logger relayLog) {
+    boolean started = false;
     try {
+      if (!relayLifecycle.getAsBoolean()) return;
       IceBridgeClient client;
 
       // Settings take precedence; env vars allow advanced override (e.g. testing).
@@ -598,19 +702,9 @@ final class Initializer {
         // separately).
         // Desktop will use the remote as its IceBridge backend instead of forking a local daemon.
         client = new IceBridgeClient(remoteUrl);
+        relayResources.add(client);
         if (token != null && !token.isEmpty()) {
           client.setAuthToken(token);
-        }
-        // Multi USE_REMOTE demux: /poll?pub= needs own identity before first register.
-        try {
-          File idFile =
-              com.frostwire.search.relay.RelayConstants.identityFile(
-                  CommonUtils.getUserSettingsDir());
-          if (idFile != null && idFile.isFile()) {
-            client.setOwnPub(com.frostwire.search.relay.IdentityKeys.load(idFile).ed25519PubRaw());
-          }
-        } catch (Throwable t) {
-          relayLog.debug("Could not preload identity for IceBridge poll demux: " + t);
         }
         relayLog.info("Using remote IceBridge at " + remoteUrl + " (no local subprocess)");
         relayLog.info(
@@ -646,33 +740,20 @@ final class Initializer {
                 // relayPort=0: the app's own IncomingRelayServer already owns
                 // the identity TCP port (dual-bind causes EADDRINUSE).
                 jarPath, identityFile, 0, effectiveRudpPort, 0, role, bindHost);
-        launcher.start();
+        relayResources.add(launcher);
+        if (!launcher.startAndAwaitHealthy(15_000)) {
+          relayLog.warn(
+              "IceBridge daemon did not become healthy in time; distributed search disabled");
+          return;
+        }
+        if (!relayLifecycle.getAsBoolean()) return;
         relayLog.info("IceBridge daemon (local child) started:");
         relayLog.info("  controlPort=" + launcher.controlPort() + " (auto-assigned)");
         relayLog.info("  rudpPort=" + launcher.rudpPort());
         relayLog.info("  relayPort=" + launcher.relayPort() + " (identity)");
         relayLog.info("  bindHost=" + bindHost + " role=" + role);
 
-        // Wait for the daemon to become healthy (up to 15s).
         client = launcher.client();
-        boolean healthy = false;
-        for (int i = 0; i < 150; i++) {
-          if (client.health()) {
-            healthy = true;
-            break;
-          }
-          if (!launcher.isAlive()) {
-            relayLog.warn("IceBridge process exited before becoming healthy");
-            return;
-          }
-          Thread.sleep(100);
-        }
-        if (!healthy) {
-          relayLog.warn(
-              "IceBridge daemon did not become healthy in time; " + "distributed search disabled");
-          launcher.close();
-          return;
-        }
 
         // Core feature: distributed search/TORRENT_FETCH must still work hours
         // after launch. If the child dies, holds UDP 6889 as an orphan, or
@@ -683,12 +764,14 @@ final class Initializer {
 
         // Now that the child is healthy, add our IceBridge relay endpoint (the one others will
         // connect to for identity) to the host cache so it appears in the UI table.
-        addSelfToIceBridgeHostCache("127.0.0.1", relayListenPort, role);
+        addSelfToIceBridgeHostCache("127.0.0.1", relayListenPort, role, identity);
       }
 
-      // Create the transport and start the background poller.
+      // Subscribe to our identity queue before the first poll in both local and remote mode.
+      client.setOwnPub(identity.ed25519PubRaw());
+      if (!relayLifecycle.getAsBoolean()) return;
       IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
-      transport.start();
+      relayResources.add(transport);
 
       // Register an incoming-request handler so remote peers can
       // search our local index through IceBridge.
@@ -701,12 +784,24 @@ final class Initializer {
           new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
       IncomingSearchRequestHandler incomingHandler =
           new IncomingSearchRequestHandler(
-              transport, searchService, directory, identity, localIndex);
+              transport,
+              searchService,
+              directory,
+              identity,
+              localIndex,
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
       incomingHandler.setTorrentMetadataProvider(
-          new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider());
-      incomingHandler.start();
+          new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider(
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE));
+      relayResources.add(incomingHandler::stop);
       // Expose the wiring to download paths (TORRENT_FETCH metadata requests).
       com.frostwire.search.relay.MeshRequestContext.init(transport, identity);
+      relayResources.add(
+          () -> {
+            if (com.frostwire.search.relay.MeshRequestContext.transport() == transport) {
+              com.frostwire.search.relay.MeshRequestContext.init(null, null);
+            }
+          });
 
       // Sync PeerDirectory ↔ IceBridge mesh: push verified peers, pull mesh
       // registry into directory (forwarder-first discovery), register self.
@@ -734,9 +829,13 @@ final class Initializer {
       // Gnutella leaf model: CLIENT answers from its local index but never forwards.
       incomingHandler.setForwardingEnabled(
           syncRole != com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.CLIENT);
+      if (!relayLifecycle.getAsBoolean()) return;
+      incomingHandler.start();
+      transport.start();
       PeerRegistrySync peerSync =
           new PeerRegistrySync(
               client, directory, advertiseHost, effectiveRudpPort, identity, syncRole);
+      relayResources.add(peerSync);
       peerSync.start();
       relayLog.info(
           "PeerRegistrySync advertiseHost="
@@ -748,12 +847,21 @@ final class Initializer {
 
       // Wire the DISTRIBUTED search engine.
       DistributedSearchEngineWire.wire(localIndex, directory, identity, transport);
+      relayResources.add(() -> DistributedSearchEngineWire.unwire(transport));
+      started = true;
       boolean usingRemote = useRemote && remoteUrl != null && !remoteUrl.isEmpty();
       relayLog.info(
           "Relay stack ready; Distributed search engine wired via IceBridge"
               + (usingRemote ? " (remote)" : " (local daemon)"));
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      relayLog.warn("IceBridge startup interrupted; distributed search disabled", e);
     } catch (Throwable t) {
       relayLog.warn("Failed to start IceBridge; distributed search disabled", t);
+    } finally {
+      if (!started) {
+        stopRelayServices();
+      }
     }
   }
 
@@ -807,6 +915,7 @@ final class Initializer {
    */
   private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex) {
     try {
+      if (!relayLifecycle.getAsBoolean()) return;
       int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
       int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
       String envRudp = System.getenv("ICEBRIDGE_RUDP_PORT");
@@ -819,9 +928,16 @@ final class Initializer {
       IdentityRecordPublisher publisher =
           new IdentityRecordPublisher(identity, port, rudpPort, "BOTH");
       IndexAnnouncementPublisher indexPublisher =
-          new IndexAnnouncementPublisher(localIndex, identity);
+          new IndexAnnouncementPublisher(
+              localIndex,
+              identity,
+              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
       // More aggressive DHT announcements so relayers and peers are found faster.
-      new DhtAdvertiser(publisher, indexPublisher, 30).start();
+      DhtAdvertiser advertiser =
+          new DhtAdvertiser(
+              publisher, indexPublisher, 30, () -> btEngine, true, false, relayLifecycle);
+      relayLifecycle.own(advertiser, advertiser::awaitStopped);
+      advertiser.start();
     } catch (Throwable t) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn("Failed to start DHT advertiser; node will not be discoverable", t);
@@ -838,21 +954,24 @@ final class Initializer {
       PeerDirectory directory, BTEngine btEngine, IdentityKeys ownIdentity) {
     try {
       DhtPeerDiscoverySource dhtSource = new DhtPeerDiscoverySource(btEngine);
-      PeerAuthenticator baseAuthenticator = new DirectTcpPeerAuthenticator();
+      DirectTcpPeerAuthenticator baseAuthenticator =
+          new DirectTcpPeerAuthenticator(ownIdentity.ed25519());
+      relayResources.add(baseAuthenticator);
       // Count failed handshakes against the host cache so dead entries are
       // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
-      PeerAuthenticator authenticator = (host, port) -> {
-        java.util.Optional<IdentityRecord> rec = baseAuthenticator.authenticate(host, port);
-        if (rec.isEmpty()) {
-          try {
-            com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                .markFailure(host, port);
-          } catch (Throwable ignored) {
-            // cache is best-effort
-          }
-        }
-        return rec;
-      };
+      PeerAuthenticator authenticator =
+          (host, port) -> {
+            java.util.Optional<IdentityRecord> rec = baseAuthenticator.authenticate(host, port);
+            if (rec.isEmpty()) {
+              try {
+                com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                    .markFailure(host, port);
+              } catch (Throwable ignored) {
+                // cache is best-effort
+              }
+            }
+            return rec;
+          };
       byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
       // Previously verified servers from the host cache get a fast re-join
       // path through the SAME identity authenticator as DHT endpoints — no
@@ -865,22 +984,20 @@ final class Initializer {
       // Skip our own externally-visible endpoint (multi-homed hosts, VPN
       // egress) the same way Android skips the carrier-NAT hairpin.
       final BTEngine engineForIp = btEngine;
-      discovery.setSelfEndpoint(() -> {
-        try {
-          return engineForIp != null ? engineForIp.getExternalIp() : null;
-        } catch (Throwable ignored) {
-          return null;
-        }
-      }, SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
+      discovery.setSelfEndpoint(
+          () -> {
+            try {
+              return engineForIp != null ? engineForIp.getExternalIp() : null;
+            } catch (Throwable ignored) {
+              return null;
+            }
+          },
+          SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
       // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
       // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
-      new PeerDiscoveryScheduler(discovery, 30).start();
-      // Immediate discovery tick so peers/relayers appear quickly instead of waiting for first
-      // scheduled tick.
-      try {
-        discovery.discoverAndRegister();
-      } catch (Exception ignored) {
-      }
+      PeerDiscoveryScheduler scheduler = new PeerDiscoveryScheduler(discovery, 30);
+      relayResources.add(scheduler::stop);
+      scheduler.start();
     } catch (Throwable t) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn("Failed to start peer discovery; will not learn about other peers", t);
@@ -922,13 +1039,16 @@ final class Initializer {
               port,
               rudpPort,
               "BOTH");
-      IncomingRelayServer server = new IncomingRelayServer(role, identityRecord, port, "0.0.0.0");
+      IncomingRelayServer server =
+          new IncomingRelayServer(
+              role, identityRecord, identity.ed25519().getPrivate(), port, "0.0.0.0");
+      relayResources.add(server::stop);
       server.start();
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .info("Direct peer-search server listening on 0.0.0.0:" + server.port());
 
       // Add our direct relay identity listener to the IceBridge host cache for visibility.
-      addSelfToIceBridgeHostCache("127.0.0.1", port, "BOTH");
+      addSelfToIceBridgeHostCache("127.0.0.1", port, "BOTH", identity);
     } catch (java.io.IOException e) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn(
@@ -945,16 +1065,17 @@ final class Initializer {
    * port, *not* the IceBridge HTTP control API (which is what desktop uses locally to drive its
    * IceBridge daemon process).
    */
-  private void addSelfToIceBridgeHostCache(String host, int port, String role) {
+  private void addSelfToIceBridgeHostCache(
+      String host, int port, String role, IdentityKeys identity) {
     if (port <= 0) return;
     try {
       var cache = com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
       // Try a quick local TCP identity fetch (self-ping). If it works we mark success.
-      try {
-        com.frostwire.search.relay.OutgoingRelayClient client =
-            new com.frostwire.search.relay.OutgoingRelayClient();
-        var rec = client.fetchIdentity(host, port);
-        if (rec.isPresent() && rec.get().verifySignature()) {
+      try (DirectTcpPeerAuthenticator authenticator =
+          new DirectTcpPeerAuthenticator(identity.ed25519(), 1_000)) {
+        var rec = authenticator.authenticate(host, port);
+        if (rec.isPresent()
+            && java.util.Arrays.equals(rec.get().ed25519Pub(), identity.ed25519PubRaw())) {
           cache.markSuccess(host, port, role);
           return;
         }

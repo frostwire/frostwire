@@ -15,47 +15,61 @@ import com.frostwire.search.relay.PeerDirectory;
 /**
  * Tiny installer that wires the user-facing DISTRIBUTED search engine.
  *
- * <p>All four dependencies must be installed before the engine reports
- * itself as ready: a {@link LocalIndex} for the local half of the search,
- * a {@link PeerDirectory} for authenticated peers, the node's
- * {@link IdentityKeys} for signing requests, and a
- * {@link DistributedSearchTransport} for sending and receiving payloads
- * over IceBridge.
+ * <p>All four dependencies must be installed before the engine reports itself as ready: a {@link
+ * LocalIndex} for the local half of the search, a {@link PeerDirectory} for authenticated peers,
+ * the node's {@link IdentityKeys} for signing requests, and a {@link DistributedSearchTransport}
+ * for sending and receiving payloads over IceBridge.
  */
 public final class DistributedSearchEngineWire {
-    private static volatile PeerDirectory peerDirectoryRef;
+  private static volatile PeerDirectory peerDirectoryRef;
 
-    private DistributedSearchEngineWire() {
-    }
+  private DistributedSearchEngineWire() {}
 
-    public static void wire(LocalIndex localIndex,
-                            PeerDirectory peerDirectory,
-                            IdentityKeys identity,
-                            DistributedSearchTransport transport) {
-        if (localIndex == null) {
-            throw new IllegalArgumentException("localIndex is null");
-        }
-        if (peerDirectory == null) {
-            throw new IllegalArgumentException("peerDirectory is null");
-        }
-        if (identity == null) {
-            throw new IllegalArgumentException("identity is null");
-        }
-        if (transport == null) {
-            throw new IllegalArgumentException("transport is null");
-        }
-        SearchEngine distributed = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
-        if (distributed == null) {
-            throw new IllegalStateException("DISTRIBUTED search engine is not registered");
-        }
-        distributed.setLocalIndex(localIndex)
-                .setPeerDirectory(peerDirectory)
-                .setIdentityKeys(identity)
-                .setSearchTransport(transport);
-        peerDirectoryRef = peerDirectory;
+  public static synchronized void wire(
+      LocalIndex localIndex,
+      PeerDirectory peerDirectory,
+      IdentityKeys identity,
+      DistributedSearchTransport transport) {
+    if (localIndex == null) {
+      throw new IllegalArgumentException("localIndex is null");
     }
+    if (peerDirectory == null) {
+      throw new IllegalArgumentException("peerDirectory is null");
+    }
+    if (identity == null) {
+      throw new IllegalArgumentException("identity is null");
+    }
+    if (transport == null) {
+      throw new IllegalArgumentException("transport is null");
+    }
+    SearchEngine distributed =
+        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    if (distributed == null) {
+      throw new IllegalStateException("DISTRIBUTED search engine is not registered");
+    }
+    distributed
+        .setLocalIndex(localIndex)
+        .setPeerDirectory(peerDirectory)
+        .setIdentityKeys(identity)
+        .setSearchTransport(transport);
+    peerDirectoryRef = peerDirectory;
+  }
 
-    public static PeerDirectory getPeerDirectory() {
-        return peerDirectoryRef;
+  /** Clear only the wiring owned by the stopping stack, never a replacement's transport. */
+  public static synchronized void unwire(DistributedSearchTransport transport) {
+    SearchEngine distributed =
+        SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+    if (distributed != null && transport != null && distributed.getSearchTransport() == transport) {
+      distributed
+          .setSearchTransport(null)
+          .setIdentityKeys(null)
+          .setPeerDirectory(null)
+          .setLocalIndex(null);
+      peerDirectoryRef = null;
     }
+  }
+
+  public static PeerDirectory getPeerDirectory() {
+    return peerDirectoryRef;
+  }
 }
