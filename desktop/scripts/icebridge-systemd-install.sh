@@ -241,10 +241,11 @@ main() {
   JAVA_BIN=$(readlink -f -- "${JAVA_BIN}")
   layout
   trusted_dir "$(dirname -- "${JAVA_BIN}")"
-  [[ -x "${JAVA_BIN}" && $(stat -c %u -- "${JAVA_BIN}") == 0 ]] || fail "Java must be a root-owned executable" || return
+  regular_file "${JAVA_BIN}"
+  [[ -x "${JAVA_BIN}" ]] || fail "Java must be an executable" || return
   local mode
   mode=$(stat -c %a -- "${JAVA_BIN}")
-  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be service-writable" || return
+  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be writable by the service or other users" || return
   local dir
   for dir in "${INSTALL_DIR}" "${CONFIG_DIR}" "${STATE_DIR}"; do
     trusted_dir "$(dirname -- "${dir}")"
