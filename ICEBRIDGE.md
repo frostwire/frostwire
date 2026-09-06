@@ -121,8 +121,7 @@ printed install command:
 ```bash
 cd ~/frostwire/desktop
 ./scripts/icebridge-systemd-install.sh --build
-# Then copy/paste the printed command, for example:
-sudo ./scripts/icebridge-systemd-install.sh --jar=/home/ubuntu/frostwire/desktop/build/libs/icebridge.jar
+# Then copy/paste both printed commands. The first stages the JAR root-owned.
 ```
 
 #### Manual steps (same outcome)
