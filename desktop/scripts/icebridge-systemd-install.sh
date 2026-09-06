@@ -202,7 +202,9 @@ main() {
   layout
   local jar="" build=0 root script_path staged_jar
   root=$(cd "$(dirname -- "$0")/.." && pwd)
-  script_path=$(realpath -e -- "$0")
+  # Preserve the operator's invocation path; realpath may expose a private
+  # checkout path when this trusted script is reached through a symlink.
+  script_path="$0"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --jar=*) jar="${1#--jar=}" ;;
