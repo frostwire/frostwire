@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Install a prebuilt, operator-trusted IceBridge artifact on Linux/systemd.
+# Build or install an operator-trusted IceBridge artifact on Linux/systemd.
 # Build UNPRIVILEGED first, then stage the chosen artifact under a root-owned,
 # non-writable-by-others directory. This script never builds or runs a JAR as root.
 # Run the trusted checkout's script, never a copy in a service-writable tree:
+#   ./desktop/scripts/icebridge-systemd-install.sh --build
 #   sudo bash desktop/scripts/icebridge-systemd-install.sh --jar=/trusted/icebridge.jar
-# --no-build is accepted for old automation, but --jar is always required.
+# --no-build is accepted for old automation. Installation always requires --jar.
 #
 # Code: /opt/icebridge (root). Config: /etc/icebridge (root, tokens root:service).
 # State: /var/lib/icebridge (service). Existing root config wins over installer
@@ -199,15 +200,29 @@ snapshot_data() {
 
 main() {
   layout
-  local jar="" arg
+  local jar="" arg build=0 root script_path
+  root=$(cd "$(dirname -- "$0")/.." && pwd)
+  script_path=$(realpath -e -- "$0")
   for arg in "$@"; do
     case "${arg}" in
       --jar=*) jar="${arg#--jar=}" ;;
+      --build) build=1 ;;
       --no-build) ;;
-      --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar [--no-build]\n'; return ;;
+      --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --build\n'; printf '       sudo bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar\n'; return ;;
       *) fail "Unknown option"; return 1 ;;
     esac
   done
+  if (( build )); then
+    [[ "${EUID}" -ne 0 ]] || fail "--build must run as an unprivileged user; do not use sudo" || return
+    [[ -z "${jar}" ]] || fail "--build cannot be combined with --jar" || return
+    printf 'Building IceBridge as %s...\n' "$(id -un)"
+    (cd "${root}" && ./gradlew icebridgeJar)
+    jar="${root}/build/libs/icebridge.jar"
+    [[ -f "${jar}" && ! -L "${jar}" ]] || fail "Build completed without ${jar}" || return
+    printf 'Built %s\n' "${jar}"
+    printf 'Install it with:\n  sudo "%s" --jar="%s"\n' "${script_path}" "${jar}"
+    return
+  fi
   [[ "${EUID}" -eq 0 ]] || fail "Install requires root; build first as an unprivileged user. No automatic elevation." || return
   export PATH=/usr/sbin:/usr/bin:/sbin:/bin
   [[ -n "${jar}" ]] || fail "Explicit --jar required; never reuse a service-owned installed JAR" || return
