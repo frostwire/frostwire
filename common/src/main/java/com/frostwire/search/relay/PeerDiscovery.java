@@ -149,7 +149,6 @@ public final class PeerDiscovery {
                             : authenticator.authenticate(host, port);
                     if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) break;
                     if (maybeIdentity.isEmpty()) {
-                        LOG.debug("Authentication failed for discovered peer " + host + ":" + port);
                         continue;
                     }
                     IdentityRecord identity = maybeIdentity.get();

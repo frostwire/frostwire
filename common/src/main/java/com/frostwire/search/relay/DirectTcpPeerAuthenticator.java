@@ -121,6 +121,24 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator, Auto
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return Optional.empty();
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOG.debug("Identity possession proof timed out for " + host + ":" + port);
+            return Optional.empty();
+        } catch (java.util.concurrent.ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof java.net.ConnectException) {
+                LOG.debug("Identity peer refused connection at " + host + ":" + port);
+            } else if (cause instanceof java.net.SocketTimeoutException) {
+                LOG.debug("Identity peer did not answer at " + host + ":" + port);
+            } else if (cause instanceof java.net.UnknownHostException) {
+                LOG.debug("Identity peer host did not resolve: " + host);
+            } else if (cause instanceof java.io.IOException) {
+                LOG.debug("Identity peer unreachable at " + host + ":" + port);
+            } else {
+                LOG.debug(
+                        "Identity possession proof unavailable for " + host + ":" + port, e);
+            }
+            return Optional.empty();
         } catch (Exception e) {
             LOG.debug("Identity possession proof unavailable for " + host + ":" + port, e);
             return Optional.empty();
