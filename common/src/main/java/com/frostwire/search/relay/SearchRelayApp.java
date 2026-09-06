@@ -35,20 +35,26 @@ public final class SearchRelayApp implements AutoCloseable {
     private final IncomingSearchRequestHandler handler;
     private final PeerRegistrySync registrySync;
     private final PeerDirectory directory;
+    private final IceBridgeServer server;
 
     private SearchRelayApp(IceBridgeSearchTransport transport,
                            IncomingSearchRequestHandler handler,
                            PeerRegistrySync registrySync,
-                           PeerDirectory directory) {
+                            PeerDirectory directory,
+                            IceBridgeServer server) {
         this.transport = transport;
         this.handler = handler;
         this.registrySync = registrySync;
         this.directory = directory;
+        this.server = server;
     }
 
     public static SearchRelayApp start(IceBridgeServer server) {
         if (server == null) {
             throw new IllegalArgumentException("server is null");
+        }
+        if (!server.setSharedConsumerEnabled(true)) {
+            throw new IllegalStateException("server has no shared delivery queue");
         }
         IceBridgeClient client = new IceBridgeClient(server.controlPort());
         client.setAuthToken(server.authToken());
@@ -72,7 +78,7 @@ public final class SearchRelayApp implements AutoCloseable {
         registrySync.start();
 
         LOG.info("SearchRelayApp started: dual-envelope forward with empty index");
-        return new SearchRelayApp(transport, handler, registrySync, directory);
+        return new SearchRelayApp(transport, handler, registrySync, directory, server);
     }
 
     /** Visible for tests: the directory fed by registry mesh import. */
@@ -99,9 +105,13 @@ public final class SearchRelayApp implements AutoCloseable {
         try {
             if (transport != null) {
                 transport.close();
+                transport.client().close();
             }
         } catch (Throwable t) {
             LOG.debug("SearchRelayApp: transport close failed", t);
+        }
+        if (!server.setSharedConsumerEnabled(false)) {
+            LOG.debug("SearchRelayApp: pending shared messages remain owned by server until shutdown");
         }
     }
 }

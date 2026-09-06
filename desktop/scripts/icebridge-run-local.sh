@@ -3,8 +3,8 @@
 #
 # Defaults: bind 0.0.0.0, role FORWARDER, DHT on, TCP identity 6888, UDP mesh 6889,
 # control HTTP 8081 (loopback only inside the JVM). Builds icebridge.jar if missing,
-# kills any previous icebridge process bound to the same relay/control ports
-# (pidfile + port sweep), then runs via java -jar (preferred over long-lived Gradle).
+# never kills existing processes (including old PID-file targets), then runs via
+# java -jar. Stop an old instance through its owner, or choose different ports.
 # Default (no flags) starts the server detached and tails the log — Ctrl+C
 # stops the tail only; the server keeps running.
 #
@@ -24,6 +24,12 @@
 # SEARCH / TELEMETRY (PING) / other MeshProtocolId traffic.
 
 set -euo pipefail
+umask 077
+
+if [[ "${EUID}" -eq 0 ]]; then
+  echo "ERROR: run-local builds and launches code; run it as an unprivileged user." >&2
+  exit 1
+fi
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${ROOT}"
@@ -60,7 +66,7 @@ done
 if [[ -f "${ROOT}/.env" ]]; then
   while IFS= read -r line || [[ -n "${line}" ]]; do
     [[ -z "${line}" || "${line}" =~ ^[[:space:]]*# ]] && continue
-    if [[ "${line}" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+    if [[ "${line}" =~ ^(ICEBRIDGE_[A-Z0-9_]+)=(.*)$ ]]; then
       key="${BASH_REMATCH[1]}"
       val="${BASH_REMATCH[2]}"
       val="${val%\"}"
@@ -91,6 +97,10 @@ export ICEBRIDGE_DHT="${ICEBRIDGE_DHT:-true}"
 export ICEBRIDGE_IDENTITY_FILE="${ICEBRIDGE_IDENTITY_FILE:-${ROOT}/identity.dat}"
 export ICEBRIDGE_AUTH_TOKENS_FILE="${ICEBRIDGE_AUTH_TOKENS_FILE:-${ROOT}/icebridge-tokens.txt}"
 export ICEBRIDGE_MAX_PEERS="${ICEBRIDGE_MAX_PEERS:-10000}"
+export ICEBRIDGE_MAX_SESSIONS="${ICEBRIDGE_MAX_SESSIONS:-1024}"
+export ICEBRIDGE_MESH_FANOUT="${ICEBRIDGE_MESH_FANOUT:-6}"
+export ICEBRIDGE_SEARCH_PEER_FANOUT="${ICEBRIDGE_SEARCH_PEER_FANOUT:-8}"
+export ICEBRIDGE_SEARCH_TTL="${ICEBRIDGE_SEARCH_TTL:-2}"
 export ICEBRIDGE_PEER_TTL_SEC="${ICEBRIDGE_PEER_TTL_SEC:-300}"
 export ICEBRIDGE_MAX_QPS_PER_KEY="${ICEBRIDGE_MAX_QPS_PER_KEY:-30.0}"
 
@@ -126,16 +136,14 @@ fi
 
 if [[ "${GENERATE_TOKEN}" -eq 1 ]] || [[ ! -f "${ICEBRIDGE_AUTH_TOKENS_FILE}" ]]; then
   if [[ ! -f "${ICEBRIDGE_AUTH_TOKENS_FILE}" ]]; then
-    echo "==> No tokens file; generating one (printed once)"
+    echo "==> No tokens file; generating one in the restricted tokens file"
   else
-    echo "==> Generating additional token (printed once)"
+    echo "==> Generating additional token in the restricted tokens file"
   fi
-  token_once="${ICEBRIDGE_AUTH_TOKENS_FILE}.once"
   "${JAVA_BIN}" -jar "${JAR}" \
     --generate-token \
     --auth-tokens-file "${ICEBRIDGE_AUTH_TOKENS_FILE}" \
-    | tee "${token_once}"
-  chmod 600 "${ICEBRIDGE_AUTH_TOKENS_FILE}" "${token_once}" 2>/dev/null || true
+    > /dev/null
   if [[ "${GENERATE_TOKEN}" -eq 1 ]]; then
     echo "==> Token generation done; not starting server (--generate-token)."
     exit 0
@@ -192,83 +200,8 @@ wait_for_health() {
   return 1
 }
 
-# PIDs listening on a local TCP port (one per line; empty when free).
-# lsof covers macOS + most Linux; ss covers Linux iproute2. No match when
-# neither tool exists (caller warns once).
-pids_on_tcp_port() {
-  local port="$1"
-  if command -v lsof >/dev/null 2>&1; then
-    lsof -tiTCP:"${port}" -sTCP:LISTEN 2>/dev/null || true
-    return 0
-  fi
-  if command -v ss >/dev/null 2>&1; then
-    ss -ltnp 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
-    return 0
-  fi
-  return 1
-}
-
-# Stop anything from a previous run before we bind: our mode-specific pidfile
-# first, then any stray still bound to OUR relay/control TCP ports (e.g. a
-# forwarder launched by hand). Scoped to our ports, so a --colo instance on
-# 7000/7001 is never touched by a default-ports run and vice versa.
-kill_existing() {
-  local victims="" pid=""
-  if [[ -f "${PIDFILE}" ]]; then
-    pid="$(tr -cd '0-9' < "${PIDFILE}" 2>/dev/null || true)"
-    if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null \
-        && ps -p "${pid}" -o args= 2>/dev/null | grep -q "icebridge"; then
-      victims="${victims} ${pid}"
-    fi
-    rm -f "${PIDFILE}"
-  fi
-  if ! command -v lsof >/dev/null 2>&1 && ! command -v ss >/dev/null 2>&1; then
-    echo "    WARNING: neither lsof nor ss found; cannot sweep strays by port." >&2
-  else
-    local port="" p=""
-    for port in "${ICEBRIDGE_RELAY_PORT}" "${ICEBRIDGE_CONTROL_HTTP_PORT}"; do
-      for p in $(pids_on_tcp_port "${port}" || true); do
-        [[ "${p}" != "$$" ]] && victims="${victims} ${p}"
-      done
-    done
-  fi
-  victims="$(echo ${victims} | tr ' ' '\n' | sort -nu | tr '\n' ' ')"
-  if [[ -z "${victims// }" ]]; then
-    return 0
-  fi
-  echo "==> Stopping existing icebridge process(es):${victims}"
-  # shellcheck disable=SC2086
-  kill ${victims} 2>/dev/null || true
-  local i="" alive="" p="" still="" remain=""
-  for i in $(seq 1 25); do
-    alive=""
-    for p in ${victims}; do
-      kill -0 "${p}" 2>/dev/null && alive="${alive} ${p}"
-    done
-    [[ -z "${alive// }" ]] && break
-    sleep 0.2
-  done
-  for p in ${victims}; do
-    kill -0 "${p}" 2>/dev/null && still="${still} ${p}"
-  done
-  if [[ -n "${still// }" ]]; then
-    echo "    TERM ignored, escalating to KILL:${still}"
-    # shellcheck disable=SC2086
-    kill -9 ${still} 2>/dev/null || true
-    sleep 1
-  fi
-  for p in ${victims}; do
-    kill -0 "${p}" 2>/dev/null && remain="${remain} ${p}"
-  done
-  if [[ -n "${remain// }" ]]; then
-    echo "ERROR: could not stop icebridge pid(s):${remain}; ports may still be bound." >&2
-    return 1
-  fi
-  echo "    stopped."
-}
-
-# Free our ports before binding (skipped for --generate-token-only runs above).
-kill_existing
+# A PID file or port is not proof of ownership. Let the JVM fail its bind
+# rather than terminating somebody else's service or a reused process ID.
 
 if [[ "${USE_GRADLE}" -eq 1 ]]; then
   run_server

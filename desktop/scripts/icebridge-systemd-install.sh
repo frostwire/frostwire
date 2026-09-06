@@ -1,319 +1,308 @@
 #!/usr/bin/env bash
-# Install / upgrade a standalone IceBridge FORWARDER on a Linux host.
-# One step: rebuilds icebridge.jar from the enclosing checkout (unless
-# --no-build), copies it to $INSTALL_DIR (default /opt/icebridge), then
-# installs/restarts the systemd unit.
-# Run ON the EC2 instance from the frostwire checkout, e.g.:
-#   sudo INSTALL_DIR=/opt/icebridge bash desktop/scripts/icebridge-systemd-install.sh
-# (or via: ssh host 'bash -s' < scripts/icebridge-systemd-install.sh)
+# Install a prebuilt, operator-trusted IceBridge artifact on Linux/systemd.
+# Build UNPRIVILEGED first, then stage the chosen artifact under a root-owned,
+# non-writable-by-others directory. This script never builds or runs a JAR as root.
+# Run the trusted checkout's script, never a copy in a service-writable tree:
+#   sudo bash desktop/scripts/icebridge-systemd-install.sh --jar=/trusted/icebridge.jar
+# --no-build is accepted for old automation, but --jar is always required.
 #
-# Usage:
-#   sudo INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh [--no-build] [--jar=/path/to/icebridge.jar]
-#   TOKEN_FILE=... ICEBRIDGE_RUDP_PORT=6889 ... bash icebridge-systemd-install.sh
+# Code: /opt/icebridge (root). Config: /etc/icebridge (root, tokens root:service).
+# State: /var/lib/icebridge (service). Existing root config wins over installer
+# environment on upgrades. Edit icebridge.env there and restart to apply changes.
+# Legacy /opt/icebridge/icebridge.env is parsed as strict allowlisted DATA, never
+# sourced. Default legacy identity/token paths migrate; custom paths, symlinks,
+# hardlinks, unknown keys or shell syntax require manual operator review. Legacy
+# caches are deliberately not imported. Rotate old tokens if compromise is possible.
+# Failed migration leaves the service stopped and directories locked down. Review
+# the rejected data and rerun this trusted installer; do not start the old unit.
+# Prior program directories are retained as DATA under root-only
+# ${INSTALL_DIR}.previous.XXXXXXXX/data; operators may archive/remove them later.
 #
-# Control HTTP binds 127.0.0.1 only (see ControlServer). Do not open it in the
-# security group; use SSH -L for ops. Mesh plane: TCP identity + UDP rUDP.
+# All tokens are full node-administrator credentials, NOT isolated tenant tokens.
+# Control stays loopback-only; use SSH forwarding, never open its security group.
+# This installer does not kill port owners or PID-file targets. A foreign listener
+# must be resolved by its operator; IceBridge binding fails without harming it.
+#
+# Provisional containment, NOT a measured capacity claim: heap 256 MiB, direct
+# buffers 128 MiB, total MemoryMax 768 MiB leaves ~384 MiB for JVM/native libtorrent,
+# stacks and code. TasksMax 256, NOFILE 8192, sessions 1024, lean fanout by default.
+# Tune in a root-owned systemd drop-in only after RSS/native/delivery measurements.
+# No MemoryDenyWriteExecute (JIT/JNI need executable mappings); /tmp is private but
+# executable for native extraction. State and private temp are the only write areas.
 
 set -euo pipefail
+umask 077
 
-NO_BUILD=0
-JAR_SRC=""
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --no-build) NO_BUILD=1 ;;
-    --jar=*)
-      JAR_SRC="${1#--jar=}"
-      # Resolve now: the script cd's into INSTALL_DIR later.
-      if [[ "${JAR_SRC}" != /* ]]; then
-        JAR_SRC="$(pwd)/${JAR_SRC}"
-      fi
-      ;;
-    -h|--help)
-      echo "Usage: INSTALL_DIR=/opt/icebridge bash icebridge-systemd-install.sh [--no-build] [--jar=/path/to/icebridge.jar]"
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      exit 1
-      ;;
-  esac
-  shift
-done
+fail() { printf 'ERROR: %s\n' "$*" >&2; return 1; }
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DESKTOP_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-
-INSTALL_DIR="${INSTALL_DIR:-/opt/icebridge}"
-SERVICE_USER="${SERVICE_USER:-icebridge}"
-RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-6889}"
-RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-6888}"
-# Host for rUDP / identity listeners. Control HTTP ignores this and stays on 127.0.0.1.
-BIND_HOST="${ICEBRIDGE_HOST:-0.0.0.0}"
-CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-8081}"
-ROLE="${ICEBRIDGE_ROLE:-FORWARDER}"
-# Resolve to absolute path for systemd (relative "java" is unreliable under unit PATH).
-JAVA_BIN_RAW="${JAVA_BIN:-java}"
-if command -v "${JAVA_BIN_RAW}" >/dev/null 2>&1; then
-  JAVA_BIN="$(command -v "${JAVA_BIN_RAW}")"
-else
-  JAVA_BIN="${JAVA_BIN_RAW}"
-fi
-
-# Self-elevate: the install (INSTALL_DIR + systemd unit) needs root. Re-exec
-# under sudo, passing our config through explicitly (sudoers may strip the
-# environment), preserving args and working directory. No sudo binary, or
-# already root: continue as-is (non-root falls back to env-file + manual
-# nohup instructions at the end).
-if [[ "$(id -u)" -ne 0 ]] && command -v sudo >/dev/null 2>&1 && [[ -f "$0" ]]; then
-  echo "==> Need root for ${INSTALL_DIR} + systemd; re-running under sudo (may ask for your password)."
-  # Gradle needs JAVA_HOME (sudo resets PATH and strips the environment);
-  # derive it from the resolved java binary when the caller didn't export one.
-  ELEVATED_JAVA_HOME="${JAVA_HOME:-}"
-  if [[ -z "${ELEVATED_JAVA_HOME}" && "${JAVA_BIN:-}" == */* ]]; then
-    ELEVATED_JAVA_HOME="$(cd "$(dirname "${JAVA_BIN}")/.." 2>/dev/null && pwd)"
-  fi
-  exec sudo \
-    "INSTALL_DIR=${INSTALL_DIR}" \
-    "SERVICE_USER=${SERVICE_USER}" \
-    "JAVA_BIN=${JAVA_BIN:-java}" \
-    "JAVA_HOME=${ELEVATED_JAVA_HOME}" \
-    "FORCE_ENV=${FORCE_ENV:-0}" \
-    "ICEBRIDGE_HOST=${ICEBRIDGE_HOST:-}" \
-    "ICEBRIDGE_RUDP_PORT=${ICEBRIDGE_RUDP_PORT:-}" \
-    "ICEBRIDGE_RELAY_PORT=${ICEBRIDGE_RELAY_PORT:-}" \
-    "ICEBRIDGE_CONTROL_HTTP_PORT=${ICEBRIDGE_CONTROL_HTTP_PORT:-}" \
-    "ICEBRIDGE_ROLE=${ICEBRIDGE_ROLE:-}" \
-    "ICEBRIDGE_IDENTITY_FILE=${ICEBRIDGE_IDENTITY_FILE:-}" \
-    "ICEBRIDGE_AUTH_TOKENS_FILE=${ICEBRIDGE_AUTH_TOKENS_FILE:-}" \
-    "ICEBRIDGE_MAX_PEERS=${ICEBRIDGE_MAX_PEERS:-}" \
-    "ICEBRIDGE_PEER_TTL_SEC=${ICEBRIDGE_PEER_TTL_SEC:-}" \
-    "ICEBRIDGE_MAX_QPS_PER_KEY=${ICEBRIDGE_MAX_QPS_PER_KEY:-}" \
-    "ICEBRIDGE_BOOTSTRAP=${ICEBRIDGE_BOOTSTRAP:-}" \
-    "ICEBRIDGE_DHT=${ICEBRIDGE_DHT:-}" \
-    bash "$0" "$@"
-fi
-
-# One-step: build the jar from the enclosing checkout (skipped with --no-build
-# or an explicit --jar=...). Falls back to a jar already in INSTALL_DIR.
-if [[ -z "${JAR_SRC}" && "${NO_BUILD}" -eq 0 && -x "${DESKTOP_ROOT}/gradlew" ]]; then
-  echo "==> Building icebridge.jar from ${DESKTOP_ROOT}"
-  (cd "${DESKTOP_ROOT}" && ./gradlew icebridgeJar)
-  JAR_SRC="${DESKTOP_ROOT}/build/libs/icebridge.jar"
-  if [[ -n "${SUDO_USER:-}" ]]; then
-    chown -R "${SUDO_USER}" "${DESKTOP_ROOT}/build" 2>/dev/null || true
-  fi
-fi
-if [[ -z "${JAR_SRC}" ]]; then
-  JAR_SRC="${INSTALL_DIR}/icebridge.jar"
-fi
-if [[ ! -f "${JAR_SRC}" ]]; then
-  echo "ERROR: no icebridge.jar (tried ${JAR_SRC}). Re-run without --no-build" >&2
-  echo "  from a frostwire checkout, pass --jar=/path/to/icebridge.jar," >&2
-  echo "  or scp one to ${INSTALL_DIR}/ first." >&2
-  exit 1
-fi
-
-if ! command -v "${JAVA_BIN}" >/dev/null 2>&1 && [[ ! -x "${JAVA_BIN}" ]]; then
-  echo "ERROR: java not found (${JAVA_BIN_RAW}). Install JDK 17+ (Amazon Corretto / Temurin)." >&2
-  exit 1
-fi
-
-# Prefer realpath-style absolute for ExecStart
-if [[ "${JAVA_BIN}" != /* ]]; then
-  if command -v "${JAVA_BIN}" >/dev/null 2>&1; then
-    JAVA_BIN="$(command -v "${JAVA_BIN}")"
-  fi
-fi
-if [[ "${JAVA_BIN}" != /* ]]; then
-  echo "ERROR: JAVA_BIN must resolve to an absolute path for systemd (got: ${JAVA_BIN})" >&2
-  exit 1
-fi
-
-echo "==> Layout under ${INSTALL_DIR}"
-mkdir -p "${INSTALL_DIR}"
-cd "${INSTALL_DIR}"
-
-if [[ "${JAR_SRC}" != "${INSTALL_DIR}/icebridge.jar" ]]; then
-  echo "==> Installing jar -> ${INSTALL_DIR}/icebridge.jar"
-  cp -f "${JAR_SRC}" "${INSTALL_DIR}/icebridge.jar"
-fi
-
-if [[ ! -f icebridge-tokens.txt ]]; then
-  echo "==> Generating control token (printed once)"
-  "${JAVA_BIN}" -jar icebridge.jar --generate-token --auth-tokens-file icebridge-tokens.txt | tee icebridge-token.once
-  chmod 600 icebridge-tokens.txt icebridge-token.once
-fi
-
-ENV_FILE="${INSTALL_DIR}/icebridge.env"
-write_icebridge_env() {
-  cat > "${ENV_FILE}" <<EOF
-ICEBRIDGE_HOST=${BIND_HOST}
-ICEBRIDGE_RUDP_PORT=${RUDP_PORT}
-ICEBRIDGE_RELAY_PORT=${RELAY_PORT}
-ICEBRIDGE_CONTROL_HTTP_PORT=${CONTROL_HTTP_PORT}
-ICEBRIDGE_ROLE=${ROLE}
-ICEBRIDGE_IDENTITY_FILE=${INSTALL_DIR}/identity.dat
-ICEBRIDGE_AUTH_TOKENS_FILE=${INSTALL_DIR}/icebridge-tokens.txt
-ICEBRIDGE_BOOTSTRAP=true
-ICEBRIDGE_DHT=true
-ICEBRIDGE_MAX_PEERS=10000
-ICEBRIDGE_PEER_TTL_SEC=300
-ICEBRIDGE_MAX_QPS_PER_KEY=30.0
-EOF
-  chmod 600 "${ENV_FILE}"
+layout() {
+  INSTALL_DIR="${INSTALL_DIR:-/opt/icebridge}"
+  CONFIG_DIR="${CONFIG_DIR:-/etc/icebridge}"
+  STATE_DIR="${STATE_DIR:-/var/lib/icebridge}"
+  SERVICE_USER="${SERVICE_USER:-icebridge}"
+  JAVA_BIN="${JAVA_BIN:-/usr/bin/java}"
+  local path
+  for path in "${INSTALL_DIR}" "${CONFIG_DIR}" "${STATE_DIR}" "${JAVA_BIN}"; do
+    [[ "${path}" =~ ^/[a-zA-Z0-9_./+-]+$ && "${path}" != */ && "${path}" != *//*
+       && "/${path}/" != */../* && "/${path}/" != */./* ]] || fail "Use simple absolute paths without dot components" || return
+  done
+  [[ "${SERVICE_USER}" =~ ^[a-z_][a-z0-9_-]*$ && "${SERVICE_USER}" != root ]] || fail "Invalid service user" || return
+  [[ "${CONFIG_DIR}/" != "${INSTALL_DIR}/"* && "${INSTALL_DIR}/" != "${CONFIG_DIR}/"*
+     && "${STATE_DIR}/" != "${INSTALL_DIR}/"* && "${INSTALL_DIR}/" != "${STATE_DIR}/"*
+     && "${STATE_DIR}/" != "${CONFIG_DIR}/"* && "${CONFIG_DIR}/" != "${STATE_DIR}/"* ]] || fail "Code, config and state must be separate" || return
 }
 
-if [[ -f "${ENV_FILE}" ]]; then
-  # Preserve operator edits on upgrade unless FORCE_ENV=1.
-  if [[ "${FORCE_ENV:-0}" == "1" ]]; then
-    echo "==> FORCE_ENV=1 — rewriting ${ENV_FILE}"
-    write_icebridge_env
-  else
-    echo "==> Keeping existing ${ENV_FILE} (FORCE_ENV=1 to replace from current ICEBRIDGE_* / defaults)"
-  fi
-else
-  echo "==> Writing ${ENV_FILE}"
-  write_icebridge_env
-fi
-
-# Source final env so health check uses the active control port
-# shellcheck disable=SC1090
-set -a
-# shellcheck source=/dev/null
-source "${ENV_FILE}"
-set +a
-CONTROL_HTTP_PORT="${ICEBRIDGE_CONTROL_HTTP_PORT:-${CONTROL_HTTP_PORT}}"
-RELAY_PORT="${ICEBRIDGE_RELAY_PORT:-${RELAY_PORT}}"
-RUDP_PORT="${ICEBRIDGE_RUDP_PORT:-${RUDP_PORT}}"
-
-# PIDs bound to a local port (TCP listeners, or UDP sockets), one per line.
-# lsof covers both; ss needs -t/-u variants. Empty when free or when
-# neither tool exists (caller falls back to the jar's own pre-flight error).
-pids_on_tcp_port() {
-  local port="$1"
-  if command -v lsof >/dev/null 2>&1; then
-    lsof -tiTCP:"${port}" -sTCP:LISTEN 2>/dev/null || true
-    return 0
-  fi
-  if command -v ss >/dev/null 2>&1; then
-    ss -ltnp 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
-    return 0
-  fi
-  return 1
+# Emits canonical EnvironmentFile assignments. No eval, source, expansion or
+# arbitrary exported keys. Limits apply before read so a line cannot grow forever.
+normalize_env() {
+  local file="$1" line key value size total=0
+  local LC_ALL=C
+  [[ -f "${file}" && ! -L "${file}" ]] || fail "Config must be a regular non-symlink file" || return
+  size=$(wc -c < "${file}")
+  (( size <= 65536 )) || fail "Config exceeds 64 KiB" || return
+  (( $(tr -d '\000' < "${file}" | wc -c) == size )) || fail "Config contains NUL bytes" || return
+  while IFS= read -r -n 4097 line || [[ -n "${line}" ]]; do
+    total=$((total + ${#line} + 1))
+    (( total <= 65537 )) || fail "Config exceeds 64 KiB while reading" || return
+    (( ${#line} <= 4096 )) || fail "Config line exceeds 4096 characters" || return
+    line="${line%$'\r'}"
+    [[ -z "${line}" || "${line}" =~ ^[[:space:]]*# ]] && continue
+    [[ "${line}" =~ ^(ICEBRIDGE_[A-Z0-9_]+)=(.*)$ ]] || fail "Expected allowlisted KEY=value data" || return
+    key="${BASH_REMATCH[1]}"; value="${BASH_REMATCH[2]}"
+    if [[ "${value}" == \"*\" || "${value}" == \'*\' ]]; then
+      value="${value:1:${#value}-2}"
+    fi
+    case "${key}" in
+      ICEBRIDGE_HOST)
+        [[ "${value}" =~ ^[a-zA-Z0-9_.:-]+$ ]] || fail "Invalid ${key}" || return ;;
+      ICEBRIDGE_ROLE)
+        [[ "${value}" == FORWARDER || "${value}" == CLIENT || "${value}" == BOTH ]] || fail "Invalid ${key}" || return ;;
+      ICEBRIDGE_RUDP_PORT|ICEBRIDGE_RELAY_PORT|ICEBRIDGE_CONTROL_HTTP_PORT)
+        [[ "${value}" =~ ^[0-9]{1,5}$ ]] && (( 10#${value} <= 65535 )) || fail "Invalid ${key}" || return
+        [[ "${key}" != ICEBRIDGE_CONTROL_HTTP_PORT || 10#${value} -gt 0 ]] || fail "Control port must be positive" || return ;;
+      ICEBRIDGE_MAX_PEERS|ICEBRIDGE_MAX_SESSIONS|ICEBRIDGE_PEER_TTL_SEC|ICEBRIDGE_MESH_FANOUT|ICEBRIDGE_SEARCH_PEER_FANOUT|ICEBRIDGE_MESH_HOP_TTL|ICEBRIDGE_SEARCH_TTL|ICEBRIDGE_SOFT_MAX|ICEBRIDGE_LEAF_UP_CONNECTIONS)
+        [[ "${value}" =~ ^[0-9]{1,9}$ ]] && (( 10#${value} > 0 )) || fail "Invalid ${key}" || return ;;
+      ICEBRIDGE_MAX_QPS_PER_KEY)
+        [[ "${value}" =~ ^[0-9]{1,6}(\.[0-9]{1,6})?$ && "${value}" =~ [1-9] ]] || fail "Invalid ${key}" || return ;;
+      ICEBRIDGE_BOOTSTRAP|ICEBRIDGE_DHT|ICEBRIDGE_SEARCH_APP)
+        [[ "${value}" == true || "${value}" == false ]] || fail "Invalid ${key}" || return ;;
+      ICEBRIDGE_IDENTITY_FILE)
+        case "${value}" in
+          identity.dat|./identity.dat|"${INSTALL_DIR}/identity.dat"|"${STATE_DIR}/identity.dat") value="${STATE_DIR}/identity.dat" ;;
+          *) fail "Custom legacy identity path requires manual migration"; return 1 ;;
+        esac ;;
+      ICEBRIDGE_AUTH_TOKENS_FILE)
+        case "${value}" in
+          icebridge-tokens.txt|./icebridge-tokens.txt|"${INSTALL_DIR}/icebridge-tokens.txt"|"${CONFIG_DIR}/icebridge-tokens.txt") value="${CONFIG_DIR}/icebridge-tokens.txt" ;;
+          *) fail "Custom legacy token path requires manual migration"; return 1 ;;
+        esac ;;
+      *) fail "Unsupported config key: ${key}"; return 1 ;;
+    esac
+    printf '%s=%s\n' "${key}" "${value}"
+  done < "${file}"
 }
 
-pids_on_udp_port() {
-  local port="$1"
-  if command -v lsof >/dev/null 2>&1; then
-    lsof -tiUDP:"${port}" 2>/dev/null || true
-    return 0
-  fi
-  if command -v ss >/dev/null 2>&1; then
-    ss -lnup 2>/dev/null | grep -F ":${port} " | grep -o 'pid=[0-9][0-9]*' | cut -d= -f2 || true
-    return 0
-  fi
-  return 1
+default_env() {
+  local entry key value
+  for entry in HOST=0.0.0.0 RUDP_PORT=6889 RELAY_PORT=6888 CONTROL_HTTP_PORT=8081 \
+      ROLE=FORWARDER MAX_PEERS=10000 MAX_SESSIONS=1024 PEER_TTL_SEC=300 \
+      MAX_QPS_PER_KEY=30.0 BOOTSTRAP=true DHT=true SEARCH_APP=true \
+      MESH_FANOUT=6 SEARCH_PEER_FANOUT=8 MESH_HOP_TTL=3 SEARCH_TTL=2 \
+      SOFT_MAX=3 LEAF_UP_CONNECTIONS=3; do
+    key="ICEBRIDGE_${entry%%=*}"; value="${entry#*=}"
+    printf '%s=%s\n' "${key}" "${!key:-${value}}"
+  done
+  printf 'ICEBRIDGE_IDENTITY_FILE=%s/identity.dat\n' "${STATE_DIR}"
+  printf 'ICEBRIDGE_AUTH_TOKENS_FILE=%s/icebridge-tokens.txt\n' "${CONFIG_DIR}"
 }
 
-# Stop strays from previous runs (hand-launched java -jar, old run-local
-# background) that would collide with the unit on relay/control TCP or rUDP.
-# Scoped to our three ports. Fails fast when a squatter won't die, so we
-# never install a crash-looping unit.
-stop_strays() {
-  local victims="" p=""
-  for p in $(pids_on_tcp_port "${RELAY_PORT}" || true) \
-           $(pids_on_tcp_port "${CONTROL_HTTP_PORT}" || true) \
-           $(pids_on_udp_port "${RUDP_PORT}" || true); do
-    [[ "${p}" != "$$" ]] && victims="${victims} ${p}"
-  done
-  victims="$(echo ${victims} | tr ' ' '\n' | sort -nu | tr '\n' ' ')"
-  if [[ -z "${victims// }" ]]; then
-    return 0
-  fi
-  echo "==> Stopping stray icebridge process(es) on our ports:${victims}"
-  # shellcheck disable=SC2086
-  kill ${victims} 2>/dev/null || true
-  local i="" alive=""
-  for i in $(seq 1 25); do
-    alive=""
-    for p in ${victims}; do
-      kill -0 "${p}" 2>/dev/null && alive="${alive} ${p}"
-    done
-    [[ -z "${alive// }" ]] && break
-    sleep 0.2
-  done
-  local still=""
-  for p in ${victims}; do
-    kill -0 "${p}" 2>/dev/null && still="${still} ${p}"
-  done
-  if [[ -n "${still// }" ]]; then
-    echo "    TERM ignored, escalating to KILL:${still}"
-    # shellcheck disable=SC2086
-    kill -9 ${still} 2>/dev/null || true
-    sleep 1
-  fi
-  local remain=""
-  for p in ${victims}; do
-    kill -0 "${p}" 2>/dev/null && remain="${remain} ${p}"
-  done
-  if [[ -n "${remain// }" ]]; then
-    echo "ERROR: port squatter(s) won't die:${remain}; refusing to install a crash-loop." >&2
-    return 1
-  fi
-  echo "    stopped."
-}
-
-# systemd unit (requires root)
-UNIT=/etc/systemd/system/icebridge.service
-if [[ "$(id -u)" -eq 0 ]]; then
-  id -u "${SERVICE_USER}" >/dev/null 2>&1 || useradd --system --home "${INSTALL_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
-  chown -R "${SERVICE_USER}:${SERVICE_USER}" "${INSTALL_DIR}"
-
-  cat > "${UNIT}" <<EOF
+render_unit() {
+  cat <<EOF
 [Unit]
-Description=FrostWire IceBridge FORWARDER (DHT + rUDP mesh)
+Description=FrostWire IceBridge relay
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
 
 [Service]
 Type=simple
 User=${SERVICE_USER}
-WorkingDirectory=${INSTALL_DIR}
-EnvironmentFile=${INSTALL_DIR}/icebridge.env
-ExecStart=${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar --host ${ICEBRIDGE_HOST} --rudp-port ${ICEBRIDGE_RUDP_PORT} --relay-port ${ICEBRIDGE_RELAY_PORT} --control-http-port ${ICEBRIDGE_CONTROL_HTTP_PORT} --role ${ICEBRIDGE_ROLE} --identity-file ${ICEBRIDGE_IDENTITY_FILE} --auth-tokens-file ${ICEBRIDGE_AUTH_TOKENS_FILE} --max-peers ${ICEBRIDGE_MAX_PEERS} --peer-ttl-sec ${ICEBRIDGE_PEER_TTL_SEC} --max-qps-per-key ${ICEBRIDGE_MAX_QPS_PER_KEY} --dht --bootstrap
+Group=${SERVICE_USER}
+WorkingDirectory=${STATE_DIR}
+EnvironmentFile=${CONFIG_DIR}/icebridge.env
+Environment=ICEBRIDGE_LOAD_DOT_ENV=false
+ExecStart=${JAVA_BIN} -Xms64m -Xmx256m -XX:MaxDirectMemorySize=128m -XX:ActiveProcessorCount=2 -Duser.home=${STATE_DIR} -jar ${INSTALL_DIR}/icebridge.jar
 Restart=on-failure
 RestartSec=5
-LimitNOFILE=65535
-# Bound journal volume under flood: per-packet drops already log at DEBUG,
-# this caps any residual spam (~66 lines/sec) so one flooder can't evict
-# the log history inside the 200M journal budget. Tune after EC2 baseline.
+TimeoutStopSec=30
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=${STATE_DIR}
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+CapabilityBoundingSet=
+AmbientCapabilities=
+MemoryMax=768M
+TasksMax=256
+LimitNOFILE=8192
+LimitCORE=0
 LogRateLimitIntervalSec=30s
 LogRateLimitBurst=2000
 
 [Install]
 WantedBy=multi-user.target
 EOF
+}
 
+# Linux stat, with every ancestor checked: a root-owned leaf under a writable
+# parent is not a trusted destination. Never follow symlinks while repairing.
+trusted_dir() {
+  local path="$1" mode
+  while :; do
+    [[ -d "${path}" && ! -L "${path}" && $(stat -c %u -- "${path}") == 0 ]] || fail "Untrusted directory: ${path}" || return
+    mode=$(stat -c %a -- "${path}")
+    (( (8#${mode} & 0022) == 0 )) || fail "Writable directory: ${path}" || return
+    [[ "${path}" == / ]] && break
+    path=$(dirname -- "${path}")
+  done
+}
+
+regular_file() {
+  [[ -f "$1" && ! -L "$1" && $(stat -c %h -- "$1") == 1 ]] || fail "Expected regular non-linked file: $1"
+}
+
+trusted_file() {
+  local mode
+  trusted_dir "$(dirname -- "$1")" || return
+  regular_file "$1" || return
+  [[ $(stat -c %u -- "$1") == 0 ]] || fail "Expected root-owned file: $1" || return
+  mode=$(stat -c %a -- "$1")
+  (( (8#${mode} & 0022) == 0 )) || fail "Writable trusted file: $1"
+}
+
+# Source names are locked down by their root-owned parent first. A process may
+# still hold a writable file descriptor, so bound the actual copy, not just stat.
+snapshot_data() {
+  regular_file "$1" || return
+  head -c 65537 -- "$1" > "$2" || return
+  (( $(wc -c < "$2") <= 65536 )) || fail "Migration data exceeds 64 KiB"
+}
+
+main() {
+  layout
+  local jar="" arg
+  for arg in "$@"; do
+    case "${arg}" in
+      --jar=*) jar="${arg#--jar=}" ;;
+      --no-build) ;;
+      --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar [--no-build]\n'; return ;;
+      *) fail "Unknown option"; return 1 ;;
+    esac
+  done
+  [[ "${EUID}" -eq 0 ]] || fail "Install requires root; build first as an unprivileged user. No automatic elevation." || return
+  export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+  [[ -n "${jar}" ]] || fail "Explicit --jar required; never reuse a service-owned installed JAR" || return
+  jar=$(realpath -e -- "${jar}")
+  [[ "${jar}" != "${INSTALL_DIR}/"* && "${jar}" != "${STATE_DIR}/"* ]] || fail "Artifact must come from outside the old service layout" || return
+  trusted_file "${jar}"
+  JAVA_BIN=$(readlink -f -- "${JAVA_BIN}")
+  layout
+  trusted_dir "$(dirname -- "${JAVA_BIN}")"
+  [[ -x "${JAVA_BIN}" && $(stat -c %u -- "${JAVA_BIN}") == 0 ]] || fail "Java must be a root-owned executable" || return
+  local mode
+  mode=$(stat -c %a -- "${JAVA_BIN}")
+  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be service-writable" || return
+  local dir
+  for dir in "${INSTALL_DIR}" "${CONFIG_DIR}" "${STATE_DIR}"; do
+    trusted_dir "$(dirname -- "${dir}")"
+    [[ ! -L "${dir}" ]] || fail "Refusing symlink directory: ${dir}" || return
+  done
+  trusted_dir /etc/systemd/system
+  [[ ! -L /etc/systemd/system/icebridge.service ]] || fail "Refusing symlink unit" || return
+  if [[ -e /etc/systemd/system/icebridge.service ]]; then
+    trusted_file /etc/systemd/system/icebridge.service
+  fi
+  # Only stop the named root-managed unit. Never infer ownership from a port/PID.
+  if systemctl cat icebridge.service >/dev/null 2>&1; then
+    systemctl stop icebridge.service
+  fi
+  id -u "${SERVICE_USER}" >/dev/null 2>&1 || useradd --system --user-group --home-dir "${STATE_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
+  [[ $(id -u "${SERVICE_USER}") != 0 ]] || fail "Service account must not have uid 0" || return
+  # Revoke directory access before inspecting legacy children. Even a surviving
+  # service process must not swap these paths between validation and copying.
+  install -d -o root -g root -m 0700 "${INSTALL_DIR}"
+  trusted_dir "${INSTALL_DIR}"
+  if [[ -e "${CONFIG_DIR}" ]]; then trusted_dir "${CONFIG_DIR}"; fi
+  install -d -o root -g "${SERVICE_USER}" -m 0750 "${CONFIG_DIR}"
+  install -d -o root -g root -m 0700 "${STATE_DIR}"
+  local stage
+  stage=$(mktemp -d "${CONFIG_DIR}/.install.XXXXXXXX")
+  # stage lives under a root-only-writable parent, never under service state.
+  trap "rm -rf -- '${stage}'" EXIT
+  default_env > "${stage}/defaults"
+  normalize_env "${stage}/defaults" > "${stage}/env"
+  local old_env="${CONFIG_DIR}/icebridge.env"
+  if [[ ! -e "${old_env}" && ! -L "${old_env}" ]]; then old_env="${INSTALL_DIR}/icebridge.env"; fi
+  if [[ -e "${old_env}" || -L "${old_env}" ]]; then
+    snapshot_data "${old_env}" "${stage}/old-env"
+    # Defaults precede preserved assignments, so the operator's last value wins.
+    normalize_env "${stage}/old-env" >> "${stage}/env"
+  fi
+  awk -F= '!($1 in values) { keys[++n]=$1 } { values[$1]=$0 } END { for (i=1;i<=n;i++) print values[keys[i]] }' "${stage}/env" > "${stage}/final-env"
+  local target="${CONFIG_DIR}/icebridge-tokens.txt"
+  if [[ -e "${target}" || -L "${target}" ]]; then
+    snapshot_data "${target}" "${stage}/tokens"
+  elif [[ -e "${INSTALL_DIR}/icebridge-tokens.txt" || -L "${INSTALL_DIR}/icebridge-tokens.txt" ]]; then
+    snapshot_data "${INSTALL_DIR}/icebridge-tokens.txt" "${stage}/tokens"
+  else
+    # OS randomness, not operator-supplied executable code; never print credentials.
+    openssl rand -hex 32 > "${stage}/tokens"
+  fi
+  chown root:"${SERVICE_USER}" "${stage}/tokens"
+  chmod 0640 "${stage}/tokens"
+  target="${STATE_DIR}/identity.dat"
+  if [[ ! -e "${target}" && ! -L "${target}" && ( -e "${INSTALL_DIR}/identity.dat" || -L "${INSTALL_DIR}/identity.dat" ) ]]; then
+    # Stage outside service-owned state, then rename. No following destination links.
+    snapshot_data "${INSTALL_DIR}/identity.dat" "${stage}/identity.dat"
+    chown "${SERVICE_USER}:${SERVICE_USER}" "${stage}/identity.dat"
+    chmod 0600 "${stage}/identity.dat"
+    mv -T -- "${stage}/identity.dat" "${target}"
+  elif [[ -e "${target}" || -L "${target}" ]]; then
+    regular_file "${target}"
+  fi
+  install -o root -g root -m 0644 "${jar}" "${stage}/icebridge.jar"
+  render_unit > "${stage}/unit"
+  chmod 0644 "${stage}/unit"
+  chmod 0600 "${stage}/final-env"
+  mv -T -- "${stage}/tokens" "${CONFIG_DIR}/icebridge-tokens.txt"
+  mv -T -- "${stage}/final-env" "${CONFIG_DIR}/icebridge.env"
+  # Do not leave service-owned scripts, libraries or old env files in the active
+  # code tree. The backup is never sourced, built, added to a classpath or run.
+  local previous
+  previous=$(mktemp -d "${INSTALL_DIR}.previous.XXXXXXXX")
+  mv -T -- "${INSTALL_DIR}" "${previous}/data"
+  install -d -o root -g root -m 0755 "${INSTALL_DIR}"
+  mv -T -- "${stage}/icebridge.jar" "${INSTALL_DIR}/icebridge.jar"
+  mv -T -- "${stage}/unit" /etc/systemd/system/icebridge.service
+  chown "${SERVICE_USER}:${SERVICE_USER}" "${STATE_DIR}"
   systemctl daemon-reload
   systemctl enable icebridge.service
-  systemctl stop icebridge.service 2>/dev/null || true
-  stop_strays || exit 1
   systemctl start icebridge.service
-  sleep 2
-  systemctl --no-pager -l status icebridge.service || true
-  echo "==> Health (localhost only — control binds 127.0.0.1):"
-  curl -sS "http://127.0.0.1:${CONTROL_HTTP_PORT}/health" || true
-  echo
-else
-  echo "==> Not root: wrote ${ENV_FILE} — run with sudo for systemd, or:"
-  echo "    set -a; source ${ENV_FILE}; set +a"
-  echo "    nohup ${JAVA_BIN} -jar ${INSTALL_DIR}/icebridge.jar --host ${ICEBRIDGE_HOST} --rudp-port ${ICEBRIDGE_RUDP_PORT} --relay-port ${ICEBRIDGE_RELAY_PORT} --control-http-port ${ICEBRIDGE_CONTROL_HTTP_PORT} --role ${ICEBRIDGE_ROLE} --identity-file ${ICEBRIDGE_IDENTITY_FILE} --auth-tokens-file ${ICEBRIDGE_AUTH_TOKENS_FILE} --max-peers ${ICEBRIDGE_MAX_PEERS} --peer-ttl-sec ${ICEBRIDGE_PEER_TTL_SEC} --max-qps-per-key ${ICEBRIDGE_MAX_QPS_PER_KEY} --dht --bootstrap > ${INSTALL_DIR}/icebridge.log 2>&1 &"
-fi
+  printf 'Installed root-owned code/config and separate service state. Inspect systemctl status icebridge.service.\n'
+  printf 'Control is loopback-only. Preserve config edits in %s/icebridge.env; restart to apply.\n' "${CONFIG_DIR}"
+  printf 'Prior install retained as data only in %s/data\n' "${previous}"
+  rm -rf -- "${stage}"
+  trap - EXIT
+}
 
-echo "==> Security group checklist (AWS console / CLI):"
-echo "    TCP  ${RELAY_PORT}  from 0.0.0.0/0   # identity handshake"
-echo "    UDP  ${RUDP_PORT}   from 0.0.0.0/0   # rUDP mesh"
-echo "    DO NOT open control HTTP ${CONTROL_HTTP_PORT} — binds 127.0.0.1 only; use:"
-echo "      ssh -L 18081:127.0.0.1:${CONTROL_HTTP_PORT} <host>"
-echo "    UDP  0-65535 outbound (or at least 6881/25401) for public DHT bootstrap"
-echo "==> Done."
+# Tests may source THIS trusted script to exercise only the parser/unit renderer.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi

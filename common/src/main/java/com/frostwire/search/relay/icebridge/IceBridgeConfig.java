@@ -8,6 +8,9 @@
 package com.frostwire.search.relay.icebridge;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -46,8 +49,8 @@ public final class IceBridgeConfig {
 
     /** Default cap on concurrent rUDP sessions per node (cheap UDP state). */
     public static final int DEFAULT_MAX_SESSIONS = 1024;
-    /** Standalone cloud forwarders serve thousands of clients per node. */
-    public static final int CLOUD_MAX_SESSIONS = 4096;
+    /** Conservative startup cap; larger deployments require measured resource budgets. */
+    public static final int CLOUD_MAX_SESSIONS = DEFAULT_MAX_SESSIONS;
 
     public IceBridgeConfig(String host,
                            int rudpPort,
@@ -96,11 +99,17 @@ public final class IceBridgeConfig {
         this.rudpPort = requirePositiveOrZero(rudpPort, "rudpPort");
         this.relayPort = requirePositiveOrZero(relayPort, "relayPort");
         this.controlHttpPort = requirePositive(controlHttpPort, "controlHttpPort");
+        if (rudpPort > 65535 || relayPort > 65535 || controlHttpPort > 65535) {
+            throw new IllegalArgumentException("ports must be <= 65535");
+        }
         this.role = Objects.requireNonNullElse(role, Role.CLIENT);
         this.identityFile = identityFile;
         this.maxPeers = requirePositive(maxPeers, "maxPeers");
         this.maxSessions = requirePositive(maxSessions, "maxSessions");
         this.peerTtlSec = requirePositive(peerTtlSec, "peerTtlSec");
+        if (peerTtlSec > Long.MAX_VALUE / 1000) {
+            throw new IllegalArgumentException("peerTtlSec exceeds millisecond range");
+        }
         this.maxQpsPerKey = requirePositive(maxQpsPerKey, "maxQpsPerKey");
         this.bootstrap = bootstrap;
         this.dhtEnabled = dhtEnabled;
@@ -312,7 +321,7 @@ public final class IceBridgeConfig {
     }
 
     private static double requirePositive(double value, String name) {
-        if (value <= 0) {
+        if (!Double.isFinite(value) || value <= 0) {
             throw new IllegalArgumentException(name + " must be > 0");
         }
         return value;
@@ -349,27 +358,33 @@ public final class IceBridgeConfig {
      * @return config built from env vars, with cloud defaults for unset vars
      */
     public static IceBridgeConfig fromEnv() {
+        return fromEnv(Collections.emptyMap());
+    }
+
+    /** CLI overrides > exported environment > system properties/.env > role defaults. */
+    static IceBridgeConfig fromEnv(Map<String, String> overrides) {
         Builder b = newBuilder();
-        String host = env("ICEBRIDGE_HOST", "0.0.0.0");
+        String host = env(overrides, "ICEBRIDGE_HOST", "0.0.0.0");
         b.host(host);
-        b.rudpPort(envInt("ICEBRIDGE_RUDP_PORT", 6889));
-        b.relayPort(envInt("ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
-        b.controlHttpPort(envInt("ICEBRIDGE_CONTROL_HTTP_PORT", 8081));
-        String roleStr = env("ICEBRIDGE_ROLE", "FORWARDER");
-        Role role = Role.valueOf(roleStr.toUpperCase());
+        b.rudpPort(envInt(overrides, "ICEBRIDGE_RUDP_PORT", 6889));
+        b.relayPort(envInt(overrides, "ICEBRIDGE_RELAY_PORT", com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT));
+        b.controlHttpPort(envInt(overrides, "ICEBRIDGE_CONTROL_HTTP_PORT", 8081));
+        String roleStr = env(overrides, "ICEBRIDGE_ROLE", "FORWARDER");
+        Role role = Role.valueOf(roleStr.toUpperCase(Locale.ROOT));
         b.role(role);
-        String identityPath = env("ICEBRIDGE_IDENTITY_FILE", "identity.dat");
+        String identityPath = env(overrides, "ICEBRIDGE_IDENTITY_FILE", "identity.dat");
         b.identityFile(new File(identityPath));
-        b.maxPeers(envInt("ICEBRIDGE_MAX_PEERS", 10000));
-        b.maxSessions(envInt("ICEBRIDGE_MAX_SESSIONS",
+        b.maxPeers(envInt(overrides, "ICEBRIDGE_MAX_PEERS", 10000));
+        b.maxSessions(envInt(overrides, "ICEBRIDGE_MAX_SESSIONS",
                 role == Role.FORWARDER ? CLOUD_MAX_SESSIONS : DEFAULT_MAX_SESSIONS));
-        b.peerTtlSec(envLong("ICEBRIDGE_PEER_TTL_SEC", 300));
-        b.maxQpsPerKey(envDouble("ICEBRIDGE_MAX_QPS_PER_KEY", 30.0));
-        b.bootstrap(envBool("ICEBRIDGE_BOOTSTRAP", true));
+        b.peerTtlSec(Long.parseLong(env(overrides, "ICEBRIDGE_PEER_TTL_SEC", "300")));
+        b.maxQpsPerKey(Double.parseDouble(env(overrides, "ICEBRIDGE_MAX_QPS_PER_KEY", "30.0")));
+        b.bootstrap(envBool(overrides, "ICEBRIDGE_BOOTSTRAP", true));
         boolean dhtDefault = role == Role.FORWARDER || role == Role.BOTH;
-        b.dhtEnabled(envBool("ICEBRIDGE_DHT", dhtDefault));
-        String tokensFile = env("ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
+        b.dhtEnabled(envBool(overrides, "ICEBRIDGE_DHT", dhtDefault));
+        String tokensFile = env(overrides, "ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
         b.authTokensFile(new File(tokensFile));
+        IceBridgeConfig config = b.build();
         // Topology is process-wide (IceBridgeTopology reads the same env keys
         // in its constructor); re-apply here so fromEnv() after startup still
         // refreshes live limits. Standalone FORWARDER hubs (e.g. EC2) default
@@ -377,18 +392,23 @@ public final class IceBridgeConfig {
         // compiled defaults. Explicit env always wins on every role.
         boolean cloudHub = role == Role.FORWARDER;
         IceBridgeTopology.get().applyRemote(
-                envInt("ICEBRIDGE_MESH_FANOUT",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_FANOUT : 0),
-                envInt("ICEBRIDGE_SEARCH_PEER_FANOUT",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT : 0),
-                envInt("ICEBRIDGE_MESH_HOP_TTL",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_HOP_TTL : 0),
-                envInt("ICEBRIDGE_SEARCH_TTL",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_TTL : 0));
-        return b.build();
+                envInt(overrides, "ICEBRIDGE_MESH_FANOUT",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_FANOUT : IceBridgeTopology.DEFAULT_MESH_BROADCAST_FANOUT),
+                envInt(overrides, "ICEBRIDGE_SEARCH_PEER_FANOUT",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT : IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT),
+                envInt(overrides, "ICEBRIDGE_MESH_HOP_TTL",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_HOP_TTL : IceBridgeTopology.DEFAULT_MESH_HOP_TTL),
+                envInt(overrides, "ICEBRIDGE_SEARCH_TTL",
+                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_TTL : IceBridgeTopology.DEFAULT_SEARCH_TTL),
+                envInt(overrides, "ICEBRIDGE_SOFT_MAX", IceBridgeTopology.DEFAULT_SOFT_MAX),
+                envInt(overrides, "ICEBRIDGE_LEAF_UP_CONNECTIONS", IceBridgeTopology.DEFAULT_LEAF_ULTRAPEER_CONNECTIONS));
+        return config;
     }
 
-    private static String env(String key, String def) {
+    private static String env(Map<String, String> overrides, String key, String def) {
+        if (overrides.containsKey(key)) {
+            return overrides.get(key);
+        }
         String v = System.getenv(key);
         if (v == null || v.isEmpty()) {
             v = System.getProperty(key);
@@ -396,51 +416,14 @@ public final class IceBridgeConfig {
         return v != null && !v.isEmpty() ? v : def;
     }
 
-    private static int envInt(String key, int def) {
-        String v = System.getenv(key);
-        if (v == null || v.isEmpty()) {
-            v = System.getProperty(key);
-        }
-        if (v == null || v.isEmpty()) return def;
-        try {
-            return Integer.parseInt(v);
-        } catch (NumberFormatException e) {
-            return def;
-        }
+    private static int envInt(Map<String, String> overrides, String key, int def) {
+        return Integer.parseInt(env(overrides, key, Integer.toString(def)));
     }
 
-    private static long envLong(String key, long def) {
-        String v = System.getenv(key);
-        if (v == null || v.isEmpty()) {
-            v = System.getProperty(key);
-        }
-        if (v == null || v.isEmpty()) return def;
-        try {
-            return Long.parseLong(v);
-        } catch (NumberFormatException e) {
-            return def;
-        }
-    }
-
-    private static double envDouble(String key, double def) {
-        String v = System.getenv(key);
-        if (v == null || v.isEmpty()) {
-            v = System.getProperty(key);
-        }
-        if (v == null || v.isEmpty()) return def;
-        try {
-            return Double.parseDouble(v);
-        } catch (NumberFormatException e) {
-            return def;
-        }
-    }
-
-    private static boolean envBool(String key, boolean def) {
-        String v = System.getenv(key);
-        if (v == null || v.isEmpty()) {
-            v = System.getProperty(key);
-        }
-        if (v == null || v.isEmpty()) return def;
-        return "true".equalsIgnoreCase(v) || "1".equals(v) || "yes".equalsIgnoreCase(v);
+    private static boolean envBool(Map<String, String> overrides, String key, boolean def) {
+        String v = env(overrides, key, Boolean.toString(def));
+        if ("true".equalsIgnoreCase(v) || "1".equals(v) || "yes".equalsIgnoreCase(v)) return true;
+        if ("false".equalsIgnoreCase(v) || "0".equals(v) || "no".equalsIgnoreCase(v)) return false;
+        throw new IllegalArgumentException(key + " must be true or false");
     }
 }

@@ -45,6 +45,7 @@ class SearchRelayAppTest {
 
   @AfterEach
   void tearDown() {
+    java.util.Collections.reverse(resources);
     for (AutoCloseable r : resources) {
       try {
         r.close();
@@ -124,7 +125,11 @@ class SearchRelayAppTest {
     resources.add(transport);
     PeerDirectory directory =
         new PeerDirectory(new PeerKarmaCache(new RemoteKarmaChainFetcher(peerPub -> null)));
-    RelaySearchService service = new RelaySearchService(index, keys);
+    RelaySearchService service =
+        new RelaySearchService(
+            index,
+            keys,
+            hash -> index.torrents.stream().anyMatch(t -> t.infoHashHex().equals(hash)));
     IncomingSearchRequestHandler handler =
         new IncomingSearchRequestHandler(transport, service, directory, keys, index);
     handler.start();
@@ -133,8 +138,8 @@ class SearchRelayAppTest {
   }
 
   /**
-   * The forwarder answers immediately from its empty index (0 rows) AND forwards; the holder's
-   * signed answer (1 row) arrives later. Wait for the first response with actual rows.
+   * The pure forwarder suppresses its empty response and forwards; wait for the holder's signed
+   * answer with actual rows.
    */
   private static RemoteSearchResponse awaitResponse(List<byte[]> inbox, long timeoutMs)
       throws Exception {
@@ -242,7 +247,7 @@ class SearchRelayAppTest {
                 .dhtEnabled(false)
                 .build();
         server = new IceBridgeServer(config);
-        server.start();
+        server.start(true); // SearchRelayApp owns the shared /poll consumer.
         return server;
       } catch (Throwable t) {
         last = t;
