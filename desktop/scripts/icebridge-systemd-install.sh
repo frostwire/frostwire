@@ -200,17 +200,23 @@ snapshot_data() {
 
 main() {
   layout
-  local jar="" arg build=0 root script_path
+  local jar="" build=0 root script_path staged_jar
   root=$(cd "$(dirname -- "$0")/.." && pwd)
   script_path=$(realpath -e -- "$0")
-  for arg in "$@"; do
-    case "${arg}" in
-      --jar=*) jar="${arg#--jar=}" ;;
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --jar=*) jar="${1#--jar=}" ;;
+      --jar)
+        shift
+        [[ $# -gt 0 ]] || fail "--jar requires a path" || return
+        jar="$1"
+        ;;
       --build) build=1 ;;
       --no-build) ;;
       --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --build\n'; printf '       sudo bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar\n'; return ;;
       *) fail "Unknown option"; return 1 ;;
     esac
+    shift
   done
   if (( build )); then
     [[ "${EUID}" -ne 0 ]] || fail "--build must run as an unprivileged user; do not use sudo" || return
@@ -220,7 +226,10 @@ main() {
     jar="${root}/build/libs/icebridge.jar"
     [[ -f "${jar}" && ! -L "${jar}" ]] || fail "Build completed without ${jar}" || return
     printf 'Built %s\n' "${jar}"
-    printf 'Install it with:\n  sudo "%s" --jar="%s"\n' "${script_path}" "${jar}"
+    staged_jar="/root/icebridge-build/icebridge.jar"
+    printf 'Stage the artifact in a root-owned directory, then install it with:\n'
+    printf '  sudo install -D -o root -g root -m 0644 -- "%s" "%s"\n' "${jar}" "${staged_jar}"
+    printf '  sudo "%s" --jar="%s"\n' "${script_path}" "${staged_jar}"
     return
   fi
   [[ "${EUID}" -eq 0 ]] || fail "Install requires root; build first as an unprivileged user. No automatic elevation." || return
