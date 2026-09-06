@@ -159,7 +159,8 @@ public final class RelayRole implements LeafPromotionManager.ForwardingTarget {
             throw new IllegalStateException(
                     "identity not configured for forwarding");
         }
-        if (request.ttl() <= 0) {
+        if (request.ttl() <= 1 || request.isLoop(identity.ed25519PubRaw())
+                || !service.claimForward(request)) {
             return Collections.emptyList();
         }
         try {
@@ -173,15 +174,17 @@ public final class RelayRole implements LeafPromotionManager.ForwardingTarget {
     private List<ForwardTarget> selectForwardTargets(RemoteSearchRequest request) {
         byte[] ownPub = identity.ed25519PubRaw();
         int hopsSoFar = request.path() != null ? request.path().length : 0;
-        // forward() guarantees ttl > 0. Clamping may reduce the remaining
-        // ttl to 0; this hop still forwards, and the next hop's ttl guard
-        // stops further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
+        if (newTtl <= 0) {
+            return Collections.emptyList();
+        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         if (maxForwardTargets > 0) {
             m = Math.min(m, maxForwardTargets);
         }
         Set<String> excludeHex = new HashSet<>();
+        excludeHex.add(Hex.encode(ownPub));
+        excludeHex.add(Hex.encode(request.requesterPub()));
         if (request.path() != null) {
             for (byte[] hop : request.path()) {
                 if (hop != null) {

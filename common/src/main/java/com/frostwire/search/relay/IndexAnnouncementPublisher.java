@@ -15,7 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -56,9 +58,17 @@ public final class IndexAnnouncementPublisher {
 
     private final LocalIndex index;
     private final IdentityKeys identity;
+    private final ShareVisibilityPolicy visibility;
+    private final Set<String> publishedHashes = new LinkedHashSet<>();
+    private boolean published;
     private final AtomicLong seq = new AtomicLong(Instant.now().getEpochSecond());
 
     public IndexAnnouncementPublisher(LocalIndex index, IdentityKeys identity) {
+        this(index, identity, null);
+    }
+
+    public IndexAnnouncementPublisher(LocalIndex index, IdentityKeys identity,
+                                      ShareVisibilityPolicy visibility) {
         if (index == null) {
             throw new IllegalArgumentException("index is null");
         }
@@ -67,6 +77,7 @@ public final class IndexAnnouncementPublisher {
         }
         this.index = index;
         this.identity = identity;
+        this.visibility = visibility;
     }
 
     /**
@@ -74,7 +85,7 @@ public final class IndexAnnouncementPublisher {
      * rows included in the published manifest, or 0 if nothing was
      * published (empty index or DHT not available).
      */
-    public int publishIfNeeded(SessionManager session) {
+    public synchronized int publishIfNeeded(SessionManager session) {
         if (session == null) {
             return 0;
         }
@@ -82,16 +93,27 @@ public final class IndexAnnouncementPublisher {
             long now = Instant.now().getEpochSecond();
             List<String> unpublished = index.needsRepublish(now,
                     RelayConstants.RELAY_REPUBLISH_INTERVAL_SEC);
-            if (unpublished.isEmpty()) {
+            boolean withdrawn = false;
+            for (String hash : publishedHashes) {
+                if (!ShareVisibility.isPubliclyShared(hash, visibility) || index.get(hash).isEmpty()) {
+                    withdrawn = true;
+                    break;
+                }
+            }
+            if (unpublished.isEmpty() && !withdrawn && published) {
                 return 0;
             }
 
             // Gather the rows
             List<LocalSharedTorrent> rows = new ArrayList<>();
-            for (String infoHashHex : unpublished) {
-                index.get(infoHashHex).ifPresent(rows::add);
+            Set<String> candidates = new LinkedHashSet<>(unpublished);
+            candidates.addAll(publishedHashes);
+            for (String infoHashHex : candidates) {
+                if (ShareVisibility.isPubliclyShared(infoHashHex, visibility)) {
+                    index.get(infoHashHex).ifPresent(rows::add);
+                }
             }
-            if (rows.isEmpty()) {
+            if (rows.isEmpty() && publishedHashes.isEmpty() && published) {
                 return 0;
             }
 
@@ -101,7 +123,8 @@ public final class IndexAnnouncementPublisher {
             // Build manifest, fitting within MAX_MANIFEST_BYTES
             Entry manifest = buildManifest(rows);
             if (manifest == null) {
-                return 0;
+                // Replace our last advertisement after the final public share is withdrawn.
+                manifest = buildManifestEntry(java.util.Collections.emptyList());
             }
 
             // Publish as BEP 46 mutable item
@@ -109,18 +132,17 @@ public final class IndexAnnouncementPublisher {
             byte[] privKey = identity.ed25519SecretKeyNaCl();
             byte[] salt = RelayConstants.BEP46_SALT_INDEX.getBytes(StandardCharsets.US_ASCII);
             session.dhtPutItem(pubKey, privKey, manifest, salt);
+            published = true;
 
             // Mark rows as published
             long pubTime = Instant.now().getEpochSecond();
             int count = 0;
-            for (LocalSharedTorrent row : rows) {
-                // Re-check: did we include this row in the manifest?
-                // (we may have truncated due to size)
-                index.markPublished(row.infoHashHex(), pubTime);
+            publishedHashes.clear();
+            for (Entry row : manifest.dictionary().get("rows").list()) {
+                String hash = row.dictionary().get("ih").string();
+                publishedHashes.add(hash);
+                index.markPublished(hash, pubTime);
                 count++;
-                if (count >= countRowsInManifest(manifest)) {
-                    break;
-                }
             }
 
             LOG.info("Published index manifest with " + count +
@@ -141,18 +163,22 @@ public final class IndexAnnouncementPublisher {
             return null;
         }
 
-        // Try with all rows, then shrink until it fits
-        List<LocalSharedTorrent> included = new ArrayList<>(rows);
-        while (!included.isEmpty()) {
+        // Grow only the bounded manifest prefix, not repeated full-catalog encodings.
+        List<LocalSharedTorrent> included = new ArrayList<>();
+        Entry last = null;
+        for (LocalSharedTorrent row : rows) {
+            if (row == null || !ShareVisibility.isPubliclyShared(row.infoHashHex(), visibility)) {
+                continue;
+            }
+            included.add(row);
             Entry entry = buildManifestEntry(included);
             byte[] bencoded = entry.bencode();
-            if (bencoded.length <= MAX_MANIFEST_BYTES) {
-                return entry;
+            if (bencoded.length > MAX_MANIFEST_BYTES) {
+                break;
             }
-            // Remove last row and retry
-            included.remove(included.size() - 1);
+            last = entry;
         }
-        return null;
+        return last;
     }
 
     private Entry buildManifestEntry(List<LocalSharedTorrent> rows) {
@@ -175,16 +201,4 @@ public final class IndexAnnouncementPublisher {
         return Entry.fromMap(map);
     }
 
-    private static int countRowsInManifest(Entry manifest) {
-        try {
-            Map<String, Entry> dict = manifest.dictionary();
-            Entry rowsEntry = dict.get("rows");
-            if (rowsEntry != null) {
-                return rowsEntry.list().size();
-            }
-        } catch (Throwable t) {
-            // bencode structure changed; fallback
-        }
-        return Integer.MAX_VALUE;
-    }
 }

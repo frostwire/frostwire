@@ -11,13 +11,14 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -29,10 +30,10 @@ import java.util.function.Predicate;
  * <ol>
  *   <li>TTL-range sanity (fail closed on absurd hop budgets).</li>
  *   <li>Known-spam drop (cheap directory read, no crypto).</li>
- *   <li>Rate-limit per requester (token bucket).</li>
+ *   <li>Freshness and global ingress budget.</li>
  *   <li>Verify the requester's Ed25519 signature over the
  *       request's canonical bytes.</li>
- *   <li>Check timestamp skew (anti-replay).</li>
+ *   <li>Bounded requester/nonce replay admission and authenticated quota.</li>
  *   <li>Query the local {@link LocalIndex} and build a
  *       {@link RemoteSearchResponse} signed by this node's key.</li>
  * </ol>
@@ -51,13 +52,27 @@ public final class RelaySearchService {
     private static final Logger LOG = Logger.getLogger(RelaySearchService.class);
 
     private static final int RESULT_LIMIT_CAP = RemoteSearchRequest.MAX_LIMIT;
-    private static final long MAX_TIMESTAMP_SKEW_MS =
-            RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC * 1000L;
+    private static final int MAX_REPLAY_ENTRIES = 4096;
 
     private final LocalIndex index;
     private final IdentityKeys identity;
     private final RateLimiter rateLimiter;
     private final ShareVisibilityPolicy visibility;
+    private final RateLimiter ingress = new RateLimiter(100, 100, 1, 60_000);
+    private final Map<String, Admission> replay = new LinkedHashMap<>();
+
+    private static final class Admission {
+        final RemoteSearchRequest request;
+        final long expiresNanos;
+        boolean ready;
+        boolean forwarded;
+
+        Admission(RemoteSearchRequest request) {
+            this.request = request;
+            this.expiresNanos = System.nanoTime()
+                    + (2 * RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC + 1) * 1_000_000_000L;
+        }
+    }
     private volatile SeederEndpointProvider seederEndpointProvider = SeederEndpointProvider.NONE;
     /**
      * Cheap pre-verify spam gate. Defaults to always-false (accept unknowns,
@@ -100,7 +115,7 @@ public final class RelaySearchService {
         this.index = index;
         this.identity = identity;
         this.rateLimiter = rateLimiter;
-        this.visibility = visibility;
+        this.visibility = visibility == null ? hash -> false : visibility;
     }
 
     /**
@@ -120,6 +135,40 @@ public final class RelaySearchService {
         this.spamChecker = spamChecker != null ? spamChecker : k -> false;
     }
 
+    /** Reuses the public policy for catalog and other serving paths. */
+    public boolean isPubliclyShared(String infoHashHex) {
+        return ShareVisibility.isPubliclyShared(infoHashHex, visibility);
+    }
+
+    private static String replayKey(RemoteSearchRequest request) {
+        return Hex.encode(request.requesterPub()) + ':' + Hex.encode(request.nonce());
+    }
+
+    /** One forwarding permit for the exact successfully handled immutable request. */
+    public boolean claimForward(RemoteSearchRequest request) {
+        if (request == null) {
+            return false;
+        }
+        synchronized (replay) {
+            Admission admission = replay.get(replayKey(request));
+            if (admission == null || admission.request != request || !admission.ready
+                    || admission.forwarded || System.nanoTime() - admission.expiresNanos >= 0) {
+                return false;
+            }
+            admission.forwarded = true;
+            return true;
+        }
+    }
+
+    /** Periodic maintenance; no provider or network work. */
+    public void evictIdle() {
+        rateLimiter.evictIdle(10 * 60_000L);
+        synchronized (replay) {
+            long now = System.nanoTime();
+            replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
+        }
+    }
+
     /**
      * Handle an incoming request. Returns empty if the request
      * is rejected for any reason (bad signature, stale timestamp,
@@ -131,7 +180,8 @@ public final class RelaySearchService {
         }
         try {
             int ttl = request.ttl();
-            if (ttl < 0 || ttl > RemoteSearchRequest.MAX_PATH_LENGTH) {
+            if (ttl <= 0 || ttl > RemoteSearchRequest.MAX_PATH_LENGTH
+                    || request.isLoop(identity.ed25519PubRaw())) {
                 LOG.debug("RelaySearchService: rejected request (ttl out of range "
                         + ttl + ") keywords=" + request.keywords());
                 return Optional.empty();
@@ -143,9 +193,10 @@ public final class RelaySearchService {
                         + request.keywords());
                 return Optional.empty();
             }
-            if (!rateLimiter.tryAcquire(requesterPub)) {
-                LOG.debug("RelaySearchService: rejected request (rate limit) keywords="
-                        + request.keywords());
+            long nowSec = System.currentTimeMillis() / 1000L;
+            if (request.timestamp() < nowSec - RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || request.timestamp() > nowSec + RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || !ingress.tryAcquire("search")) {
                 return Optional.empty();
             }
             if (!verifySignature(request)) {
@@ -153,28 +204,37 @@ public final class RelaySearchService {
                         + request.keywords());
                 return Optional.empty();
             }
-            long nowMs = System.currentTimeMillis();
-            long skew = Math.abs(nowMs - (request.timestamp() * 1000L));
-            if (skew > MAX_TIMESTAMP_SKEW_MS) {
-                LOG.debug("RelaySearchService: rejected request (timestamp skew "
-                        + skew + "ms) keywords=" + request.keywords());
-                return Optional.empty();
+            Admission admission;
+            synchronized (replay) {
+                long now = System.nanoTime();
+                replay.values().removeIf(entry -> now - entry.expiresNanos >= 0);
+                String key = replayKey(request);
+                if (replay.containsKey(key) || replay.size() >= MAX_REPLAY_ENTRIES
+                        || !rateLimiter.tryAcquire(requesterPub)) {
+                    return Optional.empty();
+                }
+                admission = new Admission(request);
+                replay.put(key, admission);
             }
             int limit = Math.min(request.limit(), RESULT_LIMIT_CAP);
-            int fetch = visibility == null || visibility == ShareVisibilityPolicy.INCLUDE_ALL
+            int fetch = visibility == ShareVisibilityPolicy.INCLUDE_ALL
                     ? limit
                     : Math.min(limit * 4, Math.max(limit, 200));
             List<LocalSharedTorrent> rows = index.search(request.keywords(), fetch);
             if (rows == null) {
                 rows = new ArrayList<>();
             }
-            rows = ShareVisibility.filter(rows, visibility);
+            rows = ShareVisibility.filter(rows, this::isPubliclyShared);
             if (rows.size() > limit) {
                 rows = new ArrayList<>(rows.subList(0, limit));
             }
             LOG.info("RelaySearchService: answered keywords=\"" + request.keywords()
                     + "\" rows=" + rows.size());
-            return Optional.of(buildResponse(request, rows));
+            RemoteSearchResponse response = buildResponse(request, rows);
+            synchronized (replay) {
+                admission.ready = true;
+            }
+            return Optional.of(response);
         } catch (Throwable t) {
             LOG.warn("RelaySearchService.handle failed", t);
             return Optional.empty();

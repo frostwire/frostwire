@@ -39,7 +39,7 @@ class RelayRoleTest {
     index = new NoopLocalIndex();
     directory = new PeerDirectory(karma);
     identity = IdentityKeys.generate();
-    service = new RelaySearchService(index, identity);
+    service = new RelaySearchService(index, identity, ShareVisibilityPolicy.INCLUDE_ALL);
     role = new RelayRole(service, directory);
     forwardingRole = new RelayRole(service, directory, identity);
   }
@@ -128,9 +128,9 @@ class RelayRoleTest {
   }
 
   @Test
-  void forwardThrowsWithoutIdentity() {
+  void forwardThrowsWithoutIdentity() throws Exception {
     RelayRole noIdentityRole = new RelayRole(service, directory);
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 1, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(1, new byte[0][]);
     assertThrows(IllegalStateException.class, () -> noIdentityRole.forward(req));
   }
 
@@ -138,7 +138,7 @@ class RelayRoleTest {
   void forwardReturnsEmptyWhenTtlZero() throws Exception {
     KeyPairBag peerA = new KeyPairBag();
     directory.upsertVerified(peerA.pub, "host-a", 6881);
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 0, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(0, new byte[0][]);
     List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertTrue(result.isEmpty());
   }
@@ -152,69 +152,58 @@ class RelayRoleTest {
     directory.upsertVerified(peerA.pub, "host-a", 6881);
     RemoteSearchRequest signed = signRequest(requester, "ubuntu", 5);
     assertTrue(forwardingRole.handleRequest(signed).isPresent());
-    RemoteSearchRequest hopReady =
-        RemoteSearchRequest.builder()
-            .keywords(signed.keywords())
-            .limit(signed.limit())
-            .nonce(signed.nonce())
-            .ttl(2)
-            .requesterPub(signed.requesterPub())
-            .path(signed.path())
-            .timestamp(signed.timestamp())
-            .signature(signed.signature())
-            .build();
-    assertFalse(forwardingRole.forward(hopReady).isEmpty());
+    assertFalse(forwardingRole.forward(signed).isEmpty());
     // CLIENT leaf: no forwards, local answers unaffected.
     forwardingRole.setForwardingEnabled(false);
     try {
-      assertTrue(forwardingRole.forward(hopReady).isEmpty());
-      assertTrue(forwardingRole.handleRequest(signed).isPresent());
+      assertTrue(forwardingRole.forward(signed).isEmpty());
+      assertTrue(forwardingRole.handleRequest(signRequest(requester, "ubuntu", 5)).isPresent());
     } finally {
       forwardingRole.setForwardingEnabled(true);
     }
-    assertFalse(forwardingRole.forward(hopReady).isEmpty());
+    assertTrue(forwardingRole.forward(signed).isEmpty(), "forward admission is one-shot");
   }
 
   @Test
-  void forward_fewerPeersThanFanout_returnsAllAvailable() {
+  void forward_fewerPeersThanFanout_returnsAllAvailable() throws Exception {
     for (int i = 1; i <= 5; i++) {
       directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
     }
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(2, new byte[0][]);
     List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertEquals(
         5, result.size(), "with fewer verified peers than the search fanout, all are selected");
   }
 
   @Test
-  void forward_morePeersThanFanout_capsAtSearchPeerFanout() {
+  void forward_morePeersThanFanout_capsAtSearchPeerFanout() throws Exception {
     for (int i = 1; i <= RelayRole.MAX_FORWARD_TARGETS + 2; i++) {
       directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
     }
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(2, new byte[0][]);
     List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertEquals(RelayRole.MAX_FORWARD_TARGETS, result.size());
   }
 
   @Test
-  void forward_capBelowFanout_limitsTargets() {
+  void forward_capBelowFanout_limitsTargets() throws Exception {
     for (int i = 1; i <= 5; i++) {
       directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
     }
     forwardingRole.setMaxForwardTargets(2);
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(2, new byte[0][]);
     List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertEquals(2, result.size(), "promoted-leaf cap should bound forwards");
   }
 
   @Test
-  void setMaxForwardTargetsRejectsNegativeRestoresDefaultOnZero() {
+  void setMaxForwardTargetsRejectsNegativeRestoresDefaultOnZero() throws Exception {
     assertThrows(IllegalArgumentException.class, () -> forwardingRole.setMaxForwardTargets(-1));
     for (int i = 1; i <= 5; i++) {
       directory.upsertVerified(fakePub(i), "host-" + i, 6880 + i);
     }
     forwardingRole.setMaxForwardTargets(0);
-    RemoteSearchRequest req = buildForwardableRequest(new byte[32], 2, new byte[0][]);
+    RemoteSearchRequest req = admittedRequest(2, new byte[0][]);
     assertEquals(5, forwardingRole.forward(req).size());
   }
 
@@ -224,9 +213,8 @@ class RelayRoleTest {
     KeyPairBag peerB = new KeyPairBag();
     directory.upsertVerified(peerA.pub, "host-a", 6881);
     directory.upsertVerified(peerB.pub, "host-b", 6882);
-    byte[] requesterPub = new byte[32];
     byte[][] path = {peerA.pub};
-    RemoteSearchRequest req = buildForwardableRequest(requesterPub, 2, path);
+    RemoteSearchRequest req = admittedRequest(2, path);
     List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertEquals(1, result.size());
     assertTrue(
@@ -240,30 +228,19 @@ class RelayRoleTest {
     directory.upsertVerified(peerA.pub, "host-a", 6881);
     KeyPairBag requester = new KeyPairBag();
     RemoteSearchRequest req = signRequest(requester, "ubuntu", 25);
-    // Give the signed request a positive ttl for hopping.
-    RemoteSearchRequest hopReady =
-        RemoteSearchRequest.builder()
-            .keywords(req.keywords())
-            .limit(req.limit())
-            .nonce(req.nonce())
-            .ttl(1)
-            .requesterPub(req.requesterPub())
-            .path(req.path())
-            .timestamp(req.timestamp())
-            .signature(req.signature())
-            .build();
-    List<RelayRole.ForwardTarget> result = forwardingRole.forward(hopReady);
+    assertTrue(forwardingRole.handleRequest(req).isPresent());
+    List<RelayRole.ForwardTarget> result = forwardingRole.forward(req);
     assertEquals(1, result.size());
     RelayRole.ForwardTarget target = result.get(0);
     RemoteSearchRequest forwarded = target.request();
-    assertEquals(0, forwarded.ttl(), "ttl must be decremented");
+    assertEquals(1, forwarded.ttl(), "ttl must be decremented without dead sends");
     assertEquals(1, forwarded.pathLength(), "own pubkey must be appended to path");
     assertTrue(
         Arrays.equals(forwarded.path()[0], identity.ed25519PubRaw()),
         "path must contain this node's own pubkey");
     assertTrue(Arrays.equals(target.peerPub(), peerA.pub), "target must be the selected peer");
     assertTrue(
-        Arrays.equals(hopReady.signature(), forwarded.signature()),
+        Arrays.equals(req.signature(), forwarded.signature()),
         "dual-envelope: requester signature preserved");
     assertTrue(
         verifySignature(forwarded, requester.pub),
@@ -287,19 +264,27 @@ class RelayRoleTest {
     return pub;
   }
 
-  private static RemoteSearchRequest buildForwardableRequest(
-      byte[] requesterPub, int ttl, byte[][] path) {
+  private RemoteSearchRequest admittedRequest(int ttl, byte[][] path) throws Exception {
+    KeyPairBag requester = new KeyPairBag();
     byte[] nonce = new byte[32];
-    return RemoteSearchRequest.builder()
-        .keywords("ubuntu")
-        .limit(25)
-        .nonce(nonce)
-        .ttl(ttl)
-        .requesterPub(requesterPub)
-        .path(path)
-        .timestamp(System.currentTimeMillis() / 1000L)
-        .signature(new byte[64])
-        .build();
+    RemoteSearchRequest.Builder builder =
+        RemoteSearchRequest.builder()
+            .keywords("ubuntu")
+            .limit(25)
+            .nonce(nonce)
+            .ttl(ttl)
+            .requesterPub(requester.pub)
+            .path(path)
+            .timestamp(System.currentTimeMillis() / 1000L)
+            .signature(new byte[64]);
+    Signature signer = Signature.getInstance("Ed25519");
+    signer.initSign(requester.priv);
+    signer.update(builder.build().canonicalBytes());
+    RemoteSearchRequest request = builder.signature(signer.sign()).build();
+    if (ttl > 0) {
+      assertTrue(forwardingRole.handleRequest(request).isPresent());
+    }
+    return request;
   }
 
   private static boolean verifySignature(RemoteSearchRequest request, byte[] expectedPubRaw)
@@ -315,13 +300,14 @@ class RelayRoleTest {
       throws Exception {
     long ts = System.currentTimeMillis() / 1000L;
     byte[] nonce = new byte[32];
-    for (int i = 0; i < 32; i++) nonce[i] = (byte) i;
+    new java.security.SecureRandom().nextBytes(nonce);
     RemoteSearchRequest unsigned =
         RemoteSearchRequest.builder()
             .nonce(nonce)
             .requesterPub(requester.pub)
             .keywords(keywords)
             .limit(limit)
+            .ttl(2)
             .timestamp(ts)
             .path(new byte[0][])
             .signature(new byte[64])
@@ -335,6 +321,7 @@ class RelayRoleTest {
         .requesterPub(requester.pub)
         .keywords(keywords)
         .limit(limit)
+        .ttl(2)
         .timestamp(ts)
         .path(new byte[0][])
         .signature(sigBytes)

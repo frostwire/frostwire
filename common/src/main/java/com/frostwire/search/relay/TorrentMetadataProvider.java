@@ -14,10 +14,19 @@ package com.frostwire.search.relay;
  *
  * <p>Implementations MUST return the complete .torrent serialization
  * (including BEP 52 piece layers for hybrid torrents) or {@code null} when
- * this node does not hold the torrent. Implementations run on the transport
- * poller thread and must be fast and non-blocking.
+ * this node does not publicly share the torrent. Implementations run on a
+ * bounded request worker, never the response poller.
  */
 public interface TorrentMetadataProvider {
+
+    /**
+     * Current authorization, checked before cache access and while sending.
+     * Must deny private, removed, unshared and temporary metadata-only torrents.
+     * Merely implementing the byte source does not opt into public sharing.
+     */
+    default boolean isPubliclyShared(byte[] infoHashV1) {
+        return false;
+    }
 
     /**
      * @param infoHashV1 20-byte v1 info hash of the wanted torrent

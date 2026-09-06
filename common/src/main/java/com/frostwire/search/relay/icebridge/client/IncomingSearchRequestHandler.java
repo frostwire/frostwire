@@ -15,12 +15,15 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.RateLimiter;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteCatalogBrowseRequest;
 import com.frostwire.search.relay.RemoteIndexFetcher;
 import com.frostwire.search.relay.RemoteSearchRequest;
 import com.frostwire.search.relay.RemoteSearchResponse;
 import com.frostwire.search.relay.SearchPayloadCodec;
+import com.frostwire.search.relay.ShareVisibility;
+import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.search.relay.TorrentMetadataProvider;
 import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.TorrentMetadataResponse;
@@ -30,7 +33,6 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -45,8 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Listens for incoming search requests on a {@link DistributedSearchTransport}
@@ -114,6 +116,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private final PeerDirectory peerDirectory;
     private final IdentityKeys identity;
     private final LocalIndex localIndex;
+    private final ShareVisibilityPolicy visibility;
+    private volatile boolean stopped;
+    private final ThreadLocal<Long> responseDeadline = new ThreadLocal<>();
+    private final ThreadLocal<Long> responseGeneration = new ThreadLocal<>();
+    private final AtomicLong generation = new AtomicLong();
+    private final Set<DistributedSearchTransport.SendOperation> activeSends = new HashSet<>();
     /**
      * Role-gated forwarding (Gnutella leaf model). When false, this node
      * answers from its local index but {@link #forwardRequest} drops every
@@ -127,18 +135,23 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      */
     private volatile int maxForwardTargets;
     private volatile TorrentMetadataProvider torrentMetadataProvider;
-    private final ConcurrentHashMap<String, RateBucket> rateMap = new ConcurrentHashMap<>();
+    private final RateLimiter rateLimiter = new RateLimiter(MAX_REQUESTS_PER_MINUTE, 0.5);
+    private final RateLimiter ingress = new RateLimiter(100, 100, 1, 60_000);
+    private final RateLimiter metadataWork = new RateLimiter(4 * METADATA_MAX_BYTES, METADATA_MAX_BYTES, 1, 60_000);
+    private final RateLimiter outboundBytes = new RateLimiter(2 * 1024 * 1024, 1024 * 1024, 1, 60_000);
+    private final Map<String, Long> replay = new LinkedHashMap<>();
+    private static final int MAX_REPLAY_ENTRIES = 4096;
 
     /**
      * Bounded LRU of fully-signed .torrent responses keyed by infohash hex.
-     * Signed chunks are reusable across requests because the v2 signature
+     * Positive signed chunks are reusable across requests because the v3 signature
      * domain excludes the per-request nonce and timestamp (content is
      * immutable per infohash — replay can only deliver identical bytes).
      * A hit serves without provider I/O, re-splitting, re-signing, or
      * re-encoding the signature: templates are restamped with the live nonce
      * via {@link TorrentMetadataResponse#withNonceTimestamp} and re-encoded.
-     * Only hits and over-cap templates are cached. Misses are never cached —
-     * a torrent may arrive after the first miss. Max 32 x 256KB = 8MB.
+     * Negative responses are never cached. Max 32 x 256KB payload bytes,
+     * plus bounded chunk/signature overhead; entries expire after five minutes.
      */
     private static final int TORRENT_CACHE_MAX_ENTRIES = 32;
     private final Map<String, CachedMetadata> torrentCache =
@@ -152,14 +165,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     /** Cached fully-signed response template. Misses are not cached. */
     private static final class CachedMetadata {
-        final List<TorrentMetadataResponse> signedChunks; // 1 frame when tooLarge
-        final boolean tooLarge;
+        final List<TorrentMetadataResponse> signedChunks;
         final int length;
+        final TorrentMetadataProvider provider;
+        final long expiresNanos = System.nanoTime() + 300_000_000_000L;
 
-        CachedMetadata(List<TorrentMetadataResponse> signedChunks, boolean tooLarge, int length) {
+        CachedMetadata(List<TorrentMetadataResponse> signedChunks, int length, TorrentMetadataProvider provider) {
             this.signedChunks = signedChunks;
-            this.tooLarge = tooLarge;
             this.length = length;
+            this.provider = provider;
         }
     }
 
@@ -180,6 +194,16 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                                         PeerDirectory peerDirectory,
                                         IdentityKeys identity,
                                         LocalIndex localIndex) {
+        this(transport, searchService, peerDirectory, identity, localIndex,
+                searchService == null ? null : searchService::isPubliclyShared);
+    }
+
+    public IncomingSearchRequestHandler(DistributedSearchTransport transport,
+                                        RelaySearchService searchService,
+                                        PeerDirectory peerDirectory,
+                                        IdentityKeys identity,
+                                        LocalIndex localIndex,
+                                        ShareVisibilityPolicy visibility) {
         if (transport == null) {
             throw new IllegalArgumentException("transport is null");
         }
@@ -191,16 +215,21 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         this.peerDirectory = peerDirectory;
         this.identity = identity;
         this.localIndex = localIndex;
+        this.visibility = visibility;
     }
 
     public void start() {
+        stopped = false;
         transport.addListener(this);
         LOG.info("IncomingSearchRequestHandler started");
     }
 
     /** Answerer for TORRENT_FETCH (Protocol #3 METADATA) requests, or null. */
     public void setTorrentMetadataProvider(TorrentMetadataProvider provider) {
-        this.torrentMetadataProvider = provider;
+        synchronized (torrentCache) {
+            this.torrentMetadataProvider = provider;
+            torrentCache.clear();
+        }
     }
 
     /**
@@ -227,7 +256,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     }
 
     public void stop() {
+        stopped = true;
+        generation.incrementAndGet();
         transport.removeListener(this);
+        synchronized (activeSends) {
+            for (DistributedSearchTransport.SendOperation operation : activeSends) {
+                operation.cancel();
+            }
+        }
+        torrentCache.clear();
         LOG.info("IncomingSearchRequestHandler stopped");
     }
 
@@ -238,6 +275,31 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     @Override
     public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+        onPayloadBefore(sourcePub, payload, protocolId, System.nanoTime() + 30_000_000_000L, generation.get());
+    }
+
+    long generation() {
+        return generation.get();
+    }
+
+    void onPayloadBefore(byte[] sourcePub, byte[] payload, int protocolId, long deadlineNanos, long workGeneration) {
+        if (stopped || payload == null || payload.length > 16 * 1024
+                || workGeneration != generation.get() || System.nanoTime() - deadlineNanos >= 0) {
+            return;
+        }
+        responseDeadline.set(deadlineNanos);
+        responseGeneration.set(workGeneration);
+        try {
+            if (canSend()) {
+                handlePayload(sourcePub, payload, protocolId);
+            }
+        } finally {
+            responseDeadline.remove();
+            responseGeneration.remove();
+        }
+    }
+
+    private void handlePayload(byte[] sourcePub, byte[] payload, int protocolId) {
         if (MeshProtocolId.effective(protocolId) == MeshProtocolId.METADATA) {
             handleTorrentMetadataPayload(sourcePub, payload);
             return;
@@ -268,9 +330,11 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             return;
         }
         try {
-            String requesterKey = Hex.encode(request.requesterPub());
-            if (!tryAcquire(requesterKey)) {
-                LOG.debug("Rate-limited torrent metadata request from " + requesterKey);
+            long nowSec = System.currentTimeMillis() / 1000L;
+            if (request.nonce().length != 32
+                    || request.timestamp() < nowSec - TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || request.timestamp() > nowSec + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || !ingress.tryAcquire("requests")) {
                 return;
             }
             if (!request.verifySignature()) {
@@ -279,13 +343,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                         + " timeWindowSkewUnknown");
                 return;
             }
-            long nowSec = System.currentTimeMillis() / 1000L;
-            long skew = Math.abs(nowSec - request.timestamp());
-            if (skew > TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC) {
-                LOG.debug("Rejected torrent metadata request: timestamp skew " + skew
-                        + "s (max " + TorrentMetadataRequest.MAX_TIMESTAMP_SKEW_SEC
-                        + "s) ih=" + request.infoHashHex()
-                        + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
+            if (!admit("metadata", request.requesterPub(), request.nonce())) {
                 return;
             }
             sendTorrentMetadataResponse(request);
@@ -302,21 +360,30 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private void sendTorrentMetadataResponse(TorrentMetadataRequest request) throws GeneralSecurityException {
         String ihHex = request.infoHashHex();
         long ts = System.currentTimeMillis() / 1000L;
+        TorrentMetadataProvider provider = torrentMetadataProvider;
+        if (!isMetadataPublic(provider, request.infoHash())) {
+            torrentCache.remove(ihHex);
+            sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
+                    request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_NOT_FOUND),
+                    request.requesterPub());
+            return;
+        }
         CachedMetadata cached = torrentCache.get(ihHex);
-        if (cached != null) {
-            if (cached.tooLarge) {
-                LOG.info("TORRENT_FETCH over cap (cached) ih=" + ihHex
-                        + " bytes=" + cached.length);
-            } else {
-                LOG.info("TORRENT_FETCH answer (cached) ih=" + ihHex
-                        + " bytes=" + cached.length
-                        + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
-            }
+        if (cached != null && cached.provider == provider && System.nanoTime() - cached.expiresNanos < 0) {
+            LOG.debug("TORRENT_FETCH answer (cached) ih=" + ihHex + " bytes=" + cached.length);
             sendCachedTemplates(cached, request, ts);
             return;
         }
-        TorrentMetadataProvider provider = torrentMetadataProvider;
-        byte[] torrentBytes = provider == null ? null : provider.torrentBytes(request.infoHash());
+        torrentCache.remove(ihHex);
+        // Reserve the worst-case signing cost before provider/native work. No refund on failure.
+        if (!metadataWork.tryAcquire("metadata", METADATA_MAX_BYTES)) {
+            return;
+        }
+        byte[] torrentBytes = provider.torrentBytes(request.infoHash());
+        if (!isMetadataPublic(provider, request.infoHash())) {
+            torrentCache.remove(ihHex);
+            return;
+        }
         if (torrentBytes == null) {
             // Never cache misses: the torrent may arrive after this request.
             LOG.info("TORRENT_FETCH miss ih=" + ihHex
@@ -327,28 +394,30 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             return;
         }
         if (torrentBytes.length > METADATA_MAX_BYTES) {
-            // Safe to cache: infohash is the content hash, so these bytes
-            // are immutable and every future request for ihHex is over cap.
-            CachedMetadata overCap = new CachedMetadata(
-                    java.util.Collections.singletonList(signMetadataChunk(
-                            TorrentMetadataResponse.buildError(
-                                    request.nonce(), request.infoHash(), ts,
-                                    TorrentMetadataResponse.ERR_TOO_LARGE))),
-                    true, torrentBytes.length);
-            torrentCache.put(ihHex, overCap);
+            // Negative signatures bind the current request; never restamp/cache them.
+            sendSignedMetadataChunk(TorrentMetadataResponse.buildError(
+                    request.nonce(), request.infoHash(), ts, TorrentMetadataResponse.ERR_TOO_LARGE),
+                    request.requesterPub());
             LOG.info("TORRENT_FETCH over cap ih=" + ihHex
                     + " bytes=" + torrentBytes.length);
-            sendCachedTemplates(overCap, request, ts);
             return;
         }
         List<TorrentMetadataResponse> signed = new ArrayList<>();
         for (TorrentMetadataResponse chunk :
                 TorrentMetadataResponse.buildChunks(request.nonce(), request.infoHash(), ts, torrentBytes)) {
+            if (!canSend() || !isMetadataPublic(provider, request.infoHash())) {
+                return;
+            }
             signed.add(signMetadataChunk(chunk));
         }
         CachedMetadata hit = new CachedMetadata(
-                java.util.Collections.unmodifiableList(signed), false, torrentBytes.length);
-        torrentCache.put(ihHex, hit);
+                Collections.unmodifiableList(signed), torrentBytes.length, provider);
+        synchronized (torrentCache) {
+            if (provider != torrentMetadataProvider || !canSend()) {
+                return;
+            }
+            torrentCache.put(ihHex, hit);
+        }
         LOG.info("TORRENT_FETCH answer ih=" + ihHex
                 + " bytes=" + torrentBytes.length
                 + " requester=" + Hex.encode(request.requesterPub()).substring(0, 12));
@@ -362,21 +431,29 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     /**
      * Serve cached signed templates to a new request: restamp each with the
-     * live nonce/timestamp (free — outside the v2 signature domain), encode,
+     * live nonce/timestamp (outside the positive v3 signature domain), encode,
      * and send. Zero Ed25519 SIGNs on a hit.
      */
     private void sendCachedTemplates(
             CachedMetadata cached, TorrentMetadataRequest request, long ts) {
         for (TorrentMetadataResponse template : cached.signedChunks) {
-            sendPresignedChunk(
-                    template.withNonceTimestamp(request.nonce(), ts), request.requesterPub());
+            if (!isMetadataPublic(cached.provider, request.infoHash())) {
+                torrentCache.remove(request.infoHashHex());
+                return;
+            }
+            if (!sendPresignedChunk(
+                    template.withNonceTimestamp(request.nonce(), ts), request.requesterPub())) {
+                return;
+            }
         }
     }
 
     /** Sign one unsigned chunk and send it (cache-miss path only). */
     private void sendSignedMetadataChunk(TorrentMetadataResponse unsigned, byte[] requesterPub)
             throws GeneralSecurityException {
-        sendPresignedChunk(signMetadataChunk(unsigned), requesterPub);
+        if (canSend()) {
+            sendPresignedChunk(signMetadataChunk(unsigned), requesterPub);
+        }
     }
 
     private TorrentMetadataResponse signMetadataChunk(TorrentMetadataResponse unsigned)
@@ -398,11 +475,56 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 .build();
     }
 
-    private void sendPresignedChunk(TorrentMetadataResponse signed, byte[] requesterPub) {
+    private boolean sendPresignedChunk(TorrentMetadataResponse signed, byte[] requesterPub) {
         byte[] bytes = SearchPayloadCodec.encodeTorrentMetadataResponse(signed);
-        if (!transport.send(requesterPub, MeshProtocolId.METADATA, bytes)) {
+        if (!send(requesterPub, MeshProtocolId.METADATA, bytes)) {
             LOG.debug("Could not route torrent metadata chunk ci=" + signed.chunkIndex()
                     + " to requester " + Hex.encode(requesterPub));
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isMetadataPublic(TorrentMetadataProvider provider, byte[] hash) {
+        if (provider == null || provider != torrentMetadataProvider || !canSend()) {
+            return false;
+        }
+        try {
+            return ShareVisibility.isPubliclyShared(Hex.encode(hash), visibility)
+                    && provider.isPubliclyShared(hash);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private boolean canSend() {
+        Long deadline = responseDeadline.get();
+        Long workGeneration = responseGeneration.get();
+        return !stopped && !Thread.currentThread().isInterrupted()
+                && (workGeneration == null || workGeneration == generation.get())
+                && (deadline == null || System.nanoTime() - deadline < 0);
+    }
+
+    private boolean send(byte[] target, int protocol, byte[] payload) {
+        if (!canSend() || !outboundBytes.tryAcquire("outbound", payload.length)) {
+            return false;
+        }
+        Long deadline = responseDeadline.get();
+        DistributedSearchTransport.SendOperation operation = transport.createSend(target, protocol, payload,
+                deadline == null ? System.nanoTime() + 30_000_000_000L : deadline);
+        synchronized (activeSends) {
+            if (!canSend() || activeSends.size() >= 64) {
+                operation.cancel();
+                return false;
+            }
+            activeSends.add(operation);
+        }
+        try {
+            return operation.execute();
+        } finally {
+            synchronized (activeSends) {
+                activeSends.remove(operation);
+            }
         }
     }
 
@@ -441,10 +563,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     + request.keywords() + "\"");
             return;
         }
-        // Rate-limit is applied inside RelaySearchService before signature
-        // verify, keyed by requesterPub (not transport sourcePub).
+        // Admission authenticates before charging the requester and deduplicates lookup/fanout.
         try {
             Optional<RemoteSearchResponse> response = searchService.handle(request);
+            if (response.isEmpty()) {
+                return;
+            }
             if (response.isPresent()) {
                 RemoteSearchResponse r = response.get();
                 // Pure FORWARDER / EmptyLocalIndex: never send 0-row finals. An empty
@@ -463,12 +587,14 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             }
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process request", t);
+            return;
         }
 
         if (MULTI_HOP_FORWARDING_ENABLED
-                && request.ttl() > 0
+                && request.ttl() > 1
                 && peerDirectory != null
-                && identity != null) {
+                && identity != null
+                && searchService.claimForward(request)) {
             try {
                 forwardRequest(request, sourcePub);
             } catch (Throwable t) {
@@ -483,10 +609,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      */
     private void sendSearchResponse(byte[] requesterPub, RemoteSearchResponse full) {
         List<RemoteSearchResponse.Row> rows = full.rows();
+        for (RemoteSearchResponse.Row row : rows) {
+            if (!searchService.isPubliclyShared(Hex.encode(row.infoHash)) || !canSend()) {
+                return;
+            }
+        }
         int chunkSize = RemoteSearchResponse.DEFAULT_STREAM_CHUNK_SIZE;
         if (rows.size() <= chunkSize || identity == null) {
             byte[] responseBytes = SearchPayloadCodec.encodeResponse(full);
-            if (!transport.send(requesterPub, MeshProtocolId.SEARCH, responseBytes)) {
+            if (!send(requesterPub, MeshProtocolId.SEARCH, responseBytes)) {
                 LOG.debug("Could not route search response to requester "
                         + Hex.encode(requesterPub));
             }
@@ -497,6 +628,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         long ts = full.timestamp();
         byte[] nonce = full.nonce();
         for (int i = 0; i < chunks; i++) {
+            if (!canSend()) {
+                return;
+            }
             int from = i * chunkSize;
             int to = Math.min(from + chunkSize, total);
             boolean isFinal = i == chunks - 1;
@@ -508,20 +642,23 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                         .finalChunk(isFinal);
                 for (int r = from; r < to; r++) {
                     RemoteSearchResponse.Row row = rows.get(r);
+                    if (!searchService.isPubliclyShared(Hex.encode(row.infoHash))) {
+                        return;
+                    }
                     b.addRow(row.infoHash, row.name, row.sizeBytes, row.fileCount,
-                            row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile);
+                            row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile, row.seederEndpoints);
                 }
                 RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
                 Signature signer = IdentityKeys.softwareSignature("Ed25519");
                 signer.initSign(identity.ed25519().getPrivate());
                 signer.update(unsigned.canonicalBytes());
                 RemoteSearchResponse chunk = b.signature(signer.sign()).build();
-            byte[] bytes = SearchPayloadCodec.encodeResponse(chunk);
-            if (!transport.send(requesterPub, MeshProtocolId.SEARCH, bytes)) {
-                LOG.debug("Could not route search chunk " + i + " to "
-                        + Hex.encode(requesterPub));
-                return;
-            }
+                byte[] bytes = SearchPayloadCodec.encodeResponse(chunk);
+                if (!send(requesterPub, MeshProtocolId.SEARCH, bytes)) {
+                    LOG.debug("Could not route search chunk " + i + " to "
+                            + Hex.encode(requesterPub));
+                    return;
+                }
             } catch (Throwable t) {
                 LOG.debug("Failed to stream search chunk " + i, t);
                 return;
@@ -531,31 +668,33 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     private void handleCatalogBrowseRequest(RemoteCatalogBrowseRequest request,
                                             byte[] sourcePub) {
-        if (localIndex == null || identity == null) {
+        if (localIndex == null || identity == null
+                || !Arrays.equals(request.targetPub(), identity.ed25519PubRaw())) {
             return;
         }
 
         try {
+            long nowSec = System.currentTimeMillis() / 1000L;
+            if (request.nonce().length != 32
+                    || request.timestamp() < nowSec - RemoteCatalogBrowseRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || request.timestamp() > nowSec + RemoteCatalogBrowseRequest.MAX_TIMESTAMP_SKEW_SEC
+                    || !ingress.tryAcquire("requests")) {
+                return;
+            }
             if (!verifyCatalogBrowseSignature(request)) {
                 LOG.debug("Rejected catalog browse: bad signature");
                 return;
             }
-            long nowSec = System.currentTimeMillis() / 1000L;
-            long skew = Math.abs(nowSec - request.timestamp());
-            if (skew > RemoteCatalogBrowseRequest.MAX_TIMESTAMP_SKEW_SEC) {
-                LOG.debug("Rejected catalog browse: timestamp skew " + skew + "s");
-                return;
-            }
             // Rate-limit only after verify, by requesterPub (authoritative identity).
             String requesterKey = Hex.encode(request.requesterPub());
-            if (!tryAcquire(requesterKey)) {
+            if (!admit("browse", request.requesterPub(), request.nonce())) {
                 LOG.debug("IncomingSearchRequestHandler: rate-limited catalog browse from "
                         + requesterKey);
                 return;
             }
             byte[] responseBytes = buildCatalogBrowseResponse();
             if (responseBytes != null) {
-                transport.send(request.requesterPub(), responseBytes);
+                send(request.requesterPub(), MeshProtocolId.SEARCH, responseBytes);
             }
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process catalog browse", t);
@@ -568,8 +707,14 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             if (torrents == null) {
                 torrents = new ArrayList<>();
             }
-            List<RemoteIndexFetcher.RemoteTorrentEntry> entries = new ArrayList<>(torrents.size());
+            List<RemoteIndexFetcher.RemoteTorrentEntry> entries = new ArrayList<>();
             for (LocalSharedTorrent t : torrents) {
+                if (entries.size() >= RemoteSearchRequest.MAX_LIMIT || !canSend()) {
+                    break;
+                }
+                if (t == null || !ShareVisibility.isPubliclyShared(t.infoHashHex(), visibility)) {
+                    continue;
+                }
                 entries.add(new RemoteIndexFetcher.RemoteTorrentEntry(
                         t.infoHashHex(), t.name(), t.sizeBytes(), t.fileCount()));
             }
@@ -620,10 +765,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         }
         byte[] ownPub = identity.ed25519PubRaw();
         int hopsSoFar = request.path() != null ? request.path().length : 0;
-        // Caller guarantees ttl > 0. Clamping may reduce the remaining ttl
-        // to 0; this hop still forwards, and the next hop's ttl guard stops
-        // further forwarding (soft-max horizon, LimeWire semantics).
         int newTtl = IceBridgeTopology.get().clampRemainingTtl(hopsSoFar, request.ttl() - 1);
+        if (newTtl <= 0 || request.isLoop(ownPub)) {
+            return;
+        }
         int m = IceBridgeTopology.get().searchPeerFanout();
         if (maxForwardTargets > 0) {
             m = Math.min(m, maxForwardTargets);
@@ -658,7 +803,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 // Dual-envelope: preserve requester query signature; only hop fields change.
                 RemoteSearchRequest nextHop = request.withNextHop(ownPub, newTtl);
                 byte[] forwardedPayload = SearchPayloadCodec.encodeRequest(nextHop);
-                if (transport.send(peerPub, forwardedPayload)) {
+                if (send(peerPub, MeshProtocolId.SEARCH, forwardedPayload)) {
                     forwarded++;
                     LOG.debug("Forwarded search hop ttl=" + newTtl + " to "
                             + Hex.encode(peerPub).substring(0, 12) + "…");
@@ -669,26 +814,31 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         }
     }
 
-    private boolean tryAcquire(String sourceKey) {
-        long now = System.currentTimeMillis();
-        RateBucket bucket = rateMap.computeIfAbsent(sourceKey, k -> new RateBucket());
-        return bucket.tryAcquire(now);
+    private boolean admit(String protocol, byte[] requester, byte[] nonce) {
+        String key = protocol + ':' + Hex.encode(requester) + ':' + Hex.encode(nonce);
+        synchronized (replay) {
+            long now = System.nanoTime();
+            replay.values().removeIf(expiry -> now - expiry >= 0);
+            if (replay.containsKey(key) || replay.size() >= MAX_REPLAY_ENTRIES
+                    || !rateLimiter.tryAcquire(requester)) {
+                return false;
+            }
+            replay.put(key, now + (2 * RemoteSearchRequest.MAX_TIMESTAMP_SKEW_SEC + 1) * 1_000_000_000L);
+            return true;
+        }
     }
 
-    /** Simple sliding-window rate limiter per source. */
-    private static final class RateBucket {
-        private final long[] timestamps = new long[MAX_REQUESTS_PER_MINUTE];
-        private int index = 0;
-
-        synchronized boolean tryAcquire(long now) {
-            long cutoff = now - 60_000;
-            // Check if the slot at current index is older than 1 minute.
-            if (timestamps[index] < cutoff) {
-                timestamps[index] = now;
-                index = (index + 1) % MAX_REQUESTS_PER_MINUTE;
-                return true;
-            }
-            return false;
+    /** Called by the transport maintenance timer, including during idle periods. */
+    public void evictIdle() {
+        searchService.evictIdle();
+        rateLimiter.evictIdle(10 * 60_000L);
+        synchronized (replay) {
+            long now = System.nanoTime();
+            replay.values().removeIf(expiry -> now - expiry >= 0);
+        }
+        synchronized (torrentCache) {
+            long now = System.nanoTime();
+            torrentCache.values().removeIf(entry -> now - entry.expiresNanos >= 0);
         }
     }
 }

@@ -18,6 +18,18 @@ public final class ShareVisibility {
     private ShareVisibility() {
     }
 
+    /** Public serving is opt-in and policy failures never expose a row. */
+    public static boolean isPubliclyShared(String infoHashHex, ShareVisibilityPolicy policy) {
+        if (infoHashHex == null || policy == null) {
+            return false;
+        }
+        try {
+            return policy.isVisible(infoHashHex);
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
     /**
      * Filter index rows through {@code policy}. Null policy = include all.
      */

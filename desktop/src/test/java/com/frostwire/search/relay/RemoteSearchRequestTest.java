@@ -250,22 +250,22 @@ class RemoteSearchRequestTest {
   }
 
   @Test
-  void withNextHopInvalidatesSignature() {
+  void withNextHopPreservesSignature() {
     byte[] nonce = new byte[32];
     byte[] nextHop = new byte[32];
     nextHop[31] = 0x01;
+    byte[] signature = new byte[64];
+    java.util.Arrays.fill(signature, (byte) 7);
     RemoteSearchRequest r =
         RemoteSearchRequest.builder()
             .nonce(nonce)
             .requesterPub(pubRaw)
-            .signature(new byte[64])
+            .ttl(3)
+            .signature(signature)
             .build();
     RemoteSearchRequest forwarded = r.withNextHop(nextHop, 2);
-    // Signature bytes should be all zero (invalidated) — caller must re-sign
-    byte[] fwdSig = forwarded.signature();
-    for (byte b : fwdSig) {
-      assertEquals(0, b, "Forwarded request's signature must be zeroed");
-    }
+    assertArrayEquals(signature, forwarded.signature());
+    assertEquals(r.maxTtl(), forwarded.maxTtl());
   }
 
   @Test
@@ -316,6 +316,7 @@ class RemoteSearchRequestTest {
             .nonce(nonce)
             .requesterPub(pubRaw)
             .path(bigPath)
+            .ttl(0)
             .signature(new byte[64])
             .build();
     assertEquals(RemoteSearchRequest.MAX_PATH_LENGTH, r.pathLength());
@@ -364,6 +365,8 @@ class RemoteSearchRequestTest {
             .signature(new byte[64])
             .build();
     java.util.Map<String, Object> m = r.toBencodeableMap();
+    assertArrayEquals(
+        r.canonicalBytes(), RemoteSearchRequest.fromBencodeableMap(m).canonicalBytes());
     // The nonce in the map should be base64(nonce) which decodes back to the same bytes
     String nonceB64 = (String) m.get("nonce");
     byte[] decodedNonce = java.util.Base64.getDecoder().decode(nonceB64);
@@ -371,5 +374,82 @@ class RemoteSearchRequestTest {
     assertEquals(
         Hex.encode(pubRaw),
         Hex.encode(java.util.Base64.getDecoder().decode((String) m.get("pub"))));
+  }
+
+  @Test
+  void oldWireAndMissingSignedBudgetAreRejected() {
+    RemoteSearchRequest r =
+        RemoteSearchRequest.builder()
+            .nonce(new byte[32])
+            .requesterPub(pubRaw)
+            .signature(new byte[64])
+            .build();
+    java.util.Map<String, Object> map = r.toBencodeableMap();
+    map.put("v", 2);
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+    map.put("v", RemoteSearchRequest.VERSION);
+    map.remove("maxTtl");
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+  }
+
+  @Test
+  void maximumBudgetIsSignedAndCannotBeResetOnHop() {
+    RemoteSearchRequest r =
+        RemoteSearchRequest.builder()
+            .nonce(new byte[32])
+            .requesterPub(pubRaw)
+            .ttl(3)
+            .signature(new byte[64])
+            .build();
+    java.util.Map<String, Object> map = r.toBencodeableMap();
+    map.put("maxTtl", 4);
+    RemoteSearchRequest changed = RemoteSearchRequest.fromBencodeableMap(map);
+    assertNotNull(changed);
+    assertFalse(java.util.Arrays.equals(r.canonicalBytes(), changed.canonicalBytes()));
+    assertThrows(IllegalArgumentException.class, () -> r.withNextHop(new byte[32], 3));
+    map.put("ttl", 5);
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+    map.put("ttl", 1L << 32);
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+  }
+
+  @Test
+  void wireCannotUseBuilderSentinelOrDiscardMalformedPath() {
+    RemoteSearchRequest request =
+        RemoteSearchRequest.builder()
+            .nonce(new byte[32])
+            .requesterPub(pubRaw)
+            .signature(new byte[64])
+            .build();
+    java.util.Map<String, Object> map = request.toBencodeableMap();
+    map.put("maxTtl", -1);
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+    map = request.toBencodeableMap();
+    map.put("path", "not-a-path");
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+    map = request.toBencodeableMap();
+    map.put("ts", 1.5);
+    assertNull(RemoteSearchRequest.fromBencodeableMap(map));
+  }
+
+  @Test
+  void repeatedPathAndOversizedNonceAreRejected() {
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            RemoteSearchRequest.builder()
+                .nonce(new byte[33])
+                .requesterPub(pubRaw)
+                .signature(new byte[64])
+                .build());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            RemoteSearchRequest.builder()
+                .nonce(new byte[32])
+                .requesterPub(pubRaw)
+                .path(new byte[][] {pubRaw, pubRaw})
+                .signature(new byte[64])
+                .build());
   }
 }

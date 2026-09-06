@@ -41,7 +41,8 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys handlerIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
     byte[] peerA = rawPub(generateEd25519KeyPair());
@@ -55,7 +56,7 @@ class IncomingSearchRequestHandlerTest {
     handler.start();
 
     byte[][] path = {requesterPub};
-    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 2, path);
     transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
     // 1 local response + up to 2 forwards
@@ -67,12 +68,13 @@ class IncomingSearchRequestHandlerTest {
     for (RemoteSearchRequest hop : forwarded) {
       assertArrayEquals(
           request.signature(), hop.signature(), "forward must preserve requester signature");
-      assertEquals(0, hop.ttl(), "ttl should be decremented by one hop");
+      assertEquals(1, hop.ttl(), "ttl should be decremented by one useful hop");
       assertTrue(hop.pathLength() >= 2, "path should include forwarder pub");
     }
     RemoteSearchResponse response =
         SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload);
     assertNotNull(response);
+    assertEquals(1, response.rows().size());
     assertArrayEquals(request.nonce(), response.nonce());
   }
 
@@ -84,7 +86,8 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys handlerIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
     byte[] peerA = rawPub(generateEd25519KeyPair());
@@ -99,7 +102,7 @@ class IncomingSearchRequestHandlerTest {
     handler.start();
 
     byte[][] path = {requesterPub};
-    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 2, path);
     transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
 
     assertEquals(2, transport.sent.size(), "local response plus exactly one capped forward");
@@ -113,7 +116,8 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys handlerIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     KeyPair peerKey = generateEd25519KeyPair();
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
@@ -139,7 +143,8 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys handlerIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
     byte[] peerA = rawPub(generateEd25519KeyPair());
@@ -173,11 +178,12 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys targetIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService targetService = new RelaySearchService(index, targetIdentity);
+    RelaySearchService targetService =
+        new RelaySearchService(index, targetIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     byte[][] path = {requesterPub};
-    RemoteSearchRequest original = signedRequest(requesterKey, "ubuntu", 25, 1, path);
-    RemoteSearchRequest nextHop = original.withNextHop(forwarder.ed25519PubRaw(), 0);
+    RemoteSearchRequest original = signedRequest(requesterKey, "ubuntu", 25, 2, path);
+    RemoteSearchRequest nextHop = original.withNextHop(forwarder.ed25519PubRaw(), 1);
 
     assertArrayEquals(
         original.signature(), nextHop.signature(), "withNextHop must preserve requester signature");
@@ -191,8 +197,8 @@ class IncomingSearchRequestHandlerTest {
         targetService.handle(nextHop).isPresent(),
         "RelaySearchService accepts dual-envelope hop with preserved requester sig");
     assertTrue(
-        targetService.handle(original).isPresent(),
-        "original requester-signed request still accepted");
+        targetService.handle(original).isEmpty(),
+        "second graph arrival is rejected even with a different outer path");
   }
 
   @Test
@@ -203,7 +209,8 @@ class IncomingSearchRequestHandlerTest {
     IdentityKeys handlerIdentity = IdentityKeys.generate();
     InMemoryLocalIndex index = new InMemoryLocalIndex();
     index.torrents.add(torrent("ubuntu server", 500L, 1));
-    RelaySearchService service = new RelaySearchService(index, handlerIdentity);
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
 
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
 
@@ -229,17 +236,19 @@ class IncomingSearchRequestHandlerTest {
     byte[] requesterPub = rawPub(requesterKey);
 
     IdentityKeys holderIdentity = IdentityKeys.generate();
-    RelaySearchService service = new RelaySearchService(new InMemoryLocalIndex(), holderIdentity);
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
 
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
         new IncomingSearchRequestHandler(transport, service, directory, holderIdentity);
 
-    byte[] infoHash = randomBytes(20);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
     // 200KB: over the old 64KB cap, under the 256KB torrent cap.
-    byte[] torrentBytes = randomBytes(200 * 1024);
-    handler.setTorrentMetadataProvider(ih -> torrentBytes);
+    byte[] torrentBytes = TestTorrentMetadata.bytes(200 * 1024);
+    handler.setTorrentMetadataProvider(publicProvider(ih -> torrentBytes));
     handler.start();
 
     TorrentMetadataRequest request = signedMetadataRequest(requesterKey, infoHash, randomBytes(32));
@@ -253,14 +262,17 @@ class IncomingSearchRequestHandlerTest {
         (torrentBytes.length + TorrentMetadataResponse.CHUNK_DATA_BYTES - 1)
             / TorrentMetadataResponse.CHUNK_DATA_BYTES;
     assertEquals(
-        expectedChunks, transport.sent.size(), "200KB torrent must be served as chunks, not TOO_LARGE");
+        expectedChunks,
+        transport.sent.size(),
+        "200KB torrent must be served as chunks, not TOO_LARGE");
     List<TorrentMetadataResponse> chunks = new ArrayList<>();
     for (CapturingTransport.SentPayload sp : transport.sent) {
       TorrentMetadataResponse chunk = SearchPayloadCodec.decodeTorrentMetadataResponse(sp.payload);
       assertNotNull(chunk);
       assertFalse(chunk.isError(), "no chunk may carry an error");
       assertTrue(
-          chunk.verifySignature(holderIdentity.ed25519PubRaw()), "chunk must verify under holder pub");
+          chunk.verifySignature(holderIdentity.ed25519PubRaw()),
+          "chunk must verify under holder pub");
       assertArrayEquals(request.nonce(), chunk.nonce(), "chunk nonce must match request nonce");
       chunks.add(chunk);
     }
@@ -275,16 +287,19 @@ class IncomingSearchRequestHandlerTest {
     byte[] requesterPub = rawPub(requesterKey);
 
     IdentityKeys holderIdentity = IdentityKeys.generate();
-    RelaySearchService service = new RelaySearchService(new InMemoryLocalIndex(), holderIdentity);
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
 
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
         new IncomingSearchRequestHandler(transport, service, directory, holderIdentity);
-    handler.setTorrentMetadataProvider(ih -> randomBytes(300 * 1024));
+    handler.setTorrentMetadataProvider(publicProvider(ih -> randomBytes(300 * 1024)));
     handler.start();
 
-    TorrentMetadataRequest request = signedMetadataRequest(requesterKey, randomBytes(20), randomBytes(32));
+    TorrentMetadataRequest request =
+        signedMetadataRequest(requesterKey, randomBytes(20), randomBytes(32));
     handler.onPayload(
         requesterPub,
         SearchPayloadCodec.encodeTorrentMetadataRequest(request),
@@ -306,28 +321,32 @@ class IncomingSearchRequestHandlerTest {
     byte[] requesterPub = rawPub(requesterKey);
 
     IdentityKeys holderIdentity = IdentityKeys.generate();
-    RelaySearchService service = new RelaySearchService(new InMemoryLocalIndex(), holderIdentity);
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
     PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
 
     CapturingTransport transport = new CapturingTransport();
     IncomingSearchRequestHandler handler =
         new IncomingSearchRequestHandler(transport, service, directory, holderIdentity);
-    byte[] torrentBytes = randomBytes(1024);
+    byte[] torrentBytes = TestTorrentMetadata.bytes(1024);
     AtomicInteger providerCalls = new AtomicInteger();
     handler.setTorrentMetadataProvider(
-        ih -> {
-          providerCalls.incrementAndGet();
-          return torrentBytes;
-        });
+        publicProvider(
+            ih -> {
+              providerCalls.incrementAndGet();
+              return torrentBytes;
+            }));
     handler.start();
 
-    byte[] infoHash = randomBytes(20);
+    byte[] infoHash = TestTorrentMetadata.infoHash();
     // Two distinct nonces: signatures are restamped templates, so chunk
     // signatures must be byte-identical across rounds (zero re-signing) while
     // each frame still carries its own request nonce.
     List<byte[]> firstSigs = null;
     for (int round = 0; round < 2; round++) {
-      TorrentMetadataRequest request = signedMetadataRequest(requesterKey, infoHash, randomBytes(32));
+      TorrentMetadataRequest request =
+          signedMetadataRequest(requesterKey, infoHash, randomBytes(32));
       handler.onPayload(
           requesterPub,
           SearchPayloadCodec.encodeTorrentMetadataRequest(request),
@@ -336,7 +355,8 @@ class IncomingSearchRequestHandlerTest {
       List<TorrentMetadataResponse> chunks = new ArrayList<>();
       List<byte[]> sigs = new ArrayList<>();
       for (CapturingTransport.SentPayload sp : transport.sent) {
-        TorrentMetadataResponse chunk = SearchPayloadCodec.decodeTorrentMetadataResponse(sp.payload);
+        TorrentMetadataResponse chunk =
+            SearchPayloadCodec.decodeTorrentMetadataResponse(sp.payload);
         assertNotNull(chunk);
         assertFalse(chunk.isError());
         assertArrayEquals(request.nonce(), chunk.nonce());
@@ -360,7 +380,347 @@ class IncomingSearchRequestHandlerTest {
     assertEquals(1, handler.torrentCacheSize());
   }
 
+  @Test
+  void rejectedAndRepeatedSearchesNeverForward() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    directory.upsertVerified(rawPub(generateEd25519KeyPair()), "peer", 6881);
+    RelaySearchService service = new RelaySearchService(new InMemoryLocalIndex(), holder);
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, directory, holder);
+    RemoteSearchRequest valid = signedRequest(requester, "ubuntu", 25, 2, new byte[0][]);
+    java.util.Map<String, Object> map = valid.toBencodeableMap();
+    map.put("sig", java.util.Base64.getEncoder().encodeToString(new byte[64]));
+    RemoteSearchRequest bad = RemoteSearchRequest.fromBencodeableMap(map);
+    handler.onPayload(rawPub(requester), SearchPayloadCodec.encodeRequest(bad), 0);
+    assertTrue(transport.sent.isEmpty(), "failed verification cannot send or forward");
+    assertEquals(0, service.rateLimiter().bucketCount());
+    handler.onPayload(rawPub(requester), SearchPayloadCodec.encodeRequest(valid), 0);
+    assertEquals(2, transport.sent.size());
+    transport.sent.clear();
+    handler.onPayload(rawPub(requester), SearchPayloadCodec.encodeRequest(valid), 0);
+    assertTrue(transport.sent.isEmpty(), "duplicate graph arrival cannot repeat work");
+    RemoteSearchRequest terminal =
+        signedRequest(requester, "ubuntu", 25, 1, new byte[0][], randomBytes(32));
+    handler.onPayload(rawPub(requester), SearchPayloadCodec.encodeRequest(terminal), 0);
+    assertEquals(1, transport.sent.size(), "ttl1 only answers locally");
+    assertTrue(extractForwardedRequests(transport).isEmpty());
+  }
+
+  @Test
+  void defaultDeniedMetadataNeverReadsProviderAndWithdrawalInvalidatesCache() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    byte[] hash = randomBytes(20);
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(
+                new InMemoryLocalIndex(), holder, ShareVisibilityPolicy.INCLUDE_ALL),
+            null,
+            holder);
+    AtomicInteger reads = new AtomicInteger();
+    handler.setTorrentMetadataProvider(
+        ih -> {
+          reads.incrementAndGet();
+          return new byte[900];
+        });
+    TorrentMetadataRequest first = signedMetadataRequest(requester, hash, randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(first),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(0, reads.get());
+    assertEquals(
+        TorrentMetadataResponse.ERR_NOT_FOUND,
+        SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(0).payload).error());
+    java.util.concurrent.atomic.AtomicBoolean visible =
+        new java.util.concurrent.atomic.AtomicBoolean(true);
+    handler.setTorrentMetadataProvider(
+        new TorrentMetadataProvider() {
+          @Override
+          public boolean isPubliclyShared(byte[] ih) {
+            return visible.get();
+          }
+
+          @Override
+          public byte[] torrentBytes(byte[] ih) {
+            reads.incrementAndGet();
+            return new byte[900];
+          }
+        });
+    transport.sent.clear();
+    TorrentMetadataRequest publicRequest = signedMetadataRequest(requester, hash, randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(publicRequest),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(1, reads.get());
+    assertEquals(1, handler.torrentCacheSize());
+    visible.set(
+        false); // Covers policy withdrawal for removed/private/unshared/metadata-only states.
+    transport.sent.clear();
+    TorrentMetadataRequest withdrawn = signedMetadataRequest(requester, hash, randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(withdrawn),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(1, reads.get(), "denial precedes both provider and cached bytes");
+    assertEquals(0, handler.torrentCacheSize());
+    assertEquals(1, transport.sent.size());
+    assertEquals(
+        TorrentMetadataResponse.ERR_NOT_FOUND,
+        SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(0).payload).error());
+    transport.sent.clear();
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(withdrawn),
+        0,
+        MeshProtocolId.METADATA);
+    assertTrue(transport.sent.isEmpty(), "metadata replay does not re-serve even errors");
+  }
+
+  @Test
+  void streamingPreservesSeederEndpoints() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    for (int i = 0; i < 25; i++) index.torrents.add(torrent("ubuntu " + i, 100, 1));
+    RelaySearchService service =
+        new RelaySearchService(index, holder, ShareVisibilityPolicy.INCLUDE_ALL);
+    service.setSeederEndpointProvider(() -> List.of("127.0.0.1:6881"));
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, null, holder, index);
+    RemoteSearchRequest request = signedRequest(requester, "ubuntu", 25, 1, new byte[0][]);
+    handler.onPayload(rawPub(requester), SearchPayloadCodec.encodeRequest(request), 0);
+    assertEquals(5, transport.sent.size());
+    int rows = 0;
+    for (CapturingTransport.SentPayload sent : transport.sent) {
+      RemoteSearchResponse response = SearchPayloadCodec.decodeResponse(sent.payload);
+      for (RemoteSearchResponse.Row row : response.rows()) {
+        assertEquals(List.of("127.0.0.1:6881"), row.seederEndpoints);
+        rows++;
+      }
+    }
+    assertEquals(25, rows);
+  }
+
+  @Test
+  void browseUsesSamePublicPolicyAsSearchAndStopsAfterWithdrawal() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    LocalSharedTorrent visibleRow = torrent("public-name", 100, 1);
+    index.torrents.add(visibleRow);
+    index.torrents.add(torrent("hidden-name", 100, 1));
+    java.util.Set<String> visible = new java.util.HashSet<>();
+    visible.add(visibleRow.infoHashHex());
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(index, holder, visible::contains),
+            null,
+            holder,
+            index);
+    for (int round = 0; round < 2; round++) {
+      RemoteCatalogBrowseRequest.Builder builder =
+          RemoteCatalogBrowseRequest.builder()
+              .requesterPub(rawPub(requester))
+              .targetPub(holder.ed25519PubRaw())
+              .nonce(randomBytes(32))
+              .timestamp(System.currentTimeMillis() / 1000)
+              .signature(new byte[64]);
+      Signature signer = Signature.getInstance("Ed25519");
+      signer.initSign(requester.getPrivate());
+      signer.update(builder.build().canonicalBytes());
+      handler.onPayload(
+          rawPub(requester),
+          SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build()),
+          0);
+      assertEquals(1, transport.sent.size());
+      String manifest =
+          new String(transport.sent.get(0).payload, java.nio.charset.StandardCharsets.UTF_8);
+      assertFalse(manifest.contains("hidden-name"));
+      assertEquals(round == 0, manifest.contains("public-name"));
+      transport.sent.clear();
+      visible.clear();
+    }
+  }
+
   // --- helpers ---
+
+  @Test
+  void providerPermissionAloneDoesNotOverrideDefaultDeniedHandler() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport, new RelaySearchService(new InMemoryLocalIndex(), holder), null, holder);
+    AtomicInteger reads = new AtomicInteger();
+    handler.setTorrentMetadataProvider(
+        publicProvider(
+            hash -> {
+              reads.incrementAndGet();
+              return new byte[100];
+            }));
+    TorrentMetadataRequest request =
+        signedMetadataRequest(requester, randomBytes(20), randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(request),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(0, reads.get());
+    assertEquals(0, handler.torrentCacheSize());
+    assertEquals(
+        TorrentMetadataResponse.ERR_NOT_FOUND,
+        SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(0).payload).error());
+  }
+
+  @Test
+  void negativeResponsesAreFreshlySignedAndNeverCached() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(
+                new InMemoryLocalIndex(), holder, ShareVisibilityPolicy.INCLUDE_ALL),
+            null,
+            holder);
+    AtomicInteger reads = new AtomicInteger();
+    handler.setTorrentMetadataProvider(
+        publicProvider(
+            hash -> {
+              reads.incrementAndGet();
+              return new byte[IncomingSearchRequestHandler.METADATA_MAX_BYTES + 1];
+            }));
+    byte[] hash = randomBytes(20);
+    byte[] previousSignature = null;
+    for (int i = 0; i < 2; i++) {
+      TorrentMetadataRequest request = signedMetadataRequest(requester, hash, randomBytes(32));
+      handler.onPayload(
+          rawPub(requester),
+          SearchPayloadCodec.encodeTorrentMetadataRequest(request),
+          0,
+          MeshProtocolId.METADATA);
+      TorrentMetadataResponse response =
+          SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(i).payload);
+      assertEquals(TorrentMetadataResponse.ERR_TOO_LARGE, response.error());
+      assertArrayEquals(request.nonce(), response.nonce());
+      assertTrue(response.verifySignature(holder.ed25519PubRaw()));
+      if (previousSignature != null) {
+        assertFalse(Arrays.equals(previousSignature, response.signature()));
+      }
+      previousSignature = response.signature();
+      assertEquals(0, handler.torrentCacheSize());
+    }
+    assertEquals(2, reads.get(), "negative templates must not be reused");
+  }
+
+  @Test
+  void providerReplacementDuringReadCannotPopulateOrServeOldCache() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(
+                new InMemoryLocalIndex(), holder, ShareVisibilityPolicy.INCLUDE_ALL),
+            null,
+            holder);
+    AtomicInteger newReads = new AtomicInteger();
+    TorrentMetadataProvider replacement =
+        publicProvider(
+            hash -> {
+              newReads.incrementAndGet();
+              return TestTorrentMetadata.bytes(10);
+            });
+    handler.setTorrentMetadataProvider(
+        publicProvider(
+            hash -> {
+              handler.setTorrentMetadataProvider(replacement);
+              return TestTorrentMetadata.bytes(100);
+            }));
+    TorrentMetadataRequest old =
+        signedMetadataRequest(requester, TestTorrentMetadata.infoHash(), randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(old),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(0, handler.torrentCacheSize());
+    assertTrue(transport.sent.isEmpty());
+    TorrentMetadataRequest current =
+        signedMetadataRequest(requester, TestTorrentMetadata.infoHash(), randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(current),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(1, newReads.get());
+    assertEquals(1, handler.torrentCacheSize());
+    assertArrayEquals(
+        TestTorrentMetadata.bytes(10),
+        SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(0).payload).data());
+  }
+
+  @Test
+  void metadataSendRejectionAndWithdrawalStopRemainingChunks() throws Exception {
+    for (boolean withdraw : new boolean[] {false, true}) {
+      IdentityKeys holder = IdentityKeys.generate();
+      KeyPair requester = generateEd25519KeyPair();
+      CapturingTransport transport = new CapturingTransport();
+      java.util.concurrent.atomic.AtomicBoolean visible =
+          new java.util.concurrent.atomic.AtomicBoolean(true);
+      IncomingSearchRequestHandler handler =
+          new IncomingSearchRequestHandler(
+              transport,
+              new RelaySearchService(new InMemoryLocalIndex(), holder, hash -> visible.get()),
+              null,
+              holder);
+      handler.setTorrentMetadataProvider(publicProvider(hash -> new byte[4096]));
+      transport.acceptSend = withdraw;
+      transport.afterSend =
+          () -> {
+            if (withdraw) visible.set(false);
+          };
+      TorrentMetadataRequest request =
+          signedMetadataRequest(requester, randomBytes(20), randomBytes(32));
+      handler.onPayload(
+          rawPub(requester),
+          SearchPayloadCodec.encodeTorrentMetadataRequest(request),
+          0,
+          MeshProtocolId.METADATA);
+      assertEquals(1, transport.sent.size(), "no chunk after rejection or visibility withdrawal");
+      if (withdraw) assertEquals(0, handler.torrentCacheSize());
+    }
+  }
+
+  private static TorrentMetadataProvider publicProvider(TorrentMetadataProvider bytes) {
+    return new TorrentMetadataProvider() {
+      @Override
+      public boolean isPubliclyShared(byte[] hash) {
+        return true;
+      }
+
+      @Override
+      public byte[] torrentBytes(byte[] hash) {
+        return bytes.torrentBytes(hash);
+      }
+    };
+  }
 
   private static byte[] randomBytes(int n) {
     byte[] b = new byte[n];
@@ -507,6 +867,8 @@ class IncomingSearchRequestHandlerTest {
   private static final class CapturingTransport implements DistributedSearchTransport {
     private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     final List<SentPayload> sent = new CopyOnWriteArrayList<>();
+    boolean acceptSend = true;
+    Runnable afterSend = () -> {};
 
     void deliver(byte[] sourcePub, byte[] payload) {
       for (PayloadListener l : listeners) {
@@ -517,7 +879,8 @@ class IncomingSearchRequestHandlerTest {
     @Override
     public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
       sent.add(new SentPayload(targetPub, payload));
-      return true;
+      afterSend.run();
+      return acceptSend;
     }
 
     @Override
@@ -579,6 +942,11 @@ class IncomingSearchRequestHandlerTest {
         }
       }
       return out;
+    }
+
+    @Override
+    public List<LocalSharedTorrent> listAll() {
+      return new ArrayList<>(torrents);
     }
 
     @Override
