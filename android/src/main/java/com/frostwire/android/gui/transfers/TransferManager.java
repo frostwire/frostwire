@@ -233,7 +233,9 @@ public final class TransferManager {
     }
 
     public BittorrentDownload getBittorrentDownload(String infoHash) {
-        return bittorrentDownloadsMap.get(infoHash);
+        synchronized (downloadsMapMonitor) {
+            return bittorrentDownloadsMap.get(infoHash);
+        }
     }
 
     private boolean alreadyDownloading(String detailsUrl) {

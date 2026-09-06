@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
@@ -74,6 +75,22 @@ public class AndroidKarmaChainStoreTest {
         store.close();
         store.close();
         assertFalse(store.isOpen());
+    }
+
+    @Test
+    public void revokedGenerationCannotWriteAndStillClosesItsConnection() {
+        store.close();
+        java.util.concurrent.atomic.AtomicBoolean active = new java.util.concurrent.atomic.AtomicBoolean(true);
+        store = new AndroidKarmaChainStore(context, "test-karma-chain.db", active::get);
+        KarmaChainEntry entry = KarmaChainEntry.createEpochCommitment(
+                KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw,
+                block(850000L), KarmaConstants.MAX_ENERGY, keyPair.getPrivate());
+        active.set(false);
+        assertThrows(IllegalStateException.class, () -> store.append(entry));
+        store.close();
+        assertFalse(store.isOpen());
+        store = new AndroidKarmaChainStore(context, "test-karma-chain.db");
+        assertTrue(store.loadChain(pubRaw).entries().isEmpty());
     }
 
     @Test

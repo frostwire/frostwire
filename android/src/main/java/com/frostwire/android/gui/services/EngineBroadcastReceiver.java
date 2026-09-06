@@ -67,6 +67,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
             } else if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
+                // Revoke before queued native work; a busy MISC queue is not an authorization delay.
+                if (!com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed()) {
+                    Engine.instance().stopServices(true);
+                }
                 postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleNetworkStateChange(context, intent));
             }
         } catch (Throwable e) {
@@ -88,7 +92,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         ensureBackgroundThreadOrCrash("EngineBroadcastReceiver.handleNetworkStateChange must be called from a background thread");
 
         NetworkManager networkManager = NetworkManager.instance();
-        boolean isDataUp = intent.getBooleanExtra("isDataUp", false);
+        boolean isDataUp = com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed();
 
         if (isDataUp) {
             handleConnectedNetwork(context, networkManager);
@@ -131,12 +135,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         if (vpnGuardEnabled && !hasVpn) {
             LOG.info("VPN guard enabled but no VPN detected. Pausing torrents.");
             TransferManager.instance().pauseTorrents();
+            Engine.instance().stopServices(true);
             return;
         }
 
         if (Engine.instance().isDisconnected()) {
             LOG.info("Connected to network. Starting services.");
-            Engine.instance().startServices();
+            Engine.instance().resumeServicesIfDisconnected();
         }
 
         if (shouldStopSeeding()) {
@@ -149,13 +154,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
      */
     private void handleDisconnectedNetwork(NetworkManager networkManager) {
         LOG.info("Disconnected from network");
-
-        // If VPN guard is enabled and we still have VPN, don't stop
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                (networkManager.isTunnelUp() || networkManager.isVpnConnected())) {
-            LOG.info("Network disconnected but VPN is still active. Not stopping services.");
-            return;
-        }
 
         Engine.instance().stopServices(true);
     }
@@ -187,7 +185,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             boolean hasVpn = networkManager.isTunnelUp() || networkManager.isVpnConnected();
 
             if (!vpnGuardEnabled || hasVpn) {
-                Engine.instance().startServices();
+                Engine.instance().resumeServicesIfDisconnected();
             }
         }
     }
@@ -209,6 +207,9 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     private static void reopenNetworkSockets() {
         // sleep for a second, since IPv6 addresses takes time to be reported
         SystemClock.sleep(1000);
-        BTEngine.getInstance().reopenNetworkSockets();
+        if (!Engine.instance().wasShutdown()
+                && com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed()) {
+            BTEngine.getInstance().reopenNetworkSockets();
+        }
     }
 }

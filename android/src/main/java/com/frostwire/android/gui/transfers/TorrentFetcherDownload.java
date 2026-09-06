@@ -18,8 +18,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.os.Handler;
-import android.os.HandlerThread;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
@@ -53,21 +51,21 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
   private static final Logger LOG = Logger.getLogger(TorrentFetcherDownload.class);
 
-  private static final Handler HANDLER;
-
-  static {
-    HandlerThread handlerThread = new HandlerThread("TorrentFetcher-HandlerThread");
-    handlerThread.start();
-    HANDLER = new Handler(handlerThread.getLooper());
-  }
+  private static final java.util.concurrent.ThreadPoolExecutor FETCHERS =
+      new java.util.concurrent.ThreadPoolExecutor(1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+          new java.util.concurrent.ArrayBlockingQueue<>(64),
+          runnable -> new Thread(runnable, "TorrentFetcher"));
 
   private final TransferManager manager;
   private final TorrentDownloadInfo info;
+  private final String selectedHash;
   private final Date created;
   private final TorrentFetcherListener fetcherListener;
   public final long tokenId;
 
-  private TransferState state;
+  private volatile TransferState state;
+  private final DownloadStartGate startGate = new DownloadStartGate();
+  private final java.util.concurrent.FutureTask<Void> fetchTask;
 
   TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info) {
     this(manager, info, null);
@@ -75,15 +73,27 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
   public TorrentFetcherDownload(
       TransferManager manager, TorrentDownloadInfo info, TorrentFetcherListener listener) {
+    this(manager, info, listener, FETCHERS);
+  }
+
+  TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info,
+                         TorrentFetcherListener listener, java.util.concurrent.Executor executor) {
     this.manager = manager;
     this.info = info;
+    this.selectedHash = info.getHash();
     this.created = new Date();
     this.fetcherListener = listener;
     this.tokenId = new Random(System.currentTimeMillis()).nextLong();
     state = TransferState.DOWNLOADING_TORRENT;
 
-    // Use shared HandlerThread with looper to avoid creating a thread per download
-    HANDLER.post(new FetcherRunnable());
+    fetchTask = new java.util.concurrent.FutureTask<>(new FetcherRunnable(), null);
+    try {
+      executor.execute(fetchTask);
+    } catch (java.util.concurrent.RejectedExecutionException full) {
+      startGate.cancel();
+      fetchTask.cancel(false);
+      state = TransferState.ERROR;
+    }
   }
 
   String getTorrentUri() {
@@ -216,6 +226,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
   @Override
   public void remove(boolean deleteData) {
+    if (startGate.cancel()) {
+      fetchTask.cancel(true);
+      FETCHERS.remove(fetchTask);
+    }
     state = TransferState.CANCELED;
     manager.remove(this);
   }
@@ -261,12 +275,19 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
   private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
     try {
+      if (!matchesSelectedHash(data)) {
+        LOG.warn("Torrent metadata does not match the selected hash");
+        return;
+      }
       TorrentInfo ti = TorrentInfo.bdecode(data);
       boolean[] selection = null;
       if (info.getRelativePath() != null) {
         selection = calculateSelection(ti, info.getRelativePath());
       }
 
+      if (!startGate.tryStart()) {
+        return;
+      }
       BTEngine.getInstance()
           .download(
               ti,
@@ -277,6 +298,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     } catch (Throwable e) {
       LOG.error("Error downloading torrent", e);
     }
+  }
+
+  private boolean matchesSelectedHash(byte[] data) {
+    return selectedHash == null || selectedHash.isEmpty()
+        || MeshTorrentMetadataFetcher.matchesInfoHash(data, com.frostwire.util.Hex.decode(selectedHash));
   }
 
   private boolean[] calculateSelection(TorrentInfo ti, String path) {
@@ -306,7 +332,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
       if (holderPub == null || wiring.searchTransport() == null || wiring.identity() == null) {
         return null;
       }
-      String hash = info.getHash();
+      String hash = selectedHash;
       if (hash == null || hash.length() != 40) {
         return null;
       }
@@ -339,6 +365,9 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           // (piece layers included) from the holder over IceBridge.
           // Falls back to the direct magnet add on timeout/miss.
           byte[] meshMetadata = fetchMeshTorrentMetadata(uri);
+          if (state == TransferState.CANCELED) {
+            return;
+          }
           if (meshMetadata != null) {
             LOG.info("Torrent metadata fetched over IceBridge mesh, starting transfer");
             downloadTorrent(meshMetadata, LibTorrentMagnetDownloader.parsePeers(uri));
@@ -349,7 +378,9 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           // BEP 9 metadata does not include the top-level piece-layer dictionary.
           // Add it directly so libtorrent keeps x.pe peers and fetches piece layers.
           LOG.info("Starting x.pe magnet directly in BTEngine");
-          BTEngine.getInstance().download(uri, null, new torrent_flags_t());
+          if (startGate.tryStart()) {
+            BTEngine.getInstance().download(uri, null, new torrent_flags_t());
+          }
           remove(false);
           return;
         }
@@ -371,7 +402,9 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           // Don't download the torrent yourself, there's a listener waiting
           // for the .torrent, and it's up to this listener to start the transfer.
           if (fetcherListener != null) {
-            fetcherListener.onTorrentInfoFetched(data, uri, tokenId);
+            if (matchesSelectedHash(data) && startGate.tryStart()) {
+              fetcherListener.onTorrentInfoFetched(data, uri, tokenId);
+            }
             return;
           }
 
@@ -384,10 +417,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
             remove(false);
           }
         } else {
-          state = TransferState.ERROR;
+          if (state != TransferState.CANCELED) state = TransferState.ERROR;
         }
       } catch (Throwable e) {
-        state = TransferState.ERROR;
+        if (state != TransferState.CANCELED) state = TransferState.ERROR;
         LOG.error("Error downloading torrent from uri", e);
       }
     }

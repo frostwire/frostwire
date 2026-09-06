@@ -28,7 +28,10 @@ public class VpnDropProtectionScopeTest {
 
     assertTrue(vpnGuardBlock.contains("TransferManager.instance().pauseTorrents();"));
     assertTrue(vpnGuardBlock.contains("Pausing torrents."));
-    assertFalse(vpnGuardBlock.contains("Engine.instance().stopServices(true);"));
+    assertTrue(vpnGuardBlock.contains("Engine.instance().stopServices(true);"));
+    assertTrue(
+        vpnGuardBlock.indexOf("TransferManager.instance().pauseTorrents();")
+            < vpnGuardBlock.indexOf("Engine.instance().stopServices(true);"));
   }
 
   @Test

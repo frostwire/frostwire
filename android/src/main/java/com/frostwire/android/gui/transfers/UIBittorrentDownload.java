@@ -74,6 +74,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private volatile long cachedEta;
     private volatile boolean cachedSeeding;
     private volatile boolean cachedPaused;
+    private volatile boolean removedFromSharing;
+    private volatile boolean sharingPaused;
     private volatile boolean cachedFinished;
     private volatile boolean cachedComplete;
     private volatile String cachedMagnetUri;
@@ -281,6 +283,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public void pause() {
+        sharingPaused = true;
         if (!dl.wasPaused()) {
             dl.pause();
         }
@@ -291,6 +294,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public void resume() {
         dl.resume();
+        sharingPaused = false;
     }
 
     @Override
@@ -324,7 +328,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
+        removedFromSharing = true;
         manager.remove(this);
+        com.frostwire.android.search.AndroidRelayStack.withdrawTorrent(getInfoHash());
 
         // Post all cleanup operations asynchronously to avoid blocking the UI thread
         // This includes torrent removal, file deletion, and media store cleanup
@@ -356,6 +362,14 @@ public final class UIBittorrentDownload implements BittorrentDownload {
                 }
             }
         });
+    }
+
+    public boolean isRemovedFromSharing() {
+        return removedFromSharing;
+    }
+
+    public boolean isSharingPaused() {
+        return sharingPaused;
     }
 
     @Override

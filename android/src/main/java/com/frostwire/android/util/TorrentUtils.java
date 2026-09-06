@@ -164,17 +164,8 @@ public final class TorrentUtils {
                 LOG.error("Torrent created but not in TransferManager, keeping HTTP row: " + fd.filePath);
                 return false;
             }
-            try {
-                com.frostwire.android.gui.RelaySearchWiring wiring =
-                        com.frostwire.android.gui.SearchEngine.DISTRIBUTED_WIRING;
-                if (wiring.localIndex() != null) {
-                    new com.frostwire.search.relay.SharedTorrentIndexer(
-                            wiring.localIndex(), wiring.identity())
-                            .indexTorrentInfo(tinfo, fd.title);
-                }
-            } catch (Throwable indexErr) {
-                LOG.warn("Seeded HTTP download but mesh index failed: " + fd.filePath, indexErr);
-            }
+            // The owned engine indexer indexes this live transfer. Do not create an
+            // untracked writer that can outlive removal or an identity replacement.
             if (httpTransfer != null) {
                 manager.remove(httpTransfer);
             }

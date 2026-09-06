@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * Android SQLite implementation of {@link KarmaChainStore}.
@@ -94,6 +95,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                     PEER_TABLE + " (total_score)";
 
     private final SQLiteDatabase db;
+    private final BooleanSupplier permitted;
     private volatile boolean open = true;
 
     /**
@@ -104,6 +106,11 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
      * @param dbName  the database file name (same as AndroidLocalIndex)
      */
     public AndroidKarmaChainStore(Context context, String dbName) {
+        this(context, dbName, () -> true);
+    }
+
+    AndroidKarmaChainStore(Context context, String dbName, BooleanSupplier permitted) {
+        this.permitted = permitted;
         File dbFile = context.getDatabasePath(dbName);
         File parent = dbFile.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -111,7 +118,12 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
         }
         this.db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null,
                 SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY);
-        initializeSchema();
+        try {
+            initializeSchema();
+        } catch (RuntimeException failure) {
+            db.close();
+            throw failure;
+        }
     }
 
     private void initializeSchema() {
@@ -132,6 +144,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
                 ? entry.epoch()
                 : KarmaConstants.epochForHeight(entry.blockHeight());
         synchronized (db) {
+            ensureOpen();
             db.beginTransaction();
             try {
                 ContentValues cv = new ContentValues(14);
@@ -298,7 +311,7 @@ public final class AndroidKarmaChainStore implements KarmaChainStore {
     }
 
     private void ensureOpen() {
-        if (!open) {
+        if (!open || !permitted.getAsBoolean()) {
             throw new IllegalStateException("AndroidKarmaChainStore is closed");
         }
     }

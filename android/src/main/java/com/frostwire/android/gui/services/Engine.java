@@ -72,7 +72,8 @@ public final class Engine implements IEngineService {
 
     private EngineForegroundService engineForegroundService;
 
-    private boolean wasShutdown;
+    private volatile boolean wasShutdown;
+    private volatile boolean disconnected;
 
     private CoreMediaPlayer mediaPlayer;
 
@@ -100,7 +101,9 @@ public final class Engine implements IEngineService {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             LOG.info("Engine::onApplicationCreate(): Starting EngineForegroundService...");
             mediaPlayer = new ApolloMediaPlayer();
-            startEngineService(application);
+            synchronized (this) {
+                if (!wasShutdown) startEngineService(application);
+            }
         });
     }
 
@@ -111,15 +114,14 @@ public final class Engine implements IEngineService {
 
     private synchronized EngineForegroundService getForegroundService() {
         EngineForegroundService liveService = EngineForegroundService.getInstance();
-        if (liveService != null) {
-            engineForegroundService = liveService;
-        }
+        engineForegroundService = liveService != null && liveService.acceptsStarts() ? liveService : null;
         return engineForegroundService;
     }
 
     synchronized void onForegroundServiceCreated(EngineForegroundService service) {
+        if (service == null || !service.acceptsStarts()) return;
         engineForegroundService = service;
-        if (pendingStartServices && service != null) {
+        if (pendingStartServices) {
             boolean restartAfterShutdown = wasShutdown;
             pendingStartServices = false;
             wasShutdown = false;
@@ -130,6 +132,9 @@ public final class Engine implements IEngineService {
     synchronized void onForegroundServiceDestroyed(EngineForegroundService service) {
         if (engineForegroundService == service) {
             engineForegroundService = null;
+        }
+        if (pendingStartServices && EngineForegroundService.getInstance() == null) {
+            startEngineService(getApplication());
         }
     }
 
@@ -160,7 +165,7 @@ public final class Engine implements IEngineService {
 
     public boolean isDisconnected() {
         EngineForegroundService service = getForegroundService();
-        return service != null && service.isDisconnected();
+        return disconnected || (service != null && service.isDisconnected());
     }
 
     /**
@@ -171,11 +176,12 @@ public final class Engine implements IEngineService {
      * the UI thread. No-op when already ready.
      */
     public void ensureDistributedSearchReady(long timeoutMs) {
-        if (!SearchEngine.DISTRIBUTED.isEnabled() || SearchEngine.DISTRIBUTED.isReady()) {
+        if (wasShutdown || !com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
+                || SearchEngine.DISTRIBUTED.isReady()) {
             return;
         }
         LOG.info("Engine: IceBridge down at search time — restarting");
-        startServices();
+        ensureServicesRunning();
         EngineForegroundService svc = getForegroundService();
         if (svc != null && !svc.isRelayStackRunning()) {
             CountDownLatch latch = new CountDownLatch(1);
@@ -189,9 +195,10 @@ public final class Engine implements IEngineService {
             }
         }
         long deadline = System.currentTimeMillis() + Math.max(0L, timeoutMs);
-        while (!SearchEngine.DISTRIBUTED.isReady() && System.currentTimeMillis() < deadline) {
+        while (!wasShutdown && com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
+                && !SearchEngine.DISTRIBUTED.isReady() && System.currentTimeMillis() < deadline) {
             if (getForegroundService() == null) {
-                startServices();
+                ensureServicesRunning();
             }
             try {
                 Thread.sleep(200);
@@ -208,6 +215,11 @@ public final class Engine implements IEngineService {
     @Override
     public synchronized void startServices() {
         LOG.info("Engine::startServices(): Requesting startServices from EngineForegroundService");
+        if (!com.frostwire.android.search.AndroidRelayStack.isNetworkAllowed()) {
+            if (!wasShutdown) disconnected = true;
+            return;
+        }
+        disconnected = false;
         EngineForegroundService service = getForegroundService();
         if (service != null) {
             boolean restartAfterShutdown = wasShutdown;
@@ -216,8 +228,19 @@ public final class Engine implements IEngineService {
             service.startServices(restartAfterShutdown);
         } else {
             pendingStartServices = true;
-            startEngineService(getApplication());
+            // A stopped instance may still be awaiting onDestroy. Never reuse it.
+            if (EngineForegroundService.getInstance() == null) {
+                startEngineService(getApplication());
+            }
         }
+    }
+
+    private synchronized void ensureServicesRunning() {
+        if (!wasShutdown) startServices();
+    }
+
+    public synchronized void resumeServicesIfDisconnected() {
+        if (disconnected) startServices();
     }
 
     public static void startPython() {
@@ -272,13 +295,17 @@ public final class Engine implements IEngineService {
         return pythonInstance;
     }
 
-    public void stopServices(boolean disconnected) {
+    public synchronized void stopServices(boolean disconnected) {
+        // A later connectivity broadcast must not turn an explicit stop into auto-resume.
+        if (disconnected && wasShutdown && !this.disconnected) return;
         LOG.info("Stopping Engine services...");
         TellurideCourier.abortCurrentQuery();
-        stopEngineService();
+        this.disconnected = disconnected;
+        stopEngineService(disconnected);
     }
 
     private void startEngineService(Context context) {
+        if (context == null) return;
         Intent serviceIntent = new Intent(context, EngineForegroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // Check if conditions are appropriate for starting the service
@@ -296,13 +323,18 @@ public final class Engine implements IEngineService {
         }
     }
 
-    private void stopEngineService() {
+    private synchronized void stopEngineService(boolean disconnected) {
+        wasShutdown = true;
+        pendingStartServices = false;
+        EngineForegroundService service = getForegroundService();
+        if (service != null) {
+            service.stopServices(disconnected);
+        }
         Context context = getApplication();
         if (context != null) {
             Intent serviceIntent = new Intent(context, EngineForegroundService.class);
             context.stopService(serviceIntent);
         }
-        wasShutdown = true;
     }
 
     @Override
@@ -332,12 +364,14 @@ public final class Engine implements IEngineService {
 
 
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
         LOG.info("Engine::shutdown() Shutting down EngineForegroundService...");
-        stopEngineService();
+        disconnected = false;
+        stopEngineService(false);
     }
 
     private void registerStatusReceiver(Context context) {
+        if (receiver != null) return;
         receiver = new EngineBroadcastReceiver();
 
         IntentFilter fileFilter = new IntentFilter();

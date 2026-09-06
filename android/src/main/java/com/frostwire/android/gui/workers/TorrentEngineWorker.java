@@ -24,7 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineForegroundService;
 import com.frostwire.util.Logger;
 
 public class TorrentEngineWorker extends Worker {
@@ -39,7 +40,10 @@ public class TorrentEngineWorker extends Worker {
     public Result doWork() {
         try {
             LOG.info("TorrentEngineWorker:doWork(): Starting Torrent Engine...");
-            BTEngine.getInstance().start();
+            EngineForegroundService service = EngineForegroundService.getInstance();
+            if (service != null && !Engine.instance().wasShutdown()) {
+                service.startServices();
+            }
             return Result.success();
         } catch (Exception e) {
             LOG.error("TorrentEngineWorker:doWork(): Error starting Torrent Engine", e);

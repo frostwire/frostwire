@@ -34,33 +34,24 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.ConfigurationRepository;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.workers.TorrentEngineWorker;
 import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.search.relay.IdentityKeys;
-import com.frostwire.search.relay.RelayConstants;
-import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-import com.frostwire.util.TaskThrottle;
-import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 
-import okhttp3.ConnectionPool;
 
 public class EngineForegroundService extends Service implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineForegroundService.class);
@@ -69,21 +60,43 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
 
-    private static volatile byte state = STATE_UNSTARTED;
+    private volatile byte state = STATE_UNSTARTED;
     private volatile static EngineForegroundService instance;
     private final AtomicReference<Byte> stateReference = new AtomicReference<>(STATE_UNSTARTED);
-    private final Object instanceLock = new Object();
+    private static final Object INSTANCE_LOCK = new Object();
+    private final Object relayLock = new Object();
+    private final RelayServiceGeneration engineGeneration = new RelayServiceGeneration();
+    private final RelayServiceGeneration relayGeneration = new RelayServiceGeneration();
+    private final ConfigurationRepository.OnPreferenceChangeListener relayPreferences = key -> {
+        if (Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY.equals(key)
+                || Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY.equals(key)) {
+            if (!AndroidRelayStack.isNetworkAllowed()) {
+                Engine.instance().stopServices(true);
+            } else {
+                Engine.instance().resumeServicesIfDisconnected();
+            }
+            ensureRelayStack(true, null);
+        } else if (Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED.equals(key)) {
+            ensureRelayStack(true, null);
+        }
+    };
     public byte STATE_DISCONNECTED = 14;
     private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
     private volatile AndroidRelayStack relayStack;
-    private volatile boolean relayStackStarting;
+    private volatile boolean foregroundReady;
 
     public static EngineForegroundService getInstance() {
         return instance;
     }
 
-    private static void resumeBTEngineTask(EngineForegroundService engineForegroundService, boolean wasShutdown) {
+    private static void resumeBTEngineTask(EngineForegroundService engineForegroundService, boolean wasShutdown,
+                                         long generation) {
+        if (!engineForegroundService.engineGeneration.isCurrent(generation)
+                || instance != engineForegroundService || Engine.instance().wasShutdown()
+                || !AndroidRelayStack.isNetworkAllowed()) {
+            return;
+        }
         LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
         engineForegroundService.updateState(STATE_STARTING);
         BTEngine btEngine = BTEngine.getInstance();
@@ -94,12 +107,18 @@ public class EngineForegroundService extends Service implements IEngineService {
             TransferManager.instance().reset();
         }
         btEngine.resume();
+        if (!engineForegroundService.engineGeneration.isCurrent(generation)
+                || Engine.instance().wasShutdown() || !AndroidRelayStack.isNetworkAllowed()) {
+            btEngine.pause();
+            return;
+        }
         TransferManager.instance().ensureTorrentsRestored();
-        engineForegroundService.preloadIdentityFromDisk();
-        engineForegroundService.startRelayStack(btEngine);
+        if (!engineForegroundService.engineGeneration.isCurrent(generation)) return;
+        engineForegroundService.startRelayStack();
         if (!wasShutdown) {
             TransferManager.instance().forceReannounceTorrents();
         }
+        if (!engineForegroundService.engineGeneration.isCurrent(generation)) return;
         engineForegroundService.updateState(STATE_STARTED);
         LOG.info("resumeBTEngineTask(): Engine started", true);
     }
@@ -108,10 +127,10 @@ public class EngineForegroundService extends Service implements IEngineService {
     public void onCreate() {
         super.onCreate();
 
-        synchronized (instanceLock) {
+        synchronized (INSTANCE_LOCK) {
             instance = this;
         }
-        Engine.instance().onForegroundServiceCreated(this);
+        ConfigurationManager.instance().registerOnPreferenceChange(relayPreferences);
 
         LOG.info("EngineForegroundService::onCreate() - Initializing service");
 
@@ -126,14 +145,16 @@ public class EngineForegroundService extends Service implements IEngineService {
         startPermanentNotificationUpdatesTask(this);
 
         // Schedule initial tasks
-        scheduleTorrentEngineWork();
         scheduleNotificationWork();
     }
 
     private void initializeNotifiedStorage() {
         LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initializing in background thread");
+        final long generation = engineGeneration.current();
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
-            notifiedStorage = new NotifiedStorage(this);
+            if (!engineGeneration.isCurrent(generation)) return;
+            NotifiedStorage storage = new NotifiedStorage(getApplicationContext());
+            if (engineGeneration.isCurrent(generation)) notifiedStorage = storage;
             LOG.info("EngineForegroundService::initializeNotifiedStorage() - Initialization complete");
         });
     }
@@ -160,23 +181,26 @@ public class EngineForegroundService extends Service implements IEngineService {
         if (!tryShowPersistentNotification(notification, startId, isNullIntentRestart, isAppInForeground)) {
             return START_NOT_STICKY;
         }
+        foregroundReady = true;
 
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
-            new Thread("EngineForegroundService::onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
-                @Override
-                public void run() {
-                    shutdownSupport();
-                }
-            }.start();
+            shutdown();
+            return START_NOT_STICKY;
+        }
+        Engine.instance().onForegroundServiceCreated(this);
+
+        if (!acceptsStarts() || Engine.instance().wasShutdown()) {
+            stopSelfResult(startId);
             return START_NOT_STICKY;
         }
 
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> cancelAllNotificationsTask(this));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            if (instance == this && acceptsStarts()) cancelAllNotificationsTask(this);
+        });
 
-        if (intent == null) {
-            return START_NOT_STICKY;
-        }
+        startServices();
+        if (intent == null) return START_NOT_STICKY;
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent);
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
@@ -216,6 +240,16 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     @Override
     public void onDestroy() {
+        foregroundReady = false;
+        engineGeneration.retire();
+        relayGeneration.retire();
+        stopRelayStack();
+        ConfigurationManager.instance().unregisterOnPreferenceChange(relayPreferences);
+        synchronized (INSTANCE_LOCK) {
+            if (instance == this) {
+                instance = null;
+            }
+        }
         super.onDestroy();
         Engine.instance().onForegroundServiceDestroyed(this);
         LOG.info("EngineForegroundService::onDestroy() - Stopping service and cleaning up WorkManager jobs");
@@ -233,82 +267,23 @@ public class EngineForegroundService extends Service implements IEngineService {
             cancelAllNotificationsTask(this);
             notificationUpdateDaemon.stop();
         }
-        // Do not stop IceBridge here. Android reaps this FGS while the process
-        // (and BTEngine) stay alive; tearing down the mesh then makes search
-        // silently do nothing until a force-stop. Explicit Engine.shutdown()
-        // / stopServices() still close the stack.
+        // A recreated service gets a new generation. No public sockets belong
+        // to a destroyed service, even when libtorrent remains in the process.
     }
 
-    /**
-     * Load {@code identity.dat} into {@link SearchEngine#DISTRIBUTED_WIRING} on a
-     * dedicated thread as soon as homeDir is known. Does not start IceBridge —
-     * only makes Node ID / fingerprint available to Settings during cold start.
-     */
-    private void preloadIdentityFromDisk() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
-            try {
-                if (SearchEngine.DISTRIBUTED_WIRING.identity() != null) {
-                    return;
-                }
-                File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
-                if (homeDir == null) {
-                    return;
-                }
-                File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
-                if (!identityFile.isFile() || identityFile.length() == 0) {
-                    return;
-                }
-                IdentityKeys keys = IdentityKeys.load(identityFile);
-                SearchEngine.DISTRIBUTED_WIRING.identity(keys);
-                LOG.info("EngineForegroundService::preloadIdentityFromDisk: nodeId="
-                        + Hex.encode(keys.nodeId()));
-            } catch (Throwable t) {
-                LOG.warn("EngineForegroundService::preloadIdentityFromDisk failed", t);
-            }
-        });
-    }
-
-    private void startRelayStack(BTEngine btEngine) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            if (relayStack != null || relayStackStarting) {
-                return;
-            }
-            relayStackStarting = true;
-            try {
-                File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
-                if (homeDir == null) {
-                    LOG.warn("EngineForegroundService::startRelayStack: no libtorrent homeDir");
-                    return;
-                }
-                if (SearchEngine.DISTRIBUTED_WIRING.identity() == null) {
-                    File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
-                    if (identityFile.isFile() && identityFile.length() > 0) {
-                        try {
-                            SearchEngine.DISTRIBUTED_WIRING.identity(IdentityKeys.load(identityFile));
-                        } catch (Throwable t) {
-                            LOG.warn("EngineForegroundService::startRelayStack identity preload", t);
-                        }
-                    }
-                }
-                relayStack = AndroidRelayStack.start(this, homeDir, btEngine);
-                if (relayStack != null) {
-                    LOG.info("EngineForegroundService::startRelayStack: AndroidRelayStack started");
-                } else {
-                    LOG.warn("EngineForegroundService::startRelayStack: AndroidRelayStack.start returned null");
-                }
-            } catch (Throwable t) {
-                LOG.warn("EngineForegroundService::startRelayStack failed", t);
-            } finally {
-                relayStackStarting = false;
-            }
-        });
+    private void startRelayStack() {
+        ensureRelayStack(false, null);
     }
 
     /**
      * Whether the distributed-search / IceBridge stack is running.
      */
     public boolean isRelayStackRunning() {
-        return relayStack != null;
+        return relayStack != null && mayParticipate(relayGeneration.current());
+    }
+
+    boolean acceptsStarts() {
+        return foregroundReady && engineGeneration.isCurrent(engineGeneration.current());
     }
 
     /**
@@ -316,7 +291,7 @@ public class EngineForegroundService extends Service implements IEngineService {
      */
     @Nullable
     public AndroidRelayStack getRelayStack() {
-        return relayStack;
+        return isRelayStackRunning() ? relayStack : null;
     }
 
     /**
@@ -328,23 +303,30 @@ public class EngineForegroundService extends Service implements IEngineService {
      * @param done         optional callback on the main thread (may be null)
      */
     public void ensureRelayStack(boolean forceRestart, Runnable done) {
+        if (forceRestart) {
+            stopRelayStack();
+        }
+        final long generation = relayGeneration.current();
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
-                if (forceRestart) {
-                    stopRelayStackBlocking();
-                }
-                if (relayStack == null && !relayStackStarting) {
+                if (relayStack == null && mayParticipate(generation)) {
                     BTEngine btEngine = BTEngine.getInstance();
                     File homeDir = BTEngine.ctx != null ? BTEngine.ctx.homeDir : null;
                     if (homeDir == null) {
                         LOG.warn("EngineForegroundService::ensureRelayStack: no libtorrent homeDir");
                     } else {
                         // First-run PoW identity mining can take several seconds.
-                        relayStack = AndroidRelayStack.start(this, homeDir, btEngine);
-                        if (relayStack != null) {
-                            LOG.info("EngineForegroundService::ensureRelayStack: started");
-                        } else {
-                            LOG.warn("EngineForegroundService::ensureRelayStack: start returned null");
+                        AndroidRelayStack started = AndroidRelayStack.start(this, homeDir, btEngine,
+                                () -> mayParticipate(generation));
+                        boolean adopted = false;
+                        synchronized (relayLock) {
+                            if (started != null && mayParticipate(generation)) {
+                                relayStack = started;
+                                adopted = true;
+                            }
+                        }
+                        if (started != null && !adopted) {
+                            started.close();
                         }
                     }
                 }
@@ -358,20 +340,23 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private void stopRelayStack() {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::stopRelayStackBlocking);
-    }
-
-    private void stopRelayStackBlocking() {
-        AndroidRelayStack stack = relayStack;
-        relayStack = null;
-        if (stack != null) {
-            try {
-                stack.close();
-                LOG.info("EngineForegroundService::stopRelayStack: AndroidRelayStack closed");
-            } catch (Throwable t) {
-                LOG.warn("EngineForegroundService::stopRelayStack failed", t);
+        final AndroidRelayStack stack;
+        synchronized (relayLock) {
+            relayGeneration.invalidate();
+            stack = relayStack;
+            relayStack = null;
+            if (stack != null) {
+                stack.deactivate();
             }
         }
+        if (stack != null) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, stack::close);
+        }
+    }
+
+    private boolean mayParticipate(long generation) {
+        return foregroundReady && relayGeneration.isCurrent(generation) && instance == this
+                && !Engine.instance().wasShutdown() && AndroidRelayStack.isParticipationEnabled();
     }
 
     @Nullable
@@ -445,23 +430,6 @@ public class EngineForegroundService extends Service implements IEngineService {
                 .build();
     }
 
-    private void scheduleTorrentEngineWork() {
-        // Use TaskThrottle to prevent rapid re-scheduling of the same work
-        if (!TaskThrottle.isReadyToSubmitTask("TorrentEngineWork", 30000)) { // 30 second minimum interval
-            LOG.info("TorrentEngineWork throttled - too soon since last execution");
-            return;
-        }
-        
-        // Use unique work name to prevent duplicate scheduling
-        WorkManager.getInstance(this)
-                .enqueueUniqueWork(
-                    "TorrentEngineWork",
-                    androidx.work.ExistingWorkPolicy.KEEP, // Don't replace if already running
-                    new OneTimeWorkRequest.Builder(TorrentEngineWorker.class).build()
-                );
-        LOG.info("TorrentEngineWork scheduled");
-    }
-
     private void scheduleNotificationWork() {
         // Cancel any existing notification work to prevent duplicates
         WorkManager.getInstance(this).cancelUniqueWork("NotificationWork");
@@ -483,60 +451,9 @@ public class EngineForegroundService extends Service implements IEngineService {
         if (notificationUpdateDaemon != null) {
             notificationUpdateDaemon.stop();
         }
-        stopServices(false);
+        Engine.instance().shutdown();
         stopForeground(Service.STOP_FOREGROUND_REMOVE);
         stopSelf();
-    }
-
-    private void shutdownSupport() {
-        LOG.debug("shutdownSupport");
-        
-        // Cancel all WorkManager jobs first to prevent scheduling conflicts
-        try {
-            WorkManager workManager = WorkManager.getInstance(this);
-            workManager.cancelUniqueWork("TorrentEngineWork");
-            workManager.cancelUniqueWork("NotificationWork");
-            LOG.debug("shutdownSupport - cancelled all WorkManager jobs");
-        } catch (Exception e) {
-            LOG.warn("shutdownSupport - error cancelling WorkManager jobs: " + e.getMessage(), e);
-        }
-        
-        Librarian.instance().shutdownHandler();
-        stopPermanentNotificationUpdates();
-        cancelAllNotificationsTask(this);
-        stopServices(false);
-        if (BTEngine.ctx != null) {
-            LOG.debug("EngineForegroundService::shutdownSupport(), stopping BTEngine...");
-            BTEngine.getInstance().stop();
-            LOG.debug("EngineForegroundService::shutdownSupport(), BTEngine stopped");
-        } else {
-            LOG.debug("EngineForegroundService::shutdownSupport(), BTEngine didn't have a chance to start, no need to stop it");
-        }
-        stopOkHttp();
-        updateState(STATE_STOPPED);
-        stopSelf();
-    }
-
-    private void stopPermanentNotificationUpdates() {
-        if (notificationUpdateDaemon != null) {
-            notificationUpdateDaemon.stop();
-        }
-    }
-
-    private void stopOkHttp() {
-        ConnectionPool pool = OkHttpClientWrapper.CONNECTION_POOL;
-        try {
-            pool.evictAll();
-        } catch (Throwable e) {
-            LOG.error("EngineService::stopOkHttp() Error evicting all connections from OkHttp ConnectionPool", e);
-        }
-        try {
-            synchronized (OkHttpClientWrapper.CONNECTION_POOL) {
-                pool.notifyAll();
-            }
-        } catch (Throwable e) {
-            LOG.error("EngineService::stopOkHttp() Error notifying all threads waiting on OkHttp ConnectionPool", e);
-        }
     }
 
     private static void cancelAllNotificationsTask(EngineForegroundService engineForegroundService) {
@@ -555,6 +472,10 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private static void startPermanentNotificationUpdatesTask(EngineForegroundService engineForegroundService) {
+        if (instance != engineForegroundService
+                || !engineForegroundService.engineGeneration.isCurrent(engineForegroundService.engineGeneration.current())) {
+            return;
+        }
         try {
             if (engineForegroundService.notificationUpdateDaemon == null) {
                 engineForegroundService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineForegroundService.getApplicationContext());
@@ -605,6 +526,11 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     public synchronized void startServices(boolean wasShutdown) {
         LOG.info("startServices(wasShutdown=" + wasShutdown + ")", true);
+        final long generation = engineGeneration.current();
+        if (!acceptsStarts() || !engineGeneration.isCurrent(generation) || Engine.instance().wasShutdown()
+                || instance != this || !AndroidRelayStack.isNetworkAllowed()) {
+            return;
+        }
         // hard check for TOS
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             return;
@@ -617,7 +543,7 @@ public class EngineForegroundService extends Service implements IEngineService {
         if (isStarted()) {
             if (relayStack == null) {
                 LOG.info("startServices() - engine up but IceBridge down, restarting relay stack");
-                startRelayStack(BTEngine.getInstance());
+                startRelayStack();
             } else {
                 LOG.info("startServices() - aborting, it's already started", true);
             }
@@ -630,23 +556,26 @@ public class EngineForegroundService extends Service implements IEngineService {
         }
 
         LOG.info("startServices() - invoking resumeBTEngineTask, wasShutdown=" + wasShutdown);
-        TaskThrottle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> resumeBTEngineTask(this, wasShutdown));
+        updateState(STATE_STARTING);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
+                () -> resumeBTEngineTask(this, wasShutdown, generation));
     }
 
-    public void stopServices(boolean disconnected) {
+    public synchronized void stopServices(boolean disconnected) {
+        engineGeneration.retire();
+        relayGeneration.retire();
+        stopRelayStack();
         if (state == STATE_STOPPED || state == STATE_STOPPING) {
             LOG.info("EngineForegroundService::stopServices() - Already stopped or stopping");
             return;
         }
         updateState(STATE_STOPPING);
         LOG.info("EngineForegroundService::stopServices() - Pausing BTEngine");
-        TransferManager.instance().onShutdown(disconnected);
-        BTEngine.getInstance().pause();
-        stopRelayStack();
-
-        // maybe here we do something with disconnected
-        updateState(STATE_STOPPED);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            TransferManager.instance().onShutdown(disconnected);
+            BTEngine.getInstance().pause();
+            updateState(disconnected ? STATE_DISCONNECTED : STATE_STOPPED);
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
