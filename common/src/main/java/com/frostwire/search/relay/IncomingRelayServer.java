@@ -10,15 +10,19 @@ package com.frostwire.search.relay;
 import com.frostwire.util.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.security.PrivateKey;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,6 +59,7 @@ public final class IncomingRelayServer {
 
     private final RelayRole role;
     private final IdentityRecord identityRecord;
+    private final PrivateKey identityKey;
     private final int port;
     private final int backlog;
     private final int workerPoolSize;
@@ -64,7 +69,9 @@ public final class IncomingRelayServer {
 
     private ServerSocket serverSocket;
     private Thread acceptThread;
-    private ExecutorService workerPool;
+    private ThreadPoolExecutor workerPool;
+    private ScheduledThreadPoolExecutor deadlinePool;
+    private final Map<Socket, ScheduledFuture<?>> sockets = new ConcurrentHashMap<>();
     private volatile boolean running;
 
     public IncomingRelayServer(RelayRole role, int port) {
@@ -78,7 +85,8 @@ public final class IncomingRelayServer {
     /**
      * Identity-only constructor for standalone forwarders (e.g. cloud
      * IceBridge relays) that don't have a LocalIndex or PeerDirectory.
-     * Only serves identity handshakes; rejects all search requests.
+     * Without a private key, identity authentication fails closed. Use the keyed
+     * overload to serve possession proofs. Rejects all search requests.
      */
     public IncomingRelayServer(IdentityRecord identityRecord, int port) {
         this(null, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS);
@@ -90,6 +98,24 @@ public final class IncomingRelayServer {
 
     public IncomingRelayServer(IdentityRecord identityRecord, int port, String bindHost) {
         this(null, identityRecord, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE, DEFAULT_SO_TIMEOUT_MS, bindHost);
+    }
+
+    public IncomingRelayServer(RelayRole role, IdentityRecord record, PrivateKey identityKey, int port) {
+        this(role, record, identityKey, port, null);
+    }
+
+    public IncomingRelayServer(RelayRole role, IdentityRecord record, PrivateKey identityKey,
+                               int port, String bindHost) {
+        this(role, record, identityKey, port, DEFAULT_BACKLOG, DEFAULT_WORKER_POOL_SIZE,
+                DEFAULT_SO_TIMEOUT_MS, bindHost);
+    }
+
+    public IncomingRelayServer(IdentityRecord record, PrivateKey identityKey, int port) {
+        this(null, record, identityKey, port, null);
+    }
+
+    public IncomingRelayServer(IdentityRecord record, PrivateKey identityKey, int port, String bindHost) {
+        this(null, record, identityKey, port, bindHost);
     }
 
     public IncomingRelayServer(RelayRole role, int port, int backlog,
@@ -104,6 +130,12 @@ public final class IncomingRelayServer {
 
     public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, int port, int backlog,
                                int workerPoolSize, int soTimeoutMs, String bindHost) {
+        this(role, identityRecord, null, port, backlog, workerPoolSize, soTimeoutMs, bindHost);
+    }
+
+    /** Timeout is an absolute connection budget in milliseconds; zero uses the bounded default. */
+    public IncomingRelayServer(RelayRole role, IdentityRecord identityRecord, PrivateKey identityKey,
+                               int port, int backlog, int workerPoolSize, int soTimeoutMs, String bindHost) {
         if (role == null && identityRecord == null) {
             throw new IllegalArgumentException("either role or identityRecord must be non-null");
         }
@@ -121,10 +153,11 @@ public final class IncomingRelayServer {
         }
         this.role = role;
         this.identityRecord = identityRecord;
+        this.identityKey = identityKey;
         this.port = port;
         this.backlog = backlog;
         this.workerPoolSize = workerPoolSize;
-        this.soTimeoutMs = soTimeoutMs;
+        this.soTimeoutMs = soTimeoutMs == 0 ? DEFAULT_SO_TIMEOUT_MS : soTimeoutMs;
         this.bindHost = bindHost;
     }
 
@@ -132,32 +165,51 @@ public final class IncomingRelayServer {
      * Bind the server socket and start accepting connections.
      * Idempotent: subsequent calls are no-ops.
      */
-    public void start() throws IOException {
+    public synchronized void start() throws IOException {
         if (running) {
             return;
         }
-        serverSocket = new ServerSocket();
-        serverSocket.setReuseAddress(true);
-        if (bindHost != null && !bindHost.isEmpty()) {
-            serverSocket.bind(new InetSocketAddress(bindHost, port), backlog);
-        } else {
-            serverSocket.bind(new InetSocketAddress(port), backlog);
+        if (workerPool != null && !workerPool.isTerminated()) {
+            throw new IOException("previous relay workers are still stopping");
         }
-        running = true;
-        workerPool = Executors.newFixedThreadPool(workerPoolSize,
-                new WorkerThreadFactory());
-        acceptThread = new Thread(this::acceptLoop, "relay-server-accept");
-        acceptThread.setDaemon(true);
-        acceptThread.start();
-        String listenAddr = (bindHost != null && !bindHost.isEmpty()) ? bindHost : "0.0.0.0";
-        LOG.info("IncomingRelayServer listening on " + listenAddr + ":" + port);
+        serverSocket = new ServerSocket();
+        try {
+            serverSocket.setReuseAddress(true);
+            if (bindHost != null && !bindHost.isEmpty()) {
+                serverSocket.bind(new InetSocketAddress(bindHost, port), backlog);
+            } else {
+                serverSocket.bind(new InetSocketAddress(port), backlog);
+            }
+            workerPool = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, 0, TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<>(backlog), new WorkerThreadFactory());
+            deadlinePool = new ScheduledThreadPoolExecutor(1, r -> {
+                Thread thread = new Thread(r, "relay-server-deadlines");
+                thread.setDaemon(true);
+                return thread;
+            });
+            deadlinePool.setRemoveOnCancelPolicy(true);
+            running = true;
+            ServerSocket listener = serverSocket;
+            ThreadPoolExecutor workers = workerPool;
+            acceptThread = new Thread(() -> acceptLoop(listener, workers), "relay-server-accept");
+            acceptThread.setDaemon(true);
+            acceptThread.start();
+            String listenAddr = (bindHost != null && !bindHost.isEmpty()) ? bindHost : "0.0.0.0";
+            LOG.info("IncomingRelayServer listening on " + listenAddr + ":" + port);
+        } catch (IOException | RuntimeException e) {
+            serverSocket.close();
+            if (workerPool != null) workerPool.shutdownNow();
+            if (deadlinePool != null) deadlinePool.shutdownNow();
+            running = false;
+            throw e;
+        }
     }
 
     /**
      * Stop accepting new connections and shut down the worker
      * pool. Safe to call from any thread.
      */
-    public void stop() {
+    public synchronized void stop() {
         if (!running) {
             return;
         }
@@ -176,16 +228,11 @@ public final class IncomingRelayServer {
             }
         }
         if (workerPool != null) {
-            workerPool.shutdown();
-            try {
-                if (!workerPool.awaitTermination(2, TimeUnit.SECONDS)) {
-                    workerPool.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                workerPool.shutdownNow();
-            }
+            workerPool.shutdownNow();
         }
+        for (Socket socket : sockets.keySet()) release(socket);
+        sockets.clear();
+        if (deadlinePool != null) deadlinePool.shutdownNow();
         LOG.info("IncomingRelayServer stopped");
     }
 
@@ -201,15 +248,34 @@ public final class IncomingRelayServer {
         return connectionCount.get();
     }
 
-    private void acceptLoop() {
-        while (running) {
+    /** Includes queued and executing sockets, not the cumulative accept count. */
+    public int activeConnectionCount() {
+        return sockets.size();
+    }
+
+    private void acceptLoop(ServerSocket listener, ThreadPoolExecutor workers) {
+        while (!listener.isClosed()) {
             try {
-                Socket socket = serverSocket.accept();
+                Socket socket = listener.accept();
                 connectionCount.incrementAndGet();
+                long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(soTimeoutMs);
+                // Serializes admission against stop; no socket can escape shutdown's close sweep.
+                synchronized (this) {
+                    if (!running || listener != serverSocket
+                            || sockets.size() >= (long) workerPoolSize + backlog) {
+                        closeQuietly(socket);
+                        continue;
+                    }
+                    sockets.put(socket, deadlinePool.schedule(() -> closeQuietly(socket),
+                            Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS));
+                }
                 try {
-                    workerPool.execute(() -> handleConnection(socket));
+                    socket.setSoTimeout(soTimeoutMs);
+                    workers.execute(() -> handleConnection(socket, deadline));
                 } catch (RejectedExecutionException e) {
-                    closeQuietly(socket);
+                    release(socket);
+                } catch (IOException e) {
+                    release(socket);
                 }
             } catch (IOException e) {
                 if (running) {
@@ -219,18 +285,24 @@ public final class IncomingRelayServer {
         }
     }
 
-    private void handleConnection(Socket socket) {
+    private void handleConnection(Socket socket, long deadline) {
         try {
-            socket.setSoTimeout(soTimeoutMs);
-            try (InputStream in = socket.getInputStream();
-                 OutputStream out = socket.getOutputStream()) {
-                byte[] frame = RelayWireCodec.readFrame(in);
+            try (OutputStream out = socket.getOutputStream()) {
+                byte[] frame = RelayWireCodec.readFrame(socket, deadline,
+                        role == null ? RelayWireCodec.MAX_IDENTITY_PROOF_BYTES : RelayWireCodec.MAX_FRAME_BYTES);
                 if (frame == null) {
                     LOG.debug("Empty frame; closing");
                     return;
                 }
+                if (RelayWireCodec.isIdentityChallenge(frame)) {
+                    if (identityRecord != null && identityKey != null
+                            && !socket.isClosed() && System.nanoTime() - deadline < 0) {
+                        RelayWireCodec.writeFrame(out, RelayWireCodec.identityProof(frame, identityRecord, identityKey));
+                    }
+                    return;
+                }
                 if (RelayWireCodec.isIdentityRequest(frame)) {
-                    handleIdentityRequest(out, socket.getRemoteSocketAddress());
+                    // Legacy public-record probes cannot establish endpoint possession.
                     return;
                 }
                 if (role == null) {
@@ -242,11 +314,14 @@ public final class IncomingRelayServer {
                     LOG.debug("Invalid request frame; closing");
                     return;
                 }
+                if (socket.isClosed() || System.nanoTime() - deadline >= 0) return;
                 java.util.Optional<RemoteSearchResponse> response = role.handleRequest(request);
                 if (response.isEmpty()) {
                     return; // rejected silently
                 }
-                RelayWireCodec.writeResponse(out, response.get());
+                if (!socket.isClosed() && System.nanoTime() - deadline < 0) {
+                    RelayWireCodec.writeResponse(out, response.get());
+                }
             }
         } catch (Throwable t) {
             // Internet scanners / BitTorrent clients often hit TCP 6888 with non-FW frames
@@ -259,23 +334,14 @@ public final class IncomingRelayServer {
                 LOG.debug("Connection handler error from " + socket.getRemoteSocketAddress(), t);
             }
         } finally {
-            closeQuietly(socket);
+            release(socket);
         }
     }
 
-    private void handleIdentityRequest(OutputStream out,
-                                       java.net.SocketAddress remote) throws IOException {
-        if (identityRecord == null) {
-            LOG.debug("Identity request received but no identity record configured");
-            return;
-        }
-        RelayWireCodec.writeIdentityRecord(out, identityRecord);
-        // Operator-visible: Settings → Refresh/Ping uses this TCP identity path
-        // (not control HTTP / mesh TELEMETRY). Without this line, cloud hosts look silent.
-        LOG.info("IceBridge identity handshake OK from " + remote
-                + " role=" + (identityRecord.role() != null ? identityRecord.role() : "?")
-                + " nodeId=" + com.frostwire.util.Hex.encode(identityRecord.nodeId()).substring(0, 12)
-                + "…");
+    private void release(Socket socket) {
+        closeQuietly(socket);
+        ScheduledFuture<?> deadline = sockets.remove(socket);
+        if (deadline != null) deadline.cancel(false);
     }
 
     private static void closeQuietly(Socket socket) {

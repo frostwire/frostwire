@@ -14,10 +14,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -87,6 +97,10 @@ public final class RelayWireCodec {
      *         invalid
      */
     public static byte[] readFrame(InputStream in) throws IOException {
+        return readFrame(in, MAX_FRAME_BYTES);
+    }
+
+    static byte[] readFrame(InputStream in, int maxBytes) throws IOException {
         if (in == null) {
             throw new IllegalArgumentException("in is null");
         }
@@ -106,13 +120,120 @@ public final class RelayWireCodec {
                 | ((b2 & 0xff) << 16)
                 | ((b3 & 0xff) << 8)
                 | (b4 & 0xff);
-        if (length < 0 || length > MAX_FRAME_BYTES) {
+        if (length < 0 || length > maxBytes) {
             throw new IOException("invalid frame length: " + length +
                     " (peer is not speaking the FrostWire relay protocol)");
         }
         byte[] payload = new byte[length];
         din.readFully(payload);
         return payload;
+    }
+
+    /** The deadline includes the prefix and every partial payload read. */
+    static byte[] readFrame(Socket socket, long deadlineNanos, int maxBytes) throws IOException {
+        return readFrame(new FilterInputStream(socket.getInputStream()) {
+            private void remaining() throws IOException {
+                long nanos = deadlineNanos - System.nanoTime();
+                if (nanos <= 0 || Thread.currentThread().isInterrupted()) {
+                    throw new SocketTimeoutException("relay frame deadline expired");
+                }
+                socket.setSoTimeout((int) Math.min(Integer.MAX_VALUE,
+                        Math.max(1, TimeUnit.NANOSECONDS.toMillis(nanos))));
+            }
+
+            @Override
+            public int read() throws IOException {
+                remaining();
+                return in.read();
+            }
+
+            @Override
+            public int read(byte[] bytes, int offset, int length) throws IOException {
+                remaining();
+                return in.read(bytes, offset, length);
+            }
+        }, maxBytes);
+    }
+
+    // Identity proof v1 is separate from the existing bencoded search protocol.
+    static final int MAX_IDENTITY_PROOF_BYTES = 8192;
+    private static final byte[] IDENTITY_DOMAIN =
+            "FrostWire/TCP/identity-proof/v1/".getBytes(StandardCharsets.US_ASCII);
+    private static final int IDENTITY_CHALLENGE_BYTES = 2 + 32 + 32 + 64;
+
+    static byte[] identityChallenge(KeyPair keys, byte[] nonce) throws Exception {
+        if (nonce.length != 32) {
+            throw new IllegalArgumentException("nonce must be 32 bytes");
+        }
+        byte[] challenge = ByteBuffer.allocate(IDENTITY_CHALLENGE_BYTES)
+                .put((byte) 2).put((byte) 1)
+                .put(IdentityRecord.extractRawEd25519(keys.getPublic())).put(nonce).array();
+        byte[] signature = identitySign(keys.getPrivate(), "initiator", Arrays.copyOf(challenge, 66));
+        System.arraycopy(signature, 0, challenge, 66, 64);
+        return challenge;
+    }
+
+    static boolean isIdentityChallenge(byte[] frame) {
+        return frame != null && frame.length == IDENTITY_CHALLENGE_BYTES
+                && frame[0] == 2 && frame[1] == 1;
+    }
+
+    static byte[] identityProof(byte[] challenge, IdentityRecord record, PrivateKey key) throws Exception {
+        if (!isIdentityChallenge(challenge) || !identityVerify(Arrays.copyOfRange(challenge, 2, 34),
+                "initiator", Arrays.copyOf(challenge, 66), Arrays.copyOfRange(challenge, 66, 130))) {
+            throw new IOException("invalid identity challenge");
+        }
+        byte[] encoded = encodeIdentityRecord(record);
+        if (encoded.length > MAX_IDENTITY_PROOF_BYTES - 70) {
+            throw new IOException("identity record too large");
+        }
+        byte[] transcript = ByteBuffer.allocate(challenge.length + encoded.length)
+                .put(challenge).put(encoded).array();
+        byte[] signature = identitySign(key, "responder", transcript);
+        return ByteBuffer.allocate(6 + encoded.length + signature.length)
+                .put((byte) 3).put((byte) 1).putInt(encoded.length).put(encoded).put(signature).array();
+    }
+
+    static IdentityRecord verifyIdentityProof(byte[] challenge, byte[] proof) throws Exception {
+        if (!isIdentityChallenge(challenge) || proof == null || proof.length < 70
+                || proof.length > MAX_IDENTITY_PROOF_BYTES || proof[0] != 3 || proof[1] != 1) {
+            return null;
+        }
+        int length = ByteBuffer.wrap(proof, 2, 4).getInt();
+        if (length <= 0 || length != proof.length - 70) {
+            return null;
+        }
+        byte[] encoded = Arrays.copyOfRange(proof, 6, 6 + length);
+        IdentityRecord record = decodeIdentityRecord(encoded);
+        if (record == null) {
+            return null;
+        }
+        byte[] transcript = ByteBuffer.allocate(challenge.length + encoded.length)
+                .put(challenge).put(encoded).array();
+        return identityVerify(record.ed25519Pub(), "responder", transcript,
+                Arrays.copyOfRange(proof, 6 + length, proof.length)) ? record : null;
+    }
+
+    private static byte[] identitySign(PrivateKey key, String role, byte[] transcript) throws Exception {
+        Signature signer = IdentityKeys.softwareSignature("Ed25519");
+        signer.initSign(key);
+        signer.update(IDENTITY_DOMAIN);
+        signer.update(role.getBytes(StandardCharsets.US_ASCII));
+        signer.update(transcript);
+        return signer.sign();
+    }
+
+    private static boolean identityVerify(byte[] pub, String role, byte[] transcript, byte[] signature)
+            throws Exception {
+        byte[] prefix = com.frostwire.util.Hex.decode("302a300506032b6570032100");
+        byte[] encoded = ByteBuffer.allocate(prefix.length + pub.length).put(prefix).put(pub).array();
+        Signature verifier = IdentityKeys.softwareSignature("Ed25519");
+        verifier.initVerify(IdentityKeys.softwareKeyFactory("Ed25519")
+                .generatePublic(new X509EncodedKeySpec(encoded)));
+        verifier.update(IDENTITY_DOMAIN);
+        verifier.update(role.getBytes(StandardCharsets.US_ASCII));
+        verifier.update(transcript);
+        return verifier.verify(signature);
     }
 
     /**

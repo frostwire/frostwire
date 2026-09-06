@@ -104,7 +104,7 @@ public final class PeerDirectory {
         upsert(peerPub, hostname, utpPort, rudpPort, verified, null, null);
     }
 
-    private void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort, boolean verified,
+    private synchronized void upsert(byte[] peerPub, String hostname, int utpPort, int rudpPort, boolean verified,
                         Long capabilitiesOrNull, String icebridgeVersionOrNull) {
         if (peerPub == null || peerPub.length != 32) {
             throw new IllegalArgumentException("peerPub must be 32 bytes");
@@ -117,14 +117,19 @@ public final class PeerDirectory {
         }
         String key = com.frostwire.util.Hex.encode(peerPub);
         Entry existing = entries.get(key);
+        // An unauthenticated hint must not replace a possession-verified route or metadata.
+        if (existing != null && existing.verified && !verified) return;
         int effectiveRudpPort = rudpPort > 0 ? rudpPort : (existing != null ? existing.rudpPort : 0);
         long caps = capabilitiesOrNull != null
                 ? capabilitiesOrNull
                 : (existing != null ? existing.capabilities : NodeCapabilities.DEFAULT_PEER);
         String ibVer = coalesceIcebridgeVersion(icebridgeVersionOrNull,
                 existing != null ? existing.icebridgeVersion : null);
-        entries.put(key, new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
-                System.currentTimeMillis(), 0L, false, verified, caps, ibVer));
+        Entry refreshed = new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
+                System.currentTimeMillis(), existing != null ? existing.localKarmaDelta : 0L,
+                existing != null && existing.spam, verified, caps, ibVer);
+        if (existing != null) refreshed.endorsers.addAll(existing.endorsers);
+        entries.put(key, refreshed);
         evictIfNeeded();
         version.incrementAndGet();
     }
@@ -158,7 +163,7 @@ public final class PeerDirectory {
     /**
      * Update only the capability bitflags for a known peer.
      */
-    public void setCapabilities(byte[] peerPub, long capabilities) {
+    public synchronized void setCapabilities(byte[] peerPub, long capabilities) {
         if (peerPub == null || peerPub.length != 32) {
             return;
         }
@@ -174,7 +179,7 @@ public final class PeerDirectory {
      * Used to build the web of trust over time. If the target is
      * not yet known, it is registered as an unverified peer.
      */
-    public void addEndorser(byte[] targetPub, byte[] endorserPub) {
+    public synchronized void addEndorser(byte[] targetPub, byte[] endorserPub) {
         if (targetPub == null || targetPub.length != 32) {
             throw new IllegalArgumentException("targetPub must be 32 bytes");
         }
@@ -199,7 +204,7 @@ public final class PeerDirectory {
      * karma cache and tags the entry so future trust queries return
      * a strongly negative score.
      */
-    public void markSpam(byte[] peerPub) {
+    public synchronized void markSpam(byte[] peerPub) {
         if (peerPub == null || peerPub.length != 32) {
             return;
         }
@@ -217,6 +222,7 @@ public final class PeerDirectory {
         // local-only signal. A future change could publish a
         // negative endorsement to the remote chain.
         e.localKarmaDelta -= 5;
+        evictIfNeeded();
         version.incrementAndGet();
     }
 
@@ -240,7 +246,7 @@ public final class PeerDirectory {
         // Karma offset: count of endorsements in the chain tail
         // (already a participation proxy) plus any local delta
         // (e.g. from markSpam).
-        long karma = karmaCache.getKarma(peerPub) + e.localKarmaDelta;
+        long karma = karmaCache.getCachedKarma(peerPub) + e.localKarmaDelta;
         // Structural WOT trust up to MAX_DEPTH
         double transitive = transitiveTrust(peerPub, RelayConstants.WOT_MAX_DEPTH, new java.util.HashSet<>());
         return Math.max(-1.0, transitive + karma);
@@ -319,10 +325,12 @@ public final class PeerDirectory {
                 snapshot.add(e);
             }
         }
-        snapshot.sort((a, b) -> Double.compare(trustScore(b.peerPub), trustScore(a.peerPub)));
+        List<ScoredEntry> scored = new ArrayList<>(snapshot.size());
+        for (Entry e : snapshot) scored.add(new ScoredEntry(e, trustScore(e.peerPub)));
+        scored.sort((a, b) -> Double.compare(b.key, a.key));
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
-            out.add(toPeerInfo(snapshot.get(i)));
+            out.add(toPeerInfo(scored.get(i).entry));
         }
         return out;
     }
@@ -333,10 +341,12 @@ public final class PeerDirectory {
             throw new IllegalArgumentException("limit must be > 0");
         }
         List<Entry> snapshot = new ArrayList<>(entries.values());
-        snapshot.sort((a, b) -> Double.compare(trustScore(b.peerPub), trustScore(a.peerPub)));
+        List<ScoredEntry> scored = new ArrayList<>(snapshot.size());
+        for (Entry e : snapshot) scored.add(new ScoredEntry(e, trustScore(e.peerPub)));
+        scored.sort((a, b) -> Double.compare(b.key, a.key));
         List<PeerInfo> out = new ArrayList<>(Math.min(limit, snapshot.size()));
         for (int i = 0; i < Math.min(limit, snapshot.size()); i++) {
-            out.add(toPeerInfo(snapshot.get(i)));
+            out.add(toPeerInfo(scored.get(i).entry));
         }
         return out;
     }
@@ -410,11 +420,16 @@ public final class PeerDirectory {
      * Drop an entry by pubkey. No-op if the entry is not present.
      * Returns true if an entry was removed.
      */
-    public boolean evict(byte[] peerPub) {
+    public synchronized boolean evict(byte[] peerPub) {
         if (peerPub == null || peerPub.length != 32) {
             return false;
         }
-        return entries.remove(com.frostwire.util.Hex.encode(peerPub)) != null;
+        boolean removed = entries.remove(com.frostwire.util.Hex.encode(peerPub)) != null;
+        if (removed) {
+            karmaCache.evict(peerPub);
+            version.incrementAndGet();
+        }
+        return removed;
     }
 
     /** Monotonic version counter; bumps on any write. */
@@ -434,22 +449,22 @@ public final class PeerDirectory {
             }
         }
         if (oldest != null) {
-            entries.remove(com.frostwire.util.Hex.encode(oldest.peerPub));
+            evict(oldest.peerPub);
         }
     }
 
     /** Internal entry. */
     private static final class Entry {
         final byte[] peerPub;
-        String hostname;
-        int utpPort;
-        int rudpPort;
-        long lastUpdatedMs;
-        long localKarmaDelta;
-        boolean spam;
-        boolean verified;
-        long capabilities;
-        String icebridgeVersion;
+        final String hostname;
+        final int utpPort;
+        final int rudpPort;
+        final long lastUpdatedMs;
+        volatile long localKarmaDelta;
+        volatile boolean spam;
+        final boolean verified;
+        volatile long capabilities;
+        final String icebridgeVersion;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
         Entry(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
@@ -468,7 +483,9 @@ public final class PeerDirectory {
         }
 
         void addEndorser(byte[] endorserPub) {
-            endorsers.add(com.frostwire.util.Hex.encode(endorserPub));
+            if (endorsers.size() < DEFAULT_MAX_ENTRIES) {
+                endorsers.add(com.frostwire.util.Hex.encode(endorserPub));
+            }
         }
     }
 

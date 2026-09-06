@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /**
@@ -52,11 +56,14 @@ public final class PeerDiscovery {
 
     /** BEP 46 lookup timeout for identity records. */
     public static final int DEFAULT_IDENTITY_TIMEOUT_MS = 5000;
+    public static final int MAX_CANDIDATES_PER_PASS = 64;
+    public static final int DISCOVERY_PASS_TIMEOUT_MS = 15_000;
 
     private final PeerDiscoverySource source;
     private final PeerDirectory directory;
     private final PeerAuthenticator authenticator;
     private final byte[] ownEd25519Pub;
+    private final AtomicBoolean discovering = new AtomicBoolean();
     /**
      * Our currently-visible external IP supplier (e.g. BTEngine's latest
      * external_ip alert) plus our own relay port, for hairpin self-skip.
@@ -111,12 +118,21 @@ public final class PeerDiscovery {
      */
     public List<DiscoveredEndpoint> discoverAndRegister() {
         List<DiscoveredEndpoint> discovered = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) return discovered;
+        if (!discovering.compareAndSet(false, true)) return discovered;
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(DISCOVERY_PASS_TIMEOUT_MS);
         try {
             List<DiscoveredEndpoint> endpoints = source.fetchEndpoints();
+            Set<String> seen = new HashSet<>();
+            int candidates = 0;
             for (DiscoveredEndpoint ep : endpoints) {
+                if (++candidates > MAX_CANDIDATES_PER_PASS || System.nanoTime() - deadline >= 0
+                        || Thread.currentThread().isInterrupted()) break;
+                if (ep == null) continue;
                 String host = ep.host;
                 int port = ep.port;
-                if (host == null || host.isEmpty() || port <= 0) {
+                if (host == null || host.isEmpty() || port <= 0 || port > 65535
+                        || !seen.add(host + ":" + port)) {
                     continue;
                 }
                 if (isLocalEndpoint(host)) {
@@ -128,7 +144,10 @@ public final class PeerDiscovery {
                     continue;
                 }
                 if (authenticator != null) {
-                    Optional<IdentityRecord> maybeIdentity = authenticator.authenticate(host, port);
+                    Optional<IdentityRecord> maybeIdentity = authenticator instanceof DirectTcpPeerAuthenticator
+                            ? ((DirectTcpPeerAuthenticator) authenticator).authenticate(host, port, deadline)
+                            : authenticator.authenticate(host, port);
+                    if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) break;
                     if (maybeIdentity.isEmpty()) {
                         LOG.debug("Authentication failed for discovered peer " + host + ":" + port);
                         continue;
@@ -139,12 +158,10 @@ public final class PeerDiscovery {
                         continue;
                     }
                     byte[] peerPub = identity.ed25519Pub();
-                    if (alreadyKnown(peerPub, host, port)) {
-                        continue;
-                    }
+                    boolean known = alreadyKnown(peerPub, host, port);
                     directory.upsertVerified(peerPub, host, port, identity.rudpPort(),
                             identity.capabilities(), identity.icebridgeVersion());
-                    discovered.add(new DiscoveredEndpoint(host, port));
+                    if (!known) discovered.add(new DiscoveredEndpoint(host, port));
 
                     // Feed known IceBridge relays (FORWARDER / BOTH) into the host cache
                     // for the settings UI table and for faster post-restart bootstrapping.
@@ -168,6 +185,8 @@ public final class PeerDiscovery {
             }
         } catch (Throwable t) {
             LOG.debug("Peer discovery failed", t);
+        } finally {
+            discovering.set(false);
         }
         return discovered;
     }
@@ -184,15 +203,16 @@ public final class PeerDiscovery {
      * Returns null on any failure.
      */
     public IdentityRecord fetchIdentityRecord(byte[] peerPub) {
-        if (peerPub == null || peerPub.length != 32) {
+        if (peerPub == null || peerPub.length != 32 || Thread.currentThread().isInterrupted()) {
             return null;
         }
         try {
             Entry entry = source.fetchIdentityEntry(peerPub);
-            if (entry == null) {
+            if (entry == null || Thread.currentThread().isInterrupted()) {
                 return null;
             }
-            return IdentityRecord.fromEntry(entry);
+            IdentityRecord record = IdentityRecord.fromEntry(entry);
+            return Arrays.equals(record.ed25519Pub(), peerPub) ? record : null;
         } catch (Throwable t) {
             LOG.debug("Identity record fetch failed for " +
                     com.frostwire.util.Hex.encode(peerPub), t);
@@ -242,8 +262,24 @@ public final class PeerDiscovery {
             return true;
         }
         try {
-            java.net.InetAddress addr = java.net.InetAddress.getByName(host);
-            if (addr.isLoopbackAddress() || addr.isLinkLocalAddress()) {
+            // Discovery yields numeric IPs. Do not do synchronous DNS merely to filter a hint.
+            java.net.InetAddress addr;
+            if (host.indexOf(':') >= 0 && host.matches("[0-9a-fA-F:.]+")) {
+                addr = java.net.InetAddress.getByName(host);
+            } else {
+                String[] octets = host.split("\\.", -1);
+                if (octets.length != 4) return false;
+                byte[] bytes = new byte[4];
+                for (int i = 0; i < bytes.length; i++) {
+                    if (!octets[i].matches("[0-9]{1,3}")) return false;
+                    int value = Integer.parseInt(octets[i]);
+                    if (value > 255) return false;
+                    bytes[i] = (byte) value;
+                }
+                addr = java.net.InetAddress.getByAddress(bytes);
+            }
+            if (addr.isAnyLocalAddress() || addr.isLoopbackAddress() || addr.isLinkLocalAddress()
+                    || addr.isMulticastAddress()) {
                 return true;
             }
             // Exact match against this machine's interface addresses (catches the machine's own LAN/WAN IPs if announced)

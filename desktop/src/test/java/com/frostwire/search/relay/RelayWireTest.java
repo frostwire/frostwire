@@ -42,7 +42,7 @@ class RelayWireTest {
   void setUp() throws Exception {
     index = new NoopLocalIndex();
     directory = new PeerDirectory(new NoopKarmaCache());
-    service = new RelaySearchService(index, responderIdentity);
+    service = new RelaySearchService(index, responderIdentity, hash -> true);
     role = new RelayRole(service, directory);
   }
 
@@ -211,7 +211,7 @@ class RelayWireTest {
   }
 
   @Test
-  void identityHandshakeReturnsConfiguredRecord() throws Exception {
+  void legacyRecordProbeCannotAuthenticate() throws Exception {
     IdentityRecord identity = sampleIdentityRecord();
     server = new IncomingRelayServer(role, identity, 0);
     server.start();
@@ -220,9 +220,7 @@ class RelayWireTest {
     OutgoingRelayClient client = new OutgoingRelayClient();
     Optional<IdentityRecord> fetched = client.fetchIdentity("127.0.0.1", port);
 
-    assertTrue(fetched.isPresent());
-    assertArrayEquals(identity.ed25519Pub(), fetched.get().ed25519Pub());
-    assertTrue(fetched.get().verifySignature());
+    assertTrue(fetched.isEmpty());
   }
 
   @Test
@@ -240,15 +238,15 @@ class RelayWireTest {
   @Test
   void directTcpAuthenticatorAcceptsValidServerIdentity() throws Exception {
     IdentityRecord identity = sampleIdentityRecord();
-    server = new IncomingRelayServer(role, identity, 0);
+    server = new IncomingRelayServer(role, identity, responderIdentity.ed25519().getPrivate(), 0);
     server.start();
     int port = server.port();
 
-    DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator();
-    Optional<IdentityRecord> fetched = auth.authenticate("127.0.0.1", port);
-
-    assertTrue(fetched.isPresent());
-    assertArrayEquals(identity.ed25519Pub(), fetched.get().ed25519Pub());
+    try (DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator(requesterKey)) {
+      Optional<IdentityRecord> fetched = auth.authenticate("127.0.0.1", port);
+      assertTrue(fetched.isPresent());
+      assertArrayEquals(identity.ed25519Pub(), fetched.get().ed25519Pub());
+    }
   }
 
   @Test
@@ -450,11 +448,9 @@ class RelayWireTest {
   }
 
   private static IdentityRecord sampleIdentityRecord() throws Exception {
-    java.security.KeyPair kp =
-        java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
     byte[] nodeId = new byte[20];
     byte[] x25519 = new byte[32];
-    return IdentityRecord.createSigned(nodeId, kp, x25519, 6881);
+    return IdentityRecord.createSigned(nodeId, responderIdentity.ed25519(), x25519, 6881);
   }
 
   private static LocalSharedTorrent torrent(String name, long size, int fileCount) {

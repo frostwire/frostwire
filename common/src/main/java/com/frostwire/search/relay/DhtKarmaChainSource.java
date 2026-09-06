@@ -49,12 +49,22 @@ public final class DhtKarmaChainSource implements KarmaChainSource {
 
     @Override
     public Entry fetchManifest(byte[] peerPub) {
+        return fetchManifest(peerPub, dhtTimeoutMs);
+    }
+
+    Entry fetchManifest(byte[] peerPub, long deadlineNanos) {
+        long remainingMs = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(deadlineNanos - System.nanoTime());
+        return remainingMs <= 0 ? null : fetchManifest(peerPub, (int) Math.min(dhtTimeoutMs, remainingMs));
+    }
+
+    private Entry fetchManifest(byte[] peerPub, int timeoutMs) {
         if (peerPub == null || peerPub.length != 32) {
             return null;
         }
         try {
             byte[] salt = KarmaConstants.BEP46_SALT_KARMA.getBytes(StandardCharsets.US_ASCII);
-            SessionManager.MutableItem item = session.dhtGetItem(peerPub, salt, dhtTimeoutMs);
+            SessionManager.MutableItem item = DhtPeerDiscoverySource.getMutableItem(session, peerPub, salt,
+                    timeoutMs);
             if (item == null) {
                 return null;
             }

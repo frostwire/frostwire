@@ -9,13 +9,13 @@ package com.frostwire.search.relay;
 
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.SessionManager;
-import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.util.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default {@link PeerDiscoverySource} backed by the DHT. Resolves
@@ -59,23 +59,34 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
 
     @Override
     public List<DiscoveredEndpoint> fetchEndpoints() {
-        if (session == null) {
+        if (session == null || Thread.currentThread().isInterrupted()) {
             return new ArrayList<>();
         }
         List<DiscoveredEndpoint> result = new ArrayList<>();
         java.util.Set<String> seen = new java.util.HashSet<>();
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(discoveryTimeoutSec);
         try {
             // Always aggressively discover dedicated relayers first (via frostwire-relays-v1),
             // then peers. This ensures desktop finds remote IceBridge relays easily via DHT
             // and can use them for routing search/index commands over the rUDP mesh.
-            ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session, discoveryTimeoutSec);
+            // Reserve budget for peer/bootstrap topics when the preferred topic is empty.
+            ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session,
+                    Math.max(1, discoveryTimeoutSec / 3));
+            if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
             addEndpoints(relays, result, seen);
 
-            ArrayList<TcpEndpoint> endpoints = DhtRendezvous.findPeers(session, discoveryTimeoutSec);
-            addEndpoints(endpoints, result, seen);
+            int remaining = remainingSeconds(deadline);
+            if (remaining > 0 && result.size() < PeerDiscovery.MAX_CANDIDATES_PER_PASS) {
+                ArrayList<TcpEndpoint> endpoints = DhtRendezvous.findPeers(session,
+                        result.isEmpty() ? Math.max(1, remaining / 2) : remaining);
+                if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
+                addEndpoints(endpoints, result, seen);
+            }
 
-            if (result.isEmpty()) {
-                ArrayList<TcpEndpoint> bootstrap = DhtRendezvous.findBootstrapNodes(session, discoveryTimeoutSec);
+            remaining = remainingSeconds(deadline);
+            if (result.isEmpty() && remaining > 0) {
+                ArrayList<TcpEndpoint> bootstrap = DhtRendezvous.findBootstrapNodes(session, remaining);
+                if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
                 addEndpoints(bootstrap, result, seen);
             }
         } catch (Throwable t) {
@@ -94,6 +105,7 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         // ArrayList's iterator throws ConcurrentModificationException.
         TcpEndpoint[] snapshot = endpoints.toArray(new TcpEndpoint[0]);
         for (TcpEndpoint ep : snapshot) {
+            if (result.size() >= PeerDiscovery.MAX_CANDIDATES_PER_PASS) break;
             if (ep == null) {
                 continue;
             }
@@ -126,7 +138,7 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         try {
             byte[] salt = IdentityRecord.BEP46_SALT
                     .getBytes(StandardCharsets.US_ASCII);
-            SessionManager.MutableItem item = session.dhtGetItem(peerPub, salt, identityTimeoutMs);
+            SessionManager.MutableItem item = getMutableItem(session, peerPub, salt, identityTimeoutMs);
             if (item == null) {
                 return null;
             }
@@ -136,5 +148,20 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
                     com.frostwire.util.Hex.encode(peerPub), t);
             return null;
         }
+    }
+
+    static int remainingSeconds(long deadlineNanos) {
+        if (Thread.currentThread().isInterrupted()) return 0;
+        return (int) Math.max(0, TimeUnit.NANOSECONDS.toSeconds(deadlineNanos - System.nanoTime()));
+    }
+
+    /** jlibtorrent 2.0.12.9 waits in SECONDS. Round down; never expand the caller's budget. */
+    static SessionManager.MutableItem getMutableItem(SessionManager session, byte[] pub, byte[] salt,
+                                                     int timeoutMs) {
+        int seconds = timeoutMs / 1000;
+        if (seconds <= 0 || Thread.currentThread().isInterrupted()) return null;
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        SessionManager.MutableItem item = session.dhtGetItem(pub, salt, seconds);
+        return System.nanoTime() - deadline < 0 && !Thread.currentThread().isInterrupted() ? item : null;
     }
 }

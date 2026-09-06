@@ -7,8 +7,6 @@
 
 package com.frostwire.search.relay;
 
-import com.frostwire.util.Logger;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,16 +26,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * other peers' chains, but that requires crawling remote
  * chains, which is out of scope for this build.
  *
- * <p>Scores are cached in-memory by the fetcher; this class
- * additionally memoizes the aggregate result so we don't
- * re-iterate the chain on every score lookup.
+ * <p>The fetcher owns one bounded, expiring positive/negative cache.
+ * Aggregation is bounded by its maximum verified chain size, avoiding
+ * a second memoization cache with a different lifetime.
  */
-public class PeerKarmaCache {
-
-    private static final Logger LOG = Logger.getLogger(PeerKarmaCache.class);
+public class PeerKarmaCache implements AutoCloseable {
 
     private final RemoteKarmaChainFetcher fetcher;
-    private final java.util.concurrent.ConcurrentHashMap<String, Long> scoreCache = new java.util.concurrent.ConcurrentHashMap<>();
     private final AtomicLong fetches = new AtomicLong();
     private final AtomicLong cacheHits = new AtomicLong();
 
@@ -51,22 +46,23 @@ public class PeerKarmaCache {
     /**
      * Returns a karma score for the given peer. 0 means "no chain
      * or no endorsements in the tail". Never negative.
+     * May wait up to five seconds; routing/UI callers must use {@link #getCachedKarma(byte[])}.
      */
     public long getKarma(byte[] peerPub) {
         if (peerPub == null || peerPub.length != 32) {
             return 0;
         }
-        String key = com.frostwire.util.Hex.encode(peerPub);
-        Long cached = scoreCache.get(key);
-        if (cached != null) {
+        if (fetcher.isCached(peerPub)) {
             cacheHits.incrementAndGet();
-            return cached;
+        } else {
+            fetches.incrementAndGet();
         }
-        fetches.incrementAndGet();
-        List<KarmaChainEntry> chain = fetcher.fetchChain(peerPub);
-        long score = computeScore(chain);
-        scoreCache.put(key, score);
-        return score;
+        return computeScore(fetcher.fetchChain(peerPub));
+    }
+
+    /** Nonblocking routing/UI lookup; coalesces bounded refresh work on cache misses. */
+    public long getCachedKarma(byte[] peerPub) {
+        return computeScore(fetcher.getCachedChain(peerPub));
     }
 
     /** Drop the cached score for a peer; the next lookup re-fetches. */
@@ -74,14 +70,18 @@ public class PeerKarmaCache {
         if (peerPub == null) {
             return;
         }
-        scoreCache.remove(com.frostwire.util.Hex.encode(peerPub));
         fetcher.evict(peerPub);
     }
 
     /** Drop all cached scores. */
     public void clear() {
-        scoreCache.clear();
         fetcher.clear();
+    }
+
+    /** This cache owns its fetcher; close cancels its refreshes, not the shared DHT session. */
+    @Override
+    public void close() {
+        fetcher.close();
     }
 
     /** Diagnostic counters. */

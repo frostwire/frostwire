@@ -311,7 +311,7 @@ public final class RemoteIndexFetcher {
             try {
                 byte[] salt = RelayConstants.BEP46_SALT_INDEX
                         .getBytes(StandardCharsets.US_ASCII);
-                SessionManager.MutableItem item = session.dhtGetItem(peerPub, salt, dhtTimeoutMs);
+                SessionManager.MutableItem item = DhtPeerDiscoverySource.getMutableItem(session, peerPub, salt, dhtTimeoutMs);
                 if (item == null || item.item == null) {
                     return Optional.empty();
                 }
