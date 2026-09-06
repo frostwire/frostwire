@@ -239,7 +239,6 @@ main() {
   [[ "${jar}" != "${INSTALL_DIR}/"* && "${jar}" != "${STATE_DIR}/"* ]] || fail "Artifact must come from outside the old service layout" || return
   trusted_file "${jar}"
   JAVA_BIN=$(readlink -f -- "${JAVA_BIN}")
-  layout
   trusted_dir "$(dirname -- "${JAVA_BIN}")"
   regular_file "${JAVA_BIN}"
   [[ -x "${JAVA_BIN}" ]] || fail "Java must be an executable" || return
