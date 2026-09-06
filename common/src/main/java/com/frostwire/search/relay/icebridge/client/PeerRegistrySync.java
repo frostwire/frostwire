@@ -109,8 +109,11 @@ public final class PeerRegistrySync implements AutoCloseable {
     /**
      * One sync cycle: register self, push verified peers to IceBridge, pull
      * mesh peers into the directory (forwarder-first discovery).
+     *
+     * <p>Public so a fresh install can warm the mesh registry on the startup
+     * path instead of waiting for the first scheduled tick.
      */
-    void sync() {
+    public void sync() {
         try {
             registerSelf();
             pushDirectoryToMesh();

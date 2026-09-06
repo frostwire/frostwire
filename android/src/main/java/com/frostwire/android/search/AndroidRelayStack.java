@@ -471,11 +471,33 @@ public final class AndroidRelayStack implements AutoCloseable {
       IdentityRecordPublisher identityPublisher =
           new IdentityRecordPublisher(ident, advertiseRelayPort, meshRudpPort, syncRole.name());
       IndexAnnouncementPublisher indexPublisher = new IndexAnnouncementPublisher(li, ident, visibility);
+      // Phones join as CLIENT leaves: announce the peer topic so holders can be
+      // found, but never the bootstrap topic (that flag is for dedicated relays).
       da = new DhtAdvertiser(identityPublisher, indexPublisher, DHT_ADVERTISE_INTERVAL_SEC,
           () -> btEngine, true, false, permitted);
       requirePermitted(permitted);
       da.start();
       LOG.info("AndroidRelayStack: DhtAdvertiser started");
+
+      // First-run bootstrap: the scheduler's first tick is 5 minutes out and the
+      // advertiser's republish interval is 5 minutes, but a fresh install must
+      // join the mesh on this startup path — announce identity now, run one
+      // discovery pass, and warm the mesh registry. All fail-closed and bounded.
+      try {
+        da.tick(btEngine);
+      } catch (Throwable t) {
+        LOG.warn("AndroidRelayStack: initial DHT announce failed", t);
+      }
+      try {
+        pds.tick();
+      } catch (Throwable t) {
+        LOG.warn("AndroidRelayStack: initial discovery pass failed", t);
+      }
+      try {
+        prs.sync();
+      } catch (Throwable t) {
+        LOG.warn("AndroidRelayStack: initial mesh sync failed", t);
+      }
 
       if (li == null || karmaCache == null || pd == null || ident == null || tr == null) {
         throw new IllegalStateException("Wiring inputs must be non-null");
