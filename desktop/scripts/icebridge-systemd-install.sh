@@ -190,6 +190,35 @@ trusted_file() {
   (( (8#${mode} & 0022) == 0 )) || fail "Writable trusted file: $1"
 }
 
+# Java runs as the service user, never as root. The JDK may be
+# operator-owned (e.g. /home/ubuntu/src/jdk-...), so unlike code/config its
+# ancestors need not be root-owned. They must not be replaceable by the
+# service account: every component resolves to a non-symlink, is not owned
+# by the service user, and is not group/other-writable. Prints the resolved
+# binary path on success.
+trusted_java_bin() {
+  local bin="$1" dir mode owner service_user="${SERVICE_USER:-icebridge}"
+  [[ -n "${bin}" ]] || fail "Java binary path is empty (use --java-bin=/path/to/java or JAVA_BIN=...)" || return
+  bin=$(realpath -e -- "${bin}") || fail "Java not found: $1 (use --java-bin=/path/to/java or JAVA_BIN=...)" || return
+  [[ -f "${bin}" && ! -L "${bin}" && $(stat -c %h -- "${bin}") == 1 ]] || fail "Java must be a regular non-linked file: ${bin}" || return
+  [[ -x "${bin}" ]] || fail "Java must be executable: ${bin}" || return
+  owner=$(stat -c %U -- "${bin}")
+  [[ "${owner}" != "${service_user}" ]] || fail "Java must not be owned by service user: ${bin}" || return
+  mode=$(stat -c %a -- "${bin}")
+  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be writable by group/other: ${bin}" || return
+  dir=$(dirname -- "${bin}")
+  while :; do
+    [[ -d "${dir}" && ! -L "${dir}" ]] || fail "Untrusted Java directory: ${dir}" || return
+    owner=$(stat -c %U -- "${dir}")
+    [[ "${owner}" != "${service_user}" ]] || fail "Java directory owned by service user: ${dir}" || return
+    mode=$(stat -c %a -- "${dir}")
+    (( (8#${mode} & 0022) == 0 )) || fail "Java directory writable by group/other: ${dir}" || return
+    [[ "${dir}" == / ]] && break
+    dir=$(dirname -- "${dir}")
+  done
+  printf '%s\n' "${bin}"
+}
+
 # Source names are locked down by their root-owned parent first. A process may
 # still hold a writable file descriptor, so bound the actual copy, not just stat.
 snapshot_data() {
@@ -213,9 +242,14 @@ main() {
         [[ $# -gt 0 ]] || fail "--jar requires a path" || return
         jar="$1"
         ;;
+      --java-bin=*) JAVA_BIN="${1#--java-bin=}"; layout ;;
+      --java-bin)
+        shift
+        [[ $# -gt 0 ]] || fail "--java-bin requires a path" || return
+        JAVA_BIN="$1"; layout ;;
       --build) build=1 ;;
       --no-build) ;;
-      --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --build\n'; printf '       sudo bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar\n'; return ;;
+      --help|-h) printf 'Usage: bash icebridge-systemd-install.sh --build\n'; printf '       sudo bash icebridge-systemd-install.sh --jar=/trusted/prebuilt.jar [--java-bin=/path/to/java]\n'; return ;;
       *) fail "Unknown option"; return 1 ;;
     esac
     shift
@@ -231,7 +265,13 @@ main() {
     staged_jar="/root/icebridge-build/icebridge.jar"
     printf 'Stage the artifact in a root-owned directory, then install it with:\n'
     printf '  sudo install -D -o root -g root -m 0644 -- "%s" "%s"\n' "${jar}" "${staged_jar}"
-    printf '  sudo "%s" --jar="%s"\n' "${script_path}" "${staged_jar}"
+    local build_java=""
+    if command -v java >/dev/null 2>&1; then build_java=$(command -v java); fi
+    if [[ -n "${build_java}" && "${build_java}" != /usr/bin/java ]]; then
+      printf '  sudo "%s" --jar="%s" --java-bin="%s"\n' "${script_path}" "${staged_jar}" "${build_java}"
+    else
+      printf '  sudo "%s" --jar="%s"\n' "${script_path}" "${staged_jar}"
+    fi
     return
   fi
   [[ "${EUID}" -eq 0 ]] || fail "Install requires root; build first as an unprivileged user. No automatic elevation." || return
@@ -240,13 +280,7 @@ main() {
   jar=$(realpath -e -- "${jar}")
   [[ "${jar}" != "${INSTALL_DIR}/"* && "${jar}" != "${STATE_DIR}/"* ]] || fail "Artifact must come from outside the old service layout" || return
   trusted_file "${jar}"
-  JAVA_BIN=$(readlink -f -- "${JAVA_BIN}")
-  trusted_dir "$(dirname -- "${JAVA_BIN}")"
-  regular_file "${JAVA_BIN}"
-  [[ -x "${JAVA_BIN}" ]] || fail "Java must be an executable" || return
-  local mode
-  mode=$(stat -c %a -- "${JAVA_BIN}")
-  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be writable by the service or other users" || return
+  JAVA_BIN=$(trusted_java_bin "${JAVA_BIN}") || return
   local dir
   for dir in "${INSTALL_DIR}" "${CONFIG_DIR}" "${STATE_DIR}"; do
     trusted_dir "$(dirname -- "${dir}")"
