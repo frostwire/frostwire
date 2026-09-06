@@ -63,7 +63,7 @@ public final class BTEngine extends SessionManager {
     public static BTContext ctx;
     private final InnerListener innerListener;
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
-    private BTEngineListener listener;
+    private volatile BTEngineListener listener;
 
     // Cached paused state to avoid blocking EDT calls
     private volatile boolean cachedPausedState = false;
@@ -147,7 +147,8 @@ public final class BTEngine extends SessionManager {
         return listener;
     }
 
-    public void setListener(BTEngineListener listener) {
+    /** Publishes a new listener; callbacks already using an older snapshot may finish. */
+    public synchronized void setListener(BTEngineListener listener) {
         this.listener = listener;
     }
 
@@ -654,14 +655,16 @@ public final class BTEngine extends SessionManager {
     }
 
     private void fireStarted() {
-        if (listener != null) {
-            listener.started(this);
+        BTEngineListener snapshot = listener;
+        if (snapshot != null) {
+            snapshot.started(this);
         }
     }
 
     private void fireStopped() {
-        if (listener != null) {
-            listener.stopped(this);
+        BTEngineListener snapshot = listener;
+        if (snapshot != null) {
+            snapshot.stopped(this);
         }
     }
 
@@ -721,8 +724,9 @@ public final class BTEngine extends SessionManager {
                 }
 
                 BTDownload dl = new BTDownload(this, th);
-                if (listener != null) {
-                    listener.downloadAdded(this, dl);
+                BTEngineListener snapshot = listener;
+                if (snapshot != null) {
+                    snapshot.downloadAdded(this, dl);
                 }
             } else {
                 LOG.info("torrent was not successfully added");
@@ -735,8 +739,9 @@ public final class BTEngine extends SessionManager {
     private void fireDownloadUpdate(TorrentHandle th) {
         try {
             BTDownload dl = new BTDownload(this, th);
-            if (listener != null) {
-                listener.downloadUpdate(this, dl);
+            BTEngineListener snapshot = listener;
+            if (snapshot != null) {
+                snapshot.downloadUpdate(this, dl);
             }
         } catch (Throwable e) {
             LOG.error("Unable to notify update the a download", e);

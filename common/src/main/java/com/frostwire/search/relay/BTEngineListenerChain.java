@@ -13,6 +13,7 @@ import com.frostwire.bittorrent.BTEngineListener;
 import com.frostwire.util.Logger;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +39,8 @@ public final class BTEngineListenerChain implements BTEngineListener {
      * preserves any existing listener and adds the new one. Returns
      * the chain that was installed, or the existing listener if no
      * new listener was provided.
+     * Registration is atomic with removal and direct listener replacement;
+     * dispatch uses the engine's published snapshot without this monitor.
      */
     public static BTEngineListener install(BTEngine engine, BTEngineListener extra) {
         if (engine == null) {
@@ -46,6 +49,7 @@ public final class BTEngineListenerChain implements BTEngineListener {
         if (extra == null) {
             return engine.getListener();
         }
+        synchronized (engine) {
         BTEngineListener existing = engine.getListener();
         if (existing == extra) {
             return existing;
@@ -64,6 +68,55 @@ public final class BTEngineListenerChain implements BTEngineListener {
         }
         engine.setListener(chain);
         return chain;
+        }
+    }
+
+    /**
+     * Removes only this listener by identity, preserving other engine listeners.
+     * Already dispatched callbacks can still run; owners must revoke their own
+     * generation before removal. The engine monitor protects only registration,
+     * never callback execution or resource shutdown.
+     */
+    public static boolean remove(BTEngine engine, BTEngineListener listener) {
+        if (engine == null || listener == null) {
+            return false;
+        }
+        synchronized (engine) {
+            BTEngineListener existing = engine.getListener();
+            BTEngineListener replacement = without(existing, listener);
+            if (replacement == existing) {
+                return false;
+            }
+            engine.setListener(replacement);
+            return true;
+        }
+    }
+
+    private static BTEngineListener without(BTEngineListener existing, BTEngineListener listener) {
+        if (existing == listener) {
+            return null;
+        }
+        if (!(existing instanceof BTEngineListenerChain)) {
+            return existing;
+        }
+        BTEngineListenerChain chain = (BTEngineListenerChain) existing;
+        List<BTEngineListener> kept = new ArrayList<>(chain.delegates.size());
+        boolean changed = false;
+        for (BTEngineListener delegate : chain.delegates) {
+            BTEngineListener replacement = without(delegate, listener);
+            changed |= replacement != delegate;
+            if (replacement != null) {
+                kept.add(replacement);
+            }
+        }
+        if (!changed) {
+            return existing;
+        }
+        if (kept.isEmpty()) {
+            return null;
+        }
+        return kept.size() == 1 ? kept.get(0)
+                : new BTEngineListenerChain(kept.toArray(new BTEngineListener[0]));
     }
 
     public BTEngineListenerChain with(BTEngineListener extra) {
