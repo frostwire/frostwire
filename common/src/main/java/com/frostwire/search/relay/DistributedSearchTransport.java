@@ -37,6 +37,44 @@ public interface DistributedSearchTransport {
      */
     boolean send(byte[] targetPub, int protocolId, byte[] payload);
 
+    /**
+     * Creates a single-use send with an absolute {@link System#nanoTime()} deadline.
+     * The caller owns cancellation. Blocking transports must override this method
+     * to cancel their I/O; this fallback only prevents a not-yet-started send.
+     */
+    default SendOperation createSend(byte[] targetPub, int protocolId, byte[] payload, long deadlineNanos) {
+        byte[] target = targetPub.clone();
+        byte[] data = payload.clone();
+        return new SendOperation() {
+            private final java.util.concurrent.atomic.AtomicBoolean started =
+                    new java.util.concurrent.atomic.AtomicBoolean();
+            private volatile boolean cancelled;
+
+            @Override
+            public boolean execute() {
+                if (!started.compareAndSet(false, true) || cancelled
+                        || Thread.currentThread().isInterrupted()
+                        || deadlineNanos - System.nanoTime() <= 0) {
+                    return false;
+                }
+                return send(target, protocolId, data);
+            }
+
+            @Override
+            public void cancel() {
+                cancelled = true;
+            }
+        };
+    }
+
+    interface SendOperation {
+        /** Returns acceptance for delivery, not proof of remote processing. */
+        boolean execute();
+
+        /** Idempotent cancellation; production I/O implementations must unblock execution. */
+        void cancel();
+    }
+
     void addListener(PayloadListener listener);
 
     void removeListener(PayloadListener listener);
