@@ -194,10 +194,10 @@ trusted_file() {
 # operator-owned (e.g. /home/ubuntu/src/jdk-...), so unlike code/config its
 # ancestors need not be root-owned. They must not be replaceable by the
 # service account: every component resolves to a non-symlink, is not owned
-# by the service user, and is not group/other-writable. Prints the resolved
-# binary path on success.
+# by the service user, and is not writable by the service or other users.
+# Prints the resolved binary path on success.
 trusted_java_bin() {
-  local bin="$1" dir mode owner service_user="${SERVICE_USER:-icebridge}"
+  local bin="$1" dir mode owner group service_user="${SERVICE_USER:-icebridge}"
   [[ -n "${bin}" ]] || fail "Java binary path is empty (use --java-bin=/path/to/java or JAVA_BIN=...)" || return
   bin=$(realpath -e -- "${bin}") || fail "Java not found: $1 (use --java-bin=/path/to/java or JAVA_BIN=...)" || return
   [[ -f "${bin}" && ! -L "${bin}" && $(stat -c %h -- "${bin}") == 1 ]] || fail "Java must be a regular non-linked file: ${bin}" || return
@@ -205,14 +205,26 @@ trusted_java_bin() {
   owner=$(stat -c %U -- "${bin}")
   [[ "${owner}" != "${service_user}" ]] || fail "Java must not be owned by service user: ${bin}" || return
   mode=$(stat -c %a -- "${bin}")
-  (( (8#${mode} & 0022) == 0 )) || fail "Java must not be writable by group/other: ${bin}" || return
+  (( (8#${mode} & 0002) == 0 )) || fail "Java must not be writable by other users: ${bin}" || return
+  if (( (8#${mode} & 0020) != 0 )); then
+    group=$(stat -c %g -- "${bin}")
+    for owner in $(id -G "${service_user}"); do
+      [[ "${owner}" != "${group}" ]] || { fail "Java group is writable by service user: ${bin}"; return 1; }
+    done
+  fi
   dir=$(dirname -- "${bin}")
   while :; do
     [[ -d "${dir}" && ! -L "${dir}" ]] || fail "Untrusted Java directory: ${dir}" || return
     owner=$(stat -c %U -- "${dir}")
     [[ "${owner}" != "${service_user}" ]] || fail "Java directory owned by service user: ${dir}" || return
     mode=$(stat -c %a -- "${dir}")
-    (( (8#${mode} & 0022) == 0 )) || fail "Java directory writable by group/other: ${dir}" || return
+    (( (8#${mode} & 0002) == 0 )) || fail "Java directory writable by other users: ${dir}" || return
+    if (( (8#${mode} & 0020) != 0 )); then
+      group=$(stat -c %g -- "${dir}")
+      for owner in $(id -G "${service_user}"); do
+        [[ "${owner}" != "${group}" ]] || { fail "Java directory group is writable by service user: ${dir}"; return 1; }
+      done
+    fi
     [[ "${dir}" == / ]] && break
     dir=$(dirname -- "${dir}")
   done
@@ -280,6 +292,8 @@ main() {
   jar=$(realpath -e -- "${jar}")
   [[ "${jar}" != "${INSTALL_DIR}/"* && "${jar}" != "${STATE_DIR}/"* ]] || fail "Artifact must come from outside the old service layout" || return
   trusted_file "${jar}"
+  id -u "${SERVICE_USER}" >/dev/null 2>&1 || useradd --system --user-group --home-dir "${STATE_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
+  [[ $(id -u "${SERVICE_USER}") != 0 ]] || fail "Service account must not have uid 0" || return
   JAVA_BIN=$(trusted_java_bin "${JAVA_BIN}") || return
   local dir
   for dir in "${INSTALL_DIR}" "${CONFIG_DIR}" "${STATE_DIR}"; do
@@ -295,8 +309,6 @@ main() {
   if systemctl cat icebridge.service >/dev/null 2>&1; then
     systemctl stop icebridge.service
   fi
-  id -u "${SERVICE_USER}" >/dev/null 2>&1 || useradd --system --user-group --home-dir "${STATE_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
-  [[ $(id -u "${SERVICE_USER}") != 0 ]] || fail "Service account must not have uid 0" || return
   # Revoke directory access before inspecting legacy children. Even a surviving
   # service process must not swap these paths between validation and copying.
   install -d -o root -g root -m 0700 "${INSTALL_DIR}"
