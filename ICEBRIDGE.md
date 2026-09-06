@@ -112,9 +112,22 @@ unzip -Z1 desktop/build/libs/icebridge.jar | grep -E 'lib/x86_64/.*\.so'
 Do not deploy a jar missing the Linux x86_64 native (it will fail on EC2);
 arm64 only matters for Graviton hosts.
 
+#### Build and install from the EC2 checkout
+
+The installer keeps the build and privileged installation separate. From the
+repository checkout, build as `ubuntu` (never with `sudo`), then run the
+printed install command:
+
+```bash
+cd ~/frostwire/desktop
+./scripts/icebridge-systemd-install.sh --build
+# Then copy/paste the printed command, for example:
+sudo ./scripts/icebridge-systemd-install.sh --jar=/home/ubuntu/frostwire/desktop/build/libs/icebridge.jar
+```
+
 #### Manual steps (same outcome)
 
-1. **Build** on laptop: `cd desktop && ./gradlew icebridgeJar`
+1. **Build** on laptop or EC2: `cd desktop && ./gradlew icebridgeJar`
 2. **Upload** `build/libs/icebridge.jar` to e.g. `/opt/icebridge/` on the instance (Amazon Linux 2/2023 or Ubuntu; JDK 17+).
 3. **Install unit** with `scripts/icebridge-systemd-install.sh` (writes `icebridge.env` once, generates token once, systemd `icebridge.service`, `ICEBRIDGE_DHT=true`). Re-run preserves env unless `FORCE_ENV=1`.
 4. **Security group** (inbound):
