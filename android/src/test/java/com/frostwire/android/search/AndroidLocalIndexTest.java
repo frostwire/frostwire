@@ -19,6 +19,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -216,6 +217,79 @@ public class AndroidLocalIndexTest {
         }
         List<LocalSharedTorrent> results = index.search("ubuntu", 2);
         assertEquals(2, results.size());
+    }
+
+    @Test
+    public void upsert_updateKeepsFileSearchWorking() {
+        index.upsert(makeTorrentWithFiles("upd001", "Update Sync v1", 500,
+                "[{\"path\":\"old-document.txt\",\"size\":10}]"));
+        assertEquals(1, index.search("old-document", 10).size());
+
+        // Update in place: new file searchable, old file gone, stable results.
+        index.upsert(makeTorrentWithFiles("upd001", "Update Sync v2", 600,
+                "[{\"path\":\"new-document.txt\",\"size\":10}]"));
+        List<LocalSharedTorrent> fresh = index.search("new-document", 10);
+        assertEquals(1, fresh.size());
+        assertEquals("Update Sync v2", fresh.get(0).name());
+        assertTrue(index.search("old-document", 10).isEmpty());
+        assertEquals(1, index.size());
+    }
+
+    @Test
+    public void delete_thenReinsert_noFalseFileMatch() {
+        index.upsert(makeTorrentWithFiles("rei001", "First Incarnation", 100,
+                "[{\"path\":\"ghost-file.txt\",\"size\":10}]"));
+        assertEquals(1, index.search("ghost-file", 10).size());
+
+        index.delete(makeTorrent("rei001", "x", 1, 1).infoHashHex());
+
+        // Reinsert same hash with no files: stale file rows must not resurface.
+        LocalSharedTorrent bare = makeTorrent("rei001", "Second Incarnation", 200, 1);
+        index.upsert(bare);
+        assertTrue(index.search("ghost-file", 10).isEmpty());
+        assertEquals(1, index.search("second", 10).size());
+    }
+
+    @Test
+    public void search_unicodeQuery_doesNotThrow() {
+        index.upsert(makeTorrent("uni001", "Café Música Pack", 100, 1));
+        // ASCII sanitizers dropped accents entirely; unicode sanitizer keeps them.
+        List<LocalSharedTorrent> results = index.search("café música", 10);
+        assertNotNull(results);
+        assertFalse(results.isEmpty());
+    }
+
+    @Test
+    public void search_multiFileTorrent_doesNotHideSecondTorrent() {
+        StringBuilder files = new StringBuilder("[");
+        for (int i = 0; i < 20; i++) {
+            if (i > 0) files.append(',');
+            files.append("{\"path\":\"shared-prefix-file-").append(i).append(".txt\",\"size\":10}");
+        }
+        files.append(']');
+        index.upsert(makeTorrentWithFiles("mf0001", "Big Multi Pack", 200, files.toString()));
+        index.upsert(makeTorrentWithFiles("mf0002", "Small Pack", 10,
+                "[{\"path\":\"shared-prefix-loner.txt\",\"size\":10}]"));
+
+        List<LocalSharedTorrent> results = index.search("shared-prefix", 2);
+        assertEquals(2, results.size());
+        HashSet<String> names = new HashSet<>();
+        for (LocalSharedTorrent t : results) {
+            names.add(t.name());
+        }
+        assertTrue(names.contains("Big Multi Pack"));
+        assertTrue(names.contains("Small Pack"));
+    }
+
+    @Test
+    public void triggers_existAfterOpen() {
+        // Under Robolectric FTS5 is unavailable so no trigger exists; on a
+        // real device all three must exist. The original bug (three CREATE
+        // TRIGGER statements in one execSQL call) left _ai installed while
+        // _ad/_au were silently missing — assert they always agree.
+        boolean ai = index.hasTrigger("shared_torrents_ai");
+        assertEquals(ai, index.hasTrigger("shared_torrents_ad"));
+        assertEquals(ai, index.hasTrigger("shared_torrents_au"));
     }
 
     @Test
