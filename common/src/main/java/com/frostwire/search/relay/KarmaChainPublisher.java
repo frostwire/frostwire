@@ -31,9 +31,11 @@ import java.util.TreeMap;
  *   "pub":     "base64url raw Ed25519 pub",
  *   "len":     total chain length (seq + 1),
  *   "head":    "hex entryHash of the last entry in the chain",
- *   "entries": [ { "k":"EC"|"EN", "seq":n, "bh":h, "bkh":"hex",
+ *   "entries": [ { "k":"EC"|"EN", "seq":n, "bh":h, "bkh":"hex", "ph":"hex",
  *                  "ep":e?, "en":e?, "pp":"b64"?, "ih":"hex"?,
  *                  "sd":d?, "s":"b64" } ... ]
+ *   "base":    { "seq": seq of the first included entry,
+ *                "ph":  "hex entryHash of the entry before it (genesis if from start)" },
  *   "ts":      epoch seconds
  * }
  * </pre>
@@ -54,6 +56,14 @@ public final class KarmaChainPublisher {
 
     /** BEP 44 mutable item value size limit (conservative). */
     static final int MAX_MANIFEST_BYTES = 950;
+
+    /**
+     * Minimum chain size worth publishing: one epoch commitment plus one
+     * endorsement, the smallest unit that verifies as a complete chain.
+     * Smaller chains stay local until they grow; publishing a lone
+     * endorsement would force receivers to trust an unanchored tail.
+     */
+    static final int MIN_PUBLISH_CHAIN_SIZE = 2;
 
     static final int MANIFEST_VERSION = 1;
 
@@ -89,6 +99,10 @@ public final class KarmaChainPublisher {
             if (manifest == null) {
                 return 0;
             }
+            if (manifest.bencode().length > MAX_MANIFEST_BYTES) {
+                LOG.warn("Karma manifest exceeds DHT value limit; not publishing");
+                return 0;
+            }
             byte[] pubKey = identity.ed25519PubRaw();
             byte[] privKey = identity.ed25519SecretKeyNaCl();
             byte[] salt = KarmaConstants.BEP46_SALT_KARMA.getBytes(StandardCharsets.US_ASCII);
@@ -115,16 +129,25 @@ public final class KarmaChainPublisher {
         }
 
         // Try with the full chain, then shrink from the front (oldest
-        // entries drop first) until the bencoded value fits.
+        // entries drop first) until the bencoded value fits. Tails stay
+        // anchored: trimming stops at an epoch commitment, and chains too
+        // small to verify are kept local until they grow.
         List<KarmaChainEntry> included = new ArrayList<>(chain);
-        while (!included.isEmpty()) {
+        while (included.size() >= MIN_PUBLISH_CHAIN_SIZE) {
             Entry entry = buildManifestEntry(included, chain);
             byte[] bencoded = entry.bencode();
             if (bencoded.length <= MAX_MANIFEST_BYTES) {
                 return entry;
             }
             included.remove(0);
+            while (included.size() >= MIN_PUBLISH_CHAIN_SIZE
+                    && included.get(0).kind() != KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+                included.remove(0);
+            }
         }
+        // If even the smallest publishable unit (EC + 1 EN) exceeds
+        // exceeds the DHT value cap: keep the chain local rather than
+        // emit an unverifiable fragment.
         return null;
     }
 
@@ -137,12 +160,28 @@ public final class KarmaChainPublisher {
 
         Map<String, Object> map = new TreeMap<>();
         map.put("v", new Entry((long) MANIFEST_VERSION));
-        map.put("pub", new Entry(Base64.getEncoder()
+        map.put("pub", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(identity.ed25519PubRaw())));
         map.put("len", new Entry((long) fullChain.size()));
         map.put("head", new Entry(com.frostwire.util.Hex.encode(
                 writer.chain().headHash())));
         map.put("entries", Entry.fromList(entryEntries));
+        // Anchor for verifyTail: only tails trimmed from a longer chain need
+        // it. A complete chain (first entry seq 0 with genesis prevHash)
+        // verifies with verify() and carries no base — saving ~87 bytes,
+        // which is exactly the margin a minimal EC+EN manifest needs.
+        // The manifest-level "pub" already carries the owner's key, so
+        // per-entry "pub" copies are redundant: drop them (~50 bytes each)
+        // and let reconstruct() default endorserPub to the manifest owner.
+        KarmaChainEntry first = tail.get(0);
+        if (first.seq() != 0
+                || !java.util.Arrays.equals(
+                        first.prevHash(), KarmaChainEntry.GENESIS_PREV_HASH)) {
+            Map<String, Object> base = new TreeMap<>();
+            base.put("seq", new Entry(first.seq()));
+            base.put("ph", new Entry(com.frostwire.util.Hex.encode(first.prevHash())));
+            map.put("base", Entry.fromMap(base));
+        }
         map.put("ts", new Entry(Instant.now().getEpochSecond()));
         return Entry.fromMap(map);
     }
@@ -153,6 +192,7 @@ public final class KarmaChainPublisher {
         m.put("seq", new Entry(e.seq()));
         m.put("bh", new Entry(e.blockHeight()));
         m.put("bkh", new Entry(com.frostwire.util.Hex.encode(e.blockHash())));
+        m.put("ph", new Entry(com.frostwire.util.Hex.encode(e.prevHash())));
         Long epoch = e.epoch();
         if (epoch != null) {
             m.put("ep", new Entry(epoch));
@@ -163,18 +203,21 @@ public final class KarmaChainPublisher {
         }
         byte[] peerPub = e.peerPub();
         if (peerPub != null) {
-            m.put("pp", new Entry(Base64.getEncoder()
+            m.put("pp", new Entry(Base64.getUrlEncoder()
                     .withoutPadding().encodeToString(peerPub)));
         }
         byte[] infoHash = e.infoHash();
         if (infoHash != null) {
             m.put("ih", new Entry(com.frostwire.util.Hex.encode(infoHash)));
         }
+        // Score deltas are always 1 in this protocol version; the reader
+        // defaults a missing field to 1. Omitting it saves ~7 bytes per
+        // endorsement — the margin a minimal EC+EN manifest needs.
         Integer scoreDelta = e.scoreDelta();
-        if (scoreDelta != null) {
+        if (scoreDelta != null && scoreDelta != 1) {
             m.put("sd", new Entry(scoreDelta.longValue()));
         }
-        m.put("s", new Entry(Base64.getEncoder()
+        m.put("s", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(e.signature())));
         return Entry.fromMap(m);
     }
