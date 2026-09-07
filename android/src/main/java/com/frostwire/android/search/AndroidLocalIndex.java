@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -52,7 +53,7 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
     private static final Logger LOG = Logger.getLogger(AndroidLocalIndex.class);
 
     public static final String DEFAULT_DB_NAME = "frostwire-shared-torrents.db";
-    static final int SCHEMA_VERSION = 2;
+    static final int SCHEMA_VERSION = 3;
 
     static final String TABLE = "shared_torrents";
     static final String FTS = "shared_torrents_fts";
@@ -86,7 +87,8 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
             "CREATE TABLE IF NOT EXISTS " + FILES_TABLE + " (" +
                     "torrent_rowid INTEGER NOT NULL, " +
                     "file_path TEXT NOT NULL, " +
-                    "file_size INTEGER NOT NULL DEFAULT 0)";
+                    "file_size INTEGER NOT NULL DEFAULT 0, " +
+                    "fts_rowid INTEGER)";
 
     private static final String CREATE_INDEX_FILES_TORRENT_SQL =
             "CREATE INDEX IF NOT EXISTS idx_" + FILES_TABLE + "_torrent " +
@@ -97,14 +99,18 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
                     "file_path, torrent_rowid UNINDEXED, " +
                     "tokenize='porter unicode61')";
 
-    private static final String CREATE_TRIGGERS_SQL =
+    private static final String CREATE_TRIGGER_AI_SQL =
             "CREATE TRIGGER IF NOT EXISTS " + TABLE + "_ai AFTER INSERT ON " + TABLE + " BEGIN " +
                     "INSERT INTO " + FTS + "(rowid, name, tags) VALUES (new.rowid, new.name, new.tags); " +
-                    "END;" +
-                    "CREATE TRIGGER IF NOT EXISTS " + TABLE + "_ad AFTER DELETE ON " + TABLE + " BEGIN " +
+                    "END;";
+
+    private static final String CREATE_TRIGGER_AD_SQL =
+            "CREATE TRIGGER IF NOT EXISTS " + TABLE + "_ad AFTER DELETE ON " + TABLE + " BEGIN " +
                     "INSERT INTO " + FTS + "(" + FTS + ", rowid, name, tags) VALUES('delete', old.rowid, old.name, old.tags); " +
-                    "END;" +
-                    "CREATE TRIGGER IF NOT EXISTS " + TABLE + "_au AFTER UPDATE ON " + TABLE + " BEGIN " +
+                    "END;";
+
+    private static final String CREATE_TRIGGER_AU_SQL =
+            "CREATE TRIGGER IF NOT EXISTS " + TABLE + "_au AFTER UPDATE ON " + TABLE + " BEGIN " +
                     "INSERT INTO " + FTS + "(" + FTS + ", rowid, name, tags) VALUES('delete', old.rowid, old.name, old.tags); " +
                     "INSERT INTO " + FTS + "(rowid, name, tags) VALUES (new.rowid, new.name, new.tags); " +
                     "END;";
@@ -138,6 +144,10 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
         this.db.enableWriteAheadLogging();
         this.open = true;
         this.fts5Available = checkFts5Available();
+        synchronized (db) {
+            repairMissingTriggers();
+            repairOrphanFileRows();
+        }
     }
 
     public static AndroidLocalIndex open(Context context) {
@@ -154,10 +164,10 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
         synchronized (db) {
             db.beginTransaction();
             try {
-                Long oldRowid = lookupRowid(t.infoHashHex());
-                if (oldRowid != null) {
-                    db.delete(FILES_TABLE, "torrent_rowid = ?", new String[]{String.valueOf(oldRowid)});
-                }
+                // Update in place when the row already exists so the implicit
+                // rowid stays stable; db.replace() would allocate a new rowid
+                // and orphan shared_files/shared_files_fts rows keyed by it.
+                Long existingRowid = lookupRowid(t.infoHashHex());
                 ContentValues cv = new ContentValues(12);
                 cv.put("info_hash", t.infoHashHex());
                 cv.put("name", t.name());
@@ -175,7 +185,11 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
                 } else {
                     cv.putNull("last_published_at");
                 }
-                db.replace(TABLE, null, cv);
+                if (existingRowid != null) {
+                    db.update(TABLE, cv, "info_hash = ?", new String[]{normalizeHex(t.infoHashHex())});
+                } else {
+                    db.insertOrThrow(TABLE, null, cv);
+                }
                 syncSharedFiles(t.infoHashHex(), t.filesJson());
                 db.setTransactionSuccessful();
             } finally {
@@ -194,7 +208,7 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
                 Long rowid = lookupRowid(hex);
                 if (rowid != null) {
                     if (fts5Available) {
-                        db.delete(FILES_FTS, "torrent_rowid = ?", new String[]{String.valueOf(rowid)});
+                        deleteFilesFtsRows(rowid);
                     }
                     db.delete(FILES_TABLE, "torrent_rowid = ?", new String[]{String.valueOf(rowid)});
                 }
@@ -267,24 +281,26 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
                 LOG.warn("search (torrent-name) failed for query: " + ftsQuery, e);
             }
             if (out.size() < cap) {
-                String fileSql =
-                        "SELECT s.info_hash, s.name, s.size_bytes, s.file_count, s.files_json, s.tags, " +
-                                "s.publisher_node_id, s.publisher_ed25519_pub, s.publisher_utp_port, " +
-                                "s.added_at, s.last_seen_at, s.last_published_at, " +
-                                "ffts.file_path AS matched_file " +
+                // Distinct info_hash first so one torrent with many matching
+                // files cannot eat the LIMIT and hide a second torrent.
+                String hashSql =
+                        "SELECT DISTINCT s.info_hash " +
                                 "FROM " + TABLE + " s " +
                                 "JOIN " + FILES_FTS + " ffts ON ffts.torrent_rowid = s.rowid " +
                                 "WHERE " + FILES_FTS + " MATCH ? " +
-                                "ORDER BY bm25(" + FILES_FTS + ") " +
                                 "LIMIT ?";
-                int remaining = (cap - out.size()) * 2;
-                try (Cursor c = db.rawQuery(fileSql, new String[]{ftsQuery, String.valueOf(remaining)})) {
+                int remaining = cap - out.size();
+                try (Cursor c = db.rawQuery(hashSql, new String[]{ftsQuery, String.valueOf(remaining)})) {
                     while (c.moveToNext() && out.size() < cap) {
-                        LocalSharedTorrent t = readRow(c);
-                        if (seen.add(t.infoHashHex())) {
-                            String mf = c.getString(c.getColumnIndexOrThrow("matched_file"));
-                            out.add(t.toBuilder().matchedFile(mf).build());
+                        String hash = c.getString(0);
+                        if (!seen.add(hash)) {
+                            continue;
                         }
+                        LocalSharedTorrent t = queryTorrentByHash(hash);
+                        if (t == null) {
+                            continue;
+                        }
+                        out.add(t.toBuilder().matchedFile(matchedFtsFile(hash, ftsQuery)).build());
                     }
                 } catch (Throwable e) {
                     LOG.warn("search (file-path) failed for query: " + ftsQuery, e);
@@ -320,23 +336,26 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
                 LOG.warn("search (LIKE torrent-name) failed for query: " + sanitized, e);
             }
             if (out.size() < cap) {
-                String fileSql =
-                        "SELECT s.info_hash, s.name, s.size_bytes, s.file_count, s.files_json, s.tags, " +
-                                "s.publisher_node_id, s.publisher_ed25519_pub, s.publisher_utp_port, " +
-                                "s.added_at, s.last_seen_at, s.last_published_at, " +
-                                "sf.file_path AS matched_file " +
+                // Distinct info_hash first so one torrent with many matching
+                // files cannot eat the LIMIT and hide a second torrent.
+                String hashSql =
+                        "SELECT DISTINCT s.info_hash " +
                                 "FROM " + TABLE + " s " +
                                 "JOIN " + FILES_TABLE + " sf ON sf.torrent_rowid = s.rowid " +
                                 "WHERE LOWER(sf.file_path) LIKE ? ESCAPE '\\' " +
                                 "LIMIT ?";
                 int remaining = cap - out.size();
-                try (Cursor c = db.rawQuery(fileSql, new String[]{pattern, String.valueOf(remaining)})) {
+                try (Cursor c = db.rawQuery(hashSql, new String[]{pattern, String.valueOf(remaining)})) {
                     while (c.moveToNext() && out.size() < cap) {
-                        LocalSharedTorrent t = readRow(c);
-                        if (seen.add(t.infoHashHex())) {
-                            String mf = c.getString(c.getColumnIndexOrThrow("matched_file"));
-                            out.add(t.toBuilder().matchedFile(mf).build());
+                        String hash = c.getString(0);
+                        if (!seen.add(hash)) {
+                            continue;
                         }
+                        LocalSharedTorrent t = queryTorrentByHash(hash);
+                        if (t == null) {
+                            continue;
+                        }
+                        out.add(t.toBuilder().matchedFile(matchedLikeFile(hash, pattern)).build());
                     }
                 } catch (Throwable e) {
                     LOG.warn("search (LIKE file-path) failed for query: " + sanitized, e);
@@ -460,8 +479,11 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
         if (torrentRowid == null) {
             return;
         }
+        // Clean BOTH tables by stable rowid. FTS rows are deleted by their
+        // rowid list (read from the fts_rowid column) so no orphan postings
+        // survive the resync.
         if (fts5Available) {
-            db.delete(FILES_FTS, "torrent_rowid = ?", new String[]{String.valueOf(torrentRowid)});
+            deleteFilesFtsRows(torrentRowid);
         }
         db.delete(FILES_TABLE, "torrent_rowid = ?", new String[]{String.valueOf(torrentRowid)});
         List<FileEntry> entries = parseFilesJson(filesJson);
@@ -469,17 +491,155 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
             return;
         }
         for (FileEntry e : entries) {
-            ContentValues fileCv = new ContentValues(3);
-            fileCv.put("torrent_rowid", torrentRowid);
-            fileCv.put("file_path", e.path);
-            fileCv.put("file_size", e.size);
-            db.insert(FILES_TABLE, null, fileCv);
-
+            long ftsRowid = -1;
             if (fts5Available) {
                 ContentValues ftsCv = new ContentValues(2);
                 ftsCv.put("file_path", e.path);
                 ftsCv.put("torrent_rowid", torrentRowid);
-                db.insert(FILES_FTS, null, ftsCv);
+                ftsRowid = db.insert(FILES_FTS, null, ftsCv);
+            }
+            ContentValues fileCv = new ContentValues(4);
+            fileCv.put("torrent_rowid", torrentRowid);
+            fileCv.put("file_path", e.path);
+            fileCv.put("file_size", e.size);
+            if (ftsRowid >= 0) {
+                fileCv.put("fts_rowid", ftsRowid);
+            }
+            db.insert(FILES_TABLE, null, fileCv);
+        }
+    }
+
+    /**
+     * Delete indexed FTS rows for one torrent by their rowid list, read
+     * from the {@code fts_rowid} column of {@code shared_files}. Caller must
+     * hold {@code synchronized (db)} and check {@code fts5Available}.
+     */
+    private void deleteFilesFtsRows(long torrentRowid) {
+        List<Long> ftsRowids = new ArrayList<>();
+        try (Cursor c = db.rawQuery(
+                "SELECT fts_rowid FROM " + FILES_TABLE + " WHERE torrent_rowid = ? AND fts_rowid IS NOT NULL",
+                new String[]{String.valueOf(torrentRowid)})) {
+            while (c.moveToNext()) {
+                ftsRowids.add(c.getLong(0));
+            }
+        } catch (Throwable e) {
+            LOG.warn("deleteFilesFtsRows lookup failed for rowid " + torrentRowid, e);
+        }
+        for (Long ftsRowid : ftsRowids) {
+            try {
+                db.delete(FILES_FTS, "rowid = ?", new String[]{String.valueOf(ftsRowid)});
+            } catch (Throwable e) {
+                LOG.warn("deleteFilesFtsRows delete failed for fts rowid " + ftsRowid, e);
+            }
+        }
+    }
+
+    private LocalSharedTorrent queryTorrentByHash(String infoHashHex) {
+        try (Cursor c = db.query(TABLE, SELECT_COLUMNS, "info_hash = ?",
+                new String[]{normalizeHex(infoHashHex)}, null, null, null, "1")) {
+            if (c.moveToFirst()) {
+                return readRow(c);
+            }
+        } catch (Throwable e) {
+            LOG.warn("queryTorrentByHash failed for " + infoHashHex, e);
+        }
+        return null;
+    }
+
+    private String matchedFtsFile(String infoHashHex, String ftsQuery) {
+        if (!fts5Available) {
+            return null;
+        }
+        Long rowid = lookupRowid(infoHashHex);
+        if (rowid == null) {
+            return null;
+        }
+        try (Cursor c = db.rawQuery(
+                "SELECT file_path FROM " + FILES_FTS +
+                        " WHERE torrent_rowid = ? AND " + FILES_FTS + " MATCH ? LIMIT 1",
+                new String[]{String.valueOf(rowid), ftsQuery})) {
+            if (c.moveToFirst()) {
+                return c.getString(0);
+            }
+        } catch (Throwable e) {
+            LOG.warn("matchedFtsFile failed for " + infoHashHex, e);
+        }
+        return null;
+    }
+
+    private String matchedLikeFile(String infoHashHex, String pattern) {
+        Long rowid = lookupRowid(infoHashHex);
+        if (rowid == null) {
+            return null;
+        }
+        try (Cursor c = db.rawQuery(
+                "SELECT file_path FROM " + FILES_TABLE +
+                        " WHERE torrent_rowid = ? AND LOWER(file_path) LIKE ? ESCAPE '\\' LIMIT 1",
+                new String[]{String.valueOf(rowid), pattern})) {
+            if (c.moveToFirst()) {
+                return c.getString(0);
+            }
+        } catch (Throwable e) {
+            LOG.warn("matchedLikeFile failed for " + infoHashHex, e);
+        }
+        return null;
+    }
+
+    /**
+     * Recreate any missing FTS triggers. Databases created while
+     * {@code onCreate()} passed three CREATE TRIGGER statements in a single
+     * {@code execSQL()} call only installed the first trigger (Android's
+     * {@code execSQL} executes a single statement). Caller must hold
+     * {@code synchronized (db)}.
+     */
+    private void repairMissingTriggers() {
+        if (!fts5Available) {
+            return;
+        }
+        createTriggerIfMissing(TABLE + "_ai", CREATE_TRIGGER_AI_SQL);
+        createTriggerIfMissing(TABLE + "_ad", CREATE_TRIGGER_AD_SQL);
+        createTriggerIfMissing(TABLE + "_au", CREATE_TRIGGER_AU_SQL);
+    }
+
+    private void createTriggerIfMissing(String triggerName, String createSql) {
+        try (Cursor c = db.rawQuery(
+                "SELECT name FROM sqlite_master WHERE type='trigger' AND name=?",
+                new String[]{triggerName})) {
+            if (c.moveToFirst()) {
+                return;
+            }
+        } catch (Throwable e) {
+            LOG.warn("trigger lookup failed for " + triggerName, e);
+            return;
+        }
+        try {
+            db.execSQL(createSql);
+        } catch (Throwable e) {
+            LOG.warn("trigger repair failed for " + triggerName, e);
+        }
+    }
+
+    /**
+     * Delete file rows whose torrent_rowid matches no shared_torrents rowid.
+     * Caller must hold {@code synchronized (db)}.
+     */
+    private void repairOrphanFileRows() {
+        try {
+            db.delete(FILES_TABLE, "torrent_rowid NOT IN (SELECT rowid FROM " + TABLE + ")", null);
+        } catch (Throwable e) {
+            LOG.warn("repairOrphanFileRows failed", e);
+        }
+    }
+
+    boolean hasTrigger(String triggerName) {
+        synchronized (db) {
+            try (Cursor c = db.rawQuery(
+                    "SELECT name FROM sqlite_master WHERE type='trigger' AND name=?",
+                    new String[]{triggerName})) {
+                return c.moveToFirst();
+            } catch (Throwable e) {
+                LOG.warn("hasTrigger failed for " + triggerName, e);
+                return false;
             }
         }
     }
@@ -557,17 +717,27 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
         }
     }
 
+    /**
+     * Sanitize a free-form user query into a safe FTS5 MATCH expression.
+     * Keeps Unicode letters/digits (Character.isLetterOrDigit) so accented
+     * queries match the porter+unicode61 tokenizer; wraps each token in
+     * double quotes so FTS5 reserved words become literal text.
+     *
+     * <p><b>Safety note:</b> quoting is safe only because tokens contain
+     * letters/digits — no {@code "} or {@code *} can survive into them.
+     */
     private static String sanitizeFtsQuery(String raw) {
         if (raw == null) return "";
-        String lowered = raw.toLowerCase();
+        String lowered = raw.toLowerCase(Locale.ROOT);
         StringBuilder clean = new StringBuilder(lowered.length());
-        for (int i = 0; i < lowered.length(); i++) {
-            char ch = lowered.charAt(i);
-            if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) {
-                clean.append(ch);
+        for (int i = 0; i < lowered.length(); ) {
+            int cp = lowered.codePointAt(i);
+            if (Character.isLetterOrDigit(cp)) {
+                clean.appendCodePoint(cp);
             } else {
                 clean.append(' ');
             }
+            i += Character.charCount(cp);
         }
         String[] tokens = clean.toString().split("\\s+");
         StringBuilder out = new StringBuilder();
@@ -626,7 +796,9 @@ public final class AndroidLocalIndex implements LocalIndex, AutoCloseable {
             db.execSQL(CREATE_INDEX_LAST_PUBLISHED_SQL);
             try {
                 db.execSQL(CREATE_FTS_SQL);
-                db.execSQL(CREATE_TRIGGERS_SQL);
+                db.execSQL(CREATE_TRIGGER_AI_SQL);
+                db.execSQL(CREATE_TRIGGER_AD_SQL);
+                db.execSQL(CREATE_TRIGGER_AU_SQL);
                 db.execSQL(CREATE_FILES_FTS_SQL);
             } catch (Throwable t) {
                 LOG.warn("FTS5 not available, falling back to LIKE-based search", t);
