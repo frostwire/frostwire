@@ -286,4 +286,113 @@ public final class KarmaChain {
 
         return true;
     }
+
+    /**
+     * Validates a truncated tail [N..M] against its declared base: the
+     * seq of the first included entry and the entryHash of the entry
+     * immediately before it (or genesis for a complete chain).
+     *
+     * <p>Full-chain {@link #verify(List)} is untouched; this method
+     * exists so trimmed manifests that cannot start at seq 0 still
+     * get explicit verified-tail semantics: hash links within the
+     * tail, signatures, seq continuity from {@code baseSeq}, the
+     * first entry's prevHash equal to {@code basePrevHash}, and the
+     * same monotonicity/budget checks as the full chain. A tail must begin
+     * with an epoch commitment so its endorsement budget is independently
+     * verifiable without the omitted prefix.
+     */
+    public static boolean verifyTail(List<KarmaChainEntry> tail,
+                                     byte[] basePrevHash, long baseSeq) {
+        if (tail == null || tail.isEmpty()) {
+            return false;
+        }
+        if (basePrevHash == null || basePrevHash.length != 32) {
+            return false;
+        }
+        if (baseSeq < 0) {
+            return false;
+        }
+        if (tail.get(0).kind() != KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+            return false;
+        }
+        // First entry must anchor to the declared base.
+        if (!java.util.Arrays.equals(tail.get(0).prevHash(), basePrevHash)) {
+            return false;
+        }
+        if (tail.get(0).seq() != baseSeq) {
+            return false;
+        }
+
+        // All entries must share one endorser.
+        byte[] expectedPub = tail.get(0).endorserPub();
+        for (KarmaChainEntry e : tail) {
+            if (!java.util.Arrays.equals(e.endorserPub(), expectedPub)) {
+                return false;
+            }
+        }
+
+        // Signatures.
+        for (KarmaChainEntry e : tail) {
+            if (!e.verifySignature()) {
+                return false;
+            }
+        }
+
+        // Hash links within the tail.
+        for (int i = 1; i < tail.size(); i++) {
+            byte[] expectedPrev = tail.get(i - 1).entryHash();
+            if (!java.util.Arrays.equals(tail.get(i).prevHash(), expectedPrev)) {
+                return false;
+            }
+        }
+
+        // Seq continuity from baseSeq.
+        for (int i = 0; i < tail.size(); i++) {
+            if (tail.get(i).seq() != baseSeq + i) {
+                return false;
+            }
+        }
+
+        // Block heights monotonically non-decreasing.
+        for (int i = 1; i < tail.size(); i++) {
+            if (tail.get(i).blockHeight() < tail.get(i - 1).blockHeight()) {
+                return false;
+            }
+        }
+
+        // Epoch commitments in increasing order.
+        long lastEpoch = -1;
+        for (KarmaChainEntry e : tail) {
+            if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+                Long ep = e.epoch();
+                if (ep != null && ep <= lastEpoch) {
+                    return false;
+                }
+                if (ep != null) lastEpoch = ep;
+            }
+        }
+
+        // Endorsement budget per most-recent commitment in the tail.
+        long lastCommitmentEpoch = -1;
+        int endorsementsInCurrentEpoch = 0;
+        double energyAtCurrentEpoch = 0;
+        for (KarmaChainEntry e : tail) {
+            if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
+                lastCommitmentEpoch = e.epoch();
+                endorsementsInCurrentEpoch = 0;
+                energyAtCurrentEpoch = e.energy();
+            } else if (e.kind() == KarmaChainEntry.Kind.ENDORSEMENT) {
+                long entryEpoch = e.blockHeight() / KarmaConstants.BLOCKS_PER_EPOCH;
+                if (entryEpoch < lastCommitmentEpoch) {
+                    return false;
+                }
+                endorsementsInCurrentEpoch++;
+                if (endorsementsInCurrentEpoch > Math.floor(energyAtCurrentEpoch)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
