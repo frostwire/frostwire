@@ -354,8 +354,23 @@ public final class KarmaChainEntry {
      *
      * @return a new entry, or null if the dict is missing required
      *         fields or has the wrong shape for the declared kind
+     *
+     * <p>The per-entry {@code pub} field is optional: the publisher omits
+     * it (the manifest-level {@code pub} already carries the owner's key)
+     * and {@link #reconstruct(Map, byte[])} fills it from the manifest
+     * owner. The single-argument form requires it (legacy full dicts).
      */
     public static KarmaChainEntry reconstruct(Map<String, Entry> dict) {
+        return reconstruct(dict, null);
+    }
+
+    /**
+     * Reconstruct with a fallback endorser key for dicts whose
+     * {@code pub} field was omitted by the publisher.
+     *
+     * @param ownerPub manifest-level owner key, or null to require inline pub
+     */
+    public static KarmaChainEntry reconstruct(Map<String, Entry> dict, byte[] ownerPub) {
         if (dict == null) {
             return null;
         }
@@ -369,8 +384,13 @@ public final class KarmaChainEntry {
             Entry sigEntry = dict.get("s");
             if (kindEntry == null || seqEntry == null || bhEntry == null
                     || bkhEntry == null || phEntry == null
-                    || pubEntry == null || sigEntry == null) {
+                    || sigEntry == null) {
                 return null;
+            }
+            if (pubEntry == null) {
+                if (ownerPub == null || ownerPub.length != 32) {
+                    return null;
+                }
             }
 
             String kindCode = kindEntry.string();
@@ -387,9 +407,11 @@ public final class KarmaChainEntry {
             b.kind = kind;
             b.prevHash = Hex.decode(phEntry.string());
             b.seq = seqEntry.integer();
-            b.endorserPub = Base64.getDecoder().decode(pubEntry.string());
+            b.endorserPub = pubEntry != null
+                    ? Base64.getUrlDecoder().decode(pubEntry.string())
+                    : ownerPub.clone();
             b.timestamp = 0L;
-            b.signature = Base64.getDecoder().decode(sigEntry.string());
+            b.signature = Base64.getUrlDecoder().decode(sigEntry.string());
             b.blockHeight = bhEntry.integer();
             b.blockHash = Hex.decode(bkhEntry.string());
 
@@ -412,15 +434,17 @@ public final class KarmaChainEntry {
                 Entry ppEntry = dict.get("pp");
                 Entry ihEntry = dict.get("ih");
                 Entry sdEntry = dict.get("sd");
-                if (ppEntry == null || ihEntry == null || sdEntry == null) {
+                if (ppEntry == null || ihEntry == null) {
                     return null;
                 }
-                b.peerPub = Base64.getDecoder().decode(ppEntry.string());
+                b.peerPub = Base64.getUrlDecoder().decode(ppEntry.string());
                 b.infoHash = Hex.decode(ihEntry.string());
                 if (b.infoHash.length != 20) {
                     return null;
                 }
-                b.scoreDelta = (int) sdEntry.integer();
+                // Score deltas are always 1 in this protocol version; the
+                // publisher omits the field in that case to fit the DHT cap.
+                b.scoreDelta = sdEntry == null ? 1 : (int) sdEntry.integer();
             }
             return b.build();
         } catch (Throwable t) {
@@ -431,10 +455,14 @@ public final class KarmaChainEntry {
 
     /**
      * Verifies the Ed25519 signature against the canonical bytes.
+     *
+     * <p>Uses {@link IdentityKeys#softwareSignature} so verification
+     * accepts the same providers as signing (notably BouncyCastle on
+     * Android, where the default provider may reject software keys).
      */
     public boolean verifySignature() {
         try {
-            Signature verifier = Signature.getInstance("Ed25519");
+            Signature verifier = IdentityKeys.softwareSignature("Ed25519");
             verifier.initVerify(rawEd25519ToPublicKey(endorserPub));
             verifier.update(canonicalBytes());
             return verifier.verify(signature);
@@ -519,7 +547,7 @@ public final class KarmaChainEntry {
             map.put("bk", new Entry(Hex.encode(blockHash)));
             map.put("k", new Entry(kind.code));
             map.put("ph", new Entry(Hex.encode(prevHash)));
-            map.put("pub", new Entry(Base64.getEncoder().withoutPadding().encodeToString(endorserPub)));
+            map.put("pub", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(endorserPub)));
             map.put("seq", new Entry(seq));
             // Note: timestamp is NOT included in the signed canonical form
             // so that two entries created at the same logical state produce
@@ -531,7 +559,7 @@ public final class KarmaChainEntry {
                 map.put("ep", new Entry(epoch));
             } else { // ENDORSEMENT
                 map.put("ih", new Entry(Hex.encode(infoHash)));
-                map.put("pp", new Entry(Base64.getEncoder().withoutPadding().encodeToString(peerPub)));
+                map.put("pp", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub)));
                 map.put("sd", new Entry(scoreDelta));
             }
 
