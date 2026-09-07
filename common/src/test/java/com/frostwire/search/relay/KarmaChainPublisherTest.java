@@ -16,10 +16,12 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -111,7 +113,9 @@ class KarmaChainPublisherTest {
         assertEquals(1L, en.get("seq").integer());
         assertNotNull(en.get("pp"), "peerPub must be present for EN");
         assertNotNull(en.get("ih"), "infoHash must be present for EN");
-        assertNotNull(en.get("sd"), "scoreDelta must be present for EN");
+        // scoreDelta is omitted when 1 (the only value this version emits);
+        // reconstruct() defaults the missing field to 1.
+        assertNull(en.get("sd"), "scoreDelta 1 must be omitted to fit the DHT cap");
     }
 
     @Test
@@ -183,6 +187,86 @@ class KarmaChainPublisherTest {
         List<KarmaChainEntry> chain = writer.chain().entries();
         Entry manifest = publisher.buildManifest(chain);
         assertEquals((long) chain.size(), manifest.dictionary().get("len").integer());
+    }
+
+    @Test
+    void buildManifestRoundTripReconstructsEveryEntry() {
+        blockSource.withTip(288L).withBlock(288L, hashForHeight(288L));
+        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+
+        List<KarmaChainEntry> chain = writer.chain().entries();
+        assertTrue(chain.size() >= 2);
+        Entry manifest = publisher.buildManifest(chain);
+        assertNotNull(manifest);
+
+        List<Entry> dicts = manifest.dictionary().get("entries").list();
+        assertEquals(chain.size(), dicts.size(), "untruncated chain must round-trip fully");
+        byte[] ownerPub = identity.ed25519PubRaw();
+        for (int i = 0; i < chain.size(); i++) {
+            KarmaChainEntry original = chain.get(i);
+            KarmaChainEntry reconstructed =
+                    KarmaChainEntry.reconstruct(dicts.get(i).dictionary(), ownerPub);
+            assertNotNull(reconstructed, "entry " + i + " must carry all reader-required fields");
+            assertEquals(original.kind(), reconstructed.kind());
+            assertEquals(original.seq(), reconstructed.seq());
+            assertEquals(original.blockHeight(), reconstructed.blockHeight());
+            assertArrayEquals(original.blockHash(), reconstructed.blockHash());
+            assertArrayEquals(original.prevHash(), reconstructed.prevHash());
+            assertArrayEquals(original.endorserPub(), reconstructed.endorserPub());
+            assertArrayEquals(original.signature(), reconstructed.signature());
+            assertTrue(reconstructed.verifySignature(),
+                    "reconstructed entry " + i + " signature must verify");
+        }
+        byte[] verifyOwner = identity.ed25519PubRaw();
+        assertTrue(KarmaChain.verify(
+                dicts.stream().map(d -> KarmaChainEntry.reconstruct(d.dictionary(), verifyOwner))
+                        .collect(Collectors.toList())),
+                "full publisher output must pass full-chain verify");
+    }
+
+    @Test
+    void truncatedManifestCarriesCorrectBase() {
+        blockSource.withTip(144L).withBlock(144L, hashForHeight(144L));
+        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+        for (int i = 1; i < 12; i++) {
+            long tip = 144L * (i + 1);
+            blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+        }
+
+        List<KarmaChainEntry> chain = writer.chain().entries();
+        Entry manifest = publisher.buildManifest(chain);
+        assertNotNull(manifest);
+        Map<String, Entry> dict = manifest.dictionary();
+        List<Entry> included = dict.get("entries").list();
+        assertTrue(included.size() < chain.size(), "test requires truncation");
+        assertNotNull(dict.get("base"), "truncated manifest must carry base");
+
+        Map<String, Entry> base = dict.get("base").dictionary();
+        KarmaChainEntry firstIncluded =
+                KarmaChainEntry.reconstruct(included.get(0).dictionary(), identity.ed25519PubRaw());
+        assertNotNull(firstIncluded);
+        assertEquals(firstIncluded.seq(), base.get("seq").integer());
+        assertEquals(Hex.encode(firstIncluded.prevHash()), base.get("ph").string());
+
+        // The base prevHash must equal the entryHash of the chain entry
+        // immediately before the first included entry (never genesis here).
+        KarmaChainEntry predecessor = chain.get((int) firstIncluded.seq() - 1);
+        assertEquals(Hex.encode(predecessor.entryHash()), base.get("ph").string());
+
+        java.util.List<KarmaChainEntry> tail = new ArrayList<>();
+        byte[] tailOwner = identity.ed25519PubRaw();
+        for (Entry d : included) {
+            tail.add(KarmaChainEntry.reconstruct(d.dictionary(), tailOwner));
+        }
+        assertTrue(KarmaChain.verifyTail(tail,
+                Hex.decode(base.get("ph").string()), base.get("seq").integer()),
+                "truncated tail must pass verifyTail with its base");
+
+        KarmaChainEntry endorsement = tail.get(1);
+        assertFalse(KarmaChain.verifyTail(java.util.Collections.singletonList(endorsement),
+                        endorsement.prevHash(), endorsement.seq()),
+                "endorsement-only tails must not bypass energy-budget verification");
     }
 
     // --- helpers ---
