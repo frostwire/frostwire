@@ -580,7 +580,7 @@ class LocalSharedTorrentSearchPerformerTest {
       manifest.put(
           "pub",
           new com.frostwire.jlibtorrent.Entry(
-              java.util.Base64.getEncoder().withoutPadding().encodeToString(ownerPub)));
+              java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(ownerPub)));
       manifest.put("len", new com.frostwire.jlibtorrent.Entry((long) (endorsementCount + 1)));
       manifest.put(
           "head", new com.frostwire.jlibtorrent.Entry(com.frostwire.util.Hex.encode(prev)));
@@ -602,11 +602,11 @@ class LocalSharedTorrentSearchPerformerTest {
     m.put(
         "pub",
         new com.frostwire.jlibtorrent.Entry(
-            java.util.Base64.getEncoder().withoutPadding().encodeToString(e.endorserPub())));
+            java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(e.endorserPub())));
     m.put(
         "s",
         new com.frostwire.jlibtorrent.Entry(
-            java.util.Base64.getEncoder().withoutPadding().encodeToString(e.signature())));
+            java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(e.signature())));
     if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
       m.put("ep", new com.frostwire.jlibtorrent.Entry(e.epoch()));
       m.put(
@@ -617,7 +617,7 @@ class LocalSharedTorrentSearchPerformerTest {
       m.put(
           "pp",
           new com.frostwire.jlibtorrent.Entry(
-              java.util.Base64.getEncoder().withoutPadding().encodeToString(e.peerPub())));
+              java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(e.peerPub())));
       m.put("ih", new com.frostwire.jlibtorrent.Entry(com.frostwire.util.Hex.encode(e.infoHash())));
       m.put("sd", new com.frostwire.jlibtorrent.Entry(e.scoreDelta().longValue()));
     }
