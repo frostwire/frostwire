@@ -117,13 +117,16 @@ class KarmaChainEntryTest {
                 keyPair.getPrivate());
         // The signature is over the canonical bytes, which don't include the signature.
         // Tampering with the signature directly should fail verification.
-        byte[] tamperedSig = entry.signature().clone();
+        byte[] tamperedSig = entry.signature();
         tamperedSig[0] ^= 1;
-        // Build a new entry with the tampered signature
-        // (We can't easily reconstruct the entry, so test that verify works on valid
-        //  and that a fresh creation always verifies.)
+        Map<String, Entry> tamperedDict = publishDictOf(entry);
+        tamperedDict.put("s", new Entry(Base64.getUrlEncoder()
+                .withoutPadding().encodeToString(tamperedSig)));
+        KarmaChainEntry tampered = KarmaChainEntry.reconstruct(tamperedDict);
+
         assertTrue(entry.verifySignature(), "Valid entry must verify");
-        assertNotEquals(0, tamperedSig[0], "Sanity: we actually changed a bit");
+        assertNotNull(tampered);
+        assertFalse(tampered.verifySignature(), "Tampered signature must not verify");
     }
 
     @Test
@@ -326,9 +329,9 @@ class KarmaChainEntryTest {
         dict.put("bh", new Entry(850000L));
         dict.put("bkh", new Entry(com.frostwire.util.Hex.encode(block.hash())));
         dict.put("ph", new Entry(com.frostwire.util.Hex.encode(KarmaChainEntry.GENESIS_PREV_HASH)));
-        dict.put("pub", new Entry(Base64.getEncoder()
+        dict.put("pub", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(pubRaw)));
-        dict.put("s", new Entry(Base64.getEncoder()
+        dict.put("s", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(new byte[64])));
         return dict;
     }
@@ -340,16 +343,16 @@ class KarmaChainEntryTest {
         dict.put("bh", new Entry(e.blockHeight()));
         dict.put("bkh", new Entry(com.frostwire.util.Hex.encode(e.blockHash())));
         dict.put("ph", new Entry(com.frostwire.util.Hex.encode(e.prevHash())));
-        dict.put("pub", new Entry(Base64.getEncoder()
+        dict.put("pub", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(e.endorserPub())));
-        dict.put("s", new Entry(Base64.getEncoder()
+        dict.put("s", new Entry(Base64.getUrlEncoder()
                 .withoutPadding().encodeToString(e.signature())));
         if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
             dict.put("ep", new Entry(e.epoch()));
             dict.put("en", new Entry(String.format(java.util.Locale.ROOT,
                     "%.3f", e.energy())));
         } else {
-            dict.put("pp", new Entry(Base64.getEncoder()
+            dict.put("pp", new Entry(Base64.getUrlEncoder()
                     .withoutPadding().encodeToString(e.peerPub())));
             dict.put("ih", new Entry(com.frostwire.util.Hex.encode(e.infoHash())));
             dict.put("sd", new Entry(e.scoreDelta().longValue()));
