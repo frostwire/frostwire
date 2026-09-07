@@ -714,9 +714,63 @@ class LocalIndexTableTest {
                     "migration must backfill shared_files from files_json");
 
             List<LocalSharedTorrent> results = reopened.search("v2_unique_readme", 10);
-            assertEquals(1, results.size(), "file-path search must work after v2->v3 migration");
+            assertEquals(1, results.size(), "file-path search must work after v2->v4 migration");
             assertNotNull(results.get(0).matchedFile());
             assertTrue(results.get(0).matchedFile().contains("v2_unique_readme.txt"));
+        } finally {
+            reopened.close();
+        }
+    }
+
+    @Test
+    void migrationFromV3AddsFtsRowidAndRepairsOrphans() throws Exception {
+        File v3Db = new File(tempDir, "v3-migrate-test.db");
+        deleteSqliteDatabase(v3Db);
+        seedV2DatabaseWithTorrent(v3Db,
+                "legacy-v3-torrent",
+                "[{\"path\":\"v3_unique_readme.txt\",\"size\":42}]");
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + v3Db.getAbsolutePath());
+             java.sql.Statement s = c.createStatement()) {
+            s.execute("UPDATE schema_meta SET value = '3' WHERE key = 'version'");
+            // Simulate the v3 file-index shape: no fts_rowid column, with
+            // one healthy row plus one orphan row (bogus torrent_rowid).
+            s.execute("CREATE TABLE shared_files ("
+                    + "torrent_rowid INTEGER NOT NULL, "
+                    + "file_path TEXT NOT NULL, "
+                    + "file_size INTEGER NOT NULL DEFAULT 0)");
+            s.execute("CREATE INDEX idx_shared_files_torrent ON shared_files (torrent_rowid)");
+            s.execute("CREATE VIRTUAL TABLE shared_files_fts USING fts5("
+                    + "file_path, torrent_rowid UNINDEXED, "
+                    + "tokenize='porter unicode61')");
+            long torrentRowid;
+            try (java.sql.ResultSet rs = s.executeQuery("SELECT rowid FROM shared_torrents LIMIT 1")) {
+                assertTrue(rs.next(), "precondition: seeded torrent row exists");
+                torrentRowid = rs.getLong(1);
+            }
+            s.execute("INSERT INTO shared_files (torrent_rowid, file_path, file_size) VALUES ("
+                    + torrentRowid + ", 'v3_unique_readme.txt', 42)");
+            s.execute("INSERT INTO shared_files_fts (file_path, torrent_rowid) VALUES ("
+                    + "'v3_unique_readme.txt', " + torrentRowid + ")");
+            s.execute("INSERT INTO shared_files (torrent_rowid, file_path, file_size) VALUES ("
+                    + "999999999, 'v3_orphan_file.txt', 1)");
+            s.execute("INSERT INTO shared_files_fts (file_path, torrent_rowid) VALUES ("
+                    + "'v3_orphan_file.txt', 999999999)");
+        }
+        assertEquals("3", readSchemaVersion(v3Db), "precondition: seeded database must be schema v3");
+        assertEquals(2, countSharedFilesRows(v3Db), "precondition: v3 db has healthy + orphan rows");
+
+        LocalIndexTable reopened = LocalIndexTable.open(v3Db);
+        try {
+            assertEquals(String.valueOf(LocalIndexTable.SCHEMA_VERSION), readSchemaVersion(v3Db),
+                    "schema must be bumped to v" + LocalIndexTable.SCHEMA_VERSION);
+            assertEquals(1, countSharedFilesRows(v3Db),
+                    "migration must rebuild from files_json and drop the orphan row");
+            List<LocalSharedTorrent> results = reopened.search("v3_unique_readme", 10);
+            assertEquals(1, results.size(), "healthy file must stay searchable after v3->v4 migration");
+            assertNotNull(results.get(0).matchedFile());
+            assertEquals(0, reopened.search("v3_orphan_file", 10).size(),
+                    "orphan file must not match after v3->v4 migration");
         } finally {
             reopened.close();
         }
@@ -818,6 +872,140 @@ class LocalIndexTableTest {
             assertEquals(String.valueOf(LocalIndexTable.SCHEMA_VERSION), rs.getString(1),
                     "SCHEMA_VERSION must be " + LocalIndexTable.SCHEMA_VERSION + " after init");
         }
+    }
+
+    @Test
+    void updateTorrentNameThenSearchFileCorrectness() {
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles(
+                "OriginalName",
+                "[{\"path\":\"original_file.txt\",\"size\":100}]",
+                now);
+        table.upsert(t);
+
+        assertEquals(1, table.search("original_file", 10).size());
+
+        LocalSharedTorrent renamed = t.toBuilder()
+                .name("RenamedTorrent")
+                .filesJson("[{\"path\":\"renamed_file.txt\",\"size\":200}]")
+                .lastSeenAt(now + 100)
+                .build();
+        table.upsert(renamed);
+
+        assertEquals(0, table.search("original_file", 10).size(),
+                "Old filename must no longer match after rename + files update");
+        List<LocalSharedTorrent> results = table.search("renamed_file", 10);
+        assertEquals(1, results.size());
+        assertEquals("RenamedTorrent", results.get(0).name());
+        assertNotNull(results.get(0).matchedFile());
+    }
+
+    @Test
+    void deleteReinsertRowidReuseNoFalseMatch() throws Exception {
+        long now = 1_000_000L;
+        LocalSharedTorrent doomed = torrentWithFiles(
+                "DoomedTorrent",
+                "[{\"path\":\"doomed_unique_file.txt\",\"size\":100}]",
+                now);
+        table.upsert(doomed);
+        assertEquals(1, table.search("doomed_unique_file", 10).size());
+
+        table.delete(hexOf(doomed.infoHash()));
+
+        // Reinsert a different torrent (SQLite may reuse the freed rowid).
+        LocalSharedTorrent replacement = torrentWithFiles(
+                "ReplacementTorrent",
+                "[{\"path\":\"replacement_unique_file.txt\",\"size\":100}]",
+                now + 50);
+        table.upsert(replacement);
+
+        assertEquals(0, table.search("doomed_unique_file", 10).size(),
+                "Deleted torrent's file must not match after rowid reuse");
+        assertEquals(1, table.search("replacement_unique_file", 10).size());
+    }
+
+    @Test
+    void unicodeQueryReturnsAccentedAndCjkTorrent() {
+        long now = 1_000_000L;
+        table.upsert(torrentWithFiles(
+                "Caf\u00e9 M\u00fcnchen Reisef\u00fchrer",
+                "[{\"path\":\"caf\u00e9_guide.pdf\",\"size\":100}]",
+                now));
+        // CJK run separated by a space so the unicode61 tokenizer emits
+        // a standalone token (a bare "東京旅行ガイド" run would be one
+        // token and would not match a "東京" phrase query).
+        table.upsert(torrentWithFiles(
+                "\u6771\u4eac \u65c5\u884c\u30ac\u30a4\u30c9",
+                "[{\"path\":\"\u6771\u4eac/\u8cc7\u6599.txt\",\"size\":100}]",
+                now));
+
+        List<LocalSharedTorrent> accented = table.search("caf\u00e9", 10);
+        assertEquals(1, accented.size(), "Accented query must match accented torrent");
+        assertTrue(accented.get(0).name().contains("Caf\u00e9"));
+
+        List<LocalSharedTorrent> cjk = table.search("\u6771\u4eac", 10);
+        assertEquals(1, cjk.size(), "CJK query must match CJK torrent");
+    }
+
+    @Test
+    void multiFileTorrentDoesNotHideSecondTorrent() {
+        long now = 1_000_000L;
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < 20; i++) {
+            if (i > 0) sb.append(',');
+            sb.append("{\"path\":\"starvationkeyword_part").append(i).append(".txt\",\"size\":100}");
+        }
+        sb.append(']');
+        table.upsert(torrentWithFiles("Torrent ManyFiles", sb.toString(), now));
+        table.upsert(torrentWithFiles(
+                "Torrent SingleFile",
+                "[{\"path\":\"starvationkeyword_single.txt\",\"size\":100}]",
+                now));
+
+        List<LocalSharedTorrent> results = table.search("starvationkeyword", 2);
+        assertEquals(2, results.size(),
+                "One torrent with many matching files must not starve the second torrent");
+        java.util.Set<String> names = new java.util.HashSet<>();
+        for (LocalSharedTorrent r : results) {
+            names.add(r.name());
+            assertNotNull(r.matchedFile());
+        }
+        assertTrue(names.contains("Torrent ManyFiles"));
+        assertTrue(names.contains("Torrent SingleFile"));
+    }
+
+    @Test
+    void orphanRepairRemovesDanglingFileRows() throws Exception {
+        long now = 1_000_000L;
+        LocalSharedTorrent t = torrentWithFiles(
+                "HealthyTorrent",
+                "[{\"path\":\"healthy_file.txt\",\"size\":100}]",
+                now);
+        table.upsert(t);
+        int healthyFiles = countSharedFilesRows();
+        assertTrue(healthyFiles >= 1, "precondition: healthy file rows exist");
+
+        // Inject dangling rows keyed by a torrent_rowid that matches no
+        // rowid in shared_torrents (simulates pre-fix REPLACE orphan damage).
+        long bogusRowid = 999_999_999L;
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:sqlite:" + dbFile.getAbsolutePath());
+             java.sql.Statement s = c.createStatement()) {
+            s.execute("INSERT INTO shared_files (torrent_rowid, file_path, file_size) VALUES ("
+                    + bogusRowid + ", 'orphan_dangling_file.txt', 1)");
+            s.execute("INSERT INTO shared_files_fts (file_path, torrent_rowid) VALUES ("
+                    + "'orphan_dangling_file.txt', " + bogusRowid + ")");
+        }
+        assertEquals(healthyFiles + 1, countSharedFilesRows(), "precondition: orphan row injected");
+
+        table.repairOrphanFileRows();
+
+        assertEquals(healthyFiles, countSharedFilesRows(),
+                "Orphan repair must remove dangling shared_files rows");
+        assertEquals(0, table.search("orphan_dangling_file", 10).size(),
+                "Orphan FTS entries must not match after repair");
+        assertEquals(1, table.search("healthy_file", 10).size(),
+                "Healthy rows must survive orphan repair");
     }
 
     private int countSharedFilesRows() throws Exception {
