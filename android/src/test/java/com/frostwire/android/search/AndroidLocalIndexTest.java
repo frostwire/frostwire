@@ -7,6 +7,7 @@
 
 package com.frostwire.android.search;
 
+import android.app.Application;
 import android.content.Context;
 
 import com.frostwire.search.relay.LocalSharedTorrent;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 34)
+@Config(sdk = 34, application = Application.class)
 public class AndroidLocalIndexTest {
 
     private AndroidLocalIndex index;
