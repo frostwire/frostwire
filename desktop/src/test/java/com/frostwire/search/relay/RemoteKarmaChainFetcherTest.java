@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.util.Hex;
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -25,15 +24,11 @@ import org.junit.jupiter.api.Test;
 
 class RemoteKarmaChainFetcherTest {
 
-  private static KeyPair keyPair;
-  private static byte[] pubRaw;
   private static byte[] peerPub;
   private static BitcoinBlockReference block;
 
   @BeforeAll
   static void setUpClass() throws Exception {
-    keyPair = java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-    pubRaw = IdentityRecord.extractRawEd25519(keyPair.getPublic());
     peerPub = new byte[32];
     for (int i = 0; i < 32; i++) peerPub[i] = (byte) (i + 1);
     byte[] hash = new byte[32];
@@ -81,7 +76,7 @@ class RemoteKarmaChainFetcherTest {
   }
 
   @Test
-  void fetchChainReturnsNullWhenChainFailsVerification() {
+  void fetchChainReturnsNullWhenChainFailsVerification() throws Exception {
     // All-zero signature: verifySignature will return false, so
     // KarmaChain.verify will reject the chain.
     Map<String, Object> manifest = buildManifestWithBadSignature();
@@ -92,34 +87,32 @@ class RemoteKarmaChainFetcherTest {
   }
 
   @Test
-  void fetchChainReturnsChainWhenVerified() {
-    // Build a real 2-entry chain (1 commitment + 1 endorsement),
-    // sign both, build the manifest, and verify the fetcher returns it.
-    KarmaChainEntry ec =
-        KarmaChainEntry.createEpochCommitment(
-            KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw, block, 5.0, keyPair.getPrivate());
-    KarmaChainEntry en =
-        KarmaChainEntry.createEndorsement(
-            ec.entryHash(), 1, pubRaw, block, peerPub, new byte[20], 1, keyPair.getPrivate());
-
-    Map<String, Object> manifest = new HashMap<>();
-    manifest.put("v", new Entry(1L));
-    manifest.put("len", new Entry(2L));
-    manifest.put("head", new Entry(Hex.encode(en.entryHash())));
-    manifest.put("ts", new Entry(0L));
-    List<Entry> entries = new ArrayList<>();
-    entries.add(Entry.fromMap(publishDictOf(ec)));
-    entries.add(Entry.fromMap(publishDictOf(en)));
-    manifest.put("entries", Entry.fromList(entries));
+  void fetchChainReturnsChainWhenVerified() throws Exception {
+    // Feed ACTUAL publisher output: build a real KarmaChainWriter chain,
+    // publish its manifest, feed it through the fetcher with a fake source.
+    FakeBlockSource blockSource = new FakeBlockSource()
+        .withTip(144L).withBlock(144L, hashForHeight(144L));
+    IdentityKeys publisherIdentity = IdentityKeys.generate(0);
+    byte[] ownerPub = publisherIdentity.ed25519PubRaw();
+    InMemoryStore store = new InMemoryStore(ownerPub);
+    KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
+    writer.onDownloadCompletedFromPeer(peerPub, new byte[20]);
+    List<KarmaChainEntry> published = writer.chain().entries();
+    assertTrue(published.size() >= 2, "writer must produce commitment + endorsement");
+    KarmaChainPublisher publisher =
+        new KarmaChainPublisher(writer, publisherIdentity);
+    Entry manifest = publisher.buildManifest(published);
+    assertNotNull(manifest, "real publisher must emit a manifest");
+    writer.close();
 
     FakeSource source = new FakeSource();
-    source.nextManifest = Entry.fromMap(manifest);
+    source.nextManifest = manifest;
     AtomicLong now = new AtomicLong();
     RemoteKarmaChainFetcher fetcher = new RemoteKarmaChainFetcher(source, 4, 100, now::get);
 
-    List<KarmaChainEntry> fetched = fetcher.fetchChain(pubRaw);
-    assertNotNull(fetched);
-    assertEquals(2, fetched.size());
+    List<KarmaChainEntry> fetched = fetcher.fetchChain(ownerPub);
+    assertNotNull(fetched, "actual publisher output must verify end-to-end");
+    assertEquals(published.size(), fetched.size());
     assertEquals(KarmaChainEntry.Kind.EPOCH_COMMITMENT, fetched.get(0).kind());
     assertEquals(KarmaChainEntry.Kind.ENDORSEMENT, fetched.get(1).kind());
     assertEquals(1, fetcher.cacheSize());
@@ -127,7 +120,83 @@ class RemoteKarmaChainFetcherTest {
     assertThrows(UnsupportedOperationException.class, fetched::clear);
     source.nextManifest = null;
     now.addAndGet(java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(101));
-    assertNull(fetcher.fetchChain(pubRaw), "expired positive trust must be refreshed");
+    assertNull(fetcher.fetchChain(ownerPub), "expired positive trust must be refreshed");
+    assertEquals(0, fetcher.cacheSize());
+    fetcher.close();
+  }
+
+  @Test
+  void fetchChainAcceptsTruncatedTailManifest() throws Exception {
+    // Grow a chain until the publisher trims the tail; the emitted
+    // manifest carries base seq/hash and must pass verifyTail.
+    FakeBlockSource blockSource = new FakeBlockSource();
+    IdentityKeys publisherIdentity = IdentityKeys.generate(0);
+    byte[] ownerPub = publisherIdentity.ed25519PubRaw();
+    InMemoryStore store = new InMemoryStore(ownerPub);
+    KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
+    byte[] infoHash = new byte[20];
+    for (int i = 0; i < 12; i++) {
+      long tip = 144L * (i + 1);
+      blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      writer.onDownloadCompletedFromPeer(peerPub, infoHash);
+    }
+    List<KarmaChainEntry> full = writer.chain().entries();
+    KarmaChainPublisher publisher = new KarmaChainPublisher(writer, publisherIdentity);
+    Entry manifest = publisher.buildManifest(full);
+    assertNotNull(manifest);
+    int included = manifest.dictionary().get("entries").list().size();
+    assertTrue(included < full.size(), "test requires a trimmed tail");
+    assertNotNull(manifest.dictionary().get("base"), "trimmed manifest must carry base");
+    writer.close();
+
+    FakeSource source = new FakeSource();
+    source.nextManifest = manifest;
+    RemoteKarmaChainFetcher fetcher = new RemoteKarmaChainFetcher(source);
+    List<KarmaChainEntry> fetched = fetcher.fetchChain(ownerPub);
+    assertNotNull(fetched, "trimmed tail with correct base must verify");
+    assertEquals(included, fetched.size());
+    fetcher.close();
+  }
+
+  @Test
+  void fetchChainRejectsTamperedBase() throws Exception {
+    FakeBlockSource blockSource = new FakeBlockSource();
+    IdentityKeys publisherIdentity = IdentityKeys.generate(0);
+    byte[] ownerPub = publisherIdentity.ed25519PubRaw();
+    InMemoryStore store = new InMemoryStore(ownerPub);
+    KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
+    byte[] infoHash = new byte[20];
+    for (int i = 0; i < 12; i++) {
+      long tip = 144L * (i + 1);
+      blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      writer.onDownloadCompletedFromPeer(peerPub, infoHash);
+    }
+    List<KarmaChainEntry> full = writer.chain().entries();
+    KarmaChainPublisher publisher = new KarmaChainPublisher(writer, publisherIdentity);
+    Entry manifest = publisher.buildManifest(full);
+    assertNotNull(manifest);
+    assertNotNull(manifest.dictionary().get("base"), "test requires a trimmed tail");
+    writer.close();
+
+    // Tamper the base prevHash: verification must fail closed.
+    Map<String, Entry> original = manifest.dictionary();
+    Map<String, Object> tampered = new HashMap<>();
+    tampered.put("v", original.get("v"));
+    tampered.put("pub", original.get("pub"));
+    tampered.put("len", original.get("len"));
+    tampered.put("head", original.get("head"));
+    tampered.put("entries", original.get("entries"));
+    tampered.put("ts", original.get("ts"));
+    Map<String, Object> badBase = new HashMap<>();
+    Map<String, Entry> base = manifest.dictionary().get("base").dictionary();
+    badBase.put("seq", new Entry(base.get("seq").integer()));
+    badBase.put("ph", new Entry(Hex.encode(new byte[32])));
+    tampered.put("base", Entry.fromMap(badBase));
+
+    FakeSource source = new FakeSource();
+    source.nextManifest = Entry.fromMap(tampered);
+    RemoteKarmaChainFetcher fetcher = new RemoteKarmaChainFetcher(source);
+    assertNull(fetcher.fetchChain(ownerPub), "tampered base must be rejected");
     assertEquals(0, fetcher.cacheSize());
     fetcher.close();
   }
@@ -185,49 +254,25 @@ class RemoteKarmaChainFetcherTest {
   }
 
   @Test
-  void peerKarmaCacheCountsEndorsements() {
-    List<KarmaChainEntry> chain = new ArrayList<>();
-    chain.add(
-        KarmaChainEntry.createEpochCommitment(
-            KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw, block, 5.0, keyPair.getPrivate()));
-    chain.add(
-        KarmaChainEntry.createEndorsement(
-            chain.get(0).entryHash(),
-            1,
-            pubRaw,
-            block,
-            peerPub,
-            new byte[20],
-            1,
-            keyPair.getPrivate()));
-    chain.add(
-        KarmaChainEntry.createEndorsement(
-            chain.get(1).entryHash(),
-            2,
-            pubRaw,
-            block,
-            peerPub,
-            new byte[20],
-            1,
-            keyPair.getPrivate()));
-
-    // Build a verified manifest so the fetcher can reconstruct + verify.
-    Map<String, Object> manifest = new HashMap<>();
-    manifest.put("v", new Entry(1L));
-    manifest.put("len", new Entry(3L));
-    manifest.put("head", new Entry(Hex.encode(chain.get(2).entryHash())));
-    manifest.put("ts", new Entry(0L));
-    List<Entry> entries = new ArrayList<>();
-    for (KarmaChainEntry e : chain) {
-      entries.add(Entry.fromMap(publishDictOf(e)));
-    }
-    manifest.put("entries", Entry.fromList(entries));
+  void peerKarmaCacheCountsEndorsements() throws Exception {
+    FakeBlockSource blockSource = new FakeBlockSource()
+        .withTip(144L).withBlock(144L, hashForHeight(144L));
+    IdentityKeys publisherIdentity = IdentityKeys.generate(0);
+    byte[] ownerPub = publisherIdentity.ed25519PubRaw();
+    InMemoryStore store = new InMemoryStore(ownerPub);
+    KarmaChainWriter writer = new KarmaChainWriter(publisherIdentity, blockSource, store);
+    // One endorsement produces the smallest verifiable published chain: EC + EN.
+    writer.onDownloadCompletedFromPeer(peerPub, new byte[20]);
+    List<KarmaChainEntry> chain = new ArrayList<>(writer.chain().entries());
+    Entry manifest = new KarmaChainPublisher(writer, publisherIdentity).buildManifest(chain);
+    assertNotNull(manifest, "cache test must use real publisher output");
+    writer.close();
 
     FakeSource source = new FakeSource();
-    source.nextManifest = Entry.fromMap(manifest);
+    source.nextManifest = manifest;
     PeerKarmaCache cache = new PeerKarmaCache(new RemoteKarmaChainFetcher(source));
 
-    assertEquals(2, cache.getKarma(pubRaw), "score counts ENDORSEMENT entries only");
+    assertEquals(1, cache.getKarma(ownerPub), "score counts ENDORSEMENT entries only");
   }
 
   @Test
@@ -255,7 +300,64 @@ class RemoteKarmaChainFetcherTest {
 
   // --- helpers ---
 
-  private static Map<String, Object> buildManifestWithBadSignature() {
+  private static final class InMemoryStore implements KarmaChainStore {
+    private final KarmaChain chain;
+
+    InMemoryStore(byte[] ownerPub) {
+      this.chain = new KarmaChain(ownerPub);
+    }
+
+    @Override
+    public void append(KarmaChainEntry entry) {
+      // KarmaChainWriter already appended to its in-memory chain; mirror it here.
+    }
+
+    @Override
+    public KarmaChain loadChain(byte[] ownerPub) {
+      return chain;
+    }
+
+    @Override
+    public void close() {
+    }
+  }
+
+  private static final class FakeBlockSource implements BlockHeaderSource {
+    private final AtomicLong tip = new AtomicLong(-1);
+    private final Map<Long, byte[]> blocks = new HashMap<>();
+
+    FakeBlockSource withTip(long height) {
+      tip.set(height);
+      return this;
+    }
+
+    FakeBlockSource withBlock(long height, byte[] hash) {
+      blocks.put(height, hash.clone());
+      return this;
+    }
+
+    @Override
+    public BitcoinBlockReference getBlock(long height) {
+      byte[] hash = blocks.get(height);
+      return hash == null ? null : new BitcoinBlockReference(height, hash);
+    }
+
+    @Override
+    public long getChainTipHeight() {
+      return tip.get();
+    }
+  }
+
+  private static byte[] hashForHeight(long height) {
+    byte[] hash = new byte[32];
+    for (int i = 0; i < 8; i++) {
+      hash[i] = (byte) (height >>> (8 * (7 - i)));
+    }
+    return hash;
+  }
+
+  private static Map<String, Object> buildManifestWithBadSignature() throws Exception {
+    byte[] ownerPub = IdentityKeys.generate(0).ed25519PubRaw();
     Map<String, Object> manifest = new HashMap<>();
     manifest.put("v", new Entry(1L));
     manifest.put("len", new Entry(1L));
@@ -268,32 +370,12 @@ class RemoteKarmaChainFetcherTest {
     entry.put("bh", new Entry(850000L));
     entry.put("bkh", new Entry(Hex.encode(block.hash())));
     entry.put("ph", new Entry(Hex.encode(KarmaChainEntry.GENESIS_PREV_HASH)));
-    entry.put("pub", new Entry(Base64.getEncoder().withoutPadding().encodeToString(pubRaw)));
-    entry.put("s", new Entry(Base64.getEncoder().withoutPadding().encodeToString(new byte[64])));
+    entry.put("pub", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(ownerPub)));
+    entry.put("s", new Entry(Base64.getUrlEncoder().withoutPadding().encodeToString(new byte[64])));
     entry.put("ep", new Entry(1L));
     entry.put("en", new Entry("5.00"));
     manifest.put("entries", Entry.fromList(List.of(Entry.fromMap(entry))));
     return manifest;
-  }
-
-  private static Map<String, Object> publishDictOf(KarmaChainEntry e) {
-    Map<String, Object> m = new HashMap<>();
-    m.put("k", new Entry(e.kind().code()));
-    m.put("seq", new Entry(e.seq()));
-    m.put("bh", new Entry(e.blockHeight()));
-    m.put("bkh", new Entry(Hex.encode(e.blockHash())));
-    m.put("ph", new Entry(Hex.encode(e.prevHash())));
-    m.put("pub", new Entry(Base64.getEncoder().withoutPadding().encodeToString(e.endorserPub())));
-    m.put("s", new Entry(Base64.getEncoder().withoutPadding().encodeToString(e.signature())));
-    if (e.kind() == KarmaChainEntry.Kind.EPOCH_COMMITMENT) {
-      m.put("ep", new Entry(e.epoch()));
-      m.put("en", new Entry(String.format(java.util.Locale.ROOT, "%.3f", e.energy())));
-    } else {
-      m.put("pp", new Entry(Base64.getEncoder().withoutPadding().encodeToString(e.peerPub())));
-      m.put("ih", new Entry(Hex.encode(e.infoHash())));
-      m.put("sd", new Entry(e.scoreDelta().longValue()));
-    }
-    return m;
   }
 
   private static final class FakeSource implements KarmaChainSource {
