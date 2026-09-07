@@ -324,13 +324,37 @@ public final class RemoteKarmaChainFetcher implements AutoCloseable {
             } catch (Throwable t) {
                 return null;
             }
-            KarmaChainEntry entry = KarmaChainEntry.reconstruct(entryDict);
+            KarmaChainEntry entry = KarmaChainEntry.reconstruct(entryDict, owner);
             if (entry == null || !Arrays.equals(owner, entry.endorserPub())) {
                 return null;
             }
             chain.add(entry);
         }
-        if (!KarmaChain.verify(chain)) {
+        Entry baseEntry = dict.get("base");
+        if (baseEntry != null) {
+            Map<String, Entry> baseDict;
+            try {
+                baseDict = baseEntry.dictionary();
+            } catch (Throwable t) {
+                return null;
+            }
+            Entry seqEntry = baseDict.get("seq");
+            Entry phEntry = baseDict.get("ph");
+            if (seqEntry == null || phEntry == null) {
+                return null;
+            }
+            byte[] basePrevHash;
+            long baseSeq;
+            try {
+                basePrevHash = com.frostwire.util.Hex.decode(phEntry.string());
+                baseSeq = seqEntry.integer();
+            } catch (Throwable t) {
+                return null;
+            }
+            if (!KarmaChain.verifyTail(chain, basePrevHash, baseSeq)) {
+                return null;
+            }
+        } else if (!KarmaChain.verify(chain)) {
             return null;
         }
         return Collections.unmodifiableList(chain);
