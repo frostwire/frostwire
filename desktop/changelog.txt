@@ -1,4 +1,7 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
+  - fix:macOS native file icons use FileSystemView on JDK 26 instead of reflectively constructing the non-exported com.apple.laf.AquaLookAndFeel
+  - cleanup:Desktop builds support JDK 26 by upgrading google-java-format from 1.24.0 to 1.36.1
   - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
   - new:Transfers default columns — Actions, Name, Seeding, Size, Status, Progress, Down Speed, Downloaded, Uploaded, Up Speed, Time, Seeds; Tips/Donations hidden, Uploaded shown (existing custom layouts untouched)
   - fix:IceBridge P0 hardening — cheap-reject-first ingress (rate-limit before Ed25519 verify), per-IP + global HELLO budgets, per-/24 session caps, empty HELLO_ACK removed; helloRejected/relayRateLimited/searchRateLimited/powRejected/spamMarkedDropped counters in /metrics

@@ -16,13 +16,13 @@ plugins {
 }
 
 group = 'com.frostwire'
-version = '1.0-SNAPSHOT'
+version = '7.1.0'
 
 spotless {
     java {
         target 'src/main/java/**/*.java', 'src/test/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
         ratchetFrom 'origin/master'
-        googleJavaFormat('1.24.0')
+        googleJavaFormat('1.36.1')
         toggleOffOn()
         removeUnusedImports()
         trimTrailingWhitespace()
