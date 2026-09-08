@@ -88,13 +88,27 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     private JComponent createSearchEnginesCheckboxPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new MigLayout("insets 2, wrap 4, gap 8"));
+        addDistributedSearchCheckbox(panel);
         List<SearchEngine> searchEngines = SearchEngine.getEngines();
         setupCheckboxes(searchEngines, panel);
         return panel;
     }
 
+    private void addDistributedSearchCheckbox(JPanel parent) {
+        SearchEngine distributed = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
+        JCheckBox checkbox = new JCheckBox(I18n.tr("Distributed Search"));
+        checkbox.setSelected(distributed.isEnabled());
+        searchEngineCheckboxes.add(checkbox);
+        cBoxes.put(checkbox, distributed.getEnabledSetting());
+        checkbox.addItemListener(searchEnginesCheckboxListener);
+        parent.add(checkbox);
+    }
+
     private void setupCheckboxes(List<SearchEngine> searchEngines, JPanel parent) {
         for (SearchEngine se : searchEngines) {
+            if (se.getId() == SearchEngine.SearchEngineID.DISTRIBUTED_ID) {
+                continue;
+            }
             JCheckBox cBox = new JCheckBox(se.getName());
             searchEngineCheckboxes.add(cBox);
             cBox.setSelected(se.isEnabled());
