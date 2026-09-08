@@ -56,13 +56,6 @@ compileJava {
 application {
     mainClass = 'com.limegroup.gnutella.gui.Main'
 
-    // Detect if running from IDE (Gradle Wrapper or direct IDE execution)
-    // IntelliJ wraps the main class execution in a gradle task with a specific naming pattern
-    def isRunningFromIDE = System.getenv('IDEA_INITIAL_DIRECTORY') != null ||
-                           System.getProperty('idea.paths.selector') != null ||
-                           gradle.startParameter.taskNames.any { it.matches('.*\\.main\\(.*') } ||
-                           gradle.startParameter.taskNames.any { it.contains('com.limegroup.gnutella.gui.Main') }
-
     applicationDefaultJvmArgs = ['-Djava.library.path=lib/native',
                                  '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
                                  '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
@@ -76,15 +69,9 @@ application {
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
                                  //'-Xss768k', // 768k stack (development)
                                  '-Xss256k', // 256k stack (production)
-                                  '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
-                                  '-Ddebug=1',
+                                 '-Dfw.running.from.distribution=true',
 				 //'-XX:NativeMemoryTracking=detail',
     ]
-
-    // Add IDE flag when running from IDE
-    if (isRunningFromIDE) {
-        applicationDefaultJvmArgs.add('-Dfw.running.from.ide=true')
-    }
 
     // Remote management and JDWP are deliberately opt-in. Release distributions must not
     // expose unauthenticated listeners, while developers can retain the existing workflow with
@@ -126,6 +113,12 @@ application {
             '-Dsun.java2d.opengl=false',   // OpenGL can crash entire display session
         ]
     }
+}
+
+tasks.named('run') {
+    systemProperty 'fw.running.from.distribution', 'false'
+    jvmArgs '-Ddebug=1'
+    jvmArgs '-Dfw.debug.assertNoEdtIO=true'
 }
 
 repositories {
