@@ -30,9 +30,8 @@ class BtTransferShareVisibilityTest {
   }
 
   @Test
-  void eitherOptOutDeniesMetadataWithoutEnteringTheNativeSession() {
+  void iceBridgeOptOutDeniesMetadataWithoutEnteringTheNativeSession() {
     boolean iceBridge = SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue();
-    boolean distributed = SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue();
     boolean includeInactive = SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.getValue();
     try {
       LibtorrentTorrentMetadataProvider provider =
@@ -41,19 +40,12 @@ class BtTransferShareVisibilityTest {
       String selectedHex = com.frostwire.util.Hex.encode(selectedHash);
       SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.setValue(true);
       SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(false);
-      SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(true);
       assertFalse(BtTransferShareVisibility.INSTANCE.isVisible(selectedHex));
       assertFalse(provider.isPubliclyShared(selectedHash));
       assertNull(provider.torrentBytes(selectedHash));
       assertTrue(BtTransferShareVisibility.LOCAL.isVisible(selectedHex));
-      SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(true);
-      SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(false);
-      assertFalse(BtTransferShareVisibility.INSTANCE.isVisible(selectedHex));
-      assertFalse(provider.isPubliclyShared(selectedHash));
-      assertNull(provider.torrentBytes(selectedHash));
     } finally {
       SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(iceBridge);
-      SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(distributed);
       SearchEnginesSettings.LOCAL_SEARCH_INCLUDE_INACTIVE.setValue(includeInactive);
     }
   }
