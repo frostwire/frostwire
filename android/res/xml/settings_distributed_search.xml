@@ -9,9 +9,9 @@
     <PreferenceCategory android:title="@string/distributed_search_header">
 
         <SwitchPreference
-            android:key="frostwire.prefs.search.use_distributed"
-            android:title="@string/use_distributed"
-            android:summary="@string/distributed_search_summary"
+            android:key="frostwire.prefs.icebridge.enabled"
+            android:title="@string/distributed_stack_status_title"
+            android:summary="@string/distributed_icebridge_start_summary"
             android:defaultValue="true" />
 
     </PreferenceCategory>
