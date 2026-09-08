@@ -158,15 +158,21 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
     }
 
     private void setupDistributedToggle() {
-        Preference toggle = findPreference("frostwire.prefs.search.use_distributed");
+        Preference toggle = findPreference(Constants.PREF_KEY_ICEBRIDGE_ENABLED);
         if (toggle != null) {
+            updateIceBridgeToggleSummary(toggle,
+                    ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED));
             toggle.setOnPreferenceChangeListener((pref, newValue) -> {
-                pref.setSummary(Boolean.TRUE.equals(newValue)
-                        ? getString(R.string.distributed_search_summary)
-                        : getString(R.string.distributed_search_summary) + " (disabled)");
+                updateIceBridgeToggleSummary(pref, Boolean.TRUE.equals(newValue));
                 return true;
             });
         }
+    }
+
+    private void updateIceBridgeToggleSummary(Preference preference, boolean enabled) {
+        preference.setSummary(enabled
+                ? getString(R.string.distributed_icebridge_start_summary)
+                : getString(R.string.distributed_stack_not_running));
     }
 
     private void setupCopyableFields() {
