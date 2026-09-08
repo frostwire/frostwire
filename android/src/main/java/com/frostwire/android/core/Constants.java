@@ -100,6 +100,7 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
     public static final String PREF_KEY_SEARCH_USE_LOCAL = "frostwire.prefs.search.use_local";
     public static final String PREF_KEY_SEARCH_USE_DISTRIBUTED = "frostwire.prefs.search.use_distributed";
+    public static final String PREF_KEY_ICEBRIDGE_ENABLED = "frostwire.prefs.icebridge.enabled";
     /** When true, Android uses a remote IceBridge control URL instead of in-process mesh. */
     public static final String PREF_KEY_ICEBRIDGE_USE_REMOTE = "frostwire.prefs.icebridge.use_remote";
     public static final String PREF_KEY_ICEBRIDGE_REMOTE_URL = "frostwire.prefs.icebridge.remote_url";
