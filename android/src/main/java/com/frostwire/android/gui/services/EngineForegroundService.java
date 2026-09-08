@@ -76,7 +76,7 @@ public class EngineForegroundService extends Service implements IEngineService {
                 Engine.instance().resumeServicesIfDisconnected();
             }
             ensureRelayStack(true, null);
-        } else if (Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED.equals(key)) {
+        } else if (Constants.PREF_KEY_ICEBRIDGE_ENABLED.equals(key)) {
             ensureRelayStack(true, null);
         }
     };
