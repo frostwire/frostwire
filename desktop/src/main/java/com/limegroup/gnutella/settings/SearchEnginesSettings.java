@@ -74,7 +74,7 @@ public class SearchEnginesSettings extends LimeProps {
   public static final BooleanSetting LOCAL_SEARCH_INCLUDE_INACTIVE =
       FACTORY.createBooleanSetting("LOCAL_SEARCH_INCLUDE_INACTIVE", false);
   public static final BooleanSetting DISTRIBUTED_SEARCH_ENABLED =
-      FACTORY.createBooleanSetting("DISTRIBUTED_SEARCH_ENABLED", false);
+      FACTORY.createBooleanSetting("DISTRIBUTED_SEARCH_ENABLED", true);
 
   /**
    * Bind host for the IceBridge rUDP server. Use "0.0.0.0" (default) to accept rUDP from remote
