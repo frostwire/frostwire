@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.preference.PreferenceManager
 import com.andrew.apollo.MusicPlaybackService
+import com.frostwire.android.BuildConfig
 import com.frostwire.util.Hex
 import com.frostwire.util.JsonUtils
 import com.frostwire.util.Logger
@@ -57,8 +58,10 @@ object ConfigurationRepository {
         dataStore = FrostwirePreferences.dataStore
         migrateFromSharedPreferences(context)
         loadFromDataStore()
+        migrateDistributedParticipationPreference()
         seedDefaults()
         resetVolatileKeys()
+        applyBuildPolicy()
         initialized = true
         initLatch.countDown()
     }
@@ -257,6 +260,16 @@ object ConfigurationRepository {
         }
     }
 
+    private fun migrateDistributedParticipationPreference() {
+        if (!cache.containsKey(Constants.PREF_KEY_ICEBRIDGE_ENABLED)
+            && cache.containsKey(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED)) {
+            setDefault(
+                Constants.PREF_KEY_ICEBRIDGE_ENABLED,
+                getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED),
+            )
+        }
+    }
+
     private fun resetVolatileKeys() {
         for (key in volatileKeys) {
             val value = defaults[key] ?: continue
@@ -378,6 +391,7 @@ object ConfigurationRepository {
         // Off by default so normal search is web + Distributed only.
         m[Constants.PREF_KEY_SEARCH_USE_LOCAL] = false
         m[Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED] = true
+        m[Constants.PREF_KEY_ICEBRIDGE_ENABLED] = true
         m[Constants.PREF_KEY_ICEBRIDGE_USE_REMOTE] = false
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_URL] = ""
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_TOKEN] = ""
@@ -434,6 +448,12 @@ object ConfigurationRepository {
         Constants.PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT,
         Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP,
     )
+
+    private fun applyBuildPolicy() {
+        if (!BuildConfig.DEBUG) {
+            setDefault(Constants.PREF_KEY_SEARCH_USE_LOCAL, false)
+        }
+    }
 
     private fun uuidToString(uuid: UUID): String {
         val msb = uuid.mostSignificantBits
