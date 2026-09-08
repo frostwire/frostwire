@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.BuildConfig;
 import com.frostwire.gui.updates.SoundCloudConfigFetcher;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchPerformerFactory;
@@ -394,6 +395,11 @@ public abstract class SearchEngine {
           // we are invisible to excludeNonReady=true searches.
           return LOCAL.localIndex != null;
         }
+
+        @Override
+        public boolean isEnabled() {
+          return BuildConfig.DEBUG && super.isEnabled();
+        }
       };
 
   private static final SearchEngine DISTRIBUTED =
@@ -494,10 +500,22 @@ public abstract class SearchEngine {
               SOUNDCLOUD,
               FROSTCLICK));
 
+  private static final List<SearchEngine> PRODUCTION_ENGINES =
+      java.util.Collections.unmodifiableList(
+          ENGINES.stream()
+              .filter(engine -> engine.getId() != SearchEngineID.LOCAL_ID)
+              .collect(java.util.stream.Collectors.toList()));
+
+  static {
+    if (!BuildConfig.DEBUG) {
+      SearchEnginesSettings.LOCAL_SEARCH_ENABLED.setValue(false);
+    }
+  }
+
   // desktop/ is currently using this class, but it should use common/SearchManager.java in the near
   // future (like android/)
   public static List<SearchEngine> getEngines() {
-    return ENGINES;
+    return BuildConfig.DEBUG ? ENGINES : PRODUCTION_ENGINES;
   }
 
   static SearchEngine getSearchEngineByName(String name) {
@@ -513,6 +531,9 @@ public abstract class SearchEngine {
   public static SearchEngine getSearchEngineByID(SearchEngineID id) {
     if (id == SearchEngineID.TELLURIDE_ID) {
       return TELLURIDE;
+    }
+    if (id == SearchEngineID.LOCAL_ID) {
+      return LOCAL;
     }
     for (SearchEngine engine : getEngines()) {
       if (engine.getId() == id) {
