@@ -34,7 +34,7 @@ public class AndroidRelayParticipationTest {
              MockedStatic<NetworkManager> networks = mockStatic(NetworkManager.class)) {
             config.when(ConfigurationManager::instance).thenReturn(configuration);
             networks.when(NetworkManager::instance).thenReturn(network);
-            when(configuration.getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED)).thenReturn(true);
+            when(configuration.getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED)).thenReturn(true);
             when(configuration.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY)).thenReturn(true);
             when(network.isDataWIFIUp()).thenReturn(true);
             assertTrue(AndroidRelayStack.isParticipationEnabled());
@@ -49,9 +49,11 @@ public class AndroidRelayParticipationTest {
             when(network.isVpnConnected()).thenReturn(true);
             assertTrue(AndroidRelayStack.isParticipationEnabled());
             when(configuration.getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED)).thenReturn(false);
+            assertTrue(AndroidRelayStack.isParticipationEnabled());
+            when(configuration.getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED)).thenReturn(false);
             assertFalse(AndroidRelayStack.isParticipationEnabled());
             assertNull(AndroidRelayStack.start(null, null, null, () -> true));
-            when(configuration.getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED)).thenReturn(true);
+            when(configuration.getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED)).thenReturn(true);
             assertNull(AndroidRelayStack.start(null, null, null, () -> false));
         }
     }
