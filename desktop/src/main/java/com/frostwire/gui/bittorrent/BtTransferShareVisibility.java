@@ -32,7 +32,6 @@ public final class BtTransferShareVisibility implements ShareVisibilityPolicy {
   @Override
   public boolean isVisible(String infoHashHex) {
     return SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
-        && SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue()
         && isActiveTransfer(infoHashHex);
   }
 
