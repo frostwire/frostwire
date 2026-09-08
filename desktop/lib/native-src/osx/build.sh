@@ -21,14 +21,6 @@ cc ${INCLUDE_PATH} ${FLAGS_X86_64} -framework Foundation -framework CoreServices
 cc ${INCLUDE_PATH} ${FLAGS_ARM64}  -framework Foundation -framework CoreServices -framework CoreFoundation -o libMacOSXUtils.arm64  MacOSXUtils.m
 lipo -create -output ${OUTPUT_PATH}/libMacOSXUtils.dylib libMacOSXUtils.x86_64 libMacOSXUtils.arm64
 
-###############################################################################################
-# libGURL.dylib
-###############################################################################################
-echo "Building libGURL.dylib..."
-cc ${INCLUDE_PATH} ${FLAGS_X86_64} -framework Carbon -o libGURL.x86_64 GURLjnilib.c
-cc ${INCLUDE_PATH} ${FLAGS_ARM64}  -framework Carbon -o libGURL.arm64  GURLjnilib.c
-lipo -create -output ${OUTPUT_PATH}/libGURL.dylib libGURL.x86_64 libGURL.arm64
-
 rm lib*.arm64
 rm lib*.x86_64
 

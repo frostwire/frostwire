@@ -36,6 +36,24 @@ class DesktopReleasePackagingStructureTest {
   }
 
   @Test
+  void releaseMetadataMatchesUnreleasedVersion() throws Exception {
+    String build = Files.readString(DESKTOP.resolve("build.gradle"));
+    String changelog = Files.readString(DESKTOP.resolve("changelog.txt"));
+    String frostWireUtils =
+        Files.readString(
+            DESKTOP.resolve("src/main/java/com/limegroup/gnutella/util/FrostWireUtils.java"));
+    String mcpConstants =
+        Files.readString(
+            DESKTOP.resolve("../common/src/main/java/com/frostwire/mcp/MCPConstants.java"));
+
+    assertTrue(build.contains("version = '7.1.0'"));
+    assertTrue(changelog.startsWith(" FrostWire 7.1.0 UNRELEASED"));
+    assertTrue(frostWireUtils.contains("FROSTWIRE_VERSION = \"7.1.0\""));
+    assertTrue(frostWireUtils.contains("BUILD_NUMBER = 332"));
+    assertTrue(mcpConstants.contains("SERVER_VERSION = \"7.1.0\""));
+  }
+
+  @Test
   void productionBuildHidesDiagnosticLocalSearch() throws Exception {
     String buildConfig =
         Files.readString(DESKTOP.resolve("src/main/java/com/frostwire/BuildConfig.java"));
@@ -56,6 +74,39 @@ class DesktopReleasePackagingStructureTest {
             DESKTOP.resolve(
                 "src/main/java/com/frostwire/mcp/desktop/adapters/SettingsAdapter.java"));
     assertTrue(settingsAdapter.contains("if (BuildConfig.DEBUG)"));
+  }
+
+  @Test
+  void macStartupUsesJavaDesktopUrlHandlerOnly() throws Exception {
+    String initializer =
+        Files.readString(
+            DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/Initializer.java"));
+    String macEventHandler =
+        Files.readString(
+            DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/MacEventHandler.java"));
+
+    assertFalse(initializer.contains("GURLHandler"));
+    assertTrue(initializer.contains("MacEventHandler.instance()"));
+    assertTrue(macEventHandler.contains("setOpenURIHandler"));
+    assertTrue(macEventHandler.contains("java.awt.desktop.OpenURIHandler"));
+    assertTrue(macEventHandler.contains("GUIMediator.instance().openTorrentURI(uri, false)"));
+    assertFalse(
+        Files.exists(DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/GURLHandler.java")));
+    assertFalse(Files.exists(DESKTOP.resolve("lib/native-src/osx/GURLjnilib.c")));
+    assertFalse(Files.exists(DESKTOP.resolve("lib/native/libGURL.dylib")));
+    assertFalse(Files.readString(DESKTOP.resolve("lib/native-src/osx/build.sh")).contains("GURL"));
+  }
+
+  @Test
+  void macNativeIconsAvoidAquaLookAndFeelReflection() throws Exception {
+    String nativeFileIconController =
+        Files.readString(
+            DESKTOP.resolve(
+                "src/main/java/com/limegroup/gnutella/gui/NativeFileIconController.java"));
+
+    assertTrue(nativeFileIconController.contains("OSUtils.isWindows() || OSUtils.isMacOSX()"));
+    assertTrue(nativeFileIconController.contains("return constructFSVView()"));
+    assertTrue(nativeFileIconController.contains("VIEW.getSystemIcon(f)"));
   }
 
   @Test

@@ -190,7 +190,6 @@ final class Initializer {
     }
     runQueuedRequests(limeWireCore);
     if (OSUtils.isMacOSX()) {
-      GURLHandler.getInstance().register();
       MacEventHandler.instance();
     }
     // Run any after-init tasks.
@@ -261,9 +260,9 @@ final class Initializer {
   }
 
   /**
-   * Initializes any code that is dependent on external controls. Specifically, GURLHandler &
-   * MacEventHandler on OS X, ensuring that multiple LimeWire's can't run at once, and processing
-   * any arguments that were passed to LimeWire.
+   * Initializes any code that is dependent on external controls. Specifically, MacEventHandler on
+   * OS X, ensuring that multiple LimeWire's can't run at once, and processing any arguments that
+   * were passed to LimeWire.
    */
   private void runExternalChecks(LimeWireCore limeWireCore, String[] args) {
     ExternalControl externalControl = limeWireCore.getExternalControl();
