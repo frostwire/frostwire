@@ -64,7 +64,13 @@ public final class StrictEdtMode {
                 }
             }, thresholdMs, TimeUnit.MILLISECONDS);
 
-            super.dispatchEvent(event);
+            try {
+                super.dispatchEvent(event);
+            } finally {
+                if (currentTicket == my) {
+                    currentTicket = -1;
+                }
+            }
         }
 
         private static void dumpEdtAndCrash(AWTEvent event, Thread edt, long thresholdMs) {
@@ -72,14 +78,10 @@ public final class StrictEdtMode {
                     thresholdMs, edt);
             System.err.println("Event: " + event);
 
-            // Grab stack of all threads and print EDT’s
-            for (Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
-                if (e.getKey() == edt) {
-                    System.err.println("--- EDT stack ---");
-                    for (StackTraceElement ste : e.getValue()) {
-                        System.err.println("\tat " + ste);
-                    }
-                }
+            StackTraceElement[] edtStack = edt.getStackTrace();
+            System.err.println("--- EDT stack ---");
+            for (StackTraceElement ste : edtStack) {
+                System.err.println("\tat " + ste);
             }
             // Also include lock info (who might be blocking us)
             ThreadMXBean mx = ManagementFactory.getThreadMXBean();
@@ -90,6 +92,11 @@ public final class StrictEdtMode {
             }
 
             System.err.flush();
+            if (isMacMetalRenderPipelineStall(edtStack)) {
+                System.err.println("Strict EDT mode: macOS Metal renderer stall; process will continue.");
+                System.err.flush();
+                return;
+            }
             // Hard-fail the process so CI/test runs surface the problem immediately.
             Runtime.getRuntime().halt(42);
         }
@@ -120,7 +127,13 @@ public final class StrictEdtMode {
                 }
             }, thresholdMs, TimeUnit.MILLISECONDS);
 
-            super.dispatchEvent(event);
+            try {
+                super.dispatchEvent(event);
+            } finally {
+                if (currentTicket == my) {
+                    currentTicket = -1;
+                }
+            }
         }
 
         private static void dumpEdtAndQueueReport(AWTEvent event, Thread edt, long thresholdMs) {
@@ -165,5 +178,19 @@ public final class StrictEdtMode {
                 // Reporting must never break event dispatch.
             }
         }
+    }
+
+    static boolean isMacMetalRenderPipelineStall(StackTraceElement[] stack) {
+        if (stack == null) {
+            return false;
+        }
+        for (StackTraceElement frame : stack) {
+            if (frame != null
+                    && "sun.java2d.metal.MTLRenderQueue$QueueFlusher".equals(frame.getClassName())
+                    && "flushNow".equals(frame.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
