@@ -18,78 +18,43 @@
 
 package com.frostwire.tests;
 
+import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.one337x.One337xSearchPattern;
-import com.frostwire.search.CompositeFileSearchResult;
-import com.frostwire.search.ISearchPerformer;
-import com.frostwire.util.Logger;
-import com.frostwire.util.ThreadPool;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.OkHttpClientWrapper;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public final class One337xSearchPatternTest {
-    private static final Logger LOG = Logger.getLogger(One337xSearchPatternTest.class);
+    private static final String CAPTURED_SEARCH_HTML =
+            "<table>" +
+                    "<tr><td><a href=\"/torrent/12345/ubuntu-24-04-lts/\">" +
+                    "Ubuntu <strong>24.04 LTS</strong></a></td></tr>" +
+                    "<tr><td><a href=\"/torrent/67890/debian-12-netinst/\">" +
+                    "Debian 12 netinst</a></td></tr>" +
+                    "</table>";
 
     @Test
     public void one337xSearchTest() {
-        String TEST_SEARCH_TERM = "creative commons";
-        HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
-        String responseBody = null;
-        try {
-            responseBody = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM + "/1/");
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-
-        assertNotNull(responseBody, "Response body should not be null");
-
-        // Test V2 pattern-based search
         One337xSearchPattern pattern = new One337xSearchPattern();
-        List<FileSearchResult> results = pattern.parseResults(responseBody);
+        List<FileSearchResult> results = pattern.parseResults(CAPTURED_SEARCH_HTML);
 
         assertNotNull(results, "Results should not be null");
-        assertFalse(results.isEmpty(), "Should find at least one result");
-        assertTrue(results.size() <= 20, "Should have at most 20 results");
+        assertEquals(2, results.size());
 
-        LOG.info("Found " + results.size() + " results");
+        CompositeFileSearchResult first = (CompositeFileSearchResult) results.get(0);
+        assertEquals("Ubuntu 24.04 LTS", first.getDisplayName());
+        assertEquals("https://www.1377x.to/torrent/12345/ubuntu-24-04-lts/",
+                first.getDetailsUrl());
+        assertEquals("1337x", first.getSource());
+        assertFalse(first.isPreliminary());
+        assertTrue(first.isCrawlable());
 
-        // Verify first few results have expected properties
-        int checked = 0;
-        for (FileSearchResult result : results) {
-            if (checked >= 3) break;
-            checked++;
-
-            CompositeFileSearchResult sr = (CompositeFileSearchResult) result;
-
-            assertFalse(sr.getDisplayName() == null || sr.getDisplayName().isEmpty(),
-                    "Result " + checked + ": displayName is null or empty");
-            LOG.info("Result " + checked + " - displayName: " + sr.getDisplayName());
-
-            assertFalse(sr.getDetailsUrl() == null || sr.getDetailsUrl().isEmpty(),
-                    "Result " + checked + ": detailsUrl is null or empty");
-            LOG.info("Result " + checked + " - detailsUrl: " + sr.getDetailsUrl());
-
-            assertEquals("1337x", sr.getSource(),
-                    "Result " + checked + ": source should be 1337x");
-
-            assertFalse(sr.isPreliminary(),
-                    "Result " + checked + ": should NOT be preliminary (crawling is done inside performer, not in UI)");
-            LOG.info("Result " + checked + " - isPreliminary: false ✓");
-
-            assertTrue(sr.isCrawlable(),
-                    "Result " + checked + ": should be crawlable (performer crawls details page internally)");
-            LOG.info("Result " + checked + " - isCrawlable: true ✓");
-
-            LOG.info("===");
-        }
-
-        LOG.info("-done-");
+        CompositeFileSearchResult second = (CompositeFileSearchResult) results.get(1);
+        assertEquals("Debian 12 netinst", second.getDisplayName());
+        assertEquals("https://www.1377x.to/torrent/67890/debian-12-netinst/",
+                second.getDetailsUrl());
     }
 }
