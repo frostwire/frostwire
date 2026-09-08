@@ -23,11 +23,39 @@ class DesktopReleasePackagingStructureTest {
     String build = Files.readString(DESKTOP.resolve("build.gradle"));
     String defaults =
         build.substring(
-            build.indexOf("applicationDefaultJvmArgs"), build.indexOf("// Add IDE flag"));
+            build.indexOf("applicationDefaultJvmArgs"), build.indexOf("// Remote management"));
 
     assertFalse(defaults.contains("jmxremote.port"));
     assertFalse(defaults.contains("agentlib:jdwp"));
+    assertFalse(defaults.contains("-Ddebug=1"));
+    assertFalse(defaults.contains("fw.running.from.ide"));
+    assertTrue(defaults.contains("-Dfw.running.from.distribution=true"));
     assertTrue(build.contains("if (project.hasProperty('debug'))"));
+    assertTrue(build.contains("tasks.named('run')"));
+    assertTrue(build.contains("jvmArgs '-Ddebug=1'"));
+  }
+
+  @Test
+  void productionBuildHidesDiagnosticLocalSearch() throws Exception {
+    String buildConfig =
+        Files.readString(DESKTOP.resolve("src/main/java/com/frostwire/BuildConfig.java"));
+    String searchEngine =
+        Files.readString(
+            DESKTOP.resolve("src/main/java/com/limegroup/gnutella/gui/search/SearchEngine.java"));
+
+    assertTrue(
+        buildConfig.contains(
+            "CommonUtils.isRunningFromGradle() || CommonUtils.isRunningFromIntelliJ()"));
+    assertTrue(searchEngine.contains("BuildConfig.DEBUG ? ENGINES : PRODUCTION_ENGINES"));
+    assertTrue(searchEngine.contains("if (!BuildConfig.DEBUG)"));
+    assertTrue(searchEngine.contains("SearchEnginesSettings.LOCAL_SEARCH_ENABLED.setValue(false)"));
+    assertTrue(searchEngine.contains("return BuildConfig.DEBUG && super.isEnabled()"));
+
+    String settingsAdapter =
+        Files.readString(
+            DESKTOP.resolve(
+                "src/main/java/com/frostwire/mcp/desktop/adapters/SettingsAdapter.java"));
+    assertTrue(settingsAdapter.contains("if (BuildConfig.DEBUG)"));
   }
 
   @Test
