@@ -20,6 +20,7 @@ package com.frostwire.android.gui;
 
 import android.os.Build;
 import androidx.annotation.NonNull;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
@@ -425,6 +426,11 @@ public abstract class SearchEngine {
         @Override
         public boolean isReady() {
           return LOCAL_WIRING.localIndex() != null;
+        }
+
+        @Override
+        public boolean isActive() {
+          return BuildConfig.DEBUG;
         }
       };
 
