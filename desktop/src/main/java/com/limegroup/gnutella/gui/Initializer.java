@@ -470,8 +470,7 @@ final class Initializer {
   }
 
   static void startRelayParticipation(Runnable start) {
-    if (!SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
-        || !SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue()) {
+    if (!SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .info("Public relay participation disabled via settings; local index remains available");
       return;
