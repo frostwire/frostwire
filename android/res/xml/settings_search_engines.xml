@@ -18,6 +18,12 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_distributed"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_distributed"
+        android:summary="@string/distributed_search_summary"
+        android:defaultValue="true" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.preference_category.select_all"
         android:layout="@layout/view_preference_search_select_all"
         android:title="@string/select_all" />
