@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.BuildConfig;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -65,7 +66,7 @@ public class Main {
         boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");	
 
         // Check if running in a development environment (Gradle or IntelliJ)
-        boolean isDevEnvironment = CommonUtils.isRunningFromGradle() || CommonUtils.isRunningFromIntelliJ();
+        boolean isDevEnvironment = BuildConfig.DEBUG;
         boolean hasDebugger = CommonUtils.isStepDebuggerAttached();
 
         if (isDevEnvironment && !hasDebugger) {
