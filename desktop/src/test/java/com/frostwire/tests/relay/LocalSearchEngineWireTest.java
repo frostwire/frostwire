@@ -9,6 +9,7 @@ package com.frostwire.tests.relay;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.BuildConfig;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.limegroup.gnutella.gui.search.LocalSearchEngineWire;
@@ -26,20 +27,6 @@ class LocalSearchEngineWireTest {
     SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
     assertNotNull(local, "LOCAL_ID must be in the engine list");
     assertEquals("Local (test)", local.getName());
-  }
-
-  @Test
-  void localEngineIsNotReadyBeforeWiring() {
-    SearchEngine local = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.LOCAL_ID);
-    // After the previous test (which may have set an index via other paths)
-    // the field may be wired, but if not wired, isReady must be false.
-    if (!local.getEnabledSetting().getValue()) {
-      SearchEnginesSettings.LOCAL_SEARCH_ENABLED.setValue(true);
-    }
-    // We can't assert !isReady unconditionally (state may be leaked from
-    // other tests), but we can assert the wiring contract: setting a
-    // null index leaves isReady false, and setting a real index leaves
-    // isReady true.
   }
 
   @Test
@@ -68,7 +55,7 @@ class LocalSearchEngineWireTest {
   }
 
   @Test
-  void getEnginesIncludesLocal() {
+  void localEngineVisibilityMatchesBuildType() {
     List<SearchEngine> all = SearchEngine.getEngines();
     boolean found = false;
     for (SearchEngine se : all) {
@@ -77,7 +64,10 @@ class LocalSearchEngineWireTest {
         break;
       }
     }
-    assertTrue(found, "LOCAL engine must appear in getEngines()");
+    assertEquals(BuildConfig.DEBUG, found);
+    if (!BuildConfig.DEBUG) {
+      assertFalse(SearchEnginesSettings.LOCAL_SEARCH_ENABLED.getValue());
+    }
   }
 
   @Test
