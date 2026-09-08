@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 class RelayParticipationSettingsTest {
   @Test
-  void eitherOptOutStopsStartupBeforePublicDependenciesAreUsed() {
+  void onlyIceBridgeOptOutStopsPublicParticipation() {
     boolean iceBridge = SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue();
     boolean distributed = SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.getValue();
     try {
@@ -27,10 +27,10 @@ class RelayParticipationSettingsTest {
       SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(true);
       SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(false);
       Initializer.startRelayParticipation(publicStarts::incrementAndGet);
-      assertEquals(0, publicStarts.get());
+      assertEquals(1, publicStarts.get());
       SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(true);
       Initializer.startRelayParticipation(publicStarts::incrementAndGet);
-      assertEquals(1, publicStarts.get());
+      assertEquals(2, publicStarts.get());
     } finally {
       SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(iceBridge);
       SearchEnginesSettings.DISTRIBUTED_SEARCH_ENABLED.setValue(distributed);
