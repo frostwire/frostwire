@@ -177,7 +177,7 @@ public final class AndroidRelayStack implements AutoCloseable {
 
   public static boolean isParticipationEnabled() {
     try {
-      return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED)
+      return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED)
           && isNetworkAllowed();
     } catch (Throwable unavailable) {
       return false;
