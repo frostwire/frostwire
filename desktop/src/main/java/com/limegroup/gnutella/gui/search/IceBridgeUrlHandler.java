@@ -220,7 +220,7 @@ public final class IceBridgeUrlHandler {
             return;
         }
         SearchEngine distributed = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.DISTRIBUTED_ID);
-        if (distributed == null || !distributed.isReady()) {
+        if (distributed == null || !distributed.isEnabled() || !distributed.isReady()) {
             showError(I18n.tr("Distributed search engine is not ready. Please wait for IceBridge to start."));
             return;
         }
