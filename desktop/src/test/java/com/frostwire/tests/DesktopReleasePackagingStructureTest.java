@@ -120,4 +120,21 @@ class DesktopReleasePackagingStructureTest {
     assertTrue(build.contains("into 'lib'"));
     assertTrue(initializer.contains("new File(applicationJar.getParentFile(), \"icebridge.jar\")"));
   }
+
+  @Test
+  void applicationJarExcludesDaemonOnlyIceBridgeClasses() throws Exception {
+    String build = Files.readString(DESKTOP.resolve("build.gradle"));
+    String jarBlock = build.substring(build.indexOf("archiveFileName = 'frostwire.jar'"));
+
+    // Daemon-only tree ships in icebridge.jar (launched via `java -jar`);
+    // frostwire.jar keeps only the in-process client surface.
+    assertTrue(jarBlock.contains("def icebridge = 'com/frostwire/search/relay/icebridge/'"));
+    assertTrue(jarBlock.contains("'IceBridgeServer*'"));
+    assertTrue(jarBlock.contains("'control/ControlServer*'"));
+    assertTrue(jarBlock.contains("'peer/**'"));
+    assertTrue(jarBlock.contains("'udp/**'"));
+    assertTrue(
+        build.contains(
+            "attributes 'Main-Class': 'com.frostwire.search.relay.icebridge.IceBridgeServer'"));
+  }
 }
