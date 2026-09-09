@@ -135,20 +135,6 @@ public abstract class SearchEngine {
       }
     }
 
-    // Distributed counts even before its runtime wiring is ready.
-    boolean oneEnabled =
-        ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED);
-    for (SearchEngine se : candidates) {
-      if (se.isEnabled()) {
-        oneEnabled = true;
-      }
-    }
-    if (!oneEnabled) {
-      SearchEngine engineToEnable;
-      engineToEnable = ARCHIVE;
-      String prefKey = engineToEnable.getPreferenceKey();
-      ConfigurationManager.instance().setBoolean(prefKey, true);
-    }
     return candidates;
   }
 
