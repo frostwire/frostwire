@@ -350,14 +350,7 @@ public final class IdentityKeys {
                 Class<?> clazz = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
                 Provider bc = (Provider) clazz.getDeclaredConstructor().newInstance();
                 cachedBcProvider = bc;
-                // Best-effort global registration (optional).
-                if (Security.getProvider("BC") == null) {
-                    try {
-                        Security.insertProviderAt(bc, 1);
-                    } catch (Throwable ignored) {
-                    }
-                }
-                LOG.info("Using BouncyCastle provider for software Ed25519 keys");
+                LOG.info("Using explicit BouncyCastle provider for software Ed25519 keys");
                 return bc;
             } catch (Throwable t) {
                 LOG.warn("BouncyCastle not available for Ed25519 KeyFactory: " + t);
