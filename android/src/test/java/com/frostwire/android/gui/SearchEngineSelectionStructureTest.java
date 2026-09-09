@@ -7,6 +7,7 @@
 
 package com.frostwire.android.gui;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.frostwire.android.BuildConfig;
@@ -18,14 +19,27 @@ import org.junit.Test;
 public class SearchEngineSelectionStructureTest {
 
   @Test
-  public void getEngines_distributedEnabledBeforeWiring_doesNotEnableArchive() throws Exception {
+  public void getEngines_neverForceEnablesAnEngine() throws Exception {
     String source = readProjectFile("src/main/java/com/frostwire/android/gui/SearchEngine.java");
     String compactSource = source.replaceAll("\\s+", "");
 
-    assertTrue(
-        compactSource.contains(
-            "booleanoneEnabled=ConfigurationManager.instance()"
-                + ".getBoolean(Constants.PREF_KEY_SEARCH_USE_DISTRIBUTED);"));
+    assertFalse(compactSource.contains("oneEnabled"));
+    assertFalse(compactSource.contains("engineToEnable"));
+    assertFalse(compactSource.contains("setBoolean"));
+  }
+
+  @Test
+  public void deselectAll_coversEnginesBelowDistributedAndForcesNothingBackOn()
+      throws Exception {
+    String fragmentSource =
+        readProjectFile(
+            "src/main/java/com/frostwire/android/gui/fragments/preference/SearchEnginesPreferenceFragment.java");
+
+    // Distributed Search is above select-all scope and must stay untouched.
+    assertTrue(fragmentSource.contains("PREF_KEY_SEARCH_USE_DISTRIBUTED"));
+    // No fallback may re-check an engine after a deselect-all.
+    assertFalse(fragmentSource.contains("ensureOneEngineChecked"));
+    assertFalse(fragmentSource.contains("ensureMinimumEngineSelection"));
   }
 
   @Test
