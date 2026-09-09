@@ -262,6 +262,28 @@ jar {
 
     exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF', 'META-INF/*.md')
 
+    // The headless relay daemon lives in icebridge.jar (see icebridgeJar below),
+    // which the macOS/Windows installers ship beside frostwire.jar and launch via
+    // `java -jar`. Keep daemon-only IceBridge classes out of frostwire.jar so the
+    // two artifacts don't duplicate them: frostwire.jar retains only the
+    // in-process client surface (client/*, host cache, protocol constants/DTOs).
+    // When adding new daemon-only classes under these packages, extend this list.
+    def icebridge = 'com/frostwire/search/relay/icebridge/'
+    exclude([
+        'IceBridgeAuth*',
+        'IceBridgeDhtSession*',
+        'IceBridgeException*',
+        'IceBridgeMetrics*',
+        'IceBridgeServer*',
+        'IceBridgeTokens*',
+        'RelayMesh*',
+        'control/ControlHandler*',
+        'control/ControlServer*',
+        'control/InboundMessageQueue*',
+        'peer/**',
+        'udp/**',
+    ].collect { icebridge + it })
+
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
