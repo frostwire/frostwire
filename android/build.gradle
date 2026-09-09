@@ -116,12 +116,17 @@ def androidSigningKeyPassword = firstNonBlank(
 )
 
 if (isRootAssembleRelease && !androidSigningEnvKeyPassword) {
-    throw new GradleException(
-            "assembleRelease requires FROSTWIRE_ANDROID_KEY_PASSWORD to be set in the environment.\n" +
-                    "Example:\n" +
-                    "  export FROSTWIRE_ANDROID_KEY_PASSWORD='your-keystore-password'\n" +
-                    "  ./gradlew clean assembleRelease"
-    )
+    // Fail after the task graph is ready, not during configuration: throwing
+    // here would abort evaluation before the android {} block sets compileSdk,
+    // and AGP then reports a second, misleading failure that buries the cause.
+    gradle.taskGraph.whenReady {
+        throw new GradleException(
+                "FROSTWIRE_ANDROID_KEY_PASSWORD is not set in the environment.\n" +
+                        "Export the keystore password first:\n" +
+                        "  export FROSTWIRE_ANDROID_KEY_PASSWORD='your-keystore-password'\n" +
+                        "  ./gradlew clean assembleRelease"
+        )
+    }
 }
 
 android {
@@ -203,7 +208,10 @@ android {
 
     signingConfigs {
         release {
-            if (isAssembleRelease) {
+            // Skip the interactive password prompt when the env password is
+            // missing: the deferred gate above fails the build with a clear
+            // message instead.
+            if (isAssembleRelease && androidSigningEnvKeyPassword) {
                 storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
                 def sigRequester = new SignatureRequester(androidSigningKeyAlias, androidSigningKeyPassword)
                 sigRequester.ask()
