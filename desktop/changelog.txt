@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:macOS installs ship icebridge.jar beside frostwire.jar and both jars' native libraries are signed; frostwire.jar no longer duplicates daemon-only IceBridge classes
   - fix:JDK 26 HTTPS requests no longer fail after IceBridge identity initialization; Bouncy Castle is kept scoped to identity crypto instead of overriding the JVM-wide XDH provider
   - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
   - fix:macOS native file icons use FileSystemView on JDK 26 instead of reflectively constructing the non-exported com.apple.laf.AquaLookAndFeel
