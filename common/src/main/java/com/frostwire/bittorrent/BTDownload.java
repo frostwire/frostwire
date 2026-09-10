@@ -436,10 +436,20 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public void pause() {
+        pause(true);
+    }
+
+    public void pauseForPolicy() {
+        pause(false);
+    }
+
+    private void pause(boolean explicitlyPaused) {
         if (!th.isValid()) {
             return;
         }
-        extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
+        if (explicitlyPaused) {
+            extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
+        }
         th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
         invalidateStatusCache();
