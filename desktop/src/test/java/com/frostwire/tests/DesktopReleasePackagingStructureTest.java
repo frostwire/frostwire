@@ -98,15 +98,20 @@ class DesktopReleasePackagingStructureTest {
   }
 
   @Test
-  void macNativeIconsAvoidAquaLookAndFeelReflection() throws Exception {
+  void macNativeIconsUseChooserViewForRichIcons() throws Exception {
     String nativeFileIconController =
         Files.readString(
             DESKTOP.resolve(
                 "src/main/java/com/limegroup/gnutella/gui/NativeFileIconController.java"));
 
-    assertTrue(nativeFileIconController.contains("OSUtils.isWindows() || OSUtils.isMacOSX()"));
-    assertTrue(nativeFileIconController.contains("return constructFSVView()"));
-    assertTrue(nativeFileIconController.contains("VIEW.getSystemIcon(f)"));
+    // FileSystemView returns only generic icons on JDK 26; macOS must keep the
+    // JFileChooser native view (rich per-type Aqua icons), resolved via
+    // ResourceManager.getNativeUI which degrades gracefully without the
+    // --add-exports flag the mac bundle ships.
+    assertTrue(
+        nativeFileIconController.contains("if (OSUtils.isWindows()) return constructFSVView()"));
+    assertTrue(nativeFileIconController.contains("return constructFileChooserView()"));
+    assertFalse(nativeFileIconController.contains("OSUtils.isWindows() || OSUtils.isMacOSX()"));
   }
 
   @Test
