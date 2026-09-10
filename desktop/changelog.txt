@@ -2,7 +2,7 @@
   - fix:macOS installs ship icebridge.jar beside frostwire.jar and both jars' native libraries are signed; frostwire.jar no longer duplicates daemon-only IceBridge classes
   - fix:JDK 26 HTTPS requests no longer fail after IceBridge identity initialization; Bouncy Castle is kept scoped to identity crypto instead of overriding the JVM-wide XDH provider
   - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
-  - fix:macOS native file icons use FileSystemView on JDK 26 instead of reflectively constructing the non-exported com.apple.laf.AquaLookAndFeel
+  - fix:macOS file rows show rich native icons again — the JFileChooser native view is used (FileSystemView returns only generic icons on JDK 26) and the bundled app passes --add-exports for com.apple.laf like frostwire.sh does
   - cleanup:Desktop builds support JDK 26 by upgrading google-java-format from 1.24.0 to 1.36.1
   - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
   - new:Transfers default columns — Actions, Name, Seeding, Size, Status, Progress, Down Speed, Downloaded, Uploaded, Up Speed, Time, Seeds; Tips/Donations hidden, Uploaded shown (existing custom layouts untouched)
