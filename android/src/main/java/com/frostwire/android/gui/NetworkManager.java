@@ -123,22 +123,25 @@ public final class NetworkManager {
                 @Override
                 public void onAvailable(Network network) {
                     LOG.info("Network available: " + network);
-                    updateNetworkState();
-                    notifyNetworkChange();
+                    if (updateNetworkState()) {
+                        notifyNetworkChange();
+                    }
                 }
 
                 @Override
                 public void onLost(Network network) {
                     LOG.info("Network lost: " + network);
-                    updateNetworkState();
-                    notifyNetworkChange();
+                    if (updateNetworkState()) {
+                        notifyNetworkChange();
+                    }
                 }
 
                 @Override
                 public void onCapabilitiesChanged(Network network, NetworkCapabilities capabilities) {
                     LOG.info("Network capabilities changed: " + network);
-                    updateNetworkState();
-                    notifyNetworkChange();
+                    if (updateNetworkState()) {
+                        notifyNetworkChange();
+                    }
                 }
             };
 
@@ -172,13 +175,16 @@ public final class NetworkManager {
      * Updates the current network state by checking active network capabilities.
      * Uses modern NetworkCapabilities API instead of deprecated TYPE_WIFI/TYPE_MOBILE.
      */
-    private void updateNetworkState() {
+    private boolean updateNetworkState() {
+        boolean previousWifi = isWifiConnected;
+        boolean previousMobile = isMobileConnected;
+        boolean previousVpn = isVpnConnected;
         ConnectivityManager connectivityManager = getConnectivityManager();
         if (connectivityManager == null) {
             isWifiConnected = false;
             isMobileConnected = false;
             isVpnConnected = false;
-            return;
+            return previousWifi || previousMobile || previousVpn;
         }
 
         Network activeNetwork = connectivityManager.getActiveNetwork();
@@ -186,7 +192,7 @@ public final class NetworkManager {
             isWifiConnected = false;
             isMobileConnected = false;
             isVpnConnected = false;
-            return;
+            return previousWifi || previousMobile || previousVpn;
         }
 
         NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
@@ -194,16 +200,18 @@ public final class NetworkManager {
             isWifiConnected = false;
             isMobileConnected = false;
             isVpnConnected = false;
-            return;
+            return previousWifi || previousMobile || previousVpn;
         }
 
         // Save previous state to detect transitions
-        wasWifiConnected = isWifiConnected;
-        wasMobileConnected = isMobileConnected;
+        wasWifiConnected = previousWifi;
+        wasMobileConnected = previousMobile;
 
         isWifiConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
         isMobileConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
         isVpnConnected = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN);
+        return previousWifi != isWifiConnected || previousMobile != isMobileConnected ||
+                previousVpn != isVpnConnected;
     }
 
     /**
@@ -226,19 +234,18 @@ public final class NetworkManager {
         boolean wasVpnConnected = isVpnConnected;
         boolean wasTunnelUp = tunnelUp;
 
-        updateNetworkState();
+        boolean networkChanged = updateNetworkState();
         detectTunnel();
 
         // If VPN status changed, notify even if network itself didn't change
-        if (wasVpnConnected != isVpnConnected || wasTunnelUp != tunnelUp) {
+        if (networkChanged || wasVpnConnected != isVpnConnected || wasTunnelUp != tunnelUp) {
             LOG.info("VPN state changed, notifying network listeners");
             notifyNetworkChange();
         }
     }
 
     public boolean isInternetDataConnectionUp() {
-        // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
-        return isWifiConnected != isMobileConnected;
+        return isWifiConnected || isMobileConnected;
     }
 
     public boolean isDataMobileUp() {
