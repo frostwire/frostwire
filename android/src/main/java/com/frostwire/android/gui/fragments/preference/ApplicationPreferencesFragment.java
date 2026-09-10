@@ -159,7 +159,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, newVal);
             if (newVal && TransferManager.instance().isBittorrentOnVpnOnlyAndNoVpn()) {
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
-                        () -> TransferManager.instance().pauseTorrents());
+                        () -> TransferManager.instance().suspendTorrentsForPolicy());
                 UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
             } else if (!newVal) {
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
