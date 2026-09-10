@@ -114,8 +114,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         super.onResume();
         syncTransferFromIntent();
         ensureTorrentHandle(); // Purposefully not async.
-        // Populate cache before updating UI
-        updateTransferDataCache();
+        // Populate cache off the UI thread (updateCachedState performs
+        // blocking JNI); the timer paints the header from cache right after.
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::updateTransferDataCache);
         updateCommonComponents();
     }
 
@@ -190,6 +191,11 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private void updateTransferDataCache() {
         try {
             if (uiBittorrentDownload != null) {
+                // Refresh the wrapper cache first: while this detail screen is
+                // foreground the transfers list is paused, so nothing else
+                // refreshes it and the header would freeze otherwise.
+                // Runs on the DOWNLOADER thread (see callers), never the UI thread.
+                uiBittorrentDownload.updateCachedState();
                 cachedProgress = uiBittorrentDownload.getProgress();
                 cachedDownloadSpeed = uiBittorrentDownload.getDownloadSpeed();
                 cachedUploadSpeed = uiBittorrentDownload.getUploadSpeed();
