@@ -76,6 +76,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private volatile boolean cachedPaused;
     private volatile boolean removedFromSharing;
     private volatile boolean sharingPaused;
+    private volatile boolean policyPaused;
     private volatile boolean cachedFinished;
     private volatile boolean cachedComplete;
     private volatile String cachedMagnetUri;
@@ -100,9 +101,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         // This prevents TransactionTooLargeException when fragments are destroyed.
         this.items = null;
 
-        boolean vpnGuardBlocksTorrent = manager.isBittorrentOnVpnOnlyAndNoVpn();
-        if (vpnGuardBlocksTorrent) {
-            dl.pause();
+        boolean networkPolicyBlocksTorrent = manager.isBittorrentOnVpnOnlyAndNoVpn() || manager.isMobileAndDataSavingsOn();
+        if (networkPolicyBlocksTorrent) {
+            pauseForPolicy();
         } else if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
             dl.resume();
         }
@@ -114,7 +115,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         // Initialize cached state (may block briefly, but only during construction)
         updateCachedState();
-        if (vpnGuardBlocksTorrent) {
+        if (networkPolicyBlocksTorrent) {
             cachedPaused = true;
             cachedState = TransferState.PAUSED;
         }
@@ -283,6 +284,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public void pause() {
+        policyPaused = false;
         sharingPaused = true;
         if (!dl.wasPaused()) {
             dl.pause();
@@ -294,7 +296,25 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public void resume() {
         dl.resume();
+        policyPaused = false;
         sharingPaused = false;
+    }
+
+    public void pauseForPolicy() {
+        if (dl.wasPaused()) {
+            return;
+        }
+        policyPaused = true;
+        dl.pauseForPolicy();
+        cachedPaused = true;
+        cachedState = TransferState.PAUSED;
+    }
+
+    public void resumeFromPolicy() {
+        if (policyPaused) {
+            policyPaused = false;
+            dl.resume();
+        }
     }
 
     @Override
