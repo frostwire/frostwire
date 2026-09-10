@@ -156,7 +156,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       throw new java.io.InterruptedIOException("IceBridge startup cancelled or timed out");
     }
 
-    String java = ProcessHandle.current().info().command().orElse("java");
+    String java = resolveJavaBinary();
     List<String> command = new ArrayList<>();
     command.add(java);
     command.add("-jar");
@@ -212,6 +212,47 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       stopProcess();
       throw e;
     }
+  }
+
+  /**
+   * Resolve the {@code java} binary used to spawn the IceBridge child.
+   *
+   * <p>Never trusts {@code ProcessHandle.current().info().command()}: native launchers (macOS .app,
+   * Windows .exe) boot the JVM in-process via JNI, so the current process image is the application
+   * binary itself. Spawning it with {@code -jar} would boot a second full FrostWire instead of the
+   * relay daemon — and each copy spawns its own child (fork bomb). Prefer {@code
+   * <java.home>/bin/java}; fail closed otherwise.
+   */
+  static String resolveJavaBinary() throws IOException {
+    String javaHome = System.getProperty("java.home", "");
+    if (!javaHome.isEmpty()) {
+      String exe = com.frostwire.util.OSUtils.isWindows() ? "java.exe" : "java";
+      File candidate = new File(javaHome + File.separator + "bin" + File.separator + exe);
+      if (isJavaBinary(candidate)) {
+        return candidate.getAbsolutePath();
+      }
+    }
+    String current = ProcessHandle.current().info().command().orElse("");
+    if (!current.isEmpty() && isJavaBinary(new File(current))) {
+      return current;
+    }
+    throw new IOException(
+        "Cannot launch IceBridge child: no java binary found (java.home="
+            + javaHome
+            + ", current process image="
+            + current
+            + "). The current image is a native launcher, not java.");
+  }
+
+  static boolean isJavaBinary(File f) {
+    if (f == null || !f.isFile() || !f.canExecute()) {
+      return false;
+    }
+    String name = f.getName().toLowerCase(java.util.Locale.ROOT);
+    return name.equals("java")
+        || name.equals("java.exe")
+        || name.equals("javaw")
+        || name.equals("javaw.exe");
   }
 
   private Path createTokenFile(Path directory) throws IOException {
