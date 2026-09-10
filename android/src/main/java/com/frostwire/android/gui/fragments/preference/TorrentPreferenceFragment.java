@@ -62,8 +62,11 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
                 boolean newVal = (Boolean) newValue;
                 if (!newVal) { // not seeding at all
                     SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().stopSeedingTorrents());
+                            () -> TransferManager.instance().suspendSeedingTorrents());
                     UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
+                } else {
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> TransferManager.instance().resumePolicySuspendedSeeding());
                 }
                 if (preferenceSeedingWifiOnly != null) {
                     preferenceSeedingWifiOnly.setEnabled(newVal);
@@ -77,8 +80,11 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
                 boolean newVal = (Boolean) newValue;
                 if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
                     SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
-                            () -> TransferManager.instance().stopSeedingTorrents());
+                            () -> TransferManager.instance().suspendSeedingTorrents());
                     UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
+                } else {
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                            () -> TransferManager.instance().resumePolicySuspendedSeeding());
                 }
                 return true;
             });
