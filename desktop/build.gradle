@@ -124,6 +124,9 @@ tasks.named('run') {
 repositories {
     mavenCentral()
     maven { url = 'https://dl.frostwire.com/maven' }
+    flatDir {
+        dir '../dependencies'
+    }
 }
 
 dependencies {
