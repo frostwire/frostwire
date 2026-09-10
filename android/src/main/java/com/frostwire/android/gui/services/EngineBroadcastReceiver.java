@@ -100,7 +100,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             handleDisconnectedNetwork(networkManager);
         }
 
-        handleNetworkStatusChange();
         reopenNetworkSockets();
     }
 
@@ -123,7 +122,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         // If only mobile data is available and user doesn't allow torrents on mobile
         if (isMobileDataOnly && !useTorrentsOnMobileData) {
             LOG.info("Connected to mobile network but user has WiFi-only setting enabled. Pausing torrents.");
-            TransferManager.instance().pauseTorrents();
+            TransferManager.instance().suspendTorrentsForPolicy();
             Engine.instance().stopServices(true);
             return;
         }
@@ -134,7 +133,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
         if (vpnGuardEnabled && !hasVpn) {
             LOG.info("VPN guard enabled but no VPN detected. Pausing torrents.");
-            TransferManager.instance().pauseTorrents();
+            TransferManager.instance().suspendTorrentsForPolicy();
             Engine.instance().stopServices(true);
             return;
         }
@@ -144,8 +143,11 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             Engine.instance().resumeServicesIfDisconnected();
         }
 
+        TransferManager.instance().resumePolicySuspendedDownloads();
         if (shouldStopSeeding()) {
-            TransferManager.instance().stopSeedingTorrents();
+            TransferManager.instance().suspendSeedingTorrents();
+        } else {
+            TransferManager.instance().resumePolicySuspendedSeeding();
         }
     }
 
@@ -156,10 +158,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info("Disconnected from network");
 
         Engine.instance().stopServices(true);
-    }
-
-    private void handleNetworkStatusChange() {
-        NetworkManager.queryNetworkStatusBackground(NetworkManager.instance());
     }
 
     private boolean shouldStopSeeding() {
