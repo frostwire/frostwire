@@ -57,8 +57,13 @@ public class NativeFileIconController implements FileIconController {
 
   /** Retrieves the native FileView. */
   private SmartFileView getNativeFileView() {
-    // Avoid file-chooser look-and-feel internals on platforms with native FileSystemView icons.
-    if (OSUtils.isWindows() || OSUtils.isMacOSX()) return constructFSVView();
+    // Deadlocks happen on Windows when using file-chooser based view.
+    if (OSUtils.isWindows()) return constructFSVView();
+    // macOS uses the JFileChooser native view: FileSystemView only returns generic
+    // icons on JDK 26, while the Aqua file view yields rich per-type icons.
+    // Resolving it goes through ResourceManager.getNativeUI, which degrades
+    // gracefully (falls back to the current UI) when com.apple.laf is not
+    // accessible; the mac bundle passes --add-exports for it (see appbundler.xml).
     else return constructFileChooserView();
   }
 
