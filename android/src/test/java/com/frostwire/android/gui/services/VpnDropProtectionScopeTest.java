@@ -26,11 +26,11 @@ public class VpnDropProtectionScopeTest {
     String vpnGuardBlock =
         blockStartingAt(source, "VPN guard enabled but no VPN detected. Pausing torrents.");
 
-    assertTrue(vpnGuardBlock.contains("TransferManager.instance().pauseTorrents();"));
+    assertTrue(vpnGuardBlock.contains("TransferManager.instance().suspendTorrentsForPolicy();"));
     assertTrue(vpnGuardBlock.contains("Pausing torrents."));
     assertTrue(vpnGuardBlock.contains("Engine.instance().stopServices(true);"));
     assertTrue(
-        vpnGuardBlock.indexOf("TransferManager.instance().pauseTorrents();")
+        vpnGuardBlock.indexOf("TransferManager.instance().suspendTorrentsForPolicy();")
             < vpnGuardBlock.indexOf("Engine.instance().stopServices(true);"));
   }
 
@@ -62,7 +62,7 @@ public class VpnDropProtectionScopeTest {
     String restoreBlock = blockStartingAt(source, "BTEngineListenerChain.install(btEngine, engineListener)");
 
     assertTrue(restoreBlock.contains("isBittorrentOnVpnOnlyAndNoVpn()"));
-    assertTrue(restoreBlock.contains("pauseTorrents();"));
+    assertTrue(restoreBlock.contains("suspendTorrentsForPolicy();"));
   }
 
   @Test
@@ -73,7 +73,7 @@ public class VpnDropProtectionScopeTest {
     String constructorBlock = blockStartingAt(source, "public UIBittorrentDownload(TransferManager manager, BTDownload dl)");
 
     assertTrue(constructorBlock.contains("manager.isBittorrentOnVpnOnlyAndNoVpn()"));
-    assertTrue(constructorBlock.contains("dl.pause();"));
+    assertTrue(constructorBlock.contains("pauseForPolicy();"));
     assertTrue(constructorBlock.contains("cachedState = TransferState.PAUSED;"));
 
     String updateBlock = blockStartingAt(source, "public void updateCachedState()");
@@ -91,7 +91,7 @@ public class VpnDropProtectionScopeTest {
     assertTrue(
         vpnPreferenceBlock.contains(
             "ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, newVal);"));
-    assertTrue(vpnPreferenceBlock.contains("() -> TransferManager.instance().pauseTorrents()"));
+    assertTrue(vpnPreferenceBlock.contains("() -> TransferManager.instance().suspendTorrentsForPolicy()"));
     assertTrue(
         vpnPreferenceBlock.contains(
             "SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,"));
