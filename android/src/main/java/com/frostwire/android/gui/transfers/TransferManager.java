@@ -169,7 +169,6 @@ public final class TransferManager {
 
     public void reset() {
         registerPreferencesChangeListener();
-        clearTransfers();
         sessionTorrentsRestored.set(false);
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> loadTorrentsTask(0));
     }
@@ -423,6 +422,49 @@ public final class TransferManager {
             for (BittorrentDownload d : bittorrentDownloadsList) {
                 if (d.isSeeding() || d.isComplete()) {
                     d.pause();
+                }
+            }
+        }
+    }
+
+    public void suspendSeedingTorrents() {
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if ((d.isSeeding() || d.isComplete()) && d instanceof UIBittorrentDownload) {
+                    ((UIBittorrentDownload) d).pauseForPolicy();
+                }
+            }
+        }
+    }
+
+    public void suspendTorrentsForPolicy() {
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (d instanceof UIBittorrentDownload) {
+                    ((UIBittorrentDownload) d).pauseForPolicy();
+                }
+            }
+        }
+    }
+
+    public void resumePolicySuspendedDownloads() {
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (!d.isComplete() && d instanceof UIBittorrentDownload) {
+                    ((UIBittorrentDownload) d).resumeFromPolicy();
+                }
+            }
+        }
+    }
+
+    public void resumePolicySuspendedSeeding() {
+        if (isMobileAndDataSavingsOn() || isBittorrentOnVpnOnlyAndNoVpn()) {
+            return;
+        }
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (d.isComplete() && d instanceof UIBittorrentDownload) {
+                    ((UIBittorrentDownload) d).resumeFromPolicy();
                 }
             }
         }
@@ -907,7 +949,7 @@ public final class TransferManager {
             BTEngineListenerChain.install(btEngine, engineListener);
             btEngine.restoreDownloads();
             if (isBittorrentOnVpnOnlyAndNoVpn()) {
-                pauseTorrents();
+                suspendTorrentsForPolicy();
                 LOG.info("VPN guard enabled without VPN. Paused restored torrents.");
             }
         } catch (Throwable t) {
