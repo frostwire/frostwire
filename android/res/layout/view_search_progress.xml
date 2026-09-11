@@ -43,6 +43,19 @@
             android:visibility="gone" />
 
         <TextView
+            android:id="@+id/view_search_progress_text_icebridge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:text="@string/search_icebridge_starting"
+            android:textColor="@color/app_text_secondary"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/view_search_progress_text_no_results_feedback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
