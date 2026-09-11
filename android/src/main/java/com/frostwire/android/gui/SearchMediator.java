@@ -30,6 +30,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
 
@@ -54,6 +55,7 @@ public final class SearchMediator {
     private List<String> currentSearchTokens;
     private boolean searchFinished;
     private TellurideCourier.SearchPerformer lastTellurideCourier;
+    private volatile DistributedSearchPerformer distributedPerformer;
 
     private static final class InstanceHolder {
         private static final SearchMediator instance = new SearchMediator();
@@ -118,12 +120,16 @@ public final class SearchMediator {
         currentSearchToken = nextSearchToken();
         currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
         searchFinished = false;
+        distributedPerformer = null;
         ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
         int started = 0;
         for (SearchEngine se : shuffledEngines) {
             if (se.isEnabled() && se.isReady()) {
                 ISearchPerformer p = se.getPerformer(currentSearchToken, query);
+                if (p instanceof DistributedSearchPerformer) {
+                    distributedPerformer = (DistributedSearchPerformer) p;
+                }
                 manager.perform(p);
                 started++;
             }
@@ -157,6 +163,7 @@ public final class SearchMediator {
         currentSearchToken = 0;
         currentSearchTokens = null;
         searchFinished = true;
+        distributedPerformer = null;
         manager.stop();
         if (lastTellurideCourier != null) {
             lastTellurideCourier.stop();
@@ -169,6 +176,11 @@ public final class SearchMediator {
 
     public boolean isSearchFinished() {
         return searchFinished;
+    }
+
+    public int distributedPeersContacted() {
+        DistributedSearchPerformer performer = distributedPerformer;
+        return performer == null ? 0 : performer.getPeersContacted();
     }
 
     /** Active search token, or 0 when cancelled / never started. */
