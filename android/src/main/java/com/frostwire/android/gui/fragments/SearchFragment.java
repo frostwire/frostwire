@@ -52,6 +52,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.SearchMediator;
+import com.frostwire.android.search.AndroidRelayStack;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
@@ -123,6 +124,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private HeaderBanner headerBanner;
     private FWBannerView supportBanner;
     private final AtomicBoolean cancelling = new AtomicBoolean(false);
+    private final Runnable iceBridgeHintTicker = this::onIceBridgeHintTick;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -374,6 +376,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         // Immediate feedback: leave promos, show spinner + Cancel (not Retry / no-results).
         if (searchProgress != null) {
             searchProgress.setProgressEnabled(true);
+            startIceBridgeHintTicker();
         }
         if (deepSearchProgress != null) {
             deepSearchProgress.setVisibility(View.VISIBLE);
@@ -511,6 +514,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         searchInput.setFileTypeCountersVisible(false);
         hideSupportBanner();
         currentQuery = null;
+        stopIceBridgeHintTicker();
         searchProgress.setProgressEnabled(false);
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
@@ -578,8 +582,62 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         }
         // Progress spinner vs "No results" + Retry — must use setProgressEnabled (not View.setEnabled).
         if (searchProgress != null) {
-            searchProgress.setProgressEnabled(!searchFinished && !searchStopped);
+            boolean searching = !searchFinished && !searchStopped;
+            searchProgress.setProgressEnabled(searching);
+            if (searching) {
+                startIceBridgeHintTicker();
+            } else {
+                stopIceBridgeHintTicker();
+            }
         }
+    }
+
+    private void startIceBridgeHintTicker() {
+        if (searchProgress == null) {
+            return;
+        }
+        searchProgress.removeCallbacks(iceBridgeHintTicker);
+        refreshIceBridgeHint();
+        searchProgress.postDelayed(iceBridgeHintTicker, 400);
+    }
+
+    private void stopIceBridgeHintTicker() {
+        if (searchProgress != null) {
+            searchProgress.removeCallbacks(iceBridgeHintTicker);
+            searchProgress.setIceBridgeHint(null);
+        }
+    }
+
+    private void onIceBridgeHintTick() {
+        if (!isAdded() || searchProgress == null) {
+            return;
+        }
+        SearchMediator mediator = SearchMediator.instance();
+        boolean searching = mediator != null && !mediator.isSearchFinished() && !mediator.isSearchStopped();
+        refreshIceBridgeHint();
+        if (searching) {
+            searchProgress.postDelayed(iceBridgeHintTicker, 400);
+        }
+    }
+
+    private void refreshIceBridgeHint() {
+        if (searchProgress == null) {
+            return;
+        }
+        if (!SearchEngine.DISTRIBUTED.isEnabled()) {
+            searchProgress.setIceBridgeHint(null);
+            return;
+        }
+        if (!SearchEngine.DISTRIBUTED.isReady()) {
+            if (AndroidRelayStack.isParticipationEnabled()) {
+                searchProgress.setIceBridgeHint(getString(R.string.search_icebridge_starting));
+            } else {
+                searchProgress.setIceBridgeHint(getString(R.string.search_icebridge_not_running));
+            }
+            return;
+        }
+        int peers = SearchMediator.instance().distributedPeersContacted();
+        searchProgress.setIceBridgeHint(getString(R.string.search_icebridge_peers_contacted, peers));
     }
 
     private void switchView(View v, int id) {
