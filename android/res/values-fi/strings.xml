@@ -625,6 +625,9 @@
     <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
 
     <string name="searching_feedback">Searching…</string>
+    <string name="search_icebridge_starting">Käynnistetään hajautettua hakua…</string>
+    <string name="search_icebridge_not_running">Hajautettu haku ei ole käynnissä</string>
+    <string name="search_icebridge_peers_contacted">Hajautettu haku · %1$d vertaista tavoitettu</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
