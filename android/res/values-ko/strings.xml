@@ -625,6 +625,9 @@
     <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
 
     <string name="searching_feedback">Searching…</string>
+    <string name="search_icebridge_starting">분산 검색을 시작하는 중…</string>
+    <string name="search_icebridge_not_running">분산 검색이 실행 중이 아닙니다</string>
+    <string name="search_icebridge_peers_contacted">분산 검색 · 피어 %1$d개 연결됨</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
