@@ -42,6 +42,7 @@ public class SearchProgressView extends LinearLayout {
     private Button buttonCancel;
     private TextView textNoResults;
     private TextView textSearching;
+    private TextView textIceBridge;
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
     private TextView textNoDataConnection;
@@ -118,6 +119,7 @@ public class SearchProgressView extends LinearLayout {
         buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
         textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
         textSearching = findViewById(R.id.view_search_progress_text_searching);
+        textIceBridge = findViewById(R.id.view_search_progress_text_icebridge);
         textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
         textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
         textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
@@ -132,6 +134,19 @@ public class SearchProgressView extends LinearLayout {
         }
         if (textSearching != null) {
             textSearching.setVisibility(View.GONE);
+        }
+        setIceBridgeHint(null);
+    }
+
+    public void setIceBridgeHint(CharSequence hint) {
+        if (textIceBridge == null) {
+            return;
+        }
+        if (hint == null || hint.length() == 0) {
+            textIceBridge.setVisibility(View.GONE);
+        } else {
+            textIceBridge.setText(hint);
+            textIceBridge.setVisibility(View.VISIBLE);
         }
     }
 
@@ -163,6 +178,7 @@ public class SearchProgressView extends LinearLayout {
         if (textSearching != null) {
             textSearching.setVisibility(View.GONE);
         }
+        setIceBridgeHint(null);
         if (textNoResults != null) {
             textNoResults.setVisibility(View.VISIBLE);
         }
