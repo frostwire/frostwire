@@ -625,6 +625,9 @@
     <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
 
     <string name="searching_feedback">Searching…</string>
+    <string name="search_icebridge_starting">Gedistribueerd zoeken starten…</string>
+    <string name="search_icebridge_not_running">Gedistribueerd zoeken is niet actief</string>
+    <string name="search_icebridge_peers_contacted">Gedistribueerd zoeken · %1$d peers benaderd</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
