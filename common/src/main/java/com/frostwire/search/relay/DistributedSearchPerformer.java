@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Search performer that merges local {@link LocalIndex} results with
@@ -94,6 +95,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private volatile SearchListener listener;
     private volatile CountDownLatch activeWait;
     private volatile long deadlineNanos;
+    private final AtomicInteger peersContacted = new AtomicInteger();
     private final List<DistributedSearchTransport.SendOperation> activeSends = new CopyOnWriteArrayList<>();
 
     public DistributedSearchPerformer(long token, String keywords,
@@ -207,6 +209,10 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
 
     public String getKeywords() {
         return keywords;
+    }
+
+    public int getPeersContacted() {
+        return peersContacted.get();
     }
 
     @Override
@@ -505,6 +511,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         pendingRequest.complete(latch);
                         continue;
                     }
+                    peersContacted.incrementAndGet();
                     sends.add(SENDERS.submit(() -> {
                         try {
                             if (!operation.execute()) {
