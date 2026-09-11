@@ -625,6 +625,9 @@
     <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
 
     <string name="searching_feedback">Searching…</string>
+    <string name="search_icebridge_starting">పంపిణీ శోధన ప్రారంభమవుతోంది…</string>
+    <string name="search_icebridge_not_running">పంపిణీ శోధన నడుస్తున్నది కాదు</string>
+    <string name="search_icebridge_peers_contacted">పంపిణీ శోధన · %1$d పీర్లను సంప్రదించారు</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
