@@ -625,6 +625,9 @@
     <string name="distributed_icebridge_pinging">Pinging known hosts…</string>
 
     <string name="searching_feedback">Searching…</string>
+    <string name="search_icebridge_starting">Запуск размеркаванага пошуку…</string>
+    <string name="search_icebridge_not_running">Размеркаваны пошук не запушчаны</string>
+    <string name="search_icebridge_peers_contacted">Размеркаваны пошук · звязаліся з %1$d пірамі</string>
     <string name="distributed_identity_public_key">Public Key</string>
     <string name="distributed_identity_karma">Karma Score</string>
     <string name="distributed_identity_shared_count">Shared Torrents</string>
