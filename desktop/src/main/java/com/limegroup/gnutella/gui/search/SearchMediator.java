@@ -81,10 +81,7 @@ public final class SearchMediator {
 
   private static volatile SearchMediator instance;
 
-  /**
-   * This instance handles the display of all search results. TODO: Changed to package-protected for
-   * testing to add special results
-   */
+  /** This instance handles the display of all search results. */
   private static SearchResultDisplayer RESULT_DISPLAYER;
 
   private static JComponent RESULT_COMPONENT_PLACEHOLDER;
