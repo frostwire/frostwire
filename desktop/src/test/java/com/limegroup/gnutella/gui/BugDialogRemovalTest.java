@@ -70,6 +70,18 @@ class BugDialogRemovalTest {
   }
 
   @Test
+  void deadBugSettingsAreGone() throws Exception {
+    String settings =
+        readSource("desktop/src/main/java/com/limegroup/gnutella/settings/BugSettings.java");
+    assertFalse(
+        settings.contains("BUG_REPORT_SERVER"), "dead doctor-servlet endpoint setting must go");
+    assertFalse(settings.contains("USE_AUTOMATIC_BUG"), "dead auto-send setting must go");
+    assertFalse(settings.contains("IGNORE_ALL_BUGS"), "dead discard-all setting must go");
+    assertTrue(settings.contains("SEND_DEADLOCK_BUGS"), "live deadlock toggle must stay");
+    assertTrue(settings.contains("LOG_BUGS_LOCALLY"), "live local-log toggle must stay");
+  }
+
+  @Test
   void bugReportsOptionsPaneIsGone() throws Exception {
     assertFalse(
         sourceExists(
