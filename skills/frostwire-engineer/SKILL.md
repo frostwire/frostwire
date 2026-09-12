@@ -434,6 +434,8 @@ Never batch failed tests into a "fix later" commit. Never commit `desktop/GROK_R
 - **Prefix with scope tag in brackets**: `[desktop]`, `[android]`, `[common]`, or `[all]`.
 - **Reference issue numbers** so GitHub auto-links them: `(#1291)`.
 - **Imperative mood**: "Fix NPE" not "Fixed NPE" or "Fixes NPE".
+- **Append the exact LLM model identifier used to author the commit** at the
+  end of every commit message, for example `openai/gpt-5.6-luna`.
 - First line ≤ 72 chars. Body wraps at 72. Use a blank line between summary and body.
 
 ### Clean History
