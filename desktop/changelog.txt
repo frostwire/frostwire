@@ -169,6 +169,7 @@
   - fix:Transfer detail Pieces tab now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
   - fix:Removed dead estimateRowsBytes() method from RemoteSearchResponse
   - cleanup:Removed the legacy doctor-servlet bug report dialogs; errors report silently through Icebase, deadlocks through the crash spooler, and the fatal dialog no longer contacts the retired endpoint
+  - new:Transfer Detail General tab offers Check Local Data and a per-torrent Sequential download toggle; Trackers menu offers Add Tracker with strong URL validation, and Edit Trackers now trims entries and names the offending line
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
