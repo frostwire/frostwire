@@ -513,6 +513,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.BugDialogRemovalTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DefaultErrorCatcherTest"
         includeTestsMatching "com.limegroup.gnutella.LifecycleManagerImplTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DesktopRelayLifecycleTest"
