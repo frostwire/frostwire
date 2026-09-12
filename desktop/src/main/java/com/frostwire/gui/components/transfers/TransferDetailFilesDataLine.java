@@ -2,17 +2,17 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,128 +26,142 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.ProgressBarHolder;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 
-public final class TransferDetailFilesDataLine extends AbstractDataLine<TransferDetailFiles.TransferItemHolder> {
-    // TODO: Marcelina's design includes a "Share" column with a share button for each file.
-    // This will require:
-    // -> Creating a new torrent out of that file
-    // -> The button only shows when the file is complete
-    // -> A custom cell renderer for that column that displays a button and it's action listener
-    static LimeTableColumn ACTIONS_COLUMN;
-    static LimeTableColumn PRIORITY_COLUMN;
-    private static final LimeTableColumn[] columns = new LimeTableColumn[]{
-            // See TransferDetailFilesActionsRenderer for action's code
-            ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 80, true, true, true, TransferDetailFiles.TransferItemHolder.class),
-            new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
-            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 350, true, true, true, String.class),
-            new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 120, true, ProgressBarHolder.class),
-            new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 80, true, true, true, SizeHolder.class),
-            new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 80, true, true, true, String.class),
-            PRIORITY_COLUMN = new LimeTableColumn(6, "PRIORITY", I18n.tr("Priority"), 100, true, true, true, String.class),
-    };
+public final class TransferDetailFilesDataLine
+    extends AbstractDataLine<TransferDetailFiles.TransferItemHolder> {
+  // Per-file Share lives in the ACTIONS column (see TransferDetailFilesActionsRenderer):
+  // faded until the file is complete, then creates and seeds a torrent from the file.
+  static LimeTableColumn ACTIONS_COLUMN;
+  static LimeTableColumn PRIORITY_COLUMN;
+  private static final LimeTableColumn[] columns =
+      new LimeTableColumn[] {
+        // See TransferDetailFilesActionsRenderer for action's code
+        ACTIONS_COLUMN =
+            new LimeTableColumn(
+                0,
+                "ACTIONS",
+                I18n.tr("Actions"),
+                80,
+                true,
+                true,
+                true,
+                TransferDetailFiles.TransferItemHolder.class),
+        new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
+        new LimeTableColumn(2, "NAME", I18n.tr("Name"), 350, true, true, true, String.class),
+        new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 120, true, ProgressBarHolder.class),
+        new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 80, true, true, true, SizeHolder.class),
+        new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 80, true, true, true, String.class),
+        PRIORITY_COLUMN =
+            new LimeTableColumn(
+                6, "PRIORITY", I18n.tr("Priority"), 100, true, true, true, String.class),
+      };
 
-    public TransferDetailFilesDataLine() {
+  public TransferDetailFilesDataLine() {}
+
+  @Override
+  public int getColumnCount() {
+    return columns.length;
+  }
+
+  @Override
+  public LimeTableColumn getColumn(int col) {
+    return columns[col];
+  }
+
+  @Override
+  public boolean isDynamic(int col) {
+    return false;
+  }
+
+  @Override
+  public boolean isClippable(int col) {
+    return false;
+  }
+
+  @Override
+  public Object getValueAt(int col) {
+    final TransferDetailFiles.TransferItemHolder holder = getInitializeObject();
+    if (holder == null) {
+      return null;
     }
-
-    @Override
-    public int getColumnCount() {
-        return columns.length;
+    final int ACTIONS = 0;
+    final int NUMBER = 1;
+    final int NAME = 2;
+    final int PROGRESS = 3;
+    final int SIZE = 4;
+    final int TYPE = 5;
+    final int PRIORITY = 6;
+    switch (col) {
+      case NUMBER:
+        return holder.fileOffset + 1; // humans...
+      case NAME:
+        return holder.displayName;
+      case PROGRESS:
+        return holder.complete ? 100 : holder.progress;
+      case SIZE:
+        return new SizeHolder(holder.transferItem.getSize());
+      case TYPE:
+        return holder.fileType;
+      case PRIORITY:
+        return priorityToString(holder.priority);
+      case ACTIONS:
+        // See TransferDetailFilesActionsRenderer for action's code
+        return holder;
     }
+    return null;
+  }
 
-    @Override
-    public LimeTableColumn getColumn(int col) {
-        return columns[col];
+  public static String priorityToString(int priority) {
+    switch (priority) {
+      case 0:
+        return I18n.tr("Don't Download");
+      case 1:
+        return I18n.tr("Normal");
+      case 2:
+        return I18n.tr("Low");
+      case 3:
+        return I18n.tr("Low+");
+      case 4:
+        return I18n.tr("Below Normal");
+      case 5:
+        return I18n.tr("Above Normal");
+      case 6:
+        return I18n.tr("High");
+      case 7:
+        return I18n.tr("Maximum");
+      default:
+        return I18n.tr("Unknown");
     }
+  }
 
-    @Override
-    public boolean isDynamic(int col) {
-        return false;
+  public TransferItem getTransferItem() {
+    final TransferDetailFiles.TransferItemHolder holder = getInitializeObject();
+    if (holder == null) {
+      return null;
     }
+    return holder.transferItem;
+  }
 
-    @Override
-    public boolean isClippable(int col) {
-        return false;
-    }
+  @Override
+  public void setValueAt(Object o, int col) {}
 
-    @Override
-    public Object getValueAt(int col) {
-        final TransferDetailFiles.TransferItemHolder holder = getInitializeObject();
-        if (holder == null) {
-            return null;
-        }
-        final int ACTIONS = 0;
-        final int NUMBER = 1;
-        final int NAME = 2;
-        final int PROGRESS = 3;
-        final int SIZE = 4;
-        final int TYPE = 5;
-        final int PRIORITY = 6;
-        switch (col) {
-            case NUMBER:
-                return holder.fileOffset + 1; // humans...
-            case NAME:
-                return holder.displayName;
-            case PROGRESS:
-                return holder.complete ? 100 : holder.progress;
-            case SIZE:
-                return new SizeHolder(holder.transferItem.getSize());
-            case TYPE:
-                return holder.fileType;
-            case PRIORITY:
-                return priorityToString(holder.priority);
-            case ACTIONS:
-                // See TransferDetailFilesActionsRenderer for action's code
-                return holder;
-        }
-        return null;
-    }
+  @Override
+  public int getTypeAheadColumn() {
+    return 0;
+  }
 
-    public static String priorityToString(int priority) {
-        switch (priority) {
-            case 0: return I18n.tr("Don't Download");
-            case 1: return I18n.tr("Normal");
-            case 2: return I18n.tr("Low");
-            case 3: return I18n.tr("Low+");
-            case 4: return I18n.tr("Below Normal");
-            case 5: return I18n.tr("Above Normal");
-            case 6: return I18n.tr("High");
-            case 7: return I18n.tr("Maximum");
-            default: return I18n.tr("Unknown");
-        }
-    }
+  @Override
+  public void cleanup() {}
 
-    public TransferItem getTransferItem() {
-        final TransferDetailFiles.TransferItemHolder holder = getInitializeObject();
-        if (holder == null) {
-            return null;
-        }
-        return holder.transferItem;
-    }
+  @Override
+  public void update() {}
 
+  @Override
+  public String[] getToolTipArray(int col) {
+    return new String[0];
+  }
 
-    @Override
-    public void setValueAt(Object o, int col) {
-    }
-
-    @Override
-    public int getTypeAheadColumn() {
-        return 0;
-    }
-
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void update() {
-    }
-
-    @Override
-    public String[] getToolTipArray(int col) {
-        return new String[0];
-    }
-
-    @Override
-    public boolean isTooltipRequired(int col) {
-        return false;
-    }
+  @Override
+  public boolean isTooltipRequired(int col) {
+    return false;
+  }
 }
