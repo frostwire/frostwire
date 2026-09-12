@@ -60,7 +60,6 @@ public final class OptionsConstructor {
   private static final String BITTORRENT_KEY = "OPTIONS_BITTORRENT_MAIN_TITLE";
   private static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
   private static final String STATUS_BAR_KEY = "OPTIONS_STATUS_BAR_MAIN_TITLE";
-  private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
   private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
   private static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
   private static final String IP_FILTER_KEY = "OPTIONS_IP_FILTER_MAIN_TITLE";
@@ -284,9 +283,6 @@ public final class OptionsConstructor {
           I18n.tr("System Tray"),
           ShutdownPaneItem.class);
     }
-    // debug
-    addOption(OptionsMediator.ROOT_NODE_KEY, BUGS_KEY, I18n.tr("Bug Reports"), BugsPaneItem.class);
-
     addOption(
         OptionsMediator.ROOT_NODE_KEY, MCP_KEY, I18n.tr("MCP Server"), MCPSettingsPaneItem.class);
     addGroupTreeNode(
