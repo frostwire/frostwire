@@ -508,6 +508,8 @@ findings and passing test counts are not claims about the current source.
 
 - Use `frostwire-engineer` for implementation contracts and
   `frostwire-code-reviewer` for correctness/security review.
+- Every commit message ends with the exact LLM model identifier used to author
+  it, for example `openai/gpt-5.6-luna`.
 - Use MentisDB chain `frostwire`, existing identity `gubatron`; search related
   findings, workload evidence, API contracts, and ownership before editing.
   Recheck historical assumptions against current source and dependencies.
