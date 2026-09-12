@@ -129,6 +129,7 @@ Focus on the repeated frames and the triggering thread, not just the headline ex
 - If no meaningful automated test is possible, state the limiting factor in the commit summary or final report.
 - Update the current `UNRELEASED` section of `changelog.txt`.
 - Commit granularly.
+- Every commit message must end with the exact LLM model identifier used to author the commit, for example `openai/gpt-5.6-luna`.
 - Push only when the user asked for it or the workflow explicitly requires it.
 
 ## Close State
