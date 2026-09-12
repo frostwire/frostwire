@@ -7,11 +7,11 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.jlibtorrent.LibTorrent;
+import com.frostwire.search.telluride.TellurideBuild;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.jlibtorrent.LibTorrent;
-import com.frostwire.search.telluride.TellurideBuild;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -93,7 +93,7 @@ public final class CrashReportSpooler {
     }
   }
 
-  static void record(Throwable problem) {
+  public static void record(Throwable problem) {
     try {
       String throttleKey = throttleKeyFor(problem);
       if (!tryAcquire(throttleKey)) {
@@ -112,9 +112,9 @@ public final class CrashReportSpooler {
   }
 
   /**
-   * Synchronously spools a crash report without requiring {@link #start()} to have run and
-   * without attempting any upload. Intended for fatal paths that exit immediately after.
-   * Deliberately unthrottled: a fatal report must never be dropped.
+   * Synchronously spools a crash report without requiring {@link #start()} to have run and without
+   * attempting any upload. Intended for fatal paths that exit immediately after. Deliberately
+   * unthrottled: a fatal report must never be dropped.
    */
   public static void recordSync(Throwable problem) {
     try {
@@ -448,18 +448,18 @@ public final class CrashReportSpooler {
         String exceptionClass,
         Frame[] stackFrames,
         String nonce) {
-        this.app_version = appVersion;
-        this.app_build = Integer.toString(appBuild);
-        this.os_name = osName;
-        this.os_version = osVersion;
-        this.os_arch = osArch;
-        this.runtime_version = runtimeVersion;
-        this.jre_version = jreVersion;
-        this.java_vendor = javaVendor;
-        this.jlibtorrent_version = jlibtorrentVersion;
-        this.telluride_build = tellurideBuild;
-        this.cpu_count = Integer.toString(cpuCount);
-        this.max_memory_mb = Long.toString(maxMemoryMb);
+      this.app_version = appVersion;
+      this.app_build = Integer.toString(appBuild);
+      this.os_name = osName;
+      this.os_version = osVersion;
+      this.os_arch = osArch;
+      this.runtime_version = runtimeVersion;
+      this.jre_version = jreVersion;
+      this.java_vendor = javaVendor;
+      this.jlibtorrent_version = jlibtorrentVersion;
+      this.telluride_build = tellurideBuild;
+      this.cpu_count = Integer.toString(cpuCount);
+      this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
       this.exception_class = exceptionClass;
       this.stack_frames = stackFrames;
