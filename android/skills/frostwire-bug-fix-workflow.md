@@ -33,6 +33,7 @@ Applies to all bug fixes in the FrostWire monorepo (android/, desktop/, common/,
   - `jlibtorrent/`→ `[jlibtorrent] `
   - Cross-cutting → `[all] `
 - Use imperative mood: `Fix NPE` not `Fixed NPE`.
+- Every commit message must end with the exact LLM model identifier used to author the commit, for example `openai/gpt-5.6-luna`.
 - Reference issue numbers when available: `[android] fix SoftwareUpdaterDialog BundleCompat crash on API < 33 (#1291)`
 
 ## 3. Changelog Update
