@@ -247,6 +247,7 @@ The code must follow the FrostWire house style. See `frostwire-engineer` skill f
 - [ ] **No magic numbers** — named constants for buffer sizes, port numbers, table names, DHT key prefixes.
 - [ ] **Reuse before building** — search `com.frostwire.util.*` before writing any utility.
 - [ ] **Commit message format** — `[scope] imperative description (#issue)`. Scopes: `[android]`, `[desktop]`, `[common]`, `[all]`, `[test]`, `[docs]`, `[build]`.
+- [ ] **Commit message model suffix** — every commit message ends with the exact LLM model identifier used to author it, for example `openai/gpt-5.6-luna`.
 - [ ] **One change per commit** — don't mix features, refactors, and formatting in the same commit.
 - [ ] **Changelog updated** — `desktop/changelog.txt` and/or `android/changelog.txt` updated for user-facing changes. `common/` changes update BOTH.
 - [ ] **UI/i18n parity** — desktop user-facing strings use `I18n.tr`; Android locale keys, placeholders/plurals, and affected themes remain consistent.
