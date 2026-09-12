@@ -519,6 +519,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.DesktopRelayLifecycleTest"
         includeTestsMatching "com.limegroup.gnutella.gui.RelayParticipationSettingsTest"
         includeTestsMatching "com.frostwire.gui.bittorrent.*"
+        includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesShareTest"
     }
 
     testLogging {
