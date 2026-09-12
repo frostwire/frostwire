@@ -168,6 +168,7 @@
   - new:Advanced BitTorrent settings now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
   - fix:Transfer detail Pieces tab now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
   - fix:Removed dead estimateRowsBytes() method from RemoteSearchResponse
+  - cleanup:Removed the legacy doctor-servlet bug report dialogs; errors report silently through Icebase, deadlocks through the crash spooler, and the fatal dialog no longer contacts the retired endpoint
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
