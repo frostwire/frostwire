@@ -95,9 +95,11 @@ public final class BTDownload implements BittorrentDownload {
             // data dir and strands such torrents at 0% forever.
             String infoHash = getInfoHash();
             if (infoHash != null && !engine.resumeDataFile(infoHash).exists()) {
+                LOG.info("BTDownload::backfill missing resume for " + infoHash);
                 doResumeData(true);
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            LOG.warn("BTDownload::backfill resume failed", e);
         }
     }
 
@@ -819,6 +821,7 @@ public final class BTDownload implements BittorrentDownload {
                 entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
                 e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
                 FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
+                LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
             }
         } catch (Throwable e) {
             LOG.warn("Error saving resume data", e);
