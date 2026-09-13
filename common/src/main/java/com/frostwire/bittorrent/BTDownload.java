@@ -823,7 +823,15 @@ public final class BTDownload implements BittorrentDownload {
             return;
         }
         try {
-            if (th != null && th.isValid() && th.needSaveResumeData()) {
+            if (th == null || !th.isValid()) {
+                return;
+            }
+            if (force) {
+                // Unconditional: torrents that never got dirty (born-complete seeds)
+                // must still persist resume data, otherwise a restart restores
+                // them under the default data dir and they sit at 0% forever.
+                th.saveResumeData();
+            } else if (th.needSaveResumeData()) {
                 th.saveResumeData(TorrentHandle.ONLY_IF_MODIFIED);
             }
         } catch (Throwable e) {
@@ -933,6 +941,7 @@ public final class BTDownload implements BittorrentDownload {
                 case TORRENT_CHECKED:
                     invalidateStatusCache();
                     torrentChecked();
+                    doResumeData(true);
                     break;
                 case SAVE_RESUME_DATA:
                     serializeResumeData((SaveResumeDataAlert) alert);
