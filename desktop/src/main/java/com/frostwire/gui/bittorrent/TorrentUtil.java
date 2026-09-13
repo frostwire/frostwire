@@ -290,6 +290,14 @@ public final class TorrentUtil {
       return;
     }
 
+    if (file == null || !file.exists()) {
+      LOG.warn("TorrentUtil:makeTorrentAndDownload refused, file does not exist: " + file);
+      if (uiTorrentMakerListener != null) {
+        uiTorrentMakerListener.onException();
+      }
+      return;
+    }
+
     try {
       file_storage fs = new file_storage();
       add_files_listener addf_listener =
