@@ -39,6 +39,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
@@ -68,6 +69,14 @@ public final class TransferDetailGeneral extends JPanel
   private final JButton copyMagnetURLButton;
   private final JButton checkLocalDataButton;
   private final JCheckBox sequentialDownloadCheckbox;
+  private final CardLayout recheckCardLayout;
+  private final JPanel recheckCardPanel;
+  private final JProgressBar recheckProgressBar;
+  private volatile RecheckPhase recheckPhase = RecheckPhase.IDLE;
+  private volatile BTDownload recheckTarget;
+  private volatile long recheckStartNanos;
+  private volatile long recheckDoneNanos;
+  private volatile String recheckResultText = "";
   private final JLabel createdOnLabel;
   private final JLabel commentLabel;
   private ActionListener copyInfoHashActionListener;
@@ -170,9 +179,15 @@ public final class TransferDetailGeneral extends JPanel
     midPanel.add(uploadSpeedLimitButton, "gapright 50, wrap");
     // Per-torrent actions (same engine calls as Transfers > right-click > Advanced).
     midPanel.add(new JGrayLabel(I18n.tr("Actions") + ":"), "split 3, gapright 10");
-    midPanel.add(checkLocalDataButton = new JButton(I18n.tr("Check Local Data")), "gapright 50");
+    recheckCardLayout = new CardLayout();
+    recheckCardPanel = new JPanel(recheckCardLayout);
+    midPanel.add(recheckCardPanel, "gapright 50");
+    recheckCardPanel.add(checkLocalDataButton = new JButton(I18n.tr("Check Local Data")), "button");
     checkLocalDataButton.setToolTipText(I18n.tr("Force a recheck of the downloaded files"));
     checkLocalDataButton.addActionListener(e -> onCheckLocalData());
+    recheckProgressBar = new JProgressBar(0, 100);
+    recheckProgressBar.setStringPainted(true);
+    recheckCardPanel.add(recheckProgressBar, "progress");
     midPanel.add(
         sequentialDownloadCheckbox = new JCheckBox(I18n.tr("Sequential download")),
         "gapright 50, wrap");
@@ -285,6 +300,7 @@ public final class TransferDetailGeneral extends JPanel
     long eta = guiBtDownload.getETA();
     String magnetURI = btDownload.magnetUri();
     final BTDownload expectedBtDownload = btDownload;
+    final RecheckSnapshot recheckSnapshot = computeRecheckSnapshot(btDownload, state, status);
 
     GUIMediator.safeInvokeLater(
         () -> {
@@ -326,6 +342,14 @@ public final class TransferDetailGeneral extends JPanel
                   I18n.tr("total")));
           uploadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(uploadLimit));
           sequentialDownloadCheckbox.setSelected(btDownload.isSequentialDownload());
+          if (recheckSnapshot.showProgress) {
+            recheckCardLayout.show(recheckCardPanel, "progress");
+            recheckProgressBar.setValue(recheckSnapshot.barValue);
+            recheckProgressBar.setString(recheckSnapshot.barText);
+          } else {
+            recheckCardLayout.show(recheckCardPanel, "button");
+            checkLocalDataButton.setEnabled(true);
+          }
           shareRatioLabel.setText(shareRatio);
           saveLocationLabel.setText(saveLocation);
           MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
@@ -386,6 +410,10 @@ public final class TransferDetailGeneral extends JPanel
     peersLabel.setText("");
     uploadSpeedLimitLabel.setText("");
     sequentialDownloadCheckbox.setSelected(false);
+    recheckPhase = RecheckPhase.IDLE;
+    recheckTarget = null;
+    recheckCardLayout.show(recheckCardPanel, "button");
+    checkLocalDataButton.setEnabled(true);
     shareRatioLabel.setText("");
     saveLocationLabel.setText("");
     MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
@@ -464,9 +492,13 @@ public final class TransferDetailGeneral extends JPanel
 
   private void onCheckLocalData() {
     BTDownload target = btDownload;
-    if (target == null) {
+    if (target == null || recheckPhase != RecheckPhase.IDLE) {
       return;
     }
+    recheckTarget = target;
+    recheckPhase = RecheckPhase.WAITING;
+    recheckStartNanos = System.nanoTime();
+    checkLocalDataButton.setEnabled(false);
     BackgroundQueuedExecutorService.schedule(target::forceRecheck);
   }
 
@@ -477,6 +509,107 @@ public final class TransferDetailGeneral extends JPanel
     }
     boolean sequential = sequentialDownloadCheckbox.isSelected();
     BackgroundQueuedExecutorService.schedule(() -> target.setSequentialDownload(sequential));
+  }
+
+  /**
+   * Advances the recheck state machine off the EDT and returns what the progress card should show.
+   * Phases: WAITING (clicked, libtorrent not checking yet) to CHECKING (verified slices of the
+   * status held on this thread) to DONE (result text held a few seconds) back to IDLE (button).
+   */
+  private RecheckSnapshot computeRecheckSnapshot(
+      BTDownload torrent, TransferState state, TorrentStatus status) {
+    RecheckPhase phase = recheckPhase;
+    if (recheckTarget != torrent) {
+      if (phase != RecheckPhase.IDLE) {
+        recheckPhase = RecheckPhase.IDLE;
+        recheckTarget = null;
+      }
+      return RecheckSnapshot.button();
+    }
+    long now = System.nanoTime();
+    switch (phase) {
+      case WAITING:
+        if (state == TransferState.CHECKING) {
+          recheckPhase = RecheckPhase.CHECKING;
+          int percent = checkingPercent(status);
+          return RecheckSnapshot.progress(checkingText(status, percent), percent);
+        }
+        if (now - recheckStartNanos > TimeUnit.SECONDS.toNanos(3)) {
+          recheckPhase = RecheckPhase.IDLE;
+          recheckTarget = null;
+        }
+        return RecheckSnapshot.button();
+      case CHECKING:
+        if (state == TransferState.CHECKING) {
+          int percent = checkingPercent(status);
+          return RecheckSnapshot.progress(checkingText(status, percent), percent);
+        }
+        recheckPhase = RecheckPhase.DONE;
+        recheckDoneNanos = now;
+        recheckResultText = I18n.tr("Recheck complete") + " — " + torrent.getProgress() + "%";
+        return RecheckSnapshot.progress(recheckResultText, 100);
+      case DONE:
+        if (now - recheckDoneNanos > TimeUnit.SECONDS.toNanos(4)) {
+          recheckPhase = RecheckPhase.IDLE;
+          recheckTarget = null;
+          return RecheckSnapshot.button();
+        }
+        return RecheckSnapshot.progress(recheckResultText, 100);
+      case IDLE:
+      default:
+        return RecheckSnapshot.button();
+    }
+  }
+
+  private static String checkingText(TorrentStatus status, int percent) {
+    if (status != null && status.state() == TorrentStatus.State.CHECKING_RESUME_DATA) {
+      return I18n.tr("Checking resume data…");
+    }
+    if (percent < 0) {
+      return I18n.tr("Checking files…");
+    }
+    return I18n.tr("Checking files") + " — " + percent + "%";
+  }
+
+  private static int checkingPercent(TorrentStatus status) {
+    if (status == null) {
+      return 0;
+    }
+    float progress = status.progress();
+    if (progress < 0) {
+      return 0;
+    }
+    if (progress >= 1) {
+      return 100;
+    }
+    return (int) (progress * 100);
+  }
+
+  private enum RecheckPhase {
+    IDLE,
+    WAITING,
+    CHECKING,
+    DONE
+  }
+
+  private static final class RecheckSnapshot {
+    final boolean showProgress;
+    final int barValue;
+    final String barText;
+
+    private RecheckSnapshot(boolean showProgress, int barValue, String barText) {
+      this.showProgress = showProgress;
+      this.barValue = barValue;
+      this.barText = barText;
+    }
+
+    static RecheckSnapshot button() {
+      return new RecheckSnapshot(false, 0, "");
+    }
+
+    static RecheckSnapshot progress(String text, int value) {
+      return new RecheckSnapshot(true, Math.max(0, Math.min(100, value)), text);
+    }
   }
 
   /**
