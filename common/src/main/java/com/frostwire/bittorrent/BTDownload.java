@@ -88,6 +88,17 @@ public final class BTDownload implements BittorrentDownload {
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();
         engine.addListener(innerListener);
+        try {
+            // Backfill resume for torrents that never persist it otherwise
+            // (zero-piece torrents never check, born-complete seeds may never
+            // get dirty). Restoring without resume falls back to the default
+            // data dir and strands such torrents at 0% forever.
+            String infoHash = getInfoHash();
+            if (infoHash != null && !engine.resumeDataFile(infoHash).exists()) {
+                doResumeData(true);
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     private static boolean isPaused(TorrentStatus s) {
