@@ -32,6 +32,21 @@ class TransferDetailActionsTest {
   }
 
   @Test
+  void recheckButtonDisablesAndReportsProgress() throws Exception {
+    String general =
+        readSource(
+            "desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java");
+    assertTrue(
+        general.contains("recheckProgressBar"), "General tab must swap in a recheck progress bar");
+    assertTrue(general.contains("setStringPainted(true)"), "recheck bar must paint status text");
+    assertTrue(
+        general.contains("TransferState.CHECKING"), "General tab must track the CHECKING state");
+    assertTrue(general.contains("Recheck complete"), "General tab must report the recheck outcome");
+    assertTrue(
+        general.contains("setEnabled(false)"), "Check Local Data must disable while running");
+  }
+
+  @Test
   void trackersMenuOffersValidatedAddTracker() throws Exception {
     String factory =
         readSource(
