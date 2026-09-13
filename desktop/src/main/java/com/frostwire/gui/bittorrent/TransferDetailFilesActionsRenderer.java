@@ -2,17 +2,17 @@
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -31,213 +31,224 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import javax.swing.*;
+import net.miginfocom.swing.MigLayout;
 
 public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCellRenderer {
-    // Lazy-loaded icons to avoid EDT blocking during class loading
-    private static ImageIcon play_solid;
-    private static AlphaIcon play_transparent;
-    private static ImageIcon share_solid;
-    private static AlphaIcon share_faded;
-    private static volatile boolean iconsLoaded = false;
-    private static Runnable onDownloadStartedCallback;
+  // Lazy-loaded icons to avoid EDT blocking during class loading
+  private static ImageIcon play_solid;
+  private static AlphaIcon play_transparent;
+  private static ImageIcon share_solid;
+  private static AlphaIcon share_faded;
+  private static volatile boolean iconsLoaded = false;
+  private static Runnable onDownloadStartedCallback;
 
-    /**
-     * Lazy load icons on first access to avoid EDT blocking during class loading
-     */
-    private static synchronized void ensureIconsLoaded() {
-        if (iconsLoaded) {
-            return;
-        }
-        try {
-            play_solid = GUIMediator.getThemeImage("search_result_play_over");
-            play_transparent = new AlphaIcon(play_solid, 0.1f);
-            share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
-            share_faded = new AlphaIcon(share_solid, 0.1f);
-            iconsLoaded = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  /** Lazy load icons on first access to avoid EDT blocking during class loading */
+  private static synchronized void ensureIconsLoaded() {
+    if (iconsLoaded) {
+      return;
+    }
+    try {
+      play_solid = GUIMediator.getThemeImage("search_result_play_over");
+      play_transparent = new AlphaIcon(play_solid, 0.1f);
+      share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
+      share_faded = new AlphaIcon(share_solid, 0.1f);
+      iconsLoaded = true;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void setOnDownloadStartedCallback(Runnable callback) {
+    onDownloadStartedCallback = callback;
+  }
+
+  private final JLabel playButton;
+  private final JLabel shareButton;
+  private final JLabel downloadButton;
+  private TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+  public TransferDetailFilesActionsRenderer() {
+    ensureIconsLoaded(); // Ensure icons are loaded on first use
+    setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+    setLayout(
+        new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!][80px!]"));
+    playButton = new JLabel(play_transparent);
+    playButton.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+              onPlay();
+            }
+          }
+        });
+    shareButton = new JLabel(share_faded);
+    shareButton.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+              onShare();
+            }
+          }
+        });
+    downloadButton = new JLabel(I18n.tr("Download"));
+    downloadButton.setForeground(new Color(0, 102, 204));
+    downloadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    downloadButton.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+              onDownload();
+            }
+          }
+        });
+    add(playButton, "width 20px!, growx 0, aligny top, push");
+    add(shareButton, "width 20px!, growx 0, aligny top, push");
+    add(downloadButton, "width 80px!, growx 0, aligny top, push");
+  }
+
+  @Override
+  protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
+    cancelEdit(); // Gubatron: This is what solved the flickering/empty cell bug when the first
+    // column cells were clicked on. -Dec 28th 2020
+    if (!(dataHolder instanceof TransferDetailFiles.TransferItemHolder)) {
+      if (transferItemHolder != null) {
+        updateButtons();
+      }
+      return;
+    }
+    transferItemHolder = (TransferDetailFiles.TransferItemHolder) dataHolder;
+    updateButtons();
+  }
+
+  private void onPlay() {
+    if (!transferItemHolder.complete) {
+      return;
+    }
+    new PlayAction(transferItemHolder).actionPerformed(null);
+  }
+
+  private void onShare() {
+    if (!transferItemHolder.complete) {
+      return;
+    }
+    File file = transferItemHolder.transferItem.getFile();
+    if (file == null || !file.exists()) {
+      GUIMediator.showError(I18n.tr("Cannot share this file because it no longer exists on disk."));
+      return;
+    }
+    if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+      new Thread(
+              () -> {
+                TorrentUtil.makeTorrentAndDownload(file, null, true);
+                GUIMediator.safeInvokeLater(
+                    () -> BTDownloadMediator.instance().updateTableFilters());
+              })
+          .start();
+    }
+  }
+
+  private void onDownload() {
+    if (transferItemHolder == null || !transferItemHolder.skipped) {
+      return;
+    }
+    startDownload(transferItemHolder.transferItem);
+  }
+
+  private static void startDownload(TransferItem item) {
+    if (!(item instanceof BTDownloadItem)) {
+      return;
+    }
+    BTDownloadItem btItem = (BTDownloadItem) item;
+    BackgroundQueuedExecutorService.schedule(
+        () -> {
+          btItem.setPriority(Priority.NORMAL);
+          GUIMediator.safeInvokeLater(
+              () -> {
+                if (onDownloadStartedCallback != null) {
+                  onDownloadStartedCallback.run();
+                }
+              });
+        });
+  }
+
+  private void updateButtons() {
+    if (transferItemHolder == null) {
+      return;
+    }
+    boolean skipped = transferItemHolder.skipped;
+    playButton.setVisible(!skipped);
+    shareButton.setVisible(!skipped);
+    downloadButton.setVisible(skipped);
+    if (!skipped) {
+      playButton.setIcon(transferItemHolder.complete ? play_solid : play_transparent);
+      shareButton.setIcon(transferItemHolder.complete ? share_solid : share_faded);
+    }
+    playButton.invalidate();
+    shareButton.invalidate();
+    downloadButton.invalidate();
+  }
+
+  public static final class OpenInFolderAction extends AbstractAction {
+    private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+    public OpenInFolderAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+      transferItemHolder = itemHolder;
+      putValue(Action.NAME, I18n.tr("Explore"));
+      putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
+      putValue(Action.SHORT_DESCRIPTION, I18n.tr("Open Folder Containing the File"));
+      putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
     }
 
-    public static void setOnDownloadStartedCallback(Runnable callback) {
-        onDownloadStartedCallback = callback;
+    public void actionPerformed(ActionEvent ae) {
+      File selectedFile = transferItemHolder.transferItem.getFile();
+      if (selectedFile.isFile() && selectedFile.getParentFile() != null) {
+        GUIMediator.launchExplorer(selectedFile);
+      }
     }
+  }
 
-    private final JLabel playButton;
-    private final JLabel shareButton;
-    private final JLabel downloadButton;
-    private TransferDetailFiles.TransferItemHolder transferItemHolder;
+  public static final class PlayAction extends AbstractAction {
+    private final TransferDetailFiles.TransferItemHolder transferItemHolder;
 
-    public TransferDetailFilesActionsRenderer() {
-        ensureIconsLoaded(); // Ensure icons are loaded on first use
-        setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-        setLayout(new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!][80px!]"));
-        playButton = new JLabel(play_transparent);
-        playButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    onPlay();
-                }
-            }
-        });
-        shareButton = new JLabel(share_faded);
-        shareButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    onShare();
-                }
-            }
-        });
-        downloadButton = new JLabel(I18n.tr("Download"));
-        downloadButton.setForeground(new Color(0, 102, 204));
-        downloadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        downloadButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    onDownload();
-                }
-            }
-        });
-        add(playButton, "width 20px!, growx 0, aligny top, push");
-        add(shareButton, "width 20px!, growx 0, aligny top, push");
-        add(downloadButton, "width 80px!, growx 0, aligny top, push");
+    public PlayAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+      transferItemHolder = itemHolder;
+      putValue(Action.NAME, I18n.tr("Play"));
+      putValue(LimeAction.SHORT_NAME, I18n.tr("Play"));
     }
 
     @Override
-    protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
-        cancelEdit(); // Gubatron: This is what solved the flickering/empty cell bug when the first column cells were clicked on. -Dec 28th 2020
-        if (!(dataHolder instanceof TransferDetailFiles.TransferItemHolder)) {
-            if (transferItemHolder != null) {
-                updateButtons();
-            }
-            return;
-        }
-        transferItemHolder = (TransferDetailFiles.TransferItemHolder) dataHolder;
-        updateButtons();
+    public void actionPerformed(ActionEvent e) {
+      File file = transferItemHolder.transferItem.getFile();
+      if (PlaybackUtil.isPlayableFile(file)) {
+        GUIMediator.instance().playInOS(new MediaSource(file));
+      } else {
+        GUIMediator.launchFile(file);
+      }
+    }
+  }
+
+  public static final class DownloadAction extends AbstractAction {
+    private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+    public DownloadAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+      transferItemHolder = itemHolder;
+      putValue(Action.NAME, I18n.tr("Download"));
+      putValue(LimeAction.SHORT_NAME, I18n.tr("Download"));
+      putValue(Action.SHORT_DESCRIPTION, I18n.tr("Start downloading this file"));
     }
 
-    private void onPlay() {
-        if (!transferItemHolder.complete) {
-            return;
-        }
-        new PlayAction(transferItemHolder).actionPerformed(null);
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      startDownload(transferItemHolder.transferItem);
     }
-
-    private void onShare() {
-        if (!transferItemHolder.complete) {
-            return;
-        }
-        File file = transferItemHolder.transferItem.getFile();
-        if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-            new Thread(() -> {
-                TorrentUtil.makeTorrentAndDownload(file, null, true);
-                GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
-            }).start();
-        }
-    }
-
-    private void onDownload() {
-        if (transferItemHolder == null || !transferItemHolder.skipped) {
-            return;
-        }
-        startDownload(transferItemHolder.transferItem);
-    }
-
-    private static void startDownload(TransferItem item) {
-        if (!(item instanceof BTDownloadItem)) {
-            return;
-        }
-        BTDownloadItem btItem = (BTDownloadItem) item;
-        BackgroundQueuedExecutorService.schedule(() -> {
-            btItem.setPriority(Priority.NORMAL);
-            GUIMediator.safeInvokeLater(() -> {
-                if (onDownloadStartedCallback != null) {
-                    onDownloadStartedCallback.run();
-                }
-            });
-        });
-    }
-
-    private void updateButtons() {
-        if (transferItemHolder == null) {
-            return;
-        }
-        boolean skipped = transferItemHolder.skipped;
-        playButton.setVisible(!skipped);
-        shareButton.setVisible(!skipped);
-        downloadButton.setVisible(skipped);
-        if (!skipped) {
-            playButton.setIcon(transferItemHolder.complete ? play_solid : play_transparent);
-            shareButton.setIcon(transferItemHolder.complete ? share_solid : share_faded);
-        }
-        playButton.invalidate();
-        shareButton.invalidate();
-        downloadButton.invalidate();
-    }
-
-    public final static class OpenInFolderAction extends AbstractAction {
-        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
-
-        public OpenInFolderAction(TransferDetailFiles.TransferItemHolder itemHolder) {
-            transferItemHolder = itemHolder;
-            putValue(Action.NAME, I18n.tr("Explore"));
-            putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Open Folder Containing the File"));
-            putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
-        }
-
-        public void actionPerformed(ActionEvent ae) {
-            File selectedFile = transferItemHolder.transferItem.getFile();
-            if (selectedFile.isFile() && selectedFile.getParentFile() != null) {
-                GUIMediator.launchExplorer(selectedFile);
-            }
-        }
-    }
-
-    public final static class PlayAction extends AbstractAction {
-        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
-
-        public PlayAction(TransferDetailFiles.TransferItemHolder itemHolder) {
-            transferItemHolder = itemHolder;
-            putValue(Action.NAME, I18n.tr("Play"));
-            putValue(LimeAction.SHORT_NAME, I18n.tr("Play"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            File file = transferItemHolder.transferItem.getFile();
-            if (PlaybackUtil.isPlayableFile(file)) {
-                GUIMediator.instance().playInOS(new MediaSource(file));
-            } else {
-                GUIMediator.launchFile(file);
-            }
-        }
-    }
-
-    public final static class DownloadAction extends AbstractAction {
-        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
-
-        public DownloadAction(TransferDetailFiles.TransferItemHolder itemHolder) {
-            transferItemHolder = itemHolder;
-            putValue(Action.NAME, I18n.tr("Download"));
-            putValue(LimeAction.SHORT_NAME, I18n.tr("Download"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Start downloading this file"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            startDownload(transferItemHolder.transferItem);
-        }
-    }
+  }
 }
