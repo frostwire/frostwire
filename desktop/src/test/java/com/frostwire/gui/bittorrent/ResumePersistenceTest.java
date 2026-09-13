@@ -33,6 +33,19 @@ class ResumePersistenceTest {
   }
 
   @Test
+  void constructorBackfillsMissingResume() throws Exception {
+    String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
+    int start = download.indexOf("public BTDownload(BTEngine engine, TorrentHandle th)");
+    assertTrue(start >= 0, "BTDownload constructor not found");
+    int end = download.indexOf("private static boolean isPaused", start);
+    String body = download.substring(start, end);
+    assertTrue(
+        body.contains("resumeDataFile") && body.contains("doResumeData(true)"),
+        "constructor must force a resume save when no resume file exists yet,"
+            + " so zero-piece torrents that never check still persist");
+  }
+
+  @Test
   void checkCompletionTriggersForcedResumeSave() throws Exception {
     String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
     int start = download.indexOf("case TORRENT_CHECKED:");
