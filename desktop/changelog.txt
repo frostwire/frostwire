@@ -172,6 +172,7 @@
   - new:Transfer Detail General tab offers Check Local Data and a per-torrent Sequential download toggle; Trackers menu offers Add Tracker with strong URL validation, and Edit Trackers now trims entries and names the offending line
   - new:Transfer Detail Check Local Data disables while the recheck runs and swaps in a progress bar with live phase and percent, then reports the outcome
   - fix:Born-complete torrents (per-file Share, auto-seed) now persist resume data at check completion and on every forced save — restarts no longer restore them under the default data dir at 0%
+  - fix:Missing resume files are backfilled when a torrent is constructed, covering zero-piece torrents that never trigger a check
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
