@@ -579,6 +579,33 @@ public final class BTEngine extends SessionManager {
         return new File(ctx.homeDir, infoHash + ".torrent");
     }
 
+    /**
+     * Ensures the session .torrent file exists for a handle, using the same
+     * hash naming the resume backfill and serializer use. Magnet-origin
+     * torrents never go through a .torrent-saving download path, so without
+     * this the restore scan cannot see them on the next launch.
+     */
+    void ensureResumeTorrentFile(TorrentHandle th) {
+        try {
+            if (th == null || !th.isValid()) {
+                return;
+            }
+            String hash = th.infoHash().toString();
+            if (resumeTorrentFile(hash).exists()) {
+                return;
+            }
+            TorrentInfo ti = th.torrentFile();
+            if (ti == null) {
+                return;
+            }
+            entry e = ti.toEntry().swig();
+            FileUtils.writeByteArrayToFile(
+                    resumeTorrentFile(hash), Vectors.byte_vector2bytes(e.bencode()));
+        } catch (Throwable t) {
+            LOG.warn("Error ensuring resume torrent file", t);
+        }
+    }
+
     File torrentFile(String name) {
         return new File(ctx.torrentsDir, name + ".torrent");
     }
