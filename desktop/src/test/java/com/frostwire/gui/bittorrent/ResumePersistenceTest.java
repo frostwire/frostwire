@@ -46,6 +46,18 @@ class ResumePersistenceTest {
   }
 
   @Test
+  void sessionTorrentFileEnsuredAlongsideResume() throws Exception {
+    String engine = readSource("common/src/main/java/com/frostwire/bittorrent/BTEngine.java");
+    assertTrue(
+        engine.contains("ensureResumeTorrentFile"),
+        "BTEngine must ensure a session .torrent exists so magnet-origin torrents survive restarts");
+    String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
+    assertTrue(
+        download.contains("ensureResumeTorrentFile"),
+        "BTDownload must ensure the session .torrent alongside the resume backfill");
+  }
+
+  @Test
   void checkCompletionTriggersForcedResumeSave() throws Exception {
     String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
     int start = download.indexOf("case TORRENT_CHECKED:");
