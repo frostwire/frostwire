@@ -174,6 +174,7 @@
   - fix:Born-complete torrents (per-file Share, auto-seed) now persist resume data at check completion and on every forced save — restarts no longer restore them under the default data dir at 0%
   - fix:Missing resume files are backfilled when a torrent is constructed, covering zero-piece torrents that never trigger a check
   - fix:Transfer Detail Files tab no longer freezes per-file progress while a transfer is still moving — holders rebuild on torrent progress drift, settled torrents skip native calls
+  - fix:Sharing a file that no longer exists on disk is refused with a clear error instead of creating a torrent that can never complete
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
