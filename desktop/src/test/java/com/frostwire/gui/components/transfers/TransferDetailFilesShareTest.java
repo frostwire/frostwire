@@ -31,6 +31,23 @@ class TransferDetailFilesShareTest {
   }
 
   @Test
+  void shareRefusesMissingFiles() throws Exception {
+    String renderer =
+        readSource(
+            "desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java");
+    assertTrue(
+        renderer.contains("!file.exists()"),
+        "share must refuse files that no longer exist on disk");
+    String util = readSource("desktop/src/main/java/com/frostwire/gui/bittorrent/TorrentUtil.java");
+    int start = util.indexOf("boolean dhtTrackedOnly,\n      TorrentType torrentType)");
+    assertTrue(start >= 0, "makeTorrentAndDownload core not found");
+    String body = util.substring(start, start + 2500);
+    assertTrue(
+        body.contains("!file.exists()"),
+        "makeTorrentAndDownload must refuse missing files for all callers");
+  }
+
+  @Test
   void filesActionsRendererOffersShare() throws Exception {
     String renderer =
         readSource(
