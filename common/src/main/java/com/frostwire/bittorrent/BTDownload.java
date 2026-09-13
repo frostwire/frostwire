@@ -98,6 +98,7 @@ public final class BTDownload implements BittorrentDownload {
                 LOG.info("BTDownload::backfill missing resume for " + infoHash);
                 doResumeData(true);
             }
+            engine.ensureResumeTorrentFile(th);
         } catch (Throwable e) {
             LOG.warn("BTDownload::backfill resume failed", e);
         }
@@ -822,6 +823,7 @@ public final class BTDownload implements BittorrentDownload {
                 e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
                 FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
                 LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
+                engine.ensureResumeTorrentFile(th);
             }
         } catch (Throwable e) {
             LOG.warn("Error saving resume data", e);
