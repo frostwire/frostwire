@@ -119,7 +119,8 @@ tasks.named('run') {
     systemProperty 'fw.running.from.distribution', 'false'
     jvmArgs '-Ddebug=1'
     jvmArgs '-Dfw.debug.assertNoEdtIO=true'
-    // NB: 'run' does not inherit applicationDefaultJvmArgs, mirror the OS flags here.
+    // NB: 'run' does not inherit applicationDefaultJvmArgs, mirror the needed flags here.
+    jvmArgs '-Djava.library.path=lib/native'
     if (OperatingSystem.current().isMacOsX()) {
         jvmArgs '--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true'
     }
