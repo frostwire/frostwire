@@ -53,10 +53,13 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      * Override the normal refresh.
      * Because the DataLine's don't cache any data,
      * we can just call update and they'll show the correct info
-     * now.
+     * now. Repaints only rows whose displayed values changed.
      */
     public Object refresh() {
-        fireTableRowsUpdated(0, getRowCount());
+        if (getRowCount() == 0) {
+            return null;
+        }
+        fireChangedRowsSinceLastRefresh();
         return null;
     }
 
