@@ -54,8 +54,15 @@ public class PromptTextFieldUI extends PromptTextUI {
     public JTextComponent getPromptComponent(JTextComponent txt) {
         LabelField lbl = (LabelField) super.getPromptComponent(txt);
         JTextField txtField = (JTextField) txt;
-        lbl.setHorizontalAlignment(txtField.getHorizontalAlignment());
-        lbl.setColumns(txtField.getColumns());
+        // Sizing/paint callers invoke this repeatedly during layout validation;
+        // only assign properties that actually changed to avoid revalidate /
+        // property-change churn.
+        if (lbl.getHorizontalAlignment() != txtField.getHorizontalAlignment()) {
+            lbl.setHorizontalAlignment(txtField.getHorizontalAlignment());
+        }
+        if (lbl.getColumns() != txtField.getColumns()) {
+            lbl.setColumns(txtField.getColumns());
+        }
         // Make search field in Leopard paint focused border.
         lbl.hasFocus = txtField.hasFocus() && NativeSearchFieldSupport.isNativeSearchField(txtField);
         // leopard client properties. see
@@ -63,7 +70,9 @@ public class PromptTextFieldUI extends PromptTextUI {
         NativeSearchFieldSupport.setSearchField(lbl, NativeSearchFieldSupport.isSearchField(txtField));
         NativeSearchFieldSupport.setFindPopupMenu(lbl, NativeSearchFieldSupport.getFindPopupMenu(txtField));
         //here we need to copy the border again for Mac OS X, because the above calls may have replaced it.
-        lbl.setBorder(txtField.getBorder());
+        if (lbl.getBorder() != txtField.getBorder()) {
+            lbl.setBorder(txtField.getBorder());
+        }
         return lbl;
     }
 
