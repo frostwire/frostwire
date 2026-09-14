@@ -5,6 +5,7 @@ import com.frostwire.gui.theme.SkinTextFieldBackgroundPainter;
 
 import javax.accessibility.Accessible;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.synth.SynthTextFieldUI;
 import javax.swing.text.*;
@@ -16,6 +17,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -108,10 +110,19 @@ public abstract class PromptTextUI extends TextUI {
                 promptComponent.updateUI();
             }
         }
+        String desiredText = null;
         if (txt.isFocusOwner() && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIDE_PROMPT) {
-            promptComponent.setText(null);
+            desiredText = null;
         } else {
-            promptComponent.setText(PromptSupport.getPrompt(txt));
+            desiredText = PromptSupport.getPrompt(txt);
+        }
+        // getPromptComponent() is called from getPreferredSize/getMinimumSize/
+        // getMaximumSize/paint during layout validation. Rewriting the prompt
+        // document on every call fires remove+insert document events and their
+        // listener cascades; only touch the component when a value truly changes.
+        String currentText = promptComponent.getText();
+        if (!Objects.equals(desiredText == null ? "" : desiredText, currentText == null ? "" : currentText)) {
+            promptComponent.setText(desiredText);
         }
         if (promptComponent.getHighlighter() != null) {
             promptComponent.getHighlighter().removeAllHighlights();
@@ -127,16 +138,23 @@ public abstract class PromptTextUI extends TextUI {
         } else {
             promptComponent.setForeground(PromptSupport.getForeground(txt));
         }
-        if (PromptSupport.getFontStyle(txt) == null) {
-            promptComponent.setFont(txt.getFont());
-        } else {
-            promptComponent.setFont(txt.getFont().deriveFont(PromptSupport.getFontStyle(txt)));
+        Font desiredFont = PromptSupport.getFontStyle(txt) == null
+                ? txt.getFont()
+                : txt.getFont().deriveFont(PromptSupport.getFontStyle(txt));
+        if (!desiredFont.equals(promptComponent.getFont())) {
+            promptComponent.setFont(desiredFont);
         }
-        promptComponent.setBackground(PromptSupport.getBackground(txt));
+        Color desiredBackground = PromptSupport.getBackground(txt);
+        if (!desiredBackground.equals(promptComponent.getBackground())) {
+            promptComponent.setBackground(desiredBackground);
+        }
         promptComponent.setEnabled(txt.isEnabled());
         promptComponent.setOpaque(txt.isOpaque());
         promptComponent.setBounds(txt.getBounds());
-        promptComponent.setBorder(txt.getBorder());
+        Border desiredBorder = txt.getBorder();
+        if (desiredBorder != promptComponent.getBorder()) {
+            promptComponent.setBorder(desiredBorder);
+        }
         promptComponent.setSelectedTextColor(txt.getSelectedTextColor());
         promptComponent.setSelectionColor(txt.getSelectionColor());
         promptComponent.setEditable(txt.isEditable());
