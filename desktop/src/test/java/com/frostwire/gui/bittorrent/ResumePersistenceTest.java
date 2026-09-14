@@ -21,6 +21,41 @@ import org.junit.jupiter.api.Test;
 class ResumePersistenceTest {
 
   @Test
+  void resumeAndSessionTorrentShareOneCanonicalHash() throws Exception {
+    String engine = readSource("common/src/main/java/com/frostwire/bittorrent/BTEngine.java");
+    assertTrue(
+        engine.contains("String canonicalInfoHash(TorrentInfo ti)"),
+        "BTEngine must define one canonical hash for persistence naming");
+    // session .torrent naming
+    int srt = engine.indexOf("private void saveResumeTorrent(TorrentInfo ti)");
+    assertTrue(srt >= 0, "saveResumeTorrent not found");
+    String srtBody =
+        engine.substring(srt, engine.indexOf("private String getEscapedFilename", srt));
+    assertTrue(
+        srtBody.contains("canonicalInfoHash(ti)"),
+        "session .torrent must be named by the canonical hash");
+    // resume naming
+    String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
+    int srd = download.indexOf("private void serializeResumeData(SaveResumeDataAlert alert)");
+    assertTrue(srd >= 0, "serializeResumeData not found");
+    String srdBody = download.substring(srd, download.indexOf("private void doResumeData", srd));
+    assertTrue(
+        srdBody.contains("engine.canonicalInfoHash(th)"),
+        "resume sidecar must be named by the same canonical hash as the session .torrent");
+  }
+
+  @Test
+  void restoreHealsV2NamedResumes() throws Exception {
+    String engine = readSource("common/src/main/java/com/frostwire/bittorrent/BTEngine.java");
+    int rd = engine.indexOf("public void restoreDownloads()");
+    assertTrue(rd >= 0, "restoreDownloads not found");
+    String body = engine.substring(rd, engine.indexOf("File settingsFile()", rd));
+    assertTrue(
+        body.contains("resumeFileFor("),
+        "restore must resolve the resume by filename hash and both info hashes");
+  }
+
+  @Test
   void forcedResumeSaveBypassesDirtyGate() throws Exception {
     String download = readSource("common/src/main/java/com/frostwire/bittorrent/BTDownload.java");
     int start = download.indexOf("private void doResumeData(boolean force)");
