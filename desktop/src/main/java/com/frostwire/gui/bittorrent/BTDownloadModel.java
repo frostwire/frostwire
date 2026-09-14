@@ -165,11 +165,13 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
                             System.err.println("Error updating row " + i + ": " + e.getMessage());
                         }
                     }
-                    // Fire table update on EDT after background work is done
+                    // Fire table update on EDT after background work is done,
+                    // repainting only rows that actually changed.
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        int currentSize2 = getRowCount();
-                        if (currentSize2 > 0) {
-                            fireTableRowsUpdated(0, currentSize2 - 1);
+                        try {
+                            fireChangedRowsSinceLastRefresh();
+                        } finally {
+                            isRefreshing.set(false);
                         }
                     });
                 } catch (Exception e) {
