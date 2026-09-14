@@ -138,6 +138,15 @@ public final class TipOfTheDayMediator {
     }
 
     /**
+     * Instantiates the HTML editor kit off the EDT so its class loading (parser,
+     * DTD, CSS) does not stall the first tip render. Safe to call from any
+     * thread; creates no components.
+     */
+    public static void preloadHtmlEngine() {
+        new javax.swing.text.html.HTMLEditorKit();
+    }
+
+    /**
      * Causes the TOTD window to become visible.
      */
     public void displayTipWindow() {
