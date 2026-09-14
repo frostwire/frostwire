@@ -236,6 +236,9 @@ public final class GUIMediator {
       TipOfTheDayMediator.instance();
       ThreadExecutor.startThread(
           () -> {
+            // Warm the HTML engine off the EDT so the tip contents render
+            // promptly instead of paying parser class loading on first paint.
+            TipOfTheDayMediator.preloadHtmlEngine();
             try {
               Thread.sleep(500);
             } catch (InterruptedException ignored) {
