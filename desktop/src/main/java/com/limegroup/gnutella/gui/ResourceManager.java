@@ -24,11 +24,13 @@ import com.frostwire.util.OSUtils;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
 import org.limewire.util.StringUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
-import java.awt.*;
+import javax.swing.plaf.ComponentUI;import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -177,22 +179,43 @@ public final class ResourceManager {
      * This tries, in order, the exact location, the location as a png, and the
      * location as a gif.
      * <p>
-     * Uses deferred image loading to avoid blocking the EDT.
+     * Static images decode eagerly so every paint is a direct blit; animated
+     * GIFs keep deferred Toolkit loading so the animation is preserved.
      */
     private static ImageIcon getImageFromURL(String location, boolean file) {
         // try exact filename first.
         URL img = toURL(location, file);
         if (img != null)
-            return createDeferredImageIcon(img);
+            return createImageIcon(img);
         // try with png second
         img = toURL(location + ".png", file);
         if (img != null)
-            return createDeferredImageIcon(img);
-        // try with gif third
+            return createImageIcon(img);
+        // try with gif third (async load preserves animation)
         img = toURL(location + ".gif", file);
         if (img != null)
             return createDeferredImageIcon(img);
         return null;
+    }
+
+    /**
+     * Eagerly decodes a static image into a BufferedImage-backed icon, so icon
+     * paints never pay the per-paint Toolkit conversion plus software blit that
+     * freezes the EDT on large paints. Animated GIFs and unreadable images
+     * fall back to deferred Toolkit loading; image loading never fails here.
+     */
+    private static ImageIcon createImageIcon(URL url) {
+        if (!url.getPath().toLowerCase(Locale.ENGLISH).endsWith(".gif")) {
+            try {
+                BufferedImage image = ImageIO.read(url);
+                if (image != null) {
+                    return new ImageIcon(image);
+                }
+            } catch (IOException | RuntimeException ignored) {
+                // fall through to deferred loading
+            }
+        }
+        return createDeferredImageIcon(url);
     }
 
     /**
