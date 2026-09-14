@@ -101,16 +101,15 @@ application {
     if (OperatingSystem.current().isMacOsX()) {
         applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true']
     } else if (OperatingSystem.current().isLinux()) {
-        // Optimize rendering for Linux - works with X.org and Wayland
-	def sessionType = System.getenv("XDG_SESSION_TYPE") ?: "x11"
-	def isWayland = sessionType.toLowerCase().contains("wayland")
-	def xrenderValue = isWayland ? "-Dsun.java2d.xrender=false" : "-Dsun.java2d.xrender=true"
-        System.out.println("xrenderValue=" + xrenderValue)
-        // System.getEnv  
+        // XRender is the fastest stable pipeline on BOTH X.org and XWayland.
+        // Measured on this setup (ARM64 VM, virtio/virgl GPU, JDK 26): forcing
+        // sun.java2d.xrender=false sends every on-screen image blit through the
+        // legacy X11 core path and makes it ~1000x slower (16x16 icon: ~3us with
+        // XRender vs ~6.3ms without), which is what freezes the EDT. OpenGL stays
+        // off: on virtualized/ARM64 GPUs it can wedge the entire display session.
         applicationDefaultJvmArgs += [
-            xrenderValue,
-            //'-Djdk.gtk.version=2',
-            '-Dsun.java2d.opengl=false',   // OpenGL can crash entire display session
+            '-Dsun.java2d.xrender=true',
+            '-Dsun.java2d.opengl=false',
         ]
     }
 }
@@ -121,8 +120,20 @@ tasks.named('run') {
     jvmArgs '-Dfw.debug.assertNoEdtIO=true'
     // NB: 'run' does not inherit applicationDefaultJvmArgs, mirror the needed flags here.
     jvmArgs '-Djava.library.path=lib/native'
+    jvmArgs '--add-opens=java.desktop/java.awt=ALL-UNNAMED'
+    jvmArgs '--add-opens=java.desktop/javax.swing=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
     if (OperatingSystem.current().isMacOsX()) {
         jvmArgs '--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true'
+    } else if (OperatingSystem.current().isLinux()) {
+        // Mirror the application{} Linux pipeline flags: XRender is fast on
+        // XWayland too, and OpenGL stays off (can wedge virtualized/ARM64
+        // sessions). See the application{} Linux block for the measurements.
+        jvmArgs '-Dsun.java2d.xrender=true'
+        jvmArgs '-Dsun.java2d.opengl=false'
+        // Mutter (GNOME Wayland + XWayland) is a non-reparenting WM; without this
+        // Java windows can appear blank or unmanaged.
+        environment '_JAVA_AWT_WM_NONREPARENTING', '1'
     }
 }
 
@@ -215,7 +226,7 @@ dependencies {
         }
     }
 
-    implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
+    implementation fileTree(dir: 'lib/jars', include: ['*.jar'], exclude: ['frostwire.jar'])
     // FlatLaf for dark theme support
     implementation 'com.formdev:flatlaf:3.7.1'
     testImplementation platform('org.junit:junit-bom:5.13.4')
