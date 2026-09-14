@@ -31,4 +31,23 @@ public class SeedsHolder implements Comparable<SeedsHolder> {
     public int compareTo(SeedsHolder other) {
         return (connected + seeds) - (other.connected + other.seeds);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SeedsHolder)) {
+            return false;
+        }
+        SeedsHolder other = (SeedsHolder) o;
+        return connected == other.connected && seeds == other.seeds;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Integer.hashCode(connected);
+        result = 31 * result + Integer.hashCode(seeds);
+        return result;
+    }
 }
