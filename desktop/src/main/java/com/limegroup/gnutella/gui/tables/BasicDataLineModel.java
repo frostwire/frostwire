@@ -247,8 +247,13 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Fires row-updated events only for rows whose displayed values changed
      * since the previous refresh, so the 1-second GUI refresh does not repaint
      * tables whose content did not change. Contiguous changed rows collapse
-     * into a single range event. The first call (or a row-count change) falls
-     * back to a full-range event.
+     * into a single range event. A row-count change falls back to a
+     * full-range event.
+     *
+     * <p>The first call only stores the baseline and fires nothing: rows reach
+     * the view through their own insert events with freshly initialized values,
+     * so there is nothing to repaint yet. This keeps every table's first
+     * refresh tick (all firing at startup) from repainting the whole window.
      *
      * <p>Background: a full-table repaint walks every visible cell through the
      * software Java2D pipeline (one native X call per primitive under XWayland),
@@ -263,7 +268,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
             lastRefreshSnapshot = now;
         }
         if (last == null || last.length != now.length) {
-            if (now.length > 0) {
+            if (last != null && now.length > 0) {
                 fireTableRowsUpdated(0, now.length - 1);
             }
             return;
