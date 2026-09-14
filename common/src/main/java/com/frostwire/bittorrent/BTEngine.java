@@ -549,16 +549,22 @@ public final class BTEngine extends SessionManager {
         if (torrents != null) {
             for (File t : torrents) {
                 try {
-                    String infoHash = FilenameUtils.getBaseName(t.getName());
-                    if (infoHash != null) {
-                        File resumeFile = resumeDataFile(infoHash);
-                        File savePath = readSavePath(infoHash);
+                    String fileNameHash = FilenameUtils.getBaseName(t.getName());
+                    if (fileNameHash != null) {
+                        TorrentInfo restoredInfo = null;
+                        try {
+                            restoredInfo = new TorrentInfo(t);
+                        } catch (Throwable ignored) {
+                            // RestoreDownloadTask will report the failure
+                        }
+                        File resumeFile = resumeFileFor(fileNameHash, restoredInfo);
+                        File savePath = readSavePath(resumeFile);
                         File checked = setupSaveDir(savePath);
                         if (checked == null) {
                             checked = setupSaveDir(ctx.dataDir);
                         }
                         if (checked == null) {
-                            LOG.warn("Can't create data dir or mount point is not accessible for infoHash=" + infoHash);
+                            LOG.warn("Can't create data dir or mount point is not accessible for infoHash=" + fileNameHash);
                             continue;
                         }
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, checked, null, resumeFile));
@@ -590,8 +596,8 @@ public final class BTEngine extends SessionManager {
             if (th == null || !th.isValid()) {
                 return;
             }
-            String hash = th.infoHash().toString();
-            if (resumeTorrentFile(hash).exists()) {
+            String hash = canonicalInfoHash(th);
+            if (hash == null || resumeTorrentFile(hash).exists()) {
                 return;
             }
             TorrentInfo ti = th.torrentFile();
@@ -614,6 +620,112 @@ public final class BTEngine extends SessionManager {
         return new File(ctx.homeDir, infoHash + ".resume");
     }
 
+    /**
+     * Canonical persistence hash used to name BOTH the session .torrent and its
+     * .resume sidecar: v1 when the torrent has one, else v2. Hybrid/v2 torrents
+     * used to record the .torrent under v1 ({@code ti.infoHashV1()}) but the
+     * resume under {@code torrent_handle.infoHash()} (v2), so restore looked up
+     * {@code <v1>.resume}, found nothing, and fell back to the default data dir.
+     */
+    String canonicalInfoHash(TorrentInfo ti) {
+        if (ti == null) {
+            return null;
+        }
+        try {
+            Sha1Hash v1 = ti.infoHashV1();
+            if (v1 != null) {
+                return v1.toString().toLowerCase();
+            }
+        } catch (Throwable ignored) {
+            // fall through to v2
+        }
+        try {
+            Sha256Hash v2 = ti.infoHashV2();
+            if (v2 != null && !v2.isAllZeros()) {
+                return v2.toString().toLowerCase();
+            }
+        } catch (Throwable ignored) {
+            // no usable hash
+        }
+        return null;
+    }
+
+    String canonicalInfoHash(TorrentHandle th) {
+        if (th == null) {
+            return null;
+        }
+        try {
+            String hash = canonicalInfoHash(th.torrentFile());
+            if (hash != null) {
+                return hash;
+            }
+        } catch (Throwable ignored) {
+            // fall back to the handle hash
+        }
+        try {
+            return th.infoHash().toString().toLowerCase();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Locates the resume sidecar for a restored session torrent by trying the
+     * .torrent filename hash first, then both info hashes from its contents.
+     * Heals installs written before the naming was unified.
+     */
+    private File resumeFileFor(String fileNameHash, TorrentInfo ti) {
+        java.util.List<String> candidates = new java.util.ArrayList<>(3);
+        if (fileNameHash != null && !fileNameHash.isEmpty()) {
+            candidates.add(fileNameHash.toLowerCase());
+        }
+        if (ti != null) {
+            try {
+                Sha1Hash v1 = ti.infoHashV1();
+                if (v1 != null) {
+                    candidates.add(v1.toString().toLowerCase());
+                }
+            } catch (Throwable ignored) {
+            }
+            try {
+                Sha256Hash v2 = ti.infoHashV2();
+                if (v2 != null && !v2.isAllZeros()) {
+                    String v2hex = v2.toString().toLowerCase();
+                    candidates.add(v2hex);
+                    // Legacy resume naming used torrent_handle.infoHash(), a
+                    // 20-byte hash: for v2 that is the truncated v2 prefix.
+                    if (v2hex.length() > 40) {
+                        candidates.add(v2hex.substring(0, 40));
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        for (String candidate : candidates) {
+            File file = resumeDataFile(candidate);
+            if (file.exists()) {
+                return file;
+            }
+        }
+        return resumeDataFile(fileNameHash != null ? fileNameHash.toLowerCase() : "");
+    }
+
+    File readSavePath(String infoHash) {
+        return readSavePath(resumeDataFile(infoHash));
+    }
+
+    private File readSavePath(File resumeFile) {
+        File savePath = null;
+        try {
+            byte[] arr = FileUtils.readFileToByteArray(resumeFile);
+            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
+            savePath = new File(e.dict().get("save_path").string());
+        } catch (Throwable e) {
+            // can't recover the original torrent path
+        }
+        return savePath;
+    }
+
     File readTorrentPath(String infoHash) {
         File torrent = null;
         try {
@@ -624,18 +736,6 @@ public final class BTEngine extends SessionManager {
             // can't recover an original torrent path
         }
         return torrent;
-    }
-
-    File readSavePath(String infoHash) {
-        File savePath = null;
-        try {
-            byte[] arr = FileUtils.readFileToByteArray(resumeDataFile(infoHash));
-            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
-            savePath = new File(e.dict().get("save_path").string());
-        } catch (Throwable e) {
-            // can't recover the original torrent path
-        }
-        return savePath;
     }
 
     private void saveTorrent(TorrentInfo ti) {
@@ -661,11 +761,11 @@ public final class BTEngine extends SessionManager {
             entry e = ti.toEntry().swig();
             e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-            Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-            if (infoHashV1 != null) {
-                FileUtils.writeByteArrayToFile(resumeTorrentFile(infoHashV1.toString()), arr);
+            String hash = canonicalInfoHash(ti);
+            if (hash != null) {
+                FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), arr);
             } else {
-                LOG.warn("Cannot save resume data for v2-only torrent - no v1 hash available");
+                LOG.warn("Cannot save session torrent - no usable info hash");
             }
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
