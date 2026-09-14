@@ -93,7 +93,7 @@ public final class BTDownload implements BittorrentDownload {
             // (zero-piece torrents never check, born-complete seeds may never
             // get dirty). Restoring without resume falls back to the default
             // data dir and strands such torrents at 0% forever.
-            String infoHash = getInfoHash();
+            String infoHash = engine.canonicalInfoHash(th);
             if (infoHash != null && !engine.resumeDataFile(infoHash).exists()) {
                 LOG.info("BTDownload::backfill missing resume for " + infoHash);
                 doResumeData(true);
@@ -491,7 +491,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
-        String infoHash = this.getInfoHash();
+        String infoHash = engine.canonicalInfoHash(th);
         incompleteFilesToRemove = getIncompleteFiles();
         // prevent any further resume serialization during removal
         removing = true;
@@ -741,7 +741,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public File getTorrentFile() {
-        return engine.readTorrentPath(this.getInfoHash());
+        return engine.readTorrentPath(engine.canonicalInfoHash(th));
     }
 
     public Set<File> getIncompleteFiles() {
@@ -817,7 +817,9 @@ public final class BTDownload implements BittorrentDownload {
                 return;
             }
             if (th.isValid()) {
-                String infoHash = th.infoHash().toString();
+                // Same canonical hash BTEngine uses to name the session .torrent,
+                // so restore's <torrent-name>.resume lookup always matches.
+                String infoHash = engine.canonicalInfoHash(th);
                 File file = engine.resumeDataFile(infoHash);
                 entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
                 e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
@@ -885,7 +887,7 @@ public final class BTDownload implements BittorrentDownload {
     private Map<String, String> createExtra() {
         Map<String, String> map = new HashMap<>();
         try {
-            String infoHash = getInfoHash();
+            String infoHash = engine.canonicalInfoHash(th);
             File file = engine.resumeDataFile(infoHash);
             if (file.exists()) {
                 byte[] arr = FileUtils.readFileToByteArray(file);
