@@ -115,6 +115,9 @@ application {
 }
 
 tasks.named('run') {
+    // Distributed search spawns the icebridge.jar daemon; without it the app
+    // silently disables IceBridge, so 'run' must build the jar like 'test' does.
+    dependsOn icebridgeJar
     systemProperty 'fw.running.from.distribution', 'false'
     jvmArgs '-Ddebug=1'
     jvmArgs '-Dfw.debug.assertNoEdtIO=true'
@@ -486,6 +489,7 @@ gettextBundle.dependsOn gettextInit
 // I believe the JVM also installs signal handlers for managing its garbage collection, so it sounds plausible
 // that there's some clash.
 tasks.register('runWithJSig', JavaExec) {
+    dependsOn icebridgeJar
     classpath = sourceSets.main.runtimeClasspath
     mainClass = application.mainClass
     jvmArgs = application.applicationDefaultJvmArgs
