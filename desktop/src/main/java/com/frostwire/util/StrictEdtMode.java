@@ -92,8 +92,8 @@ public final class StrictEdtMode {
             }
 
             System.err.flush();
-            if (isMacMetalRenderPipelineStall(edtStack)) {
-                System.err.println("Strict EDT mode: macOS Metal renderer stall; process will continue.");
+            if (isRenderPipelineStall(edtStack)) {
+                System.err.println("Strict EDT mode: render pipeline stall (pure JDK/Swing paint, no app frames); process will continue.");
                 System.err.flush();
                 return;
             }
@@ -142,10 +142,12 @@ public final class StrictEdtMode {
             System.err.println("Event: " + event);
 
             // Grab stack of all threads and print EDT’s
+            StackTraceElement[] edtStack = null;
             for (Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
                 if (e.getKey() == edt) {
+                    edtStack = e.getValue();
                     System.err.println("--- EDT stack ---");
-                    for (StackTraceElement ste : e.getValue()) {
+                    for (StackTraceElement ste : edtStack) {
                         System.err.println("\tat " + ste);
                     }
                 }
@@ -159,6 +161,11 @@ public final class StrictEdtMode {
             }
 
             System.err.flush();
+            if (isRenderPipelineStall(edtStack)) {
+                System.err.println("Strict EDT mode: render pipeline stall; skipping Icebase report.");
+                System.err.flush();
+                return;
+            }
             // Production never halts: queue a throttled Icebase report and keep dispatching.
             // Bounded descriptor on purpose: the raw event string can carry coordinates and
             // other high-cardinality data that would explode server-side issue grouping.
@@ -180,6 +187,16 @@ public final class StrictEdtMode {
         }
     }
 
+    private static final String JAVA2D_PREFIX = "sun.java2d.";
+    private static final String SWING_PREFIX = "javax.swing.";
+    private static final String FLATLAF_PREFIX = "com.formdev.";
+    private static final String WATCHDOG_PREFIX = "com.frostwire.util.StrictEdtMode";
+    private static final String[] APP_FRAME_PREFIXES = {
+            "com.frostwire.",
+            "com.limegroup.",
+            "org.limewire."
+    };
+
     static boolean isMacMetalRenderPipelineStall(StackTraceElement[] stack) {
         if (stack == null) {
             return false;
@@ -192,5 +209,64 @@ public final class StrictEdtMode {
             }
         }
         return false;
+    }
+
+    /**
+     * Pure JDK/Swing paint stall (render pipeline, not an app defect).
+     *
+     * <p>Thread-safe: stateless stack inspection, no shared mutable state.
+     *
+     * <p>True when the EDT is busy inside the Java2D software/hardware rasterizer
+     * ({@code sun.java2d.*}) reached from Swing/AWT paint, with no FrostWire app
+     * frames on the stack. This covers the Linux XWayland path where
+     * {@code -Dsun.java2d.xrender=false -Dsun.java2d.opengl=false} forces
+     * software loops (MaskBlit/Blit via SpanShapeRenderer, e.g. EtchedBorder
+     * border painting) that can exceed the Strict-EDT threshold on first paint
+     * while RUNNABLE in native code. Any {@code com.frostwire.*},
+     * {@code com.limegroup.*} or {@code org.limewire.*} frame disqualifies the
+     * exemption so real app work on the EDT still fails fast. The watchdog's own
+     * {@code StrictEdtMode$TimingEventQueue.dispatchEvent} frame is always on the
+     * EDT stack and is ignored.
+     */
+    static boolean isRenderPipelineStall(StackTraceElement[] stack) {
+        if (stack == null || stack.length == 0) {
+            return false;
+        }
+        if (isMacMetalRenderPipelineStall(stack)) {
+            return true;
+        }
+        boolean hasJava2dRaster = false;
+        boolean hasSwingPaint = false;
+        for (StackTraceElement frame : stack) {
+            if (frame == null) {
+                continue;
+            }
+            String className = frame.getClassName();
+            if (className == null) {
+                continue;
+            }
+            if (className.startsWith(WATCHDOG_PREFIX)) {
+                continue;
+            }
+            for (String appPrefix : APP_FRAME_PREFIXES) {
+                if (className.startsWith(appPrefix)) {
+                    return false;
+                }
+            }
+            if (className.startsWith(JAVA2D_PREFIX)) {
+                hasJava2dRaster = true;
+            }
+            if (className.startsWith(SWING_PREFIX)
+                    || className.startsWith(FLATLAF_PREFIX)
+                    || "sun.awt.SunGraphicsCallback".equals(className)
+                    || "java.awt.GraphicsCallback".equals(className)) {
+                hasSwingPaint = true;
+            } else if (className.startsWith("java.awt.")
+                    && frame.getMethodName() != null
+                    && frame.getMethodName().contains("paint")) {
+                hasSwingPaint = true;
+            }
+        }
+        return hasJava2dRaster && hasSwingPaint;
     }
 }
