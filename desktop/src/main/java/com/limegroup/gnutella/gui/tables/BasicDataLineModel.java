@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles common tasks associated with storing the DataLine's of a table.
@@ -82,6 +83,16 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     private boolean _isSorted = false;
     private boolean _resortRunning = false;
     private boolean _resortPending = false;
+    /**
+     * Snapshot placeholder for a cell that threw while reading. Identity
+     * comparison guarantees the row is treated as changed and repainted.
+     */
+    private static final Object UNREADABLE_CELL = new Object();
+    /**
+     * Displayed values at the previous refresh, for change-scoped row events.
+     * Guarded by {@link #_listLock}.
+     */
+    private Object[][] lastRefreshSnapshot;
 
     /*
      * Constructor -- creates the model, tying it to
@@ -222,15 +233,94 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * @return null
      */
     public Object refresh() {
-        int end;
+        if (getRowCount() == 0) {
+            return null;
+        }
         synchronized (_listLock) {
-            end = _list.size();
             for (T t : _list) t.update();
         }
-        if (end > 0) {
-            fireTableRowsUpdated(0, end - 1);
-        }
+        fireChangedRowsSinceLastRefresh();
         return null;
+    }
+
+    /**
+     * Fires row-updated events only for rows whose displayed values changed
+     * since the previous refresh, so the 1-second GUI refresh does not repaint
+     * tables whose content did not change. Contiguous changed rows collapse
+     * into a single range event. The first call (or a row-count change) falls
+     * back to a full-range event.
+     *
+     * <p>Background: a full-table repaint walks every visible cell through the
+     * software Java2D pipeline (one native X call per primitive under XWayland),
+     * which can freeze the EDT for seconds on large tables. Repaints must stay
+     * proportional to what actually changed.
+     */
+    protected final void fireChangedRowsSinceLastRefresh() {
+        Object[][] now = snapshotDisplayedValues();
+        Object[][] last;
+        synchronized (_listLock) {
+            last = lastRefreshSnapshot;
+            lastRefreshSnapshot = now;
+        }
+        if (last == null || last.length != now.length) {
+            if (now.length > 0) {
+                fireTableRowsUpdated(0, now.length - 1);
+            }
+            return;
+        }
+        int rangeStart = -1;
+        for (int r = 0; r < now.length; r++) {
+            if (!rowsEqual(last[r], now[r])) {
+                if (rangeStart == -1) {
+                    rangeStart = r;
+                }
+            } else if (rangeStart != -1) {
+                fireTableRowsUpdated(rangeStart, r - 1);
+                rangeStart = -1;
+            }
+        }
+        if (rangeStart != -1) {
+            fireTableRowsUpdated(rangeStart, now.length - 1);
+        }
+    }
+
+    /**
+     * Snapshots the currently displayed cell values with one {@code getValueAt}
+     * pass per row. Pure model reads: fires no events.
+     */
+    private Object[][] snapshotDisplayedValues() {
+        int cols = getColumnCount();
+        synchronized (_listLock) {
+            Object[][] snapshot = new Object[_list.size()][];
+            for (int r = 0; r < snapshot.length; r++) {
+                Object[] values = new Object[cols];
+                for (int c = 0; c < cols; c++) {
+                    try {
+                        values[c] = _list.get(r).getValueAt(c);
+                    } catch (RuntimeException e) {
+                        // Unreadable cell: force the row event below.
+                        values[c] = UNREADABLE_CELL;
+                    }
+                }
+                snapshot[r] = values;
+            }
+            return snapshot;
+        }
+    }
+
+    private static boolean rowsEqual(Object[] a, Object[] b) {
+        if (a == b) {
+            return true;
+        }
+        if (a == null || b == null || a.length != b.length) {
+            return false;
+        }
+        for (int i = 0; i < a.length; i++) {
+            if (!Objects.equals(a[i], b[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
