@@ -218,11 +218,9 @@ public final class StrictEdtMode {
      *
      * <p>True when the EDT is busy inside the Java2D software/hardware rasterizer
      * ({@code sun.java2d.*}) reached from Swing/AWT paint, with no FrostWire app
-     * frames on the stack. This covers the Linux XWayland path where
-     * {@code -Dsun.java2d.xrender=false -Dsun.java2d.opengl=false} forces
-     * software loops (MaskBlit/Blit via SpanShapeRenderer, e.g. EtchedBorder
-     * border painting) that can exceed the Strict-EDT threshold on first paint
-     * while RUNNABLE in native code. Any {@code com.frostwire.*},
+     * frames on the stack. This covers pure JDK paint stalls (MaskBlit/Blit via
+     * SpanShapeRenderer, image blits, glyph runs) that can exceed the Strict-EDT
+     * threshold while RUNNABLE in native code. Any {@code com.frostwire.*},
      * {@code com.limegroup.*} or {@code org.limewire.*} frame disqualifies the
      * exemption so real app work on the EDT still fails fast. The watchdog's own
      * {@code StrictEdtMode$TimingEventQueue.dispatchEvent} frame is always on the
