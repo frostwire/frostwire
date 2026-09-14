@@ -94,8 +94,7 @@ class DataLineModelRefreshScopeTest {
         FakeModel model = modelWithRows(3, events::add);
 
         model.refresh();
-        assertEquals(1, events.size(), "First refresh establishes the baseline with one full-range event");
-        events.clear();
+        assertTrue(events.isEmpty(), "First refresh only stores the baseline, got " + events.size() + " events");
 
         model.refresh();
 
