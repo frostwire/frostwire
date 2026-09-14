@@ -41,6 +41,52 @@ import java.nio.file.StandardCopyOption;
  * all the necessary classes for the application.
  */
 public class Main {
+    /**
+     * Forces grayscale (not subpixel-LCD) Swing text rendering on Linux.
+     *
+     * <p>Swing text ({@code SwingUtilities2.drawString}, used by every Synth
+     * label, table cell and progress-bar string) resolves LCD-vs-grayscale from
+     * the {@code awt.font.desktophints} desktop property supplied by the GNOME
+     * XSettings. Per-Graphics antialiasing hints cannot override it, and the
+     * double-buffered offscreen graphics never even see them, so table paints
+     * rasterize every glyph through the native subpixel rasterizer. That costs
+     * roughly 3x the grayscale path in the software Java2D pipeline and freezes
+     * full-table paints on XWayland. The remaining desktop hints (e.g.
+     * fractional metrics) are preserved.
+     *
+     * <p>{@code Toolkit.setDesktopProperty} is protected, so this reflective
+     * call relies on the {@code --add-opens=java.desktop/java.awt=ALL-UNNAMED}
+     * flag already present in the application and run JVM arguments. When the
+     * call is unavailable the desktop hints are left untouched.
+     */
+    public static void disableLcdFontSmoothing() {
+        try {
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            java.lang.reflect.Method setter = Toolkit.class.getDeclaredMethod(
+                    "setDesktopProperty", String.class, Object.class);
+            setter.setAccessible(true);
+            setter.invoke(toolkit, "awt.font.desktophints",
+                    grayscaleFontHints(toolkit.getDesktopProperty("awt.font.desktophints")));
+        } catch (ReflectiveOperationException | SecurityException ignored) {
+            // Leave the desktop hints untouched.
+        }
+    }
+
+    /**
+     * Returns a copy of the given desktop font hints requesting grayscale text
+     * antialiasing instead of subpixel-LCD. Pure function for testability.
+     */
+    public static java.util.Map<Object, Object> grayscaleFontHints(Object currentHints) {
+        java.util.Map<Object, Object> hints;
+        if (currentHints instanceof java.util.Map) {
+            hints = new java.util.HashMap<>((java.util.Map<?, ?>) currentHints);
+        } else {
+            hints = new java.util.HashMap<>();
+        }
+        hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        return hints;
+    }
+
     private static URL CHOSEN_SPLASH_URL = null;
 
     /**
@@ -61,6 +107,7 @@ public class Main {
                 field.set(toolkit, "FrostWire");
             } catch (Exception ignored) {
             }
+            disableLcdFontSmoothing();
         }
         String arch = System.getProperty("os.arch").toLowerCase();
         boolean isARM64 = arch.equals("aarch64") || arch.equals("arm64");	
