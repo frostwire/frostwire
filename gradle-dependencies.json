@@ -1,0 +1,122 @@
+[
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/xerial/sqlite-jdbc/3.43.0.0/sqlite-jdbc-3.43.0.0.jar",
+        "sha256": "50524b16b649fb03f81df6e61dec69911b8849e6943c61b85faa24e49bfd98fc",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10.jar",
+        "sha256": "a4c74d94d64ce1abe53760fe0389dd941f6fc558d0dab35e47c085a11ec80f28",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10.jar",
+        "sha256": "ac6361bf9ad1ed382c2103d9712c47cdec166232b4903ed596e8876b0681c9b7",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar",
+        "sha256": "b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar",
+        "sha256": "67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10.jar",
+        "sha256": "55e989c512b80907799f854309f3bc7782c5b3d13932442d0379d5c472711504",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/google/re2j/re2j/1.8/re2j-1.8.jar",
+        "sha256": "7b52c72156dd7f98b3237a5b35c1d34fba381b21048c89208913ad80a45dfbd7",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/googlecode/gettext-commons/gettext-commons/0.9.8/gettext-commons-0.9.8.jar",
+        "sha256": "e99db87257317dd14767661fb0d55d05c63b777c5f89243dc4fa04736cc48ef0",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/26.0.1/annotations-26.0.1.jar",
+        "sha256": "2037be378980d3ba9333e97955f3b2cde392aa124d04ca73ce2eee6657199297",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/formdev/flatlaf/3.6/flatlaf-3.6.jar",
+        "sha256": "2df1e3183600262a15f76aa4ae5acc2c154e884f7672bddaaac66842a37cf3f0",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10.jar",
+        "sha256": "cde3341ba18a2ba262b0b7cf6c55b20c90e8d434e42c9a13e6a3f770db965a88",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.10/gson-2.10.jar",
+        "sha256": "0cdd163ce3598a20fc04eee71b140b24f6f2a3b35f0a499dbbdd9852e83fbfaf",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://dl.frostwire.com/maven/com/frostwire/jlibtorrent-linux/2.0.12.5/jlibtorrent-linux-2.0.12.5.jar",
+        "sha256": "364fefdf2affdb1f2b45e1bdc3cbe6eb17884b32a39c10362776b1c46c6c1663",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://dl.frostwire.com/maven/com/frostwire/jlibtorrent/2.0.12.5/jlibtorrent-2.0.12.5.jar",
+        "sha256": "27f7bb2c363bf6830465b599b020fca3c247aefcc5fcfd1730dc545637e9a91c",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-params/5.9.0/junit-jupiter-params-5.9.0.jar",
+        "sha256": "b8cef7982dd53df84c957a6e9ac89ede967cf2e6d9340ef4c51786e20548c41b",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-api/5.9.0/junit-jupiter-api-5.9.0.jar",
+        "sha256": "3e370bcbb1e857fda5f0b203724116d02b05e788faa1eb2518814accf9cfb5b1",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar",
+        "sha256": "b509448ac506d607319f182537f0b35d71007582ec741832a1f111e5b5b70b38",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar",
+        "sha256": "58812de60898d976fb81ef3b62da05c6604c18fd4a249f5044282479fc286af2",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-commons/1.9.0/junit-platform-commons-1.9.0.jar",
+        "sha256": "e5894b710094b4caafc6280b8829a439fb764901ea0ae18d06ed80388b309b7a",
+        "dest": "dependencies"
+    },
+    {
+        "type": "file",
+        "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/5.9.0/junit-jupiter-5.9.0.jar",
+        "sha256": "2db2e4aa2b5e82fefcbf18d0af20c8095a43e94ad9ab9d16bd87557cdaa397dd",
+        "dest": "dependencies"
+    }
+]
