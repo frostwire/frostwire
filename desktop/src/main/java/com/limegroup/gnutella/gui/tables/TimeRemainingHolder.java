@@ -37,6 +37,22 @@ public final class TimeRemainingHolder implements Comparable<TimeRemainingHolder
         return (int) (o._timeRemaining - _timeRemaining);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TimeRemainingHolder)) {
+            return false;
+        }
+        return _timeRemaining == ((TimeRemainingHolder) o)._timeRemaining;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(_timeRemaining);
+    }
+
     public String toString() {
         if (_timeRemaining < 0) {
             return "\u221E";
