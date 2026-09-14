@@ -64,6 +64,25 @@ public final class SizeHolder implements Comparable<SizeHolder> {
             return 0;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SizeHolder)) {
+            return false;
+        }
+        SizeHolder other = (SizeHolder) o;
+        return Double.compare(_size, other._size) == 0 && _string.equals(other._string);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Double.hashCode(_size);
+        result = 31 * result + _string.hashCode();
+        return result;
+    }
+
     /**
      * Returns the string value of this size, formatted with commas and
      * "KB" appended to the end.
