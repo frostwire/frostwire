@@ -128,10 +128,14 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
 
     /**
-     * Override to not iterate through each result.
+     * Override to not iterate through each result. Repaints only rows whose
+     * displayed values changed since unaffected rows cost a full-table paint.
      */
     public Object refresh() {
-        fireTableRowsUpdated(0, getRowCount());
+        if (getRowCount() == 0) {
+            return null;
+        }
+        fireChangedRowsSinceLastRefresh();
         return null;
     }
 
