@@ -217,8 +217,14 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
 
     /** Bounded shape demux only; workers still decode and authenticate every request. */
     private static boolean isRequest(byte[] payload, int protocolId) {
-        if (payload.length == 0 || payload.length > MAX_REQUEST_BYTES
-                || (protocolId != MeshProtocolId.SEARCH && protocolId != MeshProtocolId.METADATA)) {
+        if (payload.length == 0 || payload.length > MAX_REQUEST_BYTES) {
+            return false;
+        }
+        if (protocolId == MeshProtocolId.INDEX_DIGEST) {
+            // Opaque content fingerprint; the handler validates its shape before storing it.
+            return true;
+        }
+        if (protocolId != MeshProtocolId.SEARCH && protocolId != MeshProtocolId.METADATA) {
             return false;
         }
         boolean requester = false;
