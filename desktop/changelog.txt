@@ -1,67 +1,8 @@
  FrostWire 7.1.0 UNRELEASED
-  - fix:right-clicking the transfer detail Files tab with no row selected no longer throws a NullPointerException
-  - fix:transfer action buttons no longer flicker between enabled and disabled while a download is in progress; share/play availability is computed per row off the EDT instead of being cached on the single shared renderer
-  - fix:Linux/Wayland startup no longer freezes or crashes when opening the Transfers tab — Java2D was forced onto the legacy software X11 pipeline, where on-screen icon and text blits are ~1000x slower; rendering now uses the XRender pipeline, which is fast and stable under XWayland
-  - fix:Desktop UI repaints only rows that actually changed instead of every table row each second, theme icons decode once instead of on every paint, and Tip of the Day renders without subpixel-text stalls
-  - fix:macOS installs ship icebridge.jar beside frostwire.jar and both jars' native libraries are signed; frostwire.jar no longer duplicates daemon-only IceBridge classes
-  - fix:JDK 26 HTTPS requests no longer fail after IceBridge identity initialization; Bouncy Castle is kept scoped to identity crypto instead of overriding the JVM-wide XDH provider
-  - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
-  - fix:macOS file rows show rich native icons again — the JFileChooser native view is used (FileSystemView returns only generic icons on JDK 26) and the bundled app passes --add-exports for com.apple.laf like frostwire.sh does
-  - cleanup:Desktop builds support JDK 26 by upgrading google-java-format from 1.24.0 to 1.36.1
-  - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
-  - new:Transfers default columns — Actions, Name, Seeding, Size, Status, Progress, Down Speed, Downloaded, Uploaded, Up Speed, Time, Seeds; Tips/Donations hidden, Uploaded shown (existing custom layouts untouched)
-  - fix:IceBridge P0 hardening — cheap-reject-first ingress (rate-limit before Ed25519 verify), per-IP + global HELLO budgets, per-/24 session caps, empty HELLO_ACK removed; helloRejected/relayRateLimited/searchRateLimited/powRejected/spamMarkedDropped counters in /metrics
-  - fix:TORRENT_FETCH serves torrents up to 256KB (was 64KB) with signed TOO_LARGE above; holder-signed chunks are cached and restamped per request nonce (metadata protocol v2)
-  - fix:Mesh log volume — per-packet/per-rejection logs demoted to DEBUG (metrics counters carry the signal); systemd unit caps journal spam (LogRateLimit 2000/30s)
-  - fix:IceBridge ops scripts — run-local kills previous instances and detaches safely on Ctrl+C; systemd install is one-step (builds the jar, sudo self-elevation with JAVA_HOME passthrough, stops port strays, no crash-loops)
-  - cleanup:GPL header on all post-2020 Java files missing it (79 files)
-  - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
-  - fix:IceBridge child supervision prevents orphan processes and preserves distributed search/TORRENT_FETCH across crashes and restarts
-  - fix:Standalone IceBridge forwarders launch with DHT and bootstrap discovery enabled, while release packages include icebridge.jar
-  - fix:Desktop release distributions no longer expose unauthenticated JMX or JDWP listeners
-  - fix:TORRENT_FETCH returns holder-signed full torrent metadata through EC2 relay hops, including piece layers for hybrid torrents
-  - fix:Distributed search and relay responses follow live rUDP sessions after cellular NAT rebinding instead of stale registry endpoints
-  - fix:Metadata-less magnets are replaced by the real libtorrent transfer, preserving x.pe peers and avoiding invalid piece-layer reconstruction
-  - fix:Mesh magnets no longer advertise BitTorrent port 0 from failed listeners
-  - fix:Newly created YouTube/HTTP torrents are indexed immediately after auto-seeding
-  - fix:YouTube downloads preserve headers, ranges, cancellation, and resume behavior; Telluride build 47 uses yt-dlp 2026.8.19
-  - fix:YouTube search returns both best video and best audio streams, including muxed-only responses
-  - new:About window shows the current Telluride build number
-  - fix:Slideshow / MISC HTTP no longer dies on OkHttp HTTP/2 stream header timeout (o2.php) — MISC client is HTTP/1.1, shared clients send HTTP/2 pings, slideshow retries once after evicting a stale pool
-  - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=30; LimeWire ultrapeer baseline retained
-  - new:IceBridge topology limits — IceBridgeTopology + env ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready)
-  - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
-  - cleanup:Local search is diagnostic only (default off) — same LocalIndex path as inbound IceBridge answers; peer discovery is Distributed Search
-  - cleanup:Identity settings UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as Android
-  - new:Local search (and remote answers from this node) only return actively seeded/swarming transfers with full metadata by default — historical LocalIndex rows excluded unless Options → Shared Torrents Database → "Include inactive / historical shares" is enabled
-  - new:Standalone IceBridge (icebridge-run-local.sh / AWS) logs successful mesh traffic at INFO — HELLO, HELLO_ACK, RELAY, SEARCH, TELEMETRY/PING and other known protocolIds
-  - fix:IceBridge mesh security — HELLO_ACK carries signed identity so initiators learn remotePub (fixes rejected multi-hop RELAY); RELAY_RESPONSE requires authenticated session (no fire-and-forget spoof); RELAY app payload capped to single rUDP fragment; hop TTL default 3; mesh fan-out 3; per-peer RELAY rate limit; local registry targets delivered via /poll without self-UDP
-  - new:IceBridge multi-hop mesh RELAY — hop TTL frame, Type.RELAY delivery, forwarder mesh via RelayMesh; MultiRelayMeshSearchTest (3 FORWARDER + seeder/searcher clients)
-  - fix:IdentityRecord.fromEntry accepts v1/v2 again (read path) — still writes v3 with caps; fixes self-ping / peer handshake decode after capability bump
-  - fix:DHT peer discovery ConcurrentModificationException — snapshot TcpEndpoint lists from dhtGetPeers before iterating (jlibtorrent alert threads can mutate live lists)
-  - new:IceBridge multi-protocol fabric — all mesh payloads IBP1-framed with protocolId on /send and /poll (SEARCH=1)
-  - new:Node capability advertisement — IdentityRecord v3 caps bitflags (RELAY/SEARCH/INDEX/STORE/DHT/TORRENT/AI); PeerDirectory filters by capability; roles still derived for DHT topics
-  - new:Streaming distributed search responses — RESULT chunks with final flag; large result sets stream multiple signed frames; performer accumulates until final
-  - new:KeyspaceRouter ranks peers by XOR distance of SHA-1(keywords) for future responsibility-based routing (search still fans out trust-ordered peers first)
-  - new:ICEBRIDGE_ARCHITECTURE_REVIEW.md north-star layering + implementation status matrix
-  - cleanup:Drop pre-alpha wire shims — no bare SEARCH payloads, no dual response signature domain, no IdentityRecord v1/v2 parse, no 96-byte HELLO auth
-  - new:Dual-envelope distributed search multi-hop (v2) — requester signature covers query only; hops preserve sig; default ttl=2; PeerRegistrySync registers self and imports IceBridge mesh peers (forwarder-first discovery)
-  - fix:IceBridge CLI prints identity load vs proof-of-work mining progress on stdout (first-run no longer looks hung); non-protocol TCP 6888 probes at DEBUG without stack spam
-  - fix:IceBridge ops scripts — systemd install creates writable /opt dir; control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
-  - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-systemd-install.sh
-  - new:Identity settings — Initialize Identity button with off-EDT proof-of-work mining (progress bar) and restart; import/restore/export now use the same libtorrent/identity.dat path as the relay stack
-  - new:Standalone IceBridge embedded DHT announce — pure FORWARDER nodes publish on frostwire-relays-v1 (+ optional bootstrap) via minimal jlibtorrent SessionManager without FrostWire desktop; ICEBRIDGE_DHT / --dht / --no-dht; DhtAdvertiser accepts SessionManager supplier
-  - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
-  - fix:IncomingSearchRequestHandler rate-limits catalog browse by verified requesterPub after signature check (not transport sourcePub); search rate-limit owned by RelaySearchService
-  - fix:Desktop IncomingSearchRequestHandler now receives LocalIndex so catalog browse works (parity with Android)
-  - fix:Stop seeding PeerDirectory with unverified IceBridge host-cache placeholders (reduces self/auth spam); host cache remains UI/history only
-  - fix:common/ relay identity and IceBridge file I/O no longer use java.nio.file (Android-safe File streams)
-  - new:ICEBRIDGE.md operator stub (ports, local vs remote, tokens, co-located pitfalls, security model)
   - fix:CRITICAL: matchedFile excluded from RemoteSearchResponse canonical bytes — Ed25519 signature did not cover the matched file path, allowing MITM tampering. Now included in appendRowBencode as "mf" key
   - fix:IP Filter critical blocking bug — add_rule() was passing flags=0 (allow) instead of ip_filter.access_flags.blocked.swigValue()=1, so blocked IP ranges were silently allowed through libtorrent (#1291) — caught by new IPFilterBlockingTest regression suite
-  - fix:FragmentReassembler DoS vulnerability — DATA_END with fragIndex=Integer.MAX_VALUE forced a 2-billion-iteration loop; assemble() had int overflow causing NegativeArraySizeException that killed the rUDP channel. Added MAX_FRAGMENTS_PER_GROUP (4096), MAX_ASSEMBLED_SIZE (16MB), and long accumulation
-  - fix:Timestamp-skew bypass via Math.abs(Long.MIN_VALUE) — Math.abs(Long.MIN_VALUE) returns a negative value, bypassing the >60s skew check in registration and response verification. Replaced with manual sign flip
   - fix:TLS hostname verification now uses proper suffix matching instead of substring contains — prevents attacker-controlled hostnames from matching whitelisted domains
+  - fix:Timestamp-skew bypass via Math.abs(Long.MIN_VALUE) — Math.abs(Long.MIN_VALUE) returns a negative value, bypassing the >60s skew check in registration and response verification. Replaced with manual sign flip
   - fix:rUDP HELLO replay prevention — 8-byte Unix timestamp added to the signed message. HELLOs with timestamp skew > 300s are rejected (104-byte format only)
   - fix:IceBridge control API requires auth token (X-IceBridge-Token header) on all endpoints except /health — 32-byte random hex string generated at startup
   - fix:RegisterRequest canonical string uses length-prefixed fields to prevent delimiter injection
@@ -75,6 +16,74 @@
   - fix:matchedFile length validation (max 4096 chars) in DistributedSearchPerformer and LocalSharedTorrentSearchPerformer — rejects pathologically long values from malicious remote peers
   - fix:DistributedSearchPerformer validates search result row fields — name max 2048 chars, infoHash must be 20 bytes, per-row try/catch prevents NPE from malformed responses
   - fix:IncomingSearchRequestHandler rate-limits per source to 30 requests/minute
+  - fix:FragmentReassembler DoS vulnerability — DATA_END with fragIndex=Integer.MAX_VALUE forced a 2-billion-iteration loop; assemble() had int overflow causing NegativeArraySizeException that killed the rUDP channel. Added MAX_FRAGMENTS_PER_GROUP (4096), MAX_ASSEMBLED_SIZE (16MB), and long accumulation
+  - fix:IceBridge P0 hardening — cheap-reject-first ingress (rate-limit before Ed25519 verify), per-IP + global HELLO budgets, per-/24 session caps, empty HELLO_ACK removed; helloRejected/relayRateLimited/searchRateLimited/powRejected/spamMarkedDropped counters in /metrics
+  - fix:IceBridge rejects unauthenticated rUDP application packets and applies backpressure instead of acknowledging messages that could not be delivered
+  - fix:IceBridge mesh security — HELLO_ACK carries signed identity so initiators learn remotePub (fixes rejected multi-hop RELAY); RELAY_RESPONSE requires authenticated session (no fire-and-forget spoof); RELAY app payload capped to single rUDP fragment; hop TTL default 3; mesh fan-out 3; per-peer RELAY rate limit; local registry targets delivered via /poll without self-UDP
+  - fix:Desktop release distributions no longer expose unauthenticated JMX or JDWP listeners
+  - fix:IceBridge rUDP and relay TCP listeners now default to bind 0.0.0.0 (publicly reachable). Desktop bind host default changed from 127.0.0.1; IncomingRelayServer now supports explicit bind host (used by IceBridgeServer with config.host()).
+  - fix:Standalone IceBridge forwarders launch with DHT and bootstrap discovery enabled, while release packages include icebridge.jar
+  - fix:IceBridge child supervision prevents orphan processes and preserves distributed search/TORRENT_FETCH across crashes and restarts
+  - fix:TORRENT_FETCH returns holder-signed full torrent metadata through EC2 relay hops, including piece layers for hybrid torrents
+  - fix:Distributed search and relay responses follow live rUDP sessions after cellular NAT rebinding instead of stale registry endpoints
+  - new:Dual-envelope distributed search multi-hop (v2) — requester signature covers query only; hops preserve sig; default ttl=2; PeerRegistrySync registers self and imports IceBridge mesh peers (forwarder-first discovery)
+  - fix:Distributed search multi-hop disabled (ttl=0) — re-signing forwarded requests with the forwarder key while keeping original requesterPub always failed verification; v1 is direct verified-peer search only until dual-envelope hop protocol
+  - fix:RudpSession sequence-wrap deadlock — after ~2^31 packets, signed comparison treated the wrapped sequence as a duplicate, permanently stalling the session. Fixed with Integer.compareUnsigned for all sequence comparisons and ConcurrentSkipListMap comparator
+  - fix:RudpSessionManager pending-packet memory leak — unacked reliable packets were never purged after timeout; only cleared by ackLocal(). Now removed after MAX_RETRIES or RETRANSMIT_TIMEOUT_MS
+  - fix:IceBridgeServer peerTtlSec*1000 overflow — for large config values, long multiply overflowed to negative, disabling eviction. Fixed with Math.multiplyExact
+  - fix:PeerRegistry capacity enforcement — the maxPeers limit was checked AFTER merge(), so byPubHex.containsKey(key) was always true for a just-added peer; new peers were never rejected. Now checked BEFORE merge
+  - fix:FragmentReassembler cross-session collision — group key changed from int groupId to String (sender + groupId)
+  - fix:InboundMessageQueue O(n²) performance — ConcurrentLinkedQueue.size() (O(n)) was called in a while-loop for overflow eviction. Replaced with AtomicInteger counter
+  - fix:IncomingSearchRequestHandler rate-limits catalog browse by verified requesterPub after signature check (not transport sourcePub); search rate-limit owned by RelaySearchService
+  - fix:Desktop IncomingSearchRequestHandler now receives LocalIndex so catalog browse works (parity with Android)
+  - fix:Stop seeding PeerDirectory with unverified IceBridge host-cache placeholders (reduces self/auth spam); host cache remains UI/history only
+  - fix:common/ relay identity and IceBridge file I/O no longer use java.nio.file (Android-safe File streams)
+  - new:IceBridge rUDP bind host configurable (ICEBRIDGE_BIND_HOST setting) — use "0.0.0.0" to accept rUDP from remote peers (cloud forwarder mode) or "127.0.0.1" for local-only daemon mode (default). Control HTTP server always binds to localhost
+  - fix:TORRENT_FETCH serves torrents up to 256KB (was 64KB) with signed TOO_LARGE above; holder-signed chunks are cached and restamped per request nonce (metadata protocol v2)
+  - fix:Linux/Wayland startup no longer freezes or crashes when opening the Transfers tab — Java2D was forced onto the legacy software X11 pipeline, where on-screen icon and text blits are ~1000x slower; rendering now uses the XRender pipeline, which is fast and stable under XWayland
+  - fix:JDK 26 HTTPS requests no longer fail after IceBridge identity initialization; Bouncy Castle is kept scoped to identity crypto instead of overriding the JVM-wide XDH provider
+  - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
+  - fix:right-clicking the transfer detail Files tab with no row selected no longer throws a NullPointerException
+  - fix:transfer action buttons no longer flicker between enabled and disabled while a download is in progress; share/play availability is computed per row off the EDT instead of being cached on the single shared renderer
+  - fix:Desktop UI repaints only rows that actually changed instead of every table row each second, theme icons decode once instead of on every paint, and Tip of the Day renders without subpixel-text stalls
+  - fix:ThreadPool stack size increased from 4 KB to 512 KB — the previous 4 KB stack was far below the JVM default and caused StackOverflowError on deep call chains
+  - fix:Restored torrents stop landing at 0% — the session .torrent and its .resume sidecar now share one canonical hash (they used v1 vs v2), and restore heals installs written with the old mismatched names
+  - fix:Born-complete torrents (per-file Share, auto-seed) now persist resume data at check completion and on every forced save — restarts no longer restore them under the default data dir at 0%
+  - fix:Missing resume files are backfilled when a torrent is constructed, covering zero-piece torrents that never trigger a check
+  - fix:Session .torrent files are ensured alongside resume data so magnet-origin torrents survive restarts instead of vanishing from restore
+  - fix:Transfer Detail Files tab no longer freezes per-file progress while a transfer is still moving — holders rebuild on torrent progress drift, settled torrents skip native calls
+  - fix:Sharing a file that no longer exists on disk is refused with a clear error instead of creating a torrent that can never complete
+  - fix:SearchManager no longer cancels all global HTTP requests on stop — OkHttpClientWrapper.cancelAllRequests() was nuking non-search HTTP traffic (updates, FrostClick). Stopped performers now abort via the 'stopped' flag
+  - fix:SearchMediator onResults IndexOutOfBoundsException — results.get(0) without null/empty check crashed the executor thread when a performer called onResults([])
+  - fix:VPN detection false positive on macOS — system utun interfaces (iCloud, Back to My Mac) were falsely detected as active VPN tunnels even when VPN was off, because they match the "utun" interface name pattern. Now validates that utun interfaces have a real routable IPv4 address before counting them as VPN. Also added "vpn" to interface name checks for broader VPN detection coverage
+  - fix:SearchMediator onResults no longer blocks search executor threads on the EDT — changed safeInvokeAndWait to safeInvokeLater so results are dispatched asynchronously
+  - fix:HTTP search responses now check for 4xx/5xx error codes before returning the body — Cloudflare challenge pages and rate-limit responses are no longer passed to parsers as if they were valid search results
+  - fix:JdkHttpClient.head reads response code before disconnect and drains error stream to prevent socket leaks
+  - fix:Slideshow / MISC HTTP no longer dies on OkHttp HTTP/2 stream header timeout (o2.php) — MISC client is HTTP/1.1, shared clients send HTTP/2 pings, slideshow retries once after evicting a stale pool
+  - fix:DHT peer discovery ConcurrentModificationException — snapshot TcpEndpoint lists from dhtGetPeers before iterating (jlibtorrent alert threads can mutate live lists)
+  - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
+  - fix:YouTube downloads preserve headers, ranges, cancellation, and resume behavior; Telluride build 47 uses yt-dlp 2026.8.19
+  - fix:YouTube search returns both best video and best audio streams, including muxed-only responses
+  - fix:Newly created YouTube/HTTP torrents are indexed immediately after auto-seeding
+  - new:File-level search indexing — individual file paths within torrents are now indexed in a separate shared_files FTS5 table, enabling search matches on file names (e.g. "readme.txt") even when the torrent name doesn't contain the query. Search results that match on a file path populate the matchedFile field, surfaced as the result filename in the UI
+  - new:Local search (and remote answers from this node) only return actively seeded/swarming transfers with full metadata by default — historical LocalIndex rows excluded unless Options → Shared Torrents Database → "Include inactive / historical shares" is enabled
+  - fix:Idope search engine removed from commons, desktop, and android — idope.pics now requires TLS 1.3 and was failing handshakes on macOS arm64 and other TLS-1.2-only stacks. Removed IdopeSearchPattern, createIdopeTorrentSearch, SearchEngineID.IDOPE_ID, IDOPE_SEARCH_ENABLED, PREF_KEY_SEARCH_USE_IDOPE, all 39 localized use_idope strings, the android settings entry, and the desktop MCP engine registry. Added IdopeRemovalTest regression suite
+  - new:Bitsearch added as a new REST-API torrent search engine (bitsearch.eu) — clean JSON, 200 free requests/day per IP, magnet links built client-side from DefaultTrackers. No crawling, replaces the gap left by the Idope removal
+  - fix:Search result table Seeds and Size columns now sort numerically — clicking Seeds ranks 436 above 64; previously sorted lexicographically as strings or by relevance score instead of seed count
+  - fix:Default tracker list in TorrentUtil, CreateTorrentDialog, and UrlUtils updated to 16 trackers that responded to a BEP 15 connect_request probe on 2026-06-08 — removed 6 dead trackers (opentrackr, openbittorrent, exodus, moeking, explodie, coppersurfer) and added reliable replacements from ngosang/trackerslist per #1004. New DefaultTrackerListTest regression suite asserts all three files stay in sync
+  - new:Transfer Detail General tab offers Check Local Data and a per-torrent Sequential download toggle; Trackers menu offers Add Tracker with strong URL validation, and Edit Trackers now trims entries and names the offending line
+  - new:Transfer Detail Check Local Data disables while the recheck runs and swaps in a progress bar with live phase and percent, then reports the outcome
+  - new:Advanced BitTorrent settings now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
+  - new:Identity settings screen (Options > Identity) — displays node ID, fingerprint, public key, identity difficulty (leading zero bits), karma score, and shared torrent count. Buttons: Show Seed Phrase (24-word BIP39 mnemonic with copy-to-clipboard), Restore from Seed Phrase, Export Identity File, Import Identity File, Copy Fingerprint. Restore and import create a .bak backup before overwriting and trigger a restart
+  - new:BIP39 mnemonic support for identity backup — com.frostwire.crypto.Bip39Mnemonic encodes/decodes the 32-byte Ed25519 seed as a 24-word mnemonic using the standard BIP39 English wordlist with SHA-256 checksum. Enables offline paper backup of FrostWire identities
+  - new:IdentityKeys.fromSeed() — deterministically reconstructs an Ed25519 keypair from a 32-byte seed via jlibtorrent's Ed25519.createKeypair, enabling identity restore from a BIP39 mnemonic. X25519 keypair is freshly generated (not derivable from the Ed25519 seed). IdentityKeys.save/load are now public for import/export
+  - fix:IdentityKeys.generate() now uses jlibtorrent's native Ed25519 for keypair generation instead of the JDK's KeyPairGenerator — the JDK's pure-Java Ed25519 implementation is 50-100x slower than native on some platforms (macOS arm64), causing first-run identity PoW mining to take >2 minutes instead of ~1-2 seconds
+  - new:icebridge:// URL protocol handler — handles URLs of the form icebridge://<peer_pubkey_hex>/<command>. Commands: /browse (fetch and display peer's shared torrent catalog from DHT), /search/<keywords> (send a signed search request to a specific peer), /info (show peer details from PeerDirectory or DHT identity record). Integrated into the search bar — typing an icebridge:// URL triggers the handler instead of a normal search. Clipboard monitoring for icebridge:// URLs
+  - new:IceBridge software version announce — IdentityRecord v4 ib_ver + control /register+/lookup; Peers table IceBridge column; constants SOFTWARE_VERSION=1.1.0 / SOFTWARE_VERSION_CODE=1 for future crawler penetration stats
+  - new:About window shows the current Telluride build number
+  - new:Transfers default columns — Actions, Name, Seeding, Size, Status, Progress, Down Speed, Downloaded, Uploaded, Up Speed, Time, Seeds; Tips/Donations hidden, Uploaded shown (existing custom layouts untouched)
+  - fix:macOS installs ship icebridge.jar beside frostwire.jar and both jars' native libraries are signed; frostwire.jar no longer duplicates daemon-only IceBridge classes
+  - fix:macOS file rows show rich native icons again — the JFileChooser native view is used (FileSystemView returns only generic icons on JDK 26) and the bundled app passes --add-exports for com.apple.laf like frostwire.sh does
   - new:IceBridge distributed search architecture — FrostWire now launches a local IceBridge daemon (standalone rUDP relay servent) that provides a reliable, fragmented, authenticated mesh transport between peers. The DistributedSearchPerformer sends signed search requests through the daemon's HTTP control API; the daemon routes them over rUDP to remote peers' daemons, which process them and send signed responses back. A single poller thread drains the daemon's /poll endpoint and dispatches payloads to all registered listeners
   - new:rUDP (Reliable UDP) transport implemented from scratch — Ed25519-authenticated HELLO handshake, sequence-numbered DATA with ACK and retransmission (500ms interval, 5 retries, 5s timeout), application-level fragmentation/reassembly for payloads exceeding the UDP MTU (DATA_FRAG + DATA_END packet types, 1024-byte chunks with 12-byte fragment headers), HOLE_PUNCH for NAT traversal, and RELAY forwarding through forwarder peers. Built on Netty NioDatagramChannel
   - new:IceBridge control API — localhost-only HTTP server with endpoints: /health, /register (Ed25519-signed peer registration), /route (localhost-trusted unsigned peer routing), /lookup, /send (opaque payload delivery), /poll (drain inbound messages), /metrics
@@ -82,33 +91,82 @@
   - new:IceBridgeClient and IceBridgeProcessLauncher — desktop HTTP client for the local IceBridge daemon, plus subprocess launcher that starts icebridge.jar with auto-allocated ports, shared identity, and redirected log output
   - new:IncomingSearchRequestHandler — permanent listener that processes incoming search requests through RelaySearchService and sends signed responses back via the transport
   - new:PeerRegistrySync — periodic daemon thread that syncs verified PeerDirectory entries into the IceBridge daemon's registry via /route every 30 seconds, using the well-known rUDP port 6889
+  - new:IceBridge multi-hop mesh RELAY — hop TTL frame, Type.RELAY delivery, forwarder mesh via RelayMesh; MultiRelayMeshSearchTest (3 FORWARDER + seeder/searcher clients)
+  - new:IceBridge multi-protocol fabric — all mesh payloads IBP1-framed with protocolId on /send and /poll (SEARCH=1)
+  - new:Node capability advertisement — IdentityRecord v3 caps bitflags (RELAY/SEARCH/INDEX/STORE/DHT/TORRENT/AI); PeerDirectory filters by capability; roles still derived for DHT topics
+  - new:Streaming distributed search responses — RESULT chunks with final flag; large result sets stream multiple signed frames; performer accumulates until final
+  - new:KeyspaceRouter ranks peers by XOR distance of SHA-1(keywords) for future responsibility-based routing (search still fans out trust-ordered peers first)
   - refactor:DistributedSearchPerformer refactored from direct-TCP OutgoingRelayClient to transport-agnostic DistributedSearchTransport — the performer now sends requests via transport.send() and collects responses through a temporary PayloadListener registered for the duration of the search. Removed thread pool; the transport's poller handles delivery
   - refactor:OutgoingRelayClient verification extracted into shared SearchResponseVerifier (DRY) — both the direct-TCP and IceBridge paths now apply identical nonce, timestamp-skew, and Ed25519 signature checks
   - refactor:IceBridge client classes (IceBridgeClient, IceBridgeSearchTransport, IncomingSearchRequestHandler, PeerRegistrySync) moved from desktop to common for Android reuse. IceBridgeClient rewritten with OkHttp (replaces java.net.http.HttpClient). IceBridgeServer auth token stdout leak removed
   - refactor:PeerDiscoveryScheduler, DhtAdvertiser, KarmaChainWriter, KarmaChainPublisher, KarmaChainCommitScheduler moved from desktop to common for Android reuse. KarmaChainStore interface extracted — KarmaChainTable now implements it. KarmaChainWriter depends on the interface instead of the concrete table
   - new:Distributed search forwarding (v2) — search requests now use ttl=1 and include the requester's pubkey in the path array, enabling one-hop forwarding through trusted peers. IncomingSearchRequestHandler forwards requests to up to 3 trusted peers not already in the path, re-signing each forwarded request. Anti-amplification: max 3 forward targets, existing rate limits apply
   - new:Multi-instance distributed search test — headless integration test that simulates two FrostWire instances on the same machine with different identities, ports, and local indexes, verifying cross-instance search via real rUDP
-  - new:File-level search indexing — individual file paths within torrents are now indexed in a separate shared_files FTS5 table, enabling search matches on file names (e.g. "readme.txt") even when the torrent name doesn't contain the query. Search results that match on a file path populate the matchedFile field, surfaced as the result filename in the UI
+  - new:Identity settings — Initialize Identity button with off-EDT proof-of-work mining (progress bar) and restart; import/restore/export now use the same libtorrent/identity.dat path as the relay stack
+  - new:Standalone IceBridge embedded DHT announce — pure FORWARDER nodes publish on frostwire-relays-v1 (+ optional bootstrap) via minimal jlibtorrent SessionManager without FrostWire desktop; ICEBRIDGE_DHT / --dht / --no-dht; DhtAdvertiser accepts SessionManager supplier
+  - new:Karma settings screen (Options > Karma) — displays own karma chain status (current epoch, available endorsement energy, total endorsements given, karma score) and a top-peers-by-karma leaderboard (top 20, with score, endorsement count, last-endorsed timestamp). Right-click to copy peer public keys
+  - new:Peer directory settings screen (Options > Peers) — shows all known peers in a table with public key, hostname, uTP port, trust score, verified/spam status, endorser count, and last-updated time. Right-click to copy key, block (mark as spam), remove, or browse the peer's shared torrents catalog (fetched via DHT BEP 46 using RemoteIndexFetcher)
+  - new:Shared torrents database viewer (Options > Shared Torrents) — browse the local shared torrents index with search, showing name, size, file count, info hash, publisher key, timestamps, and matched file. Right-click to copy info hash, copy magnet link, or copy publisher key
+  - new:Remote peer catalog fetch protocol — RemoteIndexFetcher fetches a peer's shared torrent catalog from the DHT via BEP 46 (IndexAnnouncementPublisher manifest). RemoteCatalogBrowseRequest provides a signed request/response protocol for browsing a specific peer's catalog over the IceBridge transport. IncomingSearchRequestHandler handles both search requests and catalog browse requests
+  - new:IndexAnnouncementPublisher wired into DhtAdvertiser — shared torrent index manifests are now published to the DHT every 5 minutes alongside identity records, enabling peers to discover each other's shared catalogs
+  - new:LocalIndex.listAll() — enumerate all shared torrents in the local index for UI browsing
+  - new:DistributedSearchEngineWire.getPeerDirectory() — static accessor for the shared PeerDirectory instance, enabling UI panels to access peer data
+  - new:IP Filter now supports multiple block list formats — P2P, DAT, CIDR, and Hosts formats are auto-detected and parsed. ZIP archives are now supported alongside existing GZIP decompression. Extracted format readers into separate classes (P2PIPFilterInputStreamReader, DatFilterInputStreamReader, CidrFilterInputStreamReader, HostsFilterInputStreamReader) with shared IPFilterFormat enum
+  - new:IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
+  - new:IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
+  - new:Added MCP auto-configuration support for Grok Build in the shared AgentDetector / AgentConfigWriter (common module). Grok is now detected via `grok` binary in PATH + ~/.grok/config.toml presence. "Configure" writes a native TOML entry under [mcp_servers.frostwire] with url + enabled=true using the HTTP/Streamable transport. This allows direct MCP connection from Grok Build TUI to the local FrostWire MCP server (port 8796 by default).
+  - fix:MCP streamable HTTP handshake for Grok + other agents: notifications/initialized now returns 202 Accepted + "accepted" body (text/plain) + data: accepted on SSE stream. No initial data on GET SSE open. Allows grok mcp doctor frostwire (and rmcp-based clients) to complete connect instead of hanging on "Sse(session)".
+  - new:IceBridge topology limits — IceBridgeTopology + env ICEBRIDGE_MESH_FANOUT / SEARCH_PEER_FANOUT / MESH_HOP_TTL / SEARCH_TTL / SOFT_MAX (remote-config ready)
+  - new:IceBridge hybrid EC2 topology benchmark + TopologyAutoResearch auto-loop optimizes N/M/TTLs for hit-rate vs traffic on fat EC2 hub mesh + FrostWire leaves; hybrid profile N=16 M=30; LimeWire ultrapeer baseline retained
+  - new:Standalone IceBridge (icebridge-run-local.sh / AWS) logs successful mesh traffic at INFO — HELLO, HELLO_ACK, RELAY, SEARCH, TELEMETRY/PING and other known protocolIds
+  - fix:SearchManager checkIfFinished race — crawl() and submitSimpleSearchTask() now add tasks inside synchronized(tasks) blocks, closing the race where a CrawlTask was enqueued between checkIfFinished's 'no pending' check and the onStopped callback
+  - fix:SearchResultDisplayer entries list now synchronized — the static ArrayList was mutated from EDT and iterated from search executor threads without synchronization, risking ConcurrentModificationException. Now a Collections.synchronizedList with synchronized blocks on all iteration paths
+  - fix:AbstractSearchPerformer thread-safety — 'stopped' and 'listener' fields were not volatile; stop() from EDT was not visible to executor threads, causing results to be delivered after user clicked Stop
+  - fix:DistributedSearchPerformer pending-map leak and NPE — timed-out searches leaked PendingRequest entries; malformed response rows with null infoHash caused NPE before latch countdown. Pending cleared in finally; rows validated
+  - fix:SearchMediator filter token-mutation fragility — searchTokens list was passed to filter2 which could mutate it via internal token removal. Now a defensive copy is made at the filter entry point
+  - fix:SearchEngine TPB _domainName not volatile — background thread wrote _domainName; isReady() read it on EDT. Without volatile, TPB might never become ready. Also added try/catch and named daemon thread for mirror fetch
+  - fix:SearchEngine.getSearchEngineByName prefix matching — fragile name.startsWith() replaced with exact name match or name + space prefix to prevent short engine names from matching longer ones
+  - fix:SearchEngine TPB mirror fetch error handling — added try/catch and named daemon thread instead of raw new Thread()
+  - fix:SoundCloud default credentials refreshed to the values published at update.frostwire.com/android (client_id=A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz, app_version=1780910323) — pre-existing drift across SoundCloudConfigFetcher, SoundcloudSearchPattern, SoundcloudUtils, and SoftwareUpdater fallbacks now also aligned
+  - refactor:Tracker list consolidated into a single source of truth at com.frostwire.bittorrent.DefaultTrackers (#1004) — TorrentUtil, CreateTorrentDialog, and TorrentsCSVSearchPattern now consume DefaultTrackers.ANNOUNCE_URLS / MAGNET_URL_PARAMETERS. Removed duplicated UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS
+  - fix:IceBridgeProcessLauncher temp log directory leak — every start/stop cycle leaked a temp directory with log files. Now recursively deleted in close()
+  - fix:IceBridgeServer.parseArgs now skips --auth-token (handled separately by parseAuthToken) — previously threw IllegalArgumentException on unknown option
+  - fix:PeerRegistrySync rUDP port is now configurable via constructor parameter
+  - fix:Torrent crawl cache replaced with LRU eviction (LinkedHashMap, max 500 entries) — old cache had no eviction, causing unbounded memory growth in long-running sessions
+  - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — the underlying DatabaseCrawlCache handles its own thread safety. Cache field is now volatile with local-variable snapshots
+  - fix:Transfer detail Pieces tab now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
   - fix:shared_files_fts switched from external content FTS5 table (with triggers) to standalone FTS5 table with manual index management — external content "delete" triggers failed silently when rowids were reused, causing stale FTS entries
   - fix:INSERT OR REPLACE on shared_torrents orphaned shared_files rows — REPLACE assigns a new rowid, leaving old file rows unreferenced. Now pre-deletes old shared_files rows before the replace
   - fix:sanitizeFtsQuery now replaces non-alphanumeric separators (underscore, dot, dash, slash) with spaces instead of dropping them — prevents mismatch between FTS5 tokenizer (which splits on these chars) and the query sanitizer (which was concatenating tokens like "real_file" into "realfile")
   - fix:parseFilesJson capped at MAX_FILES_PER_TORRENT (10000) — prevents unbounded row growth for torrents with tens of thousands of files
+  - fix:SearchEngine.getEngines cached as static final — was allocating a new Arrays.asList on every call (per search, per result lookup, per engine lookup)
+  - fix:SearchManager removed O(n²) nextOrdinal — the method iterated all tasks per crawlable result and was never used for sorting (no priority queue). Removed Comparable, ordinal field, and nextOrdinal method
+  - fix:SearchMediator stripHtml regex precompiled — two String.replaceAll calls per result were recompiling regex on every search result. Now static final Pattern
+  - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger
+  - fix:PerformersHelper.reduceHtml no longer double-allocates strings
+  - fix:PerformersHelper relevance-ranking hot path — eliminate per-result regex compilation in sanitize/normalize (www. stripping and combining-mark removal after NFKD), speeding up fuzzy matching and result normalization on large search result sets
+  - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional created at accessor boundary only
+  - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields
+  - fix:Knaben search query JSON now properly escaped via Gson
+  - fix:Removed Sec-Fetch-Mode: navigate header from all HTTP requests
+  - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList)
+  - fix:Removed dead estimateRowsBytes() method from RemoteSearchResponse
+  - cleanup:Desktop builds support JDK 26 by upgrading google-java-format from 1.24.0 to 1.36.1
+  - fix:Mesh log volume — per-packet/per-rejection logs demoted to DEBUG (metrics counters carry the signal); systemd unit caps journal spam (LogRateLimit 2000/30s)
+  - fix:IceBridge ops scripts — run-local kills previous instances and detaches safely on Ctrl+C; systemd install is one-step (builds the jar, sudo self-elevation with JAVA_HOME passthrough, stops port strays, no crash-loops)
+  - cleanup:GPL header on all post-2020 Java files missing it (79 files)
+  - fix:Metadata-less magnets are replaced by the real libtorrent transfer, preserving x.pe peers and avoiding invalid piece-layer reconstruction
+  - fix:Mesh magnets no longer advertise BitTorrent port 0 from failed listeners
+  - cleanup:Local search is diagnostic only (default off) — same LocalIndex path as inbound IceBridge answers; peer discovery is Distributed Search
+  - cleanup:Identity settings UI uses shared IdentityLifecycle (common/) for generate/install/seed/import/export — same logic as Android
+  - fix:IdentityRecord.fromEntry accepts v1/v2 again (read path) — still writes v3 with caps; fixes self-ping / peer handshake decode after capability bump
+  - new:ICEBRIDGE_ARCHITECTURE_REVIEW.md north-star layering + implementation status matrix
+  - cleanup:Drop pre-alpha wire shims — no bare SEARCH payloads, no dual response signature domain, no IdentityRecord v1/v2 parse, no 96-byte HELLO auth
+  - fix:IceBridge CLI prints identity load vs proof-of-work mining progress on stdout (first-run no longer looks hung); non-protocol TCP 6888 probes at DEBUG without stack spam
+  - fix:IceBridge ops scripts — systemd install creates writable /opt dir; control URL is SSH tunnel only (127.0.0.1 bind); install uses absolute java path and preserves icebridge.env; no --background+--gradle; default control HTTP 8081 aligns run-local/fromEnv/.env.example
+  - new:IceBridge fat JAR multi-arch jlibtorrent natives (Linux x86_64/arm64 + macOS) so Mac-built icebridge.jar runs DHT on EC2; scripts/icebridge-systemd-install.sh
+  - new:ICEBRIDGE.md operator stub (ports, local vs remote, tokens, co-located pitfalls, security model)
   - fix:SCHEMA_VERSION bumped to 2 to reflect shared_files and shared_files_fts table additions
-  - fix:Idope search engine removed from commons, desktop, and android — idope.pics now requires TLS 1.3 and was failing handshakes on macOS arm64 and other TLS-1.2-only stacks. Removed IdopeSearchPattern, createIdopeTorrentSearch, SearchEngineID.IDOPE_ID, IDOPE_SEARCH_ENABLED, PREF_KEY_SEARCH_USE_IDOPE, all 39 localized use_idope strings, the android settings entry, and the desktop MCP engine registry. Added IdopeRemovalTest regression suite
-  - new:Bitsearch added as a new REST-API torrent search engine (bitsearch.eu) — clean JSON, 200 free requests/day per IP, magnet links built client-side from DefaultTrackers. No crawling, replaces the gap left by the Idope removal
-  - new:Identity settings screen (Options > Identity) — displays node ID, fingerprint, public key, identity difficulty (leading zero bits), karma score, and shared torrent count. Buttons: Show Seed Phrase (24-word BIP39 mnemonic with copy-to-clipboard), Restore from Seed Phrase, Export Identity File, Import Identity File, Copy Fingerprint. Restore and import create a .bak backup before overwriting and trigger a restart
-  - new:BIP39 mnemonic support for identity backup — com.frostwire.crypto.Bip39Mnemonic encodes/decodes the 32-byte Ed25519 seed as a 24-word mnemonic using the standard BIP39 English wordlist with SHA-256 checksum. Enables offline paper backup of FrostWire identities
-  - new:IdentityKeys.fromSeed() — deterministically reconstructs an Ed25519 keypair from a 32-byte seed via jlibtorrent's Ed25519.createKeypair, enabling identity restore from a BIP39 mnemonic. X25519 keypair is freshly generated (not derivable from the Ed25519 seed). IdentityKeys.save/load are now public for import/export
-  - fix:IdentityKeys.generate() now uses jlibtorrent's native Ed25519 for keypair generation instead of the JDK's KeyPairGenerator — the JDK's pure-Java Ed25519 implementation is 50-100x slower than native on some platforms (macOS arm64), causing first-run identity PoW mining to take >2 minutes instead of ~1-2 seconds
-  - new:icebridge:// URL protocol handler — handles URLs of the form icebridge://<peer_pubkey_hex>/<command>. Commands: /browse (fetch and display peer's shared torrent catalog from DHT), /search/<keywords> (send a signed search request to a specific peer), /info (show peer details from PeerDirectory or DHT identity record). Integrated into the search bar — typing an icebridge:// URL triggers the handler instead of a normal search. Clipboard monitoring for icebridge:// URLs
-  - new:Remote peer catalog fetch protocol — RemoteIndexFetcher fetches a peer's shared torrent catalog from the DHT via BEP 46 (IndexAnnouncementPublisher manifest). RemoteCatalogBrowseRequest provides a signed request/response protocol for browsing a specific peer's catalog over the IceBridge transport. IncomingSearchRequestHandler handles both search requests and catalog browse requests
-  - new:IndexAnnouncementPublisher wired into DhtAdvertiser — shared torrent index manifests are now published to the DHT every 5 minutes alongside identity records, enabling peers to discover each other's shared catalogs
-  - new:Karma settings screen (Options > Karma) — displays own karma chain status (current epoch, available endorsement energy, total endorsements given, karma score) and a top-peers-by-karma leaderboard (top 20, with score, endorsement count, last-endorsed timestamp). Right-click to copy peer public keys
-  - new:Peer directory settings screen (Options > Peers) — shows all known peers in a table with public key, hostname, uTP port, trust score, verified/spam status, endorser count, and last-updated time. Right-click to copy key, block (mark as spam), remove, or browse the peer's shared torrents catalog (fetched via DHT BEP 46 using RemoteIndexFetcher)
-  - new:Shared torrents database viewer (Options > Shared Torrents) — browse the local shared torrents index with search, showing name, size, file count, info hash, publisher key, timestamps, and matched file. Right-click to copy info hash, copy magnet link, or copy publisher key
-  - new:LocalIndex.listAll() — enumerate all shared torrents in the local index for UI browsing
-  - new:DistributedSearchEngineWire.getPeerDirectory() — static accessor for the shared PeerDirectory instance, enabling UI panels to access peer data
-  - new:IceBridge rUDP bind host configurable (ICEBRIDGE_BIND_HOST setting) — use "0.0.0.0" to accept rUDP from remote peers (cloud forwarder mode) or "127.0.0.1" for local-only daemon mode (default). Control HTTP server always binds to localhost
   - update:jlibtorrent to 2.0.12.9 with libtorrent RC_2_0 cb6fe6b9c (86 commits ahead of previous) — includes tracker URL validation hardening, SOCKS5 parsing fixes, resume-data sanitization, peer encryption improvements, symbolic link support (BEP 47), and 4 new Java APIs (natpmpGateway, allowMultipleConnectionsPerPid, natpmpLeaseDuration, pieceSizeForReq). OpenSSL upgraded to 3.6.0. Build now requires -frtti flag across all platforms due to upstream dynamic_cast in smart_ban.cpp
   - fix:IP Filter persistence restored (#1291) — jlibtorrent session state does not persist ip_filter across restarts, so custom ip_filter.db persistence is required
   - fix:IP Filter ip_filter.db corruption root cause (#1291) — atomic writes with synchronized access prevent concurrent corruption during import and clear operations
@@ -122,65 +180,7 @@
   - fix:IP Filter HTTP errors now shown in panel + blocklist site links added (#1291)
   - fix:IP Filter JNI calls moved off EDT to background threads to prevent UI stalls (#1291)
   - fix:IP Filter JPopupMenu background theming on dark themes (#1291)
-  - new:IP Filter now supports multiple block list formats — P2P, DAT, CIDR, and Hosts formats are auto-detected and parsed. ZIP archives are now supported alongside existing GZIP decompression. Extracted format readers into separate classes (P2PIPFilterInputStreamReader, DatFilterInputStreamReader, CidrFilterInputStreamReader, HostsFilterInputStreamReader) with shared IPFilterFormat enum
-  - new:IP Filter table right-click context menu with Edit and Remove actions — edit opens the Add Range dialog pre-populated with the selected range's values, remove deletes the range and rebuilds the IP filter and BTEngine
-  - new:IP Filter panel description now lists supported file formats (.p2p, .dat, .cidr, .hosts) and compression types (.gz, .zip)
-  - fix:ThreadPool stack size increased from 4 KB to 512 KB — the previous 4 KB stack was far below the JVM default and caused StackOverflowError on deep call chains
-  - fix:SearchManager no longer cancels all global HTTP requests on stop — OkHttpClientWrapper.cancelAllRequests() was nuking non-search HTTP traffic (updates, FrostClick). Stopped performers now abort via the 'stopped' flag
-  - fix:SearchMediator onResults IndexOutOfBoundsException — results.get(0) without null/empty check crashed the executor thread when a performer called onResults([])
-  - fix:SearchResultDisplayer entries list now synchronized — the static ArrayList was mutated from EDT and iterated from search executor threads without synchronization, risking ConcurrentModificationException. Now a Collections.synchronizedList with synchronized blocks on all iteration paths
-  - fix:AbstractSearchPerformer thread-safety — 'stopped' and 'listener' fields were not volatile; stop() from EDT was not visible to executor threads, causing results to be delivered after user clicked Stop
-  - fix:DistributedSearchPerformer pending-map leak and NPE — timed-out searches leaked PendingRequest entries; malformed response rows with null infoHash caused NPE before latch countdown. Pending cleared in finally; rows validated
-  - fix:VPN detection false positive on macOS — system utun interfaces (iCloud, Back to My Mac) were falsely detected as active VPN tunnels even when VPN was off, because they match the "utun" interface name pattern. Now validates that utun interfaces have a real routable IPv4 address before counting them as VPN. Also added "vpn" to interface name checks for broader VPN detection coverage
-  - fix:HTTP search responses now check for 4xx/5xx error codes before returning the body — Cloudflare challenge pages and rate-limit responses are no longer passed to parsers as if they were valid search results
-  - fix:Search result table Seeds and Size columns now sort numerically — clicking Seeds ranks 436 above 64; previously sorted lexicographically as strings or by relevance score instead of seed count
-  - fix:IceBridge rUDP and relay TCP listeners now default to bind 0.0.0.0 (publicly reachable). Desktop bind host default changed from 127.0.0.1; IncomingRelayServer now supports explicit bind host (used by IceBridgeServer with config.host()).
-  - fix:Default tracker list in TorrentUtil, CreateTorrentDialog, and UrlUtils updated to 16 trackers that responded to a BEP 15 connect_request probe on 2026-06-08 — removed 6 dead trackers (opentrackr, openbittorrent, exodus, moeking, explodie, coppersurfer) and added reliable replacements from ngosang/trackerslist per #1004. New DefaultTrackerListTest regression suite asserts all three files stay in sync
-  - fix:SoundCloud default credentials refreshed to the values published at update.frostwire.com/android (client_id=A8wpv6WPWhcpz9BhiL66KfK8IHy6NLoz, app_version=1780910323) — pre-existing drift across SoundCloudConfigFetcher, SoundcloudSearchPattern, SoundcloudUtils, and SoftwareUpdater fallbacks now also aligned
-  - refactor:Tracker list consolidated into a single source of truth at com.frostwire.bittorrent.DefaultTrackers (#1004) — TorrentUtil, CreateTorrentDialog, and TorrentsCSVSearchPattern now consume DefaultTrackers.ANNOUNCE_URLS / MAGNET_URL_PARAMETERS. Removed duplicated UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS
-  - new:Added MCP auto-configuration support for Grok Build in the shared AgentDetector / AgentConfigWriter (common module). Grok is now detected via `grok` binary in PATH + ~/.grok/config.toml presence. "Configure" writes a native TOML entry under [mcp_servers.frostwire] with url + enabled=true using the HTTP/Streamable transport. This allows direct MCP connection from Grok Build TUI to the local FrostWire MCP server (port 8796 by default).
-  - fix:MCP streamable HTTP handshake for Grok + other agents: notifications/initialized now returns 202 Accepted + "accepted" body (text/plain) + data: accepted on SSE stream. No initial data on GET SSE open. Allows grok mcp doctor frostwire (and rmcp-based clients) to complete connect instead of hanging on "Sse(session)".
-  - fix:PeerRegistry capacity enforcement — the maxPeers limit was checked AFTER merge(), so byPubHex.containsKey(key) was always true for a just-added peer; new peers were never rejected. Now checked BEFORE merge
-  - fix:FragmentReassembler cross-session collision — group key changed from int groupId to String (sender + groupId)
-  - fix:RudpSession sequence-wrap deadlock — after ~2^31 packets, signed comparison treated the wrapped sequence as a duplicate, permanently stalling the session. Fixed with Integer.compareUnsigned for all sequence comparisons and ConcurrentSkipListMap comparator
-  - fix:RudpSessionManager pending-packet memory leak — unacked reliable packets were never purged after timeout; only cleared by ackLocal(). Now removed after MAX_RETRIES or RETRANSMIT_TIMEOUT_MS
-  - fix:IceBridgeServer peerTtlSec*1000 overflow — for large config values, long multiply overflowed to negative, disabling eviction. Fixed with Math.multiplyExact
-  - fix:IceBridgeProcessLauncher temp log directory leak — every start/stop cycle leaked a temp directory with log files. Now recursively deleted in close()
-  - fix:IceBridgeServer.parseArgs now skips --auth-token (handled separately by parseAuthToken) — previously threw IllegalArgumentException on unknown option
-  - fix:PeerRegistrySync rUDP port is now configurable via constructor parameter
-  - fix:InboundMessageQueue O(n²) performance — ConcurrentLinkedQueue.size() (O(n)) was called in a while-loop for overflow eviction. Replaced with AtomicInteger counter
-  - fix:SearchManager checkIfFinished race — crawl() and submitSimpleSearchTask() now add tasks inside synchronized(tasks) blocks, closing the race where a CrawlTask was enqueued between checkIfFinished's 'no pending' check and the onStopped callback
-  - fix:SearchMediator onResults no longer blocks search executor threads on the EDT — changed safeInvokeAndWait to safeInvokeLater so results are dispatched asynchronously
-  - fix:SearchMediator filter token-mutation fragility — searchTokens list was passed to filter2 which could mutate it via internal token removal. Now a defensive copy is made at the filter entry point
-  - fix:SearchEngine TPB _domainName not volatile — background thread wrote _domainName; isReady() read it on EDT. Without volatile, TPB might never become ready. Also added try/catch and named daemon thread for mirror fetch
-  - fix:SearchEngine.getSearchEngineByName prefix matching — fragile name.startsWith() replaced with exact name match or name + space prefix to prevent short engine names from matching longer ones
-  - fix:SearchEngine TPB mirror fetch error handling — added try/catch and named daemon thread instead of raw new Thread()
-  - fix:SearchEngine.getEngines cached as static final — was allocating a new Arrays.asList on every call (per search, per result lookup, per engine lookup)
-  - fix:SearchManager removed O(n²) nextOrdinal — the method iterated all tasks per crawlable result and was never used for sorting (no priority queue). Removed Comparable, ordinal field, and nextOrdinal method
-  - fix:Torrent crawl cache replaced with LRU eviction (LinkedHashMap, max 500 entries) — old cache had no eviction, causing unbounded memory growth in long-running sessions
-  - fix:CrawlPagedWebSearchPerformer cache no longer uses global synchronized lock — the underlying DatabaseCrawlCache handles its own thread safety. Cache field is now volatile with local-variable snapshots
-  - fix:SearchMediator stripHtml regex precompiled — two String.replaceAll calls per result were recompiling regex on every search result. Now static final Pattern
-  - fix:CrawlPagedWebSearchPerformer crawl counter is now AtomicInteger
-  - fix:PerformersHelper.reduceHtml no longer double-allocates strings
-  - fix:PerformersHelper relevance-ranking hot path — eliminate per-result regex compilation in sanitize/normalize (www. stripping and combining-mark removal after NFKD), speeding up fuzzy matching and result normalization on large search result sets
-  - fix:CompositeFileSearchResult Builder no longer allocates 5 Optional wrappers per build() — nullable fields with Optional created at accessor boundary only
-  - fix:Regex search patterns (Nyaa, Torrentz2) are now compiled once as static final fields
-  - fix:Knaben search query JSON now properly escaped via Gson
-  - fix:Removed Sec-Fetch-Mode: navigate header from all HTTP requests
-  - fix:NullTrustManager certificate list is now thread-safe (CopyOnWriteArrayList)
-  - fix:JdkHttpClient.head reads response code before disconnect and drains error stream to prevent socket leaks
-  - new:Advanced BitTorrent settings now expose jlibtorrent 2.0.12.9 controls for NAT-PMP gateway override, NAT-PMP lease duration, and allowing multiple connections from the same peer ID
-  - fix:Transfer detail Pieces tab now uses jlibtorrent's v2-aware pieceSizeForReq() API for accurate piece-size display
-  - fix:Removed dead estimateRowsBytes() method from RemoteSearchResponse
   - cleanup:Removed the legacy doctor-servlet bug report dialogs; errors report silently through Icebase, deadlocks through the crash spooler, and the fatal dialog no longer contacts the retired endpoint
-  - new:Transfer Detail General tab offers Check Local Data and a per-torrent Sequential download toggle; Trackers menu offers Add Tracker with strong URL validation, and Edit Trackers now trims entries and names the offending line
-  - new:Transfer Detail Check Local Data disables while the recheck runs and swaps in a progress bar with live phase and percent, then reports the outcome
-  - fix:Born-complete torrents (per-file Share, auto-seed) now persist resume data at check completion and on every forced save — restarts no longer restore them under the default data dir at 0%
-  - fix:Missing resume files are backfilled when a torrent is constructed, covering zero-piece torrents that never trigger a check
-  - fix:Session .torrent files are ensured alongside resume data so magnet-origin torrents survive restarts instead of vanishing from restore
-  - fix:Restored torrents stop landing at 0% — the session .torrent and its .resume sidecar now share one canonical hash (they used v1 vs v2), and restore heals installs written with the old mismatched names
-  - fix:Transfer Detail Files tab no longer freezes per-file progress while a transfer is still moving — holders rebuild on torrent progress drift, settled torrents skip native calls
-  - fix:Sharing a file that no longer exists on disk is refused with a clear error instead of creating a torrent that can never complete
 FrostWire 7.0.4 APR/22/2026
   - new:Built-in Model Context Protocol (MCP) server with 38 desktop tools across 8 categories, settings-pane controls, and client configuration support for Copilot, Codex, Claude Desktop, OpenCode, Qwen, and ChatGPT Desktop
   - new:Restart button dialog — when settings changes require a restart, users can now click "Restart Now" instead of manually closing and reopening FrostWire
