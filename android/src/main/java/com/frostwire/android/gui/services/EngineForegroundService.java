@@ -145,7 +145,22 @@ public class EngineForegroundService extends Service implements IEngineService {
         startPermanentNotificationUpdatesTask(this);
 
         // Schedule initial tasks
-        scheduleNotificationWork();
+        safeScheduleNotificationWork();
+    }
+
+    /**
+     * WorkManager is on-demand initialized (its manifest initializer is removed and
+     * {@code MainApplication} is the {@code Configuration.Provider}), so {@code getInstance} can
+     * throw before the app finishes initializing. A throw here would abort {@code onCreate}, the
+     * pending {@code startForegroundService()} requirement would never be satisfied, and the system
+     * would kill the process with a {@code RemoteServiceException}.
+     */
+    private void safeScheduleNotificationWork() {
+        try {
+            scheduleNotificationWork();
+        } catch (Throwable t) {
+            LOG.warn("EngineForegroundService::safeScheduleNotificationWork failed", t);
+        }
     }
 
     private void initializeNotifiedStorage() {
@@ -173,12 +188,12 @@ public class EngineForegroundService extends Service implements IEngineService {
 
         if (startAction == EngineForegroundStartPolicy.Action.STOP_BACKGROUND_RESTART) {
             LOG.warn("EngineForegroundService::onStartCommand() - Skipping foreground promotion for background sticky restart");
-            stopSelfResult(startId);
+            stopSelf();
             return START_NOT_STICKY;
         }
 
         Notification notification = createPersistentNotification();
-        if (!tryShowPersistentNotification(notification, startId, isNullIntentRestart, isAppInForeground)) {
+        if (!tryShowPersistentNotification(notification, isNullIntentRestart, isAppInForeground)) {
             return START_NOT_STICKY;
         }
         foregroundReady = true;
@@ -191,7 +206,7 @@ public class EngineForegroundService extends Service implements IEngineService {
         Engine.instance().onForegroundServiceCreated(this);
 
         if (!acceptsStarts() || Engine.instance().wasShutdown()) {
-            stopSelfResult(startId);
+            stopSelf();
             return START_NOT_STICKY;
         }
 
@@ -211,22 +226,27 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private boolean tryShowPersistentNotification(Notification notification,
-                                                  int startId,
                                                   boolean isNullIntentRestart,
                                                   boolean isAppInForeground) {
         try {
             showPersistentNotification(notification);
             return true;
         } catch (RuntimeException e) {
+            // Android 12+ can refuse the promotion when the app is not allowed to start a
+            // foreground service. Swallowing the failure and returning would still leave the
+            // pending startForegroundService() requirement unmet, so the system would later kill
+            // the process with a RemoteServiceException. Fully stop the service instead; stopSelf()
+            // clears the requirement even when multiple startIds are pending.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                     && e instanceof ForegroundServiceStartNotAllowedException) {
                 LOG.warn("EngineForegroundService::tryShowPersistentNotification() - Foreground promotion not allowed. " +
                                 "nullIntentRestart=" + isNullIntentRestart +
                                 " appInForeground=" + isAppInForeground, e);
-                stopSelfResult(startId);
-                return false;
+            } else {
+                LOG.error("EngineForegroundService::tryShowPersistentNotification() - Foreground promotion failed", e);
             }
-            throw e;
+            stopSelf();
+            return false;
         }
     }
 
@@ -366,26 +386,28 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private Notification createPersistentNotification() {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            NotificationChannel channel = notificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-            if (channel == null) {
-                channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_LOW);
-                channel.setSound(null, null);
-                notificationManager.createNotificationChannel(channel);
+        PendingIntent showFrostWireIntent = null;
+        try {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                NotificationChannel channel = notificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+                if (channel == null) {
+                    channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_LOW);
+                    channel.setSound(null, null);
+                    notificationManager.createNotificationChannel(channel);
+                }
             }
-        }
 
-        PendingIntent showFrostWireIntent = PendingIntent.getActivity(
-                this,
-                0,
-                new Intent(this, MainActivity.class)
-                        .setAction(Constants.ACTION_SHOW_TRANSFERS)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                PendingIntent.FLAG_IMMUTABLE
-        );
+            showFrostWireIntent = PendingIntent.getActivity(
+                    this,
+                    0,
+                    new Intent(this, MainActivity.class)
+                            .setAction(Constants.ACTION_SHOW_TRANSFERS)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                    PendingIntent.FLAG_IMMUTABLE
+            );
 
-        PendingIntent shutdownIntent = PendingIntent.getActivity(
+            PendingIntent shutdownIntent = PendingIntent.getActivity(
                 this,
                 1,
                 new Intent(this, MainActivity.class)
@@ -413,8 +435,12 @@ public class EngineForegroundService extends Service implements IEngineService {
 
             LOG.info("createPersistentNotification() created notification with RemoteViews successfully");
             return notification;
-        } catch (Throwable e) {
-            LOG.error("Failed to create notification with RemoteViews in EngineForegroundService, using fallback", e);
+            } catch (Throwable e) {
+                LOG.error("Failed to create notification with RemoteViews in EngineForegroundService, using fallback", e);
+                return buildSimplePersistentNotification(showFrostWireIntent);
+            }
+        } catch (Throwable t) {
+            LOG.warn("createPersistentNotification() failed, using minimal notification", t);
             return buildSimplePersistentNotification(showFrostWireIntent);
         }
     }
