@@ -25,6 +25,12 @@ package com.frostwire.gui.bittorrent;
 final class TransferHolder {
     private final BTDownload dl;
     private final String displayName;
+    // Per-row action state, computed off the EDT during the model refresh and
+    // read by the (shared) renderer/editor. Keeping it on the holder prevents
+    // one row's state from clobbering another's as the single renderer instance
+    // is stamped across rows.
+    private volatile boolean canShare;
+    private volatile boolean canPlay;
 
     public TransferHolder(final BTDownload dl) {
         this.dl = dl;
@@ -33,6 +39,19 @@ final class TransferHolder {
 
     public BTDownload getDl() {
         return dl;
+    }
+
+    void setActionsState(boolean canShare, boolean canPlay) {
+        this.canShare = canShare;
+        this.canPlay = canPlay;
+    }
+
+    boolean canShare() {
+        return canShare;
+    }
+
+    boolean canPlay() {
+        return canPlay;
     }
 
     public String toString() {
