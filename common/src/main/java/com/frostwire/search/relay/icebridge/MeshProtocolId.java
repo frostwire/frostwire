@@ -39,6 +39,9 @@ public final class MeshProtocolId {
     /** Reserved for file synchronization. */
     public static final int FILESYNC = 7;
 
+    /** Bounded keyword fingerprint a peer announces so searches route to likely holders. */
+    public static final int INDEX_DIGEST = 8;
+
     private MeshProtocolId() {
     }
 
@@ -51,7 +54,7 @@ public final class MeshProtocolId {
 
     public static boolean isKnown(int protocolId) {
         int id = effective(protocolId);
-        return id >= SEARCH && id <= FILESYNC;
+        return id >= SEARCH && id <= INDEX_DIGEST;
     }
 
     /**
@@ -74,6 +77,8 @@ public final class MeshProtocolId {
                 return "TELEMETRY";
             case FILESYNC:
                 return "FILESYNC";
+            case INDEX_DIGEST:
+                return "INDEX_DIGEST";
             default:
                 return "PROTO_" + id;
         }
