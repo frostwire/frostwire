@@ -393,6 +393,13 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
             }
             cachedBytesDownloadedHolder = new SizeHolder(download);
             cachedBytesUploadedHolder = new SizeHolder(upload);
+            // Compute action availability off the EDT so the shared actions
+            // renderer never performs these checks while painting.
+            if (transferHolder != null) {
+                transferHolder.setActionsState(
+                        BittorrentDownload.RendererHelper.canShareNow(initializer),
+                        initializer.canPreview());
+            }
             if (initializer.getCopyrightLicenseBroker() != null &&
                     initializer.getCopyrightLicenseBroker().license != null) {
                 license = initializer.getCopyrightLicenseBroker().license.getName();
