@@ -30,6 +30,37 @@ FrostWire desktop/Android are **clients and optional co-located nodes** of that 
 
 Desktop may run **both** an in-app `IncomingRelayServer` (identity TCP) and a **child** IceBridge process (or attach to a **remote** standalone).
 
+### Content-aware search routing (app layer, `protocolId=8` `INDEX_DIGEST`)
+
+Blind fan-out to `M` random peers does not scale: with a large directory a single holder is
+reached only by luck. Instead:
+
+- Each node with a non-empty `LocalIndex` announces a bounded keyword **Bloom filter**
+  (`IndexDigest`, `protocolId=8`) to its directory peers via `PeerRegistrySync`. No false
+  negatives for indexed tokens, so a real holder is never missed; a false positive only costs one
+  extra peer queried.
+- Forwarders (`IncomingSearchRequestHandler.forwardRequest`) and requesters
+  (`DistributedSearchPerformer.selectPeers`) select **digest matches first**, then fill the
+  remaining budget with live peers for exploration. This keeps fan-out bounded while reliably
+  reaching holders.
+- Tokens are Unicode-normalized (diacritics stripped, lower-cased), so `Inglés` matches `ingles`.
+
+### Peer liveness and pruning
+
+`PeerDirectory` tracks last contact and consecutive delivery failures per peer
+(`CONTACT_TTL_MS`, `AFFIRM_TTL_MS`, `MAX_FAILURES`):
+
+- Any authenticated inbound frame or verified response calls `markContact` and clears the streak.
+- Failed sends/forwards call `markFailure`; a peer is dropped at `MAX_FAILURES`.
+- `evictUnreachable` (run from the transport maintenance timer) prunes peers that are silent past
+  the contact TTL, or never heard from and no longer affirmed by discovery.
+- `PeerRegistrySync` ignores stale `/lookup` rows (`MAX_LOOKUP_AGE_MS`) so dead routes are not
+  re-imported.
+
+Net effect: searches are never routed to unreachable nodes, and unreachable nodes are removed from
+the local peer list instead of being retried forever.
+
+
 ## Roles
 
 - `CLIENT` — join mesh, do not advertise as forwarder (unless auto-elected when connectable).
