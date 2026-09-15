@@ -56,9 +56,23 @@ class TransferDetailFilesShareTest {
     assertTrue(
         renderer.contains("TorrentUtil.makeTorrentAndDownload"),
         "share must create and seed a torrent from the file");
+    assertTrue(renderer.contains("complete"), "share must be gated on the file being complete");
+  }
+
+  @Test
+  void fileRowPopupMenuOffersShare() throws Exception {
+    String renderer =
+        readSource(
+            "desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java");
     assertTrue(
-        renderer.contains("if (!transferItemHolder.complete)"),
-        "share/play must be gated on the file being complete");
+        renderer.contains("class ShareAction"),
+        "the renderer must expose a ShareAction for the file-row popup menu");
+    String mediator =
+        readSource(
+            "desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesTableMediator.java");
+    assertTrue(
+        mediator.contains("TransferDetailFilesActionsRenderer.ShareAction"),
+        "the Files row popup menu must include the Share action");
   }
 
   private static String readSource(String moduleRelative) throws Exception {
