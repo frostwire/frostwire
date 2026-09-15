@@ -12,7 +12,9 @@ import java.security.MessageDigest;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Bounded keyword fingerprint a node publishes so forwarders can route a search to peers that
@@ -53,6 +55,9 @@ public final class IndexDigest {
   /** Minimum token length; shorter fragments add noise without routing value. */
   public static final int MIN_TOKEN_LENGTH = 3;
 
+  /** Per-text cap so a huge file list cannot make digest building expensive. */
+  public static final int MAX_TEXT_CHARS = 16 * 1024;
+
   private static final int MASK = 0xFF;
 
   private final byte[] bits;
@@ -66,16 +71,19 @@ public final class IndexDigest {
    * alphanumerics, drop short fragments, de-duplicated, insertion-ordered.
    */
   public static List<String> tokenize(String text) {
-    List<String> tokens = new ArrayList<>();
     if (text == null || text.isEmpty()) {
-      return tokens;
+      return List.of();
     }
+    if (text.length() > MAX_TEXT_CHARS) {
+      text = text.substring(0, MAX_TEXT_CHARS);
+    }
+    Set<String> tokens = new LinkedHashSet<>();
     String normalized =
         Normalizer.normalize(text, Normalizer.Form.NFD)
             .replaceAll("\\p{M}+", "")
             .toLowerCase(java.util.Locale.ROOT);
     StringBuilder current = new StringBuilder();
-    for (int i = 0; i < normalized.length(); i++) {
+    for (int i = 0; i < normalized.length() && tokens.size() < MAX_TOKENS; i++) {
       char c = normalized.charAt(i);
       if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
         current.append(c);
@@ -84,15 +92,12 @@ public final class IndexDigest {
       }
     }
     flushToken(current, tokens);
-    return tokens;
+    return new ArrayList<>(tokens);
   }
 
-  private static void flushToken(StringBuilder current, List<String> out) {
-    if (current.length() >= MIN_TOKEN_LENGTH) {
-      String token = current.toString();
-      if (!out.contains(token)) {
-        out.add(token);
-      }
+  private static void flushToken(StringBuilder current, Set<String> out) {
+    if (current.length() >= MIN_TOKEN_LENGTH && out.size() < MAX_TOKENS) {
+      out.add(current.toString());
     }
     current.setLength(0);
   }
