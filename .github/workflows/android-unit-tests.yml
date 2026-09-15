@@ -33,6 +33,11 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # The action's default 'packages' still requests the removed 'tools'
+          # package, which makes `sdkmanager tools` fail with exit code 1.
+          # Install only packages that still exist in the SDK repository.
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
