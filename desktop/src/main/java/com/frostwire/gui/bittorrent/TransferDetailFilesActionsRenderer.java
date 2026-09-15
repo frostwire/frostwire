@@ -137,10 +137,18 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
   }
 
   private void onShare() {
-    if (!transferItemHolder.complete) {
+    shareItem(transferItemHolder);
+  }
+
+  /**
+   * Creates and seeds a torrent from the file's on-disk copy. Only complete files are shareable;
+   * missing files are refused with a clear error. Shared by the row button and the popup menu.
+   */
+  static void shareItem(TransferDetailFiles.TransferItemHolder holder) {
+    if (holder == null || !holder.complete) {
       return;
     }
-    File file = transferItemHolder.transferItem.getFile();
+    File file = holder.transferItem.getFile();
     if (file == null || !file.exists()) {
       GUIMediator.showError(I18n.tr("Cannot share this file because it no longer exists on disk."));
       return;
@@ -233,6 +241,22 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
       } else {
         GUIMediator.launchFile(file);
       }
+    }
+  }
+
+  public static final class ShareAction extends AbstractAction {
+    private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+    public ShareAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+      transferItemHolder = itemHolder;
+      putValue(Action.NAME, I18n.tr("Share"));
+      putValue(LimeAction.SHORT_NAME, I18n.tr("Share"));
+      putValue(Action.SHORT_DESCRIPTION, I18n.tr("Create a torrent from this file and seed it"));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      shareItem(transferItemHolder);
     }
   }
 
