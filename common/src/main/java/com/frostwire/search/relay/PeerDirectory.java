@@ -449,7 +449,13 @@ public final class PeerDirectory {
         }
         Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
         if (e == null) {
-            return;
+            // The announcement can arrive before the relay has imported the peer as verified
+            // (registry import runs on its own cadence). Keep the digest on an unverified
+            // placeholder so the later upsert promotes it with the fingerprint intact.
+            e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false,
+                    NodeCapabilities.NONE, "");
+            entries.put(com.frostwire.util.Hex.encode(peerPub), e);
+            evictIfNeeded();
         }
         if (digest == null) {
             e.indexDigest = null;
