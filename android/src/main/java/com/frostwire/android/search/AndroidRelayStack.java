@@ -417,7 +417,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       } catch (Throwable ignored) {
       }
       IceBridgeConfig.Role syncRole = readConfiguredRole();
-      prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident, syncRole);
+      prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident, syncRole, li);
       requirePermitted(permitted);
       prs.start();
       LOG.info(
