@@ -11,13 +11,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IndexDigest;
+import com.frostwire.search.relay.KarmaChainSource;
+import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelaySearchService;
+import com.frostwire.search.relay.RemoteKarmaChainFetcher;
 import com.frostwire.search.relay.SearchPayloadCodec;
 import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.search.relay.TorrentMetadataProvider;
 import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.TorrentMetadataResponse;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
+import com.frostwire.jlibtorrent.Entry;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import java.lang.reflect.Field;
@@ -199,6 +205,53 @@ class IceBridgeSearchTransportTest {
         builder.signature(signer.sign()).build());
   }
 
+  private static PeerDirectory newDirectory() {
+    return new PeerDirectory(
+        new PeerKarmaCache(
+            new RemoteKarmaChainFetcher(
+                new KarmaChainSource() {
+                  @Override
+                  public Entry fetchManifest(byte[] peerPub) {
+                    return null;
+                  }
+                })));
+  }
+
+  @Test
+  void indexDigestFramesAreDeliveredAndStoredForHolderRouting() throws Exception {
+    IdentityKeys self = IdentityKeys.generate();
+    IdentityKeys sender = IdentityKeys.generate();
+    IdentityKeys other = IdentityKeys.generate();
+    try (Fixture fixture = new Fixture()) {
+      PeerDirectory directory = newDirectory();
+      directory.upsertVerified(sender.ed25519PubRaw(), "10.0.0.9", 6889);
+      directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.10", 6889);
+      IncomingSearchRequestHandler handler =
+          new IncomingSearchRequestHandler(
+              fixture.transport,
+              new RelaySearchService(
+                  new EmptyLocalIndex(), self, ShareVisibilityPolicy.INCLUDE_ALL),
+              directory,
+              self);
+      handler.start();
+
+      byte[] digest = IndexDigest.build(List.of("Inglés En Miami (audio).webm")).toBytes();
+      fixture.offer(sender.ed25519PubRaw(), digest, MeshProtocolId.INDEX_DIGEST);
+      fixture.poll();
+
+      assertTrue(directory.isLive(sender.ed25519PubRaw()), "inbound frame counts as contact");
+      List<PeerDirectory.PeerInfo> holders =
+          directory.sampleHolders(
+              "miami", 4, java.util.Set.of(), com.frostwire.search.relay.NodeCapabilities.NONE,
+              new java.util.Random(1), 1);
+      assertFalse(holders.isEmpty());
+      assertArrayEquals(
+          sender.ed25519PubRaw(),
+          holders.get(0).peerPub(),
+          "the peer that announced a matching digest is routed to first");
+    }
+  }
+
   /** Local control fixture: no UDP, discovery, or external network participation. */
   private static final class Fixture implements AutoCloseable {
     final ConcurrentLinkedQueue<Map<String, Object>> messages = new ConcurrentLinkedQueue<>();
@@ -246,17 +299,21 @@ class IceBridgeSearchTransportTest {
       transport = new IceBridgeSearchTransport(client);
     }
 
-    void offer(byte[] payload) {
+    void offer(byte[] sourcePub, byte[] payload, int protocolId) {
       messages.add(
           Map.of(
               "sourcePub",
-              Base64.getUrlEncoder().encodeToString(new byte[32]),
+              Base64.getUrlEncoder().encodeToString(sourcePub),
               "payload",
               Base64.getUrlEncoder().encodeToString(payload),
               "receivedMs",
               System.currentTimeMillis(),
               "protocolId",
-              MeshProtocolId.METADATA));
+              protocolId));
+    }
+
+    void offer(byte[] payload) {
+      offer(new byte[32], payload, MeshProtocolId.METADATA);
     }
 
     void poll() throws Exception {
