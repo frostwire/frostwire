@@ -1,3 +1,16 @@
+FrostWire 3.2.1 build 777 UNRELEASED
+  - new:Distributed search routes to the peers that actually hold the content — nodes announce a compact keyword fingerprint and requests are forwarded to likely holders with a small bounded fan-out instead of random peers, so rare results are found reliably and faster
+  - new:Peers keep an up-to-date list of reachable IceBridge nodes and never query unreachable ones — nodes that stop answering (directly or through a relay) are removed from the local list and evicted instead of being retried forever
+  - new:Search progress now shows IceBridge status — "Distributed Search · N peers contacted" with starting / not-running hints, translated to every supported language
+  - new:IceBridge participates as a full node (BOTH) by default, with a separate relay-participation switch and a node setting that restarts the relay stack when changed
+  - fix:Warming the mesh on relay startup lets a fresh install find peers without waiting for the first discovery tick
+  - fix:VPN and seeding preference toggles suspend torrents for policy without overwriting an explicit user pause, and the transfer list is no longer cleared on reset
+  - fix:Network status changes are no longer rebroadcast, and notifications fire only for real Wi-Fi/mobile/VPN transport changes
+  - fix:The engine's foreground service stops cleanly when promotion fails instead of crashing with RemoteServiceException
+  - fix:Only real audio files open in the music player; video containers (webm/mp4/mkv/…) open with the system chooser
+  - fix:The local search index preserves FTS rowids across reindexing and repairs triggers, fixing missing or duplicated results with unicode names
+  - fix:Distributed Search settings refresh automatically while the screen is visible
+  - fix:Deselecting every web search engine leaves Distributed Search enabled and no longer re-enables Archive.org at startup
 FrostWire 3.2.0 build 776 SEP/03/2026
   - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
   - fix:Peer discovery stops retrying dead hosts — host-cache entries are evicted after 5 consecutive ping/handshake failures (any success resets the streak)
