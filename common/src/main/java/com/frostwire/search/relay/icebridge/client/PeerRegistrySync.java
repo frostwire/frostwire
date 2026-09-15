@@ -58,7 +58,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     /** Never rebuild the index digest more often than this (SHA-256 over every name/path). */
     private static final long DIGEST_REBUILD_INTERVAL_MS = 120_000L;
     /** Force a re-announce even when unchanged, so a restarted relay relearns our digest. */
-    private static final long DIGEST_REFRESH_INTERVAL_MS = 300_000L;
+    private static final long DIGEST_REFRESH_INTERVAL_MS = 120_000L;
     /** Bounded fan-out for digest announcements. */
     private static final int DIGEST_TARGETS = 16;
 
