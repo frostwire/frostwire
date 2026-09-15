@@ -62,6 +62,19 @@ class IndexDigestTest {
   }
 
   @Test
+  void largeInputIsBounded() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 20_000; i++) {
+      sb.append("token").append(i).append(" /path/to/file").append(i).append(".mp4\n");
+    }
+    String huge = sb.toString();
+    assertTrue(IndexDigest.tokenize(huge).size() <= IndexDigest.MAX_TOKENS);
+    IndexDigest digest = IndexDigest.build(List.of(huge));
+    assertEquals(IndexDigest.DEFAULT_BYTES, digest.byteLength());
+    assertTrue(digest.population() > 0);
+  }
+
+  @Test
   void boundedSizeAndLowFalsePositiveRate() {
     IndexDigest digest = IndexDigest.build(List.of("miami"));
     assertEquals(IndexDigest.DEFAULT_BYTES, digest.byteLength());
