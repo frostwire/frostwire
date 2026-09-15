@@ -239,6 +239,13 @@ class IceBridgeSearchTransportTest {
       fixture.offer(sender.ed25519PubRaw(), digest, MeshProtocolId.INDEX_DIGEST);
       fixture.poll();
 
+      // pollAndDispatch hands the frame to a worker thread; wait for it to be stored.
+      long deadline = System.currentTimeMillis() + 5_000;
+      while (!directory.hasIndexDigest(sender.ed25519PubRaw())
+          && System.currentTimeMillis() < deadline) {
+        Thread.sleep(10);
+      }
+      assertTrue(directory.hasIndexDigest(sender.ed25519PubRaw()), "digest delivered and stored");
       assertTrue(directory.isLive(sender.ed25519PubRaw()), "inbound frame counts as contact");
       List<PeerDirectory.PeerInfo> holders =
           directory.sampleHolders(
