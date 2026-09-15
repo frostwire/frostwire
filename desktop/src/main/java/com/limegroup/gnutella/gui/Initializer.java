@@ -864,20 +864,26 @@ final class Initializer {
   }
 
   /**
-   * First routable, non-loopback, non-link-local IPv4 address of an active
-   * interface. Used to advertise this node to the IceBridge mesh.
+   * First routable, non-loopback, non-link-local IPv4 address of an active interface. Used to
+   * advertise this node to the IceBridge mesh.
    *
-   * <p>Deliberately avoids {@code InetAddress.getLocalHost()}: on Ubuntu/Debian
-   * the hostname is mapped to 127.0.1.1 in /etc/hosts, so it would advertise an
-   * unreachable loopback endpoint.
+   * <p>Deliberately avoids {@code InetAddress.getLocalHost()}: on Ubuntu/Debian the hostname is
+   * mapped to 127.0.1.1 in /etc/hosts, so it would advertise an unreachable loopback endpoint.
    */
   private static java.util.Optional<String> firstRoutableIPv4() {
+    java.util.Optional<String> defaultRoute = primaryOutboundIPv4();
+    if (defaultRoute.isPresent()) {
+      return defaultRoute;
+    }
     try {
       java.util.Enumeration<java.net.NetworkInterface> nics =
           java.net.NetworkInterface.getNetworkInterfaces();
       while (nics != null && nics.hasMoreElements()) {
         java.net.NetworkInterface nic = nics.nextElement();
-        if (!nic.isUp() || nic.isLoopback() || nic.isVirtual()) {
+        if (!nic.isUp()
+            || nic.isLoopback()
+            || nic.isVirtual()
+            || com.frostwire.util.NetworkAdvertising.isLikelyVirtualInterfaceName(nic.getName())) {
           continue;
         }
         java.util.Enumeration<java.net.InetAddress> addrs = nic.getInetAddresses();
@@ -893,6 +899,29 @@ final class Initializer {
       }
     } catch (Exception ignored) {
       // fall through to loopback
+    }
+    return java.util.Optional.empty();
+  }
+
+  /**
+   * IPv4 address the OS would use to reach the internet (the default route's source address).
+   *
+   * <p>This is the address peers can actually reach. Interface enumeration is unreliable on hosts
+   * with virtual adapters (e.g. macOS UTM/VM bridges), where a bridge address can be listed first
+   * and would be advertised to the mesh even though nothing outside that bridge can reach it.
+   * Connecting a UDP socket performs no traffic; it only asks the OS to pick the route.
+   */
+  private static java.util.Optional<String> primaryOutboundIPv4() {
+    try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
+      socket.connect(java.net.InetAddress.getByName("8.8.8.8"), 53);
+      java.net.InetAddress local = socket.getLocalAddress();
+      if (local instanceof java.net.Inet4Address
+          && !local.isAnyLocalAddress()
+          && !local.isLoopbackAddress()) {
+        return java.util.Optional.of(local.getHostAddress());
+      }
+    } catch (Throwable ignored) {
+      // no route / offline: caller falls back to enumeration
     }
     return java.util.Optional.empty();
   }
