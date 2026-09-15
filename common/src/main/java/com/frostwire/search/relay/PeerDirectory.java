@@ -535,6 +535,15 @@ public final class PeerDirectory {
         return e != null && isLive(e, System.currentTimeMillis());
     }
 
+    /** True when the peer has announced a content fingerprint. */
+    public boolean hasIndexDigest(byte[] peerPub) {
+        if (peerPub == null || peerPub.length != 32) {
+            return false;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        return e != null && e.indexDigest != null;
+    }
+
     private static boolean isLive(Entry e, long nowMs) {
         if (e.failures >= MAX_FAILURES) {
             return false;
