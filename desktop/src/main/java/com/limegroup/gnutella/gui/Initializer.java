@@ -832,7 +832,7 @@ final class Initializer {
       transport.start();
       PeerRegistrySync peerSync =
           new PeerRegistrySync(
-              client, directory, advertiseHost, effectiveRudpPort, identity, syncRole);
+              client, directory, advertiseHost, effectiveRudpPort, identity, syncRole, localIndex);
       relayResources.add(peerSync);
       peerSync.start();
       relayLog.info(
