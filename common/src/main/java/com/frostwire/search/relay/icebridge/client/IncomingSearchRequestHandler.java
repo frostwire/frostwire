@@ -300,12 +300,24 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     }
 
     private void handlePayload(byte[] sourcePub, byte[] payload, int protocolId) {
-        if (MeshProtocolId.effective(protocolId) == MeshProtocolId.METADATA) {
+        // Any authenticated inbound frame is positive proof the sender is reachable, so
+        // clear its failure streak before dispatching.
+        if (peerDirectory != null && sourcePub != null) {
+            peerDirectory.markContact(sourcePub);
+        }
+        int meshProtocol = MeshProtocolId.effective(protocolId);
+        if (meshProtocol == MeshProtocolId.INDEX_DIGEST) {
+            if (peerDirectory != null) {
+                peerDirectory.setIndexDigest(sourcePub, payload);
+            }
+            return;
+        }
+        if (meshProtocol == MeshProtocolId.METADATA) {
             handleTorrentMetadataPayload(sourcePub, payload);
             return;
         }
         // Only Protocol #1 (search) is handled here; other protocols are ignored.
-        if (MeshProtocolId.effective(protocolId) != MeshProtocolId.SEARCH) {
+        if (meshProtocol != MeshProtocolId.SEARCH) {
             return;
         }
         RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
@@ -791,8 +803,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             excludeHex.add(Hex.encode(ownPub));
         }
         List<PeerDirectory.PeerInfo> sampled =
-                peerDirectory.sampleVerified(m, excludeHex, NodeCapabilities.NONE,
-                        ThreadLocalRandom.current());
+                peerDirectory.sampleHolders(request.keywords(), m, excludeHex,
+                        NodeCapabilities.NONE, ThreadLocalRandom.current(),
+                        Math.max(1, m / 4));
         int forwarded = 0;
         for (PeerDirectory.PeerInfo peer : sampled) {
             if (forwarded >= m) {
@@ -807,9 +820,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     forwarded++;
                     LOG.debug("Forwarded search hop ttl=" + newTtl + " to "
                             + Hex.encode(peerPub).substring(0, 12) + "…");
+                } else {
+                    peerDirectory.markFailure(peerPub);
                 }
             } catch (Throwable t) {
                 LOG.debug("Failed to forward search request to peer", t);
+                peerDirectory.markFailure(peerPub);
             }
         }
     }
@@ -832,6 +848,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     public void evictIdle() {
         searchService.evictIdle();
         rateLimiter.evictIdle(10 * 60_000L);
+        if (peerDirectory != null) {
+            peerDirectory.evictUnreachable(System.currentTimeMillis());
+        }
         synchronized (replay) {
             long now = System.nanoTime();
             replay.values().removeIf(expiry -> now - expiry >= 0);
