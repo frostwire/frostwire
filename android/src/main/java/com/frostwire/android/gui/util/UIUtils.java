@@ -496,12 +496,18 @@ public final class UIUtils {
         if (mime != null && mime.startsWith("audio/")) {
             return true;
         }
-        // YouTube audio downloads are often .mp4, .webm, .opus, or .m4a containers
-        // whose MIME type resolves to video/* or is unknown. ExoPlayer handles all of these.
+        // Only real audio extensions route to the in-app music player. Video
+        // containers that can also carry audio (webm, mp4, 3gp) must NOT: opening
+        // a .webm movie must suggest a video player, not Apollo.
         String lowerPath = filePath.toLowerCase();
-        return lowerPath.endsWith(".mp4") || lowerPath.endsWith(".m4a")
-                || lowerPath.endsWith(".webm") || lowerPath.endsWith(".opus")
-                || lowerPath.endsWith(".3gp") || lowerPath.endsWith(".3gpp");
+        return lowerPath.endsWith(".mp3") || lowerPath.endsWith(".m4a")
+                || lowerPath.endsWith(".aac") || lowerPath.endsWith(".ogg")
+                || lowerPath.endsWith(".oga") || lowerPath.endsWith(".opus")
+                || lowerPath.endsWith(".wav") || lowerPath.endsWith(".wma")
+                || lowerPath.endsWith(".flac") || lowerPath.endsWith(".mka")
+                || lowerPath.endsWith(".amr") || lowerPath.endsWith(".m4b")
+                || lowerPath.endsWith(".aiff") || lowerPath.endsWith(".aif")
+                || lowerPath.endsWith(".mid") || lowerPath.endsWith(".midi");
     }
 
     /**
