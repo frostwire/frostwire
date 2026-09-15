@@ -731,8 +731,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
     } catch (Throwable ignored) {
     }
-    // Gnutella leaf model: phones answer locally + originate, never forward.
-    return IceBridgeConfig.Role.CLIENT;
+    // Default to full participation (BOTH): originate, answer from the local index, and relay.
+    return IceBridgeConfig.Role.BOTH;
   }
 
   /** icebridge-remote.txt: line1=url, line2=token (optional). */
