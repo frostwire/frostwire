@@ -35,7 +35,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -56,11 +58,61 @@ public class TransferDetailFilesTableMediator
   }
 
   void setHolders(List<TransferDetailFiles.TransferItemHolder> holders) {
+    // The Files tab refreshes every second. Skip the rebuild when the visible
+    // holders are unchanged so the table (and its selection) is left alone.
+    if (sameAsDisplayed(holders)) {
+      return;
+    }
     if (TABLE.isEditing()) {
       TABLE.getCellEditor().cancelCellEditing();
     }
+    Set<Integer> selectedFileOffsets = selectedFileOffsets();
     DATA_MODEL.setHolders(holders);
+    restoreSelectionByFileOffset(selectedFileOffsets);
+  }
+
+  /** True when the displayed rows already match the requested holders in order and identity. */
+  private boolean sameAsDisplayed(List<TransferDetailFiles.TransferItemHolder> holders) {
+    if (holders == null || DATA_MODEL.getRowCount() != holders.size()) {
+      return false;
+    }
+    for (int row = 0; row < holders.size(); row++) {
+      TransferDetailFilesDataLine line = DATA_MODEL.get(row);
+      if (line == null || line.getInitializeObject() != holders.get(row)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private Set<Integer> selectedFileOffsets() {
+    Set<Integer> offsets = new HashSet<>();
+    for (int viewRow : TABLE.getSelectedRows()) {
+      int modelRow = TABLE.convertRowIndexToModel(viewRow);
+      TransferDetailFilesDataLine line = DATA_MODEL.get(modelRow);
+      if (line != null && line.getInitializeObject() != null) {
+        offsets.add(line.getInitializeObject().fileOffset);
+      }
+    }
+    return offsets;
+  }
+
+  private void restoreSelectionByFileOffset(Set<Integer> offsets) {
     TABLE.clearSelection();
+    if (offsets.isEmpty()) {
+      return;
+    }
+    for (int modelRow = 0; modelRow < DATA_MODEL.getRowCount(); modelRow++) {
+      TransferDetailFilesDataLine line = DATA_MODEL.get(modelRow);
+      if (line != null
+          && line.getInitializeObject() != null
+          && offsets.contains(line.getInitializeObject().fileOffset)) {
+        int viewRow = TABLE.convertRowIndexToView(modelRow);
+        if (viewRow >= 0) {
+          TABLE.addRowSelectionInterval(viewRow, viewRow);
+        }
+      }
+    }
   }
 
   @Override
