@@ -60,6 +60,7 @@ object ConfigurationRepository {
         loadFromDataStore()
         migrateDistributedParticipationPreference()
         seedDefaults()
+        migrateIceBridgeRoleToBoth()
         resetVolatileKeys()
         applyBuildPolicy()
         initialized = true
@@ -270,6 +271,21 @@ object ConfigurationRepository {
         }
     }
 
+    /**
+     * Older builds defaulted the IceBridge role to CLIENT and seeded that value, so existing
+     * installs keep a leaf-only phone even after the default changed to BOTH. Upgrade a stored
+     * CLIENT once; a deliberate later choice by the user is preserved via the migration flag.
+     */
+    private fun migrateIceBridgeRoleToBoth() {
+        val flag = "_migrated_icebridge_role_both"
+        if (cache[flag] == true) return
+        val current = cache[Constants.PREF_KEY_ICEBRIDGE_ROLE] as? String
+        if (current == null || current.equals("CLIENT", ignoreCase = true)) {
+            setDefault(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH")
+        }
+        setDefault(flag, true)
+    }
+
     private fun resetVolatileKeys() {
         for (key in volatileKeys) {
             val value = defaults[key] ?: continue
@@ -398,7 +414,7 @@ object ConfigurationRepository {
         // Stored as strings so EditTextPreference works with PreferenceDataStore.
         m[Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT] = "6889"
         m[Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT] = "6888"
-        m[Constants.PREF_KEY_ICEBRIDGE_ROLE] = "CLIENT"
+        m[Constants.PREF_KEY_ICEBRIDGE_ROLE] = "BOTH"
         m[Constants.PREF_KEY_SEARCH_USE_YT] = (Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
         m[Constants.PREF_KEY_SEARCH_USE_KNABEN] = true
         m[Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV] = true
