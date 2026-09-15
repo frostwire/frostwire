@@ -810,7 +810,7 @@ final class Initializer {
       if (advertiseHost == null || advertiseHost.isEmpty()) {
         advertiseHost =
             com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT > 0
-                ? java.net.InetAddress.getLocalHost().getHostAddress()
+                ? firstRoutableIPv4().orElse("127.0.0.1")
                 : "127.0.0.1";
       }
       String roleStr = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
@@ -861,6 +861,40 @@ final class Initializer {
         stopRelayServices();
       }
     }
+  }
+
+  /**
+   * First routable, non-loopback, non-link-local IPv4 address of an active
+   * interface. Used to advertise this node to the IceBridge mesh.
+   *
+   * <p>Deliberately avoids {@code InetAddress.getLocalHost()}: on Ubuntu/Debian
+   * the hostname is mapped to 127.0.1.1 in /etc/hosts, so it would advertise an
+   * unreachable loopback endpoint.
+   */
+  private static java.util.Optional<String> firstRoutableIPv4() {
+    try {
+      java.util.Enumeration<java.net.NetworkInterface> nics =
+          java.net.NetworkInterface.getNetworkInterfaces();
+      while (nics != null && nics.hasMoreElements()) {
+        java.net.NetworkInterface nic = nics.nextElement();
+        if (!nic.isUp() || nic.isLoopback() || nic.isVirtual()) {
+          continue;
+        }
+        java.util.Enumeration<java.net.InetAddress> addrs = nic.getInetAddresses();
+        while (addrs.hasMoreElements()) {
+          java.net.InetAddress addr = addrs.nextElement();
+          if (addr instanceof java.net.Inet4Address
+              && !addr.isLoopbackAddress()
+              && !addr.isLinkLocalAddress()
+              && !addr.isAnyLocalAddress()) {
+            return java.util.Optional.of(addr.getHostAddress());
+          }
+        }
+      }
+    } catch (Exception ignored) {
+      // fall through to loopback
+    }
+    return java.util.Optional.empty();
   }
 
   /**
