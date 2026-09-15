@@ -329,6 +329,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             peers = peerDirectory.topByTrustVerified(maxPeers);
         }
         peers = KeyspaceRouter.rankByKeyspace(keywords, peers);
+        // Content-aware: peers whose announced index digest may hold the query come first,
+        // the keyspace-ranked remainder follows for coverage.
+        peers = peerDirectory.rankByHoldership(keywords, peers);
         if (peers.size() > maxPeers) {
             peers = peers.subList(0, maxPeers);
         }
@@ -448,6 +451,8 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         // pure forwarders; keep latch open for the real answer).
                         return;
                     }
+                    // A verified response is proof the holder is reachable.
+                    peerDirectory.markContact(holderPub);
                     synchronized (lock) {
                         if (!accepting[0] || stopped || System.nanoTime() >= phaseDeadline) {
                             return;
@@ -517,10 +522,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                             if (!operation.execute()) {
                                 pending.remove(nonce);
                                 pendingRequest.complete(latch);
+                                peerDirectory.markFailure(peer.peerPub());
                             }
                         } catch (Exception e) {
                             pending.remove(nonce);
                             pendingRequest.complete(latch);
+                            peerDirectory.markFailure(peer.peerPub());
                         } finally {
                             operation.cancel();
                             activeSends.remove(operation);
