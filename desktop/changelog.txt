@@ -41,6 +41,8 @@
   - new:IceBridge rUDP bind host configurable (ICEBRIDGE_BIND_HOST setting) — use "0.0.0.0" to accept rUDP from remote peers (cloud forwarder mode) or "127.0.0.1" for local-only daemon mode (default). Control HTTP server always binds to localhost
   - fix:TORRENT_FETCH serves torrents up to 256KB (was 64KB) with signed TOO_LARGE above; holder-signed chunks are cached and restamped per request nonce (metadata protocol v2)
   - fix:Linux/Wayland startup no longer freezes or crashes when opening the Transfers tab — Java2D was forced onto the legacy software X11 pipeline, where on-screen icon and text blits are ~1000x slower; rendering now uses the XRender pipeline, which is fast and stable under XWayland
+  - new:Transfer Detail Files row context menu now offers Share for completed files, creating and seeding a torrent from that file (same behavior as the row's share button)
+  - fix:Library media-type rescans are coalesced, so a burst of completed downloads no longer overflows the background executor and spams RejectedExecutionException
   - fix:JDK 26 HTTPS requests no longer fail after IceBridge identity initialization; Bouncy Castle is kept scoped to identity crypto instead of overriding the JVM-wide XDH provider
   - fix:macOS startup no longer crashes when the legacy libGURL JNI handler fails to load; magnet URLs use the Java Desktop OpenURIHandler included since Java 9, and obsolete libGURL code and binaries were removed
   - fix:right-clicking the transfer detail Files tab with no row selected no longer throws a NullPointerException
