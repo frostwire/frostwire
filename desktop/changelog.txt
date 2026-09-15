@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:transfer action buttons no longer flicker between enabled and disabled while a download is in progress; share/play availability is computed per row off the EDT instead of being cached on the single shared renderer
   - fix:Linux/Wayland startup no longer freezes or crashes when opening the Transfers tab — Java2D was forced onto the legacy software X11 pipeline, where on-screen icon and text blits are ~1000x slower; rendering now uses the XRender pipeline, which is fast and stable under XWayland
   - fix:Desktop UI repaints only rows that actually changed instead of every table row each second, theme icons decode once instead of on every paint, and Tip of the Day renders without subpixel-text stalls
   - fix:macOS installs ship icebridge.jar beside frostwire.jar and both jars' native libraries are signed; frostwire.jar no longer duplicates daemon-only IceBridge classes
