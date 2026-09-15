@@ -161,9 +161,19 @@ public class TransferDetailFilesTableMediator extends
 
     @Override
     protected JPopupMenu createPopupMenu() {
+        int selectedRow = TABLE.getSelectedRow();
+        if (selectedRow < 0) {
+            return null;
+        }
         TransferDetailFilesModel dataModel = getDataModel();
-        TransferDetailFilesDataLine transferDetailFilesDataLine = dataModel.get(TABLE.getSelectedRow());
+        TransferDetailFilesDataLine transferDetailFilesDataLine = dataModel.get(selectedRow);
+        if (transferDetailFilesDataLine == null) {
+            return null;
+        }
         TransferDetailFiles.TransferItemHolder transferItemHolder = transferDetailFilesDataLine.getInitializeObject();
+        if (transferItemHolder == null) {
+            return null;
+        }
         JPopupMenu menu = new SkinPopupMenu();
         if (transferItemHolder.skipped) {
             menu.add(new TransferDetailFilesActionsRenderer.DownloadAction(transferItemHolder));
