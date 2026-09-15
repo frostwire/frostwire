@@ -65,14 +65,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private JLabel labelPlay;
     private JLabel labelShare;
     private BTDownload dl;
-    /**
-     * Cache the last known state to avoid re-querying during paint operations.
-     * This prevents expensive JNI calls that block the EDT during rendering.
-     */
-    private boolean lastKnownCanShare = false;
-    private boolean lastKnownCanPlay = false;
-    private long lastStateCheckTime = 0;
-    private static final long STATE_CHECK_INTERVAL_MS = 200; // Re-check state every 200ms
 
     public TransferActionsRenderer() {
         setupUI();
@@ -122,43 +114,25 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
 
     private void updateUIData(TransferHolder actionsHolder) {
         dl = actionsHolder.getDl();
-
-        // Only re-check state periodically to avoid expensive JNI calls during paint
-        long now = System.currentTimeMillis();
-        if (now - lastStateCheckTime >= STATE_CHECK_INTERVAL_MS) {
-            try {
-                lastKnownCanShare = BittorrentDownload.RendererHelper.canShareNow(dl);
-                lastKnownCanPlay = dl.canPreview();
-                lastStateCheckTime = now;
-            } catch (Exception e) {
-                // If state check fails, fall back to last known state
-                System.err.println("Error checking transfer state: " + e.getMessage());
-            }
-        }
-
-        labelShare.setIcon(lastKnownCanShare ? share_solid : share_faded);
-        updatePlayButton();
-    }
-
-    private void updatePlayButton() {
-        // Use cached play state to avoid expensive checks during render
-        labelPlay.setIcon((lastKnownCanPlay) ? play_solid : play_transparent);
+        // State is computed off the EDT by BTDownloadDataLine.update() and stored
+        // per row, so this shared renderer never queries the transfer while
+        // painting (and one row's state cannot leak into another's).
+        labelShare.setIcon(actionsHolder.canShare() ? share_solid : share_faded);
+        labelPlay.setIcon(actionsHolder.canPlay() ? play_solid : play_transparent);
     }
 
     private void onPlay() {
-        if (dl.canPreview()) {
+        if (dl != null && dl.canPreview()) {
             File file = dl.getPreviewFile();
             if (file != null) {
                 GUIMediator.instance().launchMedia(new MediaSource(file));
             }
-            updatePlayButton();
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Don't call updatePlayButton() here as it may trigger expensive state checks during paint
-        // The state is already updated in updateUIData() which is called before painting
+        // Action state is applied in updateUIData() before painting.
     }
 }
