@@ -58,6 +58,27 @@ public final class PeerDirectory {
     /** Bounded entry count; oldest-stale evicted when exceeded. */
     public static final int DEFAULT_MAX_ENTRIES = 1024;
 
+    /**
+     * Consecutive delivery failures after which a peer is treated as unreachable and dropped. A
+     * reachable peer never accumulates strikes because any inbound frame or verified response
+     * resets the counter.
+     */
+    public static final int MAX_FAILURES = 5;
+
+    /**
+     * How long an entry stays queryable after the last time we actually heard from the peer. Once
+     * exceeded the entry is no longer selected for search forwarding and is pruned by {@link
+     * #evictUnreachable(long)}.
+     */
+    public static final long CONTACT_TTL_MS = 10 * 60_000L;
+
+    /**
+     * How long an entry that has never been heard from stays queryable after it was last affirmed
+     * by discovery/registry sync. Prevents a dead peer that keeps getting re-imported from being
+     * selected forever.
+     */
+    public static final long AFFIRM_TTL_MS = 5 * 60_000L;
+
     private final ConcurrentHashMap<String, Entry> entries = new ConcurrentHashMap<>();
     private final PeerKarmaCache karmaCache;
     private final int maxEntries;
@@ -128,7 +149,12 @@ public final class PeerDirectory {
         Entry refreshed = new Entry(peerPub, hostname, utpPort, effectiveRudpPort,
                 System.currentTimeMillis(), existing != null ? existing.localKarmaDelta : 0L,
                 existing != null && existing.spam, verified, caps, ibVer);
-        if (existing != null) refreshed.endorsers.addAll(existing.endorsers);
+        if (existing != null) {
+            refreshed.endorsers.addAll(existing.endorsers);
+            refreshed.indexDigest = existing.indexDigest;
+            refreshed.lastContactMs = existing.lastContactMs;
+            refreshed.failures = existing.failures;
+        }
         entries.put(key, refreshed);
         evictIfNeeded();
         version.incrementAndGet();
@@ -320,8 +346,10 @@ public final class PeerDirectory {
             throw new IllegalArgumentException("limit must be > 0");
         }
         List<Entry> snapshot = new ArrayList<>();
+        long nowMs = System.currentTimeMillis();
         for (Entry e : entries.values()) {
-            if (e.verified && NodeCapabilities.has(e.capabilities, requiredCaps)) {
+            if (e.verified && NodeCapabilities.has(e.capabilities, requiredCaps)
+                    && isLive(e, nowMs)) {
                 snapshot.add(e);
             }
         }
@@ -372,28 +400,7 @@ public final class PeerDirectory {
         if (random == null) {
             throw new IllegalArgumentException("random is null");
         }
-        List<Entry> eligible = new ArrayList<>();
-        for (Entry e : entries.values()) {
-            if (!e.verified || e.spam || !NodeCapabilities.has(e.capabilities, requiredCaps)) {
-                continue;
-            }
-            if (excludeHex != null
-                    && excludeHex.contains(com.frostwire.util.Hex.encode(e.peerPub))) {
-                continue;
-            }
-            eligible.add(e);
-        }
-        List<ScoredEntry> keyed = new ArrayList<>(eligible.size());
-        for (Entry e : eligible) {
-            double weight = 1.0 + Math.max(0.0, trustScore(e.peerPub));
-            keyed.add(new ScoredEntry(e, Math.pow(random.nextDouble(), 1.0 / weight)));
-        }
-        keyed.sort((a, b) -> Double.compare(b.key, a.key));
-        List<PeerInfo> out = new ArrayList<>(Math.min(limit, keyed.size()));
-        for (int i = 0; i < Math.min(limit, keyed.size()); i++) {
-            out.add(toPeerInfo(keyed.get(i).entry));
-        }
-        return out;
+        return sampleEntries(liveEligible(excludeHex, requiredCaps), limit, random);
     }
 
     private static final class ScoredEntry {
@@ -432,6 +439,239 @@ public final class PeerDirectory {
         return removed;
     }
 
+    /**
+     * Record the content fingerprint a peer announced. Passing {@code null} clears it. Malformed
+     * frames are ignored so a peer cannot poison routing with an oversized announcement.
+     */
+    public synchronized void setIndexDigest(byte[] peerPub, byte[] digest) {
+        if (peerPub == null || peerPub.length != 32) {
+            return;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        if (e == null) {
+            return;
+        }
+        if (digest == null) {
+            e.indexDigest = null;
+        } else {
+            IndexDigest parsed = IndexDigest.fromBytes(digest);
+            if (parsed == null) {
+                return;
+            }
+            e.indexDigest = parsed.toBytes();
+        }
+        version.incrementAndGet();
+    }
+
+    /**
+     * Record positive proof of contact with a peer (an authenticated inbound frame or a verified
+     * response). Resets the failure streak so a peer that came back is queryable again.
+     */
+    public synchronized void markContact(byte[] peerPub) {
+        if (peerPub == null || peerPub.length != 32) {
+            return;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        if (e == null) {
+            return;
+        }
+        e.lastContactMs = System.currentTimeMillis();
+        e.failures = 0;
+    }
+
+    /**
+     * Record one consecutive delivery failure. The peer is dropped once it reaches {@link
+     * #MAX_FAILURES} so searches stop being routed to an unreachable node. Returns true if the
+     * entry was evicted.
+     */
+    public synchronized boolean markFailure(byte[] peerPub) {
+        if (peerPub == null || peerPub.length != 32) {
+            return false;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        if (e == null) {
+            return false;
+        }
+        e.failures++;
+        if (e.failures >= MAX_FAILURES) {
+            return evict(peerPub);
+        }
+        return false;
+    }
+
+    /**
+     * Drop peers proven unreachable: too many consecutive failures, silent past {@link
+     * #CONTACT_TTL_MS}, or never heard from and no longer affirmed within {@link #AFFIRM_TTL_MS}.
+     * Returns the number of entries removed.
+     */
+    public synchronized int evictUnreachable(long nowMs) {
+        List<byte[]> doomed = new ArrayList<>();
+        for (Entry e : entries.values()) {
+            if (!isLive(e, nowMs)) {
+                doomed.add(e.peerPub);
+            }
+        }
+        int evicted = 0;
+        for (byte[] pub : doomed) {
+            if (evict(pub)) {
+                evicted++;
+            }
+        }
+        return evicted;
+    }
+
+    /** True while an entry is recent enough and has not failed repeatedly. */
+    public boolean isLive(byte[] peerPub) {
+        if (peerPub == null || peerPub.length != 32) {
+            return false;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        return e != null && isLive(e, System.currentTimeMillis());
+    }
+
+    private static boolean isLive(Entry e, long nowMs) {
+        if (e.failures >= MAX_FAILURES) {
+            return false;
+        }
+        if (e.lastContactMs > 0) {
+            return nowMs - e.lastContactMs <= CONTACT_TTL_MS;
+        }
+        return nowMs - e.lastUpdatedMs <= AFFIRM_TTL_MS;
+    }
+
+    /**
+     * Holder-aware sample: peers whose announced {@link IndexDigest} reports the query tokens come
+     * first (ranked by match count, then trust). Remaining slots are filled from live peers so
+     * content on peers with an unknown digest is still discoverable.
+     *
+     * <p>{@code exploreSlots} reserves slots for that exploration; when nothing matches, the whole
+     * budget explores so recall never collapses.
+     */
+    public List<PeerInfo> sampleHolders(String keywords, int limit, Set<String> excludeHex,
+                                        long requiredCaps, Random random, int exploreSlots) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit must be > 0");
+        }
+        if (random == null) {
+            throw new IllegalArgumentException("random is null");
+        }
+        List<String> queryTokens = IndexDigest.tokenize(keywords);
+        List<Entry> live = liveEligible(excludeHex, requiredCaps);
+        List<Entry> matched = new ArrayList<>();
+        List<Entry> rest = new ArrayList<>();
+        for (Entry e : live) {
+            if (digestMatchScore(e, queryTokens) > 0) {
+                matched.add(e);
+            } else {
+                rest.add(e);
+            }
+        }
+        matched.sort((a, b) -> {
+            int sa = digestMatchScore(a, queryTokens);
+            int sb = digestMatchScore(b, queryTokens);
+            if (sa != sb) {
+                return Integer.compare(sb, sa);
+            }
+            return Double.compare(trustScore(b.peerPub), trustScore(a.peerPub));
+        });
+        int explore = matched.isEmpty()
+                ? limit
+                : Math.max(0, Math.min(exploreSlots, limit - 1));
+        int holderSlots = Math.max(1, limit - explore);
+        List<PeerInfo> out = new ArrayList<>(limit);
+        for (int i = 0; i < matched.size() && i < holderSlots; i++) {
+            out.add(toPeerInfo(matched.get(i)));
+        }
+        if (out.size() < limit) {
+            out.addAll(sampleEntries(rest, limit - out.size(), random));
+        }
+        return out;
+    }
+
+    /**
+     * Stable reorder of an existing candidate list: peers whose announced digest may hold the
+     * query tokens first (by match count, then incoming order), remaining peers keep their
+     * incoming (e.g. keyspace/trust) order.
+     */
+    public List<PeerInfo> rankByHoldership(String keywords, List<PeerInfo> peers) {
+        if (peers == null || peers.isEmpty()) {
+            return peers == null ? List.of() : peers;
+        }
+        List<String> queryTokens = IndexDigest.tokenize(keywords);
+        if (queryTokens.isEmpty()) {
+            return peers;
+        }
+        List<PeerInfo> matched = new ArrayList<>();
+        List<PeerInfo> rest = new ArrayList<>();
+        java.util.Map<String, Integer> scores = new java.util.HashMap<>();
+        for (PeerInfo p : peers) {
+            String key = com.frostwire.util.Hex.encode(p.peerPub());
+            Entry e = entries.get(key);
+            int score = e == null ? 0 : digestMatchScore(e, queryTokens);
+            if (score > 0) {
+                scores.put(key, score);
+                matched.add(p);
+            } else {
+                rest.add(p);
+            }
+        }
+        if (matched.isEmpty()) {
+            return peers;
+        }
+        matched.sort((a, b) -> Integer.compare(
+                scores.getOrDefault(com.frostwire.util.Hex.encode(b.peerPub()), 0),
+                scores.getOrDefault(com.frostwire.util.Hex.encode(a.peerPub()), 0)));
+        List<PeerInfo> out = new ArrayList<>(peers.size());
+        out.addAll(matched);
+        out.addAll(rest);
+        return out;
+    }
+
+    private List<Entry> liveEligible(Set<String> excludeHex, long requiredCaps) {
+        long nowMs = System.currentTimeMillis();
+        List<Entry> eligible = new ArrayList<>();
+        for (Entry e : entries.values()) {
+            if (!e.verified || e.spam || !NodeCapabilities.has(e.capabilities, requiredCaps)) {
+                continue;
+            }
+            if (!isLive(e, nowMs)) {
+                continue;
+            }
+            if (excludeHex != null
+                    && excludeHex.contains(com.frostwire.util.Hex.encode(e.peerPub))) {
+                continue;
+            }
+            eligible.add(e);
+        }
+        return eligible;
+    }
+
+    private static int digestMatchScore(Entry e, List<String> queryTokens) {
+        byte[] digest = e.indexDigest;
+        if (digest == null || queryTokens.isEmpty()) {
+            return 0;
+        }
+        IndexDigest parsed = IndexDigest.fromBytes(digest);
+        return parsed == null ? 0 : parsed.matchCount(queryTokens);
+    }
+
+    private List<PeerInfo> sampleEntries(List<Entry> candidates, int limit, Random random) {
+        if (limit <= 0 || candidates.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<ScoredEntry> keyed = new ArrayList<>(candidates.size());
+        for (Entry e : candidates) {
+            double weight = 1.0 + Math.max(0.0, trustScore(e.peerPub));
+            keyed.add(new ScoredEntry(e, Math.pow(random.nextDouble(), 1.0 / weight)));
+        }
+        keyed.sort((a, b) -> Double.compare(b.key, a.key));
+        List<PeerInfo> out = new ArrayList<>(Math.min(limit, keyed.size()));
+        for (int i = 0; i < Math.min(limit, keyed.size()); i++) {
+            out.add(toPeerInfo(keyed.get(i).entry));
+        }
+        return out;
+    }
+
     /** Monotonic version counter; bumps on any write. */
     public long version() {
         return version.get();
@@ -465,6 +705,9 @@ public final class PeerDirectory {
         final boolean verified;
         volatile long capabilities;
         final String icebridgeVersion;
+        volatile byte[] indexDigest;
+        volatile long lastContactMs;
+        volatile int failures;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
 
         Entry(byte[] peerPub, String hostname, int utpPort, int rudpPort, long lastUpdatedMs,
