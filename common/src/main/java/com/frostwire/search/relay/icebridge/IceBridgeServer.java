@@ -12,6 +12,7 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.IdentityRecordPublisher;
 import com.frostwire.search.relay.IncomingRelayServer;
+import com.frostwire.search.relay.icebridge.control.CatalogFetcher;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
@@ -484,6 +485,18 @@ public final class IceBridgeServer implements AutoCloseable {
 
     public int controlPort() {
         return controlServer == null ? 0 : controlServer.port();
+    }
+
+    /**
+     * Install (or clear) the catalog fetch hook backing {@code GET /catalog}
+     * on the control API. Ignored when the control server has not been
+     * created yet.
+     */
+    public void setCatalogFetcher(CatalogFetcher catalogFetcher) {
+        ControlServer cs = this.controlServer;
+        if (cs != null) {
+            cs.setCatalogFetcher(catalogFetcher);
+        }
     }
 
     /**
