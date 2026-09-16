@@ -4340,7 +4340,7 @@ msgid "Enable IceBridge (distributed relay)"
 msgstr "IceBridge সক্ষম করুন (বিতরণকৃত রিলে)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
-msgid "Share my share catalog publicly (crawlers)"
+msgid "Make shared torrents catalog crawlable"
 msgstr "আমার শেয়ার ক্যাটালগ প্রকাশ্যে শেয়ার করুন (ক্রলার)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
