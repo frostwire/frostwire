@@ -7,12 +7,21 @@
 
 package com.frostwire.search.relay;
 
+import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Search application layer (Protocol #1) for a standalone IceBridge
@@ -26,10 +35,28 @@ import com.frostwire.util.Logger;
  * the hub, the hub forwards to the real holders, and their signed
  * responses route back over the mesh. The control plane stays local —
  * the app talks to the server's own loopback control API only.
+ *
+ * <p>The app also installs a {@code GET /catalog} fetcher (see
+ * {@link com.frostwire.search.relay.icebridge.control.CatalogFetcher}) that
+ * browses a peer's full shared-torrent manifest with {@link CatalogBrowser}.
+ * Response rows are capped at {@link RemoteSearchRequest#MAX_LIMIT} and at a
+ * {@link #MAX_CATALOG_RESPONSE_BYTES} byte budget. Large manifests rely on
+ * the transport's DATA fragmentation for delivery; the relay/legacy path is
+ * <b>not</b> chunked, so an over-budget catalog is truncated here rather than
+ * streamed.
  */
 public final class SearchRelayApp implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(SearchRelayApp.class);
+    private static final Gson GSON = new Gson();
+
+    /**
+     * Approximate byte budget for a single {@code GET /catalog} JSON body.
+     * Mirrors the mesh payload budget; once reached, no further rows are
+     * emitted. Large manifests are expected to ride transport DATA
+     * fragmentation — the relay path is not chunked.
+     */
+    private static final int MAX_CATALOG_RESPONSE_BYTES = RemoteSearchResponse.MAX_STREAM_BYTES;
 
     private final IceBridgeSearchTransport transport;
     private final IncomingSearchRequestHandler handler;
@@ -65,6 +92,13 @@ public final class SearchRelayApp implements AutoCloseable {
         IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
         transport.start();
 
+        // Install the relay-side catalog fetch hook for GET /catalog. The
+        // CatalogBrowser is single-fetch and not thread-safe, while the
+        // control API may invoke the fetcher from several HTTP workers, so
+        // calls are serialized on the browser instance.
+        CatalogBrowser catalogBrowser = new CatalogBrowser(server.identity(), transport);
+        server.setCatalogFetcher((pubB64, timeoutMs) -> fetchCatalog(catalogBrowser, pubB64, timeoutMs));
+
         RelaySearchService service = new RelaySearchService(emptyIndex, server.identity());
         IncomingSearchRequestHandler handler = new IncomingSearchRequestHandler(
                 transport, service, directory, server.identity(), emptyIndex);
@@ -84,6 +118,62 @@ public final class SearchRelayApp implements AutoCloseable {
     /** Visible for tests: the directory fed by registry mesh import. */
     PeerDirectory directory() {
         return directory;
+    }
+
+    /**
+     * Catalog fetch hook body for {@code GET /catalog}: decode the requested
+     * publisher, browse its manifest over the mesh, and flatten the rows into
+     * the {@code {"ih","name","s","fc","pub"}} control-API shape.
+     *
+     * <p>Never throws: any failure yields an error {@link JsonObject}. The
+     * {@code pub} field is the requested publisher in hex — catalog rows
+     * carry no independent publisher field, so the requested key is used.
+     * Rows are capped at {@link RemoteSearchRequest#MAX_LIMIT} and stop once
+     * {@link #MAX_CATALOG_RESPONSE_BYTES} is reached.
+     */
+    private static JsonElement fetchCatalog(CatalogBrowser browser, String pubB64, int timeoutMs) {
+        try {
+            byte[] pub = IceBridgeAuth.decodeBase64(pubB64);
+            if (pub == null || pub.length != 32) {
+                return catalogError("invalid pub");
+            }
+            String pubHex = Hex.encode(pub);
+            List<RemoteIndexFetcher.RemoteTorrentEntry> rows;
+            synchronized (browser) {
+                rows = browser.fetchCatalog(pub, timeoutMs);
+            }
+            JsonArray result = new JsonArray();
+            int emitted = 0;
+            long bytes = 0;
+            for (RemoteIndexFetcher.RemoteTorrentEntry row : rows) {
+                if (row == null) {
+                    continue;
+                }
+                if (emitted >= RemoteSearchRequest.MAX_LIMIT
+                        || bytes >= MAX_CATALOG_RESPONSE_BYTES) {
+                    break;
+                }
+                JsonObject element = new JsonObject();
+                element.addProperty("ih", row.infoHashHex());
+                element.addProperty("name", row.name());
+                element.addProperty("s", row.sizeBytes());
+                element.addProperty("fc", row.fileCount());
+                element.addProperty("pub", pubHex);
+                bytes += GSON.toJson(element).getBytes(StandardCharsets.UTF_8).length;
+                result.add(element);
+                emitted++;
+            }
+            return result;
+        } catch (Throwable t) {
+            String message = t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
+            return catalogError(message);
+        }
+    }
+
+    private static JsonObject catalogError(String message) {
+        JsonObject error = new JsonObject();
+        error.addProperty("error", message);
+        return error;
     }
 
     @Override
