@@ -49,6 +49,11 @@ public final class RudpSessionManager {
     private static final long RETRANSMIT_INTERVAL_MS = 500;
     private static final long RETRANSMIT_TIMEOUT_MS = 15_000;
     private static final long SESSION_IDLE_MS = 120_000;
+    /**
+     * How often an authenticated peer's registry liveness is refreshed from inbound traffic.
+     * Keeps stable sessions (no new HELLO) addressable without per-packet overhead.
+     */
+    private static final long REGISTRY_TOUCH_INTERVAL_MS = 30_000;
     private static final int MAX_RETRIES = 5;
     private static final int SEND_WINDOW = 32;
     private static final int MAX_SESSIONS_PER_SUBNET_24 = 256;
@@ -96,30 +101,104 @@ public final class RudpSessionManager {
     /** True reserves bounded next-hop ownership; false means no work was accepted. */
     public synchronized boolean deliver(byte[] targetPub, byte[] payload) {
         if (closed || targetPub == null || targetPub.length != 32 || !validPayload(payload)) {
+            logDeliverFailure(targetPub, false, false, null, false, false,
+                    closed ? "closed" : "invalid-input", payload == null ? -1 : payload.length);
             return false;
         }
         if (Arrays.equals(targetPub, identity.ed25519PubRaw())) {
-            return notifyListener(identity.ed25519PubRaw(), payload);
+            if (notifyListener(identity.ed25519PubRaw(), payload)) {
+                return true;
+            }
+            logDeliverFailure(targetPub, false, false, null, false, false,
+                    "self-delivery-rejected", payload.length);
+            return false;
         }
         PeerRecord target = registry.lookup(targetPub);
-        if (target != null) {
-            InetSocketAddress address = literalAddress(target.host(), target.rudpPort());
+        boolean targetKnown = target != null;
+        InetSocketAddress address =
+                targetKnown ? literalAddress(target.host(), target.rudpPort()) : null;
+        boolean liveSession = false;
+        boolean dialFailed = false;
+        boolean queueFull = false;
+        String reason;
+        if (targetKnown) {
             if (isLocalRudpEndpoint(address)) {
-                return deliverToLocalPollClient(targetPub, new byte[0], payload);
+                if (deliverToLocalPollClient(targetPub, new byte[0], payload)) {
+                    return true;
+                }
+                logDeliverFailure(targetPub, true, false, address, false, true,
+                        "local-poll-queue-full", payload.length);
+                return false;
             }
             RudpSession live = findSessionByPub(targetPub);
             if (live != null) {
-                return queueData(live, payload);
-            }
-            if (address != null) {
+                liveSession = true;
+                if (queueData(live, payload)) {
+                    return true;
+                }
+                queueFull = true;
+                reason = "live-session-queue-full";
+            } else if (address != null) {
                 RudpSession session = connectSession(address, targetPub);
-                return session != null && queueData(session, payload);
+                if (session != null && queueData(session, payload)) {
+                    return true;
+                }
+                dialFailed = session == null;
+                queueFull = session != null;
+                reason = dialFailed ? "dial-failed" : "dial-queue-full";
+            } else {
+                reason = "no-literal-address";
             }
+        } else {
+            reason = "target-unknown";
         }
         if (payload.length > RelayFrame.MAX_APP_PAYLOAD) {
+            logDeliverFailure(targetPub, targetKnown, liveSession, address, dialFailed, queueFull,
+                    reason + ":payload-over-relay-cap", payload.length);
             return false;
         }
-        return forward(targetPub, payload, IceBridgeTopology.get().meshHopTtl(), null);
+        // Direct session path failed transiently (queue full or dial failed).
+        // Fall back to the existing bounded mesh flood rather than a hard false.
+        boolean forwarded = forward(targetPub, payload, IceBridgeTopology.get().meshHopTtl(), null);
+        if (!forwarded) {
+            logDeliverFailure(targetPub, targetKnown, liveSession, address, dialFailed, queueFull,
+                    reason + ":no-forwarder-accepted", payload.length);
+        }
+        return forwarded;
+    }
+
+    private static void logDeliverFailure(byte[] targetPub, boolean targetKnown, boolean liveSession,
+                                          InetSocketAddress address, boolean dialFailed, boolean queueFull,
+                                          String reason, int payloadBytes) {
+        LOG.info("deliver failed target=" + hexPrefix(targetPub, 12)
+                + " targetKnown=" + targetKnown
+                + " liveSession=" + liveSession
+                + " address=" + formatAddress(address)
+                + " dialFailed=" + dialFailed
+                + " queueFull=" + queueFull
+                + " payloadBytes=" + payloadBytes
+                + " reason=" + reason);
+    }
+
+    private static String hexPrefix(byte[] bytes, int hexChars) {
+        if (bytes == null) {
+            return "null";
+        }
+        int count = Math.min(bytes.length, Math.max(0, hexChars / 2));
+        StringBuilder sb = new StringBuilder(count * 2);
+        for (int i = 0; i < count; i++) {
+            int value = bytes[i] & 0xFF;
+            sb.append(Character.forDigit(value >>> 4, 16))
+                    .append(Character.forDigit(value & 0xF, 16));
+        }
+        return sb.toString();
+    }
+
+    private static String formatAddress(InetSocketAddress address) {
+        if (address == null || address.getAddress() == null) {
+            return "null";
+        }
+        return address.getAddress().getHostAddress() + ":" + address.getPort();
     }
 
     /**
@@ -325,6 +404,7 @@ public final class RudpSessionManager {
         if (!session.isAuthenticated()) {
             return;
         }
+        touchRegistryIfDue(session);
         if (packet.type() == RudpPacket.Type.PATH_RESPONSE) {
             if (packet.sequence() == 0 && packet.ackThrough() == 0 && sender.equals(session.candidateAddress)
                     && Arrays.equals(packet.payload(), session.pathChallenge)
@@ -764,8 +844,24 @@ public final class RudpSessionManager {
         return maxSessions;
     }
 
-    private RudpSession findSessionByPub(byte[] pub) {
-        for (RudpSession session : sessionsByRemoteId.values()) {
+    /**
+     * Refresh the registry entry for an authenticated peer at most every {@link
+     * #REGISTRY_TOUCH_INTERVAL_MS}. Only for peers already known to the registry.
+     */
+    private void touchRegistryIfDue(RudpSession session) {
+        byte[] peer = session.remotePub();
+        if (peer == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - session.lastRegistryTouchMs() < REGISTRY_TOUCH_INTERVAL_MS) {
+            return;
+        }
+        session.markRegistryTouch(now);
+        registry.touch(peer);
+    }
+
+    private RudpSession findSessionByPub(byte[] pub) {        for (RudpSession session : sessionsByRemoteId.values()) {
             if (Arrays.equals(pub, session.remotePub())) {
                 return session;
             }
