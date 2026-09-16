@@ -131,6 +131,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      */
     private volatile boolean forwardingEnabled = true;
     /**
+     * Explicit opt-in for serving catalog browse requests. Defaults to false:
+     * a node answers {@link RemoteCatalogBrowseRequest} (returning its
+     * shared-torrent manifest) only after the owner enables it.
+     */
+    private volatile boolean publicCatalogEnabled = false;
+    /**
      * Forward fanout cap for promoted leaves. Non-positive means the live
      * topology default.
      */
@@ -242,6 +248,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     @Override
     public void setForwardingEnabled(boolean forwardingEnabled) {
         this.forwardingEnabled = forwardingEnabled;
+    }
+
+    /**
+     * Enables or disables serving incoming catalog browse requests.
+     * Serving is opt-in: default off, so a node never exposes its shared
+     * catalog unless the owner explicitly enables it.
+     */
+    public void setPublicCatalogEnabled(boolean publicCatalogEnabled) {
+        this.publicCatalogEnabled = publicCatalogEnabled;
     }
 
     /**
@@ -687,6 +702,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
 
     private void handleCatalogBrowseRequest(RemoteCatalogBrowseRequest request,
                                             byte[] sourcePub) {
+        if (!publicCatalogEnabled) {
+            return;
+        }
         if (localIndex == null || identity == null
                 || !Arrays.equals(request.targetPub(), identity.ed25519PubRaw())) {
             return;
