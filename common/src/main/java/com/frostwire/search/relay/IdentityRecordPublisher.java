@@ -42,6 +42,7 @@ public final class IdentityRecordPublisher {
     private final int utpPort;
     private final int rudpPort;
     private final String role;
+    private long extraCaps;
     private long lastPublishEpochSec;
 
     public IdentityRecordPublisher(IdentityKeys identity, int utpPort) {
@@ -49,6 +50,11 @@ public final class IdentityRecordPublisher {
     }
 
     public IdentityRecordPublisher(IdentityKeys identity, int utpPort, int rudpPort, String role) {
+        this(identity, utpPort, rudpPort, role, 0L);
+    }
+
+    public IdentityRecordPublisher(IdentityKeys identity, int utpPort, int rudpPort, String role,
+                                   long extraCaps) {
         if (identity == null) {
             throw new IllegalArgumentException("identity is null");
         }
@@ -62,6 +68,21 @@ public final class IdentityRecordPublisher {
         this.utpPort = utpPort;
         this.rudpPort = rudpPort;
         this.role = role != null ? role : "BOTH";
+        this.extraCaps = extraCaps;
+    }
+
+    /**
+     * Additional capability bits ORed into the signed record on top of
+     * {@link NodeCapabilities#fromRole(String)}. Used for explicit
+     * opt-ins such as {@link NodeCapabilities#PUBLIC_CATALOG}.
+     */
+    public IdentityRecordPublisher withExtraCaps(long extraCaps) {
+        this.extraCaps = extraCaps;
+        return this;
+    }
+
+    public long extraCaps() {
+        return extraCaps;
     }
 
     /**
@@ -103,7 +124,8 @@ public final class IdentityRecordPublisher {
                     identity.nodeId(),
                     identity.ed25519(),
                     identity.x25519PubRaw(),
-                    utpPort, rudpPort, role);
+                    utpPort, rudpPort, role,
+                    NodeCapabilities.fromRole(role) | extraCaps);
             Entry entry = record.toEntry();
             byte[] pubKey = identity.ed25519PubRaw();
             byte[] privKey = identity.ed25519SecretKeyNaCl();
