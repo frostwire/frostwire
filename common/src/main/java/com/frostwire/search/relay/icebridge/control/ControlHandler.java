@@ -7,6 +7,8 @@
 
 package com.frostwire.search.relay.icebridge.control;
 
+import com.frostwire.search.relay.event.IceBridgeEvent;
+import com.frostwire.search.relay.event.IceBridgeEventLog;
 import com.frostwire.search.relay.icebridge.IceBridgeAuth;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
@@ -35,6 +37,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +52,7 @@ import java.util.stream.Collectors;
  *   <li>{@code POST /send} — send an opaque payload to a target peer.</li>
  *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.</li>
  *   <li>{@code GET /metrics} — return in-memory counters and registry size.</li>
+ *   <li>{@code GET /events} — return recent IceBridge events, newest first (filterable).</li>
  *   <li>{@code GET /health} — liveness check.</li>
  * </ul>
  */
@@ -58,6 +62,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private static final Gson GSON = new Gson();
     private static final int DEFAULT_LOOKUP_COUNT = 10;
     private static final int DEFAULT_POLL_COUNT = 64;
+    private static final int DEFAULT_EVENTS_LIMIT = 100;
+    private static final int MAX_EVENTS_LIMIT = 1000;
     private static final int MAX_BODY_BYTES = 64 * 1024;
 
     private final PeerRegistry registry;
@@ -120,6 +126,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = handlePoll(uri);
             } else if (method == HttpMethod.GET && "/metrics".equals(path)) {
                 response = handleMetrics();
+            } else if (method == HttpMethod.GET && "/events".equals(path)) {
+                response = handleEvents(uri);
             } else if (method == HttpMethod.GET && "/health".equals(path)) {
                 response = ApiResponse.success("ok");
             } else {
@@ -373,6 +381,42 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 metrics.spamMarkedDroppedCount(),
                 registry.size(), registry.registrations(), registry.lookups(), registry.evicted());
         return ApiResponse.success(snapshot);
+    }
+
+    private ApiResponse<List<IceBridgeEvent>> handleEvents(String uri) {
+        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+        IceBridgeEvent.Level level = IceBridgeEventLog.parseLevel(firstParam(decoder, "level"));
+        Set<IceBridgeEvent.Category> categories =
+                IceBridgeEventLog.parseCategories(firstParam(decoder, "category"));
+        String text = firstParam(decoder, "q");
+        String peer = firstParam(decoder, "peer");
+        long since = 0L;
+        String sinceParam = firstParam(decoder, "since");
+        if (sinceParam != null) {
+            try {
+                since = Long.parseLong(sinceParam);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        int limit = DEFAULT_EVENTS_LIMIT;
+        String limitParam = firstParam(decoder, "limit");
+        if (limitParam != null) {
+            try {
+                limit = Integer.parseInt(limitParam);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        limit = Math.max(1, Math.min(limit, MAX_EVENTS_LIMIT));
+        return ApiResponse.success(
+                IceBridgeEventLog.instance().query(level, categories, text, peer, since, limit));
+    }
+
+    private static String firstParam(QueryStringDecoder decoder, String name) {
+        List<String> values = decoder.parameters().get(name);
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        return values.get(0);
     }
 
     private void sendJson(ChannelHandlerContext ctx, FullHttpRequest request,
