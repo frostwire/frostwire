@@ -8,21 +8,33 @@
 package com.frostwire.mcp.desktop.tools.relay2;
 
 import com.frostwire.mcp.MCPTool;
-import com.frostwire.search.relay.LocalIndex;
-import com.frostwire.search.relay.LocalSharedTorrent;
+import com.frostwire.search.relay.CatalogBrowser;
+import com.frostwire.search.relay.DistributedSearchTransport;
+import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.RemoteIndexFetcher;
+import com.frostwire.util.Hex;
+import com.frostwire.util.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.gui.search.SearchEngine;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * MCP tool intended to browse a remote peer's shared catalog.
+ * MCP tool that fetches a remote peer's shared-torrent catalog over IceBridge.
  *
- * <p>The desktop has no MCP-exposed path to fetch a remote catalog yet: that requires the IceBridge
- * {@code RemoteIndexFetcher} over the relay transport. Rather than fabricate a remote fetch, this
- * tool returns this node's LOCAL shared index rows and states the limitation.
+ * <p>Delegates to {@link CatalogBrowser}, which sends a signed catalog-browse request over the
+ * relay transport and verifies the peer-signed manifest that comes back. Peers only answer when
+ * they have opted in to {@code PUBLIC_CATALOG}; otherwise the catalog is returned empty. No peer
+ * IPs are ever included in the response.
  */
 public final class PeerCatalogTool implements MCPTool {
+
+  private static final Logger LOG = Logger.getLogger(PeerCatalogTool.class);
+
+  private static final int DEFAULT_TIMEOUT_MS = 5000;
+  private static final int MIN_TIMEOUT_MS = 100;
+  private static final int MAX_TIMEOUT_MS = 30000;
 
   @Override
   public String name() {
@@ -31,7 +43,7 @@ public final class PeerCatalogTool implements MCPTool {
 
   @Override
   public String description() {
-    return "Browse a peer's shared catalog. Remote catalogs require the IceBridge RemoteIndexFetcher (not wired to MCP yet); this returns the local shared index capped by limit and explains the limitation.";
+    return "Fetch a peer's shared-torrent catalog over IceBridge by its ed25519 pubkey. Peers only answer if they have opted in to PUBLIC_CATALOG; otherwise the catalog is empty. Returns no IP addresses.";
   }
 
   @Override
@@ -40,21 +52,22 @@ public final class PeerCatalogTool implements MCPTool {
     schema.addProperty("type", "object");
     JsonObject props = new JsonObject();
 
-    JsonObject pubProp = new JsonObject();
-    pubProp.addProperty("type", "string");
-    pubProp.addProperty(
-        "description", "64-character hex ed25519 pubkey of the peer whose catalog is requested");
-    props.add("pub", pubProp);
+    JsonObject peerProp = new JsonObject();
+    peerProp.addProperty("type", "string");
+    peerProp.addProperty(
+        "description", "Peer ed25519 pubkey as 64-character hex or base64url (32 raw bytes)");
+    props.add("peer", peerProp);
 
-    JsonObject limitProp = new JsonObject();
-    limitProp.addProperty("type", "integer");
-    limitProp.addProperty("description", "Maximum rows to return (default 100, clamp 1..500)");
-    props.add("limit", limitProp);
+    JsonObject timeoutProp = new JsonObject();
+    timeoutProp.addProperty("type", "integer");
+    timeoutProp.addProperty(
+        "description", "Fetch timeout in milliseconds (default 5000, clamp 100..30000)");
+    props.add("timeout_ms", timeoutProp);
 
     schema.add("properties", props);
 
     JsonArray required = new JsonArray();
-    required.add("pub");
+    required.add("peer");
     schema.add("required", required);
     return schema;
   }
@@ -63,39 +76,51 @@ public final class PeerCatalogTool implements MCPTool {
   public JsonObject execute(JsonObject arguments) {
     JsonObject out = new JsonObject();
     try {
-      String hex = RelayToolSupport.stringArg(arguments, "pub");
-      if (hex == null || hex.isEmpty()) {
-        out.addProperty("error", "Missing required parameter: pub");
-        return out;
-      }
+      String rawPeer = RelayToolSupport.stringArg(arguments, "peer");
+      byte[] pubBytes;
       try {
-        RelayToolSupport.parsePub32(hex);
+        pubBytes = RelayToolSupport.parsePub(rawPeer);
       } catch (IllegalArgumentException e) {
         out.addProperty("error", e.getMessage());
         return out;
       }
+      String peer = Hex.encode(pubBytes);
 
-      int limit = RelayToolSupport.clampInt(arguments, "limit", 100, 1, 500);
-
-      LocalIndex index = SearchEngine.getDistributedLocalIndex();
-      if (index == null) {
-        out.addProperty("error", "LocalIndex is not available (relay stack not wired)");
+      DistributedSearchTransport transport = SearchEngine.getDistributedSearchTransport();
+      IdentityKeys identity = SearchEngine.getDistributedIdentity();
+      if (transport == null || identity == null) {
+        out.addProperty("error", "distributed relay not wired");
         return out;
       }
 
-      List<LocalSharedTorrent> all = index.listAll();
-      JsonArray torrents = new JsonArray();
-      for (int i = 0; i < all.size() && i < limit; i++) {
-        torrents.add(RelayToolSupport.torrentToJson(all.get(i)));
+      int timeoutMs =
+          RelayToolSupport.clampInt(
+              arguments, "timeout_ms", DEFAULT_TIMEOUT_MS, MIN_TIMEOUT_MS, MAX_TIMEOUT_MS);
+
+      List<RemoteIndexFetcher.RemoteTorrentEntry> entries;
+      try {
+        entries = new CatalogBrowser(identity, transport).fetchCatalog(pubBytes, timeoutMs);
+      } catch (Throwable t) {
+        LOG.debug("peer catalog fetch failed for " + peer, t);
+        entries = null;
+      }
+      if (entries == null) {
+        entries = Collections.emptyList();
       }
 
-      out.addProperty("pub", hex);
-      out.addProperty("source", "local");
-      out.addProperty("count", torrents.size());
-      out.add("torrents", torrents);
-      out.addProperty(
-          "note",
-          "Remote peer catalogs require the IceBridge RemoteIndexFetcher over the relay transport and are not wired to MCP yet; returning this node's local shared index instead.");
+      JsonArray catalog = new JsonArray();
+      for (RemoteIndexFetcher.RemoteTorrentEntry entry : entries) {
+        JsonObject row = new JsonObject();
+        row.addProperty("ih", entry.infoHashHex());
+        row.addProperty("name", entry.name());
+        row.addProperty("size_bytes", entry.sizeBytes());
+        row.addProperty("files", entry.fileCount());
+        catalog.add(row);
+      }
+
+      out.addProperty("count", catalog.size());
+      out.addProperty("peer", peer);
+      out.add("catalog", catalog);
     } catch (Throwable t) {
       out.addProperty("error", t.toString());
     }
