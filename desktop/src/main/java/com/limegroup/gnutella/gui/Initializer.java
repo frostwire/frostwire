@@ -827,6 +827,9 @@ final class Initializer {
       // Gnutella leaf model: CLIENT answers from its local index but never forwards.
       incomingHandler.setForwardingEnabled(
           syncRole != com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.CLIENT);
+      // Opt-in: only serve catalog-browse requests when the user allows crawling.
+      incomingHandler.setPublicCatalogEnabled(
+          SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue());
       if (!relayLifecycle.getAsBoolean()) return;
       incomingHandler.start();
       transport.start();
@@ -986,8 +989,12 @@ final class Initializer {
         } catch (NumberFormatException ignored) {
         }
       }
+      long extraCaps =
+          SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue()
+              ? com.frostwire.search.relay.NodeCapabilities.PUBLIC_CATALOG
+              : 0L;
       IdentityRecordPublisher publisher =
-          new IdentityRecordPublisher(identity, port, rudpPort, "BOTH");
+          new IdentityRecordPublisher(identity, port, rudpPort, "BOTH", extraCaps);
       IndexAnnouncementPublisher indexPublisher =
           new IndexAnnouncementPublisher(
               localIndex,
