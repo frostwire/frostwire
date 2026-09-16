@@ -110,6 +110,23 @@ class IceBridgeEventLogTest {
   }
 
   @Test
+  void matchesPredicateHonorsEveryFilter() {
+    IceBridgeEvent e =
+        IceBridgeEvent.of(IceBridgeEvent.Level.WARN, IceBridgeEvent.Category.FORWARD, "aabbcc", "hi miami");
+    assertTrue(IceBridgeEventLog.matches(e, null, null, null, null, 0));
+    assertTrue(IceBridgeEventLog.matches(e, IceBridgeEvent.Level.INFO, null, "MIAMI", "AABB", 0));
+    assertTrue(IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.FORWARD), null, null, 0));
+    assertFalse(
+        IceBridgeEventLog.matches(e, IceBridgeEvent.Level.ERROR, null, null, null, 0), "level below min");
+    assertFalse(
+        IceBridgeEventLog.matches(e, null, Set.of(IceBridgeEvent.Category.DIGEST), null, null, 0), "category");
+    assertFalse(IceBridgeEventLog.matches(e, null, null, "absent", null, 0), "text");
+    assertFalse(IceBridgeEventLog.matches(e, null, null, null, "zz", 0), "peer");
+    assertFalse(
+        IceBridgeEventLog.matches(e, null, null, null, null, e.timestampMs() + 1), "since in the future");
+  }
+
+  @Test
   void parseHelpersAreLenient() {
     Set<IceBridgeEvent.Category> cats = IceBridgeEventLog.parseCategories("search, FORWARD, bogus");
     assertTrue(cats.contains(IceBridgeEvent.Category.SEARCH));
