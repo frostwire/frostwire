@@ -91,6 +91,7 @@ public final class SearchRelayApp implements AutoCloseable {
                 new RemoteKarmaChainFetcher(peerPub -> null)));
 
         IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
+        transport.setMetrics(server.metrics());
         transport.start();
 
         // Install the relay-side catalog fetch hook for GET /catalog. The
