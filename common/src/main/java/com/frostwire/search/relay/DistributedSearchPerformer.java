@@ -681,6 +681,10 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             magnet += "&x.hp=" + java.util.Base64.getUrlEncoder().withoutPadding()
                     .encodeToString(row.publisherEd25519Pub);
         }
+        if (row.publicCatalog) {
+            // x.hc = holder opted in to PUBLIC_CATALOG: the "crawl peer" action is offered.
+            magnet += "&x.hc=1";
+        }
         // Validate matchedFile: reject null, empty, or pathologically long values.
         String matchedFile = row.matchedFile;
         if (matchedFile != null) {
