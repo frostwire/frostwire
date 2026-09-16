@@ -82,6 +82,22 @@ public final class RelaySearchService {
      */
     private volatile Predicate<byte[]> spamChecker = k -> false;
 
+    /**
+     * Advertised PUBLIC_CATALOG opt-in. When true, response rows carry {@code pc} and the response
+     * is written as wire v4 so requesters can gate "crawl peer" without probing; when false the
+     * response stays wire v3 (old peers keep verifying it).
+     */
+    private volatile boolean publicCatalog;
+
+    /** Enable advertising this node's catalog as crawlable on search results. */
+    public void setPublicCatalog(boolean publicCatalog) {
+        this.publicCatalog = publicCatalog;
+    }
+
+    public boolean isPublicCatalog() {
+        return publicCatalog;
+    }
+
     public RelaySearchService(LocalIndex index, IdentityKeys identity) {
         this(index, identity, new RateLimiter(
                 RelayConstants.DEFAULT_MAX_QPS,
@@ -243,6 +259,7 @@ public final class RelaySearchService {
 
     private RemoteSearchResponse buildResponse(RemoteSearchRequest request,
                                                List<LocalSharedTorrent> rows) {
+        boolean catalog = publicCatalog;
         RemoteSearchResponse.Builder b = RemoteSearchResponse.builder()
                 .nonce(request.nonce())
                 .timestamp(System.currentTimeMillis() / 1000L);
@@ -250,7 +267,7 @@ public final class RelaySearchService {
         for (LocalSharedTorrent t : rows) {
             byte[] nodeId = t.publisherNodeId();
             b.addRow(t.infoHash(), t.name(), t.sizeBytes(), t.fileCount(),
-                    t.publisherEd25519Pub(), nodeId, t.matchedFile(), endpoints);
+                    t.publisherEd25519Pub(), nodeId, t.matchedFile(), endpoints, catalog);
         }
         RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
         byte[] sig = sign(unsigned.canonicalBytes());
