@@ -20,6 +20,7 @@ import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.util.Logger;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
  *   <li>{@code GET /poll?count=N} — retrieve received payloads queued for the local process.</li>
  *   <li>{@code GET /metrics} — return in-memory counters and registry size.</li>
  *   <li>{@code GET /events} — return recent IceBridge events, newest first (filterable).</li>
+ *   <li>{@code GET /catalog?pub=<base64url>&timeoutMs=<n>} — fetch a peer's shared-torrent catalog.</li>
  *   <li>{@code GET /health} — liveness check.</li>
  * </ul>
  */
@@ -65,6 +67,9 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private static final int DEFAULT_EVENTS_LIMIT = 100;
     private static final int MAX_EVENTS_LIMIT = 1000;
     private static final int MAX_BODY_BYTES = 64 * 1024;
+    private static final int DEFAULT_CATALOG_TIMEOUT_MS = 5000;
+    private static final int MIN_CATALOG_TIMEOUT_MS = 100;
+    private static final int MAX_CATALOG_TIMEOUT_MS = 30000;
 
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
@@ -72,19 +77,22 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
     private final IceBridgeTokens authTokens;
+    private final CatalogFetcher catalogFetcher;
 
     public ControlHandler(PeerRegistry registry,
                           IceBridgeMetrics metrics,
                           IceBridgeConfig config,
                           RudpSessionManager rudpSessionManager,
                           InboundMessageQueue inboundQueue,
-                          IceBridgeTokens authTokens) {
+                          IceBridgeTokens authTokens,
+                          CatalogFetcher catalogFetcher) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
         this.rudpSessionManager = rudpSessionManager;
         this.inboundQueue = inboundQueue;
         this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
+        this.catalogFetcher = catalogFetcher;
     }
 
     @Override
@@ -128,6 +136,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = handleMetrics();
             } else if (method == HttpMethod.GET && "/events".equals(path)) {
                 response = handleEvents(uri);
+            } else if (method == HttpMethod.GET && "/catalog".equals(path)) {
+                response = handleCatalog(uri);
             } else if (method == HttpMethod.GET && "/health".equals(path)) {
                 response = ApiResponse.success("ok");
             } else {
@@ -409,6 +419,36 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         limit = Math.max(1, Math.min(limit, MAX_EVENTS_LIMIT));
         return ApiResponse.success(
                 IceBridgeEventLog.instance().query(level, categories, text, peer, since, limit));
+    }
+
+    private ApiResponse<JsonElement> handleCatalog(String uri) {
+        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+        String pubParam = firstParam(decoder, "pub");
+        if (pubParam == null || pubParam.isEmpty()) {
+            return ApiResponse.error("invalid pub");
+        }
+        try {
+            if (IceBridgeAuth.decodeBase64(pubParam).length != 32) {
+                return ApiResponse.error("invalid pub");
+            }
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid pub");
+        }
+
+        int timeoutMs = DEFAULT_CATALOG_TIMEOUT_MS;
+        String timeoutParam = firstParam(decoder, "timeoutMs");
+        if (timeoutParam != null) {
+            try {
+                timeoutMs = Integer.parseInt(timeoutParam);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        timeoutMs = Math.max(MIN_CATALOG_TIMEOUT_MS, Math.min(timeoutMs, MAX_CATALOG_TIMEOUT_MS));
+
+        if (catalogFetcher == null) {
+            return ApiResponse.error("catalog fetch not available");
+        }
+        return ApiResponse.success(catalogFetcher.fetch(pubParam, timeoutMs));
     }
 
     private static String firstParam(QueryStringDecoder decoder, String name) {
