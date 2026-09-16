@@ -399,7 +399,11 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 metrics.helloRejectedCount(), metrics.relayRateLimitedCount(),
                 metrics.searchRateLimitedCount(), metrics.powRejectedCount(),
                 metrics.spamMarkedDroppedCount(),
-                registry.size(), registry.registrations(), registry.lookups(), registry.evicted());
+                registry.size(), registry.registrations(), registry.lookups(), registry.evicted(),
+                metrics.transportPollRunsCount(), metrics.transportPollErrorsCount(),
+                metrics.transportPollDrainBatchesCount(), metrics.transportMessagesDrainedCount(),
+                metrics.requestWorkQueueDepthGauge(), metrics.requestWorkRejectedCount(),
+                metrics.verifyFailuresCount());
         return ApiResponse.success(snapshot);
     }
 
@@ -561,6 +565,20 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         final long lookups;
         @SuppressWarnings("unused")
         final long evicted;
+        @SuppressWarnings("unused")
+        final long transportPollRuns;
+        @SuppressWarnings("unused")
+        final long transportPollErrors;
+        @SuppressWarnings("unused")
+        final long transportPollDrainBatches;
+        @SuppressWarnings("unused")
+        final long transportMessagesDrained;
+        @SuppressWarnings("unused")
+        final long requestWorkQueueDepth;
+        @SuppressWarnings("unused")
+        final long requestWorkRejected;
+        @SuppressWarnings("unused")
+        final long verifyFailures;
 
         MetricsSnapshot(long rudpPacketsIn, long rudpPacketsOut,
                         long rudpBytesIn, long rudpBytesOut,
@@ -569,7 +587,11 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                         long searchRateLimited, long powRejected,
                         long spamMarkedDropped,
                         int registrySize, long registrations,
-                        long lookups, long evicted) {
+                        long lookups, long evicted,
+                        long transportPollRuns, long transportPollErrors,
+                        long transportPollDrainBatches, long transportMessagesDrained,
+                        long requestWorkQueueDepth, long requestWorkRejected,
+                        long verifyFailures) {
             this.rudpPacketsIn = rudpPacketsIn;
             this.rudpPacketsOut = rudpPacketsOut;
             this.rudpBytesIn = rudpBytesIn;
@@ -585,6 +607,13 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             this.registrations = registrations;
             this.lookups = lookups;
             this.evicted = evicted;
+            this.transportPollRuns = transportPollRuns;
+            this.transportPollErrors = transportPollErrors;
+            this.transportPollDrainBatches = transportPollDrainBatches;
+            this.transportMessagesDrained = transportMessagesDrained;
+            this.requestWorkQueueDepth = requestWorkQueueDepth;
+            this.requestWorkRejected = requestWorkRejected;
+            this.verifyFailures = verifyFailures;
         }
     }
 }
