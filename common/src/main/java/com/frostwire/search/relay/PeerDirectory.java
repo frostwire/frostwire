@@ -435,6 +435,8 @@ public final class PeerDirectory {
         if (removed) {
             karmaCache.evict(peerPub);
             version.incrementAndGet();
+            com.frostwire.search.relay.event.IceBridgeEvents.peer(
+                    com.frostwire.util.Hex.encode(peerPub), "evicted from directory");
         }
         return removed;
     }
