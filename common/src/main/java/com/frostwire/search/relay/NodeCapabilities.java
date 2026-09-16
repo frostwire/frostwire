@@ -24,6 +24,11 @@ public final class NodeCapabilities {
     public static final long DHT = 1L << 4;
     public static final long TORRENT = 1L << 5;
     public static final long AI = 1L << 6;
+    /**
+     * Explicit opt-in (default off): advertises "my shared-torrent
+     * catalog may be crawled". Not part of any DEFAULT_* mask.
+     */
+    public static final long PUBLIC_CATALOG = 1L << 7;
 
     /** Typical FrostWire peer that can answer search and seed torrents. */
     public static final long DEFAULT_PEER = SEARCH | INDEX | TORRENT | DHT;
