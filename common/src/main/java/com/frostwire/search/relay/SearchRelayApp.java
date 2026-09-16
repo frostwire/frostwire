@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -99,6 +100,14 @@ public final class SearchRelayApp implements AutoCloseable {
         CatalogBrowser catalogBrowser = new CatalogBrowser(server.identity(), transport);
         server.setCatalogFetcher((pubB64, timeoutMs) -> fetchCatalog(catalogBrowser, pubB64, timeoutMs));
 
+        // Install the relay-side torrent fetch hook for GET /torrent. The
+        // MeshTorrentMetadataFetcher registers a temporary transport listener,
+        // so concurrent HTTP workers must not interleave: calls are serialized
+        // on a dedicated lock.
+        Object torrentFetchLock = new Object();
+        server.setTorrentFetcher((infoHashHex, holderPubB64, timeoutMs) ->
+                fetchTorrent(server, transport, torrentFetchLock, infoHashHex, holderPubB64, timeoutMs));
+
         RelaySearchService service = new RelaySearchService(emptyIndex, server.identity());
         IncomingSearchRequestHandler handler = new IncomingSearchRequestHandler(
                 transport, service, directory, server.identity(), emptyIndex);
@@ -135,7 +144,7 @@ public final class SearchRelayApp implements AutoCloseable {
         try {
             byte[] pub = IceBridgeAuth.decodeBase64(pubB64);
             if (pub == null || pub.length != 32) {
-                return catalogError("invalid pub");
+                return errorJson("invalid pub");
             }
             String pubHex = Hex.encode(pub);
             List<RemoteIndexFetcher.RemoteTorrentEntry> rows;
@@ -166,14 +175,56 @@ public final class SearchRelayApp implements AutoCloseable {
             return result;
         } catch (Throwable t) {
             String message = t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
-            return catalogError(message);
+            return errorJson(message);
         }
     }
 
-    private static JsonObject catalogError(String message) {
+    private static JsonObject errorJson(String message) {
         JsonObject error = new JsonObject();
         error.addProperty("error", message);
         return error;
+    }
+
+    /**
+     * Torrent fetch hook body for {@code GET /torrent}: decode the requested
+     * info hash and holder key, run the verified Protocol #3 metadata fetch,
+     * and return the full .torrent bytes base64-encoded.
+     *
+     * <p>Never throws: any failure yields an error {@link JsonObject}. Access
+     * to the transport is serialized on {@code lock} because
+     * {@link MeshTorrentMetadataFetcher} registers a temporary transport
+     * listener for the duration of the fetch.
+     */
+    private static JsonElement fetchTorrent(IceBridgeServer server,
+                                            IceBridgeSearchTransport transport,
+                                            Object lock,
+                                            String infoHashHex,
+                                            String holderPubB64,
+                                            int timeoutMs) {
+        try {
+            byte[] infoHash = Hex.decode(infoHashHex);
+            if (infoHash == null || infoHash.length != 20) {
+                return errorJson("invalid ih");
+            }
+            byte[] holderPub = IceBridgeAuth.decodeBase64(holderPubB64);
+            if (holderPub == null || holderPub.length != 32) {
+                return errorJson("invalid pub");
+            }
+            byte[] torrentBytes;
+            synchronized (lock) {
+                torrentBytes = MeshTorrentMetadataFetcher.fetch(
+                        transport, server.identity(), holderPub, infoHash, timeoutMs);
+            }
+            if (torrentBytes == null || torrentBytes.length == 0) {
+                return errorJson("torrent fetch failed");
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("data_b64", Base64.getEncoder().encodeToString(torrentBytes));
+            return result;
+        } catch (Throwable t) {
+            String message = t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
+            return errorJson(message);
+        }
     }
 
     @Override
