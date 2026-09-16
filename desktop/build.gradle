@@ -348,6 +348,43 @@ tasks.register('icebridgeJar', Jar) {
     }
 }
 
+// Standalone presence crawler (separate tool): DHT heartbeat topics only, never dials peers.
+tasks.register('crawlerJar', Jar) {
+    group = 'build'
+    description = 'Builds the standalone IceBridge presence crawler fat JAR (multi-arch jlibtorrent natives).'
+
+    archiveFileName = 'icebridge-crawler.jar'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF', 'META-INF/*.md')
+    exclude('META-INF/INDEX.LIST', 'META-INF/io.netty.versions.properties')
+    exclude('com/limegroup/gnutella/gui/**')
+    exclude('com/frostwire/gui/**')
+    exclude('com/frostwire/desktop/**')
+
+    from sourceSets.main.output
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.icebridgeCloudNatives.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    manifest {
+        attributes 'Main-Class': 'com.frostwire.search.relay.crawl.IceBridgeCrawler'
+    }
+}
+
+tasks.register('runCrawler', JavaExec) {
+    group = 'application'
+    description = 'Runs the headless IceBridge presence crawler. Use -Pcrawler.args="--once --buckets 3" for a single pass.'
+
+    dependsOn crawlerJar
+
+    classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge-crawler.jar")
+    mainClass = 'com.frostwire.search.relay.crawl.IceBridgeCrawler'
+
+    if (project.hasProperty('crawler.args')) {
+        args project.property('crawler.args').toString().split()
+    }
+}
+
 tasks.register('icebridge', JavaExec) {
     group = 'application'
     description = 'Runs the IceBridge relay server. Reads config from .env or ICEBRIDGE_* env vars. Use -Picebridge.args="--generate-token" to create a new bearer token.'
