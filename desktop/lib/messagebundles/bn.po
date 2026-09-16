@@ -4340,6 +4340,10 @@ msgid "Enable IceBridge (distributed relay)"
 msgstr "IceBridge সক্ষম করুন (বিতরণকৃত রিলে)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
+msgid "Share my share catalog publicly (crawlers)"
+msgstr "আমার শেয়ার ক্যাটালগ প্রকাশ্যে শেয়ার করুন (ক্রলার)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "স্থানীয় IceBridge ডেমন ব্যবহার করুন (fork subprocess)"
 

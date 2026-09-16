@@ -9335,6 +9335,10 @@ msgstr ""
 msgid "Enable IceBridge (distributed relay)"
 msgstr "Enable IceBridge (distributed relay)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
+msgid "Share my share catalog publicly (crawlers)"
+msgstr "ਮੇਰਾ ਸ਼ੇਅਰ ਕੈਟਾਲਾਗ ਜਨਤਕ ਤੌਰ 'ਤੇ ਸਾਂਝਾ ਕਰੋ (ਕ੍ਰਾਲਰ)"
+
 
 
 
