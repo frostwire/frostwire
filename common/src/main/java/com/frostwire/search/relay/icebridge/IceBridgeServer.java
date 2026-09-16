@@ -15,6 +15,7 @@ import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.icebridge.control.CatalogFetcher;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
+import com.frostwire.search.relay.icebridge.control.TorrentFetcher;
 import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import com.frostwire.search.relay.icebridge.udp.RudpServer;
@@ -496,6 +497,18 @@ public final class IceBridgeServer implements AutoCloseable {
         ControlServer cs = this.controlServer;
         if (cs != null) {
             cs.setCatalogFetcher(catalogFetcher);
+        }
+    }
+
+    /**
+     * Install (or clear) the torrent fetch hook backing {@code GET /torrent}
+     * on the control API. Ignored when the control server has not been
+     * created yet.
+     */
+    public void setTorrentFetcher(TorrentFetcher torrentFetcher) {
+        ControlServer cs = this.controlServer;
+        if (cs != null) {
+            cs.setTorrentFetcher(torrentFetcher);
         }
     }
 
