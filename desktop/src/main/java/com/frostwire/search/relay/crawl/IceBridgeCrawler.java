@@ -21,12 +21,17 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Headless presence crawler for the IceBridge DHT heartbeat topics.
+ * Headless crawler for the IceBridge DHT heartbeat topics and relay shared-torrent catalogs.
  *
  * <p>For every hour bucket in a small window it does a read-only BEP 5 {@code dhtGetPeers} lookup
  * on {@link RelayConstants#heartbeatTopic(long)} and records the returned {@code host:port} pairs.
  * It never dials, authenticates, or handshakes with any peer; the DHT lookup itself is the only
  * network activity beyond the embedding session's bootstrap traffic.
+ *
+ * <p>When a relay URL is supplied it additionally asks that relay's HTTP control API for candidate
+ * peers and their shared-torrent catalogs. All persisted data is anonymous: presence endpoints are
+ * stored only as truncated hashes and catalog rows carry only metadata plus the publisher public
+ * key, never an address.
  *
  * <p>Run once with {@code --once}, continuously with the default loop, or dump stored counts with
  * {@code --report}.
@@ -64,14 +69,17 @@ public final class IceBridgeCrawler {
 
     IceBridgeDhtSession dht = null;
     CrawlerStore store = null;
+    RelayControlClient relayClient = null;
     try {
       dht = IceBridgeDhtSession.start("0.0.0.0");
       store = CrawlerStore.open(dbFile);
+      if (options.hasRelayUrl()) {
+        relayClient = new RelayControlClient(options.relayUrl, options.relayToken);
+      }
       if (options.once) {
-        runOnce(
-            store, dht.session(), options.buckets, options.timeoutSec, System.currentTimeMillis());
+        crawlPass(store, dht.session(), options, relayClient, System.currentTimeMillis());
       } else {
-        loop(store, dht.session(), options);
+        loop(store, dht.session(), options, relayClient);
       }
       printSummary(store, options.buckets, System.currentTimeMillis());
       return 0;
@@ -116,11 +124,15 @@ public final class IceBridgeCrawler {
     }
   }
 
-  private static void loop(CrawlerStore store, SessionManager session, CliOptions options) {
+  private static void loop(
+      CrawlerStore store,
+      SessionManager session,
+      CliOptions options,
+      RelayControlClient relayClient) {
     long intervalMs = TimeUnit.SECONDS.toMillis(options.intervalSec);
     while (true) {
       try {
-        runOnce(store, session, options.buckets, options.timeoutSec, System.currentTimeMillis());
+        crawlPass(store, session, options, relayClient, System.currentTimeMillis());
       } catch (Throwable t) {
         LOG.error("Crawl pass failed; continuing", t);
       }
@@ -131,6 +143,61 @@ public final class IceBridgeCrawler {
         return;
       }
     }
+  }
+
+  /**
+   * One crawl pass: DHT presence observations first, then (when a relay is configured) the
+   * shared-torrent catalog. Neither stage is allowed to abort the other.
+   */
+  private static void crawlPass(
+      CrawlerStore store,
+      SessionManager session,
+      CliOptions options,
+      RelayControlClient relayClient,
+      long nowMs) {
+    runOnce(store, session, options.buckets, options.timeoutSec, nowMs);
+    if (relayClient != null) {
+      crawlCatalog(store, relayClient, options.catalogTimeoutSec, nowMs);
+    }
+  }
+
+  /**
+   * Ask the relay for candidate peer public keys and fetch each peer's shared-torrent catalog.
+   *
+   * <p>Only the {@code pub} from each response is persisted (as the torrent's publisher); the peer
+   * {@code host}/{@code port} returned by {@code /lookup} is deliberately discarded. A failure for
+   * one peer is logged and the pass continues.
+   */
+  static void crawlCatalog(
+      CrawlerStore store, RelayControlClient relayClient, int catalogTimeoutSec, long nowMs) {
+    List<String> pubs;
+    try {
+      pubs = relayClient.lookupPeerPubs(catalogTimeoutSec);
+    } catch (Throwable t) {
+      LOG.error("Relay lookup failed; skipping catalog pass", t);
+      return;
+    }
+    int peersFetched = 0;
+    for (String pub : pubs) {
+      try {
+        List<RelayControlClient.CatalogEntry> entries =
+            relayClient.fetchCatalog(pub, catalogTimeoutSec);
+        for (RelayControlClient.CatalogEntry entry : entries) {
+          store.recordTorrent(
+              entry.infohash(),
+              entry.name(),
+              entry.sizeBytes(),
+              entry.files(),
+              entry.publisherPeerId(),
+              nowMs);
+        }
+        peersFetched++;
+      } catch (Throwable t) {
+        LOG.error("Catalog fetch failed; continuing", t);
+      }
+    }
+    System.out.println(
+        "catalog: " + peersFetched + " peers, " + store.torrentCount() + " distinct infohashes");
   }
 
   private static void collectEndpoints(
@@ -170,6 +237,17 @@ public final class IceBridgeCrawler {
               + " new");
     }
     System.out.println("total distinct endpoints: " + store.totalDistinct(window, nowMs));
+    printCatalogSummary(store);
+  }
+
+  private static void printCatalogSummary(CrawlerStore store) {
+    System.out.println("--- torrent catalog summary ---");
+    System.out.println("distinct infohashes: " + store.torrentCount());
+    System.out.println("total torrent sightings: " + store.totalTorrentSightings());
+    for (CrawlerStore.Torrent torrent : store.topTorrents(10)) {
+      System.out.println(
+          "  " + torrent.seenCount() + "x " + torrent.infohash() + " " + torrent.name());
+    }
   }
 
   private static void closeQuietly(CrawlerStore store) {
@@ -196,7 +274,8 @@ public final class IceBridgeCrawler {
 
   private static String usage() {
     return "Usage: IceBridgeCrawler [--db <path>] [--once] [--interval-sec <n>]"
-        + " [--buckets <n>] [--timeout-sec <n>] [--report]";
+        + " [--buckets <n>] [--timeout-sec <n>] [--relay-url <http://host:port>]"
+        + " [--relay-token <t>] [--catalog] [--catalog-timeout-sec <n>] [--report]";
   }
 
   static final class CliOptions {
@@ -206,6 +285,14 @@ public final class IceBridgeCrawler {
     int intervalSec = 1800;
     int buckets = 3;
     int timeoutSec = 15;
+    String relayUrl = null;
+    String relayToken = "";
+    boolean catalog;
+    int catalogTimeoutSec = 8;
+
+    boolean hasRelayUrl() {
+      return relayUrl != null && !relayUrl.isBlank();
+    }
 
     static CliOptions parse(String[] args) {
       CliOptions options = new CliOptions();
@@ -255,9 +342,39 @@ public final class IceBridgeCrawler {
           case "--report":
             options.report = true;
             break;
+          case "--relay-url":
+            {
+              String url = value(args, i + 1, inline, name);
+              if (url.isBlank()) {
+                throw new IllegalArgumentException("--relay-url requires a non-empty URL");
+              }
+              options.relayUrl = url;
+              if (inline == null) {
+                i++;
+              }
+              break;
+            }
+          case "--relay-token":
+            options.relayToken = value(args, i + 1, inline, name);
+            if (inline == null) {
+              i++;
+            }
+            break;
+          case "--catalog":
+            options.catalog = true;
+            break;
+          case "--catalog-timeout-sec":
+            options.catalogTimeoutSec = positiveInt(value(args, i + 1, inline, name), name);
+            if (inline == null) {
+              i++;
+            }
+            break;
           default:
             throw new IllegalArgumentException("unknown argument: " + raw);
         }
+      }
+      if (options.catalog && !options.hasRelayUrl()) {
+        throw new IllegalArgumentException("--catalog requires --relay-url");
       }
       return options;
     }
