@@ -385,6 +385,20 @@ tasks.register('runCrawler', JavaExec) {
     }
 }
 
+tasks.register('runMirror', JavaExec) {
+    group = 'application'
+    description = 'Runs the allowlist-driven IceBridge mirror (re-shares selected torrents). Use -Pmirror.args="--db ... --relay-url ... --mirror-dir ... --allow-file ...".'
+
+    dependsOn crawlerJar
+
+    classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge-crawler.jar")
+    mainClass = 'com.frostwire.search.relay.crawl.IceBridgeMirror'
+
+    if (project.hasProperty('mirror.args')) {
+        args project.property('mirror.args').toString().split()
+    }
+}
+
 tasks.register('icebridge', JavaExec) {
     group = 'application'
     description = 'Runs the IceBridge relay server. Reads config from .env or ICEBRIDGE_* env vars. Use -Picebridge.args="--generate-token" to create a new bearer token.'
