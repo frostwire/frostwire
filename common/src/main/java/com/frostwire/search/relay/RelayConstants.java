@@ -30,6 +30,15 @@ public final class RelayConstants {
     public static final String TOPIC_PEERS = "frostwire-peers-v1";
     public static final String TOPIC_RELAYS = "frostwire-relays-v1";
     public static final String TOPIC_BOOTSTRAP = "frostwire-bootstrap-v1";
+    /**
+     * Time-bucketed rendezvous topic nodes announce under so an observer can estimate how many
+     * peers are online in a window without ever dialing any of them. See {@link
+     * #heartbeatTopic(long)}.
+     */
+    public static final String TOPIC_HEARTBEAT_PREFIX = "frostwire-heartbeat-v1";
+
+    /** Bucket width for {@link #heartbeatTopic(long)}; one hour balances resolution and topic count. */
+    public static final long HEARTBEAT_BUCKET_MS = 60L * 60L * 1000L;
 
     public static final String BEP46_SALT_IDENTITY = "frostwire-identity-v1";
     public static final String BEP46_SALT_INDEX = "frostwire-index-v1";
@@ -80,8 +89,17 @@ public final class RelayConstants {
         return new File(relayHomeDir(userSettingsDir), IDENTITY_FILE);
     }
 
-    public static byte[] topicHash(String topic) {
-        try {
+    /** Bucket index for a wall-clock time; stable within an hour. */
+    public static long heartbeatBucketIndex(long epochMs) {
+        return Math.floorDiv(epochMs, HEARTBEAT_BUCKET_MS);
+    }
+
+    /** Topic a peer announces under for the bucket containing {@code epochMs}. */
+    public static String heartbeatTopic(long epochMs) {
+        return TOPIC_HEARTBEAT_PREFIX + "-" + heartbeatBucketIndex(epochMs);
+    }
+
+    public static byte[] topicHash(String topic) {        try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             return sha1.digest(topic.getBytes(StandardCharsets.US_ASCII));
         } catch (Exception e) {
