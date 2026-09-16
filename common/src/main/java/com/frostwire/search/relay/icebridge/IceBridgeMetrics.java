@@ -28,6 +28,13 @@ public final class IceBridgeMetrics {
     private final AtomicLong searchRateLimitedCount = new AtomicLong();
     private final AtomicLong powRejectedCount = new AtomicLong();
     private final AtomicLong spamMarkedDroppedCount = new AtomicLong();
+    private final AtomicLong transportPollRunsCount = new AtomicLong();
+    private final AtomicLong transportPollErrorsCount = new AtomicLong();
+    private final AtomicLong transportPollDrainBatchesCount = new AtomicLong();
+    private final AtomicLong transportMessagesDrainedCount = new AtomicLong();
+    private final AtomicLong requestWorkQueueDepthGauge = new AtomicLong();
+    private final AtomicLong requestWorkRejectedCount = new AtomicLong();
+    private final AtomicLong verifyFailuresCount = new AtomicLong();
 
     public void rudpPacketIn(int bytes) {
         rudpPacketsIn.incrementAndGet();
@@ -65,6 +72,34 @@ public final class IceBridgeMetrics {
 
     public void spamMarkedDropped() {
         spamMarkedDroppedCount.incrementAndGet();
+    }
+
+    public void incrementTransportPollRuns(long delta) {
+        transportPollRunsCount.addAndGet(delta);
+    }
+
+    public void incrementTransportPollErrors(long delta) {
+        transportPollErrorsCount.addAndGet(delta);
+    }
+
+    public void incrementTransportPollDrainBatches(long delta) {
+        transportPollDrainBatchesCount.addAndGet(delta);
+    }
+
+    public void incrementTransportMessagesDrained(long delta) {
+        transportMessagesDrainedCount.addAndGet(delta);
+    }
+
+    public void setRequestWorkQueueDepthGauge(long value) {
+        requestWorkQueueDepthGauge.set(value);
+    }
+
+    public void incrementRequestWorkRejected(long delta) {
+        requestWorkRejectedCount.addAndGet(delta);
+    }
+
+    public void incrementVerifyFailures(long delta) {
+        verifyFailuresCount.addAndGet(delta);
     }
 
     public long rudpPacketsIn() {
@@ -111,6 +146,34 @@ public final class IceBridgeMetrics {
         return spamMarkedDroppedCount.get();
     }
 
+    public long transportPollRunsCount() {
+        return transportPollRunsCount.get();
+    }
+
+    public long transportPollErrorsCount() {
+        return transportPollErrorsCount.get();
+    }
+
+    public long transportPollDrainBatchesCount() {
+        return transportPollDrainBatchesCount.get();
+    }
+
+    public long transportMessagesDrainedCount() {
+        return transportMessagesDrainedCount.get();
+    }
+
+    public long requestWorkQueueDepthGauge() {
+        return requestWorkQueueDepthGauge.get();
+    }
+
+    public long requestWorkRejectedCount() {
+        return requestWorkRejectedCount.get();
+    }
+
+    public long verifyFailuresCount() {
+        return verifyFailuresCount.get();
+    }
+
     public void reset() {
         rudpPacketsIn.set(0);
         rudpPacketsOut.set(0);
@@ -123,5 +186,12 @@ public final class IceBridgeMetrics {
         searchRateLimitedCount.set(0);
         powRejectedCount.set(0);
         spamMarkedDroppedCount.set(0);
+        transportPollRunsCount.set(0);
+        transportPollErrorsCount.set(0);
+        transportPollDrainBatchesCount.set(0);
+        transportMessagesDrainedCount.set(0);
+        requestWorkQueueDepthGauge.set(0);
+        requestWorkRejectedCount.set(0);
+        verifyFailuresCount.set(0);
     }
 }
