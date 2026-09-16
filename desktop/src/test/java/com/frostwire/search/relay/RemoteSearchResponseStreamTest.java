@@ -143,8 +143,7 @@ class RemoteSearchResponseStreamTest {
     assertEquals(0, parsed.chunkIndex());
     assertEquals(1, parsed.rows().size());
     assertEquals(RemoteSearchResponse.VERSION, parsed.version());
-    assertEquals(
-        3, RemoteSearchResponse.VERSION, "wire v3 rows may carry optional bt seeder endpoints");
+    assertEquals(4, RemoteSearchResponse.VERSION, "current wire version is v4");
     assertEquals(
         2,
         RemoteSearchResponse.VERSION_2,
