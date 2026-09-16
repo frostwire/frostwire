@@ -358,6 +358,94 @@ class RudpSessionManagerComprehensiveTest {
   }
 
   @Test
+  void deliverFallsBackToMeshForwardWhenLiveSessionQueueIsFull() throws Exception {
+    try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
+      f.handshake();
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  f.peer.ed25519PubRaw(),
+                  "127.0.0.1",
+                  f.address.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      InetSocketAddress forwarder = new InetSocketAddress("127.0.0.1", 64011);
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  "127.0.0.1",
+                  forwarder.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      for (int i = 0; i < RudpSession.MAX_PENDING_PACKETS; i++) {
+        assertTrue(f.manager.sendData(f.address, new byte[] {1}));
+      }
+      assertEquals(RudpSession.MAX_PENDING_PACKETS, f.manager.pendingCountForTest(f.address));
+      assertTrue(f.manager.deliver(f.peer.ed25519PubRaw(), new byte[] {7}));
+      assertEquals(
+          2, f.manager.pendingCountForTest(forwarder), "HELLO plus mesh-forwarded payload");
+    }
+  }
+
+  @Test
+  void deliverFallsBackToMeshForwardWhenDialTargetIsRejected() throws Exception {
+    try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
+      f.handshake();
+      byte[] target = IdentityKeys.generate(0).ed25519PubRaw();
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  target,
+                  "127.0.0.1",
+                  f.address.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      InetSocketAddress forwarder = new InetSocketAddress("127.0.0.1", 64012);
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  "127.0.0.1",
+                  forwarder.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      assertTrue(f.manager.deliver(target, new byte[] {9}));
+      assertEquals(
+          2, f.manager.pendingCountForTest(forwarder), "HELLO plus mesh-forwarded payload");
+      assertEquals(2, f.manager.sessionCount());
+    }
+  }
+
+  @Test
+  void deliverDoesNotForwardWhenPayloadExceedsRelayCap() throws Exception {
+    try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
+      f.handshake();
+      byte[] target = IdentityKeys.generate(0).ed25519PubRaw();
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  target,
+                  "127.0.0.1",
+                  f.address.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      InetSocketAddress forwarder = new InetSocketAddress("127.0.0.1", 64013);
+      assertTrue(
+          f.registry.register(
+              new PeerRecord(
+                  IdentityKeys.generate(0).ed25519PubRaw(),
+                  "127.0.0.1",
+                  forwarder.getPort(),
+                  IceBridgeConfig.Role.FORWARDER,
+                  System.currentTimeMillis())));
+      assertFalse(f.manager.deliver(target, new byte[RelayFrame.MAX_APP_PAYLOAD + 1]));
+      assertEquals(0, f.manager.pendingCountForTest(forwarder));
+      assertEquals(1, f.manager.sessionCount(), "no forward session created");
+    }
+  }
+
+  @Test
   void introductionsRemainDisabledEvenForAuthenticatedPeers() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> fail("unexpected delivery"))) {
       f.handshake();
