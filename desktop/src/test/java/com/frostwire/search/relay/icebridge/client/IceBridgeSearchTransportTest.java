@@ -9,6 +9,7 @@ package com.frostwire.search.relay.icebridge.client;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IndexDigest;
@@ -23,7 +24,6 @@ import com.frostwire.search.relay.TorrentMetadataProvider;
 import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.TorrentMetadataResponse;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
-import com.frostwire.jlibtorrent.Entry;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import java.lang.reflect.Field;
@@ -99,6 +99,12 @@ class IceBridgeSearchTransportTest {
                   TorrentMetadataResponse.ERR_NOT_FOUND));
       for (int i = 0; i < 100; i++) fixture.offer(response);
       fixture.poll();
+      // Response delivery runs on a bounded lane off the poller now; await it while the provider
+      // workers remain blocked (isolation, not synchronous delivery, is the property under test).
+      long responseDeadline = System.currentTimeMillis() + 3000;
+      while (responses.get() < 100 && System.currentTimeMillis() < responseDeadline) {
+        Thread.sleep(20);
+      }
       assertEquals(100, responses.get(), "responses delivered while providers remain blocked");
       ThreadPoolExecutor workers = fixture.workers();
       assertEquals(0, workers.getQueue().size(), "response frames never occupy request capacity");
@@ -249,8 +255,12 @@ class IceBridgeSearchTransportTest {
       assertTrue(directory.isLive(sender.ed25519PubRaw()), "inbound frame counts as contact");
       List<PeerDirectory.PeerInfo> holders =
           directory.sampleHolders(
-              "miami", 4, java.util.Set.of(), com.frostwire.search.relay.NodeCapabilities.NONE,
-              new java.util.Random(1), 1);
+              "miami",
+              4,
+              java.util.Set.of(),
+              com.frostwire.search.relay.NodeCapabilities.NONE,
+              new java.util.Random(1),
+              1);
       assertFalse(holders.isEmpty());
       assertArrayEquals(
           sender.ed25519PubRaw(),
