@@ -30,6 +30,17 @@ import com.frostwire.mcp.desktop.tools.library.LibraryFileDetailTool;
 import com.frostwire.mcp.desktop.tools.library.LibraryListTool;
 import com.frostwire.mcp.desktop.tools.library.LibraryOpenTool;
 import com.frostwire.mcp.desktop.tools.library.LibraryScanTool;
+import com.frostwire.mcp.desktop.tools.obs.LogsClearTool;
+import com.frostwire.mcp.desktop.tools.obs.LogsQueryTool;
+import com.frostwire.mcp.desktop.tools.obs.LogsTailTool;
+import com.frostwire.mcp.desktop.tools.obs.RelayMetricsTool;
+import com.frostwire.mcp.desktop.tools.relay2.DigestStatusTool;
+import com.frostwire.mcp.desktop.tools.relay2.LocalIndexListTool;
+import com.frostwire.mcp.desktop.tools.relay2.LocalIndexSearchTool;
+import com.frostwire.mcp.desktop.tools.relay2.PeerBlockTool;
+import com.frostwire.mcp.desktop.tools.relay2.PeerCatalogTool;
+import com.frostwire.mcp.desktop.tools.relay2.PeerRemoveTool;
+import com.frostwire.mcp.desktop.tools.relay2.PeersListTool;
 import com.frostwire.mcp.desktop.tools.search.SearchCancelTool;
 import com.frostwire.mcp.desktop.tools.search.SearchEngineToggleTool;
 import com.frostwire.mcp.desktop.tools.search.SearchEnginesTool;
@@ -124,6 +135,21 @@ public final class FrostWireMCPServerFactory {
     // Decentralized search / IceBridge relay diagnostics (for MCP testing)
     server.registerTool(new RelayStatusTool());
     server.registerTool(new DiscoveredPeersTool());
+
+    // IceBridge observability: event log + relay metrics
+    server.registerTool(new LogsQueryTool());
+    server.registerTool(new LogsTailTool());
+    server.registerTool(new LogsClearTool());
+    server.registerTool(new RelayMetricsTool());
+
+    // IceBridge parity: peer directory + local index (mirrors the Settings panes)
+    server.registerTool(new PeersListTool());
+    server.registerTool(new PeerRemoveTool());
+    server.registerTool(new PeerBlockTool());
+    server.registerTool(new PeerCatalogTool());
+    server.registerTool(new LocalIndexListTool());
+    server.registerTool(new LocalIndexSearchTool());
+    server.registerTool(new DigestStatusTool());
   }
 
   private static void registerAllResources(MCPServer server) {
