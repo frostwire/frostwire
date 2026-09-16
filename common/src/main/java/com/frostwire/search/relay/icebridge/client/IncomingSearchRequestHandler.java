@@ -257,6 +257,9 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
      */
     public void setPublicCatalogEnabled(boolean publicCatalogEnabled) {
         this.publicCatalogEnabled = publicCatalogEnabled;
+        if (searchService != null) {
+            searchService.setPublicCatalog(publicCatalogEnabled);
+        }
     }
 
     /**
