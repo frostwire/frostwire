@@ -45,6 +45,7 @@ public final class ControlServer implements AutoCloseable {
     private final RudpSessionManager rudpSessionManager;
     private final InboundMessageQueue inboundQueue;
     private final IceBridgeTokens authTokens;
+    private volatile CatalogFetcher catalogFetcher;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel channel;
@@ -75,6 +76,15 @@ public final class ControlServer implements AutoCloseable {
         return authTokens;
     }
 
+    /**
+     * Install the catalog fetch hook used by {@code GET /catalog}. May be
+     * called after {@link #start()}: each new connection reads the current
+     * value when its {@link ControlHandler} is created.
+     */
+    public void setCatalogFetcher(CatalogFetcher catalogFetcher) {
+        this.catalogFetcher = catalogFetcher;
+    }
+
     public void start() throws InterruptedException {
         int port = config.controlHttpPort();
         if (port <= 0) {
@@ -93,7 +103,7 @@ public final class ControlServer implements AutoCloseable {
                         ch.pipeline()
                                 .addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens));
+                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens, catalogFetcher));
                     }
                 });
 
