@@ -806,6 +806,17 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 peerDirectory.sampleHolders(request.keywords(), m, excludeHex,
                         NodeCapabilities.NONE, ThreadLocalRandom.current(),
                         Math.max(1, m / 4));
+        StringBuilder chosen = new StringBuilder();
+        for (PeerDirectory.PeerInfo peer : sampled) {
+            if (chosen.length() > 0) {
+                chosen.append(',');
+            }
+            chosen.append(Hex.encode(peer.peerPub()), 0, 12);
+        }
+        LOG.debug("Forward selection keywords=\"" + request.keywords() + "\" m=" + m
+                + " live=" + peerDirectory.liveCount()
+                + " digests=" + peerDirectory.digestCount()
+                + " chosen=" + chosen);
         int forwarded = 0;
         for (PeerDirectory.PeerInfo peer : sampled) {
             if (forwarded >= m) {
@@ -820,12 +831,13 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     forwarded++;
                     LOG.debug("Forwarded search hop ttl=" + newTtl + " to "
                             + Hex.encode(peerPub).substring(0, 12) + "…");
-                } else {
-                    peerDirectory.markFailure(peerPub);
                 }
+                // Do NOT count a failed fan-out send as a peer failure: a forwarder routinely has
+                // no live session with a NAT'd peer yet, and that is not evidence of
+                // unreachability. Penalizing it here evicts reachable holders and drops their
+                // announced digest. Liveness comes from inbound contact and verified responses.
             } catch (Throwable t) {
                 LOG.debug("Failed to forward search request to peer", t);
-                peerDirectory.markFailure(peerPub);
             }
         }
     }
