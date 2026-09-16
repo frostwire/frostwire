@@ -43,6 +43,7 @@ final class RudpSession {
     static final int MAX_RETAINED_BYTES = 1024 * 1024;
 
     private volatile long lastActivityMs;
+    private volatile long lastRegistryTouchMs;
     private final AtomicInteger nextLocalSeq = new AtomicInteger(1);
     private final AtomicInteger ackedThroughLocal = new AtomicInteger(0);
     private final AtomicInteger receivedThroughRemote = new AtomicInteger(0);
@@ -126,6 +127,15 @@ final class RudpSession {
 
     long lastActivityMs() {
         return lastActivityMs;
+    }
+
+    /** Wall-clock of the last registry liveness refresh; throttles {@code touch} calls. */
+    long lastRegistryTouchMs() {
+        return lastRegistryTouchMs;
+    }
+
+    void markRegistryTouch(long wallClockMs) {
+        lastRegistryTouchMs = wallClockMs;
     }
 
     int nextLocalSequence() {
