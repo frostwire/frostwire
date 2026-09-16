@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay.crawl;
 
+import com.frostwire.search.relay.TorrentMetadataResponse;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
@@ -17,6 +18,7 @@ import com.google.gson.JsonParser;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,10 @@ public final class RelayControlClient {
 
   /** Maximum response body, in bytes, accepted before parsing. */
   static final int MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+
+  /** Maximum response body accepted for a single .torrent fetch (base64 envelope plus slack). */
+  static final int MAX_TORRENT_RESPONSE_BYTES =
+      (int) TorrentMetadataResponse.MAX_TORRENT_BYTES + 128 * 1024;
 
   private static final Logger LOG = Logger.getLogger(RelayControlClient.class);
   private static final String TOKEN_HEADER = "X-IceBridge-Token";
@@ -85,16 +91,45 @@ public final class RelayControlClient {
     return parseCatalog(getBounded(url, timeoutMs(catalogTimeoutSec)));
   }
 
+  /**
+   * Fetch the full .torrent bytes for {@code infoHashHex} from the holder identified by {@code
+   * holderPubBase64Url} via {@code GET /torrent}. Returns null on any error, missing data, a
+   * response larger than {@link #MAX_TORRENT_RESPONSE_BYTES}, or decoded bytes that are empty or
+   * exceed {@link TorrentMetadataResponse#MAX_TORRENT_BYTES}.
+   */
+  public byte[] fetchTorrent(String infoHashHex, String holderPubBase64Url, int timeoutMs) {
+    if (infoHashHex == null
+        || infoHashHex.isBlank()
+        || holderPubBase64Url == null
+        || holderPubBase64Url.isBlank()) {
+      return null;
+    }
+    int boundedTimeout = Math.max(1, timeoutMs);
+    String url =
+        relayUrl
+            + "/torrent?ih="
+            + URLEncoder.encode(infoHashHex.trim(), StandardCharsets.UTF_8)
+            + "&pub="
+            + URLEncoder.encode(holderPubBase64Url.trim(), StandardCharsets.UTF_8)
+            + "&timeoutMs="
+            + boundedTimeout;
+    return parseTorrentData(getBounded(url, boundedTimeout, MAX_TORRENT_RESPONSE_BYTES));
+  }
+
   private String getBounded(String url, int timeoutMs) {
+    return getBounded(url, timeoutMs, MAX_RESPONSE_BYTES);
+  }
+
+  private String getBounded(String url, int timeoutMs, int maxBytes) {
     Map<String, String> headers = token.isBlank() ? null : Map.of(TOKEN_HEADER, token);
     try {
       String body = http.get(url, timeoutMs, USER_AGENT, null, null, headers);
       if (body == null) {
         return null;
       }
-      // The shared client has its own coarse cap; enforce the tighter crawler cap before parsing.
-      if (body.getBytes(StandardCharsets.UTF_8).length > MAX_RESPONSE_BYTES) {
-        LOG.warn("Relay response exceeds " + MAX_RESPONSE_BYTES + " bytes; skipping");
+      // The shared client has its own coarse cap; enforce the tighter cap before parsing.
+      if (body.getBytes(StandardCharsets.UTF_8).length > maxBytes) {
+        LOG.warn("Relay response exceeds " + maxBytes + " bytes; skipping");
         return null;
       }
       return body;
@@ -187,6 +222,39 @@ public final class RelayControlClient {
 
   private static JsonArray asArray(JsonElement element) {
     return element != null && element.isJsonArray() ? element.getAsJsonArray() : null;
+  }
+
+  private static JsonObject asObject(JsonElement element) {
+    return element != null && element.isJsonObject() ? element.getAsJsonObject() : null;
+  }
+
+  /**
+   * Parse a {@code /torrent} payload's {@code data.data_b64} field into decoded bytes. Returns null
+   * when the payload is unsuccessful, missing, not valid base64, empty, or over the size budget.
+   */
+  static byte[] parseTorrentData(String json) {
+    JsonObject root = parseRoot(json);
+    if (!isOk(root)) {
+      return null;
+    }
+    JsonObject data = asObject(root.get("data"));
+    if (data == null) {
+      return null;
+    }
+    String encoded = getString(data, "data_b64");
+    if (encoded == null || encoded.isBlank()) {
+      return null;
+    }
+    byte[] decoded;
+    try {
+      decoded = Base64.getDecoder().decode(encoded);
+    } catch (RuntimeException e) {
+      return null;
+    }
+    if (decoded.length == 0 || decoded.length > TorrentMetadataResponse.MAX_TORRENT_BYTES) {
+      return null;
+    }
+    return decoded;
   }
 
   private static String getString(JsonObject object, String key) {
