@@ -48,6 +48,12 @@ public final class DhtAdvertiser implements AutoCloseable {
     private final Supplier<SessionManager> sessionSupplier;
     private final boolean announcePeerTopic;
     private final boolean announceBootstrapTopic;
+    /**
+     * Announce the time-bucketed heartbeat topic so presence crawlers can estimate how many peers
+     * are online without dialing anyone. On by default; opt out with {@link
+     * #setAnnounceHeartbeatTopic(boolean)}.
+     */
+    private volatile boolean announceHeartbeatTopic = true;
     private final Lifecycle lifecycle;
     private final AtomicLong lastTickEpochSec = new AtomicLong();
     private final AtomicLong identityPublishes = new AtomicLong();
@@ -198,6 +204,11 @@ public final class DhtAdvertiser implements AutoCloseable {
         return running && !lifecycle.isClosed();
     }
 
+    /** Opt out of heartbeat announcements (privacy-constrained or minimal nodes). */
+    public void setAnnounceHeartbeatTopic(boolean enabled) {
+        this.announceHeartbeatTopic = enabled;
+    }
+
     /**
      * Run one tick on the calling worker, also allowed before start but never after stop.
      * Returns true only if all enabled stages finish without revocation or error.
@@ -256,6 +267,15 @@ public final class DhtAdvertiser implements AutoCloseable {
             }
             if (announceBootstrapTopic) {
                 DhtRendezvous.announceBootstrap(session, announcePort);
+            }
+            if (!lifecycle.getAsBoolean()) {
+                return false;
+            }
+            if (announceHeartbeatTopic) {
+                DhtRendezvous.announce(
+                        session,
+                        DhtRendezvous.topic(RelayConstants.heartbeatTopic(System.currentTimeMillis())),
+                        announcePort);
             }
             if (!lifecycle.getAsBoolean()) {
                 return false;
