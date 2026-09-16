@@ -282,6 +282,70 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void cachedTorrentTemplatesAreRestampedPerRequestAndStillVerify() throws Exception {
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+
+    IdentityKeys holderIdentity = IdentityKeys.generate();
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), holderIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport, service, new PeerDirectory(new NoOpKarmaCache()), holderIdentity);
+
+    byte[] infoHash = TestTorrentMetadata.infoHash();
+    byte[] torrentBytes = TestTorrentMetadata.bytes(1000); // several chunks
+    java.util.concurrent.atomic.AtomicInteger providerCalls =
+        new java.util.concurrent.atomic.AtomicInteger();
+    handler.setTorrentMetadataProvider(
+        publicProvider(
+            ih -> {
+              providerCalls.incrementAndGet();
+              return torrentBytes;
+            }));
+    handler.start();
+
+    for (int round = 0; round < 2; round++) {
+      byte[] nonce = randomBytes(32);
+      TorrentMetadataRequest request = signedMetadataRequest(requesterKey, infoHash, nonce);
+      transport.sent.clear();
+
+      handler.onPayload(
+          requesterPub,
+          SearchPayloadCodec.encodeTorrentMetadataRequest(request),
+          System.currentTimeMillis(),
+          MeshProtocolId.METADATA);
+
+      assertFalse(transport.sent.isEmpty(), "round " + round + ": must serve chunks");
+      List<TorrentMetadataResponse> chunks = new ArrayList<>();
+      for (CapturingTransport.SentPayload sp : transport.sent) {
+        TorrentMetadataResponse chunk =
+            SearchPayloadCodec.decodeTorrentMetadataResponse(sp.payload);
+        assertNotNull(chunk, "round " + round + ": decode");
+        assertFalse(chunk.isError(), "round " + round + ": no error chunk");
+        assertTrue(
+            chunk.verifySignature(holderIdentity.ed25519PubRaw()),
+            "round " + round + ": must verify under holder pub after restamp");
+        assertArrayEquals(
+            nonce, chunk.nonce(), "round " + round + ": must carry the live request nonce");
+        assertArrayEquals(infoHash, chunk.infoHash(), "round " + round + ": ih must match request");
+        chunks.add(chunk);
+      }
+      chunks.sort(java.util.Comparator.comparingInt(TorrentMetadataResponse::chunkIndex));
+      assertArrayEquals(torrentBytes, TorrentMetadataResponse.assemble(chunks), "round " + round);
+    }
+
+    assertEquals(1, handler.torrentCacheSize(), "served payload must be cached once");
+    assertEquals(
+        1,
+        providerCalls.get(),
+        "round 2 must be served from the cached templates (no extra provider read)");
+  }
+
+  @Test
   void torrentOver256KBIsRejectedTooLarge() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
