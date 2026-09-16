@@ -119,6 +119,22 @@ public final class PeerRegistry {
     }
 
     /**
+     * Refresh a known peer's liveness without touching its advertised role/version. Called on
+     * authenticated inbound traffic so a stable peer whose session stays up (no new HELLO) does
+     * not age out of the registry and become unaddressable between re-handshakes.
+     *
+     * <p>No-op when the peer is unknown; callers must not use this to create entries.
+     */
+    public synchronized void touch(byte[] ed25519Pub) {
+        if (ed25519Pub == null || ed25519Pub.length != 32) {
+            return;
+        }
+        byPubHex.computeIfPresent(
+                Hex.encode(ed25519Pub),
+                (k, existing) -> existing.withLastSeen(System.currentTimeMillis()));
+    }
+
+    /**
      * Look up recent peers that advertise relay/forward capability.
      *
      * @param maxResults maximum number of records to return
