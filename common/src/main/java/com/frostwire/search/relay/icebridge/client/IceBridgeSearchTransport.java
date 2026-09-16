@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge.client;
 
 import com.frostwire.search.relay.DistributedSearchTransport;
+import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient.InboundMessage;
 import com.frostwire.util.Logger;
@@ -43,12 +44,16 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     private static final int MAX_DRAIN_BATCHES = 16;
     private static final int MAX_REQUEST_BYTES = 16 * 1024;
     private static final int MAX_QUEUED_REQUESTS = 64;
+    /** Bounded lane for delivering responses/control frames off the poller thread. */
+    private static final int MAX_QUEUED_DELIVERIES = 512;
 
     private final IceBridgeClient client;
     private final CopyOnWriteArrayList<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService scheduler;
     private final ThreadPoolExecutor requestWorkers;
     private final AtomicBoolean started = new AtomicBoolean();
+    private final ThreadPoolExecutor deliveryWorkers;
+    private volatile IceBridgeMetrics metrics;
     private final Set<SendOperation> activeSends = new HashSet<>();
     private volatile boolean closed;
 
@@ -63,6 +68,12 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
                     t.setDaemon(true);
                     return t;
                 }, new ThreadPoolExecutor.AbortPolicy());
+        this.deliveryWorkers = new ThreadPoolExecutor(2, 2, 0, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(MAX_QUEUED_DELIVERIES), r -> {
+                    Thread t = new Thread(r, "icebridge-delivery-worker");
+                    t.setDaemon(true);
+                    return t;
+                }, new ThreadPoolExecutor.CallerRunsPolicy());
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-transport-poller");
             t.setDaemon(true);
@@ -73,6 +84,14 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     /** Control-plane client (for host refresh / mesh TELEMETRY warm). */
     public IceBridgeClient client() {
         return client;
+    }
+
+    /**
+     * Attach the owning server's metrics so pipeline saturation (poll lag, drain volume, request
+     * queue depth, rejections) is visible on {@code /metrics}. Optional; null disables recording.
+     */
+    public void setMetrics(IceBridgeMetrics metrics) {
+        this.metrics = metrics;
     }
 
     /**
@@ -158,6 +177,7 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
             }
         }
         requestWorkers.shutdownNow();
+        deliveryWorkers.shutdownNow();
         synchronized (activeSends) {
             for (SendOperation operation : activeSends) {
                 operation.cancel();
@@ -168,9 +188,17 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     }
 
     private void pollAndDispatch() {
+        IceBridgeMetrics m = metrics;
+        if (m != null) {
+            m.incrementTransportPollRuns(1);
+        }
         try {
             for (int batch = 0; batch < MAX_DRAIN_BATCHES && !closed; batch++) {
                 List<InboundMessage> messages = client.poll(POLL_BATCH_SIZE);
+                if (m != null) {
+                    m.incrementTransportPollDrainBatches(1);
+                    m.incrementTransportMessagesDrained(messages.size());
+                }
                 for (InboundMessage msg : messages) {
                     if (closed) {
                         return;
@@ -198,8 +226,13 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
                                 });
                                 continue;
                             }
-                            listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs(), protocolId);
+                            // Responses and control frames go out on a bounded lane so a slow
+                            // listener cannot stall polling for everyone (head-of-line blocking).
+                            deliverOffPoller(listener, msg, protocolId);
                         } catch (RejectedExecutionException e) {
+                            if (m != null) {
+                                m.incrementRequestWorkRejected(1);
+                            }
                             LOG.debug("Incoming request queue full; dropping unadmitted work");
                         } catch (Throwable t) {
                             LOG.warn("Payload listener threw", t);
@@ -211,8 +244,30 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
                 }
             }
         } catch (Throwable t) {
+            if (m != null) {
+                m.incrementTransportPollErrors(1);
+            }
             LOG.warn("IceBridgeSearchTransport poll failed", t);
+        } finally {
+            if (m != null) {
+                m.setRequestWorkQueueDepthGauge(requestWorkers.getQueue().size());
+            }
         }
+    }
+
+    /**
+     * Deliver one non-request frame on the bounded delivery lane. Saturation applies backpressure
+     * via {@code CallerRunsPolicy} (runs on the poller) rather than dropping the frame: search and
+     * metadata responses are one-shot and are not retransmitted by the holder.
+     */
+    private void deliverOffPoller(PayloadListener listener, InboundMessage msg, int protocolId) {
+        deliveryWorkers.execute(() -> {
+            try {
+                listener.onPayload(msg.sourcePub(), msg.payload(), msg.receivedMs(), protocolId);
+            } catch (Throwable t) {
+                LOG.warn("Payload listener threw", t);
+            }
+        });
     }
 
     /** Bounded shape demux only; workers still decode and authenticate every request. */
