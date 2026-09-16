@@ -10,6 +10,7 @@ package com.frostwire.mcp.desktop.tools.relay2;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.util.Hex;
 import com.google.gson.JsonObject;
+import java.util.Base64;
 
 /**
  * Shared argument-parsing and JSON helpers for the IceBridge peer-directory / local-index MCP
@@ -67,6 +68,36 @@ final class RelayToolSupport {
     byte[] bytes = Hex.decode(hex);
     if (bytes.length != 32) {
       throw new IllegalArgumentException("pub must decode to 32 bytes");
+    }
+    return bytes;
+  }
+
+  /**
+   * Decodes a peer public key supplied either as a 64-character hex string or as a base64url
+   * encoding (padded or unpadded) of the raw 32 bytes. Throws IllegalArgumentException when the
+   * input is missing or does not decode to exactly 32 bytes.
+   */
+  static byte[] parsePub(String raw) {
+    if (raw == null || raw.isEmpty()) {
+      throw new IllegalArgumentException("Missing required parameter: peer");
+    }
+    byte[] bytes = null;
+    if (raw.length() == 64) {
+      try {
+        bytes = Hex.decode(raw);
+      } catch (IllegalArgumentException ignored) {
+        bytes = null;
+      }
+    }
+    if (bytes == null) {
+      try {
+        bytes = Base64.getUrlDecoder().decode(raw);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("peer must be 64-char hex or base64url of 32 bytes");
+      }
+    }
+    if (bytes.length != 32) {
+      throw new IllegalArgumentException("peer must decode to 32 bytes");
     }
     return bytes;
   }
