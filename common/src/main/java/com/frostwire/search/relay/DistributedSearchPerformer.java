@@ -14,6 +14,8 @@ import com.frostwire.search.ISearchPerformer;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.relay.event.IceBridgeEvent;
+import com.frostwire.search.relay.event.IceBridgeEvents;
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -229,6 +231,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
             }
 
             List<PeerDirectory.PeerInfo> peers = selectPeers();
+            IceBridgeEvents.search("", "query \"" + keywords + "\" peers=" + peers.size());
             if (!peers.isEmpty()) {
                 if (dynamicQuery != null) {
                     merged.addAll(queryPeersPhased(peers, merged));
@@ -446,6 +449,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                         LOG.warn("DistributedSearchPerformer: response verify failed from "
                                 + req.peer.hostname() + " rows=" + response.rows().size()
                                 + " final=" + response.isFinalChunk());
+                        IceBridgeEvents.warn(IceBridgeEvent.Category.SEARCH, "",
+                                "response verify failed from " + req.peer.hostname()
+                                        + " rows=" + response.rows().size());
                         // Bad frame: drop but keep waiting — do NOT complete on a
                         // failed final (poison empty finals were a separate bug on
                         // pure forwarders; keep latch open for the real answer).
@@ -453,6 +459,9 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     }
                     // A verified response is proof the holder is reachable.
                     peerDirectory.markContact(holderPub);
+                    IceBridgeEvents.search(Hex.encode(holderPub),
+                            "verified result rows=" + response.rows().size()
+                                    + " final=" + response.isFinalChunk());
                     synchronized (lock) {
                         if (!accepting[0] || stopped || System.nanoTime() >= phaseDeadline) {
                             return;
