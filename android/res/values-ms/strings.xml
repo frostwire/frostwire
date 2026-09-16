@@ -613,7 +613,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">Kongsi katalog saya dengan crawler</string>
+    <string name="icebridge_public_catalog_title">Kongsi katalog kongsi saya secara awam (crawler)</string>
     <string name="icebridge_public_catalog_summary">Benarkan crawler rangkaian mengindeks torrent yang anda kongsi secara terbuka. Dimatikan secara lalai.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>

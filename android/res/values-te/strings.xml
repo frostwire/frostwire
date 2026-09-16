@@ -613,7 +613,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">నా కేటలాగ్‌ను క్రాలర్‌లతో పంచుకోండి</string>
+    <string name="icebridge_public_catalog_title">షేర్ చేసిన టొరెంట్ కేటలాగ్ను క్రాల్ చేయగలిగేలా చేయండి</string>
     <string name="icebridge_public_catalog_summary">మీరు బహిరంగంగా పంచుకునే టొరెంట్‌లను నెట్‌వర్క్ క్రాలర్‌లు ఇండెక్స్ చేయనివ్వండి. డిఫాల్ట్‌గా ఆఫ్.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>

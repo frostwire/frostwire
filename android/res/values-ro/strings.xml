@@ -613,7 +613,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">Partajează catalogul meu cu crawler-ele</string>
+    <string name="icebridge_public_catalog_title">Partajează public catalogul meu de partajare (crawlere)</string>
     <string name="icebridge_public_catalog_summary">Permite crawler-elor rețelei să indexeze torrentele pe care le partajezi public. Dezactivat implicit.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>

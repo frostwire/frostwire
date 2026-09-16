@@ -613,7 +613,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">Споделяне на каталога ми с обхождащи</string>
+    <string name="icebridge_public_catalog_title">Публично споделяне на каталога ми за споделяне (обхождащи)</string>
     <string name="icebridge_public_catalog_summary">Позволете на обхождащите в мрежата да индексират торентите, които публично споделяте. Изключено по подразбиране.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>

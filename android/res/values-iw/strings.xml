@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">שיתוף הקטלוג שלי עם סורקים</string>
+    <string name="icebridge_public_catalog_title">שתף את קטלוג השיתוף שלי באופן ציבורי (סורקים)</string>
     <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה משתף באופן ציבורי. כבוי כברירת מחדל.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>

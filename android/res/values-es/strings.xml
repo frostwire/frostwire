@@ -616,7 +616,7 @@
     <string name="distributed_icebridge_config_unknown">Ports unavailable until the stack starts</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">Compartir mi catálogo con rastreadores</string>
+    <string name="icebridge_public_catalog_title">Compartir públicamente mi catálogo de archivos compartidos (rastreadores)</string>
     <string name="icebridge_public_catalog_summary">Deja que los rastreadores de la red indexen los torrents que compartes públicamente. Desactivado por defecto.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
