@@ -111,6 +111,8 @@ public final class Constants {
     public static final String PREF_KEY_ICEBRIDGE_RELAY_PORT = "frostwire.prefs.icebridge.relay_port";
     /** BOTH | FORWARDER | CLIENT */
     public static final String PREF_KEY_ICEBRIDGE_ROLE = "frostwire.prefs.icebridge.role";
+    /** Explicit opt-in to advertise the shared-torrent catalog to crawlers. Default false. */
+    public static final String PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG = "frostwire.prefs.icebridge.public_catalog";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
