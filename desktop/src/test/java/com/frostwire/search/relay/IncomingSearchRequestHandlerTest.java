@@ -530,6 +530,7 @@ class IncomingSearchRequestHandlerTest {
             null,
             holder,
             index);
+    handler.setPublicCatalogEnabled(true);
     for (int round = 0; round < 2; round++) {
       RemoteCatalogBrowseRequest.Builder builder =
           RemoteCatalogBrowseRequest.builder()
