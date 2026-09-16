@@ -24,6 +24,9 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   private final JCheckBox ENABLED_CHECKBOX =
       new JCheckBox(I18n.tr("Enable IceBridge (distributed relay)"));
 
+  private final JCheckBox PUBLIC_CATALOG_CHECKBOX =
+      new JCheckBox(I18n.tr("Share my share catalog publicly (crawlers)"));
+
   private final JRadioButton LOCAL_RADIO =
       new JRadioButton(I18n.tr("Use local IceBridge daemon (fork subprocess)"));
   private final JRadioButton REMOTE_RADIO = new JRadioButton(I18n.tr("Use remote IceBridge relay"));
@@ -65,11 +68,15 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     // Prevent components from stretching vertically (the root cause of tall Role dropdown etc.)
     GUIUtils.restrictSize(ENABLED_CHECKBOX, SizePolicy.RESTRICT_HEIGHT);
+    GUIUtils.restrictSize(PUBLIC_CATALOG_CHECKBOX, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(LOCAL_RADIO, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(REMOTE_RADIO, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(ROLE_COMBO, SizePolicy.RESTRICT_HEIGHT);
 
+    PUBLIC_CATALOG_CHECKBOX.setToolTipText(I18n.tr("Share my share catalog publicly (crawlers)"));
+
     add(ENABLED_CHECKBOX);
+    add(PUBLIC_CATALOG_CHECKBOX);
     add(getHorizontalSeparator());
 
     add(LOCAL_RADIO);
@@ -182,6 +189,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
   private void updateState() {
     boolean enabled = ENABLED_CHECKBOX.isSelected();
+    PUBLIC_CATALOG_CHECKBOX.setEnabled(enabled);
     LOCAL_RADIO.setEnabled(enabled);
     REMOTE_RADIO.setEnabled(enabled);
     updateRemoteFields();
@@ -210,6 +218,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   @Override
   public void initOptions() {
     ENABLED_CHECKBOX.setSelected(SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    PUBLIC_CATALOG_CHECKBOX.setSelected(SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue());
     boolean useRemote = SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue();
     if (useRemote) {
       REMOTE_RADIO.setSelected(true);
@@ -243,6 +252,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   @Override
   public boolean applyOptions() {
     SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(ENABLED_CHECKBOX.isSelected());
+    SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.setValue(PUBLIC_CATALOG_CHECKBOX.isSelected());
     SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.setValue(REMOTE_RADIO.isSelected());
     SearchEnginesSettings.ICEBRIDGE_BIND_HOST.setValue(BIND_HOST_FIELD.getText().trim());
     SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.setValue(RUDP_PORT_FIELD.getValue());
@@ -258,6 +268,9 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     log.info("=== IceBridge Configuration (updated via settings; restart required) ===");
     log.info(
         "  ICEBRIDGE_ENABLED             = " + SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    log.info(
+        "  ICEBRIDGE_PUBLIC_CATALOG      = "
+            + SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue());
     log.info(
         "  ICEBRIDGE_USE_REMOTE          = "
             + SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue());
@@ -288,6 +301,8 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   @Override
   public boolean isDirty() {
     return ENABLED_CHECKBOX.isSelected() != SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue()
+        || PUBLIC_CATALOG_CHECKBOX.isSelected()
+            != SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue()
         || REMOTE_RADIO.isSelected() != SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.getValue()
         || !BIND_HOST_FIELD
             .getText()
