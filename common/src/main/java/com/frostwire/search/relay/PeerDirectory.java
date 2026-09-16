@@ -544,6 +544,30 @@ public final class PeerDirectory {
         return e != null && e.indexDigest != null;
     }
 
+    /** Verified, live entries that announced a content fingerprint (diagnostics). */
+    public int digestCount() {
+        long nowMs = System.currentTimeMillis();
+        int count = 0;
+        for (Entry e : entries.values()) {
+            if (e.verified && e.indexDigest != null && isLive(e, nowMs)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** Verified, live entries (diagnostics). */
+    public int liveCount() {
+        long nowMs = System.currentTimeMillis();
+        int count = 0;
+        for (Entry e : entries.values()) {
+            if (e.verified && isLive(e, nowMs)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private static boolean isLive(Entry e, long nowMs) {
         if (e.failures >= MAX_FAILURES) {
             return false;
