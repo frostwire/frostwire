@@ -184,6 +184,18 @@ public final class AndroidRelayStack implements AutoCloseable {
     }
   }
 
+  /**
+   * Explicit opt-in for advertising the shared-torrent catalog to crawlers. Defaults to false:
+   * the owner must enable it in the Distributed Search settings.
+   */
+  public static boolean isPublicCatalogEnabled() {
+    try {
+      return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG);
+    } catch (Throwable unavailable) {
+      return false;
+    }
+  }
+
   /** Best-effort row cleanup; public authorization is already revoked by TransferManager removal. */
   public static void withdrawTorrent(String hash) {
     AndroidRelayStack stack = live;
@@ -400,6 +412,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       // Gnutella leaf model: CLIENT answers locally but never forwards.
       // Applies to both in-process and USE_REMOTE paths.
       ih.setForwardingEnabled(readConfiguredRole() != IceBridgeConfig.Role.CLIENT);
+      // Opt-in: only serve catalog-browse requests when the user allows crawling.
+      ih.setPublicCatalogEnabled(isPublicCatalogEnabled());
       // Symmetric holder: answer TORRENT_FETCH (Protocol #3 METADATA) for
       // torrents this device seeds (e.g. auto-seeded YouTube downloads).
       ih.setTorrentMetadataProvider(
@@ -468,8 +482,13 @@ public final class AndroidRelayStack implements AutoCloseable {
       LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
 
       int advertiseRelayPort = readConfiguredRelayPort();
+      long extraCaps =
+          isPublicCatalogEnabled()
+              ? com.frostwire.search.relay.NodeCapabilities.PUBLIC_CATALOG
+              : 0L;
       IdentityRecordPublisher identityPublisher =
-          new IdentityRecordPublisher(ident, advertiseRelayPort, meshRudpPort, syncRole.name());
+          new IdentityRecordPublisher(
+              ident, advertiseRelayPort, meshRudpPort, syncRole.name(), extraCaps);
       IndexAnnouncementPublisher indexPublisher = new IndexAnnouncementPublisher(li, ident, visibility);
       // Phones join as CLIENT leaves: announce the peer topic so holders can be
       // found, but never the bootstrap topic (that flag is for dedicated relays).
