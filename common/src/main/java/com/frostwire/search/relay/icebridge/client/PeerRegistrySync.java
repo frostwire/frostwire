@@ -13,6 +13,7 @@ import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.NodeCapabilities;
 import com.frostwire.search.relay.PeerDirectory;
+import com.frostwire.search.relay.event.IceBridgeEvents;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
@@ -249,6 +250,8 @@ public final class PeerRegistrySync implements AutoCloseable {
                 lastDigestSendMs = now;
                 LOG.debug("PeerRegistrySync: announced index digest to " + sent + "/"
                         + targets.size() + " peers");
+                IceBridgeEvents.digest("", "announced index digest to " + sent + "/"
+                        + targets.size() + " peers");
             }
         } catch (Throwable t) {
             LOG.debug("PeerRegistrySync: digest announce failed", t);
@@ -316,6 +319,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             // importing them would re-add dead routes to the search directory.
             if (info.lastSeenMs > 0
                     && System.currentTimeMillis() - info.lastSeenMs > MAX_LOOKUP_AGE_MS) {
+                IceBridgeEvents.peer(Hex.encode(pub), "skipped stale /lookup entry");
                 continue;
             }
             // Identity TCP port unknown from mesh registry; use rUDP port as
