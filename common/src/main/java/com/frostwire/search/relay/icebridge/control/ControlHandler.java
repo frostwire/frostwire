@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
  *   <li>{@code GET /metrics} — return in-memory counters and registry size.</li>
  *   <li>{@code GET /events} — return recent IceBridge events, newest first (filterable).</li>
  *   <li>{@code GET /catalog?pub=<base64url>&timeoutMs=<n>} — fetch a peer's shared-torrent catalog.</li>
+ *   <li>{@code GET /torrent?ih=<hex>&pub=<base64url>&timeoutMs=<n>} — fetch a holder-signed .torrent.</li>
  *   <li>{@code GET /health} — liveness check.</li>
  * </ul>
  */
@@ -70,6 +71,10 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private static final int DEFAULT_CATALOG_TIMEOUT_MS = 5000;
     private static final int MIN_CATALOG_TIMEOUT_MS = 100;
     private static final int MAX_CATALOG_TIMEOUT_MS = 30000;
+    private static final int DEFAULT_TORRENT_TIMEOUT_MS = 15000;
+    private static final int MIN_TORRENT_TIMEOUT_MS = 100;
+    private static final int MAX_TORRENT_TIMEOUT_MS = 30000;
+    private static final int INFO_HASH_HEX_LENGTH = 40;
 
     private final PeerRegistry registry;
     private final IceBridgeMetrics metrics;
@@ -78,6 +83,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     private final InboundMessageQueue inboundQueue;
     private final IceBridgeTokens authTokens;
     private final CatalogFetcher catalogFetcher;
+    private final TorrentFetcher torrentFetcher;
 
     public ControlHandler(PeerRegistry registry,
                           IceBridgeMetrics metrics,
@@ -85,7 +91,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                           RudpSessionManager rudpSessionManager,
                           InboundMessageQueue inboundQueue,
                           IceBridgeTokens authTokens,
-                          CatalogFetcher catalogFetcher) {
+                          CatalogFetcher catalogFetcher,
+                          TorrentFetcher torrentFetcher) {
         this.registry = registry;
         this.metrics = metrics;
         this.config = config;
@@ -93,6 +100,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         this.inboundQueue = inboundQueue;
         this.authTokens = (authTokens != null) ? authTokens : new IceBridgeTokens(config.authTokensFile());
         this.catalogFetcher = catalogFetcher;
+        this.torrentFetcher = torrentFetcher;
     }
 
     @Override
@@ -138,6 +146,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = handleEvents(uri);
             } else if (method == HttpMethod.GET && "/catalog".equals(path)) {
                 response = handleCatalog(uri);
+            } else if (method == HttpMethod.GET && "/torrent".equals(path)) {
+                response = handleTorrent(uri);
             } else if (method == HttpMethod.GET && "/health".equals(path)) {
                 response = ApiResponse.success("ok");
             } else {
@@ -449,6 +459,42 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
             return ApiResponse.error("catalog fetch not available");
         }
         return ApiResponse.success(catalogFetcher.fetch(pubParam, timeoutMs));
+    }
+
+    private ApiResponse<JsonElement> handleTorrent(String uri) {
+        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+        String infoHashHex = firstParam(decoder, "ih");
+        if (infoHashHex == null
+                || infoHashHex.length() != INFO_HASH_HEX_LENGTH
+                || !infoHashHex.matches("[0-9a-fA-F]{" + INFO_HASH_HEX_LENGTH + "}")) {
+            return ApiResponse.error("invalid ih");
+        }
+        String holderPub = firstParam(decoder, "pub");
+        if (holderPub == null || holderPub.isEmpty()) {
+            return ApiResponse.error("invalid pub");
+        }
+        try {
+            if (IceBridgeAuth.decodeBase64(holderPub).length != 32) {
+                return ApiResponse.error("invalid pub");
+            }
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("invalid pub");
+        }
+
+        int timeoutMs = DEFAULT_TORRENT_TIMEOUT_MS;
+        String timeoutParam = firstParam(decoder, "timeoutMs");
+        if (timeoutParam != null) {
+            try {
+                timeoutMs = Integer.parseInt(timeoutParam);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        timeoutMs = Math.max(MIN_TORRENT_TIMEOUT_MS, Math.min(timeoutMs, MAX_TORRENT_TIMEOUT_MS));
+
+        if (torrentFetcher == null) {
+            return ApiResponse.error("torrent fetch not available");
+        }
+        return ApiResponse.success(torrentFetcher.fetch(infoHashHex, holderPub, timeoutMs));
     }
 
     private static String firstParam(QueryStringDecoder decoder, String name) {
