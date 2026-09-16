@@ -25,7 +25,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
       new JCheckBox(I18n.tr("Enable IceBridge (distributed relay)"));
 
   private final JCheckBox PUBLIC_CATALOG_CHECKBOX =
-      new JCheckBox(I18n.tr("Share my share catalog publicly (crawlers)"));
+      new JCheckBox(I18n.tr("Make shared torrents catalog crawlable"));
 
   private final JRadioButton LOCAL_RADIO =
       new JRadioButton(I18n.tr("Use local IceBridge daemon (fork subprocess)"));
@@ -73,7 +73,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     GUIUtils.restrictSize(REMOTE_RADIO, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(ROLE_COMBO, SizePolicy.RESTRICT_HEIGHT);
 
-    PUBLIC_CATALOG_CHECKBOX.setToolTipText(I18n.tr("Share my share catalog publicly (crawlers)"));
+    PUBLIC_CATALOG_CHECKBOX.setToolTipText(I18n.tr("Make shared torrents catalog crawlable"));
 
     add(ENABLED_CHECKBOX);
     add(PUBLIC_CATALOG_CHECKBOX);
