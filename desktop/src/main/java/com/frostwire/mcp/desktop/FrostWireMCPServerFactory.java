@@ -33,8 +33,14 @@ import com.frostwire.mcp.desktop.tools.library.LibraryScanTool;
 import com.frostwire.mcp.desktop.tools.obs.LogsClearTool;
 import com.frostwire.mcp.desktop.tools.obs.LogsQueryTool;
 import com.frostwire.mcp.desktop.tools.obs.LogsTailTool;
+import com.frostwire.mcp.desktop.tools.obs.McpControlTool;
+import com.frostwire.mcp.desktop.tools.obs.McpStatusTool;
 import com.frostwire.mcp.desktop.tools.obs.RelayMetricsTool;
+import com.frostwire.mcp.desktop.tools.obs.RemoteLogsQueryTool;
 import com.frostwire.mcp.desktop.tools.relay2.DigestStatusTool;
+import com.frostwire.mcp.desktop.tools.relay2.HostCacheAddTool;
+import com.frostwire.mcp.desktop.tools.relay2.HostCacheListTool;
+import com.frostwire.mcp.desktop.tools.relay2.HostCachePingTool;
 import com.frostwire.mcp.desktop.tools.relay2.LocalIndexListTool;
 import com.frostwire.mcp.desktop.tools.relay2.LocalIndexSearchTool;
 import com.frostwire.mcp.desktop.tools.relay2.PeerBlockTool;
@@ -150,6 +156,14 @@ public final class FrostWireMCPServerFactory {
     server.registerTool(new LocalIndexListTool());
     server.registerTool(new LocalIndexSearchTool());
     server.registerTool(new DigestStatusTool());
+
+    // Host cache + remote relay event log + MCP server lifecycle
+    server.registerTool(new HostCacheListTool());
+    server.registerTool(new HostCachePingTool());
+    server.registerTool(new HostCacheAddTool());
+    server.registerTool(new RemoteLogsQueryTool());
+    server.registerTool(new McpStatusTool());
+    server.registerTool(new McpControlTool());
   }
 
   private static void registerAllResources(MCPServer server) {
