@@ -46,6 +46,7 @@ public final class ControlServer implements AutoCloseable {
     private final InboundMessageQueue inboundQueue;
     private final IceBridgeTokens authTokens;
     private volatile CatalogFetcher catalogFetcher;
+    private volatile TorrentFetcher torrentFetcher;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel channel;
@@ -85,6 +86,15 @@ public final class ControlServer implements AutoCloseable {
         this.catalogFetcher = catalogFetcher;
     }
 
+    /**
+     * Install the torrent fetch hook used by {@code GET /torrent}. May be
+     * called after {@link #start()}: each new connection reads the current
+     * value when its {@link ControlHandler} is created.
+     */
+    public void setTorrentFetcher(TorrentFetcher torrentFetcher) {
+        this.torrentFetcher = torrentFetcher;
+    }
+
     public void start() throws InterruptedException {
         int port = config.controlHttpPort();
         if (port <= 0) {
@@ -103,7 +113,7 @@ public final class ControlServer implements AutoCloseable {
                         ch.pipeline()
                                 .addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens, catalogFetcher));
+                                .addLast(new ControlHandler(registry, metrics, config, rudpSessionManager, inboundQueue, authTokens, catalogFetcher, torrentFetcher));
                     }
                 });
 
