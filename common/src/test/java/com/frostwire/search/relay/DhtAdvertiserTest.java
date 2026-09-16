@@ -66,13 +66,14 @@ class DhtAdvertiserTest {
         //     peer topic
         //  3. DhtRendezvous.announceRelay -> dhtAnnounce for the BEP 5
         //     relay topic (because role=BOTH is a forwarder)
+        //  4. DhtRendezvous.announce -> dhtAnnounce for the hourly heartbeat topic
         // All record via putItemCalls.
         assertTrue(advertiser.tick(session));
-        assertEquals(3, session.putItemCalls.size());
+        assertEquals(4, session.putItemCalls.size());
     }
 
     @Test
-    void tickWithBootstrapAndCustomSupplierAnnouncesFourTopics() {
+    void tickWithBootstrapAndCustomSupplierAnnouncesExpectedTopics() {
         RecordingSession custom = new RecordingSession();
         DhtAdvertiser icebridgeStyle = new DhtAdvertiser(
                 new IdentityRecordPublisher(identity, 6888, 6889, "FORWARDER"),
@@ -82,9 +83,25 @@ class DhtAdvertiserTest {
                 false,  // pure FORWARDER: no peer topic
                 true);  // bootstrap topic
         assertTrue(icebridgeStyle.tick(custom));
-        // identity put + relay announce + bootstrap announce
-        assertEquals(3, custom.putItemCalls.size());
+        // identity put + relay announce + bootstrap announce + heartbeat announce
+        assertEquals(4, custom.putItemCalls.size());
         assertEquals(1, icebridgeStyle.announceCount());
+    }
+
+    @Test
+    void heartbeatAnnounceIsOnByDefaultAndCanBeDisabled() {
+        RecordingSession withHeartbeat = new RecordingSession();
+        DhtAdvertiser on = new DhtAdvertiser(new IdentityRecordPublisher(identity, 6888), 60);
+        assertTrue(on.tick(withHeartbeat));
+        assertEquals(4, withHeartbeat.putItemCalls.size(),
+                "identity put + peer + relay + heartbeat");
+
+        RecordingSession withoutHeartbeat = new RecordingSession();
+        DhtAdvertiser off = new DhtAdvertiser(new IdentityRecordPublisher(identity, 6888), 60);
+        off.setAnnounceHeartbeatTopic(false);
+        assertTrue(off.tick(withoutHeartbeat));
+        assertEquals(3, withoutHeartbeat.putItemCalls.size(),
+                "heartbeat disabled: identity put + peer + relay");
     }
 
     @Test
