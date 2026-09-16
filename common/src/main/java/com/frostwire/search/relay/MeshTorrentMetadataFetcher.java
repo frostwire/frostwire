@@ -19,10 +19,16 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Fetches a torrent's full .torrent bytes from its holder over the IceBridge
@@ -38,6 +44,16 @@ import java.util.concurrent.TimeUnit;
  * <p>Fail-fast: a signed holder error frame (NOT_FOUND/TOO_LARGE) returns
  * null immediately instead of waiting out the timeout.
  *
+ * <p>Bounded concurrency (fail-closed): at most
+ * {@link #MAX_GLOBAL_IN_FLIGHT_FETCHES} fetches may be in flight across the
+ * whole process, and at most {@link #MAX_IN_FLIGHT_PER_HOLDER} of those may
+ * target the same 32-byte holder pub. A call that cannot reserve either slot
+ * returns {@code null} immediately: it never blocks and never occupies a
+ * {@link #SENDERS} worker, so a metadata storm cannot exhaust threads. Callers
+ * should treat {@code null} as retryable backpressure. Every reserved slot is
+ * released in a {@code finally}, including on interrupt, timeout, and
+ * rejection.
+ *
  * <p>Chunks arriving via EC2 RELAY_RESPONSE are attributed to the hop pub, not
  * the holder. Auth is the holder Ed25519 signature on each chunk — never
  * require {@code sourcePub == holderPub} or cellular TORRENT_FETCH times out.
@@ -48,6 +64,50 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
 
     /** How long to wait for the holder's full chunked answer. */
     public static final int DEFAULT_TIMEOUT_SEC = 15;
+
+    /**
+     * Maximum number of metadata fetches allowed to be in flight process-wide.
+     * A fair {@link Semaphore} enforces this; a caller that cannot acquire a
+     * permit returns {@code null} without blocking (fail closed), so a storm of
+     * concurrent {@code /torrent} or catalog metadata requests can never
+     * exhaust caller threads or the {@link #SENDERS} pool. Sized slightly above
+     * the pool's active thread count so the queue can absorb bursty traffic
+     * without unbounded pile-up.
+     */
+    static final int MAX_GLOBAL_IN_FLIGHT_FETCHES = 8;
+
+    /**
+     * Maximum number of concurrent metadata fetches targeting the same 32-byte
+     * holder pub. Extra requests to a hot holder return {@code null}
+     * immediately (fail closed) so one holder cannot monopolize the global
+     * gate.
+     */
+    static final int MAX_IN_FLIGHT_PER_HOLDER = 2;
+
+    /**
+     * Defensive ceiling on the number of distinct holders tracked in
+     * {@link #HOLDER_IN_FLIGHT}. The global gate already bounds live entries by
+     * {@link #MAX_GLOBAL_IN_FLIGHT_FETCHES}; this is a belt-and-suspenders cap
+     * so a bug can never grow the map without bound.
+     */
+    static final int MAX_TRACKED_HOLDERS = 64;
+
+    /**
+     * Process-wide in-flight fetch gate. Fair so arrival order is preserved
+     * under contention; acquisition is always non-blocking
+     * ({@link Semaphore#tryAcquire()}).
+     */
+    private static final Semaphore GLOBAL_FETCH_GATE =
+            new Semaphore(MAX_GLOBAL_IN_FLIGHT_FETCHES, true);
+
+    /**
+     * Live per-holder fetch counts keyed by hex-encoded holder pub. Entries are
+     * removed as soon as a count returns to zero.
+     */
+    private static final ConcurrentHashMap<String, AtomicInteger> HOLDER_IN_FLIGHT =
+            new ConcurrentHashMap<>();
+    private static final AtomicInteger TRACKED_HOLDERS = new AtomicInteger();
+
     private static final ThreadPoolExecutor SENDERS = new ThreadPoolExecutor(
             4, 4, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(32), r -> {
                 Thread thread = new Thread(r, "mesh-metadata-send");
@@ -90,8 +150,15 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
      * Send a TORRENT_FETCH request and block up to the timeout for the
      * verified full .torrent bytes.
      *
-     * @return the holder-signed full .torrent bytes, or null on timeout,
-     *         transport failure, verification failure, or holder error.
+     * <p>Fail-closed admission: this method first reserves a global in-flight
+     * slot ({@link #MAX_GLOBAL_IN_FLIGHT_FETCHES}) and then a per-holder slot
+     * ({@link #MAX_IN_FLIGHT_PER_HOLDER}). If either is exhausted it returns
+     * {@code null} immediately without blocking. Both slots are released in
+     * {@code finally} on every exit path.
+     *
+     * @return the holder-signed full .torrent bytes, or null on admission
+     *         rejection (gate or per-holder cap), timeout, transport failure,
+     *         verification failure, or holder error.
      */
     public static byte[] fetch(DistributedSearchTransport transport,
                                IdentityKeys identity,
@@ -104,9 +171,82 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
                 || Thread.currentThread().isInterrupted()) {
             return null;
         }
-        MeshTorrentMetadataFetcher fetcher = new MeshTorrentMetadataFetcher(
-                transport, identity, holderPub, infoHash, timeoutMs);
-        return fetcher.fetchNow();
+        if (!GLOBAL_FETCH_GATE.tryAcquire()) {
+            LOG.info("MeshTorrentMetadataFetcher: global fetch gate saturated, failing closed ih="
+                    + Hex.encode(infoHash));
+            return null;
+        }
+        String holderHex = Hex.encode(holderPub);
+        try {
+            if (!tryAcquireHolderSlot(holderHex)) {
+                LOG.info("MeshTorrentMetadataFetcher: per-holder fetch cap reached for holder "
+                        + holderHex.substring(0, 8) + " ih=" + Hex.encode(infoHash));
+                return null;
+            }
+            try {
+                MeshTorrentMetadataFetcher fetcher = new MeshTorrentMetadataFetcher(
+                        transport, identity, holderPub, infoHash, timeoutMs);
+                return fetcher.fetchNow();
+            } finally {
+                releaseHolderSlot(holderHex);
+            }
+        } finally {
+            GLOBAL_FETCH_GATE.release();
+        }
+    }
+
+    /**
+     * Atomically reserve one per-holder in-flight slot. Returns {@code false}
+     * (fail closed, no slot held) when the holder already has
+     * {@link #MAX_IN_FLIGHT_PER_HOLDER} fetches running or when the tracking
+     * map has reached {@link #MAX_TRACKED_HOLDERS}.
+     */
+    private static boolean tryAcquireHolderSlot(String holderHex) {
+        AtomicBoolean acquired = new AtomicBoolean(false);
+        HOLDER_IN_FLIGHT.compute(holderHex, (key, counter) -> {
+            if (counter == null) {
+                if (TRACKED_HOLDERS.get() >= MAX_TRACKED_HOLDERS) {
+                    return null;
+                }
+                TRACKED_HOLDERS.incrementAndGet();
+                acquired.set(true);
+                return new AtomicInteger(1);
+            }
+            if (counter.get() >= MAX_IN_FLIGHT_PER_HOLDER) {
+                return counter;
+            }
+            counter.incrementAndGet();
+            acquired.set(true);
+            return counter;
+        });
+        return acquired.get();
+    }
+
+    /** Release one per-holder slot, removing the entry once the count hits zero. */
+    private static void releaseHolderSlot(String holderHex) {
+        HOLDER_IN_FLIGHT.computeIfPresent(holderHex, (key, counter) -> {
+            if (counter.decrementAndGet() <= 0) {
+                TRACKED_HOLDERS.decrementAndGet();
+                return null;
+            }
+            return counter;
+        });
+    }
+
+    /**
+     * Submit to the bounded sender pool without ever blocking the caller. The
+     * pool's bounded queue uses the default abort policy, so a full pool throws
+     * {@link RejectedExecutionException}; that is caught and converted to
+     * {@code null} so a storm fails closed instead of propagating to callers.
+     * Interrupts and the caller's deadline are otherwise preserved unchanged.
+     */
+    private static Future<Boolean> submitOrNull(Callable<Boolean> task) {
+        try {
+            return SENDERS.submit(task);
+        } catch (RejectedExecutionException e) {
+            LOG.info("MeshTorrentMetadataFetcher: sender pool saturated, failing closed");
+            return null;
+        }
     }
 
     private byte[] fetchNow() {
@@ -123,7 +263,10 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
             byte[] payload = SearchPayloadCodec.encodeTorrentMetadataRequest(request);
             operation = transport.createSend(holderPub, MeshProtocolId.METADATA, payload, deadlineNanos);
             DistributedSearchTransport.SendOperation send = operation;
-            sent = SENDERS.submit(send::execute);
+            sent = submitOrNull(send::execute);
+            if (sent == null) {
+                return null;
+            }
             if (!sent.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
                 LOG.info("MeshTorrentMetadataFetcher: send failed to holder "
                         + Hex.encode(holderPub).substring(0, 8) + " ih=" + Hex.encode(infoHash));
@@ -147,8 +290,11 @@ public final class MeshTorrentMetadataFetcher implements DistributedSearchTransp
                 return null;
             }
             // JNI cannot be interrupted, so bound both its admission and the caller's wait.
-            verified = SENDERS.submit(() -> !Thread.currentThread().isInterrupted()
+            verified = submitOrNull(() -> !Thread.currentThread().isInterrupted()
                     && System.nanoTime() < deadlineNanos && matchesInfoHash(assembled, infoHash));
+            if (verified == null) {
+                return null;
+            }
             return verified.get(Math.max(1, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)
                     && !Thread.currentThread().isInterrupted() && System.nanoTime() < deadlineNanos
                     ? assembled : null;
