@@ -27,6 +27,7 @@ import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.search.relay.TorrentMetadataProvider;
 import com.frostwire.search.relay.TorrentMetadataRequest;
 import com.frostwire.search.relay.TorrentMetadataResponse;
+import com.frostwire.search.relay.event.IceBridgeEvents;
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
@@ -309,6 +310,8 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         if (meshProtocol == MeshProtocolId.INDEX_DIGEST) {
             if (peerDirectory != null) {
                 peerDirectory.setIndexDigest(sourcePub, payload);
+                IceBridgeEvents.digest(Hex.encode(sourcePub),
+                        "index digest applied bytes=" + payload.length);
             }
             return;
         }
@@ -575,6 +578,10 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     + request.keywords() + "\"");
             return;
         }
+        if (IceBridgeEvents.enabled()) {
+            IceBridgeEvents.search(Hex.encode(sourcePub),
+                    "inbound search keywords=\"" + request.keywords() + "\" ttl=" + request.ttl());
+        }
         // Admission authenticates before charging the requester and deduplicates lookup/fanout.
         try {
             Optional<RemoteSearchResponse> response = searchService.handle(request);
@@ -813,10 +820,12 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             }
             chosen.append(Hex.encode(peer.peerPub()), 0, 12);
         }
-        LOG.debug("Forward selection keywords=\"" + request.keywords() + "\" m=" + m
+        String forwardSelection = "Forward selection keywords=\"" + request.keywords() + "\" m=" + m
                 + " live=" + peerDirectory.liveCount()
                 + " digests=" + peerDirectory.digestCount()
-                + " chosen=" + chosen);
+                + " chosen=" + chosen;
+        LOG.debug(forwardSelection);
+        IceBridgeEvents.forward("", forwardSelection);
         int forwarded = 0;
         for (PeerDirectory.PeerInfo peer : sampled) {
             if (forwarded >= m) {
