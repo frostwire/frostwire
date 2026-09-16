@@ -57,22 +57,23 @@ public class SearchEnginesSettings extends LimeProps {
       FACTORY.createBooleanSetting("KNABEN_SEARCH_ENABLED", false);
   public static final BooleanSetting BITSEARCH_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("BITSEARCH_SEARCH_ENABLED", true);
+
   /**
-   * Diagnostic only: Local search queries this node's {@code LocalIndex} — the
-   * same index that answers inbound IceBridge distributed search requests. It
-   * does not contact peers. Default off; enable when testing what this node
-   * would serve remotely.
+   * Diagnostic only: Local search queries this node's {@code LocalIndex} — the same index that
+   * answers inbound IceBridge distributed search requests. It does not contact peers. Default off;
+   * enable when testing what this node would serve remotely.
    */
   public static final BooleanSetting LOCAL_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("LOCAL_SEARCH_ENABLED", false);
+
   /**
-   * When false (default), Local search and answers to remote distributed
-   * search only include torrents still in the transfer table with metadata
-   * that are seeding or actively downloading (in the swarm). When true,
-   * historical LocalIndex rows may appear even if no longer transferring.
+   * When false (default), Local search and answers to remote distributed search only include
+   * torrents still in the transfer table with metadata that are seeding or actively downloading (in
+   * the swarm). When true, historical LocalIndex rows may appear even if no longer transferring.
    */
   public static final BooleanSetting LOCAL_SEARCH_INCLUDE_INACTIVE =
       FACTORY.createBooleanSetting("LOCAL_SEARCH_INCLUDE_INACTIVE", false);
+
   public static final BooleanSetting DISTRIBUTED_SEARCH_ENABLED =
       FACTORY.createBooleanSetting("DISTRIBUTED_SEARCH_ENABLED", true);
 
@@ -87,6 +88,13 @@ public class SearchEnginesSettings extends LimeProps {
 
   public static final BooleanSetting ICEBRIDGE_ENABLED =
       FACTORY.createBooleanSetting("ICEBRIDGE_ENABLED", true);
+
+  /**
+   * Opt-in: publish this node's share catalog so IceBridge crawlers can discover and index the
+   * files it shares. Default false (sharing stays private unless explicitly enabled).
+   */
+  public static final BooleanSetting ICEBRIDGE_PUBLIC_CATALOG =
+      FACTORY.createBooleanSetting("ICEBRIDGE_PUBLIC_CATALOG", false);
 
   public static final BooleanSetting ICEBRIDGE_USE_REMOTE =
       FACTORY.createBooleanSetting("ICEBRIDGE_USE_REMOTE", false);
