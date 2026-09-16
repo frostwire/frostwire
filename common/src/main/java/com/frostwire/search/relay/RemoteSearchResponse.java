@@ -48,7 +48,18 @@ public final class RemoteSearchResponse {
     /** Wire version 2: signature domain always includes chunk + final flags. */
     public static final int VERSION_2 = 2;
     /** Wire version 3: rows may carry optional {@code bt} seeder endpoints. */
-    public static final int VERSION = 3;
+    public static final int VERSION_3 = 3;
+    /**
+     * Wire version 4: a row may carry {@code pc} — the holder's PUBLIC_CATALOG opt-in — so a
+     * requester can gate "crawl peer" before attempting a catalog fetch. Readers still accept
+     * v2/v3 (no {@code pc} = not crawlable); a v3 reader ignores {@code pc}.
+     */
+    public static final int VERSION_4 = 4;
+    /**
+     * Wire version written by default. v4 is the current format; readers still accept v2/v3 so
+     * peers on the limited pre-release build keep verifying each other's results.
+     */
+    public static final int VERSION = VERSION_4;
 
     /**
      * Default max rows per streamed RESULT frame. Full sets larger than this
@@ -79,7 +90,7 @@ public final class RemoteSearchResponse {
             this.rows.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
                     r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
-                    r.matchedFile, r.seederEndpoints));
+                    r.matchedFile, r.seederEndpoints, r.publicCatalog));
         }
         this.signature = signature.clone();
         this.chunkIndex = chunkIndex;
@@ -104,7 +115,7 @@ public final class RemoteSearchResponse {
             out.add(new Row(r.infoHash.clone(), r.name, r.sizeBytes,
                     r.fileCount, r.publisherEd25519Pub.clone(),
                     r.publisherNodeId == null ? null : r.publisherNodeId.clone(),
-                    r.matchedFile, r.seederEndpoints));
+                    r.matchedFile, r.seederEndpoints, r.publicCatalog));
         }
         return out;
     }
@@ -145,13 +156,13 @@ public final class RemoteSearchResponse {
         // (the row list is already in insertion order).
         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
         for (Row r : rows) {
-            appendRowBencode(out, r);
+            appendRowBencode(out, r, version);
         }
         return out.toByteArray();
     }
 
-    private static void appendRowBencode(java.io.ByteArrayOutputStream out, Row r) {
-        // Bencode a dict with sorted keys: bt?, fc, ih, mf?, n, nid?, pub, s
+    private static void appendRowBencode(java.io.ByteArrayOutputStream out, Row r, int version) {
+        // Bencode a dict with sorted keys: bt?, fc, ih, mf?, n, nid?, pc?, pub, s
         java.util.Map<String, byte[]> parts = new java.util.TreeMap<>();
         if (!r.seederEndpoints.isEmpty()) {
             parts.put("bt", String.join(",", r.seederEndpoints)
@@ -165,6 +176,9 @@ public final class RemoteSearchResponse {
         parts.put("n", r.name.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if (r.publisherNodeId != null) {
             parts.put("nid", Hex.encode(r.publisherNodeId).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        }
+        if (version >= VERSION_4 && r.publicCatalog) {
+            parts.put("pc", "1".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         }
         parts.put("pub", Base64.getEncoder().withoutPadding()
                 .encodeToString(r.publisherEd25519Pub).getBytes(java.nio.charset.StandardCharsets.UTF_8));
@@ -227,6 +241,9 @@ public final class RemoteSearchResponse {
             }
             if (!r.seederEndpoints.isEmpty()) {
                 row.put("bt", new ArrayList<>(r.seederEndpoints));
+            }
+            if (version >= VERSION_4 && r.publicCatalog) {
+                row.put("pc", Boolean.TRUE);
             }
             rowMaps.add(row);
         }
@@ -341,9 +358,19 @@ public final class RemoteSearchResponse {
                             }
                         }
                     }
+                    boolean publicCatalog = false;
+                    Object pcObj = row.get("pc");
+                    if (pcObj instanceof Boolean) {
+                        publicCatalog = (Boolean) pcObj;
+                    } else if (pcObj instanceof Number) {
+                        publicCatalog = ((Number) pcObj).longValue() != 0;
+                    } else if (pcObj instanceof String) {
+                        String pcText = (String) pcObj;
+                        publicCatalog = "1".equals(pcText) || Boolean.parseBoolean(pcText);
+                    }
                     b.addRow(ih, (String) nObj, ((Number) sObj).longValue(),
                             ((Number) fcObj).intValue(), pub, nid, matchedFile,
-                            seederEndpoints);
+                            seederEndpoints, publicCatalog);
                 }
             }
             return b.build();
@@ -367,6 +394,8 @@ public final class RemoteSearchResponse {
         public final String matchedFile;
         /** Responder BT listen endpoints (host:port, v3+; empty when none advertised). */
         public final List<String> seederEndpoints;
+        /** Responder's PUBLIC_CATALOG opt-in (v4+): may this holder's catalog be crawled? */
+        public final boolean publicCatalog;
 
         public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
                   byte[] publisherEd25519Pub, byte[] publisherNodeId) {
@@ -382,6 +411,13 @@ public final class RemoteSearchResponse {
         public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
                   byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile,
                   List<String> seederEndpoints) {
+            this(infoHash, name, sizeBytes, fileCount, publisherEd25519Pub, publisherNodeId,
+                    matchedFile, seederEndpoints, false);
+        }
+
+        public Row(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                  byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile,
+                  List<String> seederEndpoints, boolean publicCatalog) {
             if (infoHash == null || infoHash.length != 20) {
                 throw new IllegalArgumentException("infoHash must be 20 bytes");
             }
@@ -402,6 +438,7 @@ public final class RemoteSearchResponse {
             }
             this.publisherNodeId = publisherNodeId == null ? null : publisherNodeId.clone();
             this.matchedFile = matchedFile;
+            this.publicCatalog = publicCatalog;
             if (seederEndpoints == null || seederEndpoints.isEmpty()) {
                 this.seederEndpoints = java.util.Collections.emptyList();
             } else {
@@ -566,6 +603,14 @@ public final class RemoteSearchResponse {
                               List<String> seederEndpoints) {
             rows.add(new Row(infoHash, name, sizeBytes, fileCount,
                     publisherEd25519Pub, publisherNodeId, matchedFile, seederEndpoints));
+            return this;
+        }
+
+        public Builder addRow(byte[] infoHash, String name, long sizeBytes, int fileCount,
+                              byte[] publisherEd25519Pub, byte[] publisherNodeId, String matchedFile,
+                              List<String> seederEndpoints, boolean publicCatalog) {
+            rows.add(new Row(infoHash, name, sizeBytes, fileCount,
+                    publisherEd25519Pub, publisherNodeId, matchedFile, seederEndpoints, publicCatalog));
             return this;
         }
 
