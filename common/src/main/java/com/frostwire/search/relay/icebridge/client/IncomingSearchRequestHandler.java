@@ -805,6 +805,17 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         }
     }
 
+    /**
+     * Fan out one search hop to up to {@code m} sampled holders, synchronously on the request worker
+     * lane.
+     *
+     * <p>Deliberately synchronous: the per-request deadline and generation are held in our
+     * {@link ThreadLocal}s ({@code responseDeadline}/{@code responseGeneration}) and {@link #send}
+     * reads them for staleness/cancellation. Dispatching the fan-out to another thread would lose
+     * those and require threading an explicit deadline/generation through every send. The bounded
+     * request lane (queue 64, abort policy) is also the intentional amplification control, so
+     * moving this work elsewhere would only relocate the same load without bounding it better.
+     */
     private void forwardRequest(RemoteSearchRequest request, byte[] sourcePub) {
         if (!forwardingEnabled) {
             LOG.debug("Dropping search forward: forwarding disabled (CLIENT leaf role)");
