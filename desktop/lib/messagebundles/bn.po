@@ -4343,6 +4343,22 @@ msgstr "IceBridge সক্ষম করুন (বিতরণকৃত রি�
 msgid "Make shared torrents catalog crawlable"
 msgstr "আমার শেয়ার ক্যাটালগ প্রকাশ্যে শেয়ার করুন (ক্রলার)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding & Publishing"
+msgstr "সিডিং ও প্রকাশ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding a torrent publishes it to the BitTorrent network, making it discoverable by others. You can choose whether crawlers may browse the torrents you are actively seeding."
+msgstr "একটি টরেন্ট সিড করলে তা BitTorrent নেটওয়ার্কে প্রকাশিত হয়, ফলে অন্যরা এটি খুঁজে পায়। আপনি ঠিক করতে পারেন ক্রলাররা আপনার সক্রিয়ভাবে সিড করা টরেন্ট ব্রাউজ করতে পারবে কি না।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:46
+msgid "Let crawlers browse the torrents I am actively seeding"
+msgstr "আমি সক্রিয়ভাবে সিড করছি এমন টরেন্ট ক্রলারদের ব্রাউজ করতে দিন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:78
+msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
+msgstr "শুধুমাত্র আপনি সক্রিয়ভাবে সিড করছেন এমন টরেন্টই ক্রলারদের সাথে শেয়ার করা হয়। সিড না করা ডাউনলোড ইতিহাস কখনও প্রকাশ করা হয় না।"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "স্থানীয় IceBridge ডেমন ব্যবহার করুন (fork subprocess)"

@@ -4532,6 +4532,22 @@ msgstr "Activer IceBridge (relais distribué)"
 msgid "Make shared torrents catalog crawlable"
 msgstr "Partager publiquement mon catalogue de partage (robots)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding & Publishing"
+msgstr "Partage et publication"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding a torrent publishes it to the BitTorrent network, making it discoverable by others. You can choose whether crawlers may browse the torrents you are actively seeding."
+msgstr "Partager un torrent le publie sur le réseau BitTorrent, le rendant découvrable par les autres. Vous pouvez choisir si les robots d'exploration peuvent parcourir les torrents que vous partagez activement."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:46
+msgid "Let crawlers browse the torrents I am actively seeding"
+msgstr "Autoriser les robots d'exploration à parcourir les torrents que je partage activement"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:78
+msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
+msgstr "Seuls les torrents que vous partagez activement sont partagés avec les robots d'exploration. L'historique de téléchargement qui n'est pas partagé n'est jamais publié."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Utiliser le démon IceBridge local (sous-processus fork)"

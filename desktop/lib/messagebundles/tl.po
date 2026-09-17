@@ -4370,6 +4370,22 @@ msgstr "Paganahin ang IceBridge (distributed relay)"
 msgid "Make shared torrents catalog crawlable"
 msgstr "Ibahagi nang publiko ang aking share catalog (mga crawler)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding & Publishing"
+msgstr "Pagse-seed at Paglalathala"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding a torrent publishes it to the BitTorrent network, making it discoverable by others. You can choose whether crawlers may browse the torrents you are actively seeding."
+msgstr "Ang pag-seed ng torrent ay naglalathala nito sa BitTorrent network, na ginagawa itong matatagpuan ng iba. Maaari mong piliin kung maaaring mag-browse ang mga crawler sa mga torrent na aktibo mong sine-seed."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:46
+msgid "Let crawlers browse the torrents I am actively seeding"
+msgstr "Payagan ang mga crawler na mag-browse sa mga torrent na aktibo kong sine-seed"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:78
+msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
+msgstr "Tanging ang mga torrent na aktibo mong sine-seed ang ibinabahagi sa mga crawler. Ang kasaysayan ng pag-download na hindi sine-seed ay hindi kailanman inilalathala."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Gamitin ang local IceBridge daemon (fork subprocess)"

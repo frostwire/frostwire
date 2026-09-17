@@ -4409,6 +4409,22 @@ msgstr "Enable IceBridge (distributed relay)"
 msgid "Make shared torrents catalog crawlable"
 msgstr "Rannañ foran ma c'hatalog rannañ (kraperien)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding & Publishing"
+msgstr "Hadañ ha Embann"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding a torrent publishes it to the BitTorrent network, making it discoverable by others. You can choose whether crawlers may browse the torrents you are actively seeding."
+msgstr "Hadañ un torrent a embann anezhañ war ar rouedad BitTorrent, o lakaat anezhañ da vezañ kavet gant ar re all. Gallout a rit dibab hag-eñ e c'hall ar skraberien verdeiñ an torrentoù a hadit en un doare oberiant."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:46
+msgid "Let crawlers browse the torrents I am actively seeding"
+msgstr "Lezel ar skraberien da verdeiñ an torrentoù a hadan en un doare oberiant"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:78
+msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
+msgstr "An torrentoù a hadit en un doare oberiant hepken a vez rannet gant ar skraberien. Roll an ezkargadurioù n'eo ket hadet ne vez ket embannet morse."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Use local IceBridge daemon (fork subprocess)"

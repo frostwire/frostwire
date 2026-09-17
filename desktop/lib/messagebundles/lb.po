@@ -4459,6 +4459,22 @@ msgstr "IceBridge aschalten (verdeelte Relay)"
 msgid "Make shared torrents catalog crawlable"
 msgstr "Mäin Deelkatalog ëffentlech deelen (Crawler)"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding & Publishing"
+msgstr "Seeding & Verëffentlechen"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:39
+msgid "Seeding a torrent publishes it to the BitTorrent network, making it discoverable by others. You can choose whether crawlers may browse the torrents you are actively seeding."
+msgstr "En Torrent seeden verëffentlecht en am BitTorrent-Netz, sou datt anerer en fanne kënnen. Dir kënnt auswielen, ob Crawler déi Torrenten duerchsiche kënnen, déi Dir aktiv seedt."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:46
+msgid "Let crawlers browse the torrents I am actively seeding"
+msgstr "Crawler erlaben, d'Torrenten z'duerchsichen, déi ech aktiv seeden"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:78
+msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
+msgstr "Nëmmen Torrenten, déi Dir aktiv seedt, ginn mat Crawler gedeelt. Downloadverlaf, deen net geseed gëtt, gëtt ni verëffentlecht."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Lokalen IceBridge-Daemon benotzen (Fork-Ënnerprozess)"
