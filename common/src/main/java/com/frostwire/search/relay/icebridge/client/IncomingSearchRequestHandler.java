@@ -755,6 +755,13 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 if (t == null || !ShareVisibility.isPubliclyShared(t.infoHashHex(), visibility)) {
                     continue;
                 }
+                // Only serve torrents the transfer manager is actively sharing right now. The
+                // local index also keeps history (previously downloaded, not seeding) which must
+                // never be published to crawlers.
+                if (torrentMetadataProvider != null
+                        && !isMetadataPublic(torrentMetadataProvider, t.infoHash())) {
+                    continue;
+                }
                 entries.add(new RemoteIndexFetcher.RemoteTorrentEntry(
                         t.infoHashHex(), t.name(), t.sizeBytes(), t.fileCount()));
             }
