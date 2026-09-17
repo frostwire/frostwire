@@ -582,6 +582,7 @@ test {
         includeTestsMatching "com.frostwire.crypto.*"
         includeTestsMatching "com.frostwire.mcp.*"
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
+        includeTestsMatching "com.limegroup.gnutella.gui.icebridge.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageLoadingTest"
         includeTestsMatching "com.frostwire.gui.searchfield.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
