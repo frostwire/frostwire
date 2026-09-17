@@ -770,6 +770,13 @@ final class Initializer {
       if (!relayLifecycle.getAsBoolean()) return;
       IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client);
       relayResources.add(transport);
+      // Attach pipeline metrics so poll/drain saturation and rejected work are visible
+      // through the MCP relay metrics tool.
+      com.frostwire.search.relay.icebridge.IceBridgeMetrics transportMetrics =
+          new com.frostwire.search.relay.icebridge.IceBridgeMetrics();
+      transport.setMetrics(transportMetrics);
+      com.limegroup.gnutella.gui.search.SearchEngine.setDistributedTransportMetrics(
+          transportMetrics);
 
       // Register an incoming-request handler so remote peers can
       // search our local index through IceBridge.

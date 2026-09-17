@@ -447,6 +447,12 @@ public abstract class SearchEngine {
   /** Holder for the transport used by the DISTRIBUTED engine to send/receive search payloads. */
   private volatile DistributedSearchTransport searchTransport;
 
+  /**
+   * Optional pipeline metrics of the DISTRIBUTED transport (poll runs/errors, drain volume,
+   * request-queue depth, rejected work, verification failures). Surfaced through MCP diagnostics.
+   */
+  private volatile com.frostwire.search.relay.icebridge.IceBridgeMetrics transportMetrics;
+
   /** MCP / diagnostics accessors for distributed relay wiring. */
   public static com.frostwire.search.relay.PeerDirectory getDistributedPeerDirectory() {
     return DISTRIBUTED.peerDirectory;
@@ -463,6 +469,18 @@ public abstract class SearchEngine {
 
   public static com.frostwire.search.relay.LocalIndex getDistributedLocalIndex() {
     return DISTRIBUTED.localIndex;
+  }
+
+  /** Installs the metrics object attached to the DISTRIBUTED transport, for MCP diagnostics. */
+  public static void setDistributedTransportMetrics(
+      com.frostwire.search.relay.icebridge.IceBridgeMetrics metrics) {
+    DISTRIBUTED.transportMetrics = metrics;
+  }
+
+  /** The DISTRIBUTED transport metrics, or {@code null} when not wired. */
+  public static com.frostwire.search.relay.icebridge.IceBridgeMetrics
+      getDistributedTransportMetrics() {
+    return DISTRIBUTED.transportMetrics;
   }
 
   private final SearchEngineID _id;

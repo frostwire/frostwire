@@ -81,6 +81,22 @@ public class RelayMetricsTool implements MCPTool {
         // Leave hasLocalIndex false.
       }
       out.addProperty("has_local_index", hasLocalIndex);
+
+      try {
+        com.frostwire.search.relay.icebridge.IceBridgeMetrics metrics =
+            SearchEngine.getDistributedTransportMetrics();
+        if (metrics != null) {
+          out.addProperty("transport_poll_runs", metrics.transportPollRunsCount());
+          out.addProperty("transport_poll_errors", metrics.transportPollErrorsCount());
+          out.addProperty("transport_drain_batches", metrics.transportPollDrainBatchesCount());
+          out.addProperty("transport_messages_drained", metrics.transportMessagesDrainedCount());
+          out.addProperty("transport_request_queue_depth", metrics.requestWorkQueueDepthGauge());
+          out.addProperty("transport_request_rejected", metrics.requestWorkRejectedCount());
+          out.addProperty("transport_verify_failures", metrics.verifyFailuresCount());
+        }
+      } catch (Throwable ignore) {
+        // Transport metrics are optional diagnostics.
+      }
     } catch (Throwable t) {
       out.addProperty("error", String.valueOf(t));
     }
