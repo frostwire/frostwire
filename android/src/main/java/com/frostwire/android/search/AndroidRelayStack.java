@@ -32,6 +32,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BTEngineListenerChain;
+import com.frostwire.search.relay.CatalogBrowser;
 import com.frostwire.search.relay.CompositePeerDiscoverySource;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
@@ -108,6 +109,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC;
 
   private static final Object START_LOCK = new Object();
+  /** Serializes catalog browses: a {@link CatalogBrowser} is not thread-safe. */
+  private static final Object CATALOG_BROWSE_LOCK = new Object();
   private static volatile AndroidRelayStack live;
   private static final long PUBLICATION_DRAIN_SECONDS = 2;
   private static final ScheduledThreadPoolExecutor CLEANUP = new ScheduledThreadPoolExecutor(1, task -> {
@@ -682,6 +685,11 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.permitted = permitted;
   }
 
+  /** The currently running stack, or {@code null} when IceBridge is not up. */
+  public static AndroidRelayStack live() {
+    return live;
+  }
+
   public AndroidLocalIndex localIndex() {
     return localIndex;
   }
@@ -709,6 +717,32 @@ public final class AndroidRelayStack implements AutoCloseable {
 
   public PeerDirectory peerDirectory() {
     return peerDirectory;
+  }
+
+  /**
+   * Fetches {@code peerPub}'s public shared-torrent catalog over the IceBridge
+   * mesh: the same signed Protocol #1 request the desktop relay control API
+   * exposes as {@code GET /catalog}. A {@link CatalogBrowser} is not
+   * thread-safe, so calls are serialized here; this method blocks and must be
+   * invoked off the UI thread. Returns an empty list when the stack is not up,
+   * the peer has not opted in to PUBLIC_CATALOG, or the peer does not answer
+   * within {@code timeoutMs}.
+   */
+  public java.util.List<com.frostwire.search.relay.RemoteIndexFetcher.RemoteTorrentEntry>
+      browseCatalog(byte[] peerPub, int timeoutMs) {
+    IceBridgeSearchTransport t = transport;
+    IdentityKeys id = identity;
+    if (t == null || id == null || peerPub == null || peerPub.length != 32) {
+      return java.util.Collections.emptyList();
+    }
+    synchronized (CATALOG_BROWSE_LOCK) {
+      return new CatalogBrowser(id, t).fetchCatalog(peerPub, timeoutMs);
+    }
+  }
+
+  /** True when the mesh transport is up, so a catalog browse can be attempted. */
+  public boolean canBrowseCatalog() {
+    return transport != null && identity != null;
   }
 
   private static int freeLocalControlPort() throws java.io.IOException {
