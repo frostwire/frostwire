@@ -405,6 +405,10 @@ public final class AndroidRelayStack implements AutoCloseable {
 
       tr = new IceBridgeSearchTransport(cl);
       requirePermitted(permitted);
+      // In-process server: surface this transport's pipeline saturation on the local /metrics.
+      if (srv != null) {
+        tr.setMetrics(srv.metrics());
+      }
       tr.start();
 
       RelaySearchService ss = new RelaySearchService(li, ident, visibility);
