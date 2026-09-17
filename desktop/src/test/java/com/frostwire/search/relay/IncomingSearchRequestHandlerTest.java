@@ -620,6 +620,62 @@ class IncomingSearchRequestHandlerTest {
     }
   }
 
+  @Test
+  void catalogServesOnlyActivelySharedTorrentsNotDownloadHistory() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    LocalSharedTorrent active = torrent("actively-seeding", 100, 1);
+    LocalSharedTorrent history = torrent("downloaded-not-seeding", 100, 1);
+    index.torrents.add(active);
+    index.torrents.add(history);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(index, holder, ShareVisibilityPolicy.INCLUDE_ALL),
+            null,
+            holder,
+            index);
+    handler.setPublicCatalogEnabled(true);
+    handler.setTorrentMetadataProvider(
+        new TorrentMetadataProvider() {
+          @Override
+          public boolean isPubliclyShared(byte[] hash) {
+            return java.util.Arrays.equals(hash, active.infoHash());
+          }
+
+          @Override
+          public byte[] torrentBytes(byte[] hash) {
+            return null;
+          }
+        });
+
+    RemoteCatalogBrowseRequest.Builder builder =
+        RemoteCatalogBrowseRequest.builder()
+            .requesterPub(rawPub(requester))
+            .targetPub(holder.ed25519PubRaw())
+            .nonce(randomBytes(32))
+            .timestamp(System.currentTimeMillis() / 1000)
+            .signature(new byte[64]);
+    Signature signer = Signature.getInstance("Ed25519");
+    signer.initSign(requester.getPrivate());
+    signer.update(builder.build().canonicalBytes());
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build()),
+        0);
+
+    assertEquals(1, transport.sent.size());
+    String manifest =
+        new String(transport.sent.get(0).payload, java.nio.charset.StandardCharsets.UTF_8);
+    assertTrue(manifest.contains("actively-seeding"), "active share must be served");
+    assertFalse(
+        manifest.contains("downloaded-not-seeding"),
+        "downloaded-but-not-seeding history must never be served");
+  }
+
   // --- helpers ---
 
   @Test
