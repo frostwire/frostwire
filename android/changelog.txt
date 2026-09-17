@@ -1,4 +1,7 @@
 FrostWire 3.2.1 build 777 UNRELEASED
+  - new:Seeding is publishing — the first-run wizard explains that seeding a torrent makes it discoverable on the BitTorrent network, and lets you opt in (off by default) to having the torrents you are actively seeding browsable by the network's crawlers
+  - fix:Only torrents you are actively seeding are shared with catalog crawlers — downloaded history that is not seeding is no longer published
+  - fix:Distributed search and the relay stay responsive under heavy search traffic — packet processing is handed off the socket event loop, response delivery runs on a bounded lane, and concurrent torrent-metadata fetches are capped
   - new:Distributed search routes to the peers that actually hold the content — nodes announce a compact keyword fingerprint and requests are forwarded to likely holders with a small bounded fan-out instead of random peers, so rare results are found reliably and faster
   - new:Peers keep an up-to-date list of reachable IceBridge nodes and never query unreachable ones — nodes that stop answering (directly or through a relay) are removed from the local list and evicted instead of being retried forever
   - new:Search progress now shows IceBridge status — "Distributed Search · N peers contacted" with starting / not-running hints, translated to every supported language
