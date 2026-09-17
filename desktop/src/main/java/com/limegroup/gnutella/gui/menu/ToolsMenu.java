@@ -82,11 +82,24 @@ final class ToolsMenu extends AbstractMenu {
     MENU.add(switchThemeMenu);
     addSeparator();
     addMenuItem(new IceBridgeConsoleAction());
+    addMenuItem(new PeerCatalogAction());
   }
 
   @Override
   protected void refresh() {
     updateAction.refresh();
+  }
+
+  private static class PeerCatalogAction extends AbstractAction {
+    PeerCatalogAction() {
+      super(I18n.tr("Browse Shared Torrents"));
+      putValue(LONG_DESCRIPTION, I18n.tr("Browse the torrents a peer shares over IceBridge"));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      com.limegroup.gnutella.gui.icebridge.PeerCatalogWindow.showPeerPicker();
+    }
   }
 
   private static class IceBridgeConsoleAction extends AbstractAction {

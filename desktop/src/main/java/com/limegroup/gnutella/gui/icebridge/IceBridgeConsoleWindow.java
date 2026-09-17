@@ -144,6 +144,9 @@ public final class IceBridgeConsoleWindow {
     JButton copy = new JButton(I18n.tr("Copy"));
     copy.addActionListener(e -> copyToClipboard());
     controls.add(copy);
+    JButton peerCatalog = new JButton(I18n.tr("Browse Shared Torrents") + "...");
+    peerCatalog.addActionListener(e -> PeerCatalogWindow.showPeerPicker());
+    controls.add(peerCatalog);
     controls.add(autoScroll);
     controls.add(Box.createHorizontalGlue());
 
