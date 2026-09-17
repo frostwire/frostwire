@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">A seedelés közzététel</string>
     <string name="icebridge_public_catalog_wizard_description">Amikor seedel egy torrentet, közzéteszi azt a BitTorrent hálózaton, hogy mások megtalálhassák és letölthessék. Kiválaszthatja, hogy a hálózat bejárói indexelhessék-e azokat a torrenteket is, amelyeket aktívan seedel.</string>
     <string name="icebridge_public_catalog_wizard_label">Engedje, hogy a bejárók böngésszék az általam aktívan seedelt torrenteket</string>
+    <string name="peer_catalog_browse_action">Megosztott torrentek böngészése</string>
+    <string name="peer_catalog_title">Megosztott torrentek</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

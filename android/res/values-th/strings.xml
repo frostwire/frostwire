@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">การซีดคือการเผยแพร่</string>
     <string name="icebridge_public_catalog_wizard_description">เมื่อคุณซีดทอร์เรนต์ คุณจะเผยแพร่มันไปยังเครือข่าย BitTorrent เพื่อให้ผู้อื่นค้นหาและดาวน์โหลดได้ คุณสามารถเลือกได้ว่าครอว์เลอร์ของเครือข่ายจะจัดทำดัชนีทอร์เรนต์ที่คุณกำลังซีดอย่างจริงจังด้วยหรือไม่</string>
     <string name="icebridge_public_catalog_wizard_label">ให้ครอว์เลอร์เรียกดูทอร์เรนต์ที่ฉันกำลังซีดอย่างจริงจัง</string>
+    <string name="peer_catalog_browse_action">เรียกดูทอร์เรนต์ที่แชร์</string>
+    <string name="peer_catalog_title">ทอร์เรนต์ที่แชร์</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

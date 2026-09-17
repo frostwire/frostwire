@@ -620,6 +620,8 @@
     <string name="icebridge_public_catalog_wizard_title">Сидовање је објављивање</string>
     <string name="icebridge_public_catalog_wizard_description">Када сидујете торрент, објављујете га на BitTorrent мрежи тако да га други могу пронаћи и преузети. Можете да изаберете да ли претраживачи мреже могу да индексирају и торренте које активно сидујете.</string>
     <string name="icebridge_public_catalog_wizard_label">Дозволи претраживачима да прегледају торренте које активно сидујем</string>
+    <string name="peer_catalog_browse_action">Прегледај дељене торенте</string>
+    <string name="peer_catalog_title">Дељени торенти</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

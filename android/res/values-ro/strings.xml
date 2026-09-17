@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">Seedarea înseamnă publicare</string>
     <string name="icebridge_public_catalog_wizard_description">Când seedezi un torrent, îl publici în rețeaua BitTorrent pentru ca alții să îl poată găsi și descărca. Poți alege dacă crawler-ele rețelei pot indexa și torrentele pe care le seedezi activ.</string>
     <string name="icebridge_public_catalog_wizard_label">Permite crawler-elor să răsfoiască torrentele pe care le seedez activ</string>
+    <string name="peer_catalog_browse_action">Navighează torrentele partajate</string>
+    <string name="peer_catalog_title">Torrente partajate</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

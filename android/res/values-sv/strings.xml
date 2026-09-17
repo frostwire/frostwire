@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">Seeding är publicering</string>
     <string name="icebridge_public_catalog_wizard_description">När du seedar en torrent publicerar du den på BitTorrent-nätverket så att andra kan hitta och ladda ner den. Du kan välja om nätverkets crawlers också får indexera de torrents du aktivt seedar.</string>
     <string name="icebridge_public_catalog_wizard_label">Låt crawlers bläddra bland de torrents jag aktivt seeder</string>
+    <string name="peer_catalog_browse_action">Bläddra bland delade torrents</string>
+    <string name="peer_catalog_title">Delade torrents</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

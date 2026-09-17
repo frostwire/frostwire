@@ -203,6 +203,10 @@
                 android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
                 android:screenOrientation="portrait"
                 android:label="@string/title_activity_transfer_detail" />
+        <activity
+                android:name="com.frostwire.android.gui.activities.PeerCatalogActivity"
+                android:screenOrientation="portrait"
+                android:label="@string/peer_catalog_title" />
 
         <!-- apollo activities -->
         <activity

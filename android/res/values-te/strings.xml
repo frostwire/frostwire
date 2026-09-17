@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">సీడ్ చేయడం అంటే ప్రచురించడం</string>
     <string name="icebridge_public_catalog_wizard_description">మీరు ఒక టొరెంట్‌ను సీడ్ చేసినప్పుడు, ఇతరులు దానిని కనుగొని డౌన్‌లోడ్ చేయగలిగేలా మీరు దానిని BitTorrent నెట్‌వర్క్‌లో ప్రచురిస్తారు. మీరు చురుకుగా సీడ్ చేస్తున్న టొరెంట్లను నెట్‌వర్క్ క్రాలర్‌లు కూడా ఇండెక్స్ చేయవచ్చా అనేది మీరు ఎంచుకోవచ్చు.</string>
     <string name="icebridge_public_catalog_wizard_label">నేను చురుకుగా సీడ్ చేస్తున్న టొరెంట్లను క్రాలర్‌లు బ్రౌజ్ చేయనివ్వండి</string>
+    <string name="peer_catalog_browse_action">షేర్ చేసిన టొరెంట్లను బ్రౌజ్ చేయండి</string>
+    <string name="peer_catalog_title">షేర్ చేసిన టొరెంట్లు</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

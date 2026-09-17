@@ -411,6 +411,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                     }
                 }
             };
+            // Distributed results whose holder publishes a catalog offer a
+            // "Browse Shared Torrents" long-press action; other rows stay as they were.
+            adapter.setShowMenuOnLongClick(true);
         }
         list.setAdapter(adapter);
     }

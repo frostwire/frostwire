@@ -619,6 +619,8 @@
     <string name="icebridge_public_catalog_wizard_title">シードは公開です</string>
     <string name="icebridge_public_catalog_wizard_description">torrent をシードすると、他の人が見つけてダウンロードできるように BitTorrent ネットワークへ公開されます。ネットワークのクローラーにも、あなたが実際にシードしている torrent をインデックスさせるかどうかを選べます。</string>
     <string name="icebridge_public_catalog_wizard_label">クローラーに、私が実際にシードしている torrent を閲覧させる</string>
+    <string name="peer_catalog_browse_action">共有トレントを閲覧</string>
+    <string name="peer_catalog_title">共有トレント</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

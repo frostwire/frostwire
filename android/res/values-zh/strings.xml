@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">做种即发布</string>
     <string name="icebridge_public_catalog_wizard_description">当你为种子做种时，你将其发布到 BitTorrent 网络，让他人能够找到并下载。你可以选择是否允许网络爬虫同时索引你正在积极做种的种子。</string>
     <string name="icebridge_public_catalog_wizard_label">允许爬虫浏览我正在积极做种的种子</string>
+    <string name="peer_catalog_browse_action">浏览共享种子</string>
+    <string name="peer_catalog_title">共享种子</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

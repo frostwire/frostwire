@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">Semear é publicar</string>
     <string name="icebridge_public_catalog_wizard_description">Quando você semeia um torrent, você o publica na rede BitTorrent para que outras pessoas possam encontrá-lo e baixá-lo. Você pode escolher se os rastreadores da rede também podem indexar os torrents que você está semeando ativamente.</string>
     <string name="icebridge_public_catalog_wizard_label">Permitir que os rastreadores naveguem pelos torrents que estou semeando ativamente</string>
+    <string name="peer_catalog_browse_action">Navegar pelos torrents partilhados</string>
+    <string name="peer_catalog_title">Torrents partilhados</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

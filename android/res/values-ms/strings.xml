@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">Seed ialah penerbitan</string>
     <string name="icebridge_public_catalog_wizard_description">Apabila anda melakukan seed untuk torrent, anda menerbitkannya pada rangkaian BitTorrent supaya orang lain boleh menemuinya dan memuat turunnya. Anda boleh memilih sama ada crawler rangkaian juga boleh mengindeks torrent yang anda seed secara aktif.</string>
     <string name="icebridge_public_catalog_wizard_label">Benarkan crawler melayari torrent yang sedang saya seed secara aktif</string>
+    <string name="peer_catalog_browse_action">Semak imbas Torrent Dikongsi</string>
+    <string name="peer_catalog_title">Torrent Dikongsi</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

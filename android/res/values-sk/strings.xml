@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">Seedovanie je zverejňovanie</string>
     <string name="icebridge_public_catalog_wizard_description">Keď seedujete torrent, zverejňujete ho v sieti BitTorrent, aby ho ostatní mohli nájsť a stiahnuť. Môžete si vybrať, či prehľadávače siete môžu indexovať aj torrenty, ktoré aktívne seedujete.</string>
     <string name="icebridge_public_catalog_wizard_label">Nechať prehľadávače prezerať torrenty, ktoré aktívne seedujem</string>
+    <string name="peer_catalog_browse_action">Prehliadať zdieľané torrenty</string>
+    <string name="peer_catalog_title">Zdieľané torrenty</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

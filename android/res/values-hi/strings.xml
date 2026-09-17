@@ -618,6 +618,8 @@
     <string name="icebridge_public_catalog_wizard_title">सीड करना ही प्रकाशित करना है</string>
     <string name="icebridge_public_catalog_wizard_description">जब आप कोई टोरेंट सीड करते हैं, तो आप उसे BitTorrent नेटवर्क पर प्रकाशित करते हैं ताकि दूसरे लोग उसे ढूँढकर डाउनलोड कर सकें। आप चुन सकते हैं कि नेटवर्क के क्रॉलर उन टोरेंट को भी इंडेक्स कर सकें जिन्हें आप सक्रिय रूप से सीड कर रहे हैं।</string>
     <string name="icebridge_public_catalog_wizard_label">क्रॉलर को उन टोरेंट ब्राउज़ करने दें जिन्हें मैं सक्रिय रूप से सीड कर रहा हूँ</string>
+    <string name="peer_catalog_browse_action">साझा किए गए टोरेंट ब्राउज़ करें</string>
+    <string name="peer_catalog_title">साझा किए गए टोरेंट</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

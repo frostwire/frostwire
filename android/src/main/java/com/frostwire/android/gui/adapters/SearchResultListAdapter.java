@@ -41,6 +41,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
+import com.frostwire.android.gui.adapters.menu.BrowseSharedTorrentsMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.SearchResultUtils;
 import com.frostwire.android.gui.util.UIUtils;
@@ -48,10 +49,13 @@ import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
 import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
+import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.util.FWImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -294,6 +298,31 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     protected void onItemClicked(View v) {
         SearchResult sr = (SearchResult) v.getTag();
         searchResultClicked(sr);
+    }
+
+    /**
+     * Long-press menu, offered only for Distributed results whose holder opted
+     * in to being browsable (magnet flag {@code x.hc=1} and an {@code x.hp}
+     * holder address). Every other row returns null, so long-press remains a
+     * no-op for them.
+     */
+    @Override
+    protected MenuAdapter getMenuAdapter(View view) {
+        if (view == null || !(view.getTag() instanceof SearchResult)) {
+            return null;
+        }
+        SearchResult sr = (SearchResult) view.getTag();
+        String magnet = sr.getDetailsUrl();
+        if (!LibTorrentMagnetDownloader.hasPublicCatalogFlag(magnet)) {
+            return null;
+        }
+        byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(magnet);
+        if (holderPub == null) {
+            return null;
+        }
+        List<MenuAction> items = new ArrayList<>(1);
+        items.add(new BrowseSharedTorrentsMenuAction(getContext(), holderPub));
+        return new MenuAdapter(getContext(), sr.getDisplayName(), items);
     }
 
     abstract protected void searchResultClicked(SearchResult sr);
