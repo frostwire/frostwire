@@ -50,6 +50,12 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     private final IceBridgeClient client;
     private final CopyOnWriteArrayList<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService scheduler;
+    /**
+     * Bounded lane for inbound request work (index query, signing, forwards). Deliberately small
+     * with {@link ThreadPoolExecutor.AbortPolicy}: dropping unadmitted inbound search work is the
+     * amplification control, not a bug. Saturation is observable via the {@code requestWorkRejected}
+     * and {@code requestWorkQueueDepth} metrics. Workers never run on the poller thread.
+     */
     private final ThreadPoolExecutor requestWorkers;
     private final AtomicBoolean started = new AtomicBoolean();
     private final ThreadPoolExecutor deliveryWorkers;
