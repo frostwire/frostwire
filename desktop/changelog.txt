@@ -1,4 +1,12 @@
  FrostWire 7.1.0 UNRELEASED
+  - new:Seeding is publishing — a new setup-wizard page explains that seeding a torrent makes it discoverable on the BitTorrent network, and lets you opt in (off by default) to having the torrents you are actively seeding browsable by the network's crawlers
+  - fix:Only torrents you are actively seeding are shared with catalog crawlers — previously downloaded torrents that are not seeding are no longer published
+  - new:Tools → IceBridge Console — a live, filterable IceBridge/distributed-search event log (filter by level, category, text, or peer; pause, clear, save, copy)
+  - new:The MCP server now exposes IceBridge observability and control — logs query/tail/clear, relay metrics, peer list/remove/block, local index list/search, digest status, host-cache list/ping/add, remote relay logs, MCP status/control, and IceBridge settings via settings get/set
+  - new:Headless IceBridge presence crawler and mirror tooling (DHT heartbeat-topic presence counts, catalog crawler, allowlist-driven re-sharing)
+  - fix:Distributed search and the relay stay responsive under heavy search traffic — rUDP packet processing is handed off the socket event loop, response delivery runs on a bounded lane, and concurrent torrent-metadata fetches are capped instead of exhausting threads
+  - new:Pipeline saturation is observable — /metrics reports poll runs/errors, drain volume, request-queue depth, rejected work, and verification failures
+  - fix:Crawler data stays anonymous — presence is stored as hashed endpoints and catalogs by publisher peer id only (never IP addresses)
   - fix:CRITICAL: matchedFile excluded from RemoteSearchResponse canonical bytes — Ed25519 signature did not cover the matched file path, allowing MITM tampering. Now included in appendRowBencode as "mf" key
   - fix:IP Filter critical blocking bug — add_rule() was passing flags=0 (allow) instead of ip_filter.access_flags.blocked.swigValue()=1, so blocked IP ranges were silently allowed through libtorrent (#1291) — caught by new IPFilterBlockingTest regression suite
   - fix:TLS hostname verification now uses proper suffix matching instead of substring contains — prevents attacker-controlled hostnames from matching whitelisted domains
