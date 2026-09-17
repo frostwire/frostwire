@@ -73,7 +73,9 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     GUIUtils.restrictSize(REMOTE_RADIO, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(ROLE_COMBO, SizePolicy.RESTRICT_HEIGHT);
 
-    PUBLIC_CATALOG_CHECKBOX.setToolTipText(I18n.tr("Make shared torrents catalog crawlable"));
+    PUBLIC_CATALOG_CHECKBOX.setToolTipText(
+        I18n.tr(
+            "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."));
 
     add(ENABLED_CHECKBOX);
     add(PUBLIC_CATALOG_CHECKBOX);
