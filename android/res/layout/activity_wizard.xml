@@ -33,6 +33,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.frostwire.android.gui.views.PublicCatalogWizardPage
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.frostwire.android.gui.views.IntentWizardPage
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
