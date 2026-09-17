@@ -88,6 +88,27 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
         }
     }
 
+    /**
+     * Reads the {@code x.hc} public-catalog flag the Distributed search
+     * performer appends to a result magnet when its holder has opted in to
+     * PUBLIC_CATALOG. When set, catalogs of that holder may be browsed, so the
+     * UI offers the "Browse Shared Torrents" action. Fails closed: absent,
+     * malformed, or any value other than {@code 1}/{@code true} yields false.
+     */
+    public static boolean hasPublicCatalogFlag(String magnetUri) {
+        if (StringUtils.isNullOrEmpty(magnetUri) || magnetUri.startsWith("http")) {
+            return false;
+        }
+        int i = magnetUri.indexOf("x.hc=");
+        if (i < 0) {
+            return false;
+        }
+        int start = i + "x.hc=".length();
+        int end = magnetUri.indexOf('&', start);
+        String value = end < 0 ? magnetUri.substring(start) : magnetUri.substring(start, end);
+        return "1".equals(value) || "true".equalsIgnoreCase(value);
+    }
+
     public static File getTempDir() {
         File fwDummy = null;
         try {

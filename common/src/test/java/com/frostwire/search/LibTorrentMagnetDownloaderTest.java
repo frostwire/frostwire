@@ -75,4 +75,27 @@ public class LibTorrentMagnetDownloaderTest {
         assertNull(LibTorrentMagnetDownloader.parseHolderPub(null));
         assertNull(LibTorrentMagnetDownloader.parseHolderPub("http://example.com/f.torrent"));
     }
+
+    @Test
+    public void detectsPublicCatalogFlag() {
+        assertTrue(LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&dn=test.bin&x.hc=1"));
+        assertTrue(LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hc=1&x.hp=abc"));
+        assertTrue(LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hc=true"));
+    }
+
+    @Test
+    public void publicCatalogFlagFailsClosed() {
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&dn=test.bin"));
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hc=0"));
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag(
+                "magnet:?xt=urn:btih:" + INFOHASH + "&x.hc="));
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag(null));
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag(""));
+        assertTrue(!LibTorrentMagnetDownloader.hasPublicCatalogFlag("http://example.com/f.torrent"));
+    }
 }
