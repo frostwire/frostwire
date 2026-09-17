@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - new:Browse the torrents a peer shares — right-click a Distributed search result whose holder allows crawling ("Browse Shared Torrents") to list everything that peer is sharing
   - new:Seeding is publishing — a new setup-wizard page explains that seeding a torrent makes it discoverable on the BitTorrent network, and lets you opt in (off by default) to having the torrents you are actively seeding browsable by the network's crawlers
   - fix:Only torrents you are actively seeding are shared with catalog crawlers — previously downloaded torrents that are not seeding are no longer published
   - new:Tools → IceBridge Console — a live, filterable IceBridge/distributed-search event log (filter by level, category, text, or peer; pause, clear, save, copy)
