@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">내 공유 카탈로그를 공개적으로 공유 (크롤러)</string>
-    <string name="icebridge_public_catalog_summary">네트워크 크롤러가 공개적으로 공유하는 토렌트를 색인하도록 허용합니다. 기본값은 꺼짐입니다.</string>
+    <string name="icebridge_public_catalog_summary">네트워크 크롤러가 현재 시딩 중인 토렌트를 색인하도록 허용합니다. 시딩하지 않는 다운로드 기록은 절대 공개되지 않습니다. 기본값은 꺼짐입니다.</string>
+    <string name="icebridge_public_catalog_wizard_title">시딩은 공개입니다</string>
+    <string name="icebridge_public_catalog_wizard_description">토렌트를 시딩하면 다른 사람들이 찾아 다운로드할 수 있도록 BitTorrent 네트워크에 공개됩니다. 네트워크 크롤러가 현재 시딩 중인 토렌트도 색인하도록 할지 선택할 수 있습니다.</string>
+    <string name="icebridge_public_catalog_wizard_label">크롤러가 내가 현재 시딩 중인 토렌트를 탐색하도록 허용</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

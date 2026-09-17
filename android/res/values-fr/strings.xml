@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Partager publiquement mon catalogue de partage (robots)</string>
-    <string name="icebridge_public_catalog_summary">Laissez les robots du réseau indexer les torrents que vous partagez publiquement. Désactivé par défaut.</string>
+    <string name="icebridge_public_catalog_summary">Laissez les robots du réseau indexer les torrents que vous partagez activement. L\'historique des téléchargements qui n\'est pas partagé n\'est jamais publié. Désactivé par défaut.</string>
+    <string name="icebridge_public_catalog_wizard_title">Partager, c\'est publier</string>
+    <string name="icebridge_public_catalog_wizard_description">Lorsque vous partagez un torrent, vous le publiez sur le réseau BitTorrent afin que d\'autres puissent le trouver et le télécharger. Vous pouvez choisir si les robots du réseau peuvent aussi indexer les torrents que vous partagez activement.</string>
+    <string name="icebridge_public_catalog_wizard_label">Autoriser les robots à parcourir les torrents que je partage activement</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

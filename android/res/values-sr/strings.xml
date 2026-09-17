@@ -616,7 +616,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Јавно објави мој каталог дељења (краулери)</string>
-    <string name="icebridge_public_catalog_summary">Дозволите претраживачима мреже да индексирају торренте које јавно делите. Подразумевано искључено.</string>
+    <string name="icebridge_public_catalog_summary">Дозволите претраживачима мреже да индексирају торренте које активно сидујете. Историја преузимања која се не сидује никада се не објављује. Подразумевано искључено.</string>
+    <string name="icebridge_public_catalog_wizard_title">Сидовање је објављивање</string>
+    <string name="icebridge_public_catalog_wizard_description">Када сидујете торрент, објављујете га на BitTorrent мрежи тако да га други могу пронаћи и преузети. Можете да изаберете да ли претраживачи мреже могу да индексирају и торренте које активно сидујете.</string>
+    <string name="icebridge_public_catalog_wizard_label">Дозволи претраживачима да прегледају торренте које активно сидујем</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

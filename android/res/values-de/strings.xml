@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Meinen Freigabekatalog öffentlich teilen (Crawler)</string>
-    <string name="icebridge_public_catalog_summary">Lass die Crawler des Netzwerks die Torrents indexieren, die du öffentlich teilst. Standardmäßig aus.</string>
+    <string name="icebridge_public_catalog_summary">Lass die Crawler des Netzwerks die Torrents indexieren, die du aktiv seedest. Downloadverlauf, der nicht geseedet wird, wird niemals veröffentlicht. Standardmäßig aus.</string>
+    <string name="icebridge_public_catalog_wizard_title">Seeden ist Veröffentlichen</string>
+    <string name="icebridge_public_catalog_wizard_description">Wenn du einen Torrent seedest, veröffentlichst du ihn im BitTorrent-Netzwerk, sodass andere ihn finden und herunterladen können. Du kannst wählen, ob die Crawler des Netzwerks auch die Torrents indexieren dürfen, die du aktiv seedest.</string>
+    <string name="icebridge_public_catalog_wizard_label">Crawler dürfen die Torrents durchsuchen, die ich aktiv seede</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

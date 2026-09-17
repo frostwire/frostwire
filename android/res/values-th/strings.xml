@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">แชร์แค็ตตาล็อกการแชร์ของฉันแบบสาธารณะ (ตัวรวบรวมข้อมูล)</string>
-    <string name="icebridge_public_catalog_summary">ให้ครอว์เลอร์ของเครือข่ายจัดทำดัชนีทอร์เรนต์ที่คุณแชร์แบบสาธารณะ ปิดไว้โดยค่าเริ่มต้น</string>
+    <string name="icebridge_public_catalog_summary">ให้ครอว์เลอร์ของเครือข่ายจัดทำดัชนีทอร์เรนต์ที่คุณกำลังซีดอย่างจริงจัง ประวัติการดาวน์โหลดที่ไม่ได้ซีดจะไม่ถูกเผยแพร่เลย ปิดไว้โดยค่าเริ่มต้น</string>
+    <string name="icebridge_public_catalog_wizard_title">การซีดคือการเผยแพร่</string>
+    <string name="icebridge_public_catalog_wizard_description">เมื่อคุณซีดทอร์เรนต์ คุณจะเผยแพร่มันไปยังเครือข่าย BitTorrent เพื่อให้ผู้อื่นค้นหาและดาวน์โหลดได้ คุณสามารถเลือกได้ว่าครอว์เลอร์ของเครือข่ายจะจัดทำดัชนีทอร์เรนต์ที่คุณกำลังซีดอย่างจริงจังด้วยหรือไม่</string>
+    <string name="icebridge_public_catalog_wizard_label">ให้ครอว์เลอร์เรียกดูทอร์เรนต์ที่ฉันกำลังซีดอย่างจริงจัง</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

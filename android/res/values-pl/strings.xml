@@ -617,7 +617,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Udostępnij publicznie mój katalog udostępniania (crawlery)</string>
-    <string name="icebridge_public_catalog_summary">Pozwól robotom indeksującym sieci indeksować torrenty, które publicznie udostępniasz. Domyślnie wyłączone.</string>
+    <string name="icebridge_public_catalog_summary">Pozwól robotom indeksującym sieci indeksować torrenty, które aktywnie seedujesz. Historia pobierania, która nie jest seedowana, nigdy nie jest publikowana. Domyślnie wyłączone.</string>
+    <string name="icebridge_public_catalog_wizard_title">Seedowanie to publikowanie</string>
+    <string name="icebridge_public_catalog_wizard_description">Gdy seedujesz torrent, publikujesz go w sieci BitTorrent, aby inni mogli go znaleźć i pobrać. Możesz wybrać, czy roboty indeksujące sieci mogą także indeksować torrenty, które aktywnie seedujesz.</string>
+    <string name="icebridge_public_catalog_wizard_label">Pozwól robotom przeglądać torrenty, które aktywnie seeduję</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

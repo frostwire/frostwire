@@ -615,7 +615,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Публично делиться каталогом общих файлов (краулеры)</string>
-    <string name="icebridge_public_catalog_summary">Разрешить краулерам сети индексировать торренты, которыми вы открыто делитесь. По умолчанию выключено.</string>
+    <string name="icebridge_public_catalog_summary">Разрешить краулерам сети индексировать торренты, которые вы активно раздаёте. История загрузок, которая не раздаётся, никогда не публикуется. По умолчанию выключено.</string>
+    <string name="icebridge_public_catalog_wizard_title">Раздача — это публикация</string>
+    <string name="icebridge_public_catalog_wizard_description">Когда вы раздаёте торрент, вы публикуете его в сети BitTorrent, чтобы другие могли его найти и скачать. Вы можете выбрать, могут ли краулеры сети также индексировать торренты, которые вы активно раздаёте.</string>
+    <string name="icebridge_public_catalog_wizard_label">Разрешить краулерам просматривать торренты, которые я активно раздаю</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

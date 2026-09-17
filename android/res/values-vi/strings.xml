@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">Chia sẻ công khai danh mục chia sẻ của tôi (trình thu thập)</string>
-    <string name="icebridge_public_catalog_summary">Cho phép trình thu thập của mạng lập chỉ mục các torrent bạn chia sẻ công khai. Mặc định tắt.</string>
+    <string name="icebridge_public_catalog_summary">Cho phép trình thu thập của mạng lập chỉ mục các torrent bạn đang seed tích cực. Lịch sử tải xuống không còn seed sẽ không bao giờ được công bố. Mặc định tắt.</string>
+    <string name="icebridge_public_catalog_wizard_title">Seed là công bố</string>
+    <string name="icebridge_public_catalog_wizard_description">Khi bạn seed một torrent, bạn công bố nó lên mạng BitTorrent để người khác có thể tìm thấy và tải xuống. Bạn có thể chọn liệu trình thu thập của mạng cũng được lập chỉ mục các torrent bạn đang seed tích cực hay không.</string>
+    <string name="icebridge_public_catalog_wizard_label">Cho phép trình thu thập duyệt các torrent tôi đang seed tích cực</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

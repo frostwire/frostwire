@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">मेरा शेयर कैटलॉग सार्वजनिक रूप से साझा करें (क्रॉलर)</string>
-    <string name="icebridge_public_catalog_summary">नेटवर्क के क्रॉलर को उन टोरेंट को इंडेक्स करने दें जिन्हें आप सार्वजनिक रूप से साझा करते हैं। डिफ़ॉल्ट रूप से बंद।</string>
+    <string name="icebridge_public_catalog_summary">नेटवर्क के क्रॉलर को उन टोरेंट को इंडेक्स करने दें जिन्हें आप सक्रिय रूप से सीड कर रहे हैं। जो डाउनलोड इतिहास सीड नहीं हो रहा है वह कभी प्रकाशित नहीं होता। डिफ़ॉल्ट रूप से बंद।</string>
+    <string name="icebridge_public_catalog_wizard_title">सीड करना ही प्रकाशित करना है</string>
+    <string name="icebridge_public_catalog_wizard_description">जब आप कोई टोरेंट सीड करते हैं, तो आप उसे BitTorrent नेटवर्क पर प्रकाशित करते हैं ताकि दूसरे लोग उसे ढूँढकर डाउनलोड कर सकें। आप चुन सकते हैं कि नेटवर्क के क्रॉलर उन टोरेंट को भी इंडेक्स कर सकें जिन्हें आप सक्रिय रूप से सीड कर रहे हैं।</string>
+    <string name="icebridge_public_catalog_wizard_label">क्रॉलर को उन टोरेंट ब्राउज़ करने दें जिन्हें मैं सक्रिय रूप से सीड कर रहा हूँ</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">شارك كتالوج المشاركة الخاص بي علنًا (برامج الزحف)</string>
-    <string name="icebridge_public_catalog_summary">اترك زاحفي الشبكة يفهرسون ملفات التورنت التي تشاركها علنًا. معطّل افتراضيًا.</string>
+    <string name="icebridge_public_catalog_summary">اترك زاحفي الشبكة يفهرسون ملفات التورنت التي تُشاركها بنشاط. سجل التنزيلات التي لا تُشارك لا يُنشر أبدًا. معطّل افتراضيًا.</string>
+    <string name="icebridge_public_catalog_wizard_title">المشاركة هي النشر</string>
+    <string name="icebridge_public_catalog_wizard_description">عندما تشارك ملف تورنت، فإنك تنشره على شبكة BitTorrent ليتمكن الآخرون من العثور عليه وتنزيله. يمكنك اختيار ما إذا كان بإمكان زاحفي الشبكة أيضًا فهرسة ملفات التورنت التي تشاركها بنشاط.</string>
+    <string name="icebridge_public_catalog_wizard_label">اترك الزاحفين يتصفحون ملفات التورنت التي أشاركها بنشاط</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

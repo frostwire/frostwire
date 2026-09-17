@@ -615,7 +615,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">שתף את קטלוג השיתוף שלי באופן ציבורי (סורקים)</string>
-    <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה משתף באופן ציבורי. כבוי כברירת מחדל.</string>
+    <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה עושה להם seed באופן פעיל. היסטוריית הורדות שאינה עושה seed לא מתפרסמת לעולם. כבוי כברירת מחדל.</string>
+    <string name="icebridge_public_catalog_wizard_title">לעשות seed זה לפרסם</string>
+    <string name="icebridge_public_catalog_wizard_description">כאשר אתה עושה seed לטורנט, אתה מפרסם אותו ברשת BitTorrent כדי שאחרים יוכלו למצוא ולהוריד אותו. אתה יכול לבחור אם סורקי הרשת יוכלו לאנדקס גם את הטורנטים שאתה עושה להם seed באופן פעיל.</string>
+    <string name="icebridge_public_catalog_wizard_label">אפשר לסורקים לעיין בטורנטים שאני עושה להם seed באופן פעיל</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

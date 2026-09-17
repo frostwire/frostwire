@@ -615,7 +615,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">共有カタログを公開で共有する（クローラー）</string>
-    <string name="icebridge_public_catalog_summary">ネットワークのクローラーが、公開共有している torrent をインデックスできるようにします。既定ではオフです。</string>
+    <string name="icebridge_public_catalog_summary">ネットワークのクローラーが、あなたが実際にシードしている torrent をインデックスできるようにします。シードしていないダウンロード履歴が公開されることはありません。既定ではオフです。</string>
+    <string name="icebridge_public_catalog_wizard_title">シードは公開です</string>
+    <string name="icebridge_public_catalog_wizard_description">torrent をシードすると、他の人が見つけてダウンロードできるように BitTorrent ネットワークへ公開されます。ネットワークのクローラーにも、あなたが実際にシードしている torrent をインデックスさせるかどうかを選べます。</string>
+    <string name="icebridge_public_catalog_wizard_label">クローラーに、私が実際にシードしている torrent を閲覧させる</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

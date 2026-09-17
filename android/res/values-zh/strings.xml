@@ -614,7 +614,10 @@
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
     <string name="icebridge_public_catalog_title">公开分享我的共享目录（爬虫）</string>
-    <string name="icebridge_public_catalog_summary">允许网络爬虫索引你公开分享的种子。默认关闭。</string>
+    <string name="icebridge_public_catalog_summary">允许网络爬虫索引你正在积极做种的种子。未在做种的下载历史永远不会被公开。默认关闭。</string>
+    <string name="icebridge_public_catalog_wizard_title">做种即发布</string>
+    <string name="icebridge_public_catalog_wizard_description">当你为种子做种时，你将其发布到 BitTorrent 网络，让他人能够找到并下载。你可以选择是否允许网络爬虫同时索引你正在积极做种的种子。</string>
+    <string name="icebridge_public_catalog_wizard_label">允许爬虫浏览我正在积极做种的种子</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>
