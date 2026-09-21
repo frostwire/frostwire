@@ -230,27 +230,42 @@ public final class PeerRegistry {
     }
 
     /**
-     * Look up registered peers for mesh discovery / routing.
+     * Look up registered peers for mesh discovery / routing, rotating the page on every call.
+     *
+     * <p>A forwarder's directory only converges on the whole registry if successive lookups return
+     * <em>different</em> slices. Returning a stable prefix (e.g. a {@code HashMap} iteration order)
+     * leaves the peers past {@code maxResults} permanently undiscovered — which is how leaf/CLIENT
+     * holders become invisible to holder-aware routing.
      *
      * @param maxResults   maximum number of records to return
      * @param forwardersOnly if true, only FORWARDER/BOTH roles
      */
     public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly) {
+        return lookupPeers(maxResults, forwardersOnly, ThreadLocalRandom.current());
+    }
+
+    /**
+     * Deterministic overload for tests: same rotating selection driven by the given source of
+     * randomness.
+     */
+    public List<PeerRecord> lookupPeers(int maxResults, boolean forwardersOnly, Random random) {
         if (maxResults <= 0) {
             return Collections.emptyList();
         }
+        if (random == null) {
+            throw new IllegalArgumentException("random is null");
+        }
         lookups.incrementAndGet();
-        List<PeerRecord> result = new ArrayList<>(Math.min(maxResults, byPubHex.size()));
+        List<PeerRecord> eligible = new ArrayList<>();
         for (PeerRecord r : byPubHex.values()) {
             if (forwardersOnly && !r.canForward()) {
                 continue;
             }
-            result.add(r);
-            if (result.size() >= maxResults) {
-                break;
-            }
+            eligible.add(r);
         }
-        return Collections.unmodifiableList(result);
+        Collections.shuffle(eligible, random);
+        return Collections.unmodifiableList(
+                new ArrayList<>(eligible.subList(0, Math.min(maxResults, eligible.size()))));
     }
 
     /**

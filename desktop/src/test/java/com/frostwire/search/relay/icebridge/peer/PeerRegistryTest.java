@@ -217,6 +217,51 @@ class PeerRegistryTest {
     assertTrue(registry.lookupForwarders(0, new Random(1)).isEmpty());
   }
 
+  @Test
+  void lookupPeersRotatesAndConvergesOnTheWholeRegistry() {
+    // Regression: a stable prefix left every peer past the page size permanently undiscovered,
+    // which is how leaf/CLIENT holders stayed invisible to holder-aware routing.
+    PeerRegistry registry = new RegistryBuilder().maxPeers(200).build();
+    long now = System.currentTimeMillis();
+    for (int i = 0; i < 120; i++) {
+      byte[] pub = new byte[32];
+      pub[0] = (byte) i;
+      pub[1] = (byte) (i >> 8);
+      registry.register(
+          new PeerRecord(pub, (10 + i) + ".0.0.1", 6888, IceBridgeConfig.Role.CLIENT, now));
+    }
+    Set<String> seen = new HashSet<>();
+    for (int seed = 0; seed < 200; seed++) {
+      seen.addAll(hexes(registry.lookupPeers(50, false, new Random(seed))));
+    }
+    assertEquals(120, seen.size(), "rotating pages must eventually cover every peer");
+  }
+
+  @Test
+  void lookupPeersIsSeedDeterministicAndHonorsForwardersOnly() {
+    PeerRegistry registry = new RegistryBuilder().maxPeers(100).build();
+    long now = System.currentTimeMillis();
+    for (int i = 1; i <= 20; i++) {
+      byte[] pub = new byte[32];
+      pub[0] = (byte) i;
+      registry.register(
+          new PeerRecord(
+              pub,
+              i + ".0.0.1",
+              6888,
+              i % 2 == 0 ? IceBridgeConfig.Role.FORWARDER : IceBridgeConfig.Role.CLIENT,
+              now));
+    }
+    List<String> first = hexes(registry.lookupPeers(5, false, new Random(7)));
+    List<String> second = hexes(registry.lookupPeers(5, false, new Random(7)));
+    assertEquals(first, second, "same seed must reproduce the same page");
+    List<PeerRecord> forwardersOnly = registry.lookupPeers(100, true, new Random(1));
+    assertEquals(10, forwardersOnly.size());
+    assertTrue(forwardersOnly.stream().allMatch(PeerRecord::canForward));
+    assertTrue(registry.lookupPeers(0, false).isEmpty());
+    assertThrows(IllegalArgumentException.class, () -> registry.lookupPeers(1, false, null));
+  }
+
   private static PeerRegistry registryWithForwarders(String prefix, int from, int count) {
     PeerRegistry registry = new RegistryBuilder().maxPeers(100).build();
     long now = System.currentTimeMillis();
