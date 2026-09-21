@@ -320,6 +320,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         LOG.warn("AndroidRelayStack: config read for remote IceBridge failed", t);
       }
 
+      com.frostwire.search.relay.icebridge.IceBridgeTopology.get()
+          .applyForRole(readConfiguredRole());
       int meshRudpPort = PeerRegistrySync.ICEBRIDGE_RUDP_PORT;
       karmaCache =
           new PeerKarmaCache(new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
