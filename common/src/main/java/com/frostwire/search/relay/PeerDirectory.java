@@ -444,6 +444,13 @@ public final class PeerDirectory {
     /**
      * Record the content fingerprint a peer announced. Passing {@code null} clears it. Malformed
      * frames are ignored so a peer cannot poison routing with an oversized announcement.
+     *
+     * <p>An INDEX_DIGEST frame is only ever delivered on an authenticated rUDP session, so the
+     * sender is a live peer that holds content even when the mesh registry has not imported it as a
+     * searchable entry. Unknown senders are therefore registered <b>queryable</b> (verified, with a
+     * fresh contact time) rather than as an unverified placeholder the holder-aware sampler skips —
+     * otherwise leaf/CLIENT holders (which {@code /lookup} ordering can omit) would never be ranked
+     * or routed to, and their content would only be found by blind fan-out luck.
      */
     public synchronized void setIndexDigest(byte[] peerPub, byte[] digest) {
         if (peerPub == null || peerPub.length != 32) {
@@ -451,11 +458,10 @@ public final class PeerDirectory {
         }
         Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
         if (e == null) {
-            // The announcement can arrive before the relay has imported the peer as verified
-            // (registry import runs on its own cadence). Keep the digest on an unverified
-            // placeholder so the later upsert promotes it with the fingerprint intact.
-            e = new Entry(peerPub, "", 0, 0, System.currentTimeMillis(), 0L, false, false,
+            long now = System.currentTimeMillis();
+            e = new Entry(peerPub, "", 0, 0, now, 0L, false, true,
                     NodeCapabilities.NONE, "");
+            e.lastContactMs = now;
             entries.put(com.frostwire.util.Hex.encode(peerPub), e);
             evictIfNeeded();
         }

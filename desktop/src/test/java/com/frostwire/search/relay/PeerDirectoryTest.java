@@ -465,6 +465,39 @@ class PeerDirectoryTest {
                 1, new HashSet<>(), com.frostwire.search.relay.NodeCapabilities.NONE, null));
   }
 
+  @Test
+  void authenticatedDigestFromUnknownLeafHolderIsQueryableAndRanked() {
+    // Regression: a CLIENT/leaf holder that is not in the relay's /lookup import (so the
+    // forwarder never upserts it) still announces its digest over an authenticated session.
+    // It must become queryable and be ranked as a holder, otherwise its content is only
+    // found by blind fan-out luck.
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] leaf = samplePub(77);
+    assertFalse(d.hasIndexDigest(leaf));
+    assertEquals(0, d.digestCount());
+
+    d.setIndexDigest(
+        leaf,
+        IndexDigest.build(
+                java.util.List.of(
+                    "Chip Stocks Crash, 20B Fund Margin Called, Frontier Labs SLOW DOWN AI"))
+            .toBytes());
+
+    assertTrue(d.hasIndexDigest(leaf));
+    assertEquals(1, d.digestCount());
+    assertEquals(1, d.liveCount());
+    java.util.List<PeerDirectory.PeerInfo> holders =
+        d.sampleHolders(
+            "20B",
+            1,
+            new HashSet<>(),
+            com.frostwire.search.relay.NodeCapabilities.NONE,
+            new Random(1),
+            0);
+    assertEquals(1, holders.size());
+    assertArrayEquals(leaf, holders.get(0).peerPub());
+  }
+
   private static byte[] samplePub(int id) {
     byte[] pub = new byte[32];
     pub[0] = (byte) id;
