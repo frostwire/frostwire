@@ -42,6 +42,14 @@ public final class MeshProtocolId {
     /** Bounded keyword fingerprint a peer announces so searches route to likely holders. */
     public static final int INDEX_DIGEST = 8;
 
+    /**
+     * Node metadata announcement: the sender's capability bitmask
+     * ({@link com.frostwire.search.relay.NodeCapabilities}). Lets a relay learn a peer's
+     * advertised role/capabilities over the mesh, so a peer it only knows from an observed
+     * session is not permanently treated as capability-less.
+     */
+    public static final int NODE_META = 9;
+
     private MeshProtocolId() {
     }
 
@@ -54,7 +62,7 @@ public final class MeshProtocolId {
 
     public static boolean isKnown(int protocolId) {
         int id = effective(protocolId);
-        return id >= SEARCH && id <= INDEX_DIGEST;
+        return id >= SEARCH && id <= NODE_META;
     }
 
     /**
@@ -79,6 +87,8 @@ public final class MeshProtocolId {
                 return "FILESYNC";
             case INDEX_DIGEST:
                 return "INDEX_DIGEST";
+            case NODE_META:
+                return "NODE_META";
             default:
                 return "PROTO_" + id;
         }

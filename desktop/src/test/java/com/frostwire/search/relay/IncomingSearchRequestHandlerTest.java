@@ -202,6 +202,75 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void nodeMetaAnnouncementUpgradesObservedPeerCapabilities() throws Exception {
+    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    RelaySearchService service =
+        new RelaySearchService(
+            new InMemoryLocalIndex(), handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
+    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    byte[] peerPub = IdentityKeys.generate().ed25519PubRaw();
+    // Relay only observed the session: no capabilities recorded.
+    directory.upsertVerified(
+        peerPub, "10.0.0.61", 6889, 6889, com.frostwire.search.relay.NodeCapabilities.NONE);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
+    handler.start();
+
+    handler.onPayload(
+        peerPub,
+        com.frostwire.search.relay.icebridge.NodeMetaPayload.encode(
+            com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH),
+        System.currentTimeMillis(),
+        com.frostwire.search.relay.icebridge.MeshProtocolId.NODE_META);
+
+    assertEquals(
+        com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH,
+        directory.get(peerPub).orElseThrow().capabilities(),
+        "authenticated NODE_META must correct the peer's advertised capabilities");
+    assertTrue(directory.get(peerPub).orElseThrow().isVerified());
+  }
+
+  @Test
+  void selfHeldContentIsReturnedWithoutForwardingToSelf() throws Exception {
+    // Closes the "forward to itself" question: a node that holds the query answers it locally, so
+    // excluding its own pub from the fan-out never drops its content.
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+
+    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    index.torrents.add(torrent("ubuntu server", 500L, 1));
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
+    PeerDirectory directory = new PeerDirectory(new NoOpKarmaCache());
+    // The handler itself is a holder and is present in its own directory.
+    directory.upsertVerified(
+        handlerIdentity.ed25519PubRaw(),
+        "10.0.0.62",
+        6889,
+        6889,
+        com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(transport, service, directory, handlerIdentity);
+    handler.start();
+
+    byte[][] path = {requesterPub};
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 2, path);
+    transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
+
+    assertEquals(1, transport.sent.size(), "only the local response; no forward to self");
+    RemoteSearchResponse response =
+        SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload);
+    assertNotNull(response);
+    assertArrayEquals(request.nonce(), response.nonce());
+    assertFalse(response.rows().isEmpty(), "self-held content must be returned");
+  }
+
+  @Test
   void localResponseStillGoesThroughWhenNoPeersToForward() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);

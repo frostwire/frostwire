@@ -96,6 +96,41 @@ class PeerRegistrySyncTest {
   }
 
   @Test
+  void syncRoutesLeafWithItsRealRoleNotBoth() throws Exception {
+    IdentityKeys leaf = IdentityKeys.generate(0);
+    directory.upsertVerified(
+        leaf.ed25519PubRaw(),
+        "10.0.0.7",
+        6888,
+        6889,
+        com.frostwire.search.relay.NodeCapabilities.fromRole("CLIENT"));
+    sync = new PeerRegistrySync(client, directory, "127.0.0.1");
+    sync.sync();
+    com.frostwire.search.relay.icebridge.peer.PeerRecord routed =
+        registry.lookup(leaf.ed25519PubRaw());
+    assertNotNull(routed, "leaf must still be routed (deliverable)");
+    assertEquals(
+        IceBridgeConfig.Role.CLIENT,
+        routed.role(),
+        "a leaf peer must not be advertised as a forwarder");
+    assertTrue(registry.lookupForwarders(10).isEmpty(), "leaf must not be floodable");
+  }
+
+  @Test
+  void roleForCapsDerivesAdvertisedRole() {
+    assertEquals(
+        IceBridgeConfig.Role.CLIENT,
+        PeerRegistrySync.roleForCaps(com.frostwire.search.relay.NodeCapabilities.DEFAULT_PEER));
+    assertEquals(
+        IceBridgeConfig.Role.FORWARDER,
+        PeerRegistrySync.roleForCaps(
+            com.frostwire.search.relay.NodeCapabilities.DEFAULT_FORWARDER));
+    assertEquals(
+        IceBridgeConfig.Role.BOTH,
+        PeerRegistrySync.roleForCaps(com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH));
+  }
+
+  @Test
   void syncHandlesEmptyDirectory() {
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
@@ -130,9 +165,10 @@ class PeerRegistrySyncTest {
     directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 6889);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
-    // push: /route + warm /send; pull: /lookup; import of that same peer: /route + warm /send.
+    // push: /route + warm /send; pull: /lookup; import of that same peer: /route + warm /send;
+    // and one NODE_META capability announcement (the peer is the only directory target).
     assertEquals(
-        5,
+        6,
         metrics.controlRequests(),
         "routing a verified peer must warm its rUDP session with a TELEMETRY ping");
   }

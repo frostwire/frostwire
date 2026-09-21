@@ -541,6 +541,34 @@ class PeerDirectoryTest {
     assertEquals(0, d.digestCount());
   }
 
+  @Test
+  void peerMetaAdvertisementUpgradesObservedCapabilities() {
+    // A relay that only observed a session records the peer without capabilities; the peer's
+    // NODE_META announcement must correct that, otherwise it stays excluded from capability-scoped
+    // selection (e.g. RELAY-capped digest targets).
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] observed = samplePub(91);
+    d.upsertVerified(observed, "10.0.0.91", 6889, 6889, NodeCapabilities.NONE);
+    assertTrue(
+        d.sampleVerified(1, new HashSet<>(), NodeCapabilities.RELAY, new Random(1)).isEmpty());
+
+    d.applyPeerMeta(observed, NodeCapabilities.DEFAULT_BOTH);
+
+    assertEquals(
+        1, d.sampleVerified(1, new HashSet<>(), NodeCapabilities.RELAY, new Random(1)).size());
+    assertTrue(d.get(observed).orElseThrow().isVerified());
+  }
+
+  @Test
+  void peerMetaFromUnknownPeerRegistersItQueryable() {
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] unknown = samplePub(92);
+    d.applyPeerMeta(unknown, NodeCapabilities.fromRole("CLIENT"));
+    assertEquals(1, d.liveCount());
+    assertEquals(
+        1, d.sampleVerified(1, new HashSet<>(), NodeCapabilities.SEARCH, new Random(1)).size());
+  }
+
   private static byte[] samplePub(int id) {
     byte[] pub = new byte[32];
     pub[0] = (byte) id;

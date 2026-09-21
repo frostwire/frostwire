@@ -16,6 +16,7 @@ import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.event.IceBridgeEvents;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.MeshProtocolId;
+import com.frostwire.search.relay.icebridge.NodeMetaPayload;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
@@ -49,7 +50,12 @@ public final class PeerRegistrySync implements AutoCloseable {
 
     private static final long SYNC_INTERVAL_SEC = 30;
     private static final long INITIAL_DELAY_SEC = 3;
-    private static final int LOOKUP_COUNT = 50;
+    /**
+     * Registry page size per sync. {@code /lookup} clamps to 100; rotation (see
+     * {@code PeerRegistry.lookupPeers}) means successive syncs walk different slices, so the
+     * directory converges on the whole registry instead of a fixed prefix.
+     */
+    private static final int LOOKUP_COUNT = 100;
     private static final byte[] WARM_PING = {0x01};
     /**
      * Ignore mesh entries the forwarder has not seen recently. A registry TTL is short; a peer
@@ -62,6 +68,8 @@ public final class PeerRegistrySync implements AutoCloseable {
     private static final long DIGEST_REFRESH_INTERVAL_MS = 120_000L;
     /** Bounded fan-out for digest announcements. */
     private static final int DIGEST_TARGETS = 16;
+    /** Bounded fan-out for capability/role announcements. */
+    private static final int NODE_META_TARGETS = 16;
 
     private final IceBridgeClient client;
     private final PeerDirectory directory;
@@ -75,6 +83,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private volatile byte[] lastDigest;
     private volatile long lastDigestBuildMs;
     private volatile long lastDigestSendMs;
+    private volatile long lastNodeMetaSendMs;
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
@@ -151,6 +160,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             pushDirectoryToMesh();
             pullMeshIntoDirectory();
             publishIndexDigest();
+            publishNodeMeta();
         } catch (Throwable t) {
             LOG.warn("PeerRegistrySync failed", t);
         }
@@ -179,8 +189,10 @@ public final class PeerRegistrySync implements AutoCloseable {
                 continue;
             }
             int peerRudpPort = peer.rudpPort() > 0 ? peer.rudpPort() : rudpPort;
+            // Push the peer's real role, not a blanket BOTH: advertising a leaf as a
+            // forwarder makes relays flood through nodes that cannot relay.
             if (client.route(peer.peerPub(), peer.hostname(),
-                    peerRudpPort, IceBridgeConfig.Role.BOTH)) {
+                    peerRudpPort, roleForCaps(peer.capabilities()))) {
                 registered++;
                 warmMeshPeer(peer.peerPub());
             }
@@ -189,6 +201,16 @@ public final class PeerRegistrySync implements AutoCloseable {
             LOG.info("PeerRegistrySync: routed " + registered
                     + "/" + peers.size() + " directory peers to IceBridge");
         }
+    }
+
+    /** Derive the registry role label from an advertised capability bitmask. */
+    static IceBridgeConfig.Role roleForCaps(long capabilities) {
+        if (!NodeCapabilities.has(capabilities, NodeCapabilities.RELAY)) {
+            return IceBridgeConfig.Role.CLIENT;
+        }
+        return NodeCapabilities.has(capabilities, NodeCapabilities.SEARCH)
+                ? IceBridgeConfig.Role.BOTH
+                : IceBridgeConfig.Role.FORWARDER;
     }
 
     /**
@@ -278,6 +300,45 @@ public final class PeerRegistrySync implements AutoCloseable {
             return null;
         }
         return IndexDigest.build(texts).toBytes();
+    }
+
+    /**
+     * Announce this node's capability bitmask to directory peers.
+     *
+     * <p>The mesh registry only learns a peer's role from an explicit {@code /register} or
+     * {@code /route}; a relay that only ever observed the peer's authenticated session records it
+     * as a bare CLIENT. Announcing capabilities over the mesh lets those relays correct the peer's
+     * advertised role/capabilities instead of treating it as capability-less forever.
+     */
+    private void publishNodeMeta() {
+        try {
+            long now = System.currentTimeMillis();
+            if (now - lastNodeMetaSendMs < DIGEST_REFRESH_INTERVAL_MS) {
+                return;
+            }
+            byte[] meta = NodeMetaPayload.encode(NodeCapabilities.fromRole(localRole.name()));
+            List<PeerDirectory.PeerInfo> targets =
+                    directory.topByTrustVerified(NODE_META_TARGETS, NodeCapabilities.RELAY);
+            if (targets.isEmpty()) {
+                targets = directory.topByTrustVerified(NODE_META_TARGETS);
+            }
+            int sent = 0;
+            for (PeerDirectory.PeerInfo peer : targets) {
+                if (ownPub != null && Arrays.equals(peer.peerPub(), ownPub)) {
+                    continue;
+                }
+                if (client.send(peer.peerPub(), MeshProtocolId.NODE_META, meta)) {
+                    sent++;
+                }
+            }
+            if (sent > 0) {
+                lastNodeMetaSendMs = now;
+                LOG.debug("PeerRegistrySync: announced node meta to " + sent + "/"
+                        + targets.size() + " peers");
+            }
+        } catch (Throwable t) {
+            LOG.debug("PeerRegistrySync: node meta announce failed", t);
+        }
     }
 
     private void pullMeshIntoDirectory() {

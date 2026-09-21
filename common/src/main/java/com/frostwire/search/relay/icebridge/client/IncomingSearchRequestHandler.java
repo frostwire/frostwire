@@ -333,6 +333,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             }
             return;
         }
+        if (meshProtocol == MeshProtocolId.NODE_META) {
+            long caps = com.frostwire.search.relay.icebridge.NodeMetaPayload.decode(payload);
+            if (caps >= 0 && peerDirectory != null) {
+                peerDirectory.applyPeerMeta(sourcePub, caps);
+                IceBridgeEvents.digest(Hex.encode(sourcePub),
+                        "node meta applied caps=" + caps);
+            }
+            return;
+        }
         if (meshProtocol == MeshProtocolId.METADATA) {
             handleTorrentMetadataPayload(sourcePub, payload);
             return;

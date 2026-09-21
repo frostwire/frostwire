@@ -493,6 +493,38 @@ public final class PeerDirectory {
     }
 
     /**
+     * Apply a peer's advertised capability bitmask (NODE_META announcement).
+     *
+     * <p>An authenticated announcement is proof the sender is live, so an unknown peer is
+     * registered <b>queryable</b> and an existing entry — including one a relay only learned from
+     * an observed session, recorded without capabilities — is upgraded to the advertised
+     * capabilities. Without this, a peer observed as capability-less stays excluded from
+     * capability-scoped selection (e.g. {@code RELAY}-capped digest targets) even though it
+     * advertises a role over the mesh.
+     */
+    public synchronized void applyPeerMeta(byte[] peerPub, long capabilities) {
+        if (peerPub == null || peerPub.length != 32) {
+            return;
+        }
+        String key = com.frostwire.util.Hex.encode(peerPub);
+        long now = System.currentTimeMillis();
+        Entry e = entries.get(key);
+        if (e == null) {
+            e = new Entry(peerPub, "", 0, 0, now, 0L, false, true, capabilities, "");
+            e.lastContactMs = now;
+            entries.put(key, e);
+            evictIfNeeded();
+        } else {
+            e.capabilities = capabilities;
+            e.verified = true;
+            if (e.lastContactMs <= 0) {
+                e.lastContactMs = now;
+            }
+        }
+        version.incrementAndGet();
+    }
+
+    /**
      * Record positive proof of contact with a peer (an authenticated inbound frame or a verified
      * response). Resets the failure streak so a peer that came back is queryable again.
      */

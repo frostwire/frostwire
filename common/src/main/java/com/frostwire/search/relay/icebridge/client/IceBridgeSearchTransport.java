@@ -265,6 +265,10 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
      * Deliver one non-request frame on the bounded delivery lane. Saturation applies backpressure
      * via {@code CallerRunsPolicy} (runs on the poller) rather than dropping the frame: search and
      * metadata responses are one-shot and are not retransmitted by the holder.
+     *
+     * <p>Unlike the rUDP fragment ingest lane (which must stay strictly FIFO), reordering here is
+     * safe: consumers demultiplex by nonce and reassemble chunked payloads by explicit chunk index,
+     * so a frame that overtakes a queued one is still placed correctly.
      */
     private void deliverOffPoller(PayloadListener listener, InboundMessage msg, int protocolId) {
         deliveryWorkers.execute(() -> {
