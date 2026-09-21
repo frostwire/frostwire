@@ -443,37 +443,52 @@ public final class PeerDirectory {
 
     /**
      * Record the content fingerprint a peer announced. Passing {@code null} clears it. Malformed
-     * frames are ignored so a peer cannot poison routing with an oversized announcement.
+     * frames are rejected <b>before</b> any mutation so a bad announcement can neither create nor
+     * verify an entry.
      *
      * <p>An INDEX_DIGEST frame is only ever delivered on an authenticated rUDP session, so the
      * sender is a live peer that holds content even when the mesh registry has not imported it as a
-     * searchable entry. Unknown senders are therefore registered <b>queryable</b> (verified, with a
-     * fresh contact time) rather than as an unverified placeholder the holder-aware sampler skips —
-     * otherwise leaf/CLIENT holders (which {@code /lookup} ordering can omit) would never be ranked
-     * or routed to, and their content would only be found by blind fan-out luck.
+     * searchable entry. A valid digest therefore promotes an unknown sender (or an existing
+     * unverified hint from DHT/discovery/endorsements) to <b>queryable</b>: without this, leaf
+     * holders that {@code /lookup} ordering omits would never be ranked or routed to, and their
+     * content would only be found by blind fan-out luck.
      */
     public synchronized void setIndexDigest(byte[] peerPub, byte[] digest) {
         if (peerPub == null || peerPub.length != 32) {
             return;
         }
-        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        byte[] parsedBytes = null;
+        if (digest != null) {
+            IndexDigest parsed = IndexDigest.fromBytes(digest);
+            if (parsed == null) {
+                return; // malformed frame: ignore before touching the directory
+            }
+            parsedBytes = parsed.toBytes();
+        }
+        String key = com.frostwire.util.Hex.encode(peerPub);
+        Entry e = entries.get(key);
         if (e == null) {
+            if (parsedBytes == null) {
+                return; // clearing an unknown peer's digest is a no-op
+            }
             long now = System.currentTimeMillis();
             e = new Entry(peerPub, "", 0, 0, now, 0L, false, true,
                     NodeCapabilities.NONE, "");
             e.lastContactMs = now;
-            entries.put(com.frostwire.util.Hex.encode(peerPub), e);
+            e.indexDigest = parsedBytes;
+            entries.put(key, e);
             evictIfNeeded();
+            version.incrementAndGet();
+            return;
         }
-        if (digest == null) {
-            e.indexDigest = null;
-        } else {
-            IndexDigest parsed = IndexDigest.fromBytes(digest);
-            if (parsed == null) {
-                return;
+        if (parsedBytes != null) {
+            // Authenticated digest = proof the sender is reachable and holds content.
+            e.verified = true;
+            if (e.lastContactMs <= 0) {
+                e.lastContactMs = System.currentTimeMillis();
             }
-            e.indexDigest = parsed.toBytes();
         }
+        e.indexDigest = parsedBytes;
         version.incrementAndGet();
     }
 
@@ -749,7 +764,7 @@ public final class PeerDirectory {
         final long lastUpdatedMs;
         volatile long localKarmaDelta;
         volatile boolean spam;
-        final boolean verified;
+        volatile boolean verified;
         volatile long capabilities;
         final String icebridgeVersion;
         volatile byte[] indexDigest;

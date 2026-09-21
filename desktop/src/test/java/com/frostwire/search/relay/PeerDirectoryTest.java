@@ -498,6 +498,49 @@ class PeerDirectoryTest {
     assertArrayEquals(leaf, holders.get(0).peerPub());
   }
 
+  @Test
+  void digestPromotesExistingUnverifiedHolderToQueryable() {
+    // Regression: the first fix only handled unknown senders. A peer already present as an
+    // unverified hint (DHT discovery / endorsements) kept its digest but stayed unverified, so
+    // digestCount() and holder-aware sampling still skipped it.
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] leaf = samplePub(88);
+    d.upsert(leaf, "10.0.0.88", 6889);
+    assertFalse(d.get(leaf).orElseThrow().isVerified());
+    assertEquals(0, d.digestCount());
+
+    d.setIndexDigest(
+        leaf, IndexDigest.build(java.util.List.of("20B Fund Margin Called")).toBytes());
+
+    assertTrue(d.get(leaf).orElseThrow().isVerified());
+    assertEquals(1, d.digestCount());
+    java.util.List<PeerDirectory.PeerInfo> holders =
+        d.sampleHolders(
+            "20B",
+            1,
+            new HashSet<>(),
+            com.frostwire.search.relay.NodeCapabilities.NONE,
+            new Random(1),
+            0);
+    assertEquals(1, holders.size());
+    assertArrayEquals(leaf, holders.get(0).peerPub());
+  }
+
+  @Test
+  void malformedDigestNeitherCreatesNorPromotesEntries() {
+    PeerDirectory d = new PeerDirectory(new FakeKarmaCache());
+    byte[] unknown = samplePub(89);
+    d.setIndexDigest(unknown, new byte[] {1, 2, 3});
+    assertTrue(d.get(unknown).isEmpty(), "malformed digest must not create an entry");
+
+    byte[] hinted = samplePub(90);
+    d.upsert(hinted, "10.0.0.90", 6889);
+    d.setIndexDigest(hinted, new byte[] {1, 2, 3});
+    assertFalse(d.get(hinted).orElseThrow().isVerified(), "malformed digest must not verify");
+    assertFalse(d.hasIndexDigest(hinted));
+    assertEquals(0, d.digestCount());
+  }
+
   private static byte[] samplePub(int id) {
     byte[] pub = new byte[32];
     pub[0] = (byte) id;
