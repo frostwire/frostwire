@@ -165,10 +165,11 @@ class PeerRegistrySyncTest {
     directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 6889);
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
-    // push: /route + warm /send; pull: /lookup; import of that same peer: /route + warm /send;
-    // and one NODE_META capability announcement (the peer is the only directory target).
+    // push: /route + warm /send; pull: /lookup; import of that same peer: /route (no per-import
+    // warm — uplinks are a separate RELAY-only sample, and this peer has no RELAY cap);
+    // and one NODE_META capability announcement.
     assertEquals(
-        6,
+        5,
         metrics.controlRequests(),
         "routing a verified peer must warm its rUDP session with a TELEMETRY ping");
   }

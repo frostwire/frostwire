@@ -159,6 +159,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             registerSelf();
             pushDirectoryToMesh();
             pullMeshIntoDirectory();
+            maintainUplinks();
             publishIndexDigest();
             publishNodeMeta();
         } catch (Throwable t) {
@@ -393,7 +394,6 @@ public final class PeerRegistrySync implements AutoCloseable {
             directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort,
                     caps, info.icebridgeVersion);
             client.route(pub, info.host, info.rudpPort, role);
-            warmMeshPeer(pub);
             // Seed host cache for Settings → Refresh/Ping (TCP identity on 6888).
             // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.
             if (!isLoopbackHost(info.host)
@@ -412,6 +412,31 @@ public final class PeerRegistrySync implements AutoCloseable {
         if (imported > 0) {
             LOG.info("PeerRegistrySync: imported " + imported
                     + " mesh peers into PeerDirectory (forwarder-first discovery)");
+        }
+    }
+
+    /**
+     * Keep a Gnutella-shaped set of sessions to powerful nodes. A leaf warms at most
+     * {@link com.frostwire.search.relay.icebridge.IceBridgeTopology#LEAF_MAX_UPLINKS}
+     * RELAY peers (and every one it knows, once that is at least the minimum). An
+     * ultrapeer warms up to {@link com.frostwire.search.relay.icebridge.IceBridgeTopology#ULTRAPEER_FANOUT}.
+     * The set is resampled each sync so 100k leaves do not all pin the same hubs.
+     */
+    private void maintainUplinks() {
+        int degree = com.frostwire.search.relay.icebridge.IceBridgeTopology.uplinkDegree(localRole);
+        java.util.Set<String> exclude = new java.util.HashSet<>();
+        if (ownPub != null) {
+            exclude.add(Hex.encode(ownPub));
+        }
+        List<PeerDirectory.PeerInfo> hubs = directory.sampleVerified(
+                degree, exclude, NodeCapabilities.RELAY, java.util.concurrent.ThreadLocalRandom.current());
+        int warmed = 0;
+        for (PeerDirectory.PeerInfo hub : hubs) {
+            warmMeshPeer(hub.peerPub());
+            warmed++;
+        }
+        if (warmed > 0) {
+            LOG.debug("PeerRegistrySync: uplinks " + warmed + "/" + degree + " role=" + localRole);
         }
     }
 

@@ -857,10 +857,29 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         if (ownPub != null) {
             excludeHex.add(Hex.encode(ownPub));
         }
-        List<PeerDirectory.PeerInfo> sampled =
-                peerDirectory.sampleHolders(request.keywords(), m, excludeHex,
-                        NodeCapabilities.NONE, ThreadLocalRandom.current(),
-                        Math.max(1, m / 4));
+        // Most of the budget walks other ultrapeers (RELAY). A quarter is reserved
+        // for digest holders, including leaves, so a match is queried directly and
+        // a miss still propagates across the backbone instead of dying on NAT'd clients.
+        int holderBudget = Math.max(1, m / 4);
+        List<PeerDirectory.PeerInfo> holders =
+                peerDirectory.matchingHolders(request.keywords(), Math.min(holderBudget, m), excludeHex);
+        for (PeerDirectory.PeerInfo holder : holders) {
+            excludeHex.add(Hex.encode(holder.peerPub()));
+        }
+        List<PeerDirectory.PeerInfo> sampled = new ArrayList<>(m);
+        sampled.addAll(holders);
+        if (sampled.size() < m) {
+            List<PeerDirectory.PeerInfo> relays = peerDirectory.sampleVerified(
+                    m - sampled.size(), excludeHex, NodeCapabilities.RELAY, ThreadLocalRandom.current());
+            sampled.addAll(relays);
+            for (PeerDirectory.PeerInfo relay : relays) {
+                excludeHex.add(Hex.encode(relay.peerPub()));
+            }
+        }
+        if (sampled.size() < m) {
+            sampled.addAll(peerDirectory.sampleVerified(
+                    m - sampled.size(), excludeHex, NodeCapabilities.NONE, ThreadLocalRandom.current()));
+        }
         StringBuilder chosen = new StringBuilder();
         for (PeerDirectory.PeerInfo peer : sampled) {
             if (chosen.length() > 0) {

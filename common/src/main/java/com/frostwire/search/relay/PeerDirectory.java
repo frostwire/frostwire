@@ -634,6 +634,40 @@ public final class PeerDirectory {
     }
 
     /**
+     * Digest matches only, best match first. Empty when nothing matches — unlike
+     * {@link #sampleHolders}, this does not fill the budget with random peers.
+     * Callers use the spare slots to walk the ultrapeer mesh.
+     */
+    public synchronized List<PeerInfo> matchingHolders(String keywords, int limit, Set<String> excludeHex) {
+        if (limit <= 0) {
+            return List.of();
+        }
+        List<String> queryTokens = IndexDigest.tokenize(keywords);
+        if (queryTokens.isEmpty()) {
+            return List.of();
+        }
+        List<Entry> matched = new ArrayList<>();
+        for (Entry e : liveEligible(excludeHex, NodeCapabilities.NONE)) {
+            if (digestMatchScore(e, queryTokens) > 0) {
+                matched.add(e);
+            }
+        }
+        matched.sort((a, b) -> {
+            int sa = digestMatchScore(a, queryTokens);
+            int sb = digestMatchScore(b, queryTokens);
+            if (sa != sb) {
+                return Integer.compare(sb, sa);
+            }
+            return Double.compare(trustScore(b.peerPub), trustScore(a.peerPub));
+        });
+        List<PeerInfo> out = new ArrayList<>(Math.min(limit, matched.size()));
+        for (int i = 0; i < matched.size() && i < limit; i++) {
+            out.add(toPeerInfo(matched.get(i)));
+        }
+        return out;
+    }
+
+    /**
      * Holder-aware sample: peers whose announced {@link IndexDigest} reports the query tokens come
      * first (ranked by match count, then trust). Remaining slots are filled from live peers so
      * content on peers with an unknown digest is still discoverable.

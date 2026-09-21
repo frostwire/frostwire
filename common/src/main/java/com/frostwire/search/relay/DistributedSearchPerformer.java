@@ -65,6 +65,15 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     /** M — default search peer fanout from {@link IceBridgeTopology}. */
     private static final int DEFAULT_MAX_PEERS =
             IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT;
+
+    /** Live fanout, clamped to the constructor's hard cap of 64. */
+    private static int livePeerBudget() {
+        int budget = IceBridgeTopology.get().searchPeerFanout();
+        if (budget <= 0 || budget > 64) {
+            return DEFAULT_MAX_PEERS;
+        }
+        return budget;
+    }
     private static final int DEFAULT_LOCAL_LIMIT = 50;
     private static final int DEFAULT_PEER_LIMIT = 25;
     private static final int DEFAULT_PEER_TIMEOUT_SEC = 10;
@@ -106,7 +115,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                                        IdentityKeys identity,
                                        DistributedSearchTransport transport) {
         this(token, keywords, localIndex, peerDirectory, identity, transport,
-                DEFAULT_MAX_PEERS, DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT, DEFAULT_PEER_TIMEOUT_SEC);
+                livePeerBudget(), DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT, DEFAULT_PEER_TIMEOUT_SEC);
     }
 
     public DistributedSearchPerformer(long token, String keywords,
@@ -134,7 +143,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                                        DistributedSearchTransport transport,
                                        DynamicQueryConfig dynamicQuery) {
         this(token, keywords, localIndex, peerDirectory, identity, transport,
-                DEFAULT_MAX_PEERS, DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT,
+                livePeerBudget(), DEFAULT_LOCAL_LIMIT, DEFAULT_PEER_LIMIT,
                 DEFAULT_PEER_TIMEOUT_SEC, dynamicQuery);
     }
 
@@ -326,8 +335,12 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     private List<PeerDirectory.PeerInfo> selectPeers() {
         // Prefer peers that advertise SEARCH/INDEX, then rank by keyspace
         // XOR distance so eventual responsibility routing has a foundation.
+        // A leaf addresses its ultrapeer uplinks (RELAY). An ultrapeer, or a
+        // process that has not declared a role, still prefers SEARCH-capable peers.
+        long preferred = IceBridgeTopology.get().leafUplinkMode()
+                ? NodeCapabilities.RELAY : NodeCapabilities.SEARCH;
         List<PeerDirectory.PeerInfo> peers =
-                peerDirectory.topByTrustVerified(maxPeers * 3, NodeCapabilities.SEARCH);
+                peerDirectory.topByTrustVerified(maxPeers * 3, preferred);
         if (peers.isEmpty()) {
             peers = peerDirectory.topByTrustVerified(maxPeers);
         }
