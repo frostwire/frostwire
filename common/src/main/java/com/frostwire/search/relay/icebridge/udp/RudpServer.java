@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * rUDP listener for the IceBridge servent.
@@ -44,9 +45,7 @@ public final class RudpServer implements AutoCloseable {
     /**
      * rUDP ingest workers. A small fixed pool is enough: {@link
      * RudpSessionManager#onPacket} is globally synchronized, so extra threads only
-     * absorb bursty arrivals while keeping the Netty event loop free. The bounded
-     * queue plus {@link ThreadPoolExecutor.CallerRunsPolicy} provides backpressure
-     * instead of silently dropping decoded datagrams.
+     * absorb bursty arrivals while keeping the Netty event loop free.
      */
     /**
      * A single ingest worker: Netty delivers datagrams for a channel on one event-loop thread in
@@ -54,6 +53,12 @@ public final class RudpServer implements AutoCloseable {
      * DATA_FRAG/DATA_END frames across threads and break reassembly, and they could not process
      * faster anyway because {@link RudpSessionManager#onPacket} is globally serialized. The win
      * here is only that the event loop hands off instead of blocking on that monitor.
+     *
+     * <p>A full queue <b>drops</b> the newest datagram instead of running it on the event loop
+     * (which would let it overtake already-queued, older frames and break FIFO ordering). Dropping
+     * is safe: rUDP is reliable, so a datagram whose sequence/fragment was never accepted is
+     * retransmitted by the sender, whereas an out-of-order delivery is discarded anyway and costs
+     * the same retransmission without ever risking an ordering violation.
      */
     private static final int INGEST_THREADS = 1;
     private static final int INGEST_QUEUE_CAPACITY = 4096;
@@ -119,22 +124,24 @@ public final class RudpServer implements AutoCloseable {
         @Override
         public void channelRead0(ChannelHandlerContext ctx, RudpPacketEnvelope envelope) {
             // Frame/decode only on the event loop; hand the envelope to the bounded
-            // ingest pool. CallerRunsPolicy means a saturated pool briefly runs the
-            // task on the event loop rather than dropping the datagram.
+            // ingest pool. A full queue drops the datagram (rUDP retransmits) rather
+            // than running it here out of order.
             ingestExecutor.submit(() -> manager.onPacket(envelope));
         }
     }
 
     /**
-     * Bounded hand-off from the Netty event loop to rUDP packet processing. Submission
-     * never throws and never blocks unbounded: once the queue is full the caller runs
-     * the task itself ({@link ThreadPoolExecutor.CallerRunsPolicy}), and once closed
-     * further submissions are ignored.
+     * Bounded hand-off from the Netty event loop to rUDP packet processing. Accepted tasks are
+     * processed FIFO by a single worker. Once the queue is full the newest submission is dropped
+     * (returned {@code false}) rather than run on the caller: running it would process it ahead of
+     * queued older frames and violate the ordering that fragment reassembly and sequence checks
+     * rely on. The sender's rUDP retransmission recovers the dropped datagram.
      */
     static final class IngestExecutor implements AutoCloseable {
         private final ThreadPoolExecutor executor;
         private final int queueCapacity;
         private final AtomicBoolean closed = new AtomicBoolean(false);
+        private final AtomicLong dropped = new AtomicLong();
 
         IngestExecutor(int threads, int queueCapacity) {
             this.queueCapacity = queueCapacity;
@@ -146,7 +153,7 @@ public final class RudpServer implements AutoCloseable {
             };
             executor = new ThreadPoolExecutor(threads, threads, 0L, TimeUnit.MILLISECONDS,
                     new ArrayBlockingQueue<>(queueCapacity), threadFactory,
-                    new ThreadPoolExecutor.CallerRunsPolicy());
+                    new ThreadPoolExecutor.AbortPolicy());
         }
 
         boolean submit(Runnable task) {
@@ -157,8 +164,14 @@ public final class RudpServer implements AutoCloseable {
                 executor.execute(task);
                 return true;
             } catch (RejectedExecutionException e) {
+                dropped.incrementAndGet();
                 return false;
             }
+        }
+
+        /** Datagrams dropped because the ingest queue was full (recovered by rUDP retransmit). */
+        long droppedCount() {
+            return dropped.get();
         }
 
         int queueCapacity() {

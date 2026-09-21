@@ -9,9 +9,11 @@ package com.frostwire.search.relay.icebridge.udp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,7 +51,7 @@ class RudpServerIngestTest {
 
   @Test
   @Timeout(10)
-  void boundedQueueRunsOnCallerWhenFull() throws Exception {
+  void boundedQueueDropsNewestWhenFullInsteadOfReordering() throws Exception {
     try (RudpServer.IngestExecutor ingest = new RudpServer.IngestExecutor(1, 1)) {
       assertEquals(1, ingest.queueCapacity());
 
@@ -63,14 +65,19 @@ class RudpServerIngestTest {
               }));
       assertTrue(workerBusy.await(5, TimeUnit.SECONDS));
 
-      assertTrue(ingest.submit(() -> {}));
-
-      Thread caller = Thread.currentThread();
-      AtomicReference<Thread> runner = new AtomicReference<>();
-      assertTrue(ingest.submit(() -> runner.set(Thread.currentThread())));
-      assertSame(caller, runner.get());
+      List<Integer> order = Collections.synchronizedList(new ArrayList<>());
+      assertTrue(ingest.submit(() -> order.add(1)), "first queued task is accepted");
+      // Queue is full: the newest datagram must be dropped, never run ahead of the
+      // queued older one (that would break fragment/sequence ordering).
+      assertFalse(ingest.submit(() -> order.add(2)), "newest task is dropped when full");
+      assertEquals(1, ingest.droppedCount());
 
       releaseWorker.countDown();
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+      while (order.isEmpty() && System.nanoTime() < deadline) {
+        Thread.sleep(10);
+      }
+      assertEquals(List.of(1), order, "accepted tasks run in FIFO order, dropped one never ran");
     }
   }
 
