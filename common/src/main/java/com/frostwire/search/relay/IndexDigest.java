@@ -111,17 +111,20 @@ public final class IndexDigest {
     int size = clampBytes(bytes);
     byte[] out = new byte[size];
     if (texts != null) {
-      int indexed = 0;
+      // Deduplicate across fragments: counting repeated tokens toward MAX_TOKENS would stop
+      // indexing early on repetitive names/file lists and silently drop real keywords, which
+      // would violate the no-false-negatives invariant (a holder becomes invisible for its own
+      // content).
+      Set<String> indexed = new LinkedHashSet<>();
+      outer:
       for (String text : texts) {
         for (String token : tokenize(text)) {
-          if (indexed >= MAX_TOKENS) {
-            break;
+          if (indexed.size() >= MAX_TOKENS) {
+            break outer;
           }
-          index(out, token);
-          indexed++;
-        }
-        if (indexed >= MAX_TOKENS) {
-          break;
+          if (indexed.add(token)) {
+            index(out, token);
+          }
         }
       }
     }
@@ -132,17 +135,19 @@ public final class IndexDigest {
   public static IndexDigest fromTokens(Collection<String> tokens) {
     byte[] out = new byte[DEFAULT_BYTES];
     if (tokens != null) {
-      int indexed = 0;
+      Set<String> indexed = new LinkedHashSet<>();
+      outer:
       for (String token : tokens) {
-        if (token == null || indexed >= MAX_TOKENS) {
+        if (token == null) {
           continue;
         }
         for (String part : tokenize(token)) {
-          if (indexed >= MAX_TOKENS) {
-            break;
+          if (indexed.size() >= MAX_TOKENS) {
+            break outer;
           }
-          index(out, part);
-          indexed++;
+          if (indexed.add(part)) {
+            index(out, part);
+          }
         }
       }
     }

@@ -13,10 +13,26 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class IndexDigestTest {
+
+  @Test
+  void repeatedTokensDoNotConsumeTheDistinctTokenBudget() {
+    // Regression: duplicates used to count toward MAX_TOKENS, so a holder whose names/file lists
+    // repeat words would stop indexing early and become a false negative for its real keywords.
+    List<String> texts = new ArrayList<>();
+    for (int i = 0; i < IndexDigest.MAX_TOKENS * 2; i++) {
+      texts.add("duplicate words here");
+    }
+    texts.add("20B Fund Margin Called");
+    IndexDigest digest = IndexDigest.build(texts);
+    assertTrue(digest.mightContain("20b"), "keyword after many duplicates must be indexed");
+    assertTrue(digest.mightContain("margin"));
+    assertTrue(digest.mightContain("duplicate"));
+  }
 
   @Test
   void tokenizesAndNormalizesDiacritics() {
