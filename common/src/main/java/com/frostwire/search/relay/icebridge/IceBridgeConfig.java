@@ -344,12 +344,12 @@ public final class IceBridgeConfig {
      *   <li>{@code ICEBRIDGE_DHT} — embed DHT SessionManager and announce (default: true for
      *       FORWARDER/BOTH, false for CLIENT)</li>
      *   <li>{@code ICEBRIDGE_AUTH_TOKENS_FILE} — path to file with bearer tokens, one per line (default: icebridge-tokens.txt)</li>
-     *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: max IceBridge peers for mesh RELAY (default: 6)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: max FrostWire peers per search hop (default: 8)</li>
-     *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3, SOFT_MAX)</li>
-     *   <li>{@code ICEBRIDGE_SEARCH_TTL} — dual-envelope search TTL (default: 2)</li>
-     *   <li>{@code ICEBRIDGE_SOFT_MAX} — hops+remaining_ttl clamp (default: 3)</li>
-     *   <li>{@code ICEBRIDGE_LEAF_UP_CONNECTIONS} — leaf attachments to IceBridges (default: 3)</li>
+      *   <li>{@code ICEBRIDGE_MESH_FANOUT} — N: mesh RELAY flood (ultrapeer 32, leaf 6)</li>
+      *   <li>{@code ICEBRIDGE_SEARCH_PEER_FANOUT} — M: search hop (ultrapeer 32, leaf 6)</li>
+      *   <li>{@code ICEBRIDGE_MESH_HOP_TTL} — mesh RELAY hop TTL (default: 3; not the search horizon)</li>
+      *   <li>{@code ICEBRIDGE_SEARCH_TTL} — search hop TTL (default: 7, classic Gnutella)</li>
+      *   <li>{@code ICEBRIDGE_SOFT_MAX} — hops+remaining_ttl clamp (default: 7)</li>
+      *   <li>{@code ICEBRIDGE_LEAF_UP_CONNECTIONS} — leaf attachments to powerful nodes (default: 6, min 3)</li>
      * </ul>
      *
      * <p>Topology limits are applied via {@link IceBridgeTopology} (process-wide,
@@ -385,23 +385,20 @@ public final class IceBridgeConfig {
         String tokensFile = env(overrides, "ICEBRIDGE_AUTH_TOKENS_FILE", "icebridge-tokens.txt");
         b.authTokensFile(new File(tokensFile));
         IceBridgeConfig config = b.build();
-        // Topology is process-wide (IceBridgeTopology reads the same env keys
-        // in its constructor); re-apply here so fromEnv() after startup still
-        // refreshes live limits. Standalone FORWARDER hubs (e.g. EC2) default
-        // to the fat hub profile for unset keys; leaves keep the lean
-        // compiled defaults. Explicit env always wins on every role.
-        boolean cloudHub = role == Role.FORWARDER;
+        // Topology is process-wide. BOTH and FORWARDER take the ultrapeer
+        // profile (fanout 32, search TTL 7); CLIENT keeps a leaf uplink cap.
+        // Explicit env always wins on every role.
+        // BOTH and FORWARDER are ultrapeers (inbound-capable). CLIENT leaves
+        // address at most LEAF_MAX_UPLINKS hubs. Search horizon is Gnutella's
+        // 7; mesh flood TTL stays short. Explicit env still wins (0 = unchanged).
+        IceBridgeTopology.get().applyForRole(role);
         IceBridgeTopology.get().applyRemote(
-                envInt(overrides, "ICEBRIDGE_MESH_FANOUT",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_FANOUT : IceBridgeTopology.DEFAULT_MESH_BROADCAST_FANOUT),
-                envInt(overrides, "ICEBRIDGE_SEARCH_PEER_FANOUT",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT : IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT),
-                envInt(overrides, "ICEBRIDGE_MESH_HOP_TTL",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_MESH_HOP_TTL : IceBridgeTopology.DEFAULT_MESH_HOP_TTL),
-                envInt(overrides, "ICEBRIDGE_SEARCH_TTL",
-                        cloudHub ? IceBridgeTopology.HYBRID_EC2_SEARCH_TTL : IceBridgeTopology.DEFAULT_SEARCH_TTL),
-                envInt(overrides, "ICEBRIDGE_SOFT_MAX", IceBridgeTopology.DEFAULT_SOFT_MAX),
-                envInt(overrides, "ICEBRIDGE_LEAF_UP_CONNECTIONS", IceBridgeTopology.DEFAULT_LEAF_ULTRAPEER_CONNECTIONS));
+                envOverride(overrides, "ICEBRIDGE_MESH_FANOUT"),
+                envOverride(overrides, "ICEBRIDGE_SEARCH_PEER_FANOUT"),
+                envOverride(overrides, "ICEBRIDGE_MESH_HOP_TTL"),
+                envOverride(overrides, "ICEBRIDGE_SEARCH_TTL"),
+                envOverride(overrides, "ICEBRIDGE_SOFT_MAX"),
+                envOverride(overrides, "ICEBRIDGE_LEAF_UP_CONNECTIONS"));
         return config;
     }
 
@@ -418,6 +415,20 @@ public final class IceBridgeConfig {
 
     private static int envInt(Map<String, String> overrides, String key, int def) {
         return Integer.parseInt(env(overrides, key, Integer.toString(def)));
+    }
+
+    /** Explicit override, or {@code 0} so {@link IceBridgeTopology#applyRemote} leaves the field. */
+    private static int envOverride(Map<String, String> overrides, String key) {
+        if (!overrides.containsKey(key)) {
+            String v = System.getenv(key);
+            if (v == null || v.isEmpty()) {
+                v = System.getProperty(key);
+            }
+            if (v == null || v.isEmpty()) {
+                return 0;
+            }
+        }
+        return Integer.parseInt(env(overrides, key, "0"));
     }
 
     private static boolean envBool(Map<String, String> overrides, String key, boolean def) {

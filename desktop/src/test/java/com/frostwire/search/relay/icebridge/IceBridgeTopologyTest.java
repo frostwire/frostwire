@@ -48,7 +48,7 @@ class IceBridgeTopologyTest {
     assertEquals(96, IceBridgeTopology.MAX_MESH_BROADCAST_FANOUT);
     assertEquals(96, IceBridgeTopology.MAX_SEARCH_PEER_FANOUT);
     assertEquals(6, IceBridgeTopology.MAX_MESH_HOP_TTL);
-    assertEquals(6, IceBridgeTopology.MAX_SEARCH_TTL);
+    assertEquals(7, IceBridgeTopology.MAX_SEARCH_TTL);
   }
 
   @Test
@@ -77,6 +77,28 @@ class IceBridgeTopologyTest {
     // exceeds a 30k-peer network.
     long wild = IceBridgeTopology.worstCaseMeshPackets(32, 3);
     assertTrue(wild > 30_000, "infinite tree N=32 TTL=3 = " + wild);
+  }
+
+  @Test
+  void applyForRoleSplitsUltrapeerAndLeaf() {
+    IceBridgeTopology t = IceBridgeTopology.get();
+    t.resetToDefaults();
+    t.applyForRole(IceBridgeConfig.Role.BOTH);
+    assertEquals(IceBridgeTopology.ULTRAPEER_FANOUT, t.meshBroadcastFanout());
+    assertEquals(IceBridgeTopology.ULTRAPEER_FANOUT, t.searchPeerFanout());
+    assertEquals(IceBridgeTopology.GNUTELLA_SEARCH_TTL, t.searchTtl());
+    assertEquals(IceBridgeTopology.GNUTELLA_SEARCH_TTL, t.softMax());
+    assertEquals(3, t.meshHopTtl(), "mesh flood TTL stays short");
+    assertEquals(false, t.leafUplinkMode());
+
+    t.resetToDefaults();
+    t.applyForRole(IceBridgeConfig.Role.CLIENT);
+    assertEquals(IceBridgeTopology.LEAF_MAX_UPLINKS, t.searchPeerFanout());
+    assertEquals(IceBridgeTopology.LEAF_MAX_UPLINKS, t.leafUltrapeerConnections());
+    assertEquals(IceBridgeTopology.LEAF_MIN_UPLINKS, t.leafMinUplinks());
+    assertEquals(true, t.leafUplinkMode());
+    assertEquals(IceBridgeTopology.uplinkDegree(IceBridgeConfig.Role.CLIENT), 6);
+    assertEquals(IceBridgeTopology.uplinkDegree(IceBridgeConfig.Role.FORWARDER), 32);
   }
 
   @Test

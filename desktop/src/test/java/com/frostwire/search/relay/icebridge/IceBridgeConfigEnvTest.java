@@ -46,10 +46,11 @@ class IceBridgeConfigEnvTest {
     IceBridgeConfig.fromEnv();
 
     IceBridgeTopology topo = IceBridgeTopology.get();
-    assertEquals(IceBridgeTopology.HYBRID_EC2_MESH_FANOUT, topo.meshBroadcastFanout());
-    assertEquals(IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT, topo.searchPeerFanout());
-    assertEquals(IceBridgeTopology.HYBRID_EC2_MESH_HOP_TTL, topo.meshHopTtl());
-    assertEquals(IceBridgeTopology.HYBRID_EC2_SEARCH_TTL, topo.searchTtl());
+    assertEquals(IceBridgeTopology.ULTRAPEER_FANOUT, topo.meshBroadcastFanout());
+    assertEquals(IceBridgeTopology.ULTRAPEER_FANOUT, topo.searchPeerFanout());
+    assertEquals(IceBridgeTopology.DEFAULT_MESH_HOP_TTL, topo.meshHopTtl());
+    assertEquals(IceBridgeTopology.GNUTELLA_SEARCH_TTL, topo.searchTtl());
+    assertEquals(IceBridgeTopology.GNUTELLA_SEARCH_TTL, topo.softMax());
   }
 
   @Test
@@ -62,20 +63,21 @@ class IceBridgeConfigEnvTest {
 
     IceBridgeTopology topo = IceBridgeTopology.get();
     assertEquals(6, topo.meshBroadcastFanout());
-    assertEquals(IceBridgeTopology.HYBRID_EC2_SEARCH_PEER_FANOUT, topo.searchPeerFanout());
+    assertEquals(IceBridgeTopology.ULTRAPEER_FANOUT, topo.searchPeerFanout());
   }
 
   @Test
-  void leafRoleKeepsLeanTopology() {
+  void clientRoleKeepsLeafUplinks() {
     IceBridgeTopology.get().resetToDefaults();
-    System.setProperty("ICEBRIDGE_ROLE", "BOTH");
+    System.setProperty("ICEBRIDGE_ROLE", "CLIENT");
 
     IceBridgeConfig config = IceBridgeConfig.fromEnv();
 
     IceBridgeTopology topo = IceBridgeTopology.get();
     assertEquals(IceBridgeTopology.DEFAULT_MESH_BROADCAST_FANOUT, topo.meshBroadcastFanout());
-    assertEquals(IceBridgeTopology.DEFAULT_SEARCH_PEER_FANOUT, topo.searchPeerFanout());
-    assertEquals(IceBridgeTopology.DEFAULT_SEARCH_TTL, topo.searchTtl());
+    assertEquals(IceBridgeTopology.LEAF_MAX_UPLINKS, topo.searchPeerFanout());
+    assertEquals(IceBridgeTopology.GNUTELLA_SEARCH_TTL, topo.searchTtl());
+    assertEquals(true, topo.leafUplinkMode());
     assertEquals(IceBridgeConfig.DEFAULT_MAX_SESSIONS, config.maxSessions());
     assertEquals(1024, config.maxSessions());
   }

@@ -80,10 +80,32 @@ public final class IceBridgeTopology {
     /** LimeWire remote ceilings (NUM_CONNECTIONS / MAX_LEAVES max 96). */
     public static final int MAX_MESH_BROADCAST_FANOUT = 96;
     public static final int MAX_SEARCH_PEER_FANOUT = 96;
-    /** LimeWire dynamic query max TTL was 6. */
+    /**
+     * Classic Gnutella query TTL. The wire path budget is 8
+     * ({@code RemoteSearchRequest.MAX_PATH_LENGTH}), so 7 is the deepest hop
+     * count a request can actually travel. Mesh RELAY flood stays on the
+     * shorter {@link #DEFAULT_MESH_HOP_TTL}: that path has no per-query dedup
+     * and must not inherit this horizon.
+     */
+    public static final int GNUTELLA_SEARCH_TTL = 7;
+
+    /**
+     * Ultrapeer degree (Gnutella {@code NUM_CONNECTIONS}). BOTH and FORWARDER
+     * nodes — the ones that can accept inbound sessions — forward a search to
+     * at most this many other powerful peers per hop.
+     */
+    public static final int ULTRAPEER_FANOUT = LIMEWIRE_MESH_FANOUT;
+
+    /** A leaf tries to keep at least this many sessions to powerful nodes. */
+    public static final int LEAF_MIN_UPLINKS = 3;
+
+    /** A leaf never opens more than this many sessions to powerful nodes. */
+    public static final int LEAF_MAX_UPLINKS = 6;
+
+    /** LimeWire dynamic query max TTL was 6; classic Gnutella used 7. */
     public static final int MAX_MESH_HOP_TTL = 6;
-    public static final int MAX_SEARCH_TTL = 6;
-    public static final int MAX_SOFT_MAX = 5;
+    public static final int MAX_SEARCH_TTL = GNUTELLA_SEARCH_TTL;
+    public static final int MAX_SOFT_MAX = GNUTELLA_SEARCH_TTL;
 
     private static final IceBridgeTopology INSTANCE = new IceBridgeTopology();
 
@@ -93,6 +115,9 @@ public final class IceBridgeTopology {
     private volatile int searchTtl = DEFAULT_SEARCH_TTL;
     private volatile int softMax = DEFAULT_SOFT_MAX;
     private volatile int leafUltrapeerConnections = DEFAULT_LEAF_ULTRAPEER_CONNECTIONS;
+    /** Set by {@link #applyForRole}; false until a process declares its role. */
+    private volatile boolean roleApplied;
+    private volatile boolean ultrapeer;
 
     private IceBridgeTopology() {
         meshBroadcastFanout = clamp(
@@ -147,9 +172,62 @@ public final class IceBridgeTopology {
         return softMax;
     }
 
-    /** Leaf attachments to ultrapeer-class IceBridges. */
+    /** Leaf attachments to ultrapeer-class IceBridges (the max, never below {@link #LEAF_MIN_UPLINKS} once a role is applied). */
     public int leafUltrapeerConnections() {
         return leafUltrapeerConnections;
+    }
+
+    /** Minimum powerful-node sessions a leaf should hold when that many exist. */
+    public int leafMinUplinks() {
+        return LEAF_MIN_UPLINKS;
+    }
+
+    /**
+     * True after {@link #applyForRole} for a CLIENT. Originators then address
+     * their few ultrapeer uplinks instead of a wide peer sample.
+     */
+    public boolean leafUplinkMode() {
+        return roleApplied && !ultrapeer;
+    }
+
+    /** BOTH and FORWARDER accept inbound sessions and forward like ultrapeers. */
+    public static boolean isUltrapeer(IceBridgeConfig.Role role) {
+        return role == IceBridgeConfig.Role.BOTH || role == IceBridgeConfig.Role.FORWARDER;
+    }
+
+    /**
+     * Sessions to keep warm: 32 for an ultrapeer mesh, {@link #LEAF_MAX_UPLINKS}
+     * for a leaf. A leaf with fewer than {@link #LEAF_MIN_UPLINKS} known hubs
+     * warms every hub it has.
+     */
+    public static int uplinkDegree(IceBridgeConfig.Role role) {
+        return isUltrapeer(role) ? ULTRAPEER_FANOUT : LEAF_MAX_UPLINKS;
+    }
+
+    /**
+     * Role profile. Ultrapeers (BOTH, FORWARDER) forward to
+     * {@link #ULTRAPEER_FANOUT} peers with a Gnutella search horizon of
+     * {@link #GNUTELLA_SEARCH_TTL}. Leaves keep a small mesh flood and address
+     * at most {@link #LEAF_MAX_UPLINKS} powerful nodes. Mesh flood TTL is left
+     * unchanged: unknown-target RELAY floods are not search queries.
+     *
+     * <p>An explicit {@code ICEBRIDGE_*} env/property already applied by the
+     * constructor is preserved ({@code applyRemote} treats {@code <= 0} as
+     * "leave unchanged").
+     */
+    public void applyForRole(IceBridgeConfig.Role role) {
+        boolean ultra = isUltrapeer(role);
+        applyRemote(
+                envPresent("ICEBRIDGE_MESH_FANOUT") ? 0
+                        : (ultra ? ULTRAPEER_FANOUT : DEFAULT_MESH_BROADCAST_FANOUT),
+                envPresent("ICEBRIDGE_SEARCH_PEER_FANOUT") ? 0
+                        : (ultra ? ULTRAPEER_FANOUT : LEAF_MAX_UPLINKS),
+                0,
+                envPresent("ICEBRIDGE_SEARCH_TTL") ? 0 : GNUTELLA_SEARCH_TTL,
+                envPresent("ICEBRIDGE_SOFT_MAX") ? 0 : GNUTELLA_SEARCH_TTL,
+                envPresent("ICEBRIDGE_LEAF_UP_CONNECTIONS") ? 0 : LEAF_MAX_UPLINKS);
+        this.ultrapeer = ultra;
+        this.roleApplied = true;
     }
 
     /**
@@ -298,10 +376,20 @@ public final class IceBridgeTopology {
         searchTtl = DEFAULT_SEARCH_TTL;
         softMax = DEFAULT_SOFT_MAX;
         leafUltrapeerConnections = DEFAULT_LEAF_ULTRAPEER_CONNECTIONS;
+        roleApplied = false;
+        ultrapeer = false;
     }
 
     private static int clamp(int v, int lo, int hi) {
         return Math.max(lo, Math.min(hi, v));
+    }
+
+    private static boolean envPresent(String key) {
+        String v = System.getenv(key);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(key);
+        }
+        return v != null && !v.isEmpty();
     }
 
     private static int envInt(String key, int def) {
