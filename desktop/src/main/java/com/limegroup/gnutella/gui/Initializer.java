@@ -831,6 +831,7 @@ final class Initializer {
         }
       } catch (IllegalArgumentException ignored) {
       }
+      com.frostwire.search.relay.icebridge.IceBridgeTopology.get().applyForRole(syncRole);
       // Gnutella leaf model: CLIENT answers from its local index but never forwards.
       incomingHandler.setForwardingEnabled(
           syncRole != com.frostwire.search.relay.icebridge.IceBridgeConfig.Role.CLIENT);
