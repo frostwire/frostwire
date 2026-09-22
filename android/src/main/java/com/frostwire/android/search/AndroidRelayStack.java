@@ -727,7 +727,7 @@ public final class AndroidRelayStack implements AutoCloseable {
 
   /**
    * Fetches {@code peerPub}'s public shared-torrent catalog over the IceBridge
-   * mesh: the same signed Protocol #1 request the desktop relay control API
+   * mesh on {@code MeshProtocolId.CATALOG}: the same signed request the desktop relay control API
    * exposes as {@code GET /catalog}. A {@link CatalogBrowser} is not
    * thread-safe, so calls are serialized here; this method blocks and must be
    * invoked off the UI thread. Returns an empty list when the stack is not up,
