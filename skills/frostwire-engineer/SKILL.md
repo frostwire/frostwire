@@ -51,6 +51,7 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 |--------|---------------|
 | **"Fail closed, not crashed"** | Native code, deserialization, network calls — guard recoverable failures and fall back; Java catches cannot stop a native process crash |
 | **"Off the EDT / off the main thread"** | JNI, I/O, parsing, heavy computation, network, DB writes |
+| **"Fix the violation, never mute the detector"** | StrictMode, StrictEdtMode, compiler/lint warnings, assertions, tests, authentication checks, timeouts, monitoring |
 | **"jlibtorrent already handles this"** | Before building custom persistence (e.g. `ip_filter`, session state) |
 | **"Delete code, don't hoard it"** | Refactors, cleanup, removing dead layers — net-negative LoC is good |
 | **"One change, one commit"** | Git history hygiene when authorized — keep tightly-coupled changes together when splitting would break builds or contracts |
@@ -161,6 +162,13 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 - **Android**: All heavy ops on a background thread. Never network or disk I/O on the main thread. Use `SystemUtils.postToHandler(HandlerThreadName.MISC, runnable)` for non-urgent work, `HandlerThreadName.HIGH_PRIORITY` for short user-tap actions (play button, open file) targeting <100 ms response. Inspect the selected helper: some handlers spawn threads rather than provide a bounded queue; priority is not a latency guarantee.
 - **JNI calls to jlibtorrent must never happen on the EDT.** Always offload to a background executor.
 - **Strict EDT is enabled on desktop**: `StrictEdtMode` installs a timing `EventQueue` at startup and reports any dispatch event exceeding 2 seconds. Treat every report as a defect; never wait on a latch, `Future`, DHT/JNI call, network request, disk operation, or lock with unbounded contention from the EDT.
+
+### Never Hide Diagnostic Failures
+
+- Never make a report disappear by weakening, disabling, permitting around, filtering, or suppressing its detector. This includes `StrictMode`, `StrictEdtMode`, compiler/lint warnings, assertions, tests, authentication checks, timeouts, and monitoring.
+- Capture the complete diagnostic first, including the violation/error type; a stack fragment alone does not establish root cause. Reproduce and trace the actual work before changing code.
+- Fix the cause: move blocking work off the constrained thread, correct lifecycle/data-flow/API misuse, or redesign the boundary. `StrictMode.allowThreadDiskReads/Writes()` is not a fix for application work on the main thread.
+- A narrow exception is allowed only for proven unavoidable third-party/platform behavior when no correct isolation exists. Document the exact external cause, minimize the scope, preserve all other diagnostics, and add regression coverage. Suppression is never the first attempt.
 
 ### Desktop Executor Selection
 
@@ -371,10 +379,11 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 ### Bug Fix Pattern
 
 1. Reproduce and understand the **root cause**. Don't fix symptoms.
-2. Write the **smallest possible fix**. One line is better than ten.
-3. Add a regression test that would have caught the original bug.
-4. Update `changelog.txt` for user-facing fixes (Desktop and Android have separate changelogs).
-5. Verify the build passes on **all targets** the change touches.
+2. Keep diagnostics enabled; do not turn off or weaken the mechanism that exposed the bug.
+3. Write the **smallest possible fix**. One line is better than ten.
+4. Add a regression test that would have caught the original bug.
+5. Update `changelog.txt` for user-facing fixes (Desktop and Android have separate changelogs).
+6. Verify the build passes on **all targets** the change touches.
 
 ### Compile Before Commit
 
