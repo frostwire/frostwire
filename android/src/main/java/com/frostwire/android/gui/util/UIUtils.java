@@ -403,21 +403,21 @@ public final class UIUtils {
         intent.addCategory(Intent.CATEGORY_BROWSABLE);
 
         Activity activity = unwrapActivity(context);
-        Context launchContext = activity != null ? activity : context.getApplicationContext();
-        if (launchContext == null) {
-            launchContext = context;
-        }
+        Context applicationContext = context.getApplicationContext();
+        Context launchContext = activity != null ? activity : applicationContext != null ? applicationContext : context;
 
         if (activity == null) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
 
-        try {
-            launchContext.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            LOG.error("openURL: No activity found to open URL: " + trimmedUrl, e);
-            showShortMessage(context, R.string.no_browser_found);
-        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.HIGH_PRIORITY, () -> {
+            try {
+                launchContext.startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                LOG.error("openURL: No activity found to open URL: " + trimmedUrl, e);
+                SystemUtils.postToUIThread(() -> showShortMessage(context, R.string.no_browser_found));
+            }
+        });
     }
 
     private static Activity unwrapActivity(Context context) {
