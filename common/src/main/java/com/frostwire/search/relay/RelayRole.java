@@ -201,11 +201,19 @@ public final class RelayRole implements LeafPromotionManager.ForwardingTarget {
         List<PeerDirectory.PeerInfo> sampled = new ArrayList<>(m);
         sampled.addAll(holders);
         if (sampled.size() < m) {
+            List<String> tokens = IndexDigest.tokenize(request.keywords());
             List<PeerDirectory.PeerInfo> relays = directory.sampleVerified(
-                    m - sampled.size(), excludeHex, NodeCapabilities.RELAY, ThreadLocalRandom.current());
-            sampled.addAll(relays);
+                    Math.max(m - sampled.size(), (m - sampled.size()) * 4),
+                    excludeHex, NodeCapabilities.RELAY, ThreadLocalRandom.current());
             for (PeerDirectory.PeerInfo relay : relays) {
+                if (sampled.size() >= m) {
+                    break;
+                }
+                if (!directory.clusterAllows(relay.peerPub(), tokens)) {
+                    continue;
+                }
                 excludeHex.add(Hex.encode(relay.peerPub()));
+                sampled.add(relay);
             }
         }
         if (sampled.size() < m) {
