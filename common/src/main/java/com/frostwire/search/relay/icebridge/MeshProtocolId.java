@@ -50,6 +50,18 @@ public final class MeshProtocolId {
      */
     public static final int NODE_META = 9;
 
+    /**
+     * OR of a node's leaf digests, expanded into a larger table. Neighboring ultrapeers skip a
+     * forward when the query misses it. Older peers ignore the unknown id.
+     */
+    public static final int CLUSTER_DIGEST = 10;
+
+    /**
+     * Signed request for one peer's shared-torrent catalog, and the signed manifest in reply.
+     * Not a search: it is never forwarded, and it is not decoded as a keyword query.
+     */
+    public static final int CATALOG = 11;
+
     private MeshProtocolId() {
     }
 
@@ -62,7 +74,7 @@ public final class MeshProtocolId {
 
     public static boolean isKnown(int protocolId) {
         int id = effective(protocolId);
-        return id >= SEARCH && id <= NODE_META;
+        return id >= SEARCH && id <= CATALOG;
     }
 
     /**
@@ -89,6 +101,10 @@ public final class MeshProtocolId {
                 return "INDEX_DIGEST";
             case NODE_META:
                 return "NODE_META";
+            case CLUSTER_DIGEST:
+                return "CLUSTER_DIGEST";
+            case CATALOG:
+                return "CATALOG";
             default:
                 return "PROTO_" + id;
         }
