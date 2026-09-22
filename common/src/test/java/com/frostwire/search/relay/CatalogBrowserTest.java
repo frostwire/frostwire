@@ -96,7 +96,7 @@ class CatalogBrowserTest {
     browser.fetchCatalog(peerPub, 3000);
 
     FakeTransport.SentOperation sent = transport.sent.get(0);
-    assertEquals(MeshProtocolId.SEARCH, sent.protocolId);
+    assertEquals(MeshProtocolId.CATALOG, sent.protocolId);
     assertTrue(Arrays.equals(peerPub, sent.targetPub));
 
     RemoteCatalogBrowseRequest request =
@@ -255,7 +255,7 @@ class CatalogBrowserTest {
         Thread deliver = new Thread(() -> {
           for (PayloadListener listener : listeners) {
             listener.onPayload(responderPub, response, System.currentTimeMillis(),
-                MeshProtocolId.SEARCH);
+                MeshProtocolId.CATALOG);
           }
         }, "catalog-browser-fake-deliver");
         deliver.setDaemon(true);
