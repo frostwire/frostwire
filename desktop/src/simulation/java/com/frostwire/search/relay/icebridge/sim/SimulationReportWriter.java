@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -48,8 +49,27 @@ public final class SimulationReportWriter {
         previousFiles.isEmpty() ? null : previousFiles.get(previousFiles.size() - 1);
     JsonObject previous = previousFile == null ? null : read(previousFile);
     String stamp = FILE_TIME.format(timestamp);
-    Path json = outputDirectory.resolve("icebridge-simulation-" + stamp + ".json");
-    Path html = outputDirectory.resolve("icebridge-simulation-" + stamp + ".html");
+    Path json;
+    Path html;
+    int sequence = 1;
+    while (true) {
+      String base =
+          "icebridge-simulation-"
+              + stamp
+              + (sequence == 1 ? "" : String.format(Locale.ROOT, "-%04d", sequence));
+      json = outputDirectory.resolve(base + ".json");
+      html = outputDirectory.resolve(base + ".html");
+      if (Files.exists(html)) {
+        sequence++;
+        continue;
+      }
+      try {
+        Files.createFile(json);
+        break;
+      } catch (FileAlreadyExistsException collision) {
+        sequence++;
+      }
+    }
     JsonObject benchmark = benchmark(report, timestamp);
     Files.writeString(json, GSON.toJson(benchmark), StandardCharsets.UTF_8);
     List<JsonObject> history = new ArrayList<>();
@@ -59,7 +79,7 @@ public final class SimulationReportWriter {
     history.add(benchmark);
     Files.writeString(
         html,
-        html(report, timestamp, json, previousFile, previous, history),
+        html(report, timestamp, json, previousFile, previous, benchmark, history),
         StandardCharsets.UTF_8);
     Files.writeString(
         outputDirectory.resolve("latest-report.txt"),
@@ -88,6 +108,7 @@ public final class SimulationReportWriter {
       Path json,
       Path previousFile,
       JsonObject previous,
+      JsonObject current,
       List<JsonObject> history) {
     HealthBudgets budgets = new HealthBudgets();
     StringBuilder out = new StringBuilder(48_000);
@@ -115,15 +136,21 @@ public final class SimulationReportWriter {
         .append(metric("Amplification", f3(report.amplificationRatio) + "×", "flood / honest"))
         .append(
             metric("Duplicate delivery", percent(report.duplicateDeliveryRatio), "leaf requests"))
-        .append(metric("Compute time", report.durationMillis + " ms", "viewer time excluded"))
+        .append(
+            metric(
+                "Compute time",
+                report.durationMillis + " ms",
+                "UI wait excluded; tracing included"))
         .append("</section>")
         .append(section("SLO gate", sloTable(report, budgets)))
         .append(section("Traffic profile", traffic(report)))
         .append(section("Network topology", topology(report)))
         .append(section("Tuning insights", insights(report)))
         .append(
-            section("Previous benchmark comparison", comparison(report, previousFile, previous)))
-        .append(section("Benchmark history", history(history)))
+            section(
+                "Previous benchmark comparison",
+                comparison(report, previousFile, previous, current)))
+        .append(section("Benchmark history", history(history, current)))
         .append(section("Reproducibility", reproducibility(report, timestamp, json)))
         .append(section("Model boundaries", limitations()))
         .append(
@@ -196,7 +223,11 @@ public final class SimulationReportWriter {
         .append(r.findableSearches + r.nonFindableSearches)
         .append("</b> honest searches</p><p><b>")
         .append(r.floodAttempts)
-        .append("</b> flood attempts</p></div>");
+        .append("</b> flood attempts</p><p><b>")
+        .append(String.format(Locale.US, "%,d", r.hubForwardMessages))
+        .append("</b> hub forwards</p><p><b>")
+        .append(String.format(Locale.US, "%,d", r.duplicateHubDeliveries))
+        .append("</b> duplicate hub deliveries</p></div>");
     return out.toString();
   }
 
@@ -252,7 +283,7 @@ public final class SimulationReportWriter {
     List<String> insights = new ArrayList<>();
     if (r.findableHitRate >= 0.99) {
       insights.add(
-          "Digest-prioritized holder slots preserve complete recall in this catalog. This creates room to test a smaller exploration budget without sacrificing the current recall SLO.");
+          "This workload achieved near-complete recall. The 20-hub backbone is easy to saturate; test smaller fanout and rarer items before concluding that recall is robust.");
     }
     if (r.duplicateDeliveryRatio > 0.20) {
       insights.add(
@@ -268,9 +299,9 @@ public final class SimulationReportWriter {
     }
     if (r.hottestHubShare < 0.08) {
       insights.add(
-          "Backbone load is balanced: the hottest hub carries only "
+          "The fully connected backbone has uniform load: the hottest hub carries "
               + percent(r.hottestHubShare)
-              + " of observed traffic. No hub-degree rebalance is indicated.");
+              + " of observed traffic. Test asymmetric topologies before drawing a load-balance conclusion.");
     }
     if (r.amplificationRatio <= 1.0) {
       insights.add(
@@ -284,9 +315,15 @@ public final class SimulationReportWriter {
   }
 
   private static String comparison(
-      NetworkHealthReport current, Path previousFile, JsonObject previousRoot) {
+      NetworkHealthReport report,
+      Path previousFile,
+      JsonObject previousRoot,
+      JsonObject currentRoot) {
     if (previousRoot == null || !previousRoot.has("report")) {
       return "<p class=\"muted\">No previous benchmark exists yet. The next run will compare against this one.</p>";
+    }
+    if (!compatible(previousRoot, currentRoot)) {
+      return "<p class=\"muted\">Not comparable: seed, workload configuration, host or JVM differs from the previous benchmark.</p>";
     }
     JsonObject previous = previousRoot.getAsJsonObject("report");
     StringBuilder out =
@@ -294,29 +331,24 @@ public final class SimulationReportWriter {
             .append(escape(previousFile.getFileName().toString()))
             .append(
                 "</p><table><thead><tr><th>Metric</th><th>Previous</th><th>Current</th><th>Change</th></tr></thead><tbody>");
-    delta(out, "Health score", previous, "healthScore", current.healthScore, true);
-    delta(out, "Findable recall", previous, "findableHitRate", current.findableHitRate, true);
+    delta(out, "Health score", previous, "healthScore", report.healthScore, true);
+    delta(out, "Findable recall", previous, "findableHitRate", report.findableHitRate, true);
     delta(
         out,
         "Miss p95 messages",
         previous,
         "nonFindableP95Messages",
-        current.nonFindableP95Messages,
+        report.nonFindableP95Messages,
         false);
     delta(
-        out,
-        "Flood admission",
-        previous,
-        "floodAdmissionRatio",
-        current.floodAdmissionRatio,
-        false);
-    delta(out, "Amplification", previous, "amplificationRatio", current.amplificationRatio, false);
+        out, "Flood admission", previous, "floodAdmissionRatio", report.floodAdmissionRatio, false);
+    delta(out, "Amplification", previous, "amplificationRatio", report.amplificationRatio, false);
     delta(
         out,
         "Duplicate delivery",
         previous,
         "duplicateDeliveryRatio",
-        current.duplicateDeliveryRatio,
+        report.duplicateDeliveryRatio,
         false);
     return out.append("</tbody></table>").toString();
   }
@@ -345,14 +377,47 @@ public final class SimulationReportWriter {
         .append("</td></tr>");
   }
 
-  private static String history(List<JsonObject> history) {
-    int start = Math.max(0, history.size() - 20);
+  private static boolean compatible(JsonObject previous, JsonObject current) {
+    if (!previous.has("report") || !previous.getAsJsonObject("report").has("config")) {
+      return false;
+    }
+    if (!workload(previous).equals(workload(current))) {
+      return false;
+    }
+    for (String key : List.of("host", "java", "architecture")) {
+      if (!previous.has(key) || !previous.get(key).equals(current.get(key))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static JsonObject workload(JsonObject run) {
+    JsonObject config = run.getAsJsonObject("report").getAsJsonObject("config").deepCopy();
+    for (String routingParameter :
+        List.of(
+            "minUplinks",
+            "maxUplinks",
+            "searchPeerFanout",
+            "holderBudget",
+            "searchTtl",
+            "softMax",
+            "admissionBurst",
+            "admissionRefillPerSecond")) {
+      config.remove(routingParameter);
+    }
+    return config;
+  }
+
+  private static String history(List<JsonObject> history, JsonObject current) {
+    List<JsonObject> comparable = history.stream().filter(run -> compatible(run, current)).toList();
+    int start = Math.max(0, comparable.size() - 20);
     StringBuilder out =
         new StringBuilder(
             "<div class=\"history-chart\"><svg viewBox=\"0 0 900 180\" role=\"img\" aria-label=\"Health score history\"><polyline points=\"");
     List<Double> scores = new ArrayList<>();
-    for (int i = start; i < history.size(); i++) {
-      scores.add(history.get(i).getAsJsonObject("report").get("healthScore").getAsDouble());
+    for (int i = start; i < comparable.size(); i++) {
+      scores.add(comparable.get(i).getAsJsonObject("report").get("healthScore").getAsDouble());
     }
     for (int i = 0; i < scores.size(); i++) {
       double x = scores.size() == 1 ? 450 : 20 + i * 860.0 / (scores.size() - 1);
@@ -361,8 +426,8 @@ public final class SimulationReportWriter {
     }
     out.append(
         "\"/></svg></div><table><thead><tr><th>Run</th><th>Commit</th><th>Score</th><th>Recall</th><th>Miss p95</th><th>Flood admitted</th><th>Duplicate</th></tr></thead><tbody>");
-    for (int i = history.size() - 1; i >= start; i--) {
-      JsonObject root = history.get(i);
+    for (int i = comparable.size() - 1; i >= start; i--) {
+      JsonObject root = comparable.get(i);
       JsonObject r = root.getAsJsonObject("report");
       out.append("<tr><td>")
           .append(escape(root.get("timestamp").getAsString()))
@@ -392,6 +457,8 @@ public final class SimulationReportWriter {
         + row("Seed", Long.toString(c.seed))
         + row("Nodes", c.ultrapeerCount + " ultrapeers + " + c.leafCount + " leaves")
         + row("Catalog", c.contentItems + " items × " + c.tokensPerItem + " tokens")
+        + row("Maximum holders per item", Integer.toString(c.maxHoldersPerItem))
+        + row("Digest availability", percent(c.digestCoverageFraction))
         + row("Honest workload", percent(c.searcherFraction) + " × " + c.searchesPerSearcher)
         + row("Flood workload", percent(c.flooderFraction) + " × " + c.flooderBurst)
         + "</tbody></table><table><tbody>"
@@ -406,7 +473,7 @@ public final class SimulationReportWriter {
   }
 
   private static String limitations() {
-    return "<ul class=\"limitations\"><li>Message-level deterministic model, not packet-level rUDP. NAT traversal, handshakes, loss, retransmission, latency, and cryptographic CPU cost are excluded.</li><li>Bloom-filter false positives are excluded; digest matching uses exact simulated tokens.</li><li>The ultrapeer backbone uses ideal nonce deduplication and deterministic traversal. Real peer sampling and session availability can increase variance.</li><li>Use trends between identical configurations as benchmarks. Change one network parameter at a time when tuning.</li></ul>";
+    return "<ul class=\"limitations\"><li>All nodes are in-memory objects within one JVM. This is a message-count model, not separate FrostWire processes: production request parsing, signing, response handlers, rUDP, NAT, loss, latency, and cryptographic CPU cost are excluded.</li><li>Leaf and cluster tables use the production IndexDigest Bloom filter; digest availability is an explicit workload assumption.</li><li>Duplicate hub deliveries are counted before receiver deduplication; available sessions and actual transport delays are not modeled.</li><li>Compare runs with the same seed and workload; change one routing parameter at a time. Fully covering a small hub mesh is not WAN recall evidence.</li></ul>";
   }
 
   private static String section(String title, String body) {
@@ -434,7 +501,7 @@ public final class SimulationReportWriter {
               path ->
                   path.getFileName()
                       .toString()
-                      .matches("icebridge-simulation-\\d{8}-\\d{6}\\.json"))
+                      .matches("icebridge-simulation-\\d{8}-\\d{6}(?:-\\d+)?\\.json"))
           .sorted(Comparator.comparing(path -> path.getFileName().toString()))
           .toList();
     }
