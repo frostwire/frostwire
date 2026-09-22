@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * <p>Counterpart to the DHT-backed {@link RemoteIndexFetcher.DhtIndexSource}:
  * instead of resolving a BEP 46 mutable item, this client sends a signed
- * {@link RemoteCatalogBrowseRequest} directly to the target peer over
- * Protocol #1 ({@link MeshProtocolId#SEARCH}) and waits for the peer-signed
+ * {@link RemoteCatalogBrowseRequest} directly to the target peer on
+     * {@link MeshProtocolId#CATALOG} and waits for the peer-signed
  * JSON manifest that
  * {@code com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler}
  * builds.
@@ -162,7 +162,7 @@ public final class CatalogBrowser {
 
           @Override
           public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
-            if (MeshProtocolId.effective(protocolId) == MeshProtocolId.SEARCH) {
+            if (MeshProtocolId.effective(protocolId) == MeshProtocolId.CATALOG) {
               accept(payload);
             }
           }
@@ -185,7 +185,7 @@ public final class CatalogBrowser {
     DistributedSearchTransport.SendOperation operation = null;
     Future<?> sendFuture = null;
     try {
-      operation = transport.createSend(target, MeshProtocolId.SEARCH, encoded, deadlineNanos);
+      operation = transport.createSend(target, MeshProtocolId.CATALOG, encoded, deadlineNanos);
       if (operation == null) {
         return Collections.emptyList();
       }

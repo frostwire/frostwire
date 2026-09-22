@@ -36,8 +36,8 @@ import java.util.Map;
  * (4-byte big-endian length followed by bytes for variable-length
  * fields; 8-byte big-endian for the timestamp).
  *
- * <p>The request is sent directly to the target peer via
- * {@link DistributedSearchTransport#send(byte[], byte[])}.
+     * <p>The request is sent directly to the target peer on
+     * {@code MeshProtocolId.CATALOG}, never on SEARCH.
  */
 public final class RemoteCatalogBrowseRequest {
 

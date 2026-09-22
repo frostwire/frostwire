@@ -10,6 +10,7 @@ package com.frostwire.search.relay.icebridge.client;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.IndexDigest;
 import com.frostwire.search.relay.LeafPromotionManager;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalSharedTorrent;
@@ -302,7 +303,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     }
 
     void onPayloadBefore(byte[] sourcePub, byte[] payload, int protocolId, long deadlineNanos, long workGeneration) {
-        if (stopped || payload == null || payload.length > 16 * 1024
+        if (stopped || payload == null || payload.length > 24 * 1024
                 || workGeneration != generation.get() || System.nanoTime() - deadlineNanos >= 0) {
             return;
         }
@@ -333,6 +334,14 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             }
             return;
         }
+        if (meshProtocol == MeshProtocolId.CLUSTER_DIGEST) {
+            if (peerDirectory != null) {
+                peerDirectory.setClusterDigest(sourcePub, payload);
+                IceBridgeEvents.digest(Hex.encode(sourcePub),
+                        "cluster digest applied bytes=" + payload.length);
+            }
+            return;
+        }
         if (meshProtocol == MeshProtocolId.NODE_META) {
             long caps = com.frostwire.search.relay.icebridge.NodeMetaPayload.decode(payload);
             if (caps >= 0 && peerDirectory != null) {
@@ -346,20 +355,20 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             handleTorrentMetadataPayload(sourcePub, payload);
             return;
         }
-        // Only Protocol #1 (search) is handled here; other protocols are ignored.
+        if (meshProtocol == MeshProtocolId.CATALOG) {
+            RemoteCatalogBrowseRequest browseRequest =
+                    SearchPayloadCodec.decodeCatalogBrowseRequest(payload);
+            if (browseRequest != null) {
+                handleCatalogBrowseRequest(browseRequest, sourcePub);
+            }
+            return;
+        }
         if (meshProtocol != MeshProtocolId.SEARCH) {
             return;
         }
         RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
         if (request != null) {
             handleSearchRequest(request, sourcePub);
-            return;
-        }
-
-        RemoteCatalogBrowseRequest browseRequest =
-                SearchPayloadCodec.decodeCatalogBrowseRequest(payload);
-        if (browseRequest != null) {
-            handleCatalogBrowseRequest(browseRequest, sourcePub);
         }
     }
 
@@ -743,7 +752,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
             }
             byte[] responseBytes = buildCatalogBrowseResponse();
             if (responseBytes != null) {
-                send(request.requesterPub(), MeshProtocolId.SEARCH, responseBytes);
+                send(request.requesterPub(), MeshProtocolId.CATALOG, responseBytes);
             }
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process catalog browse", t);
@@ -869,11 +878,19 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         List<PeerDirectory.PeerInfo> sampled = new ArrayList<>(m);
         sampled.addAll(holders);
         if (sampled.size() < m) {
+            List<String> tokens = IndexDigest.tokenize(request.keywords());
             List<PeerDirectory.PeerInfo> relays = peerDirectory.sampleVerified(
-                    m - sampled.size(), excludeHex, NodeCapabilities.RELAY, ThreadLocalRandom.current());
-            sampled.addAll(relays);
+                    Math.max(m - sampled.size(), (m - sampled.size()) * 4),
+                    excludeHex, NodeCapabilities.RELAY, ThreadLocalRandom.current());
             for (PeerDirectory.PeerInfo relay : relays) {
+                if (sampled.size() >= m) {
+                    break;
+                }
+                if (!peerDirectory.clusterAllows(relay.peerPub(), tokens)) {
+                    continue;
+                }
                 excludeHex.add(Hex.encode(relay.peerPub()));
+                sampled.add(relay);
             }
         }
         if (sampled.size() < m) {

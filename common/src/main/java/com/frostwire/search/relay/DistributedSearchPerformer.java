@@ -17,6 +17,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.relay.event.IceBridgeEvent;
 import com.frostwire.search.relay.event.IceBridgeEvents;
 import com.frostwire.search.relay.icebridge.IceBridgeTopology;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
@@ -430,7 +431,17 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         boolean[] accepting = {true};
 
         DistributedSearchTransport.PayloadListener responseListener =
-                (sourcePub, payload, receivedMs) -> {
+                new DistributedSearchTransport.PayloadListener() {
+                    @Override
+                    public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs, int protocolId) {
+                        if (MeshProtocolId.effective(protocolId) != MeshProtocolId.SEARCH) {
+                            return;
+                        }
+                        onPayload(sourcePub, payload, receivedMs);
+                    }
+
+                    @Override
+                    public void onPayload(byte[] sourcePub, byte[] payload, long receivedMs) {
                     if (stopped || System.nanoTime() >= phaseDeadline || payload == null
                             || payload.length > RemoteSearchResponse.MAX_STREAM_BYTES) {
                         return;
@@ -514,6 +525,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                                 latch.countDown();
                             }
                         }
+                    }
                     }
                 };
 
