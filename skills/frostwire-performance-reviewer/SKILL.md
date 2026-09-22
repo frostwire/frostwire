@@ -197,8 +197,12 @@ JIT, assertions, logging, and classpath differences.
 - `adb logcat`, StrictMode, and ANR traces as evidence of thread violations,
   not as substitutes for a profile.
 
-Never silence StrictMode or permit disk/network work on the main thread to make
-a benchmark green. Move the work, cache it, or redesign the call boundary.
+Never silence or relax StrictMode, StrictEdtMode, warnings, assertions, tests,
+timeouts, authentication checks, or monitoring to make a benchmark or report
+green. Capture the complete diagnostic type, establish root cause, and move the
+work, cache it, or redesign the call boundary. A narrowly scoped suppression is
+acceptable only for proven unavoidable third-party/platform behavior when no
+correct isolation exists; document it and cover it with a regression test.
 
 ## 5. Distributed Search And IceBridge Profiling
 
@@ -366,7 +370,8 @@ Review in this order. Higher-leverage structural changes come before micro-opts.
 - creating executors/threads for each transfer or search
 - retaining `Activity`, `View`, or service contexts from long-lived workers
 - retry loops that wake the device or radio without a bound
-- `StrictMode.allowThreadDiskReads/Writes` used to conceal application work
+- `StrictMode.allowThreadDiskReads/Writes` used to conceal application work;
+  move the work off the main thread instead of muting the detector
 
 ### Desktop Red Flags
 
