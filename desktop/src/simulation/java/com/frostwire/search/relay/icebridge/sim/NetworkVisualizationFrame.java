@@ -28,7 +28,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -41,6 +43,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /** Standalone, interactive Swing visualization for simulation-only network snapshots. */
 public final class NetworkVisualizationFrame extends JFrame {
@@ -51,7 +54,7 @@ public final class NetworkVisualizationFrame extends JFrame {
   private static final Color MUTED = new Color(105, 139, 127);
   private static final Color MINT = new Color(78, 230, 168);
   private static final Color AMBER = new Color(246, 196, 83);
-  private static final Color RED = new Color(255, 107, 107);
+  private static final Color RED = new Color(255, 32, 48);
   private static final Color BLUE = new Color(108, 182, 255);
 
   private final NetworkCanvas canvas = new NetworkCanvas();
@@ -60,6 +63,7 @@ public final class NetworkVisualizationFrame extends JFrame {
   private final JProgressBar progress = new JProgressBar();
   private final JButton openReport = new JButton("Open HTML report");
   private Path reportPath;
+  private Integer inspectedNodeId;
 
   public NetworkVisualizationFrame() {
     super("IceBridge Network Simulation");
@@ -96,8 +100,15 @@ public final class NetworkVisualizationFrame extends JFrame {
             + "Ultrapeer    mint\n"
             + "Leaf         blue\n"
             + "Searcher     amber\n"
-            + "Flooder      red\n");
-    canvas.setNodeSelectionListener(this::showNode);
+            + "Flooder      red\n"
+            + "Packet       sampled moving hop\n\n"
+            + "Animation shows one sampled search per 25,\n"
+            + "not every message on the wire.\n");
+    canvas.setNodeSelectionListener(
+        node -> {
+          inspectedNodeId = node == null ? null : node.id;
+          showNode(node);
+        });
     JScrollPane detailScroll = new JScrollPane(details);
     detailScroll.setPreferredSize(new Dimension(300, 300));
     detailScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -156,16 +167,33 @@ public final class NetworkVisualizationFrame extends JFrame {
 
   private void update(NetworkSnapshot snapshot) {
     canvas.setSnapshot(snapshot);
+    if (inspectedNodeId != null) {
+      showNode(nodeById(snapshot, inspectedNodeId));
+    }
     progress.setMaximum(Math.max(1, snapshot.totalSearches));
     progress.setValue(snapshot.completedSearches);
     progress.setString(snapshot.completedSearches + " / " + snapshot.totalSearches);
+    int percent =
+        snapshot.totalSearches == 0 ? 0 : snapshot.completedSearches * 100 / snapshot.totalSearches;
     status.setText(
-        snapshot.phase
-            + " · "
-            + snapshot.nodes.size()
-            + " nodes · "
-            + snapshot.edges.size()
-            + " links");
+        String.format(
+            "%d%%  %s  ·  findable %d/%d  ·  flood admitted %d/%d  ·  %,d messages",
+            percent,
+            snapshot.phase,
+            snapshot.findableHits,
+            snapshot.findableAttempts,
+            snapshot.floodAdmitted,
+            snapshot.floodAttempts,
+            snapshot.messagesSoFar));
+  }
+
+  static NetworkNode nodeById(NetworkSnapshot snapshot, int id) {
+    for (NetworkNode node : snapshot.nodes) {
+      if (node.id == id) {
+        return node;
+      }
+    }
+    return null;
   }
 
   private void showNode(NetworkNode node) {
@@ -228,9 +256,22 @@ public final class NetworkVisualizationFrame extends JFrame {
     private Point dragStart;
     private boolean dragged;
     private Integer selectedNode;
+    private final List<LivePacket> packets = new ArrayList<>();
+    private final Timer animator;
 
     NetworkCanvas() {
       setBackground(BACKGROUND);
+      animator =
+          new Timer(
+              33,
+              event -> {
+                long now = System.currentTimeMillis();
+                packets.removeIf(packet -> now - packet.bornMillis > 800 + packet.hop.step * 90L);
+                if (!packets.isEmpty()) {
+                  repaint();
+                }
+              });
+      animator.start();
       MouseAdapter mouse =
           new MouseAdapter() {
             @Override
@@ -283,6 +324,13 @@ public final class NetworkVisualizationFrame extends JFrame {
       if (positions.isEmpty()) {
         layout(snapshot);
       }
+      long now = System.currentTimeMillis();
+      for (IceBridgeWorkloadSimulator.ActivityHop hop : snapshot.activity) {
+        packets.add(new LivePacket(hop, now));
+      }
+      while (packets.size() > 160) {
+        packets.remove(0);
+      }
       repaint();
     }
 
@@ -308,7 +356,35 @@ public final class NetworkVisualizationFrame extends JFrame {
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       paintEdges(g, current);
       paintNodes(g, current);
+      paintPackets(g);
       g.dispose();
+    }
+
+    private void paintPackets(Graphics2D g) {
+      long now = System.currentTimeMillis();
+      for (LivePacket packet : packets) {
+        Point2D.Double from = positions.get(packet.hop.from);
+        Point2D.Double to = positions.get(packet.hop.to);
+        if (from == null || to == null) {
+          continue;
+        }
+        float age = (now - packet.bornMillis - packet.hop.step * 90L) / 800f;
+        if (age < 0 || age >= 1) {
+          continue;
+        }
+        float travel = Math.min(1f, age / 0.75f);
+        Point start = screen(from);
+        Point end = screen(to);
+        int x = start.x + Math.round((end.x - start.x) * travel);
+        int y = start.y + Math.round((end.y - start.y) * travel);
+        Color color = packet.hop.flood ? RED : packet.hop.hit ? MINT : AMBER;
+        int alpha = age > 0.75f ? Math.max(0, (int) (255 * (1f - age) / 0.25f)) : 230;
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
+        g.setStroke(new BasicStroke(packet.hop.hit ? 2.5f : 1.5f));
+        g.drawLine(start.x, start.y, x, y);
+        int size = packet.hop.hit ? 9 : 6;
+        g.fillOval(x - size / 2, y - size / 2, size, size);
+      }
     }
 
     private void paintEdges(Graphics2D g, NetworkSnapshot current) {
@@ -338,24 +414,41 @@ public final class NetworkVisualizationFrame extends JFrame {
         maxMessages = Math.max(maxMessages, node.messages);
       }
       for (NetworkNode node : current.nodes) {
-        Point point = screen(positions.get(node.id));
-        int size = node.type == NodeType.ULTRAPEER ? 15 : Math.max(3, (int) Math.round(4 * zoom));
-        Color color = node.type == NodeType.ULTRAPEER ? MINT : BLUE;
-        if (node.searcher) {
-          color = AMBER;
+        if (!node.flooder) {
+          paintNode(g, node, maxMessages);
         }
+      }
+      for (NetworkNode node : current.nodes) {
         if (node.flooder) {
-          color = RED;
+          paintNode(g, node, maxMessages);
         }
-        double load = Math.log1p(node.messages) / Math.log1p(maxMessages);
-        int alpha = 90 + (int) (165 * load);
-        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
-        g.fillOval(point.x - size / 2, point.y - size / 2, size, size);
-        if (selectedNode != null && selectedNode == node.id) {
-          g.setColor(AMBER);
-          g.setStroke(new BasicStroke(2f));
-          g.drawOval(point.x - size / 2 - 5, point.y - size / 2 - 5, size + 10, size + 10);
-        }
+      }
+    }
+
+    private void paintNode(Graphics2D g, NetworkNode node, long maxMessages) {
+      Point point = screen(positions.get(node.id));
+      int size = node.type == NodeType.ULTRAPEER ? 15 : Math.max(3, (int) Math.round(4 * zoom));
+      Color color = node.type == NodeType.ULTRAPEER ? MINT : BLUE;
+      if (node.searcher) {
+        color = AMBER;
+      }
+      int alpha = 90 + (int) (165 * Math.log1p(node.messages) / Math.log1p(maxMessages));
+      if (node.flooder) {
+        color = RED;
+        alpha = 255;
+        size = Math.max(12, (int) Math.round(14 * Math.max(0.7, zoom)));
+      }
+      g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
+      g.fillOval(point.x - size / 2, point.y - size / 2, size, size);
+      if (node.flooder) {
+        g.setColor(new Color(255, 220, 220));
+        g.setStroke(new BasicStroke(2f));
+        g.drawOval(point.x - size / 2 - 3, point.y - size / 2 - 3, size + 6, size + 6);
+      }
+      if (selectedNode != null && selectedNode == node.id) {
+        g.setColor(AMBER);
+        g.setStroke(new BasicStroke(2f));
+        g.drawOval(point.x - size / 2 - 5, point.y - size / 2 - 5, size + 10, size + 10);
       }
     }
 
@@ -398,6 +491,16 @@ public final class NetworkVisualizationFrame extends JFrame {
         nodeSelectionListener.selected(nearest);
       }
       repaint();
+    }
+
+    private static final class LivePacket {
+      final IceBridgeWorkloadSimulator.ActivityHop hop;
+      final long bornMillis;
+
+      LivePacket(IceBridgeWorkloadSimulator.ActivityHop hop, long bornMillis) {
+        this.hop = hop;
+        this.bornMillis = bornMillis;
+      }
     }
 
     private Point screen(Point2D.Double point) {
