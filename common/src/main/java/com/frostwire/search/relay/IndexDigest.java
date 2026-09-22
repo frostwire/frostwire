@@ -37,11 +37,28 @@ import java.util.Set;
  */
 public final class IndexDigest {
 
-  /** Bytes per published digest. 4096 bytes × 8 bits = 32768 bits. */
+  /** Bytes of the bit array a leaf publishes. 4096 × 8 = 32768 bits. */
   public static final int DEFAULT_BYTES = 4096;
 
+  /**
+   * Bit-array size of an ultrapeer's cluster table (OR of its leaves, expanded).
+   * 16384 × 8 = 131072 bits, the size late Gnutella used between ultrapeers.
+   */
+  public static final int CLUSTER_BYTES = 16384;
+
   public static final int MIN_BYTES = 64;
-  public static final int MAX_BYTES = 8192;
+  public static final int MAX_BYTES = CLUSTER_BYTES;
+
+  /** Wire version. Frames without it are rejected so an old hash cannot be misread. */
+  public static final int VERSION = 1;
+
+  private static final Set<String> STOPWORDS = Set.of(
+      "the", "and", "for", "with", "from", "that", "this", "you", "not",
+      "mp3", "mp4", "m4a", "m4v", "flac", "ogg", "wav", "aac", "wma",
+      "mkv", "avi", "wmv", "webm", "mov", "mpg", "mpeg",
+      "jpg", "jpeg", "png", "gif", "pdf", "zip", "rar",
+      "720", "1080", "2160", "480", "1440",
+      "x264", "x265", "h264", "h265", "uhd", "hdr");
 
   /** Number of Bloom hash probes per token. */
   public static final int HASHES = 4;
@@ -97,7 +114,10 @@ public final class IndexDigest {
 
   private static void flushToken(StringBuilder current, Set<String> out) {
     if (current.length() >= MIN_TOKEN_LENGTH && out.size() < MAX_TOKENS) {
-      out.add(current.toString());
+      String token = current.toString();
+      if (!STOPWORDS.contains(token)) {
+        out.add(token);
+      }
     }
     current.setLength(0);
   }
@@ -159,14 +179,66 @@ public final class IndexDigest {
    * callers can reject malformed peer announcements without throwing.
    */
   public static IndexDigest fromBytes(byte[] raw) {
-    if (raw == null || raw.length < MIN_BYTES || raw.length > MAX_BYTES) {
+    if (raw == null || raw.length < 1 + MIN_BYTES || raw[0] != (byte) VERSION) {
       return null;
     }
-    return new IndexDigest(raw.clone());
+    int bitBytes = raw.length - 1;
+    if (bitBytes > MAX_BYTES || Integer.bitCount(bitBytes) != 1) {
+      return null;
+    }
+    byte[] bits = new byte[bitBytes];
+    System.arraycopy(raw, 1, bits, 0, bitBytes);
+    return new IndexDigest(bits);
+  }
+
+  /**
+   * OR leaf filters into one cluster table. A token set in a smaller power-of-two
+   * filter is expanded so a probe of the cluster cannot miss it.
+   */
+  public static IndexDigest aggregate(Collection<IndexDigest> parts) {
+    byte[] cluster = new byte[CLUSTER_BYTES];
+    if (parts != null) {
+      for (IndexDigest part : parts) {
+        if (part != null) {
+          orExpanded(part.bits, cluster);
+        }
+      }
+    }
+    return new IndexDigest(cluster);
+  }
+
+  /**
+   * Hits required before a peer counts as a holder. One or two tokens must all hit.
+   * Longer queries use LimeWire's two-thirds rule so one noisy token cannot hide a match
+   * and one common token cannot mark every library.
+   */
+  public static int requiredHits(int tokenCount) {
+    if (tokenCount <= 2) {
+      return Math.max(tokenCount, 1);
+    }
+    return (tokenCount * 2 + 2) / 3;
+  }
+
+  /** True when this filter passes {@link #requiredHits} for the already-tokenized query. */
+  public boolean routes(Collection<String> queryTokens) {
+    if (queryTokens == null || queryTokens.isEmpty()) {
+      return false;
+    }
+    int hits = 0;
+    int need = requiredHits(queryTokens.size());
+    for (String token : queryTokens) {
+      if (token != null && mightContainExact(token)) {
+        hits++;
+      }
+    }
+    return hits >= need;
   }
 
   public byte[] toBytes() {
-    return bits.clone();
+    byte[] out = new byte[1 + bits.length];
+    out[0] = (byte) VERSION;
+    System.arraycopy(bits, 0, out, 1, bits.length);
+    return out;
   }
 
   public int byteLength() {
@@ -227,14 +299,10 @@ public final class IndexDigest {
   }
 
   private boolean mightContainExact(String token) {
-    long m = (long) bits.length * 8L;
-    long h1 = hash(token, 0);
-    long h2 = hash(token, 1) | 1L;
+    long bitCount = (long) bits.length * 8L;
+    int shift = 64 - Long.numberOfTrailingZeros(bitCount);
     for (int i = 0; i < HASHES; i++) {
-      long bit = ((h1 + (long) i * h2) % m + m) % m;
-      int index = (int) (bit >>> 3);
-      int mask = 1 << (bit & 7);
-      if ((bits[index] & mask) == 0) {
+      if (!bitSet(bits, hash(token, i) >>> shift)) {
         return false;
       }
     }
@@ -242,14 +310,46 @@ public final class IndexDigest {
   }
 
   private static void index(byte[] out, String token) {
-    long m = (long) out.length * 8L;
-    long h1 = hash(token, 0);
-    long h2 = hash(token, 1) | 1L;
+    long bitCount = (long) out.length * 8L;
+    int shift = 64 - Long.numberOfTrailingZeros(bitCount);
     for (int i = 0; i < HASHES; i++) {
-      long bit = ((h1 + (long) i * h2) % m + m) % m;
-      int index = (int) (bit >>> 3);
-      out[index] |= (byte) (1 << (bit & 7));
+      setBit(out, hash(token, i) >>> shift);
     }
+  }
+
+  /** OR {@code small} into {@code large}, expanding when the cluster is a larger power of two. */
+  private static void orExpanded(byte[] small, byte[] large) {
+    int smallBits = small.length * 8;
+    int largeBits = large.length * 8;
+    if (smallBits == largeBits) {
+      for (int i = 0; i < small.length; i++) {
+        large[i] |= small[i];
+      }
+      return;
+    }
+    if (largeBits < smallBits || largeBits % smallBits != 0) {
+      return;
+    }
+    int factor = largeBits / smallBits;
+    for (int i = 0; i < smallBits; i++) {
+      if (!bitSet(small, i)) {
+        continue;
+      }
+      int base = i * factor;
+      for (int j = 0; j < factor; j++) {
+        setBit(large, base + j);
+      }
+    }
+  }
+
+  private static boolean bitSet(byte[] bits, long bit) {
+    int index = (int) (bit >>> 3);
+    return (bits[index] & (1 << (bit & 7))) != 0;
+  }
+
+  private static void setBit(byte[] bits, long bit) {
+    int index = (int) (bit >>> 3);
+    bits[index] |= (byte) (1 << (bit & 7));
   }
 
   private static long hash(String token, int salt) {
