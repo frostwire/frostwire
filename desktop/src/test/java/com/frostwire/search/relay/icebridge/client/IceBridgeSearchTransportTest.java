@@ -18,6 +18,7 @@ import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
+import com.frostwire.search.relay.RemoteSearchRequest;
 import com.frostwire.search.relay.SearchPayloadCodec;
 import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.search.relay.TorrentMetadataProvider;
@@ -36,6 +37,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +122,275 @@ class IceBridgeSearchTransportTest {
       assertEquals(0, fixture.sends.get(), "stopped work cannot respond");
     } finally {
       release.countDown();
+    }
+  }
+
+  @Test
+  void demuxAdmitsAnnouncementsAndKeepsRepliesOffTheRequestLane() {
+    byte[] json =
+        "{\"v\":1,\"k\":\"miami\",\"pub\":\"p\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    assertTrue(IceBridgeSearchTransport.isRequest(json, MeshProtocolId.SEARCH));
+    assertFalse(
+        IceBridgeSearchTransport.isRequest(
+            "{\"v\":1,\"nonce\":\"n\",\"rows\":[],\"sig\":\"s\"}"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            MeshProtocolId.SEARCH));
+    assertTrue(
+        IceBridgeSearchTransport.isRequest(
+            "{\"v\":1,\"ih\":\"ab\",\"pub\":\"p\"}"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            MeshProtocolId.METADATA));
+    assertFalse(
+        IceBridgeSearchTransport.isRequest(
+            "{\"v\":1,\"nonce\":\"n\",\"ih\":\"ab\",\"ts\":1,\"sig\":\"s\"}"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            MeshProtocolId.METADATA));
+    assertTrue(IceBridgeSearchTransport.isRequest(new byte[] {1}, MeshProtocolId.TELEMETRY));
+    assertTrue(
+        IceBridgeSearchTransport.isRequest(
+            IndexDigest.build(java.util.List.of("miami")).toBytes(), MeshProtocolId.INDEX_DIGEST));
+    assertTrue(
+        IceBridgeSearchTransport.isRequest(
+            IndexDigest.aggregate(
+                    java.util.List.of(IndexDigest.build(java.util.List.of("beatles"))))
+                .toBytes(),
+            MeshProtocolId.CLUSTER_DIGEST));
+    assertTrue(
+        IceBridgeSearchTransport.isRequest(
+            com.frostwire.search.relay.icebridge.NodeMetaPayload.encode(
+                com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH),
+            MeshProtocolId.NODE_META));
+    assertTrue(
+        IceBridgeSearchTransport.isRequest(
+            "{\"v\":1,\"target\":\"abc\",\"pub\":\"p\"}"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            MeshProtocolId.CATALOG));
+    assertFalse(
+        IceBridgeSearchTransport.isRequest(
+            "{\"v\":1,\"pub\":\"p\",\"rows\":[],\"ts\":1,\"sig\":\"s\"}"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            MeshProtocolId.CATALOG));
+    for (int reserved :
+        new int[] {
+          MeshProtocolId.CHAT, MeshProtocolId.PUBSUB, MeshProtocolId.AI, MeshProtocolId.FILESYNC
+        }) {
+      assertFalse(
+          IceBridgeSearchTransport.isRequest(new byte[] {1}, reserved),
+          "reserved id " + reserved + " must not occupy the request lane");
+    }
+  }
+
+  @Test
+  void pollDeliversEveryImplementedAnnouncementToTheHandler() throws Exception {
+    IdentityKeys self = IdentityKeys.generate();
+    IdentityKeys ping = IdentityKeys.generate();
+    IdentityKeys meta = IdentityKeys.generate();
+    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys cluster = IdentityKeys.generate();
+    try (Fixture fixture = new Fixture()) {
+      PeerDirectory directory = newDirectory();
+      directory.upsertVerified(ping.ed25519PubRaw(), "10.0.0.1", 6889);
+      directory.upsertVerified(
+          meta.ed25519PubRaw(),
+          "10.0.0.2",
+          6889,
+          6889,
+          com.frostwire.search.relay.NodeCapabilities.NONE);
+      directory.upsertVerified(holder.ed25519PubRaw(), "10.0.0.3", 6889);
+      directory.upsertVerified(
+          cluster.ed25519PubRaw(),
+          "10.0.0.4",
+          6889,
+          6889,
+          com.frostwire.search.relay.NodeCapabilities.RELAY);
+      IncomingSearchRequestHandler handler =
+          new IncomingSearchRequestHandler(
+              fixture.transport,
+              new RelaySearchService(
+                  new EmptyLocalIndex(), self, ShareVisibilityPolicy.INCLUDE_ALL),
+              directory,
+              self);
+      handler.start();
+      fixture.offer(ping.ed25519PubRaw(), new byte[] {0x01}, MeshProtocolId.TELEMETRY);
+      fixture.offer(
+          meta.ed25519PubRaw(),
+          com.frostwire.search.relay.icebridge.NodeMetaPayload.encode(
+              com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH),
+          MeshProtocolId.NODE_META);
+      fixture.offer(
+          holder.ed25519PubRaw(),
+          IndexDigest.build(java.util.List.of("beatles anthology")).toBytes(),
+          MeshProtocolId.INDEX_DIGEST);
+      fixture.offer(
+          cluster.ed25519PubRaw(),
+          IndexDigest.aggregate(java.util.List.of(IndexDigest.build(java.util.List.of("beatles"))))
+              .toBytes(),
+          MeshProtocolId.CLUSTER_DIGEST);
+      fixture.poll();
+      long deadline = System.currentTimeMillis() + 5_000;
+      while (System.currentTimeMillis() < deadline
+          && !(directory.isLive(ping.ed25519PubRaw())
+              && directory.get(meta.ed25519PubRaw()).orElseThrow().capabilities()
+                  == com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH
+              && directory.hasIndexDigest(holder.ed25519PubRaw())
+              && !directory.clusterAllows(
+                  cluster.ed25519PubRaw(), java.util.List.of("zzzznotpresent")))) {
+        Thread.sleep(10);
+      }
+      assertTrue(
+          directory.isLive(ping.ed25519PubRaw()), "TELEMETRY must mark contact via the poll path");
+      assertEquals(
+          com.frostwire.search.relay.NodeCapabilities.DEFAULT_BOTH,
+          directory.get(meta.ed25519PubRaw()).orElseThrow().capabilities(),
+          "NODE_META must be applied via the poll path");
+      assertTrue(
+          directory.hasIndexDigest(holder.ed25519PubRaw()),
+          "INDEX_DIGEST must be stored via the poll path");
+      assertTrue(
+          directory.clusterAllows(cluster.ed25519PubRaw(), java.util.List.of("beatles")),
+          "CLUSTER_DIGEST must be stored via the poll path");
+      assertFalse(
+          directory.clusterAllows(cluster.ed25519PubRaw(), java.util.List.of("zzzznotpresent")));
+    }
+  }
+
+  @Test
+  void pollAnswersSearchCatalogAndMetadataOnTheirOwnProtocol() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    IdentityKeys requester = IdentityKeys.generate();
+    byte[] requesterPub = requester.ed25519PubRaw();
+    try (Fixture fixture = new Fixture()) {
+      SilentIndex index = new SilentIndex();
+      IncomingSearchRequestHandler handler =
+          new IncomingSearchRequestHandler(
+              fixture.transport,
+              new RelaySearchService(index, holder, ShareVisibilityPolicy.INCLUDE_ALL),
+              newDirectory(),
+              holder,
+              index);
+      handler.setPublicCatalogEnabled(true);
+      handler.start();
+      long now = System.currentTimeMillis() / 1000L;
+      fixture.offer(requesterPub, signedSearch(requester, now), MeshProtocolId.SEARCH);
+      fixture.offer(
+          requesterPub,
+          signedCatalog(requester, holder.ed25519PubRaw(), now),
+          MeshProtocolId.CATALOG);
+      fixture.offer(requesterPub, signedMetadata(requester, now), MeshProtocolId.METADATA);
+      fixture.poll();
+      long deadline = System.currentTimeMillis() + 5_000;
+      while (System.currentTimeMillis() < deadline
+          && !(fixture.sentProtocols.contains(MeshProtocolId.SEARCH)
+              && fixture.sentProtocols.contains(MeshProtocolId.CATALOG)
+              && fixture.sentProtocols.contains(MeshProtocolId.METADATA))) {
+        Thread.sleep(10);
+      }
+      assertTrue(
+          fixture.sentProtocols.contains(MeshProtocolId.SEARCH),
+          "a search request must be answered on SEARCH, got " + fixture.sentProtocols);
+      assertTrue(
+          fixture.sentProtocols.contains(MeshProtocolId.CATALOG),
+          "a catalog request must be answered on CATALOG, got " + fixture.sentProtocols);
+      assertTrue(
+          fixture.sentProtocols.contains(MeshProtocolId.METADATA),
+          "a metadata request must be answered on METADATA, got " + fixture.sentProtocols);
+    }
+  }
+
+  private static byte[] signedSearch(IdentityKeys requester, long now) throws Exception {
+    byte[] pub = requester.ed25519PubRaw();
+    RemoteSearchRequest unsigned =
+        RemoteSearchRequest.builder()
+            .keywords("beatles")
+            .limit(5)
+            .nonce(new byte[32])
+            .ttl(1)
+            .requesterPub(pub)
+            .path(new byte[][] {pub})
+            .timestamp(now)
+            .signature(new byte[64])
+            .build();
+    Signature signer = IdentityKeys.softwareSignature("Ed25519");
+    signer.initSign(requester.ed25519().getPrivate());
+    signer.update(unsigned.canonicalBytes());
+    return SearchPayloadCodec.encodeRequest(
+        RemoteSearchRequest.builder()
+            .keywords("beatles")
+            .limit(5)
+            .nonce(new byte[32])
+            .ttl(1)
+            .requesterPub(pub)
+            .path(new byte[][] {pub})
+            .timestamp(now)
+            .signature(signer.sign())
+            .build());
+  }
+
+  private static byte[] signedCatalog(IdentityKeys requester, byte[] target, long now)
+      throws Exception {
+    com.frostwire.search.relay.RemoteCatalogBrowseRequest.Builder builder =
+        com.frostwire.search.relay.RemoteCatalogBrowseRequest.builder()
+            .requesterPub(requester.ed25519PubRaw())
+            .targetPub(target)
+            .nonce(new byte[32])
+            .timestamp(now)
+            .signature(new byte[64]);
+    Signature signer = IdentityKeys.softwareSignature("Ed25519");
+    signer.initSign(requester.ed25519().getPrivate());
+    signer.update(builder.build().canonicalBytes());
+    return SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build());
+  }
+
+  private static byte[] signedMetadata(IdentityKeys requester, long now) throws Exception {
+    byte[] hash = new byte[20];
+    hash[0] = 7;
+    com.frostwire.search.relay.TorrentMetadataRequest.Builder builder =
+        com.frostwire.search.relay.TorrentMetadataRequest.builder()
+            .infoHash(hash)
+            .nonce(new byte[32])
+            .requesterPub(requester.ed25519PubRaw())
+            .timestamp(now)
+            .signature(new byte[64]);
+    Signature signer = IdentityKeys.softwareSignature("Ed25519");
+    signer.initSign(requester.ed25519().getPrivate());
+    signer.update(builder.build().canonicalBytes());
+    return SearchPayloadCodec.encodeTorrentMetadataRequest(
+        builder.signature(signer.sign()).build());
+  }
+
+  /** Not an EmptyLocalIndex, so an empty search still produces a signed reply. */
+  private static final class SilentIndex implements com.frostwire.search.relay.LocalIndex {
+    @Override
+    public void upsert(com.frostwire.search.relay.LocalSharedTorrent torrent) {}
+
+    @Override
+    public void delete(String infoHashHex) {}
+
+    @Override
+    public java.util.Optional<com.frostwire.search.relay.LocalSharedTorrent> get(
+        String infoHashHex) {
+      return java.util.Optional.empty();
+    }
+
+    @Override
+    public List<com.frostwire.search.relay.LocalSharedTorrent> search(String query, int limit) {
+      return List.of();
+    }
+
+    @Override
+    public void markPublished(String infoHashHex, long timestamp) {}
+
+    @Override
+    public List<String> needsRepublish(long nowSec, long thresholdSec) {
+      return List.of();
+    }
+
+    @Override
+    public void updateLastSeen(String infoHashHex, long ts) {}
+
+    @Override
+    public int size() {
+      return 0;
     }
   }
 
@@ -273,6 +544,7 @@ class IceBridgeSearchTransportTest {
   private static final class Fixture implements AutoCloseable {
     final ConcurrentLinkedQueue<Map<String, Object>> messages = new ConcurrentLinkedQueue<>();
     final AtomicInteger sends = new AtomicInteger();
+    final List<Integer> sentProtocols = new CopyOnWriteArrayList<>();
     final CountDownLatch sendStarted = new CountDownLatch(1);
     final CountDownLatch sendRelease = new CountDownLatch(1);
     volatile boolean blockSend;
@@ -290,6 +562,17 @@ class IceBridgeSearchTransportTest {
               Map<String, Object> message;
               while (batch.size() < 256 && (message = messages.poll()) != null) batch.add(message);
             } else if (exchange.getRequestURI().getPath().equals("/send")) {
+              String posted =
+                  new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+              try {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> fields = new Gson().fromJson(posted, Map.class);
+                Object id = fields == null ? null : fields.get("protocolId");
+                if (id instanceof Number) {
+                  sentProtocols.add(((Number) id).intValue());
+                }
+              } catch (RuntimeException ignored) {
+              }
               sends.incrementAndGet();
               sendStarted.countDown();
               if (blockSend) {

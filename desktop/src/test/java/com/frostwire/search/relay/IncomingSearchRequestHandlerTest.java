@@ -678,7 +678,8 @@ class IncomingSearchRequestHandlerTest {
       handler.onPayload(
           rawPub(requester),
           SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build()),
-          0);
+          0,
+          com.frostwire.search.relay.icebridge.MeshProtocolId.CATALOG);
       assertEquals(1, transport.sent.size());
       String manifest =
           new String(transport.sent.get(0).payload, java.nio.charset.StandardCharsets.UTF_8);
@@ -734,7 +735,8 @@ class IncomingSearchRequestHandlerTest {
     handler.onPayload(
         rawPub(requester),
         SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build()),
-        0);
+        0,
+        com.frostwire.search.relay.icebridge.MeshProtocolId.CATALOG);
 
     assertEquals(1, transport.sent.size());
     String manifest =

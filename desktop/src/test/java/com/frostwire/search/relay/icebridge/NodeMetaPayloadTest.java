@@ -44,5 +44,7 @@ class NodeMetaPayloadTest {
   void protocolIdIsKnownAndNamed() {
     assertTrue(MeshProtocolId.isKnown(MeshProtocolId.NODE_META));
     assertEquals("NODE_META", MeshProtocolId.name(MeshProtocolId.NODE_META));
+    assertTrue(MeshProtocolId.isKnown(MeshProtocolId.CATALOG));
+    assertEquals("CATALOG", MeshProtocolId.name(MeshProtocolId.CATALOG));
   }
 }

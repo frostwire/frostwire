@@ -63,9 +63,40 @@ class IndexDigestTest {
   @Test
   void rejectsMalformedFrames() {
     assertNull(IndexDigest.fromBytes(null));
-    assertNull(IndexDigest.fromBytes(new byte[IndexDigest.MIN_BYTES - 1]));
-    assertNull(IndexDigest.fromBytes(new byte[IndexDigest.MAX_BYTES + 1]));
-    assertNotNull(IndexDigest.fromBytes(new byte[IndexDigest.MIN_BYTES]));
+    assertNull(IndexDigest.fromBytes(new byte[IndexDigest.MIN_BYTES]));
+    assertNull(IndexDigest.fromBytes(new byte[IndexDigest.MAX_BYTES + 2]));
+    byte[] versioned = new byte[1 + IndexDigest.MIN_BYTES];
+    versioned[0] = (byte) IndexDigest.VERSION;
+    assertNotNull(IndexDigest.fromBytes(versioned));
+  }
+
+  @Test
+  void stopwordsAreNotIndexedAndDoNotCountAsHits() {
+    IndexDigest digest = IndexDigest.build(List.of("the beatles live mp4"));
+    assertFalse(digest.mightContain("the"));
+    assertFalse(digest.mightContain("mp4"));
+    assertTrue(digest.mightContain("beatles"));
+    assertTrue(digest.routes(List.of("beatles")));
+    assertFalse(digest.routes(List.of("the")));
+  }
+
+  @Test
+  void twoThirdsOfALongQueryMustHit() {
+    IndexDigest digest = IndexDigest.build(List.of("alpha beta gamma"));
+    assertTrue(digest.routes(List.of("alpha", "beta")));
+    assertFalse(digest.routes(List.of("alpha", "missing", "absent")));
+    assertTrue(digest.routes(List.of("alpha", "beta", "missing")));
+    assertEquals(2, IndexDigest.requiredHits(3));
+    assertEquals(3, IndexDigest.requiredHits(4));
+  }
+
+  @Test
+  void clusterOrPreservesALeafToken() {
+    IndexDigest leaf = IndexDigest.build(List.of("beatles anthology"));
+    IndexDigest cluster = IndexDigest.aggregate(List.of(leaf));
+    assertEquals(IndexDigest.CLUSTER_BYTES, cluster.byteLength());
+    assertTrue(cluster.routes(List.of("beatles")));
+    assertFalse(cluster.routes(List.of("zzzznotpresent")));
   }
 
   @Test
