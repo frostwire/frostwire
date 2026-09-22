@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay.icebridge.sim;
 
+import com.frostwire.search.relay.IndexDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +49,8 @@ public final class IceBridgeWorkloadSimulator {
     public int maxUplinks = 6;
     public int searchPeerFanout = 32;
     public int holderBudget = 8;
+    public int maxHoldersPerItem = 8;
+    public double digestCoverageFraction = 0.90;
     public int searchTtl = 7;
     public int softMax = 7;
     public int admissionBurst = 30;
@@ -68,6 +71,8 @@ public final class IceBridgeWorkloadSimulator {
       copy.maxUplinks = maxUplinks;
       copy.searchPeerFanout = searchPeerFanout;
       copy.holderBudget = holderBudget;
+      copy.maxHoldersPerItem = maxHoldersPerItem;
+      copy.digestCoverageFraction = digestCoverageFraction;
       copy.searchTtl = searchTtl;
       copy.softMax = softMax;
       copy.admissionBurst = admissionBurst;
@@ -134,24 +139,58 @@ public final class IceBridgeWorkloadSimulator {
     }
   }
 
+  public static final class ActivityHop {
+    public final int from;
+    public final int to;
+    public final boolean flood;
+    public final boolean hit;
+    public final int step;
+
+    ActivityHop(int from, int to, boolean flood, boolean hit, int step) {
+      this.from = from;
+      this.to = to;
+      this.flood = flood;
+      this.hit = hit;
+      this.step = step;
+    }
+  }
+
   public static final class NetworkSnapshot {
     public final String phase;
     public final int completedSearches;
     public final int totalSearches;
+    public final int findableHits;
+    public final int findableAttempts;
+    public final int floodAdmitted;
+    public final int floodAttempts;
+    public final long messagesSoFar;
     public final List<NetworkNode> nodes;
     public final List<NetworkEdge> edges;
+    public final List<ActivityHop> activity;
 
     NetworkSnapshot(
         String phase,
         int completedSearches,
         int totalSearches,
+        int findableHits,
+        int findableAttempts,
+        int floodAdmitted,
+        int floodAttempts,
+        long messagesSoFar,
         List<NetworkNode> nodes,
-        List<NetworkEdge> edges) {
+        List<NetworkEdge> edges,
+        List<ActivityHop> activity) {
       this.phase = phase;
       this.completedSearches = completedSearches;
       this.totalSearches = totalSearches;
+      this.findableHits = findableHits;
+      this.findableAttempts = findableAttempts;
+      this.floodAdmitted = floodAdmitted;
+      this.floodAttempts = floodAttempts;
+      this.messagesSoFar = messagesSoFar;
       this.nodes = List.copyOf(nodes);
       this.edges = edges;
+      this.activity = List.copyOf(activity);
     }
   }
 
@@ -185,6 +224,8 @@ public final class IceBridgeWorkloadSimulator {
     public final int floodAdmitted;
     public final long totalSearchMessages;
     public final long totalResponseMessages;
+    public final long hubForwardMessages;
+    public final long duplicateHubDeliveries;
     public final double findableHitRate;
     public final double findableMeanMessages;
     public final double findableP95Messages;
@@ -224,6 +265,8 @@ public final class IceBridgeWorkloadSimulator {
       all.addAll(flood);
       this.totalSearchMessages = sum(all, outcome -> outcome.requestMessages);
       this.totalResponseMessages = sum(all, outcome -> outcome.responseMessages);
+      this.hubForwardMessages = sum(all, outcome -> outcome.hubForwardMessages);
+      this.duplicateHubDeliveries = sum(all, outcome -> outcome.duplicateHubDeliveries);
       this.findableHitRate = ratio(findable, outcome -> outcome.hit);
       this.findableMeanMessages = mean(findable);
       this.findableP95Messages = percentile(findable, 0.95);
@@ -298,6 +341,8 @@ public final class IceBridgeWorkloadSimulator {
     final int responseMessages;
     final int leafMessages;
     final int duplicateDeliveries;
+    final int hubForwardMessages;
+    final int duplicateHubDeliveries;
 
     SearchOutcome(
         boolean hit,
@@ -305,13 +350,17 @@ public final class IceBridgeWorkloadSimulator {
         int requestMessages,
         int responseMessages,
         int leafMessages,
-        int duplicateDeliveries) {
+        int duplicateDeliveries,
+        int hubForwardMessages,
+        int duplicateHubDeliveries) {
       this.hit = hit;
       this.admitted = admitted;
       this.requestMessages = requestMessages;
       this.responseMessages = responseMessages;
       this.leafMessages = leafMessages;
       this.duplicateDeliveries = duplicateDeliveries;
+      this.hubForwardMessages = hubForwardMessages;
+      this.duplicateHubDeliveries = duplicateHubDeliveries;
     }
 
     int totalMessages() {
@@ -355,7 +404,8 @@ public final class IceBridgeWorkloadSimulator {
   private static final class Hub {
     final int id;
     final List<Integer> leaves = new ArrayList<>();
-    final Map<Integer, Set<String>> leafDigests = new HashMap<>();
+    final Map<Integer, IndexDigest> leafDigests = new HashMap<>();
+    IndexDigest clusterDigest;
     final Map<Integer, AdmissionBucket> admission = new HashMap<>();
     final Set<Long> forwarded = new HashSet<>();
     long outgoingMessages;
@@ -383,12 +433,26 @@ public final class IceBridgeWorkloadSimulator {
     }
   }
 
+  private static final class Delivery {
+    final int hubId;
+    final int ttl;
+    final boolean[] path;
+
+    Delivery(int hubId, int ttl, boolean[] path) {
+      this.hubId = hubId;
+      this.ttl = ttl;
+      this.path = path;
+    }
+  }
+
   private final WorkloadConfig config;
   private final Random random;
   private final List<Hub> hubs = new ArrayList<>();
   private final List<Leaf> leaves = new ArrayList<>();
   private final List<ContentItem> catalog = new ArrayList<>();
   private final List<NetworkEdge> edges = new ArrayList<>();
+  private final List<ActivityHop> lastActivity = new ArrayList<>();
+  private boolean hasRun;
 
   public IceBridgeWorkloadSimulator(WorkloadConfig config) {
     this.config = config.copy();
@@ -401,7 +465,17 @@ public final class IceBridgeWorkloadSimulator {
     return run(null);
   }
 
-  public NetworkHealthReport run(SimulationObserver observer) {
+  public synchronized NetworkHealthReport run(SimulationObserver observer) {
+    if (hasRun) {
+      hubs.clear();
+      leaves.clear();
+      catalog.clear();
+      edges.clear();
+      lastActivity.clear();
+      random.setSeed(config.seed);
+      buildNetwork();
+    }
+    hasRun = true;
     long startedNanos = System.nanoTime();
     long observerNanos = 0;
     List<Integer> searchers = sampleLeaves(config.searcherFraction);
@@ -418,20 +492,47 @@ public final class IceBridgeWorkloadSimulator {
     long nonce = 1;
     double nowSecond = 0;
     int completed = 0;
+    int findableHits = 0;
+    int floodAdmittedCount = 0;
     int total =
         flooders.size() * config.flooderBurst + searchers.size() * config.searchesPerSearcher;
-    observerNanos += publish(observer, "Flood attack", completed, total);
+    int cadence = observer == null ? 100 : 25;
+    observerNanos += publish(observer, "Flood attack", completed, total, 0, 0, 0, 0);
 
     for (int flooder : flooders) {
       for (int i = 0; i < config.flooderBurst; i++) {
         nowSecond += 0.01;
-        flood.add(search(flooder, null, nonce++, nowSecond));
+        boolean trace = observer != null && (completed + 1) % cadence == 0;
+        SearchOutcome outcome = search(flooder, null, nonce++, nowSecond, true, trace);
+        flood.add(outcome);
+        if (outcome.admitted) {
+          floodAdmittedCount++;
+        }
         completed++;
-        if (completed % 100 == 0) {
-          observerNanos += publish(observer, "Flood attack", completed, total);
+        if (completed % cadence == 0) {
+          observerNanos +=
+              publish(
+                  observer,
+                  "Flood attack",
+                  completed,
+                  total,
+                  findableHits,
+                  findable.size(),
+                  floodAdmittedCount,
+                  flood.size());
         }
       }
     }
+    observerNanos +=
+        publish(
+            observer,
+            "Honest search workload",
+            completed,
+            total,
+            findableHits,
+            findable.size(),
+            floodAdmittedCount,
+            flood.size());
     for (int round = 0; round < config.searchesPerSearcher; round++) {
       nowSecond += 30;
       for (int i = 0; i < searchers.size(); i++) {
@@ -440,15 +541,37 @@ public final class IceBridgeWorkloadSimulator {
             (round * searchers.size() + i) % 2 == 0
                 ? catalog.get(random.nextInt(catalog.size()))
                 : null;
-        SearchOutcome outcome = search(searcher, target, nonce++, nowSecond);
+        boolean trace = observer != null && (completed + 1) % cadence == 0;
+        SearchOutcome outcome = search(searcher, target, nonce++, nowSecond, false, trace);
         (target == null ? nonFindable : findable).add(outcome);
+        if (target != null && outcome.hit) {
+          findableHits++;
+        }
         completed++;
-        if (completed % 100 == 0) {
-          observerNanos += publish(observer, "Honest search workload", completed, total);
+        if (completed % cadence == 0) {
+          observerNanos +=
+              publish(
+                  observer,
+                  "Honest search workload",
+                  completed,
+                  total,
+                  findableHits,
+                  findable.size(),
+                  floodAdmittedCount,
+                  flood.size());
         }
       }
     }
-    observerNanos += publish(observer, "Complete", completed, total);
+    observerNanos +=
+        publish(
+            observer,
+            "Complete",
+            completed,
+            total,
+            findableHits,
+            findable.size(),
+            floodAdmittedCount,
+            flood.size());
     long durationNanos = System.nanoTime() - startedNanos - observerNanos;
     return new NetworkHealthReport(
         config,
@@ -471,9 +594,9 @@ public final class IceBridgeWorkloadSimulator {
     for (int itemId = 0; itemId < config.contentItems; itemId++) {
       ContentItem item = new ContentItem(itemId);
       for (int token = 0; token < config.tokensPerItem; token++) {
-        item.tokens.add("token" + itemId + "_" + token);
+        item.tokens.add("token" + itemId + "part" + token);
       }
-      int holderCount = 1 + random.nextInt(config.holderBudget);
+      int holderCount = 1 + random.nextInt(config.maxHoldersPerItem);
       while (item.holders.size() < holderCount) {
         item.holders.add(random.nextInt(config.leafCount));
       }
@@ -506,98 +629,161 @@ public final class IceBridgeWorkloadSimulator {
         if (leaf.heldItems.isEmpty()) {
           continue;
         }
-        Set<String> digest = new HashSet<>();
-        for (int itemId : leaf.heldItems) {
-          digest.addAll(catalog.get(itemId).tokens);
+        if (random.nextDouble() >= config.digestCoverageFraction) {
+          continue;
         }
-        hub.leafDigests.put(leafId, digest);
+        List<String> tokens = new ArrayList<>();
+        for (int itemId : leaf.heldItems) {
+          tokens.addAll(catalog.get(itemId).tokens);
+        }
+        hub.leafDigests.put(leafId, IndexDigest.fromTokens(tokens));
       }
+      hub.clusterDigest = IndexDigest.aggregate(hub.leafDigests.values());
     }
   }
 
-  private SearchOutcome search(int requester, ContentItem target, long nonce, double nowSecond) {
+  private SearchOutcome search(
+      int requester,
+      ContentItem target,
+      long nonce,
+      double nowSecond,
+      boolean flood,
+      boolean trace) {
     Leaf origin = leaves.get(requester);
-    boolean[] visited = new boolean[config.ultrapeerCount];
-    List<Integer> frontier = new ArrayList<>();
+    List<String> queryTokens =
+        target == null
+            ? List.of("unfindable" + nonce)
+            : IndexDigest.tokenize(String.join(" ", target.tokens));
+    List<Delivery> frontier = new ArrayList<>();
+    int originNode = config.ultrapeerCount + requester;
+    int traced = 0;
+    if (trace) {
+      lastActivity.clear();
+    }
     for (int hubId : origin.uplinks) {
-      visited[hubId] = true;
-      frontier.add(hubId);
+      boolean[] path = new boolean[config.ultrapeerCount];
+      path[hubId] = true;
+      frontier.add(new Delivery(hubId, config.searchTtl, path));
+      if (trace) {
+        lastActivity.add(new ActivityHop(originNode, hubId, flood, false, 0));
+        traced++;
+      }
     }
     int requestMessages = frontier.size();
+    int hubForwardMessages = 0;
+    int duplicateHubDeliveries = 0;
     int leafMessages = 0;
     int duplicates = 0;
-    int hops = 0;
-    int ttl = config.searchTtl;
     boolean admitted = false;
     Set<Integer> hits = new HashSet<>();
     long requestKey = (((long) requester) << 32) ^ nonce;
 
-    while (!frontier.isEmpty() && ttl > 0) {
-      List<Integer> next = new ArrayList<>();
-      for (int hubId : frontier) {
+    while (!frontier.isEmpty()) {
+      List<Delivery> next = new ArrayList<>();
+      for (Delivery delivery : frontier) {
+        int hubId = delivery.hubId;
         Hub hub = hubs.get(hubId);
+        if (hub.forwarded.contains(requestKey)) {
+          duplicateHubDeliveries++;
+          continue;
+        }
         AdmissionBucket bucket =
             hub.admission.computeIfAbsent(
                 requester, ignored -> new AdmissionBucket(config.admissionBurst, nowSecond));
-        if (!bucket.acquire(config, nowSecond) || !hub.forwarded.add(requestKey)) {
+        if (!bucket.acquire(config, nowSecond)) {
           hub.rejectedSearches++;
           continue;
         }
+        hub.forwarded.add(requestKey);
         admitted = true;
         hub.admittedSearches++;
-        List<Integer> targets = matchingTargets(hub, target);
+        List<Integer> targets = matchingTargets(hub, queryTokens);
         int forwarded = 0;
-        if (ttl > 1 && hops + 1 < config.softMax) {
-          for (int neighbor = 0;
-              neighbor < config.ultrapeerCount
-                  && targets.size() + forwarded < config.searchPeerFanout;
-              neighbor++) {
-            if (neighbor != hubId && !visited[neighbor]) {
-              visited[neighbor] = true;
-              next.add(neighbor);
-              forwarded++;
+        int hops = config.searchTtl - delivery.ttl;
+        if (delivery.ttl > 1 && hops + 1 < config.softMax) {
+          List<Integer> neighbors = new ArrayList<>();
+          for (int neighbor = 0; neighbor < config.ultrapeerCount; neighbor++) {
+            if (!delivery.path[neighbor]) {
+              neighbors.add(neighbor);
+            }
+          }
+          Collections.shuffle(neighbors, random);
+          neighbors.sort(
+              (a, b) ->
+                  Boolean.compare(
+                      hubs.get(b).clusterDigest.routes(queryTokens),
+                      hubs.get(a).clusterDigest.routes(queryTokens)));
+          for (int neighbor : neighbors) {
+            if (targets.size() + forwarded >= config.searchPeerFanout) {
+              break;
+            }
+            boolean[] path = delivery.path.clone();
+            path[neighbor] = true;
+            next.add(new Delivery(neighbor, delivery.ttl - 1, path));
+            forwarded++;
+            if (trace && traced < 36) {
+              lastActivity.add(new ActivityHop(hubId, neighbor, flood, false, hops + 1));
+              traced++;
             }
           }
           requestMessages += forwarded;
+          hubForwardMessages += forwarded;
           hub.outgoingMessages += forwarded;
         }
         fillExplorationTargets(hub, targets, config.searchPeerFanout - forwarded);
         requestMessages += targets.size();
         leafMessages += targets.size();
         hub.outgoingMessages += targets.size();
+        int shownLeaves = 0;
         for (int leafId : targets) {
           Leaf leaf = leaves.get(leafId);
+          boolean replay = leaf.lastRequester == requester && leaf.lastNonce == nonce;
+          boolean hit = !replay && target != null && leaf.heldItems.contains(target.id);
+          if (trace && (hit || shownLeaves < 2) && traced < 48) {
+            lastActivity.add(
+                new ActivityHop(hubId, config.ultrapeerCount + leafId, flood, false, hops + 1));
+            shownLeaves++;
+            traced++;
+          }
+          if (trace && hit && traced < 48) {
+            lastActivity.add(
+                new ActivityHop(config.ultrapeerCount + leafId, originNode, false, true, hops + 2));
+            traced++;
+          }
           leaf.messages++;
-          if (leaf.lastRequester == requester && leaf.lastNonce == nonce) {
+          if (replay) {
             duplicates++;
             leaf.duplicates++;
             continue;
           }
           leaf.lastRequester = requester;
           leaf.lastNonce = nonce;
-          if (target != null && leaf.heldItems.contains(target.id)) {
+          if (hit) {
             hits.add(leafId);
           }
         }
       }
       frontier = next;
-      ttl--;
-      hops++;
     }
     return new SearchOutcome(
-        !hits.isEmpty(), admitted, requestMessages, hits.size(), leafMessages, duplicates);
+        !hits.isEmpty(),
+        admitted,
+        requestMessages,
+        hits.size(),
+        leafMessages,
+        duplicates,
+        hubForwardMessages,
+        duplicateHubDeliveries);
   }
 
-  private List<Integer> matchingTargets(Hub hub, ContentItem target) {
+  private List<Integer> matchingTargets(Hub hub, List<String> queryTokens) {
     List<Integer> targets = new ArrayList<>(config.holderBudget);
-    if (target != null) {
-      for (int leafId : hub.leaves) {
-        Set<String> digest = hub.leafDigests.get(leafId);
-        if (digest != null && digest.containsAll(target.tokens)) {
-          targets.add(leafId);
-          if (targets.size() == config.holderBudget) {
-            break;
-          }
+    for (int leafId : hub.leaves) {
+      IndexDigest digest = hub.leafDigests.get(leafId);
+      if (digest != null && digest.routes(queryTokens)) {
+        targets.add(leafId);
+        if (targets.size() == config.holderBudget) {
+          break;
         }
       }
     }
@@ -627,7 +813,14 @@ public final class IceBridgeWorkloadSimulator {
   }
 
   private long publish(
-      SimulationObserver observer, String phase, int completedSearches, int totalSearches) {
+      SimulationObserver observer,
+      String phase,
+      int completedSearches,
+      int totalSearches,
+      int findableHits,
+      int findableAttempts,
+      int floodAdmitted,
+      int floodAttempts) {
     if (observer == null) {
       return 0;
     }
@@ -661,8 +854,24 @@ public final class IceBridgeWorkloadSimulator {
               leaf.searcher,
               leaf.flooder));
     }
+    long messages = 0;
+    for (Hub hub : hubs) {
+      messages += hub.outgoingMessages;
+    }
     observer.onSnapshot(
-        new NetworkSnapshot(phase, completedSearches, totalSearches, nodes, List.copyOf(edges)));
+        new NetworkSnapshot(
+            phase,
+            completedSearches,
+            totalSearches,
+            findableHits,
+            findableAttempts,
+            floodAdmitted,
+            floodAttempts,
+            messages,
+            nodes,
+            List.copyOf(edges),
+            lastActivity));
+    lastActivity.clear();
     return System.nanoTime() - started;
   }
 
@@ -670,11 +879,30 @@ public final class IceBridgeWorkloadSimulator {
     if (config.ultrapeerCount <= 0
         || config.leafCount <= 0
         || config.contentItems <= 0
+        || config.tokensPerItem <= 0
+        || !Double.isFinite(config.searcherFraction)
+        || config.searcherFraction < 0
+        || config.searcherFraction > 1
+        || !Double.isFinite(config.flooderFraction)
+        || config.flooderFraction < 0
+        || config.flooderFraction > 1
+        || config.searchesPerSearcher < 0
+        || config.flooderBurst < 0
         || config.minUplinks <= 0
         || config.maxUplinks < config.minUplinks
         || config.maxUplinks > config.ultrapeerCount
         || config.searchPeerFanout <= 0
+        || config.searchTtl <= 0
+        || config.softMax <= 0
+        || config.admissionBurst <= 0
+        || !Double.isFinite(config.admissionRefillPerSecond)
+        || config.admissionRefillPerSecond < 0
         || config.holderBudget <= 0
+        || config.maxHoldersPerItem <= 0
+        || config.maxHoldersPerItem > config.leafCount
+        || !Double.isFinite(config.digestCoverageFraction)
+        || config.digestCoverageFraction < 0
+        || config.digestCoverageFraction > 1
         || config.holderBudget > config.searchPeerFanout) {
       throw new IllegalArgumentException("invalid workload configuration");
     }
