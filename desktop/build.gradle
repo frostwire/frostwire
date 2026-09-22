@@ -20,7 +20,7 @@ version = '7.1.0'
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/simulation/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
         ratchetFrom 'origin/master'
         googleJavaFormat('1.36.1')
         toggleOffOn()
@@ -33,7 +33,7 @@ spotless {
 tasks.register('lint') {
     group = 'verification'
     description = 'Runs Spotless format check + javac warnings (lint).'
-    dependsOn 'spotlessCheck', 'compileJava', 'compileTestJava'
+    dependsOn 'spotlessCheck', 'compileJava', 'compileSimulationJava', 'compileTestJava'
     doLast {
         println 'Lint check complete. Fix with: ./gradlew spotlessApply'
     }
@@ -272,6 +272,21 @@ sourceSets {
             srcDir 'src/test/resources'
         }
     }
+
+    simulation {
+        java.srcDir 'src/simulation/java'
+        resources.srcDir 'src/simulation/resources'
+    }
+}
+
+configurations {
+    simulationImplementation.extendsFrom implementation
+    simulationRuntimeOnly.extendsFrom runtimeOnly
+}
+
+dependencies {
+    simulationImplementation sourceSets.main.output
+    testImplementation sourceSets.simulation.output
 }
 
 jar {
@@ -427,6 +442,56 @@ tasks.register('icebridge', JavaExec) {
     }
 
     standardInput = System.in
+}
+
+tasks.register('runIceBridgeSimulation', JavaExec) {
+    group = 'application'
+    description = 'Runs the isolated IceBridge workload benchmark, live visualization, and HTML report.'
+    dependsOn tasks.named('simulationClasses')
+    classpath = sourceSets.simulation.runtimeClasspath
+    mainClass = 'com.frostwire.search.relay.icebridge.sim.IceBridgeSimulationMain'
+
+    if (project.hasProperty('simulation.args')) {
+        args project.property('simulation.args').toString().split().findAll { it }
+    }
+}
+
+tasks.register('simulationTest', Test) {
+    group = 'verification'
+    description = 'Runs only the isolated IceBridge simulation and benchmark tests.'
+    dependsOn tasks.named('testClasses')
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty 'java.awt.headless', 'true'
+    jvmArgs '-Djava.awt.headless=true'
+    filter {
+        includeTestsMatching 'com.frostwire.search.relay.icebridge.sim.*'
+        includeTestsMatching 'com.frostwire.search.relay.icebridge.IceBridgeNetworkSimulationTest'
+        includeTestsMatching 'com.frostwire.search.relay.icebridge.TopologyAutoResearchTest'
+    }
+    testLogging {
+        events 'passed', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('verifySimulationIsolation') {
+    group = 'verification'
+    description = 'Verifies that simulation-only classes are absent from FrostWire client and IceBridge artifacts.'
+    dependsOn tasks.named('jar'), tasks.named('icebridgeJar')
+    doLast {
+        [tasks.named('jar').get().archiveFile.get().asFile,
+         tasks.named('icebridgeJar').get().archiveFile.get().asFile].each { artifact ->
+            def leaked = zipTree(artifact).matching {
+                include 'com/frostwire/search/relay/icebridge/sim/**'
+            }.files
+            if (!leaked.isEmpty()) {
+                throw new org.gradle.api.GradleException(
+                        "Simulation classes leaked into ${artifact.name}: ${leaked}")
+            }
+        }
+    }
 }
 
 // The standalone daemon is part of the desktop runtime, not just a developer convenience.
