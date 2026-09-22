@@ -51,4 +51,46 @@ class SimulationReportWriterTest {
         second.html().toAbsolutePath().toString(),
         Files.readString(outputDirectory.resolve("latest-report.txt")).trim());
   }
+
+  @Test
+  void sameSecondDoesNotOverwriteAndDifferentSeedsDoNotProduceFalseDeltas() throws Exception {
+    SimulationReportWriter writer = new SimulationReportWriter();
+    ZonedDateTime now = ZonedDateTime.of(2026, 9, 22, 15, 55, 10, 0, ZoneId.of("UTC"));
+    WorkloadConfig config = new WorkloadConfig();
+    NetworkHealthReport first = new IceBridgeWorkloadSimulator(config).run();
+    SimulationReportWriter.ReportArtifacts original = writer.write(first, outputDirectory, now);
+    String originalJson = Files.readString(original.json());
+
+    config.seed++;
+    NetworkHealthReport different = new IceBridgeWorkloadSimulator(config).run();
+    SimulationReportWriter.ReportArtifacts next = writer.write(different, outputDirectory, now);
+
+    assertTrue(Files.exists(original.html()));
+    assertEquals(originalJson, Files.readString(original.json()));
+    assertTrue(!original.html().equals(next.html()));
+    assertTrue(Files.readString(next.html()).contains("Not comparable"));
+    assertTrue(!Files.readString(next.html()).contains("Baseline: "));
+  }
+
+  @Test
+  void routingParameterChangesRemainComparableOnTheSameWorkload() throws Exception {
+    SimulationReportWriter writer = new SimulationReportWriter();
+    WorkloadConfig config = new WorkloadConfig();
+    config.searchesPerSearcher = 2;
+    ZonedDateTime now = ZonedDateTime.of(2026, 9, 22, 15, 55, 10, 0, ZoneId.of("UTC"));
+    writer.write(new IceBridgeWorkloadSimulator(config).run(), outputDirectory, now);
+
+    config.searchPeerFanout = 12;
+    String html =
+        Files.readString(
+            writer
+                .write(
+                    new IceBridgeWorkloadSimulator(config).run(),
+                    outputDirectory,
+                    now.plusSeconds(1))
+                .html());
+
+    assertTrue(html.contains("Baseline: "));
+    assertTrue(!html.contains("Not comparable"));
+  }
 }
