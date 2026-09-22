@@ -9,11 +9,14 @@ package com.frostwire.search.relay.icebridge.sim;
 
 import com.frostwire.search.relay.icebridge.sim.IceBridgeWorkloadSimulator.HealthBudgets;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeWorkloadSimulator.NetworkHealthReport;
+import com.frostwire.search.relay.icebridge.sim.IceBridgeWorkloadSimulator.NetworkSnapshot;
+import com.frostwire.search.relay.icebridge.sim.IceBridgeWorkloadSimulator.SimulationObserver;
 import com.frostwire.search.relay.icebridge.sim.IceBridgeWorkloadSimulator.WorkloadConfig;
 import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 import javax.swing.SwingUtilities;
 
 /** Command-line entry point for the standalone IceBridge benchmark and live network viewer. */
@@ -46,9 +49,23 @@ public final class IceBridgeSimulationMain {
   private static void run(
       WorkloadConfig config, Options options, NetworkVisualizationFrame viewer) {
     try {
+      System.out.printf(
+          Locale.US,
+          "Building network: %d ultrapeers, %d leaves, seed %d%n",
+          config.ultrapeerCount,
+          config.leafCount,
+          config.seed);
+      System.out.flush();
       IceBridgeWorkloadSimulator simulator = new IceBridgeWorkloadSimulator(config);
+      SimulationObserver ui = viewer == null ? null : viewer.observer(options.paceMillis);
       NetworkHealthReport report =
-          viewer == null ? simulator.run() : simulator.run(viewer.observer(options.paceMillis));
+          simulator.run(
+              snapshot -> {
+                printProgress(snapshot);
+                if (ui != null) {
+                  ui.onSnapshot(snapshot);
+                }
+              });
       SimulationReportWriter.ReportArtifacts artifacts =
           new SimulationReportWriter().write(report, options.outputDirectory, ZonedDateTime.now());
       System.out.println(report);
@@ -74,6 +91,24 @@ public final class IceBridgeSimulationMain {
         throw new IllegalStateException("IceBridge simulation failed", failure);
       }
     }
+  }
+
+  private static void printProgress(NetworkSnapshot snapshot) {
+    int percent =
+        snapshot.totalSearches == 0 ? 0 : snapshot.completedSearches * 100 / snapshot.totalSearches;
+    System.out.printf(
+        Locale.US,
+        "[%3d%%] %-22s %4d/%d  findable %d/%d  flood %d/%d admitted  %,d messages%n",
+        percent,
+        snapshot.phase,
+        snapshot.completedSearches,
+        snapshot.totalSearches,
+        snapshot.findableHits,
+        snapshot.findableAttempts,
+        snapshot.floodAdmitted,
+        snapshot.floodAttempts,
+        snapshot.messagesSoFar);
+    System.out.flush();
   }
 
   private static NetworkVisualizationFrame createViewer() throws Exception {
