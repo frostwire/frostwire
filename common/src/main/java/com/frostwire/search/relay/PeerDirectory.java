@@ -152,6 +152,7 @@ public final class PeerDirectory {
         if (existing != null) {
             refreshed.endorsers.addAll(existing.endorsers);
             refreshed.indexDigest = existing.indexDigest;
+            refreshed.clusterDigest = existing.clusterDigest;
             refreshed.lastContactMs = existing.lastContactMs;
             refreshed.failures = existing.failures;
         }
@@ -493,6 +494,73 @@ public final class PeerDirectory {
     }
 
     /**
+     * Record the OR of a peer's leaves. A missing or malformed frame is ignored. Unlike
+     * {@link #setIndexDigest}, this is not proof the sender itself holds the query — only that
+     * some leaf behind it might.
+     */
+    public synchronized void setClusterDigest(byte[] peerPub, byte[] digest) {
+        if (peerPub == null || peerPub.length != 32 || digest == null) {
+            return;
+        }
+        IndexDigest parsed = IndexDigest.fromBytes(digest);
+        if (parsed == null) {
+            return;
+        }
+        String key = com.frostwire.util.Hex.encode(peerPub);
+        long now = System.currentTimeMillis();
+        Entry e = entries.get(key);
+        if (e == null) {
+            e = new Entry(peerPub, "", 0, 0, now, 0L, false, true, NodeCapabilities.NONE, "");
+            e.lastContactMs = now;
+            entries.put(key, e);
+            evictIfNeeded();
+        } else {
+            e.verified = true;
+            if (e.lastContactMs <= 0) {
+                e.lastContactMs = now;
+            }
+        }
+        e.clusterDigest = parsed.toBytes();
+        version.incrementAndGet();
+    }
+
+    /**
+     * Own-library fingerprints of live leaves (no RELAY cap). An ultrapeer ORs these into the
+     * cluster table it advertises to neighboring ultrapeers.
+     */
+    public synchronized List<byte[]> leafIndexDigests() {
+        long nowMs = System.currentTimeMillis();
+        List<byte[]> out = new ArrayList<>();
+        for (Entry e : entries.values()) {
+            if (e.indexDigest == null || !e.verified || !isLive(e, nowMs)) {
+                continue;
+            }
+            if (NodeCapabilities.has(e.capabilities, NodeCapabilities.RELAY)) {
+                continue;
+            }
+            out.add(e.indexDigest.clone());
+        }
+        return out;
+    }
+
+    /**
+     * Whether a forward to this peer is allowed. No cluster table means unknown, so the forward
+     * is allowed — a missing announcement must not black-hole a hop. A table that fails the
+     * query is a skip.
+     */
+    public synchronized boolean clusterAllows(byte[] peerPub, List<String> queryTokens) {
+        if (peerPub == null || peerPub.length != 32 || queryTokens == null || queryTokens.isEmpty()) {
+            return true;
+        }
+        Entry e = entries.get(com.frostwire.util.Hex.encode(peerPub));
+        if (e == null || e.clusterDigest == null) {
+            return true;
+        }
+        IndexDigest parsed = IndexDigest.fromBytes(e.clusterDigest);
+        return parsed == null || parsed.routes(queryTokens);
+    }
+
+    /**
      * Apply a peer's advertised capability bitmask (NODE_META announcement).
      *
      * <p>An authenticated announcement is proof the sender is live, so an unknown peer is
@@ -648,7 +716,7 @@ public final class PeerDirectory {
         }
         List<Entry> matched = new ArrayList<>();
         for (Entry e : liveEligible(excludeHex, NodeCapabilities.NONE)) {
-            if (digestMatchScore(e, queryTokens) > 0) {
+            if (digestRoutes(e, queryTokens)) {
                 matched.add(e);
             }
         }
@@ -688,7 +756,7 @@ public final class PeerDirectory {
         List<Entry> matched = new ArrayList<>();
         List<Entry> rest = new ArrayList<>();
         for (Entry e : live) {
-            if (digestMatchScore(e, queryTokens) > 0) {
+            if (digestRoutes(e, queryTokens)) {
                 matched.add(e);
             } else {
                 rest.add(e);
@@ -774,6 +842,15 @@ public final class PeerDirectory {
         return eligible;
     }
 
+    private static boolean digestRoutes(Entry e, List<String> queryTokens) {
+        byte[] digest = e.indexDigest;
+        if (digest == null || queryTokens.isEmpty()) {
+            return false;
+        }
+        IndexDigest parsed = IndexDigest.fromBytes(digest);
+        return parsed != null && parsed.routes(queryTokens);
+    }
+
     private static int digestMatchScore(Entry e, List<String> queryTokens) {
         byte[] digest = e.indexDigest;
         if (digest == null || queryTokens.isEmpty()) {
@@ -834,6 +911,7 @@ public final class PeerDirectory {
         volatile long capabilities;
         final String icebridgeVersion;
         volatile byte[] indexDigest;
+        volatile byte[] clusterDigest;
         volatile long lastContactMs;
         volatile int failures;
         final java.util.Set<String> endorsers = ConcurrentHashMap.newKeySet();
