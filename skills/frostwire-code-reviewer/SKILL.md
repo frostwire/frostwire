@@ -158,6 +158,7 @@ Give each finding `path:line`, trigger/preconditions, violated invariant, user i
 - [ ] **BTEngine off UI thread** — JNI calls to jlibtorrent (`BTEngine`, `SessionManager`, `Ed25519`, `TorrentInfo`) must NEVER happen on the EDT (desktop) or main thread (Android). Use a worker such as `ThreadExecutor` or `SystemUtils.postToHandler(MISC, ...)`. `GUIMediator.safeInvokeLater()` schedules **ON** the EDT and is only for the UI result, not the expensive work.
 - [ ] **Android lifecycle** — are Activity/Fragment/Service callbacks guarded against null/destroyed state? Is `getContext()` null-checked?
 - [ ] **SharedPreferences thread safety** — `OnPreferenceChangeListener` callbacks run on the main thread. Any BTEngine/DB call inside must be dispatched to a background thread.
+- [ ] **Diagnostic integrity** — the change must fix the reported violation, not weaken the detector. Reject `StrictMode.allowThreadDiskReads/Writes()`, relaxed `StrictEdtMode`, disabled lint/compiler warnings, removed assertions, skipped tests, reduced monitoring, or widened exception swallowing when their purpose is to hide application defects. Require the complete diagnostic type and root-cause evidence. A narrow suppression is acceptable only for proven unavoidable third-party/platform behavior with no isolatable fix, minimal scope, documentation, and regression coverage.
 - [ ] **Search input sanitization** — `LocalIndex.search()` is called with keywords from remote peers (via `RelaySearchService`). All search input must be treated as untrusted. FTS5 queries must be sanitized. LIKE queries must escape wildcards.
 
 ---
@@ -197,6 +198,7 @@ Code that handles untrusted input must be hardened against malicious actors.
 - [ ] **No O(n²) on hot paths** — search results, UI lists, peer directories. If iterating a collection inside another iteration, consider a Set/Map lookup instead.
 - [ ] **No DB calls on UI thread** — all `SQLiteDatabase` operations are on background threads. `synchronized(db)` blocks must be short.
 - [ ] **No network on UI thread** — all HTTP, rUDP, DHT operations are off the main thread.
+- [ ] **No diagnostic suppression as optimization** — moving work, caching, batching, or redesigning the boundary are fixes; permitting forbidden work or disabling its report is not.
 - [ ] **Batch DB operations** — multiple INSERTs use `beginTransaction()/endTransaction()` not individual auto-commits.
 - [ ] **Cursor management** — Cursors are closed via try-with-resources. Large result sets are paginated (`LIMIT`).
 - [ ] **Memory bounds** — cap untrusted collections/bodies before materialization. Reserve inbound queue capacity before acceptance; never silently evict accepted work. Reject/backpressure unaccepted work and give accepted expiry/cancellation an explicit outcome.
@@ -458,7 +460,7 @@ Based on the FrostWire codebase history + MentisDB frostwire chain lessons. Reva
 3. **No transaction in multi-step DB writes** — crash mid-write leaves DB inconsistent. Wrap in `beginTransaction()`.
 4. **`close()` race condition** — resource ownership and concurrent use/close are not coordinated. Database serialization and interruptible transport cancellation need different synchronization; do not require cancellation to wait behind blocking I/O.
 5. **`Math.abs(Long.MIN_VALUE)` is negative** — timestamp skew bypass. Manual sign flip also overflows; validate domains and use checked arithmetic/bounded comparisons. Freshness alone does not prevent replay.
-6. **jlibtorrent on UI thread** — StrictMode violation or EDT freeze. Always background.
+6. **jlibtorrent on UI thread or diagnostic suppression** — StrictMode violation or EDT freeze: move the work to a background thread. Never relax StrictMode/StrictEdtMode, warnings, assertions, tests, timeouts, auth checks, or monitoring to make the report disappear. HIGH; BLOCK when suppression hides security, data-loss, or crash evidence.
 7. **Missing defensive `byte[].clone()`** — shared mutable state across threads.
 8. **Resource leak** — Cursor/Connection not in try-with-resources.
 9. **`System.out` instead of `Logger`** — against house style (except intentional headless CLI UX in `IceBridgeServer.main`).
