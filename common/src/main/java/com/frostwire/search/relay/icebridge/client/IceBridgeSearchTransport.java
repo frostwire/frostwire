@@ -42,7 +42,7 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     private static final long POLL_INTERVAL_MS = 300;
     private static final int POLL_BATCH_SIZE = 256;
     private static final int MAX_DRAIN_BATCHES = 16;
-    private static final int MAX_REQUEST_BYTES = 16 * 1024;
+    private static final int MAX_REQUEST_BYTES = 24 * 1024;
     private static final int MAX_QUEUED_REQUESTS = 64;
     /** Bounded lane for delivering responses/control frames off the poller thread. */
     private static final int MAX_QUEUED_DELIVERIES = 512;
@@ -280,20 +280,32 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
         });
     }
 
-    /** Bounded shape demux only; workers still decode and authenticate every request. */
-    private static boolean isRequest(byte[] payload, int protocolId) {
-        if (payload.length == 0 || payload.length > MAX_REQUEST_BYTES) {
+    /**
+     * Frames the local node must act on. One-way announcements and pings always qualify so they
+     * are not dropped before {@code markContact}. Request/response pairs share an id, so only the
+     * request shape is admitted; the reply stays on the delivery lane for the waiter.
+     */
+    static boolean isRequest(byte[] payload, int protocolId) {
+        if (payload == null || payload.length == 0 || payload.length > MAX_REQUEST_BYTES) {
             return false;
         }
-        if (protocolId == MeshProtocolId.INDEX_DIGEST) {
-            // Opaque content fingerprint; the handler validates its shape before storing it.
+        if (protocolId == MeshProtocolId.INDEX_DIGEST
+                || protocolId == MeshProtocolId.CLUSTER_DIGEST
+                || protocolId == MeshProtocolId.NODE_META
+                || protocolId == MeshProtocolId.TELEMETRY) {
             return true;
+        }
+        if (protocolId == MeshProtocolId.CATALOG) {
+            return jsonHas(payload, "target");
         }
         if (protocolId != MeshProtocolId.SEARCH && protocolId != MeshProtocolId.METADATA) {
             return false;
         }
-        boolean requester = false;
-        boolean query = false;
+        return jsonHas(payload, "pub")
+                && jsonHas(payload, protocolId == MeshProtocolId.METADATA ? "ih" : "k");
+    }
+
+    private static boolean jsonHas(byte[] payload, String field) {
         try (JsonReader reader = new JsonReader(new StringReader(new String(payload, StandardCharsets.UTF_8)))) {
             reader.beginObject();
             int fields = 0;
@@ -302,13 +314,12 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
                     return false;
                 }
                 String name = reader.nextName();
-                requester |= "pub".equals(name);
-                query |= protocolId == MeshProtocolId.METADATA ? "ih".equals(name)
-                        : "k".equals(name) || "target".equals(name);
+                if (field.equals(name)) {
+                    return true;
+                }
                 reader.skipValue();
             }
-            reader.endObject();
-            return requester && query;
+            return false;
         } catch (Exception e) {
             return false;
         }
