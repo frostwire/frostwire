@@ -66,8 +66,9 @@ public final class PeerRegistrySync implements AutoCloseable {
     private static final long DIGEST_REBUILD_INTERVAL_MS = 120_000L;
     /** Force a re-announce even when unchanged, so a restarted relay relearns our digest. */
     private static final long DIGEST_REFRESH_INTERVAL_MS = 120_000L;
-    /** Bounded fan-out for digest announcements. */
-    private static final int DIGEST_TARGETS = 16;
+    /** A leaf announces its digest only to its uplinks, not to a wide relay fan-out. */
+    private static final int DIGEST_TARGETS =
+            com.frostwire.search.relay.icebridge.IceBridgeTopology.LEAF_MAX_UPLINKS;
     /** Bounded fan-out for capability/role announcements. */
     private static final int NODE_META_TARGETS = 16;
 
@@ -84,6 +85,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private volatile long lastDigestBuildMs;
     private volatile long lastDigestSendMs;
     private volatile long lastNodeMetaSendMs;
+    private volatile long lastClusterSendMs;
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
@@ -161,6 +163,7 @@ public final class PeerRegistrySync implements AutoCloseable {
             pullMeshIntoDirectory();
             maintainUplinks();
             publishIndexDigest();
+            publishClusterDigest();
             publishNodeMeta();
         } catch (Throwable t) {
             LOG.warn("PeerRegistrySync failed", t);
@@ -292,10 +295,6 @@ public final class PeerRegistrySync implements AutoCloseable {
                 continue;
             }
             texts.add(torrent.name());
-            String files = torrent.filesJson();
-            if (files != null && !files.isEmpty()) {
-                texts.add(files);
-            }
         }
         if (texts.isEmpty()) {
             return null;
@@ -311,6 +310,62 @@ public final class PeerRegistrySync implements AutoCloseable {
      * as a bare CLIENT. Announcing capabilities over the mesh lets those relays correct the peer's
      * advertised role/capabilities instead of treating it as capability-less forever.
      */
+    /**
+     * Advertise the OR of this node's leaves so a neighboring ultrapeer can skip a forward when
+     * the query cannot be in this cluster. Leaves do not publish one — they have no leaves.
+     */
+    private void publishClusterDigest() {
+        if (!com.frostwire.search.relay.icebridge.IceBridgeTopology.isUltrapeer(localRole)) {
+            return;
+        }
+        try {
+            long now = System.currentTimeMillis();
+            if (now - lastClusterSendMs < DIGEST_REFRESH_INTERVAL_MS) {
+                return;
+            }
+            List<IndexDigest> parts = new ArrayList<>();
+            if (lastDigest != null) {
+                IndexDigest own = IndexDigest.fromBytes(lastDigest);
+                if (own != null) {
+                    parts.add(own);
+                }
+            }
+            for (byte[] leaf : directory.leafIndexDigests()) {
+                IndexDigest parsed = IndexDigest.fromBytes(leaf);
+                if (parsed != null) {
+                    parts.add(parsed);
+                }
+            }
+            if (parts.isEmpty()) {
+                return;
+            }
+            byte[] cluster = IndexDigest.aggregate(parts).toBytes();
+            if (IndexDigest.fromBytes(cluster) == null
+                    || IndexDigest.fromBytes(cluster).population() == 0) {
+                return;
+            }
+            int degree = com.frostwire.search.relay.icebridge.IceBridgeTopology.uplinkDegree(localRole);
+            List<PeerDirectory.PeerInfo> targets =
+                    directory.topByTrustVerified(degree, NodeCapabilities.RELAY);
+            int sent = 0;
+            for (PeerDirectory.PeerInfo peer : targets) {
+                if (ownPub != null && Arrays.equals(peer.peerPub(), ownPub)) {
+                    continue;
+                }
+                if (client.send(peer.peerPub(), MeshProtocolId.CLUSTER_DIGEST, cluster)) {
+                    sent++;
+                }
+            }
+            if (sent > 0) {
+                lastClusterSendMs = now;
+                LOG.debug("PeerRegistrySync: announced cluster digest to " + sent + "/"
+                        + targets.size() + " peers");
+            }
+        } catch (Throwable t) {
+            LOG.debug("PeerRegistrySync: cluster announce failed", t);
+        }
+    }
+
     private void publishNodeMeta() {
         try {
             long now = System.currentTimeMillis();
