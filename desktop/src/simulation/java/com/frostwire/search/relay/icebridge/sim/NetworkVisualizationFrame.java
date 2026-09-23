@@ -66,7 +66,7 @@ public final class NetworkVisualizationFrame extends JFrame {
   private Integer inspectedNodeId;
 
   public NetworkVisualizationFrame() {
-    super("IceBridge Network Simulation");
+    super("IceBridge Message Model — sampled, not live sockets");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setMinimumSize(new Dimension(980, 680));
     setSize(1380, 880);
