@@ -83,7 +83,9 @@ final class IPFilterTableAccess {
             for (int i = from; i < to; i++) {
               model.add(ranges.get(i), model.getRowCount());
             }
-            mediator.refresh();
+            if (to == ranges.size()) {
+              mediator.refresh();
+            }
             return null;
           });
     }
