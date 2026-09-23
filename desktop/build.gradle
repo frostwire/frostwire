@@ -456,6 +456,17 @@ tasks.register('runIceBridgeSimulation', JavaExec) {
     }
 }
 
+tasks.register('runIceBridgeLoopback', JavaExec) {
+    group = 'application'
+    description = 'Runs real signed search/response through bounded loopback IceBridge nodes.'
+    dependsOn tasks.named('simulationClasses')
+    classpath = sourceSets.simulation.runtimeClasspath
+    mainClass = 'com.frostwire.search.relay.icebridge.sim.LoopbackSimulationMain'
+    if (project.hasProperty('loopback.nodes')) {
+        args '--nodes=' + project.property('loopback.nodes')
+    }
+}
+
 tasks.register('simulationTest', Test) {
     group = 'verification'
     description = 'Runs only the isolated IceBridge simulation and benchmark tests.'
@@ -469,6 +480,8 @@ tasks.register('simulationTest', Test) {
         includeTestsMatching 'com.frostwire.search.relay.icebridge.sim.*'
         includeTestsMatching 'com.frostwire.search.relay.icebridge.IceBridgeNetworkSimulationTest'
         includeTestsMatching 'com.frostwire.search.relay.icebridge.TopologyAutoResearchTest'
+        includeTestsMatching 'com.frostwire.search.relay.MultiInstanceDistributedSearchTest.twoInstancesSearchEachOther'
+        includeTestsMatching 'com.frostwire.search.relay.MultiRelayMeshSearchTest.searchCrossesThreeForwardersToPeerWithIndex'
     }
     testLogging {
         events 'passed', 'failed'
