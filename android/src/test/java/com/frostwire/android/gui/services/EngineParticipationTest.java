@@ -8,6 +8,7 @@ package com.frostwire.android.gui.services;
 
 import android.app.Application;
 import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.search.AndroidRelayStack;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,9 +17,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Constructor;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -87,6 +90,34 @@ public class EngineParticipationTest {
             engine.startServices();
             assertTrue(engine.isDisconnected());
             verify(service, never()).startServices(anyBoolean());
+        }
+    }
+
+    @Test
+    public void readinessRestartUsesOneTimeoutBudget() throws Exception {
+        Engine engine = engine();
+        EngineForegroundService service = mock(EngineForegroundService.class);
+        when(service.acceptsStarts()).thenReturn(true);
+        when(service.isRelayStackRunning()).thenReturn(false);
+        SearchEngine.DISTRIBUTED_WIRING
+                .localIndex(null)
+                .peerDirectory(null)
+                .identity(null)
+                .searchTransport(null);
+        assertFalse(SearchEngine.DISTRIBUTED.isReady());
+        try (MockedStatic<EngineForegroundService> services = mockStatic(EngineForegroundService.class);
+             MockedStatic<AndroidRelayStack> relay = mockStatic(AndroidRelayStack.class)) {
+            services.when(EngineForegroundService::getInstance).thenReturn(service);
+            relay.when(AndroidRelayStack::isNetworkAllowed).thenReturn(true);
+            relay.when(AndroidRelayStack::isParticipationEnabled).thenReturn(true);
+
+            long startedAt = System.nanoTime();
+            engine.ensureDistributedSearchReady(50);
+            long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+
+            assertTrue("one 50ms budget must not become the legacy 1s+ wait: " + elapsedMs,
+                    elapsedMs < 500);
+            verify(service).ensureRelayStack(anyBoolean(), any(Runnable.class));
         }
     }
 

@@ -240,6 +240,8 @@ public final class AndroidRelayStack implements AutoCloseable {
     AtomicBoolean active = new AtomicBoolean(true);
     BooleanSupplier permitted = () -> active.get() && ownerActive.getAsBoolean() && isParticipationEnabled();
     AndroidShareVisibility visibility = new AndroidShareVisibility(permitted);
+    long startupNs = System.nanoTime();
+    long phaseNs = startupNs;
     try {
       // Identity first — LocalIndex.open can take seconds and must not delay
       // Settings showing Node ID after a cold start / force-stop.
@@ -250,6 +252,8 @@ public final class AndroidRelayStack implements AutoCloseable {
           "AndroidRelayStack: identity loaded: "
               + com.frostwire.util.Hex.encode(ident.ed25519PubRaw()));
       SearchEngine.DISTRIBUTED_WIRING.identity(ident);
+      LOG.info("AndroidRelayStack: identity ready in " + elapsedMs(phaseNs) + "ms");
+      phaseNs = System.nanoTime();
 
       LocalIndex existingIndex = SearchEngine.LOCAL_WIRING.localIndex();
       if (existingIndex instanceof AndroidLocalIndex
@@ -259,6 +263,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         li = AndroidLocalIndex.open(context);
       }
       SearchEngine.LOCAL_WIRING.localIndex(li);
+      LOG.info("AndroidRelayStack: local index ready in " + elapsedMs(phaseNs) + "ms");
+      phaseNs = System.nanoTime();
 
       indexer = new AndroidSharedTorrentIndexer(li, ident, permitted);
       BTEngineListenerChain.install(btEngine, indexer);
@@ -428,6 +434,9 @@ public final class AndroidRelayStack implements AutoCloseable {
       ih.setTorrentMetadataProvider(
           new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider(visibility));
       ih.start();
+      LOG.info("AndroidRelayStack: transport and inbound handler ready in "
+          + elapsedMs(phaseNs) + "ms");
+      phaseNs = System.nanoTime();
 
       // USE_REMOTE clients register as local rUDP endpoint of the forwarder so
       // inbound mesh traffic is delivered to /poll (see RudpSessionManager).
@@ -506,26 +515,12 @@ public final class AndroidRelayStack implements AutoCloseable {
       requirePermitted(permitted);
       da.start();
       LOG.info("AndroidRelayStack: DhtAdvertiser started");
+      LOG.info("AndroidRelayStack: discovery and publication workers scheduled in "
+          + elapsedMs(phaseNs) + "ms");
 
-      // First-run bootstrap: the scheduler's first tick is 5 minutes out and the
-      // advertiser's republish interval is 5 minutes, but a fresh install must
-      // join the mesh on this startup path — announce identity now, run one
-      // discovery pass, and warm the mesh registry. All fail-closed and bounded.
-      try {
-        da.tick(btEngine);
-      } catch (Throwable t) {
-        LOG.warn("AndroidRelayStack: initial DHT announce failed", t);
-      }
-      try {
-        pds.tick();
-      } catch (Throwable t) {
-        LOG.warn("AndroidRelayStack: initial discovery pass failed", t);
-      }
-      try {
-        prs.sync();
-      } catch (Throwable t) {
-        LOG.warn("AndroidRelayStack: initial mesh sync failed", t);
-      }
+      // All three schedulers begin immediately on their own workers. Discovery
+      // still authenticates peers, and the sync still signs registration, but
+      // network round trips must not hold up search transport readiness.
 
       if (li == null || karmaCache == null || pd == null || ident == null || tr == null) {
         throw new IllegalStateException("Wiring inputs must be non-null");
@@ -545,6 +540,7 @@ public final class AndroidRelayStack implements AutoCloseable {
               + useRemote
               + " meshRudp="
               + meshRudpPort);
+      LOG.info("AndroidRelayStack: search wiring ready in " + elapsedMs(startupNs) + "ms");
 
       AndroidRelayStack stack = null;
       // Healthy CLIENT leaves promote to capped forwarders (Gnutella ultrapeer
@@ -643,6 +639,10 @@ public final class AndroidRelayStack implements AutoCloseable {
       if (karmaCache != null) karmaCache.close();
       return null;
     }
+  }
+
+  private static long elapsedMs(long sinceNs) {
+    return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - sinceNs);
   }
 
   private AndroidRelayStack(

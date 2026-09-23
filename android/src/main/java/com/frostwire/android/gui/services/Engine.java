@@ -181,27 +181,35 @@ public final class Engine implements IEngineService {
             return;
         }
         LOG.info("Engine: IceBridge down at search time — restarting");
+        long budgetMs = Math.max(0L, timeoutMs);
+        long startedAt = System.nanoTime();
         ensureServicesRunning();
         EngineForegroundService svc = getForegroundService();
         if (svc != null && !svc.isRelayStackRunning()) {
             CountDownLatch latch = new CountDownLatch(1);
             svc.ensureRelayStack(false, latch::countDown);
             try {
-                if (!latch.await(Math.max(1_000L, timeoutMs), TimeUnit.MILLISECONDS)) {
+                long remaining = Math.max(0L,
+                        budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
+                if (remaining > 0 && !latch.await(remaining, TimeUnit.MILLISECONDS)) {
                     LOG.warn("Engine: IceBridge restart timed out");
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return;
             }
         }
-        long deadline = System.currentTimeMillis() + Math.max(0L, timeoutMs);
         while (!wasShutdown && com.frostwire.android.search.AndroidRelayStack.isParticipationEnabled()
-                && !SearchEngine.DISTRIBUTED.isReady() && System.currentTimeMillis() < deadline) {
+                && !SearchEngine.DISTRIBUTED.isReady()
+                && TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt) < budgetMs) {
             if (getForegroundService() == null) {
                 ensureServicesRunning();
             }
             try {
-                Thread.sleep(200);
+                long remaining = budgetMs - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+                if (remaining > 0) {
+                    Thread.sleep(Math.min(200L, remaining));
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return;
