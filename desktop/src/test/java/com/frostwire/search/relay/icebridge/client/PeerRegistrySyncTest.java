@@ -22,6 +22,7 @@ import com.frostwire.search.relay.icebridge.peer.PeerRegistry;
 import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -157,6 +158,23 @@ class PeerRegistrySyncTest {
         directory.get(peer.ed25519PubRaw()).isPresent(),
         "mesh lookup peer must be imported as verified");
     assertTrue(directory.topByTrustVerified(10).size() >= 1);
+  }
+
+  @Test
+  void startRegistersSelfWithoutLegacyThreeSecondDelay() throws Exception {
+    IdentityKeys self = IdentityKeys.generate(0);
+    sync =
+        new PeerRegistrySync(client, directory, "127.0.0.1", 6889, self, IceBridgeConfig.Role.BOTH);
+
+    sync.start();
+
+    assertTimeoutPreemptively(
+        Duration.ofSeconds(2),
+        () -> {
+          while (registry.lookup(self.ed25519PubRaw()) == null) {
+            Thread.sleep(10);
+          }
+        });
   }
 
   @Test

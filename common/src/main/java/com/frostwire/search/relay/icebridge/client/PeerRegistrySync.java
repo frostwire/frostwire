@@ -49,7 +49,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     public static final int ICEBRIDGE_RUDP_PORT = 6889;
 
     private static final long SYNC_INTERVAL_SEC = 30;
-    private static final long INITIAL_DELAY_SEC = 3;
+    private static final long INITIAL_DELAY_SEC = 0;
     /**
      * Registry page size per sync. {@code /lookup} clamps to 100; rotation (see
      * {@code PeerRegistry.lookupPeers}) means successive syncs walk different slices, so the
