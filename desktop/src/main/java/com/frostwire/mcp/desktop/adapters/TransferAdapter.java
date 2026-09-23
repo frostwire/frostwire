@@ -70,13 +70,68 @@ public final class TransferAdapter {
     return json;
   }
 
+  public static final int MAX_TRANSFER_FILE_ROWS = 200;
+
   public static JsonArray toItemsJson(List<TransferItem> items) {
+    return toItemsJson(items, items == null ? 0 : items.size());
+  }
+
+  public static JsonArray toItemsJson(List<TransferItem> items, int limit) {
     JsonArray arr = new JsonArray();
-    for (TransferItem item : items) {
-      arr.add(toItemJson(item));
+    if (items == null || limit <= 0) {
+      return arr;
+    }
+    int end = Math.min(items.size(), limit);
+    for (int i = 0; i < end; i++) {
+      arr.add(toItemJson(items.get(i)));
     }
     return arr;
   }
+
+  public static JsonObject transferFilesEntry(
+      String downloadId, String name, List<TransferItem> items, int remaining) {
+    int total = items == null ? 0 : items.size();
+    int take = remaining > 0 && total > 0 ? Math.min(total, remaining) : 0;
+    JsonObject entry = new JsonObject();
+    entry.addProperty("downloadId", downloadId);
+    entry.addProperty("name", name);
+    entry.addProperty("fileCount", total);
+    entry.addProperty("truncated", take < total);
+    entry.add("files", toItemsJson(items, take));
+    return entry;
+  }
+
+  public static JsonObject omittedTransferFilesEntry(String downloadId, String name) {
+    JsonObject entry = new JsonObject();
+    entry.addProperty("downloadId", downloadId);
+    entry.addProperty("name", name);
+    entry.addProperty("truncated", true);
+    entry.add("files", new JsonArray());
+    return entry;
+  }
+
+  public static JsonArray boundTransferFiles(
+      int count,
+      int maxRows,
+      java.util.function.IntFunction<NamedTransfer> names,
+      java.util.function.IntFunction<List<TransferItem>> items) {
+    JsonArray allFiles = new JsonArray();
+    int remaining = maxRows;
+    for (int i = 0; i < count; i++) {
+      NamedTransfer named = names.apply(i);
+      if (remaining <= 0) {
+        allFiles.add(omittedTransferFilesEntry(named.id(), named.name()));
+        continue;
+      }
+      List<TransferItem> files = items.apply(i);
+      JsonObject entry = transferFilesEntry(named.id(), named.name(), files, remaining);
+      allFiles.add(entry);
+      remaining -= entry.getAsJsonArray("files").size();
+    }
+    return allFiles;
+  }
+
+  public record NamedTransfer(String id, String name) {}
 
   public static BTDownload findDownload(String downloadId) {
     for (BTDownload dl : getAllDownloads()) {
