@@ -71,7 +71,6 @@ import com.frostwire.mcp.desktop.tools.vpn.VPNDropProtectionTool;
 import com.frostwire.mcp.desktop.tools.vpn.VPNStatusTool;
 import com.frostwire.mcp.desktop.transport.StreamableHttpTransport;
 import com.frostwire.mcp.desktop.transport.TlsConfig;
-import com.frostwire.transfers.TransferItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -257,7 +256,9 @@ public final class FrostWireMCPServerFactory {
 
     @Override
     public String description() {
-      return "File list for all transfers";
+      return "File list for transfers, bounded to "
+          + TransferAdapter.MAX_TRANSFER_FILE_ROWS
+          + " files";
     }
 
     @Override
@@ -267,15 +268,15 @@ public final class FrostWireMCPServerFactory {
 
     @Override
     public String read() {
-      JsonArray allFiles = new JsonArray();
-      for (BTDownload dl : TransferAdapter.getAllDownloads()) {
-        JsonObject entry = new JsonObject();
-        entry.addProperty("downloadId", dl.getInfoHash());
-        entry.addProperty("name", dl.getName());
-        List<TransferItem> items = dl.getItems();
-        entry.add("files", TransferAdapter.toItemsJson(items));
-        allFiles.add(entry);
-      }
+      List<BTDownload> downloads = TransferAdapter.getAllDownloads();
+      JsonArray allFiles =
+          TransferAdapter.boundTransferFiles(
+              downloads.size(),
+              TransferAdapter.MAX_TRANSFER_FILE_ROWS,
+              i ->
+                  new TransferAdapter.NamedTransfer(
+                      downloads.get(i).getInfoHash(), downloads.get(i).getName()),
+              i -> downloads.get(i).getItems());
       return new Gson().toJson(allFiles);
     }
   }
