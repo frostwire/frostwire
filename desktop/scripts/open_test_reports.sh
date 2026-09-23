@@ -4,6 +4,7 @@
 # Usage:
 #   ./scripts/open_test_reports.sh
 #   ./scripts/open_test_reports.sh --simulation
+#   ./scripts/open_test_reports.sh --wire
 #   ./scripts/open_test_reports.sh path/to/report.html
 
 set -euo pipefail
@@ -14,6 +15,13 @@ if [[ "${1:-}" == "--simulation" ]]; then
   pointer="${ROOT}/build/reports/icebridge-simulation/latest-report.txt"
   if [[ ! -f "${pointer}" ]]; then
     echo "No simulation report found. Run ./scripts/run-icebridge-simulation.sh first." >&2
+    exit 1
+  fi
+  report="$(<"${pointer}")"
+elif [[ "${1:-}" == "--wire" ]]; then
+  pointer="${ROOT}/build/reports/icebridge-loopback/latest-report.txt"
+  if [[ ! -f "${pointer}" ]]; then
+    echo "No loopback report found. Run ./scripts/run-icebridge-simulation.sh first." >&2
     exit 1
   fi
   report="$(<"${pointer}")"
