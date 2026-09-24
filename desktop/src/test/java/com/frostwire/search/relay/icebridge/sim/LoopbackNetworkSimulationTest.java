@@ -36,4 +36,18 @@ class LoopbackNetworkSimulationTest {
     assertTrue(report.unfindableMillis() < 5_000, "miss must finish on verified empty finals");
     assertTrue(LoopbackSimulationMain.html(report).contains("production request parsing"));
   }
+
+  @Test
+  @Timeout(120)
+  void twentyFiveRealNodesBindIndependentlyAndProcessSearchTraffic() throws Exception {
+    LoopbackNetworkSimulator.Report report = new LoopbackNetworkSimulator().run(25, workDirectory);
+
+    assertEquals(25, report.nodes());
+    assertEquals(1, report.findableHits());
+    assertEquals(0, report.unfindableHits());
+    assertTrue(report.uniquePorts());
+    assertEquals(1, report.digestsKnown());
+    assertTrue(report.packetsIn() > 200);
+    assertTrue(report.packetsOut() > 200);
+  }
 }
