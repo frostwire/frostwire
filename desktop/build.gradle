@@ -321,7 +321,10 @@ jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
-        attributes 'Main-Class': 'com.limegroup.gnutella.gui.Main'
+        // The bundled SWIG jlibtorrent binding actually calls JNI. Grant the JVM's required
+        // native-access permission when launched with java -jar (JEP 472), not a warning override.
+        attributes 'Main-Class': 'com.limegroup.gnutella.gui.Main',
+                'Enable-Native-Access': 'ALL-UNNAMED'
     }
 }
 
@@ -359,7 +362,8 @@ tasks.register('icebridgeJar', Jar) {
     from { configurations.icebridgeCloudNatives.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
-        attributes 'Main-Class': 'com.frostwire.search.relay.icebridge.IceBridgeServer'
+        attributes 'Main-Class': 'com.frostwire.search.relay.icebridge.IceBridgeServer',
+                'Enable-Native-Access': 'ALL-UNNAMED'
     }
 }
 
@@ -382,7 +386,8 @@ tasks.register('crawlerJar', Jar) {
     from { configurations.icebridgeCloudNatives.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
-        attributes 'Main-Class': 'com.frostwire.search.relay.crawl.IceBridgeCrawler'
+        attributes 'Main-Class': 'com.frostwire.search.relay.crawl.IceBridgeCrawler',
+                'Enable-Native-Access': 'ALL-UNNAMED'
     }
 }
 
@@ -394,6 +399,7 @@ tasks.register('runCrawler', JavaExec) {
 
     classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge-crawler.jar")
     mainClass = 'com.frostwire.search.relay.crawl.IceBridgeCrawler'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 
     if (project.hasProperty('crawler.args')) {
         args project.property('crawler.args').toString().split()
@@ -408,6 +414,7 @@ tasks.register('runMirror', JavaExec) {
 
     classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge-crawler.jar")
     mainClass = 'com.frostwire.search.relay.crawl.IceBridgeMirror'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 
     if (project.hasProperty('mirror.args')) {
         args project.property('mirror.args').toString().split()
@@ -422,6 +429,7 @@ tasks.register('icebridge', JavaExec) {
 
     classpath = files("${layout.buildDirectory.get().asFile}/libs/icebridge.jar")
     mainClass = 'com.frostwire.search.relay.icebridge.IceBridgeServer'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 
     // Pass through all system properties starting with ICEBRIDGE_
     System.getProperties().stringPropertyNames().each { name ->
@@ -462,6 +470,10 @@ tasks.register('runIceBridgeLoopback', JavaExec) {
     dependsOn tasks.named('simulationClasses')
     classpath = sourceSets.simulation.runtimeClasspath
     mainClass = 'com.frostwire.search.relay.icebridge.sim.LoopbackSimulationMain'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_24)) {
+        jvmArgs '--illegal-native-access=deny'
+    }
     if (project.hasProperty('loopback.nodes')) {
         args '--nodes=' + project.property('loopback.nodes')
     }
@@ -476,6 +488,11 @@ tasks.register('simulationTest', Test) {
     useJUnitPlatform()
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-Djava.awt.headless=true'
+    // The SWIG jlibtorrent JNI binding requires explicit permission on JDK 24+.
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_24)) {
+        jvmArgs '--illegal-native-access=deny'
+    }
     filter {
         includeTestsMatching 'com.frostwire.search.relay.icebridge.sim.*'
         includeTestsMatching 'com.frostwire.search.relay.icebridge.IceBridgeNetworkSimulationTest'
@@ -642,6 +659,11 @@ test {
     // SettingsFactory keys (e.g. DOWNLOAD_TABLE_SORT) for the rest of the JVM.
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-Djava.awt.headless=true'
+    // Explicitly authorize JNI in the test worker, not the Gradle daemon.
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_24)) {
+        jvmArgs '--illegal-native-access=deny'
+    }
 
     // Keep the full suite deterministic and within the memory budget on developer
     // machines and CI hosts with many logical CPUs.
