@@ -157,7 +157,7 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.83'
 
     // Netty for IceBridge relay daemon (shared by desktop control path and headless server fat jar)
-    implementation 'io.netty:netty-all:4.2.0.Final'
+    implementation 'io.netty:netty-all:4.2.18.Final'
 
     // Also used by icebridgeCloudNatives / icebridgeJar multi-arch packaging below.
     ext.jlibtorrent_version = '2.0.12.9'
