@@ -150,8 +150,8 @@ public final class LoopbackNetworkSimulator {
   }
 
   public Report run(int count, Path workDirectory) throws Exception {
-    if (count < 2 || count > 20) {
-      throw new IllegalArgumentException("loopback nodes must be between 2 and 20");
+    if (count < 2 || count > 25) {
+      throw new IllegalArgumentException("loopback nodes must be between 2 and 25");
     }
     List<Node> nodes = new ArrayList<>();
     try {
