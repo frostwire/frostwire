@@ -47,6 +47,7 @@ public final class IceBridgeWorkloadSimulator {
     public int flooderBurst = 100;
     public int minUplinks = 3;
     public int maxUplinks = 6;
+    public int flooderUplinks = 16;
     public int searchPeerFanout = 32;
     public int holderBudget = 8;
     public int maxHoldersPerItem = 8;
@@ -69,6 +70,7 @@ public final class IceBridgeWorkloadSimulator {
       copy.flooderBurst = flooderBurst;
       copy.minUplinks = minUplinks;
       copy.maxUplinks = maxUplinks;
+      copy.flooderUplinks = flooderUplinks;
       copy.searchPeerFanout = searchPeerFanout;
       copy.holderBudget = holderBudget;
       copy.maxHoldersPerItem = maxHoldersPerItem;
@@ -452,6 +454,7 @@ public final class IceBridgeWorkloadSimulator {
   private final List<ContentItem> catalog = new ArrayList<>();
   private final List<NetworkEdge> edges = new ArrayList<>();
   private final List<ActivityHop> lastActivity = new ArrayList<>();
+  private final List<Integer> flooderIds = new ArrayList<>();
   private boolean hasRun;
 
   public IceBridgeWorkloadSimulator(WorkloadConfig config) {
@@ -472,6 +475,7 @@ public final class IceBridgeWorkloadSimulator {
       catalog.clear();
       edges.clear();
       lastActivity.clear();
+      flooderIds.clear();
       random.setSeed(config.seed);
       buildNetwork();
     }
@@ -479,12 +483,9 @@ public final class IceBridgeWorkloadSimulator {
     long startedNanos = System.nanoTime();
     long observerNanos = 0;
     List<Integer> searchers = sampleLeaves(config.searcherFraction);
-    List<Integer> flooders = sampleLeaves(config.flooderFraction);
+    List<Integer> flooders = flooderIds;
     for (int searcher : searchers) {
       leaves.get(searcher).searcher = true;
-    }
-    for (int flooder : flooders) {
-      leaves.get(flooder).flooder = true;
     }
     List<SearchOutcome> findable = new ArrayList<>();
     List<SearchOutcome> nonFindable = new ArrayList<>();
@@ -591,6 +592,10 @@ public final class IceBridgeWorkloadSimulator {
     for (int i = 0; i < config.leafCount; i++) {
       leaves.add(new Leaf(i));
     }
+    flooderIds.addAll(sampleLeaves(config.flooderFraction));
+    for (int flooder : flooderIds) {
+      leaves.get(flooder).flooder = true;
+    }
     for (int itemId = 0; itemId < config.contentItems; itemId++) {
       ContentItem item = new ContentItem(itemId);
       for (int token = 0; token < config.tokensPerItem; token++) {
@@ -607,7 +612,9 @@ public final class IceBridgeWorkloadSimulator {
     }
     for (Leaf leaf : leaves) {
       int uplinkCount =
-          config.minUplinks + random.nextInt(config.maxUplinks - config.minUplinks + 1);
+          leaf.flooder
+              ? Math.min(config.flooderUplinks, config.ultrapeerCount)
+              : config.minUplinks + random.nextInt(config.maxUplinks - config.minUplinks + 1);
       Set<Integer> selected = new HashSet<>();
       while (selected.size() < uplinkCount) {
         selected.add(random.nextInt(config.ultrapeerCount));
@@ -891,6 +898,7 @@ public final class IceBridgeWorkloadSimulator {
         || config.minUplinks <= 0
         || config.maxUplinks < config.minUplinks
         || config.maxUplinks > config.ultrapeerCount
+        || config.flooderUplinks <= 0
         || config.searchPeerFanout <= 0
         || config.searchTtl <= 0
         || config.softMax <= 0
