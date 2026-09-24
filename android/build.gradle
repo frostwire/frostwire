@@ -376,7 +376,7 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
 
     // Netty for IceBridge rUDP transport (in-process daemon on Android)
-    implementation 'io.netty:netty-all:4.2.0.Final'
+    implementation 'io.netty:netty-all:4.2.18.Final'
 
     // Software Ed25519 KeyFactory/Signature — AndroidKeyStore cannot import
     // jlibtorrent PKCS#8 seeds (API 34+ InvalidKeySpecException).
