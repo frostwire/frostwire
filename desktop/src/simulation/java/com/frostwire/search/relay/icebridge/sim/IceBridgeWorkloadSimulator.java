@@ -142,17 +142,25 @@ public final class IceBridgeWorkloadSimulator {
   }
 
   public static final class ActivityHop {
+    /** Direction of the sampled message on the wire. */
+    public enum Kind {
+      /** Origin or hub to hub/leaf search request or forward. */
+      REQUEST,
+      /** Holder leaf back to the requesting node. */
+      RESPONSE,
+      /** Attack traffic from a flooder. */
+      FLOOD
+    }
+
     public final int from;
     public final int to;
-    public final boolean flood;
-    public final boolean hit;
+    public final Kind kind;
     public final int step;
 
-    ActivityHop(int from, int to, boolean flood, boolean hit, int step) {
+    ActivityHop(int from, int to, Kind kind, int step) {
       this.from = from;
       this.to = to;
-      this.flood = flood;
-      this.hit = hit;
+      this.kind = kind;
       this.step = step;
     }
   }
@@ -542,7 +550,8 @@ public final class IceBridgeWorkloadSimulator {
             (round * searchers.size() + i) % 2 == 0
                 ? catalog.get(random.nextInt(catalog.size()))
                 : null;
-        boolean trace = observer != null && (completed + 1) % cadence == 0;
+        // Trace a miss too so viewers see that misses produce no result traffic.
+        boolean trace = observer != null && (completed + 1) % cadence <= 1;
         SearchOutcome outcome = search(searcher, target, nonce++, nowSecond, false, trace);
         (target == null ? nonFindable : findable).add(outcome);
         if (target != null && outcome.hit) {
@@ -661,6 +670,7 @@ public final class IceBridgeWorkloadSimulator {
         target == null
             ? List.of("unfindable" + nonce)
             : IndexDigest.tokenize(String.join(" ", target.tokens));
+    ActivityHop.Kind requestKind = flood ? ActivityHop.Kind.FLOOD : ActivityHop.Kind.REQUEST;
     List<Delivery> frontier = new ArrayList<>();
     int originNode = config.ultrapeerCount + requester;
     int traced = 0;
@@ -672,7 +682,7 @@ public final class IceBridgeWorkloadSimulator {
       path[hubId] = true;
       frontier.add(new Delivery(hubId, config.searchTtl, path));
       if (trace) {
-        lastActivity.add(new ActivityHop(originNode, hubId, flood, false, 0));
+        lastActivity.add(new ActivityHop(originNode, hubId, requestKind, 0));
         traced++;
       }
     }
@@ -729,7 +739,7 @@ public final class IceBridgeWorkloadSimulator {
             next.add(new Delivery(neighbor, delivery.ttl - 1, path));
             forwarded++;
             if (trace && traced < 36) {
-              lastActivity.add(new ActivityHop(hubId, neighbor, flood, false, hops + 1));
+              lastActivity.add(new ActivityHop(hubId, neighbor, requestKind, hops + 1));
               traced++;
             }
           }
@@ -748,13 +758,17 @@ public final class IceBridgeWorkloadSimulator {
           boolean hit = !replay && target != null && leaf.heldItems.contains(target.id);
           if (trace && (hit || shownLeaves < 2) && traced < 48) {
             lastActivity.add(
-                new ActivityHop(hubId, config.ultrapeerCount + leafId, flood, false, hops + 1));
+                new ActivityHop(hubId, config.ultrapeerCount + leafId, requestKind, hops + 1));
             shownLeaves++;
             traced++;
           }
           if (trace && hit && traced < 48) {
             lastActivity.add(
-                new ActivityHop(config.ultrapeerCount + leafId, originNode, false, true, hops + 2));
+                new ActivityHop(
+                    config.ultrapeerCount + leafId,
+                    originNode,
+                    ActivityHop.Kind.RESPONSE,
+                    hops + 2));
             traced++;
           }
           leaf.messages++;
