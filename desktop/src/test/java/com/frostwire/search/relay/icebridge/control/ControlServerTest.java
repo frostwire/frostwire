@@ -168,13 +168,13 @@ class ControlServerTest {
 
     HttpResponse<String> response = get("/poll?count=10");
     assertEquals(200, response.statusCode());
-    java.lang.reflect.Type type =
-        new TypeToken<ApiResponse<List<InboundMessageInfo>>>() {}.getType();
-    ApiResponse<List<InboundMessageInfo>> body = GSON.fromJson(response.body(), type);
-    assertTrue(body.ok, response.body());
-    assertEquals(1, body.data.size());
-    assertEquals(pubB64, body.data.get(0).sourcePub);
-    assertEquals(payloadB64, body.data.get(0).payload);
+    com.google.gson.JsonObject body =
+        com.google.gson.JsonParser.parseString(response.body()).getAsJsonObject();
+    assertTrue(body.get("ok").getAsBoolean(), response.body());
+    com.google.gson.JsonArray messages = body.getAsJsonArray("data");
+    assertEquals(1, messages.size());
+    assertEquals(pubB64, messages.get(0).getAsJsonObject().get("sourcePub").getAsString());
+    assertEquals(payloadB64, messages.get(0).getAsJsonObject().get("payload").getAsString());
   }
 
   @Test
