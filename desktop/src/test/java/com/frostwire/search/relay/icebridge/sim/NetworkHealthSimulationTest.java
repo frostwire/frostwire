@@ -142,9 +142,22 @@ class NetworkHealthSimulationTest {
         deniedFlood.activity.stream().allMatch(hop -> hop.step == 0),
         "A denied request can only reach its entry uplink");
     assertTrue(
+        deniedFlood.activity.stream()
+            .allMatch(hop -> hop.kind == IceBridgeWorkloadSimulator.ActivityHop.Kind.FLOOD),
+        "Flood traces must be labeled as attack traffic");
+    List<IceBridgeWorkloadSimulator.ActivityHop.Kind> kinds =
         snapshots.stream()
             .flatMap(snapshot -> snapshot.activity.stream())
-            .filter(hop -> hop.hit)
+            .map(hop -> hop.kind)
+            .toList();
+    assertTrue(kinds.contains(IceBridgeWorkloadSimulator.ActivityHop.Kind.REQUEST));
+    assertTrue(
+        kinds.contains(IceBridgeWorkloadSimulator.ActivityHop.Kind.RESPONSE),
+        "Result traffic must be visible as responses traveling back");
+    assertTrue(
+        snapshots.stream()
+            .flatMap(snapshot -> snapshot.activity.stream())
+            .filter(hop -> hop.kind == IceBridgeWorkloadSimulator.ActivityHop.Kind.RESPONSE)
             .allMatch(hop -> hop.step >= 2));
     assertTrue(snapshots.stream().allMatch(snapshot -> snapshot.activity.size() <= 48));
   }
