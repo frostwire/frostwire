@@ -101,7 +101,12 @@ public final class NetworkVisualizationFrame extends JFrame {
             + "Leaf         blue\n"
             + "Searcher     amber\n"
             + "Flooder      red\n"
-            + "Packet       sampled moving hop\n\n"
+            + "\n"
+            + "MESSAGE LEGEND (moving hop)\n"
+            + "Search request  amber\n"
+            + "Flood request   red\n"
+            + "Search result   mint\n"
+            + "\n"
             + "Animation shows one sampled search per 25,\n"
             + "not every message on the wire.\n");
     canvas.setNodeSelectionListener(
@@ -377,12 +382,18 @@ public final class NetworkVisualizationFrame extends JFrame {
         Point end = screen(to);
         int x = start.x + Math.round((end.x - start.x) * travel);
         int y = start.y + Math.round((end.y - start.y) * travel);
-        Color color = packet.hop.flood ? RED : packet.hop.hit ? MINT : AMBER;
+        boolean response = packet.hop.kind == IceBridgeWorkloadSimulator.ActivityHop.Kind.RESPONSE;
+        Color color =
+            switch (packet.hop.kind) {
+              case FLOOD -> RED;
+              case RESPONSE -> MINT;
+              case REQUEST -> AMBER;
+            };
         int alpha = age > 0.75f ? Math.max(0, (int) (255 * (1f - age) / 0.25f)) : 230;
         g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
-        g.setStroke(new BasicStroke(packet.hop.hit ? 2.5f : 1.5f));
+        g.setStroke(new BasicStroke(response ? 2.5f : 1.5f));
         g.drawLine(start.x, start.y, x, y);
-        int size = packet.hop.hit ? 9 : 6;
+        int size = response ? 9 : 6;
         g.fillOval(x - size / 2, y - size / 2, size, size);
       }
     }
