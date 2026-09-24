@@ -33,8 +33,8 @@ public final class LoopbackSimulationMain {
         throw new IllegalArgumentException("Unknown loopback option: " + arg);
       }
     }
-    if (nodes < 2 || nodes > 20) {
-      throw new IllegalArgumentException("loopback nodes must be between 2 and 20");
+    if (nodes < 2 || nodes > 25) {
+      throw new IllegalArgumentException("loopback nodes must be between 2 and 25");
     }
     Path output = Path.of("build", "reports", "icebridge-loopback");
     Files.createDirectories(output);
