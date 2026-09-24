@@ -13,6 +13,7 @@ import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeMetrics;
 import com.frostwire.search.relay.icebridge.IceBridgeTokens;
+import com.frostwire.search.relay.icebridge.MeshProtocolId;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
@@ -312,6 +313,45 @@ class IceBridgeClientTest {
     assertArrayEquals(payload, messages.get(0).payload());
     assertEquals(
         com.frostwire.search.relay.icebridge.MeshProtocolId.SEARCH, messages.get(0).protocolId());
+  }
+
+  @Test
+  void pollConstructsImmutableCatalogFrameWithoutLosingWireFields() {
+    byte[] source = identity.ed25519PubRaw();
+    byte[] payload = "catalog response".getBytes(StandardCharsets.UTF_8);
+    long before = System.currentTimeMillis();
+    assertTrue(
+        inboundQueue.offerFromRudp(
+            source,
+            source,
+            com.frostwire.search.relay.icebridge.MeshEnvelope.encodeForWire(
+                MeshProtocolId.CATALOG, payload)));
+
+    List<IceBridgeClient.InboundMessage> messages = client.poll(1);
+
+    assertEquals(1, messages.size());
+    assertArrayEquals(source, messages.get(0).sourcePub());
+    assertArrayEquals(payload, messages.get(0).payload());
+    assertEquals(MeshProtocolId.CATALOG, messages.get(0).protocolId());
+    assertTrue(messages.get(0).receivedMs() >= before);
+  }
+
+  @Test
+  void legacyPollFrameDefaultsToSearchWithoutMutatingFinalFields() {
+    com.google.gson.Gson codec =
+        new com.google.gson.GsonBuilder()
+            .registerTypeAdapter(
+                com.frostwire.search.relay.icebridge.control.InboundMessageInfo.class,
+                new InboundMessageInfoAdapter())
+            .create();
+    com.frostwire.search.relay.icebridge.control.InboundMessageInfo frame =
+        codec.fromJson(
+            "{\"sourcePub\":\"source\",\"payload\":\"AQ\",\"receivedMs\":42,\"extra\":true}",
+            com.frostwire.search.relay.icebridge.control.InboundMessageInfo.class);
+    assertEquals("source", frame.sourcePub);
+    assertEquals("AQ", frame.payload);
+    assertEquals(42, frame.receivedMs);
+    assertEquals(MeshProtocolId.SEARCH, frame.protocolId);
   }
 
   @Test

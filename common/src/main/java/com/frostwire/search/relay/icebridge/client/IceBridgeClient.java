@@ -54,7 +54,11 @@ import okhttp3.Response;
 public final class IceBridgeClient implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(IceBridgeClient.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new com.google.gson.GsonBuilder()
+            .registerTypeAdapter(
+                    com.frostwire.search.relay.icebridge.control.InboundMessageInfo.class,
+                    new InboundMessageInfoAdapter())
+            .create();
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final long CONNECT_TIMEOUT_SEC = 10;
     private static final long CALL_TIMEOUT_SEC = 10;
