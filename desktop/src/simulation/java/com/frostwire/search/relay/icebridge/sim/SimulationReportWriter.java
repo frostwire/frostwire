@@ -398,6 +398,7 @@ public final class SimulationReportWriter {
         List.of(
             "minUplinks",
             "maxUplinks",
+            "flooderUplinks",
             "searchPeerFanout",
             "holderBudget",
             "searchTtl",
@@ -463,6 +464,7 @@ public final class SimulationReportWriter {
         + row("Flood workload", percent(c.flooderFraction) + " × " + c.flooderBurst)
         + "</tbody></table><table><tbody>"
         + row("Uplinks", c.minUplinks + "–" + c.maxUplinks)
+        + row("Flooder uplinks", Integer.toString(Math.min(c.flooderUplinks, c.ultrapeerCount)))
         + row("Search fanout M", Integer.toString(c.searchPeerFanout))
         + row("Holder budget", Integer.toString(c.holderBudget))
         + row("Search TTL / soft max", c.searchTtl + " / " + c.softMax)
