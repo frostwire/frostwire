@@ -49,6 +49,26 @@ class NetworkHealthSimulationTest {
   }
 
   @Test
+  void floodersAttachToSixteenDifferentHubsWhileHonestLeavesStaySmall() {
+    WorkloadConfig config = new WorkloadConfig();
+    List<NetworkSnapshot> snapshots = new ArrayList<>();
+
+    NetworkHealthReport report = new IceBridgeWorkloadSimulator(config).run(snapshots::add);
+    NetworkSnapshot initial = snapshots.get(0);
+
+    assertEquals(10, initial.nodes.stream().filter(node -> node.flooder).count());
+    assertTrue(
+        initial.nodes.stream()
+            .filter(node -> node.flooder)
+            .allMatch(node -> node.connections == 16));
+    assertTrue(
+        initial.nodes.stream()
+            .filter(node -> node.type == IceBridgeWorkloadSimulator.NodeType.LEAF && !node.flooder)
+            .allMatch(node -> node.connections >= 3 && node.connections <= 6));
+    assertEquals(16, report.config.flooderUplinks);
+  }
+
+  @Test
   void recallDependsOnDigestAvailabilityRatherThanKnowingTheTarget() {
     WorkloadConfig available = new WorkloadConfig();
     available.ultrapeerCount = 4;
