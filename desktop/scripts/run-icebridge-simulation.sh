@@ -6,7 +6,7 @@
 #   ./scripts/run-icebridge-simulation.sh --no-ui --no-open
 #   ./scripts/run-icebridge-simulation.sh --seed=20260922 --pace-ms=20
 #   ./scripts/run-icebridge-simulation.sh --wire-only --wire-nodes=6
-#   ./scripts/run-icebridge-simulation.sh --wire-only --wire-nodes=20
+#   ./scripts/run-icebridge-simulation.sh --wire-only --wire-nodes=25
 
 set -euo pipefail
 
@@ -27,8 +27,8 @@ for argument in "$@"; do
     *) SIMULATION_ARGS+=("${argument}") ;;
   esac
 done
-if ! [[ "${WIRE_NODES}" =~ ^[0-9]+$ ]] || (( 10#${WIRE_NODES} < 2 || 10#${WIRE_NODES} > 20 )); then
-  echo "--wire-nodes must be between 2 and 20" >&2
+if ! [[ "${WIRE_NODES}" =~ ^[0-9]+$ ]] || (( 10#${WIRE_NODES} < 2 || 10#${WIRE_NODES} > 25 )); then
+  echo "--wire-nodes must be between 2 and 25" >&2
   exit 2
 fi
 
