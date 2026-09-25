@@ -48,6 +48,7 @@ public final class BTDownload implements BittorrentDownload {
             AlertType.TORRENT_FINISHED.swig(),
             AlertType.TORRENT_REMOVED.swig(),
             AlertType.TORRENT_CHECKED.swig(),
+            AlertType.STATE_CHANGED.swig(),
             AlertType.SAVE_RESUME_DATA.swig(),
             AlertType.PIECE_FINISHED.swig(),
             AlertType.STORAGE_MOVED.swig()};
@@ -71,6 +72,7 @@ public final class BTDownload implements BittorrentDownload {
     private volatile TorrentStatus cachedStatus;
     private volatile long lastStatusUpdateTime;
     private final AtomicBoolean statusRefreshScheduled = new AtomicBoolean(false);
+    private final Object statusRefreshLock = new Object();
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
@@ -330,16 +332,33 @@ public final class BTDownload implements BittorrentDownload {
     private void scheduleStatusRefresh() {
         com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
             try {
-                if (th.isValid()) {
-                    cachedStatus = th.status();
-                    lastStatusUpdateTime = System.currentTimeMillis();
-                }
+                refreshStatusCache();
             } catch (Exception e) {
                 LOG.warn("Error refreshing torrent status cache: " + e.getMessage());
             } finally {
                 statusRefreshScheduled.set(false);
             }
         }, "BTDownload-StatusRefresh");
+    }
+
+    /**
+     * Refreshes the native status cache synchronously. Call only from a background worker; state
+     * change alerts use this to publish fresh transfer status without waiting for the UI poll.
+     */
+    public void refreshStatusCache() {
+        synchronized (statusRefreshLock) {
+            if (!th.isValid()) {
+                invalidateStatusCache();
+                return;
+            }
+            try {
+                cachedStatus = th.status();
+                lastStatusUpdateTime = System.currentTimeMillis();
+            } catch (Throwable t) {
+                invalidateStatusCache();
+                LOG.warn("Error refreshing torrent status cache", t);
+            }
+        }
     }
 
     /**
@@ -941,6 +960,15 @@ public final class BTDownload implements BittorrentDownload {
             }
             AlertType type = alert.type();
             switch (type) {
+                case STATE_CHANGED:
+                    if (listener != null) {
+                        try {
+                            listener.stateChanged(BTDownload.this);
+                        } catch (Throwable t) {
+                            LOG.error("Error calling listener (state changed)", t);
+                        }
+                    }
+                    break;
                 case TORRENT_FINISHED:
                     try {
                         if (th.isValid()) {
@@ -974,4 +1002,5 @@ public final class BTDownload implements BittorrentDownload {
             }
         }
     }
+
 }
