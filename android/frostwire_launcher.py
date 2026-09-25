@@ -562,8 +562,12 @@ def run_logcat_tui(serial: str):
         console.print()
         console.print("[yellow]Logcat stopped.[/yellow]")
         console.print()
+        console.print("[bold]Available actions:[/bold]")
+        console.print("  [cyan]r[/cyan] — refresh the connected device list")
+        console.print("  [cyan]b[/cyan] — build, reinstall, and relaunch FrostWire on this device")
+        console.print("  [cyan]q[/cyan] — quit the launcher")
         prompt = Prompt.ask(
-            "[bold]Select action:[/bold] [r]efresh list  [b]uild/relaunch  [q]uit",
+            "[bold]Select action (r/b/q)[/bold]",
             choices=["r", "b", "q"],
             default="r"
         )
