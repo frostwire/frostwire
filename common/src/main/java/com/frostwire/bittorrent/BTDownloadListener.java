@@ -29,4 +29,7 @@ public interface BTDownloadListener {
     void finished(BTDownload dl);
 
     void removed(BTDownload dl, Set<File> incompleteFiles);
+
+    /** A torrent changed libtorrent state (checking, downloading, seeding, or paused). */
+    default void stateChanged(BTDownload dl) {}
 }
