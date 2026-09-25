@@ -40,6 +40,39 @@ public class TransferListAdapterRefreshStructureTest {
     assertTrue(uiBt.contains("notifyStateChanged(oldState,cachedState)"));
   }
 
+  @Test
+  public void returningToTransfersForcesAnImmediateStateRefresh() throws Exception {
+    String fragment =
+        read("src/main/java/com/frostwire/android/gui/fragments/TransfersFragment.java")
+            .replaceAll("(?m)//[^\\n]*", "")
+            .replaceAll("\\s+", "");
+
+    assertTrue(fragment.contains("initTimerServiceSubscription();onTime(true);"));
+  }
+
+  @Test
+  public void libtorrentStateChangeRefreshesWrapperAndNotifiesListListeners() throws Exception {
+    String btDownload =
+        read("../common/src/main/java/com/frostwire/bittorrent/BTDownload.java")
+            .replaceAll("\\s+", "");
+    String listener =
+        read("../common/src/main/java/com/frostwire/bittorrent/BTDownloadListener.java")
+            .replaceAll("\\s+", "");
+    String uiListener =
+        read("src/main/java/com/frostwire/android/gui/transfers/UIBTDownloadListener.java")
+            .replaceAll("\\s+", "");
+
+    assertTrue(btDownload.contains("AlertType.STATE_CHANGED.swig()"));
+    assertTrue(btDownload.contains("caseSTATE_CHANGED:"));
+    assertTrue(btDownload.contains("listener.stateChanged(BTDownload.this)"));
+    assertTrue(listener.contains("defaultvoidstateChanged(BTDownloaddl)"));
+    assertTrue(uiListener.contains("voidstateChanged(BTDownloaddl)"));
+    assertTrue(
+        uiListener.contains("postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,")
+            && uiListener.contains("dl.refreshStatusCache();")
+            && uiListener.contains("((UIBittorrentDownload)transfer).updateCachedState();"));
+  }
+
   private static String read(String relativePath) throws Exception {
     File file = new File(relativePath);
     if (!file.isFile()) {
