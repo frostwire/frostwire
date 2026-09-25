@@ -1,4 +1,7 @@
 FrostWire 3.2.1 build 777 UNRELEASED
+  - fix:Transfers rows now react to libtorrent state-change alerts, so Checking-to-Seeding updates do not wait for the next periodic list refresh
+  - fix:Transfers list rows now refresh immediately on libtorrent state-change alerts instead of waiting for the next list polling cycle
+  - fix:Returning from transfer details immediately refreshes the transfers list so the row reflects the latest Checking, Downloading, or Seeding state
   - fix:Distributed search becomes available sooner after startup — peer discovery, signed DHT announcements, and mesh registration now begin immediately in parallel rather than blocking the search UI; resume recovery uses one timeout budget
   - fix:Distributed search now finds torrents shared by peers that do not act as relays (leaf nodes) — forwarders were dropping their published keyword fingerprint, so those torrents only showed up by luck; the fingerprint is now honored when routing
   - new:You can now browse the torrents a peer shares — long-press a Distributed search result whose holder allows crawling ("Browse Shared Torrents") to list everything that peer is sharing and download any of it straight from that peer
