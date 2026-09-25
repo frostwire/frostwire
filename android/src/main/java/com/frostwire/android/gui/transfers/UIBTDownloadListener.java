@@ -153,6 +153,20 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         finalCleanup(dl, incompleteFiles);
     }
 
+    @Override
+    public void stateChanged(BTDownload dl) {
+        // Libtorrent's alert thread must not refresh Android UI state or do wrapper metadata work.
+        // The downloader worker refreshes the shared wrapper, which notifies the visible adapter.
+        postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            dl.refreshStatusCache();
+            BittorrentDownload transfer =
+                    TransferManager.instance().getBittorrentDownload(dl.getInfoHash());
+            if (transfer instanceof UIBittorrentDownload) {
+                ((UIBittorrentDownload) transfer).updateCachedState();
+            }
+        });
+    }
+
     private void pauseSeedingIfNecessary(BTDownload dl) {
         ConfigurationManager CM = ConfigurationManager.instance();
         boolean seedFinishedTorrents = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
