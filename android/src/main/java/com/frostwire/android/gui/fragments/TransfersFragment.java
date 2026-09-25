@@ -285,7 +285,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         }
         initTimerServiceSubscription();
-        onTime();
+        // Detail screens stop the list timer while they refresh the shared torrent state cache.
+        // Force a list snapshot on return instead of waiting for the throttle's next tick.
+        onTime(true);
     }
 
     @Override
