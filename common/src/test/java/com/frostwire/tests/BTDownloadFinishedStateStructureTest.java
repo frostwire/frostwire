@@ -29,6 +29,11 @@ class BTDownloadFinishedStateStructureTest {
     assertTrue(compact.contains("returnTransferState.SEEDING;"));
     assertTrue(
         compact.contains("caseTORRENT_FINISHED:try{if(th.isValid()){cachedStatus=th.status();"));
+    assertTrue(compact.contains("AlertType.STATE_CHANGED.swig()"));
+    assertTrue(
+        compact.contains("caseSTATE_CHANGED:if(listener!=null){try{listener.stateChanged(BTDownload.this);"));
+    assertTrue(
+        compact.contains("publicvoidrefreshStatusCache(){synchronized(statusRefreshLock){if(!th.isValid())"));
   }
 
   private static String read(String relativePath) throws IOException {
