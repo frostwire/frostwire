@@ -469,6 +469,51 @@ class RudpSessionManagerComprehensiveTest {
   }
 
   @Test
+  void freshHelloReplacesAuthenticatedAssociationAndTransfersPending() throws Exception {
+    AtomicInteger delivered = new AtomicInteger();
+    try (RudpFixture f = new RudpFixture((pub, payload) -> delivered.addAndGet(payload[0]))) {
+      f.handshake();
+      long oldCid = f.cid;
+      assertTrue(f.manager.sendData(f.address, new byte[] {9}));
+      f.drain();
+      IdentityKeys other = IdentityKeys.generate(0);
+      f.receive(
+          new RudpPacket(
+              RudpPacket.Type.HELLO,
+              515151,
+              0,
+              0,
+              RudpAuth.createHelloPayload(other, 515151, f.local.ed25519PubRaw())));
+      assertEquals(oldCid, f.manager.remoteConnectionIdForTest(f.address));
+      long newCid = 777001;
+      byte[] hello = RudpAuth.createHelloPayload(f.peer, newCid, f.local.ed25519PubRaw());
+      f.receive(new RudpPacket(RudpPacket.Type.HELLO, newCid, 0, 0, hello));
+      assertEquals(1, f.manager.sessionCount());
+      assertEquals(newCid, f.manager.remoteConnectionIdForTest(f.address));
+      assertNull(f.manager.remoteAddressForTest(oldCid));
+      byte[] transcript = RudpAuth.transcript(hello, f.take(RudpPacket.Type.HELLO_ACK).payload());
+      f.cid = newCid;
+      f.transcript = transcript;
+      f.receive(f.signed(RudpPacket.Type.HELLO_FINISH, 0, 0, new byte[0]));
+      f.take(RudpPacket.Type.HELLO_READY);
+      boolean transferred = false;
+      for (RudpPacketEnvelope envelope : f.drain()) {
+        if (envelope.packet().type() == RudpPacket.Type.DATA) {
+          RudpPacket plain =
+              RudpAuth.unprotect(
+                  f.local.ed25519PubRaw(), f.peer.ed25519PubRaw(), transcript, envelope.packet());
+          assertNotNull(plain);
+          assertArrayEquals(new byte[] {9}, plain.payload());
+          transferred = true;
+        }
+      }
+      assertTrue(transferred);
+      f.receive(f.signed(RudpPacket.Type.DATA, 1, 0, new byte[] {3}));
+      assertEquals(3, delivered.get());
+    }
+  }
+
+  @Test
   void lostReadyRecoversFromFinishRetryWithoutChangingSession() throws Exception {
     try (RudpFixture f = new RudpFixture((pub, payload) -> {})) {
       f.handshake();

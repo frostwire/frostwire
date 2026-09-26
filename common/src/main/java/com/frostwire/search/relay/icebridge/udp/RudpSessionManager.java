@@ -26,6 +26,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -499,26 +500,31 @@ public final class RudpSessionManager {
             return;
         }
         RudpSession outbound = sessionsByAddress.get(sender);
-        if (outbound != null) {
-            // Simultaneous open deterministically keeps the lower pub as initiator.
-            // The responder transfers queued work, never discards it or adds aliases.
-            if (outbound.isAuthenticated() || !outbound.weAreInitiator()
-                    || (outbound.remotePub() != null && !Arrays.equals(outbound.remotePub(), peer))
-                    || comparePub(identity.ed25519PubRaw(), peer) < 0) {
-                return;
-            }
+        if (outbound != null && outbound.remotePub() != null && !Arrays.equals(outbound.remotePub(), peer)) {
+            return;
         }
-        if (outbound == null && !canCreate(sender)) {
+        // A fresh signed HELLO means the peer lost the old CID. Replace an
+        // authenticated association, or an initiator handshake that already
+        // failed to complete. Unauthenticated simultaneous open still keeps
+        // the lower pub as initiator and transfers queued work.
+        boolean replaceStale = outbound != null && (outbound.isAuthenticated() || handshakeStalled(outbound));
+        if (outbound != null && !replaceStale
+                && (!outbound.weAreInitiator() || comparePub(identity.ed25519PubRaw(), peer) < 0)) {
+            return;
+        }
+        List<RudpSession> samePub = sessionsForPub(peer);
+        if (outbound == null && samePub.isEmpty() && !canCreate(sender)) {
             metrics.helloRejected();
             return;
         }
+        RudpSession donor = outbound != null ? outbound : newest(samePub);
         RudpSession session = new RudpSession(packet.connectionId(), packet.connectionId(), sender, peer, false);
         try {
             session.helloPayload = hello;
             session.ackPayload = RudpAuth.createAckPayload(identity, packet.connectionId(), hello);
             session.transcript = RudpAuth.transcript(hello, session.ackPayload);
-            if (outbound != null) {
-                for (PendingPacket pending : outbound.pending().values()) {
+            if (donor != null) {
+                for (PendingPacket pending : donor.pending().values()) {
                     if (pending.packet.sequence() != 0) {
                         RudpPacket old = pending.packet;
                         RudpPacket transferred = new RudpPacket(old.type(), packet.connectionId(),
@@ -529,10 +535,18 @@ public final class RudpSessionManager {
                         }
                     }
                 }
+            }
+            if (outbound != null) {
                 dropSession(outbound);
+            }
+            for (RudpSession stale : samePub) {
+                dropSession(stale);
             }
             sessionsByRemoteId.put(packet.connectionId(), session);
             sessionsByAddress.put(sender, session);
+            if (replaceStale || (donor != null && donor != outbound)) {
+                LOG.info("rUDP association replaced");
+            }
             write(sender, new RudpPacket(RudpPacket.Type.HELLO_ACK, packet.connectionId(), 0, 0, session.ackPayload));
         } catch (Exception e) {
             dropSession(session);
@@ -861,12 +875,45 @@ public final class RudpSessionManager {
         registry.touch(peer);
     }
 
-    private RudpSession findSessionByPub(byte[] pub) {        for (RudpSession session : sessionsByRemoteId.values()) {
+    private RudpSession findSessionByPub(byte[] pub) {
+        return newest(sessionsForPub(pub));
+    }
+
+    private List<RudpSession> sessionsForPub(byte[] pub) {
+        List<RudpSession> found = new ArrayList<>();
+        if (pub == null) {
+            return found;
+        }
+        for (RudpSession session : sessionsByRemoteId.values()) {
             if (Arrays.equals(pub, session.remotePub())) {
-                return session;
+                found.add(session);
             }
         }
-        return null;
+        return found;
+    }
+
+    private static RudpSession newest(List<RudpSession> sessions) {
+        RudpSession best = null;
+        for (RudpSession session : sessions) {
+            if (best == null || betterSession(session, best)) {
+                best = session;
+            }
+        }
+        return best;
+    }
+
+    /** Authenticated associations beat a newer unauthenticated dial. */
+    private static boolean betterSession(RudpSession candidate, RudpSession current) {
+        if (candidate.isAuthenticated() != current.isAuthenticated()) {
+            return candidate.isAuthenticated();
+        }
+        return candidate.lastActivityMs() >= current.lastActivityMs();
+    }
+
+    /** True once our HELLO has been retransmitted and the peer still has not finished it. */
+    private boolean handshakeStalled(RudpSession session) {
+        PendingPacket hello = session.pending().get(0);
+        return hello != null && hello.retries > 0;
     }
 
     private byte[] expectedPeer(InetSocketAddress address) {
