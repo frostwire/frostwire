@@ -345,12 +345,27 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
         if (peers.isEmpty()) {
             peers = peerDirectory.topByTrustVerified(maxPeers);
         }
+        // Pure forwarders do not advertise SEARCH, but can reach holders beyond
+        // the originator's directory. Keep an uplink in the first-hop budget even
+        // when plenty of searchable peers are already known.
+        List<PeerDirectory.PeerInfo> relays = preferred == NodeCapabilities.RELAY
+                ? List.of() : peerDirectory.topByTrustVerified(maxPeers * 3, NodeCapabilities.RELAY);
+        for (PeerDirectory.PeerInfo relay : relays) {
+            boolean present = peers.stream().anyMatch(p -> Arrays.equals(p.peerPub(), relay.peerPub()));
+            if (!present) {
+                peers.add(relay);
+            }
+        }
         peers = KeyspaceRouter.rankByKeyspace(keywords, peers);
         // Content-aware: peers whose announced index digest may hold the query come first,
         // the keyspace-ranked remainder follows for coverage.
         peers = peerDirectory.rankByHoldership(keywords, peers);
         if (peers.size() > maxPeers) {
-            peers = peers.subList(0, maxPeers);
+            peers = new ArrayList<>(peers.subList(0, maxPeers));
+            if (!relays.isEmpty() && peers.stream().noneMatch(
+                    p -> NodeCapabilities.has(p.capabilities(), NodeCapabilities.RELAY))) {
+                peers.set(maxPeers - 1, relays.get(0));
+            }
         }
         return peers;
     }

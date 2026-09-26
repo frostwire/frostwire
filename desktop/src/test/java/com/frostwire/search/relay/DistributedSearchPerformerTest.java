@@ -190,6 +190,47 @@ class DistributedSearchPerformerTest {
   }
 
   @Test
+  void searchesPureForwarderAlongsideSearchPeersEvenAtPeerCap() throws Exception {
+    PeerDirectory directory = emptyDirectory();
+    for (int i = 0; i < 3; i++) {
+      IdentityKeys searchable = IdentityKeys.generate(0);
+      directory.upsertVerified(
+          searchable.ed25519PubRaw(),
+          "127.0.0.1",
+          6800 + i,
+          6800 + i,
+          NodeCapabilities.DEFAULT_PEER);
+    }
+    IdentityKeys forwarder = IdentityKeys.generate(0);
+    directory.upsertVerified(
+        forwarder.ed25519PubRaw(), "127.0.0.1", 6889, 6889, NodeCapabilities.DEFAULT_FORWARDER);
+    FakeTransport transport = new FakeTransport();
+    transport.addResponse(forwarder.ed25519PubRaw(), forwarder, "shielded bitcoin", 200L, 1);
+    transport.deliverResponsesSynchronously();
+    RecordingListener listener = new RecordingListener();
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            24L,
+            "shielded bitcoin",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(0),
+            transport,
+            2,
+            10,
+            10,
+            1);
+    performer.setListener(listener);
+
+    performer.perform();
+
+    assertEquals(2, performer.getPeersContacted());
+    assertEquals(
+        1, listener.results.get(0).size(), "the relay must be queried within the fanout cap");
+    assertEquals("shielded bitcoin", listener.results.get(0).get(0).getDisplayName());
+  }
+
+  @Test
   void performAcceptsResponseDeliveredDuringSend() throws Exception {
     IdentityKeys peerKeys = IdentityKeys.generate();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
