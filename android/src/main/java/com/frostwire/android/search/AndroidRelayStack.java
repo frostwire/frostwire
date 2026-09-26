@@ -20,12 +20,10 @@ package com.frostwire.android.search;
 
 import android.content.Context;
 import android.os.SystemClock;
-import com.frostwire.search.relay.ConnectivityDetector;
-import com.frostwire.search.relay.LeafPromotionManager;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.util.SystemUtils;
@@ -34,6 +32,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.CatalogBrowser;
 import com.frostwire.search.relay.CompositePeerDiscoverySource;
+import com.frostwire.search.relay.ConnectivityDetector;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
@@ -49,6 +48,7 @@ import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainStore;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
+import com.frostwire.search.relay.LeafPromotionManager;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
@@ -97,8 +97,8 @@ import java.util.function.BooleanSupplier;
  * started before calling {@code start}.
  *
  * <p><b>Shutdown ordering:</b> revoke admission first, close endpoints and drain workers off main,
- * then close the borrowed karma store. A timed-out generation blocks replacement startup until
- * one shared cleanup worker observes its drain. The application-owned LocalIndex stays open.
+ * then close the borrowed karma store. A timed-out generation blocks replacement startup until one
+ * shared cleanup worker observes its drain. The application-owned LocalIndex stays open.
  */
 public final class AndroidRelayStack implements AutoCloseable {
 
@@ -109,18 +109,25 @@ public final class AndroidRelayStack implements AutoCloseable {
       RelayConstants.IDENTITY_REPUBLISH_INTERVAL_SEC;
 
   private static final Object START_LOCK = new Object();
+
   /** Serializes catalog browses: a {@link CatalogBrowser} is not thread-safe. */
   private static final Object CATALOG_BROWSE_LOCK = new Object();
+
   private static volatile AndroidRelayStack live;
   private static final long PUBLICATION_DRAIN_SECONDS = 2;
-  private static final ScheduledThreadPoolExecutor CLEANUP = new ScheduledThreadPoolExecutor(1, task -> {
-    Thread thread = new Thread(task, "AndroidRelayCleanup");
-    thread.setDaemon(true);
-    return thread;
-  });
+  private static final ScheduledThreadPoolExecutor CLEANUP =
+      new ScheduledThreadPoolExecutor(
+          1,
+          task -> {
+            Thread thread = new Thread(task, "AndroidRelayCleanup");
+            thread.setDaemon(true);
+            return thread;
+          });
+
   static {
     CLEANUP.setRemoveOnCancelPolicy(true);
   }
+
   // One outstanding generation, including partial startup, bounds retained stores and providers.
   private static PublicationOwners retiringPublications;
   private static ScheduledFuture<?> retirementTask;
@@ -156,8 +163,8 @@ public final class AndroidRelayStack implements AutoCloseable {
    * @param btEngine the running BTEngine (must already be started)
    * @return the started stack, or {@code null} on failure
    */
-  public static AndroidRelayStack start(Context context, File homeDir, BTEngine btEngine,
-                                       BooleanSupplier ownerActive) {
+  public static AndroidRelayStack start(
+      Context context, File homeDir, BTEngine btEngine, BooleanSupplier ownerActive) {
     synchronized (START_LOCK) {
       if (retiringPublications != null) return null;
       if (!ownerActive.getAsBoolean() || !isParticipationEnabled()) {
@@ -170,7 +177,8 @@ public final class AndroidRelayStack implements AutoCloseable {
         live.close();
         if (live != null || retiringPublications != null) return null;
       }
-      AndroidRelayStack started = startNew(context.getApplicationContext(), homeDir, btEngine, ownerActive);
+      AndroidRelayStack started =
+          startNew(context.getApplicationContext(), homeDir, btEngine, ownerActive);
       if (started != null) {
         live = started;
       }
@@ -188,22 +196,26 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   /**
-   * Explicit opt-in for advertising the shared-torrent catalog to crawlers. Defaults to false:
-   * the owner must enable it in the Distributed Search settings.
+   * Explicit opt-in for advertising the shared-torrent catalog to crawlers. Defaults to false: the
+   * owner must enable it in the Distributed Search settings.
    */
   public static boolean isPublicCatalogEnabled() {
     try {
-      return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG);
+      return ConfigurationManager.instance()
+          .getBoolean(Constants.PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG);
     } catch (Throwable unavailable) {
       return false;
     }
   }
 
-  /** Best-effort row cleanup; public authorization is already revoked by TransferManager removal. */
+  /**
+   * Best-effort row cleanup; public authorization is already revoked by TransferManager removal.
+   */
   public static void withdrawTorrent(String hash) {
     AndroidRelayStack stack = live;
     if (stack != null && hash != null) {
-      stack.indexer.withdraw(hash, () -> TransferManager.instance().getBittorrentDownload(hash) == null);
+      stack.indexer.withdraw(
+          hash, () -> TransferManager.instance().getBittorrentDownload(hash) == null);
     }
   }
 
@@ -211,13 +223,15 @@ public final class AndroidRelayStack implements AutoCloseable {
     ConfigurationManager cm = ConfigurationManager.instance();
     NetworkManager network = NetworkManager.instance();
     return (network.isDataWIFIUp()
-            || (!cm.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY) && network.isDataMobileUp()))
+            || (!cm.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY)
+                && network.isDataMobileUp()))
         && (!cm.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY)
-            || network.isTunnelUp() || network.isVpnConnected());
+            || network.isTunnelUp()
+            || network.isVpnConnected());
   }
 
-  private static AndroidRelayStack startNew(Context context, File homeDir, BTEngine btEngine,
-                                            BooleanSupplier ownerActive) {
+  private static AndroidRelayStack startNew(
+      Context context, File homeDir, BTEngine btEngine, BooleanSupplier ownerActive) {
     AndroidLocalIndex li = null;
     IceBridgeServer srv = null;
     IceBridgeClient cl = null;
@@ -238,7 +252,8 @@ public final class AndroidRelayStack implements AutoCloseable {
     DirectTcpPeerAuthenticator tcpAuthenticator = null;
     LeafPromotionManager promotion = null;
     AtomicBoolean active = new AtomicBoolean(true);
-    BooleanSupplier permitted = () -> active.get() && ownerActive.getAsBoolean() && isParticipationEnabled();
+    BooleanSupplier permitted =
+        () -> active.get() && ownerActive.getAsBoolean() && isParticipationEnabled();
     AndroidShareVisibility visibility = new AndroidShareVisibility(permitted);
     long startupNs = System.nanoTime();
     long phaseNs = startupNs;
@@ -277,12 +292,17 @@ public final class AndroidRelayStack implements AutoCloseable {
       com.frostwire.search.relay.BlockHeaderSource blockSource =
           new com.frostwire.search.relay.HttpBlockHeaderFetcher(bitcoinCacheDir);
       karmaWriter = new KarmaChainWriter(ident, blockSource, ks, permitted);
-      endorsementListener = new KarmaEndorsementTrigger(li, ident.ed25519PubRaw(), karmaWriter, permitted);
+      endorsementListener =
+          new KarmaEndorsementTrigger(li, ident.ed25519PubRaw(), karmaWriter, permitted);
       BTEngineListenerChain.install(btEngine, endorsementListener);
       KarmaChainPublisher karmaPublisher = new KarmaChainPublisher(karmaWriter, ident);
       kcs =
           new KarmaChainCommitScheduler(
-              karmaWriter, karmaPublisher, RelayConstants.KARMA_COMMIT_INTERVAL_SEC, () -> btEngine, permitted);
+              karmaWriter,
+              karmaPublisher,
+              RelayConstants.KARMA_COMMIT_INTERVAL_SEC,
+              () -> btEngine,
+              permitted);
       requirePermitted(permitted);
       kcs.start();
       LOG.info("AndroidRelayStack: Karma chain wired");
@@ -400,7 +420,8 @@ public final class AndroidRelayStack implements AutoCloseable {
                   meshRudpPort,
                   roleLabel);
           IncomingRelayServer relaySrv2 =
-              new IncomingRelayServer(relayRole, identityRecord, ident.ed25519().getPrivate(), relayPort);
+              new IncomingRelayServer(
+                  relayRole, identityRecord, ident.ed25519().getPrivate(), relayPort);
           relaySrv = relaySrv2;
           requirePermitted(permitted);
           relaySrv2.start();
@@ -434,8 +455,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       ih.setTorrentMetadataProvider(
           new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider(visibility));
       ih.start();
-      LOG.info("AndroidRelayStack: transport and inbound handler ready in "
-          + elapsedMs(phaseNs) + "ms");
+      LOG.info(
+          "AndroidRelayStack: transport and inbound handler ready in " + elapsedMs(phaseNs) + "ms");
       phaseNs = System.nanoTime();
 
       // USE_REMOTE clients register as local rUDP endpoint of the forwarder so
@@ -450,6 +471,10 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
       IceBridgeConfig.Role syncRole = readConfiguredRole();
       prs = new PeerRegistrySync(cl, pd, localHost, meshRudpPort, ident, syncRole, li);
+      if (indexer != null) {
+        indexer.setIndexChangedListener(prs::announceIndexDigestSoon);
+      }
+      prs.announceIndexDigestSoon();
       requirePermitted(permitted);
       prs.start();
       LOG.info(
@@ -470,30 +495,32 @@ public final class AndroidRelayStack implements AutoCloseable {
       // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
       tcpAuthenticator = new DirectTcpPeerAuthenticator(ident.ed25519());
       final DirectTcpPeerAuthenticator ownedAuthenticator = tcpAuthenticator;
-      com.frostwire.search.relay.PeerAuthenticator authenticator = (host, port) -> {
-        java.util.Optional<com.frostwire.search.relay.IdentityRecord> rec =
-            ownedAuthenticator.authenticate(host, port);
-        if (rec.isEmpty()) {
-          try {
-            IceBridgeHostCache.getInstance().markFailure(host, port);
-          } catch (Throwable ignored) {
-            // cache is best-effort
-          }
-        }
-        return rec;
-      };
-      PeerDiscovery discovery =
-          new PeerDiscovery(discoverySource, pd, authenticator, ownPub);
+      com.frostwire.search.relay.PeerAuthenticator authenticator =
+          (host, port) -> {
+            java.util.Optional<com.frostwire.search.relay.IdentityRecord> rec =
+                ownedAuthenticator.authenticate(host, port);
+            if (rec.isEmpty()) {
+              try {
+                IceBridgeHostCache.getInstance().markFailure(host, port);
+              } catch (Throwable ignored) {
+                // cache is best-effort
+              }
+            }
+            return rec;
+          };
+      PeerDiscovery discovery = new PeerDiscovery(discoverySource, pd, authenticator, ownPub);
       // Skip our own carrier-NAT hairpin: candidates at BTEngine's latest
       // external IP on our own relay port are us (or unreachable mates).
       final com.frostwire.bittorrent.BTEngine engineForIp = btEngine;
-      discovery.setSelfEndpoint(() -> {
-        try {
-          return engineForIp != null ? engineForIp.getExternalIp() : null;
-        } catch (Throwable ignored) {
-          return null;
-        }
-      }, readConfiguredRelayPort());
+      discovery.setSelfEndpoint(
+          () -> {
+            try {
+              return engineForIp != null ? engineForIp.getExternalIp() : null;
+            } catch (Throwable ignored) {
+              return null;
+            }
+          },
+          readConfiguredRelayPort());
       pds = new PeerDiscoveryScheduler(discovery, PEER_DISCOVERY_INTERVAL_SEC);
       requirePermitted(permitted);
       pds.start();
@@ -507,16 +534,26 @@ public final class AndroidRelayStack implements AutoCloseable {
       IdentityRecordPublisher identityPublisher =
           new IdentityRecordPublisher(
               ident, advertiseRelayPort, meshRudpPort, syncRole.name(), extraCaps);
-      IndexAnnouncementPublisher indexPublisher = new IndexAnnouncementPublisher(li, ident, visibility);
+      IndexAnnouncementPublisher indexPublisher =
+          new IndexAnnouncementPublisher(li, ident, visibility);
       // Phones join as CLIENT leaves: announce the peer topic so holders can be
       // found, but never the bootstrap topic (that flag is for dedicated relays).
-      da = new DhtAdvertiser(identityPublisher, indexPublisher, DHT_ADVERTISE_INTERVAL_SEC,
-          () -> btEngine, true, false, permitted);
+      da =
+          new DhtAdvertiser(
+              identityPublisher,
+              indexPublisher,
+              DHT_ADVERTISE_INTERVAL_SEC,
+              () -> btEngine,
+              true,
+              false,
+              permitted);
       requirePermitted(permitted);
       da.start();
       LOG.info("AndroidRelayStack: DhtAdvertiser started");
-      LOG.info("AndroidRelayStack: discovery and publication workers scheduled in "
-          + elapsedMs(phaseNs) + "ms");
+      LOG.info(
+          "AndroidRelayStack: discovery and publication workers scheduled in "
+              + elapsedMs(phaseNs)
+              + "ms");
 
       // All three schedulers begin immediately on their own workers. Discovery
       // still authenticates peers, and the sync still signs registration, but
@@ -545,8 +582,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       AndroidRelayStack stack = null;
       // Healthy CLIENT leaves promote to capped forwarders (Gnutella ultrapeer
       // promotion); USE_REMOTE stacks have no local sessions and stay leaves.
-      if (syncRole == IceBridgeConfig.Role.CLIENT
-          && LeafPromotionManager.promotionEnabledByEnv()) {
+      if (syncRole == IceBridgeConfig.Role.CLIENT && LeafPromotionManager.promotionEnabledByEnv()) {
         final IceBridgeServer promotionServer = srv;
         final RelayRole promotionRelay = relayRole;
         final IncomingSearchRequestHandler promotionHandler = ih;
@@ -567,8 +603,29 @@ public final class AndroidRelayStack implements AutoCloseable {
 
       stack =
           new AndroidRelayStack(
-              li, ident, srv, cl, tr, ss, ih, pd, prs, pds, da, ks, kcs, relaySrv,
-              promotion, btEngine, indexer, endorsementListener, karmaWriter, tcpAuthenticator, karmaCache, active, permitted);
+              li,
+              ident,
+              srv,
+              cl,
+              tr,
+              ss,
+              ih,
+              pd,
+              prs,
+              pds,
+              da,
+              ks,
+              kcs,
+              relaySrv,
+              promotion,
+              btEngine,
+              indexer,
+              endorsementListener,
+              karmaWriter,
+              tcpAuthenticator,
+              karmaCache,
+              active,
+              permitted);
       li = null;
       srv = null;
       cl = null;
@@ -587,7 +644,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       return stack;
     } catch (Throwable t) {
       active.set(false);
-      PublicationOwners failed = new PublicationOwners(da, kcs, endorsementListener, karmaWriter, ks);
+      PublicationOwners failed =
+          new PublicationOwners(da, kcs, endorsementListener, karmaWriter, ks);
       failed.stop();
       LOG.warn("Failed to start AndroidRelayStack", t);
       if (SearchEngine.DISTRIBUTED_WIRING.searchTransport() == tr) {
@@ -679,7 +737,9 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.peerDirectory = peerDirectory;
     this.peerRegistrySync = peerRegistrySync;
     this.peerDiscoveryScheduler = peerDiscoveryScheduler;
-    this.publications = new PublicationOwners(dhtAdvertiser, karmaScheduler, endorsementListener, karmaWriter, karmaStore);
+    this.publications =
+        new PublicationOwners(
+            dhtAdvertiser, karmaScheduler, endorsementListener, karmaWriter, karmaStore);
     this.relayServer = relayServer;
     this.leafPromotion = leafPromotion;
     this.btEngine = btEngine;
@@ -726,12 +786,11 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   /**
-   * Fetches {@code peerPub}'s public shared-torrent catalog over the IceBridge
-   * mesh on {@code MeshProtocolId.CATALOG}: the same signed request the desktop relay control API
-   * exposes as {@code GET /catalog}. A {@link CatalogBrowser} is not
-   * thread-safe, so calls are serialized here; this method blocks and must be
-   * invoked off the UI thread. Returns an empty list when the stack is not up,
-   * the peer has not opted in to PUBLIC_CATALOG, or the peer does not answer
+   * Fetches {@code peerPub}'s public shared-torrent catalog over the IceBridge mesh on {@code
+   * MeshProtocolId.CATALOG}: the same signed request the desktop relay control API exposes as
+   * {@code GET /catalog}. A {@link CatalogBrowser} is not thread-safe, so calls are serialized
+   * here; this method blocks and must be invoked off the UI thread. Returns an empty list when the
+   * stack is not up, the peer has not opted in to PUBLIC_CATALOG, or the peer does not answer
    * within {@code timeoutMs}.
    */
   public java.util.List<com.frostwire.search.relay.RemoteIndexFetcher.RemoteTorrentEntry>
@@ -814,8 +873,8 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   /**
-   * Schedule indexing for every transfer currently known to
-   * {@link TransferManager}. Safe to call multiple times.
+   * Schedule indexing for every transfer currently known to {@link TransferManager}. Safe to call
+   * multiple times.
    */
   private static void reindexExistingTransfers(AndroidSharedTorrentIndexer indexer, String phase) {
     if (indexer == null) {
@@ -936,7 +995,8 @@ public final class AndroidRelayStack implements AutoCloseable {
     owners.stop();
     synchronized (START_LOCK) {
       if (retiringPublications == owners) return;
-      if (retiringPublications != null) throw new IllegalStateException("Previous publication owner still retiring");
+      if (retiringPublications != null)
+        throw new IllegalStateException("Previous publication owner still retiring");
       retiringPublications = owners;
     }
     if (owners.closeWhenDrained(PUBLICATION_DRAIN_SECONDS, TimeUnit.SECONDS)) {
@@ -945,10 +1005,12 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
       return;
     }
-    LOG.warn("AndroidRelayStack: deferring store close and replacement startup until publication workers drain");
+    LOG.warn(
+        "AndroidRelayStack: deferring store close and replacement startup until publication workers drain");
     synchronized (START_LOCK) {
-      retirementTask = CLEANUP.scheduleWithFixedDelay(AndroidRelayStack::retryRetirement,
-          1, 1, TimeUnit.SECONDS);
+      retirementTask =
+          CLEANUP.scheduleWithFixedDelay(
+              AndroidRelayStack::retryRetirement, 1, 1, TimeUnit.SECONDS);
     }
   }
 
@@ -977,8 +1039,12 @@ public final class AndroidRelayStack implements AutoCloseable {
     private final KarmaChainStore store;
     private boolean storeClosed;
 
-    PublicationOwners(DhtAdvertiser advertiser, KarmaChainCommitScheduler scheduler,
-                      KarmaEndorsementTrigger trigger, KarmaChainWriter writer, KarmaChainStore store) {
+    PublicationOwners(
+        DhtAdvertiser advertiser,
+        KarmaChainCommitScheduler scheduler,
+        KarmaEndorsementTrigger trigger,
+        KarmaChainWriter writer,
+        KarmaChainStore store) {
       this.advertiser = advertiser;
       this.scheduler = scheduler;
       this.trigger = trigger;
@@ -997,14 +1063,18 @@ public final class AndroidRelayStack implements AutoCloseable {
       if (storeClosed) return true;
       long deadline = System.nanoTime() + unit.toNanos(timeout);
       try {
-        if (trigger != null && !trigger.awaitStopped(
-            Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
-        if (scheduler != null && !scheduler.awaitStopped(
-            Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
-        if (writer != null && !writer.awaitStopped(
-            Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
-        if (advertiser != null && !advertiser.awaitStopped(
-            Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
+        if (trigger != null
+            && !trigger.awaitStopped(
+                Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
+        if (scheduler != null
+            && !scheduler.awaitStopped(
+                Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
+        if (writer != null
+            && !writer.awaitStopped(
+                Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
+        if (advertiser != null
+            && !advertiser.awaitStopped(
+                Math.max(0, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)) return false;
         if (store != null) store.close();
         storeClosed = true;
         return true;
