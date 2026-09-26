@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Synchronizes {@link PeerDirectory} with the IceBridge mesh registry.
@@ -86,6 +87,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private volatile long lastDigestSendMs;
     private volatile long lastNodeMetaSendMs;
     private volatile long lastClusterSendMs;
+    private final AtomicBoolean digestAnnouncementPending = new AtomicBoolean();
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
@@ -170,6 +172,24 @@ public final class PeerRegistrySync implements AutoCloseable {
         }
     }
 
+    /** Schedule a debounced digest rebuild after the local shared index changes. */
+    public void announceIndexDigestSoon() {
+        if (!digestAnnouncementPending.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            scheduler.schedule(() -> {
+                try {
+                    publishIndexDigest(true);
+                } finally {
+                    digestAnnouncementPending.set(false);
+                }
+            }, 1, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.RejectedExecutionException closed) {
+            digestAnnouncementPending.set(false);
+        }
+    }
+
     private void registerSelf() {
         if (identity == null) {
             return;
@@ -238,6 +258,10 @@ public final class PeerRegistrySync implements AutoCloseable {
      * changed or after {@link #DIGEST_REFRESH_INTERVAL_MS} (so a restarted relay relearns it).
      */
     private void publishIndexDigest() {
+        publishIndexDigest(false);
+    }
+
+    private void publishIndexDigest(boolean forceRebuild) {
         LocalIndex localIndex = this.index;
         if (localIndex == null) {
             return;
@@ -245,7 +269,7 @@ public final class PeerRegistrySync implements AutoCloseable {
         try {
             long now = System.currentTimeMillis();
             byte[] digest = lastDigest;
-            if (digest == null || now - lastDigestBuildMs > DIGEST_REBUILD_INTERVAL_MS) {
+            if (forceRebuild || digest == null || now - lastDigestBuildMs > DIGEST_REBUILD_INTERVAL_MS) {
                 digest = buildIndexDigest(localIndex);
                 lastDigestBuildMs = now;
             }

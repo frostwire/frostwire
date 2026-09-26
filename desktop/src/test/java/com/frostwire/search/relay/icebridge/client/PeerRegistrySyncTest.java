@@ -10,6 +10,8 @@ package com.frostwire.search.relay.icebridge.client;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.search.relay.IdentityKeys;
+import com.frostwire.search.relay.LocalIndex;
+import com.frostwire.search.relay.LocalSharedTorrent;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerKarmaCache;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
@@ -23,6 +25,9 @@ import com.frostwire.search.relay.icebridge.udp.RudpSessionManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -136,6 +141,72 @@ class PeerRegistrySyncTest {
     sync = new PeerRegistrySync(client, directory, "127.0.0.1");
     sync.sync();
     assertEquals(0, registry.size());
+  }
+
+  @Test
+  void localIndexChangeSchedulesImmediateDigestRebuild() throws Exception {
+    LocalSharedTorrent torrent =
+        new LocalSharedTorrent.Builder()
+            .infoHash(new byte[20])
+            .name("BACK 2 LIFE (audio).webm")
+            .sizeBytes(1024)
+            .fileCount(1)
+            .filesJson("[]")
+            .publisherNodeId(new byte[20])
+            .publisherEd25519Pub(new byte[32])
+            .publisherUtpPort(0)
+            .addedAt(System.currentTimeMillis() / 1000L)
+            .lastSeenAt(System.currentTimeMillis() / 1000L)
+            .build();
+    AtomicInteger listCalls = new AtomicInteger();
+    LocalIndex index =
+        new LocalIndex() {
+          public void upsert(LocalSharedTorrent row) {}
+
+          public void delete(String hash) {}
+
+          public Optional<LocalSharedTorrent> get(String hash) {
+            return Optional.empty();
+          }
+
+          public List<LocalSharedTorrent> search(String query, int limit) {
+            return List.of();
+          }
+
+          public void markPublished(String hash, long timestamp) {}
+
+          public List<String> needsRepublish(long now, long threshold) {
+            return List.of();
+          }
+
+          public void updateLastSeen(String hash, long timestamp) {}
+
+          public int size() {
+            return 1;
+          }
+
+          public List<LocalSharedTorrent> listAll() {
+            listCalls.incrementAndGet();
+            return List.of(torrent);
+          }
+        };
+    sync =
+        new PeerRegistrySync(
+            client, directory, "127.0.0.1", 6889, null, IceBridgeConfig.Role.BOTH, index);
+
+    sync.sync();
+    assertEquals(1, listCalls.get());
+
+    sync.announceIndexDigestSoon();
+
+    assertTimeoutPreemptively(
+        Duration.ofSeconds(3),
+        () -> {
+          while (listCalls.get() < 2) {
+            Thread.sleep(10);
+          }
+        });
+    assertEquals(2, listCalls.get());
   }
 
   @Test
