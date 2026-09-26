@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.CompositeFileSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.LibTorrentMagnetDownloader;
+import com.frostwire.search.relay.DistributedSearchPerformer;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -187,26 +188,36 @@ public final class FileSearchResultUIWrapper extends AbstractUISearchResult {
       JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp) {
     PopupUtils.addMenuItem(
         SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 2);
-    PopupUtils.addMenuItem(
-        SearchMediator.TELLURIDE_DETAILS_STRING + " " + searchResult.getSource(),
-        e -> showSearchResultWebPage(true),
-        popupMenu,
-        lines.length == 1,
-        3);
-    // Distributed results whose holder opted in to PUBLIC_CATALOG carry the
-    // x.hc flag; offer browsing that holder's shared torrents over the mesh.
-    if (lines.length == 1) {
+    boolean distributed = DistributedSearchPerformer.SOURCE_NAME.equals(searchResult.getSource());
+    if (distributed) {
+      PopupUtils.addMenuItem(
+          I18n.tr("Distributed Result Details"),
+          e ->
+              DistributedSearchResultDetailsWindow.show(
+                  searchResult, getQuery(), () -> download(true)),
+          popupMenu,
+          lines.length == 1,
+          3);
+    } else {
+      PopupUtils.addMenuItem(
+          SearchMediator.TELLURIDE_DETAILS_STRING + " " + searchResult.getSource(),
+          e -> showSearchResultWebPage(true),
+          popupMenu,
+          lines.length == 1,
+          3);
+    }
+    // The holder ID is sufficient to attempt a browse: PeerCatalogWindow tries
+    // the opted-in mesh catalog first, then the holder's public DHT index.
+    if (distributed && lines.length == 1) {
       String magnet = searchResult.getDetailsUrl();
-      if (LibTorrentMagnetDownloader.hasPublicCatalogFlag(magnet)) {
-        byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(magnet);
-        if (holderPub != null) {
-          PopupUtils.addMenuItem(
-              I18n.tr("Browse Shared Torrents"),
-              e -> PeerCatalogWindow.showForPeer(holderPub),
-              popupMenu,
-              true,
-              4);
-        }
+      byte[] holderPub = LibTorrentMagnetDownloader.parseHolderPub(magnet);
+      if (holderPub != null) {
+        PopupUtils.addMenuItem(
+            I18n.tr("Browse Shared Torrents"),
+            e -> PeerCatalogWindow.showForPeer(holderPub),
+            popupMenu,
+            true,
+            4);
       }
     }
     return popupMenu;
