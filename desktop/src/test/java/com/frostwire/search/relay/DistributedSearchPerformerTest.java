@@ -184,6 +184,9 @@ class DistributedSearchPerformerTest {
     assertEquals(2, out.size(), "local + peer results merged");
     assertEquals("local ubuntu", out.get(0).getDisplayName());
     assertEquals("peer ubuntu", out.get(1).getDisplayName());
+    assertArrayEquals(
+        peerKeys.ed25519PubRaw(),
+        ((CompositeFileSearchResult) out.get(1)).getDistributedSourcePeerPub().orElseThrow());
     assertEquals(
         DistributedSearchPerformer.SOURCE_NAME,
         ((CompositeFileSearchResult) out.get(1)).getSource());

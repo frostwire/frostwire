@@ -49,10 +49,12 @@ public class CompositeFileSearchResult implements FileSearchResult {
     // allocating 5 Optional wrappers per build() call (PERF10/PERF12).
     private final Integer viewCount;
     private final TorrentMetadata torrent;
+    private final byte[] distributedSourcePeerPub;
     private final String httpDownloadUrl;
     private final StreamingCapability streaming;
     private final CrawlableCapability crawlable;
 
+    /** Backward-compatible constructor for callers without distributed source attribution. */
     public CompositeFileSearchResult(
             String displayName,
             String filename,
@@ -68,6 +70,26 @@ public class CompositeFileSearchResult implements FileSearchResult {
             Optional<String> httpDownloadUrl,
             Optional<StreamingCapability> streaming,
             Optional<CrawlableCapability> crawlable) {
+        this(displayName, filename, size, detailsUrl, source, creationTime, license, thumbnailUrl,
+                preliminary, viewCount, torrent, httpDownloadUrl, streaming, crawlable, Optional.empty());
+    }
+
+    public CompositeFileSearchResult(
+            String displayName,
+            String filename,
+            long size,
+            String detailsUrl,
+            String source,
+            long creationTime,
+            License license,
+            String thumbnailUrl,
+            boolean preliminary,
+            Optional<Integer> viewCount,
+            Optional<TorrentMetadata> torrent,
+            Optional<String> httpDownloadUrl,
+            Optional<StreamingCapability> streaming,
+            Optional<CrawlableCapability> crawlable,
+            Optional<byte[]> distributedSourcePeerPub) {
         this.displayName = displayName;
         this.filename = filename;
         this.size = size;
@@ -79,6 +101,13 @@ public class CompositeFileSearchResult implements FileSearchResult {
         this.preliminary = preliminary;
         this.viewCount = viewCount != null ? viewCount.orElse(null) : null;
         this.torrent = torrent != null ? torrent.orElse(null) : null;
+        byte[] sourcePeerPub =
+                distributedSourcePeerPub != null ? distributedSourcePeerPub.orElse(null) : null;
+        if (sourcePeerPub != null && sourcePeerPub.length != 32) {
+            throw new IllegalArgumentException("distributedSourcePeerPub must be 32 bytes");
+        }
+        this.distributedSourcePeerPub =
+                sourcePeerPub == null ? null : sourcePeerPub.clone();
         this.httpDownloadUrl = httpDownloadUrl != null ? httpDownloadUrl.orElse(null) : null;
         this.streaming = streaming != null ? streaming.orElse(null) : null;
         this.crawlable = crawlable != null ? crawlable.orElse(null) : null;
@@ -193,6 +222,13 @@ public class CompositeFileSearchResult implements FileSearchResult {
         return viewCount != null ? Optional.of(viewCount) : Optional.empty();
     }
 
+    /** Verified identity that supplied this row in distributed search, when applicable. */
+    public Optional<byte[]> getDistributedSourcePeerPub() {
+        return distributedSourcePeerPub == null
+                ? Optional.empty()
+                : Optional.of(distributedSourcePeerPub.clone());
+    }
+
     // Builder pattern for easier construction
     public static Builder builder() {
         return new Builder();
@@ -211,6 +247,7 @@ public class CompositeFileSearchResult implements FileSearchResult {
         private Integer viewCount;  // Optional view count
         private TorrentMetadata torrent;
         private String httpDownloadUrl;
+        private byte[] distributedSourcePeerPub;
         private StreamingCapability streaming;
         private CrawlableCapability crawlable;
 
@@ -269,6 +306,11 @@ public class CompositeFileSearchResult implements FileSearchResult {
             return this;
         }
 
+        public Builder distributedSourcePeerPub(byte[] peerPub) {
+            this.distributedSourcePeerPub = peerPub == null ? null : peerPub.clone();
+            return this;
+        }
+
         public Builder download(String url) {
             this.httpDownloadUrl = url;
             return this;
@@ -314,7 +356,10 @@ public class CompositeFileSearchResult implements FileSearchResult {
                     torrent != null ? Optional.of(torrent) : Optional.empty(),
                     httpDownloadUrl != null ? Optional.of(httpDownloadUrl) : Optional.empty(),
                     streaming != null ? Optional.of(streaming) : Optional.empty(),
-                    crawlable != null ? Optional.of(crawlable) : Optional.empty()
+                    crawlable != null ? Optional.of(crawlable) : Optional.empty(),
+                    distributedSourcePeerPub != null
+                            ? Optional.of(distributedSourcePeerPub)
+                            : Optional.empty()
             );
         }
     }

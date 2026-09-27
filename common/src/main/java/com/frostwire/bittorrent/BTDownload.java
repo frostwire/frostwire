@@ -114,6 +114,53 @@ public final class BTDownload implements BittorrentDownload {
         return extra;
     }
 
+    /** The signed-search source carried forward from the distributed result, if any. */
+    public byte[] getDistributedSourcePeerPub() {
+        return DistributedSourceAttribution.get(extra);
+    }
+
+    /**
+     * Attach distributed-search provenance to this transfer and persist it in resume data. The
+     * first source wins so reopening the same transfer from another result cannot rewrite history.
+     */
+    public synchronized boolean setDistributedSourcePeerPub(byte[] sourcePeerPub) {
+        if (DistributedSourceAttribution.get(extra) != null) {
+            return false;
+        }
+        if (!DistributedSourceAttribution.putIfAbsent(extra, sourcePeerPub)) {
+            return false;
+        }
+        doResumeData(true);
+        return true;
+    }
+
+    /** Merge provenance from a newer alert wrapper into the long-lived transfer wrapper. */
+    public void copyDistributedSourcePeerFrom(BTDownload other) {
+        byte[] source = other == null ? null : other.getDistributedSourcePeerPub();
+        if (source != null) {
+            // The newer alert wrapper already persisted the attribute to the shared resume file.
+            // Copy only the in-memory view here; this can run on Swing's EDT.
+            DistributedSourceAttribution.putIfAbsent(extra, source);
+        }
+    }
+
+    /** Returns the v1 info hash used by signed karma endorsements; v2-only torrents are unsupported. */
+    public String getV1InfoHash() {
+        try {
+            if (th == null || !th.isValid()) {
+                return null;
+            }
+            TorrentInfo info = th.torrentFile();
+            if (info == null || !info.isValid()) {
+                return null;
+            }
+            Sha1Hash hash = info.infoHashV1();
+            return hash == null ? null : hash.toHex();
+        } catch (Throwable unavailable) {
+            return null;
+        }
+    }
+
     @Override
     public String getName() {
         if (th == null) {
@@ -841,7 +888,11 @@ public final class BTDownload implements BittorrentDownload {
                 String infoHash = engine.canonicalInfoHash(th);
                 File file = engine.resumeDataFile(infoHash);
                 entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
-                e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
+                Map<String, String> extraSnapshot;
+                synchronized (extra) {
+                    extraSnapshot = new HashMap<>(extra);
+                }
+                e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extraSnapshot).swig());
                 FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
                 LOG.info("BTDownload::serializeResumeData saved resume for " + infoHash);
                 engine.ensureResumeTorrentFile(th);

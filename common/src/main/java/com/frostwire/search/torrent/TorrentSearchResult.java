@@ -55,4 +55,9 @@ public interface TorrentSearchResult extends FileSearchResult {
      * @return
      */
     String getHash();
+
+    /** Verified IceBridge peer that supplied this result, or null for other sources. */
+    default byte[] getDistributedSourcePeerPub() {
+        return null;
+    }
 }

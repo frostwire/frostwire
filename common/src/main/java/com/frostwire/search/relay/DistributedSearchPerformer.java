@@ -744,6 +744,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                 .creationTime(System.currentTimeMillis())
                 .preliminary(false)
                 .torrent(magnet, infoHashHex, 0, magnet)
+                .distributedSourcePeerPub(row.publisherEd25519Pub)
                 .build();
     }
 

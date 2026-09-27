@@ -75,6 +75,9 @@ public final class BTEngine extends SessionManager {
 
     // Store priorities for V2-only torrents that are added as paused and need priority application when ADD_TORRENT alert fires
     private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
+    private static final long PENDING_SOURCE_TTL_MS = 2 * 60_000L;
+    private static final int MAX_PENDING_SOURCE_PEERS = 256;
+    private final LinkedHashMap<String, PendingSourcePeer> pendingSourcePeers = new LinkedHashMap<>();
 
     private BTEngine() {
         super(false);
@@ -418,6 +421,17 @@ public final class BTEngine extends SessionManager {
     }
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean saveTorrentFile) {
+        download(ti, saveDir, selection, peers, saveTorrentFile, null);
+    }
+
+    /** Add a search-result torrent while retaining its verified distributed-source attribution. */
+    public void download(
+            TorrentInfo ti,
+            File saveDir,
+            boolean[] selection,
+            List<TcpEndpoint> peers,
+            boolean saveTorrentFile,
+            byte[] distributedSourcePeerPub) {
         if (swig() == null) {
             return;
         }
@@ -467,6 +481,11 @@ public final class BTEngine extends SessionManager {
         for (int i = 0; i < selection.length && i < priorities.length; i++) {
             priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
         }
+        // An existing transfer predates this search result, so do not reattribute it to a new
+        // search source. New and replaced handles consume the source on their add/update alert.
+        if (!torrentHandleExists) {
+            rememberSourcePeer(canonicalInfoHash(ti), distributedSourcePeerPub);
+        }
         download(ti, saveDir, priorities, null, peers);
 
         saveResumeTorrent(ti);
@@ -477,6 +496,12 @@ public final class BTEngine extends SessionManager {
 
     @Override
     public void download(String magnetUri, File saveDir, torrent_flags_t flags) {
+        download(magnetUri, saveDir, flags, null);
+    }
+
+    /** Add a search-result magnet while retaining its verified source attribution. */
+    public void download(
+            String magnetUri, File saveDir, torrent_flags_t flags, byte[] distributedSourcePeerPub) {
         if (swig() == null) {
             return;
         }
@@ -487,6 +512,7 @@ public final class BTEngine extends SessionManager {
 
         AddTorrentParams params = AddTorrentParams.parseMagnetUri(magnetUri);
         InfoHash infoHash = params.getInfoHashes();
+        rememberSourcePeer(infoHash, distributedSourcePeerPub);
         LOG.info("BTEngine.download(magnet): explicit peer count=" + params.peers().size());
         TorrentHandle handle = infoHash.hasV1() ? find(infoHash.getV1()) : find(infoHash.getV2());
         if (handle != null && handle.isValid()) {
@@ -497,6 +523,7 @@ public final class BTEngine extends SessionManager {
             fireDownloadUpdate(handle);
             return;
         }
+        rememberSourcePeer(infoHash, distributedSourcePeerPub);
         super.download(magnetUri, saveDir, flags);
     }
 
@@ -666,6 +693,102 @@ public final class BTEngine extends SessionManager {
             return th.infoHash().toString().toLowerCase();
         } catch (Throwable ignored) {
             return null;
+        }
+    }
+
+    private String canonicalInfoHash(InfoHash hashes) {
+        if (hashes == null) {
+            return null;
+        }
+        try {
+            if (hashes.hasV1()) {
+                return hashes.getV1().toString().toLowerCase(Locale.ROOT);
+            }
+            Sha256Hash v2 = hashes.getV2();
+            return v2 == null || v2.isAllZeros()
+                    ? null
+                    : v2.toString().toLowerCase(Locale.ROOT);
+        } catch (Throwable unavailable) {
+            return null;
+        }
+    }
+
+    private void rememberSourcePeer(String infoHash, byte[] sourcePeerPub) {
+        if (infoHash == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
+            return;
+        }
+        rememberSourcePeer(infoHash, new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis()));
+    }
+
+    private void rememberSourcePeer(InfoHash infoHashes, byte[] sourcePeerPub) {
+        if (infoHashes == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
+            return;
+        }
+        PendingSourcePeer pending = new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis());
+        if (infoHashes.hasV1()) {
+            rememberSourcePeer(infoHashes.getV1().toString().toLowerCase(Locale.ROOT), pending);
+        }
+        try {
+            Sha256Hash v2 = infoHashes.getV2();
+            if (v2 != null && !v2.isAllZeros()) {
+                rememberSourcePeer(v2.toString().toLowerCase(Locale.ROOT), pending);
+            }
+        } catch (Throwable ignored) {
+            // A v1-only magnet has no v2 alias.
+        }
+    }
+
+    private void rememberSourcePeer(String infoHash, PendingSourcePeer pending) {
+        if (infoHash == null || pending == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        synchronized (pendingSourcePeers) {
+            pendingSourcePeers.entrySet().removeIf(
+                    entry -> now - entry.getValue().createdAtMs > PENDING_SOURCE_TTL_MS);
+            if (!pendingSourcePeers.containsKey(infoHash)
+                    && pendingSourcePeers.size() >= MAX_PENDING_SOURCE_PEERS) {
+                pendingSourcePeers.remove(pendingSourcePeers.keySet().iterator().next());
+            }
+            pendingSourcePeers.putIfAbsent(infoHash, pending);
+        }
+    }
+
+    private void applyPendingSourcePeer(TorrentHandle handle, BTDownload download) {
+        String infoHash = canonicalInfoHash(handle);
+        if (infoHash == null || download == null) {
+            return;
+        }
+        PendingSourcePeer source;
+        synchronized (pendingSourcePeers) {
+            source = pendingSourcePeers.remove(infoHash);
+            if (source == null) {
+                try {
+                    source = pendingSourcePeers.remove(handle.infoHash().toString().toLowerCase(Locale.ROOT));
+                } catch (Throwable ignored) {
+                    // The canonical hash above is the normal path.
+                }
+            }
+            if (source != null) {
+                PendingSourcePeer consumed = source;
+                pendingSourcePeers.entrySet().removeIf(entry -> entry.getValue() == consumed);
+                if (System.currentTimeMillis() - source.createdAtMs > PENDING_SOURCE_TTL_MS) {
+                    source = null;
+                }
+            }
+        }
+        if (source != null) {
+            download.setDistributedSourcePeerPub(source.peerPub);
+        }
+    }
+
+    private static final class PendingSourcePeer {
+        final byte[] peerPub;
+        final long createdAtMs;
+
+        PendingSourcePeer(byte[] peerPub, long createdAtMs) {
+            this.peerPub = peerPub.clone();
+            this.createdAtMs = createdAtMs;
         }
     }
 
@@ -851,6 +974,7 @@ public final class BTEngine extends SessionManager {
                 }
 
                 BTDownload dl = new BTDownload(this, th);
+                applyPendingSourcePeer(th, dl);
                 BTEngineListener snapshot = listener;
                 if (snapshot != null) {
                     snapshot.downloadAdded(this, dl);
@@ -866,6 +990,7 @@ public final class BTEngine extends SessionManager {
     private void fireDownloadUpdate(TorrentHandle th) {
         try {
             BTDownload dl = new BTDownload(this, th);
+            applyPendingSourcePeer(th, dl);
             BTEngineListener snapshot = listener;
             if (snapshot != null) {
                 snapshot.downloadUpdate(this, dl);
