@@ -87,10 +87,31 @@ class KarmaChainWriterTest {
         KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
 
         writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
-        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, anotherInfoHash());
 
         assertEquals(3, writer.chain().entries().size(),
                 "1 commitment + 2 endorsements");
+    }
+
+    @Test
+    void explicitSourceEndorsementIsIdempotentForPeerAndTorrent() {
+        FakeBlockSource source = new FakeBlockSource()
+                .withTip(200L)
+                .withBlock(200L, hashForHeight(200L));
+        KarmaChainWriter writer = new KarmaChainWriter(identity, source, table);
+        writer.commitEpochIfNeeded();
+
+        assertTrue(writer.canEndorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertTrue(writer.endorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertFalse(writer.canEndorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertFalse(writer.endorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertEquals(2, writer.chain().entries().size(), "commitment + one endorsement");
+        assertEquals(1L, table.getPeerKarma(FAKE_PEER_PUB));
+
+        KarmaChainWriter restoredWriter = new KarmaChainWriter(identity, source, table);
+        assertFalse(restoredWriter.canEndorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertFalse(restoredWriter.endorseSourcePeer(FAKE_PEER_PUB, FAKE_INFO_HASH));
+        assertEquals(1L, table.getPeerKarma(FAKE_PEER_PUB));
     }
 
     @Test
@@ -105,7 +126,7 @@ class KarmaChainWriterTest {
 
         source.withTip(288L) // epoch 2
                 .withBlock(288L, hashForHeight(288L));
-        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+        writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, anotherInfoHash());
 
         assertEquals(2L, writer.chain().currentEpoch());
         assertEquals(4, writer.chain().entries().size(),
@@ -314,6 +335,12 @@ class KarmaChainWriterTest {
         for (int i = 0; i < 8; i++) {
             hash[i] = (byte) (height >>> (8 * (7 - i)));
         }
+        return hash;
+    }
+
+    private static byte[] anotherInfoHash() {
+        byte[] hash = new byte[20];
+        hash[0] = 1;
         return hash;
     }
 }

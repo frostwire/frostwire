@@ -88,6 +88,21 @@ class KarmaChainTest {
     }
 
     @Test
+    void endorsementForSameSourceAndInfoHashIsIdempotentlyRejected() {
+        KarmaChain chain = new KarmaChain(pubRaw);
+        chain.commitEpoch(block(850000L), keyPair.getPrivate());
+        byte[] source = dummyPeerPub(7);
+        byte[] infoHash = dummyInfoHash(9);
+
+        chain.endorse(source, infoHash, block(850100L), keyPair.getPrivate());
+
+        assertTrue(chain.hasEndorsement(source, infoHash));
+        assertThrows(IllegalStateException.class,
+                () -> chain.endorse(source, infoHash, block(850100L), keyPair.getPrivate()));
+        assertEquals(4, chain.availableEnergy());
+    }
+
+    @Test
     void endorseThrowsIfNoEpochCommitted() {
         KarmaChain chain = new KarmaChain(pubRaw);
         assertThrows(IllegalStateException.class, () ->

@@ -160,6 +160,9 @@ public final class KarmaChain {
         if (signingKey == null) {
             throw new IllegalArgumentException("signingKey is null");
         }
+        if (hasEndorsement(peerPub, infoHash)) {
+            throw new IllegalStateException("This source peer was already endorsed for this torrent");
+        }
         if (currentEpoch < 0) {
             throw new IllegalStateException("No epoch committed yet; call commitEpoch first");
         }
@@ -181,6 +184,21 @@ public final class KarmaChain {
         entries.add(entry);
         endorsementsThisEpoch++;
         return entry;
+    }
+
+    /** True when this chain already contains an endorsement for this peer and torrent pair. */
+    public synchronized boolean hasEndorsement(byte[] peerPub, byte[] infoHash) {
+        if (peerPub == null || peerPub.length != 32 || infoHash == null || infoHash.length != 20) {
+            return false;
+        }
+        for (KarmaChainEntry entry : entries) {
+            if (entry.kind() == KarmaChainEntry.Kind.ENDORSEMENT
+                    && java.util.Arrays.equals(peerPub, entry.peerPub())
+                    && java.util.Arrays.equals(infoHash, entry.infoHash())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Returns the available integer energy credits in the current epoch. */

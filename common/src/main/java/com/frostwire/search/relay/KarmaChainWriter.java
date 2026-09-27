@@ -132,50 +132,80 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
 
     @Override
     public void onDownloadCompletedFromPeer(byte[] peerEd25519Pub, byte[] infoHash) {
-        onDownloadCompletedFromPeer(peerEd25519Pub, infoHash, () -> true);
+        endorseSourcePeer(peerEd25519Pub, infoHash, () -> true);
     }
 
     void onDownloadCompletedFromPeer(byte[] peerEd25519Pub, byte[] infoHash,
                                      BooleanSupplier permitted) {
-        if (peerEd25519Pub == null) {
-            return;
-        }
-        if (infoHash == null) {
-            return;
+        endorseSourcePeer(peerEd25519Pub, infoHash, permitted);
+    }
+
+    /**
+     * Whether a source endorsement can currently be written. The UI separately checks that the
+     * transfer is seeding; this validates the source/hash, self-endorsement, dedup and energy gate.
+     */
+    public boolean canEndorseSourcePeer(byte[] peerEd25519Pub, byte[] infoHash) {
+        return peerEd25519Pub != null
+                && peerEd25519Pub.length == 32
+                && infoHash != null
+                && infoHash.length == 20
+                && !java.util.Arrays.equals(peerEd25519Pub, ownerPub)
+                && lifecycle.getAsBoolean()
+                && (chain.currentEpoch() < 0 || chain.availableEnergy() > 0)
+                && !chain.hasEndorsement(peerEd25519Pub, infoHash);
+    }
+
+    /** Explicitly endorse a distributed source after the user confirms a completed seed. */
+    public boolean endorseSourcePeer(byte[] peerEd25519Pub, byte[] infoHash) {
+        return endorseSourcePeer(peerEd25519Pub, infoHash, () -> true);
+    }
+
+    private boolean endorseSourcePeer(byte[] peerEd25519Pub, byte[] infoHash,
+                                      BooleanSupplier permitted) {
+        if (peerEd25519Pub == null
+                || peerEd25519Pub.length != 32
+                || infoHash == null
+                || infoHash.length != 20
+                || java.util.Arrays.equals(peerEd25519Pub, ownerPub)
+                || chain.hasEndorsement(peerEd25519Pub, infoHash)
+                || permitted == null) {
+            return false;
         }
         if (!lifecycle.enter()) {
-            return;
+            return false;
         }
+        boolean appended = false;
         try {
             peerEd25519Pub = peerEd25519Pub.clone();
             infoHash = infoHash.clone();
             if (!isPermitted(permitted)) {
-                return;
+                return false;
             }
             long tip = blockSource.getChainTipHeight();
             if (tip < 0 || !isPermitted(permitted)) {
                 LOG.debug("Skipping endorsement: no Bitcoin chain tip available");
-                return;
+                return false;
             }
             BitcoinBlockReference block = blockSource.getBlock(tip);
             if (block == null || !isPermitted(permitted)) {
                 LOG.debug("Skipping endorsement: could not resolve tip block " + tip);
-                return;
+                return false;
             }
             writeLock.lock();
             try {
                 if (!isPermitted(permitted)) {
-                    return;
+                    return false;
                 }
                 if (block.epoch() > chain.currentEpoch()) {
                     appendCommitment(block);
                 }
-                if (!isPermitted(permitted) || chain.availableEnergy() <= 0) {
-                    return;
+                if (!isPermitted(permitted) || !canEndorseSourcePeer(peerEd25519Pub, infoHash)) {
+                    return false;
                 }
                 KarmaChainEntry endorsement = chain.endorse(
                         peerEd25519Pub, infoHash, block, signingKey);
                 table.append(endorsement);
+                appended = true;
             } catch (IllegalStateException e) {
                 LOG.debug("Endorsement rejected by chain: " + e.getMessage());
             } finally {
@@ -186,6 +216,7 @@ public final class KarmaChainWriter implements KarmaEndorsementSink, AutoCloseab
         } finally {
             lifecycle.leave();
         }
+        return appended;
     }
 
     private boolean isPermitted(BooleanSupplier permitted) {

@@ -116,6 +116,12 @@ public final class KarmaEndorsementTrigger implements BTEngineListener, AutoClos
                     && !dl.isFinished()) {
                 return;
             }
+            // Distributed-search source endorsements are explicitly user initiated from the
+            // transfer UI; do not silently consume karma when this automatic completion listener
+            // sees the same attributed transfer.
+            if (dl.getDistributedSourcePeerPub() != null) {
+                return;
+            }
             if (!lifecycle.getAsBoolean()) {
                 return;
             }
