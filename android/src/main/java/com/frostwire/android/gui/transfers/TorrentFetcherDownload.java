@@ -39,10 +39,9 @@ import java.util.Random;
 /**
  * Placeholder transfer while torrent metadata is obtained.
  *
- * <p>For mesh magnets, try IceBridge TORRENT_FETCH first (cellular/NAT), then
- * fall back to a direct magnet add. IceBridge must already be up — search
- * and {@code MainActivity} resume restart it if a stale process killed the
- * stack.
+ * <p>For mesh magnets, try IceBridge TORRENT_FETCH first (cellular/NAT), then fall back to a direct
+ * magnet add. IceBridge must already be up — search and {@code MainActivity} resume restart it if a
+ * stale process killed the stack.
  *
  * @author gubatron
  * @author aldenml
@@ -52,7 +51,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
   private static final Logger LOG = Logger.getLogger(TorrentFetcherDownload.class);
 
   private static final java.util.concurrent.ThreadPoolExecutor FETCHERS =
-      new java.util.concurrent.ThreadPoolExecutor(1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+      new java.util.concurrent.ThreadPoolExecutor(
+          1,
+          1,
+          0L,
+          java.util.concurrent.TimeUnit.MILLISECONDS,
           new java.util.concurrent.ArrayBlockingQueue<>(64),
           runnable -> new Thread(runnable, "TorrentFetcher"));
 
@@ -76,8 +79,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     this(manager, info, listener, FETCHERS);
   }
 
-  TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info,
-                         TorrentFetcherListener listener, java.util.concurrent.Executor executor) {
+  TorrentFetcherDownload(
+      TransferManager manager,
+      TorrentDownloadInfo info,
+      TorrentFetcherListener listener,
+      java.util.concurrent.Executor executor) {
     this.manager = manager;
     this.info = info;
     this.selectedHash = info.getHash();
@@ -294,15 +300,18 @@ public class TorrentFetcherDownload implements BittorrentDownload {
               null,
               selection,
               peers,
-              TransferManager.instance().isDeleteStartedTorrentEnabled());
+              TransferManager.instance().isDeleteStartedTorrentEnabled(),
+              info.getDistributedSourcePeerPub());
     } catch (Throwable e) {
       LOG.error("Error downloading torrent", e);
     }
   }
 
   private boolean matchesSelectedHash(byte[] data) {
-    return selectedHash == null || selectedHash.isEmpty()
-        || MeshTorrentMetadataFetcher.matchesInfoHash(data, com.frostwire.util.Hex.decode(selectedHash));
+    return selectedHash == null
+        || selectedHash.isEmpty()
+        || MeshTorrentMetadataFetcher.matchesInfoHash(
+            data, com.frostwire.util.Hex.decode(selectedHash));
   }
 
   private boolean[] calculateSelection(TorrentInfo ti, String path) {
@@ -379,7 +388,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           // Add it directly so libtorrent keeps x.pe peers and fetches piece layers.
           LOG.info("Starting x.pe magnet directly in BTEngine");
           if (startGate.tryStart()) {
-            BTEngine.getInstance().download(uri, null, new torrent_flags_t());
+            BTEngine.getInstance()
+                .download(uri, null, new torrent_flags_t(), info.getDistributedSourcePeerPub());
           }
           remove(false);
           return;

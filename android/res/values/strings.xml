@@ -260,6 +260,10 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet copied to clipboard</string>
     <string name="transfers_context_menu_copy_magnet">Copy Magnet</string>
     <string name="transfers_context_menu_copy_infohash">Copy InfoHash</string>
+    <string name="endorse_source_peer">Endorse Source Peer</string>
+    <string name="endorse_source_peer_confirmation">Endorse %1$s as the source for this torrent? Peer ID: %2$s</string>
+    <string name="endorse_source_peer_success">Source peer endorsed</string>
+    <string name="endorse_source_peer_unavailable">Could not endorse source peer. Check available karma energy and try again.</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pause/Stop all transfers</string>
     <string name="transfers_context_resume_all_torrent_transfers">Resume all torrent transfers</string>
     <string name="drawer_open">Open navigation drawer</string>

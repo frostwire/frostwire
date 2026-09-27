@@ -33,7 +33,7 @@ public class TorrentFetcherMeshMetadataStructureTest {
         compact.indexOf("fetchMeshTorrentMetadata(uri)") >= 0
             && compact.indexOf("fetchMeshTorrentMetadata(uri)")
                 < compact.indexOf(
-                    "BTEngine.getInstance().download(uri,null,newtorrent_flags_t());"));
+                    "BTEngine.getInstance().download(uri,null,newtorrent_flags_t(),info.getDistributedSourcePeerPub());"));
     assertTrue(
         "mesh metadata success must start the transfer with x.pe peers",
         compact.contains(

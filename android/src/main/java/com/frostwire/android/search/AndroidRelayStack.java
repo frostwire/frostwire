@@ -148,6 +148,7 @@ public final class AndroidRelayStack implements AutoCloseable {
   private final BTEngine btEngine;
   private final AndroidSharedTorrentIndexer indexer;
   private final KarmaEndorsementTrigger endorsementListener;
+  private final KarmaChainWriter karmaWriter;
   private final PeerKarmaCache karmaCache;
   private final DirectTcpPeerAuthenticator tcpAuthenticator;
   private final AtomicBoolean active;
@@ -292,6 +293,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       com.frostwire.search.relay.BlockHeaderSource blockSource =
           new com.frostwire.search.relay.HttpBlockHeaderFetcher(bitcoinCacheDir);
       karmaWriter = new KarmaChainWriter(ident, blockSource, ks, permitted);
+      SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(karmaWriter);
       endorsementListener =
           new KarmaEndorsementTrigger(li, ident.ed25519PubRaw(), karmaWriter, permitted);
       BTEngineListenerChain.install(btEngine, endorsementListener);
@@ -651,6 +653,9 @@ public final class AndroidRelayStack implements AutoCloseable {
       if (SearchEngine.DISTRIBUTED_WIRING.searchTransport() == tr) {
         SearchEngine.DISTRIBUTED_WIRING.searchTransport(null).peerDirectory(null);
       }
+      if (SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter() == karmaWriter) {
+        SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(null);
+      }
       if (ih != null)
         try {
           ih.stop();
@@ -745,6 +750,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.btEngine = btEngine;
     this.indexer = indexer;
     this.endorsementListener = endorsementListener;
+    this.karmaWriter = karmaWriter;
     this.tcpAuthenticator = tcpAuthenticator;
     this.karmaCache = karmaCache;
     this.active = active;
@@ -926,6 +932,9 @@ public final class AndroidRelayStack implements AutoCloseable {
     transport.close();
     if (SearchEngine.DISTRIBUTED_WIRING.searchTransport() == transport) {
       SearchEngine.DISTRIBUTED_WIRING.searchTransport(null).peerDirectory(null);
+    }
+    if (SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter() == karmaWriter) {
+      SearchEngine.DISTRIBUTED_WIRING.karmaChainWriter(null);
     }
   }
 
