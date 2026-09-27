@@ -447,6 +447,9 @@ public abstract class SearchEngine {
   /** Holder for the transport used by the DISTRIBUTED engine to send/receive search payloads. */
   private volatile DistributedSearchTransport searchTransport;
 
+  /** Writer used for explicit, user-confirmed source endorsements from seeded transfers. */
+  private volatile com.frostwire.search.relay.KarmaChainWriter karmaChainWriter;
+
   /**
    * Optional pipeline metrics of the DISTRIBUTED transport (poll runs/errors, drain volume,
    * request-queue depth, rejected work, verification failures). Surfaced through MCP diagnostics.
@@ -469,6 +472,15 @@ public abstract class SearchEngine {
 
   public static com.frostwire.search.relay.LocalIndex getDistributedLocalIndex() {
     return DISTRIBUTED.localIndex;
+  }
+
+  public static com.frostwire.search.relay.KarmaChainWriter getDistributedKarmaChainWriter() {
+    return DISTRIBUTED.karmaChainWriter;
+  }
+
+  public static void setDistributedKarmaChainWriter(
+      com.frostwire.search.relay.KarmaChainWriter writer) {
+    DISTRIBUTED.karmaChainWriter = writer;
   }
 
   /** Installs the metrics object attached to the DISTRIBUTED transport, for MCP diagnostics. */

@@ -520,6 +520,10 @@ final class Initializer {
       KarmaChainWriter karmaWriter =
           new KarmaChainWriter(identity, blockSource, karmaTable, relayLifecycle);
       relayLifecycle.own(karmaWriter, karmaWriter::awaitStopped);
+      com.limegroup.gnutella.gui.search.SearchEngine.setDistributedKarmaChainWriter(karmaWriter);
+      relayResources.add(
+          () ->
+              com.limegroup.gnutella.gui.search.SearchEngine.setDistributedKarmaChainWriter(null));
       if (!relayLifecycle.getAsBoolean()) return;
       KarmaEndorsementTrigger endorsementTrigger =
           new KarmaEndorsementTrigger(

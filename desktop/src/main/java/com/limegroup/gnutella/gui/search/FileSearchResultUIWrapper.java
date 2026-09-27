@@ -177,6 +177,13 @@ public final class FileSearchResultUIWrapper extends AbstractUISearchResult {
             public String getReferrerUrl() {
               return searchResult.getReferrerUrl().orElse(null);
             }
+
+            @Override
+            public byte[] getDistributedSourcePeerPub() {
+              return DistributedSearchPerformer.SOURCE_NAME.equals(searchResult.getSource())
+                  ? searchResult.getDistributedSourcePeerPub().orElse(null)
+                  : null;
+            }
           };
       // Always use partial=true for torrents to show file selection dialog
       GUIMediator.instance().openTorrentSearchResult(torrentAdapter, true);

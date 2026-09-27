@@ -33,11 +33,13 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
+import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudUtils;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Hex;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.PlaybackUtil;
@@ -101,6 +103,7 @@ public final class BTDownloadMediator
   private Action clearInactiveAction;
   private TransfersFilter transfersFilter;
   private PlaySingleMediaFileAction playSingleMediaFileAction;
+  private Action endorseSourcePeerAction;
 
   // coalesce selection updates; only last result applies
   private final AtomicInteger selectionSeq = new AtomicInteger();
@@ -200,6 +203,14 @@ public final class BTDownloadMediator
     copyHashAction = BTDownloadActions.COPY_HASH_ACTION;
     shareTorrentAction = BTDownloadActions.SHARE_TORRENT_ACTION;
     playSingleMediaFileAction = BTDownloadActions.PLAY_SINGLE_AUDIO_FILE_ACTION;
+    endorseSourcePeerAction =
+        new AbstractAction(I18n.tr("Endorse Source Peer")) {
+          @Override
+          public void actionPerformed(java.awt.event.ActionEvent event) {
+            endorseSelectedSourcePeer();
+          }
+        };
+    endorseSourcePeerAction.setEnabled(false);
   }
 
   /** Returns the most prominent actions that operate on the download table. */
@@ -478,6 +489,10 @@ public final class BTDownloadMediator
     menu.add(new SkinMenuItem(shareTorrentAction));
     menu.add(new SkinMenuItem(copyMagnetAction));
     menu.add(new SkinMenuItem(copyHashAction));
+    if (endorseSourcePeerAction.isEnabled()) {
+      menu.addSeparator();
+      menu.add(new SkinMenuItem(endorseSourcePeerAction));
+    }
     menu.addSeparator();
     menu.add(new SkinMenuItem(removeAction));
     menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_ACTION));
@@ -559,6 +574,7 @@ public final class BTDownloadMediator
     BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(false);
     BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(false);
     removeYouTubeAction.setEnabled(false);
+    endorseSourcePeerAction.setEnabled(false);
     notifyTransferTabSelectionListener(null);
   }
 
@@ -593,6 +609,7 @@ public final class BTDownloadMediator
     pauseAction.setEnabled(pausable);
     copyMagnetAction.setEnabled(!isHttpTransfer(dl));
     copyHashAction.setEnabled(!isHttpTransfer(dl));
+    endorseSourcePeerAction.setEnabled(canEndorseSourcePeer(dl));
 
     shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dl.isPausable());
     // Compute media flags asynchronously and update actions when ready
@@ -604,6 +621,72 @@ public final class BTDownloadMediator
     if (GUIMediator.Tabs.TRANSFERS.equals(GUIMediator.instance().getSelectedTab())) {
       notifyTransferTabSelectionListener(dl);
     }
+  }
+
+  private boolean canEndorseSourcePeer(BTDownload download) {
+    if (!(download instanceof BittorrentDownload)
+        || download.getState() != TransferState.SEEDING
+        || !download.isCompleted()) {
+      return false;
+    }
+    com.frostwire.bittorrent.BTDownload torrent = ((BittorrentDownload) download).getDl();
+    if (torrent == null) {
+      return false;
+    }
+    byte[] source = torrent.getDistributedSourcePeerPub();
+    String infoHash = torrent.getV1InfoHash();
+    KarmaChainWriter writer =
+        com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
+    return source != null
+        && infoHash != null
+        && writer != null
+        && writer.canEndorseSourcePeer(source, Hex.decode(infoHash));
+  }
+
+  private void endorseSelectedSourcePeer() {
+    BTDownload[] selected = getSelectedDownloaders();
+    if (selected.length != 1 || !canEndorseSourcePeer(selected[0])) {
+      return;
+    }
+    com.frostwire.bittorrent.BTDownload torrent = ((BittorrentDownload) selected[0]).getDl();
+    byte[] source = torrent.getDistributedSourcePeerPub();
+    byte[] infoHash = Hex.decode(torrent.getV1InfoHash());
+    KarmaChainWriter writer =
+        com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
+    int answer =
+        JOptionPane.showConfirmDialog(
+            GUIMediator.getAppFrame(),
+            I18n.tr("Endorse this source peer for the torrent you are seeding?")
+                + "\n\n"
+                + selected[0].getDisplayName()
+                + "\n"
+                + Hex.encode(source),
+            I18n.tr("Endorse Source Peer"),
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+    if (answer != JOptionPane.YES_OPTION) {
+      return;
+    }
+    endorseSourcePeerAction.setEnabled(false);
+    DesktopParallelExecutor.execute(
+        () -> {
+          boolean endorsed = writer.endorseSourcePeer(source, infoHash);
+          GUIMediator.safeInvokeLater(
+              () -> {
+                JOptionPane.showMessageDialog(
+                    GUIMediator.getAppFrame(),
+                    endorsed
+                        ? I18n.tr("Source peer endorsed.")
+                        : I18n.tr(
+                            "Could not create the endorsement. Karma energy or Bitcoin connectivity may be unavailable."),
+                    I18n.tr("Endorse Source Peer"),
+                    endorsed ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
+                int selectedRow = TABLE.getSelectedRow();
+                if (selectedRow >= 0) {
+                  handleSelection(selectedRow);
+                }
+              });
+        });
   }
 
   private void notifyTransferTabSelectionListener(BTDownload selected) {
@@ -801,11 +884,17 @@ public final class BTDownloadMediator
                     sr.getReferrerUrl(),
                     sr.getDisplayName(),
                     false,
-                    relativePath);
+                    relativePath,
+                    sr.getDistributedSourcePeerPub());
           } else {
             d =
                 new TorrentFetcherDownload(
-                    sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload);
+                    sr.getTorrentUrl(),
+                    sr.getReferrerUrl(),
+                    sr.getDisplayName(),
+                    partialDownload,
+                    null,
+                    sr.getDistributedSourcePeerPub());
           }
           add(d);
         });
@@ -1015,7 +1104,8 @@ public final class BTDownloadMediator
       final String saveFileAs,
       final long fileSize,
       boolean extractAudio,
-      final Map<String, String> httpHeaders) {    GUIMediator.safeInvokeLater(
+      final Map<String, String> httpHeaders) {
+    GUIMediator.safeInvokeLater(
         () -> {
           final HttpDownload downloader =
               new HttpDownload(
@@ -1056,10 +1146,9 @@ public final class BTDownloadMediator
   }
 
   /**
-   * Download a DASH video-only file, then fetch its hidden m4a sibling and
-   * mux both into the saved file so it plays with sound. Runs on the HTTP
-   * thread before library scan. On any failure the silent video is kept and
-   * the temp audio removed (status quo, never worse).
+   * Download a DASH video-only file, then fetch its hidden m4a sibling and mux both into the saved
+   * file so it plays with sound. Runs on the HTTP thread before library scan. On any failure the
+   * silent video is kept and the temp audio removed (status quo, never worse).
    */
   public void openHttpWithMuxAudio(
       final String httpUrl,
@@ -1079,9 +1168,7 @@ public final class BTDownloadMediator
                 @Override
                 protected void onComplete() {
                   final File savedFile = getSaveLocation();
-                  if (savedFile.exists()
-                      && muxAudioUrl != null
-                      && !muxAudioUrl.isEmpty()) {
+                  if (savedFile.exists() && muxAudioUrl != null && !muxAudioUrl.isEmpty()) {
                     muxDashAudio(savedFile, muxAudioUrl, muxAudioExt, muxAudioHeaders);
                   }
                 }
@@ -1102,14 +1189,18 @@ public final class BTDownloadMediator
     boolean done = false;
     for (int attempt = 1; attempt <= 3 && !done; attempt++) {
       try {
-        HttpClient client =
-            HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+        HttpClient client = HttpClientFactory.newInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         client.save(audioUrl, audioTmp, attempt > 1, audioHeaders);
         String videoExt = FilenameUtils.getExtension(mp4.getName());
         if (!com.frostwire.search.telluride.DashMux.muxIfSupported(
             mp4, audioTmp, videoExt, suffix, mergedTmp)) {
-          LOG.warn("No muxer for video ." + videoExt + " + audio ." + suffix
-              + "; keeping silent video " + mp4.getAbsolutePath());
+          LOG.warn(
+              "No muxer for video ."
+                  + videoExt
+                  + " + audio ."
+                  + suffix
+                  + "; keeping silent video "
+                  + mp4.getAbsolutePath());
           break;
         }
         java.nio.file.Files.move(
@@ -1117,8 +1208,13 @@ public final class BTDownloadMediator
         LOG.info("Muxed DASH audio into " + mp4.getAbsolutePath());
         done = true;
       } catch (Throwable t) {
-        LOG.warn("DASH audio fetch/mux attempt " + attempt + "/3 for "
-            + mp4.getName() + " failed: " + t.getMessage());
+        LOG.warn(
+            "DASH audio fetch/mux attempt "
+                + attempt
+                + "/3 for "
+                + mp4.getName()
+                + " failed: "
+                + t.getMessage());
       }
     }
     try {
@@ -1127,8 +1223,8 @@ public final class BTDownloadMediator
     } catch (Throwable ignored) {
     }
     if (!done) {
-      LOG.error("Could not mux DASH audio into " + mp4.getAbsolutePath()
-          + " (keeping silent video)");
+      LOG.error(
+          "Could not mux DASH audio into " + mp4.getAbsolutePath() + " (keeping silent video)");
     }
   }
 

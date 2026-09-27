@@ -462,6 +462,11 @@ public final class PeerCatalogWindow {
       public String getReferrerUrl() {
         return null;
       }
+
+      @Override
+      public byte[] getDistributedSourcePeerPub() {
+        return peerPub.clone();
+      }
     };
   }
 

@@ -52,6 +52,7 @@ public class TorrentFetcherDownload implements BTDownload {
   private final boolean partial;
   private final String relativePath;
   private final String hash;
+  private final byte[] distributedSourcePeerPub;
   private final Date dateCreated;
   private TransferState state;
 
@@ -61,7 +62,8 @@ public class TorrentFetcherDownload implements BTDownload {
       String cookie,
       String displayName,
       boolean partial,
-      String relativePath) {
+      String relativePath,
+      byte[] distributedSourcePeerPub) {
     this.uri = uri;
     if (uri.startsWith("magnet")) {
       hash = PerformersHelper.parseInfoHash(uri);
@@ -72,6 +74,8 @@ public class TorrentFetcherDownload implements BTDownload {
     this.cookie = cookie;
     this.displayName = displayName;
     this.partial = partial;
+    this.distributedSourcePeerPub =
+        distributedSourcePeerPub == null ? null : distributedSourcePeerPub.clone();
     if (!partial) {
       this.relativePath = relativePath;
     } else {
@@ -86,7 +90,17 @@ public class TorrentFetcherDownload implements BTDownload {
 
   public TorrentFetcherDownload(
       String uri, String referrer, String displayName, boolean partial, String relativePath) {
-    this(uri, referrer, null, displayName, partial, relativePath);
+    this(uri, referrer, displayName, partial, relativePath, null);
+  }
+
+  public TorrentFetcherDownload(
+      String uri,
+      String referrer,
+      String displayName,
+      boolean partial,
+      String relativePath,
+      byte[] distributedSourcePeerPub) {
+    this(uri, referrer, null, displayName, partial, relativePath, distributedSourcePeerPub);
   }
 
   public TorrentFetcherDownload(String uri, String referrer, String displayName, boolean partial) {
@@ -249,7 +263,8 @@ public class TorrentFetcherDownload implements BTDownload {
         try {
           TorrentInfo ti = TorrentInfo.bdecode(data);
           boolean[] selection = calculateSelection(ti, relativePath);
-          BTEngine.getInstance().download(ti, null, selection, peers, true);
+          BTEngine.getInstance()
+              .download(ti, null, selection, peers, true, distributedSourcePeerPub);
         } catch (Throwable e) {
           LOG.error("Error downloading torrent", e);
         }
@@ -277,7 +292,13 @@ public class TorrentFetcherDownload implements BTDownload {
                     () -> {
                       try {
                         BTEngine.getInstance()
-                            .download(ti, finalSaveFolder, finalSelection, peers, true);
+                            .download(
+                                ti,
+                                finalSaveFolder,
+                                finalSelection,
+                                peers,
+                                true,
+                                distributedSourcePeerPub);
                       } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
                       }
