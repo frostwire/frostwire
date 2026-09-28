@@ -4353,6 +4353,22 @@ msgstr "크롤러가 내가 활발히 시딩 중인 토렌트를 탐색하도록
 msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
 msgstr "크롤러와 공유되는 것은 활발히 시딩 중인 토렌트뿐입니다. 시딩하지 않는 다운로드 기록은 절대 게시되지 않습니다."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:44
+msgid "Seeding a torrent publishes it. With Distributed Search enabled, other FrostWire users on the network can find the torrents you are actively sharing and download them from you."
+msgstr "토렌트를 시딩하면 해당 토렌트가 게시됩니다. 분산 검색이 켜져 있으면 네트워크의 다른 FrostWire 사용자가 현재 공유 중인 토렌트를 찾아 내 컴퓨터에서 다운로드할 수 있습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:36
+msgid "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."
+msgstr "지금 시딩하거나 다운로드하는 토렌트는 공유 색인에 나열되어 분산 검색을 사용하는 다른 사람들이 찾을 수 있습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:38
+msgid "Paused transfers, private torrents and your download history are never published."
+msgstr "일시 중지된 전송, 비공개 토렌트, 다운로드 기록은 절대 게시되지 않습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:40
+msgid "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."
+msgstr "참여를 중단하려면 도구들 > 옵션 > IceBridge에서 ‘IceBridge 활성화 (분산 릴레이)’을(를) 끄세요."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "로컬 IceBridge 데몬 사용 (fork 하위 프로세스)"

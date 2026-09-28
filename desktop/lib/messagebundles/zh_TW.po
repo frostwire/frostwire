@@ -4445,6 +4445,22 @@ msgstr "允許檢索程式瀏覽我正在積極做種的種子"
 msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
 msgstr "只有您正在積極做種的種子才會與檢索程式分享。未做種的下載記錄永遠不會被發佈。"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:44
+msgid "Seeding a torrent publishes it. With Distributed Search enabled, other FrostWire users on the network can find the torrents you are actively sharing and download them from you."
+msgstr "做種會公開發佈該種子。啟用分散式搜尋後，網路上的其他 FrostWire 使用者可以找到您正積極分享的種子，並從您這裡下載。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:36
+msgid "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."
+msgstr "您目前正在做種或下載的種子會列在您的共享索引中，讓使用分散式搜尋的其他人可以找到它們。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:38
+msgid "Paused transfers, private torrents and your download history are never published."
+msgstr "已暫停的傳輸、私人種子與您的下載記錄永遠不會被發佈。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:40
+msgid "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."
+msgstr "如需停止參與，請在 工具 > 選項 > IceBridge 中關閉「Enable IceBridge (distributed relay)」。"
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Use local IceBridge daemon (fork subprocess)"

@@ -4246,6 +4246,22 @@ msgstr "אפשר לסורקים לגלוש בטורנטים שאני זורע ב
 msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
 msgstr "רק טורנטים שאתה זורע בהם באופן פעיל משותפים עם סורקים. היסטוריית הורדות שאינה נזרעת לעולם אינה מתפרסמת."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:44
+msgid "Seeding a torrent publishes it. With Distributed Search enabled, other FrostWire users on the network can find the torrents you are actively sharing and download them from you."
+msgstr "זריעת טורנט מפרסמת אותו. כשהחיפוש המבוזר מופעל, משתמשי FrostWire אחרים ברשת יכולים למצוא את הטורנטים שאתם משתפים באופן פעיל ולהוריד אותם מכם."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:36
+msgid "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."
+msgstr "טורנטים שאתם זורעים או מורידים כרגע מופיעים באינדקס המשותף שלכם, כך שאנשים אחרים המשתמשים בחיפוש המבוזר יוכלו למצוא אותם."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:38
+msgid "Paused transfers, private torrents and your download history are never published."
+msgstr "העברות מושהות, טורנטים פרטיים והיסטוריית ההורדות שלכם לעולם אינם מפורסמים."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:40
+msgid "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."
+msgstr "כדי להפסיק להשתתף, כבו את „הפעל IceBridge (ממסר מבוזר)” ב-כלים > אפשרויות... > IceBridge."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "השתמש בדימון IceBridge מקומי"

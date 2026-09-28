@@ -4471,6 +4471,22 @@ msgstr "Leyfa skriðdrekum að skoða torrentin sem ég er að sá virkt"
 msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
 msgstr "Aðeins torrentin sem þú ert að sá virkt eru deild með skriðdrekum. Niðurhalssaga sem er ekki sáð er aldrei birt."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:44
+msgid "Seeding a torrent publishes it. With Distributed Search enabled, other FrostWire users on the network can find the torrents you are actively sharing and download them from you."
+msgstr "Að sá torrent birtir það. Með dreifðri leit virkri geta aðrir FrostWire-notendur á netinu fundið torrent sem þú deilir virkt og sótt þau frá þér."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:36
+msgid "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."
+msgstr "Torrent sem þú ert að sá eða sækja núna eru skráð í sameiginlega vísinum þínum, svo aðrir sem nota dreifða leit geti fundið þau."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:38
+msgid "Paused transfers, private torrents and your download history are never published."
+msgstr "Gerhlé á tilfærslum, einkatorrent og niðurhalssaga þín eru aldrei birt."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:40
+msgid "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."
+msgstr "Til að hætta þátttöku skaltu slökkva á „Enable IceBridge (distributed relay)“ í Tæki og tól > Stillingar... > IceBridge."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Use local IceBridge daemon (fork subprocess)"

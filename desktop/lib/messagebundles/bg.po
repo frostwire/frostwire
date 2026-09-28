@@ -4449,6 +4449,22 @@ msgstr "Разрешаване на обхождащите програми да
 msgid "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."
 msgstr "С обхождащите програми се споделят само торентите, които активно сийдвате. Историята на изтегляния, която не се сийдва, никога не се публикува."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingWindow.java:44
+msgid "Seeding a torrent publishes it. With Distributed Search enabled, other FrostWire users on the network can find the torrents you are actively sharing and download them from you."
+msgstr "Сийдването на торент го публикува. Когато Разпределеното търсене е включено, други потребители на FrostWire в мрежата могат да намерят торентите, които активно споделяте, и да ги изтеглят от вас."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:36
+msgid "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."
+msgstr "Торентите, които в момента сийдвате или изтегляте, са включени във вашия споделен индекс, така че други хора, използващи Разпределеното търсене, могат да ги намерят."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:38
+msgid "Paused transfers, private torrents and your download history are never published."
+msgstr "Паузираните трансфери, частните торенти и историята на изтеглянията ви никога не се публикуват."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:40
+msgid "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."
+msgstr "За да спрете участието, изключете „Enable IceBridge (distributed relay)“ в Изнстроменти > Можете да конфигурирате FrostWire опции. > IceBridge."
+
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:28
 msgid "Use local IceBridge daemon (fork subprocess)"
 msgstr "Use local IceBridge daemon (fork subprocess)"
