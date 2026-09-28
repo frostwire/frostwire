@@ -77,6 +77,10 @@ public final class SetupManager {
     if (!InstallSettings.SAVE_DIRECTORY.getValue()) {
       return SaveStatus.NEEDS;
     }
+    // QA: behave as if this build were just installed or updated.
+    if (SetupWizardOverride.isForced()) {
+      return SaveStatus.NEEDS;
+    }
     if (!InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED
         .getValue()
         .equals(String.valueOf(FrostWireUtils.getBuildNumber()))) {
