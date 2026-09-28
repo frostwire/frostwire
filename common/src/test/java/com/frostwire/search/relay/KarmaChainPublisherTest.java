@@ -129,7 +129,7 @@ class KarmaChainPublisherTest {
         for (int i = 1; i < 12; i++) {
             long tip = 144L * (i + 1);
             blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
-            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
         }
 
         List<KarmaChainEntry> chain = writer.chain().entries();
@@ -231,7 +231,7 @@ class KarmaChainPublisherTest {
         for (int i = 1; i < 12; i++) {
             long tip = 144L * (i + 1);
             blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
-            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, FAKE_INFO_HASH);
+            writer.onDownloadCompletedFromPeer(FAKE_PEER_PUB, distinctInfoHash(i));
         }
 
         List<KarmaChainEntry> chain = writer.chain().entries();
@@ -306,5 +306,13 @@ class KarmaChainPublisherTest {
         public long getChainTipHeight() {
             return tip.get();
         }
+    }
+
+    /** Endorsements are one per (peer, torrent), so growing a chain needs distinct torrents. */
+    private static byte[] distinctInfoHash(int i) {
+        byte[] infoHash = FAKE_INFO_HASH.clone();
+        infoHash[0] ^= (byte) i;
+        infoHash[1] ^= (byte) (i >>> 8);
+        return infoHash;
     }
 }

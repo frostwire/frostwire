@@ -90,8 +90,8 @@ class RemoteKarmaChainFetcherTest {
   void fetchChainReturnsChainWhenVerified() throws Exception {
     // Feed ACTUAL publisher output: build a real KarmaChainWriter chain,
     // publish its manifest, feed it through the fetcher with a fake source.
-    FakeBlockSource blockSource = new FakeBlockSource()
-        .withTip(144L).withBlock(144L, hashForHeight(144L));
+    FakeBlockSource blockSource =
+        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -99,8 +99,7 @@ class RemoteKarmaChainFetcherTest {
     writer.onDownloadCompletedFromPeer(peerPub, new byte[20]);
     List<KarmaChainEntry> published = writer.chain().entries();
     assertTrue(published.size() >= 2, "writer must produce commitment + endorsement");
-    KarmaChainPublisher publisher =
-        new KarmaChainPublisher(writer, publisherIdentity);
+    KarmaChainPublisher publisher = new KarmaChainPublisher(writer, publisherIdentity);
     Entry manifest = publisher.buildManifest(published);
     assertNotNull(manifest, "real publisher must emit a manifest");
     writer.close();
@@ -138,6 +137,8 @@ class RemoteKarmaChainFetcherTest {
     for (int i = 0; i < 12; i++) {
       long tip = 144L * (i + 1);
       blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      // One endorsement per (peer, torrent): grow the chain with distinct torrents.
+      infoHash[0] = (byte) i;
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
     }
     List<KarmaChainEntry> full = writer.chain().entries();
@@ -169,6 +170,8 @@ class RemoteKarmaChainFetcherTest {
     for (int i = 0; i < 12; i++) {
       long tip = 144L * (i + 1);
       blockSource.withTip(tip).withBlock(tip, hashForHeight(tip));
+      // One endorsement per (peer, torrent): grow the chain with distinct torrents.
+      infoHash[0] = (byte) i;
       writer.onDownloadCompletedFromPeer(peerPub, infoHash);
     }
     List<KarmaChainEntry> full = writer.chain().entries();
@@ -255,8 +258,8 @@ class RemoteKarmaChainFetcherTest {
 
   @Test
   void peerKarmaCacheCountsEndorsements() throws Exception {
-    FakeBlockSource blockSource = new FakeBlockSource()
-        .withTip(144L).withBlock(144L, hashForHeight(144L));
+    FakeBlockSource blockSource =
+        new FakeBlockSource().withTip(144L).withBlock(144L, hashForHeight(144L));
     IdentityKeys publisherIdentity = IdentityKeys.generate(0);
     byte[] ownerPub = publisherIdentity.ed25519PubRaw();
     InMemoryStore store = new InMemoryStore(ownerPub);
@@ -318,8 +321,7 @@ class RemoteKarmaChainFetcherTest {
     }
 
     @Override
-    public void close() {
-    }
+    public void close() {}
   }
 
   private static final class FakeBlockSource implements BlockHeaderSource {
