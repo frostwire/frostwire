@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Forráspeer ajánlása</string>
+    <string name="endorse_source_peer_confirmation">Ajánlja a(z) %1$s peert ennek a torrentnek a forrásaként? Peer-azonosító: %2$s</string>
+    <string name="endorse_source_peer_success">Forráspeer ajánlva</string>
+    <string name="endorse_source_peer_unavailable">A forráspeer ajánlása nem sikerült. Ellenőrizze az elérhető karma-energiát, és próbálja újra.</string>
 </resources>

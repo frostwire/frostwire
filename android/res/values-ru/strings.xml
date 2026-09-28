@@ -691,4 +691,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Рекомендовать пир-источник</string>
+    <string name="endorse_source_peer_confirmation">Рекомендовать %1$s как источник этого торрента? ID пира: %2$s</string>
+    <string name="endorse_source_peer_success">Пир-источник рекомендован</string>
+    <string name="endorse_source_peer_unavailable">Не удалось рекомендовать пир-источник. Проверьте доступную энергию кармы и повторите попытку.</string>
 </resources>

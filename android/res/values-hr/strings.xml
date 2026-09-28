@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Preporuči izvorni peer</string>
+    <string name="endorse_source_peer_confirmation">Preporučiti %1$s kao izvor za ovaj torrent? ID peera: %2$s</string>
+    <string name="endorse_source_peer_success">Izvorni peer je preporučen</string>
+    <string name="endorse_source_peer_unavailable">Izvorni peer nije mogao biti preporučen. Provjerite dostupnu karma energiju i pokušajte ponovno.</string>
 </resources>

@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">स्रोत पीअरला मान्यता द्या</string>
+    <string name="endorse_source_peer_confirmation">%1$s ला या टॉरेंटचा स्रोत म्हणून मान्यता द्यायची? पीअर ID: %2$s</string>
+    <string name="endorse_source_peer_success">स्रोत पीअरला मान्यता दिली</string>
+    <string name="endorse_source_peer_unavailable">स्रोत पीअरला मान्यता देता आली नाही. उपलब्ध कर्म ऊर्जा तपासा आणि पुन्हा प्रयत्न करा.</string>
 </resources>

@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Recommander le pair source</string>
+    <string name="endorse_source_peer_confirmation">Recommander %1$s comme source de ce torrent ? ID du pair : %2$s</string>
+    <string name="endorse_source_peer_success">Pair source recommandé</string>
+    <string name="endorse_source_peer_unavailable">Impossible de recommander le pair source. Vérifiez l\'énergie de karma disponible et réessayez.</string>
 </resources>

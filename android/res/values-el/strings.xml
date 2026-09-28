@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Επιδοκιμασία peer προέλευσης</string>
+    <string name="endorse_source_peer_confirmation">Να επιδοκιμαστεί το %1$s ως πηγή για αυτό το torrent; Αναγνωριστικό peer: %2$s</string>
+    <string name="endorse_source_peer_success">Το peer προέλευσης επιδοκιμάστηκε</string>
+    <string name="endorse_source_peer_unavailable">Δεν ήταν δυνατή η επιδοκιμασία του peer προέλευσης. Ελέγξτε τη διαθέσιμη ενέργεια karma και δοκιμάστε ξανά.</string>
 </resources>

@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">소스 피어 추천</string>
+    <string name="endorse_source_peer_confirmation">%1$s을(를) 이 토렌트의 소스로 추천하시겠습니까? 피어 ID: %2$s</string>
+    <string name="endorse_source_peer_success">소스 피어를 추천했습니다</string>
+    <string name="endorse_source_peer_unavailable">소스 피어를 추천하지 못했습니다. 사용 가능한 카르마 에너지를 확인한 후 다시 시도하세요.</string>
 </resources>

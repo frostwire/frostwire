@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">ماخذ پیئر کی توثیق کریں</string>
+    <string name="endorse_source_peer_confirmation">کیا %1$s کو اس ٹورنٹ کے ماخذ کے طور پر توثیق کرنی ہے؟ پیئر ID: %2$s</string>
+    <string name="endorse_source_peer_success">ماخذ پیئر کی توثیق ہو گئی</string>
+    <string name="endorse_source_peer_unavailable">ماخذ پیئر کی توثیق نہیں ہو سکی۔ دستیاب کرما توانائی چیک کریں اور دوبارہ کوشش کریں۔</string>
 </resources>

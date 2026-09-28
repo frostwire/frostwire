@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">మూల పీర్‌ను ఆమోదించండి</string>
+    <string name="endorse_source_peer_confirmation">ఈ టొరెంట్‌కు మూలంగా %1$s ను ఆమోదించాలా? పీర్ ID: %2$s</string>
+    <string name="endorse_source_peer_success">మూల పీర్ ఆమోదించబడింది</string>
+    <string name="endorse_source_peer_unavailable">మూల పీర్‌ను ఆమోదించడం సాధ్యం కాలేదు. అందుబాటులో ఉన్న కర్మ శక్తిని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.</string>
 </resources>

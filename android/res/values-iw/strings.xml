@@ -691,4 +691,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">המלצה על עמית המקור</string>
+    <string name="endorse_source_peer_confirmation">להמליץ על %1$s כמקור של הטורנט הזה? מזהה עמית: %2$s</string>
+    <string name="endorse_source_peer_success">עמית המקור קיבל המלצה</string>
+    <string name="endorse_source_peer_unavailable">לא ניתן היה להמליץ על עמית המקור. בדקו את אנרגיית הקארמה הזמינה ונסו שוב.</string>
 </resources>

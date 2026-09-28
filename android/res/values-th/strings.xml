@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">รับรองเพียร์ต้นทาง</string>
+    <string name="endorse_source_peer_confirmation">รับรอง %1$s เป็นต้นทางของทอร์เรนต์นี้หรือไม่ รหัสเพียร์: %2$s</string>
+    <string name="endorse_source_peer_success">รับรองเพียร์ต้นทางแล้ว</string>
+    <string name="endorse_source_peer_unavailable">ไม่สามารถรับรองเพียร์ต้นทางได้ โปรดตรวจสอบพลังงานกรรมที่เหลืออยู่แล้วลองอีกครั้ง</string>
 </resources>

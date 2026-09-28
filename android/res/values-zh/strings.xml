@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">认可来源节点</string>
+    <string name="endorse_source_peer_confirmation">认可 %1$s 为此种子的来源吗？节点 ID：%2$s</string>
+    <string name="endorse_source_peer_success">已认可来源节点</string>
+    <string name="endorse_source_peer_unavailable">无法认可来源节点。请检查可用的声望能量后重试。</string>
 </resources>

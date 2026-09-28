@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Podpořit zdrojového peera</string>
+    <string name="endorse_source_peer_confirmation">Podpořit %1$s jako zdroj tohoto torrentu? ID peera: %2$s</string>
+    <string name="endorse_source_peer_success">Zdrojový peer byl podpořen</string>
+    <string name="endorse_source_peer_unavailable">Zdrojového peera se nepodařilo podpořit. Zkontrolujte dostupnou karma energii a zkuste to znovu.</string>
 </resources>

@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Падтрымаць крынічны пір</string>
+    <string name="endorse_source_peer_confirmation">Падтрымаць %1$s як крыніцу гэтага торэнта? ID піра: %2$s</string>
+    <string name="endorse_source_peer_success">Крынічны пір падтрыманы</string>
+    <string name="endorse_source_peer_unavailable">Не ўдалося падтрымаць крынічны пір. Праверце даступную карма-энергію і паспрабуйце яшчэ раз.</string>
 </resources>

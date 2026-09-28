@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Kaynak eşi onayla</string>
+    <string name="endorse_source_peer_confirmation">%1$s bu torrent\'in kaynağı olarak onaylansın mı? Eş kimliği: %2$s</string>
+    <string name="endorse_source_peer_success">Kaynak eş onaylandı</string>
+    <string name="endorse_source_peer_unavailable">Kaynak eş onaylanamadı. Kullanılabilir karma enerjisini kontrol edip tekrar deneyin.</string>
 </resources>

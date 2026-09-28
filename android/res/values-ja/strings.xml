@@ -691,4 +691,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">提供元ピアを推薦</string>
+    <string name="endorse_source_peer_confirmation">%1$s をこのトレントの提供元として推薦しますか？ ピアID：%2$s</string>
+    <string name="endorse_source_peer_success">提供元ピアを推薦しました</string>
+    <string name="endorse_source_peer_unavailable">提供元ピアを推薦できませんでした。利用可能なカルマエネルギーを確認して、もう一度お試しください。</string>
 </resources>

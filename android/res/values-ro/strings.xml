@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Recomandă peer-ul sursă</string>
+    <string name="endorse_source_peer_confirmation">Recomanzi %1$s ca sursă pentru acest torrent? ID peer: %2$s</string>
+    <string name="endorse_source_peer_success">Peer-ul sursă a fost recomandat</string>
+    <string name="endorse_source_peer_unavailable">Peer-ul sursă nu a putut fi recomandat. Verifică energia karma disponibilă și încearcă din nou.</string>
 </resources>

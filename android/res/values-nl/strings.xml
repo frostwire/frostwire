@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">Bronpeer aanbevelen</string>
+    <string name="endorse_source_peer_confirmation">%1$s aanbevelen als bron voor deze torrent? Peer-ID: %2$s</string>
+    <string name="endorse_source_peer_success">Bronpeer aanbevolen</string>
+    <string name="endorse_source_peer_unavailable">De bronpeer kon niet worden aanbevolen. Controleer de beschikbare karma-energie en probeer het opnieuw.</string>
 </resources>

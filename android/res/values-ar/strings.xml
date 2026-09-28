@@ -690,4 +690,8 @@
     <string name="distributed_icebridge_ports_changed">Port/role saved. Restart IceBridge to apply.</string>
     <string name="distributed_icebridge_restart_hint_title">Applying changes</string>
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
+    <string name="endorse_source_peer">تزكية النظير المصدر</string>
+    <string name="endorse_source_peer_confirmation">هل تريد تزكية %1$s كمصدر لهذا التورنت؟ معرّف النظير: %2$s</string>
+    <string name="endorse_source_peer_success">تمت تزكية النظير المصدر</string>
+    <string name="endorse_source_peer_unavailable">تعذّرت تزكية النظير المصدر. تحقق من طاقة السمعة المتاحة وحاول مرة أخرى.</string>
 </resources>
