@@ -178,7 +178,9 @@ class ShareIndexQueue<D> implements AutoCloseable {
                       LOG.info(
                           "Share index: indexed "
                               + hashOf.apply(download)
-                              + (attempt == SWEEP ? " from reconcile sweep" : " after retry " + attempt));
+                              + (attempt == SWEEP
+                                  ? " from reconcile sweep"
+                                  : " after retry " + attempt));
                     }
                     notifyIndexChanged();
                   }
