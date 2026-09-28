@@ -6482,3 +6482,263 @@ msgstr "আপনি সমস্ত কলাম বন্ধ করতে প�
 
 #~ msgid "Get a T-shirt, support the project. You'll get also 10 free stickers"
 #~ msgstr "একটি টি-শার্ট পান, প্রকল্পটিকে সমর্থন করুন। আপনি 10 টি ফ্রি স্টিকারও পাবেন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:331
+msgid "Add Tracker"
+msgstr "ট্র্যাকার যোগ করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:352
+msgid "Add tracker"
+msgstr "ট্র্যাকার যোগ করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:117
+msgid "All categories"
+msgstr "সব বিভাগ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:79
+msgid "Auto-scroll"
+msgstr "স্বয়ংক্রিয় স্ক্রল"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:96
+msgid "Browse the torrents a peer shares over IceBridge"
+msgstr "IceBridge-এর মাধ্যমে কোনো পিয়ার যেসব টরেন্ট শেয়ার করে সেগুলো ব্রাউজ করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:105
+msgid "Browse this holder's shared index over IceBridge or its public DHT index."
+msgstr "IceBridge বা এর পাবলিক DHT ইনডেক্সের মাধ্যমে এই হোল্ডারের শেয়ার্ড ইনডেক্স ব্রাউজ করুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:153
+msgid "Cannot share this file because it no longer exists on disk."
+msgstr "এই ফাইলটি শেয়ার করা যাচ্ছে না কারণ এটি আর ডিস্কে নেই।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Category"
+msgstr "বিভাগ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:125
+msgid "Category:"
+msgstr "বিভাগ:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:571
+msgid "Checking files"
+msgstr "ফাইল যাচাই করা হচ্ছে"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:569
+msgid "Checking files…"
+msgstr "ফাইল যাচাই করা হচ্ছে…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:566
+msgid "Checking resume data…"
+msgstr "পুনরায় শুরুর ডেটা যাচাই করা হচ্ছে…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:138
+msgid "Clear"
+msgstr "মুছুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:165
+msgid "Click to copy"
+msgstr "কপি করতে ক্লিক করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:162
+msgid "Copied to clipboard"
+msgstr "ক্লিপবোর্ডে কপি করা হয়েছে"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:680
+msgid "Could not create the endorsement. Karma energy or Bitcoin connectivity may be unavailable."
+msgstr "সমর্থন তৈরি করা যায়নি। কর্ম শক্তি বা Bitcoin সংযোগ পাওয়া নাও যেতে পারে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:300
+msgid "Could not save the console log: "
+msgstr "কনসোল লগ সংরক্ষণ করা যায়নি: "
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:254
+msgid "Create a torrent from this file and seed it"
+msgstr "এই ফাইল থেকে একটি টরেন্ট তৈরি করে সিড করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/FileSearchResultUIWrapper.java:201
+msgid "Distributed Result Details"
+msgstr "বিতরিত ফলাফলের বিবরণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:68
+msgid "Distributed Search Result Details"
+msgstr "বিতরিত অনুসন্ধান ফলাফলের বিবরণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:94
+msgid "Download .torrent"
+msgstr ".torrent ডাউনলোড করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:195
+msgid "Download pieces in order (helps previewing media)"
+msgstr "পিসগুলো ক্রমানুসারে ডাউনলোড করুন (মিডিয়া প্রিভিউ করতে সাহায্য করে)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:207
+msgid "Endorse Source Peer"
+msgstr "সোর্স পিয়ারকে সমর্থন করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:659
+msgid "Endorse this source peer for the torrent you are seeding?"
+msgstr "আপনি যে টরেন্ট সিড করছেন তার জন্য এই সোর্স পিয়ারকে সমর্থন করবেন?"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:517
+msgid "Enter at least one tracker URL."
+msgstr "কমপক্ষে একটি ট্র্যাকার URL লিখুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:135
+msgid "Example: http://127.0.0.1:8080   or   https://relay.example.com  (use a TLS proxy for remote access)"
+msgstr "উদাহরণ: http://127.0.0.1:8080   অথবা   https://relay.example.com  (দূরবর্তী অ্যাক্সেসের জন্য TLS প্রক্সি ব্যবহার করুন)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:186
+msgid "Force a recheck of the downloaded files"
+msgstr "ডাউনলোড করা ফাইলগুলো জোর করে পুনরায় যাচাই করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:128
+msgid "Full base URL to the IceBridge control API. Remote hosts require HTTPS; HTTP is allowed only for loopback addresses (including a local authenticated tunnel)."
+msgstr "IceBridge কন্ট্রোল API-এর সম্পূর্ণ বেস URL। দূরবর্তী হোস্টের জন্য HTTPS প্রয়োজন; HTTP শুধুমাত্র loopback ঠিকানার জন্য অনুমোদিত (স্থানীয় প্রমাণীকৃত টানেলসহ)।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:272
+msgid "Holder details are not currently cached."
+msgstr "হোল্ডারের বিবরণ বর্তমানে ক্যাশে নেই।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:250
+msgid "Holder opted in"
+msgstr "হোল্ডার সম্মতি দিয়েছেন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:107
+msgid "IceBridge &Console"
+msgstr "IceBridge কনসোল"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:72
+msgid "IceBridge Console"
+msgstr "IceBridge কনসোল"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:245
+msgid "IceBridge Holder ID"
+msgstr "IceBridge হোল্ডার ID"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:266
+msgid "IceBridge version"
+msgstr "IceBridge সংস্করণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:512
+msgid "Invalid Tracker URL"
+msgstr "অবৈধ ট্র্যাকার URL"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:382
+msgid "Invalid tracker URL. Use http(s)://host/announce or udp://host:port."
+msgstr "অবৈধ ট্র্যাকার URL। http(s)://host/announce বা udp://host:port ব্যবহার করুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:511
+msgid "Invalid tracker URL:"
+msgstr "অবৈধ ট্র্যাকার URL:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:259
+msgid "Known peer address"
+msgstr "পরিচিত পিয়ার ঠিকানা"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Level"
+msgstr "স্তর"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:281
+msgid "Log files"
+msgstr "লগ ফাইল"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:283
+msgid "Magnet URI"
+msgstr "ম্যাগনেট URI"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:123
+msgid "Min level:"
+msgstr "সর্বনিম্ন স্তর:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "None advertised"
+msgstr "কোনো বিজ্ঞাপিত নেই"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:251
+msgid "Not offered"
+msgstr "প্রদান করা হয় না"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Peer"
+msgstr "পিয়ার"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:267
+msgid "Peer capabilities"
+msgstr "পিয়ারের সক্ষমতা"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:271
+msgid "Peer directory"
+msgstr "পিয়ার ডিরেক্টরি"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:262
+msgid "Peer verified"
+msgstr "পিয়ার যাচাই হয়েছে"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:129
+msgid "Peer:"
+msgstr "পিয়ার:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:383
+msgid "Post it on X"
+msgstr "X-এ পোস্ট করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:384
+msgid "Post the message above on X"
+msgstr "উপরের বার্তাটি X-এ পোস্ট করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:549
+msgid "Recheck complete"
+msgstr "পুনরায় যাচাই সম্পূর্ণ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:280
+msgid "Save IceBridge Console"
+msgstr "IceBridge কনসোল সংরক্ষণ করুন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:301
+msgid "Save failed"
+msgstr "সংরক্ষণ ব্যর্থ হয়েছে"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:141
+msgid "Save..."
+msgstr "সংরক্ষণ..."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "Seeder endpoints"
+msgstr "সিডার এন্ডপয়েন্ট"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:192
+msgid "Sequential download"
+msgstr "ক্রমিক ডাউনলোড"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:252
+msgid "Share"
+msgstr "শেয়ার"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:248
+msgid "Shared-catalog browsing"
+msgstr "শেয়ার্ড-ক্যাটালগ ব্রাউজিং"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:108
+msgid "Show live IceBridge and distributed search events"
+msgstr "সরাসরি IceBridge ও বিতরিত অনুসন্ধানের ইভেন্ট দেখান"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:679
+msgid "Source peer endorsed."
+msgstr "সোর্স পিয়ারকে সমর্থন করা হয়েছে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:127
+msgid "Text:"
+msgstr "টেক্সট:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:387
+msgid "That tracker is already on the list."
+msgstr "এই ট্র্যাকার ইতিমধ্যে তালিকায় আছে।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:81
+msgid "The info hash identifies the torrent; the holder ID routes metadata requests through IceBridge."
+msgstr "ইনফো হ্যাশ টরেন্ট শনাক্ত করে; হোল্ডার ID মেটাডেটা অনুরোধগুলো IceBridge-এর মাধ্যমে পাঠায়।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:360
+msgid "Tracker announce URL (http, https or udp)"
+msgstr "ট্র্যাকার অ্যানাউন্স URL (http, https বা udp)"

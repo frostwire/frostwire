@@ -12853,3 +12853,263 @@ msgstr "Revert To Default"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/tables/ColumnSelectionMenu.java:176
 msgid "You cannot turn off all columns."
 msgstr "You cannot turn off all columns."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:331
+msgid "Add Tracker"
+msgstr "Додај тракер"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:352
+msgid "Add tracker"
+msgstr "Додај тракер"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:117
+msgid "All categories"
+msgstr "Сите категории"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:79
+msgid "Auto-scroll"
+msgstr "Автоматско лизгање"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:96
+msgid "Browse the torrents a peer shares over IceBridge"
+msgstr "Прелистај ги торентите што пирот ги споделува преку IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:105
+msgid "Browse this holder's shared index over IceBridge or its public DHT index."
+msgstr "Прелистај го споделениот индекс на овој сопственик преку IceBridge или неговиот јавен DHT индекс."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:153
+msgid "Cannot share this file because it no longer exists on disk."
+msgstr "Оваа датотека не може да се сподели бидејќи повеќе не постои на дискот."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Category"
+msgstr "Категорија"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:125
+msgid "Category:"
+msgstr "Категорија:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:571
+msgid "Checking files"
+msgstr "Проверка на датотеки"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:569
+msgid "Checking files…"
+msgstr "Проверка на датотеки…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:566
+msgid "Checking resume data…"
+msgstr "Проверка на податоци за продолжување…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:138
+msgid "Clear"
+msgstr "Исчисти"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:165
+msgid "Click to copy"
+msgstr "Кликнете за копирање"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:162
+msgid "Copied to clipboard"
+msgstr "Копирано во таблата со исечоци"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:680
+msgid "Could not create the endorsement. Karma energy or Bitcoin connectivity may be unavailable."
+msgstr "Не можеше да се создаде препораката. Кармата енергија или Bitcoin врската можеби не се достапни."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:300
+msgid "Could not save the console log: "
+msgstr "Не можеше да се зачува дневникот на конзолата: "
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:254
+msgid "Create a torrent from this file and seed it"
+msgstr "Создај торент од оваа датотека и сидирај го"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/FileSearchResultUIWrapper.java:201
+msgid "Distributed Result Details"
+msgstr "Детали за дистрибуираниот резултат"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:68
+msgid "Distributed Search Result Details"
+msgstr "Детали за резултатот од дистрибуираното пребарување"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:94
+msgid "Download .torrent"
+msgstr "Преземи .torrent"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:195
+msgid "Download pieces in order (helps previewing media)"
+msgstr "Преземај ги деловите по ред (помага при преглед на медиуми)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:207
+msgid "Endorse Source Peer"
+msgstr "Препорачај изворен пир"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:659
+msgid "Endorse this source peer for the torrent you are seeding?"
+msgstr "Да го препорачате овој изворен пир за торентот што го сидирате?"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:517
+msgid "Enter at least one tracker URL."
+msgstr "Внесете барем една URL адреса на тракер."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:135
+msgid "Example: http://127.0.0.1:8080   or   https://relay.example.com  (use a TLS proxy for remote access)"
+msgstr "Пример: http://127.0.0.1:8080   или   https://relay.example.com  (за далечински пристап користете TLS прокси)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:186
+msgid "Force a recheck of the downloaded files"
+msgstr "Присилна повторна проверка на преземените датотеки"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:128
+msgid "Full base URL to the IceBridge control API. Remote hosts require HTTPS; HTTP is allowed only for loopback addresses (including a local authenticated tunnel)."
+msgstr "Целосна основна URL адреса на контролниот API на IceBridge. Далечинските хостови бараат HTTPS; HTTP е дозволен само за loopback адреси (вклучувајќи локален автентициран тунел)."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:272
+msgid "Holder details are not currently cached."
+msgstr "Деталите за сопственикот моментално не се во кешот."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:250
+msgid "Holder opted in"
+msgstr "Сопственикот се согласи"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:107
+msgid "IceBridge &Console"
+msgstr "&Конзола на IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:72
+msgid "IceBridge Console"
+msgstr "Конзола на IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:245
+msgid "IceBridge Holder ID"
+msgstr "ID на сопственик на IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:266
+msgid "IceBridge version"
+msgstr "Верзија на IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:512
+msgid "Invalid Tracker URL"
+msgstr "Неважечка URL адреса на тракер"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:382
+msgid "Invalid tracker URL. Use http(s)://host/announce or udp://host:port."
+msgstr "Неважечка URL адреса на тракер. Користете http(s)://host/announce или udp://host:port."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:511
+msgid "Invalid tracker URL:"
+msgstr "Неважечка URL адреса на тракер:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:259
+msgid "Known peer address"
+msgstr "Позната адреса на пир"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Level"
+msgstr "Ниво"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:281
+msgid "Log files"
+msgstr "Датотеки на дневникот"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:283
+msgid "Magnet URI"
+msgstr "Magnet URI"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:123
+msgid "Min level:"
+msgstr "Мин. ниво:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "None advertised"
+msgstr "Ништо не е огласено"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:251
+msgid "Not offered"
+msgstr "Не се нуди"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Peer"
+msgstr "Пир"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:267
+msgid "Peer capabilities"
+msgstr "Способности на пирот"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:271
+msgid "Peer directory"
+msgstr "Именик на пирови"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:262
+msgid "Peer verified"
+msgstr "Пирот е проверен"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:129
+msgid "Peer:"
+msgstr "Пир:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:383
+msgid "Post it on X"
+msgstr "Објави на X"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:384
+msgid "Post the message above on X"
+msgstr "Објави ја горната порака на X"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:549
+msgid "Recheck complete"
+msgstr "Повторната проверка заврши"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:280
+msgid "Save IceBridge Console"
+msgstr "Зачувај ја конзолата на IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:301
+msgid "Save failed"
+msgstr "Зачувувањето не успеа"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:141
+msgid "Save..."
+msgstr "Зачувај..."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "Seeder endpoints"
+msgstr "Крајни точки на сидерот"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:192
+msgid "Sequential download"
+msgstr "Секвенцијално преземање"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:252
+msgid "Share"
+msgstr "Сподели"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:248
+msgid "Shared-catalog browsing"
+msgstr "Прелистување на споделениот каталог"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:108
+msgid "Show live IceBridge and distributed search events"
+msgstr "Прикажи ги настаните на IceBridge и дистрибуираното пребарување во живо"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:679
+msgid "Source peer endorsed."
+msgstr "Изворниот пир е препорачан."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:127
+msgid "Text:"
+msgstr "Текст:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:387
+msgid "That tracker is already on the list."
+msgstr "Тој тракер веќе е на листата."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:81
+msgid "The info hash identifies the torrent; the holder ID routes metadata requests through IceBridge."
+msgstr "Info хешот го идентификува торентот; ID на сопственикот ги насочува барањата за метаподатоци преку IceBridge."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:360
+msgid "Tracker announce URL (http, https or udp)"
+msgstr "URL адреса за објава на тракерот (http, https или udp)"

@@ -6494,3 +6494,263 @@ msgstr "Ní féidir gach colúin a bhaint"
 
 #~ msgid "Hide Seeding Transfers"
 #~ msgstr "Scoir tar éis Aistrithe"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:331
+msgid "Add Tracker"
+msgstr "Cuir tracálaí leis"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:352
+msgid "Add tracker"
+msgstr "Cuir tracálaí leis"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:117
+msgid "All categories"
+msgstr "Gach catagóir"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:79
+msgid "Auto-scroll"
+msgstr "Scrollú uathoibríoch"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:96
+msgid "Browse the torrents a peer shares over IceBridge"
+msgstr "Brabhsáil na torrents a roinneann piaraí trí IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:105
+msgid "Browse this holder's shared index over IceBridge or its public DHT index."
+msgstr "Brabhsáil innéacs roinnte an sealbhóra seo trí IceBridge nó a innéacs poiblí DHT."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:153
+msgid "Cannot share this file because it no longer exists on disk."
+msgstr "Ní féidir an comhad seo a roinnt toisc nach bhfuil sé ar an diosca a thuilleadh."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Category"
+msgstr "Catagóir"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:125
+msgid "Category:"
+msgstr "Catagóir:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:571
+msgid "Checking files"
+msgstr "Comhaid á seiceáil"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:569
+msgid "Checking files…"
+msgstr "Comhaid á seiceáil…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:566
+msgid "Checking resume data…"
+msgstr "Sonraí atosaithe á seiceáil…"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:138
+msgid "Clear"
+msgstr "Glan"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:165
+msgid "Click to copy"
+msgstr "Cliceáil chun cóipeáil"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:162
+msgid "Copied to clipboard"
+msgstr "Cóipeáilte chuig an ghearrthaisce"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:680
+msgid "Could not create the endorsement. Karma energy or Bitcoin connectivity may be unavailable."
+msgstr "Níorbh fhéidir an formhuiniú a chruthú. B'fhéidir nach bhfuil fuinneamh karma nó nasc Bitcoin ar fáil."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:300
+msgid "Could not save the console log: "
+msgstr "Níorbh fhéidir logáil na consóle a shábháil: "
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:254
+msgid "Create a torrent from this file and seed it"
+msgstr "Cruthaigh torrent ón gcomhad seo agus síolaigh é"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/FileSearchResultUIWrapper.java:201
+msgid "Distributed Result Details"
+msgstr "Sonraí an Toraidh Dháilte"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:68
+msgid "Distributed Search Result Details"
+msgstr "Sonraí Thoradh an Chuardaigh Dháilte"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:94
+msgid "Download .torrent"
+msgstr "Íoslódáil .torrent"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:195
+msgid "Download pieces in order (helps previewing media)"
+msgstr "Íoslódáil píosaí in ord (cabhraíonn sé le réamhamharc meán)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:207
+msgid "Endorse Source Peer"
+msgstr "Formhuinigh an Piaraí Foinse"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:659
+msgid "Endorse this source peer for the torrent you are seeding?"
+msgstr "An bhformhuineoidh tú an piaraí foinse seo don torrent atá á shíolú agat?"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:517
+msgid "Enter at least one tracker URL."
+msgstr "Cuir isteach URL tracálaí amháin ar a laghad."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:135
+msgid "Example: http://127.0.0.1:8080   or   https://relay.example.com  (use a TLS proxy for remote access)"
+msgstr "Sampla: http://127.0.0.1:8080   nó   https://relay.example.com  (úsáid seachfhreastalaí TLS le haghaidh rochtain chianda)"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:186
+msgid "Force a recheck of the downloaded files"
+msgstr "Iachall athsheiceáil ar na comhaid a íoslódáladh"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:128
+msgid "Full base URL to the IceBridge control API. Remote hosts require HTTPS; HTTP is allowed only for loopback addresses (including a local authenticated tunnel)."
+msgstr "Bun-URL iomlán API rialaithe IceBridge. Teastaíonn HTTPS ó óstaigh chianda; ceadaítear HTTP do sheoltaí loopback amháin (lena n-áirítear tollán áitiúil fíordheimhnithe)."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:272
+msgid "Holder details are not currently cached."
+msgstr "Níl sonraí an tsealbhóra i dtaisce faoi láthair."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:250
+msgid "Holder opted in"
+msgstr "Thoiligh an sealbhóir"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:107
+msgid "IceBridge &Console"
+msgstr "&Consól IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:72
+msgid "IceBridge Console"
+msgstr "Consól IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:245
+msgid "IceBridge Holder ID"
+msgstr "ID Sealbhóra IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:266
+msgid "IceBridge version"
+msgstr "Leagan IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:512
+msgid "Invalid Tracker URL"
+msgstr "URL Tracálaí Neamhbhailí"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:382
+msgid "Invalid tracker URL. Use http(s)://host/announce or udp://host:port."
+msgstr "URL tracálaí neamhbhailí. Úsáid http(s)://host/announce nó udp://host:port."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:511
+msgid "Invalid tracker URL:"
+msgstr "URL tracálaí neamhbhailí:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:259
+msgid "Known peer address"
+msgstr "Seoladh piaraí aitheanta"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Level"
+msgstr "Leibhéal"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:281
+msgid "Log files"
+msgstr "Comhaid loga"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:283
+msgid "Magnet URI"
+msgstr "URI Magnet"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:123
+msgid "Min level:"
+msgstr "Íosleibhéal:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "None advertised"
+msgstr "Níl aon cheann fógartha"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:251
+msgid "Not offered"
+msgstr "Níl sé á thairiscint"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:336
+msgid "Peer"
+msgstr "Piaraí"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:267
+msgid "Peer capabilities"
+msgstr "Cumais an phiaraí"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:271
+msgid "Peer directory"
+msgstr "Eolaire piaraí"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:262
+msgid "Peer verified"
+msgstr "Piaraí fíoraithe"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:129
+msgid "Peer:"
+msgstr "Piaraí:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:383
+msgid "Post it on X"
+msgstr "Postáil ar X é"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:384
+msgid "Post the message above on X"
+msgstr "Postáil an teachtaireacht thuas ar X"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:549
+msgid "Recheck complete"
+msgstr "Athsheiceáil críochnaithe"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:280
+msgid "Save IceBridge Console"
+msgstr "Sábháil Consól IceBridge"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:301
+msgid "Save failed"
+msgstr "Theip ar an sábháil"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:141
+msgid "Save..."
+msgstr "Sábháil..."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:279
+msgid "Seeder endpoints"
+msgstr "Críochphointí an tsíolaire"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:192
+msgid "Sequential download"
+msgstr "Íoslódáil ord"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:252
+msgid "Share"
+msgstr "Roinn"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:248
+msgid "Shared-catalog browsing"
+msgstr "Brabhsáil ar an gcatalóg roinnte"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:108
+msgid "Show live IceBridge and distributed search events"
+msgstr "Taispeáin imeachtaí IceBridge agus cuardaigh dháilte beo"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java:679
+msgid "Source peer endorsed."
+msgstr "Formhuinithe an piaraí foinse."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java:127
+msgid "Text:"
+msgstr "Téacs:"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:387
+msgid "That tracker is already on the list."
+msgstr "Tá an tracálaí sin ar an liosta cheana féin."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:81
+msgid "The info hash identifies the torrent; the holder ID routes metadata requests through IceBridge."
+msgstr "Aithníonn an hais faisnéise an torrent; seolann ID an tsealbhóra iarratais meiteashonraí trí IceBridge."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:360
+msgid "Tracker announce URL (http, https or udp)"
+msgstr "URL fógra an tracálaí (http, https nó udp)"
