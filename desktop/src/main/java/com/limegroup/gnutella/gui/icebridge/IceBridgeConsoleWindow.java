@@ -204,7 +204,8 @@ public final class IceBridgeConsoleWindow {
     if (added) {
       model.setEvents(filtered());
       if (autoScroll.isSelected() && model.getRowCount() > 0) {
-        table.scrollRectToVisible(table.getCellRect(model.getRowCount() - 1, 0, true));
+        // Newest rows are at the top.
+        table.scrollRectToVisible(table.getCellRect(0, 0, true));
       }
     }
   }
@@ -252,13 +253,26 @@ public final class IceBridgeConsoleWindow {
             : java.util.Collections.singleton(category);
     String text = textFilter.getText();
     String peer = peerFilter.getText();
-    List<IceBridgeEvent> out = new ArrayList<>();
-    for (IceBridgeEvent e : all) {
-      if (IceBridgeEventLog.matches(e, minLevel, categories, text, peer, 0)) {
+    return newestFirst(all, e -> IceBridgeEventLog.matches(e, minLevel, categories, text, peer, 0));
+  }
+
+  /** Display order: newest entry at the top. {@code chronological} is oldest-first. */
+  static <T> List<T> newestFirst(List<T> chronological, java.util.function.Predicate<T> keep) {
+    List<T> out = new ArrayList<>();
+    for (int i = chronological.size() - 1; i >= 0; i--) {
+      T e = chronological.get(i);
+      if (keep.test(e)) {
         out.add(e);
       }
     }
     return out;
+  }
+
+  /** Copy/Save export oldest-first, like a conventional log file. */
+  private List<IceBridgeEvent> exportOrder() {
+    List<IceBridgeEvent> shown = new ArrayList<>(model.getEvents());
+    java.util.Collections.reverse(shown);
+    return shown;
   }
 
   private void saveToFile() {
@@ -269,7 +283,7 @@ public final class IceBridgeConsoleWindow {
       return;
     }
     File file = chooser.getSelectedFile();
-    String content = toText(model.getEvents());
+    String content = toText(exportOrder());
     Thread writer =
         new Thread(
             () -> {
@@ -296,7 +310,7 @@ public final class IceBridgeConsoleWindow {
   private void copyToClipboard() {
     Toolkit.getDefaultToolkit()
         .getSystemClipboard()
-        .setContents(new StringSelection(toText(model.getEvents())), null);
+        .setContents(new StringSelection(toText(exportOrder())), null);
   }
 
   private static String toText(List<IceBridgeEvent> events) {
