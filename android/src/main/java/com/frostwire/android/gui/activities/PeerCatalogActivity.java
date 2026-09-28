@@ -27,7 +27,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -40,171 +39,204 @@ import com.frostwire.search.relay.RemoteIndexFetcher.RemoteTorrentEntry;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
-
+import java.lang.ref.WeakReference;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Shows the shared-torrent catalog of a peer that opted in to being browsable
- * (Distributed search result magnet flag {@code x.hc=1}). The catalog is
- * fetched over the IceBridge mesh with the same signed request the desktop
- * relay exposes as {@code GET /catalog}; tapping an entry starts a transfer
- * whose metadata is fetched from that same holder over the mesh.
+ * Shows the shared-torrent catalog of a peer that opted in to being browsable (Distributed search
+ * result magnet flag {@code x.hc=1}). The catalog is fetched over the IceBridge mesh with the same
+ * signed request the desktop relay exposes as {@code GET /catalog}; tapping an entry starts a
+ * transfer whose metadata is fetched from that same holder over the mesh.
  *
  * @author gubatron
  */
 public class PeerCatalogActivity extends AbstractActivity {
 
-    public static final String EXTRA_PEER_PUB = "peer_pub";
+  public static final String EXTRA_PEER_PUB = "peer_pub";
 
-    private static final Logger LOG = Logger.getLogger(PeerCatalogActivity.class);
-    private static final int BROWSE_TIMEOUT_MS = 8_000;
+  private static final Logger LOG = Logger.getLogger(PeerCatalogActivity.class);
+  private static final int BROWSE_TIMEOUT_MS = 8_000;
 
-    private ListView list;
-    private TextView emptyView;
-    private ProgressBar progress;
+  private ListView list;
+  private TextView emptyView;
+  private ProgressBar progress;
 
-    public PeerCatalogActivity() {
-        super(R.layout.activity_peer_catalog);
+  public PeerCatalogActivity() {
+    super(R.layout.activity_peer_catalog);
+  }
+
+  @Override
+  protected void initComponents(Bundle savedInstanceState) {
+    super.initComponents(savedInstanceState);
+    setTitle(R.string.peer_catalog_title);
+    list = findView(R.id.peer_catalog_list);
+    emptyView = findView(R.id.peer_catalog_empty);
+    progress = findView(R.id.peer_catalog_progress);
+
+    byte[] peerPub = decodePeerPub(getIntent().getStringExtra(EXTRA_PEER_PUB));
+    if (peerPub == null) {
+      showEmpty();
+      return;
+    }
+    list.setOnItemClickListener(
+        (parent, view, position, id) -> {
+          Object item = parent.getItemAtPosition(position);
+          if (item instanceof RemoteTorrentEntry) {
+            startDownload((RemoteTorrentEntry) item, peerPub);
+          }
+        });
+    loadCatalog(peerPub);
+  }
+
+  private static byte[] decodePeerPub(String pubBase64Url) {
+    if (pubBase64Url == null || pubBase64Url.isEmpty()) {
+      return null;
+    }
+    try {
+      byte[] pub = Base64.getUrlDecoder().decode(pubBase64Url);
+      return pub.length == 32 ? pub : null;
+    } catch (Throwable t) {
+      return null;
+    }
+  }
+
+  private void loadCatalog(byte[] peerPub) {
+    // EngineThreadPool rejects tasks that reference a Context: hold the activity weakly.
+    Engine.instance().getThreadPool().execute(new CatalogLoadTask(this, peerPub));
+  }
+
+  /** Fetches off the main thread without retaining the activity if it is destroyed meanwhile. */
+  static final class CatalogLoadTask implements Runnable {
+    private final WeakReference<PeerCatalogActivity> activityRef;
+    private final byte[] peerPub;
+
+    CatalogLoadTask(PeerCatalogActivity activity, byte[] peerPub) {
+      this.activityRef = new WeakReference<>(activity);
+      this.peerPub = peerPub.clone();
     }
 
     @Override
-    protected void initComponents(Bundle savedInstanceState) {
-        super.initComponents(savedInstanceState);
-        setTitle(R.string.peer_catalog_title);
-        list = findView(R.id.peer_catalog_list);
-        emptyView = findView(R.id.peer_catalog_empty);
-        progress = findView(R.id.peer_catalog_progress);
-
-        byte[] peerPub = decodePeerPub(getIntent().getStringExtra(EXTRA_PEER_PUB));
-        if (peerPub == null) {
-            showEmpty();
-            return;
-        }
-        list.setOnItemClickListener((parent, view, position, id) -> {
-            Object item = parent.getItemAtPosition(position);
-            if (item instanceof RemoteTorrentEntry) {
-                startDownload((RemoteTorrentEntry) item, peerPub);
+    public void run() {
+      AndroidRelayStack stack = AndroidRelayStack.live();
+      List<RemoteTorrentEntry> entries =
+          (stack == null)
+              ? Collections.emptyList()
+              : stack.browseCatalog(peerPub, BROWSE_TIMEOUT_MS);
+      PeerCatalogActivity activity = activityRef.get();
+      if (activity == null) {
+        return;
+      }
+      activity.runOnUiThread(
+          () -> {
+            if (activity.isFinishing() || activity.isDestroyed()) {
+              return;
             }
+            activity.populate(entries);
+          });
+    }
+  }
+
+  private void populate(List<RemoteTorrentEntry> entries) {
+    progress.setVisibility(View.GONE);
+    if (entries == null || entries.isEmpty()) {
+      showEmpty();
+      return;
+    }
+    emptyView.setVisibility(View.GONE);
+    list.setVisibility(View.VISIBLE);
+    list.setAdapter(new PeerCatalogAdapter(entries));
+  }
+
+  private void showEmpty() {
+    progress.setVisibility(View.GONE);
+    list.setVisibility(View.GONE);
+    emptyView.setVisibility(View.VISIBLE);
+  }
+
+  private void startDownload(RemoteTorrentEntry entry, byte[] peerPub) {
+    String infoHashHex = entry.infoHashHex();
+    if (infoHashHex == null || infoHashHex.length() != 40) {
+      return;
+    }
+    String magnet =
+        UrlUtils.buildMagnetUrl(infoHashHex, entry.name(), DefaultTrackers.MAGNET_URL_PARAMETERS)
+            + "&x.hp="
+            + Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub);
+    final WeakReference<PeerCatalogActivity> activityRef = new WeakReference<>(this);
+    postToHandler(
+        HandlerThreadName.DOWNLOADER,
+        () -> {
+          try {
+            TransferManager tm = TransferManager.instance();
+            BittorrentDownload transfer = tm.downloadTorrent(magnet, null, entry.name());
+            PeerCatalogActivity activity = activityRef.get();
+            if (activity != null) {
+              activity.runOnUiThread(() -> activity.onDownloadStarted(transfer));
+            }
+          } catch (Throwable t) {
+            LOG.error("PeerCatalogActivity: could not start download " + infoHashHex, t);
+          }
         });
-        loadCatalog(peerPub);
+  }
+
+  private void onDownloadStarted(BittorrentDownload transfer) {
+    if (transfer == null || isFinishing() || isDestroyed()) {
+      return;
+    }
+    TransferManager tm = TransferManager.instance();
+    if (tm.isBittorrentDownloadAndMobileDataSavingsOn(transfer)) {
+      UIUtils.showLongMessage(this, R.string.torrent_transfer_enqueued_on_mobile_data);
+      transfer.pause();
+    } else {
+      if (tm.isBittorrentDownloadAndMobileDataSavingsOff(transfer)) {
+        UIUtils.showLongMessage(this, R.string.torrent_transfer_consuming_mobile_data);
+      }
+      UIUtils.showShortMessage(this, R.string.download_added_to_queue);
+      UIUtils.showTransfersOnDownloadStart(this);
+    }
+  }
+
+  private class PeerCatalogAdapter extends BaseAdapter {
+    private final List<RemoteTorrentEntry> entries;
+
+    PeerCatalogAdapter(List<RemoteTorrentEntry> entries) {
+      this.entries = entries;
     }
 
-    private static byte[] decodePeerPub(String pubBase64Url) {
-        if (pubBase64Url == null || pubBase64Url.isEmpty()) {
-            return null;
-        }
-        try {
-            byte[] pub = Base64.getUrlDecoder().decode(pubBase64Url);
-            return pub.length == 32 ? pub : null;
-        } catch (Throwable t) {
-            return null;
-        }
+    @Override
+    public int getCount() {
+      return entries.size();
     }
 
-    private void loadCatalog(byte[] peerPub) {
-        final AndroidRelayStack stack = AndroidRelayStack.live();
-        Engine.instance().getThreadPool().execute(() -> {
-            List<RemoteTorrentEntry> entries = (stack == null)
-                    ? Collections.emptyList()
-                    : stack.browseCatalog(peerPub, BROWSE_TIMEOUT_MS);
-            runOnUiThread(() -> {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
-                populate(entries);
-            });
-        });
+    @Override
+    public Object getItem(int position) {
+      return entries.get(position);
     }
 
-    private void populate(List<RemoteTorrentEntry> entries) {
-        progress.setVisibility(View.GONE);
-        if (entries == null || entries.isEmpty()) {
-            showEmpty();
-            return;
-        }
-        emptyView.setVisibility(View.GONE);
-        list.setVisibility(View.VISIBLE);
-        list.setAdapter(new PeerCatalogAdapter(entries));
+    @Override
+    public long getItemId(int position) {
+      return position;
     }
 
-    private void showEmpty() {
-        progress.setVisibility(View.GONE);
-        list.setVisibility(View.GONE);
-        emptyView.setVisibility(View.VISIBLE);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      View view = convertView;
+      if (view == null) {
+        view = getLayoutInflater().inflate(R.layout.view_peer_catalog_item, parent, false);
+      }
+      RemoteTorrentEntry entry = entries.get(position);
+      TextView name = view.findViewById(R.id.peer_catalog_item_name);
+      TextView details = view.findViewById(R.id.peer_catalog_item_details);
+      name.setText(entry.name());
+      details.setText(
+          UIUtils.getBytesInHuman(entry.sizeBytes())
+              + " · "
+              + entry.fileCount()
+              + " "
+              + getString(R.string.files));
+      return view;
     }
-
-    private void startDownload(RemoteTorrentEntry entry, byte[] peerPub) {
-        String infoHashHex = entry.infoHashHex();
-        if (infoHashHex == null || infoHashHex.length() != 40) {
-            return;
-        }
-        String magnet = UrlUtils.buildMagnetUrl(infoHashHex, entry.name(), DefaultTrackers.MAGNET_URL_PARAMETERS)
-                + "&x.hp=" + Base64.getUrlEncoder().withoutPadding().encodeToString(peerPub);
-        postToHandler(HandlerThreadName.DOWNLOADER, () -> {
-            try {
-                TransferManager tm = TransferManager.instance();
-                BittorrentDownload transfer = tm.downloadTorrent(magnet, null, entry.name());
-                runOnUiThread(() -> onDownloadStarted(transfer));
-            } catch (Throwable t) {
-                LOG.error("PeerCatalogActivity: could not start download " + infoHashHex, t);
-            }
-        });
-    }
-
-    private void onDownloadStarted(BittorrentDownload transfer) {
-        if (transfer == null || isFinishing() || isDestroyed()) {
-            return;
-        }
-        TransferManager tm = TransferManager.instance();
-        if (tm.isBittorrentDownloadAndMobileDataSavingsOn(transfer)) {
-            UIUtils.showLongMessage(this, R.string.torrent_transfer_enqueued_on_mobile_data);
-            transfer.pause();
-        } else {
-            if (tm.isBittorrentDownloadAndMobileDataSavingsOff(transfer)) {
-                UIUtils.showLongMessage(this, R.string.torrent_transfer_consuming_mobile_data);
-            }
-            UIUtils.showShortMessage(this, R.string.download_added_to_queue);
-            UIUtils.showTransfersOnDownloadStart(this);
-        }
-    }
-
-    private class PeerCatalogAdapter extends BaseAdapter {
-        private final List<RemoteTorrentEntry> entries;
-
-        PeerCatalogAdapter(List<RemoteTorrentEntry> entries) {
-            this.entries = entries;
-        }
-
-        @Override
-        public int getCount() {
-            return entries.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return entries.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.view_peer_catalog_item, parent, false);
-            }
-            RemoteTorrentEntry entry = entries.get(position);
-            TextView name = view.findViewById(R.id.peer_catalog_item_name);
-            TextView details = view.findViewById(R.id.peer_catalog_item_details);
-            name.setText(entry.name());
-            details.setText(UIUtils.getBytesInHuman(entry.sizeBytes())
-                    + " · " + entry.fileCount() + " " + getString(R.string.files));
-            return view;
-        }
-    }
+  }
 }
