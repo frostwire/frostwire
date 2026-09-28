@@ -8,6 +8,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,6 +43,38 @@ class FileSearchResultUIWrapperTest {
     assertTrue(details.description.contains("192.0.2.4:6889"));
     assertTrue(details.description.contains(magnet));
     assertArrayEquals(HOLDER, details.holderPub);
+  }
+
+  @Test
+  void detailsAreLabeledFieldsAndIdentifiersAreCopyable() {
+    String magnet = magnet("BACK 2 LIFE (audio).webm", "x.pe=192.0.2.4:6889&x.pe=10.0.0.5:6889");
+    DistributedSearchResultDetailsWindow.Details details =
+        DistributedSearchResultDetailsWindow.describe(
+            result("Distributed", magnet), "back 2 life", null);
+
+    assertEquals(INFO_HASH, field(details, "Info Hash").value);
+    assertTrue(field(details, "Info Hash").copyable);
+    assertTrue(field(details, "IceBridge Holder ID").copyable);
+    assertEquals("192.0.2.4:6889\n10.0.0.5:6889", field(details, "Seeder endpoints").value);
+    assertTrue(field(details, "Seeder endpoints").copyable);
+    assertFalse(field(details, "Size").copyable, "plain facts are not copy targets");
+
+    DistributedSearchResultDetailsWindow.Field magnetField = field(details, "Magnet URI");
+    assertTrue(magnetField.copyable);
+    assertEquals(magnet, magnetField.value, "copy always uses the full magnet");
+    assertTrue(
+        magnetField.display.length() <= DistributedSearchResultDetailsWindow.MAX_DISPLAY_CHARS);
+    assertTrue(magnetField.display.endsWith("\u2026"));
+  }
+
+  private static DistributedSearchResultDetailsWindow.Field field(
+      DistributedSearchResultDetailsWindow.Details details, String label) {
+    for (DistributedSearchResultDetailsWindow.Field f : details.fields) {
+      if (f.label.equals(label)) {
+        return f;
+      }
+    }
+    throw new AssertionError("missing field " + label);
   }
 
   @Test
