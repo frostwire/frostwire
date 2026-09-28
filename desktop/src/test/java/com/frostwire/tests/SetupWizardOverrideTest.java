@@ -7,11 +7,14 @@
 
 package com.frostwire.tests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.limegroup.gnutella.gui.init.SeedingPublishingText;
 import com.limegroup.gnutella.gui.init.SetupWizardOverride;
+import com.limegroup.gnutella.gui.init.WrappedText;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class SetupWizardOverrideTest {
@@ -46,5 +49,21 @@ class SetupWizardOverrideTest {
     assertTrue(html.contains("seeding or downloading"), "must say what is shared");
     assertTrue(html.contains("never published"), "must say what is not shared");
     assertTrue(html.contains("Enable IceBridge (distributed relay)"), "must say how to opt out");
+  }
+
+  @Test
+  void wizardTextWrapsWithinTheWidthAndNeverOverflows() {
+    // 1 pixel per character keeps the arithmetic obvious.
+    List<String> lines = WrappedText.wrap("aaaa bbbb cccc dddd", String::length, 9);
+    assertEquals(List.of("aaaa bbbb", "cccc dddd"), lines);
+    assertEquals(
+        List.of("abcdefgh", "ijkl"),
+        WrappedText.wrap("abcdefghijkl", String::length, 8),
+        "an over-long word is broken by character");
+    for (String line : WrappedText.wrap("one two three four five six seven", String::length, 12)) {
+      assertTrue(line.length() <= 12);
+    }
+    assertEquals(
+        "<html>a &lt;b&gt; &amp; c<br>d</html>", WrappedText.html(List.of("a <b> & c", "d")));
   }
 }

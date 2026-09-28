@@ -29,6 +29,11 @@ import javax.swing.*;
  * shared, and letting the user opt in to having those torrents browsable by crawlers.
  */
 final class SeedingPublishingWindow extends SetupWindow {
+  /** Line width inside the 700px page: its 10px side padding, the bullet and a safety margin. */
+  private static final int TEXT_WIDTH = 640;
+
+  private static final int SCOPE_INDENT = 22;
+
   private JCheckBox _crawlerOptIn;
 
   /** Creates the window and its components. */
@@ -57,7 +62,7 @@ final class SeedingPublishingWindow extends SetupWindow {
       dot.setOpaque(false);
       dot.add(new JLabel("\u2022"), BorderLayout.NORTH); // stay on the first line
       bullet.add(dot, BorderLayout.WEST);
-      bullet.add(new Paragraph(point), BorderLayout.CENTER);
+      bullet.add(new WrappedLabel(point, TEXT_WIDTH), BorderLayout.CENTER);
       mainPanel.add(bullet, row);
     }
     mainPanel.add(Box.createVerticalStrut(10), row);
@@ -79,11 +84,12 @@ final class SeedingPublishingWindow extends SetupWindow {
     gbc.gridwidth = GridBagConstraints.REMAINDER;
     gbc.weightx = 1;
     gbc.weighty = 1;
-    Paragraph scope =
-        new Paragraph(
+    WrappedLabel scope =
+        new WrappedLabel(
             I18n.tr(
-                "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."));
-    scope.setBorder(BorderFactory.createEmptyBorder(0, 22, 0, 0));
+                "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."),
+            TEXT_WIDTH - SCOPE_INDENT);
+    scope.setBorder(BorderFactory.createEmptyBorder(0, SCOPE_INDENT, 0, 0));
     mainPanel.add(scope, gbc);
     setSetupComponent(mainPanel);
   }
@@ -100,25 +106,14 @@ final class SeedingPublishingWindow extends SetupWindow {
   }
 
   /**
-   * Wrapping text that asks for a page-sized width but wraps at whatever width it is given. Swing
-   * HTML labels and plain text areas both report an unwrapped single-line width, which would widen
-   * the whole setup dialog.
+   * A plain label that shows {@code text} wrapped to {@code maxWidth} pixels, measured with the
+   * label's own font, so it never asks the setup dialog to grow.
    */
-  private static final class Paragraph extends MultiLineLabel {
-    private static final int PREFERRED_WIDTH = 560;
-
-    Paragraph(String text) {
-      super(text);
-      setOpaque(false);
+  private static final class WrappedLabel extends JLabel {
+    WrappedLabel(String text, int maxWidth) {
       setFont(getFont().deriveFont(Font.PLAIN));
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-      int width = getWidth() > 0 ? getWidth() : PREFERRED_WIDTH;
-      setSize(width, 1);
-      Dimension d = super.getPreferredSize();
-      return new Dimension(Math.min(d.width, PREFERRED_WIDTH), d.height);
+      FontMetrics metrics = getFontMetrics(getFont());
+      setText(WrappedText.html(WrappedText.wrap(text, metrics::stringWidth, maxWidth)));
     }
   }
 }
