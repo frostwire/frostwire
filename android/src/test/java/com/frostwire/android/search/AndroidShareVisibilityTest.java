@@ -40,6 +40,37 @@ public class AndroidShareVisibilityTest {
             "0000000000000000000000000000000000000000", key -> null, List.of(ui), candidate -> v1));
   }
 
+  @Test
+  public void distinctWrappersOfTheSameNativeTorrentAreTheSameTransfer() {
+    // BTEngine callbacks and ensureUiDownload() each build their own BTDownload wrapper for one
+    // torrent. A freshly seeded YouTube/HTTP file was never indexed because the callback wrapper
+    // was not the UI row's object; only the native torrent identity matters.
+    String[] callback = {"native-torrent-1"};
+    String[] uiRow = {new String("native-torrent-1")};
+    String[] readded = {"native-torrent-2"};
+    java.util.function.Function<String[], String> handleOf = w -> w[0];
+    java.util.function.BiPredicate<String, String> sameNative = String::equals;
+
+    assertTrue(AndroidShareVisibility.sameTorrent(callback, uiRow, handleOf, sameNative));
+    assertTrue(AndroidShareVisibility.sameTorrent(uiRow, uiRow, handleOf, sameNative));
+    assertFalse(
+        "a removed and re-added torrent is a different native object",
+        AndroidShareVisibility.sameTorrent(callback, readded, handleOf, sameNative));
+    assertFalse(AndroidShareVisibility.sameTorrent(callback, null, handleOf, sameNative));
+    assertFalse(
+        "missing native handle fails closed",
+        AndroidShareVisibility.sameTorrent(callback, new String[] {null}, handleOf, sameNative));
+    assertFalse(
+        "a removed native handle fails closed",
+        AndroidShareVisibility.sameTorrent(
+            callback,
+            uiRow,
+            handleOf,
+            (a, b) -> {
+              throw new IllegalStateException("handle removed");
+            }));
+  }
+
   // Visibility matrix without native handles: eligibility is decided by the
   // live-transfer predicate and participation flag, never by parsing metadata.
   @Test
