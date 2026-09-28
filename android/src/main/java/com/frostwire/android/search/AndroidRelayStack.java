@@ -287,6 +287,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       // Torrents restored before this listener was chained never fired
       // downloadAdded; subsequent downloadUpdate callbacks retry incomplete metadata.
       reindexExistingTransfers(indexer, "immediate");
+      indexer.startReconcile(AndroidRelayStack::liveTransferDownloads);
 
       ks = new AndroidKarmaChainStore(context, AndroidLocalIndex.DEFAULT_DB_NAME, permitted);
       File bitcoinCacheDir = new File(homeDir, RelayConstants.BITCOIN_HEADER_CACHE_DIR);
@@ -882,20 +883,25 @@ public final class AndroidRelayStack implements AutoCloseable {
    * Schedule indexing for every transfer currently known to {@link TransferManager}. Safe to call
    * multiple times.
    */
+  private static java.util.List<BTDownload> liveTransferDownloads() {
+    java.util.ArrayList<BTDownload> existing = new java.util.ArrayList<>();
+    for (Transfer t : TransferManager.instance().getTransfers()) {
+      if (t instanceof UIBittorrentDownload) {
+        BTDownload dl = ((UIBittorrentDownload) t).getDl();
+        if (dl != null) {
+          existing.add(dl);
+        }
+      }
+    }
+    return existing;
+  }
+
   private static void reindexExistingTransfers(AndroidSharedTorrentIndexer indexer, String phase) {
     if (indexer == null) {
       return;
     }
     try {
-      java.util.ArrayList<BTDownload> existing = new java.util.ArrayList<>();
-      for (Transfer t : TransferManager.instance().getTransfers()) {
-        if (t instanceof UIBittorrentDownload) {
-          BTDownload dl = ((UIBittorrentDownload) t).getDl();
-          if (dl != null) {
-            existing.add(dl);
-          }
-        }
-      }
+      java.util.List<BTDownload> existing = liveTransferDownloads();
       for (BTDownload download : existing) {
         indexer.downloadAdded(null, download);
       }
