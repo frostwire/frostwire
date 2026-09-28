@@ -22,7 +22,9 @@ import java.security.Signature;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -152,6 +154,8 @@ public final class CatalogBrowser {
     final CountDownLatch done = new CountDownLatch(1);
     final AtomicReference<List<RemoteIndexFetcher.RemoteTorrentEntry>> result =
         new AtomicReference<>();
+    final Map<Integer, List<RemoteIndexFetcher.RemoteTorrentEntry>> pages = new HashMap<>();
+    final int[] expectedPages = {-1};
 
     DistributedSearchTransport.PayloadListener listener =
         new DistributedSearchTransport.PayloadListener() {
@@ -171,13 +175,28 @@ public final class CatalogBrowser {
             if (done.getCount() == 0 || System.nanoTime() >= deadlineNanos) {
               return;
             }
-            List<RemoteIndexFetcher.RemoteTorrentEntry> entries =
-                decodeAndVerifyManifest(payload, expectedNonce, target);
-            if (entries == null) {
+            Page page = decodeAndVerifyManifest(payload, expectedNonce, target);
+            if (page == null) {
               return;
             }
-            result.compareAndSet(null, entries);
-            done.countDown();
+            synchronized (pages) {
+              if (page.pages <= 1) {
+                // v1 single manifest, or a one-page v2 catalog.
+                result.compareAndSet(null, page.entries);
+                done.countDown();
+                return;
+              }
+              if (expectedPages[0] < 0) {
+                expectedPages[0] = page.pages;
+              } else if (expectedPages[0] != page.pages) {
+                return; // pages of a different catalog snapshot
+              }
+              pages.putIfAbsent(page.page, page.entries);
+              if (pages.size() == expectedPages[0]) {
+                result.compareAndSet(null, CatalogManifestPages.merge(pages));
+                done.countDown();
+              }
+            }
           }
         };
 
@@ -196,6 +215,16 @@ public final class CatalogBrowser {
         done.await(remaining, TimeUnit.NANOSECONDS);
       }
       List<RemoteIndexFetcher.RemoteTorrentEntry> entries = result.get();
+      if (entries == null) {
+        synchronized (pages) {
+          if (!pages.isEmpty()) {
+            // Some pages were lost in transit: show what verified rather than nothing.
+            LOG.info("CatalogBrowser: partial catalog " + pages.size() + "/" + expectedPages[0]
+                + " pages from " + Hex.encode(target));
+            return CatalogManifestPages.merge(pages);
+          }
+        }
+      }
       return entries == null ? Collections.emptyList() : entries;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
@@ -235,11 +264,24 @@ public final class CatalogBrowser {
     }
   }
 
+  /** One verified manifest frame. v1 manifests are a single page ({@code pages == 1}). */
+  static final class Page {
+    final int page;
+    final int pages;
+    final List<RemoteIndexFetcher.RemoteTorrentEntry> entries;
+
+    Page(int page, int pages, List<RemoteIndexFetcher.RemoteTorrentEntry> entries) {
+      this.page = page;
+      this.pages = pages;
+      this.entries = entries;
+    }
+  }
+
   /**
    * Decode, bound, and verify an inbound manifest. Returns {@code null} when
    * the payload is not a valid, peer-signed manifest for this fetch.
    */
-  private static List<RemoteIndexFetcher.RemoteTorrentEntry> decodeAndVerifyManifest(
+  static Page decodeAndVerifyManifest(
       byte[] payload, byte[] expectedNonce, byte[] peerPub) {
     if (payload == null || payload.length == 0 || payload.length > MAX_MANIFEST_BYTES) {
       return null;
@@ -250,9 +292,10 @@ public final class CatalogBrowser {
       if (root == null) {
         return null;
       }
+      byte[] manifestNonce = null;
       JsonElement nonceElement = root.get("nonce");
       if (nonceElement != null && nonceElement.isJsonPrimitive()) {
-        byte[] manifestNonce = Base64.getDecoder().decode(nonceElement.getAsString());
+        manifestNonce = Base64.getDecoder().decode(nonceElement.getAsString());
         if (!Arrays.equals(manifestNonce, expectedNonce)) {
           return null;
         }
@@ -281,13 +324,30 @@ public final class CatalogBrowser {
       if (manifestPub.length != PUBLIC_KEY_LENGTH || !Arrays.equals(manifestPub, peerPub)) {
         return null;
       }
-      byte[] canonical =
-          RemoteIndexFetcher.manifestCanonicalBytes(version, pubB64, timestamp, entries);
+      int page = 0;
+      int pages = 1;
+      byte[] canonical;
+      if (version == CatalogManifestPages.VERSION) {
+        JsonElement pageElement = root.get("page");
+        JsonElement pagesElement = root.get("pages");
+        if (manifestNonce == null || pageElement == null || pagesElement == null) {
+          return null; // paged manifests must bind the request nonce and position
+        }
+        page = pageElement.getAsInt();
+        pages = pagesElement.getAsInt();
+        if (pages < 1 || pages > CatalogManifestPages.MAX_PAGES || page < 0 || page >= pages) {
+          return null;
+        }
+        canonical = CatalogManifestPages.canonicalBytes(
+            pubB64, timestamp, entries, manifestNonce, page, pages);
+      } else {
+        canonical = RemoteIndexFetcher.manifestCanonicalBytes(version, pubB64, timestamp, entries);
+      }
       if (!verifyManifestSignature(peerPub, canonical, signature)) {
         LOG.debug("CatalogBrowser: manifest signature verification failed");
         return null;
       }
-      return entries;
+      return new Page(page, pages, entries);
     } catch (Throwable t) {
       LOG.debug("CatalogBrowser: rejected malformed catalog manifest", t);
       return null;

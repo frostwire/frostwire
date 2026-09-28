@@ -138,6 +138,50 @@ class MultiRelayMeshSearchTest {
         ((CompositeFileSearchResult) results.get(0)).getSource());
   }
 
+  @Test
+  void largeCatalogCrossesForwardersInPagesThatFitOneDatagram() throws Exception {
+    // A catalog answer reaches a requester the holder has no session with only through a
+    // forwarder, which caps each payload at one datagram. A single manifest stopped fitting
+    // after a handful of torrents, so "Browse Shared Torrents" went empty.
+    RelayNode r1 = startRelay("R1");
+    RelayNode r2 = startRelay("R2");
+    int linked =
+        RelayMesh.linkFully(
+            RelayMesh.MeshNode.of(
+                new RelayMesh.MeshNode(
+                    "R1",
+                    r1.client,
+                    r1.server.identity().ed25519PubRaw(),
+                    "127.0.0.1",
+                    r1.server.rudpPort()),
+                new RelayMesh.MeshNode(
+                    "R2",
+                    r2.client,
+                    r2.server.identity().ed25519PubRaw(),
+                    "127.0.0.1",
+                    r2.server.rudpPort())));
+    assertTrue(linked >= 2);
+    warmMeshSessions(r1, r2);
+
+    PeerClient seeder = startPeerClient("seeder", r2);
+    seeder.handler.setPublicCatalogEnabled(true);
+    int count = 25;
+    for (int i = 0; i < count; i++) {
+      seeder.index.upsert(
+          torrent(
+              "Chip Stocks Crash, 20B Fund Margin Called, Frontier Labs SLOW DOWN AI part " + i,
+              193_318_977L,
+              1));
+    }
+    PeerClient browser = startPeerClient("browser", r1);
+
+    List<RemoteIndexFetcher.RemoteTorrentEntry> catalog =
+        new CatalogBrowser(browser.identity, browser.transport)
+            .fetchCatalog(seeder.identity.ed25519PubRaw(), 15_000);
+
+    assertEquals(count, catalog.size(), "every shared torrent must arrive across the forwarder");
+  }
+
   // ---- fixtures ----
 
   private RelayNode startRelay(String label) throws Exception {
@@ -193,7 +237,9 @@ class MultiRelayMeshSearchTest {
     handler.start();
     resources.add(handler::stop);
 
-    return new PeerClient(label, identity, index, directory, client, transport);
+    PeerClient peer = new PeerClient(label, identity, index, directory, client, transport);
+    peer.handler = handler;
+    return peer;
   }
 
   private static void awaitHealthy(IceBridgeClient client, String label) throws Exception {
@@ -300,6 +346,7 @@ class MultiRelayMeshSearchTest {
     final PeerDirectory directory;
     final IceBridgeClient client;
     final IceBridgeSearchTransport transport;
+    IncomingSearchRequestHandler handler;
 
     PeerClient(
         String label,
@@ -388,6 +435,13 @@ class MultiRelayMeshSearchTest {
     @Override
     public int size() {
       return rows.size();
+    }
+
+    @Override
+    public List<LocalSharedTorrent> listAll() {
+      synchronized (rows) {
+        return new ArrayList<>(rows);
+      }
     }
   }
 

@@ -7,6 +7,7 @@
 
 package com.frostwire.search.relay.icebridge.client;
 
+import com.frostwire.search.relay.CatalogManifestPages;
 import com.frostwire.search.relay.DistributedSearchTransport;
 import com.frostwire.search.relay.EmptyLocalIndex;
 import com.frostwire.search.relay.IdentityKeys;
@@ -750,16 +751,20 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                         + requesterKey);
                 return;
             }
-            byte[] responseBytes = buildCatalogBrowseResponse();
-            if (responseBytes != null) {
-                send(request.requesterPub(), MeshProtocolId.CATALOG, responseBytes);
+            List<byte[]> pages = buildCatalogBrowsePages(request.nonce());
+            // Pages are independent signed frames; each fits one relayed datagram.
+            for (byte[] page : pages) {
+                if (!send(request.requesterPub(), MeshProtocolId.CATALOG, page)) {
+                    LOG.debug("IncomingSearchRequestHandler: catalog page not accepted for delivery");
+                    break;
+                }
             }
         } catch (Throwable t) {
             LOG.debug("IncomingSearchRequestHandler failed to process catalog browse", t);
         }
     }
 
-    private byte[] buildCatalogBrowseResponse() {
+    List<byte[]> buildCatalogBrowsePages(byte[] requestNonce) {
         try {
             List<LocalSharedTorrent> torrents = localIndex.listAll();
             if (torrents == null) {
@@ -781,23 +786,29 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                     continue;
                 }
                 entries.add(new RemoteIndexFetcher.RemoteTorrentEntry(
-                        t.infoHashHex(), t.name(), t.sizeBytes(), t.fileCount()));
+                        t.infoHashHex(), CatalogManifestPages.catalogName(t.name()),
+                        t.sizeBytes(), t.fileCount()));
             }
             String pubB64 = Base64.getEncoder().withoutPadding()
                     .encodeToString(identity.ed25519PubRaw());
             long ts = System.currentTimeMillis() / 1000L;
-            byte[] canonical = RemoteIndexFetcher.manifestCanonicalBytes(
-                    RemoteIndexFetcher.MANIFEST_VERSION, pubB64, ts, entries);
+            List<List<RemoteIndexFetcher.RemoteTorrentEntry>> split =
+                    CatalogManifestPages.paginate(pubB64, ts, entries);
             PrivateKey priv = identity.ed25519().getPrivate();
-            Signature signer = IdentityKeys.softwareSignature("Ed25519");
-            signer.initSign(priv);
-            signer.update(canonical);
-            byte[] sig = signer.sign();
-            return RemoteIndexFetcher.buildManifestJson(
-                    RemoteIndexFetcher.MANIFEST_VERSION, pubB64, ts, entries, sig);
+            List<byte[]> out = new ArrayList<>(split.size());
+            for (int page = 0; page < split.size(); page++) {
+                byte[] canonical = CatalogManifestPages.canonicalBytes(
+                        pubB64, ts, split.get(page), requestNonce, page, split.size());
+                Signature signer = IdentityKeys.softwareSignature("Ed25519");
+                signer.initSign(priv);
+                signer.update(canonical);
+                out.add(CatalogManifestPages.buildJson(pubB64, ts, split.get(page), requestNonce,
+                        page, split.size(), signer.sign()));
+            }
+            return out;
         } catch (Throwable t) {
-            LOG.debug("buildCatalogBrowseResponse failed", t);
-            return null;
+            LOG.debug("buildCatalogBrowsePages failed", t);
+            return new ArrayList<>();
         }
     }
 
