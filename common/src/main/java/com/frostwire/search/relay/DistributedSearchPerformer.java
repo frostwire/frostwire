@@ -371,6 +371,19 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
     }
 
     /**
+     * Tell the transport where a selected peer lives before sending. Right after startup a peer
+     * can be verified in the directory before the registry sync has routed it into the mesh
+     * daemon; without this the search is dropped as target-unknown.
+     */
+    private void ensureRoute(PeerDirectory.PeerInfo peer) {
+        try {
+            transport.ensureRoute(peer.peerPub(), peer.hostname(), peer.rudpPort(), peer.capabilities());
+        } catch (Throwable t) {
+            LOG.debug("ensureRoute failed for " + peer.hostname() + " token=" + token, t);
+        }
+    }
+
+    /**
      * Gnutella-style dynamic querying over a pre-ranked peer list.
      *
      * <p>Phase 1 probes a small subset with TTL=1 and a short timeout;
@@ -568,6 +581,7 @@ public final class DistributedSearchPerformer implements ISearchPerformer {
                     peersContacted.incrementAndGet();
                     sends.add(SENDERS.submit(() -> {
                         try {
+                            ensureRoute(peer);
                             if (!operation.execute()) {
                                 pending.remove(nonce);
                                 pendingRequest.complete(latch);

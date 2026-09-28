@@ -46,8 +46,13 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
     private static final int MAX_QUEUED_REQUESTS = 64;
     /** Bounded lane for delivering responses/control frames off the poller thread. */
     private static final int MAX_QUEUED_DELIVERIES = 512;
+    /** Re-route a peer at most this often; the registry sync refreshes it in between. */
+    private static final long ROUTE_REFRESH_MS = 60_000L;
+    private static final int MAX_ROUTED_PEERS = 4096;
 
     private final IceBridgeClient client;
+    private final java.util.concurrent.ConcurrentHashMap<String, Long> routedPeers =
+            new java.util.concurrent.ConcurrentHashMap<>();
     private final CopyOnWriteArrayList<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService scheduler;
     /**
@@ -117,6 +122,29 @@ public final class IceBridgeSearchTransport implements DistributedSearchTranspor
             }
         }, 1, 1, TimeUnit.MINUTES);
         LOG.info("IceBridgeSearchTransport poller started");
+    }
+
+    @Override
+    public void ensureRoute(byte[] peerPub, String host, int rudpPort, long capabilities) {
+        // Only route an endpoint the directory actually knows. Guessing the default port would
+        // install a wrong direct route and bypass forwarder delivery for peers behind a relay.
+        if (closed || peerPub == null || peerPub.length != 32 || host == null || host.isBlank()
+                || rudpPort <= 0 || rudpPort > 65535) {
+            return;
+        }
+        int port = rudpPort;
+        String key = com.frostwire.util.Hex.encode(peerPub) + '@' + host + ':' + port;
+        long now = System.currentTimeMillis();
+        Long routedAt = routedPeers.get(key);
+        if (routedAt != null && now - routedAt < ROUTE_REFRESH_MS) {
+            return;
+        }
+        if (client.route(peerPub, host, port, PeerRegistrySync.roleForCaps(capabilities), true)) {
+            if (routedPeers.size() >= MAX_ROUTED_PEERS) {
+                routedPeers.clear();
+            }
+            routedPeers.put(key, now);
+        }
     }
 
     @Override

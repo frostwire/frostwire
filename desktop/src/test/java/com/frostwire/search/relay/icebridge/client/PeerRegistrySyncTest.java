@@ -93,6 +93,49 @@ class PeerRegistrySyncTest {
   }
 
   @Test
+  void transportEnsureRouteRegistersDirectoryPeerWithoutWaitingForSync() throws Exception {
+    IdentityKeys relay = IdentityKeys.generate(0);
+    try (IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client)) {
+      assertNull(registry.lookup(relay.ed25519PubRaw()));
+      transport.ensureRoute(
+          relay.ed25519PubRaw(),
+          "203.0.113.7",
+          0,
+          com.frostwire.search.relay.NodeCapabilities.DEFAULT_FORWARDER);
+      assertNull(
+          registry.lookup(relay.ed25519PubRaw()),
+          "an unknown rUDP port must not become a guessed direct route");
+      transport.ensureRoute(
+          relay.ed25519PubRaw(),
+          "203.0.113.7",
+          6889,
+          com.frostwire.search.relay.NodeCapabilities.DEFAULT_FORWARDER);
+      com.frostwire.search.relay.icebridge.peer.PeerRecord routed =
+          registry.lookup(relay.ed25519PubRaw());
+      assertNotNull(routed, "a search target must be routable before the first sync");
+      assertEquals(6889, routed.rudpPort());
+      assertEquals(IceBridgeConfig.Role.FORWARDER, routed.role());
+    }
+  }
+
+  @Test
+  void transportEnsureRouteKeepsEndpointTheDaemonAlreadyKnows() throws Exception {
+    IdentityKeys peer = IdentityKeys.generate(0);
+    assertTrue(client.route(peer.ed25519PubRaw(), "127.0.0.1", 40123, IceBridgeConfig.Role.BOTH));
+    try (IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client)) {
+      transport.ensureRoute(
+          peer.ed25519PubRaw(),
+          "10.9.9.9",
+          6889,
+          com.frostwire.search.relay.NodeCapabilities.DEFAULT_PEER);
+    }
+    com.frostwire.search.relay.icebridge.peer.PeerRecord routed =
+        registry.lookup(peer.ed25519PubRaw());
+    assertEquals("127.0.0.1", routed.host());
+    assertEquals(40123, routed.rudpPort());
+  }
+
+  @Test
   void syncSkipsUnverifiedPeers() throws Exception {
     IdentityKeys other = IdentityKeys.generate(0);
     directory.upsert(other.ed25519PubRaw(), "10.0.0.5", 6888);

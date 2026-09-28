@@ -225,6 +225,15 @@ public final class IceBridgeClient implements AutoCloseable {
      */
     public boolean route(byte[] peerPub, String host, int rudpPort,
                          IceBridgeConfig.Role role) {
+        return route(peerPub, host, rudpPort, role, false);
+    }
+
+    /**
+     * Like {@link #route(byte[], String, int, IceBridgeConfig.Role)}; with {@code ifAbsent} the
+     * daemon keeps any record it already has (for example an endpoint observed on a live session).
+     */
+    public boolean route(byte[] peerPub, String host, int rudpPort,
+                         IceBridgeConfig.Role role, boolean ifAbsent) {
         if (peerPub == null || peerPub.length != 32
                 || host == null || host.isEmpty()
                 || rudpPort <= 0 || role == null) {
@@ -235,6 +244,7 @@ public final class IceBridgeClient implements AutoCloseable {
         req.host = host;
         req.rudpPort = rudpPort;
         req.role = role;
+        req.ifAbsent = ifAbsent;
         ApiResponse<?> response = post("/route", req, new TypeToken<ApiResponse<?>>() {
         });
         return response != null && response.ok;

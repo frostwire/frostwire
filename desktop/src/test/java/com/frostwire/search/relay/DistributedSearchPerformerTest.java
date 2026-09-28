@@ -234,6 +234,39 @@ class DistributedSearchPerformerTest {
   }
 
   @Test
+  void routesEachSelectedPeerBeforeSendingSearch() throws Exception {
+    // Right after startup a relay is verified in the directory before the registry sync has
+    // routed it into IceBridge; the search itself must supply the route or it is dropped.
+    PeerDirectory directory = emptyDirectory();
+    IdentityKeys relay = IdentityKeys.generate(0);
+    directory.upsertVerified(
+        relay.ed25519PubRaw(), "203.0.113.7", 6888, 6889, NodeCapabilities.DEFAULT_FORWARDER);
+    FakeTransport transport = new FakeTransport();
+    transport.addResponse(relay.ed25519PubRaw(), relay, "recordando salsa", 200L, 1);
+    transport.deliverResponsesSynchronously();
+    RecordingListener listener = new RecordingListener();
+    DistributedSearchPerformer performer =
+        new DistributedSearchPerformer(
+            25L,
+            "recordando",
+            new InMemoryLocalIndex(),
+            directory,
+            IdentityKeys.generate(0),
+            transport,
+            4,
+            10,
+            10,
+            1);
+    performer.setListener(listener);
+
+    performer.perform();
+
+    String hex = Hex.encode(relay.ed25519PubRaw());
+    assertEquals(List.of("route:" + hex + "@203.0.113.7:6889", "send:" + hex), transport.events);
+    assertEquals(1, listener.results.get(0).size());
+  }
+
+  @Test
   void performAcceptsResponseDeliveredDuringSend() throws Exception {
     IdentityKeys peerKeys = IdentityKeys.generate();
     PeerDirectory directory = directoryWithVerifiedPeer(peerKeys, "127.0.0.1", 6888);
@@ -845,6 +878,7 @@ class DistributedSearchPerformerTest {
     private final Map<String, RelaySearchService> services = new ConcurrentHashMap<>();
     private final List<PayloadListener> listeners = new CopyOnWriteArrayList<>();
     final List<RemoteSearchRequest> sentRequests = new CopyOnWriteArrayList<>();
+    final List<String> events = new CopyOnWriteArrayList<>();
     private boolean deliverResponsesSynchronously;
     private StreamResponses stream;
 
@@ -884,7 +918,13 @@ class DistributedSearchPerformerTest {
     }
 
     @Override
+    public void ensureRoute(byte[] peerPub, String host, int rudpPort, long capabilities) {
+      events.add("route:" + Hex.encode(peerPub) + "@" + host + ":" + rudpPort);
+    }
+
+    @Override
     public boolean send(byte[] targetPub, int protocolId, byte[] payload) {
+      events.add("send:" + Hex.encode(targetPub));
       RemoteSearchRequest request = SearchPayloadCodec.decodeRequest(payload);
       if (request != null) {
         sentRequests.add(request);

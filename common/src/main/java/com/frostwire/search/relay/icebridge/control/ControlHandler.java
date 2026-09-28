@@ -259,6 +259,9 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         if (req.rudpPort <= 0 || req.rudpPort > 65535) {
             return ApiResponse.error("rudpPort must be in [1, 65535]");
         }
+        if (req.ifAbsent && registry.lookup(rawPub) != null) {
+            return ApiResponse.success("known");
+        }
         PeerRecord record = new PeerRecord(rawPub, req.host, req.rudpPort,
                 req.role == null ? IceBridgeConfig.Role.BOTH : req.role,
                 System.currentTimeMillis());

@@ -67,6 +67,21 @@ public interface DistributedSearchTransport {
         };
     }
 
+    /**
+     * Make sure the transport can reach a directory peer before sending to it.
+     *
+     * <p>A peer can become verified in the {@link PeerDirectory} (DHT/TCP discovery) before the
+     * periodic registry sync has told the mesh daemon its endpoint; sends in that window fail as
+     * target-unknown. Transports with a routing table override this; the default is a no-op.
+     *
+     * @param peerPub      32-byte Ed25519 public key of the peer
+     * @param host         peer host from the directory
+     * @param rudpPort     peer rUDP port from the directory, or {@code <= 0} when unknown
+     * @param capabilities advertised {@link NodeCapabilities} bitmask
+     */
+    default void ensureRoute(byte[] peerPub, String host, int rudpPort, long capabilities) {
+    }
+
     interface SendOperation {
         /** Returns acceptance for delivery, not proof of remote processing. */
         boolean execute();

@@ -29,4 +29,10 @@ public final class RouteRequest {
 
     /** Role advertised by the peer: FORWARDER, CLIENT, or BOTH. */
     public IceBridgeConfig.Role role;
+
+    /**
+     * When {@code true}, only add the peer if the registry has no live record for it, so a
+     * directory hint never replaces an endpoint the daemon learned from the peer itself.
+     */
+    public boolean ifAbsent;
 }
