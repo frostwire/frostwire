@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,13 +23,6 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 public class AndroidStringResourceParityTest {
-
-  // These new strings intentionally use Android's default-language fallback until translated.
-  private static final Set<String> BASE_LANGUAGE_FALLBACK_KEYS =
-      new HashSet<>(
-          Arrays.asList(
-              "endorse_source_peer", "endorse_source_peer_confirmation",
-              "endorse_source_peer_success", "endorse_source_peer_unavailable"));
 
   // [^>]*? must be non-greedy: a greedy [^>]* swallows the '/' of a
   // self-closing "<string ... />" tag, the match then continues to the next
@@ -61,8 +53,7 @@ public class AndroidStringResourceParityTest {
                     errors.add(path + " has duplicate string names");
                   }
                   for (String key : baseKeys) {
-                    if (!localizedKeySet.contains(key)
-                        && !BASE_LANGUAGE_FALLBACK_KEYS.contains(key)) {
+                    if (!localizedKeySet.contains(key)) {
                       errors.add(path + " missing " + key);
                     }
                   }
