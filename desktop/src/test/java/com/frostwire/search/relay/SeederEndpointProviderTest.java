@@ -8,6 +8,7 @@
 package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.KeyPair;
@@ -57,6 +58,37 @@ class SeederEndpointProviderTest {
             Arrays.asList("76.130.145.63:45321", "192.168.1.10:45321"),
             Collections.singletonList("10.0.0.2"));
     assertEquals(Arrays.asList("76.130.145.63:45321", "192.168.1.10:45321"), out);
+  }
+
+  @Test
+  void androidPortZeroWildcardFallsBackToSessionListenPortForLanPeers() {
+    // Android only tracks "0.0.0.0:0", so it advertised just the shared public endpoint.
+    // A desktop on the same LAN cannot reach that without NAT hairpinning.
+    List<String> out =
+        LibtorrentSeederEndpointProvider.buildEndpoints(
+            Arrays.asList("76.130.103.132:41446", "0.0.0.0:0"),
+            Collections.singletonList("192.168.4.23"),
+            41446);
+    assertEquals(Arrays.asList("76.130.103.132:41446", "192.168.4.23:41446"), out);
+  }
+
+  @Test
+  void lanEndpointsKeepTheirSlotsWhenManyExternalEntriesAreKnown() {
+    List<String> out =
+        LibtorrentSeederEndpointProvider.buildEndpoints(
+            Arrays.asList("1.1.1.1:1", "2.2.2.2:2", "3.3.3.3:3", "4.4.4.4:4", "0.0.0.0:9999"),
+            Arrays.asList("10.0.0.1", "10.0.0.2"));
+    assertEquals(Arrays.asList("1.1.1.1:1", "2.2.2.2:2", "10.0.0.1:9999", "10.0.0.2:9999"), out);
+  }
+
+  @Test
+  void carrierClatAddressesAreNotAdvertised() throws Exception {
+    assertTrue(
+        LibtorrentSeederEndpointProvider.isIetfProtocolAssignment(
+            java.net.InetAddress.getByName("192.0.0.2")));
+    assertFalse(
+        LibtorrentSeederEndpointProvider.isIetfProtocolAssignment(
+            java.net.InetAddress.getByName("192.168.4.23")));
   }
 
   @Test

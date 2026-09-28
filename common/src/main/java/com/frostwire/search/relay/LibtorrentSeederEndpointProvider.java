@@ -37,11 +37,24 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
     @Override
     public List<String> seederEndpoints() {
         try {
-            String xpe = BTEngine.getInstance().magnetPeers();
-            return buildEndpoints(parseXpe(xpe), lanIPv4s());
+            BTEngine engine = BTEngine.getInstance();
+            String xpe = engine.magnetPeers();
+            return buildEndpoints(parseXpe(xpe), lanIPv4s(), sessionListenPort(engine));
         } catch (Throwable t) {
             LOG.debug("LibtorrentSeederEndpointProvider: no endpoints", t);
             return Collections.emptyList();
+        }
+    }
+
+    private static int sessionListenPort(BTEngine engine) {
+        try {
+            if (engine.swig() == null) {
+                return -1;
+            }
+            int port = engine.swig().listen_port();
+            return port > 0 && port <= 65535 ? port : -1;
+        } catch (Throwable t) {
+            return -1;
         }
     }
 
@@ -65,6 +78,18 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
      * with each LAN address paired to the wildcard endpoint's port.
      */
     static List<String> buildEndpoints(Collection<String> entries, Collection<String> lanAddrs) {
+        return buildEndpoints(entries, lanAddrs, -1);
+    }
+
+    /**
+     * Like {@link #buildEndpoints(Collection, Collection)}; {@code sessionListenPort} is the
+     * session's real TCP listen port. It backs the LAN endpoints when the tracked listen
+     * endpoints only report {@code 0.0.0.0:0} (Android). Without LAN endpoints a peer on the
+     * same network only gets the shared public address, which needs NAT hairpinning that most
+     * home routers refuse.
+     */
+    static List<String> buildEndpoints(Collection<String> entries, Collection<String> lanAddrs,
+                                       int sessionListenPort) {
         List<String> out = new ArrayList<>();
         int wildcardPort = -1;
         for (String e : entries) {
@@ -84,7 +109,15 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
                 out.add(e);
             }
         }
+        if (wildcardPort <= 0 && sessionListenPort > 0 && sessionListenPort <= 65535) {
+            wildcardPort = sessionListenPort;
+        }
         if (wildcardPort > 0) {
+            // Keep room for LAN addresses: same-network peers cannot use the external one.
+            int lanSlots = Math.min(lanAddrs.size(), MAX_ENDPOINTS);
+            while (out.size() > MAX_ENDPOINTS - lanSlots) {
+                out.remove(out.size() - 1);
+            }
             for (String ip : lanAddrs) {
                 if (out.size() >= MAX_ENDPOINTS) {
                     break;
@@ -112,7 +145,8 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
                 while (addrs.hasMoreElements()) {
                     InetAddress a = addrs.nextElement();
                     if (a instanceof Inet4Address
-                            && !a.isLoopbackAddress() && !a.isLinkLocalAddress()) {
+                            && !a.isLoopbackAddress() && !a.isLinkLocalAddress()
+                            && !isIetfProtocolAssignment(a)) {
                         out.add(a.getHostAddress());
                     }
                 }
@@ -123,6 +157,15 @@ public final class LibtorrentSeederEndpointProvider implements SeederEndpointPro
         List<String> list = new ArrayList<>(out);
         Collections.sort(list);
         return list.size() <= 2 ? list : list.subList(0, 2);
+    }
+
+    /**
+     * 192.0.0.0/24 (RFC 6890). Carriers put 464XLAT/CLAT addresses such as 192.0.0.2 on the
+     * cellular interface; they are never reachable by other peers.
+     */
+    static boolean isIetfProtocolAssignment(InetAddress a) {
+        byte[] b = a.getAddress();
+        return b.length == 4 && (b[0] & 0xff) == 192 && b[1] == 0 && b[2] == 0;
     }
 
     private static String hostOf(String endpoint) {
