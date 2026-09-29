@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2008-08-07 00:42+0000\n"
 "Last-Translator: FTA <Unknown>\n"
 "Language-Team: none\n"
@@ -2394,7 +2394,11 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Dona"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "Dona suport a FrostWire amb un donatiu"
 
@@ -6338,9 +6342,6 @@ msgstr "No pot desconnectar totes les columnes."
 
 #~ msgid "playlist"
 #~ msgstr "llista de reproducció"
-
-#~ msgid "Donate"
-#~ msgstr "Dona"
 
 #~ msgid "Player"
 #~ msgstr "Reproductor"

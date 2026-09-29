@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2018-08-13 12:21-0300\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
@@ -2424,7 +2424,11 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nei"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Doner"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "Støtt FrostWire-utvikling med en donasjon"
 
@@ -6580,9 +6584,6 @@ msgstr "Du kan ikke skru av alle søylene."
 
 #~ msgid "Support FrostWire development with a Dash donation"
 #~ msgstr "Støtte FrostWire utvikling med en Dash donasjon"
-
-#~ msgid "Donate"
-#~ msgstr "Doner"
 
 #~ msgid ""
 #~ "FrostWire has encountered a problem during startup and cannot proceed. "

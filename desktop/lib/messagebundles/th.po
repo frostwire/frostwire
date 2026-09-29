@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2017-05-09 20:03-0300\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
@@ -2411,7 +2411,11 @@ msgstr "ใช่"
 msgid "No"
 msgstr "ไม่ใช่"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "บริจาค"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "สนับสนุน FrostWire ด้วยเงินบริจาคจำนวน 10 ล้านเหรียญสหรัฐ"
 
@@ -6687,9 +6691,6 @@ msgstr "คุณไม่สามารถปิดคอลัมน์ทั
 
 #~ msgid "Support FrostWire development with a Dash donation"
 #~ msgstr "สนับสนุน FrostWire ด้วยเงินบริจาคจำนวน 1 ล้านเหรียญสหรัฐ"
-
-#~ msgid "Donate"
-#~ msgstr "บริจาค"
 
 #~ msgid ""
 #~ "FrostWire has encountered a problem during startup and cannot proceed. "

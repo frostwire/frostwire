@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2008-07-31 03:37+0000\n"
 "Last-Translator: FTA <Unknown>\n"
 "Language-Team: none\n"
@@ -2406,7 +2406,11 @@ msgstr "Ya"
 msgid "No"
 msgstr "Tidak"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Donasi"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "&Penggunaan FrostWire"
 
@@ -6485,9 +6489,6 @@ msgstr "Anda tidak dapat mematikan semua kolom."
 
 #~ msgid "playlist"
 #~ msgstr "Playlist mP3"
-
-#~ msgid "Donate"
-#~ msgstr "Unduh"
 
 #~ msgid ""
 #~ "FrostWire has encountered a problem during startup and cannot proceed. "

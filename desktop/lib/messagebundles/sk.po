@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2008-08-07 18:20+0000\n"
 "Last-Translator: FTA <Unknown>\n"
 "Language-Team: none\n"
@@ -2425,7 +2425,11 @@ msgstr "Áno"
 msgid "No"
 msgstr "Nie"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Prispieť"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "Support FrostWire development with a donation"
 
@@ -6529,9 +6533,6 @@ msgstr "Nemôžete vypnúť všetky stĺpce."
 
 #~ msgid "playlist"
 #~ msgstr "Zoznam skladieb"
-
-#~ msgid "Donate"
-#~ msgstr "Stiahnuť"
 
 #~ msgid ""
 #~ "FrostWire has encountered a problem during startup and cannot proceed. "

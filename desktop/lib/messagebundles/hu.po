@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2008-07-30 09:36+0000\n"
 "Last-Translator: FTA <Unknown>\n"
 "Language-Team: none\n"
@@ -2425,7 +2425,11 @@ msgstr "Igen"
 msgid "No"
 msgstr "Nem"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Adományozás"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "Support FrostWire development with a donation"
 
@@ -6585,9 +6589,6 @@ msgstr "Nem kapcsolhatod ki az �sszes oszlopot."
 
 #~ msgid "playlist"
 #~ msgstr "MP3 lej�tsz�lista"
-
-#~ msgid "Donate"
-#~ msgstr "Let�lt�"
 
 #~ msgid ""
 #~ "FrostWire has encountered a problem during startup and cannot proceed. "

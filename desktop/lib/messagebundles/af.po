@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 17:56-0600\n"
+"POT-Creation-Date: 2026-09-29 14:50-0600\n"
 "PO-Revision-Date: 2008-08-05 18:20+0000\n"
 "Last-Translator: FTA <Unknown>\n"
 "Language-Team: none\n"
@@ -2433,7 +2433,11 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nee"
 
-#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:40
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:41
+msgid "Donate"
+msgstr "Skenk"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/DonationButtons.java:43
 msgid "Support FrostWire development with a donation"
 msgstr "Ondersteun FrostWire-ontwikkeling met 'n skenking"
 
@@ -6490,9 +6494,6 @@ msgstr "Jy kan nie alle kolomme afskakel nie."
 
 #~ msgid "Delete Selected Files from this playlist"
 #~ msgstr "Download al die Geselekteerde Files"
-
-#~ msgid "Donate"
-#~ msgstr "Skenk"
 
 #~ msgid "Rebuild Apple Music \"FrostWire\" Playlist"
 #~ msgstr "Herbou Apple Music \"FrostWire \" -spellys"
