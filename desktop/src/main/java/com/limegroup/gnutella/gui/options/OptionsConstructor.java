@@ -164,10 +164,6 @@ public final class OptionsConstructor {
     Component treeComponent = TREE_MANAGER.getComponent();
     treePanel.add(treeComponent);
 
-    // Constrain the tree panel's max width to its preferred width to prevent expansion on resize
-    Dimension pref = treePanel.getPreferredSize();
-    treePanel.setMaximumSize(new Dimension(pref.width, Integer.MAX_VALUE));
-
     Component paneComponent = paneManager.getComponent();
 
     // Setup the settings content
@@ -180,6 +176,10 @@ public final class OptionsConstructor {
     mainPanel.add(new OptionsButtonPanel().getComponent());
     DIALOG.getContentPane().add(mainPanel);
     OptionsTreeNode node = initializePanels();
+    // Measure after the localized nodes exist, including children in collapsed branches.
+    TREE_MANAGER.sizeToFitLabels();
+    Dimension pref = treePanel.getPreferredSize();
+    treePanel.setMaximumSize(new Dimension(pref.width, Integer.MAX_VALUE));
     paneManager.show(node);
   }
 
