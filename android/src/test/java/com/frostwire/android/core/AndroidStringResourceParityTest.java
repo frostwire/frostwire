@@ -85,6 +85,62 @@ public class AndroidStringResourceParityTest {
     assertEquals(37, count);
   }
 
+  // Strings that are legitimately identical to English in some languages: a format string with no
+  // words, and "N torrents" where the language uses the same word.
+  private static final Set<String> MAY_MATCH_ENGLISH =
+      new HashSet<>(
+          java.util.Arrays.asList(
+              "distributed_peers_row", "distributed_identity_shared_torrents", "use_bitsearch"));
+
+  private static final Pattern STRING_VALUE_PATTERN =
+      Pattern.compile("<string\\s+name=\"([^\"]+)\"([^>]*?)>(.*?)</string>", Pattern.DOTALL);
+
+  @Test
+  public void localizedStringsAreTranslatedNotEnglishCopies() throws Exception {
+    Path res = projectRoot().resolve("res");
+    java.util.Map<String, String> base = stringValues(res.resolve("values/strings.xml"));
+    List<String> untranslated = new ArrayList<>();
+    try (java.util.stream.Stream<Path> paths = Files.list(res)) {
+      paths
+          .filter(path -> path.getFileName().toString().startsWith("values-"))
+          .map(path -> path.resolve("strings.xml"))
+          .filter(Files::exists)
+          .sorted()
+          .forEach(
+              path -> {
+                try {
+                  for (java.util.Map.Entry<String, String> e : stringValues(path).entrySet()) {
+                    String english = base.get(e.getKey());
+                    if (english != null
+                        && english.equals(e.getValue())
+                        && english.length() > 12
+                        && english.matches(".*\\p{L}{3}.*")
+                        && !MAY_MATCH_ENGLISH.contains(e.getKey())) {
+                      untranslated.add(path.getParent().getFileName() + " " + e.getKey());
+                    }
+                  }
+                } catch (IOException ex) {
+                  untranslated.add(path + " failed to read: " + ex.getMessage());
+                }
+              });
+    }
+    assertTrue(
+        untranslated.size() + " strings are still English copies: " + untranslated,
+        untranslated.isEmpty());
+  }
+
+  private static java.util.Map<String, String> stringValues(Path path) throws IOException {
+    String source = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+    java.util.Map<String, String> values = new java.util.HashMap<>();
+    Matcher matcher = STRING_VALUE_PATTERN.matcher(source);
+    while (matcher.find()) {
+      if (!matcher.group(2).contains("translatable=\"false\"")) {
+        values.put(matcher.group(1), matcher.group(3));
+      }
+    }
+    return values;
+  }
+
   private static List<String> stringKeys(Path path) throws IOException {
     String source = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
     Matcher matcher = STRING_NAME_PATTERN.matcher(source);
