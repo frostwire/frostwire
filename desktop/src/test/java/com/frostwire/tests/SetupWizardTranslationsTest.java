@@ -42,13 +42,31 @@ class SetupWizardTranslationsTest {
     return out;
   }
 
+  private static final Pattern ENTRY =
+      Pattern.compile(
+          "^msgid \"((?:[^\"\\\\]|\\\\.)*)\"\\n((?:\"(?:[^\"\\\\]|\\\\.)*\"\\n)*)msgstr \"((?:[^\"\\\\]|\\\\.)*)\"\\n((?:\"(?:[^\"\\\\]|\\\\.)*\"\\n)*)",
+          Pattern.MULTILINE);
+  private static final Pattern LITERAL = Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"");
+
+  private static String join(String first, String continuation) {
+    StringBuilder sb = new StringBuilder(first);
+    Matcher m = LITERAL.matcher(continuation);
+    while (m.find()) {
+      sb.append(m.group(1));
+    }
+    return sb.toString();
+  }
+
+  /** Long entries are wrapped over several quoted lines by gettext; join them back. */
   private static String msgstr(String catalog, String msgid) {
-    Matcher m =
-        Pattern.compile(
-                "^msgid \"" + Pattern.quote(msgid.replace("\"", "\\\"")) + "\"\nmsgstr \"(.*)\"$",
-                Pattern.MULTILINE)
-            .matcher(catalog);
-    return m.find() ? m.group(1) : null;
+    String wanted = msgid.replace("\"", "\\\"");
+    Matcher m = ENTRY.matcher(catalog);
+    while (m.find()) {
+      if (join(m.group(1), m.group(2)).equals(wanted)) {
+        return join(m.group(3), m.group(4));
+      }
+    }
+    return null;
   }
 
   @Test
