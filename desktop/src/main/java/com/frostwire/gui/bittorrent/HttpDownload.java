@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 
@@ -62,6 +63,10 @@ public class HttpDownload extends HttpBTDownload {
   private final File completeFile;
   private final File incompleteFile;
   private final String md5; // optional
+  private final Executor executor;
+  private final Consumer<HttpDownload> seedTransfer;
+  private final Object completionLock = new Object();
+  private boolean completionStarted;
 
   /** If false it should delete any temporary data and start from the beginning. */
   private final boolean deleteDataWhenCancelled;
@@ -99,7 +104,34 @@ public class HttpDownload extends HttpBTDownload {
       boolean shouldResume,
       boolean deleteFileWhenTransferCancelled,
       Map<String, String> httpHeaders) {
+    this(
+        theURL,
+        theTitle,
+        saveFileAs,
+        fileSize,
+        md5hash,
+        shouldResume,
+        deleteFileWhenTransferCancelled,
+        httpHeaders,
+        HTTP_THREAD_POOL,
+        dl -> BittorrentDownload.RendererHelper.onSeedTransfer(dl, false));
+  }
+
+  // Scheduling and seeding seams keep completion regressions independent of Swing/native code.
+  HttpDownload(
+      String theURL,
+      String theTitle,
+      String saveFileAs,
+      long fileSize,
+      String md5hash,
+      boolean shouldResume,
+      boolean deleteFileWhenTransferCancelled,
+      Map<String, String> httpHeaders,
+      Executor executor,
+      Consumer<HttpDownload> seedTransfer) {
     super(saveFileAs, fileSize);
+    this.executor = executor;
+    this.seedTransfer = seedTransfer;
     url = theURL;
     title = theTitle;
     saveAs = saveFileAs;
@@ -121,7 +153,7 @@ public class HttpDownload extends HttpBTDownload {
 
   @Override
   HttpClientListener createHttpClientListener() {
-    return new HttpDownloadListenerImpl(this);
+    return new HttpDownloadListenerImpl();
   }
 
   @Override
@@ -146,13 +178,37 @@ public class HttpDownload extends HttpBTDownload {
 
   @Override
   public void pause() {
-    if (state != TransferState.FINISHED) {
-      if (isPausable()) {
-        state = TransferState.PAUSING;
-      } else {
-        state = TransferState.CANCELING;
+    synchronized (completionLock) {
+      if (state != TransferState.FINISHED) {
+        if (isPausable()) {
+          state = TransferState.PAUSING;
+        } else {
+          state = TransferState.CANCELING;
+        }
+        httpClient.cancel();
       }
-      httpClient.cancel();
+    }
+  }
+
+  @Override
+  public void remove() {
+    synchronized (completionLock) {
+      super.remove();
+    }
+  }
+
+  @Override
+  public boolean isCompleted() {
+    synchronized (completionLock) {
+      // Receiving all HTTP bytes is not completion while a subclass is replacing the file.
+      return bytesReceived > 0 && state == TransferState.FINISHED;
+    }
+  }
+
+  @Override
+  public TransferState getState() {
+    synchronized (completionLock) {
+      return state;
     }
   }
 
@@ -185,9 +241,12 @@ public class HttpDownload extends HttpBTDownload {
   }
 
   private void start(final boolean resume) {
-    state = TransferState.WAITING;
+    synchronized (completionLock) {
+      completionStarted = false;
+      state = TransferState.WAITING;
+    }
     saveFile = org.apache.commons.io.FileUtils.validFilepathLengthFile(completeFile);
-    HTTP_THREAD_POOL.execute(
+    executor.execute(
         () -> {
           try {
             File expectedFile =
@@ -196,8 +255,10 @@ public class HttpDownload extends HttpBTDownload {
             if (md5 != null && expectedFile.length() == size && checkMD5(expectedFile)) {
               saveFile = expectedFile;
               bytesReceived = expectedFile.length();
-              state = TransferState.FINISHED;
-              onComplete();
+              if (beginCompletion()) {
+                // Preserve the cached-file path's existing no-auto-seed behavior.
+                completeDownload(false);
+              }
               return;
             }
             if (resume) {
@@ -263,10 +324,52 @@ public class HttpDownload extends HttpBTDownload {
   }
 
   /**
-   * Meant to be overwritten by children classes that want to do something special after the
-   * download is completed.
+   * Synchronous postprocessing hook. The downloaded file is at getSaveLocation(), but the transfer
+   * is not completed or eligible for seeding until this returns. Handled failures may leave the
+   * original file in place (for example, a failed DASH mux).
    */
   void onComplete() {}
+
+  private boolean beginCompletion() {
+    synchronized (completionLock) {
+      if (completionStarted) {
+        return false;
+      }
+      if (httpClient.isCanceled()) {
+        httpClient.getListener().onCancel(httpClient);
+        return false;
+      }
+      completionStarted = true;
+      return true;
+    }
+  }
+
+  private void completeDownload(boolean autoSeed) {
+    synchronized (completionLock) {
+      if (httpClient.isCanceled()) {
+        httpClient.getListener().onCancel(httpClient);
+        return;
+      }
+      state = TransferState.CHECKING;
+    }
+    // Do not hold the lock across audio fetch/mux; cancellation must remain responsive.
+    onComplete();
+    synchronized (completionLock) {
+      if (httpClient.isCanceled()) {
+        httpClient.getListener().onCancel(httpClient);
+        return;
+      }
+      if (saveFile.isFile()) {
+        size = saveFile.length();
+        bytesReceived = size;
+      }
+      state = TransferState.FINISHED;
+      // SlideDownload can consume/delete its zip in the hook; there is then nothing to seed.
+      if (autoSeed && saveFile.isFile() && SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+        seedTransfer.accept(this);
+      }
+    }
+  }
 
   @Override
   public boolean canPreview() {
@@ -279,12 +382,6 @@ public class HttpDownload extends HttpBTDownload {
   }
 
   private final class HttpDownloadListenerImpl implements HttpClientListener {
-    private final HttpDownload dl;
-
-    HttpDownloadListenerImpl(HttpDownload httpDownload) {
-      dl = httpDownload;
-    }
-
     @Override
     public void onError(HttpClient client, Throwable e) {
       if (e instanceof RangeNotSupportedException) {
@@ -307,42 +404,52 @@ public class HttpDownload extends HttpBTDownload {
 
     @Override
     public void onComplete(HttpClient client) {
+      if (!beginCompletion()) {
+        return;
+      }
       if (md5 != null && !checkMD5(incompleteFile)) {
+        if (httpClient.isCanceled()) {
+          onCancel(client);
+          return;
+        }
         state = TransferState.ERROR_HASH_MD5;
         cleanupIncomplete();
         return;
       }
-      boolean renameTo = incompleteFile.renameTo(completeFile);
-      if (!renameTo) {
-        state = TransferState.ERROR_MOVING_INCOMPLETE;
-        LOG.error(
-            "Could not rename ["
-                + incompleteFile.getAbsolutePath()
-                + "] into ["
-                + completeFile.getAbsolutePath()
-                + "]");
-      } else {
-        state = TransferState.FINISHED;
-        cleanupIncomplete();
-        if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
-          BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+      synchronized (completionLock) {
+        if (httpClient.isCanceled()) {
+          onCancel(client);
+          return;
         }
-        HttpDownload.this.onComplete();
+        if (!incompleteFile.renameTo(completeFile)) {
+          state = TransferState.ERROR_MOVING_INCOMPLETE;
+          LOG.error(
+              "Could not rename ["
+                  + incompleteFile.getAbsolutePath()
+                  + "] into ["
+                  + completeFile.getAbsolutePath()
+                  + "]");
+          return;
+        }
+        cleanupIncomplete();
       }
+      completeDownload(true);
     }
 
     @Override
     public void onCancel(HttpClient client) {
-      if (state.equals(TransferState.CANCELING)) {
-        if (deleteDataWhenCancelled) {
-          cleanup();
+      synchronized (completionLock) {
+        if (state.equals(TransferState.CANCELING)) {
+          if (deleteDataWhenCancelled) {
+            cleanup();
+          }
+          state = TransferState.CANCELED;
+        } else if (state.equals(TransferState.PAUSING)) {
+          state = TransferState.PAUSED;
+          isResumable = true;
+        } else {
+          state = TransferState.CANCELED;
         }
-        state = TransferState.CANCELED;
-      } else if (state.equals(TransferState.PAUSING)) {
-        state = TransferState.PAUSED;
-        isResumable = true;
-      } else {
-        state = TransferState.CANCELED;
       }
     }
 

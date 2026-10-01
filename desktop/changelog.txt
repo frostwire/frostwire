@@ -1,4 +1,5 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:YouTube audio muxing and other HTTP post-processing finish before automatic torrent creation or sharing, so the seeded torrent describes the final file; cancellation and failed-mux fallback are covered by completion-order regressions
   - fix:Crawler opt-in now gates both mesh browsing and DHT catalog publication; opting out withdraws the previous catalog, and only active non-private seeds are listed while ordinary distributed search still finds active downloads
   - fix:Packaged desktop builds retain the IceBridge metrics used by the search transport, preventing distributed search startup from failing with a missing class; regression tests load the real application JAR without the daemon JAR
   - fix:Distributed search now reaches peers that share content but do not relay (leaf/CLIENT nodes) — their published keyword fingerprint was being dropped by forwarders, so searches reached them only by fan-out luck and their torrents looked missing
