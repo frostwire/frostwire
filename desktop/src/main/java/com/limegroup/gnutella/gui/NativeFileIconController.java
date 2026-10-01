@@ -36,12 +36,15 @@ public class NativeFileIconController implements FileIconController {
    * constructed.
    */
   NativeFileIconController() {
-    SmartFileView view = getNativeFileView();
+    this(getNativeFileView(), UISettings.PRELOAD_NATIVE_ICONS.getValue());
+  }
+
+  NativeFileIconController(SmartFileView view, boolean preloadIcons) {
     if (view == null) {
       VIEW = null;
     } else {
       VIEW = new DelegateFileView(view);
-      if (UISettings.PRELOAD_NATIVE_ICONS.getValue()) preload();
+      if (preloadIcons) preload();
     }
   }
 
@@ -56,7 +59,7 @@ public class NativeFileIconController implements FileIconController {
   }
 
   /** Retrieves the native FileView. */
-  private SmartFileView getNativeFileView() {
+  private static SmartFileView getNativeFileView() {
     // Deadlocks happen on Windows when using file-chooser based view.
     if (OSUtils.isWindows()) return constructFSVView();
     // macOS uses the JFileChooser native view: FileSystemView only returns generic
@@ -73,7 +76,7 @@ public class NativeFileIconController implements FileIconController {
    *
    * @return
    */
-  private SmartFileView constructFileChooserView() {
+  private static SmartFileView constructFileChooserView() {
     // This roundabout way of getting the FileView is necessary for the
     // following reasons:
     // 1) We need the native UI's FileView to get the correct icons,
@@ -121,7 +124,7 @@ public class NativeFileIconController implements FileIconController {
    * Constructs a FileSystemView-based FileView. Just to be safe, we do this on the Swing thread,
    * since we've seen deadlocks when constructing JFileChooser ones outside the Swing thread.
    */
-  private SmartFileView constructFSVView() {
+  private static SmartFileView constructFSVView() {
     final AtomicReference<SmartFileView> ref = new AtomicReference<>();
     GUIMediator.safeInvokeAndWait(() -> ref.set(new FSVFileView()));
     return ref.get();
@@ -168,7 +171,10 @@ public class NativeFileIconController implements FileIconController {
       }
       Icon iconCandidate = null;
       try {
-        iconCandidate = getNativeFileView().getIcon(file);
+        // The native FileView is constructed once with this controller. Creating a new
+        // JFileChooser for every extension repeatedly initializes Aqua on the EDT and
+        // can stall startup while preload walks the media types.
+        iconCandidate = VIEW.getIcon(file);
       } catch (Exception e) {
         file.delete();
         return null;
@@ -207,7 +213,7 @@ public class NativeFileIconController implements FileIconController {
   }
 
   /** A smarter FileView. */
-  private abstract static class SmartFileView extends FileView {
+  abstract static class SmartFileView extends FileView {
     /** Checks to see if the given icon is cached. */
     protected abstract boolean isIconCached(File f);
 

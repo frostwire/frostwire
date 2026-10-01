@@ -688,6 +688,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.search.*"
         includeTestsMatching "com.limegroup.gnutella.gui.icebridge.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageLoadingTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
         includeTestsMatching "com.frostwire.gui.searchfield.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
