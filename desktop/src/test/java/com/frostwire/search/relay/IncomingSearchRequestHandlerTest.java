@@ -691,6 +691,81 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void catalogPolicyIsIndependentOfSearchAndMetadataVisibility() throws Exception {
+    IdentityKeys holder = IdentityKeys.generate();
+    KeyPair requester = generateEd25519KeyPair();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    LocalSharedTorrent seed = torrent("ubuntu seeding", 100, 1);
+    LocalSharedTorrent download = torrent("ubuntu downloading", 100, 1);
+    index.torrents.add(seed);
+    index.torrents.add(download);
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport,
+            new RelaySearchService(index, holder, ShareVisibilityPolicy.INCLUDE_ALL),
+            null,
+            holder,
+            index);
+    java.util.Set<String> catalog = new java.util.HashSet<>();
+    catalog.add(seed.infoHashHex());
+    handler.setCatalogVisibilityPolicy(catalog::contains);
+    handler.setPublicCatalogEnabled(true);
+    handler.setTorrentMetadataProvider(publicProvider(hash -> new byte[100]));
+    for (int round = 0; round < 3; round++) {
+      RemoteCatalogBrowseRequest.Builder builder =
+          RemoteCatalogBrowseRequest.builder()
+              .requesterPub(rawPub(requester))
+              .targetPub(holder.ed25519PubRaw())
+              .nonce(randomBytes(32))
+              .timestamp(System.currentTimeMillis() / 1000)
+              .signature(new byte[64]);
+      Signature signer = Signature.getInstance("Ed25519");
+      signer.initSign(requester.getPrivate());
+      signer.update(builder.build().canonicalBytes());
+      handler.onPayload(
+          rawPub(requester),
+          SearchPayloadCodec.encodeCatalogBrowseRequest(builder.signature(signer.sign()).build()),
+          0,
+          MeshProtocolId.CATALOG);
+      if (round == 2) {
+        assertTrue(transport.sent.isEmpty(), "opt-out refuses mesh browsing");
+      } else {
+        assertEquals(1, transport.sent.size());
+        List<RemoteIndexFetcher.RemoteTorrentEntry> rows =
+            RemoteIndexFetcher.parseManifest(transport.sent.get(0).payload);
+        assertEquals(round == 0 ? 1 : 0, rows.size());
+        if (round == 0) assertEquals(seed.infoHashHex(), rows.get(0).infoHashHex());
+      }
+      transport.sent.clear();
+      catalog.clear();
+      if (round == 1) handler.setPublicCatalogEnabled(false);
+    }
+
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeRequest(signedRequest(requester, "ubuntu", 10, 1, new byte[0][])),
+        0);
+    assertEquals(1, transport.sent.size());
+    assertEquals(
+        2,
+        SearchPayloadCodec.decodeResponse(transport.sent.get(0).payload).rows().size(),
+        "catalog opt-out must preserve query-based sharing of downloads");
+    transport.sent.clear();
+    TorrentMetadataRequest metadata =
+        signedMetadataRequest(requester, download.infoHash(), randomBytes(32));
+    handler.onPayload(
+        rawPub(requester),
+        SearchPayloadCodec.encodeTorrentMetadataRequest(metadata),
+        0,
+        MeshProtocolId.METADATA);
+    assertEquals(1, transport.sent.size());
+    assertArrayEquals(
+        new byte[100],
+        SearchPayloadCodec.decodeTorrentMetadataResponse(transport.sent.get(0).payload).data());
+  }
+
+  @Test
   void catalogServesOnlyActivelySharedTorrentsNotDownloadHistory() throws Exception {
     IdentityKeys holder = IdentityKeys.generate();
     KeyPair requester = generateEd25519KeyPair();

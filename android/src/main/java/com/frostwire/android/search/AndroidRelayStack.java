@@ -448,6 +448,10 @@ public final class AndroidRelayStack implements AutoCloseable {
           new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
 
       ih = new IncomingSearchRequestHandler(tr, ss, pd, ident, li, visibility);
+      com.frostwire.search.relay.ShareVisibilityPolicy catalogVisibility =
+          AndroidShareVisibility.catalogPolicy(
+              permitted, AndroidRelayStack::isPublicCatalogEnabled);
+      ih.setCatalogVisibilityPolicy(catalogVisibility);
       // Gnutella leaf model: CLIENT answers locally but never forwards.
       // Applies to both in-process and USE_REMOTE paths.
       ih.setForwardingEnabled(readConfiguredRole() != IceBridgeConfig.Role.CLIENT);
@@ -538,7 +542,7 @@ public final class AndroidRelayStack implements AutoCloseable {
           new IdentityRecordPublisher(
               ident, advertiseRelayPort, meshRudpPort, syncRole.name(), extraCaps);
       IndexAnnouncementPublisher indexPublisher =
-          new IndexAnnouncementPublisher(li, ident, visibility);
+          new IndexAnnouncementPublisher(li, ident, catalogVisibility);
       // Phones join as CLIENT leaves: announce the peer topic so holders can be
       // found, but never the bootstrap topic (that flag is for dedicated relays).
       da =

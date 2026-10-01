@@ -6,6 +6,7 @@
  */
 package com.frostwire.android.search;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -16,9 +17,14 @@ import static org.mockito.Mockito.withSettings;
 
 import android.app.Application;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.TransferState;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -27,6 +33,139 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28, application = Application.class)
 public class AndroidShareVisibilityTest {
+  @Test
+  public void catalogRequiresSeedingWhileOrdinarySharingSurvivesCatalogOptOut() {
+    AtomicBoolean participating = new AtomicBoolean(true);
+    AtomicBoolean consent = new AtomicBoolean(true);
+    AtomicBoolean live = new AtomicBoolean(true);
+    AtomicReference<TransferState> transfer = new AtomicReference<>(TransferState.SEEDING);
+    Function<String, AtomicReference<TransferState>> lookup = hash -> live.get() ? transfer : null;
+    ShareVisibilityPolicy catalog =
+        AndroidShareVisibility.catalogPolicy(
+            participating::get, consent::get, lookup, AtomicReference::get);
+    AndroidShareVisibility ordinary =
+        new AndroidShareVisibility(participating::get, hash -> lookup.apply(hash) != null);
+
+    assertTrue(catalog.isVisible("abcd"));
+    assertTrue(ordinary.isVisible("abcd"));
+    transfer.set(TransferState.DOWNLOADING);
+    assertFalse("an active download is not browsable", catalog.isVisible("abcd"));
+    assertTrue("downloads remain eligible for ordinary sharing", ordinary.isVisible("abcd"));
+    transfer.set(TransferState.SEEDING);
+    consent.set(false);
+    assertFalse(catalog.isVisible("abcd"));
+    assertTrue("catalog opt-out does not disable SEARCH/METADATA", ordinary.isVisible("abcd"));
+    consent.set(true);
+    assertTrue("consent is live, not captured at construction", catalog.isVisible("abcd"));
+    live.set(false);
+    assertFalse("a removed transfer is not browsable", catalog.isVisible("abcd"));
+    assertFalse(ordinary.isVisible("abcd"));
+    live.set(true);
+    participating.set(false);
+    assertFalse(catalog.isVisible("abcd"));
+    assertFalse(ordinary.isVisible("abcd"));
+  }
+
+  @Test
+  public void catalogOptOutDoesNotPerformLiveOrNativeStateLookup() {
+    AtomicBoolean participating = new AtomicBoolean(true);
+    AtomicBoolean consent = new AtomicBoolean(false);
+    AtomicInteger lookups = new AtomicInteger();
+    AtomicInteger stateReads = new AtomicInteger();
+    ShareVisibilityPolicy catalog =
+        AndroidShareVisibility.catalogPolicy(
+            participating::get,
+            consent::get,
+            hash -> {
+              lookups.incrementAndGet();
+              return new Object();
+            },
+            transfer -> {
+              stateReads.incrementAndGet();
+              return TransferState.SEEDING;
+            });
+
+    assertFalse(catalog.isVisible("abcd"));
+    assertEquals(0, lookups.get());
+    assertEquals(0, stateReads.get());
+    consent.set(true);
+    participating.set(false);
+    assertFalse(catalog.isVisible("abcd"));
+    assertEquals(0, lookups.get());
+    assertEquals(0, stateReads.get());
+    participating.set(true);
+    assertTrue(catalog.isVisible("ABCD"));
+    assertEquals(1, lookups.get());
+    assertEquals(1, stateReads.get());
+  }
+
+  @Test
+  public void catalogConsentAndParticipationRevokedDuringLookupFailClosed() {
+    for (boolean revokeConsent : new boolean[] {true, false}) {
+      AtomicBoolean participating = new AtomicBoolean(true);
+      AtomicBoolean consent = new AtomicBoolean(true);
+      ShareVisibilityPolicy catalog =
+          AndroidShareVisibility.catalogPolicy(
+              participating::get,
+              consent::get,
+              hash -> {
+                (revokeConsent ? consent : participating).set(false);
+                return new Object();
+              },
+              transfer -> TransferState.SEEDING);
+      assertFalse("permission must be rechecked after live lookup", catalog.isVisible("abcd"));
+    }
+  }
+
+  @Test
+  public void catalogConsentRevokedDuringStateReadFailsClosed() {
+    AtomicBoolean consent = new AtomicBoolean(true);
+    AtomicInteger reads = new AtomicInteger();
+    ShareVisibilityPolicy catalog =
+        AndroidShareVisibility.catalogPolicy(
+            () -> true,
+            consent::get,
+            hash -> new Object(),
+            transfer -> {
+              reads.incrementAndGet();
+              consent.set(false);
+              return TransferState.SEEDING;
+            });
+    assertFalse(catalog.isVisible("abcd"));
+    assertEquals(1, reads.get());
+    assertFalse(catalog.isVisible("abcd"));
+    assertEquals("subsequent opt-out must not read state", 1, reads.get());
+  }
+
+  @Test
+  public void catalogMissingTransferOrUnavailableStateFailsClosed() {
+    AtomicInteger reads = new AtomicInteger();
+    ShareVisibilityPolicy missing =
+        AndroidShareVisibility.catalogPolicy(
+            () -> true,
+            () -> true,
+            hash -> null,
+            transfer -> {
+              reads.incrementAndGet();
+              return TransferState.SEEDING;
+            });
+    assertFalse(missing.isVisible("abcd"));
+    assertEquals(0, reads.get());
+    ShareVisibilityPolicy unavailable =
+        AndroidShareVisibility.catalogPolicy(
+            () -> true,
+            () -> true,
+            hash -> new Object(),
+            transfer -> {
+              throw new IllegalStateException("native handle removed");
+            });
+    assertFalse(unavailable.isVisible("abcd"));
+    ShareVisibilityPolicy unknown =
+        AndroidShareVisibility.catalogPolicy(
+            () -> true, () -> true, hash -> new Object(), transfer -> null);
+    assertFalse(unknown.isVisible("abcd"));
+  }
+
   @Test
   public void hybridTorrentCanBeLookedUpByItsIndexedV1Hash() {
     String v1 = "512e9d91e069d560df9225017543f17e29973cd0";

@@ -802,6 +802,8 @@ final class Initializer {
       incomingHandler.setTorrentMetadataProvider(
           new com.frostwire.search.relay.LibtorrentTorrentMetadataProvider(
               com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE));
+      incomingHandler.setCatalogVisibilityPolicy(
+          com.frostwire.gui.bittorrent.BtTransferShareVisibility.CATALOG);
       relayResources.add(incomingHandler::stop);
       // Expose the wiring to download paths (TORRENT_FETCH metadata requests).
       com.frostwire.search.relay.MeshRequestContext.init(transport, identity);
@@ -1008,10 +1010,8 @@ final class Initializer {
       IdentityRecordPublisher publisher =
           new IdentityRecordPublisher(identity, port, rudpPort, "BOTH", extraCaps);
       IndexAnnouncementPublisher indexPublisher =
-          new IndexAnnouncementPublisher(
-              localIndex,
-              identity,
-              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
+          com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE.createCatalogPublisher(
+              localIndex, identity);
       // More aggressive DHT announcements so relayers and peers are found faster.
       DhtAdvertiser advertiser =
           new DhtAdvertiser(

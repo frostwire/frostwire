@@ -120,6 +120,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
     private final IdentityKeys identity;
     private final LocalIndex localIndex;
     private final ShareVisibilityPolicy visibility;
+    private volatile ShareVisibilityPolicy catalogVisibility;
     private volatile boolean stopped;
     private final ThreadLocal<Long> responseDeadline = new ThreadLocal<>();
     private final ThreadLocal<Long> responseGeneration = new ThreadLocal<>();
@@ -225,6 +226,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         this.identity = identity;
         this.localIndex = localIndex;
         this.visibility = visibility;
+        this.catalogVisibility = visibility;
     }
 
     public void start() {
@@ -262,6 +264,15 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
         if (searchService != null) {
             searchService.setPublicCatalog(publicCatalogEnabled);
         }
+    }
+
+    /**
+     * Catalog authorization may be stricter than SEARCH/METADATA (e.g. seeding only).
+     * Existing constructors default to their shared visibility policy for compatibility;
+     * setting a null policy denies catalog rows.
+     */
+    public void setCatalogVisibilityPolicy(ShareVisibilityPolicy catalogVisibility) {
+        this.catalogVisibility = catalogVisibility;
     }
 
     /**
@@ -775,7 +786,7 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                 if (entries.size() >= RemoteSearchRequest.MAX_LIMIT || !canSend()) {
                     break;
                 }
-                if (t == null || !ShareVisibility.isPubliclyShared(t.infoHashHex(), visibility)) {
+                if (t == null || !ShareVisibility.isPubliclyShared(t.infoHashHex(), catalogVisibility)) {
                     continue;
                 }
                 // Only serve torrents the transfer manager is actively sharing right now. The

@@ -1,4 +1,5 @@
 FrostWire 3.2.1 build 777 UNRELEASED
+  - fix:Crawler opt-in now gates both mesh browsing and DHT catalog publication; only active non-private seeds are browsable, and opting out withdraws the previous catalog without disabling ordinary distributed search
   - fix:Transfers rows now react to libtorrent state-change alerts, so Checking-to-Seeding updates do not wait for the next periodic list refresh
   - fix:Transfers list rows now refresh immediately on libtorrent state-change alerts instead of waiting for the next list polling cycle
   - fix:Returning from transfer details immediately refreshes the transfers list so the row reflects the latest Checking, Downloading, or Seeding state

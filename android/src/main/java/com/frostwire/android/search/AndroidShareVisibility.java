@@ -15,6 +15,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.relay.ShareVisibilityPolicy;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferState;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BooleanSupplier;
@@ -41,6 +42,35 @@ public final class AndroidShareVisibility implements ShareVisibilityPolicy {
   AndroidShareVisibility(BooleanSupplier participating, Predicate<String> shared) {
     this.participating = participating;
     this.shared = shared;
+  }
+
+  /** Catalog browsing requires separate consent and a currently seeding transfer. */
+  public static ShareVisibilityPolicy catalogPolicy(
+      BooleanSupplier participating, BooleanSupplier publicCatalog) {
+    return catalogPolicy(
+        participating,
+        publicCatalog,
+        hash ->
+            liveDownload(
+                hash,
+                null,
+                TransferManager.instance()::getBittorrentDownload,
+                TransferManager.instance()::getTransfers),
+        BTDownload::getState);
+  }
+
+  /** Inject the live lookup and state read without requiring JNI in policy tests. */
+  static <T> ShareVisibilityPolicy catalogPolicy(
+      BooleanSupplier participating,
+      BooleanSupplier publicCatalog,
+      Function<String, T> liveTransfer,
+      Function<T, TransferState> stateOf) {
+    return new AndroidShareVisibility(
+        () -> participating.getAsBoolean() && publicCatalog.getAsBoolean(),
+        hash -> {
+          T transfer = liveTransfer.apply(hash);
+          return transfer != null && stateOf.apply(transfer) == TransferState.SEEDING;
+        });
   }
 
   @Override
@@ -73,9 +103,17 @@ public final class AndroidShareVisibility implements ShareVisibilityPolicy {
       BTDownload expected,
       Function<String, BittorrentDownload> lookup,
       Supplier<? extends List<? extends Transfer>> transfers) {
+    return liveDownload(hash, expected, lookup, transfers) != null;
+  }
+
+  private static BTDownload liveDownload(
+      String hash,
+      BTDownload expected,
+      Function<String, BittorrentDownload> lookup,
+      Supplier<? extends List<? extends Transfer>> transfers) {
     BittorrentDownload transfer = resolve(hash, lookup, transfers.get());
     if (!(transfer instanceof UIBittorrentDownload)) {
-      return false;
+      return null;
     }
     UIBittorrentDownload ui = (UIBittorrentDownload) transfer;
     BTDownload download = ui.getDl();
@@ -85,21 +123,23 @@ public final class AndroidShareVisibility implements ShareVisibilityPolicy {
         || (expected != null && !sameTorrent(download, expected))
         || download.wasPaused()
         || download.isPaused()) {
-      return false;
+      return null;
     }
     TorrentHandle handle = download.getTorrentHandle();
     if (handle == null || !handle.isValid()) {
-      return false;
+      return null;
     }
     TorrentInfo info = handle.torrentFile();
     return info != null
-        && info.isValid()
-        && !info.isPrivate()
-        && !ui.isRemovedFromSharing()
-        && !ui.isSharingPaused()
-        && !download.wasPaused()
-        && !download.isPaused()
-        && resolve(hash, lookup, transfers.get()) == ui;
+            && info.isValid()
+            && !info.isPrivate()
+            && !ui.isRemovedFromSharing()
+            && !ui.isSharingPaused()
+            && !download.wasPaused()
+            && !download.isPaused()
+            && resolve(hash, lookup, transfers.get()) == ui
+        ? download
+        : null;
   }
 
   /**
