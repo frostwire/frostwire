@@ -300,14 +300,14 @@ jar {
     // which the macOS/Windows installers ship beside frostwire.jar and launch via
     // `java -jar`. Keep daemon-only IceBridge classes out of frostwire.jar so the
     // two artifacts don't duplicate them: frostwire.jar retains only the
-    // in-process client surface (client/*, host cache, protocol constants/DTOs).
+    // in-process client surface (client/*, host cache, protocol constants/DTOs,
+    // and metrics constructed at desktop startup and used by transport/search).
     // When adding new daemon-only classes under these packages, extend this list.
     def icebridge = 'com/frostwire/search/relay/icebridge/'
     exclude([
         'IceBridgeAuth*',
         'IceBridgeDhtSession*',
         'IceBridgeException*',
-        'IceBridgeMetrics*',
         'IceBridgeServer*',
         'IceBridgeTokens*',
         'RelayMesh*',
@@ -651,6 +651,10 @@ tasks.register('runWithJSig', JavaExec) {
 
 test {
     dependsOn icebridgeJar
+    dependsOn tasks.named('jar')
+    // Packaged-runtime tests must see the current artifact, including packaging-only changes.
+    inputs.file(tasks.named('jar').flatMap { it.archiveFile })
+    systemProperty 'fw.test.packagedJar', tasks.named('jar').get().archiveFile.get().asFile.absolutePath
     failFast = false
     enabled = gradle.startParameter.taskNames.contains("test")
     useJUnitPlatform()
