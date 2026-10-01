@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Fut · rUDP %1$d · vezérlő-HTTP %2$d · szerep %3$s</string>
     <string name="distributed_stack_not_running">A helyi IceBridge-verem nem fut</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Hálózati adatport (UDP). Alapértelmezett: 6889. Koppintson a módosításhoz.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Hálózati adatport (UDP). Alapértelmezett: 0, automatikus port minden munkamenetben. Koppintson a módosításhoz.</string>
     <string name="distributed_icebridge_identity_port_title">Azonosító TCP-portja</string>
     <string name="distributed_icebridge_identity_port_summary">Peer-kézfogási port (TCP). Alapértelmezett: 6888. Koppintson a módosításhoz.</string>
     <string name="distributed_icebridge_role_title">Role</string>

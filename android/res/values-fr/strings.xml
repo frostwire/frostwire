@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">En cours · rUDP %1$d · HTTP de contrôle %2$d · rôle %3$s</string>
     <string name="distributed_stack_not_running">La pile IceBridge locale n\'est pas en cours d\'exécution</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Port de données du maillage (UDP). Par défaut 6889. Touchez pour modifier.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Port de données du maillage (UDP). Par défaut 0 : port automatique à chaque session. Touchez pour modifier.</string>
     <string name="distributed_icebridge_identity_port_title">Port TCP d\'identité</string>
     <string name="distributed_icebridge_identity_port_summary">Port de poignée de main entre pairs (TCP). Par défaut 6888. Touchez pour modifier.</string>
     <string name="distributed_icebridge_role_title">Role</string>

@@ -680,7 +680,7 @@
     <string name="distributed_stack_running">פועל · rUDP %1$d · HTTP שליטה %2$d · תפקיד %3$s</string>
     <string name="distributed_stack_not_running">מחסנית IceBridge המקומית אינה פועלת</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">יציאת נתוני הרשת (UDP). ברירת מחדל 6889. הקש כדי לשנות.</string>
+    <string name="distributed_icebridge_rudp_port_summary">יציאת נתוני הרשת (UDP). ברירת מחדל 0: יציאה אוטומטית בכל הפעלה. הקש כדי לשנות.</string>
     <string name="distributed_icebridge_identity_port_title">יציאת TCP של זהות</string>
     <string name="distributed_icebridge_identity_port_summary">יציאת לחיצת יד בין עמיתים (TCP). ברירת מחדל 6888. הקש כדי לשנות.</string>
     <string name="distributed_icebridge_role_title">Role</string>

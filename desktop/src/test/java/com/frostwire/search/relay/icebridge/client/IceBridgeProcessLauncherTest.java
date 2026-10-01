@@ -47,7 +47,8 @@ class IceBridgeProcessLauncherTest {
 
     assertTrue(launcher.isAlive());
     assertTrue(launcher.controlPort() > 0);
-    assertTrue(launcher.rudpPort() > 0);
+    assertEquals(
+        0, launcher.rudpPort(), "Automatic port is unknown until the child's bind is reported");
     // relayPort defaults or passed
     assertTrue(launcher.relayPort() > 0);
 
@@ -64,6 +65,8 @@ class IceBridgeProcessLauncherTest {
       Thread.sleep(100);
     }
     assertTrue(healthy, "IceBridge daemon did not become healthy in time (30s)");
+    assertTrue(launcher.awaitHealthy(5_000));
+    assertTrue(launcher.rudpPort() > 0, "The parent must learn the actual UDP port");
   }
 
   @Test

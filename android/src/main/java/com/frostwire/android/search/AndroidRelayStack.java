@@ -22,6 +22,7 @@ import android.content.Context;
 import android.os.SystemClock;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.IceBridgePortPreferences;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -828,8 +829,7 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   private static int readConfiguredRudpPort() {
-    return readConfiguredPort(
-        Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, PeerRegistrySync.ICEBRIDGE_RUDP_PORT);
+    return readConfiguredPort(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, 0);
   }
 
   private static int readConfiguredRelayPort() {
@@ -841,12 +841,8 @@ public final class AndroidRelayStack implements AutoCloseable {
     try {
       ConfigurationManager cm = ConfigurationManager.instance();
       String raw = cm.getString(prefKey);
-      if (raw != null && !raw.isEmpty()) {
-        int p = Integer.parseInt(raw.trim());
-        if (p >= 1 && p <= 65535) {
-          return p;
-        }
-      }
+      return IceBridgePortPreferences.configuredPort(
+          raw, Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT.equals(prefKey), fallback);
     } catch (Throwable ignored) {
     }
     return fallback;

@@ -148,6 +148,25 @@ public final class IceBridgeClient implements AutoCloseable {
         return health(TimeUnit.SECONDS.toMillis(CALL_TIMEOUT_SEC));
     }
 
+    /** Read the actual bound UDP port through the authenticated control API; zero means not ready. */
+    public int rudpPort(long timeoutMs) {
+        if (timeoutMs <= 0) {
+            return 0;
+        }
+        try {
+            ApiResponse<com.google.gson.JsonObject> response = get("/metrics",
+                    new TypeToken<ApiResponse<com.google.gson.JsonObject>>() {}, timeoutMs);
+            if (response == null || !response.ok || response.data == null
+                    || !response.data.has("rudpPort")) {
+                return 0;
+            }
+            int port = response.data.get("rudpPort").getAsInt();
+            return port > 0 && port <= 65535 ? port : 0;
+        } catch (Exception unavailable) {
+            return 0;
+        }
+    }
+
     /** Synchronous health probe bounded by the caller's remaining budget in milliseconds. */
     public boolean health(long timeoutMs) {
         if (timeoutMs <= 0) {

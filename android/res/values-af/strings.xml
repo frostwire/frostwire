@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Loop · rUDP %1$d · beheer-HTTP %2$d · rol %3$s</string>
     <string name="distributed_stack_not_running">Plaaslike IceBridge-stapel loop nie</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Maasdatapoort (UDP). Verstek 6889. Tik om te verander.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Maasdatapoort (UDP). Verstek 0: outomatiese poort elke sessie. Tik om te verander.</string>
     <string name="distributed_icebridge_identity_port_title">Identiteit-TCP-poort</string>
     <string name="distributed_icebridge_identity_port_summary">Peer-handdrukpoort (TCP). Verstek 6888. Tik om te verander.</string>
     <string name="distributed_icebridge_role_title">Role</string>

@@ -37,6 +37,23 @@ layout has been simplified enourmously for FrostWire 6.
 - The search is built using the awesome [H2 database](http://www.h2database.com/html/main.html) and [Lucene indexes](http://lucene.apache.org/core/).
 - JSON parsing comes from [google-gson](https://code.google.com/p/google-gson/), and so on and so on.
 
+# IceBridge client ports
+
+Desktop and Android clients use `0` for the IceBridge rUDP port by default. The
+actual UDP bind lets the operating system select an available ephemeral port;
+the client advertises that bound port in its identity and mesh registration.
+Desktop keeps the selected port across supervised daemon restarts within the
+same app session. A fresh app session selects a new port.
+
+The old client default of `6889` is migrated to automatic selection once. Custom
+positive ports and explicit environment overrides remain supported. Set a
+positive port after migration to pin it again. Standalone IceBridge relays retain
+their configured/default listening ports; they do not use the client migration.
+
+This avoids every client on an office, school, or home network requesting the
+same UDP port. Peers' routes use their advertised or authenticated observed
+endpoints; an unknown peer port is never replaced with our local selected port.
+
 # Installers
 
 If you're just looking for a FrostWire installer here are the latest official builds for [Windows, MacOSX, Linux](https://www.frostwire.com/downloads) and [Android](https://www.frostwire.com/android)

@@ -99,6 +99,15 @@ public final class RudpSessionManager {
         this.channel = channel;
     }
 
+    /** The bound UDP endpoint, not the configured zero used to request automatic binding. */
+    public synchronized int boundPort() {
+        if (channel == null || !channel.isOpen()
+                || !(channel.localAddress() instanceof InetSocketAddress)) {
+            return 0;
+        }
+        return ((InetSocketAddress) channel.localAddress()).getPort();
+    }
+
     /** True reserves bounded next-hop ownership; false means no work was accepted. */
     public synchronized boolean deliver(byte[] targetPub, byte[] payload) {
         if (closed || targetPub == null || targetPub.length != 32 || !validPayload(payload)) {

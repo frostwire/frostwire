@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Läuft · rUDP %1$d · Steuerungs-HTTP %2$d · Rolle %3$s</string>
     <string name="distributed_stack_not_running">Lokaler IceBridge-Stack läuft nicht</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Mesh-Datenport (UDP). Standard 6889. Zum Ändern tippen.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Mesh-Datenport (UDP). Standard 0: automatischer Port pro Sitzung. Zum Ändern tippen.</string>
     <string name="distributed_icebridge_identity_port_title">Identitäts-TCP-Port</string>
     <string name="distributed_icebridge_identity_port_summary">Peer-Handshake-Port (TCP). Standard 6888. Zum Ändern tippen.</string>
     <string name="distributed_icebridge_role_title">Role</string>

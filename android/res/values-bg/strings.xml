@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Работи · rUDP %1$d · HTTP за управление %2$d · роля %3$s</string>
     <string name="distributed_stack_not_running">Локалният стек на IceBridge не работи</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Порт за данни на мрежата (UDP). По подразбиране 6889. Докоснете, за да промените.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Порт за данни на мрежата (UDP). По подразбиране 0: автоматичен порт за всяка сесия. Докоснете, за да промените.</string>
     <string name="distributed_icebridge_identity_port_title">TCP порт за идентичност</string>
     <string name="distributed_icebridge_identity_port_summary">Порт за ръкостискане между пиърите (TCP). По подразбиране 6888. Докоснете, за да промените.</string>
     <string name="distributed_icebridge_role_title">Role</string>

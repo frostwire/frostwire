@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">चालू आहे · rUDP %1$d · कंट्रोल HTTP %2$d · भूमिका %3$s</string>
     <string name="distributed_stack_not_running">स्थानिक IceBridge स्टॅक चालू नाही</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">मेश डेटा पोर्ट (UDP). डीफॉल्ट 6889. बदलण्यासाठी टॅप करा.</string>
+    <string name="distributed_icebridge_rudp_port_summary">मेश डेटा पोर्ट (UDP). डीफॉल्ट 0: प्रत्येक सत्रासाठी स्वयंचलित पोर्ट. बदलण्यासाठी टॅप करा.</string>
     <string name="distributed_icebridge_identity_port_title">आयडेंटिटी TCP पोर्ट</string>
     <string name="distributed_icebridge_identity_port_summary">पीअर हँडशेक पोर्ट (TCP). डीफॉल्ट 6888. बदलण्यासाठी टॅप करा.</string>
     <string name="distributed_icebridge_role_title">Role</string>

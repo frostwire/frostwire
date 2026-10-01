@@ -37,7 +37,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
   private final File jarPath;
   private final File identityFile;
   private final int controlHttpPort;
-  private final int rudpPort;
+  private volatile int rudpPort;
   private final int relayPort;
   private final String role;
   private final String host;
@@ -87,7 +87,12 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     this.jarPath = jarPath;
     this.identityFile = identityFile;
     this.controlHttpPort = controlHttpPort <= 0 ? freePort() : controlHttpPort;
-    this.rudpPort = rudpPort <= 0 ? freePort() : rudpPort;
+    if (rudpPort < 0 || rudpPort > 65535) {
+      throw new IllegalArgumentException("rudpPort must be between 0 and 65535");
+    }
+    // Let the child's real UDP bind atomically select a port; probing a TCP socket
+    // selects the wrong transport and leaves a release/rebind race.
+    this.rudpPort = rudpPort;
     // relayPort=0 disables the child's identity TCP listener (embedder owns it).
     this.relayPort = relayPort;
     this.role = role == null || role.isEmpty() ? "BOTH" : role;
@@ -336,7 +341,18 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       }
       IceBridgeClient currentClient = client;
       if (currentClient != null && currentClient.health(remainingMs)) {
-        return System.nanoTime() - deadline < 0;
+        if (rudpPort == 0) {
+          long portBudgetMs = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
+          int boundPort = currentClient.rudpPort(portBudgetMs);
+          if (boundPort > 0) {
+            // Keep the first bound port across supervised child restarts so the
+            // parent's signed announcements never refer to a superseded endpoint.
+            rudpPort = boundPort;
+          }
+        }
+        if (rudpPort > 0) {
+          return System.nanoTime() - deadline < 0;
+        }
       }
       long remainingNanos = deadline - System.nanoTime();
       if (remainingNanos <= 0) {
@@ -485,6 +501,9 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
 
   /** Wait until our configured rUDP port is bindable again after a stale kill. */
   private void waitForRudpPortFree(long startupDeadline) {
+    if (rudpPort == 0) {
+      return;
+    }
     long deadline =
         System.nanoTime()
             + Math.min(
@@ -568,6 +587,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
                     stopProcess();
                     start();
                   }
+                  // A fresh JVM needs a readiness budget before the next short-period
+                  // health check; otherwise supervision can kill every replacement
+                  // before it has finished binding. Do not hold the launch lock here.
+                  awaitHealthy(15_000);
                 } catch (Throwable t) {
                   LOG.warn("IceBridge supervision respawn failed (will retry)", t);
                 }

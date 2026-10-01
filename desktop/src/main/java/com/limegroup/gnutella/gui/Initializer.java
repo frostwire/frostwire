@@ -558,19 +558,9 @@ final class Initializer {
       relayResources.add(() -> LocalSearchEngineWire.setKarmaCache(null));
       if (!relayLifecycle.getAsBoolean()) return;
 
-      // 8. Construct the shared peer directory (used by both
-      //    the direct peer-search server's role and the discovery scheduler)
-      //    and start the direct peer-search server. Discovered peers
-      //    will be registered into this same directory.
+      // Construct the shared directory before discovery. Public listeners and
+      // announcements wait until the IceBridge child's effective UDP port is known.
       PeerDirectory directory = new PeerDirectory(karmaCache);
-      startRelayServer(identity, localIndex, directory);
-      if (!relayLifecycle.getAsBoolean()) return;
-
-      // 9. Start the DHT advertiser so other FrostWire nodes can
-      //    discover us: re-publishes our IdentityRecord (BEP 46)
-      //    and announces under the BEP 5 peer topic.
-      startDhtAdvertiser(btEngine, identity, localIndex);
-      if (!relayLifecycle.getAsBoolean()) return;
 
       // 10. Start the peer discovery scheduler so we can
       //     discover other FrostWire nodes via BEP 5. Newly
@@ -690,14 +680,10 @@ final class Initializer {
         token = SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.getValue();
       }
 
-      int effectiveRudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
-      String envRudp = System.getenv("ICEBRIDGE_RUDP_PORT");
-      if (envRudp != null && !envRudp.isEmpty()) {
-        try {
-          effectiveRudpPort = Integer.parseInt(envRudp);
-        } catch (NumberFormatException ignored) {
-        }
-      }
+      int effectiveRudpPort =
+          IceBridgeStartup.requestedPort(
+              SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue(),
+              System.getenv("ICEBRIDGE_RUDP_PORT"));
 
       if (useRemote && remoteUrl != null && !remoteUrl.isEmpty()) {
         // Support talking directly to a remote IceBridge relay (e.g. standalone launched
@@ -707,6 +693,12 @@ final class Initializer {
         relayResources.add(client);
         if (token != null && !token.isEmpty()) {
           client.setAuthToken(token);
+        }
+        // In remote mode the backend, not this process, owns the UDP socket.
+        // Prefer its reported endpoint; retain a configured hint for older backends.
+        int remoteBoundPort = client.rudpPort(5_000);
+        if (remoteBoundPort > 0) {
+          effectiveRudpPort = remoteBoundPort;
         }
         relayLog.info("Using remote IceBridge at " + remoteUrl + " (no local subprocess)");
         relayLog.info(
@@ -736,14 +728,16 @@ final class Initializer {
         String role = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
         if (role == null || role.isEmpty()) role = "BOTH";
 
-        int relayListenPort = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
         IceBridgeProcessLauncher launcher =
             new IceBridgeProcessLauncher(
-                // relayPort=0: the app's own IncomingRelayServer already owns
+                // relayPort=0: the app's own IncomingRelayServer owns
                 // the identity TCP port (dual-bind causes EADDRINUSE).
                 jarPath, identityFile, 0, effectiveRudpPort, 0, role, bindHost);
         relayResources.add(launcher);
-        if (!launcher.startAndAwaitHealthy(15_000)) {
+        effectiveRudpPort =
+            IceBridgeStartup.startLocal(
+                () -> launcher.startAndAwaitHealthy(15_000), launcher::rudpPort, relayLifecycle);
+        if (effectiveRudpPort == 0) {
           relayLog.warn(
               "IceBridge daemon did not become healthy in time; distributed search disabled");
           return;
@@ -758,15 +752,9 @@ final class Initializer {
         client = launcher.client();
 
         // Core feature: distributed search/TORRENT_FETCH must still work hours
-        // after launch. If the child dies, holds UDP 6889 as an orphan, or
+        // after launch. If the child dies or
         // stops answering /health, the supervisor respawns it — no app restart.
         launcher.startSupervision(10_000);
-
-        effectiveRudpPort = launcher.rudpPort(); // in case auto
-
-        // Now that the child is healthy, add our IceBridge relay endpoint (the one others will
-        // connect to for identity) to the host cache so it appears in the UI table.
-        addSelfToIceBridgeHostCache("127.0.0.1", relayListenPort, role, identity);
       }
 
       // Subscribe to our identity queue before the first poll in both local and remote mode.
@@ -847,11 +835,27 @@ final class Initializer {
       if (!relayLifecycle.getAsBoolean()) return;
       incomingHandler.start();
       transport.start();
+      if (!relayLifecycle.getAsBoolean()) return;
+      // With no remote endpoint hint, retain directory synchronization without
+      // registering a fictional self endpoint (PeerRegistrySync otherwise defaults to 6889).
       PeerRegistrySync peerSync =
           new PeerRegistrySync(
-              client, directory, advertiseHost, effectiveRudpPort, identity, syncRole, localIndex);
+              client,
+              directory,
+              advertiseHost,
+              effectiveRudpPort,
+              effectiveRudpPort > 0 ? identity : null,
+              syncRole,
+              localIndex);
       relayResources.add(peerSync);
-      peerSync.start();
+      IceBridgeStartup.announce(
+          effectiveRudpPort,
+          relayLifecycle,
+          port -> startRelayServer(identity, localIndex, directory, port),
+          port -> startDhtAdvertiser(BTEngine.getInstance(), identity, localIndex, port),
+          port -> peerSync.start());
+      if (!relayLifecycle.getAsBoolean()) return;
+      if (effectiveRudpPort == 0) peerSync.start();
       relayLog.info(
           "PeerRegistrySync advertiseHost="
               + advertiseHost
@@ -991,18 +995,11 @@ final class Initializer {
    * rUDP port, and the relay listen port (configurable) so peers can find our TCP endpoint via BEP
    * 5 and our identity record via BEP 46.
    */
-  private void startDhtAdvertiser(BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex) {
+  private void startDhtAdvertiser(
+      BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex, int rudpPort) {
     try {
       if (!relayLifecycle.getAsBoolean()) return;
       int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
-      int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
-      String envRudp = System.getenv("ICEBRIDGE_RUDP_PORT");
-      if (envRudp != null && !envRudp.isEmpty()) {
-        try {
-          rudpPort = Integer.parseInt(envRudp);
-        } catch (NumberFormatException ignored) {
-        }
-      }
       long extraCaps =
           SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue()
               ? com.frostwire.search.relay.NodeCapabilities.PUBLIC_CATALOG
@@ -1091,10 +1088,10 @@ final class Initializer {
    * peer-search stack still functions.
    */
   private void startRelayServer(
-      IdentityKeys identity, LocalIndex localIndex, PeerDirectory directory) {
+      IdentityKeys identity, LocalIndex localIndex, PeerDirectory directory, int rudpPort) {
     try {
+      if (!relayLifecycle.getAsBoolean()) return;
       int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
-      int rudpPort = SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue();
       RelaySearchService service =
           new RelaySearchService(
               localIndex,

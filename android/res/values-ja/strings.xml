@@ -680,7 +680,7 @@
     <string name="distributed_stack_running">実行中 · rUDP %1$d · 制御HTTP %2$d · ロール %3$s</string>
     <string name="distributed_stack_not_running">ローカルのIceBridgeスタックが実行されていません</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">メッシュのデータポート（UDP）。デフォルトは6889。タップして変更します。</string>
+    <string name="distributed_icebridge_rudp_port_summary">メッシュのデータポート（UDP）。デフォルトは0：セッションごとにポートを自動選択。タップして変更します。</string>
     <string name="distributed_icebridge_identity_port_title">ID用TCPポート</string>
     <string name="distributed_icebridge_identity_port_summary">ピアのハンドシェイクポート（TCP）。デフォルトは6888。タップして変更します。</string>
     <string name="distributed_icebridge_role_title">Role</string>

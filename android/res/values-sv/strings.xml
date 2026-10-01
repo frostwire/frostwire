@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Körs · rUDP %1$d · kontroll-HTTP %2$d · roll %3$s</string>
     <string name="distributed_stack_not_running">Lokal IceBridge-stack körs inte</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Nätverkets dataport (UDP). Standard 6889. Tryck för att ändra.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Nätverkets dataport (UDP). Standard 0: automatisk port för varje session. Tryck för att ändra.</string>
     <string name="distributed_icebridge_identity_port_title">Identitets-TCP-port</string>
     <string name="distributed_icebridge_identity_port_summary">Peer-handskakningsport (TCP). Standard 6888. Tryck för att ändra.</string>
     <string name="distributed_icebridge_role_title">Role</string>

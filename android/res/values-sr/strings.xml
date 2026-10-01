@@ -681,7 +681,7 @@
     <string name="distributed_stack_running">Ради · rUDP %1$d · контролни HTTP %2$d · улога %3$s</string>
     <string name="distributed_stack_not_running">Локални IceBridge стек не ради</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Порт података мреже (UDP). Подразумевано 6889. Додирните за промену.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Порт података мреже (UDP). Подразумевано 0: аутоматски порт за сваку сесију. Додирните за промену.</string>
     <string name="distributed_icebridge_identity_port_title">TCP порт идентитета</string>
     <string name="distributed_icebridge_identity_port_summary">Порт за руковање пирова (TCP). Подразумевано 6888. Додирните за промену.</string>
     <string name="distributed_icebridge_role_title">Role</string>

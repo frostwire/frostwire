@@ -58,6 +58,7 @@ object ConfigurationRepository {
         dataStore = FrostwirePreferences.dataStore
         migrateFromSharedPreferences(context)
         loadFromDataStore()
+        migrateIceBridgeRudpPortToAuto()
         migrateDistributedParticipationPreference()
         seedDefaults()
         migrateIceBridgeRoleToBoth()
@@ -293,6 +294,28 @@ object ConfigurationRepository {
         }
     }
 
+    private fun migrateIceBridgeRudpPortToAuto() {
+        val flag = "_migrated_icebridge_rudp_port_auto"
+        if (cache[flag] == true) return
+        val key = Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT
+        val current = cache[key] as? String
+        val upgraded = IceBridgePortPreferences.migrateLegacyRudpPort(current, false)
+        val migrate = upgraded != current
+        try {
+            // Persist port and marker together before startup or a later manual edit.
+            runBlocking {
+                dataStore.edit { prefs ->
+                    if (migrate) prefs[stringPreferencesKey(key)] = upgraded
+                    prefs[booleanPreferencesKey(flag)] = true
+                }
+            }
+            if (migrate) cache[key] = upgraded
+            cache[flag] = true
+        } catch (e: Throwable) {
+            LOG.warn("migrateIceBridgeRudpPortToAuto failed", e)
+        }
+    }
+
     private fun setDefault(key: String, value: Any) {
         cache[key] = value
         persistAsync(key, value)
@@ -352,7 +375,12 @@ object ConfigurationRepository {
         }
 
         for ((key, value) in cache) {
-            persistAsync(key, value)
+            if (key == Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT && value is String) {
+                // Complete this import before the one-time port upgrade reads DataStore.
+                runBlocking { dataStore.edit { it[stringPreferencesKey(key)] = value } }
+            } else {
+                persistAsync(key, value)
+            }
         }
 
         editor.putBoolean("_migrated_to_datastore", true)
@@ -412,7 +440,7 @@ object ConfigurationRepository {
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_URL] = ""
         m[Constants.PREF_KEY_ICEBRIDGE_REMOTE_TOKEN] = ""
         // Stored as strings so EditTextPreference works with PreferenceDataStore.
-        m[Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT] = "6889"
+        m[Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT] = "0"
         m[Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT] = "6888"
         m[Constants.PREF_KEY_ICEBRIDGE_ROLE] = "BOTH"
         m[Constants.PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG] = false

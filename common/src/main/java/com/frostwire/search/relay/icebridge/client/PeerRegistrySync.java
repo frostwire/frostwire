@@ -212,7 +212,12 @@ public final class PeerRegistrySync implements AutoCloseable {
             if (peer.hostname() == null || peer.hostname().isBlank()) {
                 continue;
             }
-            int peerRudpPort = peer.rudpPort() > 0 ? peer.rudpPort() : rudpPort;
+            // Our automatically selected port says nothing about another peer's endpoint.
+            // Older identity records may omit UDP; keep any route the daemon already learned.
+            int peerRudpPort = peer.rudpPort();
+            if (peerRudpPort <= 0 || peerRudpPort > 65535) {
+                continue;
+            }
             // Push the peer's real role, not a blanket BOTH: advertising a leaf as a
             // forwarder makes relays flood through nodes that cannot relay.
             if (client.route(peer.peerPub(), peer.hostname(),

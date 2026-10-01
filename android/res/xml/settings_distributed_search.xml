@@ -44,7 +44,7 @@
             android:summary="@string/distributed_icebridge_rudp_port_summary"
             android:dialogTitle="@string/distributed_icebridge_rudp_port_title"
             android:inputType="number"
-            android:defaultValue="6889"
+            android:defaultValue="0"
             android:singleLine="true" />
 
         <EditTextPreference

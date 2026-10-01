@@ -93,6 +93,26 @@ class PeerRegistrySyncTest {
   }
 
   @Test
+  void syncNeverSubstitutesOurAutomaticPortForAnUnknownPeerEndpoint() throws Exception {
+    IdentityKeys other = IdentityKeys.generate(0);
+    directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 0);
+    sync = new PeerRegistrySync(client, directory, "127.0.0.1", 52345);
+    sync.sync();
+    assertNull(
+        registry.lookup(other.ed25519PubRaw()),
+        "Unknown peer UDP port cannot become our local port");
+
+    assertTrue(
+        client.route(other.ed25519PubRaw(), "127.0.0.1", 40123, IceBridgeConfig.Role.CLIENT));
+    directory.upsertVerified(other.ed25519PubRaw(), "10.0.0.5", 6888, 0);
+    sync.sync();
+    var routed = registry.lookup(other.ed25519PubRaw());
+    assertEquals("127.0.0.1", routed.host());
+    assertEquals(
+        40123, routed.rudpPort(), "Missing discovery hints must not overwrite a known endpoint");
+  }
+
+  @Test
   void transportEnsureRouteRegistersDirectoryPeerWithoutWaitingForSync() throws Exception {
     IdentityKeys relay = IdentityKeys.generate(0);
     try (IceBridgeSearchTransport transport = new IceBridgeSearchTransport(client)) {

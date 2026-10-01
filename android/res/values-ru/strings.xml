@@ -680,7 +680,7 @@
     <string name="distributed_stack_running">Работает · rUDP %1$d · HTTP управления %2$d · роль %3$s</string>
     <string name="distributed_stack_not_running">Локальный стек IceBridge не запущен</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Порт данных сети (UDP). По умолчанию 6889. Нажмите, чтобы изменить.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Порт данных сети (UDP). По умолчанию 0: автоматический порт для каждого сеанса. Нажмите, чтобы изменить.</string>
     <string name="distributed_icebridge_identity_port_title">TCP-порт идентификации</string>
     <string name="distributed_icebridge_identity_port_summary">Порт рукопожатия пиров (TCP). По умолчанию 6888. Нажмите, чтобы изменить.</string>
     <string name="distributed_icebridge_role_title">Role</string>

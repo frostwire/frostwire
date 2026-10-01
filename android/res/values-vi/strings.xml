@@ -679,7 +679,7 @@
     <string name="distributed_stack_running">Đang chạy · rUDP %1$d · HTTP điều khiển %2$d · vai trò %3$s</string>
     <string name="distributed_stack_not_running">Ngăn xếp IceBridge cục bộ không chạy</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
-    <string name="distributed_icebridge_rudp_port_summary">Cổng dữ liệu mesh (UDP). Mặc định 6889. Nhấn để thay đổi.</string>
+    <string name="distributed_icebridge_rudp_port_summary">Cổng dữ liệu mesh (UDP). Mặc định 0: cổng tự động cho mỗi phiên. Nhấn để thay đổi.</string>
     <string name="distributed_icebridge_identity_port_title">Cổng TCP danh tính</string>
     <string name="distributed_icebridge_identity_port_summary">Cổng bắt tay peer (TCP). Mặc định 6888. Nhấn để thay đổi.</string>
     <string name="distributed_icebridge_role_title">Role</string>

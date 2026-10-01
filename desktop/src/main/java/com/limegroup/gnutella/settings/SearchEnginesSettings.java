@@ -105,8 +105,33 @@ public class SearchEnginesSettings extends LimeProps {
   public static final StringSetting ICEBRIDGE_REMOTE_AUTH_TOKEN =
       FACTORY.createStringSetting("ICEBRIDGE_REMOTE_AUTH_TOKEN", "");
 
+  /** Zero lets the child bind a fresh kernel-selected UDP port each app session. */
   public static final IntSetting ICEBRIDGE_RUDP_PORT =
-      FACTORY.createIntSetting("ICEBRIDGE_RUDP_PORT", 6889);
+      FACTORY.createIntSetting("ICEBRIDGE_RUDP_PORT", 0);
+
+  private static final BooleanSetting ICEBRIDGE_RUDP_AUTO_MIGRATED =
+      (BooleanSetting)
+          FACTORY.createBooleanSetting("ICEBRIDGE_RUDP_AUTO_MIGRATED", false).setAlwaysSave(true);
+
+  static {
+    if (!ICEBRIDGE_RUDP_AUTO_MIGRATED.getValue()) {
+      ICEBRIDGE_RUDP_PORT.setValue(
+          RudpPortMigration.port(
+              ICEBRIDGE_RUDP_PORT.getValue(), false, ICEBRIDGE_USE_REMOTE.getValue()));
+      ICEBRIDGE_RUDP_AUTO_MIGRATED.setValue(true);
+      LimeProps.instance().save();
+    }
+  }
+
+  /** Pure upgrade policy, usable without initializing the enclosing settings class. */
+  public static final class RudpPortMigration {
+    private RudpPortMigration() {}
+
+    /** A later manual 6889 remains an explicit override once the marker has been saved. */
+    public static int port(int port, boolean alreadyMigrated, boolean remote) {
+      return !alreadyMigrated && !remote && port == 6889 ? 0 : port;
+    }
+  }
 
   public static final StringSetting ICEBRIDGE_ROLE =
       FACTORY.createStringSetting("ICEBRIDGE_ROLE", "BOTH");

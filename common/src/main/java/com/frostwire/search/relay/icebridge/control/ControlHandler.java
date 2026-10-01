@@ -406,7 +406,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 metrics.transportPollRunsCount(), metrics.transportPollErrorsCount(),
                 metrics.transportPollDrainBatchesCount(), metrics.transportMessagesDrainedCount(),
                 metrics.requestWorkQueueDepthGauge(), metrics.requestWorkRejectedCount(),
-                metrics.verifyFailuresCount());
+                metrics.verifyFailuresCount(), rudpSessionManager.boundPort());
         return ApiResponse.success(snapshot);
     }
 
@@ -538,6 +538,7 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
     }
 
     private static final class MetricsSnapshot {
+        final int rudpPort;
         @SuppressWarnings("unused")
         final long rudpPacketsIn;
         @SuppressWarnings("unused")
@@ -594,7 +595,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                         long transportPollRuns, long transportPollErrors,
                         long transportPollDrainBatches, long transportMessagesDrained,
                         long requestWorkQueueDepth, long requestWorkRejected,
-                        long verifyFailures) {
+                        long verifyFailures, int rudpPort) {
+            this.rudpPort = rudpPort;
             this.rudpPacketsIn = rudpPacketsIn;
             this.rudpPacketsOut = rudpPacketsOut;
             this.rudpBytesIn = rudpBytesIn;
