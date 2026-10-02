@@ -164,6 +164,7 @@
 -dontwarn io.netty.internal.tcnative.ResultCallback
 -dontwarn io.netty.internal.tcnative.SSL
 -dontwarn io.netty.internal.tcnative.SSLContext
+-dontwarn io.netty.internal.tcnative.SSLCredential
 -dontwarn io.netty.internal.tcnative.SSLPrivateKeyMethod
 -dontwarn io.netty.internal.tcnative.SSLSession
 -dontwarn io.netty.internal.tcnative.SSLSessionCache
@@ -175,6 +176,8 @@
 -dontwarn javax.naming.NamingException
 -dontwarn javax.naming.directory.DirContext
 -dontwarn javax.naming.directory.InitialDirContext
+-dontwarn javax.naming.ldap.LdapName
+-dontwarn javax.naming.ldap.Rdn
 -dontwarn javax.xml.stream.XMLStreamException
 -dontwarn lzma.sdk.ICodeProgress
 -dontwarn lzma.sdk.lzma.Encoder
@@ -182,6 +185,7 @@
 -dontwarn net.jpountz.lz4.LZ4Exception
 -dontwarn net.jpountz.lz4.LZ4Factory
 -dontwarn net.jpountz.lz4.LZ4FastDecompressor
+-dontwarn net.jpountz.lz4.LZ4SafeDecompressor
 -dontwarn net.jpountz.xxhash.XXHash32
 -dontwarn net.jpountz.xxhash.XXHashFactory
 -dontwarn org.apache.log4j.Level
@@ -209,3 +213,12 @@
 -dontwarn org.slf4j.helpers.NOPLoggerFactory
 -dontwarn org.slf4j.spi.LocationAwareLogger
 -dontwarn reactor.blockhound.integration.BlockHoundIntegration
+-dontwarn jdk.jfr.Category
+-dontwarn jdk.jfr.DataAmount
+-dontwarn jdk.jfr.Description
+-dontwarn jdk.jfr.Enabled
+-dontwarn jdk.jfr.Event
+-dontwarn jdk.jfr.FlightRecorder
+-dontwarn jdk.jfr.Label
+-dontwarn jdk.jfr.MemoryAddress
+-dontwarn jdk.jfr.Name
