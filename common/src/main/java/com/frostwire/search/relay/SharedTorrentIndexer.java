@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * {@link LocalSharedTorrent} row into the configured
  * {@link LocalIndex}.
  *
+ * <p>Signed index identities use metadata v1 when available. Hybrid handle
+ * prefixes are only legacy aliases, never a second published identity.
+ *
  * <p>When constructed with an {@link IdentityKeys}, the publisher
  * fields carry the node's real Ed25519 public key and derived node
  * ID. When constructed without keys (e.g. unit tests), placeholder
@@ -42,6 +45,7 @@ public final class SharedTorrentIndexer implements BTEngineListener {
     private static final Logger LOG = Logger.getLogger(SharedTorrentIndexer.class);
 
     private final LocalIndex index;
+    private final Runnable indexChangedListener;
     private final byte[] publisherNodeId;
     private final byte[] publisherEd25519Pub;
     private final AtomicReference<TorrentInfoSource> torrentInfoSource = new AtomicReference<>(
@@ -54,10 +58,16 @@ public final class SharedTorrentIndexer implements BTEngineListener {
 
     /** Construct with a real node identity. */
     public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity) {
+        this(index, identity, null);
+    }
+
+    /** Listener runs after a successful index write, on the producer's worker thread. */
+    public SharedTorrentIndexer(LocalIndex index, IdentityKeys identity, Runnable indexChangedListener) {
         if (index == null) {
             throw new IllegalArgumentException("index is null");
         }
         this.index = index;
+        this.indexChangedListener = indexChangedListener;
         if (identity != null) {
             this.publisherNodeId = identity.nodeId();
             this.publisherEd25519Pub = identity.ed25519PubRaw();
@@ -101,26 +111,46 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             return;
         }
         java.util.HashSet<String> live = new java.util.HashSet<>();
+        boolean canPrune = true;
         int n = 0;
         for (BTDownload dl : downloads) {
             if (dl == null) {
                 continue;
             }
-            String hex = safeInfoHash(dl);
+            TorrentInfo ti = null;
+            try {
+                ti = torrentInfoSource.get().torrentInfo(dl);
+            } catch (Throwable unavailable) {
+                LOG.debug("Metadata unavailable during live index reconciliation", unavailable);
+            }
+            String hex = ti == null ? safeInfoHash(dl) : infoHashHex(ti);
             if (hex != null) {
                 live.add(hex);
+            }
+            if (ti == null || hex == null) {
+                // A transient metadata gap cannot prove a canonical row is no longer live.
+                canPrune = false;
+            } else {
+                String alias = legacyAlias(ti, hex);
+                if (alias != null) {
+                    // Preserve the old row until its canonical upsert commits successfully.
+                    live.add(alias);
+                }
             }
             scheduleIndex(dl, IndexTrigger.ADDED);
             n++;
         }
         try {
             int removed = 0;
-            for (LocalSharedTorrent t : index.listAll()) {
+            java.util.List<LocalSharedTorrent> rows = canPrune
+                    ? index.listAll() : java.util.Collections.emptyList();
+            for (LocalSharedTorrent t : rows) {
                 if (t == null || t.infoHashHex() == null) {
                     continue;
                 }
-                if (!live.contains(t.infoHashHex().toLowerCase())) {
+                if (!live.contains(t.infoHashHex().toLowerCase(java.util.Locale.ROOT))) {
                     index.delete(t.infoHashHex());
+                    notifyIndexChanged();
                     removed++;
                 }
             }
@@ -188,6 +218,8 @@ public final class SharedTorrentIndexer implements BTEngineListener {
                     .lastSeenAt(now)
                     .build();
             index.upsert(torrent);
+            notifyIndexChanged();
+            removeLegacyAlias(ti, infoHashHex);
             LOG.info("Indexed torrent " + infoHashHex + " from " + IndexTrigger.CREATED.name());
             return IndexResult.UPSERTED;
         } catch (Throwable t) {
@@ -205,13 +237,63 @@ public final class SharedTorrentIndexer implements BTEngineListener {
             if (ti == null) {
                 return IndexResult.NO_METADATA;
             }
-            LocalSharedTorrent torrent = buildTorrent(dl, ti, infoHashHex);
+            String canonical = infoHashHex(ti);
+            if (canonical == null) {
+                return IndexResult.NO_METADATA;
+            }
+            LocalSharedTorrent torrent = buildTorrent(dl, ti, canonical);
             index.upsert(torrent);
-            LOG.info("Indexed torrent " + infoHashHex + " from " + trigger.name());
+            notifyIndexChanged();
+            removeLegacyAlias(ti, canonical);
+            LOG.info("Indexed torrent " + canonical + " from " + trigger.name());
             return IndexResult.UPSERTED;
         } catch (Throwable t) {
             LOG.warn("Failed to index torrent " + infoHashHex + " from " + trigger.name(), t);
             return IndexResult.ERROR;
+        }
+    }
+
+    private void notifyIndexChanged() {
+        if (indexChangedListener != null) {
+            try {
+                indexChangedListener.run();
+            } catch (Throwable t) {
+                // Notification failure must not turn an already committed write into ERROR.
+                LOG.warn("Failed to notify LocalIndex change", t);
+            }
+        }
+    }
+
+    private void removeLegacyAlias(TorrentInfo ti, String canonical) {
+        String alias = legacyAlias(ti, canonical);
+        if (alias == null) {
+            return;
+        }
+        try {
+            if (index.get(alias).isPresent()) {
+                index.delete(alias);
+                notifyIndexChanged();
+            }
+        } catch (Throwable t) {
+            // Keep the committed canonical row searchable; retry cleanup on the next callback.
+            LOG.warn("Failed to remove proven LocalIndex alias " + alias, t);
+        }
+    }
+
+    /** Only native metadata linking both hashes authorizes alias removal. */
+    private static String legacyAlias(TorrentInfo ti, String canonical) {
+        try {
+            if (!ti.infoHashType().has_v1()) {
+                return null;
+            }
+            Sha1Hash v1 = ti.infoHashV1();
+            if (v1 == null || !v1.toHex().equalsIgnoreCase(canonical)) {
+                return null;
+            }
+            String alias = v2Prefix(ti);
+            return alias == null || alias.equals(canonical) ? null : alias;
+        } catch (Throwable unavailable) {
+            return null;
         }
     }
 
@@ -349,23 +431,46 @@ public final class SharedTorrentIndexer implements BTEngineListener {
 
     private static String infoHashHex(TorrentInfo ti) {
         try {
-            Sha1Hash v1 = ti.infoHashV1();
-            if (v1 != null) {
-                return v1.toHex().toLowerCase();
+            if (ti.infoHashType().has_v1()) {
+                Sha1Hash v1 = ti.infoHashV1();
+                return v1 == null ? null : v1.toHex().toLowerCase(java.util.Locale.ROOT);
             }
+            // The current wire/index identity is 20 bytes. Preserve the existing v2-only
+            // handle-prefix behavior; this is not a full v2 protocol identity.
+            return v2Prefix(ti);
         } catch (Throwable t) {
             LOG.debug("TorrentInfo.infoHashV1() lookup failed", t);
+            // Do not publish a hybrid as v2 just because v1 lookup is temporarily unavailable.
+            return null;
+        }
+    }
+
+    private static String v2Prefix(TorrentInfo ti) {
+        try {
+            if (!ti.infoHashType().has_v2()) {
+                return null;
+            }
+            com.frostwire.jlibtorrent.Sha256Hash v2 = ti.infoHashV2();
+            if (v2 != null && !v2.isAllZeros()) {
+                return v2.toHex().substring(0, 40).toLowerCase(java.util.Locale.ROOT);
+            }
+        } catch (Throwable unavailable) {
+            LOG.debug("TorrentInfo.infoHashV2() lookup failed", unavailable);
         }
         return null;
     }
 
     private static String safeInfoHash(BTDownload dl) {
         try {
+            String v1 = dl.getV1InfoHash();
+            if (v1 != null && !v1.isEmpty()) {
+                return v1.toLowerCase(java.util.Locale.ROOT);
+            }
             String hex = dl.getInfoHash();
             if (hex == null || hex.isEmpty()) {
                 return null;
             }
-            return hex.toLowerCase();
+            return hex.toLowerCase(java.util.Locale.ROOT);
         } catch (Throwable t) {
             LOG.warn("Unable to read info hash from BTDownload", t);
             return null;

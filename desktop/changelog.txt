@@ -1,4 +1,6 @@
  FrostWire 7.1.0 UNRELEASED
+  - fix:Newly indexed torrents trigger a coalesced routing-digest refresh instead of waiting for the periodic rebuild; writes during an announcement schedule a follow-up and removing the last row withdraws previous holdership
+  - fix:Hybrid torrents use their metadata v1 hash consistently in the shared index and transfer lookup; successful canonical indexing removes only metadata-proven truncated-v2 duplicates
   - fix:macOS native icon preloading reuses the existing Aqua file view instead of constructing a new file chooser for every file extension, avoiding repeated multi-second stalls on the Swing event thread
   - fix:Desktop clients now choose an automatic IceBridge UDP port instead of all using 6889 behind the same router; identity records and mesh registration advertise the actual bound port, supervised restarts retain it, and unknown peer ports are never guessed from our own port
   - fix:YouTube audio muxing and other HTTP post-processing finish before automatic torrent creation or sharing, so the seeded torrent describes the final file; cancellation and failed-mux fallback are covered by completion-order regressions

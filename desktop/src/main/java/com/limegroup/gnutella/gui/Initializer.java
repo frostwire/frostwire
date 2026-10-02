@@ -455,7 +455,8 @@ final class Initializer {
       // 3. Install the auto-indexer on BTEngine (chains onto any
       //    listener already present; DownloadManagerImpl is added later).
       BTEngine btEngine = BTEngine.getInstance();
-      SharedTorrentIndexerInstaller.install(btEngine, localIndex, identity);
+      SharedTorrentIndexerInstaller.install(
+          btEngine, localIndex, identity, LocalSearchEngineWire::indexChanged);
       relayLog.info("SharedTorrentIndexer installed");
 
       LocalSearchEngineWire.setIndex(localIndex);
@@ -846,8 +847,10 @@ final class Initializer {
               effectiveRudpPort,
               effectiveRudpPort > 0 ? identity : null,
               syncRole,
-              localIndex);
+              localIndex,
+              relayLifecycle);
       relayResources.add(peerSync);
+      relayResources.add(LocalSearchEngineWire.bindIndexDigest(peerSync, relayLifecycle));
       IceBridgeStartup.announce(
           effectiveRudpPort,
           relayLifecycle,

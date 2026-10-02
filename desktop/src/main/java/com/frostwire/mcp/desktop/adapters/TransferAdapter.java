@@ -134,8 +134,19 @@ public final class TransferAdapter {
   public record NamedTransfer(String id, String name) {}
 
   public static BTDownload findDownload(String downloadId) {
-    for (BTDownload dl : getAllDownloads()) {
-      if (dl.getInfoHash() != null && dl.getInfoHash().equalsIgnoreCase(downloadId)) {
+    if (downloadId == null || downloadId.isEmpty()) {
+      return null;
+    }
+    return findDownload(getAllDownloads(), downloadId);
+  }
+
+  static BTDownload findDownload(Iterable<BTDownload> downloads, String downloadId) {
+    if (downloadId == null || downloadId.isEmpty()) {
+      return null;
+    }
+    for (BTDownload dl : downloads) {
+      if (downloadId.equalsIgnoreCase(dl.getInfoHash())
+          || downloadId.equalsIgnoreCase(dl.getV1InfoHash())) {
         return dl;
       }
     }

@@ -387,7 +387,11 @@ public final class TorrentUtil {
         return;
       }
       IdentityKeys identity = SearchEngine.getDistributedIdentity();
-      SharedTorrentIndexer indexer = new SharedTorrentIndexer(index, identity);
+      SharedTorrentIndexer indexer =
+          new SharedTorrentIndexer(
+              index,
+              identity,
+              com.limegroup.gnutella.gui.search.LocalSearchEngineWire::indexChanged);
       indexer.indexTorrentInfo(torrent, name);
     } catch (Throwable t) {
       LOG.warn("TorrentUtil: failed to index created torrent", t);

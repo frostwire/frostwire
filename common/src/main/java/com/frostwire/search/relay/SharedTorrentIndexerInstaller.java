@@ -27,7 +27,12 @@ public final class SharedTorrentIndexerInstaller {
 
     /** Install with a real node identity. */
     public static SharedTorrentIndexer install(BTEngine engine, LocalIndex index, IdentityKeys identity) {
-        SharedTorrentIndexer indexer = new SharedTorrentIndexer(index, identity);
+        return install(engine, index, identity, null);
+    }
+
+    public static SharedTorrentIndexer install(BTEngine engine, LocalIndex index, IdentityKeys identity,
+                                               Runnable indexChangedListener) {
+        SharedTorrentIndexer indexer = new SharedTorrentIndexer(index, identity, indexChangedListener);
         BTEngineListenerChain.install(engine, indexer);
         return indexer;
     }

@@ -9,7 +9,9 @@ package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Hex;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -97,30 +99,21 @@ class SharedTorrentIndexerTest {
   }
 
   @Test
-  void buildTorrentMapsHexAndNameForValidInputs() {
-    // This test does not call into libtorrent; we are only proving
-    // the conversion path that does not depend on the live JNI
-    // surface — name + info hash + files_json mapping.
-    LocalSharedTorrent torrent =
-        new LocalSharedTorrent.Builder()
-            .infoHash(Hex.decode(INFO_HASH_HEX))
-            .name("explicit-name.iso")
-            .sizeBytes(4096L)
-            .fileCount(2)
-            .filesJson(FilesJson.minimal(2, 4096L))
-            .publisherNodeId(new byte[IdentityRecord.NODE_ID_LENGTH])
-            .publisherEd25519Pub(new byte[IdentityRecord.ED25519_PUB_LENGTH])
-            .publisherUtpPort(0)
-            .addedAt(1_700_000_000L)
-            .lastSeenAt(1_700_000_005L)
-            .build();
-
-    assertEquals(INFO_HASH_HEX, torrent.infoHashHex());
+  void createdTorrentMapsNativeMetadataHashAndExplicitName() {
+    TorrentInfo metadata =
+        TorrentInfo.bdecode(
+            "d4:infod6:lengthi1e4:name17:explicit-name.iso12:piece lengthi16384e6:pieces20:xxxxxxxxxxxxxxxxxxxxee"
+                .getBytes(StandardCharsets.US_ASCII));
+    RecordingIndex index = new RecordingIndex();
+    SharedTorrentIndexer producer = new SharedTorrentIndexer(index);
+    assertEquals(IndexResult.UPSERTED, producer.indexTorrentInfo(metadata, "explicit-name.iso"));
+    LocalSharedTorrent torrent = index.upserts.get(0);
+    assertEquals(metadata.infoHashV1().toHex(), torrent.infoHashHex());
     assertEquals("explicit-name.iso", torrent.name());
-    assertEquals(2, torrent.fileCount());
-    assertEquals(4096L, torrent.sizeBytes());
-    assertEquals(1_700_000_000L, torrent.addedAt());
-    assertEquals(1_700_000_005L, torrent.lastSeenAt());
+    assertEquals(1, torrent.fileCount());
+    assertEquals(1L, torrent.sizeBytes());
+    assertTrue(torrent.addedAt() > 0);
+    assertEquals(torrent.addedAt(), torrent.lastSeenAt());
   }
 
   @Test

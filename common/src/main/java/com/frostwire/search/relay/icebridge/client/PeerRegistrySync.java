@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 
 /**
  * Synchronizes {@link PeerDirectory} with the IceBridge mesh registry.
@@ -63,7 +64,7 @@ public final class PeerRegistrySync implements AutoCloseable {
      * older than this is already gone and must not be re-promoted into the search directory.
      */
     private static final long MAX_LOOKUP_AGE_MS = 10 * 60_000L;
-    /** Never rebuild the index digest more often than this (SHA-256 over every name/path). */
+    /** Periodic rebuild interval; committed index mutations bypass it. */
     private static final long DIGEST_REBUILD_INTERVAL_MS = 120_000L;
     /** Force a re-announce even when unchanged, so a restarted relay relearns our digest. */
     private static final long DIGEST_REFRESH_INTERVAL_MS = 120_000L;
@@ -81,6 +82,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private final IceBridgeConfig.Role localRole;
     private final byte[] ownPub;
     private final LocalIndex index;
+    private final BooleanSupplier active;
     private final ScheduledExecutorService scheduler;
     private volatile byte[] lastDigest;
     private volatile long lastDigestBuildMs;
@@ -88,6 +90,7 @@ public final class PeerRegistrySync implements AutoCloseable {
     private volatile long lastNodeMetaSendMs;
     private volatile long lastClusterSendMs;
     private final AtomicBoolean digestAnnouncementPending = new AtomicBoolean();
+    private volatile boolean closed;
 
     public PeerRegistrySync(IceBridgeClient client,
                             PeerDirectory directory,
@@ -116,8 +119,20 @@ public final class PeerRegistrySync implements AutoCloseable {
                             String localHost,
                             int rudpPort,
                             IdentityKeys identity,
+                             IceBridgeConfig.Role localRole,
+                             LocalIndex index) {
+        this(client, directory, localHost, rudpPort, identity, localRole, index, () -> true);
+    }
+
+    /** The ownership gate also rejects queued digest work after its relay lifetime ends. */
+    public PeerRegistrySync(IceBridgeClient client,
+                            PeerDirectory directory,
+                            String localHost,
+                            int rudpPort,
+                            IdentityKeys identity,
                             IceBridgeConfig.Role localRole,
-                            LocalIndex index) {
+                            LocalIndex index,
+                            BooleanSupplier active) {
         if (client == null) {
             throw new IllegalArgumentException("client is null");
         }
@@ -127,6 +142,9 @@ public final class PeerRegistrySync implements AutoCloseable {
         if (localHost == null || localHost.isBlank()) {
             throw new IllegalArgumentException("localHost is null or blank");
         }
+        if (active == null) {
+            throw new IllegalArgumentException("active is null");
+        }
         this.client = client;
         this.directory = directory;
         this.localHost = localHost;
@@ -135,6 +153,7 @@ public final class PeerRegistrySync implements AutoCloseable {
         this.localRole = localRole != null ? localRole : IceBridgeConfig.Role.BOTH;
         this.ownPub = identity != null ? identity.ed25519PubRaw() : null;
         this.index = index;
+        this.active = active;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "icebridge-peer-sync");
             t.setDaemon(true);
@@ -159,6 +178,9 @@ public final class PeerRegistrySync implements AutoCloseable {
      * path instead of waiting for the first scheduled tick.
      */
     public void sync() {
+        if (!isActive()) {
+            return;
+        }
         try {
             registerSelf();
             pushDirectoryToMesh();
@@ -174,15 +196,15 @@ public final class PeerRegistrySync implements AutoCloseable {
 
     /** Schedule a debounced digest rebuild after the local shared index changes. */
     public void announceIndexDigestSoon() {
-        if (!digestAnnouncementPending.compareAndSet(false, true)) {
+        if (!isActive() || !digestAnnouncementPending.compareAndSet(false, true)) {
             return;
         }
         try {
             scheduler.schedule(() -> {
-                try {
+                // A write during the snapshot/send must schedule the next rebuild.
+                digestAnnouncementPending.set(false);
+                if (isActive()) {
                     publishIndexDigest(true);
-                } finally {
-                    digestAnnouncementPending.set(false);
                 }
             }, 1, TimeUnit.SECONDS);
         } catch (java.util.concurrent.RejectedExecutionException closed) {
@@ -259,8 +281,9 @@ public final class PeerRegistrySync implements AutoCloseable {
      * Announce this node's {@link IndexDigest} to directory peers so a forwarder can route
      * searches to likely holders instead of fanning out blindly.
      *
-     * <p>The digest is rebuilt at most every {@link #DIGEST_REBUILD_INTERVAL_MS} and re-sent when it
-     * changed or after {@link #DIGEST_REFRESH_INTERVAL_MS} (so a restarted relay relearns it).
+     * <p>Unless invalidated, the digest is rebuilt at most every
+     * {@link #DIGEST_REBUILD_INTERVAL_MS} and re-sent when it changed or after
+     * {@link #DIGEST_REFRESH_INTERVAL_MS} (so a restarted relay relearns it).
      */
     private void publishIndexDigest() {
         publishIndexDigest(false);
@@ -268,7 +291,7 @@ public final class PeerRegistrySync implements AutoCloseable {
 
     private void publishIndexDigest(boolean forceRebuild) {
         LocalIndex localIndex = this.index;
-        if (localIndex == null) {
+        if (!isActive() || localIndex == null) {
             return;
         }
         try {
@@ -293,6 +316,9 @@ public final class PeerRegistrySync implements AutoCloseable {
             }
             int sent = 0;
             for (PeerDirectory.PeerInfo peer : targets) {
+                if (!isActive()) {
+                    return;
+                }
                 if (ownPub != null && Arrays.equals(peer.peerPub(), ownPub)) {
                     continue;
                 }
@@ -315,8 +341,11 @@ public final class PeerRegistrySync implements AutoCloseable {
 
     private static byte[] buildIndexDigest(LocalIndex index) {
         List<LocalSharedTorrent> rows = index.listAll();
-        if (rows == null || rows.isEmpty()) {
+        if (rows == null) {
             return null;
+        }
+        if (rows.isEmpty()) {
+            return IndexDigest.build(java.util.Collections.emptyList()).toBytes();
         }
         List<String> texts = new ArrayList<>(rows.size() * 2);
         for (LocalSharedTorrent torrent : rows) {
@@ -324,9 +353,6 @@ public final class PeerRegistrySync implements AutoCloseable {
                 continue;
             }
             texts.add(torrent.name());
-        }
-        if (texts.isEmpty()) {
-            return null;
         }
         return IndexDigest.build(texts).toBytes();
     }
@@ -538,7 +564,12 @@ public final class PeerRegistrySync implements AutoCloseable {
 
     @Override
     public void close() {
+        closed = true;
         scheduler.shutdownNow();
         LOG.info("PeerRegistrySync stopped");
+    }
+
+    private boolean isActive() {
+        return !closed && active.getAsBoolean();
     }
 }
