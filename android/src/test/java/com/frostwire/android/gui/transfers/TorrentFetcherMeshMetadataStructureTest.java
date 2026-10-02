@@ -35,9 +35,12 @@ public class TorrentFetcherMeshMetadataStructureTest {
                 < compact.indexOf(
                     "BTEngine.getInstance().download(uri,null,newtorrent_flags_t(),info.getDistributedSourcePeerPub());"));
     assertTrue(
-        "mesh metadata success must start the transfer with x.pe peers",
+        "mesh metadata must start with x.pe peers and check whether start succeeded",
         compact.contains(
-            "downloadTorrent(meshMetadata,LibTorrentMagnetDownloader.parsePeers(uri));"));
+            "if(downloadTorrent(meshMetadata,LibTorrentMagnetDownloader.parsePeers(uri))){remove(false);}"));
+    assertTrue(
+        "a rejected mesh start must retain an observable error instead of removing the transfer",
+        compact.contains("elseif(state!=TransferState.CANCELED){state=TransferState.ERROR;}"));
     assertTrue(
         "holder pub comes from the magnet x.hp param",
         compact.contains("LibTorrentMagnetDownloader.parseHolderPub(magnetUri)"));

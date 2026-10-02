@@ -99,6 +99,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
       startGate.cancel();
       fetchTask.cancel(false);
       state = TransferState.ERROR;
+      LOG.warn("Torrent metadata fetch queue is full", full);
     }
   }
 
@@ -279,11 +280,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     return null;
   }
 
-  private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
+  private boolean downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
     try {
       if (!matchesSelectedHash(data)) {
         LOG.warn("Torrent metadata does not match the selected hash");
-        return;
+        return false;
       }
       TorrentInfo ti = TorrentInfo.bdecode(data);
       boolean[] selection = null;
@@ -292,7 +293,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
       }
 
       if (!startGate.tryStart()) {
-        return;
+        return false;
       }
       BTEngine.getInstance()
           .download(
@@ -302,8 +303,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
               peers,
               TransferManager.instance().isDeleteStartedTorrentEnabled(),
               info.getDistributedSourcePeerPub());
+      return true;
     } catch (Throwable e) {
       LOG.error("Error downloading torrent", e);
+      return false;
     }
   }
 
@@ -379,8 +382,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           }
           if (meshMetadata != null) {
             LOG.info("Torrent metadata fetched over IceBridge mesh, starting transfer");
-            downloadTorrent(meshMetadata, LibTorrentMagnetDownloader.parsePeers(uri));
-            remove(false);
+            if (downloadTorrent(meshMetadata, LibTorrentMagnetDownloader.parsePeers(uri))) {
+              remove(false);
+            } else if (state != TransferState.CANCELED) {
+              state = TransferState.ERROR;
+            }
             return;
           }
           // A hybrid/v2 magnet cannot always be reconstructed as .torrent bytes:
@@ -414,17 +420,19 @@ public class TorrentFetcherDownload implements BittorrentDownload {
           if (fetcherListener != null) {
             if (matchesSelectedHash(data) && startGate.tryStart()) {
               fetcherListener.onTorrentInfoFetched(data, uri, tokenId);
+            } else if (state != TransferState.CANCELED) {
+              LOG.warn("Torrent metadata does not match the selected hash or cannot start");
+              state = TransferState.ERROR;
             }
             return;
           }
 
-          try {
-            // re-inject x.pe peers: fetchMagnet's temp torrent (which used them)
-            // is removed right after metadata arrives; without them a fresh
-            // trackerless mesh torrent has no way to reach its only seeder.
-            downloadTorrent(data, LibTorrentMagnetDownloader.parsePeers(uri));
-          } finally {
+          // Re-inject x.pe peers after the temporary metadata torrent is removed.
+          // Keep failed placeholders visible rather than removing them as if start succeeded.
+          if (downloadTorrent(data, LibTorrentMagnetDownloader.parsePeers(uri))) {
             remove(false);
+          } else if (state != TransferState.CANCELED) {
+            state = TransferState.ERROR;
           }
         } else {
           if (state != TransferState.CANCELED) state = TransferState.ERROR;

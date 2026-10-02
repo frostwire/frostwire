@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Xác nhận %1$s là nguồn của torrent này? ID peer: %2$s</string>
     <string name="endorse_source_peer_success">Đã xác nhận peer nguồn</string>
     <string name="endorse_source_peer_unavailable">Không thể xác nhận peer nguồn. Hãy kiểm tra năng lượng karma còn lại rồi thử lại.</string>
+    <string name="peer_catalog_download_failed">Không thể bắt đầu lượt tải này. Làm mới danh mục của máy ngang hàng rồi thử lại. Kiểm tra mục Truyền tải để xem lượt tải đã có hoặc lỗi.</string>
 </resources>

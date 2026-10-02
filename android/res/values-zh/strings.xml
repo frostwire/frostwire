@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">认可 %1$s 为此种子的来源吗？节点 ID：%2$s</string>
     <string name="endorse_source_peer_success">已认可来源节点</string>
     <string name="endorse_source_peer_unavailable">无法认可来源节点。请检查可用的声望能量后重试。</string>
+    <string name="peer_catalog_download_failed">无法开始此下载。请刷新对等节点的目录后重试。请在传输页面查看已有下载或错误。</string>
 </resources>

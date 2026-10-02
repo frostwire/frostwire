@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Recomendar %1$s como origem deste torrent? ID do peer: %2$s</string>
     <string name="endorse_source_peer_success">Peer de origem recomendado</string>
     <string name="endorse_source_peer_unavailable">Não foi possível recomendar o peer de origem. Verifique a energia de karma disponível e tente novamente.</string>
+    <string name="peer_catalog_download_failed">Não foi possível iniciar este download. Atualize o catálogo do par e tente novamente. Verifique as transferências para encontrar um download existente ou um erro.</string>
 </resources>

@@ -1,4 +1,5 @@
 FrostWire 3.2.1 build 777 UNRELEASED
+  - fix:Peer catalog downloads preserve the selected holder's identity, show rejected starts and VPN restrictions, and keep failed metadata transfers visible as errors instead of silently removing them
   - fix:Shared hybrid torrent indexing consistently uses the metadata v1 hash and removes only proven truncated-v2 aliases after the canonical row is stored
   - fix:IceBridge UDP ports now default to automatic selection so multiple devices behind one router do not all claim port 6889; existing default settings are upgraded once, custom ports remain supported, and announcements use the actual bound port
   - fix:Crawler opt-in now gates both mesh browsing and DHT catalog publication; only active non-private seeds are browsable, and opting out withdraws the previous catalog without disabling ordinary distributed search

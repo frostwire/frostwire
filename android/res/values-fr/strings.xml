@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Recommander %1$s comme source de ce torrent ? ID du pair : %2$s</string>
     <string name="endorse_source_peer_success">Pair source recommandé</string>
     <string name="endorse_source_peer_unavailable">Impossible de recommander le pair source. Vérifiez l\'énergie de karma disponible et réessayez.</string>
+    <string name="peer_catalog_download_failed">Impossible de démarrer ce téléchargement. Actualisez le catalogue du pair et réessayez. Consultez les transferts pour vérifier si un téléchargement existe déjà ou si une erreur est survenue.</string>
 </resources>

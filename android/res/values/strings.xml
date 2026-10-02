@@ -526,6 +526,7 @@
     <string name="icebridge_public_catalog_wizard_label">Let crawlers browse the torrents I am actively seeding</string>
     <string name="peer_catalog_browse_action">Browse Shared Torrents</string>
     <string name="peer_catalog_title">Shared Torrents</string>
+    <string name="peer_catalog_download_failed">Could not start this download. Refresh the peer\'s catalog and try again. Check Transfers for an existing download or error.</string>
     <string name="distributed_icebridge_start_ok">IceBridge stack started</string>
     <string name="distributed_icebridge_hosts_title">Known IceBridge servers</string>
     <string name="distributed_icebridge_hosts_hint">Successfully pinged relays (TCP identity handshake). Host cache is stored with your identity data.</string>

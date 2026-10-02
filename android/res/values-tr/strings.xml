@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">%1$s bu torrent\'in kaynağı olarak onaylansın mı? Eş kimliği: %2$s</string>
     <string name="endorse_source_peer_success">Kaynak eş onaylandı</string>
     <string name="endorse_source_peer_unavailable">Kaynak eş onaylanamadı. Kullanılabilir karma enerjisini kontrol edip tekrar deneyin.</string>
+    <string name="peer_catalog_download_failed">Bu indirme başlatılamadı. Eşin kataloğunu yenileyip tekrar deneyin. Mevcut bir indirme veya hata için Aktarımlar bölümünü kontrol edin.</string>
 </resources>

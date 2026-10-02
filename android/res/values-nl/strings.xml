@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">%1$s aanbevelen als bron voor deze torrent? Peer-ID: %2$s</string>
     <string name="endorse_source_peer_success">Bronpeer aanbevolen</string>
     <string name="endorse_source_peer_unavailable">De bronpeer kon niet worden aanbevolen. Controleer de beschikbare karma-energie en probeer het opnieuw.</string>
+    <string name="peer_catalog_download_failed">Deze download kon niet worden gestart. Vernieuw de catalogus van de peer en probeer het opnieuw. Controleer Overdrachten op een bestaande download of fout.</string>
 </resources>

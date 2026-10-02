@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">هل تريد تزكية %1$s كمصدر لهذا التورنت؟ معرّف النظير: %2$s</string>
     <string name="endorse_source_peer_success">تمت تزكية النظير المصدر</string>
     <string name="endorse_source_peer_unavailable">تعذّرت تزكية النظير المصدر. تحقق من طاقة السمعة المتاحة وحاول مرة أخرى.</string>
+    <string name="peer_catalog_download_failed">تعذر بدء هذا التنزيل. حدّث كتالوج النظير وحاول مرة أخرى. تحقق من عمليات النقل بحثًا عن تنزيل موجود أو خطأ.</string>
 </resources>

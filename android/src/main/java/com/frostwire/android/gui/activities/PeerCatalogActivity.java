@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.InvalidTransfer;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -37,6 +38,7 @@ import com.frostwire.android.util.SystemUtils.HandlerThreadName;
 import com.frostwire.bittorrent.DefaultTrackers;
 import com.frostwire.search.relay.RemoteIndexFetcher.RemoteTorrentEntry;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import java.lang.ref.WeakReference;
@@ -157,7 +159,8 @@ public class PeerCatalogActivity extends AbstractActivity {
 
   private void startDownload(RemoteTorrentEntry entry, byte[] peerPub) {
     String infoHashHex = entry.infoHashHex();
-    if (infoHashHex == null || infoHashHex.length() != 40) {
+    if (infoHashHex == null || !infoHashHex.matches("[0-9a-fA-F]{40}")) {
+      UIUtils.showLongMessage(this, R.string.torrent_scheme_download_not_supported);
       return;
     }
     String magnet =
@@ -170,19 +173,37 @@ public class PeerCatalogActivity extends AbstractActivity {
         () -> {
           try {
             TransferManager tm = TransferManager.instance();
-            BittorrentDownload transfer = tm.downloadTorrent(magnet, null, entry.name());
+            BittorrentDownload transfer = tm.downloadTorrent(magnet, null, entry.name(), peerPub);
             PeerCatalogActivity activity = activityRef.get();
             if (activity != null) {
               activity.runOnUiThread(() -> activity.onDownloadStarted(transfer));
             }
           } catch (Throwable t) {
             LOG.error("PeerCatalogActivity: could not start download " + infoHashHex, t);
+            PeerCatalogActivity activity = activityRef.get();
+            if (activity != null) {
+              activity.runOnUiThread(activity::onDownloadFailed);
+            }
           }
         });
   }
 
   private void onDownloadStarted(BittorrentDownload transfer) {
-    if (transfer == null || isFinishing() || isDestroyed()) {
+    if (isFinishing() || isDestroyed()) {
+      return;
+    }
+    if (transfer instanceof InvalidTransfer) {
+      UIUtils.showLongMessage(this, ((InvalidTransfer) transfer).getReasonResId());
+      return;
+    }
+    if (transfer == null) {
+      // TransferManager returns null for an already-enqueued magnet. Show the existing queue.
+      UIUtils.showTransfersOnDownloadStart(this);
+      return;
+    }
+    if (transfer.getState() == TransferState.ERROR) {
+      onDownloadFailed();
+      UIUtils.showTransfersOnDownloadStart(this);
       return;
     }
     TransferManager tm = TransferManager.instance();
@@ -195,6 +216,12 @@ public class PeerCatalogActivity extends AbstractActivity {
       }
       UIUtils.showShortMessage(this, R.string.download_added_to_queue);
       UIUtils.showTransfersOnDownloadStart(this);
+    }
+  }
+
+  private void onDownloadFailed() {
+    if (!isFinishing() && !isDestroyed()) {
+      UIUtils.showLongMessage(this, R.string.peer_catalog_download_failed);
     }
   }
 

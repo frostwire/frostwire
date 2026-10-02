@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Да препоръчате ли %1$s като източник на този торент? ID на пира: %2$s</string>
     <string name="endorse_source_peer_success">Източникът е препоръчан</string>
     <string name="endorse_source_peer_unavailable">Източникът не можа да бъде препоръчан. Проверете наличната карма енергия и опитайте отново.</string>
+    <string name="peer_catalog_download_failed">Изтеглянето не можа да започне. Обновете каталога на партньора и опитайте отново. Проверете прехвърлянията за съществуващо изтегляне или грешка.</string>
 </resources>

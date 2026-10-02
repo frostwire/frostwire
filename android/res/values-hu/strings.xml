@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Ajánlja a(z) %1$s peert ennek a torrentnek a forrásaként? Peer-azonosító: %2$s</string>
     <string name="endorse_source_peer_success">Forráspeer ajánlva</string>
     <string name="endorse_source_peer_unavailable">A forráspeer ajánlása nem sikerült. Ellenőrizze az elérhető karma-energiát, és próbálja újra.</string>
+    <string name="peer_catalog_download_failed">Nem sikerült elindítani ezt a letöltést. Frissítse a partner katalógusát, és próbálja újra. Az átviteleknél ellenőrizze, hogy van-e már letöltés vagy hiba.</string>
 </resources>

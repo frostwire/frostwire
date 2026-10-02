@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Ondersteun %1$s as die bron vir hierdie torrent? Peer-ID: %2$s</string>
     <string name="endorse_source_peer_success">Bronpeer ondersteun</string>
     <string name="endorse_source_peer_unavailable">Kon nie die bronpeer ondersteun nie. Kontroleer die beskikbare karma-energie en probeer weer.</string>
+    <string name="peer_catalog_download_failed">Kon nie hierdie aflaai begin nie. Verfris die eweknie se katalogus en probeer weer. Kyk onder Oordragte vir ’n bestaande aflaai of fout.</string>
 </resources>

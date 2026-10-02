@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">รับรอง %1$s เป็นต้นทางของทอร์เรนต์นี้หรือไม่ รหัสเพียร์: %2$s</string>
     <string name="endorse_source_peer_success">รับรองเพียร์ต้นทางแล้ว</string>
     <string name="endorse_source_peer_unavailable">ไม่สามารถรับรองเพียร์ต้นทางได้ โปรดตรวจสอบพลังงานกรรมที่เหลืออยู่แล้วลองอีกครั้ง</string>
+    <string name="peer_catalog_download_failed">ไม่สามารถเริ่มการดาวน์โหลดนี้ได้ รีเฟรชแค็ตตาล็อกของเพียร์แล้วลองอีกครั้ง ตรวจสอบการถ่ายโอนเพื่อดูการดาวน์โหลดที่มีอยู่หรือข้อผิดพลาด</string>
 </resources>

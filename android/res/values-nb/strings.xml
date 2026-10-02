@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Vil du anbefale %1$s som kilde for denne torrenten? Peer-ID: %2$s</string>
     <string name="endorse_source_peer_success">Kilde-peer anbefalt</string>
     <string name="endorse_source_peer_unavailable">Kunne ikke anbefale kilde-peeren. Sjekk tilgjengelig karma-energi og prøv igjen.</string>
+    <string name="peer_catalog_download_failed">Kunne ikke starte denne nedlastingen. Oppdater katalogen til noden og prøv igjen. Se under Overføringer etter en eksisterende nedlasting eller feil.</string>
 </resources>

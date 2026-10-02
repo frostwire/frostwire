@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Recomanzi %1$s ca sursă pentru acest torrent? ID peer: %2$s</string>
     <string name="endorse_source_peer_success">Peer-ul sursă a fost recomandat</string>
     <string name="endorse_source_peer_unavailable">Peer-ul sursă nu a putut fi recomandat. Verifică energia karma disponibilă și încearcă din nou.</string>
+    <string name="peer_catalog_download_failed">Nu s-a putut porni această descărcare. Actualizați catalogul partenerului și încercați din nou. Verificați transferurile pentru o descărcare existentă sau o eroare.</string>
 </resources>

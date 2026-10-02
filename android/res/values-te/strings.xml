@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">ఈ టొరెంట్‌కు మూలంగా %1$s ను ఆమోదించాలా? పీర్ ID: %2$s</string>
     <string name="endorse_source_peer_success">మూల పీర్ ఆమోదించబడింది</string>
     <string name="endorse_source_peer_unavailable">మూల పీర్‌ను ఆమోదించడం సాధ్యం కాలేదు. అందుబాటులో ఉన్న కర్మ శక్తిని తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.</string>
+    <string name="peer_catalog_download_failed">ఈ డౌన్‌లోడ్‌ను ప్రారంభించలేకపోయాము. పీర్ కేటలాగ్‌ను రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి. ఇప్పటికే ఉన్న డౌన్‌లోడ్ లేదా లోపం కోసం బదిలీలను తనిఖీ చేయండి.</string>
 </resources>

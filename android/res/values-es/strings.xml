@@ -697,4 +697,5 @@
     <string name="endorse_source_peer_confirmation">¿Avalar a %1$s como origen de este torrent? ID del peer: %2$s</string>
     <string name="endorse_source_peer_success">Peer de origen avalado</string>
     <string name="endorse_source_peer_unavailable">No se pudo avalar al peer de origen. Comprueba la energía de karma disponible e inténtalo de nuevo.</string>
+    <string name="peer_catalog_download_failed">No se pudo iniciar esta descarga. Actualiza el catálogo del par e inténtalo de nuevo. Revisa Transferencias para ver si ya existe una descarga o un error.</string>
 </resources>

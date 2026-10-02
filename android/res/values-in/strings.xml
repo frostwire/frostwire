@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Dukung %1$s sebagai sumber torrent ini? ID peer: %2$s</string>
     <string name="endorse_source_peer_success">Peer sumber didukung</string>
     <string name="endorse_source_peer_unavailable">Tidak dapat mendukung peer sumber. Periksa energi karma yang tersedia dan coba lagi.</string>
+    <string name="peer_catalog_download_failed">Tidak dapat memulai unduhan ini. Segarkan katalog peer dan coba lagi. Periksa Transfer untuk unduhan yang sudah ada atau kesalahan.</string>
 </resources>

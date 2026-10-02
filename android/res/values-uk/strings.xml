@@ -694,4 +694,5 @@
     <string name="endorse_source_peer_confirmation">Рекомендувати %1$s як джерело цього торента? ID піра: %2$s</string>
     <string name="endorse_source_peer_success">Пір-джерело рекомендовано</string>
     <string name="endorse_source_peer_unavailable">Не вдалося рекомендувати пір-джерело. Перевірте доступну енергію карми та повторіть спробу.</string>
+    <string name="peer_catalog_download_failed">Не вдалося почати завантаження. Оновіть каталог вузла й повторіть спробу. Перевірте розділ передач на наявність завантаження або помилки.</string>
 </resources>
