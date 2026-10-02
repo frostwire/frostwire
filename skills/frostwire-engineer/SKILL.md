@@ -127,6 +127,10 @@ When in doubt, apply the closest mantra. They are not slogans — each one maps 
 
 ### Network Topology Is a Contract
 
+- Trace cross-component invariants before increasing retries or fan-out: committed state must reach routing summaries, one canonical content identity must survive publication through transfer lookup, and successful admission must not be reported as completed delivery.
+- Notify bounded, coalesced derived-state refresh after successful mutations. Clear single-flight pending state before snapshot/send so concurrent mutations request a follow-up; publish empty-state withdrawal and reject stale lifetime work.
+- Verify installed journeys at distinct milestones: discover, browse, validate metadata, native start, actual byte progress. Record artifact revisions and topology; local fixtures do not prove external-network reachability.
+
 - A control-plane registration is not evidence of data-plane reachability. For every advertised `host:rudpPort`, identify the process that binds that UDP socket and test delivery to it from the sender's network.
 - Remote control mode must not silently remove the local data-plane listener required for inbound traffic. If the remote relay owns delivery instead, define how it preserves source identity, queues inbound payloads, and routes replies.
 - A fallback is real only when its wire type is emitted and handled. Do not call a method `sendRelay` or `holePunch` unless an integration test observes the expected packet type on the wire and the final payload at the target.

@@ -100,6 +100,9 @@ Verify these values against current Gradle source/target, minSdk, desugaring, de
 3. **Identify the blast radius** — what modules are affected? `common/` affects both desktop and Android.
 4. **Check the diff size** — large diffs (>500 lines) need sectioned review. Ask the author to split if needed.
 5. **Trace production wiring** — establish revision, requested scope, entry points, supported roles, callers, serializers, persistence, teardown, and tests, not only changed methods.
+   - Follow one content identity through producers, persisted rows, signed messages, consumer selection, metadata verification and native lookup. Different representations require metadata-proven aliases or an explicit versioned conversion.
+   - Verify committed mutations invalidate routing/cache summaries, including empty withdrawal and writes during an in-flight refresh. Stale-owner cleanup must not detach a replacement.
+   - Distinguish acceptance, delivery, validation, native start and byte progress. Failed starts must remain observable; regression tests should exercise behavior across the failed boundary rather than merely match source text.
 6. **Check shared-brain ownership** — search `frostwire` as existing agent `gubatron` for related findings, contracts, and file claims. Apply the operating rules below before edits or new findings; distinguish resolved, latent, conditional, and current defects.
 
 ---

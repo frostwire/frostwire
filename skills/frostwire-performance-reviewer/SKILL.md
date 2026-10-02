@@ -39,6 +39,13 @@ The central rule is **evidence before optimization**. A performance finding
 must identify the workload, hot path, measurement or estimate, mechanism, and
 one concrete fix. Do not turn a style preference into a performance claim.
 
+For multi-component latency, timestamp the state commit, summary rebuild,
+transport admission/receipt, validation and user-visible delivery separately.
+Periodic cache intervals alone do not explain observed end-to-end delay.
+For UI freezes, capture the blocked thread and its dependency before choosing
+an application fix; emulator renderer waits and application I/O need different
+remedies. Label traced blocking paths separately from measured stalls.
+
 ## 1. Scope And Boundaries
 
 This skill covers single-process and end-to-end application performance:
