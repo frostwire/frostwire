@@ -73,6 +73,8 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     GUIUtils.restrictSize(REMOTE_RADIO, SizePolicy.RESTRICT_HEIGHT);
     GUIUtils.restrictSize(ROLE_COMBO, SizePolicy.RESTRICT_HEIGHT);
 
+    RUDP_PORT_FIELD.setToolTipText(I18n.tr("Use random port (Recommended)") + " (0)");
+
     PUBLIC_CATALOG_CHECKBOX.setToolTipText(
         I18n.tr(
             "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."));
@@ -253,6 +255,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean applyOptions() {
+    boolean restartRequired = isDirty();
     SearchEnginesSettings.ICEBRIDGE_ENABLED.setValue(ENABLED_CHECKBOX.isSelected());
     SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.setValue(PUBLIC_CATALOG_CHECKBOX.isSelected());
     SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.setValue(REMOTE_RADIO.isSelected());
@@ -297,7 +300,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
         "  ICEBRIDGE_CONTROL_HTTP_PORT   = "
             + SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
     log.info("======================================================================");
-    return false;
+    return restartRequired;
   }
 
   @Override
