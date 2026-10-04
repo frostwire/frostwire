@@ -289,6 +289,19 @@ dependencies {
     testImplementation sourceSets.simulation.output
 }
 
+// ZIP paths are case-sensitive, but Apple's archive extraction is not. Netty's
+// META-INF/license/ directory collides with dependency META-INF/LICENSE files.
+// Preserve the root license at a non-conflicting path in every packaged JAR.
+tasks.withType(Jar).configureEach {
+    def rootLicensePath = 'META-INF/licenses/LICENSE'
+    inputs.property('packagedRootLicensePath', rootLicensePath)
+    eachFile { entry ->
+        if (entry.path == 'META-INF/LICENSE') {
+            entry.path = rootLicensePath
+        }
+    }
+}
+
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
