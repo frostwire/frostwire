@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -23,143 +23,162 @@ import com.frostwire.jlibtorrent.SettingsPack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
-
 import javax.swing.*;
 
 public final class TorrentConnectionPaneItem extends AbstractPaneItem {
-    private final static String TITLE = I18n.tr("BitTorrent Connection Settings");
-    private final static String TEXT = I18n.tr("Adjust connection settings to make better use of your internet connection");
-    private final static String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
-    private final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum number of connections");
-    private final static String MAX_PEERS = I18n.tr("Maximum number of peers");
-    private final static String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
-    private final static String ENABLE_DISTRIBUTED_HASH_TABLE = I18n.tr("Enable Distributed Hash Table (DHT)");
-    private final static String VPN_DROP_PROTECTION = I18n.tr("VPN-Drop Protection. Require VPN connection for BitTorrent");
-    private final static String ALLOW_MULTIPLE_CONNECTIONS_PER_PID = I18n.tr("Allow multiple connections from the same peer ID");
-    private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
-    private final JCheckBox VPN_DROP_PROTECTION_CHECKBOX = new JCheckBox();
-    private final JCheckBox ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX = new JCheckBox();
-    private final WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
-    private final WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
-    private final WholeNumberField MAX_PEERS_FIELD = new SizedWholeNumberField(4);
-    private final WholeNumberField MAX_ACTIVE_SEEDS_FIELD = new SizedWholeNumberField(4);
+  private static final String TITLE = I18n.tr("BitTorrent Connection Settings");
+  private static final String TEXT =
+      I18n.tr("Adjust connection settings to make better use of your internet connection");
+  private static final String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
+  private static final String MAX_GLOBAL_NUM_CONNECTIONS =
+      I18n.tr("Global maximum number of connections");
+  private static final String MAX_PEERS = I18n.tr("Maximum number of peers");
+  private static final String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
+  private static final String ENABLE_DISTRIBUTED_HASH_TABLE =
+      I18n.tr("Enable Distributed Hash Table (DHT)");
+  private static final String VPN_DROP_PROTECTION =
+      I18n.tr("VPN-Drop Protection. Require VPN connection for BitTorrent");
+  private static final String ALLOW_MULTIPLE_CONNECTIONS_PER_PID =
+      I18n.tr("Allow multiple connections from the same peer ID");
+  private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
+  private final JCheckBox VPN_DROP_PROTECTION_CHECKBOX = new JCheckBox();
+  private final JCheckBox ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX = new JCheckBox();
+  private final WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
+  private final WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
+  private final WholeNumberField MAX_PEERS_FIELD = new SizedWholeNumberField(4);
+  private final WholeNumberField MAX_ACTIVE_SEEDS_FIELD = new SizedWholeNumberField(4);
 
-    public TorrentConnectionPaneItem() {
-        super(TITLE, TEXT);
-        BoxPanel panel = new BoxPanel();
-        LabeledComponent comp = new LabeledComponent(ENABLE_DISTRIBUTED_HASH_TABLE,
-                ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD,
-                LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        if (GUIConstants.Feature.VPN_DROP_GUARD.enabled()) {
-            comp = new LabeledComponent(VPN_DROP_PROTECTION,
-                    VPN_DROP_PROTECTION_CHECKBOX,
-                    LabeledComponent.LEFT_GLUE,
-                    LabeledComponent.LEFT);
-            panel.add(comp.getComponent());
-            panel.addVerticalComponentGap();
-        }
-        comp = new LabeledComponent(ALLOW_MULTIPLE_CONNECTIONS_PER_PID,
-                ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX,
-                LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        comp = new LabeledComponent(
-                MAX_ACTIVE_DOWNLOADS,
-                MAX_ACTIVE_DOWNLOADS_FIELD, LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        comp = new LabeledComponent(
-                MAX_ACTIVE_SEEDS,
-                MAX_ACTIVE_SEEDS_FIELD, LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        comp = new LabeledComponent(
-                MAX_GLOBAL_NUM_CONNECTIONS,
-                MAX_GLOBAL_NUM_CONNECTIONS_FIELD, LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        comp = new LabeledComponent(
-                MAX_PEERS,
-                MAX_PEERS_FIELD, LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
-        add(panel);
+  public TorrentConnectionPaneItem() {
+    super(TITLE, TEXT);
+    BoxPanel panel = new BoxPanel();
+    LabeledComponent comp =
+        new LabeledComponent(
+            ENABLE_DISTRIBUTED_HASH_TABLE,
+            ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD,
+            LabeledComponent.LEFT_GLUE,
+            LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    if (GUIConstants.Feature.VPN_DROP_GUARD.enabled()) {
+      comp =
+          new LabeledComponent(
+              VPN_DROP_PROTECTION,
+              VPN_DROP_PROTECTION_CHECKBOX,
+              LabeledComponent.LEFT_GLUE,
+              LabeledComponent.LEFT);
+      panel.add(comp.getComponent());
+      panel.addVerticalComponentGap();
     }
+    comp =
+        new LabeledComponent(
+            ALLOW_MULTIPLE_CONNECTIONS_PER_PID,
+            ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX,
+            LabeledComponent.LEFT_GLUE,
+            LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    comp =
+        new LabeledComponent(
+            MAX_ACTIVE_DOWNLOADS,
+            MAX_ACTIVE_DOWNLOADS_FIELD,
+            LabeledComponent.LEFT_GLUE,
+            LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    comp =
+        new LabeledComponent(
+            MAX_ACTIVE_SEEDS,
+            MAX_ACTIVE_SEEDS_FIELD,
+            LabeledComponent.LEFT_GLUE,
+            LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    comp =
+        new LabeledComponent(
+            MAX_GLOBAL_NUM_CONNECTIONS,
+            MAX_GLOBAL_NUM_CONNECTIONS_FIELD,
+            LabeledComponent.LEFT_GLUE,
+            LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    comp =
+        new LabeledComponent(
+            MAX_PEERS, MAX_PEERS_FIELD, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+    panel.add(comp.getComponent());
+    panel.addVerticalComponentGap();
+    add(panel);
+  }
 
-    @Override
-    public boolean isDirty() {
-        final BTEngine btEngine = BTEngine.getInstance();
-        return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
-                ConnectionSettings.VPN_DROP_PROTECTION.getValue() != VPN_DROP_PROTECTION_CHECKBOX.isSelected() ||
-                ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue() != ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected() ||
-                btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
-                (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
-                (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
-                (btEngine.maxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue());
-    }
+  @Override
+  public boolean isDirty() {
+    final BTEngine btEngine = BTEngine.getInstance();
+    return btEngine.isDhtRunning() != ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected()
+        || ConnectionSettings.VPN_DROP_PROTECTION.getValue()
+            != VPN_DROP_PROTECTION_CHECKBOX.isSelected()
+        || ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue()
+            != ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected()
+        || btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()
+        || btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()
+        || btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()
+        || btEngine.maxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue();
+  }
 
-    @Override
-    public void initOptions() {
-        final BTEngine btEngine = BTEngine.getInstance();
-        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue());
-        VPN_DROP_PROTECTION_CHECKBOX.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
-        ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.setSelected(ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue());
-        MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
-        MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
-        MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
-        MAX_ACTIVE_SEEDS_FIELD.setValue(btEngine.maxActiveSeeds());
-    }
+  @Override
+  public void initOptions() {
+    final BTEngine btEngine = BTEngine.getInstance();
+    ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(
+        SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue());
+    VPN_DROP_PROTECTION_CHECKBOX.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
+    ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.setSelected(
+        ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.getValue());
+    MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
+    MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
+    MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
+    MAX_ACTIVE_SEEDS_FIELD.setValue(btEngine.maxActiveSeeds());
+  }
 
-    @Override
-    public boolean applyOptions() {
-        BTEngine btEngine = BTEngine.getInstance();
-        applyDHTOptions(btEngine);
-        applyVPNDropProtectionOption(btEngine);
-        applyPeerIdConnectionOption(btEngine);
-        btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
-        btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
-        btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
-        btEngine.maxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
-        return isDirty();
-    }
+  @Override
+  public boolean applyOptions() {
+    BTEngine btEngine = BTEngine.getInstance();
+    applyDHTOptions(btEngine);
+    applyVPNDropProtectionOption(btEngine);
+    applyPeerIdConnectionOption(btEngine);
+    btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
+    btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
+    btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
+    btEngine.maxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
+    return false;
+  }
 
-    private void applyDHTOptions(BTEngine btEngine) {
-        boolean dhtExpectedValue = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
-        boolean dhtCurrentStatus = btEngine.isDhtRunning();
-        if (dhtCurrentStatus && !dhtExpectedValue) {
-            btEngine.stopDht();
-            SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(false);
-        } else if (!dhtCurrentStatus && dhtExpectedValue) {
-            btEngine.startDht();
-            SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(true);
-        }
+  private void applyDHTOptions(BTEngine btEngine) {
+    boolean dhtExpectedValue = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
+    boolean dhtCurrentStatus = btEngine.isDhtRunning();
+    if (dhtCurrentStatus && !dhtExpectedValue) {
+      btEngine.stopDht();
+      SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(false);
+    } else if (!dhtCurrentStatus && dhtExpectedValue) {
+      btEngine.startDht();
+      SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(true);
     }
+  }
 
-    private void applyVPNDropProtectionOption(BTEngine btEngine) {
-        boolean vpnDropProtectionSelected = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
-        if (vpnDropProtectionSelected && !VPNs.isVPNActive()) {
-            btEngine.pause();
-        } else if (!vpnDropProtectionSelected && btEngine.isPausedCached()) {
-            btEngine.resume();
-        }
-        ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);
-        GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
-        GUIMediator.instance().getStatusLine().refresh();
+  private void applyVPNDropProtectionOption(BTEngine btEngine) {
+    boolean vpnDropProtectionSelected = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
+    if (vpnDropProtectionSelected && !VPNs.isVPNActive()) {
+      btEngine.pause();
+    } else if (!vpnDropProtectionSelected && btEngine.isPausedCached()) {
+      btEngine.resume();
     }
+    ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);
+    GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
+    GUIMediator.instance().getStatusLine().refresh();
+  }
 
-    private void applyPeerIdConnectionOption(BTEngine btEngine) {
-        boolean allowMultipleConnections = ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected();
-        ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.setValue(allowMultipleConnections);
-        SettingsPack settings = new SettingsPack();
-        settings.allowMultipleConnectionsPerPid(allowMultipleConnections);
-        btEngine.applySettings(settings);
-    }
+  private void applyPeerIdConnectionOption(BTEngine btEngine) {
+    boolean allowMultipleConnections = ALLOW_MULTIPLE_CONNECTIONS_PER_PID_CHECKBOX.isSelected();
+    ConnectionSettings.ALLOW_MULTIPLE_CONNECTIONS_PER_PID.setValue(allowMultipleConnections);
+    SettingsPack settings = new SettingsPack();
+    settings.allowMultipleConnectionsPerPid(allowMultipleConnections);
+    btEngine.applySettings(settings);
+  }
 }
