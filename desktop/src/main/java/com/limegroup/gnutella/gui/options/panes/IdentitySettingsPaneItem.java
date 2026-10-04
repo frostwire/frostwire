@@ -43,8 +43,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.limewire.util.CommonUtils;
 
 /**
- * Desktop UI for identity lifecycle. Business logic lives in
- * {@link IdentityLifecycle} (shared with Android).
+ * Desktop UI for identity lifecycle. Business logic lives in {@link IdentityLifecycle} (shared with
+ * Android).
  */
 public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
@@ -488,7 +488,7 @@ public final class IdentitySettingsPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean applyOptions() {
-    return true;
+    return false;
   }
 
   @Override

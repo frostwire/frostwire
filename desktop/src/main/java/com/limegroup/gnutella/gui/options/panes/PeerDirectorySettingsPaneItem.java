@@ -510,7 +510,7 @@ public final class PeerDirectorySettingsPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean applyOptions() {
-    return true;
+    return false;
   }
 
   @Override
