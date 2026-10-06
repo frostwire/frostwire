@@ -698,4 +698,5 @@
     <string name="endorse_source_peer_success">Peer de origen avalado</string>
     <string name="endorse_source_peer_unavailable">No se pudo avalar al peer de origen. Comprueba la energía de karma disponible e inténtalo de nuevo.</string>
     <string name="peer_catalog_download_failed">No se pudo iniciar esta descarga. Actualiza el catálogo del par e inténtalo de nuevo. Revisa Transferencias para ver si ya existe una descarga o un error.</string>
+    <string name="distributed_stack_retry_countdown">Nuevo intento en %1$d s</string>
 </resources>

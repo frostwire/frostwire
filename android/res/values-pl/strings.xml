@@ -698,4 +698,5 @@
     <string name="endorse_source_peer_success">Polecono peera źródłowego</string>
     <string name="endorse_source_peer_unavailable">Nie udało się polecić peera źródłowego. Sprawdź dostępną energię karmy i spróbuj ponownie.</string>
     <string name="peer_catalog_download_failed">Nie udało się rozpocząć pobierania. Odśwież katalog peera i spróbuj ponownie. Sprawdź w transferach, czy pobieranie już istnieje lub wystąpił błąd.</string>
+    <string name="distributed_stack_retry_countdown">Ponowna próba za %1$d s</string>
 </resources>

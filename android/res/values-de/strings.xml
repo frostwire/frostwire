@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Quell-Peer empfohlen</string>
     <string name="endorse_source_peer_unavailable">Der Quell-Peer konnte nicht empfohlen werden. Prüfen Sie die verfügbare Karma-Energie und versuchen Sie es erneut.</string>
     <string name="peer_catalog_download_failed">Dieser Download konnte nicht gestartet werden. Aktualisiere den Katalog des Peers und versuche es erneut. Prüfe unter Übertragungen, ob bereits ein Download oder ein Fehler vorliegt.</string>
+    <string name="distributed_stack_retry_countdown">Erneuter Versuch in %1$d s</string>
 </resources>

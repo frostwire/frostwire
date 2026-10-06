@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">ماخذ پیئر کی توثیق ہو گئی</string>
     <string name="endorse_source_peer_unavailable">ماخذ پیئر کی توثیق نہیں ہو سکی۔ دستیاب کرما توانائی چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="peer_catalog_download_failed">یہ ڈاؤن لوڈ شروع نہیں ہو سکا۔ پیئر کا کیٹلاگ تازہ کریں اور دوبارہ کوشش کریں۔ موجودہ ڈاؤن لوڈ یا خرابی کے لیے منتقلیاں دیکھیں۔</string>
+    <string name="distributed_stack_retry_countdown">%1$d سیکنڈ میں دوبارہ کوشش کریں گے</string>
 </resources>

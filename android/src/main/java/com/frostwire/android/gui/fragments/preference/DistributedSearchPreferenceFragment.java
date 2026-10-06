@@ -74,7 +74,9 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   private int identityPathRetries;
 
   /** Live refresh of stack/identity/peer state while the screen is visible. */
-  private static final long STATUS_REFRESH_MS = 3000L;
+  private static final long STATUS_REFRESH_MS = 1000L;
+
+  private int statusRefreshTicks;
 
   private final android.os.Handler statusRefreshHandler =
       new android.os.Handler(android.os.Looper.getMainLooper());
@@ -84,7 +86,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
         public void run() {
           try {
             if (isAdded()) {
-              refreshAll();
+              if (++statusRefreshTicks % 3 == 0) refreshAll();
+              else refreshStackStatus();
             }
           } catch (Throwable ignored) {
           }
@@ -289,7 +292,10 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
             svc.ensureRelayStack(
                 true,
                 () -> {
-                  toast(R.string.distributed_icebridge_start_ok);
+                  toast(
+                      svc.isRelayStackRunning()
+                          ? R.string.distributed_icebridge_start_ok
+                          : R.string.distributed_identity_init_failed);
                   refreshAll();
                 });
           });
@@ -913,8 +919,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           final int fConfiguredRudp = configuredRudp;
           final int fConfiguredRelay = configuredRelay;
           final String fRole = role;
-          final boolean hasIdentity =
-              SearchEngine.DISTRIBUTED_WIRING.identity() != null || resolveIdentity() != null;
+          final com.frostwire.android.search.RelayStartupTracker.Snapshot startup =
+              svc != null ? svc.getRelayStartupStatus() : null;
           final boolean noService = svc == null;
           SystemUtils.postToUIThread(
               () -> {
@@ -928,12 +934,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                   } else if (fRunning && fTransport) {
                     statusPref.setSummary(
                         getString(R.string.distributed_stack_running, fRudp, fControl, fRole));
-                  } else if (hasIdentity && !fRunning) {
-                    statusPref.setSummary(R.string.distributed_stack_starting);
-                  } else if (hasIdentity && !fTransport) {
-                    statusPref.setSummary(R.string.distributed_identity_init_failed);
                   } else {
-                    statusPref.setSummary(R.string.distributed_stack_not_running);
+                    statusPref.setSummary(startupSummary(startup));
                   }
                 }
                 EditTextPreference rudpPref =
@@ -963,6 +965,23 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                 }
               });
         });
+  }
+
+  private String startupSummary(com.frostwire.android.search.RelayStartupTracker.Snapshot status) {
+    ConfigurationManager config = ConfigurationManager.instance();
+    if (!config.getBoolean(Constants.PREF_KEY_ICEBRIDGE_ENABLED))
+      return getString(R.string.disabled);
+    if (!AndroidRelayStack.isNetworkAllowed()) {
+      com.frostwire.android.gui.NetworkManager network =
+          com.frostwire.android.gui.NetworkManager.instance();
+      if (config.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY)
+          && !network.isVpnConnected()
+          && !network.isTunnelUp()) return getString(R.string.cannot_start_engine_without_vpn);
+      if (config.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY) && !network.isDataWIFIUp())
+        return getString(R.string.wifi_network_unavailable);
+      return getString(R.string.no_data_check_internet_connection);
+    }
+    return com.frostwire.android.search.RelayStartupSummary.render(requireContext(), status);
   }
 
   /**

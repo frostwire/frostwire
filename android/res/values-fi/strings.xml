@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Lähdepeeriä suositeltu</string>
     <string name="endorse_source_peer_unavailable">Lähdepeeriä ei voitu suositella. Tarkista käytettävissä oleva karma-energia ja yritä uudelleen.</string>
     <string name="peer_catalog_download_failed">Tätä latausta ei voitu aloittaa. Päivitä vertaisen luettelo ja yritä uudelleen. Tarkista siirroista, onko lataus jo olemassa tai onko tapahtunut virhe.</string>
+    <string name="distributed_stack_retry_countdown">Yritetään uudelleen %1$d s kuluttua</string>
 </resources>

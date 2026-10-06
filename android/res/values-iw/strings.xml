@@ -696,4 +696,5 @@
     <string name="endorse_source_peer_success">עמית המקור קיבל המלצה</string>
     <string name="endorse_source_peer_unavailable">לא ניתן היה להמליץ על עמית המקור. בדקו את אנרגיית הקארמה הזמינה ונסו שוב.</string>
     <string name="peer_catalog_download_failed">לא ניתן להתחיל הורדה זו. יש לרענן את הקטלוג של העמית ולנסות שוב. יש לבדוק בהעברות אם קיימת כבר הורדה או שגיאה.</string>
+    <string name="distributed_stack_retry_countdown">ניסיון נוסף בעוד %1$d שניות</string>
 </resources>

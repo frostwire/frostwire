@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Bronpeer aanbevolen</string>
     <string name="endorse_source_peer_unavailable">De bronpeer kon niet worden aanbevolen. Controleer de beschikbare karma-energie en probeer het opnieuw.</string>
     <string name="peer_catalog_download_failed">Deze download kon niet worden gestart. Vernieuw de catalogus van de peer en probeer het opnieuw. Controleer Overdrachten op een bestaande download of fout.</string>
+    <string name="distributed_stack_retry_countdown">Nieuwe poging over %1$d s</string>
 </resources>

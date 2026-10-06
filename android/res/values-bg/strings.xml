@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Източникът е препоръчан</string>
     <string name="endorse_source_peer_unavailable">Източникът не можа да бъде препоръчан. Проверете наличната карма енергия и опитайте отново.</string>
     <string name="peer_catalog_download_failed">Изтеглянето не можа да започне. Обновете каталога на партньора и опитайте отново. Проверете прехвърлянията за съществуващо изтегляне или грешка.</string>
+    <string name="distributed_stack_retry_countdown">Нов опит след %1$d сек</string>
 </resources>

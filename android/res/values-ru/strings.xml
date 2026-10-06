@@ -696,4 +696,5 @@
     <string name="endorse_source_peer_success">Пир-источник рекомендован</string>
     <string name="endorse_source_peer_unavailable">Не удалось рекомендовать пир-источник. Проверьте доступную энергию кармы и повторите попытку.</string>
     <string name="peer_catalog_download_failed">Не удалось начать загрузку. Обновите каталог узла и повторите попытку. Проверьте раздел передач на наличие существующей загрузки или ошибки.</string>
+    <string name="distributed_stack_retry_countdown">Повторная попытка через %1$d с</string>
 </resources>

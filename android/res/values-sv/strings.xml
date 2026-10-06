@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Källpeer rekommenderad</string>
     <string name="endorse_source_peer_unavailable">Det gick inte att rekommendera källpeeren. Kontrollera tillgänglig karmaenergi och försök igen.</string>
     <string name="peer_catalog_download_failed">Det gick inte att starta denna nedladdning. Uppdatera nodens katalog och försök igen. Kontrollera Överföringar efter en befintlig nedladdning eller ett fel.</string>
+    <string name="distributed_stack_retry_countdown">Försöker igen om %1$d s</string>
 </resources>

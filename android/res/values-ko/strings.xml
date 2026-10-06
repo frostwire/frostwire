@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">소스 피어를 추천했습니다</string>
     <string name="endorse_source_peer_unavailable">소스 피어를 추천하지 못했습니다. 사용 가능한 카르마 에너지를 확인한 후 다시 시도하세요.</string>
     <string name="peer_catalog_download_failed">이 다운로드를 시작할 수 없습니다. 피어의 목록을 새로 고친 후 다시 시도하세요. 전송 화면에서 기존 다운로드나 오류를 확인하세요.</string>
+    <string name="distributed_stack_retry_countdown">%1$d초 후 다시 시도합니다</string>
 </resources>

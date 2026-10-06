@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Peer sorgente raccomandato</string>
     <string name="endorse_source_peer_unavailable">Impossibile raccomandare il peer sorgente. Controlla l\'energia karma disponibile e riprova.</string>
     <string name="peer_catalog_download_failed">Impossibile avviare questo download. Aggiorna il catalogo del peer e riprova. Controlla i trasferimenti per verificare se esiste già un download o un errore.</string>
+    <string name="distributed_stack_retry_countdown">Nuovo tentativo tra %1$d s</string>
 </resources>

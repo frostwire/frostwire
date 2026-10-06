@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Крынічны пір падтрыманы</string>
     <string name="endorse_source_peer_unavailable">Не ўдалося падтрымаць крынічны пір. Праверце даступную карма-энергію і паспрабуйце яшчэ раз.</string>
     <string name="peer_catalog_download_failed">Не ўдалося пачаць спампоўванне. Абнавіце каталог вузла і паспрабуйце зноў. Праверце раздзел перадач на наяўнасць спампоўвання або памылкі.</string>
+    <string name="distributed_stack_retry_countdown">Паўторная спроба праз %1$d с</string>
 </resources>

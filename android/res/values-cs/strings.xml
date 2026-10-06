@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Zdrojový peer byl podpořen</string>
     <string name="endorse_source_peer_unavailable">Zdrojového peera se nepodařilo podpořit. Zkontrolujte dostupnou karma energii a zkuste to znovu.</string>
     <string name="peer_catalog_download_failed">Stahování se nepodařilo spustit. Obnovte katalog protějšku a zkuste to znovu. V přenosech zkontrolujte existující stahování nebo chybu.</string>
+    <string name="distributed_stack_retry_countdown">Další pokus za %1$d s</string>
 </resources>

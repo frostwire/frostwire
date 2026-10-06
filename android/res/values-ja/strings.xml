@@ -696,4 +696,5 @@
     <string name="endorse_source_peer_success">提供元ピアを推薦しました</string>
     <string name="endorse_source_peer_unavailable">提供元ピアを推薦できませんでした。利用可能なカルマエネルギーを確認して、もう一度お試しください。</string>
     <string name="peer_catalog_download_failed">このダウンロードを開始できませんでした。ピアのカタログを更新して再試行してください。転送画面で既存のダウンロードやエラーを確認してください。</string>
+    <string name="distributed_stack_retry_countdown">%1$d 秒後に再試行します</string>
 </resources>

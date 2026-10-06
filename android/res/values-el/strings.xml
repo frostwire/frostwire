@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Το peer προέλευσης επιδοκιμάστηκε</string>
     <string name="endorse_source_peer_unavailable">Δεν ήταν δυνατή η επιδοκιμασία του peer προέλευσης. Ελέγξτε τη διαθέσιμη ενέργεια karma και δοκιμάστε ξανά.</string>
     <string name="peer_catalog_download_failed">Δεν ήταν δυνατή η έναρξη αυτής της λήψης. Ανανεώστε τον κατάλογο του ομότιμου και δοκιμάστε ξανά. Ελέγξτε τις Μεταφορές για υπάρχουσα λήψη ή σφάλμα.</string>
+    <string name="distributed_stack_retry_countdown">Νέα προσπάθεια σε %1$d δ.</string>
 </resources>

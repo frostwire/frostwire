@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Пір-джерело рекомендовано</string>
     <string name="endorse_source_peer_unavailable">Не вдалося рекомендувати пір-джерело. Перевірте доступну енергію карми та повторіть спробу.</string>
     <string name="peer_catalog_download_failed">Не вдалося почати завантаження. Оновіть каталог вузла й повторіть спробу. Перевірте розділ передач на наявність завантаження або помилки.</string>
+    <string name="distributed_stack_retry_countdown">Повторна спроба через %1$d с</string>
 </resources>

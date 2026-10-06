@@ -697,4 +697,5 @@
     <string name="endorse_source_peer_success">Изворни пир је препоручен</string>
     <string name="endorse_source_peer_unavailable">Изворни пир није могао да буде препоручен. Проверите доступну карма енергију и покушајте поново.</string>
     <string name="peer_catalog_download_failed">Није могуће започети ово преузимање. Освежите каталог чвора и покушајте поново. Проверите преносе за постојеће преузимање или грешку.</string>
+    <string name="distributed_stack_retry_countdown">Нови покушај за %1$d с</string>
 </resources>

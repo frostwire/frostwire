@@ -1,4 +1,5 @@
 FrostWire 3.2.1 build 777 UNRELEASED
+  - fix:IceBridge settings show actual startup phases, timeout and failure status, and a live retry countdown; startup attempts are coalesced, late attempts cannot publish, and failed starts retry at most three times without bypassing cleanup or network policy
   - fix:Release builds retain Netty's dynamically accessed Android memory-fence fallback, preventing IceBridge startup from failing after code shrinking; release DEX verification gates packaging
   - fix:Release shrinking ignores optional Netty codec, JFR, and LDAP classes that Android does not ship, so the release build can complete
   - fix:Peer catalog downloads preserve the selected holder's identity, show rejected starts and VPN restrictions, and keep failed metadata transfers visible as errors instead of silently removing them

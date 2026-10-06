@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Peer-ul sursă a fost recomandat</string>
     <string name="endorse_source_peer_unavailable">Peer-ul sursă nu a putut fi recomandat. Verifică energia karma disponibilă și încearcă din nou.</string>
     <string name="peer_catalog_download_failed">Nu s-a putut porni această descărcare. Actualizați catalogul partenerului și încercați din nou. Verificați transferurile pentru o descărcare existentă sau o eroare.</string>
+    <string name="distributed_stack_retry_countdown">O nouă încercare în %1$d s</string>
 </resources>

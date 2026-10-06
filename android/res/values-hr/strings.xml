@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">Izvorni peer je preporučen</string>
     <string name="endorse_source_peer_unavailable">Izvorni peer nije mogao biti preporučen. Provjerite dostupnu karma energiju i pokušajte ponovno.</string>
     <string name="peer_catalog_download_failed">Nije moguće pokrenuti ovo preuzimanje. Osvježite katalog čvora i pokušajte ponovno. Provjerite prijenose za postojeće preuzimanje ili pogrešku.</string>
+    <string name="distributed_stack_retry_countdown">Novi pokušaj za %1$d s</string>
 </resources>

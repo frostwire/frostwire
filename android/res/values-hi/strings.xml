@@ -695,4 +695,5 @@
     <string name="endorse_source_peer_success">स्रोत पीयर का समर्थन किया गया</string>
     <string name="endorse_source_peer_unavailable">स्रोत पीयर का समर्थन नहीं किया जा सका। उपलब्ध कर्म ऊर्जा जाँचें और फिर प्रयास करें।</string>
     <string name="peer_catalog_download_failed">यह डाउनलोड शुरू नहीं हो सका। पीयर की सूची रीफ़्रेश करें और फिर से प्रयास करें। किसी मौजूदा डाउनलोड या त्रुटि के लिए ट्रांसफ़र देखें।</string>
+    <string name="distributed_stack_retry_countdown">%1$d सेकंड में फिर प्रयास करेंगे</string>
 </resources>
