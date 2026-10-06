@@ -428,6 +428,58 @@ tasks.matching {
     dependsOn(ensurePythonProguardRules)
 }
 
+// MethodHandles.findStatic is not a direct call: a successful R8 build can still
+// remove Netty's Android fence fallback and break its allocator at runtime.
+def verifyReleaseNettyReflection = tasks.register("verifyReleaseNettyReflection") {
+    group = "verification"
+    description = "Checks Netty's reflectively accessed fence and updater fields in release DEX."
+    dependsOn("minifyPlus1ReleaseWithR8")
+    doLast {
+        def dexFiles = fileTree(layout.buildDirectory.dir("intermediates/dex/plus1Release/minifyPlus1ReleaseWithR8")) {
+            include "classes*.dex"
+        }.files.sort()
+        if (dexFiles.isEmpty()) throw new GradleException("No shrunk release DEX files found")
+        def suffix = System.getProperty("os.name").toLowerCase().contains("windows") ? ".exe" : ""
+        def dexdump = new File(androidComponents.sdkComponents.sdkDirectory.get().asFile,
+                "build-tools/${android.buildToolsVersion}/dexdump${suffix}")
+        def classes = [:]
+        dexFiles.each { dex ->
+            def xml = providers.exec {
+                commandLine(dexdump.absolutePath, "-l", "xml", dex.absolutePath)
+            }.standardOutput.asText.get()
+            def api = new groovy.xml.XmlSlurper().parseText(xml)
+            api.'package'.findAll { it.@name.toString() == "io.netty.util.concurrent" }.each { pkg ->
+                pkg.'class'.each { cls -> classes[cls.@name.toString()] = cls }
+            }
+        }
+        def owner = classes["ConcurrentSkipListIntObjMultimap"]
+        def fallback = owner?.method?.find {
+            it.@name.toString() == "acquireFenceFallback" && it.@static.toString() == "true"
+                    && it.@return.toString() == "void" && it.parameter.size() == 0
+        }
+        if (fallback == null || fallback.size() == 0) {
+            throw new GradleException("Release DEX removed Netty acquireFenceFallback(): IceBridge cannot start on Android")
+        }
+        ["ConcurrentSkipListIntObjMultimap": ["head"],
+         'ConcurrentSkipListIntObjMultimap$Node': ["val", "next"],
+         'ConcurrentSkipListIntObjMultimap$Index': ["right"]].each { name, fields ->
+            fields.each { field ->
+                def retained = classes[name]?.field?.find {
+                    it.@name.toString() == field && it.@volatile.toString() == "true"
+                }
+                if (retained == null || retained.size() == 0) {
+                    throw new GradleException("Release DEX removed or changed Netty volatile field ${name}.${field}")
+                }
+            }
+        }
+        logger.lifecycle("Release Netty fence fallback and updater fields verified")
+    }
+}
+
+tasks.matching { it.name == "packagePlus1Release" }.configureEach {
+    dependsOn(verifyReleaseNettyReflection)
+}
+
 def plusWorkspaceReleaseApkFile = layout.buildDirectory.file(plusReleaseApkName)
 
 def copyPlus1ReleaseApkToWorkspaceBuild = tasks.register("copyPlus1ReleaseApkToWorkspaceBuild") {

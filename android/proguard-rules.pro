@@ -93,6 +93,20 @@
 -dontobfuscate
 #-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!code/allocation/variable
 
+# Netty's adaptive allocator looks up this Android fence fallback by MethodHandle.
+# Keep the real method and volatile updater targets, not just their names.
+-keepclassmembers class io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap {
+    private static void acquireFenceFallback();
+    volatile *** head;
+}
+-keepclassmembers class io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap$Node {
+    volatile *** val;
+    volatile *** next;
+}
+-keepclassmembers class io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap$Index {
+    volatile *** right;
+}
+
 # Netty (rUDP transport) references optional codecs it never loads on Android
 # (brotli/zstd/lz4/lzma, UDT, SCTP, protobuf-nano, tcnative, log facades).
 # Rules below are the -dontwarn set R8 generates for those references.
