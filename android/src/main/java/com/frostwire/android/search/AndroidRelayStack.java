@@ -156,6 +156,12 @@ public final class AndroidRelayStack implements AutoCloseable {
   private final BooleanSupplier permitted;
   private final AtomicBoolean cleanupStarted = new AtomicBoolean();
 
+  public interface StartupObserver {
+    default void phase(RelayStartupTracker.Phase phase) {}
+
+    default void failed(Throwable error) {}
+  }
+
   /**
    * Start the relay stack. All heavy work is done on the calling thread. If startup fails partway
    * through, all resources started so far are cleaned up before returning {@code null}.
@@ -167,8 +173,20 @@ public final class AndroidRelayStack implements AutoCloseable {
    */
   public static AndroidRelayStack start(
       Context context, File homeDir, BTEngine btEngine, BooleanSupplier ownerActive) {
+    return start(context, homeDir, btEngine, ownerActive, new StartupObserver() {});
+  }
+
+  public static AndroidRelayStack start(
+      Context context,
+      File homeDir,
+      BTEngine btEngine,
+      BooleanSupplier ownerActive,
+      StartupObserver observer) {
     synchronized (START_LOCK) {
-      if (retiringPublications != null) return null;
+      if (retiringPublications != null) {
+        observer.failed(new IllegalStateException("Previous startup is still draining"));
+        return null;
+      }
       if (!ownerActive.getAsBoolean() || !isParticipationEnabled()) {
         return null;
       }
@@ -180,7 +198,7 @@ public final class AndroidRelayStack implements AutoCloseable {
         if (live != null || retiringPublications != null) return null;
       }
       AndroidRelayStack started =
-          startNew(context.getApplicationContext(), homeDir, btEngine, ownerActive);
+          startNew(context.getApplicationContext(), homeDir, btEngine, ownerActive, observer);
       if (started != null) {
         live = started;
       }
@@ -233,7 +251,11 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   private static AndroidRelayStack startNew(
-      Context context, File homeDir, BTEngine btEngine, BooleanSupplier ownerActive) {
+      Context context,
+      File homeDir,
+      BTEngine btEngine,
+      BooleanSupplier ownerActive,
+      StartupObserver observer) {
     AndroidLocalIndex li = null;
     IceBridgeServer srv = null;
     IceBridgeClient cl = null;
@@ -263,6 +285,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       // Identity first — LocalIndex.open can take seconds and must not delay
       // Settings showing Node ID after a cold start / force-stop.
       File identityFile = new File(homeDir, RelayConstants.IDENTITY_FILE);
+      observer.phase(RelayStartupTracker.Phase.IDENTITY);
       IdentityKeys ident = IdentityKeys.loadOrCreate(identityFile);
       requirePermitted(permitted);
       LOG.info(
@@ -272,6 +295,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       LOG.info("AndroidRelayStack: identity ready in " + elapsedMs(phaseNs) + "ms");
       phaseNs = System.nanoTime();
 
+      observer.phase(RelayStartupTracker.Phase.INDEX);
       LocalIndex existingIndex = SearchEngine.LOCAL_WIRING.localIndex();
       if (existingIndex instanceof AndroidLocalIndex
           && ((AndroidLocalIndex) existingIndex).isOpen()) {
@@ -290,6 +314,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       reindexExistingTransfers(indexer, "immediate");
       indexer.startReconcile(AndroidRelayStack::liveTransferDownloads);
 
+      observer.phase(RelayStartupTracker.Phase.KARMA);
       ks = new AndroidKarmaChainStore(context, AndroidLocalIndex.DEFAULT_DB_NAME, permitted);
       File bitcoinCacheDir = new File(homeDir, RelayConstants.BITCOIN_HEADER_CACHE_DIR);
       com.frostwire.search.relay.BlockHeaderSource blockSource =
@@ -357,6 +382,7 @@ public final class AndroidRelayStack implements AutoCloseable {
           new PeerKarmaCache(new RemoteKarmaChainFetcher(new DhtKarmaChainSource(btEngine)));
       pd = new PeerDirectory(karmaCache);
 
+      observer.phase(RelayStartupTracker.Phase.SERVER);
       if (useRemote) {
         requirePermitted(permitted);
         LOG.info("AndroidRelayStack: using remote IceBridge at " + remoteUrl);
@@ -436,6 +462,7 @@ public final class AndroidRelayStack implements AutoCloseable {
         }
       }
 
+      observer.phase(RelayStartupTracker.Phase.TRANSPORT);
       tr = new IceBridgeSearchTransport(cl);
       requirePermitted(permitted);
       // In-process server: surface this transport's pipeline saturation on the local /metrics.
@@ -495,6 +522,7 @@ public final class AndroidRelayStack implements AutoCloseable {
               + " role="
               + syncRole);
 
+      observer.phase(RelayStartupTracker.Phase.DISCOVERY);
       DhtPeerDiscoverySource dhtDiscoverySource = new DhtPeerDiscoverySource(btEngine);
       byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
       PeerDiscoverySource discoverySource =
@@ -651,6 +679,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       LOG.info("AndroidRelayStack: started successfully");
       return stack;
     } catch (Throwable t) {
+      observer.failed(t);
       active.set(false);
       PublicationOwners failed =
           new PublicationOwners(da, kcs, endorsementListener, karmaWriter, ks);
