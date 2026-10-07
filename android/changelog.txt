@@ -1,32 +1,31 @@
-FrostWire 3.2.1 build 777 UNRELEASED
-  - fix:IceBridge settings show actual startup phases, timeout and failure status, and a live retry countdown; startup attempts are coalesced, late attempts cannot publish, and failed starts retry at most three times without bypassing cleanup or network policy
-  - fix:Release builds retain Netty's dynamically accessed Android memory-fence fallback, preventing IceBridge startup from failing after code shrinking; release DEX verification gates packaging
-  - fix:Release shrinking ignores optional Netty codec, JFR, and LDAP classes that Android does not ship, so the release build can complete
-  - fix:Peer catalog downloads preserve the selected holder's identity, show rejected starts and VPN restrictions, and keep failed metadata transfers visible as errors instead of silently removing them
-  - fix:Shared hybrid torrent indexing consistently uses the metadata v1 hash and removes only proven truncated-v2 aliases after the canonical row is stored
-  - fix:IceBridge UDP ports now default to automatic selection so multiple devices behind one router do not all claim port 6889; existing default settings are upgraded once, custom ports remain supported, and announcements use the actual bound port
-  - fix:Crawler opt-in now gates both mesh browsing and DHT catalog publication; only active non-private seeds are browsable, and opting out withdraws the previous catalog without disabling ordinary distributed search
-  - fix:Transfers rows now react to libtorrent state-change alerts, so Checking-to-Seeding updates do not wait for the next periodic list refresh
-  - fix:Transfers list rows now refresh immediately on libtorrent state-change alerts instead of waiting for the next list polling cycle
-  - fix:Returning from transfer details immediately refreshes the transfers list so the row reflects the latest Checking, Downloading, or Seeding state
-  - fix:Distributed search becomes available sooner after startup — peer discovery, signed DHT announcements, and mesh registration now begin immediately in parallel rather than blocking the search UI; resume recovery uses one timeout budget
-  - fix:Distributed search now finds torrents shared by peers that do not act as relays (leaf nodes) — forwarders were dropping their published keyword fingerprint, so those torrents only showed up by luck; the fingerprint is now honored when routing
+FrostWire 3.2.1 build 777 OCT/06/2026
   - new:You can now browse the torrents a peer shares — long-press a Distributed search result whose holder allows crawling ("Browse Shared Torrents") to list everything that peer is sharing and download any of it straight from that peer
-  - new:Seeding is publishing — the first-run wizard explains that seeding a torrent makes it discoverable on the BitTorrent network, and lets you opt in (off by default) to having the torrents you are actively seeding browsable by the network's crawlers
-  - fix:Only torrents you are actively seeding are shared with catalog crawlers — downloaded history that is not seeding is no longer published
-  - fix:Distributed search and the relay stay responsive under heavy search traffic — packet processing is handed off the socket event loop, response delivery runs on a bounded lane, and concurrent torrent-metadata fetches are capped
   - new:Distributed search routes to the peers that actually hold the content — nodes announce a compact keyword fingerprint and requests are forwarded to likely holders with a small bounded fan-out instead of random peers, so rare results are found reliably and faster
+  - fix:Distributed search now finds torrents shared by peers that do not act as relays (leaf nodes) — forwarders were dropping their published keyword fingerprint, so those torrents only showed up by luck; the fingerprint is now honored when routing
+  - fix:Release builds retain Netty's dynamically accessed Android memory-fence fallback, preventing IceBridge startup from failing after code shrinking; release DEX verification gates packaging
+  - fix:IceBridge settings show actual startup phases, timeout and failure status, and a live retry countdown; startup attempts are coalesced, late attempts cannot publish, and failed starts retry at most three times without bypassing cleanup or network policy
+  - new:Seeding is publishing — the first-run wizard explains that seeding a torrent makes it discoverable on the BitTorrent network, and lets you opt in (off by default) to having the torrents you are actively seeding browsable by the network's crawlers
+  - fix:Crawler opt-in now gates both mesh browsing and DHT catalog publication; only active non-private seeds are browsable, and opting out withdraws the previous catalog without disabling ordinary distributed search
+  - fix:Only torrents you are actively seeding are shared with catalog crawlers — downloaded history that is not seeding is no longer published
+  - fix:Distributed search becomes available sooner after startup — peer discovery, signed DHT announcements, and mesh registration now begin immediately in parallel rather than blocking the search UI; resume recovery uses one timeout budget
+  - fix:Distributed search and the relay stay responsive under heavy search traffic — packet processing is handed off the socket event loop, response delivery runs on a bounded lane, and concurrent torrent-metadata fetches are capped
   - new:Peers keep an up-to-date list of reachable IceBridge nodes and never query unreachable ones — nodes that stop answering (directly or through a relay) are removed from the local list and evicted instead of being retried forever
-  - new:Search progress now shows IceBridge status — "Distributed Search · N peers contacted" with starting / not-running hints, translated to every supported language
+  - fix:IceBridge UDP ports now default to automatic selection so multiple devices behind one router do not all claim port 6889; existing default settings are upgraded once, custom ports remain supported, and announcements use the actual bound port
+  - fix:Peer catalog downloads preserve the selected holder's identity, show rejected starts and VPN restrictions, and keep failed metadata transfers visible as errors instead of silently removing them
   - new:IceBridge participates as a full node (BOTH) by default, with a separate relay-participation switch and a node setting that restarts the relay stack when changed
+  - new:Search progress now shows IceBridge status — "Distributed Search · N peers contacted" with starting / not-running hints, translated to every supported language
   - fix:Warming the mesh on relay startup lets a fresh install find peers without waiting for the first discovery tick
-  - fix:VPN and seeding preference toggles suspend torrents for policy without overwriting an explicit user pause, and the transfer list is no longer cleared on reset
-  - fix:Network status changes are no longer rebroadcast, and notifications fire only for real Wi-Fi/mobile/VPN transport changes
-  - fix:The engine's foreground service stops cleanly when promotion fails instead of crashing with RemoteServiceException
-  - fix:Only real audio files open in the music player; video containers (webm/mp4/mkv/…) open with the system chooser
+  - fix:Shared hybrid torrent indexing consistently uses the metadata v1 hash and removes only proven truncated-v2 aliases after the canonical row is stored
   - fix:The local search index preserves FTS rowids across reindexing and repairs triggers, fixing missing or duplicated results with unicode names
+  - fix:VPN and seeding preference toggles suspend torrents for policy without overwriting an explicit user pause, and the transfer list is no longer cleared on reset
+  - fix:The engine's foreground service stops cleanly when promotion fails instead of crashing with RemoteServiceException
+  - fix:Network status changes are no longer rebroadcast, and notifications fire only for real Wi-Fi/mobile/VPN transport changes
+  - fix:Transfers rows now react to libtorrent state-change alerts, so Checking-to-Seeding updates do not wait for the next periodic list refresh
+  - fix:Returning from transfer details immediately refreshes the transfers list so the row reflects the latest Checking, Downloading, or Seeding state
+  - fix:Only real audio files open in the music player; video containers (webm/mp4/mkv/…) open with the system chooser
   - fix:Distributed Search settings refresh automatically while the screen is visible
   - fix:Deselecting every web search engine leaves Distributed Search enabled and no longer re-enables Archive.org at startup
+  - fix:Release shrinking ignores optional Netty codec, JFR, and LDAP classes that Android does not ship, so the release build can complete
 FrostWire 3.2.0 build 776 SEP/03/2026
   - new:YouTube video downloads now play with sound — DASH video-only rows auto-fetch a hidden m4a/Opus sibling and merge it (pure-Java MP4 restitch or WebM remux, same-container pairs only); sibling fetch retries with resume on throttled connections; any failure keeps the silent video
   - fix:Peer discovery stops retrying dead hosts — host-cache entries are evicted after 5 consecutive ping/handshake failures (any success resets the streak)
