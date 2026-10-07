@@ -90,11 +90,12 @@ public class SearchEnginesSettings extends LimeProps {
       FACTORY.createBooleanSetting("ICEBRIDGE_ENABLED", true);
 
   /**
-   * Opt-in: publish this node's share catalog so IceBridge crawlers can discover and index the
-   * files it shares. Default false (sharing stays private unless explicitly enabled).
+   * Opt-out: publish the torrents this node is actively seeding so IceBridge crawlers can discover
+   * and index them. Default true; users can disable it in the setup wizard or IceBridge settings.
+   * Download history that is not seeding is never published.
    */
   public static final BooleanSetting ICEBRIDGE_PUBLIC_CATALOG =
-      FACTORY.createBooleanSetting("ICEBRIDGE_PUBLIC_CATALOG", false);
+      FACTORY.createBooleanSetting("ICEBRIDGE_PUBLIC_CATALOG", true);
 
   public static final BooleanSetting ICEBRIDGE_USE_REMOTE =
       FACTORY.createBooleanSetting("ICEBRIDGE_USE_REMOTE", false);
