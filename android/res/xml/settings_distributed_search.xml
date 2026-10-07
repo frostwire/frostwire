@@ -18,7 +18,7 @@
             android:key="frostwire.prefs.icebridge.public_catalog"
             android:title="@string/icebridge_public_catalog_title"
             android:summary="@string/icebridge_public_catalog_summary"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
 
     </PreferenceCategory>
 

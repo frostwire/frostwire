@@ -216,8 +216,9 @@ public final class AndroidRelayStack implements AutoCloseable {
   }
 
   /**
-   * Explicit opt-in for advertising the shared-torrent catalog to crawlers. Defaults to false: the
-   * owner must enable it in the Distributed Search settings.
+   * Whether to advertise the shared-torrent catalog of actively seeded torrents to crawlers.
+   * Defaults to true (opt-out): the owner can disable it in the first-run wizard or the Distributed
+   * Search settings. An unreadable setting fails closed to false.
    */
   public static boolean isPublicCatalogEnabled() {
     try {
