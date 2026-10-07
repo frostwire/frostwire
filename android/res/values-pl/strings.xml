@@ -617,7 +617,7 @@
     <string name="distributed_icebridge_start">Uruchom / uruchom ponownie IceBridge</string>
     <string name="distributed_icebridge_start_summary">Uruchom sieć IceBridge w procesie, jeśli nie działa, lub wymuś jej ponowne uruchomienie</string>
     <string name="icebridge_public_catalog_title">Udostępnij publicznie mój katalog udostępniania (crawlery)</string>
-    <string name="icebridge_public_catalog_summary">Pozwól robotom indeksującym sieci indeksować torrenty, które aktywnie seedujesz. Historia pobierania, która nie jest seedowana, nigdy nie jest publikowana. Domyślnie wyłączone.</string>
+    <string name="icebridge_public_catalog_summary">Pozwól robotom indeksującym sieci indeksować torrenty, które aktywnie seedujesz. Historia pobierania, która nie jest seedowana, nigdy nie jest publikowana. Domyślnie włączone.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedowanie to publikowanie</string>
     <string name="icebridge_public_catalog_wizard_description">Gdy seedujesz torrent, publikujesz go w sieci BitTorrent, aby inni mogli go znaleźć i pobrać. Możesz wybrać, czy roboty indeksujące sieci mogą także indeksować torrenty, które aktywnie seedujesz.</string>
     <string name="icebridge_public_catalog_wizard_label">Pozwól robotom przeglądać torrenty, które aktywnie seeduję</string>

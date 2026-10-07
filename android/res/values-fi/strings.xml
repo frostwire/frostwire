@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">Käynnistä / käynnistä IceBridge uudelleen</string>
     <string name="distributed_icebridge_start_summary">Käynnistä prosessin sisäinen IceBridge-verkko, jos se ei ole käynnissä, tai pakota uudelleenkäynnistys</string>
     <string name="icebridge_public_catalog_title">Jaa jakokatalogini julkisesti (crawlerit)</string>
-    <string name="icebridge_public_catalog_summary">Anna verkon ryömijöiden indeksoida torrentit, joita jaat aktiivisesti. Lataushistoriaa, jota ei jaeta, ei koskaan julkaista. Oletusarvoisesti pois päältä.</string>
+    <string name="icebridge_public_catalog_summary">Anna verkon ryömijöiden indeksoida torrentit, joita jaat aktiivisesti. Lataushistoriaa, jota ei jaeta, ei koskaan julkaista. Oletusarvoisesti päällä.</string>
     <string name="icebridge_public_catalog_wizard_title">Jakaminen on julkaisemista</string>
     <string name="icebridge_public_catalog_wizard_description">Kun jaat torrentia, julkaiset sen BitTorrent-verkossa, jotta muut voivat löytää ja ladata sen. Voit valita, saavatko verkon ryömijät indeksoida myös torrentit, joita jaat aktiivisesti.</string>
     <string name="icebridge_public_catalog_wizard_label">Anna ryömijöiden selata torrenteja, joita jaan aktiivisesti</string>

@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">IceBridge شروع / دوبارہ شروع کریں</string>
     <string name="distributed_icebridge_start_summary">اگر ان-پروسیس IceBridge میش نہیں چل رہا تو اسے شروع کریں، یا زبردستی دوبارہ شروع کریں</string>
     <string name="icebridge_public_catalog_title">مشترکہ ٹورنٹ کیٹلاگ کو کرال کے قابل بنائیں</string>
-    <string name="icebridge_public_catalog_summary">نیٹ ورک کے کرالرز کو ان ٹورنٹس کی فہرست بنانے دیں جو آپ فعال طور پر سیڈ کر رہے ہیں۔ جو ڈاؤن لوڈ ہسٹری سیڈ نہیں ہو رہی وہ کبھی شائع نہیں کی جاتی۔ بطور ڈیفالٹ بند۔</string>
+    <string name="icebridge_public_catalog_summary">نیٹ ورک کے کرالرز کو ان ٹورنٹس کی فہرست بنانے دیں جو آپ فعال طور پر سیڈ کر رہے ہیں۔ جو ڈاؤن لوڈ ہسٹری سیڈ نہیں ہو رہی وہ کبھی شائع نہیں کی جاتی۔ بطور ڈیفالٹ آن۔</string>
     <string name="icebridge_public_catalog_wizard_title">سیڈ کرنا شائع کرنا ہے</string>
     <string name="icebridge_public_catalog_wizard_description">جب آپ کوئی ٹورنٹ سیڈ کرتے ہیں تو آپ اسے BitTorrent نیٹ ورک پر شائع کرتے ہیں تاکہ دوسرے اسے تلاش کر کے ڈاؤن لوڈ کر سکیں۔ آپ منتخب کر سکتے ہیں کہ نیٹ ورک کے کرالرز ان ٹورنٹس کو بھی انڈیکس کر سکیں جو آپ فعال طور پر سیڈ کر رہے ہیں۔</string>
     <string name="icebridge_public_catalog_wizard_label">کرالرز کو وہ ٹورنٹس براؤز کرنے دیں جو میں فعال طور پر سیڈ کر رہا ہوں</string>

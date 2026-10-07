@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">Запустити / перезапустити IceBridge</string>
     <string name="distributed_icebridge_start_summary">Запустити мережу IceBridge в процесі, якщо вона не працює, або примусово перезапустити її</string>
     <string name="icebridge_public_catalog_title">Публічно ділитися моїм каталогом спільних файлів (краулери)</string>
-    <string name="icebridge_public_catalog_summary">Дозвольте краулерам мережі індексувати торенти, які ви активно роздаєте. Історія завантажень, яка не роздається, ніколи не публікується. Вимкнено за замовчуванням.</string>
+    <string name="icebridge_public_catalog_summary">Дозвольте краулерам мережі індексувати торенти, які ви активно роздаєте. Історія завантажень, яка не роздається, ніколи не публікується. Увімкнено за замовчуванням.</string>
     <string name="icebridge_public_catalog_wizard_title">Роздача — це публікація</string>
     <string name="icebridge_public_catalog_wizard_description">Коли ви роздаєте торент, ви публікуєте його в мережі BitTorrent, щоб інші могли його знайти й завантажити. Ви можете вибрати, чи можуть краулери мережі також індексувати торенти, які ви активно роздаєте.</string>
     <string name="icebridge_public_catalog_wizard_label">Дозволити краулерам переглядати торенти, які я активно роздаю</string>

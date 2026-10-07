@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">Iniciar / reiniciar IceBridge</string>
     <string name="distributed_icebridge_start_summary">Inicia a malha IceBridge no processo se não estiver em execução, ou força o reinício</string>
     <string name="icebridge_public_catalog_title">Partilhar publicamente o meu catálogo de partilha (rastreadores)</string>
-    <string name="icebridge_public_catalog_summary">Permita que os rastreadores da rede indexem os torrents que você está semeando ativamente. O histórico de downloads que não está sendo semeado nunca é publicado. Desativado por padrão.</string>
+    <string name="icebridge_public_catalog_summary">Permita que os rastreadores da rede indexem os torrents que você está semeando ativamente. O histórico de downloads que não está sendo semeado nunca é publicado. Ativado por padrão.</string>
     <string name="icebridge_public_catalog_wizard_title">Semear é publicar</string>
     <string name="icebridge_public_catalog_wizard_description">Quando você semeia um torrent, você o publica na rede BitTorrent para que outras pessoas possam encontrá-lo e baixá-lo. Você pode escolher se os rastreadores da rede também podem indexar os torrents que você está semeando ativamente.</string>
     <string name="icebridge_public_catalog_wizard_label">Permitir que os rastreadores naveguem pelos torrents que estou semeando ativamente</string>

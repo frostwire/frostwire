@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">Pokreni / ponovno pokreni IceBridge</string>
     <string name="distributed_icebridge_start_summary">Pokreni IceBridge mrežu unutar procesa ako ne radi ili prisilno ponovno pokreni</string>
     <string name="icebridge_public_catalog_title">Javno podijeli moj katalog dijeljenja (crawleri)</string>
-    <string name="icebridge_public_catalog_summary">Neka crawleri mreže indeksiraju torrente koje aktivno seedate. Povijest preuzimanja koja se ne seeda nikada se ne objavljuje. Prema zadanim postavkama isključeno.</string>
+    <string name="icebridge_public_catalog_summary">Neka crawleri mreže indeksiraju torrente koje aktivno seedate. Povijest preuzimanja koja se ne seeda nikada se ne objavljuje. Prema zadanim postavkama uključeno.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedanje je objavljivanje</string>
     <string name="icebridge_public_catalog_wizard_description">Kada seedate torrent, objavljujete ga na BitTorrent mreži kako bi ga drugi mogli pronaći i preuzeti. Možete odabrati hoće li crawleri mreže moći indeksirati i torrente koje aktivno seedate.</string>
     <string name="icebridge_public_catalog_wizard_label">Dopusti crawlerima da pregledavaju torrente koje aktivno seedam</string>

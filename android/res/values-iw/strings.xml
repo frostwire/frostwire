@@ -615,7 +615,7 @@
     <string name="distributed_icebridge_start">הפעל / הפעל מחדש את IceBridge</string>
     <string name="distributed_icebridge_start_summary">הפעל את רשת IceBridge בתוך התהליך אם היא אינה פועלת, או אלץ הפעלה מחדש</string>
     <string name="icebridge_public_catalog_title">שתף את קטלוג השיתוף שלי באופן ציבורי (סורקים)</string>
-    <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה עושה להם seed באופן פעיל. היסטוריית הורדות שאינה עושה seed לא מתפרסמת לעולם. כבוי כברירת מחדל.</string>
+    <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה עושה להם seed באופן פעיל. היסטוריית הורדות שאינה עושה seed לא מתפרסמת לעולם. פעיל כברירת מחדל.</string>
     <string name="icebridge_public_catalog_wizard_title">לעשות seed זה לפרסם</string>
     <string name="icebridge_public_catalog_wizard_description">כאשר אתה עושה seed לטורנט, אתה מפרסם אותו ברשת BitTorrent כדי שאחרים יוכלו למצוא ולהוריד אותו. אתה יכול לבחור אם סורקי הרשת יוכלו לאנדקס גם את הטורנטים שאתה עושה להם seed באופן פעיל.</string>
     <string name="icebridge_public_catalog_wizard_label">אפשר לסורקים לעיין בטורנטים שאני עושה להם seed באופן פעיל</string>

@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">IceBridge starten / opnieuw starten</string>
     <string name="distributed_icebridge_start_summary">Start het IceBridge-mesh binnen het proces als het niet draait, of forceer een herstart</string>
     <string name="icebridge_public_catalog_title">Mijn deelcatalogus openbaar delen (crawlers)</string>
-    <string name="icebridge_public_catalog_summary">Laat de crawlers van het netwerk de torrents indexeren die je actief seedt. Downloadgeschiedenis die niet wordt geseed, wordt nooit gepubliceerd. Standaard uit.</string>
+    <string name="icebridge_public_catalog_summary">Laat de crawlers van het netwerk de torrents indexeren die je actief seedt. Downloadgeschiedenis die niet wordt geseed, wordt nooit gepubliceerd. Standaard aan.</string>
     <string name="icebridge_public_catalog_wizard_title">Seeden is publiceren</string>
     <string name="icebridge_public_catalog_wizard_description">Wanneer je een torrent seedt, publiceer je die op het BitTorrent-netwerk zodat anderen die kunnen vinden en downloaden. Je kunt kiezen of de crawlers van het netwerk ook de torrents mogen indexeren die je actief seedt.</string>
     <string name="icebridge_public_catalog_wizard_label">Crawlers mogen de torrents doorbladeren die ik actief seed</string>

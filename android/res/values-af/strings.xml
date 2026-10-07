@@ -614,7 +614,7 @@
     <string name="distributed_icebridge_start">Begin / herbegin IceBridge</string>
     <string name="distributed_icebridge_start_summary">Begin die inproses-IceBridge-maas as dit nie loop nie, of forseer \'n herbegin</string>
     <string name="icebridge_public_catalog_title">Deel my deelkatalogus publiek (kruipers)</string>
-    <string name="icebridge_public_catalog_summary">Laat die netwerk se kruipers die torrents indekseer wat jy tans aktief saai. Aflaaigeskiedenis wat nie gesaai word nie, word nooit gepubliseer nie. Verstek af.</string>
+    <string name="icebridge_public_catalog_summary">Laat die netwerk se kruipers die torrents indekseer wat jy tans aktief saai. Aflaaigeskiedenis wat nie gesaai word nie, word nooit gepubliseer nie. Verstek aan.</string>
     <string name="icebridge_public_catalog_wizard_title">Saai is publiseer</string>
     <string name="icebridge_public_catalog_wizard_description">Wanneer jy \'n torrent saai, publiseer jy dit op die BitTorrent-netwerk sodat ander mense dit kan vind en aflaai. Jy kan kies of die netwerk se kruipers ook die torrents mag indekseer wat jy tans aktief saai.</string>
     <string name="icebridge_public_catalog_wizard_label">Laat kruipers die torrents deurblaai wat ek tans aktief saai</string>
