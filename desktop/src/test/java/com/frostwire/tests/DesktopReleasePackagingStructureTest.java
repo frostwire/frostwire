@@ -36,7 +36,7 @@ class DesktopReleasePackagingStructureTest {
   }
 
   @Test
-  void releaseMetadataMatchesUnreleasedVersion() throws Exception {
+  void releaseMetadataMatchesCurrentVersion() throws Exception {
     String build = Files.readString(DESKTOP.resolve("build.gradle"));
     String changelog = Files.readString(DESKTOP.resolve("changelog.txt"));
     String frostWireUtils =
@@ -47,7 +47,8 @@ class DesktopReleasePackagingStructureTest {
             DESKTOP.resolve("../common/src/main/java/com/frostwire/mcp/MCPConstants.java"));
 
     assertTrue(build.contains("version = '7.1.0'"));
-    assertTrue(changelog.startsWith(" FrostWire 7.1.0 UNRELEASED"));
+    // Dated once the release is cut ("FrostWire 7.1.0 OCT/06/2026"), "UNRELEASED" before.
+    assertTrue(changelog.stripLeading().startsWith("FrostWire 7.1.0 "));
     assertTrue(frostWireUtils.contains("FROSTWIRE_VERSION = \"7.1.0\""));
     assertTrue(frostWireUtils.contains("BUILD_NUMBER = 332"));
     assertTrue(mcpConstants.contains("SERVER_VERSION = \"7.1.0\""));
