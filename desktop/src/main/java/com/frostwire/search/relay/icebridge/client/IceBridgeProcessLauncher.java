@@ -180,6 +180,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       command.add("--identity-file");
       command.add(identityFile.getAbsolutePath());
     }
+    // The parent owns DHT discovery (BTEngine announces our identity on the real identity port). A
+    // child announcing too would republish the same identity record with port 0 and fill the
+    // shared topics with endpoints that nobody can connect to.
+    command.add("--no-dht");
     // Child exits when this process dies — no orphan can survive a crash/kill -9.
     command.add("--parent-pid");
     command.add(String.valueOf(ProcessHandle.current().pid()));

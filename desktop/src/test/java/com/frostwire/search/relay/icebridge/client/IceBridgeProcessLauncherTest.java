@@ -69,6 +69,31 @@ class IceBridgeProcessLauncherTest {
     assertTrue(launcher.rudpPort() > 0, "The parent must learn the actual UDP port");
   }
 
+  /**
+   * The parent FrostWire owns the DHT: it announces our identity on the real identity port. A child
+   * that also announces (with its own port 0) republishes the same identity record with a useless
+   * port and fills the shared topics with junk endpoints that nobody can connect to.
+   */
+  @Test
+  void childDoesNotAnnounceOnTheDhtBecauseTheParentOwnsDiscovery() throws Exception {
+    File jar = new File(System.getProperty("user.dir"), "build/libs/icebridge.jar");
+    assertTrue(jar.isFile(), "icebridge.jar must be built first (run icebridgeJar)");
+
+    Path tmp = Files.createTempDirectory("icebridge-test-nodht");
+    File identityFile = new File(tmp.toFile(), "identity.dat");
+    IdentityKeys.save(IdentityKeys.generate(0), identityFile);
+
+    launcher = new IceBridgeProcessLauncher(jar, identityFile, 0, 0, "BOTH");
+    launcher.start();
+    assertTrue(launcher.awaitHealthy(30_000), "child did not become healthy");
+
+    String stderr = Files.readString(new File(launcher.logDir(), "stderr.log").toPath());
+    String stdout = Files.readString(new File(launcher.logDir(), "stdout.log").toPath());
+    assertFalse(stderr.contains("DhtAdvertiser started"), stderr);
+    assertFalse(stderr.contains("IceBridge DHT session started"), stderr);
+    assertTrue(stdout.contains("ICEBRIDGE_DHT               = false"), stdout);
+  }
+
   @Test
   void customRelayPortIsPassedToSubprocess() throws Exception {
     File jar = new File(System.getProperty("user.dir"), "build/libs/icebridge.jar");
