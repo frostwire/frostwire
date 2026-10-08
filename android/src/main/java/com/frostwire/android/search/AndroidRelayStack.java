@@ -532,6 +532,8 @@ public final class AndroidRelayStack implements AutoCloseable {
       // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
       tcpAuthenticator = new DirectTcpPeerAuthenticator(ident.ed25519());
       final DirectTcpPeerAuthenticator ownedAuthenticator = tcpAuthenticator;
+      // Host pings must use the keyed handshake too; servers reject the legacy keyless request.
+      IceBridgeHostCache.getInstance().setPingAuthenticator(ownedAuthenticator);
       com.frostwire.search.relay.PeerAuthenticator authenticator =
           (host, port) -> {
             java.util.Optional<com.frostwire.search.relay.IdentityRecord> rec =
@@ -723,7 +725,10 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
       if (endorsementListener != null) BTEngineListenerChain.remove(btEngine, endorsementListener);
       if (promotion != null) promotion.stop();
-      if (tcpAuthenticator != null) tcpAuthenticator.close();
+      if (tcpAuthenticator != null) {
+        IceBridgeHostCache.getInstance().setPingAuthenticator(null);
+        tcpAuthenticator.close();
+      }
       if (pds != null)
         try {
           pds.stop();

@@ -1037,6 +1037,13 @@ final class Initializer {
       DirectTcpPeerAuthenticator baseAuthenticator =
           new DirectTcpPeerAuthenticator(ownIdentity.ed25519());
       relayResources.add(baseAuthenticator);
+      // The Settings "ping" must use the keyed handshake too; servers reject the keyless request.
+      com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+          .setPingAuthenticator(baseAuthenticator);
+      relayResources.add(
+          () ->
+              com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
+                  .setPingAuthenticator(null));
       // Count failed handshakes against the host cache so dead entries are
       // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
       PeerAuthenticator authenticator =

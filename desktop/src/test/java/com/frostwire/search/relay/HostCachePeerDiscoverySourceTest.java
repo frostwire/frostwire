@@ -9,6 +9,7 @@ package com.frostwire.search.relay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import java.io.File;
@@ -22,18 +23,87 @@ class HostCachePeerDiscoverySourceTest {
   @TempDir File tempDir;
 
   @Test
-  void fetchEndpointsReturnsPingableCacheEntries() {
+  void fetchEndpointsReturnsEveryCachedServerIncludingOnesThatNeverAnswered() {
     IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
     cache.addOrUpdate("54.172.26.106", 6888, "FORWARDER");
     cache.markSuccess("54.172.26.106", 6888, "FORWARDER");
-    cache.addOrUpdate("dead.example.com", 6888, "BOTH"); // never pinged OK
+    cache.addOrUpdate(
+        "never-answered.example.com", 6888, "FORWARDER"); // e.g. server was mid-deploy
 
     HostCachePeerDiscoverySource source = new HostCachePeerDiscoverySource(cache);
     List<DiscoveredEndpoint> endpoints = source.fetchEndpoints();
 
-    assertEquals(1, endpoints.size());
+    assertEquals(2, endpoints.size());
     assertEquals("54.172.26.106", endpoints.get(0).host);
     assertEquals(6888, endpoints.get(0).port);
+    assertEquals("never-answered.example.com", endpoints.get(1).host);
+    assertTrue(endpoints.stream().allMatch(e -> e.preferred), "known servers go first");
+  }
+
+  @Test
+  void builtInSeedsAreAlwaysCandidatesEvenWhenTheCacheIsEmptyOrEvicted() {
+    IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
+    HostCachePeerDiscoverySource source =
+        new HostCachePeerDiscoverySource(
+            cache, Arrays.asList("virginia1.frostwire.com:6888", "bad-seed", "x:notaport", "y:0"));
+
+    List<DiscoveredEndpoint> endpoints = source.fetchEndpoints();
+
+    assertEquals(1, endpoints.size());
+    assertEquals("virginia1.frostwire.com", endpoints.get(0).host);
+    assertEquals(6888, endpoints.get(0).port);
+    assertTrue(endpoints.get(0).preferred);
+  }
+
+  @Test
+  void seedListCanBeOverriddenOrDisabledWithASystemProperty() {
+    String key = "frostwire.icebridge.seeds";
+    String original = System.getProperty(key);
+    try {
+      System.clearProperty(key);
+      assertEquals(Arrays.asList(RelayConstants.DEFAULT_SEED_HOSTS), RelayConstants.seedHosts());
+      System.setProperty(key, " a.example:1 , b.example:2 ,");
+      assertEquals(Arrays.asList("a.example:1", "b.example:2"), RelayConstants.seedHosts());
+      System.setProperty(key, "");
+      assertTrue(RelayConstants.seedHosts().isEmpty());
+    } finally {
+      if (original == null) System.clearProperty(key);
+      else System.setProperty(key, original);
+    }
+  }
+
+  @Test
+  void refreshPingsUsesTheAuthenticatedHandshakeSoHealthyServersAreNotEvicted() throws Exception {
+    IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
+    cache.addOrUpdate("54.172.26.106", 6888, "FORWARDER");
+    java.security.KeyPair keys =
+        java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    IdentityRecord server =
+        IdentityRecord.createSigned(new byte[20], keys, new byte[32], 6888, 6889, "FORWARDER");
+    // The legacy keyless ping would have to be used without an authenticator; it would fail here.
+    cache.setPingAuthenticator(
+        (host, port) ->
+            host.equals("54.172.26.106")
+                ? java.util.Optional.of(server)
+                : java.util.Optional.empty());
+
+    cache.refreshPings();
+
+    IceBridgeHostCache.Entry entry = cache.getAll().get(0);
+    assertTrue(entry.lastSuccessfulPingMs > 0, "ping must be recorded as a success");
+    assertEquals(0, entry.consecutiveFailures);
+    assertEquals("FORWARDER", entry.role);
+  }
+
+  @Test
+  void refreshPingsStillCountsFailuresWithTheAuthenticator() {
+    IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
+    cache.addOrUpdate("203.0.113.9", 6888, "BOTH");
+    cache.setPingAuthenticator((host, port) -> java.util.Optional.empty());
+
+    cache.refreshPings();
+
+    assertEquals(1, cache.getAll().get(0).consecutiveFailures);
   }
 
   @Test

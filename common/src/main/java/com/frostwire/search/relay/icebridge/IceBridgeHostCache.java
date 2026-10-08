@@ -8,6 +8,7 @@
 package com.frostwire.search.relay.icebridge;
 
 import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.OutgoingRelayClient;
 import com.frostwire.util.Logger;
 
@@ -59,6 +60,12 @@ public final class IceBridgeHostCache {
     private final File cacheFile;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
     private final OutgoingRelayClient pingClient;
+    /**
+     * Servers answer only the authenticated identity handshake, which needs our identity key. When
+     * set, {@link #refreshPings()} uses it; the keyless legacy request is rejected by every server
+     * that proves endpoint ownership, so pinging with it would only evict healthy hosts.
+     */
+    private volatile PeerAuthenticator pingAuthenticator;
 
     private static volatile IceBridgeHostCache INSTANCE;
     /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
@@ -264,6 +271,11 @@ public final class IceBridgeHostCache {
         return false;
     }
 
+    /** Use this authenticator for {@link #refreshPings()}; null restores the legacy keyless ping. */
+    public void setPingAuthenticator(PeerAuthenticator authenticator) {
+        this.pingAuthenticator = authenticator;
+    }
+
     public List<Entry> getAll() {
         return Collections.unmodifiableList(new ArrayList<>(entries));
     }
@@ -306,7 +318,10 @@ public final class IceBridgeHostCache {
         LOG.info("IceBridge host refresh: TCP identity ping of " + snapshot.size() + " host(s)");
         for (Entry e : snapshot) {
             try {
-                Optional<IdentityRecord> rec = pingClient.fetchIdentity(e.host, e.port);
+                PeerAuthenticator authenticator = pingAuthenticator;
+                Optional<IdentityRecord> rec = authenticator != null
+                        ? authenticator.authenticate(e.host, e.port)
+                        : pingClient.fetchIdentity(e.host, e.port);
                 if (rec.isPresent()) {
                     IdentityRecord r = rec.get();
                     if (r.verifySignature()) {

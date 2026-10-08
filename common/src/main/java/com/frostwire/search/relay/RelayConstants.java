@@ -66,6 +66,29 @@ public final class RelayConstants {
      */
     public static final int RELAY_LISTEN_PORT = 6888;
 
+    /**
+     * Last-resort IceBridge servers every client tries even when the DHT, the host cache and the LAN
+     * all come back empty, so a fresh install can always find the network. They are only candidates:
+     * each one must still pass the authenticated identity handshake. Override with the
+     * {@code frostwire.icebridge.seeds} system property (comma separated {@code host:port}; empty
+     * disables the built-in seeds).
+     */
+    public static final String[] DEFAULT_SEED_HOSTS = {"virginia1.frostwire.com:6888"};
+
+    public static java.util.List<String> seedHosts() {
+        String override = System.getProperty("frostwire.icebridge.seeds");
+        if (override == null) {
+            return java.util.Arrays.asList(DEFAULT_SEED_HOSTS);
+        }
+        java.util.List<String> seeds = new java.util.ArrayList<>();
+        for (String seed : override.split(",")) {
+            if (!seed.trim().isEmpty()) {
+                seeds.add(seed.trim());
+            }
+        }
+        return seeds;
+    }
+
     private RelayConstants() {
     }
 
