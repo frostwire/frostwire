@@ -240,7 +240,7 @@ class DiscoveryHardeningTest {
   }
 
   @Test
-  void rendezvousReservesTimeForFallbackTopicsAndChecksCancellation() {
+  void rendezvousAlwaysAsksEveryTopicWithinBoundedWaitsAndChecksCancellation() {
     List<Integer> waits = new ArrayList<>();
     SessionManager session =
         new SessionManager() {
@@ -254,9 +254,9 @@ class DiscoveryHardeningTest {
     DhtPeerDiscoverySource source = new DhtPeerDiscoverySource(session);
     assertTrue(source.fetchEndpoints().isEmpty());
     assertEquals(3, waits.size());
-    assertEquals(1, waits.get(0));
-    assertTrue(waits.get(1) <= 2);
-    assertTrue(waits.get(2) <= 4);
+    assertTrue(waits.get(0) <= 2, "the small bootstrap topic does not need a long wait");
+    assertTrue(waits.get(1) <= 3);
+    assertTrue(waits.get(2) <= 5);
     Thread.currentThread().interrupt();
     try {
       assertTrue(source.fetchEndpoints().isEmpty());

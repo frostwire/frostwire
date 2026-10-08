@@ -66,28 +66,28 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
         java.util.Set<String> seen = new java.util.HashSet<>();
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(discoveryTimeoutSec);
         try {
-            // Always aggressively discover dedicated relayers first (via frostwire-relays-v1),
-            // then peers. This ensures desktop finds remote IceBridge relays easily via DHT
-            // and can use them for routing search/index commands over the rUDP mesh.
-            // Reserve budget for peer/bootstrap topics when the preferred topic is empty.
-            ArrayList<TcpEndpoint> relays = DhtRendezvous.findRelays(session,
-                    Math.max(1, discoveryTimeoutSec / 3));
-            if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
-            addEndpoints(relays, result, seen);
-
-            int remaining = remainingSeconds(deadline);
-            if (remaining > 0 && result.size() < PeerDiscovery.MAX_CANDIDATES_PER_PASS) {
-                ArrayList<TcpEndpoint> endpoints = DhtRendezvous.findPeers(session,
-                        result.isEmpty() ? Math.max(1, remaining / 2) : remaining);
-                if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
-                addEndpoints(endpoints, result, seen);
+            // The dedicated bootstrap/forwarder servers announce on the (small) bootstrap topic. The
+            // relay and peer topics are crowded with every desktop and phone on the network, most of
+            // them unreachable, so a server listed there is found only by luck. Ask for the
+            // bootstrap topic first, always, and mark what it returns as preferred so discovery
+            // probes it before the crowd.
+            int budget = remainingSeconds(deadline);
+            if (budget > 0) {
+                addEndpoints(DhtRendezvous.findBootstrapNodes(session, Math.min(2, budget)),
+                        result, seen, true);
             }
+            if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
 
-            remaining = remainingSeconds(deadline);
-            if (result.isEmpty() && remaining > 0) {
-                ArrayList<TcpEndpoint> bootstrap = DhtRendezvous.findBootstrapNodes(session, remaining);
-                if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
-                addEndpoints(bootstrap, result, seen);
+            budget = remainingSeconds(deadline);
+            if (budget > 0 && result.size() < PeerDiscovery.MAX_CANDIDATES_PER_PASS) {
+                addEndpoints(DhtRendezvous.findRelays(session, Math.min(3, budget)),
+                        result, seen, false);
+            }
+            if (System.nanoTime() - deadline >= 0 || Thread.currentThread().isInterrupted()) return result;
+
+            budget = remainingSeconds(deadline);
+            if (budget > 0 && result.size() < PeerDiscovery.MAX_CANDIDATES_PER_PASS) {
+                addEndpoints(DhtRendezvous.findPeers(session, budget), result, seen, false);
             }
         } catch (Throwable t) {
             LOG.debug("DHT discovery failed", t);
@@ -97,7 +97,8 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
 
     private static void addEndpoints(ArrayList<TcpEndpoint> endpoints,
                                      List<DiscoveredEndpoint> result,
-                                     java.util.Set<String> seen) {
+                                     java.util.Set<String> seen,
+                                     boolean preferred) {
         if (endpoints == null || endpoints.isEmpty()) {
             return;
         }
@@ -116,7 +117,7 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
             }
             String key = host + ":" + port;
             if (seen.add(key)) {
-                result.add(new DiscoveredEndpoint(host, port));
+                result.add(new DiscoveredEndpoint(host, port, preferred));
             }
         }
     }
@@ -126,7 +127,7 @@ public final class DhtPeerDiscoverySource implements PeerDiscoverySource {
      */
     static List<DiscoveredEndpoint> collectEndpointsForTest(ArrayList<TcpEndpoint> endpoints) {
         List<DiscoveredEndpoint> result = new ArrayList<>();
-        addEndpoints(endpoints, result, new java.util.HashSet<>());
+        addEndpoints(endpoints, result, new java.util.HashSet<>(), false);
         return result;
     }
 
