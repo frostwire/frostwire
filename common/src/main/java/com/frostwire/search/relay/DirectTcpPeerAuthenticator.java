@@ -39,7 +39,7 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator, Auto
 
     // Process-wide cap also bounds uninterruptible DNS work. Idle daemon workers retire;
     // instances own/cancel their calls, but never shut down another instance's pool.
-    private static final ThreadPoolExecutor WORKERS = new ThreadPoolExecutor(4, 4, 30,
+    private static final ThreadPoolExecutor WORKERS = new ThreadPoolExecutor(8, 8, 30,
             TimeUnit.SECONDS, new ArrayBlockingQueue<>(32), r -> {
                 Thread thread = new Thread(r, "relay-identity-probe");
                 thread.setDaemon(true);
@@ -48,6 +48,11 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator, Auto
     static {
         WORKERS.allowCoreThreadTimeOut(true);
     }
+    /**
+     * Unreachable peers (NAT'd phones, stale DHT entries) never answer the SYN; waiting out the whole
+     * handshake budget for them starves reachable servers, so the connect phase gets its own cap.
+     */
+    static final int CONNECT_TIMEOUT_MS = 3000;
     private static final SecureRandom RANDOM = new SecureRandom();
     private final KeyPair identityKeys;
     private final int timeoutMs;
@@ -100,7 +105,8 @@ public final class DirectTcpPeerAuthenticator implements PeerAuthenticator, Auto
             if (remaining <= 0 || socket.isClosed() || Thread.currentThread().isInterrupted()) {
                 return Optional.empty();
             }
-            socket.connect(address, (int) Math.max(1, TimeUnit.NANOSECONDS.toMillis(remaining)));
+            socket.connect(address, (int) Math.max(1,
+                    Math.min(CONNECT_TIMEOUT_MS, TimeUnit.NANOSECONDS.toMillis(remaining))));
             byte[] nonce = new byte[32];
             RANDOM.nextBytes(nonce);
             byte[] challenge = RelayWireCodec.identityChallenge(identityKeys, nonce);

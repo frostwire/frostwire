@@ -16,14 +16,25 @@ package com.frostwire.search.relay;
 public final class DiscoveredEndpoint {
     public final String host;
     public final int port;
+    /**
+     * True for endpoints that are worth trying before the crowd: the dedicated bootstrap/forwarder
+     * servers, hosts we already verified, built-in seeds and peers on our own LAN. A discovery pass
+     * probes these first and retries them sooner after a failure.
+     */
+    public final boolean preferred;
 
     public DiscoveredEndpoint(String host, int port) {
+        this(host, port, false);
+    }
+
+    public DiscoveredEndpoint(String host, int port, boolean preferred) {
         this.host = host;
         this.port = port;
+        this.preferred = preferred;
     }
 
     @Override
     public String toString() {
-        return "DiscoveredEndpoint{" + host + ":" + port + "}";
+        return "DiscoveredEndpoint{" + host + ":" + port + (preferred ? " preferred" : "") + "}";
     }
 }
