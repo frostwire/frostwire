@@ -1064,9 +1064,16 @@ final class Initializer {
       // path through the SAME identity authenticator as DHT endpoints — no
       // unverified placeholder upserts (those would drive failed TCP auth
       // spam). DHT remains the discovery workhorse for new peers.
+      // Computers on the same network cannot reach each other through the public address the DHT
+      // knows (hairpin NAT), so they announce themselves to the LAN directly.
+      com.frostwire.search.relay.LanPeerBeacon lanBeacon =
+          new com.frostwire.search.relay.LanPeerBeacon(
+              SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
+      lanBeacon.start();
+      relayResources.add(lanBeacon);
       PeerDiscoverySource source =
           new com.frostwire.search.relay.CompositePeerDiscoverySource(
-              new com.frostwire.search.relay.HostCachePeerDiscoverySource(), dhtSource);
+              new com.frostwire.search.relay.HostCachePeerDiscoverySource(), lanBeacon, dhtSource);
       PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
       // Skip our own externally-visible endpoint (multi-homed hosts, VPN
       // egress) the same way Android skips the carrier-NAT hairpin.
