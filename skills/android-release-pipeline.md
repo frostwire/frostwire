@@ -44,7 +44,9 @@ corrections made during that release.
      spotlessCheck minifyPlus1ReleaseWithR8 verifyReleaseNettyReflection --offline
    ```
    Check `gh run list --repo frostwire/frostwire --commit <sha>` is green (android
-   unit tests, Build, desktop tests) for the code commit.
+   unit tests, Build, desktop tests) for the code commit **and again for the exact commit you
+   tag** (the changelog commit): the desktop `DesktopReleasePackagingStructureTest` asserts the
+   changelog header, so dating a changelog can break CI on the release commit.
 4. New Android strings need base + 37 locale translations
    (`AndroidStringResourceParityTest`).
 
