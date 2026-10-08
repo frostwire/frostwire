@@ -45,6 +45,22 @@ reached only by luck. Instead:
   reaching holders.
 - Tokens are Unicode-normalized (diacritics stripped, lower-cased), so `Inglés` matches `ingles`.
 
+### How a node finds other nodes (discovery)
+
+`PeerDiscovery` runs a pass every 30s. Candidates come from three sources, all of which must pass the
+authenticated identity handshake on the TCP identity port before a peer is registered:
+
+| Source | Candidates | Notes |
+|--------|------------|-------|
+| Host cache + built-in seeds (`HostCachePeerDiscoverySource`) | every cached server, plus `RelayConstants.seedHosts()` (`virginia1.frostwire.com:6888`; override with `-Dfrostwire.icebridge.seeds=host:port,...`, empty disables) | **preferred**; retried within seconds |
+| LAN multicast beacon (`LanPeerBeacon`, UDP 6890, group 239.255.70.88) | private IPv4 senders and their identity port | **preferred**; needed because the DHT only knows our public address and routers refuse to connect a machine to its own public address |
+| DHT (`DhtPeerDiscoverySource`) | `frostwire-bootstrap-v1` (preferred), then `frostwire-relays-v1`, then `frostwire-peers-v1` | the relay/peer topics hold every desktop and phone, mostly unreachable |
+
+A pass probes preferred candidates first, the rest shuffled, up to 64, **in parallel** (8 at a time, 3s
+connect cap, 15s pass budget). Endpoints that fail back off (30s doubling to 10 min; preferred ones 5s
+doubling to 1 min) so successive passes cover the whole list instead of re-probing the same dead ones.
+Only the parent process announces on the DHT; the desktop `icebridge.jar` child runs with `--no-dht`.
+
 ### Peer liveness and pruning
 
 `PeerDirectory` tracks last contact and consecutive delivery failures per peer
