@@ -197,6 +197,72 @@ class ControlServerTest {
     assertEquals("queued", body.data);
   }
 
+  @Test
+  void probeStartsAnIdentityDiscoveryHandshakeAndKeepsReportingPending() throws Exception {
+    ProbeRequest req = new ProbeRequest();
+    req.host = "198.51.100.9";
+    req.port = 6889;
+
+    for (int i = 0; i < 2; i++) {
+      HttpResponse<String> response = post("/probe", req);
+      assertEquals(200, response.statusCode(), response.body());
+      com.google.gson.JsonObject body =
+          com.google.gson.JsonParser.parseString(response.body()).getAsJsonObject();
+      assertTrue(body.get("ok").getAsBoolean(), response.body());
+      assertEquals("pending", body.getAsJsonObject("data").get("state").getAsString());
+      assertFalse(body.getAsJsonObject("data").has("pub"));
+    }
+    assertEquals(1, rudpSessionManager.sessionCount(), "polling must not open more handshakes");
+  }
+
+  @Test
+  void probeCancelDropsTheUnansweredHandshake() throws Exception {
+    ProbeRequest req = new ProbeRequest();
+    req.host = "198.51.100.9";
+    req.port = 6889;
+    assertEquals(200, post("/probe", req).statusCode());
+    assertEquals(1, rudpSessionManager.sessionCount());
+
+    req.cancel = true;
+    HttpResponse<String> response = post("/probe", req);
+
+    assertEquals(200, response.statusCode(), response.body());
+    assertTrue(response.body().contains("\"state\":\"none\""), response.body());
+    assertEquals(0, rudpSessionManager.sessionCount());
+  }
+
+  @Test
+  void probeRejectsMalformedRequestsAndNames() throws Exception {
+    ProbeRequest noHost = new ProbeRequest();
+    noHost.port = 6889;
+    assertEquals(400, post("/probe", noHost).statusCode());
+
+    ProbeRequest badPort = new ProbeRequest();
+    badPort.host = "198.51.100.9";
+    badPort.port = 70000;
+    assertEquals(400, post("/probe", badPort).statusCode());
+
+    ProbeRequest dnsName = new ProbeRequest();
+    dnsName.host = "example.com";
+    dnsName.port = 6889;
+    HttpResponse<String> response = post("/probe", dnsName);
+    assertEquals(200, response.statusCode(), "a name is simply not probed");
+    assertTrue(response.body().contains("\"state\":\"none\""), response.body());
+    assertEquals(0, rudpSessionManager.sessionCount());
+  }
+
+  @Test
+  void probeRequiresTheControlToken() throws Exception {
+    HttpRequest request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl() + "/probe"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString("{\"host\":\"198.51.100.9\",\"port\":6889}"))
+            .build();
+    assertEquals(401, HTTP.send(request, HttpResponse.BodyHandlers.ofString()).statusCode());
+    assertEquals(0, rudpSessionManager.sessionCount());
+  }
+
   private String signRegister(RegisterRequest req) throws Exception {
     Signature signer = IdentityKeys.softwareSignature("Ed25519");
     signer.initSign(identity.ed25519().getPrivate());

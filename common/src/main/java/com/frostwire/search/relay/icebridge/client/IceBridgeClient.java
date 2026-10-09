@@ -13,6 +13,8 @@ import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeConstants;
 import com.frostwire.search.relay.icebridge.control.ApiResponse;
 import com.frostwire.search.relay.icebridge.control.PeerInfo;
+import com.frostwire.search.relay.icebridge.control.ProbeRequest;
+import com.frostwire.search.relay.icebridge.control.ProbeResponse;
 import com.frostwire.search.relay.icebridge.control.RegisterRequest;
 import com.frostwire.search.relay.icebridge.control.RouteRequest;
 import com.frostwire.search.relay.icebridge.control.SendRequest;
@@ -267,6 +269,72 @@ public final class IceBridgeClient implements AutoCloseable {
         ApiResponse<?> response = post("/route", req, new TypeToken<ApiResponse<?>>() {
         });
         return response != null && response.ok;
+    }
+
+    /** State of an rUDP identity-discovery handshake, see {@link #probe(String, int, boolean)}. */
+    public enum ProbeState { NONE, PENDING, ESTABLISHED }
+
+    public static final class ProbeOutcome {
+        private final ProbeState state;
+        private final byte[] pub;
+
+        ProbeOutcome(ProbeState state, byte[] pub) {
+            this.state = state;
+            this.pub = pub == null ? null : pub.clone();
+        }
+
+        public ProbeState state() {
+            return state;
+        }
+
+        /** Authenticated 32-byte Ed25519 key of the endpoint; only when {@link ProbeState#ESTABLISHED}. */
+        public byte[] pub() {
+            return pub == null ? null : pub.clone();
+        }
+    }
+
+    /**
+     * Identity discovery over rUDP: ask the daemon to open (or poll) an identity-free handshake with
+     * {@code host:port} (literal address). Poll until {@code ESTABLISHED}, then {@code cancel} on
+     * timeout so a dead endpoint does not hold a session in the daemon.
+     */
+    public ProbeOutcome probe(String host, int port, boolean cancel) {
+        if (host == null || host.isEmpty() || port <= 0 || port > 65535) {
+            return new ProbeOutcome(ProbeState.NONE, null);
+        }
+        ProbeRequest req = new ProbeRequest();
+        req.host = host;
+        req.port = port;
+        req.cancel = cancel;
+        ApiResponse<ProbeResponse> response = post("/probe", req,
+                new TypeToken<ApiResponse<ProbeResponse>>() {
+                });
+        if (response == null || !response.ok || response.data == null || response.data.state == null) {
+            return new ProbeOutcome(ProbeState.NONE, null);
+        }
+        ProbeState state;
+        switch (response.data.state) {
+            case "established":
+                state = ProbeState.ESTABLISHED;
+                break;
+            case "pending":
+                state = ProbeState.PENDING;
+                break;
+            default:
+                return new ProbeOutcome(ProbeState.NONE, null);
+        }
+        byte[] pub = null;
+        if (state == ProbeState.ESTABLISHED) {
+            try {
+                pub = Base64.getUrlDecoder().decode(response.data.pub);
+            } catch (RuntimeException e) {
+                return new ProbeOutcome(ProbeState.NONE, null);
+            }
+            if (pub.length != 32) {
+                return new ProbeOutcome(ProbeState.NONE, null);
+            }
+        }
+        return new ProbeOutcome(state, pub);
     }
 
     /**

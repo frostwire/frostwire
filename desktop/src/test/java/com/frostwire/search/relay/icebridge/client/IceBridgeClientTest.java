@@ -78,6 +78,29 @@ class IceBridgeClientTest {
   }
 
   @Test
+  void probePollsAnIdentityDiscoveryHandshakeAndCancelsIt() {
+    IceBridgeClient.ProbeOutcome first = client.probe("198.51.100.9", 6889, false);
+    IceBridgeClient.ProbeOutcome second = client.probe("198.51.100.9", 6889, false);
+
+    assertEquals(IceBridgeClient.ProbeState.PENDING, first.state());
+    assertEquals(IceBridgeClient.ProbeState.PENDING, second.state());
+    assertNull(second.pub());
+    assertEquals(1, rudpSessionManager.sessionCount());
+
+    assertEquals(IceBridgeClient.ProbeState.NONE, client.probe("198.51.100.9", 6889, true).state());
+    assertEquals(0, rudpSessionManager.sessionCount());
+  }
+
+  @Test
+  void probeIgnoresInvalidEndpointsWithoutCallingTheDaemon() {
+    assertEquals(IceBridgeClient.ProbeState.NONE, client.probe(null, 6889, false).state());
+    assertEquals(IceBridgeClient.ProbeState.NONE, client.probe("", 6889, false).state());
+    assertEquals(IceBridgeClient.ProbeState.NONE, client.probe("198.51.100.9", 0, false).state());
+    assertEquals(IceBridgeClient.ProbeState.NONE, client.probe("example.com", 6889, false).state());
+    assertEquals(0, rudpSessionManager.sessionCount());
+  }
+
+  @Test
   void healthReturnsOk() {
     assertTrue(client.health());
   }

@@ -134,6 +134,8 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
                 response = handleConsumer(request);
             } else if (method == HttpMethod.POST && "/route".equals(path)) {
                 response = handleRoute(request);
+            } else if (method == HttpMethod.POST && "/probe".equals(path)) {
+                response = handleProbe(request);
             } else if (method == HttpMethod.GET && "/lookup".equals(path)) {
                 response = handleLookup(uri);
             } else if (method == HttpMethod.POST && "/send".equals(path)) {
@@ -269,6 +271,22 @@ public final class ControlHandler extends SimpleChannelInboundHandler<FullHttpRe
         return accepted
                 ? ApiResponse.success("routed")
                 : ApiResponse.error("rate limited or at capacity");
+    }
+
+    /** Identity discovery over rUDP: open or poll a handshake with an {@code ip:udpPort}. */
+    private ApiResponse<ProbeResponse> handleProbe(FullHttpRequest request) {
+        ProbeRequest req = decodeBody(request, ProbeRequest.class);
+        if (req == null || req.host == null || req.host.isEmpty()) {
+            return ApiResponse.error("host is required");
+        }
+        if (req.port <= 0 || req.port > 65535) {
+            return ApiResponse.error("port must be in [1, 65535]");
+        }
+        RudpSessionManager.ProbeResult result =
+                rudpSessionManager.probe(req.host, req.port, req.cancel);
+        String pub = result.pub() == null ? null : Base64.getUrlEncoder().withoutPadding().encodeToString(result.pub());
+        return ApiResponse.success(new ProbeResponse(
+                result.state().name().toLowerCase(java.util.Locale.ROOT), pub));
     }
 
     private ApiResponse<List<PeerInfo>> handleLookup(String uri) {
