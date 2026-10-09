@@ -70,6 +70,8 @@ import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -143,6 +145,7 @@ public final class AndroidRelayStack implements AutoCloseable {
   private final PeerDirectory peerDirectory;
   private final PeerRegistrySync peerRegistrySync;
   private final PeerDiscoveryScheduler peerDiscoveryScheduler;
+  private final AndroidLanBeacon lanBeacon;
   private final PublicationOwners publications;
   private final LeafPromotionManager leafPromotion;
   private final BTEngine btEngine;
@@ -263,6 +266,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     PeerDirectory pd = null;
     PeerRegistrySync prs = null;
     PeerDiscoveryScheduler pds = null;
+    AndroidLanBeacon lanBeacon = null;
     DhtAdvertiser da = null;
     AndroidKarmaChainStore ks = null;
     KarmaChainCommitScheduler kcs = null;
@@ -491,8 +495,18 @@ public final class AndroidRelayStack implements AutoCloseable {
       observer.phase(RelayStartupTracker.Phase.DISCOVERY);
       DhtPeerDiscoverySource dhtDiscoverySource = new DhtPeerDiscoverySource(btEngine);
       byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
-      PeerDiscoverySource discoverySource =
-          new CompositePeerDiscoverySource(new HostCachePeerDiscoverySource(), dhtDiscoverySource);
+      List<PeerDiscoverySource> discoverySources = new ArrayList<>();
+      discoverySources.add(new HostCachePeerDiscoverySource());
+      if (srv != null && meshRudpPort > 0) {
+        // Phones on the same wifi cannot reach each other (or a desktop) through the public
+        // address the DHT knows: routers refuse to loop back to their own public address. With our
+        // own embedded node we announce its rUDP port to the LAN, like the desktop does; a remote
+        // IceBridge owns the endpoint, so there is nothing of ours to announce.
+        lanBeacon = AndroidLanBeacon.start(context, meshRudpPort);
+        discoverySources.add(lanBeacon);
+      }
+      discoverySources.add(dhtDiscoverySource);
+      PeerDiscoverySource discoverySource = new CompositePeerDiscoverySource(discoverySources);
       // Candidates ({@code ip:udpPort}) are verified with the rUDP identity handshake that the
       // IceBridge daemon performs: no inbound TCP port is needed, so a peer that can be reached
       // over UDP can be found. Host pings in Settings use the same handshake.
@@ -610,6 +624,7 @@ public final class AndroidRelayStack implements AutoCloseable {
               pd,
               prs,
               pds,
+              lanBeacon,
               da,
               ks,
               kcs,
@@ -629,6 +644,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       pd = null;
       prs = null;
       pds = null;
+      lanBeacon = null;
       da = null;
       ks = null;
       kcs = null;
@@ -680,6 +696,7 @@ public final class AndroidRelayStack implements AutoCloseable {
           pds.stop();
         } catch (Throwable ignored) {
         }
+      if (lanBeacon != null) lanBeacon.close();
       if (prs != null)
         try {
           prs.close();
@@ -706,6 +723,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       PeerDirectory peerDirectory,
       PeerRegistrySync peerRegistrySync,
       PeerDiscoveryScheduler peerDiscoveryScheduler,
+      AndroidLanBeacon lanBeacon,
       DhtAdvertiser dhtAdvertiser,
       KarmaChainStore karmaStore,
       KarmaChainCommitScheduler karmaScheduler,
@@ -727,6 +745,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.peerDirectory = peerDirectory;
     this.peerRegistrySync = peerRegistrySync;
     this.peerDiscoveryScheduler = peerDiscoveryScheduler;
+    this.lanBeacon = lanBeacon;
     this.publications =
         new PublicationOwners(
             dhtAdvertiser, karmaScheduler, endorsementListener, karmaWriter, karmaStore);
@@ -959,6 +978,11 @@ public final class AndroidRelayStack implements AutoCloseable {
       peerDiscoveryScheduler.stop();
     } catch (Throwable t) {
       LOG.warn("Error stopping PeerDiscoveryScheduler", t);
+    }
+    try {
+      if (lanBeacon != null) lanBeacon.close();
+    } catch (Throwable t) {
+      LOG.warn("Error closing AndroidLanBeacon", t);
     }
     try {
       peerRegistrySync.close();

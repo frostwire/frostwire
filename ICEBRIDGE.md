@@ -53,7 +53,7 @@ rUDP identity-discovery handshake (`POST /probe`, an identity-free HELLO that pr
 | Source | Candidates | Notes |
 |--------|------------|-------|
 | Host cache + built-in seeds (`HostCachePeerDiscoverySource`) | every cached server, plus `RelayConstants.seedHosts()` (`virginia1.frostwire.com:6889`; override with `-Dfrostwire.icebridge.seeds=host:port,...`, empty disables) | **preferred**; retried within seconds |
-| LAN multicast beacon (`LanPeerBeacon`, UDP 6890, group 239.255.70.88) | private IPv4 senders and their rUDP port | **preferred**; needed because the DHT only knows our public address and routers refuse to connect a machine to its own public address |
+| LAN multicast beacon (`LanPeerBeacon`, UDP 6890, group 239.255.70.88; on Android `AndroidLanBeacon` holds a wifi `MulticastLock` and only runs with the embedded node) | private IPv4 senders and their rUDP port | **preferred**; needed because the DHT only knows our public address and routers refuse to connect a machine to its own public address |
 | DHT (`DhtPeerDiscoverySource`) | `frostwire-bootstrap-v1` (preferred), then `frostwire-relays-v1`, then `frostwire-peers-v1` | the relay/peer topics hold every desktop and phone, mostly unreachable |
 
 A pass probes preferred candidates first, the rest shuffled, up to 64, **in parallel** (8 at a time, 3s
