@@ -221,6 +221,69 @@ public final class RudpSessionManager {
         return session == null ? -1 : session.localConnectionId();
     }
 
+    /** Outcome of {@link #probe(String, int, boolean)}. */
+    public enum ProbeState {
+        /** No handshake exists (nothing started, the endpoint was invalid, or it was cancelled). */
+        NONE,
+        /** The HELLO was sent but the endpoint has not completed the handshake yet. */
+        PENDING,
+        /** The endpoint proved possession of an identity key; see {@link ProbeResult#pub()}. */
+        ESTABLISHED
+    }
+
+    public static final class ProbeResult {
+        private final ProbeState state;
+        private final byte[] pub;
+
+        ProbeResult(ProbeState state, byte[] pub) {
+            this.state = state;
+            this.pub = pub == null ? null : pub.clone();
+        }
+
+        public ProbeState state() {
+            return state;
+        }
+
+        /** The authenticated 32-byte Ed25519 key of the endpoint; only set when ESTABLISHED. */
+        public byte[] pub() {
+            return pub == null ? null : pub.clone();
+        }
+    }
+
+    /**
+     * Identity discovery over rUDP. A node that only knows {@code ip:udpPort} (DHT announce, LAN
+     * beacon, seed list, host cache) calls this repeatedly: the first call opens a handshake that
+     * pins no expected identity, later calls report whether the endpoint has finished proving
+     * possession of its key. The session is the same one the mesh then uses to talk to that peer.
+     * Only literal addresses are accepted: no DNS runs on a caller thread. {@code cancel} drops a
+     * handshake that never completed so a dead endpoint does not hold a session until it times out.
+     */
+    public synchronized ProbeResult probe(String host, int port, boolean cancel) {
+        InetSocketAddress address = literalAddress(host, port);
+        if (closed || !validAddress(address) || isLocalRudpEndpoint(address)) {
+            return new ProbeResult(ProbeState.NONE, null);
+        }
+        RudpSession session = sessionsByAddress.get(address);
+        if (cancel) {
+            if (session == null) {
+                return new ProbeResult(ProbeState.NONE, null);
+            }
+            if (!session.isAuthenticated()) {
+                dropSession(session);
+                return new ProbeResult(ProbeState.NONE, null);
+            }
+        } else if (session == null) {
+            session = connectSession(address, expectedPeer(address));
+            if (session == null) {
+                return new ProbeResult(ProbeState.NONE, null);
+            }
+        }
+        byte[] pub = session.remotePub();
+        return session.isAuthenticated() && pub != null
+                ? new ProbeResult(ProbeState.ESTABLISHED, pub)
+                : new ProbeResult(ProbeState.PENDING, null);
+    }
+
     private RudpSession connectSession(InetSocketAddress address, byte[] expectedPub) {
         if (closed || !validAddress(address)) {
             return null;
