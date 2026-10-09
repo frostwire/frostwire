@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">A portok addig nem érhetők el, amíg a verem el nem indul</string>
     <string name="distributed_icebridge_start">IceBridge indítása / újraindítása</string>
     <string name="distributed_icebridge_start_summary">A folyamaton belüli IceBridge-hálót elindítja, ha nem fut, vagy kényszerített újraindítást végez</string>
-    <string name="icebridge_public_catalog_title">Oszd meg nyilvánosan a megosztási katalógusomat (bejárók)</string>
-    <string name="icebridge_public_catalog_summary">Engedje, hogy a hálózat bejárói indexeljék azokat a torrenteket, amelyeket aktívan seedel. A nem seedelt letöltési előzmények soha nem kerülnek közzétételre. Alapértelmezés szerint bekapcsolva.</string>
+    <string name="icebridge_public_catalog_title">Katalógusom megosztása, hogy az emberek böngészhessék, a crawlerek pedig indexelhessék</string>
+    <string name="icebridge_public_catalog_summary">Lehetővé teszi, hogy az emberek keresés nélkül böngésszék mindazt, amit éppen seedelsz, a crawlerek pedig indexeljék a hálózatot. A nem seedelt letöltési előzmények soha nem kerülnek közzétételre.</string>
+    <string name="icebridge_join_title">Csatlakozás az IceBridge hálózathoz: keresés más felhasználók torrentjei között, és engedd, hogy megtalálják az általam seedelteket</string>
+    <string name="icebridge_join_note">Amíg ez be van kapcsolva, bárki, aki az elosztott keresést használja, megtalálhatja az éppen seedelt torrentjeidet, ha a kulcsszavai egyeznek, még akkor is, ha lent nem osztod meg a katalógusodat. A hálózat elhagyásához kapcsold ki.</string>
     <string name="icebridge_public_catalog_wizard_title">A seedelés közzététel</string>
-    <string name="icebridge_public_catalog_wizard_description">Amikor seedel egy torrentet, közzéteszi azt a BitTorrent hálózaton, hogy mások megtalálhassák és letölthessék. Kiválaszthatja, hogy a hálózat bejárói indexelhessék-e azokat a torrenteket is, amelyeket aktívan seedel.</string>
-    <string name="icebridge_public_catalog_wizard_label">Engedje, hogy a bejárók böngésszék az általam aktívan seedelt torrenteket</string>
+    <string name="icebridge_public_catalog_wizard_description">Amikor seedel egy torrentet, közzéteszi azt a BitTorrent hálózaton, hogy mások megtalálhassák és letölthessék. Alább válaszd ki, hogyan veszel részt az IceBridge hálózatban.</string>
     <string name="peer_catalog_browse_action">Megosztott torrentek böngészése</string>
     <string name="peer_catalog_title">Megosztott torrentek</string>
     <string name="distributed_icebridge_start_ok">Az IceBridge-verem elindult</string>

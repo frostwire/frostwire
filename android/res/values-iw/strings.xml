@@ -614,11 +614,12 @@
     <string name="distributed_icebridge_config_unknown">היציאות אינן זמינות עד שהמחסנית תופעל</string>
     <string name="distributed_icebridge_start">הפעל / הפעל מחדש את IceBridge</string>
     <string name="distributed_icebridge_start_summary">הפעל את רשת IceBridge בתוך התהליך אם היא אינה פועלת, או אלץ הפעלה מחדש</string>
-    <string name="icebridge_public_catalog_title">שתף את קטלוג השיתוף שלי באופן ציבורי (סורקים)</string>
-    <string name="icebridge_public_catalog_summary">אפשר לסורקי הרשת לאנדקס את הטורנטים שאתה עושה להם seed באופן פעיל. היסטוריית הורדות שאינה עושה seed לא מתפרסמת לעולם. פעיל כברירת מחדל.</string>
+    <string name="icebridge_public_catalog_title">שיתוף הקטלוג שלי כדי שאנשים יוכלו לעיין בו וזחלנים יוכלו לאנדקס אותו</string>
+    <string name="icebridge_public_catalog_summary">מאפשר לאנשים לעיין בכל מה שאתה זורע כעת בלי לחפש, ולזחלנים לאנדקס את הרשת. היסטוריית הורדות שאינה נזרעת לעולם אינה מפורסמת.</string>
+    <string name="icebridge_join_title">הצטרפות לרשת IceBridge: חיפוש טורנטים של משתמשים אחרים ומתן אפשרות להם למצוא את אלה שאני זורע</string>
+    <string name="icebridge_join_note">כל עוד האפשרות מופעלת, כל מי שמשתמש בחיפוש מבוזר יכול למצוא את הטורנטים שאתה זורע כעת כאשר מילות המפתח שלו תואמות, גם אם אינך משתף את הקטלוג שלך למטה. כבה כדי לעזוב את הרשת.</string>
     <string name="icebridge_public_catalog_wizard_title">לעשות seed זה לפרסם</string>
-    <string name="icebridge_public_catalog_wizard_description">כאשר אתה עושה seed לטורנט, אתה מפרסם אותו ברשת BitTorrent כדי שאחרים יוכלו למצוא ולהוריד אותו. אתה יכול לבחור אם סורקי הרשת יוכלו לאנדקס גם את הטורנטים שאתה עושה להם seed באופן פעיל.</string>
-    <string name="icebridge_public_catalog_wizard_label">אפשר לסורקים לעיין בטורנטים שאני עושה להם seed באופן פעיל</string>
+    <string name="icebridge_public_catalog_wizard_description">כאשר אתה עושה seed לטורנט, אתה מפרסם אותו ברשת BitTorrent כדי שאחרים יוכלו למצוא ולהוריד אותו. בחר למטה כיצד תשתתף ברשת IceBridge.</string>
     <string name="peer_catalog_browse_action">עיין בטורנטים משותפים</string>
     <string name="peer_catalog_title">טורנטים משותפים</string>
     <string name="distributed_icebridge_start_ok">מחסנית IceBridge הופעלה</string>

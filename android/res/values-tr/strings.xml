@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Yığın başlayana kadar bağlantı noktaları kullanılamaz</string>
     <string name="distributed_icebridge_start">IceBridge\'i başlat / yeniden başlat</string>
     <string name="distributed_icebridge_start_summary">İşlem içi IceBridge ağı çalışmıyorsa başlatın veya yeniden başlatmaya zorlayın</string>
-    <string name="icebridge_public_catalog_title">Paylaşım kataloğumu herkese açık paylaş (tarayıcılar)</string>
-    <string name="icebridge_public_catalog_summary">Ağın tarayıcılarının etkin olarak seed ettiğiniz torrentleri dizinlemesine izin verin. Seed edilmeyen indirme geçmişi hiçbir zaman yayımlanmaz. Varsayılan olarak açık.</string>
+    <string name="icebridge_public_catalog_title">Kataloğumu paylaş; insanlar göz atabilsin, tarayıcılar dizinleyebilsin</string>
+    <string name="icebridge_public_catalog_summary">İnsanların aramadan şu anda seed ettiğiniz her şeye göz atmasına ve tarayıcıların ağı dizinlemesine izin verir. Seed edilmeyen indirme geçmişi asla yayımlanmaz.</string>
+    <string name="icebridge_join_title">IceBridge ağına katıl: diğer kullanıcıların torrentlerini ara ve onların benim seed ettiklerimi bulmasına izin ver</string>
+    <string name="icebridge_join_note">Bu açıkken, Dağıtık aramayı kullanan herkes anahtar kelimeleri eşleştiğinde şu anda seed ettiğiniz torrentleri bulabilir; aşağıda kataloğunuzu paylaşmasanız bile. Ağdan ayrılmak için kapatın.</string>
     <string name="icebridge_public_catalog_wizard_title">Seed etmek yayımlamaktır</string>
-    <string name="icebridge_public_catalog_wizard_description">Bir torrenti seed ettiğinizde, onu BitTorrent ağında yayımlarsınız; böylece başkaları bulup indirebilir. Ağın tarayıcılarının da etkin olarak seed ettiğiniz torrentleri dizinleyip dizinleyemeyeceğini seçebilirsiniz.</string>
-    <string name="icebridge_public_catalog_wizard_label">Tarayıcıların etkin olarak seed ettiğim torrentlere göz atmasına izin ver</string>
+    <string name="icebridge_public_catalog_wizard_description">Bir torrenti seed ettiğinizde, onu BitTorrent ağında yayımlarsınız; böylece başkaları bulup indirebilir. IceBridge ağına nasıl katılacağınızı aşağıdan seçin.</string>
     <string name="peer_catalog_browse_action">Paylaşılan torrentlere göz at</string>
     <string name="peer_catalog_title">Paylaşılan torrentler</string>
     <string name="distributed_icebridge_start_ok">IceBridge yığını başlatıldı</string>

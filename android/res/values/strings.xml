@@ -517,11 +517,12 @@
     <string name="distributed_icebridge_restart_hint_summary">After changing ports or role, use Start / restart IceBridge below.</string>
     <string name="distributed_icebridge_start">Start / restart IceBridge</string>
     <string name="distributed_icebridge_start_summary">Start the in-process IceBridge mesh if it is not running, or force-restart it</string>
-    <string name="icebridge_public_catalog_title">Make shared torrents catalog crawlable</string>
-    <string name="icebridge_public_catalog_summary">Let the network\'s crawlers index the torrents you are actively seeding. Downloaded history that is not seeding is never published. On by default.</string>
+    <string name="icebridge_public_catalog_title">Share my catalog so people can browse it and crawlers can index it</string>
+    <string name="icebridge_public_catalog_summary">Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published.</string>
+    <string name="icebridge_join_title">Join the IceBridge network: search other users\' torrents and let them find the ones I am seeding</string>
+    <string name="icebridge_join_note">While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network.</string>
     <string name="icebridge_public_catalog_wizard_title">Seeding is publishing</string>
-    <string name="icebridge_public_catalog_wizard_description">When you seed a torrent, you publish it to the BitTorrent network so other people can find and download it. You can choose whether the network\'s crawlers may also index the torrents you are actively seeding.</string>
-    <string name="icebridge_public_catalog_wizard_label">Let crawlers browse the torrents I am actively seeding</string>
+    <string name="icebridge_public_catalog_wizard_description">When you seed a torrent, you publish it to the BitTorrent network so other people can find and download it. Choose below how you take part in the IceBridge network.</string>
     <string name="peer_catalog_browse_action">Browse Shared Torrents</string>
     <string name="peer_catalog_title">Shared Torrents</string>
     <string name="peer_catalog_download_failed">Could not start this download. Refresh the peer\'s catalog and try again. Check Transfers for an existing download or error.</string>

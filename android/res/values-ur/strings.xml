@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">اسٹیک شروع ہونے تک پورٹس دستیاب نہیں</string>
     <string name="distributed_icebridge_start">IceBridge شروع / دوبارہ شروع کریں</string>
     <string name="distributed_icebridge_start_summary">اگر ان-پروسیس IceBridge میش نہیں چل رہا تو اسے شروع کریں، یا زبردستی دوبارہ شروع کریں</string>
-    <string name="icebridge_public_catalog_title">مشترکہ ٹورنٹ کیٹلاگ کو کرال کے قابل بنائیں</string>
-    <string name="icebridge_public_catalog_summary">نیٹ ورک کے کرالرز کو ان ٹورنٹس کی فہرست بنانے دیں جو آپ فعال طور پر سیڈ کر رہے ہیں۔ جو ڈاؤن لوڈ ہسٹری سیڈ نہیں ہو رہی وہ کبھی شائع نہیں کی جاتی۔ بطور ڈیفالٹ آن۔</string>
+    <string name="icebridge_public_catalog_title">میرا کیٹلاگ شیئر کریں تاکہ لوگ اسے براؤز کر سکیں اور کرالرز اسے انڈیکس کر سکیں</string>
+    <string name="icebridge_public_catalog_summary">لوگوں کو تلاش کیے بغیر وہ سب کچھ براؤز کرنے دیتا ہے جو آپ فعال طور پر سیڈ کر رہے ہیں، اور کرالرز کو نیٹ ورک انڈیکس کرنے دیتا ہے۔ جو ڈاؤن لوڈ ہسٹری سیڈ نہیں ہو رہی وہ کبھی شائع نہیں ہوتی۔</string>
+    <string name="icebridge_join_title">IceBridge نیٹ ورک میں شامل ہوں: دوسرے صارفین کے ٹورنٹس تلاش کریں اور انہیں وہ ٹورنٹس تلاش کرنے دیں جو میں سیڈ کر رہا ہوں</string>
+    <string name="icebridge_join_note">جب تک یہ آن ہے، تقسیم شدہ تلاش استعمال کرنے والا کوئی بھی شخص کلیدی الفاظ مماثل ہونے پر آپ کے فعال طور پر سیڈ کیے جانے والے ٹورنٹس تلاش کر سکتا ہے، چاہے آپ نیچے اپنا کیٹلاگ شیئر نہ کریں۔ نیٹ ورک چھوڑنے کے لیے اسے بند کریں۔</string>
     <string name="icebridge_public_catalog_wizard_title">سیڈ کرنا شائع کرنا ہے</string>
-    <string name="icebridge_public_catalog_wizard_description">جب آپ کوئی ٹورنٹ سیڈ کرتے ہیں تو آپ اسے BitTorrent نیٹ ورک پر شائع کرتے ہیں تاکہ دوسرے اسے تلاش کر کے ڈاؤن لوڈ کر سکیں۔ آپ منتخب کر سکتے ہیں کہ نیٹ ورک کے کرالرز ان ٹورنٹس کو بھی انڈیکس کر سکیں جو آپ فعال طور پر سیڈ کر رہے ہیں۔</string>
-    <string name="icebridge_public_catalog_wizard_label">کرالرز کو وہ ٹورنٹس براؤز کرنے دیں جو میں فعال طور پر سیڈ کر رہا ہوں</string>
+    <string name="icebridge_public_catalog_wizard_description">جب آپ کوئی ٹورنٹ سیڈ کرتے ہیں تو آپ اسے BitTorrent نیٹ ورک پر شائع کرتے ہیں تاکہ دوسرے اسے تلاش کر کے ڈاؤن لوڈ کر سکیں۔ نیچے منتخب کریں کہ آپ IceBridge نیٹ ورک میں کیسے حصہ لیں گے۔</string>
     <string name="peer_catalog_browse_action">مشترکہ ٹورنٹس براؤز کریں</string>
     <string name="peer_catalog_title">مشترکہ ٹورنٹس</string>
     <string name="distributed_icebridge_start_ok">IceBridge اسٹیک شروع ہو گیا</string>

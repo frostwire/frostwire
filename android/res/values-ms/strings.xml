@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Port tidak tersedia sehingga tindanan bermula</string>
     <string name="distributed_icebridge_start">Mulakan / mulakan semula IceBridge</string>
     <string name="distributed_icebridge_start_summary">Mulakan mesh IceBridge dalam proses jika ia tidak berjalan, atau paksa mulakan semula</string>
-    <string name="icebridge_public_catalog_title">Kongsi katalog kongsi saya secara awam (crawler)</string>
-    <string name="icebridge_public_catalog_summary">Benarkan crawler rangkaian mengindeks torrent yang anda seed secara aktif. Sejarah muat turun yang tidak di-seed tidak pernah diterbitkan. Dihidupkan secara lalai.</string>
+    <string name="icebridge_public_catalog_title">Kongsi katalog saya supaya orang boleh menyemaknya dan perangkak boleh mengindeksnya</string>
+    <string name="icebridge_public_catalog_summary">Membolehkan orang menyemak semua yang sedang anda seed tanpa mencarinya, dan perangkak mengindeks rangkaian. Sejarah muat turun yang tidak di-seed tidak pernah diterbitkan.</string>
+    <string name="icebridge_join_title">Sertai rangkaian IceBridge: cari torrent pengguna lain dan biarkan mereka menemui torrent yang saya seed</string>
+    <string name="icebridge_join_note">Selagi ini dihidupkan, sesiapa yang menggunakan Carian Teragih boleh menemui torrent yang sedang anda seed apabila kata kuncinya sepadan, walaupun anda tidak berkongsi katalog anda di bawah. Matikan untuk keluar dari rangkaian.</string>
     <string name="icebridge_public_catalog_wizard_title">Seed ialah penerbitan</string>
-    <string name="icebridge_public_catalog_wizard_description">Apabila anda melakukan seed untuk torrent, anda menerbitkannya pada rangkaian BitTorrent supaya orang lain boleh menemuinya dan memuat turunnya. Anda boleh memilih sama ada crawler rangkaian juga boleh mengindeks torrent yang anda seed secara aktif.</string>
-    <string name="icebridge_public_catalog_wizard_label">Benarkan crawler melayari torrent yang sedang saya seed secara aktif</string>
+    <string name="icebridge_public_catalog_wizard_description">Apabila anda melakukan seed untuk torrent, anda menerbitkannya pada rangkaian BitTorrent supaya orang lain boleh menemuinya dan memuat turunnya. Pilih di bawah bagaimana anda mengambil bahagian dalam rangkaian IceBridge.</string>
     <string name="peer_catalog_browse_action">Semak imbas Torrent Dikongsi</string>
     <string name="peer_catalog_title">Torrent Dikongsi</string>
     <string name="distributed_icebridge_start_ok">Tindanan IceBridge dimulakan</string>

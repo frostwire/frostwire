@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Порти недоступні, доки не запуститься стек</string>
     <string name="distributed_icebridge_start">Запустити / перезапустити IceBridge</string>
     <string name="distributed_icebridge_start_summary">Запустити мережу IceBridge в процесі, якщо вона не працює, або примусово перезапустити її</string>
-    <string name="icebridge_public_catalog_title">Публічно ділитися моїм каталогом спільних файлів (краулери)</string>
-    <string name="icebridge_public_catalog_summary">Дозвольте краулерам мережі індексувати торенти, які ви активно роздаєте. Історія завантажень, яка не роздається, ніколи не публікується. Увімкнено за замовчуванням.</string>
+    <string name="icebridge_public_catalog_title">Поділитися моїм каталогом, щоб люди могли його переглядати, а краулери індексувати</string>
+    <string name="icebridge_public_catalog_summary">Дозволяє людям переглядати все, що ви зараз роздаєте, без пошуку, а краулерам індексувати мережу. Історія завантажень, які не роздаються, ніколи не публікується.</string>
+    <string name="icebridge_join_title">Приєднатися до мережі IceBridge: шукати торенти інших користувачів і дозволити їм знаходити ті, що я роздаю</string>
+    <string name="icebridge_join_note">Поки опція ввімкнена, будь-хто, хто користується розподіленим пошуком, може знайти торенти, які ви роздаєте, якщо збігаються ключові слова, навіть якщо ви не ділитеся каталогом нижче. Вимкніть, щоб залишити мережу.</string>
     <string name="icebridge_public_catalog_wizard_title">Роздача — це публікація</string>
-    <string name="icebridge_public_catalog_wizard_description">Коли ви роздаєте торент, ви публікуєте його в мережі BitTorrent, щоб інші могли його знайти й завантажити. Ви можете вибрати, чи можуть краулери мережі також індексувати торенти, які ви активно роздаєте.</string>
-    <string name="icebridge_public_catalog_wizard_label">Дозволити краулерам переглядати торенти, які я активно роздаю</string>
+    <string name="icebridge_public_catalog_wizard_description">Коли ви роздаєте торент, ви публікуєте його в мережі BitTorrent, щоб інші могли його знайти й завантажити. Виберіть нижче, як ви берете участь у мережі IceBridge.</string>
     <string name="peer_catalog_browse_action">Переглянути спільні торенти</string>
     <string name="peer_catalog_title">Спільні торенти</string>
     <string name="distributed_icebridge_start_ok">Стек IceBridge запущено</string>

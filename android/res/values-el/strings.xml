@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Οι θύρες δεν είναι διαθέσιμες μέχρι να ξεκινήσει η στοίβα</string>
     <string name="distributed_icebridge_start">Έναρξη / επανεκκίνηση IceBridge</string>
     <string name="distributed_icebridge_start_summary">Έναρξη του δικτύου IceBridge εντός διεργασίας αν δεν εκτελείται, ή εξαναγκασμένη επανεκκίνηση</string>
-    <string name="icebridge_public_catalog_title">Δημόσιος διαμοιρασμός του καταλόγου κοινόχρηστων αρχείων μου (crawlers)</string>
-    <string name="icebridge_public_catalog_summary">Αφήστε τους crawlers του δικτύου να ευρετηριάσουν τα torrent που κάνετε ενεργά seed. Το ιστορικό λήψεων που δεν κάνει seed δεν δημοσιεύεται ποτέ. Ενεργοποιημένο από προεπιλογή.</string>
+    <string name="icebridge_public_catalog_title">Κοινοποίηση του καταλόγου μου ώστε οι χρήστες να τον περιηγούνται και οι crawlers να τον ευρετηριάζουν</string>
+    <string name="icebridge_public_catalog_summary">Επιτρέπει σε όλους να περιηγούνται σε ό,τι μοιράζεστε ενεργά χωρίς αναζήτηση και στους crawlers να ευρετηριάζουν το δίκτυο. Το ιστορικό λήψεων που δεν μοιράζεται δεν δημοσιεύεται ποτέ.</string>
+    <string name="icebridge_join_title">Συμμετοχή στο δίκτυο IceBridge: αναζητήστε torrents άλλων χρηστών και αφήστε τους να βρίσκουν όσα μοιράζομαι</string>
+    <string name="icebridge_join_note">Όσο είναι ενεργό, οποιοσδήποτε χρησιμοποιεί την Κατανεμημένη αναζήτηση μπορεί να βρει τα torrents που μοιράζεστε ενεργά όταν ταιριάζουν οι λέξεις-κλειδιά του, ακόμη και αν δεν μοιράζεστε τον κατάλογό σας παρακάτω. Απενεργοποιήστε το για να φύγετε από το δίκτυο.</string>
     <string name="icebridge_public_catalog_wizard_title">Το seeding είναι δημοσίευση</string>
-    <string name="icebridge_public_catalog_wizard_description">Όταν κάνετε seed ένα torrent, το δημοσιεύετε στο δίκτυο BitTorrent ώστε άλλοι να μπορούν να το βρουν και να το κατεβάσουν. Μπορείτε να επιλέξετε αν οι crawlers του δικτύου μπορούν να ευρετηριάσουν και τα torrent που κάνετε ενεργά seed.</string>
-    <string name="icebridge_public_catalog_wizard_label">Να επιτρέπεται στους crawlers να περιηγούνται στα torrent που κάνω ενεργά seed</string>
+    <string name="icebridge_public_catalog_wizard_description">Όταν κάνετε seed ένα torrent, το δημοσιεύετε στο δίκτυο BitTorrent ώστε άλλοι να μπορούν να το βρουν και να το κατεβάσουν. Επιλέξτε παρακάτω πώς συμμετέχετε στο δίκτυο IceBridge.</string>
     <string name="peer_catalog_browse_action">Περιήγηση κοινόχρηστων torrent</string>
     <string name="peer_catalog_title">Κοινόχρηστα torrent</string>
     <string name="distributed_icebridge_start_ok">Η στοίβα IceBridge ξεκίνησε</string>

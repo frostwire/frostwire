@@ -10,12 +10,13 @@
 
         <SwitchPreference
             android:key="frostwire.prefs.icebridge.enabled"
-            android:title="@string/distributed_stack_status_title"
-            android:summary="@string/distributed_icebridge_start_summary"
+            android:title="@string/icebridge_join_title"
+            android:summary="@string/icebridge_join_note"
             android:defaultValue="true" />
 
         <SwitchPreference
             android:key="frostwire.prefs.icebridge.public_catalog"
+            android:dependency="frostwire.prefs.icebridge.enabled"
             android:title="@string/icebridge_public_catalog_title"
             android:summary="@string/icebridge_public_catalog_summary"
             android:defaultValue="true" />

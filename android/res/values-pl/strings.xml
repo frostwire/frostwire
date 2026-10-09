@@ -616,11 +616,12 @@
     <string name="distributed_icebridge_config_unknown">Porty niedostępne, dopóki stos się nie uruchomi</string>
     <string name="distributed_icebridge_start">Uruchom / uruchom ponownie IceBridge</string>
     <string name="distributed_icebridge_start_summary">Uruchom sieć IceBridge w procesie, jeśli nie działa, lub wymuś jej ponowne uruchomienie</string>
-    <string name="icebridge_public_catalog_title">Udostępnij publicznie mój katalog udostępniania (crawlery)</string>
-    <string name="icebridge_public_catalog_summary">Pozwól robotom indeksującym sieci indeksować torrenty, które aktywnie seedujesz. Historia pobierania, która nie jest seedowana, nigdy nie jest publikowana. Domyślnie włączone.</string>
+    <string name="icebridge_public_catalog_title">Udostępnij mój katalog, aby ludzie mogli go przeglądać, a roboty indeksujące go indeksować</string>
+    <string name="icebridge_public_catalog_summary">Pozwala ludziom przeglądać wszystko, co aktualnie seedujesz, bez wyszukiwania, a robotom indeksować sieć. Historia pobierania, która nie jest seedowana, nigdy nie jest publikowana.</string>
+    <string name="icebridge_join_title">Dołącz do sieci IceBridge: przeszukuj torrenty innych użytkowników i pozwól im znajdować te, które seeduję</string>
+    <string name="icebridge_join_note">Dopóki ta opcja jest włączona, każdy korzystający z wyszukiwania rozproszonego może znaleźć torrenty, które aktualnie seedujesz, jeśli jego słowa kluczowe pasują, nawet jeśli poniżej nie udostępniasz swojego katalogu. Wyłącz, aby opuścić sieć.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedowanie to publikowanie</string>
-    <string name="icebridge_public_catalog_wizard_description">Gdy seedujesz torrent, publikujesz go w sieci BitTorrent, aby inni mogli go znaleźć i pobrać. Możesz wybrać, czy roboty indeksujące sieci mogą także indeksować torrenty, które aktywnie seedujesz.</string>
-    <string name="icebridge_public_catalog_wizard_label">Pozwól robotom przeglądać torrenty, które aktywnie seeduję</string>
+    <string name="icebridge_public_catalog_wizard_description">Gdy seedujesz torrent, publikujesz go w sieci BitTorrent, aby inni mogli go znaleźć i pobrać. Wybierz poniżej, jak uczestniczysz w sieci IceBridge.</string>
     <string name="peer_catalog_browse_action">Przeglądaj udostępnione torrenty</string>
     <string name="peer_catalog_title">Udostępnione torrenty</string>
     <string name="distributed_icebridge_start_ok">Stos IceBridge uruchomiony</string>

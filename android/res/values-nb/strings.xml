@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Portene er utilgjengelige til stakken starter</string>
     <string name="distributed_icebridge_start">Start / start IceBridge på nytt</string>
     <string name="distributed_icebridge_start_summary">Start IceBridge-nettverket i prosessen hvis det ikke kjører, eller tving omstart</string>
-    <string name="icebridge_public_catalog_title">Del delekatalogen min offentlig (crawlere)</string>
-    <string name="icebridge_public_catalog_summary">La nettverkets crawlere indeksere torrentene du aktivt seeder. Nedlastingshistorikk som ikke seedes, publiseres aldri. På som standard.</string>
+    <string name="icebridge_public_catalog_title">Del katalogen min slik at folk kan bla gjennom den og crawlere kan indeksere den</string>
+    <string name="icebridge_public_catalog_summary">Lar folk bla gjennom alt du seeder akkurat nå uten å søke, og lar crawlere indeksere nettverket. Nedlastingslogg som ikke seedes, publiseres aldri.</string>
+    <string name="icebridge_join_title">Bli med i IceBridge-nettverket: søk i andres torrenter og la dem finne de jeg seeder</string>
+    <string name="icebridge_join_note">Så lenge dette er på, kan alle som bruker distribuert søk finne torrentene du seeder akkurat nå når søkeordene deres treffer, selv om du ikke deler katalogen din nedenfor. Slå av for å forlate nettverket.</string>
     <string name="icebridge_public_catalog_wizard_title">Seeding er publisering</string>
-    <string name="icebridge_public_catalog_wizard_description">Når du seeder en torrent, publiserer du den på BitTorrent-nettverket slik at andre kan finne og laste den ned. Du kan velge om nettverkets crawlere også kan indeksere torrentene du aktivt seeder.</string>
-    <string name="icebridge_public_catalog_wizard_label">La crawlere bla gjennom torrentene jeg aktivt seeder</string>
+    <string name="icebridge_public_catalog_wizard_description">Når du seeder en torrent, publiserer du den på BitTorrent-nettverket slik at andre kan finne og laste den ned. Velg nedenfor hvordan du deltar i IceBridge-nettverket.</string>
     <string name="peer_catalog_browse_action">Bla gjennom delte torrenter</string>
     <string name="peer_catalog_title">Delte torrenter</string>
     <string name="distributed_icebridge_start_ok">IceBridge-stakken er startet</string>

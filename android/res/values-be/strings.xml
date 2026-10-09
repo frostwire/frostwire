@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Парты недаступныя, пакуль стэк не запусціцца</string>
     <string name="distributed_icebridge_start">Запусціць / перазапусціць IceBridge</string>
     <string name="distributed_icebridge_start_summary">Запусціць сетку IceBridge ў працэсе, калі яна не працуе, або прымусова перазапусціць яе</string>
-    <string name="icebridge_public_catalog_title">Зрабіць каталог супольных торэнтаў даступным для краўлінгу</string>
-    <string name="icebridge_public_catalog_summary">Дазвольце павукам сеткі індэксаваць торэнты, якія вы актыўна раздаяце. Гісторыя запампаванняў, якая не раздаецца, ніколі не публікуецца. Па змаўчанні ўключана.</string>
+    <string name="icebridge_public_catalog_title">Падзяліцца маім каталогам, каб людзі маглі яго праглядаць, а краулеры індэксаваць</string>
+    <string name="icebridge_public_catalog_summary">Дазваляе людзям праглядаць усё, што вы цяпер раздаяце, без пошуку, а краулерам індэксаваць сетку. Гісторыя загрузак, якія не раздаюцца, ніколі не публікуецца.</string>
+    <string name="icebridge_join_title">Далучыцца да сеткі IceBridge: шукаць торэнты іншых карыстальнікаў і даць ім магчымасць знаходзіць тыя, што я раздаю</string>
+    <string name="icebridge_join_note">Пакуль гэта ўключана, любы, хто карыстаецца размеркаваным пошукам, можа знайсці торэнты, якія вы раздаяце, калі супадаюць ключавыя словы, нават калі вы не дзеліцеся каталогам ніжэй. Адключыце, каб пакінуць сетку.</string>
     <string name="icebridge_public_catalog_wizard_title">Раздача — гэта публікацыя</string>
-    <string name="icebridge_public_catalog_wizard_description">Калі вы раздаяце торэнт, вы публікуеце яго ў сетцы BitTorrent, каб іншыя людзі маглі яго знайсці і спампаваць. Вы можаце выбраць, ці могуць павукі сеткі таксама індэксаваць торэнты, якія вы актыўна раздаяце.</string>
-    <string name="icebridge_public_catalog_wizard_label">Дазволіць павукам праглядаць торэнты, якія я актыўна раздаю</string>
+    <string name="icebridge_public_catalog_wizard_description">Калі вы раздаяце торэнт, вы публікуеце яго ў сетцы BitTorrent, каб іншыя людзі маглі яго знайсці і спампаваць. Ніжэй выберыце, як вы ўдзельнічаеце ў сетцы IceBridge.</string>
     <string name="peer_catalog_browse_action">Прагляд агульных торэнтаў</string>
     <string name="peer_catalog_title">Агульныя торэнты</string>
     <string name="distributed_icebridge_start_ok">Стэк IceBridge запушчаны</string>

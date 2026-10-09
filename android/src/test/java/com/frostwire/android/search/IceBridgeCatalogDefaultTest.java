@@ -8,6 +8,8 @@
 package com.frostwire.android.search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -40,12 +42,37 @@ public class IceBridgeCatalogDefaultTest {
   }
 
   @Test
-  public void baseSummaryDoesNotClaimItIsOffByDefault() throws Exception {
+  public void catalogAndNetworkAreSeparateChoicesInTheStringsAndTheSettingsScreen()
+      throws Exception {
     String strings = readProjectFile("res/values/strings.xml");
+    String join = stringValue(strings, "icebridge_join_title");
+    String joinNote = stringValue(strings, "icebridge_join_note");
+    String catalog = stringValue(strings, "icebridge_public_catalog_title");
+    String catalogNote = stringValue(strings, "icebridge_public_catalog_summary");
+    assertNotEquals(join, catalog);
+    assertTrue(
+        "unchecking the catalog must not look like hiding from search",
+        joinNote.contains("even if you do not share your catalog"));
+    assertTrue(catalogNote.contains("browse") && catalogNote.contains("crawlers"));
+    assertFalse(
+        "the summary must not claim a stale default", catalogNote.contains("Off by default"));
+
+    String xml = readProjectFile("res/xml/settings_distributed_search.xml");
     Matcher m =
-        Pattern.compile("name=\"icebridge_public_catalog_summary\">([^<]*)<").matcher(strings);
+        Pattern.compile(
+                "android:key=\"frostwire\\.prefs\\.icebridge\\.public_catalog\"([^>]*?)/>",
+                Pattern.DOTALL)
+            .matcher(xml);
     assertTrue(m.find());
-    assertTrue(m.group(1).endsWith("On by default."));
+    assertTrue(
+        "the catalog switch is meaningless off the network",
+        m.group(1).contains("android:dependency=\"frostwire.prefs.icebridge.enabled\""));
+  }
+
+  private static String stringValue(String strings, String name) {
+    Matcher m = Pattern.compile("<string name=\"" + name + "\">([^<]*)</string>").matcher(strings);
+    assertTrue(name, m.find());
+    return m.group(1);
   }
 
   private static String readProjectFile(String relativePath) throws IOException {

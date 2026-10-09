@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">스택이 시작될 때까지 포트를 사용할 수 없습니다</string>
     <string name="distributed_icebridge_start">IceBridge 시작 / 재시작</string>
     <string name="distributed_icebridge_start_summary">프로세스 내 IceBridge 메시가 실행 중이 아니면 시작하거나 강제로 재시작합니다</string>
-    <string name="icebridge_public_catalog_title">내 공유 카탈로그를 공개적으로 공유 (크롤러)</string>
-    <string name="icebridge_public_catalog_summary">네트워크 크롤러가 현재 시딩 중인 토렌트를 색인하도록 허용합니다. 시딩하지 않는 다운로드 기록은 절대 공개되지 않습니다. 기본값은 켜짐입니다.</string>
+    <string name="icebridge_public_catalog_title">내 카탈로그를 공유하여 다른 사람이 둘러보고 크롤러가 색인할 수 있게 하기</string>
+    <string name="icebridge_public_catalog_summary">검색하지 않아도 현재 시딩 중인 모든 항목을 다른 사람이 둘러볼 수 있고 크롤러가 네트워크를 색인할 수 있게 합니다. 시딩하지 않는 다운로드 기록은 절대 게시되지 않습니다.</string>
+    <string name="icebridge_join_title">IceBridge 네트워크 참여: 다른 사용자의 토렌트를 검색하고 내가 시딩 중인 토렌트를 그들이 찾을 수 있게 합니다</string>
+    <string name="icebridge_join_note">이 옵션이 켜져 있는 동안에는 분산 검색을 사용하는 누구나 키워드가 일치하면 현재 시딩 중인 토렌트를 찾을 수 있습니다. 아래에서 카탈로그를 공유하지 않아도 마찬가지입니다. 네트워크에서 나가려면 끄세요.</string>
     <string name="icebridge_public_catalog_wizard_title">시딩은 공개입니다</string>
-    <string name="icebridge_public_catalog_wizard_description">토렌트를 시딩하면 다른 사람들이 찾아 다운로드할 수 있도록 BitTorrent 네트워크에 공개됩니다. 네트워크 크롤러가 현재 시딩 중인 토렌트도 색인하도록 할지 선택할 수 있습니다.</string>
-    <string name="icebridge_public_catalog_wizard_label">크롤러가 내가 현재 시딩 중인 토렌트를 탐색하도록 허용</string>
+    <string name="icebridge_public_catalog_wizard_description">토렌트를 시딩하면 다른 사람들이 찾아 다운로드할 수 있도록 BitTorrent 네트워크에 공개됩니다. 아래에서 IceBridge 네트워크에 참여하는 방식을 선택하세요.</string>
     <string name="peer_catalog_browse_action">공유 토렌트 찾아보기</string>
     <string name="peer_catalog_title">공유 토렌트</string>
     <string name="distributed_icebridge_start_ok">IceBridge 스택이 시작되었습니다</string>

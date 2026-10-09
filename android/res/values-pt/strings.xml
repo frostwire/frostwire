@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Portas indisponíveis até a pilha iniciar</string>
     <string name="distributed_icebridge_start">Iniciar / reiniciar IceBridge</string>
     <string name="distributed_icebridge_start_summary">Inicia a malha IceBridge no processo se não estiver em execução, ou força o reinício</string>
-    <string name="icebridge_public_catalog_title">Partilhar publicamente o meu catálogo de partilha (rastreadores)</string>
-    <string name="icebridge_public_catalog_summary">Permita que os rastreadores da rede indexem os torrents que você está semeando ativamente. O histórico de downloads que não está sendo semeado nunca é publicado. Ativado por padrão.</string>
+    <string name="icebridge_public_catalog_title">Partilhar o meu catálogo para que as pessoas o possam explorar e os rastreadores o possam indexar</string>
+    <string name="icebridge_public_catalog_summary">Permite que as pessoas explorem tudo o que está a semear sem precisarem de pesquisar, e que os rastreadores indexem a rede. O histórico de transferências que não está a ser semeado nunca é publicado.</string>
+    <string name="icebridge_join_title">Entrar na rede IceBridge: pesquisar torrents de outros utilizadores e deixar que encontrem os que estou a semear</string>
+    <string name="icebridge_join_note">Enquanto estiver ativado, qualquer pessoa que use a Pesquisa distribuída pode encontrar os torrents que está a semear quando as suas palavras-chave coincidirem, mesmo que não partilhe o seu catálogo abaixo. Desative para sair da rede.</string>
     <string name="icebridge_public_catalog_wizard_title">Semear é publicar</string>
-    <string name="icebridge_public_catalog_wizard_description">Quando você semeia um torrent, você o publica na rede BitTorrent para que outras pessoas possam encontrá-lo e baixá-lo. Você pode escolher se os rastreadores da rede também podem indexar os torrents que você está semeando ativamente.</string>
-    <string name="icebridge_public_catalog_wizard_label">Permitir que os rastreadores naveguem pelos torrents que estou semeando ativamente</string>
+    <string name="icebridge_public_catalog_wizard_description">Quando você semeia um torrent, você o publica na rede BitTorrent para que outras pessoas possam encontrá-lo e baixá-lo. Escolha abaixo como participa na rede IceBridge.</string>
     <string name="peer_catalog_browse_action">Navegar pelos torrents partilhados</string>
     <string name="peer_catalog_title">Torrents partilhados</string>
     <string name="distributed_icebridge_start_ok">Pilha do IceBridge iniciada</string>

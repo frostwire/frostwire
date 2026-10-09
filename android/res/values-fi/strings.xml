@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Portit eivät ole käytettävissä ennen kuin pino käynnistyy</string>
     <string name="distributed_icebridge_start">Käynnistä / käynnistä IceBridge uudelleen</string>
     <string name="distributed_icebridge_start_summary">Käynnistä prosessin sisäinen IceBridge-verkko, jos se ei ole käynnissä, tai pakota uudelleenkäynnistys</string>
-    <string name="icebridge_public_catalog_title">Jaa jakokatalogini julkisesti (crawlerit)</string>
-    <string name="icebridge_public_catalog_summary">Anna verkon ryömijöiden indeksoida torrentit, joita jaat aktiivisesti. Lataushistoriaa, jota ei jaeta, ei koskaan julkaista. Oletusarvoisesti päällä.</string>
+    <string name="icebridge_public_catalog_title">Jaa luetteloni, jotta ihmiset voivat selata sitä ja indeksoijat indeksoida sen</string>
+    <string name="icebridge_public_catalog_summary">Antaa ihmisten selata kaikkea, mitä jaat aktiivisesti, hakematta, ja indeksoijien indeksoida verkon. Latahistoriaa, jota ei jaeta, ei julkaista koskaan.</string>
+    <string name="icebridge_join_title">Liity IceBridge-verkkoon: hae muiden käyttäjien torrentteja ja anna heidän löytää ne, joita jaan</string>
+    <string name="icebridge_join_note">Kun tämä on päällä, kuka tahansa hajautettua hakua käyttävä voi löytää aktiivisesti jakamasi torrentit, kun hänen hakusanansa täsmäävät, vaikka et jakaisi luetteloasi alla. Poista käytöstä poistuaksesi verkosta.</string>
     <string name="icebridge_public_catalog_wizard_title">Jakaminen on julkaisemista</string>
-    <string name="icebridge_public_catalog_wizard_description">Kun jaat torrentia, julkaiset sen BitTorrent-verkossa, jotta muut voivat löytää ja ladata sen. Voit valita, saavatko verkon ryömijät indeksoida myös torrentit, joita jaat aktiivisesti.</string>
-    <string name="icebridge_public_catalog_wizard_label">Anna ryömijöiden selata torrenteja, joita jaan aktiivisesti</string>
+    <string name="icebridge_public_catalog_wizard_description">Kun jaat torrentia, julkaiset sen BitTorrent-verkossa, jotta muut voivat löytää ja ladata sen. Valitse alla, miten osallistut IceBridge-verkkoon.</string>
     <string name="peer_catalog_browse_action">Selaa jaettuja torrenteja</string>
     <string name="peer_catalog_title">Jaetut torrentit</string>
     <string name="distributed_icebridge_start_ok">IceBridge-pino käynnistetty</string>

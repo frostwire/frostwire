@@ -45,13 +45,37 @@
             android:text="@string/icebridge_public_catalog_wizard_description" />
 
         <CheckBox
+            android:id="@+id/view_public_catalog_wizard_page_check_join_network"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/icebridge_join_title" />
+
+        <TextView
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="35dp"
+            android:text="@string/icebridge_join_note" />
+
+        <CheckBox
             android:id="@+id/view_public_catalog_wizard_page_check_public_catalog"
             style="@style/WizardSubTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
-            android:text="@string/icebridge_public_catalog_wizard_label" />
+            android:text="@string/icebridge_public_catalog_title" />
+
+        <TextView
+            android:id="@+id/view_public_catalog_wizard_page_catalog_note"
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="35dp"
+            android:text="@string/icebridge_public_catalog_summary" />
 
     </LinearLayout>
 </ScrollView>

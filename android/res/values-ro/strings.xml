@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Porturile nu sunt disponibile până la pornirea stivei</string>
     <string name="distributed_icebridge_start">Pornește / repornește IceBridge</string>
     <string name="distributed_icebridge_start_summary">Pornește rețeaua mesh IceBridge din proces dacă nu rulează sau forțează repornirea ei</string>
-    <string name="icebridge_public_catalog_title">Partajează public catalogul meu de partajare (crawlere)</string>
-    <string name="icebridge_public_catalog_summary">Permite crawler-elor rețelei să indexeze torrentele pe care le seedezi activ. Istoricul descărcărilor care nu este seedat nu este niciodată publicat. Activat implicit.</string>
+    <string name="icebridge_public_catalog_title">Partajează catalogul meu pentru ca oamenii să îl poată răsfoi și crawlerele să îl poată indexa</string>
+    <string name="icebridge_public_catalog_summary">Permite oamenilor să răsfoiască tot ce distribui activ fără să caute și crawlerelor să indexeze rețeaua. Istoricul descărcărilor care nu sunt distribuite nu este publicat niciodată.</string>
+    <string name="icebridge_join_title">Alătură-te rețelei IceBridge: caută torrentele altor utilizatori și lasă-i să le găsească pe cele pe care le distribui</string>
+    <string name="icebridge_join_note">Cât timp este activat, oricine folosește Căutarea distribuită poate găsi torrentele pe care le distribui activ atunci când cuvintele sale cheie se potrivesc, chiar dacă nu îți partajezi catalogul mai jos. Dezactivează pentru a părăsi rețeaua.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedarea înseamnă publicare</string>
-    <string name="icebridge_public_catalog_wizard_description">Când seedezi un torrent, îl publici în rețeaua BitTorrent pentru ca alții să îl poată găsi și descărca. Poți alege dacă crawler-ele rețelei pot indexa și torrentele pe care le seedezi activ.</string>
-    <string name="icebridge_public_catalog_wizard_label">Permite crawler-elor să răsfoiască torrentele pe care le seedez activ</string>
+    <string name="icebridge_public_catalog_wizard_description">Când seedezi un torrent, îl publici în rețeaua BitTorrent pentru ca alții să îl poată găsi și descărca. Alege mai jos cum participi la rețeaua IceBridge.</string>
     <string name="peer_catalog_browse_action">Navighează torrentele partajate</string>
     <string name="peer_catalog_title">Torrente partajate</string>
     <string name="distributed_icebridge_start_ok">Stiva IceBridge a pornit</string>

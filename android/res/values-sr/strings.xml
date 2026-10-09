@@ -615,11 +615,12 @@
     <string name="distributed_icebridge_config_unknown">Портови нису доступни док се стек не покрене</string>
     <string name="distributed_icebridge_start">Покрени / поново покрени IceBridge</string>
     <string name="distributed_icebridge_start_summary">Покрени IceBridge мрежу унутар процеса ако не ради или принудно поново покрени</string>
-    <string name="icebridge_public_catalog_title">Јавно објави мој каталог дељења (краулери)</string>
-    <string name="icebridge_public_catalog_summary">Дозволите претраживачима мреже да индексирају торренте које активно сидујете. Историја преузимања која се не сидује никада се не објављује. Подразумевано укључено.</string>
+    <string name="icebridge_public_catalog_title">Подели мој каталог да га људи могу прегледати, а претраживачи индексирати</string>
+    <string name="icebridge_public_catalog_summary">Омогућава људима да прегледају све што тренутно сидрите без претраге, а претраживачима да индексирају мрежу. Историја преузимања која се не сидри никада се не објављује.</string>
+    <string name="icebridge_join_title">Придружи се IceBridge мрежи: претражуј торенте других корисника и дозволи им да пронађу оне које ја сидрим</string>
+    <string name="icebridge_join_note">Док је ово укључено, свако ко користи дистрибуирану претрагу може да пронађе торенте које тренутно сидрите када се кључне речи поклопе, чак и ако не делите свој каталог испод. Искључите да напустите мрежу.</string>
     <string name="icebridge_public_catalog_wizard_title">Сидовање је објављивање</string>
-    <string name="icebridge_public_catalog_wizard_description">Када сидујете торрент, објављујете га на BitTorrent мрежи тако да га други могу пронаћи и преузети. Можете да изаберете да ли претраживачи мреже могу да индексирају и торренте које активно сидујете.</string>
-    <string name="icebridge_public_catalog_wizard_label">Дозволи претраживачима да прегледају торренте које активно сидујем</string>
+    <string name="icebridge_public_catalog_wizard_description">Када сидујете торрент, објављујете га на BitTorrent мрежи тако да га други могу пронаћи и преузети. Изаберите у наставку како учествујете у IceBridge мрежи.</string>
     <string name="peer_catalog_browse_action">Прегледај дељене торенте</string>
     <string name="peer_catalog_title">Дељени торенти</string>
     <string name="distributed_icebridge_start_ok">IceBridge стек је покренут</string>

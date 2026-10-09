@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">स्टैक शुरू होने तक पोर्ट उपलब्ध नहीं हैं</string>
     <string name="distributed_icebridge_start">IceBridge शुरू / पुनः आरंभ करें</string>
     <string name="distributed_icebridge_start_summary">यदि इन-प्रोसेस IceBridge मेश नहीं चल रहा है तो उसे शुरू करें, या जबरन पुनः आरंभ करें</string>
-    <string name="icebridge_public_catalog_title">मेरा शेयर कैटलॉग सार्वजनिक रूप से साझा करें (क्रॉलर)</string>
-    <string name="icebridge_public_catalog_summary">नेटवर्क के क्रॉलर को उन टोरेंट को इंडेक्स करने दें जिन्हें आप सक्रिय रूप से सीड कर रहे हैं। जो डाउनलोड इतिहास सीड नहीं हो रहा है वह कभी प्रकाशित नहीं होता। डिफ़ॉल्ट रूप से चालू।</string>
+    <string name="icebridge_public_catalog_title">मेरा कैटलॉग साझा करें ताकि लोग उसे ब्राउज़ कर सकें और क्रॉलर उसे इंडेक्स कर सकें</string>
+    <string name="icebridge_public_catalog_summary">लोगों को खोजे बिना वह सब ब्राउज़ करने देता है जो आप सक्रिय रूप से सीड कर रहे हैं, और क्रॉलर को नेटवर्क इंडेक्स करने देता है। जो डाउनलोड इतिहास सीड नहीं हो रहा है वह कभी प्रकाशित नहीं होता।</string>
+    <string name="icebridge_join_title">IceBridge नेटवर्क से जुड़ें: अन्य उपयोगकर्ताओं के टोरेंट खोजें और उन्हें वे टोरेंट खोजने दें जो मैं सीड कर रहा हूँ</string>
+    <string name="icebridge_join_note">जब तक यह चालू है, वितरित खोज इस्तेमाल करने वाला कोई भी व्यक्ति, कीवर्ड मेल खाने पर, आपके सक्रिय रूप से सीड किए जा रहे टोरेंट ढूँढ सकता है, भले ही आप नीचे अपना कैटलॉग साझा न करें। नेटवर्क छोड़ने के लिए इसे बंद करें।</string>
     <string name="icebridge_public_catalog_wizard_title">सीड करना ही प्रकाशित करना है</string>
-    <string name="icebridge_public_catalog_wizard_description">जब आप कोई टोरेंट सीड करते हैं, तो आप उसे BitTorrent नेटवर्क पर प्रकाशित करते हैं ताकि दूसरे लोग उसे ढूँढकर डाउनलोड कर सकें। आप चुन सकते हैं कि नेटवर्क के क्रॉलर उन टोरेंट को भी इंडेक्स कर सकें जिन्हें आप सक्रिय रूप से सीड कर रहे हैं।</string>
-    <string name="icebridge_public_catalog_wizard_label">क्रॉलर को उन टोरेंट ब्राउज़ करने दें जिन्हें मैं सक्रिय रूप से सीड कर रहा हूँ</string>
+    <string name="icebridge_public_catalog_wizard_description">जब आप कोई टोरेंट सीड करते हैं, तो आप उसे BitTorrent नेटवर्क पर प्रकाशित करते हैं ताकि दूसरे लोग उसे ढूँढकर डाउनलोड कर सकें। नीचे चुनें कि आप IceBridge नेटवर्क में कैसे भाग लेंगे।</string>
     <string name="peer_catalog_browse_action">साझा किए गए टोरेंट ब्राउज़ करें</string>
     <string name="peer_catalog_title">साझा किए गए टोरेंट</string>
     <string name="distributed_icebridge_start_ok">IceBridge स्टैक शुरू हो गया</string>

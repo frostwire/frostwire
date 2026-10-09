@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">พอร์ตยังใช้ไม่ได้จนกว่าสแตกจะเริ่มทำงาน</string>
     <string name="distributed_icebridge_start">เริ่ม / เริ่ม IceBridge ใหม่</string>
     <string name="distributed_icebridge_start_summary">เริ่มเมช IceBridge ในโพรเซสหากยังไม่ทำงาน หรือบังคับให้เริ่มใหม่</string>
-    <string name="icebridge_public_catalog_title">แชร์แค็ตตาล็อกการแชร์ของฉันแบบสาธารณะ (ตัวรวบรวมข้อมูล)</string>
-    <string name="icebridge_public_catalog_summary">ให้ครอว์เลอร์ของเครือข่ายจัดทำดัชนีทอร์เรนต์ที่คุณกำลังซีดอย่างจริงจัง ประวัติการดาวน์โหลดที่ไม่ได้ซีดจะไม่ถูกเผยแพร่เลย เปิดไว้โดยค่าเริ่มต้น</string>
+    <string name="icebridge_public_catalog_title">แชร์แคตตาล็อกของฉัน เพื่อให้ผู้คนเรียกดูและครอว์เลอร์จัดทำดัชนีได้</string>
+    <string name="icebridge_public_catalog_summary">ให้ผู้คนเรียกดูทุกอย่างที่คุณกำลังซีดโดยไม่ต้องค้นหา และให้ครอว์เลอร์จัดทำดัชนีเครือข่าย ประวัติการดาวน์โหลดที่ไม่ได้ซีดจะไม่ถูกเผยแพร่เลย</string>
+    <string name="icebridge_join_title">เข้าร่วมเครือข่าย IceBridge: ค้นหาทอร์เรนต์ของผู้ใช้อื่น และให้พวกเขาพบทอร์เรนต์ที่ฉันซีดอยู่</string>
+    <string name="icebridge_join_note">ขณะที่เปิดอยู่ ใครก็ตามที่ใช้การค้นหาแบบกระจายสามารถพบทอร์เรนต์ที่คุณกำลังซีดเมื่อคีย์เวิร์ดตรงกัน แม้คุณจะไม่ได้แชร์แคตตาล็อกของคุณด้านล่างก็ตาม ปิดเพื่อออกจากเครือข่าย</string>
     <string name="icebridge_public_catalog_wizard_title">การซีดคือการเผยแพร่</string>
-    <string name="icebridge_public_catalog_wizard_description">เมื่อคุณซีดทอร์เรนต์ คุณจะเผยแพร่มันไปยังเครือข่าย BitTorrent เพื่อให้ผู้อื่นค้นหาและดาวน์โหลดได้ คุณสามารถเลือกได้ว่าครอว์เลอร์ของเครือข่ายจะจัดทำดัชนีทอร์เรนต์ที่คุณกำลังซีดอย่างจริงจังด้วยหรือไม่</string>
-    <string name="icebridge_public_catalog_wizard_label">ให้ครอว์เลอร์เรียกดูทอร์เรนต์ที่ฉันกำลังซีดอย่างจริงจัง</string>
+    <string name="icebridge_public_catalog_wizard_description">เมื่อคุณซีดทอร์เรนต์ คุณจะเผยแพร่มันไปยังเครือข่าย BitTorrent เพื่อให้ผู้อื่นค้นหาและดาวน์โหลดได้ เลือกด้านล่างว่าคุณจะมีส่วนร่วมในเครือข่าย IceBridge อย่างไร</string>
     <string name="peer_catalog_browse_action">เรียกดูทอร์เรนต์ที่แชร์</string>
     <string name="peer_catalog_title">ทอร์เรนต์ที่แชร์</string>
     <string name="distributed_icebridge_start_ok">เริ่มสแตก IceBridge แล้ว</string>

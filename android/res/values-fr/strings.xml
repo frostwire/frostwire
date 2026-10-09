@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Ports indisponibles tant que la pile n\'a pas démarré</string>
     <string name="distributed_icebridge_start">Démarrer / redémarrer IceBridge</string>
     <string name="distributed_icebridge_start_summary">Démarrer le maillage IceBridge intégré s\'il n\'est pas en cours d\'exécution, ou forcer son redémarrage</string>
-    <string name="icebridge_public_catalog_title">Partager publiquement mon catalogue de partage (robots)</string>
-    <string name="icebridge_public_catalog_summary">Laissez les robots du réseau indexer les torrents que vous partagez activement. L\'historique des téléchargements qui n\'est pas partagé n\'est jamais publié. Activé par défaut.</string>
+    <string name="icebridge_public_catalog_title">Partager mon catalogue pour que les gens puissent le parcourir et les robots l\'indexer</string>
+    <string name="icebridge_public_catalog_summary">Permet aux gens de parcourir tout ce que vous partagez activement sans le rechercher, et aux robots d\'indexer le réseau. L\'historique des téléchargements qui ne sont pas partagés n\'est jamais publié.</string>
+    <string name="icebridge_join_title">Rejoindre le réseau IceBridge : rechercher les torrents des autres utilisateurs et les laisser trouver ceux que je partage</string>
+    <string name="icebridge_join_note">Tant que cette option est activée, toute personne utilisant la Recherche distribuée peut trouver les torrents que vous partagez activement lorsque ses mots-clés correspondent, même si vous ne partagez pas votre catalogue ci-dessous. Désactivez-la pour quitter le réseau.</string>
     <string name="icebridge_public_catalog_wizard_title">Partager, c\'est publier</string>
-    <string name="icebridge_public_catalog_wizard_description">Lorsque vous partagez un torrent, vous le publiez sur le réseau BitTorrent afin que d\'autres puissent le trouver et le télécharger. Vous pouvez choisir si les robots du réseau peuvent aussi indexer les torrents que vous partagez activement.</string>
-    <string name="icebridge_public_catalog_wizard_label">Autoriser les robots à parcourir les torrents que je partage activement</string>
+    <string name="icebridge_public_catalog_wizard_description">Lorsque vous partagez un torrent, vous le publiez sur le réseau BitTorrent afin que d\'autres puissent le trouver et le télécharger. Choisissez ci-dessous comment vous participez au réseau IceBridge.</string>
     <string name="peer_catalog_browse_action">Parcourir les torrents partagés</string>
     <string name="peer_catalog_title">Torrents partagés</string>
     <string name="distributed_icebridge_start_ok">Pile IceBridge démarrée</string>

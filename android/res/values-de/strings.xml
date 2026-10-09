@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Ports sind erst verfügbar, wenn der Stack gestartet ist</string>
     <string name="distributed_icebridge_start">IceBridge starten / neu starten</string>
     <string name="distributed_icebridge_start_summary">Das prozessinterne IceBridge-Mesh starten, falls es nicht läuft, oder einen Neustart erzwingen</string>
-    <string name="icebridge_public_catalog_title">Meinen Freigabekatalog öffentlich teilen (Crawler)</string>
-    <string name="icebridge_public_catalog_summary">Lass die Crawler des Netzwerks die Torrents indexieren, die du aktiv seedest. Downloadverlauf, der nicht geseedet wird, wird niemals veröffentlicht. Standardmäßig an.</string>
+    <string name="icebridge_public_catalog_title">Meinen Katalog teilen, damit Leute ihn durchstöbern und Crawler ihn indexieren können</string>
+    <string name="icebridge_public_catalog_summary">Erlaubt es Leuten, alles zu durchstöbern, was du aktiv seedest, ohne danach zu suchen, und Crawlern, das Netzwerk zu indexieren. Download-Verlauf, der nicht geseedet wird, wird nie veröffentlicht.</string>
+    <string name="icebridge_join_title">Dem IceBridge-Netzwerk beitreten: Torrents anderer Nutzer durchsuchen und von ihnen gefunden werden, wenn ich seede</string>
+    <string name="icebridge_join_note">Solange dies aktiviert ist, kann jeder, der die Verteilte Suche nutzt, deine aktiv geseedeten Torrents finden, wenn seine Suchbegriffe passen, auch wenn du unten deinen Katalog nicht teilst. Deaktiviere es, um das Netzwerk zu verlassen.</string>
     <string name="icebridge_public_catalog_wizard_title">Seeden ist Veröffentlichen</string>
-    <string name="icebridge_public_catalog_wizard_description">Wenn du einen Torrent seedest, veröffentlichst du ihn im BitTorrent-Netzwerk, sodass andere ihn finden und herunterladen können. Du kannst wählen, ob die Crawler des Netzwerks auch die Torrents indexieren dürfen, die du aktiv seedest.</string>
-    <string name="icebridge_public_catalog_wizard_label">Crawler dürfen die Torrents durchsuchen, die ich aktiv seede</string>
+    <string name="icebridge_public_catalog_wizard_description">Wenn du einen Torrent seedest, veröffentlichst du ihn im BitTorrent-Netzwerk, sodass andere ihn finden und herunterladen können. Wähle unten, wie du am IceBridge-Netzwerk teilnimmst.</string>
     <string name="peer_catalog_browse_action">Geteilte Torrents browsen</string>
     <string name="peer_catalog_title">Geteilte Torrents</string>
     <string name="distributed_icebridge_start_ok">IceBridge-Stack gestartet</string>

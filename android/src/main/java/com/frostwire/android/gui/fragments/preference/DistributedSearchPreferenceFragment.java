@@ -175,7 +175,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   private void updateIceBridgeToggleSummary(Preference preference, boolean enabled) {
     preference.setSummary(
         enabled
-            ? getString(R.string.distributed_icebridge_start_summary)
+            ? getString(R.string.icebridge_join_note)
             : getString(R.string.distributed_stack_not_running));
   }
 

@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Portovi nisu dostupni dok se stog ne pokrene</string>
     <string name="distributed_icebridge_start">Pokreni / ponovno pokreni IceBridge</string>
     <string name="distributed_icebridge_start_summary">Pokreni IceBridge mrežu unutar procesa ako ne radi ili prisilno ponovno pokreni</string>
-    <string name="icebridge_public_catalog_title">Javno podijeli moj katalog dijeljenja (crawleri)</string>
-    <string name="icebridge_public_catalog_summary">Neka crawleri mreže indeksiraju torrente koje aktivno seedate. Povijest preuzimanja koja se ne seeda nikada se ne objavljuje. Prema zadanim postavkama uključeno.</string>
+    <string name="icebridge_public_catalog_title">Podijeli moj katalog kako bi ga ljudi mogli pregledavati, a crawleri indeksirati</string>
+    <string name="icebridge_public_catalog_summary">Omogućuje ljudima da pregledavaju sve što trenutačno dijelite bez pretraživanja i crawlerima da indeksiraju mrežu. Povijest preuzimanja koja se ne dijeli nikada se ne objavljuje.</string>
+    <string name="icebridge_join_title">Pridruži se IceBridge mreži: pretraži torrente drugih korisnika i dopusti im da pronađu one koje ja dijelim</string>
+    <string name="icebridge_join_note">Dok je ovo uključeno, svatko tko koristi distribuirano pretraživanje može pronaći torrente koje trenutačno dijelite kada se ključne riječi podudaraju, čak i ako ne dijelite svoj katalog u nastavku. Isključite za napuštanje mreže.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedanje je objavljivanje</string>
-    <string name="icebridge_public_catalog_wizard_description">Kada seedate torrent, objavljujete ga na BitTorrent mreži kako bi ga drugi mogli pronaći i preuzeti. Možete odabrati hoće li crawleri mreže moći indeksirati i torrente koje aktivno seedate.</string>
-    <string name="icebridge_public_catalog_wizard_label">Dopusti crawlerima da pregledavaju torrente koje aktivno seedam</string>
+    <string name="icebridge_public_catalog_wizard_description">Kada seedate torrent, objavljujete ga na BitTorrent mreži kako bi ga drugi mogli pronaći i preuzeti. Odaberite u nastavku kako sudjelujete u IceBridge mreži.</string>
     <string name="peer_catalog_browse_action">Pregledaj dijeljene torrente</string>
     <string name="peer_catalog_title">Dijeljeni torrenti</string>
     <string name="distributed_icebridge_start_ok">IceBridge stog je pokrenut</string>

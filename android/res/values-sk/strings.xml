@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Porty nie sú dostupné, kým sa zásobník nespustí</string>
     <string name="distributed_icebridge_start">Spustiť / reštartovať IceBridge</string>
     <string name="distributed_icebridge_start_summary">Spustiť sieť IceBridge v rámci procesu, ak nebeží, alebo vynútiť jej reštart</string>
-    <string name="icebridge_public_catalog_title">Verejne zdieľať môj katalóg zdieľania (crawlery)</string>
-    <string name="icebridge_public_catalog_summary">Nechajte prehľadávače siete indexovať torrenty, ktoré aktívne seedujete. História sťahovania, ktorá sa neseeduje, sa nikdy nezverejňuje. Predvolene zapnuté.</string>
+    <string name="icebridge_public_catalog_title">Zdieľať môj katalóg, aby ho ľudia mohli prehliadať a prehľadávače indexovať</string>
+    <string name="icebridge_public_catalog_summary">Umožní ľuďom prehliadať všetko, čo práve zdieľate, bez vyhľadávania, a prehľadávačom indexovať sieť. História sťahovania, ktorá sa nezdieľa, sa nikdy nezverejňuje.</string>
+    <string name="icebridge_join_title">Pripojiť sa do siete IceBridge: hľadať torrenty iných používateľov a nechať ich nájsť tie, ktoré zdieľam</string>
+    <string name="icebridge_join_note">Kým je to zapnuté, ktokoľvek, kto používa distribuované vyhľadávanie, môže nájsť torrenty, ktoré práve zdieľate, ak sa zhodujú kľúčové slová, aj keď svoj katalóg nižšie nezdieľate. Vypnutím sieť opustíte.</string>
     <string name="icebridge_public_catalog_wizard_title">Seedovanie je zverejňovanie</string>
-    <string name="icebridge_public_catalog_wizard_description">Keď seedujete torrent, zverejňujete ho v sieti BitTorrent, aby ho ostatní mohli nájsť a stiahnuť. Môžete si vybrať, či prehľadávače siete môžu indexovať aj torrenty, ktoré aktívne seedujete.</string>
-    <string name="icebridge_public_catalog_wizard_label">Nechať prehľadávače prezerať torrenty, ktoré aktívne seedujem</string>
+    <string name="icebridge_public_catalog_wizard_description">Keď seedujete torrent, zverejňujete ho v sieti BitTorrent, aby ho ostatní mohli nájsť a stiahnuť. Nižšie vyberte, ako sa chcete zapojiť do siete IceBridge.</string>
     <string name="peer_catalog_browse_action">Prehliadať zdieľané torrenty</string>
     <string name="peer_catalog_title">Zdieľané torrenty</string>
     <string name="distributed_icebridge_start_ok">Zásobník IceBridge sa spustil</string>

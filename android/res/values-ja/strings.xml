@@ -614,11 +614,12 @@
     <string name="distributed_icebridge_config_unknown">スタックが起動するまでポートは利用できません</string>
     <string name="distributed_icebridge_start">IceBridgeを起動 / 再起動</string>
     <string name="distributed_icebridge_start_summary">プロセス内のIceBridgeメッシュが動作していない場合は起動し、または強制的に再起動します</string>
-    <string name="icebridge_public_catalog_title">共有カタログを公開で共有する（クローラー）</string>
-    <string name="icebridge_public_catalog_summary">ネットワークのクローラーが、あなたが実際にシードしている torrent をインデックスできるようにします。シードしていないダウンロード履歴が公開されることはありません。既定ではオンです。</string>
+    <string name="icebridge_public_catalog_title">カタログを共有して、他の人が閲覧でき、クローラーがインデックスできるようにする</string>
+    <string name="icebridge_public_catalog_summary">検索しなくても、あなたが現在シードしているすべてを他の人が閲覧でき、クローラーがネットワークをインデックスできるようになります。シードしていないダウンロード履歴が公開されることはありません。</string>
+    <string name="icebridge_join_title">IceBridge ネットワークに参加する：他のユーザーのトレントを検索し、自分がシードしているトレントを見つけてもらう</string>
+    <string name="icebridge_join_note">オンの間は、分散検索を使う誰もが、キーワードが一致すればあなたが現在シードしているトレントを見つけられます。下でカタログを共有していなくても同様です。ネットワークから抜けるにはオフにしてください。</string>
     <string name="icebridge_public_catalog_wizard_title">シードは公開です</string>
-    <string name="icebridge_public_catalog_wizard_description">torrent をシードすると、他の人が見つけてダウンロードできるように BitTorrent ネットワークへ公開されます。ネットワークのクローラーにも、あなたが実際にシードしている torrent をインデックスさせるかどうかを選べます。</string>
-    <string name="icebridge_public_catalog_wizard_label">クローラーに、私が実際にシードしている torrent を閲覧させる</string>
+    <string name="icebridge_public_catalog_wizard_description">torrent をシードすると、他の人が見つけてダウンロードできるように BitTorrent ネットワークへ公開されます。IceBridge ネットワークへの参加方法を以下から選んでください。</string>
     <string name="peer_catalog_browse_action">共有トレントを閲覧</string>
     <string name="peer_catalog_title">共有トレント</string>
     <string name="distributed_icebridge_start_ok">IceBridgeスタックを起動しました</string>

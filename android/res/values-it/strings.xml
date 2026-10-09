@@ -613,11 +613,12 @@
     <string name="distributed_icebridge_config_unknown">Porte non disponibili finché lo stack non si avvia</string>
     <string name="distributed_icebridge_start">Avvia / riavvia IceBridge</string>
     <string name="distributed_icebridge_start_summary">Avvia la mesh IceBridge in-process se non è in esecuzione, oppure forza il riavvio</string>
-    <string name="icebridge_public_catalog_title">Condividi pubblicamente il mio catalogo dei file condivisi (crawler)</string>
-    <string name="icebridge_public_catalog_summary">Consenti ai crawler della rete di indicizzare i torrent che stai seedando attivamente. La cronologia dei download che non è in seed non viene mai pubblicata. Attivato per impostazione predefinita.</string>
+    <string name="icebridge_public_catalog_title">Condividi il mio catalogo così le persone possono sfogliarlo e i crawler indicizzarlo</string>
+    <string name="icebridge_public_catalog_summary">Permette alle persone di sfogliare tutto ciò che condividi attivamente senza cercarlo e ai crawler di indicizzare la rete. La cronologia dei download non condivisi non viene mai pubblicata.</string>
+    <string name="icebridge_join_title">Unisciti alla rete IceBridge: cerca i torrent degli altri utenti e lascia che trovino quelli che condivido</string>
+    <string name="icebridge_join_note">Finché è attivo, chiunque usi la Ricerca distribuita può trovare i torrent che stai condividendo quando le sue parole chiave corrispondono, anche se non condividi il tuo catalogo qui sotto. Disattivalo per lasciare la rete.</string>
     <string name="icebridge_public_catalog_wizard_title">Il seeding è pubblicare</string>
-    <string name="icebridge_public_catalog_wizard_description">Quando fai il seed di un torrent, lo pubblichi sulla rete BitTorrent così che altri possano trovarlo e scaricarlo. Puoi scegliere se i crawler della rete possono indicizzare anche i torrent che stai seedando attivamente.</string>
-    <string name="icebridge_public_catalog_wizard_label">Consenti ai crawler di sfogliare i torrent che sto seedando attivamente</string>
+    <string name="icebridge_public_catalog_wizard_description">Quando fai il seed di un torrent, lo pubblichi sulla rete BitTorrent così che altri possano trovarlo e scaricarlo. Scegli qui sotto come partecipare alla rete IceBridge.</string>
     <string name="peer_catalog_browse_action">Sfoglia i torrent condivisi</string>
     <string name="peer_catalog_title">Torrent condivisi</string>
     <string name="distributed_icebridge_start_ok">Stack IceBridge avviato</string>
