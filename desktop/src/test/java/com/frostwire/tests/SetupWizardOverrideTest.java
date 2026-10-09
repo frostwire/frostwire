@@ -48,7 +48,7 @@ class SetupWizardOverrideTest {
     assertTrue(html.contains("Distributed Search"), "must name the feature");
     assertTrue(html.contains("seeding or downloading"), "must say what is shared");
     assertTrue(html.contains("never published"), "must say what is not shared");
-    assertTrue(html.contains("Enable IceBridge (distributed relay)"), "must say how to opt out");
+    assertTrue(html.contains("Tools > Options > IceBridge"), "must say where to change it later");
   }
 
   @Test

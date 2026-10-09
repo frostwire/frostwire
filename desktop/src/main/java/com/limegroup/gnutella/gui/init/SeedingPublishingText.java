@@ -37,7 +37,27 @@ public final class SeedingPublishingText {
             "Torrents you are seeding or downloading right now are listed in your shared index, so other people using Distributed Search can find them."),
         I18n.tr(
             "Paused transfers, private torrents and your download history are never published."),
-        I18n.tr(
-            "To stop taking part, turn off \"Enable IceBridge (distributed relay)\" in Tools > Options > IceBridge."));
+        I18n.tr("You can change both options later in Tools > Options > IceBridge."));
+  }
+
+  /** First choice: take part in the network at all (search, and be found by keyword). */
+  public static String joinNetworkLabel() {
+    return I18n.tr(
+        "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding");
+  }
+
+  public static String joinNetworkNote() {
+    return I18n.tr(
+        "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network.");
+  }
+
+  /** Second choice: let people list and crawlers index everything actively seeded. */
+  public static String catalogLabel() {
+    return I18n.tr("Share my catalog so people can browse it and crawlers can index it");
+  }
+
+  public static String catalogNote() {
+    return I18n.tr(
+        "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published.");
   }
 }

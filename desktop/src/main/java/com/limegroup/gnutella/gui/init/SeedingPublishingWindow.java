@@ -24,9 +24,9 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * First-run/update wizard page explaining that seeding a torrent publishes it, that with
- * Distributed Search enabled other peers on the network can find the torrents being actively
- * shared, and letting the user opt in to having those torrents browsable by crawlers.
+ * First-run/update wizard page explaining that seeding a torrent publishes it, and asking two
+ * separate questions: whether to join the IceBridge network (search, and be found by keyword), and
+ * whether to also share the whole catalog so people can browse it and crawlers can index it.
  */
 final class SeedingPublishingWindow extends SetupWindow {
   /** Line width inside the 700px page: its 10px side padding, the bullet and a safety margin. */
@@ -34,7 +34,8 @@ final class SeedingPublishingWindow extends SetupWindow {
 
   private static final int SCOPE_INDENT = 22;
 
-  private JCheckBox _crawlerOptIn;
+  private JCheckBox _joinNetwork;
+  private JCheckBox _shareCatalog;
 
   /** Creates the window and its components. */
   SeedingPublishingWindow(SetupManager manager) {
@@ -66,42 +67,41 @@ final class SeedingPublishingWindow extends SetupWindow {
       mainPanel.add(bullet, row);
     }
     mainPanel.add(Box.createVerticalStrut(10), row);
-    _crawlerOptIn =
-        new JCheckBox(I18n.tr("Let crawlers browse the torrents I am actively seeding"));
-    _crawlerOptIn.setSelected(SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue());
-    _crawlerOptIn.setToolTipText(
-        I18n.tr(
-            "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."));
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.NORTHWEST;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.weightx = 1;
-    mainPanel.add(_crawlerOptIn, gbc);
-    gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.NORTHWEST;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    WrappedLabel scope =
-        new WrappedLabel(
-            I18n.tr(
-                "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."),
-            TEXT_WIDTH - SCOPE_INDENT);
-    scope.setBorder(BorderFactory.createEmptyBorder(0, SCOPE_INDENT, 0, 0));
-    mainPanel.add(scope, gbc);
+
+    _joinNetwork = new JCheckBox(SeedingPublishingText.joinNetworkLabel());
+    _joinNetwork.setSelected(SearchEnginesSettings.ICEBRIDGE_ENABLED.getValue());
+    _joinNetwork.setToolTipText(SeedingPublishingText.joinNetworkNote());
+    mainPanel.add(_joinNetwork, row);
+    mainPanel.add(note(SeedingPublishingText.joinNetworkNote()), row);
+    mainPanel.add(Box.createVerticalStrut(10), row);
+
+    _shareCatalog = new JCheckBox(SeedingPublishingText.catalogLabel());
+    _shareCatalog.setSelected(SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue());
+    _shareCatalog.setToolTipText(SeedingPublishingText.catalogNote());
+    _shareCatalog.setEnabled(_joinNetwork.isSelected());
+    // Sharing the catalog only makes sense on the network: leaving it disables the second choice.
+    _joinNetwork.addItemListener(e -> _shareCatalog.setEnabled(_joinNetwork.isSelected()));
+    mainPanel.add(_shareCatalog, row);
+    GridBagConstraints last = (GridBagConstraints) row.clone();
+    last.weighty = 1;
+    mainPanel.add(note(SeedingPublishingText.catalogNote()), last);
     setSetupComponent(mainPanel);
   }
 
+  private static JComponent note(String text) {
+    WrappedLabel note = new WrappedLabel(text, TEXT_WIDTH - SCOPE_INDENT);
+    note.setBorder(BorderFactory.createEmptyBorder(0, SCOPE_INDENT, 0, 0));
+    return note;
+  }
+
   /**
-   * Persists the crawler opt-in value. Loading happens in {@link #createWindow()}, which is called
-   * every time the page is opened.
+   * Persists both choices. Loading happens in {@link #createWindow()}, which is called every time
+   * the page is opened.
    */
   @Override
   public void applySettings(boolean loadCoreComponents) {
-    if (_crawlerOptIn != null) {
-      SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.setValue(_crawlerOptIn.isSelected());
+    if (_joinNetwork != null && _shareCatalog != null) {
+      SeedingPublishingChoices.save(_joinNetwork.isSelected(), _shareCatalog.isSelected());
     }
   }
 

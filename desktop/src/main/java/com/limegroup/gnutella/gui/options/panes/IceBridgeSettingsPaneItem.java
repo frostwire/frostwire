@@ -9,6 +9,7 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+import com.limegroup.gnutella.gui.init.SeedingPublishingText;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import java.awt.*;
 import javax.swing.*;
@@ -22,10 +23,10 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
           "Configure the IceBridge relay for decentralized search. Desktop can use its own local IceBridge daemon or connect to a remote one (e.g. standalone relay). For remote mode, use the full base URL of the remote control API (include http:// and the control HTTP port).");
 
   private final JCheckBox ENABLED_CHECKBOX =
-      new JCheckBox(I18n.tr("Enable IceBridge (distributed relay)"));
+      new JCheckBox(SeedingPublishingText.joinNetworkLabel());
 
   private final JCheckBox PUBLIC_CATALOG_CHECKBOX =
-      new JCheckBox(I18n.tr("Make shared torrents catalog crawlable"));
+      new JCheckBox(SeedingPublishingText.catalogLabel());
 
   private final JRadioButton LOCAL_RADIO =
       new JRadioButton(I18n.tr("Use local IceBridge daemon (fork subprocess)"));
@@ -73,9 +74,8 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     RUDP_PORT_FIELD.setToolTipText(I18n.tr("Use random port (Recommended)") + " (0)");
 
-    PUBLIC_CATALOG_CHECKBOX.setToolTipText(
-        I18n.tr(
-            "Only torrents you are actively seeding are shared with crawlers. Downloaded history that is not seeding is never published."));
+    ENABLED_CHECKBOX.setToolTipText(SeedingPublishingText.joinNetworkNote());
+    PUBLIC_CATALOG_CHECKBOX.setToolTipText(SeedingPublishingText.catalogNote());
 
     add(ENABLED_CHECKBOX);
     add(PUBLIC_CATALOG_CHECKBOX);

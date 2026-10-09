@@ -73,13 +73,17 @@ class SetupWizardTranslationsTest {
   void sourceStringsMatchTheCatalogKeys() {
     List<String> points = SeedingPublishingText.distributedSearchPoints();
     assertEquals(3, points.size());
-    assertTrue(points.get(2).startsWith("To stop taking part, turn off"));
+    assertTrue(points.get(2).startsWith("You can change both options later"));
   }
 
   @Test
   void everyLanguageTranslatesTheWizardPage() throws Exception {
     List<String> msgids = new ArrayList<>(SeedingPublishingText.distributedSearchPoints());
     msgids.add(DESCRIPTION);
+    msgids.add(SeedingPublishingText.joinNetworkLabel());
+    msgids.add(SeedingPublishingText.joinNetworkNote());
+    msgids.add(SeedingPublishingText.catalogLabel());
+    msgids.add(SeedingPublishingText.catalogNote());
     List<Path> files = catalogs();
     assertTrue(files.size() >= 61, "expected every language catalog, found " + files.size());
     for (Path file : files) {
