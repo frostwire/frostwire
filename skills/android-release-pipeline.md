@@ -24,7 +24,8 @@ corrections made during that release.
 - Never ship a changed default, security setting, or privacy behavior that the
   changelog/strings contradict. Stop and ask the user.
 - Commit prefixes: `[android]` for app changes, `[www]` for the website. The commit
-  body's last line is the model id. Push frostwire to both `origin` and `gubatron`.
+  body's last line is the id of the model that wrote the commit (`anthropic/claude-sonnet-5.5`
+  for Claude Sonnet 5.5); never copy the trailer from older commits. Push frostwire to both `origin` and `gubatron`.
 - Leave personal untracked files alone: `.opencode/`, `desktop/2,000`,
   `desktop/GROK_RESUME_SESSION`, `telluride_macos.arm64.zip`.
 
@@ -193,3 +194,22 @@ Repo: `/Users/gubatron/workspace/frostwire-cloud` (remote
 - Tagging before the APK is verified caused two tag moves. Tag after verification.
 - Release-only failures (R8 removing reflectively accessed members) do not show up
   in debug builds or unit tests; keep `verifyReleaseNettyReflection` in the gate.
+
+## Lessons from 3.2.2 build 778
+
+- Two APKs were built and discarded before the shipped one: the first (15:44) predated the LAN
+  beacon commit, and a bug found by the user during testing (the browsable flag dropped when
+  results were streamed in chunks) needed another code fix. Re-check APK mtime against the final
+  commit date every time, and look for files newer than the APK:
+  `find android/src common/src android/res android/AndroidManifest.xml -newer <apk> -type f`.
+- `dexdump -d` output is huge and contains invalid UTF-8; use Python with
+  `open(f, errors='ignore')`, not awk, to inspect it. Useful checks: a class descriptor exists
+  (`AndroidLanBeacon`), `createMulticastLock`/`MulticastLock.acquire`/`release` references exist,
+  and a method calls the expected overload (e.g. `IncomingSearchRequestHandler.sendSearchResponse`
+  calling `Builder.addRow(...;Z)` with the catalog flag). `aapt2 dump badging` shows versionCode
+  (Plus variant `9090778`) and versionName.
+- The Plus1 APK is the only variant that ships; the file name has `-plus.apk`.
+- Rewriting history after the changelog commit (e.g. to fix commit trailers) changes the commit
+  hash but not the tree; tag the new HEAD, whose tree equals the one the APK was built from.
+- Order that worked: verify APK -> tag -> `gh release create` with the APK attached -> verify the
+  asset digest and download URL -> website commit -> `ssh ubuntu@virginia1` pull.
