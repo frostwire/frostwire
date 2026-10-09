@@ -499,7 +499,7 @@ Use this section whenever the change touches `common/.../search/relay/**`, IceBr
 
 | Plane | Mechanism | Role |
 |-------|-----------|------|
-| Identity / bootstrap | Direct TCP (`IncomingRelayServer`, historical default port 6888) + BEP 46 `IdentityRecord` | Learn Ed25519 pub + rudpPort + role; a valid record is not proof of live endpoint key possession |
+| Identity / bootstrap | rUDP identity-discovery handshake (`POST /probe`, `RudpPeerProber`) + BEP 46 `IdentityRecord` (the former TCP identity port was removed 2026-10: unreachable behind NAT) | The handshake proves endpoint key possession; the signed record supplies role/capabilities/version and is not proof of a live endpoint |
 | Discovery | BEP 5 topics `frostwire-peers-v1`, `frostwire-relays-v1`, `frostwire-bootstrap-v1` | Multi-writer rendezvous only |
 | Data / search transport | IceBridge rUDP mesh + HTTP control API | Opaque payload routing for signed search messages |
 | Search application | `DistributedSearchPerformer` + `RelaySearchService` + `SearchResponseVerifier` | Sign/verify keywords & results |
@@ -510,7 +510,7 @@ Design reference: repo root `DESIGN_RELAY_REGISTRY.md`; reconcile it with curren
 ### Checklist — Identity & discovery
 
 - [ ] **Own-pub self-skip** — `PeerDiscovery` receives `ownEd25519Pub`; after identity verify, skip if pub matches own (MentisDB #831).
-- [ ] **Loopback skip** — `isLocalEndpoint` rejects 127.0.0.1 / localhost / ::1 before TCP auth.
+- [ ] **Loopback skip** — `isLocalEndpoint` rejects 127.0.0.1 / localhost / ::1 before the rUDP probe.
 - [ ] **Verified-only search** — `DistributedSearchPerformer` uses `topByTrustVerified`, never raw `topByTrust` / placeholders.
 - [ ] **IdentityRecord v2** — historical `rudp_port` + `role` addition retained v1 fallback (`rudpPort==0` → 6889). Verify the current version/fallback contract rather than hardcoding that historical default into new callers.
 - [ ] **DHT topics** — peers announce peers topic; FORWARDER/BOTH (or auto-elect when connectable) announce relays; discovery prefers relays first (no `<10 peers` gate — MentisDB #832).
