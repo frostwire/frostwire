@@ -61,19 +61,19 @@ public final class RelayConstants {
     public static final String BITCOIN_HEADER_CACHE_DIR = "bitcoin-headers";
 
     /**
-     * Default TCP port for the relay search server. Separate from
-     * the BitTorrent listen port range to avoid conflicts.
+     * Legacy default of the removed TCP identity/search port. Peers are verified over rUDP now;
+     * {@code IceBridgeConfig} keeps it only as the "standalone forwarder" marker.
      */
     public static final int RELAY_LISTEN_PORT = 6888;
 
     /**
      * Last-resort IceBridge servers every client tries even when the DHT, the host cache and the LAN
      * all come back empty, so a fresh install can always find the network. They are only candidates:
-     * each one must still pass the authenticated identity handshake. Override with the
+     * each one must still pass the rUDP identity handshake (the port is the rUDP port). Override with the
      * {@code frostwire.icebridge.seeds} system property (comma separated {@code host:port}; empty
      * disables the built-in seeds).
      */
-    public static final String[] DEFAULT_SEED_HOSTS = {"virginia1.frostwire.com:6888"};
+    public static final String[] DEFAULT_SEED_HOSTS = {"virginia1.frostwire.com:6889"};
 
     public static java.util.List<String> seedHosts() {
         String override = System.getProperty("frostwire.icebridge.seeds");

@@ -11,7 +11,6 @@ import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.IdentityKeys;
 import com.frostwire.search.relay.IdentityRecord;
 import com.frostwire.search.relay.IdentityRecordPublisher;
-import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.icebridge.control.CatalogFetcher;
 import com.frostwire.search.relay.icebridge.control.ControlServer;
 import com.frostwire.search.relay.icebridge.control.InboundMessageQueue;
@@ -58,7 +57,6 @@ public final class IceBridgeServer implements AutoCloseable {
     private RudpSessionManager rudpSessionManager;
     private InboundMessageQueue inboundQueue;
     private ScheduledExecutorService janitor;
-    private IncomingRelayServer relayServer;
     private IceBridgeDhtSession dhtSession;
     private DhtAdvertiser dhtAdvertiser;
 
@@ -99,7 +97,8 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("Configuration (from .env / ICEBRIDGE_* env vars):");
         System.out.println("  ICEBRIDGE_HOST              = " + config.host());
         System.out.println("  ICEBRIDGE_RUDP_PORT         = " + config.rudpPort() + " (UDP)");
-        System.out.println("  ICEBRIDGE_RELAY_PORT        = " + config.relayPort() + " (TCP, identity handshake)");
+        System.out.println("  ICEBRIDGE_RELAY_PORT        = " + config.relayPort()
+                + " (ignored: peers are verified over rUDP; non-zero selects standalone forwarder mode)");
         System.out.println("  ICEBRIDGE_CONTROL_HTTP_PORT = " + config.controlHttpPort() + " (TCP)");
         System.out.println("  ICEBRIDGE_ROLE              = " + config.role());
         System.out.println("  ICEBRIDGE_IDENTITY_FILE     = " + (config.identityFile() != null ? config.identityFile() : "(default)"));
@@ -117,11 +116,6 @@ public final class IceBridgeServer implements AutoCloseable {
             System.err.println("       Another IceBridge instance or FrostWire may already be running.");
             System.err.println("       To use a different port: ICEBRIDGE_RUDP_PORT=<port> ./gradlew icebridge");
             System.exit(1);
-        }
-        if (config.relayPort() > 0 && !checkPortAvailable(config.host(), config.relayPort(), false)) {
-            System.err.println("WARNING: TCP port " + config.relayPort() + " (identity handshake) is already in use.");
-            System.err.println("         Another IceBridge instance or FrostWire may already be running.");
-            System.err.println("         To use a different port: ICEBRIDGE_RELAY_PORT=<port> ./gradlew icebridge");
         }
         if (config.controlHttpPort() > 0 && !checkPortAvailable(config.host(), config.controlHttpPort(), false)) {
             System.err.println("ERROR: TCP port " + config.controlHttpPort() + " is already in use.");
@@ -156,8 +150,6 @@ public final class IceBridgeServer implements AutoCloseable {
                 System.out.println("  Health:  curl -sS http://127.0.0.1:" + config.controlHttpPort() + "/health");
                 System.out.println("  Metrics: curl -sS -H \"X-IceBridge-Token: <token>\" http://127.0.0.1:"
                         + config.controlHttpPort() + "/metrics");
-                System.out.println("  (TCP " + config.relayPort()
-                        + " probes that are not FrostWire protocol are ignored at DEBUG — scanners/BT clients are normal.)");
                 System.out.flush();
                 Thread.sleep(Long.MAX_VALUE);
             } finally {
@@ -312,7 +304,6 @@ public final class IceBridgeServer implements AutoCloseable {
         try {
             controlServer.start();
             rudpServer.start();
-            startRelayServer();
             startJanitor();
             startDhtAnnouncer();
         } catch (InterruptedException | RuntimeException | Error e) {
@@ -365,28 +356,6 @@ public final class IceBridgeServer implements AutoCloseable {
                 JANITOR_INITIAL_DELAY_SEC, JANITOR_INTERVAL_SEC, TimeUnit.SECONDS);
     }
 
-    private void startRelayServer() {
-        int relayPort = config.relayPort();
-        // relayPort=0: embedder owns IncomingRelayServer (Android starts a full
-        // RelayRole server on RELAY_LISTEN_PORT; dual-bind causes EADDRINUSE).
-        if (relayPort <= 0) {
-            LOG.info("IceBridge identity handshake TCP server disabled (relayPort=0; external owner)");
-            return;
-        }
-        try {
-            IdentityRecord record = IdentityRecord.createSigned(
-                    identity.nodeId(), identity.ed25519(),
-                    identity.x25519PubRaw(), relayPort,
-                    rudpServer.port(), config.role().name());
-            relayServer = new IncomingRelayServer(record, identity.ed25519().getPrivate(), relayPort, config.host());
-            relayServer.start();
-            LOG.info("IceBridge identity handshake server listening on " + config.host() + ":" + relayPort + " (TCP)");
-        } catch (Throwable t) {
-            LOG.warn("Failed to start identity handshake server on port " + relayPort
-                    + "; peers will not be able to authenticate this relay via TCP", t);
-        }
-    }
-
     /**
      * Start embedded DHT announce when {@link IceBridgeConfig#dhtEnabled()}.
      * Fail-closed: mesh stays up if native DHT fails to start.
@@ -398,7 +367,8 @@ public final class IceBridgeServer implements AutoCloseable {
         }
         try {
             dhtSession = IceBridgeDhtSession.start(config.host());
-            // BEP 5 advertise TCP identity port; rUDP port is in IdentityRecord (BEP 46).
+            // BEP 5 announces the rUDP port: peers verify an announced endpoint with the rUDP
+            // identity handshake. The full identity record is published via BEP 46.
             IdentityRecordPublisher publisher = new IdentityRecordPublisher(
                     identity,
                     config.relayPort(),
@@ -418,7 +388,7 @@ public final class IceBridgeServer implements AutoCloseable {
             dhtAdvertiser.start();
             LOG.info("IceBridge DHT announcer started: peerTopic=" + peerTopic
                     + " bootstrapTopic=" + bootstrapTopic
-                    + " announcePort=" + config.relayPort());
+                    + " announcePort=" + publisher.announcePort());
         } catch (Throwable t) {
             LOG.warn("IceBridge DHT announcer failed to start; relay mesh continues without DHT visibility", t);
             stopDhtAnnouncer();
@@ -546,12 +516,6 @@ public final class IceBridgeServer implements AutoCloseable {
         if (janitor != null) {
             janitor.shutdownNow();
         }
-        if (relayServer != null) {
-            try {
-                relayServer.stop();
-            } catch (Throwable ignored) {
-            }
-        }
         if (rudpServer != null) {
             try {
                 rudpServer.close();
@@ -661,7 +625,7 @@ public final class IceBridgeServer implements AutoCloseable {
         System.out.println("Options:");
         System.out.println("  CLI overrides exported ICEBRIDGE_* env, then system properties/.env, then role defaults.");
         System.out.println("  --rudp-port PORT           rUDP listen port (0 = disable, auto for local)");
-        System.out.println("  --relay-port PORT          TCP identity/relay handshake port (default 6888)");
+        System.out.println("  --relay-port PORT          ignored by peer verification (rUDP); non-zero selects standalone forwarder mode (default 6888)");
         System.out.println("  --control-http-port PORT   HTTP control port on 127.0.0.1 (required, must be > 0)");
         System.out.println("  --role ROLE                FORWARDER, CLIENT, or BOTH");
         System.out.println("  --identity-file PATH       Ed25519 identity file");

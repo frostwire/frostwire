@@ -32,12 +32,13 @@ import java.util.function.Supplier;
  * <ol>
  *   <li>The source's {@link PeerDiscoverySource#fetchEndpoints}
  *       returns a list of {@code (host, port)} candidates.</li>
- *   <li>If a {@link PeerAuthenticator} is configured, each
- *       candidate is authenticated before it is registered. On
- *       success, the peer is inserted with its real Ed25519
- *       pubkey via {@link PeerDirectory#upsertVerified(byte[], String, int)}.
+ *   <li>If a {@link PeerProber} is configured, each candidate
+ *       ({@code ip:udpPort}) is probed with the rUDP identity-discovery
+ *       handshake before it is registered. On success the peer is
+ *       inserted with its real Ed25519 pubkey via
+ *       {@link PeerDirectory#upsertVerified(byte[], String, int, int)}.
  *       On failure, the endpoint is dropped.</li>
- *   <li>When no authenticator is configured, each candidate is
+ *   <li>When no prober is configured, each candidate is
  *       registered with a placeholder pubkey derived from
  *       {@code SHA-256(host:port)}. Placeholder entries are
  *       unverified and must not be used for distributed search.</li>
@@ -60,11 +61,11 @@ public final class PeerDiscovery {
     public static final int MAX_CANDIDATES_PER_PASS = 64;
     public static final int DISCOVERY_PASS_TIMEOUT_MS = 15_000;
     /** Identity handshakes in flight at once during a discovery pass. */
-    public static final int DEFAULT_PROBE_CONCURRENCY = 8;
+    public static final int DEFAULT_PROBE_CONCURRENCY = 16;
 
     private final PeerDiscoverySource source;
     private final PeerDirectory directory;
-    private final PeerAuthenticator authenticator;
+    private final PeerProber prober;
     private final byte[] ownEd25519Pub;
     private final AtomicBoolean discovering = new AtomicBoolean();
     private final java.util.concurrent.ConcurrentHashMap<String, Backoff> backoff =
@@ -86,12 +87,12 @@ public final class PeerDiscovery {
     }
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory,
-                         PeerAuthenticator authenticator) {
-        this(source, directory, authenticator, null);
+                         PeerProber prober) {
+        this(source, directory, prober, null);
     }
 
     public PeerDiscovery(PeerDiscoverySource source, PeerDirectory directory,
-                         PeerAuthenticator authenticator, byte[] ownEd25519Pub) {
+                         PeerProber prober, byte[] ownEd25519Pub) {
         if (source == null) {
             throw new IllegalArgumentException("source is null");
         }
@@ -100,7 +101,7 @@ public final class PeerDiscovery {
         }
         this.source = source;
         this.directory = directory;
-        this.authenticator = authenticator;
+        this.prober = prober;
         this.ownEd25519Pub = (ownEd25519Pub != null) ? ownEd25519Pub.clone() : null;
     }
 
@@ -122,8 +123,8 @@ public final class PeerDiscovery {
      * that were newly registered in the directory (i.e., not
      * already known).
      *
-     * <p>When an authenticator is present, only successfully
-     * authenticated endpoints are returned and registered.
+     * <p>When a prober is present, only endpoints that proved possession of
+     * their key are returned and registered.
      *
      * <p>Candidates are probed in parallel (see {@link #setProbeConcurrency(int)}) so a handful of
      * unreachable peers cannot use up the pass; {@link DiscoveredEndpoint#preferred} endpoints go
@@ -137,7 +138,7 @@ public final class PeerDiscovery {
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(passTimeoutMs);
         try {
             List<DiscoveredEndpoint> candidates = selectCandidates(source.fetchEndpoints());
-            if (authenticator == null) {
+            if (prober == null) {
                 registerPlaceholders(candidates, discovered);
             } else {
                 probeAndRegister(candidates, deadline, discovered);
@@ -256,10 +257,7 @@ public final class PeerDiscovery {
                 return new Probe(ep, ep.host, Optional.empty());
             }
         }
-        Optional<IdentityRecord> identity = authenticator instanceof DirectTcpPeerAuthenticator
-                ? ((DirectTcpPeerAuthenticator) authenticator).authenticate(host, ep.port, deadline)
-                : authenticator.authenticate(host, ep.port);
-        return new Probe(ep, host, identity);
+        return new Probe(ep, host, prober.probe(host, ep.port, deadline));
     }
 
     private void register(Probe probe, List<DiscoveredEndpoint> discovered) {
@@ -270,30 +268,24 @@ public final class PeerDiscovery {
             recordFailure(ep);
             return;
         }
-        IdentityRecord identity = probe.identity.get();
-        if (ownEd25519Pub != null && Arrays.equals(identity.ed25519Pub(), ownEd25519Pub)) {
+        byte[] peerPub = probe.identity.get().pub();
+        if (ownEd25519Pub != null && Arrays.equals(peerPub, ownEd25519Pub)) {
             LOG.debug("Skipping self discovery for " + host + ":" + port);
             quiet(ep, SELF_QUIET_MS);
             return;
         }
         clearBackoff(ep);
-        byte[] peerPub = identity.ed25519Pub();
         boolean known = alreadyKnown(peerPub, host, port);
-        directory.upsertVerified(peerPub, host, port, identity.rudpPort(),
-                identity.capabilities(), identity.icebridgeVersion());
-        if (!known) discovered.add(new DiscoveredEndpoint(host, port));
-
-        // Feed known IceBridge relays (FORWARDER / BOTH) into the host cache
-        // for the settings UI table and for faster post-restart bootstrapping.
-        String role = identity.role();
-        if ("FORWARDER".equals(role) || "BOTH".equals(role)) {
-            try {
-                com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                        .markSuccess(host, port, role);
-            } catch (Throwable ignored) {
-                // cache is best-effort
-            }
+        // The endpoint is the rUDP endpoint: that is the only port the handshake used. Role and
+        // capabilities arrive afterwards in the peer's NODE_META and are kept when it is known.
+        IdentityRecord record = probe.identity.get().record().orElse(null);
+        if (record != null) {
+            directory.upsertVerified(peerPub, host, port, port, record.capabilities(),
+                    record.icebridgeVersion());
+        } else {
+            directory.upsertVerified(peerPub, host, port, port);
         }
+        if (!known) discovered.add(new DiscoveredEndpoint(host, port));
     }
 
     // ---- back-off ----
@@ -318,9 +310,9 @@ public final class PeerDiscovery {
     private static final class Probe {
         final DiscoveredEndpoint endpoint;
         final String host;
-        final Optional<IdentityRecord> identity;
+        final Optional<ProbedPeer> identity;
 
-        Probe(DiscoveredEndpoint endpoint, String host, Optional<IdentityRecord> identity) {
+        Probe(DiscoveredEndpoint endpoint, String host, Optional<ProbedPeer> identity) {
             this.endpoint = endpoint;
             this.host = host;
             this.identity = identity;
@@ -393,21 +385,7 @@ public final class PeerDiscovery {
      * Returns null on any failure.
      */
     public IdentityRecord fetchIdentityRecord(byte[] peerPub) {
-        if (peerPub == null || peerPub.length != 32 || Thread.currentThread().isInterrupted()) {
-            return null;
-        }
-        try {
-            Entry entry = source.fetchIdentityEntry(peerPub);
-            if (entry == null || Thread.currentThread().isInterrupted()) {
-                return null;
-            }
-            IdentityRecord record = IdentityRecord.fromEntry(entry);
-            return Arrays.equals(record.ed25519Pub(), peerPub) ? record : null;
-        } catch (Throwable t) {
-            LOG.debug("Identity record fetch failed for " +
-                    com.frostwire.util.Hex.encode(peerPub), t);
-            return null;
-        }
+        return IdentityRecordLookup.fetch(source, peerPub);
     }
 
     /**

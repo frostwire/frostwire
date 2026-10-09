@@ -88,7 +88,6 @@ public class SettingsSetTool implements MCPTool {
       allowed.add("ICEBRIDGE_BIND_HOST");
       allowed.add("ICEBRIDGE_ROLE");
       allowed.add("ICEBRIDGE_RUDP_PORT");
-      allowed.add("ICEBRIDGE_RELAY_LISTEN_PORT");
       allowed.add("ICEBRIDGE_CONTROL_HTTP_PORT");
       error.add("allowedKeys", allowed);
       return error;

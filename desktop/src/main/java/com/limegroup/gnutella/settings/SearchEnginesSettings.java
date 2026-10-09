@@ -139,11 +139,4 @@ public class SearchEnginesSettings extends LimeProps {
 
   public static final IntSetting ICEBRIDGE_CONTROL_HTTP_PORT =
       FACTORY.createIntSetting("ICEBRIDGE_CONTROL_HTTP_PORT", 0); // 0 = auto
-
-  /**
-   * TCP port for the direct relay identity handshake server (also advertised in IdentityRecord).
-   * Default 6888. Must be different from bittorrent ports.
-   */
-  public static final IntSetting ICEBRIDGE_RELAY_LISTEN_PORT =
-      FACTORY.createIntSetting("ICEBRIDGE_RELAY_LISTEN_PORT", 6888);
 }

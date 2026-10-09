@@ -109,7 +109,11 @@ class PeerDiscoveryTest {
 
   @Test
   void selfSkipFailsOpenOnSupplierThrow() {
-    discovery.setSelfEndpoint(() -> { throw new RuntimeException("no network"); }, 6888);
+    discovery.setSelfEndpoint(
+        () -> {
+          throw new RuntimeException("no network");
+        },
+        6888);
     source.endpoints.add(new DiscoveredEndpoint("203.0.113.7", 6888));
     assertEquals(1, discovery.discoverAndRegister().size());
   }
@@ -178,27 +182,72 @@ class PeerDiscoveryTest {
 
   @Test
   void discoverWithAuthenticatorRegistersVerifiedPeers() {
-    FakeAuthenticator auth = new FakeAuthenticator();
+    FakeProber auth = new FakeProber();
     discovery = new PeerDiscovery(source, directory, auth);
 
     source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
-    IdentityRecord record = auth.add("10.0.0.1", 6888);
+    ProbedPeer peer = auth.add("10.0.0.1", 6888);
 
     List<DiscoveredEndpoint> result = discovery.discoverAndRegister();
 
     assertEquals(1, result.size());
     assertEquals(1, directory.size());
-    byte[] realPub = record.ed25519Pub();
+    byte[] realPub = peer.pub();
     PeerDirectory.PeerInfo info = directory.get(realPub).orElse(null);
     assertNotNull(info);
     assertEquals("10.0.0.1", info.hostname());
     assertEquals(6888, info.utpPort());
+    assertEquals(6888, info.rudpPort(), "the probed endpoint is the rUDP endpoint");
     assertTrue(info.isVerified());
   }
 
   @Test
+  void aProbedPeersIdentityRecordSuppliesItsCapabilitiesWhileTheEndpointStaysTheRudpEndpoint()
+      throws Exception {
+    java.security.KeyPair keys =
+        java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+    IdentityRecord record =
+        IdentityRecord.createSigned(
+            new byte[20],
+            keys,
+            new byte[32],
+            6889,
+            6889,
+            "FORWARDER",
+            NodeCapabilities.DEFAULT_FORWARDER);
+    ProbedPeer server = new ProbedPeer(record.ed25519Pub(), record);
+    discovery =
+        new PeerDiscovery(
+            source, directory, (host, port, deadlineNanos) -> java.util.Optional.of(server));
+    source.endpoints.add(new DiscoveredEndpoint("54.172.26.106", 6889));
+
+    assertEquals(1, discovery.discoverAndRegister().size());
+
+    PeerDirectory.PeerInfo info = directory.get(record.ed25519Pub()).orElseThrow();
+    assertEquals(NodeCapabilities.DEFAULT_FORWARDER, info.capabilities());
+    assertEquals(6889, info.rudpPort());
+    assertEquals("54.172.26.106", info.hostname());
+  }
+
+  @Test
+  void aKnownPeersCapabilitiesSurviveARediscoveryWithoutARecord() {
+    FakeProber prober = new FakeProber();
+    discovery = new PeerDiscovery(source, directory, prober);
+    source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
+    ProbedPeer peer = prober.add("10.0.0.1", 6888);
+    assertEquals(1, discovery.discoverAndRegister().size());
+    directory.setCapabilities(peer.pub(), NodeCapabilities.DEFAULT_FORWARDER);
+
+    discovery.setClock(() -> Long.MAX_VALUE / 2); // any back-off is over
+    discovery.discoverAndRegister();
+
+    assertEquals(
+        NodeCapabilities.DEFAULT_FORWARDER, directory.get(peer.pub()).orElseThrow().capabilities());
+  }
+
+  @Test
   void discoverWithAuthenticatorDropsUnauthenticatedPeers() {
-    FakeAuthenticator auth = new FakeAuthenticator();
+    FakeProber auth = new FakeProber();
     discovery = new PeerDiscovery(source, directory, auth);
 
     source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
@@ -212,7 +261,7 @@ class PeerDiscoveryTest {
 
   @Test
   void discoverWithAuthenticatorIsIdempotentForVerifiedPeers() {
-    FakeAuthenticator auth = new FakeAuthenticator();
+    FakeProber auth = new FakeProber();
     discovery = new PeerDiscovery(source, directory, auth);
 
     source.endpoints.add(new DiscoveredEndpoint("10.0.0.1", 6888));
@@ -254,26 +303,25 @@ class PeerDiscoveryTest {
 
   // --- helpers ---
 
-  private static final class FakeAuthenticator implements PeerAuthenticator {
-    final Map<String, IdentityRecord> records = new HashMap<>();
+  private static final class FakeProber implements PeerProber {
+    final Map<String, ProbedPeer> peers = new HashMap<>();
 
-    IdentityRecord add(String host, int port) {
+    ProbedPeer add(String host, int port) {
       try {
         java.security.KeyPair kp =
             java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-        byte[] nodeId = new byte[20];
-        byte[] x25519 = new byte[32];
-        IdentityRecord record = IdentityRecord.createSigned(nodeId, kp, x25519, port);
-        records.put(host + ":" + port, record);
-        return record;
+        IdentityRecord record = IdentityRecord.createSigned(new byte[20], kp, new byte[32], port);
+        ProbedPeer peer = new ProbedPeer(record.ed25519Pub());
+        peers.put(host + ":" + port, peer);
+        return peer;
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
 
     @Override
-    public java.util.Optional<IdentityRecord> authenticate(String host, int port) {
-      return java.util.Optional.ofNullable(records.get(host + ":" + port));
+    public java.util.Optional<ProbedPeer> probe(String host, int port, long deadlineNanos) {
+      return java.util.Optional.ofNullable(peers.get(host + ":" + port));
     }
   }
 

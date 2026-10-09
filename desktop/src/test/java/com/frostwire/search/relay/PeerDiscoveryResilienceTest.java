@@ -44,7 +44,7 @@ class PeerDiscoveryResilienceTest {
     endpoints.clear();
   }
 
-  private PeerDiscovery discovery(PeerAuthenticator authenticator) {
+  private PeerDiscovery discovery(PeerProber prober) {
     PeerDiscoverySource source =
         new PeerDiscoverySource() {
           @Override
@@ -57,15 +57,16 @@ class PeerDiscoveryResilienceTest {
             return null;
           }
         };
-    PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator);
+    PeerDiscovery discovery = new PeerDiscovery(source, directory, prober);
     discovery.setClock(nowMs::get);
     return discovery;
   }
 
-  private static IdentityRecord record(int port) {
+  private static ProbedPeer peer() {
     try {
       KeyPair keys = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-      return IdentityRecord.createSigned(new byte[20], keys, new byte[32], port);
+      return new ProbedPeer(
+          IdentityRecord.createSigned(new byte[20], keys, new byte[32], 6889).ed25519Pub());
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
@@ -77,10 +78,10 @@ class PeerDiscoveryResilienceTest {
       endpoints.add(new DiscoveredEndpoint("203.0.113." + (i + 1), 6888));
     }
     endpoints.add(new DiscoveredEndpoint("198.51.100.7", 6888));
-    IdentityRecord server = record(6888);
+    ProbedPeer server = peer();
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> {
+            (host, port, deadline) -> {
               if (host.equals("198.51.100.7")) return Optional.of(server);
               sleep(200); // an unreachable peer burns its connect timeout
               return Optional.empty();
@@ -92,7 +93,7 @@ class PeerDiscoveryResilienceTest {
     List<DiscoveredEndpoint> found = discovery.discoverAndRegister();
 
     assertEquals(1, found.size(), "the reachable server must be found despite 40 dead peers");
-    assertTrue(directory.get(server.ed25519Pub()).isPresent());
+    assertTrue(directory.get(server.pub()).isPresent());
     assertTrue((System.nanoTime() - started) / 1_000_000 < 2_500, "probes must run in parallel");
   }
 
@@ -105,7 +106,7 @@ class PeerDiscoveryResilienceTest {
     List<String> order = Collections.synchronizedList(new ArrayList<>());
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> {
+            (host, port, deadline) -> {
               order.add(host);
               return Optional.empty();
             });
@@ -125,7 +126,7 @@ class PeerDiscoveryResilienceTest {
     AtomicInteger calls = new AtomicInteger();
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> {
+            (host, port, deadline) -> {
               calls.incrementAndGet();
               probed.add(host);
               return Optional.empty();
@@ -147,7 +148,7 @@ class PeerDiscoveryResilienceTest {
     AtomicInteger preferred = new AtomicInteger();
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> {
+            (host, port, deadline) -> {
               (host.startsWith("198") ? preferred : ordinary).incrementAndGet();
               return Optional.empty();
             });
@@ -169,17 +170,18 @@ class PeerDiscoveryResilienceTest {
   @Test
   void successClearsBackoff() {
     endpoints.add(new DiscoveredEndpoint("198.51.100.7", 6888, true));
-    IdentityRecord server = record(6888);
+    ProbedPeer server = peer();
     AtomicInteger calls = new AtomicInteger();
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> calls.incrementAndGet() == 1 ? Optional.empty() : Optional.of(server));
+            (host, port, deadline) ->
+                calls.incrementAndGet() == 1 ? Optional.empty() : Optional.of(server));
 
     assertTrue(discovery.discoverAndRegister().isEmpty());
     nowMs.addAndGet(10_000);
     assertEquals(1, discovery.discoverAndRegister().size());
     assertEquals(2, calls.get());
-    assertTrue(directory.get(server.ed25519Pub()).isPresent());
+    assertTrue(directory.get(server.pub()).isPresent());
   }
 
   @Test
@@ -189,7 +191,7 @@ class PeerDiscoveryResilienceTest {
     }
     PeerDiscovery discovery =
         discovery(
-            (host, port) -> {
+            (host, port, deadline) -> {
               sleep(60_000);
               return Optional.empty();
             });

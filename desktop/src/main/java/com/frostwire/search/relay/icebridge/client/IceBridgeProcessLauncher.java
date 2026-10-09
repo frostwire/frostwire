@@ -93,7 +93,8 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     // Let the child's real UDP bind atomically select a port; probing a TCP socket
     // selects the wrong transport and leaves a release/rebind race.
     this.rudpPort = rudpPort;
-    // relayPort=0 disables the child's identity TCP listener (embedder owns it).
+    // relayPort=0 selects embedder mode: the parent owns search (Protocol #1), the child only
+    // transports.
     this.relayPort = relayPort;
     this.role = role == null || role.isEmpty() ? "BOTH" : role;
     this.host = host == null || host.isEmpty() ? "127.0.0.1" : host;

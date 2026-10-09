@@ -105,9 +105,6 @@ public class SettingsAdapter {
         settings.addProperty(
             "ICEBRIDGE_RUDP_PORT", SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
         settings.addProperty(
-            "ICEBRIDGE_RELAY_LISTEN_PORT",
-            SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
-        settings.addProperty(
             "ICEBRIDGE_CONTROL_HTTP_PORT",
             SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT.getValue());
         break;
@@ -195,7 +192,6 @@ public class SettingsAdapter {
     map.put("ICEBRIDGE_BIND_HOST", SearchEnginesSettings.ICEBRIDGE_BIND_HOST);
     map.put("ICEBRIDGE_ROLE", SearchEnginesSettings.ICEBRIDGE_ROLE);
     map.put("ICEBRIDGE_RUDP_PORT", SearchEnginesSettings.ICEBRIDGE_RUDP_PORT);
-    map.put("ICEBRIDGE_RELAY_LISTEN_PORT", SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT);
     map.put("ICEBRIDGE_CONTROL_HTTP_PORT", SearchEnginesSettings.ICEBRIDGE_CONTROL_HTTP_PORT);
     // ICEBRIDGE_REMOTE_AUTH_TOKEN is intentionally omitted: it must never be
     // readable or writable through MCP.

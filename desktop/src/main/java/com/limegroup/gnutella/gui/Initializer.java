@@ -23,33 +23,36 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.relay.BTEngineListenerChain;
 import com.frostwire.search.relay.BlockHeaderSource;
+import com.frostwire.search.relay.CompositePeerDiscoverySource;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
-import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
+import com.frostwire.search.relay.HostCachePeerDiscoverySource;
+import com.frostwire.search.relay.HostCacheTrackingProber;
 import com.frostwire.search.relay.HttpBlockHeaderFetcher;
 import com.frostwire.search.relay.IdentityKeys;
-import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.IdentityRecordEnrichingProber;
 import com.frostwire.search.relay.IdentityRecordPublisher;
-import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.IndexAnnouncementPublisher;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
 import com.frostwire.search.relay.KarmaChainPublisher;
 import com.frostwire.search.relay.KarmaChainTable;
 import com.frostwire.search.relay.KarmaChainWriter;
 import com.frostwire.search.relay.KarmaEndorsementTrigger;
+import com.frostwire.search.relay.LanPeerBeacon;
 import com.frostwire.search.relay.LocalIndex;
 import com.frostwire.search.relay.LocalIndexTable;
-import com.frostwire.search.relay.PeerAuthenticator;
 import com.frostwire.search.relay.PeerDirectory;
 import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
 import com.frostwire.search.relay.PeerDiscoverySource;
 import com.frostwire.search.relay.PeerKarmaCache;
-import com.frostwire.search.relay.RelayRole;
+import com.frostwire.search.relay.PeerProber;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
+import com.frostwire.search.relay.RudpPeerProber;
 import com.frostwire.search.relay.SharedTorrentIndexerInstaller;
+import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import com.frostwire.search.relay.icebridge.client.IceBridgeClient;
 import com.frostwire.search.relay.icebridge.client.IceBridgeProcessLauncher;
 import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
@@ -75,6 +78,7 @@ import com.limegroup.gnutella.util.MacOSXUtils;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicHTML;
 import org.limewire.util.CommonUtils;
@@ -563,15 +567,8 @@ final class Initializer {
       // announcements wait until the IceBridge child's effective UDP port is known.
       PeerDirectory directory = new PeerDirectory(karmaCache);
 
-      // 10. Start the peer discovery scheduler so we can
-      //     discover other FrostWire nodes via BEP 5. Newly
-      //     discovered endpoints are registered in the
-      //     SHARED PeerDirectory with placeholder pubkeys
-      //     (derived from SHA-256(host:port)). When a peer
-      //     sends us a request, we learn their real pubkey
-      //     and can upgrade the entry.
-      startPeerDiscovery(directory, btEngine, identity);
-      if (!relayLifecycle.getAsBoolean()) return;
+      // Peer discovery needs the IceBridge daemon (candidates are verified with the rUDP identity
+      // handshake), so it starts in startIceBridgeSearch once the daemon is healthy.
 
       // Log IceBridge configuration (from settings) early. This shows what will be used
       // for any IceBridge child process launched this session. Env vars can still override.
@@ -648,9 +645,6 @@ final class Initializer {
     log.info(
         "  ICEBRIDGE_RUDP_PORT           = "
             + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
-    log.info(
-        "  ICEBRIDGE_RELAY_LISTEN_PORT   = "
-            + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
     log.info(
         "  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
     log.info(
@@ -731,8 +725,7 @@ final class Initializer {
 
         IceBridgeProcessLauncher launcher =
             new IceBridgeProcessLauncher(
-                // relayPort=0: the app's own IncomingRelayServer owns
-                // the identity TCP port (dual-bind causes EADDRINUSE).
+                // relayPort=0: peers are verified over rUDP, the daemon opens no TCP port.
                 jarPath, identityFile, 0, effectiveRudpPort, 0, role, bindHost);
         relayResources.add(launcher);
         effectiveRudpPort =
@@ -747,7 +740,6 @@ final class Initializer {
         relayLog.info("IceBridge daemon (local child) started:");
         relayLog.info("  controlPort=" + launcher.controlPort() + " (auto-assigned)");
         relayLog.info("  rudpPort=" + launcher.rudpPort());
-        relayLog.info("  relayPort=" + launcher.relayPort() + " (identity)");
         relayLog.info("  bindHost=" + bindHost + " role=" + role);
 
         client = launcher.client();
@@ -854,11 +846,12 @@ final class Initializer {
       IceBridgeStartup.announce(
           effectiveRudpPort,
           relayLifecycle,
-          port -> startRelayServer(identity, localIndex, directory, port),
           port -> startDhtAdvertiser(BTEngine.getInstance(), identity, localIndex, port),
           port -> peerSync.start());
       if (!relayLifecycle.getAsBoolean()) return;
       if (effectiveRudpPort == 0) peerSync.start();
+      startPeerDiscovery(directory, BTEngine.getInstance(), identity, client, effectiveRudpPort);
+      if (!relayLifecycle.getAsBoolean()) return;
       relayLog.info(
           "PeerRegistrySync advertiseHost="
               + advertiseHost
@@ -1002,13 +995,12 @@ final class Initializer {
       BTEngine btEngine, IdentityKeys identity, LocalIndex localIndex, int rudpPort) {
     try {
       if (!relayLifecycle.getAsBoolean()) return;
-      int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
       long extraCaps =
           SearchEnginesSettings.ICEBRIDGE_PUBLIC_CATALOG.getValue()
               ? com.frostwire.search.relay.NodeCapabilities.PUBLIC_CATALOG
               : 0L;
       IdentityRecordPublisher publisher =
-          new IdentityRecordPublisher(identity, port, rudpPort, "BOTH", extraCaps);
+          new IdentityRecordPublisher(identity, rudpPort, rudpPort, "BOTH", extraCaps);
       IndexAnnouncementPublisher indexPublisher =
           com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE.createCatalogPublisher(
               localIndex, identity);
@@ -1025,160 +1017,67 @@ final class Initializer {
   }
 
   /**
-   * Start the peer discovery scheduler so we can find other FrostWire nodes via BEP 5, authenticate
-   * them via the direct TCP identity handshake, and populate the local {@link PeerDirectory}. By
-   * this point BTEngine is already running (the indexer and karma trigger were installed in steps 3
-   * and 4), so {@code btEngine} is the live DHT-capable session.
+   * Start the peer discovery scheduler so we can find other FrostWire nodes through the DHT, the
+   * local network and the host cache, verify each candidate {@code ip:udpPort} with the rUDP
+   * identity handshake that the IceBridge daemon performs, and populate the local {@link
+   * PeerDirectory}. No inbound TCP port is involved, so a peer that can be reached over UDP can be
+   * found.
    */
   private void startPeerDiscovery(
-      PeerDirectory directory, BTEngine btEngine, IdentityKeys ownIdentity) {
+      PeerDirectory directory,
+      BTEngine btEngine,
+      IdentityKeys ownIdentity,
+      IceBridgeClient client,
+      int rudpPort) {
     try {
+      if (!relayLifecycle.getAsBoolean()) return;
+      IceBridgeHostCache hostCache = IceBridgeHostCache.getInstance();
+      PeerProber prober = new RudpPeerProber(client);
+      // Settings "Refresh / Ping" verifies cached servers with the same handshake.
+      hostCache.setPingProber(prober);
+      relayResources.add(() -> hostCache.setPingProber(null));
       DhtPeerDiscoverySource dhtSource = new DhtPeerDiscoverySource(btEngine);
-      DirectTcpPeerAuthenticator baseAuthenticator =
-          new DirectTcpPeerAuthenticator(ownIdentity.ed25519());
-      relayResources.add(baseAuthenticator);
-      // The Settings "ping" must use the keyed handshake too; servers reject the keyless request.
-      com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-          .setPingAuthenticator(baseAuthenticator);
-      relayResources.add(
-          () ->
-              com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                  .setPingAuthenticator(null));
-      // Count failed handshakes against the host cache so dead entries are
-      // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
-      PeerAuthenticator authenticator =
-          (host, port) -> {
-            java.util.Optional<IdentityRecord> rec = baseAuthenticator.authenticate(host, port);
-            if (rec.isEmpty()) {
-              try {
-                com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                    .markFailure(host, port);
-              } catch (Throwable ignored) {
-                // cache is best-effort
-              }
-            }
-            return rec;
-          };
-      byte[] ownPub = (ownIdentity != null) ? ownIdentity.ed25519PubRaw() : null;
-      // Previously verified servers from the host cache get a fast re-join
-      // path through the SAME identity authenticator as DHT endpoints — no
-      // unverified placeholder upserts (those would drive failed TCP auth
-      // spam). DHT remains the discovery workhorse for new peers.
-      // Computers on the same network cannot reach each other through the public address the DHT
-      // knows (hairpin NAT), so they announce themselves to the LAN directly.
-      com.frostwire.search.relay.LanPeerBeacon lanBeacon =
-          new com.frostwire.search.relay.LanPeerBeacon(
-              SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
-      lanBeacon.start();
-      relayResources.add(lanBeacon);
-      PeerDiscoverySource source =
-          new com.frostwire.search.relay.CompositePeerDiscoverySource(
-              new com.frostwire.search.relay.HostCachePeerDiscoverySource(), lanBeacon, dhtSource);
-      PeerDiscovery discovery = new PeerDiscovery(source, directory, authenticator, ownPub);
-      // Skip our own externally-visible endpoint (multi-homed hosts, VPN
-      // egress) the same way Android skips the carrier-NAT hairpin.
-      final BTEngine engineForIp = btEngine;
+      // A new peer's signed identity record tells us whether it is a forwarder; failed handshakes
+      // count against the host cache so dead entries are evicted instead of retried forever.
+      PeerProber trackedProber =
+          new HostCacheTrackingProber(
+              new IdentityRecordEnrichingProber(
+                  prober, dhtSource, pub -> directory.get(pub).isEmpty()),
+              hostCache);
+      byte[] ownPub = ownIdentity.ed25519PubRaw();
+      java.util.List<PeerDiscoverySource> sources = new ArrayList<>();
+      // Known servers and the built-in seeds get a fast re-join path; the DHT discovers the rest.
+      sources.add(new HostCachePeerDiscoverySource());
+      if (rudpPort > 0) {
+        // Computers on the same network cannot reach each other through the public address the DHT
+        // knows (hairpin NAT), so they announce their rUDP port to the LAN directly.
+        LanPeerBeacon lanBeacon = new LanPeerBeacon(rudpPort);
+        lanBeacon.start();
+        relayResources.add(lanBeacon);
+        sources.add(lanBeacon);
+      }
+      sources.add(dhtSource);
+      PeerDiscovery discovery =
+          new PeerDiscovery(
+              new CompositePeerDiscoverySource(sources), directory, trackedProber, ownPub);
+      // Skip our own externally-visible endpoint (multi-homed hosts, VPN egress) the same way
+      // Android skips the carrier-NAT hairpin.
       discovery.setSelfEndpoint(
           () -> {
             try {
-              return engineForIp != null ? engineForIp.getExternalIp() : null;
+              return btEngine != null ? btEngine.getExternalIp() : null;
             } catch (Throwable ignored) {
               return null;
             }
           },
-          SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
-      // Aggressive relay/peer discovery for faster mesh formation and seeing relayers.
-      // Default was 5min; 60s makes it much more responsive for testing with standalone relays.
+          rudpPort);
+      // Aggressive discovery for faster mesh formation and seeing relayers.
       PeerDiscoveryScheduler scheduler = new PeerDiscoveryScheduler(discovery, 30);
       relayResources.add(scheduler::stop);
       scheduler.start();
     } catch (Throwable t) {
       com.frostwire.util.Logger.getLogger(Initializer.class)
           .warn("Failed to start peer discovery; will not learn about other peers", t);
-    }
-  }
-
-  /**
-   * Construct the direct peer-search service + role + TCP server, and start listening. The server
-   * is daemon-threaded and does not prevent JVM exit. If the listen port is already in use, the
-   * failure is logged and the direct peer-search server is left disabled; the rest of the direct
-   * peer-search stack still functions.
-   */
-  private void startRelayServer(
-      IdentityKeys identity, LocalIndex localIndex, PeerDirectory directory, int rudpPort) {
-    try {
-      if (!relayLifecycle.getAsBoolean()) return;
-      int port = SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue();
-      RelaySearchService service =
-          new RelaySearchService(
-              localIndex,
-              identity,
-              com.frostwire.gui.bittorrent.BtTransferShareVisibility.INSTANCE);
-      service.setSeederEndpointProvider(
-          new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
-      RelayRole role = new RelayRole(service, directory, identity);
-      // Gnutella leaf model: CLIENT answers from its local index but never forwards.
-      // Unknown/unparseable role keeps historical behavior (forwarding enabled).
-      try {
-        String relayRole = SearchEnginesSettings.ICEBRIDGE_ROLE.getValue();
-        role.setForwardingEnabled(
-            relayRole == null || !relayRole.trim().equalsIgnoreCase("CLIENT"));
-      } catch (Throwable ignored) {
-      }
-      IdentityRecord identityRecord =
-          IdentityRecord.createSigned(
-              identity.nodeId(),
-              identity.ed25519(),
-              identity.x25519PubRaw(),
-              port,
-              rudpPort,
-              "BOTH");
-      IncomingRelayServer server =
-          new IncomingRelayServer(
-              role, identityRecord, identity.ed25519().getPrivate(), port, "0.0.0.0");
-      relayResources.add(server::stop);
-      server.start();
-      com.frostwire.util.Logger.getLogger(Initializer.class)
-          .info("Direct peer-search server listening on 0.0.0.0:" + server.port());
-
-      // Add our direct relay identity listener to the IceBridge host cache for visibility.
-      addSelfToIceBridgeHostCache("127.0.0.1", port, "BOTH", identity);
-    } catch (java.io.IOException e) {
-      com.frostwire.util.Logger.getLogger(Initializer.class)
-          .warn(
-              "Failed to start direct peer-search server on port "
-                  + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue()
-                  + "; incoming direct peer-search requests will not be served",
-              e);
-    }
-  }
-
-  /**
-   * Adds our own relay endpoint to the IceBridge host cache (so it shows in the settings table) and
-   * attempts a local self-ping. This uses the direct TCP identity handshake protocol on the relay
-   * port, *not* the IceBridge HTTP control API (which is what desktop uses locally to drive its
-   * IceBridge daemon process).
-   */
-  private void addSelfToIceBridgeHostCache(
-      String host, int port, String role, IdentityKeys identity) {
-    if (port <= 0) return;
-    try {
-      var cache = com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
-      // Try a quick local TCP identity fetch (self-ping). If it works we mark success.
-      try (DirectTcpPeerAuthenticator authenticator =
-          new DirectTcpPeerAuthenticator(identity.ed25519(), 1_000)) {
-        var rec = authenticator.authenticate(host, port);
-        if (rec.isPresent()
-            && java.util.Arrays.equals(rec.get().ed25519Pub(), identity.ed25519PubRaw())) {
-          cache.markSuccess(host, port, role);
-          return;
-        }
-      } catch (Exception ignored) {
-        // fall through to plain add
-      }
-      cache.addOrUpdate(host, port, role);
-    } catch (Throwable ignored) {
-      // best effort
     }
   }
 

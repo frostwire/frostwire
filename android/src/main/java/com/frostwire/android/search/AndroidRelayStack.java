@@ -37,12 +37,11 @@ import com.frostwire.search.relay.ConnectivityDetector;
 import com.frostwire.search.relay.DhtAdvertiser;
 import com.frostwire.search.relay.DhtKarmaChainSource;
 import com.frostwire.search.relay.DhtPeerDiscoverySource;
-import com.frostwire.search.relay.DirectTcpPeerAuthenticator;
 import com.frostwire.search.relay.HostCachePeerDiscoverySource;
+import com.frostwire.search.relay.HostCacheTrackingProber;
 import com.frostwire.search.relay.IdentityKeys;
-import com.frostwire.search.relay.IdentityRecord;
+import com.frostwire.search.relay.IdentityRecordEnrichingProber;
 import com.frostwire.search.relay.IdentityRecordPublisher;
-import com.frostwire.search.relay.IncomingRelayServer;
 import com.frostwire.search.relay.IndexAnnouncementPublisher;
 import com.frostwire.search.relay.KarmaChainCommitScheduler;
 import com.frostwire.search.relay.KarmaChainPublisher;
@@ -56,10 +55,11 @@ import com.frostwire.search.relay.PeerDiscovery;
 import com.frostwire.search.relay.PeerDiscoveryScheduler;
 import com.frostwire.search.relay.PeerDiscoverySource;
 import com.frostwire.search.relay.PeerKarmaCache;
+import com.frostwire.search.relay.PeerProber;
 import com.frostwire.search.relay.RelayConstants;
-import com.frostwire.search.relay.RelayRole;
 import com.frostwire.search.relay.RelaySearchService;
 import com.frostwire.search.relay.RemoteKarmaChainFetcher;
+import com.frostwire.search.relay.RudpPeerProber;
 import com.frostwire.search.relay.icebridge.IceBridgeConfig;
 import com.frostwire.search.relay.icebridge.IceBridgeHostCache;
 import com.frostwire.search.relay.icebridge.IceBridgeServer;
@@ -144,14 +144,12 @@ public final class AndroidRelayStack implements AutoCloseable {
   private final PeerRegistrySync peerRegistrySync;
   private final PeerDiscoveryScheduler peerDiscoveryScheduler;
   private final PublicationOwners publications;
-  private final IncomingRelayServer relayServer;
   private final LeafPromotionManager leafPromotion;
   private final BTEngine btEngine;
   private final AndroidSharedTorrentIndexer indexer;
   private final KarmaEndorsementTrigger endorsementListener;
   private final KarmaChainWriter karmaWriter;
   private final PeerKarmaCache karmaCache;
-  private final DirectTcpPeerAuthenticator tcpAuthenticator;
   private final AtomicBoolean active;
   private final BooleanSupplier permitted;
   private final AtomicBoolean cleanupStarted = new AtomicBoolean();
@@ -262,19 +260,16 @@ public final class AndroidRelayStack implements AutoCloseable {
     IceBridgeClient cl = null;
     IceBridgeSearchTransport tr = null;
     IncomingSearchRequestHandler ih = null;
-    RelayRole relayRole = null;
     PeerDirectory pd = null;
     PeerRegistrySync prs = null;
     PeerDiscoveryScheduler pds = null;
     DhtAdvertiser da = null;
     AndroidKarmaChainStore ks = null;
     KarmaChainCommitScheduler kcs = null;
-    IncomingRelayServer relaySrv = null;
     AndroidSharedTorrentIndexer indexer = null;
     KarmaEndorsementTrigger endorsementListener = null;
     KarmaChainWriter karmaWriter = null;
     PeerKarmaCache karmaCache = null;
-    DirectTcpPeerAuthenticator tcpAuthenticator = null;
     LeafPromotionManager promotion = null;
     AtomicBoolean active = new AtomicBoolean(true);
     BooleanSupplier permitted =
@@ -396,14 +391,13 @@ public final class AndroidRelayStack implements AutoCloseable {
         if (!cl.health()) {
           LOG.warn("AndroidRelayStack: remote IceBridge health check failed: " + remoteUrl);
         }
-        // No in-process IceBridgeServer / identity TCP when remote — forwarder owns mesh.
+        // No in-process IceBridgeServer when remote — the forwarder owns the mesh.
         srv = null;
-        relaySrv = null;
       } else {
         int controlPort = freeLocalControlPort();
         int configuredRudp = readConfiguredRudpPort();
         IceBridgeConfig.Role role = readConfiguredRole();
-        // relayPort=0 on IceBridgeServer: identity TCP is owned by IncomingRelayServer below.
+        // relayPort=0: peers are verified over rUDP, there is no identity TCP port.
         IceBridgeConfig config =
             IceBridgeConfig.newBuilder()
                 .host("0.0.0.0")
@@ -432,35 +426,6 @@ public final class AndroidRelayStack implements AutoCloseable {
         cl = new IceBridgeClient(srv.controlPort());
         cl.setAuthToken(srv.authToken());
         cl.setOwnPub(ident.ed25519PubRaw());
-
-        try {
-          int relayPort = readConfiguredRelayPort();
-          String roleLabel = role.name();
-          RelaySearchService relayService = new RelaySearchService(li, ident, visibility);
-          relayService.setSeederEndpointProvider(
-              new com.frostwire.search.relay.LibtorrentSeederEndpointProvider());
-          relayRole = new RelayRole(relayService, pd, ident);
-          // Gnutella leaf model: CLIENT answers locally but never forwards.
-          relayRole.setForwardingEnabled(role != IceBridgeConfig.Role.CLIENT);
-          IdentityRecord identityRecord =
-              IdentityRecord.createSigned(
-                  ident.nodeId(),
-                  ident.ed25519(),
-                  ident.x25519PubRaw(),
-                  relayPort,
-                  meshRudpPort,
-                  roleLabel);
-          IncomingRelayServer relaySrv2 =
-              new IncomingRelayServer(
-                  relayRole, identityRecord, ident.ed25519().getPrivate(), relayPort);
-          relaySrv = relaySrv2;
-          requirePermitted(permitted);
-          relaySrv2.start();
-          LOG.info("AndroidRelayStack: IncomingRelayServer started on port " + relayPort);
-          IceBridgeHostCache.getInstance().markSuccess("127.0.0.1", relayPort, roleLabel);
-        } catch (Throwable t) {
-          LOG.warn("AndroidRelayStack: Failed to start IncomingRelayServer", t);
-        }
       }
 
       observer.phase(RelayStartupTracker.Phase.TRANSPORT);
@@ -528,28 +493,23 @@ public final class AndroidRelayStack implements AutoCloseable {
       byte[] ownPub = (ident != null) ? ident.ed25519PubRaw() : null;
       PeerDiscoverySource discoverySource =
           new CompositePeerDiscoverySource(new HostCachePeerDiscoverySource(), dhtDiscoverySource);
-      // Count failed handshakes against the host cache so dead entries are
-      // evicted after MAX_CONSECUTIVE_FAILURES instead of retried forever.
-      tcpAuthenticator = new DirectTcpPeerAuthenticator(ident.ed25519());
-      final DirectTcpPeerAuthenticator ownedAuthenticator = tcpAuthenticator;
-      // Host pings must use the keyed handshake too; servers reject the legacy keyless request.
-      IceBridgeHostCache.getInstance().setPingAuthenticator(ownedAuthenticator);
-      com.frostwire.search.relay.PeerAuthenticator authenticator =
-          (host, port) -> {
-            java.util.Optional<com.frostwire.search.relay.IdentityRecord> rec =
-                ownedAuthenticator.authenticate(host, port);
-            if (rec.isEmpty()) {
-              try {
-                IceBridgeHostCache.getInstance().markFailure(host, port);
-              } catch (Throwable ignored) {
-                // cache is best-effort
-              }
-            }
-            return rec;
-          };
-      PeerDiscovery discovery = new PeerDiscovery(discoverySource, pd, authenticator, ownPub);
+      // Candidates ({@code ip:udpPort}) are verified with the rUDP identity handshake that the
+      // IceBridge daemon performs: no inbound TCP port is needed, so a peer that can be reached
+      // over UDP can be found. Host pings in Settings use the same handshake.
+      IceBridgeHostCache hostCache = IceBridgeHostCache.getInstance();
+      PeerProber prober = new RudpPeerProber(cl);
+      hostCache.setPingProber(prober);
+      final PeerDirectory discoveryDirectory = pd;
+      // A new peer's signed identity record tells us whether it is a forwarder; failed handshakes
+      // count against the host cache so dead entries are evicted instead of retried forever.
+      PeerProber trackedProber =
+          new HostCacheTrackingProber(
+              new IdentityRecordEnrichingProber(
+                  prober, dhtDiscoverySource, pub -> discoveryDirectory.get(pub).isEmpty()),
+              hostCache);
+      PeerDiscovery discovery = new PeerDiscovery(discoverySource, pd, trackedProber, ownPub);
       // Skip our own carrier-NAT hairpin: candidates at BTEngine's latest
-      // external IP on our own relay port are us (or unreachable mates).
+      // external IP on our own rUDP port are us (or unreachable mates).
       final com.frostwire.bittorrent.BTEngine engineForIp = btEngine;
       discovery.setSelfEndpoint(
           () -> {
@@ -559,31 +519,31 @@ public final class AndroidRelayStack implements AutoCloseable {
               return null;
             }
           },
-          readConfiguredRelayPort());
+          meshRudpPort);
       pds = new PeerDiscoveryScheduler(discovery, PEER_DISCOVERY_INTERVAL_SEC);
       requirePermitted(permitted);
       pds.start();
       LOG.info("AndroidRelayStack: PeerDiscoveryScheduler started");
 
-      int advertiseRelayPort = readConfiguredRelayPort();
       long extraCaps =
           isPublicCatalogEnabled()
               ? com.frostwire.search.relay.NodeCapabilities.PUBLIC_CATALOG
               : 0L;
       IdentityRecordPublisher identityPublisher =
           new IdentityRecordPublisher(
-              ident, advertiseRelayPort, meshRudpPort, syncRole.name(), extraCaps);
+              ident, meshRudpPort, meshRudpPort, syncRole.name(), extraCaps);
       IndexAnnouncementPublisher indexPublisher =
           new IndexAnnouncementPublisher(li, ident, catalogVisibility);
-      // Phones join as CLIENT leaves: announce the peer topic so holders can be
-      // found, but never the bootstrap topic (that flag is for dedicated relays).
+      // Phones join as CLIENT leaves: announce the peer topic so holders can be found, but never
+      // the bootstrap topic (that flag is for dedicated relays). With a remote IceBridge the
+      // forwarder owns the UDP endpoint, so there is nothing of ours to announce.
       da =
           new DhtAdvertiser(
               identityPublisher,
               indexPublisher,
               DHT_ADVERTISE_INTERVAL_SEC,
               () -> btEngine,
-              true,
+              srv != null,
               false,
               permitted);
       requirePermitted(permitted);
@@ -623,7 +583,6 @@ public final class AndroidRelayStack implements AutoCloseable {
       // promotion); USE_REMOTE stacks have no local sessions and stay leaves.
       if (syncRole == IceBridgeConfig.Role.CLIENT && LeafPromotionManager.promotionEnabledByEnv()) {
         final IceBridgeServer promotionServer = srv;
-        final RelayRole promotionRelay = relayRole;
         final IncomingSearchRequestHandler promotionHandler = ih;
         final long promotionStartMs = SystemClock.elapsedRealtime();
         promotion =
@@ -635,7 +594,6 @@ public final class AndroidRelayStack implements AutoCloseable {
                         : 0,
                 () -> SystemClock.elapsedRealtime() - promotionStartMs,
                 permitted);
-        promotion.addTarget(promotionRelay);
         promotion.addTarget(promotionHandler);
         promotion.start();
       }
@@ -655,13 +613,11 @@ public final class AndroidRelayStack implements AutoCloseable {
               da,
               ks,
               kcs,
-              relaySrv,
               promotion,
               btEngine,
               indexer,
               endorsementListener,
               karmaWriter,
-              tcpAuthenticator,
               karmaCache,
               active,
               permitted);
@@ -676,8 +632,6 @@ public final class AndroidRelayStack implements AutoCloseable {
       da = null;
       ks = null;
       kcs = null;
-      relaySrv = null;
-      relayRole = null;
       promotion = null;
       LOG.info("AndroidRelayStack: started successfully");
       return stack;
@@ -709,11 +663,6 @@ public final class AndroidRelayStack implements AutoCloseable {
           cl.close();
         } catch (Throwable ignored) {
         }
-      if (relaySrv != null)
-        try {
-          relaySrv.stop();
-        } catch (Throwable ignored) {
-        }
       if (srv != null)
         try {
           srv.close();
@@ -725,10 +674,7 @@ public final class AndroidRelayStack implements AutoCloseable {
       }
       if (endorsementListener != null) BTEngineListenerChain.remove(btEngine, endorsementListener);
       if (promotion != null) promotion.stop();
-      if (tcpAuthenticator != null) {
-        IceBridgeHostCache.getInstance().setPingAuthenticator(null);
-        tcpAuthenticator.close();
-      }
+      IceBridgeHostCache.getInstance().setPingProber(null);
       if (pds != null)
         try {
           pds.stop();
@@ -763,13 +709,11 @@ public final class AndroidRelayStack implements AutoCloseable {
       DhtAdvertiser dhtAdvertiser,
       KarmaChainStore karmaStore,
       KarmaChainCommitScheduler karmaScheduler,
-      IncomingRelayServer relayServer,
       LeafPromotionManager leafPromotion,
       BTEngine btEngine,
       AndroidSharedTorrentIndexer indexer,
       KarmaEndorsementTrigger endorsementListener,
       KarmaChainWriter karmaWriter,
-      DirectTcpPeerAuthenticator tcpAuthenticator,
       PeerKarmaCache karmaCache,
       AtomicBoolean active,
       BooleanSupplier permitted) {
@@ -786,13 +730,11 @@ public final class AndroidRelayStack implements AutoCloseable {
     this.publications =
         new PublicationOwners(
             dhtAdvertiser, karmaScheduler, endorsementListener, karmaWriter, karmaStore);
-    this.relayServer = relayServer;
     this.leafPromotion = leafPromotion;
     this.btEngine = btEngine;
     this.indexer = indexer;
     this.endorsementListener = endorsementListener;
     this.karmaWriter = karmaWriter;
-    this.tcpAuthenticator = tcpAuthenticator;
     this.karmaCache = karmaCache;
     this.active = active;
     this.permitted = permitted;
@@ -865,11 +807,6 @@ public final class AndroidRelayStack implements AutoCloseable {
 
   private static int readConfiguredRudpPort() {
     return readConfiguredPort(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, 0);
-  }
-
-  private static int readConfiguredRelayPort() {
-    return readConfiguredPort(
-        Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT, RelayConstants.RELAY_LISTEN_PORT);
   }
 
   private static int readConfiguredPort(String prefKey, int fallback) {
@@ -1000,11 +937,6 @@ public final class AndroidRelayStack implements AutoCloseable {
     LOG.info("AndroidRelayStack: shutting down...");
     // Close public endpoints before waiting for native index work or scheduled providers.
     try {
-      if (relayServer != null) relayServer.stop();
-    } catch (Throwable t) {
-      LOG.warn("Error stopping IncomingRelayServer", t);
-    }
-    try {
       client.close();
     } catch (Throwable t) {
       LOG.warn("Error closing client", t);
@@ -1014,7 +946,7 @@ public final class AndroidRelayStack implements AutoCloseable {
     } catch (Throwable t) {
       LOG.warn("Error closing server", t);
     }
-    tcpAuthenticator.close();
+    IceBridgeHostCache.getInstance().setPingProber(null);
     BTEngineListenerChain.remove(btEngine, indexer);
     BTEngineListenerChain.remove(btEngine, endorsementListener);
     indexer.close();

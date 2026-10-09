@@ -278,7 +278,7 @@ public final class IceBridgeClient implements AutoCloseable {
         private final ProbeState state;
         private final byte[] pub;
 
-        ProbeOutcome(ProbeState state, byte[] pub) {
+        public ProbeOutcome(ProbeState state, byte[] pub) {
             this.state = state;
             this.pub = pub == null ? null : pub.clone();
         }

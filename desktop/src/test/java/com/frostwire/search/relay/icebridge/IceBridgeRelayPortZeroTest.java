@@ -16,50 +16,53 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Android embeds IceBridge with relayPort=0 so only one IncomingRelayServer
- * binds TCP identity (full RelayRole). Standalone keeps default 6888.
+ * Embedders (Android, the desktop child) run IceBridge with relayPort=0: the parent owns search
+ * (Protocol #1) and the daemon only transports. Peers are verified over rUDP, so relayPort opens no
+ * TCP socket in either mode; it only distinguishes embedder from standalone forwarder (default
+ * 6888).
  */
 class IceBridgeRelayPortZeroTest {
 
-    @TempDir
-    File tmp;
+  @TempDir File tmp;
 
-    @Test
-    void builderAcceptsRelayPortZero() {
-        IceBridgeConfig cfg = IceBridgeConfig.newBuilder()
-                .host("127.0.0.1")
-                .rudpPort(0)
-                .relayPort(0)
-                .controlHttpPort(findFreeTcpPort())
-                .role(IceBridgeConfig.Role.BOTH)
-                .identityFile(new File(tmp, "id.dat"))
-                .maxPeers(10)
-                .peerTtlSec(60)
-                .maxQpsPerKey(1.0)
-                .build();
-        assertEquals(0, cfg.relayPort());
-    }
+  @Test
+  void builderAcceptsRelayPortZero() {
+    IceBridgeConfig cfg =
+        IceBridgeConfig.newBuilder()
+            .host("127.0.0.1")
+            .rudpPort(0)
+            .relayPort(0)
+            .controlHttpPort(findFreeTcpPort())
+            .role(IceBridgeConfig.Role.BOTH)
+            .identityFile(new File(tmp, "id.dat"))
+            .maxPeers(10)
+            .peerTtlSec(60)
+            .maxQpsPerKey(1.0)
+            .build();
+    assertEquals(0, cfg.relayPort());
+  }
 
-    @Test
-    void defaultRelayPortIsPositive() {
-        IceBridgeConfig cfg = IceBridgeConfig.newBuilder()
-                .host("127.0.0.1")
-                .rudpPort(0)
-                .controlHttpPort(findFreeTcpPort())
-                .role(IceBridgeConfig.Role.BOTH)
-                .identityFile(new File(tmp, "id.dat"))
-                .maxPeers(10)
-                .peerTtlSec(60)
-                .maxQpsPerKey(1.0)
-                .build();
-        assertTrue(cfg.relayPort() > 0);
-    }
+  @Test
+  void defaultRelayPortIsPositive() {
+    IceBridgeConfig cfg =
+        IceBridgeConfig.newBuilder()
+            .host("127.0.0.1")
+            .rudpPort(0)
+            .controlHttpPort(findFreeTcpPort())
+            .role(IceBridgeConfig.Role.BOTH)
+            .identityFile(new File(tmp, "id.dat"))
+            .maxPeers(10)
+            .peerTtlSec(60)
+            .maxQpsPerKey(1.0)
+            .build();
+    assertTrue(cfg.relayPort() > 0);
+  }
 
-    private static int findFreeTcpPort() {
-        try (ServerSocket s = new ServerSocket(0)) {
-            return s.getLocalPort();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+  private static int findFreeTcpPort() {
+    try (ServerSocket s = new ServerSocket(0)) {
+      return s.getLocalPort();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
     }
+  }
 }

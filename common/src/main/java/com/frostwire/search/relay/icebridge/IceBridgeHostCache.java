@@ -7,9 +7,8 @@
 
 package com.frostwire.search.relay.icebridge;
 
-import com.frostwire.search.relay.IdentityRecord;
-import com.frostwire.search.relay.PeerAuthenticator;
-import com.frostwire.search.relay.OutgoingRelayClient;
+import com.frostwire.search.relay.PeerProber;
+import com.frostwire.search.relay.ProbedPeer;
 import com.frostwire.util.Logger;
 
 import java.io.BufferedReader;
@@ -38,6 +37,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * relay.example.com:6888,FORWARDER,1712345678900,2
  * </pre>
  *
+ * <p>The port of an entry is its <b>rUDP</b> port: servers are verified with the rUDP identity-discovery
+ * handshake, never with a TCP connection.
+ *
  * <p>Only entries that have successfully pinged (via identity handshake)
  * are considered "live" for display. Entries that fail
  * {@link #MAX_CONSECUTIVE_FAILURES} consecutive pings are evicted so dead
@@ -59,13 +61,11 @@ public final class IceBridgeHostCache {
 
     private final File cacheFile;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
-    private final OutgoingRelayClient pingClient;
     /**
-     * Servers answer only the authenticated identity handshake, which needs our identity key. When
-     * set, {@link #refreshPings()} uses it; the keyless legacy request is rejected by every server
-     * that proves endpoint ownership, so pinging with it would only evict healthy hosts.
+     * How Settings "Refresh / Ping" authenticates a cached server: the rUDP identity-discovery
+     * handshake. Without a prober (stack not running) there is nothing to ping with.
      */
-    private volatile PeerAuthenticator pingAuthenticator;
+    private volatile PeerProber pingProber;
 
     private static volatile IceBridgeHostCache INSTANCE;
     /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
@@ -101,22 +101,14 @@ public final class IceBridgeHostCache {
     }
 
     public IceBridgeHostCache() {
-        this(defaultCacheFile(), new OutgoingRelayClient());
+        this(defaultCacheFile());
     }
 
     public IceBridgeHostCache(File cacheFile) {
-        this(cacheFile, new OutgoingRelayClient());
-    }
-
-    public IceBridgeHostCache(File cacheFile, OutgoingRelayClient pingClient) {
         if (cacheFile == null) {
             throw new IllegalArgumentException("cacheFile is null");
         }
         this.cacheFile = cacheFile;
-        // Use relatively short timeouts for host cache pings — we expect many entries
-        // to be stale or non-FrostWire nodes.
-        this.pingClient = pingClient != null ? pingClient
-                : new OutgoingRelayClient(2000, 3000);
         load();
     }
 
@@ -243,6 +235,19 @@ public final class IceBridgeHostCache {
         save();
     }
 
+    /** Refresh a cached host after a successful handshake; unknown hosts are never added. */
+    public synchronized void markSuccessIfKnown(String host, int port) {
+        if (host == null || host.isEmpty() || port <= 0) return;
+        for (int i = 0; i < entries.size(); i++) {
+            Entry e = entries.get(i);
+            if (e.host.equals(host) && e.port == port) {
+                entries.set(i, new Entry(host, port, e.role, System.currentTimeMillis(), 0));
+                save();
+                return;
+            }
+        }
+    }
+
     /**
      * Record one failed ping for a known host. Unknown hosts are ignored
      * (never cache pure failures). At {@link #MAX_CONSECUTIVE_FAILURES} the
@@ -271,9 +276,9 @@ public final class IceBridgeHostCache {
         return false;
     }
 
-    /** Use this authenticator for {@link #refreshPings()}; null restores the legacy keyless ping. */
-    public void setPingAuthenticator(PeerAuthenticator authenticator) {
-        this.pingAuthenticator = authenticator;
+    /** Use this prober for {@link #refreshPings()}; null (stack stopped) makes the refresh a no-op. */
+    public void setPingProber(PeerProber prober) {
+        this.pingProber = prober;
     }
 
     public List<Entry> getAll() {
@@ -296,61 +301,46 @@ public final class IceBridgeHostCache {
     }
 
     /**
-     * Attempt to ping every known entry via TCP identity handshake on the
-     * relay/identity port (default 6888). This is <em>not</em> the IceBridge
-     * control HTTP API and is not mesh TELEMETRY — operators watching a pure
-     * FORWARDER should look for {@code IceBridge identity handshake OK} on the
-     * identity TCP listener.
+     * Attempt to reach every known entry with the rUDP identity-discovery handshake (the same
+     * handshake mesh peers use; it needs no TCP port). This is <em>not</em> the IceBridge control
+     * HTTP API and not mesh TELEMETRY.
      *
-     * <p>Successful pings update lastSuccessfulPingMs and role. Failed pings
-     * accrue a consecutive-failure streak ({@link #markFailure}) and evict
-     * after {@link #MAX_CONSECUTIVE_FAILURES}. Blocking; call from a
-     * background thread.
+     * <p>Successful pings update lastSuccessfulPingMs (the role stays as learned from the mesh).
+     * Failed pings accrue a consecutive-failure streak ({@link #markFailure}) and evict after
+     * {@link #MAX_CONSECUTIVE_FAILURES}. Blocking; call from a background thread.
      */
     public void refreshPings() {
+        PeerProber prober = pingProber;
+        if (prober == null) {
+            LOG.info("IceBridge host refresh: stack not running (nothing to ping with)");
+            return;
+        }
         List<Entry> snapshot = new ArrayList<>(entries);
         if (snapshot.isEmpty()) {
-            LOG.info("IceBridge host refresh: cache empty (nothing to TCP-ping)");
+            LOG.info("IceBridge host refresh: cache empty (nothing to ping)");
             return;
         }
         int ok = 0;
         int fail = 0;
-        LOG.info("IceBridge host refresh: TCP identity ping of " + snapshot.size() + " host(s)");
+        LOG.info("IceBridge host refresh: rUDP identity ping of " + snapshot.size() + " host(s)");
         for (Entry e : snapshot) {
             try {
-                PeerAuthenticator authenticator = pingAuthenticator;
-                Optional<IdentityRecord> rec = authenticator != null
-                        ? authenticator.authenticate(e.host, e.port)
-                        : pingClient.fetchIdentity(e.host, e.port);
-                if (rec.isPresent()) {
-                    IdentityRecord r = rec.get();
-                    if (r.verifySignature()) {
-                        markSuccess(e.host, e.port, r.role());
-                        ok++;
-                        LOG.info("IceBridge host ping OK " + e.host + ":" + e.port
-                                + " role=" + (r.role() != null ? r.role() : "?"));
-                        continue;
-                    }
-                    fail++;
-                    markFailure(e.host, e.port);
-                    LOG.warn("IceBridge host ping bad signature " + e.host + ":" + e.port);
+                java.util.Optional<ProbedPeer> peer = prober.probe(e.host, e.port,
+                        System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5));
+                if (peer.isPresent()) {
+                    markSuccess(e.host, e.port, e.role);
+                    ok++;
+                    LOG.info("IceBridge host ping OK " + e.host + ":" + e.port);
                 } else {
                     fail++;
                     markFailure(e.host, e.port);
                     LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
-                            + " (no identity record)");
+                            + " (no rUDP identity proof)");
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 fail++;
                 markFailure(e.host, e.port);
-                String msg = ex.getMessage();
-                if (msg != null && msg.contains("invalid frame length")) {
-                    LOG.warn("IceBridge host ping: " + e.host + ":" + e.port
-                            + " does not speak the relay protocol (stale entry?)");
-                } else {
-                    LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port
-                            + ": " + (msg != null ? msg : ex.getClass().getSimpleName()));
-                }
+                LOG.warn("IceBridge host ping failed " + e.host + ":" + e.port + ": " + ex);
             }
         }
         LOG.info("IceBridge host refresh done: ok=" + ok + " fail=" + fail

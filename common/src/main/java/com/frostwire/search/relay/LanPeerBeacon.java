@@ -24,7 +24,6 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.LongSupplier;
 import java.util.function.Predicate;
 
 /**
@@ -32,10 +31,10 @@ import java.util.function.Predicate;
  *
  * <p>The DHT only knows a node by its public address, and a router normally refuses to connect a
  * machine to its own public address (hairpin NAT), so two computers on the same wifi never find each
- * other through it. Each node therefore periodically multicasts a tiny datagram carrying its TCP
- * identity port; receivers take the sender's private address and offer {@code address:port} as a
+ * other through it. Each node therefore periodically multicasts a tiny datagram carrying its rUDP
+ * port; receivers take the sender's private address and offer {@code address:port} as a
  * {@link DiscoveredEndpoint#preferred preferred} candidate. The beacon is only a hint: the endpoint
- * still has to pass the authenticated identity handshake in {@link PeerDiscovery} before anything
+ * still has to pass the rUDP identity handshake in {@link PeerDiscovery} before anything
  * is trusted, and nothing is ever answered.
  */
 public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
@@ -47,16 +46,16 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
     public static final int UDP_PORT = 6890;
     public static final long ANNOUNCE_INTERVAL_MS = 10_000;
     public static final long ENTRY_TTL_MS = 120_000;
-    static final int MAX_ENTRIES = 128;
+    public static final int MAX_ENTRIES = 128;
     private static final String MAGIC = "FWIB1";
     private static final int MAX_DATAGRAM = 64;
 
-    private final int identityPort;
+    private final int rudpPort;
     private final int udpPort;
     private final List<InetSocketAddress> directTargets;
     private final Predicate<InetAddress> acceptSender;
     private final long announceIntervalMs;
-    private final LongSupplier clockMs;
+    private final long entryTtlMs;
     private final boolean multicast;
     private final Map<String, Long> seen = new LinkedHashMap<>();
     private volatile boolean closed;
@@ -65,24 +64,29 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
     private Thread receiver;
 
     /** Production beacon: multicast on every local interface, accepting private senders only. */
-    public LanPeerBeacon(int identityPort) {
-        this(identityPort, UDP_PORT, Collections.emptyList(), LanPeerBeacon::isPrivateLanAddress,
-                ANNOUNCE_INTERVAL_MS, System::currentTimeMillis, true);
+    public LanPeerBeacon(int rudpPort) {
+        this(rudpPort, UDP_PORT, Collections.emptyList(), LanPeerBeacon::isPrivateLanAddress,
+                ANNOUNCE_INTERVAL_MS, ENTRY_TTL_MS, true);
     }
 
-    /** Test seam: unicast {@code directTargets} instead of (or besides) the multicast group. */
-    LanPeerBeacon(int identityPort, int udpPort, List<InetSocketAddress> directTargets,
-                  Predicate<InetAddress> acceptSender, long announceIntervalMs,
-                  LongSupplier clockMs, boolean multicast) {
-        if (identityPort <= 0 || identityPort > 65535) {
-            throw new IllegalArgumentException("identityPort out of range: " + identityPort);
+    /**
+     * @param udpPort       port the beacon listens on and multicasts to
+     * @param unicastTargets peers to announce to directly, for networks that drop multicast
+     * @param acceptSender  which sender addresses are believed (private LAN addresses in production)
+     * @param multicast     also announce on the multicast group of every local interface
+     */
+    public LanPeerBeacon(int rudpPort, int udpPort, List<InetSocketAddress> unicastTargets,
+                         Predicate<InetAddress> acceptSender, long announceIntervalMs,
+                         long entryTtlMs, boolean multicast) {
+        if (rudpPort <= 0 || rudpPort > 65535) {
+            throw new IllegalArgumentException("rudpPort out of range: " + rudpPort);
         }
-        this.identityPort = identityPort;
+        this.rudpPort = rudpPort;
         this.udpPort = udpPort;
-        this.directTargets = new ArrayList<>(directTargets);
+        this.directTargets = new ArrayList<>(unicastTargets);
         this.acceptSender = acceptSender;
         this.announceIntervalMs = announceIntervalMs;
-        this.clockMs = clockMs;
+        this.entryTtlMs = entryTtlMs;
         this.multicast = multicast;
     }
 
@@ -116,7 +120,7 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
             sender = daemon("lan-beacon-announce", this::announceLoop);
             receiver.start();
             sender.start();
-            LOG.info("LanPeerBeacon started, identity port " + identityPort);
+            LOG.info("LanPeerBeacon started, rUDP port " + rudpPort);
         } catch (IOException | RuntimeException e) {
             LOG.info("LanPeerBeacon unavailable, LAN discovery is off: " + e);
         }
@@ -124,7 +128,7 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
 
     @Override
     public List<DiscoveredEndpoint> fetchEndpoints() {
-        long cutoff = clockMs.getAsLong() - ENTRY_TTL_MS;
+        long cutoff = System.currentTimeMillis() - entryTtlMs;
         List<DiscoveredEndpoint> out = new ArrayList<>();
         synchronized (seen) {
             seen.values().removeIf(lastSeen -> lastSeen < cutoff);
@@ -156,12 +160,12 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
 
     // ---- wire format ----
 
-    static byte[] encode(int port) {
+    private static byte[] encode(int port) {
         return (MAGIC + " " + port).getBytes(StandardCharsets.US_ASCII);
     }
 
-    /** The advertised identity port, or -1 for anything that is not a well-formed beacon. */
-    static int decode(byte[] data, int length) {
+    /** The advertised rUDP port, or -1 for anything that is not a well-formed beacon. */
+    private static int decode(byte[] data, int length) {
         if (length <= 0 || length > MAX_DATAGRAM) return -1;
         String text = new String(data, 0, length, StandardCharsets.US_ASCII);
         if (!text.startsWith(MAGIC + " ")) return -1;
@@ -174,14 +178,14 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
     }
 
     /** RFC 1918 private IPv4 space: the only senders a LAN beacon can honestly come from. */
-    static boolean isPrivateLanAddress(InetAddress address) {
+    public static boolean isPrivateLanAddress(InetAddress address) {
         return address instanceof java.net.Inet4Address && address.isSiteLocalAddress();
     }
 
     // ---- loops ----
 
     private void announceLoop() {
-        byte[] payload = encode(identityPort);
+        byte[] payload = encode(rudpPort);
         while (!closed) {
             MulticastSocket s = socket;
             if (s == null) return;
@@ -233,11 +237,11 @@ public final class LanPeerBeacon implements PeerDiscoverySource, AutoCloseable {
         }
     }
 
-    void remember(String host, int port) {
+    private void remember(String host, int port) {
         synchronized (seen) {
             String key = host + ":" + port;
             seen.remove(key);
-            seen.put(key, clockMs.getAsLong());
+            seen.put(key, System.currentTimeMillis());
             while (seen.size() > MAX_ENTRIES) {
                 seen.remove(seen.keySet().iterator().next());
             }

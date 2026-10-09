@@ -10,9 +10,6 @@ package com.frostwire.search.relay;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.frostwire.jlibtorrent.SessionManager;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.Duration;
@@ -27,187 +24,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
 class DiscoveryHardeningTest {
-
-  @Test
-  void possessionProofBindsFreshChallengeRequesterAndExactRecord() throws Exception {
-    KeyPair server = keys();
-    KeyPair client = keys();
-    IdentityRecord record = record(server);
-    byte[] nonce = new byte[32];
-    byte[] challenge = RelayWireCodec.identityChallenge(client, nonce);
-    byte[] proof = RelayWireCodec.identityProof(challenge, record, server.getPrivate());
-    assertArrayEquals(
-        record.ed25519Pub(), RelayWireCodec.verifyIdentityProof(challenge, proof).ed25519Pub());
-
-    nonce[0] = 1;
-    assertNull(
-        RelayWireCodec.verifyIdentityProof(RelayWireCodec.identityChallenge(client, nonce), proof));
-    assertNull(
-        RelayWireCodec.verifyIdentityProof(
-            RelayWireCodec.identityChallenge(keys(), new byte[32]), proof));
-    byte[] wrongKeyProof = RelayWireCodec.identityProof(challenge, record, keys().getPrivate());
-    assertNull(RelayWireCodec.verifyIdentityProof(challenge, wrongKeyProof));
-    byte[] otherRecord = RelayWireCodec.encodeIdentityRecord(record(keys()));
-    byte[] substitutedRecordProof =
-        java.nio.ByteBuffer.allocate(70 + otherRecord.length)
-            .put((byte) 3)
-            .put((byte) 1)
-            .putInt(otherRecord.length)
-            .put(otherRecord)
-            .put(proof, proof.length - 64, 64)
-            .array();
-    assertNull(RelayWireCodec.verifyIdentityProof(challenge, substitutedRecordProof));
-    assertNull(
-        RelayWireCodec.verifyIdentityProof(challenge, RelayWireCodec.encodeIdentityRecord(record)));
-    proof[1] = 0;
-    assertNull(RelayWireCodec.verifyIdentityProof(challenge, proof));
-  }
-
-  @Test
-  void invalidChallengeIsRejectedBeforeProofIsProduced() throws Exception {
-    KeyPair server = keys();
-    byte[] challenge = RelayWireCodec.identityChallenge(keys(), new byte[32]);
-    challenge[challenge.length - 1] ^= 1;
-    assertThrows(
-        IOException.class,
-        () -> RelayWireCodec.identityProof(challenge, record(server), server.getPrivate()));
-  }
-
-  @Test
-  void identityFrameBoundIsIndependentOfSearchFrameBound() {
-    byte[] prefix =
-        java.nio.ByteBuffer.allocate(4).putInt(RelayWireCodec.MAX_IDENTITY_PROOF_BYTES + 1).array();
-    assertThrows(
-        IOException.class,
-        () ->
-            RelayWireCodec.readFrame(
-                new ByteArrayInputStream(prefix), RelayWireCodec.MAX_IDENTITY_PROOF_BYTES));
-    assertEquals(1024 * 1024, RelayWireCodec.MAX_FRAME_BYTES);
-  }
-
-  @Test
-  void oldConstructorsFailClosedAndKeyedServerAuthenticates() throws Exception {
-    KeyPair serverKeys = keys();
-    IdentityRecord identity = record(serverKeys);
-    IncomingRelayServer legacy = new IncomingRelayServer(identity, 0, "127.0.0.1");
-    legacy.start();
-    try (DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator(keys(), 1000)) {
-      assertTrue(auth.authenticate("127.0.0.1", legacy.port()).isEmpty());
-    } finally {
-      legacy.stop();
-    }
-    IncomingRelayServer server =
-        new IncomingRelayServer(identity, serverKeys.getPrivate(), 0, "127.0.0.1");
-    server.start();
-    try (DirectTcpPeerAuthenticator disabled = new DirectTcpPeerAuthenticator();
-        DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator(keys(), 2000)) {
-      assertTrue(disabled.authenticate("127.0.0.1", server.port()).isEmpty());
-      assertArrayEquals(
-          identity.ed25519Pub(),
-          auth.authenticate("127.0.0.1", server.port()).orElseThrow().ed25519Pub());
-      auth.close();
-      assertTrue(auth.authenticate("127.0.0.1", server.port()).isEmpty());
-    } finally {
-      server.stop();
-    }
-  }
-
-  @Test
-  void acceptedAndQueuedSocketsAreBoundedAndClosedOnStop() throws Exception {
-    KeyPair key = keys();
-    IncomingRelayServer server =
-        new IncomingRelayServer(null, record(key), key.getPrivate(), 0, 1, 1, 5000, "127.0.0.1");
-    server.start();
-    try (Socket first = new Socket("127.0.0.1", server.port());
-        Socket queued = new Socket("127.0.0.1", server.port())) {
-      await(() -> server.activeConnectionCount() == 2);
-      try (Socket excess = new Socket("127.0.0.1", server.port())) {
-        excess.setSoTimeout(1000);
-        assertEquals(-1, excess.getInputStream().read());
-        assertEquals(2, server.activeConnectionCount());
-      }
-      server.stop();
-      first.setSoTimeout(1000);
-      queued.setSoTimeout(1000);
-      assertEquals(-1, first.getInputStream().read());
-      assertEquals(-1, queued.getInputStream().read());
-      assertEquals(0, server.activeConnectionCount());
-    } finally {
-      server.stop();
-    }
-  }
-
-  @Test
-  void incompleteFramesExpireAndCapacityRecovers() throws Exception {
-    KeyPair key = keys();
-    IncomingRelayServer server =
-        new IncomingRelayServer(null, record(key), key.getPrivate(), 0, 1, 1, 200, "127.0.0.1");
-    server.start();
-    try {
-      try (Socket socket = new Socket("127.0.0.1", server.port())) {
-        socket.setSoTimeout(1500);
-        // A normal peer that abandons a partial prefix still releases admission.
-        socket.getOutputStream().write(new byte[] {0, 0});
-        assertEquals(-1, socket.getInputStream().read());
-      }
-      await(() -> server.activeConnectionCount() == 0);
-      try (DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator(keys(), 1500)) {
-        assertTrue(auth.authenticate("127.0.0.1", server.port()).isPresent());
-      }
-    } finally {
-      server.stop();
-    }
-  }
-
-  @Test
-  void socketReadHonorsAlreadyExpiredAbsoluteDeadline() throws Exception {
-    try (java.net.ServerSocket listener =
-            new java.net.ServerSocket(0, 1, java.net.InetAddress.getLoopbackAddress());
-        Socket sender = new Socket(listener.getInetAddress(), listener.getLocalPort());
-        Socket receiver = listener.accept()) {
-      RelayWireCodec.writeFrame(sender.getOutputStream(), new byte[] {1});
-      assertThrows(
-          java.net.SocketTimeoutException.class,
-          () -> RelayWireCodec.readFrame(receiver, System.nanoTime() - 1, 100));
-    }
-  }
-
-  @Test
-  void authenticatorCloseWakesPendingReadAndClosesOwnedSocket() throws Exception {
-    try (java.net.ServerSocket listener =
-            new java.net.ServerSocket(0, 1, java.net.InetAddress.getLoopbackAddress());
-        DirectTcpPeerAuthenticator auth = new DirectTcpPeerAuthenticator(keys(), 5000)) {
-      AtomicReference<java.util.Optional<IdentityRecord>> result = new AtomicReference<>();
-      Thread caller =
-          new Thread(
-              () ->
-                  result.set(
-                      auth.authenticate(
-                          listener.getInetAddress().getHostAddress(), listener.getLocalPort())));
-      listener.setSoTimeout(2000);
-      caller.start();
-      try (Socket accepted = listener.accept()) {
-        assertTrue(
-            RelayWireCodec.isIdentityChallenge(
-                RelayWireCodec.readFrame(
-                    accepted, System.nanoTime() + TimeUnit.SECONDS.toNanos(2), 8192)));
-        auth.close();
-        caller.join(2000);
-        assertFalse(caller.isAlive());
-        assertTrue(result.get().isEmpty());
-        accepted.setSoTimeout(1000);
-        assertEquals(-1, accepted.getInputStream().read());
-      } finally {
-        auth.close();
-        caller.join(2000);
-      }
-    }
-  }
 
   @Test
   void mutableLookupTimeoutsUseDependencySecondsWithoutRoundingUp() {
@@ -291,7 +111,7 @@ class DiscoveryHardeningTest {
           new PeerDiscovery(
               source,
               directory,
-              (host, port) -> {
+              (host, port, deadlineNanos) -> {
                 authenticated.incrementAndGet();
                 return java.util.Optional.empty();
               });

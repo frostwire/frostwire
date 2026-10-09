@@ -41,7 +41,7 @@ import java.util.function.BooleanSupplier;
  * <p><b>Pull (forwarder-first discovery):</b> imports peers from IceBridge
  * {@code GET /lookup} into {@link PeerDirectory} as verified entries. Mesh
  * registration is already Ed25519-signed at the forwarder; this is the path
- * when direct TCP identity (home NAT) is unreachable — DESIGN_RELAY_REGISTRY
+ * when a direct rUDP path (home NAT) is unreachable — DESIGN_RELAY_REGISTRY
  * hybrid plane + §8 mesh search.
  */
 public final class PeerRegistrySync implements AutoCloseable {
@@ -504,16 +504,14 @@ public final class PeerRegistrySync implements AutoCloseable {
             directory.upsertVerified(pub, info.host, info.rudpPort, info.rudpPort,
                     caps, info.icebridgeVersion);
             client.route(pub, info.host, info.rudpPort, role);
-            // Seed host cache for Settings → Refresh/Ping (TCP identity on 6888).
+            // Seed host cache for Settings → Refresh/Ping (rUDP identity handshake).
             // Skip loopback USE_REMOTE self-registrations; only public/remote hosts.
             if (!isLoopbackHost(info.host)
                     && (role == IceBridgeConfig.Role.FORWARDER
                     || role == IceBridgeConfig.Role.BOTH)) {
                 try {
                     com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance()
-                            .addOrUpdate(info.host,
-                                    com.frostwire.search.relay.RelayConstants.RELAY_LISTEN_PORT,
-                                    role.name());
+                            .addOrUpdate(info.host, info.rudpPort, role.name());
                 } catch (Throwable ignored) {
                 }
             }

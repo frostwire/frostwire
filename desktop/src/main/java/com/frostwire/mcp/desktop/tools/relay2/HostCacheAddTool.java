@@ -38,7 +38,7 @@ public final class HostCacheAddTool implements MCPTool {
 
     JsonObject portProp = new JsonObject();
     portProp.addProperty("type", "integer");
-    portProp.addProperty("description", "TCP identity/relay port (e.g. 6888)");
+    portProp.addProperty("description", "rUDP port of the relay (e.g. 6889)");
     props.add("port", portProp);
 
     JsonObject roleProp = new JsonObject();

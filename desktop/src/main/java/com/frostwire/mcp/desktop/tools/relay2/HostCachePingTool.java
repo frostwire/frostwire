@@ -13,7 +13,7 @@ import com.frostwire.util.Logger;
 import com.google.gson.JsonObject;
 
 /**
- * MCP tool that triggers a TCP identity ping of every known IceBridge host.
+ * MCP tool that triggers an rUDP identity ping of every known IceBridge host.
  *
  * <p>{@link IceBridgeHostCache#refreshPings()} blocks while it pings each host, so it is run on a
  * daemon background thread and this tool returns immediately with {@code started}. Callers should
@@ -30,7 +30,7 @@ public final class HostCachePingTool implements MCPTool {
 
   @Override
   public String description() {
-    return "Start a background TCP identity ping of all known IceBridge relay hosts. Returns"
+    return "Start a background rUDP identity ping of all known IceBridge relay hosts. Returns"
         + " started=true immediately; re-list the host cache to observe results.";
   }
 

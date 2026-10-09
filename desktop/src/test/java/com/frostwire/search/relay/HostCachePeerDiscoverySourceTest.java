@@ -45,13 +45,13 @@ class HostCachePeerDiscoverySourceTest {
     IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
     HostCachePeerDiscoverySource source =
         new HostCachePeerDiscoverySource(
-            cache, Arrays.asList("virginia1.frostwire.com:6888", "bad-seed", "x:notaport", "y:0"));
+            cache, Arrays.asList("virginia1.frostwire.com:6889", "bad-seed", "x:notaport", "y:0"));
 
     List<DiscoveredEndpoint> endpoints = source.fetchEndpoints();
 
     assertEquals(1, endpoints.size());
     assertEquals("virginia1.frostwire.com", endpoints.get(0).host);
-    assertEquals(6888, endpoints.get(0).port);
+    assertEquals(6889, endpoints.get(0).port);
     assertTrue(endpoints.get(0).preferred);
   }
 
@@ -73,16 +73,12 @@ class HostCachePeerDiscoverySourceTest {
   }
 
   @Test
-  void refreshPingsUsesTheAuthenticatedHandshakeSoHealthyServersAreNotEvicted() throws Exception {
+  void refreshPingsUsesTheRudpHandshakeSoHealthyServersAreNotEvicted() throws Exception {
     IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
     cache.addOrUpdate("54.172.26.106", 6888, "FORWARDER");
-    java.security.KeyPair keys =
-        java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-    IdentityRecord server =
-        IdentityRecord.createSigned(new byte[20], keys, new byte[32], 6888, 6889, "FORWARDER");
-    // The legacy keyless ping would have to be used without an authenticator; it would fail here.
-    cache.setPingAuthenticator(
-        (host, port) ->
+    ProbedPeer server = new ProbedPeer(IdentityKeys.generate(0).ed25519PubRaw());
+    cache.setPingProber(
+        (host, port, deadlineNanos) ->
             host.equals("54.172.26.106")
                 ? java.util.Optional.of(server)
                 : java.util.Optional.empty());
@@ -96,10 +92,10 @@ class HostCachePeerDiscoverySourceTest {
   }
 
   @Test
-  void refreshPingsStillCountsFailuresWithTheAuthenticator() {
+  void refreshPingsStillCountsFailuresWithTheProber() {
     IceBridgeHostCache cache = new IceBridgeHostCache(new File(tempDir, "hosts.txt"));
     cache.addOrUpdate("203.0.113.9", 6888, "BOTH");
-    cache.setPingAuthenticator((host, port) -> java.util.Optional.empty());
+    cache.setPingProber((host, port, deadlineNanos) -> java.util.Optional.empty());
 
     cache.refreshPings();
 

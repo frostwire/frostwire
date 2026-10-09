@@ -35,8 +35,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
   private final JTextField BIND_HOST_FIELD = new SizedTextField(15, SizePolicy.RESTRICT_HEIGHT);
   private final WholeNumberField RUDP_PORT_FIELD =
       new SizedWholeNumberField(6889, 5, SizePolicy.RESTRICT_BOTH);
-  private final WholeNumberField RELAY_LISTEN_PORT_FIELD =
-      new SizedWholeNumberField(6888, 5, SizePolicy.RESTRICT_BOTH);
   private final JComboBox<String> ROLE_COMBO =
       new JComboBox<>(new String[] {"BOTH", "CLIENT", "FORWARDER"});
 
@@ -97,14 +95,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
         new LabeledComponent(
                 I18n.tr("rUDP port:"),
                 RUDP_PORT_FIELD,
-                LabeledComponent.NO_GLUE,
-                LabeledComponent.LEFT)
-            .getComponent());
-    localFieldsPanel.addHorizontalComponentGap();
-    localFieldsPanel.add(
-        new LabeledComponent(
-                I18n.tr("Relay listen port (identity):"),
-                RELAY_LISTEN_PORT_FIELD,
                 LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT)
             .getComponent());
@@ -173,7 +163,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     hostsLabel.setToolTipText(
         I18n.tr(
             "These are remote (or your own) IceBridge relays discovered via DHT. "
-                + "Ping = TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+                + "Ping = rUDP identity handshake with the server (not the IceBridge control HTTP). "
                 + "Desktop controls its local IceBridge daemon over HTTP on localhost."));
     add(hostsLabel);
     JScrollPane hostsScroll = new JScrollPane(hostsTable);
@@ -213,7 +203,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     // Field enables (respect both the top-level enabled checkbox and the mode)
     BIND_HOST_FIELD.setEnabled(enabled && !remote);
     RUDP_PORT_FIELD.setEnabled(enabled && !remote);
-    RELAY_LISTEN_PORT_FIELD.setEnabled(enabled && !remote);
     ROLE_COMBO.setEnabled(enabled && !remote);
     REMOTE_URL_FIELD.setEnabled(enabled && remote);
     REMOTE_TOKEN_FIELD.setEnabled(enabled && remote);
@@ -232,7 +221,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
 
     BIND_HOST_FIELD.setText(SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue());
     RUDP_PORT_FIELD.setValue(SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
-    RELAY_LISTEN_PORT_FIELD.setValue(SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
     ROLE_COMBO.setSelectedItem(SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
 
     REMOTE_URL_FIELD.setText(SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.getValue());
@@ -261,7 +249,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     SearchEnginesSettings.ICEBRIDGE_USE_REMOTE.setValue(REMOTE_RADIO.isSelected());
     SearchEnginesSettings.ICEBRIDGE_BIND_HOST.setValue(BIND_HOST_FIELD.getText().trim());
     SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.setValue(RUDP_PORT_FIELD.getValue());
-    SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.setValue(RELAY_LISTEN_PORT_FIELD.getValue());
     SearchEnginesSettings.ICEBRIDGE_ROLE.setValue((String) ROLE_COMBO.getSelectedItem());
     SearchEnginesSettings.ICEBRIDGE_REMOTE_URL.setValue(REMOTE_URL_FIELD.getText().trim());
     SearchEnginesSettings.ICEBRIDGE_REMOTE_AUTH_TOKEN.setValue(REMOTE_TOKEN_FIELD.getText().trim());
@@ -292,9 +279,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
         "  ICEBRIDGE_RUDP_PORT           = "
             + SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue());
     log.info(
-        "  ICEBRIDGE_RELAY_LISTEN_PORT   = "
-            + SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue());
-    log.info(
         "  ICEBRIDGE_ROLE                = " + SearchEnginesSettings.ICEBRIDGE_ROLE.getValue());
     log.info(
         "  ICEBRIDGE_CONTROL_HTTP_PORT   = "
@@ -314,8 +298,6 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
             .trim()
             .equals(SearchEnginesSettings.ICEBRIDGE_BIND_HOST.getValue())
         || RUDP_PORT_FIELD.getValue() != SearchEnginesSettings.ICEBRIDGE_RUDP_PORT.getValue()
-        || RELAY_LISTEN_PORT_FIELD.getValue()
-            != SearchEnginesSettings.ICEBRIDGE_RELAY_LISTEN_PORT.getValue()
         || !((String) ROLE_COMBO.getSelectedItem())
             .equals(SearchEnginesSettings.ICEBRIDGE_ROLE.getValue())
         || !REMOTE_URL_FIELD
@@ -335,8 +317,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
               try {
                 com.frostwire.search.relay.icebridge.IceBridgeHostCache cache =
                     com.frostwire.search.relay.icebridge.IceBridgeHostCache.getInstance();
-                // 1) TCP identity handshake on relay port (default 6888) — shows as
-                //    "IceBridge identity handshake OK" on the remote IncomingRelayServer.
+                // 1) rUDP identity handshake with every cached server.
                 cache.refreshPings();
                 // 2) Control /health + mesh TELEMETRY PING via IceBridgeClient (USE_REMOTE
                 //    or local child) so standalone forwarder logs show TELEMETRY lines.
