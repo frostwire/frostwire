@@ -713,7 +713,8 @@ public final class IncomingSearchRequestHandler implements DistributedSearchTran
                         return;
                     }
                     b.addRow(row.infoHash, row.name, row.sizeBytes, row.fileCount,
-                            row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile, row.seederEndpoints);
+                            row.publisherEd25519Pub, row.publisherNodeId, row.matchedFile, row.seederEndpoints,
+                            row.publicCatalog);
                 }
                 RemoteSearchResponse unsigned = b.signature(new byte[64]).build();
                 Signature signer = IdentityKeys.softwareSignature("Ed25519");

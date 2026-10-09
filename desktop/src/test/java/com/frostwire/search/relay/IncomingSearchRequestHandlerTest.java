@@ -300,6 +300,44 @@ class IncomingSearchRequestHandlerTest {
   }
 
   @Test
+  void streamedChunksKeepTheBrowsableCatalogFlag() throws Exception {
+    KeyPair requesterKey = generateEd25519KeyPair();
+    byte[] requesterPub = rawPub(requesterKey);
+
+    IdentityKeys handlerIdentity = IdentityKeys.generate();
+    InMemoryLocalIndex index = new InMemoryLocalIndex();
+    int rows = RemoteSearchResponse.DEFAULT_STREAM_CHUNK_SIZE * 2 + 1;
+    for (int i = 0; i < rows; i++) {
+      index.torrents.add(torrent("ubuntu server " + i, 500L, 1));
+    }
+    RelaySearchService service =
+        new RelaySearchService(index, handlerIdentity, ShareVisibilityPolicy.INCLUDE_ALL);
+
+    CapturingTransport transport = new CapturingTransport();
+    IncomingSearchRequestHandler handler =
+        new IncomingSearchRequestHandler(
+            transport, service, new PeerDirectory(new NoOpKarmaCache()), handlerIdentity);
+    handler.setPublicCatalogEnabled(true);
+    handler.start();
+
+    byte[][] path = {requesterPub};
+    RemoteSearchRequest request = signedRequest(requesterKey, "ubuntu", 25, 1, path);
+    transport.deliver(requesterPub, SearchPayloadCodec.encodeRequest(request));
+
+    assertTrue(transport.sent.size() > 1, "a result set this large must be streamed in chunks");
+    int total = 0;
+    for (CapturingTransport.SentPayload sent : transport.sent) {
+      RemoteSearchResponse chunk = SearchPayloadCodec.decodeResponse(sent.payload);
+      assertNotNull(chunk);
+      for (RemoteSearchResponse.Row row : chunk.rows()) {
+        assertTrue(row.publicCatalog, "every streamed row must advertise the browsable catalog");
+        total++;
+      }
+    }
+    assertEquals(rows, total);
+  }
+
+  @Test
   void torrentPayloadUpTo256KBIsServedInChunks() throws Exception {
     KeyPair requesterKey = generateEd25519KeyPair();
     byte[] requesterPub = rawPub(requesterKey);
