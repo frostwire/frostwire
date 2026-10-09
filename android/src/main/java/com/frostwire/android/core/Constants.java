@@ -29,216 +29,305 @@ import com.frostwire.android.BuildConfig;
  */
 public final class Constants {
 
-    /**
-     * isDevelopment
-     */
-    public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
+  /** isDevelopment */
+  public static final boolean IS_BASIC_AND_DEBUG =
+      BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
 
-    private static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
+  public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
-    /**
-     * should manually match the manifest, here for convenience so we can ask for it from static contexts without
-     * needing to pass the Android app context to obtain the PackageManager instance.
-     */
-    public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
+  private static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
 
-    public static final String APP_PACKAGE_NAME = "com.frostwire.android";
+  /**
+   * should manually match the manifest, here for convenience so we can ask for it from static
+   * contexts without needing to pass the Android app context to obtain the PackageManager instance.
+   */
+  public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
 
-    public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
+  public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 
-    public static final int JOB_ID_ENGINE_SERVICE = 10001;
-    public static final int JOB_ID_MUSIC_PLAYBACK_SERVICE = 20001;
+  public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
 
-    // preference keys
-    public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
-    public static final String PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD = "frostwire.prefs.core.last_seen_version_build";
-    public static final String PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP = "frostwire.prefs.core.main_application_on_create_timestamp";
+  public static final int JOB_ID_ENGINE_SERVICE = 10001;
+  public static final int JOB_ID_MUSIC_PLAYBACK_SERVICE = 20001;
 
-    public static final String PREF_KEY_NETWORK_ENABLE_DHT = "frostwire.prefs.network.enable_dht";
+  // preference keys
+  public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
+  public static final String PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD =
+      "frostwire.prefs.core.last_seen_version_build";
+  public static final String PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP =
+      "frostwire.prefs.core.main_application_on_create_timestamp";
 
-    public static final String PREF_KEY_NETWORK_USE_WIFI_ONLY = "frostwire.prefs.network.use_wifi_only";
-    public static final String PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY = "frostwire.prefs.network.bittorrent_on_vpn_only";
+  public static final String PREF_KEY_NETWORK_ENABLE_DHT = "frostwire.prefs.network.enable_dht";
 
-    // I2P Configuration
-    public static final String PREF_KEY_NETWORK_I2P_ENABLED = "frostwire.prefs.network.i2p_enabled";
-    public static final String PREF_KEY_NETWORK_I2P_HOSTNAME = "frostwire.prefs.network.i2p_hostname";
-    public static final String PREF_KEY_NETWORK_I2P_PORT = "frostwire.prefs.network.i2p_port";
-    public static final String PREF_KEY_NETWORK_I2P_ALLOW_MIXED = "frostwire.prefs.network.i2p_allow_mixed";
-    public static final String PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY = "frostwire.prefs.network.i2p_inbound_quantity";
-    public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY = "frostwire.prefs.network.i2p_outbound_quantity";
-    public static final String PREF_KEY_NETWORK_I2P_INBOUND_LENGTH = "frostwire.prefs.network.i2p_inbound_length";
-    public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH = "frostwire.prefs.network.i2p_outbound_length";
-    public static final String PREF_KEY_NETWORK_NATPMP_GATEWAY = "frostwire.prefs.network.natpmp_gateway";
-    public static final String PREF_KEY_NETWORK_NATPMP_LEASE_DURATION = "frostwire.prefs.network.natpmp_lease_duration";
-    public static final String PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID = "frostwire.prefs.network.allow_multiple_connections_per_pid";
+  public static final String PREF_KEY_NETWORK_USE_WIFI_ONLY =
+      "frostwire.prefs.network.use_wifi_only";
+  public static final String PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY =
+      "frostwire.prefs.network.bittorrent_on_vpn_only";
 
-    public static final String PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_download_for_torrent_deep_scan";
-    public static final String PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_rounds_for_torrent_deep_scan";
-    public static final String PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.interval_ms_for_torrent_deep_scan";
-    public static final String PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.min_seeds_for_torrent_deep_scan";
-    public static final String PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_RESULT = "frostwire.prefs.search.min_seeds_for_torrent_result";
-    public static final String PREF_KEY_SEARCH_MAX_TORRENT_FILES_TO_INDEX = "frostwire.prefs.search.max_torrent_files_to_index";
-    public static final String PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT = "frostwire.prefs.search.fulltext_search_results_limit";
+  // I2P Configuration
+  public static final String PREF_KEY_NETWORK_I2P_ENABLED = "frostwire.prefs.network.i2p_enabled";
+  public static final String PREF_KEY_NETWORK_I2P_HOSTNAME = "frostwire.prefs.network.i2p_hostname";
+  public static final String PREF_KEY_NETWORK_I2P_PORT = "frostwire.prefs.network.i2p_port";
+  public static final String PREF_KEY_NETWORK_I2P_ALLOW_MIXED =
+      "frostwire.prefs.network.i2p_allow_mixed";
+  public static final String PREF_KEY_NETWORK_I2P_INBOUND_QUANTITY =
+      "frostwire.prefs.network.i2p_inbound_quantity";
+  public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_QUANTITY =
+      "frostwire.prefs.network.i2p_outbound_quantity";
+  public static final String PREF_KEY_NETWORK_I2P_INBOUND_LENGTH =
+      "frostwire.prefs.network.i2p_inbound_length";
+  public static final String PREF_KEY_NETWORK_I2P_OUTBOUND_LENGTH =
+      "frostwire.prefs.network.i2p_outbound_length";
+  public static final String PREF_KEY_NETWORK_NATPMP_GATEWAY =
+      "frostwire.prefs.network.natpmp_gateway";
+  public static final String PREF_KEY_NETWORK_NATPMP_LEASE_DURATION =
+      "frostwire.prefs.network.natpmp_lease_duration";
+  public static final String PREF_KEY_NETWORK_ALLOW_MULTIPLE_CONNECTIONS_PER_PID =
+      "frostwire.prefs.network.allow_multiple_connections_per_pid";
 
-    public static final String PREF_KEY_SEARCH_USE_ZOOQLE = "frostwire.prefs.search.use_zooqle";
-    public static final String PREF_KEY_SEARCH_USE_SOUNDCLOUD = "frostwire.prefs.search.use_soundcloud";
-    public static final String PREF_KEY_SEARCH_USE_ARCHIVEORG = "frostwire.prefs.search.use_archiveorg";
-    public static final String PREF_KEY_SEARCH_USE_FROSTCLICK = "frostwire.prefs.search.use_frostclick";
-    public static final String PREF_KEY_SEARCH_USE_NYAA = "frostwire.prefs.search.use_nyaa";
-    public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
-    public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";
-    public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
-    public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
-    public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER = "frostwire.prefs.search.use_telluride_courier";
-    public static final String PREF_KEY_SEARCH_USE_YT = "frostwire.prefs.search.use_yt";
-    public static final String PREF_KEY_SEARCH_USE_TORRENTSCSV = "frostwire.prefs.search.use_torrentscsv";
-    public static final String PREF_KEY_SEARCH_USE_KNABEN = "frostwire.prefs.search.use_knaben";
-    public static final String PREF_KEY_SEARCH_USE_BITSEARCH = "frostwire.prefs.search.use_bitsearch";
-    /** Preference key must match settings_search_engines.xml (use_bt_digg). */
-    public static final String PREF_KEY_SEARCH_USE_BTDIGG = "frostwire.prefs.search.use_bt_digg";
-    public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
-    public static final String PREF_KEY_SEARCH_USE_LOCAL = "frostwire.prefs.search.use_local";
-    public static final String PREF_KEY_SEARCH_USE_DISTRIBUTED = "frostwire.prefs.search.use_distributed";
-    public static final String PREF_KEY_ICEBRIDGE_ENABLED = "frostwire.prefs.icebridge.enabled";
-    /** When true, Android uses a remote IceBridge control URL instead of in-process mesh. */
-    public static final String PREF_KEY_ICEBRIDGE_USE_REMOTE = "frostwire.prefs.icebridge.use_remote";
-    public static final String PREF_KEY_ICEBRIDGE_REMOTE_URL = "frostwire.prefs.icebridge.remote_url";
-    public static final String PREF_KEY_ICEBRIDGE_REMOTE_TOKEN = "frostwire.prefs.icebridge.remote_token";
-    /** Mesh data plane UDP port (string for EditTextPreference). Default 6889. */
-    public static final String PREF_KEY_ICEBRIDGE_RUDP_PORT = "frostwire.prefs.icebridge.rudp_port";
-    /** Identity handshake TCP port (string for EditTextPreference). Default 6888. */
-    public static final String PREF_KEY_ICEBRIDGE_RELAY_PORT = "frostwire.prefs.icebridge.relay_port";
-    /** BOTH | FORWARDER | CLIENT */
-    public static final String PREF_KEY_ICEBRIDGE_ROLE = "frostwire.prefs.icebridge.role";
-    /** Explicit opt-in to advertise the shared-torrent catalog to crawlers. Default false. */
-    public static final String PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG = "frostwire.prefs.icebridge.public_catalog";
+  public static final String PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN =
+      "frostwire.prefs.search.count_download_for_torrent_deep_scan";
+  public static final String PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN =
+      "frostwire.prefs.search.count_rounds_for_torrent_deep_scan";
+  public static final String PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN =
+      "frostwire.prefs.search.interval_ms_for_torrent_deep_scan";
+  public static final String PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_DEEP_SCAN =
+      "frostwire.prefs.search.min_seeds_for_torrent_deep_scan";
+  public static final String PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_RESULT =
+      "frostwire.prefs.search.min_seeds_for_torrent_result";
+  public static final String PREF_KEY_SEARCH_MAX_TORRENT_FILES_TO_INDEX =
+      "frostwire.prefs.search.max_torrent_files_to_index";
+  public static final String PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT =
+      "frostwire.prefs.search.fulltext_search_results_limit";
 
-    public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
-    public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
-    public static final String PREF_KEY_GUI_TOS_ACCEPTED = "frostwire.prefs.gui.tos_accepted";
-    public static final String PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER = "frostwire.prefs.gui.finished_downloads_between_ratings_reminder";
-    public static final String PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE = "frostwire.prefs.gui.initial_settings_complete";
-    public static final String PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION = "frostwire.prefs.gui.enable_permanent_status_notification";
-    public static final String PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED = "frostwire.prefs.gui.search.keywordfilterdrawer.tip_touchtags_dismissed";
-    public static final String PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED = "frostwire.prefs.gui.search.search.filter_drawer_button_clicked";
-    public static final String PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START = "frostwire.prefs.gui.show_transfers_on_download_start";
-    public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG = "frostwire.prefs.gui.show_new_transfer_dialog";
-    public static final String PREF_KEY_GUI_SUPPORT_VPN_THRESHOLD = "frostwire.prefs.gui.support_vpn_threshold";
-    public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP = "frostwire.prefs.gui.installation_timestamp";
+  public static final String PREF_KEY_SEARCH_USE_ZOOQLE = "frostwire.prefs.search.use_zooqle";
+  public static final String PREF_KEY_SEARCH_USE_SOUNDCLOUD =
+      "frostwire.prefs.search.use_soundcloud";
+  public static final String PREF_KEY_SEARCH_USE_ARCHIVEORG =
+      "frostwire.prefs.search.use_archiveorg";
+  public static final String PREF_KEY_SEARCH_USE_FROSTCLICK =
+      "frostwire.prefs.search.use_frostclick";
+  public static final String PREF_KEY_SEARCH_USE_NYAA = "frostwire.prefs.search.use_nyaa";
+  public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
+  public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";
+  public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
+  public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
+  public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER =
+      "frostwire.prefs.search.use_telluride_courier";
+  public static final String PREF_KEY_SEARCH_USE_YT = "frostwire.prefs.search.use_yt";
+  public static final String PREF_KEY_SEARCH_USE_TORRENTSCSV =
+      "frostwire.prefs.search.use_torrentscsv";
+  public static final String PREF_KEY_SEARCH_USE_KNABEN = "frostwire.prefs.search.use_knaben";
+  public static final String PREF_KEY_SEARCH_USE_BITSEARCH = "frostwire.prefs.search.use_bitsearch";
 
-    public static final String PREF_KEY_GUI_PLAYER_REPEAT_MODE = "com.frostwire.android.player.REPEAT_MODE";
-    public static final String PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED = "com.frostwire.android.player.SHUFFLE_ENABLED";
-    public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH = "frostwire.prefs.gui.distraction_free_search";
+  /** Preference key must match settings_search_engines.xml (use_bt_digg). */
+  public static final String PREF_KEY_SEARCH_USE_BTDIGG = "frostwire.prefs.search.use_bt_digg";
 
-    public static final String PREF_KEY_GUI_THEME_MODE = "frostwire.prefs.gui.theme_mode";
+  public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS =
+      "frostwire.prefs.search.use_torrentdownloads";
+  public static final String PREF_KEY_SEARCH_USE_LOCAL = "frostwire.prefs.search.use_local";
+  public static final String PREF_KEY_SEARCH_USE_DISTRIBUTED =
+      "frostwire.prefs.search.use_distributed";
+  public static final String PREF_KEY_ICEBRIDGE_ENABLED = "frostwire.prefs.icebridge.enabled";
 
-    public static final String PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED = "frostwire.prefs.torrent.max_download_speed";
-    public static final String PREF_KEY_TORRENT_MAX_UPLOAD_SPEED = "frostwire.prefs.torrent.max_upload_speed";
-    public static final String PREF_KEY_TORRENT_MAX_DOWNLOADS = "frostwire.prefs.torrent.max_downloads";
-    public static final String PREF_KEY_TORRENT_MAX_UPLOADS = "frostwire.prefs.torrent.max_uploads";
-    public static final String PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS = "frostwire.prefs.torrent.max_total_connections";
-    public static final String PREF_KEY_TORRENT_MAX_PEERS = "frostwire.prefs.torrent.max_peers";
-    public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS = "frostwire.prefs.torrent.seed_finished_torrents";
-    public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY = "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
-    public static final String PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES = "frostwire.prefs.torrent.delete_started_torrent_files";
-    public static final String PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX = "frostwire.prefs.torrent.transfer_detail_last_selected_tab_index";
-    public static final String PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED = "frostwire.prefs.torrent.sequential_transfers_enabled";
+  /** When true, Android uses a remote IceBridge control URL instead of in-process mesh. */
+  public static final String PREF_KEY_ICEBRIDGE_USE_REMOTE = "frostwire.prefs.icebridge.use_remote";
 
-    // Incoming connection port range settings
-    public static final String PREF_KEY_TORRENT_INCOMING_PORT_START = "frostwire.prefs.torrent.incoming_port_start";
-    public static final String PREF_KEY_TORRENT_INCOMING_PORT_END = "frostwire.prefs.torrent.incoming_port_end";
-    public static final int DEFAULT_TORRENT_INCOMING_PORT_START = 1024;
-    public static final int DEFAULT_TORRENT_INCOMING_PORT_END = 57000;
+  public static final String PREF_KEY_ICEBRIDGE_REMOTE_URL = "frostwire.prefs.icebridge.remote_url";
+  public static final String PREF_KEY_ICEBRIDGE_REMOTE_TOKEN =
+      "frostwire.prefs.icebridge.remote_token";
 
-    public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
+  /** Mesh data plane UDP port (string for EditTextPreference). Default 6889. */
+  public static final String PREF_KEY_ICEBRIDGE_RUDP_PORT = "frostwire.prefs.icebridge.rudp_port";
 
-    public static final String ACTION_REQUEST_SHUTDOWN = "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";
-    public static final String ACTION_SHOW_TRANSFERS = "com.frostwire.android.ACTION_SHOW_TRANSFERS";
-    public static final String ACTION_SHOW_VPN_STATUS_PROTECTED = "com.frostwire.android.ACTION_SHOW_VPN_STATUS_PROTECTED";
-    public static final String ACTION_SHOW_VPN_STATUS_UNPROTECTED = "com.frostwire.android.ACTION_SHOW_VPN_STATUS_UNPROTECTED";
-    public static final String ACTION_START_TRANSFER_FROM_PREVIEW = "com.frostwire.android.ACTION_START_TRANSFER_FROM_PREVIEW";
-    public static final String ACTION_MEDIA_PLAYER_PLAY = "com.frostwire.android.ACTION_MEDIA_PLAYER_PLAY";
-    public static final String ACTION_MEDIA_PLAYER_STOPPED = "com.frostwire.android.ACTION_MEDIA_PLAYER_STOPPED";
-    public static final String ACTION_MEDIA_PLAYER_PAUSED = "com.frostwire.android.ACTION_MEDIA_PLAYER_PAUSED";
-    public static final String ACTION_REFRESH_FINGER = "com.frostwire.android.ACTION_REFRESH_FINGER";
-    public static final String ACTION_NOTIFY_SDCARD_MOUNTED = "com.frostwire.android.ACTION_NOTIFY_SDCARD_MOUNTED";
+  /** Identity handshake TCP port (string for EditTextPreference). Default 6888. */
+  /** BOTH | FORWARDER | CLIENT */
+  public static final String PREF_KEY_ICEBRIDGE_ROLE = "frostwire.prefs.icebridge.role";
 
-    public static final String ACTION_NOTIFY_UPDATE_AVAILABLE = "com.frostwire.android.NOTIFY_UPDATE_AVAILABLE";
-    public static final String ACTION_NOTIFY_DATA_INTERNET_CONNECTION = "com.frostwire.android.NOTIFY_CHECK_INTERNET_CONNECTION";
+  /** Explicit opt-in to advertise the shared-torrent catalog to crawlers. Default false. */
+  public static final String PREF_KEY_ICEBRIDGE_PUBLIC_CATALOG =
+      "frostwire.prefs.icebridge.public_catalog";
 
-    public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
-    public static final String EXTRA_DOWNLOAD_COMPLETE_PATH = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
-    public static final String EXTRA_REFRESH_FILE_TYPE = "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";
-    public static final String EXTRA_FINISH_MAIN_ACTIVITY = "com.frostwire.android.EXTRA_FINISH_MAIN_ACTIVITY";
+  public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD =
+      "frostwire.prefs.gui.vibrate_on_finished_download";
+  public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER =
+      "frostwire.prefs.gui.last_media_type_filter";
+  public static final String PREF_KEY_GUI_TOS_ACCEPTED = "frostwire.prefs.gui.tos_accepted";
+  public static final String PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER =
+      "frostwire.prefs.gui.finished_downloads_between_ratings_reminder";
+  public static final String PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE =
+      "frostwire.prefs.gui.initial_settings_complete";
+  public static final String PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION =
+      "frostwire.prefs.gui.enable_permanent_status_notification";
+  public static final String PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED =
+      "frostwire.prefs.gui.search.keywordfilterdrawer.tip_touchtags_dismissed";
+  public static final String PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED =
+      "frostwire.prefs.gui.search.search.filter_drawer_button_clicked";
+  public static final String PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START =
+      "frostwire.prefs.gui.show_transfers_on_download_start";
+  public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG =
+      "frostwire.prefs.gui.show_new_transfer_dialog";
+  public static final String PREF_KEY_GUI_SUPPORT_VPN_THRESHOLD =
+      "frostwire.prefs.gui.support_vpn_threshold";
+  public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP =
+      "frostwire.prefs.gui.installation_timestamp";
 
-    public static final String MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
+  public static final String PREF_KEY_GUI_PLAYER_REPEAT_MODE =
+      "com.frostwire.android.player.REPEAT_MODE";
+  public static final String PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED =
+      "com.frostwire.android.player.SHUFFLE_ENABLED";
+  public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH =
+      "frostwire.prefs.gui.distraction_free_search";
 
-    // generic file types
-    public static final byte FILE_TYPE_AUDIO = 0x00;
-    public static final byte FILE_TYPE_PICTURES = 0x01;
-    public static final byte FILE_TYPE_VIDEOS = 0x02;
-    public static final byte FILE_TYPE_DOCUMENTS = 0x03;
-    public static final byte FILE_TYPE_APPLICATIONS = 0x04;
-    public static final byte FILE_TYPE_RINGTONES = 0x05;
-    public static final byte FILE_TYPE_TORRENTS = 0x06;
-    public static final byte FILE_TYPE_FILES = 0x07;
-    public static final byte FILE_TYPE_UNKNOWN = 0x08;
+  public static final String PREF_KEY_GUI_THEME_MODE = "frostwire.prefs.gui.theme_mode";
 
-    public static final String MIME_TYPE_ANDROID_PACKAGE_ARCHIVE = "application/vnd.android.package-archive";
-    public static final String MIME_TYPE_BITTORRENT = "application/x-bittorrent";
+  public static final String PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED =
+      "frostwire.prefs.torrent.max_download_speed";
+  public static final String PREF_KEY_TORRENT_MAX_UPLOAD_SPEED =
+      "frostwire.prefs.torrent.max_upload_speed";
+  public static final String PREF_KEY_TORRENT_MAX_DOWNLOADS =
+      "frostwire.prefs.torrent.max_downloads";
+  public static final String PREF_KEY_TORRENT_MAX_UPLOADS = "frostwire.prefs.torrent.max_uploads";
+  public static final String PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS =
+      "frostwire.prefs.torrent.max_total_connections";
+  public static final String PREF_KEY_TORRENT_MAX_PEERS = "frostwire.prefs.torrent.max_peers";
+  public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS =
+      "frostwire.prefs.torrent.seed_finished_torrents";
+  public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY =
+      "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
+  public static final String PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES =
+      "frostwire.prefs.torrent.delete_started_torrent_files";
+  public static final String PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX =
+      "frostwire.prefs.torrent.transfer_detail_last_selected_tab_index";
+  public static final String PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED =
+      "frostwire.prefs.torrent.sequential_transfers_enabled";
 
-    /**
-     * URL where FrostWire checks for software updates
-     */
-    private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION && !IS_BASIC_AND_DEBUG ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
-    public static final String SERVER_UPDATE_URL = "https://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
-    public static final String FROSTWIRE_MORE_RESULTS = "https://www.frostwire.com/more.results";
-    public static final String SERVER_PROMOTIONS_URL = "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
-    public static final String SUPPORT_URL = "https://www.reddit.com/r/FrostWire/";
-    public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
-    public static final String ALL_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/";
-    public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
-    public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL = "https://www.frostwire.com/download/?os=android&from=OTA";
-    public static final String FROSTWIRE_ANDROID_GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.frostwire.android";
+  // Incoming connection port range settings
+  public static final String PREF_KEY_TORRENT_INCOMING_PORT_START =
+      "frostwire.prefs.torrent.incoming_port_start";
+  public static final String PREF_KEY_TORRENT_INCOMING_PORT_END =
+      "frostwire.prefs.torrent.incoming_port_end";
+  public static final int DEFAULT_TORRENT_INCOMING_PORT_START = 1024;
+  public static final int DEFAULT_TORRENT_INCOMING_PORT_END = 57000;
 
-    public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus") + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
+  public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
 
-    /**
-     * Social Media official URLS
-     */
-    public static final String SOCIAL_URL_FACEBOOK_PAGE = "https://www.facebook.com/FrostwireOfficial";
-    public static final String SOCIAL_URL_TWITTER_PAGE = "https://x.com/frostwire";
-    public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
-    public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
-    public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
+  public static final String ACTION_REQUEST_SHUTDOWN =
+      "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";
+  public static final String ACTION_SHOW_TRANSFERS = "com.frostwire.android.ACTION_SHOW_TRANSFERS";
+  public static final String ACTION_SHOW_VPN_STATUS_PROTECTED =
+      "com.frostwire.android.ACTION_SHOW_VPN_STATUS_PROTECTED";
+  public static final String ACTION_SHOW_VPN_STATUS_UNPROTECTED =
+      "com.frostwire.android.ACTION_SHOW_VPN_STATUS_UNPROTECTED";
+  public static final String ACTION_START_TRANSFER_FROM_PREVIEW =
+      "com.frostwire.android.ACTION_START_TRANSFER_FROM_PREVIEW";
+  public static final String ACTION_MEDIA_PLAYER_PLAY =
+      "com.frostwire.android.ACTION_MEDIA_PLAYER_PLAY";
+  public static final String ACTION_MEDIA_PLAYER_STOPPED =
+      "com.frostwire.android.ACTION_MEDIA_PLAYER_STOPPED";
+  public static final String ACTION_MEDIA_PLAYER_PAUSED =
+      "com.frostwire.android.ACTION_MEDIA_PLAYER_PAUSED";
+  public static final String ACTION_REFRESH_FINGER = "com.frostwire.android.ACTION_REFRESH_FINGER";
+  public static final String ACTION_NOTIFY_SDCARD_MOUNTED =
+      "com.frostwire.android.ACTION_NOTIFY_SDCARD_MOUNTED";
 
-    public static final String FROSTWIRE_BLOG_URL = "https://blog.frostwire.com/";
+  public static final String ACTION_NOTIFY_UPDATE_AVAILABLE =
+      "com.frostwire.android.NOTIFY_UPDATE_AVAILABLE";
+  public static final String ACTION_NOTIFY_DATA_INTERNET_CONNECTION =
+      "com.frostwire.android.NOTIFY_CHECK_INTERNET_CONNECTION";
 
-    public static final String FROSTWIRE_GIVE_URL = "https://www.frostwire.com/give/?from=";
-    public static final String STICKERS_SHOP_URL = "https://www.frostwire.com/stickers";
-    public static final String CONTACT_US_URL = "https://www.frostwire.com/contact";
-    public static final String TRANSLATE_HELP_URL = "https://github.com/frostwire/frostwire";
-    public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
+  public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION =
+      "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
+  public static final String EXTRA_DOWNLOAD_COMPLETE_PATH =
+      "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
+  public static final String EXTRA_REFRESH_FILE_TYPE =
+      "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";
+  public static final String EXTRA_FINISH_MAIN_ACTIVITY =
+      "com.frostwire.android.EXTRA_FINISH_MAIN_ACTIVITY";
 
-    public static final String FROSTWIRE_VPN_URL = "https://www.frostwire.com/vpn.pia";
+  public static final String MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION =
+      "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 
-    public static final String PIA_VPN_URL = FROSTWIRE_VPN_URL;
+  // generic file types
+  public static final byte FILE_TYPE_AUDIO = 0x00;
+  public static final byte FILE_TYPE_PICTURES = 0x01;
+  public static final byte FILE_TYPE_VIDEOS = 0x02;
+  public static final byte FILE_TYPE_DOCUMENTS = 0x03;
+  public static final byte FILE_TYPE_APPLICATIONS = 0x04;
+  public static final byte FILE_TYPE_RINGTONES = 0x05;
+  public static final byte FILE_TYPE_TORRENTS = 0x06;
+  public static final byte FILE_TYPE_FILES = 0x07;
+  public static final byte FILE_TYPE_UNKNOWN = 0x08;
 
-    public static final int NOTIFICATION_FROSTWIRE_STATUS = 112000;
-    public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 112001;
-    public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 112002;
+  public static final String MIME_TYPE_ANDROID_PACKAGE_ARCHIVE =
+      "application/vnd.android.package-archive";
+  public static final String MIME_TYPE_BITTORRENT = "application/x-bittorrent";
 
-    public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
-    public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://blog.frostwire.com/2016/12/05/how-to-create-playlists-on-frostwire-for-android/";
+  /** URL where FrostWire checks for software updates */
+  private static final String FROM_URL_PARAMETERS =
+      "from=android&basic="
+          + (IS_GOOGLE_PLAY_DISTRIBUTION && !IS_BASIC_AND_DEBUG ? "1" : "0")
+          + "&version="
+          + FROSTWIRE_VERSION_STRING
+          + "&build="
+          + FROSTWIRE_BUILD;
 
-    public static int[] engineOwnedNotificationIds() {
-        return new int[] {
-                NOTIFICATION_FROSTWIRE_STATUS,
-                NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED
-        };
-    }
+  public static final String SERVER_UPDATE_URL =
+      "https://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
+  public static final String FROSTWIRE_MORE_RESULTS = "https://www.frostwire.com/more.results";
+  public static final String SERVER_PROMOTIONS_URL =
+      "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
+  public static final String SUPPORT_URL = "https://www.reddit.com/r/FrostWire/";
+  public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
+  public static final String ALL_FEATURED_DOWNLOADS_URL =
+      "https://www.frostwire.com/featured-downloads/";
+  public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
+  public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL =
+      "https://www.frostwire.com/download/?os=android&from=OTA";
+  public static final String FROSTWIRE_ANDROID_GOOGLE_PLAY_URL =
+      "https://play.google.com/store/apps/details?id=com.frostwire.android";
 
-    private Constants() {
-    }
+  public static final String USER_AGENT =
+      "FrostWire/android-"
+          + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus")
+          + "/"
+          + Constants.FROSTWIRE_VERSION_STRING
+          + "/"
+          + Constants.FROSTWIRE_BUILD;
+
+  /** Social Media official URLS */
+  public static final String SOCIAL_URL_FACEBOOK_PAGE =
+      "https://www.facebook.com/FrostwireOfficial";
+
+  public static final String SOCIAL_URL_TWITTER_PAGE = "https://x.com/frostwire";
+  public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
+  public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
+  public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
+
+  public static final String FROSTWIRE_BLOG_URL = "https://blog.frostwire.com/";
+
+  public static final String FROSTWIRE_GIVE_URL = "https://www.frostwire.com/give/?from=";
+  public static final String STICKERS_SHOP_URL = "https://www.frostwire.com/stickers";
+  public static final String CONTACT_US_URL = "https://www.frostwire.com/contact";
+  public static final String TRANSLATE_HELP_URL = "https://github.com/frostwire/frostwire";
+  public static final String CHANGELOG_URL =
+      "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
+
+  public static final String FROSTWIRE_VPN_URL = "https://www.frostwire.com/vpn.pia";
+
+  public static final String PIA_VPN_URL = FROSTWIRE_VPN_URL;
+
+  public static final int NOTIFICATION_FROSTWIRE_STATUS = 112000;
+  public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 112001;
+  public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 112002;
+
+  public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
+  public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL =
+      "https://blog.frostwire.com/2016/12/05/how-to-create-playlists-on-frostwire-for-android/";
+
+  public static int[] engineOwnedNotificationIds() {
+    return new int[] {NOTIFICATION_FROSTWIRE_STATUS, NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED};
+  }
+
+  private Constants() {}
 }

@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">로컬 IceBridge 스택이 실행 중이 아닙니다</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">메시 데이터 포트(UDP). 기본값 0: 세션마다 포트 자동 선택. 탭하여 변경하세요.</string>
-    <string name="distributed_icebridge_identity_port_title">ID TCP 포트</string>
-    <string name="distributed_icebridge_identity_port_summary">피어 핸드셰이크 포트(TCP). 기본값 6888. 탭하여 변경하세요.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — 검색하고 다른 사용자의 릴레이를 도움</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — 릴레이만(로컬 검색 응답 없음)</string>

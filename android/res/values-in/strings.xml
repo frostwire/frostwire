@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Tumpukan IceBridge lokal tidak berjalan</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Port data mesh (UDP). Default 0: port otomatis setiap sesi. Ketuk untuk mengubah.</string>
-    <string name="distributed_icebridge_identity_port_title">Port TCP identitas</string>
-    <string name="distributed_icebridge_identity_port_summary">Port handshake peer (TCP). Default 6888. Ketuk untuk mengubah.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Cari dan bantu merelay untuk yang lain</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Hanya relay (tanpa jawaban pencarian lokal)</string>

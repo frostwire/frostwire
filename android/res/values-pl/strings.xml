@@ -683,8 +683,6 @@
     <string name="distributed_stack_not_running">Lokalny stos IceBridge nie działa</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Port danych sieci (UDP). Domyślnie 0: automatyczny port dla każdej sesji. Dotknij, aby zmienić.</string>
-    <string name="distributed_icebridge_identity_port_title">Port TCP tożsamości</string>
-    <string name="distributed_icebridge_identity_port_summary">Port uzgadniania peerów (TCP). Domyślnie 6888. Dotknij, aby zmienić.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Wyszukuj i pomagaj innym w przekazywaniu</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Tylko przekazywanie (bez lokalnych odpowiedzi na wyszukiwania)</string>

@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">స్థానిక IceBridge స్టాక్ నడవడం లేదు</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">మెష్ డేటా పోర్ట్ (UDP). డిఫాల్ట్ 0: ప్రతి సెషన్‌లో స్వయంచాలక పోర్ట్. మార్చడానికి తట్టండి.</string>
-    <string name="distributed_icebridge_identity_port_title">ఐడెంటిటీ TCP పోర్ట్</string>
-    <string name="distributed_icebridge_identity_port_summary">పీర్ హ్యాండ్‌షేక్ పోర్ట్ (TCP). డిఫాల్ట్ 6888. మార్చడానికి తట్టండి.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — శోధించండి మరియు ఇతరుల కోసం రిలే చేయడంలో సహాయపడండి</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — రిలే మాత్రమే (స్థానిక శోధన సమాధానాలు లేవు)</string>

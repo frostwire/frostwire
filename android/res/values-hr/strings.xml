@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Lokalni IceBridge stog ne radi</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Port podataka mreže (UDP). Zadano 0: automatski port za svaku sesiju. Dodirnite za promjenu.</string>
-    <string name="distributed_icebridge_identity_port_title">TCP port identiteta</string>
-    <string name="distributed_icebridge_identity_port_summary">Port za rukovanje peerova (TCP). Zadano 6888. Dodirnite za promjenu.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Pretražuj i pomaži drugima s releiranjem</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Samo relej (bez lokalnih odgovora na pretraživanje)</string>

@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Plaaslike IceBridge-stapel loop nie</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Maasdatapoort (UDP). Verstek 0: outomatiese poort elke sessie. Tik om te verander.</string>
-    <string name="distributed_icebridge_identity_port_title">Identiteit-TCP-poort</string>
-    <string name="distributed_icebridge_identity_port_summary">Peer-handdrukpoort (TCP). Verstek 6888. Tik om te verander.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BEIDE — Soek en help ander relay</string>
     <string name="distributed_icebridge_role_forwarder_label">VOORTSTUURDER — Relay net (geen plaaslike soekantwoorde nie)</string>

@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">स्थानिक IceBridge स्टॅक चालू नाही</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">मेश डेटा पोर्ट (UDP). डीफॉल्ट 0: प्रत्येक सत्रासाठी स्वयंचलित पोर्ट. बदलण्यासाठी टॅप करा.</string>
-    <string name="distributed_icebridge_identity_port_title">आयडेंटिटी TCP पोर्ट</string>
-    <string name="distributed_icebridge_identity_port_summary">पीअर हँडशेक पोर्ट (TCP). डीफॉल्ट 6888. बदलण्यासाठी टॅप करा.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — शोधा आणि इतरांसाठी रिले करण्यास मदत करा</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — फक्त रिले (स्थानिक शोध उत्तरे नाहीत)</string>

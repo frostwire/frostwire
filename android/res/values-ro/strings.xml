@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Stiva IceBridge locală nu rulează</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Port de date al rețelei mesh (UDP). Implicit 0: port automat pentru fiecare sesiune. Atinge pentru a schimba.</string>
-    <string name="distributed_icebridge_identity_port_title">Port TCP identitate</string>
-    <string name="distributed_icebridge_identity_port_summary">Port handshake peer (TCP). Implicit 6888. Atinge pentru a schimba.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Caută și ajută la retransmiterea pentru alții</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Doar releu (fără răspunsuri locale la căutări)</string>

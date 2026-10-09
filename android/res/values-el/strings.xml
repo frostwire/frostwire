@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Η τοπική στοίβα IceBridge δεν εκτελείται</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Θύρα δεδομένων δικτύου (UDP). Προεπιλογή 0: αυτόματη θύρα για κάθε συνεδρία. Πατήστε για αλλαγή.</string>
-    <string name="distributed_icebridge_identity_port_title">Θύρα TCP ταυτότητας</string>
-    <string name="distributed_icebridge_identity_port_summary">Θύρα χειραψίας peer (TCP). Προεπιλογή 6888. Πατήστε για αλλαγή.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Αναζήτηση και βοήθεια στη μεταφορά για άλλους</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Μόνο ρελέ (χωρίς τοπικές απαντήσεις αναζήτησης)</string>

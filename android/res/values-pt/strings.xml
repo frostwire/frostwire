@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">A pilha IceBridge local não está em execução</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Porta de dados da malha (UDP). Predefinição 0: porta automática em cada sessão. Toque para alterar.</string>
-    <string name="distributed_icebridge_identity_port_title">Porta TCP de identidade</string>
-    <string name="distributed_icebridge_identity_port_summary">Porta de handshake entre peers (TCP). Predefinição 6888. Toque para alterar.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Pesquisar e ajudar a retransmitir para outros</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Apenas retransmitir (sem respostas de pesquisa locais)</string>

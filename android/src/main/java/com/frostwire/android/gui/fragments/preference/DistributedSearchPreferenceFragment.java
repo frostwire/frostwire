@@ -816,8 +816,8 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
   }
 
   /**
-   * Editable rUDP / identity TCP ports and role. Values are stored in prefs; stack picks them up on
-   * Start / restart IceBridge.
+   * Editable rUDP port and role. Values are stored in prefs; stack picks them up on Start / restart
+   * IceBridge.
    */
   private void setupIceBridgePortAndRolePrefs() {
     EditTextPreference rudpPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT);
@@ -826,13 +826,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           rudpPref,
           Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT,
           R.string.distributed_icebridge_rudp_port_summary);
-    }
-    EditTextPreference relayPref = findPreference(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT);
-    if (relayPref != null) {
-      bindPortPreference(
-          relayPref,
-          Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT,
-          R.string.distributed_icebridge_identity_port_summary);
     }
     ListPreference rolePref = findPreference(Constants.PREF_KEY_ICEBRIDGE_ROLE);
     if (rolePref != null) {
@@ -899,11 +892,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           int configuredRudp =
               IceBridgePortPreferences.configuredPort(
                   safePrefString(Constants.PREF_KEY_ICEBRIDGE_RUDP_PORT, "0"), true, 0);
-          int configuredRelay =
-              IceBridgePortPreferences.configuredPort(
-                  safePrefString(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT, "6888"),
-                  false,
-                  RelayConstants.RELAY_LISTEN_PORT);
           int rudp = configuredRudp;
           int control = 0;
           String role = safePrefString(Constants.PREF_KEY_ICEBRIDGE_ROLE, "BOTH");
@@ -917,7 +905,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           final int fRudp = rudp;
           final int fControl = control;
           final int fConfiguredRudp = configuredRudp;
-          final int fConfiguredRelay = configuredRelay;
           final String fRole = role;
           final com.frostwire.android.search.RelayStartupTracker.Snapshot startup =
               svc != null ? svc.getRelayStartupStatus() : null;
@@ -948,16 +935,6 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
                           + "\n"
                           + text
                           + (fRunning && fRudp != fConfiguredRudp ? " → " + fRudp : ""));
-                }
-                EditTextPreference relayPref =
-                    findPreference(Constants.PREF_KEY_ICEBRIDGE_RELAY_PORT);
-                if (relayPref != null) {
-                  String text = String.valueOf(fConfiguredRelay);
-                  relayPref.setText(text);
-                  relayPref.setSummary(
-                      getString(R.string.distributed_icebridge_identity_port_summary)
-                          + "\n"
-                          + text);
                 }
                 ListPreference rolePref = findPreference(Constants.PREF_KEY_ICEBRIDGE_ROLE);
                 if (rolePref != null) {
@@ -998,8 +975,7 @@ public final class DistributedSearchPreferenceFragment extends AbstractPreferenc
           IceBridgeHostCache cache = IceBridgeHostCache.getInstance();
           if (ping) {
             try {
-              // TCP identity handshake (relay port) — remote logs:
-              // "IceBridge identity handshake OK from …"
+              // rUDP identity handshake with each cached server
               cache.refreshPings();
             } catch (Throwable t) {
               LOG.warn("IceBridge host refreshPings failed", t);

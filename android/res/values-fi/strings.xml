@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Paikallinen IceBridge-pino ei ole käynnissä</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Verkon dataportti (UDP). Oletus 0: automaattinen portti joka istunnossa. Vaihda napauttamalla.</string>
-    <string name="distributed_icebridge_identity_port_title">Identiteetin TCP-portti</string>
-    <string name="distributed_icebridge_identity_port_summary">Vertaisten kättelyportti (TCP). Oletus 6888. Vaihda napauttamalla.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Hae ja auta välittämään muille</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Vain välitys (ei paikallisia hakuvastauksia)</string>

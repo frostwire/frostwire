@@ -680,8 +680,6 @@
     <string name="distributed_stack_not_running">Lokálny zásobník IceBridge nebeží</string>
     <string name="distributed_icebridge_rudp_port_title">rUDP port</string>
     <string name="distributed_icebridge_rudp_port_summary">Dátový port siete (UDP). Predvolený 0: automatický port pre každú reláciu. Ťuknutím zmeníte.</string>
-    <string name="distributed_icebridge_identity_port_title">Port TCP identity</string>
-    <string name="distributed_icebridge_identity_port_summary">Port handshake peerov (TCP). Predvolený 6888. Ťuknutím zmeníte.</string>
     <string name="distributed_icebridge_role_title">Role</string>
     <string name="distributed_icebridge_role_both_label">BOTH — Vyhľadávať a pomáhať ostatným s prenosom</string>
     <string name="distributed_icebridge_role_forwarder_label">FORWARDER — Iba prenos (bez lokálnych odpovedí na vyhľadávanie)</string>
