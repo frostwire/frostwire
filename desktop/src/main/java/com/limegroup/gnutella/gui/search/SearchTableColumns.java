@@ -46,7 +46,7 @@ final class SearchTableColumns {
           ACTIONS_IDX,
           "RESULT_PANEL_ACTIONS",
           I18n.tr("Actions"),
-          63,
+          84,
           true,
           SearchResultActionsHolder.class);
   private final LimeTableColumn COUNT_COLUMN =

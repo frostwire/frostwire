@@ -32,6 +32,7 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.VPNDropGuard;
+import com.limegroup.gnutella.gui.icebridge.PeerCatalogWindow;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,6 +52,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
   private static AlphaIcon download_transparent;
   private static ImageIcon details_solid;
   private static AlphaIcon details_transparent;
+  private static ImageIcon browse_solid;
+  private static AlphaIcon browse_transparent;
   private static volatile boolean iconsLoaded = false;
 
   /** Lazy load icons on first access to avoid EDT blocking during class loading */
@@ -74,6 +77,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
               IconRepainter.brightenIfDarkTheme(
                   GUIMediator.getThemeImage("search_result_details_over"));
       details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
+      browse_solid =
+          (ImageIcon)
+              IconRepainter.brightenIfDarkTheme(
+                  GUIMediator.getThemeImage("search_result_browse_over"));
+      browse_transparent = new AlphaIcon(browse_solid, BUTTONS_TRANSPARENCY);
       iconsLoaded = true;
     } catch (Exception e) {
       e.printStackTrace();
@@ -83,7 +91,9 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
   private JLabel labelPlay;
   private JLabel labelPartialDownload;
   private JLabel labelDownload;
+  private JLabel labelBrowse;
   private UISearchResult uiSearchResult;
+  private byte[] browsableHolderPub;
   private boolean showSolid;
 
   public SearchResultActionsRenderer() {
@@ -121,6 +131,19 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     c.gridx = GridBagConstraints.RELATIVE;
     c.ipadx = 3;
     add(labelPartialDownload, c);
+    labelBrowse = new JLabel(browse_transparent);
+    labelBrowse.setToolTipText(I18n.tr("Browse Shared Torrents"));
+    labelBrowse.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            labelBrowse_mouseReleased(e);
+          }
+        });
+    c = new GridBagConstraints();
+    c.gridx = GridBagConstraints.RELATIVE;
+    c.ipadx = 3;
+    add(labelBrowse, c);
     setEnabled(true);
   }
 
@@ -165,6 +188,12 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     // [+] Preliminary Download - shows format/content selection
     labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
     labelPartialDownload.setVisible(isPreliminary);
+
+    // Browse Shared Torrents: only when the holder opted in to sharing its catalog
+    browsableHolderPub =
+        BrowsableHolder.advertisedPub(sr.getSource(), uiSearchResult.getDetailsUrl());
+    labelBrowse.setIcon(showSolid ? browse_solid : browse_transparent);
+    labelBrowse.setVisible(browsableHolderPub != null);
   }
 
   private boolean isSearchResultPlayable() {
@@ -210,6 +239,12 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         uiSearchResult.play();
       }
       updatePlayButton();
+    }
+  }
+
+  private void labelBrowse_mouseReleased(MouseEvent e) {
+    if (e.getButton() == MouseEvent.BUTTON1 && browsableHolderPub != null) {
+      PeerCatalogWindow.showForPeer(browsableHolderPub);
     }
   }
 
