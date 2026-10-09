@@ -4633,11 +4633,11 @@ msgstr "알려진 IceBridge 서버 (핑 성공한 릴레이):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
 "DHT를 통해 발견된 원격 (또는 자체) IceBridge 릴레이입니다. Ping = 릴레이 포트"
-"의 TCP 신원 핸드셰이크 (IceBridge 제어 HTTP 아님). 데스크톱은 localhost의 "
+"의 rUDP 신원 핸드셰이크 (IceBridge 제어 HTTP 아님). 데스크톱은 localhost의 "
 "HTTP로 로컬 IceBridge 데몬을 제어합니다."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:379

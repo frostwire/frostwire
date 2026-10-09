@@ -4599,10 +4599,10 @@ msgstr "Teadaolevad IceBridge serverid (edukalt pingitud releed):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
-"Need on DHT kaudu leitud kaugreleed (või sinu omad). Ping = TCP identiteedi "
+"Need on DHT kaudu leitud kaugreleed (või sinu omad). Ping = rUDP identiteedi "
 "käepigistus relee pordis (mitte IceBridge juhtimis-HTTP). Töölauarakendus "
 "juhib kohalikku deemonit HTTP kaudu localhostis."
 

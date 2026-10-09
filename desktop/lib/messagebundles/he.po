@@ -4523,10 +4523,10 @@ msgstr "שרתי IceBridge מוכרים (ממסרים שנענו):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
-"אלה ממסרים מרוחקים (או שלך) שהתגלו דרך DHT. Ping הוא לחיצת TCP בפורט הממסר. "
+"אלה ממסרים מרוחקים (או שלך) שהתגלו דרך DHT. Ping הוא לחיצת rUDP בפורט הממסר. "
 "הדימון המקומי נשלט דרך HTTP ב localhost."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:379

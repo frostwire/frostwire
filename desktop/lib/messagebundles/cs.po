@@ -604,7 +604,7 @@ msgstr "Oškrábejte Tracker"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:443
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:185
 msgid "Check Local Data"
-msgstr "Zkontrolovat aktualizace"
+msgstr "Zkontrolovat místní data"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:464
 msgid "Edit trackers"
@@ -906,7 +906,7 @@ msgstr "Hledej a stahuj."
 #. Default to hybrid
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:234
 msgid "Hybrid torrents support both v1 and v2 protocols and are recommended"
-msgstr "Hybrid torrents support both v1 and v2 protocols and are recommended"
+msgstr "Hybridní torrenty podporují protokoly v1 i v2 a jsou doporučeny"
 
 #. first button will dock all the way east,
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:246
@@ -1047,7 +1047,7 @@ msgstr "Uložit .torrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:173
 msgid "Change..."
-msgstr "Change..."
+msgstr "Změnit..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/PartialFilesDialog.java:182
 msgid "Reset to Default"
@@ -1375,7 +1375,7 @@ msgstr "Vytvořit torrent z tohoto souboru a začít ho sdílet"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferDetailFilesActionsRenderer.java:270
 msgid "Start downloading this file"
-msgstr "Start downloading this file"
+msgstr "Zahájit stahování tohoto souboru"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/bittorrent/TransferSeedingRenderer.java:80
 msgid ""
@@ -1452,7 +1452,7 @@ msgstr "Zobrazit všechny označené položky"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:55
 msgid "Priority"
-msgstr "Priority"
+msgstr "Priorita"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:116
 msgid "Don't Download"
@@ -1464,23 +1464,23 @@ msgstr "Normal"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:120
 msgid "Low"
-msgstr "Low"
+msgstr "Nízká"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:122
 msgid "Low+"
-msgstr "Low+"
+msgstr "Nízká+"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:124
 msgid "Below Normal"
-msgstr "Below Normal"
+msgstr "Pod normální"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:126
 msgid "Above Normal"
-msgstr "Above Normal"
+msgstr "Nad normální"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:128
 msgid "High"
-msgstr "High"
+msgstr "Vysoká"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesDataLine.java:130
 msgid "Maximum"
@@ -1488,7 +1488,7 @@ msgstr "Maximální hledání"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailFilesTableMediator.java:255
 msgid "Set Priority"
-msgstr "Set Priority"
+msgstr "Nastavit prioritu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:135
 msgid "complete"
@@ -1534,7 +1534,7 @@ msgstr "Stahující ode mne"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:177
 msgid "Adjust upload speed limit"
-msgstr "Adjust upload speed limit"
+msgstr "Nastavit limit rychlosti odesílání"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:186
 msgid "Force a recheck of the downloaded files"
@@ -1586,7 +1586,7 @@ msgstr "total"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:448
 msgid "Enter download speed limit in KB/s (0 = unlimited):"
-msgstr "Enter download speed limit in KB/s (0 = unlimited):"
+msgstr "Zadejte limit rychlosti stahování v KB/s (0 = neomezeno):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:449
 msgid "Download Speed Limit"
@@ -1594,7 +1594,7 @@ msgstr "Rychlost stahování:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:475
 msgid "Enter upload speed limit in KB/s (0 = unlimited):"
-msgstr "Enter upload speed limit in KB/s (0 = unlimited):"
+msgstr "Zadejte limit rychlosti odesílání v KB/s (0 = neomezeno):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:476
 msgid "Upload Speed Limit"
@@ -2231,7 +2231,7 @@ msgstr "O FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:60
 msgid "An anonymous test report was queued for Icebase."
-msgstr "An anonymous test report was queued for Icebase."
+msgstr "Anonymní testovací zpráva byla zařazena do fronty Icebase."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/AboutWindow.java:61
 msgid "Test Report"
@@ -2452,7 +2452,7 @@ msgstr "O FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:481
 msgid "Restart Now"
-msgstr "Restart Now"
+msgstr "Restartovat nyní"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:481
 msgid "Restart Later"
@@ -2463,19 +2463,17 @@ msgstr "Vrátit"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:399
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:468
 msgid "Restart Required"
-msgstr "Restart Required"
+msgstr "Je nutný restart"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:808
 msgid ""
 "Cannot open URLs. Try installing GVFS and restarting FrostWire to solve the "
 "issue."
-msgstr ""
-"Cannot open URLs. Try installing GVFS and restarting FrostWire to solve the "
-"issue."
+msgstr "Nelze otevřít adresy URL. Zkuste nainstalovat GVFS a restartovat FrostWire."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:810
 msgid "ERROR: Opening URLs isn't supported on this platform!"
-msgstr "ERROR: Opening URLs isn't supported on this platform!"
+msgstr "CHYBA: Otevírání adres URL není na této platformě podporováno!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/GUIMediator.java:817
 #, java-format
@@ -2669,17 +2667,13 @@ msgstr "Thank you"
 msgid ""
 "FrostWire has encountered problems in managing your settings.  Your settings "
 "changes may not be saved on shutdown."
-msgstr ""
-"FrostWire došlo k problémům při řízení nastavení.  Změny nastavení nebudou "
-"uloženy na vypnutí."
+msgstr "FrostWire narazil na potíže při správě vašeho nastavení. Změny nastavení se při ukončení nemusí uložit."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/SettingsWarningManager.java:35
 msgid ""
 "FrostWire has encountered problems in loading your settings.  FrostWire will "
 "attempt to use the default values; however, may behave unexpectedly."
-msgstr ""
-"FrostWire zjistila problémy v načítání nastavení.  FrostWire se pokusí "
-"použít výchozí hodnoty; však mohou chovat neočekávaně."
+msgstr "FrostWire narazil na potíže při načítání vašeho nastavení. FrostWire se pokusí použít výchozí hodnoty, ale může se chovat neočekávaně."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/ShutdownWindow.java:44
 msgid "Shutting down FrostWire..."
@@ -2903,14 +2897,7 @@ msgid ""
 "<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">ETH/EVM "
 "compatible or ERC-20 tokens like USDC/USDT</a></li></ul><br>Thank you for "
 "your continued support."
-msgstr ""
-"<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire "
-"installer features no bundled offers or advertisement and you can download "
-"it for free. You can help support the continued development of FrostWire "
-"with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:"
-"<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">ETH/EVM "
-"compatible or ERC-20 tokens like USDC/USDT</a></li></ul><br>Thank you for "
-"your continued support."
+msgstr "<a href=\"{0}\"><h2>Podpořte FrostWire ještě dnes</h2></a><br>Instalátor FrostWire neobsahuje žádné přibalené nabídky ani reklamy a stahuje se zdarma. Pokračující vývoj FrostWire můžete podpořit svými <a href=\"{0}\">dary</a>.<br><br>Přispět můžete přes:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">tokeny kompatibilní s ETH/EVM nebo ERC-20, například USDC/USDT</a></li></ul><br>Děkujeme za vaši trvalou podporu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:27
 msgid ""
@@ -3363,12 +3350,12 @@ msgstr "VPN"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:97
 msgid "-Drop protection"
-msgstr "Zakázat automatickou ochranu VPN"
+msgstr "-ochrana při výpadku"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNDropProtectionCheckbox.java:101
 msgid ""
 "When enabled, BitTorrent transfers will pause if your VPN is disconnected"
-msgstr "BitTorrent je vypnutý, protože váš VPN je odpojen"
+msgstr "Když je zapnuto, přenosy BitTorrent se pozastaví, pokud se vaše VPN odpojí"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/VPNStatusButton.java:80
 msgid ""
@@ -3632,14 +3619,13 @@ msgstr "Peer"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/PeerCatalogWindow.java:82
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/PeerCatalogWindow.java:306
 msgid "Browsing peer catalog..."
-msgstr "Browsing peer catalog..."
+msgstr "Prochází se katalog uzlu..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/PeerCatalogWindow.java:159
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:83
 msgid ""
 "Invalid IceBridge URL: peer public key must be 64 hex characters (32 bytes)"
-msgstr ""
-"Invalid IceBridge URL: peer public key must be 64 hex characters (32 bytes)"
+msgstr "Neplatná URL IceBridge: veřejný klíč uzlu musí mít 64 hexadecimálních znaků (32 bajtů)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/PeerCatalogWindow.java:160
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:509
@@ -3650,7 +3636,7 @@ msgstr "Interní chyba"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:270
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:278
 msgid "Could not fetch peer catalog (peer may be offline)"
-msgstr "Could not fetch peer catalog (peer may be offline)"
+msgstr "Katalog uzlu se nepodařilo načíst (uzel může být offline)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/PeerCatalogWindow.java:319
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:306
@@ -4089,7 +4075,7 @@ msgstr "Nástroje"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:44
 msgid "Switch Theme"
-msgstr "Switch Theme"
+msgstr "Přepnout motiv"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:49
 msgid "&Default"
@@ -4097,11 +4083,11 @@ msgstr "Použít výchozí"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:61
 msgid "&Light Flat (beta)"
-msgstr "&Light Flat (beta)"
+msgstr "Světlý plochý (&L) (beta)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:73
 msgid "&Dark Flat (beta)"
-msgstr "&Dark Flat (beta)"
+msgstr "Tmavý plochý (&D) (beta)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/menu/ToolsMenu.java:96
 msgid "Browse the torrents a peer shares over IceBridge"
@@ -4315,7 +4301,7 @@ msgstr "Dokovat do systémové lišty"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:287
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:36
 msgid "MCP Server"
-msgstr "MCP Server"
+msgstr "Server MCP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:289
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:99
@@ -4332,7 +4318,7 @@ msgstr "IceBridge"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:296
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:68
 msgid "Identity"
-msgstr "Identity"
+msgstr "Identita"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/OptionsConstructor.java:297
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:44
@@ -4447,20 +4433,19 @@ msgstr "Možnosti"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:36
 msgid ""
 "Configure I2P for anonymous BitTorrent. Requires I2P router running locally."
-msgstr ""
-"Configure I2P for anonymous BitTorrent. Requires I2P router running locally."
+msgstr "Nastavte I2P pro anonymní BitTorrent. Vyžaduje lokálně běžící směrovač I2P."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:38
 msgid "Enable I2P Support"
-msgstr "Enable I2P Support"
+msgstr "Povolit podporu I2P"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:39
 msgid "Allow mixed mode (I2P + regular peers)"
-msgstr "Allow mixed mode (I2P + regular peers)"
+msgstr "Povolit smíšený režim (I2P + běžné uzly)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:63
 msgid "SAM Bridge Host:"
-msgstr "SAM Bridge Host:"
+msgstr "Hostitel SAM Bridge:"
 
 #.
 #. Constant for the key of the locale-specific `String` for the
@@ -4475,49 +4460,44 @@ msgstr "Hostitel:"
 #. Tunnel settings
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:81
 msgid "Tunnel Settings (Advanced):"
-msgstr "Tunnel Settings (Advanced):"
+msgstr "Nastavení tunelů (pokročilé):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:85
 msgid "Inbound Tunnels:"
-msgstr "Inbound Tunnels:"
+msgstr "Příchozí tunely:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:91
 msgid "Outbound Tunnels:"
-msgstr "Outbound Tunnels:"
+msgstr "Odchozí tunely:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:98
 msgid "Inbound Hops:"
-msgstr "Inbound Hops:"
+msgstr "Příchozí skoky:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:104
 msgid "Outbound Hops:"
-msgstr "Outbound Hops:"
+msgstr "Odchozí skoky:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:112
 msgid ""
 "Note: Tunnels [1-16], Hops [0-7]. Higher values = more anonymity, slower "
 "speed."
-msgstr ""
-"Note: Tunnels [1-16], Hops [0-7]. Higher values = more anonymity, slower "
-"speed."
+msgstr "Poznámka: Tunely [1-16], skoky [0-7]. Vyšší hodnoty = větší anonymita, nižší rychlost."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:149
 msgid "Tunnel quantities must be between 1 and 16"
-msgstr "Tunnel quantities must be between 1 and 16"
+msgstr "Počet tunelů musí být mezi 1 a 16"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/I2PPaneItem.java:153
 msgid "Tunnel hop lengths must be between 0 and 7"
-msgstr "Tunnel hop lengths must be between 0 and 7"
+msgstr "Délka skoků tunelu musí být mezi 0 a 7"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:67
 msgid ""
 "You can manually enter IP addresses ranges to filter out, you can also "
 "import bulk addresses from an IP block list file or URL "
 "(.p2p, .dat, .cidr, .hosts — compressed as .gz or .zip)"
-msgstr ""
-"You can manually enter IP addresses ranges to filter out, you can also "
-"import bulk addresses from an IP block list file or URL "
-"(.p2p, .dat, .cidr, .hosts — compressed as .gz or .zip)"
+msgstr "Rozsahy IP adres k filtrování můžete zadat ručně, nebo adresy hromadně importovat ze souboru či URL se seznamem blokovaných IP (.p2p, .dat, .cidr, .hosts — komprimované jako .gz nebo .zip)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:70
 msgid "Decompressing"
@@ -4527,9 +4507,7 @@ msgstr "Dekomprese"
 msgid ""
 "Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or "
 "Hosts format)"
-msgstr ""
-"Enter the URL or local file path of an IP block list (P2P, DAT, CIDR, or "
-"Hosts format)"
+msgstr "Zadejte URL nebo cestu k místnímu souboru se seznamem blokovaných IP (formát P2P, DAT, CIDR nebo Hosts)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:143
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:464
@@ -4547,16 +4525,16 @@ msgstr "Clear IP Block List"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:157
 msgid "Find free IP block lists at:"
-msgstr "Find free IP block lists at:"
+msgstr "Bezplatné seznamy blokovaných IP najdete na:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:160
 msgid "Community-maintained P2P, DAT, CIDR lists"
-msgstr "Community-maintained P2P, DAT, CIDR lists"
+msgstr "Komunitou udržované seznamy P2P, DAT, CIDR"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:201
 #, java-format
 msgid "Failed to download block list: {0}"
-msgstr "Failed to download block list: {0}"
+msgstr "Stažení seznamu blokovaných IP se nezdařilo: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:210
 msgid "Invalid URI or file path"
@@ -4564,7 +4542,7 @@ msgstr "Invalid URI or file path"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:278
 msgid "Invalid IP Filter file format. Supported: P2P, DAT, CIDR, Hosts"
-msgstr "Invalid IP Filter file format. Supported: P2P, DAT, CIDR, Hosts"
+msgstr "Neplatný formát souboru IP filtru. Podporováno: P2P, DAT, CIDR, Hosts"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:310
 msgid "Importing"
@@ -4572,7 +4550,7 @@ msgstr "Importuji"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:423
 msgid "Select the IP filter file (P2P, DAT, CIDR, or Hosts format)"
-msgstr "Select the IP filter file (P2P, DAT, CIDR, or Hosts format)"
+msgstr "Vyberte soubor IP filtru (formát P2P, DAT, CIDR nebo Hosts)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterPaneItem.java:464
 msgid "Importing..."
@@ -4580,7 +4558,7 @@ msgstr "Importuji"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:86
 msgid "Edit"
-msgstr "Edit"
+msgstr "Upravit"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IPFilterTableMediator.java:106
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:54
@@ -4602,11 +4580,7 @@ msgid ""
 "own local IceBridge daemon or connect to a remote one (e.g. standalone "
 "relay). For remote mode, use the full base URL of the remote control API "
 "(include http:// and the control HTTP port)."
-msgstr ""
-"Configure the IceBridge relay for decentralized search. Desktop can use its "
-"own local IceBridge daemon or connect to a remote one (e.g. standalone "
-"relay). For remote mode, use the full base URL of the remote control API "
-"(include http:// and the control HTTP port)."
+msgstr "Nastavte relay IceBridge pro decentralizované vyhledávání. Počítač může používat vlastní místní proces IceBridge nebo se připojit ke vzdálenému (například samostatný relay). Ve vzdáleném režimu použijte úplnou základní URL vzdáleného ovládacího API (včetně http:// a ovládacího portu HTTP)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:25
 msgid "Enable IceBridge (distributed relay)"
@@ -4618,11 +4592,11 @@ msgstr "Veřejně sdílet můj katalog sdílení (crawlery)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:31
 msgid "Use local IceBridge daemon (fork subprocess)"
-msgstr "Use local IceBridge daemon (fork subprocess)"
+msgstr "Použít místní proces IceBridge (spustit podproces)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:32
 msgid "Use remote IceBridge relay"
-msgstr "Use remote IceBridge relay"
+msgstr "Použít vzdálený relay IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:50
 msgid "Refresh / Ping"
@@ -4630,7 +4604,7 @@ msgstr "Hledej Šmudlo"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:88
 msgid "Bind host:"
-msgstr "Bind host:"
+msgstr "Hostitel pro vazbu:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:96
 msgid "rUDP port:"
@@ -4646,7 +4620,7 @@ msgstr "Role:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:120
 msgid "Remote URL:"
-msgstr "Remote URL:"
+msgstr "Vzdálená URL:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:129
 msgid ""
@@ -4674,31 +4648,24 @@ msgstr "Více možností"
 msgid ""
 "Bearer token for X-IceBridge-Token header. Generate one on the remote with --"
 "generate-token (or ICEBRIDGE_AUTH_TOKENS_FILE)."
-msgstr ""
-"Bearer token for X-IceBridge-Token header. Generate one on the remote with --"
-"generate-token (or ICEBRIDGE_AUTH_TOKENS_FILE)."
+msgstr "Token Bearer pro hlavičku X-IceBridge-Token. Vygenerujte jej na vzdáleném počítači pomocí --generate-token (nebo ICEBRIDGE_AUTH_TOKENS_FILE)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:160
 msgid ""
 "Changes require restarting FrostWire. Use remote mode to point desktop at a "
 "standalone IceBridge (launched via ./gradlew icebridge)."
-msgstr ""
-"Changes require restarting FrostWire. Use remote mode to point desktop at a "
-"standalone IceBridge (launched via ./gradlew icebridge)."
+msgstr "Změny vyžadují restart FrostWire. Vzdálený režim použijte k připojení počítače k samostatnému IceBridge (spuštěnému pomocí ./gradlew icebridge)."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:170
 msgid "Known IceBridge servers (successfully pinged relays):"
-msgstr "Known IceBridge servers (successfully pinged relays):"
+msgstr "Známé servery IceBridge (úspěšně pingnuté relay):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
-msgstr ""
-"These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
-"Desktop controls its local IceBridge daemon over HTTP on localhost."
+msgstr "Toto jsou vzdálené (nebo vaše vlastní) relay IceBridge objevené přes DHT. Ping = rUDP ověření identity na portu relay (nikoli řídicí HTTP IceBridge). Počítač ovládá svůj místní démon IceBridge přes HTTP na localhostu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:379
 msgid "Host"
@@ -4710,34 +4677,31 @@ msgstr "Role"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:379
 msgid "Last Successful Ping"
-msgstr "Last Successful Ping"
+msgstr "Poslední úspěšný ping"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:419
 msgid "never"
-msgstr "never"
+msgstr "nikdy"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:71
 msgid ""
 "Your FrostWire identity is a cryptographic keypair that uniquely identifies "
 "you on the distributed search network. Back it up using the seed phrase to "
 "avoid losing your identity and karma reputation."
-msgstr ""
-"Your FrostWire identity is a cryptographic keypair that uniquely identifies "
-"you on the distributed search network. Back it up using the seed phrase to "
-"avoid losing your identity and karma reputation."
+msgstr "Vaše identita FrostWire je kryptografický pár klíčů, který vás jednoznačně identifikuje v síti distribuovaného vyhledávání. Zálohujte ji pomocí fráze, abyste o identitu a reputaci nepřišli."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:81
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:173
 msgid "Initialize Identity"
-msgstr "Initialize Identity"
+msgstr "Inicializovat identitu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:82
 msgid "Show Seed Phrase"
-msgstr "Ukončit po stažení"
+msgstr "Zobrazit frázi"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:83
 msgid "Restore from Seed Phrase"
-msgstr "Restore from Seed Phrase"
+msgstr "Obnovit z fráze"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:84
 msgid "Export Identity File"
@@ -4749,28 +4713,28 @@ msgstr "Odkaz na soubor torrentu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:107
 msgid "Mining proof-of-work identity…"
-msgstr "Mining proof-of-work identity…"
+msgstr "Těží se identita s důkazem práce…"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:117
 msgid "Node ID:"
-msgstr "Node ID:"
+msgstr "ID uzlu:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:118
 msgid "Fingerprint:"
-msgstr "Fingerprint:"
+msgstr "Otisk:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:126
 msgid "Public Key:"
-msgstr "Public Key:"
+msgstr "Veřejný klíč:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:127
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:112
 msgid "Karma Score:"
-msgstr "Karma Score:"
+msgstr "Skóre reputace:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:128
 msgid "Identity Difficulty:"
-msgstr "Identity Difficulty:"
+msgstr "Obtížnost identity:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:129
 msgid "Shared Torrents:"
@@ -4786,7 +4750,7 @@ msgstr "Vytvořit nový Torrent"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:182
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:160
 msgid "(not initialized)"
-msgstr "(not initialized)"
+msgstr "(neinicializováno)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:183
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:184
@@ -4803,42 +4767,33 @@ msgid ""
 "and karma identity. FrostWire will save a backup copy first, but you should "
 "also export your identity or seed phrase. FrostWire will restart when "
 "finished."
-msgstr ""
-"Creating a new random identity will permanently replace your current node ID "
-"and karma identity. FrostWire will save a backup copy first, but you should "
-"also export your identity or seed phrase. FrostWire will restart when "
-"finished."
+msgstr "Vytvořením nové náhodné identity trvale nahradíte své aktuální ID uzlu a reputační identitu. FrostWire nejprve uloží zálohu, ale měli byste si také exportovat identitu nebo frázi. Po dokončení se FrostWire restartuje."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:261
 msgid ""
 "Identity created successfully. FrostWire will now restart to load it into "
 "the relay stack."
-msgstr ""
-"Identity created successfully. FrostWire will now restart to load it into "
-"the relay stack."
+msgstr "Identita byla úspěšně vytvořena. FrostWire se nyní restartuje, aby ji načetl do zásobníku relay."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:273
 msgid "Failed to initialize identity: "
-msgstr "Failed to initialize identity: "
+msgstr "Inicializace identity se nezdařila: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:311
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:412
 msgid "No identity loaded."
-msgstr "No identity loaded."
+msgstr "Není načtena žádná identita."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:328
 msgid "WARNING:"
-msgstr "WARNING:"
+msgstr "VAROVÁNÍ:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:331
 msgid ""
 "Anyone with this phrase can impersonate you and access your karma "
 "reputation. Write it down on paper and store it securely. Never share it "
 "with anyone."
-msgstr ""
-"Anyone with this phrase can impersonate you and access your karma "
-"reputation. Write it down on paper and store it securely. Never share it "
-"with anyone."
+msgstr "Kdokoli, kdo zná tuto frázi, se může vydávat za vás a použít vaši reputaci. Zapište si ji na papír, uložte ji na bezpečné místo a nikdy ji s nikým nesdílejte."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:339
 msgid "Copy to Clipboard"
@@ -4848,15 +4803,15 @@ msgstr "Kopírovat odkaz do schránky"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:483
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:238
 msgid "Copied!"
-msgstr "Copied!"
+msgstr "Zkopírováno!"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:354
 msgid "Your Seed Phrase (24 words)"
-msgstr "Your Seed Phrase (24 words)"
+msgstr "Vaše fráze (24 slov)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:358
 msgid "Failed to generate seed phrase: "
-msgstr "Failed to generate seed phrase: "
+msgstr "Vygenerování fráze se nezdařilo: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:368
 msgid ""
@@ -4864,24 +4819,18 @@ msgid ""
 "identity, including your karma reputation and node ID. This cannot be undone."
 "<br><br>Make sure you have backed up your current identity first."
 "<br><br>FrostWire will need to restart after restoring."
-msgstr ""
-"Restoring from a seed phrase will <b>permanently replace</b> your current "
-"identity, including your karma reputation and node ID. This cannot be undone."
-"<br><br>Make sure you have backed up your current identity first."
-"<br><br>FrostWire will need to restart after restoring."
+msgstr "Obnovení z fráze <b>trvale nahradí</b> vaši aktuální identitu včetně reputace a ID uzlu. Tuto akci nelze vrátit zpět.<br><br>Ujistěte se, že jste si nejprve zálohovali aktuální identitu.<br><br>Po obnovení je nutné FrostWire restartovat."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:373
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:447
 msgid "Confirm Identity Replacement"
-msgstr "Confirm Identity Replacement"
+msgstr "Potvrdit nahrazení identity"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:384
 msgid ""
 "Enter your 24-word seed phrase. Words may be separated by spaces, commas, or "
 "line breaks. Uppercase letters are accepted."
-msgstr ""
-"Enter your 24-word seed phrase. Words may be separated by spaces, commas, or "
-"line breaks. Uppercase letters are accepted."
+msgstr "Zadejte svou frázi o 24 slovech. Slova mohou být oddělena mezerami, čárkami nebo novými řádky. Velká písmena jsou povolena."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:386
 msgid "Restore Identity"
@@ -4891,13 +4840,11 @@ msgstr "Obnovit původní nastavení"
 msgid ""
 "Identity restored successfully. FrostWire will now restart to apply the new "
 "identity."
-msgstr ""
-"Identity restored successfully. FrostWire will now restart to apply the new "
-"identity."
+msgstr "Identita byla úspěšně obnovena. FrostWire se nyní restartuje, aby použil novou identitu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:405
 msgid "Failed to restore identity: "
-msgstr "Failed to restore identity: "
+msgstr "Obnovení identity se nezdařilo: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:420
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:457
@@ -4906,7 +4853,7 @@ msgstr "FrostWire: Sdílení velkých souborů"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:429
 msgid "Identity exported to:"
-msgstr "Identity exported to:"
+msgstr "Identita byla exportována do:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:430
 msgid "Export Complete"
@@ -4914,25 +4861,22 @@ msgstr "Dokončeno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:434
 msgid "Failed to export identity: "
-msgstr "Failed to export identity: "
+msgstr "Export identity se nezdařil: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:444
 msgid ""
 "Importing an identity file will <b>permanently replace</b> your current "
 "identity. This cannot be undone. FrostWire will need to restart after "
 "importing."
-msgstr ""
-"Importing an identity file will <b>permanently replace</b> your current "
-"identity. This cannot be undone. FrostWire will need to restart after "
-"importing."
+msgstr "Import souboru identity <b>trvale nahradí</b> vaši aktuální identitu. Tuto akci nelze vrátit zpět. Po importu je nutné FrostWire restartovat."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:467
 msgid "Identity imported successfully. FrostWire will now restart."
-msgstr "Identity imported successfully. FrostWire will now restart."
+msgstr "Identita byla úspěšně importována. FrostWire se nyní restartuje."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IdentitySettingsPaneItem.java:474
 msgid "Failed to import identity: "
-msgstr "Failed to import identity: "
+msgstr "Import identity se nezdařil: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IgnoreResultsPaneItem.java:36
 msgid "Filter Results"
@@ -4955,19 +4899,16 @@ msgid ""
 "Your karma reputation is anchored to a hash-linked chain of endorsements you "
 "issue to peers after completing downloads from them. Endorsements are "
 "created automatically when a download finishes."
-msgstr ""
-"Your karma reputation is anchored to a hash-linked chain of endorsements you "
-"issue to peers after completing downloads from them. Endorsements are "
-"created automatically when a download finishes."
+msgstr "Vaše reputace je ukotvena v řetězci doporučení propojených hashem, která udělujete uzlům po dokončení stahování od nich. Doporučení se vytvářejí automaticky po dokončení stahování."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:57
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:42
 msgid "Peer Public Key"
-msgstr "Peer Public Key"
+msgstr "Veřejný klíč uzlu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:58
 msgid "Score"
-msgstr "Score"
+msgstr "Skóre"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:59
 msgid "Endorsements"
@@ -4975,35 +4916,35 @@ msgstr "Torrenty"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:60
 msgid "Last Endorsed At"
-msgstr "Last Endorsed At"
+msgstr "Naposledy doporučeno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:70
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:249
 msgid "Endorse Peer"
-msgstr "Endorse Peer"
+msgstr "Doporučit uzel"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:109
 msgid "Current Epoch:"
-msgstr "Current Epoch:"
+msgstr "Aktuální epocha:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:110
 msgid "Available Endorsement Energy:"
-msgstr "Available Endorsement Energy:"
+msgstr "Dostupná energie doporučení:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:111
 msgid "Total Endorsements Given:"
-msgstr "Celkový počet torrentů indexovány"
+msgstr "Celkem udělených doporučení:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:130
 msgid "Top Peers by Karma"
-msgstr "Top Peers by Karma"
+msgstr "Nejlepší uzly podle reputace"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:169
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:170
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:171
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:172
 msgid "(no karma database)"
-msgstr "(no karma database)"
+msgstr "(žádná databáze reputace)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:194
 msgid "endorsements"
@@ -5011,15 +4952,13 @@ msgstr "Torrenty"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:234
 msgid "Copy Full Public Key"
-msgstr "Copy Full Public Key"
+msgstr "Kopírovat celý veřejný klíč"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/KarmaSettingsPaneItem.java:247
 msgid ""
 "Manual endorsement requires a completed download from this peer. "
 "Endorsements are automatically created when a download from a peer completes."
-msgstr ""
-"Manual endorsement requires a completed download from this peer. "
-"Endorsements are automatically created when a download from a peer completes."
+msgstr "Ruční doporučení vyžaduje dokončené stažení od tohoto uzlu. Doporučení se vytvářejí automaticky po dokončení stahování od uzlu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/LibraryFoldersPaneItem.java:45
 msgid "Library Included Folders"
@@ -5033,9 +4972,7 @@ msgstr "Při procházení knihovny, můžete zvolit složky pro soubory zahrnut�
 msgid ""
 "Configure the FrostWire MCP (Model Context Protocol) server to allow AI "
 "agents to control FrostWire programmatically."
-msgstr ""
-"Configure the FrostWire MCP (Model Context Protocol) server to allow AI "
-"agents to control FrostWire programmatically."
+msgstr "Nastavte server FrostWire MCP (Model Context Protocol), aby agenti AI mohli FrostWire ovládat programově."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:39
 msgid "Enable MCP Server"
@@ -5043,7 +4980,7 @@ msgstr "Povolit funkce ALFA"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:40
 msgid "Start MCP server when FrostWire starts"
-msgstr "Start MCP server when FrostWire starts"
+msgstr "Spustit server MCP při startu FrostWire"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:42
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchButtons.java:39
@@ -5056,7 +4993,7 @@ msgstr "Vrátit"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:48
 msgid "Enable HTTPS (TLS)"
-msgstr "Enable HTTPS (TLS)"
+msgstr "Povolit HTTPS (TLS)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:74
 msgid "Host:"
@@ -5066,25 +5003,23 @@ msgstr "Host:"
 msgid ""
 "When HTTPS is enabled, a self-signed certificate is auto-generated for local "
 "use."
-msgstr ""
-"When HTTPS is enabled, a self-signed certificate is auto-generated for local "
-"use."
+msgstr "Při zapnutí HTTPS se automaticky vygeneruje certifikát podepsaný sám sebou pro lokální použití."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:91
 msgid "MCP Clients/Harnesses"
-msgstr "MCP Clients/Harnesses"
+msgstr "Klienti/frameworky MCP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:137
 msgid "Port must be between 1 and 65535"
-msgstr "Port must be between 1 and 65535"
+msgstr "Port musí být mezi 1 a 65535"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:142
 msgid "Host cannot be empty"
-msgstr "Host cannot be empty"
+msgstr "Hostitel nesmí být prázdný"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:188
 msgid "Running on "
-msgstr "Running on "
+msgstr "Běží na "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:202
 msgid "Starting..."
@@ -5092,19 +5027,19 @@ msgstr "Importuji"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:212
 msgid "Failed to start MCP server: "
-msgstr "Failed to start MCP server: "
+msgstr "Spuštění serveru MCP se nezdařilo: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:222
 msgid "Stopping..."
-msgstr "Importuji"
+msgstr "Zastavuje se..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:240
 msgid "Restarting..."
-msgstr "Importuji"
+msgstr "Restartuje se..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:250
 msgid "Failed to restart MCP server: "
-msgstr "Failed to restart MCP server: "
+msgstr "Restart serveru MCP se nezdařil: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:347
 msgid "Configured"
@@ -5112,7 +5047,7 @@ msgstr "Nastavit možnosti"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:347
 msgid "Not configured"
-msgstr "Not configured"
+msgstr "Nenastaveno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/MCPSettingsPaneItem.java:349
 msgid "Not installed"
@@ -5217,15 +5152,12 @@ msgid ""
 "Peers discovered on the distributed search network, ordered by trust score. "
 "Right-click a peer to copy its key, block it, remove it, or browse its "
 "shared torrents."
-msgstr ""
-"Peers discovered on the distributed search network, ordered by trust score. "
-"Right-click a peer to copy its key, block it, remove it, or browse its "
-"shared torrents."
+msgstr "Uzly objevené v síti distribuovaného vyhledávání seřazené podle skóre důvěry. Klikněte na uzel pravým tlačítkem pro zkopírování jeho klíče, zablokování, odebrání nebo procházení jeho sdílených torrentů."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:43
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:311
 msgid "Hostname"
-msgstr "Hostname"
+msgstr "Název hostitele"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:45
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:373
@@ -5235,12 +5167,12 @@ msgstr "Hostitel:"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:46
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:341
 msgid "Trust Score"
-msgstr "Trust Score"
+msgstr "Skóre důvěry"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:47
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:321
 msgid "Verified"
-msgstr "Verified"
+msgstr "Ověřeno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:48
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:331
@@ -5250,7 +5182,7 @@ msgstr "Spam"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:49
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:326
 msgid "Endorsers"
-msgstr "Endorsers"
+msgstr "Doporučující"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:50
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:336
@@ -5259,11 +5191,11 @@ msgstr "Aktualizovat"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:55
 msgid "Showing 0 of 0 peers"
-msgstr "Showing 0 of 0 peers"
+msgstr "Zobrazeno 0 z 0 uzlů"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:117
 msgid "(peer directory not available)"
-msgstr "(peer directory not available)"
+msgstr "(katalog uzlů není k dispozici)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:135
 msgid "Showing"
@@ -5271,19 +5203,19 @@ msgstr "Zobrazit"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:143
 msgid "peers"
-msgstr "Protějšky"
+msgstr "uzly"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:151
 msgid "(failed to read peer directory)"
-msgstr "Vyberte jediný adresář"
+msgstr "(nepodařilo se načíst katalog uzlů)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:189
 msgid "Could not block peer: "
-msgstr "Could not block peer: "
+msgstr "Uzel se nepodařilo zablokovat: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:207
 msgid "Could not remove peer: "
-msgstr "Nelze přeložit cestu ke složce."
+msgstr "Uzel se nepodařilo odebrat: "
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:226
 msgid "Fetching peer catalog..."
@@ -5296,11 +5228,11 @@ msgstr "Torrenty"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:343
 msgid "Copy Public Key"
-msgstr "Copy Public Key"
+msgstr "Kopírovat veřejný klíč"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:347
 msgid "Block Peer (mark as spam)"
-msgstr "Block Peer (mark as spam)"
+msgstr "Zablokovat uzel (označit jako spam)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/PeerDirectorySettingsPaneItem.java:351
 msgid "Remove Peer"
@@ -5425,15 +5357,15 @@ msgstr "TCP port konec:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:98
 msgid "NAT-PMP Settings (Advanced):"
-msgstr "NAT-PMP Settings (Advanced):"
+msgstr "Nastavení NAT-PMP (pokročilé):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:104
 msgid "Gateway override:"
-msgstr "Gateway override:"
+msgstr "Přepsání brány:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:113
 msgid "Lease duration (seconds):"
-msgstr "Lease duration (seconds):"
+msgstr "Doba zapůjčení (sekundy):"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:168
 #, java-format
@@ -5446,7 +5378,7 @@ msgstr "Je třeba zadat platný rozsah portů."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/RouterConfigurationPaneItem.java:183
 msgid "NAT-PMP lease duration must be greater than 0 seconds."
-msgstr "NAT-PMP lease duration must be greater than 0 seconds."
+msgstr "Doba zapůjčení NAT-PMP musí být větší než 0 sekund."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:36
 msgid "Search Engines"
@@ -5469,14 +5401,11 @@ msgid ""
 "Browse the contents of your local shared torrents database (LocalIndex). "
 "Search by name or file path, inspect info hashes and publisher keys, and "
 "copy magnet links for any shared torrent."
-msgstr ""
-"Browse the contents of your local shared torrents database (LocalIndex). "
-"Search by name or file path, inspect info hashes and publisher keys, and "
-"copy magnet links for any shared torrent."
+msgstr "Procházejte obsah místní databáze sdílených torrentů (LocalIndex). Hledejte podle názvu nebo cesty k souboru, prohlížejte info hashe a klíče vydavatelů a kopírujte magnet odkazy libovolného sdíleného torrentu."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:45
 msgid "Include inactive / historical shares in Local search"
-msgstr "Include inactive / historical shares in Local search"
+msgstr "Zahrnout do místního vyhledávání neaktivní / historická sdílení"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:48
 msgid "Clear Search"
@@ -5487,18 +5416,15 @@ msgid ""
 "When off (default), Local search and answers to remote peers only include "
 "torrents you are still seeding or actively downloading with full metadata. "
 "When on, past index rows may appear even if removed from Transfers."
-msgstr ""
-"When off (default), Local search and answers to remote peers only include "
-"torrents you are still seeding or actively downloading with full metadata. "
-"When on, past index rows may appear even if removed from Transfers."
+msgstr "Když je vypnuto (výchozí), místní vyhledávání a odpovědi vzdáleným uzlům zahrnují jen torrenty, které stále sdílíte nebo aktivně stahujete s úplnými metadaty. Když je zapnuto, mohou se objevit i starší položky indexu, i když byly odebrány z přenosů."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:84
 msgid "Total shared torrents:"
-msgstr "Celkový počet torrentů indexovány"
+msgstr "Celkem sdílených torrentů:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:93
 msgid "Database file size:"
-msgstr "Database file size:"
+msgstr "Velikost souboru databáze:"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:107
 msgid "Search:"
@@ -5507,7 +5433,7 @@ msgstr "Hledat"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:145
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:168
 msgid "Database not initialized"
-msgstr "Database not initialized"
+msgstr "Databáze není inicializována"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:272
 msgid "Copy Info Hash"
@@ -5519,15 +5445,15 @@ msgstr "Kopírovat Magnet"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:280
 msgid "Copy Publisher Key"
-msgstr "Copy Publisher Key"
+msgstr "Kopírovat klíč vydavatele"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:294
 msgid "Publisher"
-msgstr "Publisher"
+msgstr "Vydavatel"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:295
 msgid "Added At"
-msgstr "Added At"
+msgstr "Přidáno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/SharedTorrentsDatabasePaneItem.java:296
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:383
@@ -5740,7 +5666,7 @@ msgstr "VPN-Drop ochranu. Vyžadovat připojení VPN pro BitTorrent"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:38
 msgid "Allow multiple connections from the same peer ID"
-msgstr "Allow multiple connections from the same peer ID"
+msgstr "Povolit více spojení ze stejného ID uzlu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/TorrentFilesFolderPaneItem.java:34
 msgid "Torrent Files Folder"
@@ -5808,7 +5734,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:50
 msgid "Edit IP Range"
-msgstr "Edit IP Range"
+msgstr "Upravit rozsah IP"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/ipfilter/AddRangeManuallyDialog.java:57
 msgid "Starting IP address"
@@ -5908,7 +5834,7 @@ msgstr "Nic není inzerováno"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/DistributedSearchResultDetailsWindow.java:283
 msgid "Magnet URI"
-msgstr "Magnet URI"
+msgstr "Magnet odkaz"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/FileSearchResultUIWrapper.java:201
 msgid "Distributed Result Details"
@@ -5916,53 +5842,52 @@ msgstr "Podrobnosti distribuovaného výsledku"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:70
 msgid "Invalid IceBridge URL: must start with icebridge://"
-msgstr "Invalid IceBridge URL: must start with icebridge://"
+msgstr "Neplatná URL IceBridge: musí začínat icebridge://"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:76
 msgid "Invalid IceBridge URL: missing command"
-msgstr "Invalid IceBridge URL: missing command"
+msgstr "Neplatná URL IceBridge: chybí příkaz"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:90
 msgid "Invalid IceBridge URL: could not decode peer public key"
-msgstr "Invalid IceBridge URL: could not decode peer public key"
+msgstr "Neplatná URL IceBridge: nelze dekódovat veřejný klíč uzlu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:94
 msgid "Invalid IceBridge URL: peer public key must decode to 32 bytes"
-msgstr "Invalid IceBridge URL: peer public key must decode to 32 bytes"
+msgstr "Neplatná URL IceBridge: veřejný klíč uzlu se musí dekódovat na 32 bajtů"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:118
 #, java-format
 msgid "Unknown IceBridge command: {0}"
-msgstr "Unknown IceBridge command: {0}"
+msgstr "Neznámý příkaz IceBridge: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:167
 msgid "IceBridge search requires keywords in the URL path"
-msgstr "IceBridge search requires keywords in the URL path"
+msgstr "Vyhledávání IceBridge vyžaduje klíčová slova v cestě URL"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:174
 msgid ""
 "Distributed search engine is not ready. Please wait for IceBridge to start."
-msgstr ""
-"Distributed search engine is not ready. Please wait for IceBridge to start."
+msgstr "Distribuovaný vyhledávač není připraven. Počkejte, až se IceBridge spustí."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:180
 msgid "Distributed search transport or identity is not available."
-msgstr "Distributed search transport or identity is not available."
+msgstr "Přenos nebo identita distribuovaného vyhledávání není k dispozici."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:184
 #, java-format
 msgid "Searching peer {0}..."
-msgstr "Searching peer {0}..."
+msgstr "Hledá se u uzlu {0}..."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:244
 #, java-format
 msgid "Failed to send search request to peer {0}. The peer may be offline."
-msgstr "Failed to send search request to peer {0}. The peer may be offline."
+msgstr "Odeslání požadavku na vyhledávání uzlu {0} se nezdařilo. Uzel může být offline."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:252
 #, java-format
 msgid "No results from peer {0} for \"{1}\"."
-msgstr "No results from peer {0} for \"{1}\"."
+msgstr "Uzel {0} nevrátil žádné výsledky pro \"{1}\"."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:254
 msgid "IceBridge Search"
@@ -5971,12 +5896,12 @@ msgstr "Hledej Šmudlo"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:280
 #, java-format
 msgid "IceBridge Search - {0} results"
-msgstr "IceBridge Search - {0} results"
+msgstr "Vyhledávání IceBridge - {0} výsledků"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:284
 #, java-format
 msgid "Error processing search results: {0}"
-msgstr "Error processing search results: {0}"
+msgstr "Chyba při zpracování výsledků vyhledávání: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:292
 msgid "Fetching peer info..."
@@ -5985,38 +5910,38 @@ msgstr "Vytvoření centrálního panelu..."
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:306
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:363
 msgid "Public Key"
-msgstr "Public Domain"
+msgstr "Veřejný klíč"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:368
 msgid "Node ID"
-msgstr "Node ID"
+msgstr "ID uzlu"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:378
 msgid "First Seen"
-msgstr "First Seen"
+msgstr "Poprvé spatřen"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:388
 msgid "Signature Valid"
-msgstr "Signature Valid"
+msgstr "Platný podpis"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:392
 msgid "(Fetched from DHT; peer not in local directory)"
-msgstr "(Fetched from DHT; peer not in local directory)"
+msgstr "(Načteno z DHT; uzel není v místním adresáři)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:411
 #, java-format
 msgid "Peer {0} is not known and no identity record was found in the DHT."
-msgstr "Peer {0} is not known and no identity record was found in the DHT."
+msgstr "Uzel {0} není znám a v DHT nebyl nalezen žádný záznam identity."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:413
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:420
 msgid "IceBridge Peer Info"
-msgstr "IceBridge Peer Info"
+msgstr "Informace o uzlu IceBridge"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/IceBridgeUrlHandler.java:424
 #, java-format
 msgid "Error fetching peer info: {0}"
-msgstr "Error fetching peer info: {0}"
+msgstr "Chyba při načítání informací o uzlu: {0}"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/LabeledRangeSlider.java:47
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:103

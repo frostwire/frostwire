@@ -4722,11 +4722,11 @@ msgstr "Znane serwery IceBridge (przekaźniki z udanym pingiem):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
 "To zdalne (lub własne) przekaźniki IceBridge wykryte przez DHT. Ping = "
-"uzgadnianie tożsamości TCP na porcie przekaźnika (nie HTTP sterowania "
+"uzgadnianie tożsamości rUDP na porcie przekaźnika (nie HTTP sterowania "
 "IceBridge). Desktop steruje lokalnym demonem IceBridge przez HTTP na "
 "localhost."
 

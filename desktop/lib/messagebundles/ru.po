@@ -4703,10 +4703,10 @@ msgstr "Известные серверы IceBridge (успешно опроше
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
-"Это удалённые (или ваши) реле IceBridge, найденные через DHT. Пинг = TCP-"
+"Это удалённые (или ваши) реле IceBridge, найденные через DHT. Пинг = rUDP-"
 "хендшейк идентичности на порту реле (не HTTP управления IceBridge). Desktop "
 "управляет локальным демоном IceBridge по HTTP на localhost."
 

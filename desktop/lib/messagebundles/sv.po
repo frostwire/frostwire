@@ -4713,11 +4713,11 @@ msgstr "Kända IceBridge-servrar (lyckat pingade reläer):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
 "Dessa är fjärr- (eller egna) IceBridge-reläer som upptäckts via DHT. Ping = "
-"TCP-identitetshandskakning på reläporten (inte IceBridge-kontroll-HTTP). "
+"rUDP-identitetshandskakning på reläporten (inte IceBridge-kontroll-HTTP). "
 "Desktop styr sin lokala IceBridge-demon över HTTP på localhost."
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:379

@@ -163,7 +163,7 @@ public final class IceBridgeSettingsPaneItem extends AbstractPaneItem {
     hostsLabel.setToolTipText(
         I18n.tr(
             "These are remote (or your own) IceBridge relays discovered via DHT. "
-                + "Ping = rUDP identity handshake with the server (not the IceBridge control HTTP). "
+                + "Ping = rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
                 + "Desktop controls its local IceBridge daemon over HTTP on localhost."));
     add(hostsLabel);
     JScrollPane hostsScroll = new JScrollPane(hostsTable);

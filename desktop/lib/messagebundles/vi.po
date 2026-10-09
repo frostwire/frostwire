@@ -4713,11 +4713,11 @@ msgstr "Máy chủ IceBridge đã biết (relay ping thành công):"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/options/panes/IceBridgeSettingsPaneItem.java:173
 msgid ""
 "These are remote (or your own) IceBridge relays discovered via DHT. Ping = "
-"TCP identity handshake on the relay port (not the IceBridge control HTTP). "
+"rUDP identity handshake on the relay port (not the IceBridge control HTTP). "
 "Desktop controls its local IceBridge daemon over HTTP on localhost."
 msgstr ""
 "Đây là các relay IceBridge từ xa (hoặc của bạn) phát hiện qua DHT. Ping = "
-"bắt tay danh tính TCP trên cổng relay (không phải HTTP điều khiển "
+"bắt tay danh tính rUDP trên cổng relay (không phải HTTP điều khiển "
 "IceBridge). Desktop điều khiển daemon IceBridge cục bộ qua HTTP trên "
 "localhost."
 
