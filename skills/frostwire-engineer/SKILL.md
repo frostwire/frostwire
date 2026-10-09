@@ -348,6 +348,26 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 - Never hardcode English in UI code. Search for `I18n.tr(` to verify coverage of new strings.
 - `changelog.txt` entries are user-facing and need i18n awareness too.
 
+### Desktop Translation Workflow (gettext: `.pot` -> `.po` -> `messages.jar`)
+
+The desktop app does NOT read the `.po` files at runtime. It reads compiled `Messages_<lang>.class` bundles inside the tracked file `desktop/lib/jars/messages.jar`. Editing a `.po` without rebuilding the jar changes nothing for users (this was missed once on 2026-10-09; the jar was rebuilt only after being asked). Every string change ends with a jar rebuild.
+
+1. **Add the string in code** with `I18n.tr("English text")` (`{0}` placeholders for `I18n.tr(String, Object...)`).
+2. **Update `desktop/lib/messagebundles/frostwire.pot`.** Prefer appending only the new `msgid` entries by script (run `xgettext` on the sources into a scratch `.pot`, diff its msgids against `frostwire.pot`, append the missing ones). `./gradlew gettextExtract` rewrites every `#:` source-line reference in all 61 catalogs and produces thousands of lines of churn; only run it as its own mechanical commit, never mixed with translations.
+3. **Add the entry to every `desktop/lib/messagebundles/<lang>.po`** (61 files: default, en, en_CA, en_GB and 57 languages). New entries start with `msgstr` equal to the English `msgid` (or empty); the English fallback is acceptable only as a short-lived placeholder.
+4. **Translate.** For each language replace the `msgstr`. Rules:
+   - Keep technical names untranslated: IceBridge, MCP, I2P, NAT-PMP, DHT, rUDP, BitTorrent, Magnet.
+   - Preserve `{0}`/`{1}` placeholders, `&` mnemonics (`&Dark` -> keep one `&`), HTML tags, trailing spaces and `\"` escapes exactly.
+   - **`java-format` strings (any msgstr containing `{N}`) are run through `java.text.MessageFormat`: every literal apostrophe must be doubled (`l''utilisateur`, `FrostWire''ı`)**, otherwise the placeholder is swallowed. `msgfmt -c` reports "a format specification for argument {0} doesn't exist in 'msgstr'" when this is wrong. Strings without `{N}` keep a single apostrophe.
+   - Check what is still English with a script comparing `msgstr == msgid` per language; `desktop` has `SetupWizardTranslationsTest` enforcing wizard strings in all 61 catalogs. Generate batch worksheets as numbered lines (`N ||| translation`) per language and apply them with a script that replaces by `msgid` (handles wrapped multi-line `msgid`/`msgstr`, collapses the replaced `msgstr` to one line); do not hand-edit 60 files.
+   - Zh_HK may be derived from zh_TW; verify terminology for the others.
+5. **Validate every catalog**: `cd desktop/lib/messagebundles && for l in *.po; do msgfmt -c -o /dev/null $l; done` (the "header field 'Language'" warning is pre-existing and harmless).
+6. **Rebuild the bundle**: `cd desktop && ./gradlew gettextBundle --offline`. This regenerates `Messages_*.class` for every language at least 35% complete (plus the default bundle) and rewrites `lib/jars/messages.jar` (it creates and deletes the temporary `lib/messagebundles/org` directory). Verify: `unzip -p`/`javap -v -cp <extracted> org.limewire.i18n.Messages_xx` shows the new strings, and the set of `Messages_*` entries is unchanged unless a language crossed the 35% threshold.
+7. **Test**: full desktop suite (`./gradlew test`), including `SetupWizardTranslationsTest`.
+8. **Commit separately and push**: (a) code change `I18n.tr` + `.pot` + `.po` entries, (b) translations (`[desktop] Translate ...`), (c) `[desktop] Rebuild messages bundle ...` containing only `lib/jars/messages.jar` (precedents: `37222e3bf`, `53e427514`, `12ffd3bd5`, `926e8b3ce`). A rebuilt jar is a binary file: rebuild it once at the end of a translation batch, not after every language, and never commit it before the `.po` files it was built from are final.
+9. **Android is separate**: `android/res/values*/strings.xml` (base + 37 locales, parity enforced by `AndroidStringResourceParityTest`; escape apostrophes as `\'`, ampersands as `&amp;`). No `.pot`/jar step.
+10. Record the languages that still fall back to English in the commit body or the release notes, so the gap is explicit rather than discovered later (currently desktop br, fa, fi, ga, gl, hu, is, lt, mk, mt, nn, pa, sk, sr_Latn and a few others have ~233 untranslated 7.1.0 strings).
+
 ### Skin / Theme Consistency
 
 - Use themed components (`SkinPopupMenu`, `SkinButton`, etc.) instead of raw Swing/Android defaults.
