@@ -6273,6 +6273,27 @@ msgstr "Revert To Default"
 msgid "You cannot turn off all columns."
 msgstr "You cannot turn off all columns."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Придружи се на мрежата IceBridge: пребарувај торенти на други корисници и дозволи им да ги најдат оние што јас ги сидирам"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Додека ова е вклучено, секој што користи дистрибуирано пребарување може да ги најде торентите што моментално ги сидирате кога неговите клучни зборови се совпаѓаат, дури и ако не го споделувате вашиот каталог подолу. Исклучете за да ја напуштите мрежата."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Сподели го мојот каталог за луѓето да можат да го прелистуваат, а роботите да го индексираат"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Им дозволува на луѓето да прелистуваат сè што моментално го сидирате без пребарување, а на роботите да ја индексираат мрежата. Историјата на преземања што не се сидира никогаш не се објавува."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Двете опции можете да ги промените подоцна во Алатки > Опции > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

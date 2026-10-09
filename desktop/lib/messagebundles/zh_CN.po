@@ -6313,6 +6313,27 @@ msgstr "恢复默认设置 "
 msgid "You cannot turn off all columns."
 msgstr "你不能关掉所有列。"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "加入 IceBridge 网络：搜索其他用户的种子，并让他们找到我正在做种的种子"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "开启期间，任何使用分布式搜索的人只要关键词匹配，就能找到你正在做种的种子，即使你没有在下方分享目录。关闭即可退出网络。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "分享我的目录，让他人可以浏览，让爬虫可以索引"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "让他人无需搜索即可浏览你正在做种的全部内容，并允许爬虫为网络建立索引。未在做种的下载历史绝不会被公开。"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "两个选项以后都可以在 工具 > 选项 > IceBridge 中更改。"
+
+
 #~ msgid "Twitter it"
 #~ msgstr "分享到推特"
 

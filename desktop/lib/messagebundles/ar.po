@@ -6214,6 +6214,27 @@ msgstr "استعادة الافتراضي"
 msgid "You cannot turn off all columns."
 msgstr "لا يمكنك إطفاء جميع الأعمدة."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "الانضمام إلى شبكة IceBridge: ابحث في تورنتات المستخدمين الآخرين واسمح لهم بالعثور على ما أبذره"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "ما دام هذا الخيار مفعّلًا، يمكن لأي شخص يستخدم البحث الموزّع العثور على التورنتات التي تبذرها حاليًا عند تطابق كلماته المفتاحية، حتى لو لم تشارك كتالوجك أدناه. أوقفه لمغادرة الشبكة."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "شارك كتالوجي ليتمكن الناس من تصفحه ويتمكن الزواحف من فهرسته"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "يتيح للناس تصفح كل ما تبذره حاليًا دون البحث عنه، ويتيح للزواحف فهرسة الشبكة. لا يُنشر أبدًا سجل التنزيلات الذي لا يُبذر."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "يمكنك تغيير الخيارين لاحقًا من أدوات > خيارات > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "اكتب تغريده عنه على تويتر"
 

@@ -6264,6 +6264,27 @@ msgstr "Revert To Default"
 msgid "You cannot turn off all columns."
 msgstr "You cannot turn off all columns."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "پیوستن به شبکه IceBridge: در تورنت‌های سایر کاربران جستجو کنید و بگذارید تورنت‌هایی را که بذر می‌کنم پیدا کنند"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "تا زمانی که این گزینه روشن است، هر کسی که از جستجوی توزیع‌شده استفاده کند می‌تواند در صورت تطابق کلیدواژه‌هایش تورنت‌هایی را که اکنون بذر می‌کنید پیدا کند، حتی اگر کاتالوگ خود را در پایین به اشتراک نگذارید. برای ترک شبکه آن را خاموش کنید."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "کاتالوگ من را به اشتراک بگذار تا مردم بتوانند آن را مرور کنند و خزنده‌ها آن را نمایه کنند"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "به مردم اجازه می‌دهد بدون جستجو هر آنچه را اکنون بذر می‌کنید مرور کنند و به خزنده‌ها اجازه می‌دهد شبکه را نمایه کنند. سابقه دانلودهایی که بذر نمی‌شوند هرگز منتشر نمی‌شود."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "می‌توانید هر دو گزینه را بعداً در ابزارها > گزینه‌ها > IceBridge تغییر دهید."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

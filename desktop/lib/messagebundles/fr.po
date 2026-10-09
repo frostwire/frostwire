@@ -6419,6 +6419,27 @@ msgstr "Rétablir les options par défaut"
 msgid "You cannot turn off all columns."
 msgstr "Vous ne pouvez pas cacher toutes les colonnes."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Rejoindre le réseau IceBridge : rechercher les torrents des autres utilisateurs et les laisser trouver ceux que je partage"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Tant que cette option est activée, toute personne utilisant la Recherche distribuée peut trouver les torrents que vous partagez activement lorsque ses mots-clés correspondent, même si vous ne partagez pas votre catalogue ci-dessous. Désactivez-la pour quitter le réseau."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Partager mon catalogue pour que les gens puissent le parcourir et les robots l'indexer"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Permet aux gens de parcourir tout ce que vous partagez activement sans le rechercher, et aux robots d'indexer le réseau. L'historique des téléchargements qui ne sont pas partagés n'est jamais publié."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Vous pourrez modifier ces deux options plus tard dans Outils > Options > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter le"
 

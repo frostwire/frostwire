@@ -6325,6 +6325,27 @@ msgstr "Restaurar padrões"
 msgid "You cannot turn off all columns."
 msgstr "Não pode desativar todas as colunas."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Entrar na rede IceBridge: pesquisar torrents de outros utilizadores e deixar que encontrem os que estou a semear"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Enquanto estiver ativado, qualquer pessoa que use a Pesquisa distribuída pode encontrar os torrents que está a semear quando as suas palavras-chave coincidirem, mesmo que não partilhe o seu catálogo abaixo. Desative para sair da rede."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Partilhar o meu catálogo para que as pessoas o possam explorar e os rastreadores o possam indexar"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Permite que as pessoas explorem tudo o que está a semear sem precisarem de pesquisar, e que os rastreadores indexem a rede. O histórico de transferências que não está a ser semeado nunca é publicado."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Pode alterar as duas opções mais tarde em Ferramentas > Opções > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitar"
 

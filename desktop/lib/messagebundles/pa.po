@@ -6257,6 +6257,27 @@ msgstr "ਵਾਪਸ ਡਿਫ਼ੌਲਟ ਕਰੋ"
 msgid "You cannot turn off all columns."
 msgstr "You cannot turn off all columns."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "IceBridge ਨੈੱਟਵਰਕ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ: ਹੋਰ ਵਰਤੋਂਕਾਰਾਂ ਦੇ ਟੋਰੈਂਟ ਖੋਜੋ ਅਤੇ ਉਨ੍ਹਾਂ ਨੂੰ ਉਹ ਲੱਭਣ ਦਿਓ ਜੋ ਮੈਂ ਸੀਡ ਕਰ ਰਿਹਾ ਹਾਂ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "ਜਦੋਂ ਤੱਕ ਇਹ ਚਾਲੂ ਹੈ, ਵੰਡੀ ਹੋਈ ਖੋਜ ਵਰਤਣ ਵਾਲਾ ਕੋਈ ਵੀ ਵਿਅਕਤੀ ਕੀਵਰਡ ਮਿਲਣ ਤੇ ਤੁਹਾਡੇ ਸਰਗਰਮੀ ਨਾਲ ਸੀਡ ਕੀਤੇ ਜਾ ਰਹੇ ਟੋਰੈਂਟ ਲੱਭ ਸਕਦਾ ਹੈ, ਭਾਵੇਂ ਤੁਸੀਂ ਹੇਠਾਂ ਆਪਣਾ ਕੈਟਾਲੌਗ ਸਾਂਝਾ ਨਾ ਕਰੋ। ਨੈੱਟਵਰਕ ਛੱਡਣ ਲਈ ਇਸਨੂੰ ਬੰਦ ਕਰੋ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "ਮੇਰਾ ਕੈਟਾਲੌਗ ਸਾਂਝਾ ਕਰੋ ਤਾਂ ਜੋ ਲੋਕ ਇਸਨੂੰ ਬ੍ਰਾਊਜ਼ ਕਰ ਸਕਣ ਅਤੇ ਕ੍ਰਾਲਰ ਇਸਨੂੰ ਇੰਡੈਕਸ ਕਰ ਸਕਣ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "ਲੋਕਾਂ ਨੂੰ ਖੋਜੇ ਬਿਨਾਂ ਉਹ ਸਭ ਬ੍ਰਾਊਜ਼ ਕਰਨ ਦਿੰਦਾ ਹੈ ਜੋ ਤੁਸੀਂ ਸਰਗਰਮੀ ਨਾਲ ਸੀਡ ਕਰ ਰਹੇ ਹੋ, ਅਤੇ ਕ੍ਰਾਲਰਾਂ ਨੂੰ ਨੈੱਟਵਰਕ ਇੰਡੈਕਸ ਕਰਨ ਦਿੰਦਾ ਹੈ। ਜੋ ਡਾਊਨਲੋਡ ਇਤਿਹਾਸ ਸੀਡ ਨਹੀਂ ਹੋ ਰਿਹਾ ਉਹ ਕਦੇ ਪ੍ਰਕਾਸ਼ਿਤ ਨਹੀਂ ਹੁੰਦਾ।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "ਤੁਸੀਂ ਦੋਵੇਂ ਵਿਕਲਪ ਬਾਅਦ ਵਿੱਚ ਟੂਲ > ਓਪਸ਼ੰਜ਼ > IceBridge ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।"
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

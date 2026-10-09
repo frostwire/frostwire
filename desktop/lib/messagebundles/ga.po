@@ -6335,6 +6335,27 @@ msgstr "Fill Ar An Réamhshocrú"
 msgid "You cannot turn off all columns."
 msgstr "Ní féidir gach colúin a bhaint"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Bí páirteach i líonra IceBridge: cuardaigh torrents úsáideoirí eile agus lig dóibh na cinn atá á síolrú agam a aimsiú"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Fad a bheidh sé seo ar siúl, is féidir le duine ar bith a úsáideann an Cuardach Dáilte na torrents atá á síolrú agat a aimsiú nuair a thagann a bhfocail eochair leo, fiú mura roinneann tú do chatalóg thíos. Cas as é chun an líonra a fhágáil."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Roinn mo chatalóg ionas gur féidir le daoine í a bhrabhsáil agus le crawlers í a innéacsú"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Ligeann sé do dhaoine gach a bhfuil á shíolrú agat a bhrabhsáil gan cuardach, agus do crawlers an líonra a innéacsú. Ní fhoilsítear stair íoslódálacha nach bhfuil á síolrú choíche."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Is féidir leat an dá rogha a athrú níos déanaí in Uirlisí > Roghanna > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

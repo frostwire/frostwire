@@ -6295,6 +6295,27 @@ msgstr "Standard verwenden"
 msgid "You cannot turn off all columns."
 msgstr "Sie können nicht alle Spalten ausblenden."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Dem IceBridge-Netzwerk beitreten: Torrents anderer Nutzer durchsuchen und von ihnen gefunden werden, wenn ich seede"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Solange dies aktiviert ist, kann jeder, der die Verteilte Suche nutzt, deine aktiv geseedeten Torrents finden, wenn seine Suchbegriffe passen, auch wenn du unten deinen Katalog nicht teilst. Deaktiviere es, um das Netzwerk zu verlassen."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Meinen Katalog teilen, damit Leute ihn durchstöbern und Crawler ihn indexieren können"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Erlaubt es Leuten, alles zu durchstöbern, was du aktiv seedest, ohne danach zu suchen, und Crawlern, das Netzwerk zu indexieren. Download-Verlauf, der nicht geseedet wird, wird nie veröffentlicht."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Du kannst beide Optionen später unter Extras > Einstellungen > IceBridge ändern."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Mit Twitter veröffentlichen"
 

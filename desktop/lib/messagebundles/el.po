@@ -6367,6 +6367,27 @@ msgstr "Επαναφορά στην προεπιλογή"
 msgid "You cannot turn off all columns."
 msgstr "Δεν μπορείτε να χαλάσετε όλες τις στήλες."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Συμμετοχή στο δίκτυο IceBridge: αναζητήστε torrents άλλων χρηστών και αφήστε τους να βρίσκουν όσα μοιράζομαι"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Όσο είναι ενεργό, οποιοσδήποτε χρησιμοποιεί την Κατανεμημένη αναζήτηση μπορεί να βρει τα torrents που μοιράζεστε ενεργά όταν ταιριάζουν οι λέξεις-κλειδιά του, ακόμη και αν δεν μοιράζεστε τον κατάλογό σας παρακάτω. Απενεργοποιήστε το για να φύγετε από το δίκτυο."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Κοινοποίηση του καταλόγου μου ώστε οι χρήστες να τον περιηγούνται και οι crawlers να τον ευρετηριάζουν"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Επιτρέπει σε όλους να περιηγούνται σε ό,τι μοιράζεστε ενεργά χωρίς αναζήτηση και στους crawlers να ευρετηριάζουν το δίκτυο. Το ιστορικό λήψεων που δεν μοιράζεται δεν δημοσιεύεται ποτέ."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Μπορείτε να αλλάξετε και τις δύο επιλογές αργότερα στα Εργαλεία > Επιλογές > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Τιτιβίστε το"
 

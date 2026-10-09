@@ -6288,6 +6288,27 @@ msgstr "Revert To Default"
 msgid "You cannot turn off all columns."
 msgstr "You cannot turn off all columns."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Prisijungti prie IceBridge tinklo: ieškoti kitų vartotojų torrentų ir leisti jiems rasti tuos, kuriuos aš sėju"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Kol tai įjungta, bet kas, naudojantis paskirstytąją paiešką, gali rasti jūsų šiuo metu sėjamus torrentus, kai sutampa jų raktažodžiai, net jei žemiau nesidalijate savo katalogu. Išjunkite, kad paliktumėte tinklą."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Dalytis mano katalogu, kad žmonės galėtų jį naršyti, o robotai indeksuoti"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Leidžia žmonėms naršyti viską, ką šiuo metu sėjate, neieškant, o robotams indeksuoti tinklą. Atsisiuntimų istorija, kuri nesėjama, niekada neskelbiama."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Abi parinktis galite pakeisti vėliau skiltyje Įrankiai > Parinktys > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

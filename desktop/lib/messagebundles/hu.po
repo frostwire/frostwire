@@ -6333,6 +6333,27 @@ msgstr "Alap�rtelmez�"
 msgid "You cannot turn off all columns."
 msgstr "Nem kapcsolhatod ki az �sszes oszlopot."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Csatlakozás az IceBridge hálózathoz: keresés más felhasználók torrentjei között, és engedd, hogy megtalálják az általam seedelteket"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Amíg ez be van kapcsolva, bárki, aki az elosztott keresést használja, megtalálhatja az éppen seedelt torrentjeidet, ha a kulcsszavai egyeznek, még akkor is, ha lent nem osztod meg a katalógusodat. A hálózat elhagyásához kapcsold ki."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Katalógusom megosztása, hogy az emberek böngészhessék, a crawlerek pedig indexelhessék"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Lehetővé teszi, hogy az emberek keresés nélkül böngésszék mindazt, amit éppen seedelsz, a crawlerek pedig indexeljék a hálózatot. A nem seedelt letöltési előzmények soha nem kerülnek közzétételre."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Mindkét beállítást később is módosíthatod az Eszközök > Beállítások > IceBridge menüben."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

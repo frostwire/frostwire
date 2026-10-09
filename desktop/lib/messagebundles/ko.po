@@ -6179,6 +6179,27 @@ msgstr "초기설정으로 되돌림"
 msgid "You cannot turn off all columns."
 msgstr "모든 칼럼을 오프로 할 수  없는 상태"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "IceBridge 네트워크 참여: 다른 사용자의 토렌트를 검색하고 내가 시딩 중인 토렌트를 그들이 찾을 수 있게 합니다"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "이 옵션이 켜져 있는 동안에는 분산 검색을 사용하는 누구나 키워드가 일치하면 현재 시딩 중인 토렌트를 찾을 수 있습니다. 아래에서 카탈로그를 공유하지 않아도 마찬가지입니다. 네트워크에서 나가려면 끄세요."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "내 카탈로그를 공유하여 다른 사람이 둘러보고 크롤러가 색인할 수 있게 하기"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "검색하지 않아도 현재 시딩 중인 모든 항목을 다른 사람이 둘러볼 수 있고 크롤러가 네트워크를 색인할 수 있게 합니다. 시딩하지 않는 다운로드 기록은 절대 게시되지 않습니다."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "두 옵션 모두 나중에 도구 > 옵션 > IceBridge에서 변경할 수 있습니다."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "트위터"
 

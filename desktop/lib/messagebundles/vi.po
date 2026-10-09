@@ -6284,6 +6284,27 @@ msgstr "Trở Lại Mặc định"
 msgid "You cannot turn off all columns."
 msgstr "Bạn không thể tắt tất cả các cột."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Tham gia mạng IceBridge: tìm torrent của người dùng khác và để họ tìm thấy những torrent tôi đang seed"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Khi bật, bất kỳ ai dùng Tìm kiếm Phân tán đều có thể tìm thấy các torrent bạn đang seed khi từ khóa khớp, ngay cả khi bạn không chia sẻ danh mục ở bên dưới. Tắt để rời khỏi mạng."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Chia sẻ danh mục của tôi để mọi người có thể duyệt và trình thu thập có thể lập chỉ mục"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Cho phép mọi người duyệt mọi thứ bạn đang seed mà không cần tìm kiếm, và cho phép trình thu thập lập chỉ mục mạng. Lịch sử tải xuống không được seed sẽ không bao giờ được công bố."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Bạn có thể đổi cả hai tùy chọn sau trong Công cụ > Tuỳ chọn > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter nó"
 

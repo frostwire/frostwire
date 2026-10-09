@@ -6231,6 +6231,27 @@ msgstr "ডিফল্টে প্রত্যাবর্তন"
 msgid "You cannot turn off all columns."
 msgstr "আপনি সমস্ত কলাম বন্ধ করতে পারবেন না"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "IceBridge নেটওয়ার্কে যোগ দিন: অন্য ব্যবহারকারীদের টরেন্ট খুঁজুন এবং আমি যেগুলো সিড করছি সেগুলো তাদের খুঁজে পেতে দিন"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "এটি চালু থাকলে, বিতরণকৃত অনুসন্ধান ব্যবহারকারী যে কেউ কীওয়ার্ড মিললে আপনার সক্রিয়ভাবে সিড করা টরেন্ট খুঁজে পেতে পারে, এমনকি আপনি নিচে আপনার ক্যাটালগ শেয়ার না করলেও। নেটওয়ার্ক ছাড়তে এটি বন্ধ করুন।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "আমার ক্যাটালগ শেয়ার করুন যাতে মানুষ ব্রাউজ করতে পারে এবং ক্রলার ইনডেক্স করতে পারে"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "মানুষকে অনুসন্ধান ছাড়াই আপনার সক্রিয়ভাবে সিড করা সবকিছু ব্রাউজ করতে দেয় এবং ক্রলারদের নেটওয়ার্ক ইনডেক্স করতে দেয়। সিড না করা ডাউনলোড ইতিহাস কখনও প্রকাশ করা হয় না।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "আপনি পরে টুলস > অপশন > IceBridge থেকে দুটি বিকল্পই বদলাতে পারেন।"
+
+
 #~ msgid "Twitter it"
 #~ msgstr "টুইটারে শেয়ার করুন"
 

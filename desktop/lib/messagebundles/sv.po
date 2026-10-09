@@ -6284,6 +6284,27 @@ msgstr "Återgå till standardvärden"
 msgid "You cannot turn off all columns."
 msgstr "Du kan inte dölja alla kolumner."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Anslut till IceBridge-nätverket: sök bland andras torrenter och låt dem hitta de jag seedar"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Så länge detta är på kan vem som helst som använder distribuerad sökning hitta de torrenter du seedar just nu när deras sökord matchar, även om du inte delar din katalog nedan. Stäng av för att lämna nätverket."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Dela min katalog så att folk kan bläddra i den och crawlers kan indexera den"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Låter folk bläddra bland allt du seedar just nu utan att söka, och låter crawlers indexera nätverket. Nedladdningshistorik som inte seedas publiceras aldrig."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Du kan ändra båda alternativen senare under Verktyg > Inställningar > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twittra om den"
 

@@ -6337,6 +6337,27 @@ msgstr "Rikthe Tipiket"
 msgid "You cannot turn off all columns."
 msgstr "Ju nuk mund të fshini gjithë kolonat."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Bashkohu me rrjetin IceBridge: kërko torrentët e përdoruesve të tjerë dhe lejoji të gjejnë ata që unë po i ndaj"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Për sa kohë që kjo është e aktivizuar, kushdo që përdor Kërkimin e Shpërndarë mund të gjejë torrentët që po ndani aktivisht kur fjalët e tij kyçe përputhen, edhe nëse nuk e ndani katalogun tuaj më poshtë. Çaktivizoje për të lënë rrjetin."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Ndaj katalogun tim që njerëzit ta shfletojnë dhe zvarritësit ta indeksojnë"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "I lejon njerëzit të shfletojnë gjithçka që po ndani aktivisht pa kërkuar, dhe zvarritësve të indeksojnë rrjetin. Historiku i shkarkimeve që nuk ndahen nuk botohet kurrë."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Të dyja opsionet mund t'i ndryshosh më vonë te Mjetet > Opsionet > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter atë"
 

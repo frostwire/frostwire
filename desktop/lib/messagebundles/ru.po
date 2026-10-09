@@ -6277,6 +6277,27 @@ msgstr "Вернуть по умолчанию"
 msgid "You cannot turn off all columns."
 msgstr "Нельзя убрать все колонки."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Присоединиться к сети IceBridge: искать торренты других пользователей и позволить им находить те, что я раздаю"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Пока опция включена, любой, кто пользуется распределённым поиском, может найти раздаваемые вами торренты, если совпадут ключевые слова, даже если вы не делитесь каталогом ниже. Отключите, чтобы покинуть сеть."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Поделиться моим каталогом, чтобы люди могли его просматривать, а краулеры индексировать"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Позволяет людям просматривать всё, что вы сейчас раздаёте, без поиска, а краулерам индексировать сеть. История загрузок, которые не раздаются, никогда не публикуется."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Обе опции можно изменить позже в Инструменты > Настройки > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter"
 

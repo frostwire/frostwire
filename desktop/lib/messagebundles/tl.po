@@ -6361,6 +6361,27 @@ msgstr "Bumalik sa Orihinal"
 msgid "You cannot turn off all columns."
 msgstr "Hindi mo maaring hindi paandarin ang lahat ng hanay."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Sumali sa IceBridge network: maghanap ng mga torrent ng ibang user at hayaan silang mahanap ang mga sini-seed ko"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Habang naka-on ito, kahit sinong gumagamit ng Distributed Search ay makakahanap ng mga torrent na aktibo mong sini-seed kapag tumugma ang kanilang mga keyword, kahit hindi mo ibahagi ang iyong catalog sa ibaba. I-off ito para umalis sa network."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Ibahagi ang catalog ko para ma-browse ito ng mga tao at ma-index ito ng mga crawler"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Pinapayagan ang mga tao na i-browse ang lahat ng aktibo mong sini-seed nang hindi naghahanap, at ang mga crawler na i-index ang network. Ang history ng download na hindi sini-seed ay hindi kailanman ilalathala."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Maaari mong baguhin ang dalawang opsyon sa Tools > Pagpipilian > IceBridge mamaya."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter ito"
 

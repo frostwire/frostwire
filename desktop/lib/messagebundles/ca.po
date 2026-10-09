@@ -6106,6 +6106,27 @@ msgstr "Endarrera per defecte"
 msgid "You cannot turn off all columns."
 msgstr "No pot desconnectar totes les columnes."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Uneix-te a la xarxa IceBridge: cerca els torrents d'altres usuaris i deixa'ls trobar els que comparteixo"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Mentre estigui activat, qualsevol persona que utilitzi la Cerca distribuïda pot trobar els torrents que comparteixes activament quan les seves paraules clau coincideixin, encara que no comparteixis el teu catàleg a sota. Desactiva-ho per sortir de la xarxa."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Comparteix el meu catàleg perquè la gent el pugui explorar i els rastrejadors el puguin indexar"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Permet que la gent exploris tot el que comparteixes activament sense cercar-ho i que els rastrejadors indexin la xarxa. L'historial de descàrregues que no es comparteix mai es publica."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Pots canviar les dues opcions més endavant a Eines > Opcions > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Piuja-ho"
 

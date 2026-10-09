@@ -6204,6 +6204,27 @@ msgstr "फ़ॉन्टवर्क अनुपस्थिति फ़ॉ�
 msgid "You cannot turn off all columns."
 msgstr "आप सभी कॉलम को नहीं बदल सकते हैं."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "IceBridge नेटवर्क से जुड़ें: अन्य उपयोगकर्ताओं के टोरेंट खोजें और उन्हें वे टोरेंट खोजने दें जो मैं सीड कर रहा हूँ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "जब तक यह चालू है, वितरित खोज इस्तेमाल करने वाला कोई भी व्यक्ति, कीवर्ड मेल खाने पर, आपके सक्रिय रूप से सीड किए जा रहे टोरेंट ढूँढ सकता है, भले ही आप नीचे अपना कैटलॉग साझा न करें। नेटवर्क छोड़ने के लिए इसे बंद करें।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "मेरा कैटलॉग साझा करें ताकि लोग उसे ब्राउज़ कर सकें और क्रॉलर उसे इंडेक्स कर सकें"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "लोगों को खोजे बिना वह सब ब्राउज़ करने देता है जो आप सक्रिय रूप से सीड कर रहे हैं, और क्रॉलर को नेटवर्क इंडेक्स करने देता है। जो डाउनलोड इतिहास सीड नहीं हो रहा है वह कभी प्रकाशित नहीं होता।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "आप दोनों विकल्प बाद में टूल्स > विकल्प > IceBridge में बदल सकते हैं।"
+
+
 #~ msgid "Twitter it"
 #~ msgstr "इसे ट्विट्टर करें "
 

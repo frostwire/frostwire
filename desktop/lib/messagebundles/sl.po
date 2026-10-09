@@ -6262,6 +6262,27 @@ msgstr "Obnova prednastavenych"
 msgid "You cannot turn off all columns."
 msgstr "Ne morete izklopiti vse stolpce."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Pridruži se omrežju IceBridge: išči torrente drugih uporabnikov in jim dovoli, da najdejo tiste, ki jih sejem"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Dokler je to vklopljeno, lahko kdorkoli uporablja porazdeljeno iskanje, najde torrente, ki jih trenutno sejete, če se ključne besede ujemajo, tudi če spodaj ne delite svojega kataloga. Izklopite za izhod iz omrežja."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Deli moj katalog, da ga lahko ljudje brskajo, iskalniki pa indeksirajo"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Ljudem omogoča brskanje po vsem, kar trenutno sejete, brez iskanja, iskalnikom pa indeksiranje omrežja. Zgodovina prenosov, ki se ne sejejo, ni nikoli objavljena."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Obe možnosti lahko pozneje spremenite v Orodja > Možnosti > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Pošlji na Twitter"
 

@@ -6335,6 +6335,27 @@ msgstr "Op Standard zerécksetzen"
 msgid "You cannot turn off all columns."
 msgstr "Du kanns net all Kolonnen ausschalten."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Dem IceBridge-Netzwierk bäitrieden: Torrente vun anere Benotzer sichen a se ze loossen déi fannen, déi ech seede"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Soulaang dat un ass, kann jiddereen, deen déi verdeelt Sich benotzt, d'Torrente fannen, déi Dir aktiv seedt, wann seng Schlësselwierder passen, och wann Dir Äre Katalog hei ënnen net deelt. Schalt et aus fir d'Netzwierk ze verloossen."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Mäi Katalog deelen, sou datt d'Leit en duerchsiche kënnen an Crawler en indexéiere kënnen"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Erlaabt de Leit alles duerchzesichen, wat Dir aktiv seedt, ouni dernach ze sichen, an de Crawler d'Netzwierk ze indexéieren. Download-Verlaf, deen net geseed gëtt, gëtt ni verëffentlecht."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Dir kënnt béid Optiounen méi spéit ënner Geräter > Optiounen > IceBridge änneren."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Tweet et"
 

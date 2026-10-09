@@ -6284,6 +6284,27 @@ msgstr "Breyta í sjálfvirkt"
 msgid "You cannot turn off all columns."
 msgstr "Þú getur ekki slökkt á öllum dálkunum."
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "Taka þátt í IceBridge-netinu: leita að torrentum annarra notenda og leyfa þeim að finna þau sem ég sái"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "Á meðan kveikt er á þessu getur hver sem notar dreifða leit fundið torrent sem þú ert að sá þegar leitarorð þeirra passa, jafnvel þótt þú deilir ekki skránni þinni hér að neðan. Slökktu til að yfirgefa netið."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "Deila skránni minni svo fólk geti skoðað hana og skriðlar geti skráð hana"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "Leyfir fólki að skoða allt sem þú ert að sá án þess að leita og skriðlum að skrá netið. Niðurhalssaga sem ekki er sáð er aldrei birt."
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "Þú getur breytt báðum valkostum síðar í Verkfæri > Stillingar > IceBridge."
+
+
 #~ msgid "Twitter it"
 #~ msgstr "Twitter it"
 

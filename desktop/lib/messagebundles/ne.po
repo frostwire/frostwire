@@ -6186,6 +6186,27 @@ msgstr "डिफल्टमा उल्ताऊ"
 msgid "You cannot turn off all columns."
 msgstr "तपाईंले सबै स्तम्भहरु बन्द गर्न सक्नुहुन्न।"
 
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:44
+msgid "Join the IceBridge network: search other users' torrents and let them find the ones I am seeding"
+msgstr "IceBridge नेटवर्कमा सामेल हुनुहोस्: अरू प्रयोगकर्ताका टोरेन्ट खोज्नुहोस् र म सिड गरिरहेका टोरेन्ट उनीहरूलाई भेट्टाउन दिनुहोस्"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:50
+msgid "While this is on, anyone using Distributed Search can find the torrents you are actively seeding when their keywords match, even if you do not share your catalog below. Turn it off to leave the network."
+msgstr "यो खुला रहँदासम्म, वितरित खोज प्रयोग गर्ने जो कोहीले कीवर्ड मिल्दा तपाईंले सक्रिय रूपमा सिड गरिरहनुभएका टोरेन्टहरू भेट्टाउन सक्छ, तपाईंले तल आफ्नो क्याटलग साझा नगरे पनि। नेटवर्क छोड्न यसलाई बन्द गर्नुहोस्।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:56
+msgid "Share my catalog so people can browse it and crawlers can index it"
+msgstr "मेरो क्याटलग साझा गर्नुहोस् ताकि मानिसहरूले ब्राउज गर्न र क्रलरहरूले इन्डेक्स गर्न सकून्"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:61
+msgid "Lets people browse everything you are actively seeding without searching for it, and lets crawlers index the network. Downloaded history that is not seeding is never published."
+msgstr "मानिसहरूलाई खोज्नु बिना तपाईंले सक्रिय रूपमा सिड गरिरहनुभएको सबै ब्राउज गर्न दिन्छ, र क्रलरहरूलाई नेटवर्क इन्डेक्स गर्न दिन्छ। सिड नगरिएको डाउनलोड इतिहास कहिल्यै प्रकाशित हुँदैन।"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/init/SeedingPublishingText.java:41
+msgid "You can change both options later in Tools > Options > IceBridge."
+msgstr "तपाईं दुवै विकल्प पछि उपकरण > रोजाइ > IceBridge मा बदल्न सक्नुहुन्छ।"
+
+
 #~ msgid "Twitter it"
 #~ msgstr "यो ट्वीट गर्नुहोस्"
 
