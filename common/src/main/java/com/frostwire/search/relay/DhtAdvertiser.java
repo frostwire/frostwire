@@ -243,7 +243,7 @@ public final class DhtAdvertiser implements AutoCloseable {
                     indexPublishes.incrementAndGet();
                 }
             }
-            int announcePort = identityPublisher.utpPort();
+            int announcePort = identityPublisher.announcePort();
             if (!lifecycle.getAsBoolean()) {
                 return false;
             }

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -323,6 +324,40 @@ class DhtAdvertiserTest {
                 assertTrue(owner.awaitStopped(3, TimeUnit.SECONDS));
             }
         }
+    }
+
+    @Test
+    void topicsAreAnnouncedWithTheRudpPortSoPeersCanHandshakeOverUdp() throws Exception {
+        RecordingSession session = new RecordingSession();
+        DhtAdvertiser advertiser = new DhtAdvertiser(
+                new IdentityRecordPublisher(identity, 6888, 6889, "BOTH"),
+                null, 1, () -> session, true, true);
+        try {
+            advertiser.start();
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (System.nanoTime() < deadline
+                    && session.putItemCalls.stream().filter(c -> "announce".equals(c[0])).count() < 3) {
+                Thread.sleep(25);
+            }
+            List<Object[]> announces = new ArrayList<>();
+            for (Object[] call : session.putItemCalls) {
+                if ("announce".equals(call[0])) announces.add(call);
+            }
+            assertTrue(announces.size() >= 3, "peer, relay and bootstrap topics are announced");
+            for (Object[] announce : announces) {
+                assertEquals(6889, announce[2], "the TCP identity port must not be announced");
+            }
+        } finally {
+            advertiser.close();
+            assertTrue(advertiser.awaitStopped(3, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    void legacyPublisherWithoutRudpPortStillAnnouncesItsOnlyPort() {
+        IdentityRecordPublisher publisher = new IdentityRecordPublisher(identity, 6888);
+        assertEquals(6888, publisher.announcePort());
+        assertEquals(6889, new IdentityRecordPublisher(identity, 6888, 6889, "BOTH").announcePort());
     }
 
     private static void awaitUninterruptibly(CountDownLatch latch) {

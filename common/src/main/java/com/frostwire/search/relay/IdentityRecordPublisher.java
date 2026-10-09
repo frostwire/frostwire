@@ -151,6 +151,15 @@ public final class IdentityRecordPublisher {
         return rudpPort;
     }
 
+    /**
+     * Port announced on the DHT topics. Peers verify an announced endpoint with the rUDP identity
+     * handshake, so this is the rUDP port: UDP can be mapped or hole-punched, a TCP port behind a
+     * NAT is unreachable. Falls back to the legacy value only when no rUDP port is known.
+     */
+    public int announcePort() {
+        return rudpPort > 0 ? rudpPort : utpPort;
+    }
+
     public String role() {
         return role;
     }
