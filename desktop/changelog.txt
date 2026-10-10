@@ -1,4 +1,4 @@
-FrostWire 7.1.0 OCT/09/2026
+FrostWire 7.1.0 OCT/10/2026
    - new:Computers on the same network find each other — nodes multicast their rUDP port on the LAN, since the public address the DHT reports cannot be reached from inside the same router
    - new:Distributed search results from peers that share their catalog show a "Browse Shared Torrents" icon in the Actions column, so browsing a peer's catalog no longer depends on discovering the right-click menu
   - new:Browse the torrents a peer shares — right-click a Distributed search result whose holder allows crawling ("Browse Shared Torrents") to list everything that peer is sharing, download any of it straight from that peer, or copy its magnet; also available from Tools → Browse Shared Torrents and the IceBridge Console
