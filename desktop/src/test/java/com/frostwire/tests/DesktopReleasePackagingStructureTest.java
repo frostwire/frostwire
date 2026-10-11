@@ -46,12 +46,12 @@ class DesktopReleasePackagingStructureTest {
         Files.readString(
             DESKTOP.resolve("../common/src/main/java/com/frostwire/mcp/MCPConstants.java"));
 
-    assertTrue(build.contains("version = '7.1.0'"));
-    // Dated once the release is cut ("FrostWire 7.1.0 OCT/06/2026"), "UNRELEASED" before.
-    assertTrue(changelog.stripLeading().startsWith("FrostWire 7.1.0 "));
-    assertTrue(frostWireUtils.contains("FROSTWIRE_VERSION = \"7.1.0\""));
-    assertTrue(frostWireUtils.contains("BUILD_NUMBER = 332"));
-    assertTrue(mcpConstants.contains("SERVER_VERSION = \"7.1.0\""));
+    assertTrue(build.contains("version = '7.1.1'"));
+    // Dated once the release is cut ("FrostWire 7.1.1 MMM/DD/YYYY"), "UNRELEASED" before.
+    assertTrue(changelog.stripLeading().startsWith("FrostWire 7.1.1 "));
+    assertTrue(frostWireUtils.contains("FROSTWIRE_VERSION = \"7.1.1\""));
+    assertTrue(frostWireUtils.contains("BUILD_NUMBER = 333"));
+    assertTrue(mcpConstants.contains("SERVER_VERSION = \"7.1.1\""));
   }
 
   @Test
