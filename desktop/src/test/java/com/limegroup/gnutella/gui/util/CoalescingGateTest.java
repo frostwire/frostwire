@@ -66,6 +66,23 @@ class CoalescingGateTest {
         "raw media-type scans must not be submitted directly to the bounded executor");
   }
 
+  @Test
+  void downloadRefreshTickNeverThrowsFromASaturatedExecutor() throws Exception {
+    String source =
+        readSource("desktop/src/main/java/com/frostwire/gui/bittorrent/BTDownloadMediator.java")
+            .replaceAll("\\s+", "");
+
+    assertTrue(
+        source.contains("clearableScanGate.begin()"),
+        "the once-a-second clearable scan must be coalesced");
+    assertTrue(
+        source.contains("catch(RejectedExecutionException"),
+        "a saturated bounded executor must not throw into the EDT refresh tick");
+    assertTrue(
+        source.contains("clearableScanGate.finish()"),
+        "the gate must be released after the scan and after a rejected submission");
+  }
+
   private static String readSource(String moduleRelative) throws Exception {
     String stripped =
         moduleRelative.startsWith("desktop/")

@@ -55,6 +55,7 @@ import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.TableSettings;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.CoalescingGate;
 import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
@@ -105,6 +107,7 @@ public final class BTDownloadMediator
   private PlaySingleMediaFileAction playSingleMediaFileAction;
   private Action endorseSourcePeerAction;
 
+  private final CoalescingGate clearableScanGate = new CoalescingGate();
   // coalesce selection updates; only last result applies
   private final AtomicInteger selectionSeq = new AtomicInteger();
 
@@ -350,29 +353,45 @@ public final class BTDownloadMediator
       }
     }
 
-    // Perform expensive clearable check in background thread
-    DesktopParallelExecutor.execute(
-        () -> {
-          try {
-            int n = DATA_MODEL.getRowCount();
-            boolean anyClearable = false;
-            for (int i = n - 1; i >= 0; i--) {
-              BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
-              if (btDownloadDataLine != null) {
-                BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
-                if (initializeObject != null && isClearable(initializeObject)) {
-                  anyClearable = true;
-                  break;
-                }
-              }
+    // Perform expensive clearable check in background thread. This runs every refresh tick on the
+    // EDT: never queue more than one scan, and never let a saturated executor throw into the EDT.
+    if (!clearableScanGate.begin()) {
+      return; // the previous scan is still queued or running; the next tick checks again
+    }
+    try {
+      DesktopParallelExecutor.execute(
+          () -> {
+            try {
+              scanForClearableDownloads();
+            } finally {
+              clearableScanGate.finish();
             }
-            // Post result back to EDT
-            final boolean finalAnyClearable = anyClearable;
-            SwingUtilities.invokeLater(() -> clearInactiveAction.setEnabled(finalAnyClearable));
-          } catch (Exception e) {
-            System.err.println("Error checking for clearable downloads: " + e.getMessage());
+          });
+    } catch (RejectedExecutionException saturated) {
+      clearableScanGate.finish(); // skip this tick, a later one retries
+    }
+  }
+
+  private void scanForClearableDownloads() {
+    try {
+      int n = DATA_MODEL.getRowCount();
+      boolean anyClearable = false;
+      for (int i = n - 1; i >= 0; i--) {
+        BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
+        if (btDownloadDataLine != null) {
+          BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
+          if (initializeObject != null && isClearable(initializeObject)) {
+            anyClearable = true;
+            break;
           }
-        });
+        }
+      }
+      // Post result back to EDT
+      final boolean finalAnyClearable = anyClearable;
+      SwingUtilities.invokeLater(() -> clearInactiveAction.setEnabled(finalAnyClearable));
+    } catch (Exception e) {
+      System.err.println("Error checking for clearable downloads: " + e.getMessage());
+    }
   }
 
   public int getActiveDownloads() {
