@@ -1,5 +1,6 @@
 FrostWire 7.1.1 UNRELEASED
    - fix:The Transfers list no longer crashes the app when the background task pool is busy — the once-a-second check for clearable downloads is now coalesced to one scan at a time and skipped for a tick if the pool is full, instead of throwing into the UI thread
+   - fix:Opening a file or folder from FrostWire no longer reports a crash when the file was moved or deleted since you clicked it, or when the system denies access — the failure is handled in the background instead of escaping as an IllegalArgumentException
 FrostWire 7.1.0 OCT/10/2026
    - new:Computers on the same network find each other — nodes multicast their rUDP port on the LAN, since the public address the DHT reports cannot be reached from inside the same router
    - new:Distributed search results from peers that share their catalog show a "Browse Shared Torrents" icon in the Actions column, so browsing a peer's catalog no longer depends on discovering the right-click menu

@@ -108,6 +108,11 @@ public final class Launcher {
             System.err.println("Attempted to open an unsupported file!");
           } catch (IOException e) {
             System.err.println("Failed to open file: " + e.getMessage());
+          } catch (IllegalArgumentException | SecurityException e) {
+            // Desktop.open() throws IllegalArgumentException when the file no longer exists (moved
+            // or deleted since the user clicked it) and SecurityException when the OS denies
+            // access. This runs on a pool thread, so nothing may escape from here.
+            System.err.println("Could not open file " + file + ": " + e.getMessage());
           }
         });
 
