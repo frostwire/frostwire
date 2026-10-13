@@ -22,8 +22,9 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
 
     public MediaTypeSavedFilesDirectoryHolder(MediaType type) {
         this.type = type;
-        cache = new HashSet<>();
+        cache = Collections.synchronizedSet(new HashSet<>());
     }
 
     public MediaType getMediaType() {
@@ -74,6 +75,7 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
         return 0;
     }
 
+    /** Live cache; synchronize on the returned set when iterating directly. */
     public Set<File> getCache() {
         return cache;
     }
