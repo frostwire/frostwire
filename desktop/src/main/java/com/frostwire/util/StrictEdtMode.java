@@ -169,17 +169,17 @@ public final class StrictEdtMode {
             // Production never halts: queue a throttled Icebase report and keep dispatching.
             // Bounded descriptor on purpose: the raw event string can carry coordinates and
             // other high-cardinality data that would explode server-side issue grouping.
-            maybeQueueProductionReport(event.getClass().getName() + "#" + event.getID());
+            maybeQueueProductionReport(event.getClass().getName() + "#" + event.getID(), edtStack);
         }
 
-        private static void maybeQueueProductionReport(String eventDescription) {
+        private static void maybeQueueProductionReport(String eventDescription, StackTraceElement[] edtStack) {
             long now = System.currentTimeMillis();
             if (now - lastProductionReportMillis < REPORT_COOLDOWN_MS) {
                 return;
             }
             lastProductionReportMillis = now;
             try {
-                CrashReportSpooler.recordStrictMode(eventDescription, 1);
+                CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack);
                 CrashReportSpooler.recordWatchdog(1);
             } catch (Throwable ignored) {
                 // Reporting must never break event dispatch.

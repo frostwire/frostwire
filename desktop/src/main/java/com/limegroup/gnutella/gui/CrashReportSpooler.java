@@ -180,6 +180,12 @@ public final class CrashReportSpooler {
 
   /** Queues an anonymous StrictMode violation report for Icebase. No-op until {@link #start()}. */
   public static void recordStrictMode(String violationClass, int violationCount) {
+    recordStrictMode(violationClass, violationCount, null);
+  }
+
+  /** Queues the captured violating thread's stack, not the reporting thread's stack. */
+  public static void recordStrictMode(
+      String violationClass, int violationCount, StackTraceElement[] capturedStack) {
     try {
       if (!tryAcquire("strictmode:" + sanitizeViolationClass(violationClass))) {
         LOG.debug("Throttled anonymous strictmode report");
@@ -187,7 +193,7 @@ public final class CrashReportSpooler {
       }
       CrashReportSpooler spooler = INSTANCE;
       if (spooler != null) {
-        spooler.spoolStrictMode(violationClass, violationCount);
+        spooler.spoolStrictMode(violationClass, violationCount, capturedStack);
         UPLOAD_QUEUE.execute(spooler::uploadPending);
         LOG.info("Automatically queued anonymous strictmode report for Icebase");
       }
@@ -236,7 +242,11 @@ public final class CrashReportSpooler {
   }
 
   void spoolStrictMode(String violationClass, int violationCount) {
-    spoolPayload(strictModeReportFor(violationClass, violationCount));
+    spoolStrictMode(violationClass, violationCount, null);
+  }
+
+  void spoolStrictMode(String violationClass, int violationCount, StackTraceElement[] capturedStack) {
+    spoolPayload(strictModeReportFor(violationClass, violationCount, capturedStack));
   }
 
   void spoolWatchdog(int missedHeartbeats) {
@@ -265,13 +275,7 @@ public final class CrashReportSpooler {
   }
 
   private CrashReport reportFor(Throwable problem) {
-    StackTraceElement[] trace = problem.getStackTrace();
-    Frame[] frames = new Frame[Math.min(trace.length, MAX_FRAMES)];
-    for (int i = 0; i < frames.length; i++) {
-      StackTraceElement element = trace[i];
-      frames[i] =
-          new Frame(element.getClassName(), element.getMethodName(), element.getLineNumber());
-    }
+    Frame[] frames = framesFor(problem.getStackTrace());
     return new CrashReport(
         appVersion,
         appBuild,
@@ -291,7 +295,18 @@ public final class CrashReportSpooler {
         UUID.randomUUID().toString().replace("-", ""));
   }
 
-  private StrictModeReport strictModeReportFor(String violationClass, int violationCount) {
+  private static Frame[] framesFor(StackTraceElement[] trace) {
+    Frame[] frames = new Frame[Math.min(trace.length, MAX_FRAMES)];
+    for (int i = 0; i < frames.length; i++) {
+      StackTraceElement element = trace[i];
+      frames[i] =
+          new Frame(element.getClassName(), element.getMethodName(), element.getLineNumber());
+    }
+    return frames;
+  }
+
+  private StrictModeReport strictModeReportFor(
+      String violationClass, int violationCount, StackTraceElement[] capturedStack) {
     return new StrictModeReport(
         appVersion,
         appBuild,
@@ -308,6 +323,7 @@ public final class CrashReportSpooler {
         memoryBucket(),
         sanitizeViolationClass(violationClass),
         clamp(violationCount, 1, 1000),
+        capturedStack == null ? null : framesFor(capturedStack),
         UUID.randomUUID().toString().replace("-", ""));
   }
 
@@ -500,6 +516,7 @@ public final class CrashReportSpooler {
     private final String memory_bucket;
     private final String violation_class;
     private final int violation_count;
+    private final Frame[] stack_frames;
     private final String report_nonce;
 
     private StrictModeReport(
@@ -518,6 +535,7 @@ public final class CrashReportSpooler {
         String memoryBucket,
         String violationClass,
         int violationCount,
+        Frame[] stackFrames,
         String nonce) {
       this.app_version = appVersion;
       this.app_build = Integer.toString(appBuild);
@@ -534,6 +552,7 @@ public final class CrashReportSpooler {
       this.memory_bucket = memoryBucket;
       this.violation_class = violationClass;
       this.violation_count = violationCount;
+      this.stack_frames = stackFrames;
       this.report_nonce = nonce;
     }
   }

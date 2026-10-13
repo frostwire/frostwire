@@ -78,6 +78,42 @@ class CrashReportSpoolerReportTypesTest {
   }
 
   @Test
+  void strictmodeReportPreservesCapturedEdtStack() {
+    File spoolDir = new File(tempDir.toFile(), "edt-stack");
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    StackTraceElement[] captured = {
+      new StackTraceElement("java.lang.Object", "wait0", "Object.java", -2),
+      new StackTraceElement("com.frostwire.Example", "blockingCall", "Example.java", 42),
+      new StackTraceElement("java.awt.EventDispatchThread", "run", "EventDispatchThread.java", -1)
+    };
+
+    spooler.spoolStrictMode("java.awt.event.FocusEvent#1004", 1, captured);
+
+    var frames = spooledJson(spoolDir.toPath()).getAsJsonArray("stack_frames");
+    assertEquals(3, frames.size());
+    assertEquals("java.lang.Object", frames.get(0).getAsJsonObject().get("class").getAsString());
+    assertEquals(-2, frames.get(0).getAsJsonObject().get("line").getAsInt());
+    assertEquals("blockingCall", frames.get(1).getAsJsonObject().get("method").getAsString());
+    assertEquals(42, frames.get(1).getAsJsonObject().get("line").getAsInt());
+    assertEquals(-1, frames.get(2).getAsJsonObject().get("line").getAsInt());
+    for (var frame : frames) {
+      assertEquals(Set.of("class", "method", "line"), frame.getAsJsonObject().keySet());
+    }
+  }
+
+  @Test
+  void strictmodeStackUsesExistingFrameLimit() {
+    File spoolDir = new File(tempDir.toFile(), "long-stack");
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    StackTraceElement[] captured = new StackTraceElement[100];
+    Arrays.fill(captured, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
+
+    spooler.spoolStrictMode("java.awt.event.FocusEvent#1004", 1, captured);
+
+    assertEquals(64, spooledJson(spoolDir.toPath()).getAsJsonArray("stack_frames").size());
+  }
+
+  @Test
   void watchdogReportHasRequiredFieldsAndValidEnums() {
     File spoolDir = new File(tempDir.toFile(), "watchdog");
     CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.0.4", 331);
