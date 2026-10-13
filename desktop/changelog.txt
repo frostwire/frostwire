@@ -1,4 +1,4 @@
-FrostWire 7.1.1 UNRELEASED
+FrostWire 7.1.0 UNRELEASED
    - fix:Anonymous UI freeze reports now include the captured EDT stack so blocking operations can be diagnosed, instead of reporting only the event name
    - fix:The Transfers list no longer crashes the app when the background task pool is busy — the once-a-second check for clearable downloads is now coalesced to one scan at a time and skipped for a tick if the pool is full, instead of throwing into the UI thread
    - fix:Opening a file or folder from FrostWire no longer reports a crash when the file was moved or deleted since you clicked it, or when the system denies access — the failure is handled in the background instead of escaping as an IllegalArgumentException

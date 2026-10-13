@@ -80,7 +80,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeReportPreservesCapturedEdtStack() {
     File spoolDir = new File(tempDir.toFile(), "edt-stack");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.0", 333);
     StackTraceElement[] captured = {
       new StackTraceElement("java.lang.Object", "wait0", "Object.java", -2),
       new StackTraceElement("com.frostwire.Example", "blockingCall", "Example.java", 42),
@@ -104,7 +104,7 @@ class CrashReportSpoolerReportTypesTest {
   @Test
   void strictmodeStackUsesExistingFrameLimit() {
     File spoolDir = new File(tempDir.toFile(), "long-stack");
-    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
+    CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.0", 333);
     StackTraceElement[] captured = new StackTraceElement[100];
     Arrays.fill(captured, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
 
