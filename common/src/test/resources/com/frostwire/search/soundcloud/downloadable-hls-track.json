@@ -1,0 +1,43 @@
+{
+  "id": 1,
+  "title": "Sanitized downloadable track",
+  "permalink": "sanitized-downloadable-track",
+  "permalink_url": "https://soundcloud.com/example/sanitized-downloadable-track",
+  "duration": 256987,
+  "created_at": "2026-09-29T18:46:56Z",
+  "downloadable": true,
+  "track_authorization": "sanitized-authorization",
+  "media": {
+    "transcodings": [
+      {
+        "url": "https://api-v2.soundcloud.com/media/sanitized/0",
+        "preset": "aac_160k",
+        "duration": 256987,
+        "snipped": false,
+        "format": {"protocol": "hls", "mime_type": "audio/mp4; codecs=\"mp4a.40.2\""},
+        "quality": "sq",
+        "is_legacy_transcoding": false
+      },
+      {
+        "url": "https://api-v2.soundcloud.com/media/sanitized/1",
+        "preset": "aac_96k",
+        "duration": 256987,
+        "snipped": false,
+        "format": {"protocol": "hls", "mime_type": "audio/mp4; codecs=\"mp4a.40.2\""},
+        "quality": "lq",
+        "is_legacy_transcoding": false
+      },
+      {
+        "url": "https://api-v2.soundcloud.com/media/sanitized/2",
+        "preset": "abr_sq",
+        "duration": 256987,
+        "snipped": false,
+        "format": {"protocol": "hls", "mime_type": "audio/mpegurl"},
+        "quality": "sq",
+        "is_legacy_transcoding": false
+      }
+    ]
+  },
+  "user": {"username": "Sanitized artist", "avatar_url": null},
+  "artwork_url": null
+}

@@ -20,9 +20,12 @@ package com.frostwire.transfers;
 
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.http.HttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -86,9 +89,21 @@ public class SoundcloudDownload extends HttpDownload {
     }
 
     @Override
+    protected void save(HttpClient client, String url, File temp, boolean resume, Map<String, String> httpHeaders) throws IOException {
+        if (sr.isHls()) {
+            HlsAudioDownloader.save(client, url, temp);
+        } else {
+            super.save(client, url, temp, resume, httpHeaders);
+        }
+    }
+
+    @Override
     protected void onFinishing() {
         LOG.info("SoundcloudDownload.onFinishing() BEGIN for: " + getDisplayName() + " tempPath=" + tempPath);
-        downloadAndUpdateCoverArt(sr, tempPath);
+        // The HLS path produces AAC in an M4A container, not an MP3 with ID3 tags.
+        if (!sr.isHls()) {
+            downloadAndUpdateCoverArt(sr, tempPath);
+        }
         LOG.info("SoundcloudDownload.onFinishing() calling super.onFinishing() for: " + getDisplayName());
         super.onFinishing();
         LOG.info("SoundcloudDownload.onFinishing() END for: " + getDisplayName());

@@ -23,11 +23,13 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
@@ -248,7 +250,7 @@ public abstract class BaseHttpDownload implements Transfer {
                         TransferState oldState = state;
                         state = TransferState.DOWNLOADING;
                         notifyStateChanged(oldState, TransferState.DOWNLOADING);
-                        client.save(url, temp, resumeAttempt, httpHeaders);
+                        save(client, url, temp, resumeAttempt, httpHeaders);
                         return; // success
                     } catch (SocketException e) {
                         if (complete || client.isCanceled()) {
@@ -259,7 +261,7 @@ public abstract class BaseHttpDownload implements Transfer {
                             attempt++;
                             long delayMs = (1L << attempt) * 1000; // 2s, 4s, 8s
                             LOG.warn("Connection reset on download attempt " + attempt + "/" + MAX_RETRIES_ON_CONNECTION_RESET
-                                    + ", resuming in " + (delayMs / 1000) + "s — " + url);
+                                    + ", resuming in " + (delayMs / 1000) + "s — " + UrlUtils.logAddress(url));
                             try {
                                 Thread.sleep(delayMs);
                             } catch (InterruptedException ie) {
@@ -279,6 +281,11 @@ public abstract class BaseHttpDownload implements Transfer {
                 }
             }
         });
+    }
+
+    /** Performs the download on the worker, preserving the client's transfer listener. */
+    protected void save(HttpClient client, String url, File temp, boolean resume, Map<String, String> httpHeaders) throws IOException {
+        client.save(url, temp, resume, httpHeaders);
     }
 
     protected final void complete(TransferState newState) {
@@ -475,7 +482,7 @@ public abstract class BaseHttpDownload implements Transfer {
 
         @Override
         public String toString() {
-            return "{BaseHttpDownload.Info@" + hashCode() + " url=" + url + " filename=" + filename + " displayname=" + displayName + " size=" + size + "}";
+            return "{BaseHttpDownload.Info@" + hashCode() + " url=" + UrlUtils.logAddress(url) + " filename=" + filename + " displayname=" + displayName + " size=" + size + "}";
         }
     }
 

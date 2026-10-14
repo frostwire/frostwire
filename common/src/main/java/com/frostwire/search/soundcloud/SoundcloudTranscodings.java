@@ -24,4 +24,5 @@ public class SoundcloudTranscodings {
     public int duration;
     public SoundcloudFormat format;
     public String quality;
+    public boolean snipped;
 }

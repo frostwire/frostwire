@@ -130,6 +130,7 @@ public final class Ssl {
                 "pirate-bay.info",
                 "piratebay.live",
                 "pirateproxylive.org",
+                "playback.media-streaming.soundcloud.cloud",
                 "scontent.cdninstagram.com",
                 "sndcdn.com",
                 "sndcdn.com",

@@ -264,7 +264,7 @@ class SoundcloudDynamicCredentialsTest {
                 LOG.info("\tDetailsUrl: " + sr.getDetailsUrl());
                 LOG.info("\tFilename: " + sr.getFilename());
                 LOG.info("\tHash: " + sr.getHash());
-                LOG.info("\tDownloadUrl: " + sr.getDownloadUrl());
+                LOG.info("\tDownloadUrl resolved: " + (sr.getDownloadUrl() != null));
                 LOG.info("\tUsername: " + sr.getUsername());
                 LOG.info("\tSize: " + sr.getSize());
 

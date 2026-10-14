@@ -123,6 +123,14 @@ public class SslTest {
     }
     
     @Test
+    void soundcloudPlaybackHostIsKnownWithoutTrustingLookalikeDomains() {
+        HostnameVerifier verifier = Ssl.fwHostnameVerifier();
+        assertTrue(verifier.verify("playback.media-streaming.soundcloud.cloud", null));
+        assertFalse(verifier.verify("playback.media-streaming.soundcloud.cloud.evil.example", null));
+        assertFalse(verifier.verify("untrusted.soundcloud.cloud", null));
+    }
+
+    @Test
     public void testBasicHostnameVerification() {
         HostnameVerifier verifier = Ssl.fwHostnameVerifier();
         

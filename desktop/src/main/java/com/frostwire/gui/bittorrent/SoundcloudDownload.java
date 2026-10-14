@@ -21,6 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.util.PlaybackUtil;
 import com.frostwire.mp3.*;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.transfers.HlsAudioDownloader;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
@@ -50,7 +51,7 @@ public class SoundcloudDownload extends HttpBTDownload {
         super(sr.getFilename(), sr.getSize());
         this.sr = sr;
         String filename = sr.getFilename();
-        tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), "mp3");
+        tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), FilenameUtils.getExtension(filename));
         start();
     }
 
@@ -97,10 +98,13 @@ public class SoundcloudDownload extends HttpBTDownload {
             String downloadUrl = null;
             try {
                 downloadUrl = sr.getDownloadUrl();
-                httpClient.save(downloadUrl, temp, false);
+                if (sr.isHls()) {
+                    HlsAudioDownloader.save(httpClient, downloadUrl, temp);
+                } else {
+                    httpClient.save(downloadUrl, temp, false);
+                }
             } catch (Throwable e) {
-                System.err.println("URL at issue: [" + downloadUrl + "]");
-                LOG.error(e.toString(), e);
+                LOG.error("SoundCloud audio download failed", e);
                 httpClientListener.onError(httpClient, e);
             }
         });
@@ -117,6 +121,9 @@ public class SoundcloudDownload extends HttpBTDownload {
     }
 
     private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
+        if (sr.isHls()) {
+            return false; // AAC/M4A cannot be tagged by the MP3 ID3 writer.
+        }
         try {
             byte[] imageBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(sr.getThumbnailUrl());
             return prepareMP3File(mp3Filename, mp3outputFilename, imageBytes, sr);

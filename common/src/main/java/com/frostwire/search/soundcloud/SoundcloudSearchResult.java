@@ -18,7 +18,13 @@
 
 package com.frostwire.search.soundcloud;
 
-import com.frostwire.mp3.*;
+import com.frostwire.mp3.ID3Wrapper;
+import com.frostwire.mp3.ID3v1Tag;
+import com.frostwire.mp3.ID3v23Tag;
+import com.frostwire.mp3.InvalidDataException;
+import com.frostwire.mp3.Mp3File;
+import com.frostwire.mp3.NotSupportedException;
+import com.frostwire.mp3.UnsupportedTagException;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
@@ -27,9 +33,11 @@ import com.frostwire.util.DateParser;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 
 
 /**
@@ -45,16 +53,30 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final String source;
     private final String thumbnailUrl;
     private final long date;
-    private final String downloadUrl;
-    private final String progressiveFormatJSONFetcherURL;
+    private volatile String downloadUrl;
+    private final String transcodingResolverUrl;
+    private final boolean hls;
+    private final HttpClient client;
+    private final BooleanSupplier uiThread;
     private final long size;
     private final String hash;
 
     public SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
+        this(item, clientId, appVersion,
+                HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD),
+                () -> Platforms.get().isUIThread());
+    }
+
+    SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion,
+                           HttpClient client, BooleanSupplier uiThread) {
+        this.client = client;
+        this.uiThread = uiThread;
+        SoundcloudTranscodings transcoding = item.downloadable ? item.getSupportedTranscoding() : null;
+        this.hls = transcoding != null && "hls".equals(transcoding.format.protocol);
         this.displayName = item.title;
         this.username = buildUsername(item);
         this.trackUrl = item.permalink_url;
-        this.filename = item.permalink + "-soundcloud.mp3";
+        this.filename = item.permalink + "-soundcloud." + (hls ? "m4a" : "mp3");
         this.size = buildSize(item);
         this.source = buildSource(item);
         String userAvatarUrl = null;
@@ -63,13 +85,18 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         }
         this.thumbnailUrl = buildThumbnailUrl(item.artwork_url != null ? item.artwork_url : userAvatarUrl);
         this.date = buildDate(item.created_at);
-        if (null != item.getProgressiveFormatJSONFetcherURL()) {
-            this.progressiveFormatJSONFetcherURL = item.getProgressiveFormatJSONFetcherURL() + "?client_id=" + clientId + "&app_version=" + appVersion;
-        } else {
-            this.progressiveFormatJSONFetcherURL = null;
-        }
+        this.transcodingResolverUrl = transcoding == null ? null
+                : transcoding.url + (transcoding.url.contains("?") ? "&" : "?")
+                + "client_id=" + UrlUtils.encode(clientId)
+                + "&app_version=" + UrlUtils.encode(appVersion)
+                + (item.track_authorization == null ? ""
+                : "&track_authorization=" + UrlUtils.encode(item.track_authorization));
         this.hash = Long.toHexString(item.id * 953 * 631);
-        this.downloadUrl = null;
+    }
+
+    /** Returns whether the selected download is an AAC fMP4 HLS playlist, not a direct MP3. */
+    public boolean isHls() {
+        return hls;
     }
 
     public boolean fetchedDownloadUrl() {
@@ -118,57 +145,53 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         return username;
     }
 
+    /**
+     * Resolves and caches the direct MP3 URL or AAC HLS playlist URL; does not download audio.
+     * An unresolved URL must be requested off the UI thread. Resolution failures return null.
+     */
     @Override
     public String getDownloadUrl() {
-        if (progressiveFormatJSONFetcherURL == null) {
-            LOG.warn("getDownloadUrl(): progressiveFormatJSONFetcherURL is null");
+        if (transcodingResolverUrl == null) {
+            LOG.warn("getDownloadUrl(): no supported downloadable transcoding");
             return null;
         }
         if (downloadUrl != null) {
             return downloadUrl;
         }
 
-        if (Platforms.get().isUIThread()) {
-            StackTraceElement[] stackTrace = new Exception().getStackTrace();
-            int maxStackShow = 10;
-            for (StackTraceElement e : stackTrace) {
-                System.out.println(e.toString());
-                if (--maxStackShow == 0) {
-                    break;
-                }
-            }
+        if (uiThread.getAsBoolean()) {
             throw new RuntimeException("SoundcloudSearchResult.getDownloadUrl(): Do not invoke getDownloadUrl() from the main thread if downloadUrl is null");
         }
 
-        HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         String json;
         try {
-            json = client.get(progressiveFormatJSONFetcherURL);
-        } catch (Throwable t) {
-            LOG.error("getDownloadUrl(): HTTP request failed for " + progressiveFormatJSONFetcherURL, t);
+            json = client.get(transcodingResolverUrl);
+        } catch (IOException | RuntimeException e) {
+            // HTTP exceptions may include the signed request URL; do not log them.
+            LOG.error("getDownloadUrl(): transcoding resolver request failed");
             return null;
         }
         if (json == null || json.isEmpty()) {
-            LOG.error("getDownloadUrl(): empty response from " + progressiveFormatJSONFetcherURL);
+            LOG.error("getDownloadUrl(): empty transcoding resolver response");
             return null;
         }
-        LOG.info("getDownloadUrl(): response for " + displayName + ": " + json);
         SoundcloudTrackURL soundcloudTrackURL;
         try {
             soundcloudTrackURL = JsonUtils.toObject(json, SoundcloudTrackURL.class);
-        } catch (Throwable t) {
-            LOG.error("getDownloadUrl(): failed to parse JSON for " + displayName + ": " + json, t);
+        } catch (RuntimeException e) {
+            LOG.error("getDownloadUrl(): invalid transcoding resolver response");
             return null;
         }
         if (soundcloudTrackURL == null) {
-            LOG.error("getDownloadUrl(): SoundcloudTrackURL parsed as null for " + displayName + ", json: " + json);
+            LOG.error("getDownloadUrl(): missing transcoding resolver response");
             return null;
         }
-        if (soundcloudTrackURL.url == null) {
-            LOG.error("getDownloadUrl(): SoundcloudTrackURL.url is null for " + displayName + ", json: " + json);
+        if (soundcloudTrackURL.url == null || soundcloudTrackURL.url.trim().isEmpty()) {
+            LOG.error("getDownloadUrl(): missing resolved transcoding URL");
             return null;
         }
-        return soundcloudTrackURL.url;
+        downloadUrl = soundcloudTrackURL.url;
+        return downloadUrl;
     }
 
     private String buildUsername(SoundcloudItem item) {
@@ -211,20 +234,6 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     private long buildDate(String str) {
         return DateParser.parseTorrentDate(str);
-    }
-
-    private String buildDownloadUrl(SoundcloudItem item, String clientId, String appVersion) {
-        final String clientAppenderChar = (item.download_url != null && item.download_url.contains("?")) ? "&" : "?";
-        String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url);
-        //http://api.soundcloud.com/tracks/#########/download no longer works, has to be /stream now.
-        if (downloadUrl.endsWith("/download")) {
-            downloadUrl = downloadUrl.replace("/download", "/stream");
-        }
-        // direct download urls don't seem to need client_id & app_version, if passed to the url returns HTTP 404.
-        if (clientId != null && appVersion != null) {
-            downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
-        }
-        return downloadUrl;
     }
 
     @Override

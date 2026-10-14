@@ -1,4 +1,5 @@
 FrostWire 7.1.1 OCT/14/2026
+   - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
    - fix:Focusing the search box no longer freezes the Linux UI while waiting for the system clipboard; automatic clipboard reads run in the background and stale results are discarded
    - fix:Opening or refreshing media-type library views no longer crashes when a background scan adds files while the view reads its cache
    - fix:Anonymous UI freeze reports now include the captured EDT stack so blocking operations can be diagnosed, instead of reporting only the event name

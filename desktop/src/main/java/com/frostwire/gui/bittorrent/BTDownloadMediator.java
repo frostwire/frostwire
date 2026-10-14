@@ -1048,11 +1048,8 @@ public final class BTDownloadMediator
     if (sr != null) {
       DesktopParallelExecutor.execute(
           () -> {
-            System.out.println(
-                "BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult about to get download url");
+            LOG.debug("Resolving SoundCloud audio URL");
             final String downloadUrl = sr.getDownloadUrl();
-            System.out.println(
-                "BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult: " + downloadUrl);
             GUIMediator.safeInvokeLater(
                 () -> {
                   if (isDownloading(downloadUrl)) {

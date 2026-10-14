@@ -99,7 +99,7 @@ public class SoundcloudSearchPatternTest {
                 LOG.info("\t DetailsUrl: " + sr.getDetailsUrl());
                 LOG.info("\t Filename: " + sr.getFilename());
                 LOG.info("\t Hash: " + sr.getHash());
-                LOG.info("\t DownloadUrl: " + sr.getDownloadUrl());
+                LOG.info("\t DownloadUrl resolved: " + (sr.getDownloadUrl() != null));
                 LOG.info("\t Username: " + sr.getUsername());
                 LOG.info("\t Size: " + sr.getSize());
 
