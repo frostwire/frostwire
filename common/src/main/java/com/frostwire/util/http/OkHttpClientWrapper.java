@@ -165,7 +165,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             Response response = getSyncResponse(client, builder);
             int code = response.code();
             if (code < 200 || code >= 300) {
-                LOG.warn("OkHttpClientWrapper::getBytes - HTTP " + code + " for " + url);
+                LOG.warn("OkHttpClientWrapper::getBytes - HTTP " + code + " for " + UrlUtils.logAddress(url));
                 closeQuietly(response.body());
                 return null;
             }
@@ -173,7 +173,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             if (responseBody != null) {
                 long contentLength = responseBody.contentLength();
                 if (contentLength > MAX_BYTES_RESPONSE_BYTES) {
-                    LOG.warn("OkHttpClientWrapper::getBytes - response too large (" + contentLength + " bytes) for " + url);
+                    LOG.warn("OkHttpClientWrapper::getBytes - response too large (" + contentLength + " bytes) for " + UrlUtils.logAddress(url));
                     closeQuietly(responseBody);
                     return null;
                 }
@@ -204,7 +204,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             Response response = getSyncResponse(client, builder);
             int code = response.code();
             if (code < 200 || code >= 300) {
-                LOG.warn("OkHttpClientWrapper::get - HTTP " + code + " for " + url);
+                LOG.warn("OkHttpClientWrapper::get - HTTP " + code + " for " + UrlUtils.logAddress(url));
                 closeQuietly(response.body());
                 return null;
             }
@@ -212,7 +212,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             if (responseBody != null) {
                 long contentLength = responseBody.contentLength();
                 if (contentLength > MAX_STRING_RESPONSE_BYTES) {
-                    LOG.warn("OkHttpClientWrapper::get - response too large (" + contentLength + " bytes) for " + url);
+                    LOG.warn("OkHttpClientWrapper::get - response too large (" + contentLength + " bytes) for " + UrlUtils.logAddress(url));
                     closeQuietly(responseBody);
                     return null;
                 }
@@ -255,18 +255,18 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         long totalBytesWritten = 0;
         try {
             response = getSyncResponse(client, builder);
-            LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + url);
+            LOG.info("OkHttpClientWrapper::save - HTTP " + response.code() + " " + response.message() + " url=" + UrlUtils.logAddress(url));
             if (!response.isSuccessful()) {
                 if (!resume) {
                     closeQuietly(bos);
                     closeQuietly(fos);
                     file.delete(); // remove the 0-byte file created by FileOutputStream before the request
                 }
-                throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + url);
+                throw new IOException("HTTP " + response.code() + " " + response.message() + " url=" + UrlUtils.logAddress(url));
             }
             if (rangeStart >= 0 && response.code() != HttpURLConnection.HTTP_PARTIAL) {
                 throw new RangeNotSupportedException(
-                        "Server ignored bytes range request for " + url);
+                        "Server ignored bytes range request for " + UrlUtils.logAddress(url));
             }
             if (rangeStart >= 0) {
                 long responseRangeStart = contentRangeStart(response.header("Content-Range"));
@@ -278,7 +278,7 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
             onHeaders(headers);
             ResponseBody responseBody = response.body();
             if (responseBody == null) {
-                throw new IOException("Empty HTTP response body for " + url);
+                throw new IOException("Empty HTTP response body for " + UrlUtils.logAddress(url));
             }
             final InputStream in = responseBody.byteStream();
             byte[] b = new byte[32768]; // 32 KiB buffer

@@ -88,6 +88,21 @@ public final class UrlUtils {
         return "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
     }
 
+    /** Request address for diagnostics, excluding query, fragment, and user credentials. */
+    public static String logAddress(String url) {
+        try {
+            URI uri = new URI(url);
+            if (uri.getScheme() == null || uri.getHost() == null) {
+                return "<invalid-url>";
+            }
+            return uri.getScheme() + "://" + uri.getHost()
+                    + (uri.getPort() == -1 ? "" : ":" + uri.getPort())
+                    + (uri.getRawPath() == null ? "" : uri.getRawPath());
+        } catch (URISyntaxException | NullPointerException e) {
+            return "<invalid-url>";
+        }
+    }
+
     /**
      * Magnet with explicit peer endpoints ({@code &x.pe=host:port}, BEP 9
      * peer-address parameter) so the torrent can be fetched directly from
