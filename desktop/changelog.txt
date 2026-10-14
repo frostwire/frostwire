@@ -1,4 +1,5 @@
 FrostWire 7.1.0 OCT/13/2026
+   - fix:Focusing the search box no longer freezes the Linux UI while waiting for the system clipboard; automatic clipboard reads run in the background and stale results are discarded
    - fix:Opening or refreshing media-type library views no longer crashes when a background scan adds files while the view reads its cache
    - fix:Anonymous UI freeze reports now include the captured EDT stack so blocking operations can be diagnosed, instead of reporting only the event name
    - fix:The Transfers list no longer crashes the app when the background task pool is busy — the once-a-second check for clearable downloads is now coalesced to one scan at a time and skipped for a tick if the pool is full, instead of throwing into the UI thread

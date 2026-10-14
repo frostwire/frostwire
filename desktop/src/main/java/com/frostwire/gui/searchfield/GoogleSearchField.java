@@ -31,6 +31,7 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.FileMenuActions;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.URLDecoder;
@@ -39,7 +40,6 @@ import org.limewire.util.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -126,17 +126,11 @@ public class GoogleSearchField extends SearchField {
                 }
             }
         });
-        cloudSearchField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
-                    return;
-                }
-                Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                String s = GUIUtils.extractStringContentFromClipboard(systemClipboard);
-                if (s == null || "".equals(s)) {
-                    return;
-                }
+        cloudSearchField.addFocusListener(new ClipboardSearchFocusListener(
+            cloudSearchField,
+            () -> SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue(),
+            () -> GUIUtils.extractStringContentFromClipboard(Toolkit.getDefaultToolkit().getSystemClipboard()),
+            s -> {
                 if (lastClipboardSearchQuery != null && lastClipboardSearchQuery.equals(s)) {
                     return;
                 }
@@ -146,8 +140,8 @@ public class GoogleSearchField extends SearchField {
                     cloudSearchField.getActionListeners()[0].actionPerformed(null);
                     cloudSearchField.setText("");
                 }
-            }
-        });
+            },
+            DesktopParallelExecutor::execute));
     }
 
 
