@@ -22,7 +22,7 @@ package com.frostwire.android.gui.fragments;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
+import com.frostwire.android.gui.views.SafeLinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -126,7 +126,7 @@ public final class AboutFragment extends AbstractFragment {
         TextView content = findView(rootView, R.id.fragment_about_content);
         String aboutHtml = getAboutText();
         content.setText(Html.fromHtml(aboutHtml, Html.FROM_HTML_MODE_LEGACY));
-        content.setMovementMethod(LinkMovementMethod.getInstance());
+        content.setMovementMethod(SafeLinkMovementMethod.getInstance());
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             loveFrostWireButton.setVisibility(View.GONE);

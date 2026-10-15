@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
@@ -89,7 +88,7 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
         checkTOUAccept.setOnCheckedChangeListener(checkAcceptListener);
         Resources r = getResources();
         TextView tosTextView = findViewById(R.id.view_intent_wizard_page_text_tos);
-        tosTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        tosTextView.setMovementMethod(SafeLinkMovementMethod.getInstance());
         final String tou = r.getString(R.string.terms_of_use);
         String tosHtml = "<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>";
         tosTextView.setText(Html.fromHtml(tosHtml, Html.FROM_HTML_MODE_LEGACY));
