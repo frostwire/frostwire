@@ -445,7 +445,7 @@ public final class IceBridgeUrlHandler {
             .timestamp(timestamp)
             .signature(new byte[64])
             .build();
-    Signature signer = Signature.getInstance("Ed25519");
+    Signature signer = IdentityKeys.softwareSignature("Ed25519");
     signer.initSign(identity.ed25519().getPrivate());
     signer.update(unsigned.canonicalBytes());
     byte[] sig = signer.sign();
