@@ -106,6 +106,30 @@ class IceBridgeClientTest {
   }
 
   @Test
+  void healthQuiet_healthyServer_returnsTrue() {
+    assertTrue(client.healthQuiet(5_000));
+  }
+
+  @Test
+  void healthQuiet_zeroBudget_returnsFalseWithoutCalling() {
+    assertFalse(client.healthQuiet(0));
+  }
+
+  @Test
+  void healthQuiet_deadPort_returnsFalseWithoutThrowing() throws Exception {
+    try (IceBridgeClient dead = new IceBridgeClient(freePort())) {
+      assertFalse(dead.healthQuiet(500));
+    }
+  }
+
+  @Test
+  void rudpPortQuiet_deadPort_returnsZeroWithoutThrowing() throws Exception {
+    try (IceBridgeClient dead = new IceBridgeClient(freePort())) {
+      assertEquals(0, dead.rudpPortQuiet(500));
+    }
+  }
+
+  @Test
   void remoteControlRequiresTls() {
     assertThrows(
         IllegalArgumentException.class, () -> new IceBridgeClient("http://192.0.2.1:8080"));
