@@ -40,12 +40,13 @@ import java.util.Set;
  */
 public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
     private final MediaType type;
-    private Set<File> cache;
+    /** Immutable snapshot, replaced wholesale so EDT clears never race worker reads. */
+    private volatile Set<File> cache;
 
     public SavedFilesDirectoryHolder(FileSetting saveDir, String name) {
         super(saveDir, name);
         type = MediaType.getAnyTypeMediaType();
-        cache = new HashSet<>();
+        cache = Collections.emptySet();
     }
 
     public Icon getIcon() {
@@ -83,18 +84,14 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
     }
 
     public void clearCache() {
-        if (cache != null) {
-            cache.clear();
-        }
+        cache = Collections.emptySet();
     }
 
     @Override
     public File[] getFiles() {
-        if (EventQueue.isDispatchThread()) {
-            return cache != null && cache.size() > 0 ? cache.toArray(new File[0]) : new File[0];
-        }
-        if (cache != null && cache.size() > 0) {
-            return cache.toArray(new File[0]);
+        Set<File> snapshot = cache;
+        if (EventQueue.isDispatchThread() || !snapshot.isEmpty()) {
+            return snapshot.toArray(new File[0]);
         }
         _hideFiles = TorrentUtil.getIgnorableFiles();
         Set<File> directoriesToNotInclude = LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue();
@@ -103,8 +100,8 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
         for (File directory : directoriesToInclude) {
             files.addAll(getFilesRecursively(directory, directoriesToNotInclude));
         }
-        cache = new HashSet<>(files);
-        return cache.toArray(new File[0]);
+        cache = Collections.unmodifiableSet(files);
+        return files.toArray(new File[0]);
     }
 
     public Collection<File> getCache() {
