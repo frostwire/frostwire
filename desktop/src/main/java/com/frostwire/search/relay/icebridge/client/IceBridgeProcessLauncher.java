@@ -336,6 +336,7 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
     if (Thread.currentThread().isInterrupted()) {
       throw new InterruptedException();
     }
+    int attempts = 0;
     while (isAlive()) {
       if (Thread.currentThread().isInterrupted()) {
         throw new InterruptedException();
@@ -345,10 +346,10 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
         return false;
       }
       IceBridgeClient currentClient = client;
-      if (currentClient != null && currentClient.health(remainingMs)) {
+      if (currentClient != null && currentClient.healthQuiet(remainingMs)) {
         if (rudpPort == 0) {
           long portBudgetMs = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
-          int boundPort = currentClient.rudpPort(portBudgetMs);
+          int boundPort = currentClient.rudpPortQuiet(portBudgetMs);
           if (boundPort > 0) {
             // Keep the first bound port across supervised child restarts so the
             // parent's signed announcements never refer to a superseded endpoint.
@@ -363,7 +364,11 @@ public final class IceBridgeProcessLauncher implements AutoCloseable {
       if (remainingNanos <= 0) {
         return false;
       }
-      TimeUnit.NANOSECONDS.sleep(Math.min(TimeUnit.MILLISECONDS.toNanos(100), remainingNanos));
+      // Back off while the child JVM boots: connection refused is expected,
+      // so poll less often the longer startup takes (100ms -> 250ms -> 500ms).
+      attempts++;
+      long sleepMs = attempts < 4 ? 100 : attempts < 10 ? 250 : 500;
+      TimeUnit.NANOSECONDS.sleep(Math.min(TimeUnit.MILLISECONDS.toNanos(sleepMs), remainingNanos));
     }
     return false;
   }
