@@ -67,6 +67,31 @@ class KarmaChainEntryTest {
     }
 
     @Test
+    void createEpochCommitmentSoftwareKeySignsAndVerifies() throws Exception {
+        IdentityKeys softwareIdentity = IdentityKeys.generate(0);
+        byte[] softwarePub = softwareIdentity.ed25519PubRaw();
+        KarmaChainEntry entry = KarmaChainEntry.createEpochCommitment(
+                KarmaChainEntry.GENESIS_PREV_HASH, 0, softwarePub, block, 5.0,
+                softwareIdentity.ed25519().getPrivate());
+        assertTrue(entry.verifySignature(),
+                "Software (BC-backed) key must sign without InvalidKeyException");
+    }
+
+    @Test
+    void createEndorsementSoftwareKeySignsAndVerifies() throws Exception {
+        IdentityKeys softwareIdentity = IdentityKeys.generate(0);
+        byte[] softwarePub = softwareIdentity.ed25519PubRaw();
+        byte[] peerPub = new byte[32];
+        peerPub[0] = 0x42;
+        byte[] infoHash = new byte[20];
+        KarmaChainEntry entry = KarmaChainEntry.createEndorsement(
+                KarmaChainEntry.GENESIS_PREV_HASH, 1, softwarePub, block,
+                peerPub, infoHash, 1, softwareIdentity.ed25519().getPrivate());
+        assertTrue(entry.verifySignature(),
+                "Software (BC-backed) key must sign without InvalidKeyException");
+    }
+
+    @Test
     void canonicalBytesAreStableAndDeterministic() {
         KarmaChainEntry e1 = KarmaChainEntry.createEpochCommitment(
                 KarmaChainEntry.GENESIS_PREV_HASH, 0, pubRaw, block, 5.0,
