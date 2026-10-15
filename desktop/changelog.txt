@@ -3,6 +3,7 @@ FrostWire 7.1.1 OCT/15/2026
    - fix:Focusing the search box no longer freezes the Linux UI while waiting for the system clipboard; automatic clipboard reads run in the background and stale results are discarded
    - fix:Opening or refreshing media-type library views no longer crashes when a background scan adds files while the view reads its cache
    - fix:Opening or refreshing the Torrent Data library view no longer crashes when its cache is cleared while a background scan or search reads it
+   - fix:Launching FrostWire without a graphical session (e.g. as a Windows service or in a headless JVM) exits with a message instead of reporting a crash
    - fix:Completed downloads count toward peer trust again — karma endorsements are signed with the same software key provider used everywhere else instead of being discarded
    - fix:Starting distributed search no longer spams the log with connection warnings while the local relay server boots — readiness is polled quietly with backoff
    - fix:Promo slideshows are parsed through the slide constructor instead of reflective final-field access, keeping them working on future Java releases

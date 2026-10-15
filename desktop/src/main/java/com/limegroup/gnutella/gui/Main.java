@@ -96,6 +96,12 @@ public class Main {
      * @param args the array of command line arguments
      */
     public static void main(String[] args) {
+        // No display (Windows service/session 0, headless JVM, no X server): the GUI cannot start,
+        // so exit with a message instead of a HeadlessException crash report.
+        if (GraphicsEnvironment.isHeadless()) {
+            System.err.println("FrostWire requires a graphical desktop session; no display is available. Exiting.");
+            System.exit(1);
+        }
         System.setProperty("sun.awt.noerasebackground", "true");
         // On Linux/KDE, set the AWT application class name to "FrostWire" so that
         // KDE Plasma shows "FrostWire" instead of "JavaEmbeddedFrame" in the system tray.
