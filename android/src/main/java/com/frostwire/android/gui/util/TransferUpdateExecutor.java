@@ -1,5 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *     Created by Angel Leon (@gubatron),
  *  *            Marcelina Knitter (@marcelinkaaa)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
