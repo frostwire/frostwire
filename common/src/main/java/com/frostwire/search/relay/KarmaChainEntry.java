@@ -12,7 +12,6 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -474,7 +473,7 @@ public final class KarmaChainEntry {
 
     private static byte[] sign(byte[] data, PrivateKey key) {
         try {
-            Signature signer = Signature.getInstance("Ed25519");
+            Signature signer = IdentityKeys.softwareSignature("Ed25519");
             signer.initSign(key);
             signer.update(data);
             return signer.sign();
@@ -493,7 +492,7 @@ public final class KarmaChainEntry {
         byte[] encoded = new byte[prefix.length + raw.length];
         System.arraycopy(prefix, 0, encoded, 0, prefix.length);
         System.arraycopy(raw, 0, encoded, prefix.length, raw.length);
-        return KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
+        return IdentityKeys.softwareKeyFactory("Ed25519").generatePublic(new X509EncodedKeySpec(encoded));
     }
 
     private static byte[] sha256(byte[] data) {
