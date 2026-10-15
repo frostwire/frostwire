@@ -19,7 +19,6 @@
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
@@ -141,7 +140,7 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
       HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
       String jsonString = fetchSlideshowJson(client, url);
       if (jsonString != null) {
-        final SlideList slideList = JsonUtils.toObject(jsonString, SlideList.class);
+        final SlideList slideList = SlideDeserializer.parseSlideList(jsonString);
         try {
           setup(slideList.slides);
         } catch (Exception e) {
