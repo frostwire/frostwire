@@ -185,6 +185,46 @@ public final class IceBridgeClient implements AutoCloseable {
     }
 
     /**
+     * Quiet health probe for startup waits: connection refused while the child
+     * JVM boots is expected, so failures log at debug instead of warn.
+     */
+    public boolean healthQuiet(long timeoutMs) {
+        if (timeoutMs <= 0) {
+            return false;
+        }
+        try {
+            ApiResponse<?> response = getQuiet("/health", new TypeToken<ApiResponse<?>>() {
+            }, timeoutMs);
+            return response != null && response.ok;
+        } catch (Exception e) {
+            LOG.debug("IceBridgeClient.healthQuiet failed for " + baseUrl + ": " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Quiet bound-port read for startup waits: mirrors {@link #rudpPort(long)}
+     * without warn-level spam while the child is still binding.
+     */
+    public int rudpPortQuiet(long timeoutMs) {
+        if (timeoutMs <= 0) {
+            return 0;
+        }
+        try {
+            ApiResponse<com.google.gson.JsonObject> response = getQuiet("/metrics",
+                    new TypeToken<ApiResponse<com.google.gson.JsonObject>>() {}, timeoutMs);
+            if (response == null || !response.ok || response.data == null
+                    || !response.data.has("rudpPort")) {
+                return 0;
+            }
+            int port = response.data.get("rudpPort").getAsInt();
+            return port > 0 && port <= 65535 ? port : 0;
+        } catch (Exception unavailable) {
+            return 0;
+        }
+    }
+
+    /**
      * Look up recent forward-capable peers.
      *
      * @param count max peers to return
@@ -479,6 +519,30 @@ public final class IceBridgeClient implements AutoCloseable {
             }
         } catch (Exception e) {
             LOG.warn("IceBridgeClient GET " + path + " failed: " + e);
+            return null;
+        }
+    }
+
+    private <T> T getQuiet(String path, TypeToken<T> type, long timeoutMs) {
+        if (closed) {
+            return null;
+        }
+        try {
+            Request.Builder builder = new Request.Builder()
+                    .url(baseUrl + path)
+                    .get();
+            addAuthHeader(builder);
+            Call call = http.newCall(builder.build());
+            call.timeout().timeout(Math.max(1, Math.min(timeoutMs, 10_000)), TimeUnit.MILLISECONDS);
+            try (Response response = call.execute()) {
+                String body = readBody(response);
+                if (body == null) {
+                    return null;
+                }
+                return GSON.fromJson(body, type.getType());
+            }
+        } catch (Exception e) {
+            LOG.debug("IceBridgeClient GET " + path + " failed: " + e);
             return null;
         }
     }
