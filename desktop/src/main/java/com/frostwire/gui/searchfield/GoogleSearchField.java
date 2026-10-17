@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -35,10 +35,6 @@ import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.URLDecoder;
-import org.limewire.util.LCS;
-import org.limewire.util.StringUtils;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URLEncoder;
@@ -46,229 +42,242 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.*;
+import org.limewire.util.LCS;
+import org.limewire.util.StringUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class GoogleSearchField extends SearchField {
-    private static final String SUGGESTIONS_URL = buildSuggestionsUrl();
-    private static final int HTTP_QUERY_TIMEOUT = 1000;
-    private SuggestionsThread suggestionsThread;
-    public static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter target URL");
+  private static final String SUGGESTIONS_URL = buildSuggestionsUrl();
+  private static final int HTTP_QUERY_TIMEOUT = 1000;
+  private SuggestionsThread suggestionsThread;
+  public static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter target URL");
 
-    public GoogleSearchField() {
-        this.dict = createDefaultDictionary();
-        setPrompt(I18n.tr("Hints by Google"));
-        setSearchMode(SearchMode.REGULAR);
-        setBackground(UIManager.getColor("TextField.background"));
-        // Set darker text color for better readability on white backgrounds
-        setDisabledTextColor(new Color(40, 40, 40));
-        setForeground(new Color(40, 40, 40));
-        putClientProperty("promptForeground", new Color(40, 40, 40));
-        initCloudSearchField(this);
+  public GoogleSearchField() {
+    this.dict = createDefaultDictionary();
+    setPrompt(I18n.tr("Hints by Google"));
+    setSearchMode(SearchMode.REGULAR);
+    setBackground(UIManager.getColor("TextField.background"));
+    // Set darker text color for better readability on white backgrounds
+    setDisabledTextColor(new Color(40, 40, 40));
+    setForeground(new Color(40, 40, 40));
+    putClientProperty("promptForeground", new Color(40, 40, 40));
+    initCloudSearchField(this);
+  }
+
+  private static String buildSuggestionsUrl() {
+    String lang = ApplicationSettings.LANGUAGE.getValue();
+    if (StringUtils.isNullOrEmpty(lang)) {
+      lang = "en";
     }
+    return "https://clients1.google.com/complete/search?client=youtube&q=%s&hl="
+        + lang
+        + "&gl=us&gs_rn=23&gs_ri=youtube&ds=yt&cp=2&gs_id=8&callback=google.sbox.p50";
+  }
 
-    private static String buildSuggestionsUrl() {
-        String lang = ApplicationSettings.LANGUAGE.getValue();
-        if (StringUtils.isNullOrEmpty(lang)) {
-            lang = "en";
-        }
-        return "https://clients1.google.com/complete/search?client=youtube&q=%s&hl=" + lang + "&gl=us&gs_rn=23&gs_ri=youtube&ds=yt&cp=2&gs_id=8&callback=google.sbox.p50";
+  public void autoCompleteInput() {
+    String input = getText();
+    if (input != null && input.length() > 0) {
+      if (suggestionsThread != null) {
+        suggestionsThread.cancel();
+      }
+      if (getAutoComplete()) {
+        suggestionsThread = new SuggestionsThread(input, this);
+        suggestionsThread.start();
+      }
+    } else {
+      hidePopup();
     }
+  }
 
-    public void autoCompleteInput() {
-        String input = getText();
-        if (input != null && input.length() > 0) {
-            if (suggestionsThread != null) {
-                suggestionsThread.cancel();
+  @Override
+  public void setText(String t) {
+    try {
+      if (t != null) {
+        t = t.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
+      }
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
+    super.setText(t);
+  }
+
+  private static String lastClipboardSearchQuery = null;
+
+  public static void eraseLastClipboardSearchQuery() {
+    lastClipboardSearchQuery = null;
+  }
+
+  public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
+    cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
+    cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
+    Font origFont = cloudSearchField.getFont();
+    Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
+    cloudSearchField.setFont(newFont);
+    cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
+    cloudSearchField.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, cloudSearchField.getPreferredSize().height));
+    cloudSearchField.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
+              cloudSearchField.setText("");
             }
-            if (getAutoComplete()) {
-                suggestionsThread = new SuggestionsThread(input, this);
-                suggestionsThread.start();
-            }
-        } else {
-            hidePopup();
-        }
-    }
-
-    @Override
-    public void setText(String t) {
-        try {
-            if (t != null) {
-                t = t.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        super.setText(t);
-    }
-
-    private static String lastClipboardSearchQuery = null;
-
-    public static void eraseLastClipboardSearchQuery() {
-        lastClipboardSearchQuery = null;
-    }
-
-    public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
-        cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
-        cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
-        Font origFont = cloudSearchField.getFont();
-        Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
-        cloudSearchField.setFont(newFont);
-        cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
-        cloudSearchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, cloudSearchField.getPreferredSize().height));
-        cloudSearchField.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
-                    cloudSearchField.setText("");
-                }
-            }
+          }
         });
-        cloudSearchField.addFocusListener(new ClipboardSearchFocusListener(
+    cloudSearchField.addFocusListener(
+        new ClipboardSearchFocusListener(
             cloudSearchField,
             () -> SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue(),
-            () -> GUIUtils.extractStringContentFromClipboard(Toolkit.getDefaultToolkit().getSystemClipboard()),
+            () ->
+                GUIUtils.extractStringContentFromClipboard(
+                    Toolkit.getDefaultToolkit().getSystemClipboard()),
             s -> {
-                if (lastClipboardSearchQuery != null && lastClipboardSearchQuery.equals(s)) {
-                    return;
-                }
-                if (s.startsWith("http") || s.startsWith("magnet")) {
-                    cloudSearchField.setText(s);
-                    lastClipboardSearchQuery = s;
-                    cloudSearchField.getActionListeners()[0].actionPerformed(null);
-                    cloudSearchField.setText("");
-                }
+              if (lastClipboardSearchQuery != null && lastClipboardSearchQuery.equals(s)) {
+                return;
+              }
+              if (s.startsWith("http") || s.startsWith("magnet")) {
+                cloudSearchField.setText(s);
+                lastClipboardSearchQuery = s;
+                cloudSearchField.getActionListeners()[0].actionPerformed(null);
+                cloudSearchField.setText("");
+              }
             },
             DesktopParallelExecutor::execute));
+  }
+
+  protected JComponent getPopupComponent() {
+    if (entryPanel != null) return entryPanel;
+    entryPanel = new JPanel(new GridBagLayout());
+    entryPanel.setBorder(UIManager.getBorder("List.border"));
+    GridBagConstraints c = new GridBagConstraints();
+    c.fill = GridBagConstraints.BOTH;
+    c.gridwidth = GridBagConstraints.REMAINDER;
+    entryList = new AutoCompleteList();
+    JScrollPane entryScrollPane = new JScrollPane(entryList);
+    entryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    entryScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    entryPanel.add(entryScrollPane, c);
+    Font origFont = getFont();
+    Font newFont = origFont;
+    if (OSUtils.isWindows()) {
+      newFont = ThemeMediator.DIALOG_FONT.deriveFont(origFont.getSize2D());
+    }
+    entryList.setFont(newFont);
+    return entryPanel;
+  }
+
+  private static final class SuggestionsThread extends Thread {
+    private final String constraint;
+    private final GoogleSearchField input;
+    private boolean cancelled;
+
+    SuggestionsThread(String constraint, GoogleSearchField input) {
+      this.constraint = constraint;
+      this.input = input;
+      this.setName("SuggestionsThread: " + constraint);
+      this.setDaemon(true);
     }
 
-
-    protected JComponent getPopupComponent() {
-        if (entryPanel != null)
-            return entryPanel;
-        entryPanel = new JPanel(new GridBagLayout());
-        entryPanel.setBorder(UIManager.getBorder("List.border"));
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        entryList = new AutoCompleteList();
-        JScrollPane entryScrollPane = new JScrollPane(entryList);
-        entryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        entryScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        entryPanel.add(entryScrollPane, c);
-        Font origFont = getFont();
-        Font newFont = origFont;
-        if (OSUtils.isWindows()) {
-            newFont = ThemeMediator.DIALOG_FONT.deriveFont(origFont.getSize2D());
-        }
-        entryList.setFont(newFont);
-        return entryPanel;
+    boolean isCancelled() {
+      return cancelled;
     }
 
-    private static final class SuggestionsThread extends Thread {
-        private final String constraint;
-        private final GoogleSearchField input;
-        private boolean cancelled;
-
-        SuggestionsThread(String constraint, GoogleSearchField input) {
-            this.constraint = constraint;
-            this.input = input;
-            this.setName("SuggestionsThread: " + constraint);
-            this.setDaemon(true);
-        }
-
-        boolean isCancelled() {
-            return cancelled;
-        }
-
-        void cancel() {
-            cancelled = true;
-        }
-
-        public void run() {
-            try {
-                String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint, StandardCharsets.UTF_8));
-                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-                String js = httpClient.get(url, HTTP_QUERY_TIMEOUT);
-                String json = stripJs(js);
-                if (!isCancelled()) {
-                    JsonArray arr = JsonParser.parseString(json).getAsJsonArray();
-                    final List<String> suggestions = readSuggestions(arr.get(1).getAsJsonArray());
-                    GUIMediator.safeInvokeLater(() -> {
-                        Iterator<String> it = suggestions.iterator();
-                        if (it.hasNext())
-                            if (!StringUtils.isNullOrEmpty(input.getText(), true)) {
-                                input.showPopup(it);
-                            } else
-                                input.hidePopup();
-                    });
-                }
-            } catch (Throwable e) {
-                // ignore
-            }
-        }
-
-        private List<String> readSuggestions(JsonArray array) {
-            String t = input.getText();
-            List<String> suggestions = new ArrayList<>(array.size());
-            if (!StringUtils.isNullOrEmpty(t, true)) {
-                for (int i = 0; i < array.size(); i++) {
-                    try {
-                        String s = LCS.lcsHtml(t, array.get(i).getAsJsonArray().get(0).getAsString());
-                        suggestions.add(s);
-                    } catch (Throwable e) {
-                        //e.printStackTrace();
-                    }
-                }
-            }
-            return suggestions;
-        }
-
-        private String stripJs(String js) {
-            js = js.replace("google.sbox.p50 && google.sbox.p50(", "");
-            js = js.replace("}])", "}]");
-            return js;
-        }
+    void cancel() {
+      cancelled = true;
     }
 
-    public static class SearchListener implements ActionListener {
-        private final GoogleSearchField cloudSearchField;
-        public SearchListener(GoogleSearchField searchField) {
-            cloudSearchField = searchField;
+    public void run() {
+      try {
+        String url =
+            String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint, StandardCharsets.UTF_8));
+        HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+        String js = httpClient.get(url, HTTP_QUERY_TIMEOUT);
+        String json = stripJs(js);
+        if (!isCancelled()) {
+          JsonArray arr = JsonParser.parseString(json).getAsJsonArray();
+          final List<String> suggestions = readSuggestions(arr.get(1).getAsJsonArray());
+          GUIMediator.safeInvokeLater(
+              () -> {
+                Iterator<String> it = suggestions.iterator();
+                if (it.hasNext())
+                  if (!StringUtils.isNullOrEmpty(input.getText(), true)) {
+                    input.showPopup(it);
+                  } else input.hidePopup();
+              });
         }
-        public void actionPerformed(ActionEvent e) {
-            // Keep the query if there was one before switching to the search tab.
-            String query = cloudSearchField.getText();
-            String queryTitle = query;
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
-            // Start a download from the search box by entering a URL.
-            if (FileMenuActions.openMagnetOrTorrent(query)) {
-                cloudSearchField.setText("");
-                cloudSearchField.hidePopup();
-                return;
-            }
-            if (query.contains("www.frostclick.com/cloudplayer/?type=yt") ||
-                    query.contains("frostwire-preview.com/?type=yt")) {
-                try {
-                    query = query.split("detailsUrl=")[1];
-                    query = URLDecoder.decode(query);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-            final SearchInformation info = SearchInformation.createTitledKeywordSearch(query, null, MediaType.getTorrentMediaType(), queryTitle);
-            // If the search worked, store & clear it.
-            if (SearchMediator.instance().triggerSearch(info) != 0) {
-                if (info.isKeywordSearch()) {
-                    cloudSearchField.addToDictionary();
-                    // Clear the existing search.
-                    cloudSearchField.setText("");
-                    cloudSearchField.hidePopup();
-                }
-            }
-        }
+      } catch (Throwable e) {
+        // ignore
+      }
     }
+
+    private List<String> readSuggestions(JsonArray array) {
+      String t = input.getText();
+      List<String> suggestions = new ArrayList<>(array.size());
+      if (!StringUtils.isNullOrEmpty(t, true)) {
+        for (int i = 0; i < array.size(); i++) {
+          try {
+            String s = LCS.lcsHtml(t, array.get(i).getAsJsonArray().get(0).getAsString());
+            suggestions.add(s);
+          } catch (Throwable e) {
+            // e.printStackTrace();
+          }
+        }
+      }
+      return suggestions;
+    }
+
+    private String stripJs(String js) {
+      js = js.replace("google.sbox.p50 && google.sbox.p50(", "");
+      js = js.replace("}])", "}]");
+      return js;
+    }
+  }
+
+  public static class SearchListener implements ActionListener {
+    private final GoogleSearchField cloudSearchField;
+
+    public SearchListener(GoogleSearchField searchField) {
+      cloudSearchField = searchField;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      // Keep the query if there was one before switching to the search tab.
+      String query = cloudSearchField.getText();
+      String queryTitle = query;
+      GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+      // Start a download from the search box by entering a URL.
+      if (FileMenuActions.openMagnetOrTorrent(query)) {
+        cloudSearchField.setText("");
+        cloudSearchField.hidePopup();
+        return;
+      }
+      if (query.contains("www.frostclick.com/cloudplayer/?type=yt")
+          || query.contains("frostwire-preview.com/?type=yt")) {
+        try {
+          query = query.split("detailsUrl=")[1];
+          query = URLDecoder.decode(query);
+        } catch (Exception e1) {
+          e1.printStackTrace();
+        }
+      }
+
+      final SearchInformation info =
+          SearchInformation.createTitledKeywordSearch(
+              query, null, MediaType.getTorrentMediaType(), queryTitle);
+      // If the search worked, store & clear it.
+      if (SearchMediator.instance().triggerSearch(info) != 0) {
+        if (info.isKeywordSearch()) {
+          cloudSearchField.addToDictionary();
+          // Clear the existing search.
+          cloudSearchField.setText("");
+          cloudSearchField.hidePopup();
+        }
+      }
+    }
+  }
 }

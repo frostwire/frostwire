@@ -33,11 +33,14 @@ class ClipboardSearchFocusListenerTest {
         () -> {
           // GoogleSearchField initializes ThemeMediator, which requires a real display.
           // Check its wiring here; the listener behavior is exercised with real Swing below.
-          String source = Files.readString(Path.of(
-              "src/main/java/com/frostwire/gui/searchfield/GoogleSearchField.java"));
-          assertTrue(source.contains("addFocusListener(new ClipboardSearchFocusListener("));
+          // Whitespace-insensitive: the formatter may wrap these calls across lines.
+          String source =
+              Files.readString(
+                      Path.of("src/main/java/com/frostwire/gui/searchfield/GoogleSearchField.java"))
+                  .replaceAll("\\s+", "");
+          assertTrue(source.contains("addFocusListener(newClipboardSearchFocusListener("));
           assertTrue(source.contains("DesktopParallelExecutor::execute"));
-          assertFalse(source.contains("public void focusGained("));
+          assertFalse(source.contains("publicvoidfocusGained("));
         });
   }
 
@@ -63,7 +66,8 @@ class ClipboardSearchFocusListenerTest {
                           () -> {
                             readOnEdt.set(SwingUtilities.isEventDispatchThread());
                             entered.countDown();
-                            assertDoesNotThrow(() -> assertTrue(release.await(5, TimeUnit.SECONDS)));
+                            assertDoesNotThrow(
+                                () -> assertTrue(release.await(5, TimeUnit.SECONDS)));
                             return "magnet:?xt=urn:btih:example";
                           },
                           text -> {
@@ -194,14 +198,18 @@ class ClipboardSearchFocusListenerTest {
           SwingUtilities.invokeAndWait(
               () -> {
                 field[0] = new JTextField();
-                listener[0] = new ClipboardSearchFocusListener(
-                    field[0], () -> true,
-                    () -> {
-                      if (reads.getAndIncrement() == 0) {
-                        throw new IllegalStateException("clipboard unavailable");
-                      }
-                      return "https://example.org";
-                    }, results::add, work::add);
+                listener[0] =
+                    new ClipboardSearchFocusListener(
+                        field[0],
+                        () -> true,
+                        () -> {
+                          if (reads.getAndIncrement() == 0) {
+                            throw new IllegalStateException("clipboard unavailable");
+                          }
+                          return "https://example.org";
+                        },
+                        results::add,
+                        work::add);
                 listener[0].focusGained(new FocusEvent(field[0], FocusEvent.FOCUS_GAINED));
               });
           work.remove(0).run();
