@@ -74,9 +74,14 @@ final class SchemaBox extends JPanel {
 
     void applyFilters() {
         AbstractButton button = getSelectedButton();
-        if (button != null) {
-            // Defer doClick() to avoid EDT violation when called from background threads
-            SwingUtilities.invokeLater(button::doClick);
+        if (button == null) {
+            return;
+        }
+        // Install the selected media-type filter without rebuilding; the caller rebuilds once.
+        for (ActionListener listener : button.getActionListeners()) {
+            if (listener instanceof SchemaButtonActionListener schemaListener) {
+                schemaListener.select(false);
+            }
         }
     }
 
@@ -287,10 +292,19 @@ final class SchemaBox extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            select(true);
+        }
+
+        void select(boolean refilter) {
             String mimeType = nmt.getMediaType().getMimeType();
             SearchSettings.LAST_MEDIA_TYPE_USED.setValue(mimeType);
-            if (resultPanel != null) {
+            if (resultPanel == null) {
+                return;
+            }
+            if (refilter) {
                 resultPanel.filterChanged(filter, 2);
+            } else {
+                resultPanel.setFilterQuietly(filter, 2);
             }
         }
     }

@@ -67,13 +67,14 @@ final class SearchOptionsPanel extends JPanel {
         textFieldKeywords.requestFocus();
     }
 
-    void updateFiltersPanel() {
+    /** Installs the engine and general filters; the caller rebuilds the table. */
+    void updateFilters() {
         if (generalFilter == null) {
             generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
         }
         updateCheckboxes(SearchEngine.getEngines());
-        resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
-        resultPanel.filterChanged(generalFilter, 1);
+        resultPanel.setFilterQuietly(new SearchEngineFilter(engineCheckboxes), 0);
+        resultPanel.setFilterQuietly(generalFilter, 1);
     }
 
     private void updateCheckboxes(List<SearchEngine> engines) {

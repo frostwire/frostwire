@@ -5,6 +5,7 @@ FrostWire 7.1.1 OCT/15/2026
    - fix:Opening or refreshing the Torrent Data library view no longer crashes when its cache is cleared while a background scan or search reads it
    - fix:Launching FrostWire without a graphical session (e.g. as a Windows service or in a headless JVM) exits with a message instead of reporting a crash
    - fix:The window-close event that starts shutdown gets 10 seconds instead of 5 before it is reported as a UI freeze, and such reports are tagged "shutdown:" so they group apart from freezes during normal use
+   - fix:Closing or switching search tabs no longer freezes the UI on large result sets — the newly shown tab's results are re-filtered once instead of three times
    - fix:Completed downloads count toward peer trust again — karma endorsements are signed with the same software key provider used everywhere else instead of being discarded
    - fix:Starting distributed search no longer spams the log with connection warnings while the local relay server boots — readiness is polled quietly with backoff
    - fix:Promo slideshows are parsed through the slide constructor instead of reflective final-field access, keeping them working on future Java releases

@@ -401,8 +401,22 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     void filterChanged(TableLineFilter<SearchResultDataLine> filter, int depth) {
         FILTER.setFilter(depth, filter);
-        //if(!FILTER.setFilter(depth, filter))
-        //    return false;
+        refilter();
+    }
+
+    /**
+     * Installs a filter without rebuilding the table, so callers that set several filters
+     * at once can rebuild a single time via {@link #refilter()}.
+     */
+    void setFilterQuietly(TableLineFilter<SearchResultDataLine> filter, int depth) {
+        FILTER.setFilter(depth, filter);
+    }
+
+    /**
+     * Rebuilds the table against the current filters, keeping the selection
+     * and viewport on the first still-visible selected row.
+     */
+    private void refilter() {
         // store the selection & visible rows
         int[] rows = TABLE.getSelectedRows();
         SearchResultDataLine[] lines = new SearchResultDataLine[rows.length];
@@ -749,18 +763,27 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     void updateFiltersPanel() {
-        schemaBox.applyFilters();
-        if (searchOptionsPanel != null) {
-            searchOptionsPanel.updateFiltersPanel();
-        }
+        applyPanelFilters(false);
     }
 
     void resetFiltersPanel() {
+        applyPanelFilters(true);
+    }
+
+    /**
+     * Re-applies the media-type, engine and general filters and rebuilds the table once.
+     * Runs on every tab switch, so it must not rebuild per filter: large result sets made
+     * that a multi-second EDT stall.
+     */
+    private void applyPanelFilters(boolean reset) {
         schemaBox.applyFilters();
         if (searchOptionsPanel != null) {
-            searchOptionsPanel.resetFilters();
-            searchOptionsPanel.updateFiltersPanel();
+            if (reset) {
+                searchOptionsPanel.resetFilters();
+            }
+            searchOptionsPanel.updateFilters();
         }
+        refilter();
     }
 
     @Override
