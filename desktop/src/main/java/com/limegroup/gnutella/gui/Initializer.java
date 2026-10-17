@@ -60,6 +60,7 @@ import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
 import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
+import com.frostwire.util.TextWarmUp;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.ExternalControl;
 import com.limegroup.gnutella.LimeCoreGlue;
@@ -76,7 +77,6 @@ import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.MacOSXUtils;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -325,29 +325,6 @@ final class Initializer {
     }
   }
 
-  private static void warmUpTextShapingInBackground() {
-    Thread warmUp =
-        new Thread(
-            () -> {
-              try {
-                // layoutGlyphVector always goes through GlyphLayout/SunLayoutEngine -> HBShaper.
-                char[] text = "FrostWire \u0915\u094D\u0937".toCharArray();
-                new Font(Font.DIALOG, Font.PLAIN, 12)
-                    .layoutGlyphVector(
-                        new FontRenderContext(null, true, true),
-                        text,
-                        0,
-                        text.length,
-                        Font.LAYOUT_LEFT_TO_RIGHT);
-              } catch (Throwable ignored) {
-                // Best effort: the first on-EDT layout will initialize it instead.
-              }
-            },
-            "TextShapingWarmUp");
-    warmUp.setDaemon(true);
-    warmUp.start();
-  }
-
   /** Initializes any early UI tasks, such as HTML loading and the Bug Manager. */
   private void initializeEarlyUI() {
     // Pre-load locales to avoid EDT violations when locales are later accessed on the EDT.
@@ -358,10 +335,10 @@ final class Initializer {
     // Pre-load header button background images to avoid MediaTracker blocking the EDT during
     // MainFrame construction
     ApplicationHeader.preloadImages();
-    // Pay the JDK's one-time HarfBuzz shaper init (HBShaper.<clinit> builds a Foreign Function
-    // linker) off the EDT. Otherwise the first complex-text layout pays it while painting; on
-    // 2-CPU machines that has stalled the EDT for over 5 seconds.
-    warmUpTextShapingInBackground();
+    // Pay the JDK's one-time text costs (HarfBuzz shaper init, fallback font character maps read
+    // from disk) off the EDT; on slow machines the first paint that needs them stalled the EDT for
+    // over 5 seconds.
+    TextWarmUp.startInBackground();
 
     // Load up the HTML engine.
     GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
