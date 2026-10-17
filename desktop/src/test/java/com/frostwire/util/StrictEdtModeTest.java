@@ -182,4 +182,29 @@ class StrictEdtModeTest {
         assertFalse(StrictEdtMode.isJdkShellFolderStall(noShellFolder));
         assertFalse(StrictEdtMode.isJdkShellFolderStall(null));
     }
+
+    @Test
+    void idleEdtStackIsNotInsideWatchedDispatch() {
+        StackTraceElement[] idle = {
+                frame("jdk.internal.misc.Unsafe", "park"),
+                frame("java.awt.EventQueue", "getNextEvent"),
+                frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+                frame("java.awt.EventDispatchThread", "run")
+        };
+
+        assertFalse(StrictEdtMode.isInsideWatchedDispatch(idle));
+        assertFalse(StrictEdtMode.isInsideWatchedDispatch(null));
+    }
+
+    @Test
+    void stalledEventStackIsInsideWatchedDispatch() {
+        StackTraceElement[] stalled = {
+                frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+                frame("java.awt.EventQueue", "dispatchEvent"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+                frame("java.awt.EventDispatchThread", "run")
+        };
+
+        assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalled));
+    }
 }

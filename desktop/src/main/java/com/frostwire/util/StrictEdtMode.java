@@ -10,7 +10,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.time.Duration;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -154,16 +153,12 @@ public final class StrictEdtMode {
                     thresholdMs, edt);
             System.err.println("Event: " + event);
 
-            // Grab stack of all threads and print EDT’s
-            StackTraceElement[] edtStack = null;
-            for (Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
-                if (e.getKey() == edt) {
-                    edtStack = e.getValue();
-                    System.err.println("--- EDT stack ---");
-                    for (StackTraceElement ste : edtStack) {
-                        System.err.println("\tat " + ste);
-                    }
-                }
+            // Sample only the EDT: walking every thread is slow on small machines and widens the
+            // window in which the stalled event finishes before its stack is captured.
+            StackTraceElement[] edtStack = edt.getStackTrace();
+            System.err.println("--- EDT stack ---");
+            for (StackTraceElement ste : edtStack) {
+                System.err.println("\tat " + ste);
             }
             // Also include lock info (who might be blocking us)
             ThreadMXBean mx = ManagementFactory.getThreadMXBean();
@@ -182,7 +177,9 @@ public final class StrictEdtMode {
             // Production never halts: queue a throttled Icebase report and keep dispatching.
             // Bounded descriptor on purpose: the raw event string can carry coordinates and
             // other high-cardinality data that would explode server-side issue grouping.
-            if (tag.isEmpty() && isJdkShellFolderStall(edtStack)) {
+            if (tag.isEmpty() && !isInsideWatchedDispatch(edtStack)) {
+                tag = STACK_MISSED_TAG;
+            } else if (tag.isEmpty() && isJdkShellFolderStall(edtStack)) {
                 tag = SHELL_FOLDER_TAG;
             }
             maybeQueueProductionReport(tag + event.getClass().getName() + "#" + event.getID(), edtStack);
@@ -205,6 +202,29 @@ public final class StrictEdtMode {
 
     static final String SHUTDOWN_TAG = "shutdown:";
     static final String SHELL_FOLDER_TAG = "jdk-shellfolder:";
+    static final String STACK_MISSED_TAG = "stack-missed:";
+
+    /**
+     * True when the EDT stack still shows the watchdog dispatching an event. False means the
+     * stalled event finished between the timer firing and the stack being sampled (the EDT is
+     * idle or on a new event's pump), so the stack says nothing about what stalled.
+     *
+     * <p>Thread-safe: stateless stack inspection.
+     */
+    static boolean isInsideWatchedDispatch(StackTraceElement[] stack) {
+        if (stack == null) {
+            return false;
+        }
+        for (StackTraceElement frame : stack) {
+            if (frame != null
+                    && frame.getClassName() != null
+                    && frame.getClassName().startsWith(WATCHDOG_PREFIX)
+                    && "dispatchEvent".equals(frame.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     private static final String SHELL_FOLDER_PREFIX = "sun.awt.shell.";
 
     /**
