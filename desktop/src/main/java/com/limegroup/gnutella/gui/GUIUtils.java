@@ -23,7 +23,6 @@ import com.frostwire.util.PlaybackUtil;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
-import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.CommonUtils;
 import com.frostwire.util.OSUtils;
@@ -424,10 +423,9 @@ public final class GUIUtils {
         }
         if (GUIMediator.isPlaylistVisible()) {
             if (PlaybackUtil.isPlayableFile(file)) {
-                if (false) {
-                    DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
-                } else if (!isPlaying) {
-                    DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().playInOS(new MediaSource(file))));
+                if (!isPlaying) {
+                    // playInOS hands the file to Launcher, which opens it off the EDT itself.
+                    SwingUtilities.invokeLater(() -> GUIMediator.instance().playInOS(new MediaSource(file)));
                 }
                 return true;
             }

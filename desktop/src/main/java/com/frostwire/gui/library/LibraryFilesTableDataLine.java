@@ -28,14 +28,12 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
-import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * This class acts as a single line containing all
@@ -309,15 +307,14 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            try {
-                DesktopParallelExecutor.execute(() -> GUIMediator.safeInvokeAndWait(() -> {
-                    IconManager.instance().getIconForFile(initializer);
-                    _iconLoaded = true;
-                    _model.refresh();
-                }));
-            } catch (RejectedExecutionException ignored) {
-                _iconScheduledForLoad = false;
-            }
+            // The icon load runs on the EDT; queue it there directly rather than parking a pool
+            // thread on invokeAndWait for every rendered row. Deferred, never inline: getIcon()
+            // is called while the table paints.
+            SwingUtilities.invokeLater(() -> {
+                IconManager.instance().getIconForFile(initializer);
+                _iconLoaded = true;
+                _model.refresh();
+            });
             return null;
         } else if (_iconLoaded || iconAvailable) {
             return IconManager.instance().getIconForFile(initializer);
