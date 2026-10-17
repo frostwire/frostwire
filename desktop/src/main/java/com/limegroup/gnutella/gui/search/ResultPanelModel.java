@@ -79,19 +79,20 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * or to change the 'count' compare to use different values for
      * multicast or secure results.
      */
-    public int compare(SearchResultDataLine ta, SearchResultDataLine tb) {
+    @Override
+    protected int compare(SearchResultDataLine ta, SearchResultDataLine tb, int column, int ascending) {
         //super.compare() will only sort Comparables and Strings.
         //since the Type column returns an Icon, we compare by hand using the file extension.
-        if (_activeColumn == SearchTableColumns.TYPE_IDX) {
-            return AbstractTableMediator.compare(ta.getExtension(), tb.getExtension()) * _ascending;
+        if (column == SearchTableColumns.TYPE_IDX) {
+            return AbstractTableMediator.compare(ta.getExtension(), tb.getExtension()) * ascending;
         }
-        if (_activeColumn == SearchTableColumns.COUNT_IDX) {
-            return compareSeeds(ta, tb);
+        if (column == SearchTableColumns.COUNT_IDX) {
+            return compareSeeds(ta, tb, ascending);
         }
-        if (_activeColumn == SearchTableColumns.SIZE_IDX) {
-            return Long.compare(ta.getSize(), tb.getSize()) * _ascending;
+        if (column == SearchTableColumns.SIZE_IDX) {
+            return Long.compare(ta.getSize(), tb.getSize()) * ascending;
         }
-        return super.compare(ta, tb);
+        return super.compare(ta, tb, column, ascending);
     }
 
     /**
@@ -228,10 +229,10 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         return get(idx).getHash();
     }
 
-    private int compareSeeds(SearchResultDataLine a, SearchResultDataLine b) {
+    private int compareSeeds(SearchResultDataLine a, SearchResultDataLine b, int ascending) {
         Integer aSeeds = a.getSeedsAsInteger();
         Integer bSeeds = b.getSeedsAsInteger();
-        return Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds) * _ascending;
+        return Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds) * ascending;
     }
 
     /**

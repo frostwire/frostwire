@@ -25,6 +25,7 @@ import javax.swing.table.AbstractTableModel;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,11 +72,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Variable for whether or not the current sorting scheme
      * is ascending (value 1) or descending (value -1).
      */
-    protected int _ascending = ASCENDING;
+    protected volatile int _ascending = ASCENDING;
     /**
      * Variable for which column is currently being sorted.
      */
-    protected int _activeColumn = -1;
+    protected volatile int _activeColumn = -1;
     /**
      * Variable for whether or not this list has been sorted
      * at least once.
@@ -192,7 +193,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     protected void doResort() {
         synchronized (_listLock) {
-            _list.sort(this);
+            _list.sort(pinnedComparator());
         }
     }
 
@@ -399,7 +400,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         // the insertion point.
         int row;
         synchronized (_listLock) {
-            row = Collections.binarySearch(_list, dl, this);
+            row = Collections.binarySearch(_list, dl, pinnedComparator());
         }
         if (row < 0) row = -(row + 1);
         return row;
@@ -677,9 +678,31 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * A generic compare function.
      */
     public int compare(T a, T b) {
-        Object o1 = a.getValueAt(_activeColumn);
-        Object o2 = b.getValueAt(_activeColumn);
-        return AbstractTableMediator.compare(o1, o2) * _ascending;
+        return compare(a, b, _activeColumn, _ascending);
+    }
+
+    /**
+     * Comparator pinned to the sort column and direction at the time it is created. Sorting
+     * runs off the EDT while the EDT can change or clear the sort column ({@link #unsort()}
+     * sets it to -1), so one sort must never re-read the live fields between comparisons.
+     */
+    private Comparator<T> pinnedComparator() {
+        final int column = _activeColumn;
+        final int ascending = _ascending;
+        return (a, b) -> compare(a, b, column, ascending);
+    }
+
+    /**
+     * Compares two lines by the given column and direction. Subclasses customizing the sort
+     * order override this, using the arguments rather than the live sort fields.
+     */
+    protected int compare(T a, T b, int column, int ascending) {
+        if (column < 0) {
+            return 0;
+        }
+        Object o1 = a.getValueAt(column);
+        Object o2 = b.getValueAt(column);
+        return AbstractTableMediator.compare(o1, o2) * ascending;
     }
 
     /**
