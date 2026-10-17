@@ -10,6 +10,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:Transfers, search results and other sortable tables no longer crash when sorting is turned off or changed while a background re-sort is running
    - fix:Opening or playing files, library searches, SoundCloud downloads and previews, Options panes and peer endorsements no longer crash when background work is busy — the shared background pool queues extra tasks instead of rejecting them, and library icons no longer tie up its threads
    - fix:The Transfers list no longer freezes on Windows while fetching file icons from the system shell — uncached icons are loaded in the background and appear on the next refresh
+   - fix:The first time text needs complex shaping no longer freezes the UI on slow machines — Java's text shaper is initialized in the background at startup
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
