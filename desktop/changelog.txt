@@ -1,7 +1,4 @@
-FrostWire 7.1.1 OCT/15/2026
-   - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
-   - fix:Focusing the search box no longer freezes the Linux UI while waiting for the system clipboard; automatic clipboard reads run in the background and stale results are discarded
-   - fix:Opening or refreshing media-type library views no longer crashes when a background scan adds files while the view reads its cache
+FrostWire 7.1.2 UNRELEASED
    - fix:Opening or refreshing the Torrent Data library view no longer crashes when its cache is cleared while a background scan or search reads it
    - fix:Launching FrostWire without a graphical session (e.g. as a Windows service or in a headless JVM) exits with a message instead of reporting a crash
    - fix:The window-close event that starts shutdown gets 10 seconds instead of 5 before it is reported as a UI freeze, and such reports are tagged "shutdown:" so they group apart from freezes during normal use
@@ -9,6 +6,11 @@ FrostWire 7.1.1 OCT/15/2026
    - fix:Right-clicking a transfer no longer freezes the UI while the BitTorrent engine is busy — torrent and global speed limits for the Advanced menu are read in the background when the transfer is selected
    - fix:UI freeze reports caused by Windows' folder chooser waiting on a slow folder (network drives, cloud placeholders) are tagged "jdk-shellfolder:" so they group apart from freezes in FrostWire's own code
    - fix:UI freeze reports whose stack was captured only after the freeze had ended are tagged "stack-missed:" instead of being filed with a misleading idle stack, and the stack is now sampled from the UI thread alone so it is captured sooner
+
+FrostWire 7.1.1 OCT/15/2026
+   - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
+   - fix:Focusing the search box no longer freezes the Linux UI while waiting for the system clipboard; automatic clipboard reads run in the background and stale results are discarded
+   - fix:Opening or refreshing media-type library views no longer crashes when a background scan adds files while the view reads its cache
    - fix:Completed downloads count toward peer trust again — karma endorsements are signed with the same software key provider used everywhere else instead of being discarded
    - fix:Starting distributed search no longer spams the log with connection warnings while the local relay server boots — readiness is polled quietly with backoff
    - fix:Promo slideshows are parsed through the slide constructor instead of reflective final-field access, keeping them working on future Java releases
