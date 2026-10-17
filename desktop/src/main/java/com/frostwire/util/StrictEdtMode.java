@@ -104,6 +104,8 @@ public final class StrictEdtMode {
 
     private static final class ProductionTimingEventQueue extends EventQueue {
         private static final long REPORT_COOLDOWN_MS = 60_000;
+        /** Grace period for the window-close event that runs the shutdown sequence. */
+        static final long SHUTDOWN_THRESHOLD_MS = 10_000;
         private static volatile long lastProductionReportMillis;
         private final long thresholdMs;
         private final AtomicLong ticket = new AtomicLong();
@@ -122,8 +124,19 @@ public final class StrictEdtMode {
 
             // arm a one-shot timer: if we're still handling THIS event after threshold -> dump & report
             SCH.schedule(() -> {
-                if (currentTicket == my) {
-                    dumpEdtAndQueueReport(event, edt, thresholdMs);
+                if (currentTicket != my) {
+                    return;
+                }
+                // Only the event running Finalizer.shutdown gets extra time; everything else,
+                // including later events while the app exits, keeps the normal threshold.
+                if (isShutdownSequence(edt.getStackTrace()) && SHUTDOWN_THRESHOLD_MS > thresholdMs) {
+                    SCH.schedule(() -> {
+                        if (currentTicket == my) {
+                            dumpEdtAndQueueReport(event, edt, SHUTDOWN_THRESHOLD_MS, SHUTDOWN_TAG);
+                        }
+                    }, SHUTDOWN_THRESHOLD_MS - thresholdMs, TimeUnit.MILLISECONDS);
+                } else {
+                    dumpEdtAndQueueReport(event, edt, thresholdMs, "");
                 }
             }, thresholdMs, TimeUnit.MILLISECONDS);
 
@@ -136,7 +149,7 @@ public final class StrictEdtMode {
             }
         }
 
-        private static void dumpEdtAndQueueReport(AWTEvent event, Thread edt, long thresholdMs) {
+        private static void dumpEdtAndQueueReport(AWTEvent event, Thread edt, long thresholdMs, String tag) {
             System.err.printf("=== STRICT-EDT VIOLATION: event took > %,d ms on %s ===%n",
                     thresholdMs, edt);
             System.err.println("Event: " + event);
@@ -169,7 +182,7 @@ public final class StrictEdtMode {
             // Production never halts: queue a throttled Icebase report and keep dispatching.
             // Bounded descriptor on purpose: the raw event string can carry coordinates and
             // other high-cardinality data that would explode server-side issue grouping.
-            maybeQueueProductionReport(event.getClass().getName() + "#" + event.getID(), edtStack);
+            maybeQueueProductionReport(tag + event.getClass().getName() + "#" + event.getID(), edtStack);
         }
 
         private static void maybeQueueProductionReport(String eventDescription, StackTraceElement[] edtStack) {
@@ -185,6 +198,27 @@ public final class StrictEdtMode {
                 // Reporting must never break event dispatch.
             }
         }
+    }
+
+    static final String SHUTDOWN_TAG = "shutdown:";
+    private static final String FINALIZER_CLASS = "com.limegroup.gnutella.gui.Finalizer";
+
+    /**
+     * True when the EDT is inside {@code Finalizer.shutdown}, i.e. handling the event that
+     * starts the app's exit sequence. Stateless stack inspection, safe from any thread.
+     */
+    static boolean isShutdownSequence(StackTraceElement[] stack) {
+        if (stack == null) {
+            return false;
+        }
+        for (StackTraceElement frame : stack) {
+            if (frame != null
+                    && FINALIZER_CLASS.equals(frame.getClassName())
+                    && "shutdown".equals(frame.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static final String JAVA2D_PREFIX = "sun.java2d.";

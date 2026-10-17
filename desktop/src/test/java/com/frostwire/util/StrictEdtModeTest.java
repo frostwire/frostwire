@@ -108,4 +108,26 @@ class StrictEdtModeTest {
         assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
         assertFalse(StrictEdtMode.isRenderPipelineStall(new StackTraceElement[0]));
     }
+
+    @Test
+    void finalizerShutdownFrameMarksShutdownSequence() {
+        StackTraceElement[] stack = {
+                new StackTraceElement("java.lang.ClassLoader", "loadClass", "ClassLoader.java", 502),
+                new StackTraceElement("com.limegroup.gnutella.gui.Finalizer", "shutdown", "Finalizer.java", 33),
+                new StackTraceElement("com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458)
+        };
+
+        assertTrue(StrictEdtMode.isShutdownSequence(stack));
+    }
+
+    @Test
+    void otherStallsAreNotShutdownSequence() {
+        StackTraceElement[] stack = {
+                new StackTraceElement("com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458),
+                new StackTraceElement("com.frostwire.gui.SomeAction", "actionPerformed", "SomeAction.java", 42)
+        };
+
+        assertFalse(StrictEdtMode.isShutdownSequence(stack));
+        assertFalse(StrictEdtMode.isShutdownSequence(null));
+    }
 }
