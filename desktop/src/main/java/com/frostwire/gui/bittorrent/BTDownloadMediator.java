@@ -633,6 +633,8 @@ public final class BTDownloadMediator
     shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dl.isPausable());
     // Compute media flags asynchronously and update actions when ready
     updateMediaUIAsync(dl, isTransferFinished);
+    // Read libtorrent rate limits off the EDT so the right-click menu can show them instantly
+    BTDownloadMediatorAdvancedMenuFactory.prefetchSpeedLimits();
 
     removeYouTubeAction.setEnabled(isHttpTransfer(dl));
     BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dl));

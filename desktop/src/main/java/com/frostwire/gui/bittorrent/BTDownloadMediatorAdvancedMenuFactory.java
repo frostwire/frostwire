@@ -40,6 +40,43 @@ import net.miginfocom.swing.MigLayout;
 final class BTDownloadMediatorAdvancedMenuFactory {
   private static final Logger LOG = Logger.getLogger(BTDownloadMediatorAdvancedMenuFactory.class);
 
+  /**
+   * Rate limits read off the EDT. The libtorrent getters are synchronous calls into the session
+   * thread and can block for seconds when it is busy, so the popup menu never calls them itself.
+   */
+  private record SpeedLimits(
+      com.frostwire.bittorrent.BTDownload dm,
+      int download,
+      int upload,
+      long globalDownload,
+      long globalUpload) {}
+
+  private static volatile SpeedLimits speedLimits;
+
+  /** Refreshes the cached rate limits of the single selected torrent in the background. */
+  static void prefetchSpeedLimits() {
+    final com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();
+    if (dms == null) {
+      return;
+    }
+    final com.frostwire.bittorrent.BTDownload dm = dms[0];
+    BackgroundQueuedExecutorService.schedule(
+        () -> {
+          try {
+            BTEngine engine = BTEngine.getInstance();
+            speedLimits =
+                new SpeedLimits(
+                    dm,
+                    dm.getDownloadRateLimit(),
+                    dm.getUploadRateLimit(),
+                    engine.downloadRateLimit(),
+                    engine.uploadRateLimit());
+          } catch (Throwable t) {
+            LOG.error("Unable to read torrent speed limits", t);
+          }
+        });
+  }
+
   // Units and precision for formatting byte counts
   private static final String[] UNITS_RATE = {"B/s", "kB/s", "MB/s", "GB/s", "TB/s"};
   private static final int[] UNITS_PRECISION = {0, 1, 2, 2, 3};
@@ -66,6 +103,28 @@ final class BTDownloadMediatorAdvancedMenuFactory {
     if (dms == null) {
       return null;
     }
+    final SkinMenu menuAdvanced = new SkinMenu(I18n.tr("Advanced"));
+    SpeedLimits limits = speedLimits;
+    if (limits != null && limits.dm() == dms[0]) {
+      addSpeedMenus(menuAdvanced, dms, limits);
+    }
+    // Keep the cache fresh for the next popup (limits may have changed since the selection).
+    prefetchSpeedLimits();
+    SkinMenu menuTracker = createTrackerMenu();
+    if (menuTracker != null) {
+      menuAdvanced.add(menuTracker);
+    }
+
+    // Add Check Local Data action to Advanced menu
+    menuAdvanced.add(new SkinMenuItem(new CheckLocalDataAction(dms[0])));
+
+    return menuAdvanced;
+  }
+
+  private static void addSpeedMenus(
+      SkinMenu menuAdvanced,
+      final com.frostwire.bittorrent.BTDownload[] dms,
+      SpeedLimits limits) {
     boolean upSpeedDisabled = false;
     long totalUpSpeed = 0;
     boolean upSpeedUnlimited = false;
@@ -74,43 +133,35 @@ final class BTDownloadMediatorAdvancedMenuFactory {
     long totalDownSpeed = 0;
     boolean downSpeedUnlimited = false;
     long downSpeedSetMax = 0;
-    for (com.frostwire.bittorrent.BTDownload btDownload : dms) {
-      try {
-        int maxul = btDownload.getUploadRateLimit();
-        if (maxul == 0) {
-          upSpeedUnlimited = true;
-        } else {
-          if (maxul > upSpeedSetMax) {
-            upSpeedSetMax = maxul;
-          }
-        }
-        if (maxul == -1) {
-          maxul = 0;
-          upSpeedDisabled = true;
-        }
-        totalUpSpeed += maxul;
-        int maxdl = btDownload.getDownloadRateLimit();
-        if (maxdl == 0) {
-          downSpeedUnlimited = true;
-        } else {
-          if (maxdl > downSpeedSetMax) {
-            downSpeedSetMax = maxdl;
-          }
-        }
-        if (maxdl == -1) {
-          maxdl = 0;
-          downSpeedDisabled = true;
-        }
-        totalDownSpeed += maxdl;
-      } catch (Exception ex) {
-        LOG.error(ex.getMessage(), ex);
+    int maxul = limits.upload();
+    if (maxul == 0) {
+      upSpeedUnlimited = true;
+    } else {
+      if (maxul > upSpeedSetMax) {
+        upSpeedSetMax = maxul;
       }
     }
-    final SkinMenu menuAdvanced = new SkinMenu(I18n.tr("Advanced"));
+    if (maxul == -1) {
+      maxul = 0;
+      upSpeedDisabled = true;
+    }
+    totalUpSpeed += maxul;
+    int maxdl = limits.download();
+    if (maxdl == 0) {
+      downSpeedUnlimited = true;
+    } else {
+      if (maxdl > downSpeedSetMax) {
+        downSpeedSetMax = maxdl;
+      }
+    }
+    if (maxdl == -1) {
+      maxdl = 0;
+      downSpeedDisabled = true;
+    }
+    totalDownSpeed += maxdl;
     // advanced > Download Speed Menu //
-    BTEngine engine = BTEngine.getInstance();
-    long maxDownload = engine.downloadRateLimit();
-    long maxUpload = engine.uploadRateLimit();
+    long maxDownload = limits.globalDownload();
+    long maxUpload = limits.globalUpload();
     addSpeedMenu(
         menuAdvanced,
         downSpeedDisabled,
@@ -129,26 +180,16 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             for (com.frostwire.bittorrent.BTDownload dm : dms) {
               dm.setDownloadRateLimit(speed);
             }
+            prefetchSpeedLimits();
           }
 
           public void setUpSpeed(final int speed) {
             for (com.frostwire.bittorrent.BTDownload dm : dms) {
               dm.setUploadRateLimit(speed);
             }
+            prefetchSpeedLimits();
           }
         });
-    SkinMenu menuTracker = createTrackerMenu();
-    if (menuTracker != null) {
-      menuAdvanced.add(menuTracker);
-    }
-
-    // Add Check Local Data action to Advanced menu
-    com.frostwire.bittorrent.BTDownload[] checkDataDms = getSingleSelectedDownloadManagers();
-    if (checkDataDms != null) {
-      menuAdvanced.add(new SkinMenuItem(new CheckLocalDataAction(checkDataDms[0])));
-    }
-
-    return menuAdvanced;
   }
 
   private static SkinMenu createTrackerMenu() {
