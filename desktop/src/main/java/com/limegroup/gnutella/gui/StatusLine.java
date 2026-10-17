@@ -26,6 +26,7 @@ import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
@@ -141,10 +142,18 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
   private StatusComponent STATUS_COMPONENT;
 
   private JPanel centerPanel;
+
   ///////////////////////////////////////////////////////////////////////////
   //  Construction
   /// ////////////////////////////////////////////////////////////////////////
   private Component centerComponent;
+
+  /** True once loadFinished() replaced the "Preparing FrostWire..." component. */
+  private boolean centerPanelReplaced;
+
+  /** Last VPN state the bar was built for; null until the first VPN check reports. */
+  private Boolean lastVpnStatus;
+
   private long _nextUpdateTime = System.currentTimeMillis();
 
   private boolean previousSeedingStatus;
@@ -587,7 +596,14 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
     long now = System.currentTimeMillis();
     if (_nextUpdateTime > now) return;
-    _nextUpdateTime = now + 1000 * 5; // update every minute
+    _nextUpdateTime = now + 1000 * 5; // poll the indicators every 5 seconds
+    if (centerPanelReplaced) {
+      // Rebuilding the whole bar here every 5s forced a full validate pass (ending in a native
+      // cursor update) for nothing; refresh the indicators in place instead.
+      refreshIndicators();
+      return;
+    }
+    centerPanelReplaced = true;
     centerPanel.removeAll();
     centerComponent = new JLabel();
     GridBagConstraints gbc = new GridBagConstraints();
@@ -657,11 +673,17 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
   /** Updates the firewall text. */
   private void updateFirewall() {
-    try {
-      BTEngine engine = BTEngine.getInstance();
-      updateFirewallLabel(!engine.isFirewalled());
-    } catch (Throwable ignored) {
-    }
+    // isFirewalled() queries the libtorrent session synchronously: keep it off the EDT.
+    BackgroundQueuedExecutorService.schedule(
+        () -> {
+          final boolean notFirewalled;
+          try {
+            notFirewalled = !BTEngine.getInstance().isFirewalled();
+          } catch (Throwable ignored) {
+            return;
+          }
+          GUIMediator.safeInvokeLater(() -> updateFirewallLabel(notFirewalled));
+        });
   }
 
   /** Updates the bandwidth statistics. */
@@ -767,7 +789,25 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
   @Override
   public void onStatusUpdated(boolean vpnIsOn) {
+    // The VPN button updates itself; only rebuild the bar when the VPN state actually changed.
+    if (lastVpnStatus != null && lastVpnStatus == vpnIsOn) {
+      return;
+    }
+    lastVpnStatus = vpnIsOn;
     refresh();
+  }
+
+  /** Re-reads the polled indicators without rebuilding the status bar. */
+  private void refreshIndicators() {
+    if (StatusBarSettings.FIREWALL_DISPLAY_ENABLED.getValue()) {
+      updateFirewall();
+    }
+    if (seedingStatusButton != null) {
+      updateSeedingStatus();
+    }
+    if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
+      vpnStatusRefresher.refresh(); // async, throttled
+    }
   }
 
   /** Action for the 'Show Connection Quality' menu item. */
@@ -872,7 +912,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
   }
 
-  private class LazyTooltip extends JLabel {
+  /** Bandwidth labels: their text changes every second, see {@link SizeStableLabel}. */
+  private class LazyTooltip extends SizeStableLabel {
     LazyTooltip(ImageIcon icon) {
       super(icon);
       setOpaque(false);
