@@ -32,7 +32,7 @@ public final class StrictEdtMode {
 
     /**
      * Production variant: same breach detection and stderr dump as {@link #install(Duration)},
-     * but never halts. Instead it queues a throttled Icebase watchdog/strictmode report and
+     * but never halts. Instead it queues a throttled Icebase strictmode report and
      * keeps dispatching events.
      */
     public static void installProduction(Duration threshold) {
@@ -193,7 +193,6 @@ public final class StrictEdtMode {
             lastProductionReportMillis = now;
             try {
                 CrashReportSpooler.recordStrictMode(eventDescription, 1, edtStack);
-                CrashReportSpooler.recordWatchdog(1);
             } catch (Throwable ignored) {
                 // Reporting must never break event dispatch.
             }
