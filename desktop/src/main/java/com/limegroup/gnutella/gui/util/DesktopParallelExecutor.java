@@ -34,8 +34,10 @@ public class DesktopParallelExecutor {
     /**
      * Thread pool for parallel background execution.
      * 4 threads allows reasonable parallelism without excessive resource consumption.
+     * The queue is unbounded: most callers run on the EDT and cannot handle
+     * RejectedExecutionException, so extra tasks wait their turn instead.
      */
-    private static final ExecutorService POOL = ExecutorsHelper.newFixedSizeThreadPool(4, "DesktopParallelExecutor");
+    private static final ExecutorService POOL = ExecutorsHelper.newFixedSizeUnboundedThreadPool(4, "DesktopParallelExecutor");
 
     private DesktopParallelExecutor() {
     }

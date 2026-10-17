@@ -107,13 +107,29 @@ public class ExecutorsHelper {
 
     /**
      * Creates a new ThreadPool with the maximum number of available threads.
-     * Items added while no threads are available to process them will wait
-     * until an executing item is finished and then be processed.
+     * At most 4 items wait while all threads are busy; further items are
+     * rejected with {@link java.util.concurrent.RejectedExecutionException}.
+     * Use {@link #newFixedSizeUnboundedThreadPool(int, String)} when callers
+     * cannot handle rejection.
      */
     public static ExecutorService newFixedSizeThreadPool(int size, String name) {
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(size, size,
                 5L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(4),
+                daemonThreadFactory(name));
+        tpe.allowCoreThreadTimeOut(true);
+        return Executors.unconfigurableExecutorService(tpe);
+    }
+
+    /**
+     * Creates a new ThreadPool with at most {@code size} threads whose waiting
+     * queue is unbounded: items added while all threads are busy wait their
+     * turn instead of being rejected. Idle threads time out after 5 seconds.
+     */
+    public static ExecutorService newFixedSizeUnboundedThreadPool(int size, String name) {
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(size, size,
+                5L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
                 daemonThreadFactory(name));
         tpe.allowCoreThreadTimeOut(true);
         return Executors.unconfigurableExecutorService(tpe);

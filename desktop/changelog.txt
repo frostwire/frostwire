@@ -8,6 +8,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:UI freeze reports whose stack was captured only after the freeze had ended are tagged "stack-missed:" instead of being filed with a misleading idle stack, and the stack is now sampled from the UI thread alone so it is captured sooner
    - fix:UI freezes are reported once, with their stack, instead of also sending a stack-less duplicate watchdog report
    - fix:Transfers, search results and other sortable tables no longer crash when sorting is turned off or changed while a background re-sort is running
+   - fix:Opening or playing files, library searches, SoundCloud downloads and previews, Options panes and peer endorsements no longer crash when background work is busy — the shared background pool queues extra tasks instead of rejecting them, and library icons no longer tie up its threads
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
