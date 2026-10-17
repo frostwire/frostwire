@@ -12,6 +12,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:The Transfers list no longer freezes on Windows while fetching file icons from the system shell — uncached icons are loaded in the background and appear on the next refresh
    - fix:The first time text needs complex shaping no longer freezes the UI on slow machines — Java's text shaper is initialized in the background at startup
    - fix:Pressing Enter in the search box no longer freezes the UI on slow machines — stopping the previous search and starting every search engine now happen in the background, in order
+   - fix:Scrolling or refreshing the Transfers and search result tables no longer freezes the UI on macOS — table cells no longer ask macOS for the mouse cursor position every time they are drawn
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported

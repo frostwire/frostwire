@@ -126,6 +126,24 @@ public abstract class FWAbstractJPanelTableCellRenderer extends JPanel
   }
 
   /**
+   * Lays out the children without the rest of {@link Container#validate()}.
+   *
+   * <p>{@code CellRendererPane} validates this renderer for every painted cell, and {@code
+   * updateUIData} usually invalidates it. {@code Container.validate()} then ends with {@code
+   * updateCursorImmediately()}, which on macOS is a synchronous round-trip to the AppKit thread
+   * ({@code CCursorManager.nativeGetCursorPosition}) and stalled the EDT while painting. A renderer
+   * only needs its layout; it never owns the cursor.
+   */
+  @Override
+  public void validate() {
+    synchronized (getTreeLock()) {
+      if (!isValid()) {
+        validateTree();
+      }
+    }
+  }
+
+  /**
    * Overridden for performance reasons. See the <a href="#override">Implementation Note</a> for
    * more information.
    */
