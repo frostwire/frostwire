@@ -130,4 +130,56 @@ class StrictEdtModeTest {
         assertFalse(StrictEdtMode.isShutdownSequence(stack));
         assertFalse(StrictEdtMode.isShutdownSequence(null));
     }
+
+    private static StackTraceElement frame(String className, String method) {
+        return new StackTraceElement(className, method, null, -1);
+    }
+
+    @Test
+    void shellFolderWaitInsideModalFileChooserIsJdkShellFolderStall() {
+        StackTraceElement[] stack = {
+                frame("java.util.concurrent.FutureTask", "get"),
+                frame("sun.awt.shell.Win32ShellFolderManager2$ComInvoker", "invoke"),
+                frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
+                frame("javax.swing.JFileChooser", "setSelectedFile"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+                frame("java.awt.Dialog", "show"),
+                frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+        };
+
+        assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
+    }
+
+    @Test
+    void slowFolderAccessCheckInFileChooserIsJdkShellFolderStall() {
+        StackTraceElement[] stack = {
+                frame("java.io.WinNTFileSystem", "checkAccess0"),
+                frame("java.io.File", "canWrite"),
+                frame("sun.awt.shell.ShellFolder", "canWrite"),
+                frame("sun.swing.FilePane", "doDirectoryChanged"),
+                frame("javax.swing.JFileChooser", "setCurrentDirectory"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+                frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput")
+        };
+
+        assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
+    }
+
+    @Test
+    void appCodeInStalledEventIsNotJdkShellFolderStall() {
+        StackTraceElement[] appCallsShell = {
+                frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
+                frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+        };
+        StackTraceElement[] noShellFolder = {
+                frame("javax.swing.JFileChooser", "setSelectedFile"),
+                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+        };
+
+        assertFalse(StrictEdtMode.isJdkShellFolderStall(appCallsShell));
+        assertFalse(StrictEdtMode.isJdkShellFolderStall(noShellFolder));
+        assertFalse(StrictEdtMode.isJdkShellFolderStall(null));
+    }
 }

@@ -182,6 +182,9 @@ public final class StrictEdtMode {
             // Production never halts: queue a throttled Icebase report and keep dispatching.
             // Bounded descriptor on purpose: the raw event string can carry coordinates and
             // other high-cardinality data that would explode server-side issue grouping.
+            if (tag.isEmpty() && isJdkShellFolderStall(edtStack)) {
+                tag = SHELL_FOLDER_TAG;
+            }
             maybeQueueProductionReport(tag + event.getClass().getName() + "#" + event.getID(), edtStack);
         }
 
@@ -201,6 +204,42 @@ public final class StrictEdtMode {
     }
 
     static final String SHUTDOWN_TAG = "shutdown:";
+    static final String SHELL_FOLDER_TAG = "jdk-shellfolder:";
+    private static final String SHELL_FOLDER_PREFIX = "sun.awt.shell.";
+
+    /**
+     * True when the stalled event is stuck in the JDK's shell-folder layer (e.g. JFileChooser
+     * listing or checking access to a slow, network or cloud-placeholder folder through
+     * {@code sun.awt.shell.*}, including the Windows COM thread) with no app code involved. Only the frames above the innermost watchdog dispatch are considered: those
+     * belong to the stalled event, while app frames further down (the code that opened a modal
+     * dialog) do not disqualify it. Any app frame in the stalled event's own frames does.
+     *
+     * <p>Thread-safe: stateless stack inspection.
+     */
+    static boolean isJdkShellFolderStall(StackTraceElement[] stack) {
+        if (stack == null) {
+            return false;
+        }
+        boolean hasShellFolder = false;
+        for (StackTraceElement frame : stack) {
+            if (frame == null || frame.getClassName() == null) {
+                continue;
+            }
+            String className = frame.getClassName();
+            if (className.startsWith(WATCHDOG_PREFIX)) {
+                return hasShellFolder;
+            }
+            for (String appPrefix : APP_FRAME_PREFIXES) {
+                if (className.startsWith(appPrefix)) {
+                    return false;
+                }
+            }
+            if (className.startsWith(SHELL_FOLDER_PREFIX)) {
+                hasShellFolder = true;
+            }
+        }
+        return false;
+    }
     private static final String FINALIZER_CLASS = "com.limegroup.gnutella.gui.Finalizer";
 
     /**
