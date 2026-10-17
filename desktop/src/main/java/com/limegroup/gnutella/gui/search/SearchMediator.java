@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.filters.SearchFilter;
@@ -40,6 +41,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.I18NConvert;
@@ -53,6 +55,10 @@ import org.limewire.util.StringUtils;
 @SuppressWarnings("RegExpRedundantEscape")
 public final class SearchMediator {
   private static final Logger LOG = Logger.getLogger(SearchMediator.class);
+
+  /** Single ordered worker for starting and stopping search performers off the EDT. */
+  private static final ExecutorService SEARCH_QUEUE =
+      ExecutorsHelper.newProcessingQueue("SearchMediator-SearchQueue");
 
   /** Query text is valid. */
   public static final int QUERY_VALID = 0;
@@ -496,26 +502,39 @@ public final class SearchMediator {
       }
     }
 
-    if (!query.startsWith("http")) {
-      manager.stop();
-    }
+    // Stopping the previous search and building every engine's performer is not UI work, and
+    // the first search of a session also loads/initializes each performer's classes and
+    // patterns: run it on the ordered search queue instead of the EDT.
+    final String searchQuery = query;
+    SEARCH_QUEUE.execute(() -> startPerformers(token, searchQuery));
+  }
 
-    if (query.startsWith("http") && !query.endsWith(".torrent")) {
-      manager.perform(
-          SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID)
-              .getPerformer(token, query));
-      boolean isPlaylist = isYouTubePlaylistUrl(query);
-      manager.perform(
-          SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID)
-              .getPerformer(token, query, isPlaylist));
-      return;
-    }
-
-    for (SearchEngine se : SearchEngine.getEngines()) {
-      if (se.isEnabled() && se.isReady()) {
-        ISearchPerformer p = se.getPerformer(token, query);
-        manager.perform(p);
+  /** Runs on {@link #SEARCH_QUEUE} so stops and starts keep the order they were requested in. */
+  private void startPerformers(long token, String query) {
+    try {
+      if (!query.startsWith("http")) {
+        manager.stop();
       }
+
+      if (query.startsWith("http") && !query.endsWith(".torrent")) {
+        manager.perform(
+            SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID)
+                .getPerformer(token, query));
+        boolean isPlaylist = isYouTubePlaylistUrl(query);
+        manager.perform(
+            SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID)
+                .getPerformer(token, query, isPlaylist));
+        return;
+      }
+
+      for (SearchEngine se : SearchEngine.getEngines()) {
+        if (se.isEnabled() && se.isReady()) {
+          ISearchPerformer p = se.getPerformer(token, query);
+          manager.perform(p);
+        }
+      }
+    } catch (Throwable t) {
+      LOG.error("Unable to start search performers for token " + token, t);
     }
   }
 
@@ -642,7 +661,8 @@ public final class SearchMediator {
   }
 
   void stopSearch() {
-    manager.stop();
+    // Same queue as startPerformers(): a stop must not overtake a start requested before it.
+    SEARCH_QUEUE.execute(manager::stop);
   }
 
   public void shutdown() {
