@@ -21,12 +21,15 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconManager;
 import com.limegroup.gnutella.gui.tables.*;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.*;
 
@@ -260,6 +263,11 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
    */
   private final AtomicLong lastUpdateTime = new AtomicLong(0);
 
+  /** Windows only: icon fetched off the EDT for {@link #backgroundIconFile}; see getIcon(). */
+  private volatile Icon backgroundIcon;
+
+  private volatile File backgroundIconFile;
+  private final AtomicBoolean backgroundIconLoading = new AtomicBoolean();
   private static final long MIN_UPDATE_INTERVAL_MS = 100; // Min 100ms between updates
 
   static LimeTableColumn staticGetColumn(int idx) {
@@ -431,18 +439,42 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
   }
 
   private Icon getIcon() {
-    if (initializer.isPartialDownload()) {
-      try {
-        return IconManager.instance().getIconForFile(new File(initializer.getDisplayName()));
-      } catch (Exception e) {
-        // ignore error
-        return IconManager.instance().getIconForFile(initializer.getSaveLocation());
-      }
-    } else if (initializer instanceof SoundcloudDownload) {
-      return IconManager.instance().getIconForFile(initializer.getSaveLocation());
-    } else {
-      return IconManager.instance().getIconForFile(initializer.getSaveLocation());
+    File file;
+    try {
+      file =
+          initializer.isPartialDownload()
+              ? new File(initializer.getDisplayName())
+              : initializer.getSaveLocation();
+    } catch (Exception e) {
+      file = initializer.getSaveLocation();
     }
+    IconManager icons = IconManager.instance();
+    // getValueAt() runs for every row on each 1s refresh, on the EDT. On Windows an uncached
+    // icon is a COM round-trip into the shell (Win32ShellFolder2.getIcon) that can block for
+    // seconds, so fetch it off the EDT; the next refresh sees the new icon and repaints the row.
+    // FileSystemView shell calls are safe from any thread there. Other platforms keep their
+    // chooser-based views on the EDT.
+    if (file == null || !OSUtils.isWindows() || icons.isIconForFileAvailable(file)) {
+      return file == null ? null : icons.getIconForFile(file);
+    }
+    if (file.equals(backgroundIconFile)) {
+      return backgroundIcon;
+    }
+    if (backgroundIconLoading.compareAndSet(false, true)) {
+      final File target = file;
+      DesktopParallelExecutor.execute(
+          () -> {
+            try {
+              backgroundIcon = icons.getIconForFile(target);
+              backgroundIconFile = target; // published after the icon (both volatile)
+            } catch (Throwable t) {
+              backgroundIconFile = target; // don't retry a failing lookup every second
+            } finally {
+              backgroundIconLoading.set(false);
+            }
+          });
+    }
+    return null;
   }
 
   /**

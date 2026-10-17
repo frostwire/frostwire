@@ -5,10 +5,11 @@ import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.settings.UISettings;
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,7 +27,7 @@ public class NativeFileIconController implements FileIconController {
   private final SmartFileView VIEW;
 
   /** A mapping from String (extension) to Icon. */
-  private final Map<String, Icon> EXTENSIONS = new HashMap<>();
+  private final Map<String, Icon> EXTENSIONS = new ConcurrentHashMap<>();
 
   /** A marker null icon so we don't create a file everytime if the icon can't be found. */
   private final Icon NULL = new ImageIcon();
@@ -183,7 +184,9 @@ public class NativeFileIconController implements FileIconController {
         icon = iconCandidate;
       }
       file.delete();
-      EXTENSIONS.put(ext, icon);
+      if (icon != null) { // ConcurrentHashMap rejects nulls; a null result is retried next time
+        EXTENSIONS.put(ext, icon);
+      }
       return icon;
     } catch (Throwable e) {
       // due to a NPE reported in BugManager
@@ -324,7 +327,9 @@ public class NativeFileIconController implements FileIconController {
   /** A FileSystemView FileView. */
   private static class FSVFileView extends SmartFileView {
     private final FileSystemView VIEW = FileSystemView.getFileSystemView();
-    private final Map<File, Icon> CACHE = new FixedsizeForgetfulHashMap<>(50000);
+    // Synchronized: on Windows, BTDownloadDataLine loads uncached icons off the EDT.
+    private final Map<File, Icon> CACHE =
+        Collections.synchronizedMap(new FixedsizeForgetfulHashMap<>(50000));
 
     @Override
     public String getDescription(File f) {
