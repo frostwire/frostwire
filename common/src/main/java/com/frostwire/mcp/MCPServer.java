@@ -21,9 +21,15 @@ public class MCPServer implements MCPRequestHandler {
     private MCPTransport transport;
     private volatile boolean initialized;
     private volatile boolean started;
+    private final String serverVersion;
 
-    public MCPServer() {
+    /**
+     * @param serverVersion the application version reported in serverInfo; the app passes its
+     *                      single source of truth (desktop: FrostWireUtils.getFrostWireVersion())
+     */
+    public MCPServer(String serverVersion) {
         this.registry = new MCPToolRegistry();
+        this.serverVersion = serverVersion;
     }
 
     public void registerTool(MCPTool tool) {
@@ -155,7 +161,7 @@ public class MCPServer implements MCPRequestHandler {
 
         JsonObject serverInfo = new JsonObject();
         serverInfo.addProperty("name", MCPConstants.SERVER_NAME);
-        serverInfo.addProperty("version", MCPConstants.SERVER_VERSION);
+        serverInfo.addProperty("version", serverVersion);
 
         JsonObject result = new JsonObject();
         result.addProperty("protocolVersion", MCPConstants.PROTOCOL_VERSION);

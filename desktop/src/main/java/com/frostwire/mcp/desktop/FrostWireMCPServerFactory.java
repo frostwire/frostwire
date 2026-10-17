@@ -76,6 +76,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.gui.VPNs;
 import com.limegroup.gnutella.settings.ConnectionSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import java.util.List;
 
 public final class FrostWireMCPServerFactory {
@@ -83,7 +84,7 @@ public final class FrostWireMCPServerFactory {
   private FrostWireMCPServerFactory() {}
 
   public static MCPServer createServer(String host, int port, TlsConfig tlsConfig) {
-    MCPServer server = new MCPServer();
+    MCPServer server = new MCPServer(FrostWireUtils.getFrostWireVersion());
     registerAllTools(server);
     registerAllResources(server);
     StreamableHttpTransport transport = new StreamableHttpTransport(host, port, tlsConfig);

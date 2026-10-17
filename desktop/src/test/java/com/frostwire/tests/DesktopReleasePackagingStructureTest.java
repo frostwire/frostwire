@@ -7,11 +7,15 @@
 
 package com.frostwire.tests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.util.FrostWireUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class DesktopReleasePackagingStructureTest {
@@ -46,12 +50,17 @@ class DesktopReleasePackagingStructureTest {
         Files.readString(
             DESKTOP.resolve("../common/src/main/java/com/frostwire/mcp/MCPConstants.java"));
 
-    assertTrue(build.contains("version = '7.1.2'"));
-    // Dated once the release is cut ("FrostWire 7.1.2 MMM/DD/YYYY"), "UNRELEASED" before.
-    assertTrue(changelog.stripLeading().startsWith("FrostWire 7.1.2 "));
-    assertTrue(frostWireUtils.contains("FROSTWIRE_VERSION = \"7.1.2\""));
-    assertTrue(frostWireUtils.contains("BUILD_NUMBER = 334"));
-    assertTrue(mcpConstants.contains("SERVER_VERSION = \"7.1.2\""));
+    // FrostWireUtils.FROSTWIRE_VERSION is the single source of truth for the app version.
+    Matcher version = Pattern.compile("FROSTWIRE_VERSION = \"([^\"]+)\"").matcher(frostWireUtils);
+    assertTrue(version.find());
+    assertEquals(FrostWireUtils.getFrostWireVersion(), version.group(1));
+    // Dated once the release is cut ("FrostWire X.Y.Z MMM/DD/YYYY"), "UNRELEASED" before.
+    assertTrue(changelog.stripLeading().startsWith("FrostWire " + version.group(1) + " "));
+    // No second copy: build.gradle derives its version from FrostWireUtils, and the MCP
+    // server is handed the version at construction instead of keeping a constant.
+    assertFalse(build.matches("(?s).*\\nversion\\s*=\\s*['\"]\\d.*"));
+    assertTrue(build.contains("FROSTWIRE_VERSION"));
+    assertFalse(mcpConstants.contains("SERVER_VERSION"));
   }
 
   @Test

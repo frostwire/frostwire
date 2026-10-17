@@ -16,7 +16,9 @@ plugins {
 }
 
 group = 'com.frostwire'
-version = '7.1.2'
+// Single source of truth for the app version: FrostWireUtils.FROSTWIRE_VERSION.
+version = (file('src/main/java/com/limegroup/gnutella/util/FrostWireUtils.java').text =~
+        /FROSTWIRE_VERSION\s*=\s*"([^"]+)"/)[0][1]
 
 spotless {
     java {
