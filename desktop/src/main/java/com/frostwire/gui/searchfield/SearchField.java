@@ -480,6 +480,7 @@ public class SearchField extends JXSearchField {
       if (OSUtils.isWindows()) {
         setFont(ThemeMediator.DIALOG_FONT);
       }
+      setCellRenderer(new MatchHighlightingCellRenderer(getCellRenderer(), () -> currentText));
     }
 
     /** Sets the text field's selection with the clicked item. */

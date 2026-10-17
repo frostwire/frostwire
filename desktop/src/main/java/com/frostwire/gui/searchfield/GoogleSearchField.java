@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
-import org.limewire.util.LCS;
 import org.limewire.util.StringUtils;
 
 /**
@@ -91,18 +90,6 @@ public class GoogleSearchField extends SearchField {
     } else {
       hidePopup();
     }
-  }
-
-  @Override
-  public void setText(String t) {
-    try {
-      if (t != null) {
-        t = t.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
-      }
-    } catch (Throwable e) {
-      e.printStackTrace();
-    }
-    super.setText(t);
   }
 
   private static String lastClipboardSearchQuery = null;
@@ -221,8 +208,8 @@ public class GoogleSearchField extends SearchField {
       if (!StringUtils.isNullOrEmpty(t, true)) {
         for (int i = 0; i < array.size(); i++) {
           try {
-            String s = LCS.lcsHtml(t, array.get(i).getAsJsonArray().get(0).getAsString());
-            suggestions.add(s);
+            // Plain text: the popup renderer bolds the typed part without the HTML engine.
+            suggestions.add(array.get(i).getAsJsonArray().get(0).getAsString());
           } catch (Throwable e) {
             // e.printStackTrace();
           }

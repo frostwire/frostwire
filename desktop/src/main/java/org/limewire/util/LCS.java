@@ -19,6 +19,7 @@
 package org.limewire.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +31,38 @@ import java.util.List;
  * @author aldenml
  */
 public class LCS {
-  public static String lcsHtml(String s1, String s2) {
-    String rs1 = new StringBuffer(s1).reverse().toString();
-    String rs2 = new StringBuffer(s2).reverse().toString();
-    LcsString seq = new LcsString(rs1, rs2, true);
-    return seq.getHtml();
+  /** Matched runs shorter than this are not highlighted; scattered single letters are noise. */
+  static final int MIN_HIGHLIGHT_RUN = 4;
+
+  /**
+   * Marks the characters of {@code text} that belong to its longest common subsequence with {@code
+   * query}, ignoring case, keeping only matched runs of at least {@value #MIN_HIGHLIGHT_RUN}
+   * characters. Used to bold the typed part of search suggestions without HTML.
+   *
+   * @return one flag per character of {@code text}
+   */
+  public static boolean[] matchMask(String query, String text) {
+    // Compare reversed strings so ties resolve toward the end, as the suggestion UI always did.
+    String reversedQuery = new StringBuilder(query).reverse().toString();
+    String reversedText = new StringBuilder(text).reverse().toString();
+    boolean[] mask = new LcsString(reversedQuery, reversedText, true).reversedTextMatches();
+    clearShortRuns(mask);
+    return mask;
+  }
+
+  private static void clearShortRuns(boolean[] mask) {
+    int runStart = -1;
+    for (int i = 0; i <= mask.length; i++) {
+      boolean matched = i < mask.length && mask[i];
+      if (matched && runStart < 0) {
+        runStart = i;
+      } else if (!matched && runStart >= 0) {
+        if (i - runStart < MIN_HIGHLIGHT_RUN) {
+          Arrays.fill(mask, runStart, i, false);
+        }
+        runStart = -1;
+      }
+    }
   }
 
   /**
@@ -244,50 +272,21 @@ public class LCS {
       }
     }
 
-    private String getHtml() {
-      DiffType type = null;
-      List<DiffEntry<Character>> diffs = diff();
+    /**
+     * Flags, in original (un-reversed) order, which characters of the text given as {@code y} are
+     * part of the longest common subsequence.
+     */
+    private boolean[] reversedTextMatches() {
+      List<DiffEntry<Character>> diffs = new ArrayList<>(diff());
       Collections.reverse(diffs);
-      StringBuilder buf = new StringBuilder();
+      boolean[] mask = new boolean[y.length()];
+      int index = 0;
       for (DiffEntry<Character> entry : diffs) {
-        if (type != entry.getType()) {
-          if (type != null) {
-            int indx = buf.lastIndexOf("<b>");
-            if (buf.length() - indx > 6) {
-              buf.append("</b>");
-            } else {
-              buf.replace(indx, indx + 3, "");
-            }
-          }
-          switch (entry.getType()) {
-            case REMOVE, ADD -> type = null;
-            default -> {
-              buf.append("<b>");
-              type = entry.getType();
-            }
-          }
-        }
-        switch (entry.getType()) {
-          case REMOVE:
-            break;
-          case ADD:
-          default:
-            buf.append(escapeHtml(entry.getValue()));
+        if (entry.getType() != DiffType.REMOVE) {
+          mask[index++] = entry.getType() == DiffType.NONE;
         }
       }
-      if (type != null) {
-        buf.append("<b>");
-      }
-      return "<html>" + buf + "</html>";
-    }
-
-    private String escapeHtml(Character ch) {
-      return switch (ch) {
-        case '<' -> "&lt;";
-        case '>' -> "&gt;";
-        case '"' -> "\\&quot;";
-        default -> ch.toString();
-      };
+      return mask;
     }
   }
 }
