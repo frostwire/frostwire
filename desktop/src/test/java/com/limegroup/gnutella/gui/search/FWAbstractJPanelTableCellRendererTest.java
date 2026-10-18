@@ -45,4 +45,16 @@ class FWAbstractJPanelTableCellRendererTest {
 
     assertEquals(new Rectangle(0, 0, 120, 20), renderer.label.getBounds());
   }
+
+  @Test
+  void renderingManyCellsInstallsTheMotionListenerOnlyOnce() {
+    LabelRenderer renderer = new LabelRenderer();
+    JTable table = new JTable(1, 1);
+
+    for (int row = 0; row < 100; row++) {
+      renderer.getTableCellRendererComponent(table, "cell " + row, row % 2 == 0, false, row, 0);
+    }
+
+    assertEquals(1, renderer.getMouseMotionListeners().length);
+  }
 }

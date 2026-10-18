@@ -18,6 +18,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:The status bar no longer rebuilds itself every 5 seconds or re-lays out the window for every bandwidth update, and checks the firewall state in the background — fewer chances for the UI to stall while idle
    - fix:The first click on a transfers or search results table no longer freezes the UI on slow machines — Java's drag-and-drop cursors are prepared in the background at startup
    - fix:Clicking Play on a transfer no longer freezes the UI while FrostWire checks the file on disk and the torrent's progress — the check runs in the background before the player opens
+   - fix:Transfers and search results no longer get slower the longer FrostWire runs — table cells were adding a new mouse listener every time they were drawn, a leak that eventually froze the UI
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported

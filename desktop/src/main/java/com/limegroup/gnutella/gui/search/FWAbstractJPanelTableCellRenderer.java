@@ -47,6 +47,21 @@ public abstract class FWAbstractJPanelTableCellRenderer extends JPanel
   private JTable table;
   private boolean isSelected;
 
+  /**
+   * Installs the cancel-on-move listener once. It used to be added from
+   * getTableCellRendererComponent(), guarded by getMouseListeners() while adding a motion listener,
+   * so every rendered cell added another listener and the chain grew without bound.
+   */
+  protected FWAbstractJPanelTableCellRenderer() {
+    addMouseMotionListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseMoved(MouseEvent e) {
+            cancelEdit();
+          }
+        });
+  }
+
   @Override
   public Component getTableCellRendererComponent(
       final JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -56,7 +71,6 @@ public abstract class FWAbstractJPanelTableCellRenderer extends JPanel
     setOpaque(true);
     setEnabled(table.isEnabled());
     updateRowBackgroundColor(isSelected, row);
-    initializeDefaultMouseListeners();
     return this;
   }
 
@@ -75,23 +89,6 @@ public abstract class FWAbstractJPanelTableCellRenderer extends JPanel
       //            setBackground((row & 1) == 1 ? alt : table.getBackground());
       setBackground(table.getBackground());
       setForeground(table.getForeground());
-    }
-  }
-
-  private void initializeDefaultMouseListeners() {
-    if (getMouseListeners() == null || getMouseListeners().length == 0) {
-      addMouseMotionListener(
-          new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-              cancelEdit();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-              cancelEdit();
-            }
-          });
     }
   }
 
