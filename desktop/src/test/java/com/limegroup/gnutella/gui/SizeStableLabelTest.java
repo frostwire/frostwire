@@ -7,12 +7,16 @@
 
 package com.limegroup.gnutella.gui;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.Font;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JPanel;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import org.junit.jupiter.api.Test;
 
 class SizeStableLabelTest {
@@ -55,5 +59,19 @@ class SizeStableLabelTest {
   @Test
   void textChangeThatResizesTheLabelStillRequestsLayout() throws Exception {
     assertEquals(1, invalidationsAfter("3 @ 1.2 MB/s", "123 @ 1,234.5 MB/s"));
+  }
+
+  /**
+   * Synth skins (ours, Nimbus) revalidate while installing the UI, before the label has a style.
+   */
+  @Test
+  void canBeCreatedUnderSynthLookAndFeel() throws Exception {
+    LookAndFeel previous = UIManager.getLookAndFeel();
+    UIManager.setLookAndFeel(new NimbusLookAndFeel());
+    try {
+      SwingUtilities.invokeAndWait(() -> assertDoesNotThrow(() -> new SizeStableLabel(null)));
+    } finally {
+      UIManager.setLookAndFeel(previous);
+    }
   }
 }
