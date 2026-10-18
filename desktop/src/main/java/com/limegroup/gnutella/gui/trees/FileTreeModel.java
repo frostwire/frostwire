@@ -60,7 +60,16 @@ public class FileTreeModel extends AbstractTreeModel {
     }
   }
 
+  /**
+   * Directory nodes are never leaves here. Answering exactly would list every visible child
+   * directory on the EDT just to decide whether to draw an expand handle, which stalls on large or
+   * network folders; children are listed when a node is expanded, and an empty folder simply
+   * expands to nothing.
+   */
   public boolean isLeaf(Object node) {
+    if (node instanceof File) {
+      return false;
+    }
     return getChildCount(node) == 0;
   }
 
