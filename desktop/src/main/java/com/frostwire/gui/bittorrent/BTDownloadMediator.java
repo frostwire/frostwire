@@ -67,8 +67,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -996,11 +999,24 @@ public final class BTDownloadMediator
   }
 
   public void addDownload(com.frostwire.bittorrent.BTDownload dl) {
-    try {
-      add(new BittorrentDownload(dl));
-    } catch (Throwable e) {
-      LOG.error("Error adding bittorrent download", e);
-    }
+    // The BittorrentDownload constructor queries libtorrent (name, size, state, pause/resume)
+    // and may clean up incomplete files: build it off the EDT, then add the row on the EDT.
+    buildThenAdd(
+        () -> new BittorrentDownload(dl),
+        BackgroundQueuedExecutorService::schedule,
+        download -> GUIMediator.safeInvokeLater(() -> add(download)));
+  }
+
+  /** Builds a transfer row's object on {@code background} and hands it to {@code adder}. */
+  static <T> void buildThenAdd(Supplier<T> build, Executor background, Consumer<T> adder) {
+    background.execute(
+        () -> {
+          try {
+            adder.accept(build.get());
+          } catch (Throwable e) {
+            LOG.error("Error adding bittorrent download", e);
+          }
+        });
   }
 
   public void updateDownload(com.frostwire.bittorrent.BTDownload dl) {

@@ -23,6 +23,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:Opening Options > Library folders no longer freezes on large or network folders — the folder tree no longer lists every subfolder just to draw its expand arrows
    - fix:Removing a transfer no longer freezes the UI while its files are checked and cleaned up — the row disappears immediately and the removal finishes in the background
    - fix:Starting to drag many files no longer freezes the UI — the drag preview shows the first few files with cached icons and a count of the rest
+   - fix:Starting or restoring downloads no longer freezes the UI while each torrent's details are read — transfers are prepared in the background and then added to the list
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported
