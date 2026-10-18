@@ -56,36 +56,20 @@ public final class TransferDetailPeers extends JPanel
     try {
       // Gather JNI data off EDT
       List<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
-      if (items == null || items.isEmpty()) {
-        return;
-      }
-      // Copy data to plain holders off EDT
+      // Copy data to plain holders off EDT; an empty list must still reach the table so peers
+      // that disconnected are removed.
       List<PeerItemHolder> holders = new ArrayList<>();
-      int i = 0;
-      for (PeerInfo item : items) {
-        holders.add(new PeerItemHolder(i++, item));
+      if (items != null) {
+        for (PeerInfo item : items) {
+          holders.add(new PeerItemHolder(item));
+        }
       }
 
       // Update table on EDT
       SwingUtilities.invokeLater(
           () -> {
             try {
-              if (tableMediator.getSize() == 0) {
-                for (PeerItemHolder holder : holders) {
-                  tableMediator.add(holder);
-                }
-              } else {
-                for (PeerItemHolder holder : holders) {
-                  try {
-                    tableMediator.update(holder);
-                  } catch (IndexOutOfBoundsException ignored) {
-                    // peer might not be there anymore, reload table from scratch
-                    tableMediator.clearTable();
-                    updateData(btDownload);
-                    return;
-                  }
-                }
-              }
+              tableMediator.syncPeers(holders);
             } catch (Throwable e) {
               LOG.error("Error updating peers table UI: " + e.getMessage());
             }
@@ -96,7 +80,9 @@ public final class TransferDetailPeers extends JPanel
   }
 
   public class PeerItemHolder {
-    final int peerOffset;
+    /** Stable identity across refreshes: the peer's endpoint, not its position in the list. */
+    final String key;
+
     final PeerInfo peerItem;
     final String address;
     final String client;
@@ -104,8 +90,8 @@ public final class TransferDetailPeers extends JPanel
     final String source;
     final String progress;
 
-    PeerItemHolder(int peerOffset, PeerInfo peerItem) {
-      this.peerOffset = peerOffset;
+    PeerItemHolder(PeerInfo peerItem) {
+      this.key = peerItem.ip();
       this.peerItem = peerItem;
       this.address = SafeText.sanitize(TransferDetailPeersDataLine.getBittorrentAddress(peerItem));
       String clientName = peerItem.client();
@@ -121,12 +107,12 @@ public final class TransferDetailPeers extends JPanel
 
     @Override
     public int hashCode() {
-      return peerOffset;
+      return key.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-      return obj instanceof PeerItemHolder && ((PeerItemHolder) obj).peerOffset == peerOffset;
+      return obj instanceof PeerItemHolder other && other.key.equals(key);
     }
   }
 }

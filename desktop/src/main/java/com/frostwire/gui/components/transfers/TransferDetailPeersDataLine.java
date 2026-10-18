@@ -165,7 +165,7 @@ public final class TransferDetailPeersDataLine
       case PROGRESS_COLUMN_ID:
         return holder.progress;
       case UPLOADED_COLUMN_ID:
-        return holder.peerItem.totalUpload();
+        return new SizeHolder(holder.peerItem.totalUpload());
       case DOWN_SPEED_COLUMN_ID:
         return (double) peer.downSpeed() / 1024;
       case UP_SPEED_COLUMN_ID:

@@ -27,6 +27,7 @@ import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import javax.swing.*;
 
 public class TransferDetailPeersTableMediator
@@ -34,6 +35,11 @@ public class TransferDetailPeersTableMediator
         TransferDetailPeersModel, TransferDetailPeersDataLine, TransferDetailPeers.PeerItemHolder> {
   TransferDetailPeersTableMediator() {
     super("TRANSFER_DETAIL_PEERS_TABLE_MEDIATOR");
+  }
+
+  /** Shows exactly {@code peers}, keeping each row tied to the same peer across refreshes. */
+  void syncPeers(List<TransferDetailPeers.PeerItemHolder> peers) {
+    KeyedRowSync.sync(DATA_MODEL, peers, holder -> holder.key);
   }
 
   @Override
