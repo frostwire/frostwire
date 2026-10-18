@@ -25,10 +25,13 @@ import com.frostwire.util.MediaSource;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 /**
@@ -127,12 +130,32 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
   }
 
   private void onPlay() {
-    if (dl != null && dl.canPreview()) {
-      File file = dl.getPreviewFile();
-      if (file != null) {
-        GUIMediator.instance().launchMedia(new MediaSource(file));
-      }
+    play(
+        dl,
+        BackgroundQueuedExecutorService::schedule,
+        file ->
+            GUIMediator.safeInvokeLater(
+                () -> GUIMediator.instance().launchMedia(new MediaSource(file))));
+  }
+
+  /**
+   * Decides off the EDT whether {@code download} can be previewed: canPreview() checks the file on
+   * disk and may toggle sequential download through libtorrent. {@code dl} is captured first
+   * because this renderer instance is shared by every row.
+   */
+  static void play(BTDownload download, Executor background, Consumer<File> launcher) {
+    if (download == null) {
+      return;
     }
+    background.execute(
+        () -> {
+          if (download.canPreview()) {
+            File file = download.getPreviewFile();
+            if (file != null) {
+              launcher.accept(file);
+            }
+          }
+        });
   }
 
   @Override
