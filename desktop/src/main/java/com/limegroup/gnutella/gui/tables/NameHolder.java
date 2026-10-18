@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.gui.LocaleLabel.LocaleString;
+import javax.swing.Icon;
 
 /**
  * @author gubatron
@@ -39,6 +40,11 @@ public class NameHolder implements Comparable<NameHolder> {
 
   public LocaleString getLocaleString() {
     return localeString;
+  }
+
+  /** Optional icon shown before the name; none by default. */
+  public Icon getIcon() {
+    return null;
   }
 
   public String toString() {

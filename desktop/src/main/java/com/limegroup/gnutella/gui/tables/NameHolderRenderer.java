@@ -46,6 +46,7 @@ public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer 
     if (labelText != null) {
       if (value != null) {
         labelText.setText(value.getLocaleString());
+        labelText.setIcon(value.getIcon());
       }
       if (table != null) {
         syncFontSize(table, labelText);

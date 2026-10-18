@@ -242,6 +242,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
   }
 
+  private void repaintTable() {
+    Component table = SwingUtilities.getAncestorOfClass(JTable.class, this);
+    if (table != null) {
+      table.repaint();
+    }
+  }
+
   private void labelBrowse_mouseReleased(MouseEvent e) {
     if (e.getButton() == MouseEvent.BUTTON1 && browsableHolderPub != null) {
       PeerCatalogWindow.showForPeer(browsableHolderPub);
@@ -258,6 +265,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         return;
       }
       uiSearchResult.download(isTorrent);
+      DownloadedSearchResults.instance().add(DownloadedSearchResults.keyOf(uiSearchResult));
+      repaintTable(); // shows the downloaded mark in the Name column
       // Only show Transfers tab for direct downloads, not for preliminary results that trigger
       // secondary searches
       boolean isPreliminary =

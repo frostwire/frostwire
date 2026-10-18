@@ -363,6 +363,7 @@ public final class SearchMediator {
       return;
     }
     line.getSearchResult().download(isTorrent);
+    DownloadedSearchResults.instance().add(DownloadedSearchResults.keyOf(line.getSearchResult()));
   }
 
   /**
