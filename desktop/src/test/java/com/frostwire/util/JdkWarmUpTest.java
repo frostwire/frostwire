@@ -42,7 +42,9 @@ class JdkWarmUpTest {
   }
 
   @Test
-  void dragAndDropWarmUpNamesARealClass() {
-    assertDoesNotThrow(() -> Class.forName(JdkWarmUp.DRAG_SOURCE_CLASS));
+  void everyClassToInitializeExistsAndLoads() {
+    for (String className : JdkWarmUp.CLASSES_TO_INITIALIZE) {
+      assertDoesNotThrow(() -> Class.forName(className), className);
+    }
   }
 }

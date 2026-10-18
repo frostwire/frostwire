@@ -26,8 +26,8 @@ import javax.swing.UIManager;
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
  *       fallback "slot" fonts, and each slot reads its character map from disk the first time it is
  *       consulted (several MB for CJK fonts).
- *   <li>Drag and drop: {@code java.awt.dnd.DragSource} builds its drag cursors from images when the
- *       class initializes, on the first mouse press in a drag-enabled table.
+ *   <li>Slow static initializers of JDK classes first used while painting or clicking, see {@link
+ *       #CLASSES_TO_INITIALIZE}.
  * </ul>
  *
  * Call after the look and feel is installed, so the UI fonts are the ones the app will paint with.
@@ -42,7 +42,13 @@ public final class JdkWarmUp {
   /** Unassigned code point no font maps, so the lookup walks (and initializes) every slot. */
   private static final int UNMAPPED_CODE_POINT = 0x0378;
 
-  static final String DRAG_SOURCE_CLASS = "java.awt.dnd.DragSource";
+  /**
+   * JDK classes whose static initializers are slow and would otherwise run on the EDT: DragSource
+   * decodes the drag cursors (first mouse press in a drag-enabled table), SunGraphicsCallback
+   * brings up java.util.logging through its PlatformLogger (first container paint).
+   */
+  static final List<String> CLASSES_TO_INITIALIZE =
+      List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
 
   private JdkWarmUp() {}
 
@@ -69,12 +75,12 @@ public final class JdkWarmUp {
       // Best effort: the first on-EDT use pays these costs instead.
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
     }
-    try {
-      // DragSource's static initializer decodes the drag cursors (PixelGrabber); otherwise the
-      // first mouse press on a drag-enabled table pays it on the EDT.
-      Class.forName(DRAG_SOURCE_CLASS);
-    } catch (Throwable t) {
-      LOG.warn("Drag-and-drop warm-up failed: " + t.getMessage(), t);
+    for (String className : CLASSES_TO_INITIALIZE) {
+      try {
+        Class.forName(className);
+      } catch (Throwable t) {
+        LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
+      }
     }
   }
 
