@@ -7,6 +7,7 @@
 
 package com.frostwire.util;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class TextWarmUpTest {
+class JdkWarmUpTest {
 
   @Test
   void distinctFontsKeepsOneFontPerFamilyAndStyleAndSkipsOtherValues() {
@@ -29,7 +30,7 @@ class TextWarmUpTest {
     defaults.put("Label.foreground", Color.BLACK);
     defaults.put("Button.margin", "not a font");
 
-    List<Font> fonts = TextWarmUp.distinctFonts(defaults);
+    List<Font> fonts = JdkWarmUp.distinctFonts(defaults);
 
     assertEquals(3, fonts.size());
     assertTrue(fonts.stream().allMatch(f -> f.getSize() == 12));
@@ -37,6 +38,11 @@ class TextWarmUpTest {
 
   @Test
   void distinctFontsOfEmptyDefaultsIsEmpty() {
-    assertTrue(TextWarmUp.distinctFonts(Map.of()).isEmpty());
+    assertTrue(JdkWarmUp.distinctFonts(Map.of()).isEmpty());
+  }
+
+  @Test
+  void dragAndDropWarmUpNamesARealClass() {
+    assertDoesNotThrow(() -> Class.forName(JdkWarmUp.DRAG_SOURCE_CLASS));
   }
 }

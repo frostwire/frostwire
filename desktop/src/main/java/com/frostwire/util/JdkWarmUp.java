@@ -17,8 +17,8 @@ import java.util.Set;
 import javax.swing.UIManager;
 
 /**
- * Pays the JDK's one-time text costs on a background thread at startup, so the first paint that
- * needs them does not stall the EDT.
+ * Pays the JDK's one-time initialization costs on a background thread at startup, so the first
+ * paint or click that needs them does not stall the EDT.
  *
  * <ul>
  *   <li>Shaping: the first complex-text layout initializes HarfBuzz ({@code HBShaper.<clinit>},
@@ -26,12 +26,14 @@ import javax.swing.UIManager;
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
  *       fallback "slot" fonts, and each slot reads its character map from disk the first time it is
  *       consulted (several MB for CJK fonts).
+ *   <li>Drag and drop: {@code java.awt.dnd.DragSource} builds its drag cursors from images when the
+ *       class initializes, on the first mouse press in a drag-enabled table.
  * </ul>
  *
  * Call after the look and feel is installed, so the UI fonts are the ones the app will paint with.
  */
-public final class TextWarmUp {
-  private static final Logger LOG = Logger.getLogger(TextWarmUp.class);
+public final class JdkWarmUp {
+  private static final Logger LOG = Logger.getLogger(JdkWarmUp.class);
 
   /** Complex script text: layoutGlyphVector always goes through GlyphLayout and the shaper. */
   private static final String SHAPING_SAMPLE =
@@ -40,10 +42,12 @@ public final class TextWarmUp {
   /** Unassigned code point no font maps, so the lookup walks (and initializes) every slot. */
   private static final int UNMAPPED_CODE_POINT = 0x0378;
 
-  private TextWarmUp() {}
+  static final String DRAG_SOURCE_CLASS = "java.awt.dnd.DragSource";
+
+  private JdkWarmUp() {}
 
   public static void startInBackground() {
-    Thread warmUp = new Thread(TextWarmUp::warmUp, "TextWarmUp");
+    Thread warmUp = new Thread(JdkWarmUp::warmUp, "JdkWarmUp");
     warmUp.setDaemon(true);
     warmUp.start();
   }
@@ -64,6 +68,13 @@ public final class TextWarmUp {
     } catch (Throwable t) {
       // Best effort: the first on-EDT use pays these costs instead.
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      // DragSource's static initializer decodes the drag cursors (PixelGrabber); otherwise the
+      // first mouse press on a drag-enabled table pays it on the EDT.
+      Class.forName(DRAG_SOURCE_CLASS);
+    } catch (Throwable t) {
+      LOG.warn("Drag-and-drop warm-up failed: " + t.getMessage(), t);
     }
   }
 

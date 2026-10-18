@@ -59,8 +59,8 @@ import com.frostwire.search.relay.icebridge.client.IceBridgeSearchTransport;
 import com.frostwire.search.relay.icebridge.client.IncomingSearchRequestHandler;
 import com.frostwire.search.relay.icebridge.client.PeerRegistrySync;
 import com.frostwire.service.ErrorService;
+import com.frostwire.util.JdkWarmUp;
 import com.frostwire.util.OSUtils;
-import com.frostwire.util.TextWarmUp;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.ExternalControl;
 import com.limegroup.gnutella.LimeCoreGlue;
@@ -335,10 +335,10 @@ final class Initializer {
     // Pre-load header button background images to avoid MediaTracker blocking the EDT during
     // MainFrame construction
     ApplicationHeader.preloadImages();
-    // Pay the JDK's one-time text costs (HarfBuzz shaper init, fallback font character maps read
-    // from disk) off the EDT; on slow machines the first paint that needs them stalled the EDT for
-    // over 5 seconds.
-    TextWarmUp.startInBackground();
+    // Pay the JDK's one-time costs (HarfBuzz shaper init, fallback font character maps read from
+    // disk, drag-and-drop cursors) off the EDT; on slow machines the first paint or click that
+    // needed them stalled the EDT for over 5 seconds.
+    JdkWarmUp.startInBackground();
 
     // Load up the HTML engine.
     GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
