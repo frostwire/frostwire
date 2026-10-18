@@ -158,7 +158,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
   /** Last VPN state the bar was built for; null until the first VPN check reports. */
   private Boolean lastVpnStatus;
 
-  /** Width the bar was last laid out for after a window resize. */
+  /** Status bar width the indicators were last laid out for after a resize. */
   private int lastResizeRefreshWidth = -1;
 
   private final SwingDebouncer resizeRefresh =
@@ -179,20 +179,16 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         () -> {
           GUIMediator.setSplashScreenString(I18n.tr("Loading Status Window..."));
           getComponent().addMouseListener(STATUS_BAR_LISTENER);
-          GUIMediator.getAppFrame()
+          // refresh() decides which indicators fit from the bar's width, so re-lay it out when the
+          // bar itself is resized: on its first real layout at startup and whenever the window
+          // width changes. Live resizes fire many events; rebuild once after they settle.
+          getComponent()
               .addComponentListener(
-                  new ComponentListener() {
+                  new ComponentAdapter() {
+                    @Override
                     public void componentResized(ComponentEvent arg0) {
-                      // Live resizes fire many events; refresh() rebuilds the whole bar, so
-                      // do it once after the resize settles, and only for width changes.
                       resizeRefresh.trigger();
                     }
-
-                    public void componentMoved(ComponentEvent arg0) {}
-
-                    public void componentShown(ComponentEvent arg0) {}
-
-                    public void componentHidden(ComponentEvent arg0) {}
                   });
           GUIMediator.setSplashScreenString(
               I18n.tr("Creating donation buttons so you can give us a hand..."));
@@ -810,7 +806,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
   }
 
   private void refreshAfterResize() {
-    int width = GUIMediator.getAppFrame().getWidth();
+    int width = BAR.getWidth();
     if (width != lastResizeRefreshWidth) {
       lastResizeRefreshWidth = width;
       refresh();
