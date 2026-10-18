@@ -25,6 +25,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:Opening Options > Library folders no longer freezes on large or network folders — the folder tree no longer lists every subfolder just to draw its expand arrows
    - fix:Removing a transfer no longer freezes the UI while its files are checked and cleaned up — the row disappears immediately and the removal finishes in the background
    - fix:The Transfers list no longer stalls while drawing the Seeding column — each row's seeding state is computed in the background instead of asking the BitTorrent engine while painting
+   - fix:Transfers no longer start a new thread every second each to refresh their status — refreshes share a small background pool, which keeps the UI responsive with many torrents
    - fix:Starting to drag many files no longer freezes the UI — the drag preview shows the first few files with cached icons and a count of the rest
    - fix:Starting or restoring downloads no longer freezes the UI while each torrent's details are read — transfers are prepared in the background and then added to the list
 

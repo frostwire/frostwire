@@ -28,12 +28,14 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -44,6 +46,14 @@ public final class BTDownload implements BittorrentDownload {
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
     private static final long STATUS_CACHE_MILLIS = 1000; // Cache status for 1 second to avoid ANR
+    /**
+     * Shared workers for status cache refreshes. Each transfer keeps at most one refresh in flight
+     * (statusRefreshScheduled), so the queue is bounded by the number of transfers; a new thread
+     * per refresh meant a native thread creation per transfer every second, started from UI
+     * callers of the cached getters.
+     */
+    static final ExecutorService STATUS_REFRESH_EXECUTOR =
+            ExecutorsHelper.newFixedSizeUnboundedThreadPool(2, "BTDownload-StatusRefresh");
     private static final int[] ALERT_TYPES = {
             AlertType.TORRENT_FINISHED.swig(),
             AlertType.TORRENT_REMOVED.swig(),
@@ -377,7 +387,7 @@ public final class BTDownload implements BittorrentDownload {
      * Schedules asynchronous refresh of status cache to avoid blocking operations on EDT.
      */
     private void scheduleStatusRefresh() {
-        com.frostwire.concurrent.concurrent.ThreadExecutor.startThread(() -> {
+        STATUS_REFRESH_EXECUTOR.execute(() -> {
             try {
                 refreshStatusCache();
             } catch (Exception e) {
@@ -385,7 +395,7 @@ public final class BTDownload implements BittorrentDownload {
             } finally {
                 statusRefreshScheduled.set(false);
             }
-        }, "BTDownload-StatusRefresh");
+        });
     }
 
     /**
