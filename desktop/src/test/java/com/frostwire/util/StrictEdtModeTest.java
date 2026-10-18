@@ -7,204 +7,204 @@
 
 package com.frostwire.util;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 class StrictEdtModeTest {
 
-    @Test
-    void identifiesMacMetalQueueFlushStall() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("java.lang.Object", "wait0", "Object.java", -2),
-                new StackTraceElement("sun.java2d.metal.MTLRenderQueue$QueueFlusher",
-                        "flushNow", "MTLRenderQueue.java", 180),
-                new StackTraceElement("com.formdev.flatlaf.ui.FlatProgressBarUI",
-                        "paint", "FlatProgressBarUI.java", 271)
-        };
+  @Test
+  void identifiesMacMetalQueueFlushStall() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("java.lang.Object", "wait0", "Object.java", -2),
+      new StackTraceElement(
+          "sun.java2d.metal.MTLRenderQueue$QueueFlusher", "flushNow", "MTLRenderQueue.java", 180),
+      new StackTraceElement(
+          "com.formdev.flatlaf.ui.FlatProgressBarUI", "paint", "FlatProgressBarUI.java", 271)
+    };
 
-        assertTrue(StrictEdtMode.isMacMetalRenderPipelineStall(stack));
-    }
+    assertTrue(StrictEdtMode.isMacMetalRenderPipelineStall(stack));
+  }
 
-    @Test
-    void applicationEdtWaitStillFailsStrictMode() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("com.frostwire.gui.SomeAction",
-                        "actionPerformed", "SomeAction.java", 42)
-        };
+  @Test
+  void applicationEdtWaitStillFailsStrictMode() {
+    StackTraceElement[] stack = {
+      new StackTraceElement(
+          "com.frostwire.gui.SomeAction", "actionPerformed", "SomeAction.java", 42)
+    };
 
-        assertFalse(StrictEdtMode.isMacMetalRenderPipelineStall(stack));
-        assertFalse(StrictEdtMode.isMacMetalRenderPipelineStall(null));
-        assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
-        assertFalse(StrictEdtMode.isRenderPipelineStall(null));
-    }
+    assertFalse(StrictEdtMode.isMacMetalRenderPipelineStall(stack));
+    assertFalse(StrictEdtMode.isMacMetalRenderPipelineStall(null));
+    assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
+    assertFalse(StrictEdtMode.isRenderPipelineStall(null));
+  }
 
-    @Test
-    void xwaylandSoftwarePaintStallIsRenderPipeline() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("sun.java2d.loops.MaskBlit",
-                        "MaskBlit", "MaskBlit.java", -2),
-                new StackTraceElement("sun.java2d.loops.Blit$GeneralMaskBlit",
-                        "Blit", "Blit.java", 205),
-                new StackTraceElement("sun.java2d.pipe.SpanShapeRenderer",
-                        "renderSpans", "SpanShapeRenderer.java", 195),
-                new StackTraceElement("java.awt.SunGraphics2D",
-                        "drawLine", "SunGraphics2D.java", 2244),
-                new StackTraceElement("javax.swing.border.EtchedBorder",
-                        "paintBorder", "EtchedBorder.java", 153),
-                new StackTraceElement("javax.swing.JComponent",
-                        "paint", "JComponent.java", 1133),
-                new StackTraceElement("javax.swing.RepaintManager$ProcessingRunnable",
-                        "run", "RepaintManager.java", 1808),
-                new StackTraceElement("java.awt.EventQueue",
-                        "dispatchEvent", "EventQueue.java", 693)
-        };
+  @Test
+  void xwaylandSoftwarePaintStallIsRenderPipeline() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("sun.java2d.loops.MaskBlit", "MaskBlit", "MaskBlit.java", -2),
+      new StackTraceElement("sun.java2d.loops.Blit$GeneralMaskBlit", "Blit", "Blit.java", 205),
+      new StackTraceElement(
+          "sun.java2d.pipe.SpanShapeRenderer", "renderSpans", "SpanShapeRenderer.java", 195),
+      new StackTraceElement("java.awt.SunGraphics2D", "drawLine", "SunGraphics2D.java", 2244),
+      new StackTraceElement(
+          "javax.swing.border.EtchedBorder", "paintBorder", "EtchedBorder.java", 153),
+      new StackTraceElement("javax.swing.JComponent", "paint", "JComponent.java", 1133),
+      new StackTraceElement(
+          "javax.swing.RepaintManager$ProcessingRunnable", "run", "RepaintManager.java", 1808),
+      new StackTraceElement("java.awt.EventQueue", "dispatchEvent", "EventQueue.java", 693)
+    };
 
-        assertTrue(StrictEdtMode.isRenderPipelineStall(stack));
-    }
+    assertTrue(StrictEdtMode.isRenderPipelineStall(stack));
+  }
 
-    @Test
-    void watchdogFrameInPaintStackStillExempt() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("sun.java2d.loops.MaskBlit",
-                        "MaskBlit", "MaskBlit.java", -2),
-                new StackTraceElement("sun.java2d.pipe.SpanShapeRenderer",
-                        "renderSpans", "SpanShapeRenderer.java", 195),
-                new StackTraceElement("javax.swing.border.EtchedBorder",
-                        "paintBorder", "EtchedBorder.java", 153),
-                new StackTraceElement("javax.swing.JComponent",
-                        "paint", "JComponent.java", 1133),
-                new StackTraceElement("com.frostwire.util.StrictEdtMode$TimingEventQueue",
-                        "dispatchEvent", "StrictEdtMode.java", 68)
-        };
+  @Test
+  void watchdogFrameInPaintStackStillExempt() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("sun.java2d.loops.MaskBlit", "MaskBlit", "MaskBlit.java", -2),
+      new StackTraceElement(
+          "sun.java2d.pipe.SpanShapeRenderer", "renderSpans", "SpanShapeRenderer.java", 195),
+      new StackTraceElement(
+          "javax.swing.border.EtchedBorder", "paintBorder", "EtchedBorder.java", 153),
+      new StackTraceElement("javax.swing.JComponent", "paint", "JComponent.java", 1133),
+      new StackTraceElement(
+          "com.frostwire.util.StrictEdtMode$TimingEventQueue",
+          "dispatchEvent",
+          "StrictEdtMode.java",
+          68)
+    };
 
-        assertTrue(StrictEdtMode.isRenderPipelineStall(stack));
-    }
+    assertTrue(StrictEdtMode.isRenderPipelineStall(stack));
+  }
 
-    @Test
-    void appFrameInPaintStackStillFailsStrictMode() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("sun.java2d.loops.MaskBlit",
-                        "MaskBlit", "MaskBlit.java", -2),
-                new StackTraceElement("javax.swing.JComponent",
-                        "paint", "JComponent.java", 1133),
-                new StackTraceElement("com.limegroup.gnutella.gui.search.SearchMediator",
-                        "paintResults", "SearchMediator.java", 42)
-        };
+  @Test
+  void appFrameInPaintStackStillFailsStrictMode() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("sun.java2d.loops.MaskBlit", "MaskBlit", "MaskBlit.java", -2),
+      new StackTraceElement("javax.swing.JComponent", "paint", "JComponent.java", 1133),
+      new StackTraceElement(
+          "com.limegroup.gnutella.gui.search.SearchMediator",
+          "paintResults",
+          "SearchMediator.java",
+          42)
+    };
 
-        assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
-    }
+    assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
+  }
 
-    @Test
-    void swingPaintWithoutJava2dStillFailsStrictMode() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("javax.swing.JComponent",
-                        "paint", "JComponent.java", 1133),
-                new StackTraceElement("com.frostwire.gui.SomeAction",
-                        "actionPerformed", "SomeAction.java", 42)
-        };
+  @Test
+  void swingPaintWithoutJava2dStillFailsStrictMode() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("javax.swing.JComponent", "paint", "JComponent.java", 1133),
+      new StackTraceElement(
+          "com.frostwire.gui.SomeAction", "actionPerformed", "SomeAction.java", 42)
+    };
 
-        assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
-        assertFalse(StrictEdtMode.isRenderPipelineStall(new StackTraceElement[0]));
-    }
+    assertFalse(StrictEdtMode.isRenderPipelineStall(stack));
+    assertFalse(StrictEdtMode.isRenderPipelineStall(new StackTraceElement[0]));
+  }
 
-    @Test
-    void finalizerShutdownFrameMarksShutdownSequence() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("java.lang.ClassLoader", "loadClass", "ClassLoader.java", 502),
-                new StackTraceElement("com.limegroup.gnutella.gui.Finalizer", "shutdown", "Finalizer.java", 33),
-                new StackTraceElement("com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458)
-        };
+  @Test
+  void finalizerShutdownFrameMarksShutdownSequence() {
+    StackTraceElement[] stack = {
+      new StackTraceElement("java.lang.ClassLoader", "loadClass", "ClassLoader.java", 502),
+      new StackTraceElement(
+          "com.limegroup.gnutella.gui.Finalizer", "shutdown", "Finalizer.java", 33),
+      new StackTraceElement(
+          "com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458)
+    };
 
-        assertTrue(StrictEdtMode.isShutdownSequence(stack));
-    }
+    assertTrue(StrictEdtMode.isShutdownSequence(stack));
+  }
 
-    @Test
-    void otherStallsAreNotShutdownSequence() {
-        StackTraceElement[] stack = {
-                new StackTraceElement("com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458),
-                new StackTraceElement("com.frostwire.gui.SomeAction", "actionPerformed", "SomeAction.java", 42)
-        };
+  @Test
+  void otherStallsAreNotShutdownSequence() {
+    StackTraceElement[] stack = {
+      new StackTraceElement(
+          "com.limegroup.gnutella.gui.GUIMediator", "shutdown", "GUIMediator.java", 458),
+      new StackTraceElement(
+          "com.frostwire.gui.SomeAction", "actionPerformed", "SomeAction.java", 42)
+    };
 
-        assertFalse(StrictEdtMode.isShutdownSequence(stack));
-        assertFalse(StrictEdtMode.isShutdownSequence(null));
-    }
+    assertFalse(StrictEdtMode.isShutdownSequence(stack));
+    assertFalse(StrictEdtMode.isShutdownSequence(null));
+  }
 
-    private static StackTraceElement frame(String className, String method) {
-        return new StackTraceElement(className, method, null, -1);
-    }
+  private static StackTraceElement frame(String className, String method) {
+    return new StackTraceElement(className, method, null, -1);
+  }
 
-    @Test
-    void shellFolderWaitInsideModalFileChooserIsJdkShellFolderStall() {
-        StackTraceElement[] stack = {
-                frame("java.util.concurrent.FutureTask", "get"),
-                frame("sun.awt.shell.Win32ShellFolderManager2$ComInvoker", "invoke"),
-                frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
-                frame("javax.swing.JFileChooser", "setSelectedFile"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
-                frame("java.awt.Dialog", "show"),
-                frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
-        };
+  @Test
+  void shellFolderWaitInsideModalFileChooserIsJdkShellFolderStall() {
+    StackTraceElement[] stack = {
+      frame("java.util.concurrent.FutureTask", "get"),
+      frame("sun.awt.shell.Win32ShellFolderManager2$ComInvoker", "invoke"),
+      frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
+      frame("javax.swing.JFileChooser", "setSelectedFile"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.Dialog", "show"),
+      frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
 
-        assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
-    }
+    assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
+  }
 
-    @Test
-    void slowFolderAccessCheckInFileChooserIsJdkShellFolderStall() {
-        StackTraceElement[] stack = {
-                frame("java.io.WinNTFileSystem", "checkAccess0"),
-                frame("java.io.File", "canWrite"),
-                frame("sun.awt.shell.ShellFolder", "canWrite"),
-                frame("sun.swing.FilePane", "doDirectoryChanged"),
-                frame("javax.swing.JFileChooser", "setCurrentDirectory"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
-                frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput")
-        };
+  @Test
+  void slowFolderAccessCheckInFileChooserIsJdkShellFolderStall() {
+    StackTraceElement[] stack = {
+      frame("java.io.WinNTFileSystem", "checkAccess0"),
+      frame("java.io.File", "canWrite"),
+      frame("sun.awt.shell.ShellFolder", "canWrite"),
+      frame("sun.swing.FilePane", "doDirectoryChanged"),
+      frame("javax.swing.JFileChooser", "setCurrentDirectory"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("com.limegroup.gnutella.gui.FileChooserHandler", "getInput")
+    };
 
-        assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
-    }
+    assertTrue(StrictEdtMode.isJdkShellFolderStall(stack));
+  }
 
-    @Test
-    void appCodeInStalledEventIsNotJdkShellFolderStall() {
-        StackTraceElement[] appCallsShell = {
-                frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
-                frame("com.frostwire.gui.SomeAction", "actionPerformed"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
-        };
-        StackTraceElement[] noShellFolder = {
-                frame("javax.swing.JFileChooser", "setSelectedFile"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
-        };
+  @Test
+  void appCodeInStalledEventIsNotJdkShellFolderStall() {
+    StackTraceElement[] appCallsShell = {
+      frame("sun.awt.shell.Win32ShellFolder2", "listFiles"),
+      frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] noShellFolder = {
+      frame("javax.swing.JFileChooser", "setSelectedFile"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
 
-        assertFalse(StrictEdtMode.isJdkShellFolderStall(appCallsShell));
-        assertFalse(StrictEdtMode.isJdkShellFolderStall(noShellFolder));
-        assertFalse(StrictEdtMode.isJdkShellFolderStall(null));
-    }
+    assertFalse(StrictEdtMode.isJdkShellFolderStall(appCallsShell));
+    assertFalse(StrictEdtMode.isJdkShellFolderStall(noShellFolder));
+    assertFalse(StrictEdtMode.isJdkShellFolderStall(null));
+  }
 
-    @Test
-    void idleEdtStackIsNotInsideWatchedDispatch() {
-        StackTraceElement[] idle = {
-                frame("jdk.internal.misc.Unsafe", "park"),
-                frame("java.awt.EventQueue", "getNextEvent"),
-                frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
-                frame("java.awt.EventDispatchThread", "run")
-        };
+  @Test
+  void idleEdtStackIsNotInsideWatchedDispatch() {
+    StackTraceElement[] idle = {
+      frame("jdk.internal.misc.Unsafe", "park"),
+      frame("java.awt.EventQueue", "getNextEvent"),
+      frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+      frame("java.awt.EventDispatchThread", "run")
+    };
 
-        assertFalse(StrictEdtMode.isInsideWatchedDispatch(idle));
-        assertFalse(StrictEdtMode.isInsideWatchedDispatch(null));
-    }
+    assertFalse(StrictEdtMode.isInsideWatchedDispatch(idle));
+    assertFalse(StrictEdtMode.isInsideWatchedDispatch(null));
+  }
 
-    @Test
-    void stalledEventStackIsInsideWatchedDispatch() {
-        StackTraceElement[] stalled = {
-                frame("com.frostwire.gui.SomeAction", "actionPerformed"),
-                frame("java.awt.EventQueue", "dispatchEvent"),
-                frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
-                frame("java.awt.EventDispatchThread", "run")
-        };
+  @Test
+  void stalledEventStackIsInsideWatchedDispatch() {
+    StackTraceElement[] stalled = {
+      frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.EventDispatchThread", "run")
+    };
 
-        assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalled));
-    }
+    assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalled));
+  }
 }
