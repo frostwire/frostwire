@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,20 +26,20 @@ import com.limegroup.gnutella.gui.tables.NameHolder;
  * @author aldenml
  */
 final class SearchResultNameHolder extends NameHolder {
-    private final String displayName;
-    private final String query;
+  private final String displayName;
+  private final String query;
 
-    SearchResultNameHolder(final UISearchResult sr) {
-        super(SafeText.sanitize(sr.getDisplayName()));
-        this.displayName = sr.getDisplayName();
-        this.query = sr.getQuery();
-    }
+  SearchResultNameHolder(final UISearchResult sr) {
+    super(SafeText.sanitize(sr.getDisplayName()));
+    this.displayName = sr.getDisplayName();
+    this.query = sr.getQuery();
+  }
 
-    String getQuery() {
-        return query;
-    }
+  String getQuery() {
+    return query;
+  }
 
-    public String toString() {
-        return displayName;
-    }
+  public String toString() {
+    return displayName;
+  }
 }
