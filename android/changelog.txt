@@ -1,4 +1,5 @@
 FrostWire 3.2.3 build 779 UNRELEASED
+  - fix:The app icon is sharp on every launcher — it is now an adaptive icon rendered from the vector logo at each screen density, instead of a small bitmap the launcher shrank into its own shape (#1209)
   - fix:Transfers no longer start a new thread every second each to refresh their status — refreshes share a small background pool
   - fix:SoundCloud search and downloads support downloadable HLS AAC tracks, saving segmented audio as M4A while retaining progressive MP3 support
   - fix:Completed downloads count toward peer trust again — karma endorsements are signed with the same software key provider used everywhere else instead of being discarded
