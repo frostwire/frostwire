@@ -2,7 +2,6 @@ package com.frostwire.util;
 
 // StrictEdtMode.java
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.limegroup.gnutella.gui.CrashReportSpooler;
 import java.awt.*;
 import java.lang.management.ManagementFactory;
@@ -10,6 +9,8 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,8 +23,25 @@ import java.util.concurrent.atomic.AtomicLong;
  * terminate the process (so you get a crash report pointing at the culprit).
  */
 public final class StrictEdtMode {
-  private static final ScheduledExecutorService SCH =
-      ExecutorsHelper.newScheduledThreadPool(1, "edt-strict-watchdog");
+  private static final ScheduledExecutorService SCH = newWatchdogScheduler();
+
+  /**
+   * One timer is armed per dispatched event and cancelled when the event finishes, so cancelled
+   * timers must leave the queue at once; otherwise every event would leave a task behind for the
+   * whole threshold (tens of thousands queued during event storms).
+   */
+  static ScheduledThreadPoolExecutor newWatchdogScheduler() {
+    ScheduledThreadPoolExecutor scheduler =
+        new ScheduledThreadPoolExecutor(
+            1,
+            runnable -> {
+              Thread thread = new Thread(runnable, "edt-strict-watchdog");
+              thread.setDaemon(true);
+              return thread;
+            });
+    scheduler.setRemoveOnCancelPolicy(true);
+    return scheduler;
+  }
 
   public static void install(Duration threshold) {
     EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
@@ -57,18 +75,20 @@ public final class StrictEdtMode {
       currentTicket = my;
 
       // arm a one-shot timer: if we're still handling THIS event after threshold -> dump & crash
-      SCH.schedule(
-          () -> {
-            if (currentTicket == my) {
-              dumpEdtAndCrash(event, edt, thresholdMs);
-            }
-          },
-          thresholdMs,
-          TimeUnit.MILLISECONDS);
+      ScheduledFuture<?> stallTimer =
+          SCH.schedule(
+              () -> {
+                if (currentTicket == my) {
+                  dumpEdtAndCrash(event, edt, thresholdMs);
+                }
+              },
+              thresholdMs,
+              TimeUnit.MILLISECONDS);
 
       try {
         super.dispatchEvent(event);
       } finally {
+        stallTimer.cancel(false);
         if (currentTicket == my) {
           currentTicket = -1;
         }
@@ -128,32 +148,37 @@ public final class StrictEdtMode {
       currentTicket = my;
 
       // arm a one-shot timer: if we're still handling THIS event after threshold -> dump & report
-      SCH.schedule(
-          () -> {
-            if (currentTicket != my) {
-              return;
-            }
-            // Only the event running Finalizer.shutdown gets extra time; everything else,
-            // including later events while the app exits, keeps the normal threshold.
-            if (isShutdownSequence(edt.getStackTrace()) && SHUTDOWN_THRESHOLD_MS > thresholdMs) {
-              SCH.schedule(
-                  () -> {
-                    if (currentTicket == my) {
-                      dumpEdtAndQueueReport(event, edt, SHUTDOWN_THRESHOLD_MS, SHUTDOWN_TAG);
-                    }
-                  },
-                  SHUTDOWN_THRESHOLD_MS - thresholdMs,
-                  TimeUnit.MILLISECONDS);
-            } else {
-              dumpEdtAndQueueReport(event, edt, thresholdMs, "");
-            }
-          },
-          thresholdMs,
-          TimeUnit.MILLISECONDS);
+      ScheduledFuture<?> stallTimer =
+          SCH.schedule(
+              () -> {
+                if (currentTicket != my) {
+                  return;
+                }
+                // Only the event running Finalizer.shutdown gets extra time; everything else,
+                // including later events while the app exits, keeps the normal threshold.
+                if (isShutdownSequence(edt.getStackTrace())
+                    && SHUTDOWN_THRESHOLD_MS > thresholdMs) {
+                  SCH.schedule(
+                      () -> {
+                        if (currentTicket == my) {
+                          dumpEdtAndQueueReport(event, edt, SHUTDOWN_THRESHOLD_MS, SHUTDOWN_TAG);
+                        }
+                      },
+                      SHUTDOWN_THRESHOLD_MS - thresholdMs,
+                      TimeUnit.MILLISECONDS);
+                } else {
+                  dumpEdtAndQueueReport(event, edt, thresholdMs, "");
+                }
+              },
+              thresholdMs,
+              TimeUnit.MILLISECONDS);
 
       try {
         super.dispatchEvent(event);
       } finally {
+        // A stall already being reported (or the shutdown re-arm) has started; cancel(false)
+        // never interrupts it, and only drops timers for events that finished in time.
+        stallTimer.cancel(false);
         if (currentTicket == my) {
           currentTicket = -1;
         }

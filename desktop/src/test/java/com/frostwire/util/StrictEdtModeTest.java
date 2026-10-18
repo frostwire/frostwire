@@ -10,6 +10,8 @@ package com.frostwire.util;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 class StrictEdtModeTest {
@@ -243,5 +245,21 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isRenderQueueLockWait(appLock));
     assertFalse(StrictEdtMode.isRenderQueueLockWait(noRenderQueue));
     assertFalse(StrictEdtMode.isRenderQueueLockWait(null));
+  }
+
+  @Test
+  void cancelledStallTimersLeaveTheWatchdogQueueImmediately() {
+    ScheduledThreadPoolExecutor scheduler = StrictEdtMode.newWatchdogScheduler();
+    try {
+      for (int i = 0; i < 1_000; i++) {
+        scheduler
+            .schedule(() -> {}, 5, TimeUnit.SECONDS)
+            .cancel(false); // the event finished within the threshold
+      }
+
+      assertTrue(scheduler.getQueue().isEmpty(), "cancelled timers must not linger");
+    } finally {
+      scheduler.shutdownNow();
+    }
   }
 }

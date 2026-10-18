@@ -19,6 +19,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:The first click on a transfers or search results table no longer freezes the UI on slow machines — Java's drag-and-drop cursors are prepared in the background at startup
    - fix:The first paint of the main window no longer pauses to start Java's logging system — it is started in the background at launch
    - fix:UI freeze reports where painting waits on Java's graphics pipeline lock (held while the GPU driver flushes) are tagged "render-queue:" so they group apart from freezes in FrostWire's own code
+   - fix:The UI freeze detector no longer leaves a pending timer behind for every UI event, which added overhead during bursts of events
    - fix:Clicking Play on a transfer no longer freezes the UI while FrostWire checks the file on disk and the torrent's progress — the check runs in the background before the player opens
    - fix:Transfers and search results no longer get slower the longer FrostWire runs — table cells were adding a new mouse listener every time they were drawn, a leak that eventually froze the UI
    - fix:Resizing the FrostWire window no longer stutters — the status bar is rebuilt once when the resize settles instead of on every resize event, and not at all for height-only changes
