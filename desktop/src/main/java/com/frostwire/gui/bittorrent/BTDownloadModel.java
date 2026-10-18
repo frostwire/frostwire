@@ -206,13 +206,18 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     return super.add(downloader, row);
   }
 
+  /**
+   * Removes the row right away and the transfer itself in the background: removing a torrent checks
+   * every file on disk, calls into libtorrent and deletes sidecar files, which stalled the EDT. The
+   * serial queue keeps removals in order with other torrent mutations.
+   */
   @Override
   public void remove(int i) {
     BTDownloadDataLine line = get(i);
     BTDownload downloader = line.getInitializeObject();
-    downloader.remove();
     _hashDownloads.remove(downloader.getHash());
     super.remove(i);
+    BackgroundQueuedExecutorService.schedule(downloader::remove);
   }
 
   public void remove(String hash) {
