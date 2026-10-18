@@ -207,4 +207,41 @@ class StrictEdtModeTest {
 
     assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalled));
   }
+
+  @Test
+  void awtLockWaitInsideRenderQueueIsTaggedEvenWithAppPaintCodeBelow() {
+    StackTraceElement[] stack = {
+      frame("jdk.internal.misc.Unsafe", "park"),
+      frame("java.util.concurrent.locks.ReentrantLock", "lock"),
+      frame("sun.awt.SunToolkit", "awtLock"),
+      frame("sun.java2d.pipe.RenderQueue", "lock"),
+      frame("sun.java2d.pipe.BufferedRenderPipe", "fillParallelogram"),
+      frame("sun.java2d.SunGraphics2D", "fillRect"),
+      frame("com.frostwire.gui.theme.SkinPanelUI", "paint"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertTrue(StrictEdtMode.isRenderQueueLockWait(stack));
+  }
+
+  @Test
+  void appCodeWaitingOnALockIsNotARenderQueueWait() {
+    StackTraceElement[] appLock = {
+      frame("jdk.internal.misc.Unsafe", "park"),
+      frame("java.util.concurrent.locks.ReentrantLock", "lock"),
+      frame("com.frostwire.gui.SomeModel", "update"),
+      frame("sun.awt.SunToolkit", "awtLock"),
+      frame("sun.java2d.pipe.RenderQueue", "lock"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+    StackTraceElement[] noRenderQueue = {
+      frame("sun.awt.SunToolkit", "awtLock"),
+      frame("sun.awt.windows.WToolkit", "sync"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(appLock));
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(noRenderQueue));
+    assertFalse(StrictEdtMode.isRenderQueueLockWait(null));
+  }
 }

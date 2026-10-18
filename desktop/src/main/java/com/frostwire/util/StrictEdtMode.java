@@ -192,6 +192,8 @@ public final class StrictEdtMode {
       // other high-cardinality data that would explode server-side issue grouping.
       if (tag.isEmpty() && !isInsideWatchedDispatch(edtStack)) {
         tag = STACK_MISSED_TAG;
+      } else if (tag.isEmpty() && isRenderQueueLockWait(edtStack)) {
+        tag = RENDER_QUEUE_TAG;
       } else if (tag.isEmpty() && isJdkShellFolderStall(edtStack)) {
         tag = SHELL_FOLDER_TAG;
       }
@@ -216,6 +218,45 @@ public final class StrictEdtMode {
   static final String SHUTDOWN_TAG = "shutdown:";
   static final String SHELL_FOLDER_TAG = "jdk-shellfolder:";
   static final String STACK_MISSED_TAG = "stack-missed:";
+  static final String RENDER_QUEUE_TAG = "render-queue:";
+
+  /**
+   * True when the EDT is blocked acquiring {@code SunToolkit.awtLock} inside Java2D's {@code
+   * RenderQueue.lock}: the render-queue flusher holds that lock while it waits on the GPU driver
+   * (OpenGL on Windows, Metal on macOS), so any drawing call on the EDT waits. Only the frames
+   * above the lock wait count; app paint code below it (the caller) is expected, but an app frame
+   * above it is not. Only the JDK takes awtLock, so app locks never match.
+   *
+   * <p>Thread-safe: stateless stack inspection.
+   */
+  static boolean isRenderQueueLockWait(StackTraceElement[] stack) {
+    if (stack == null) {
+      return false;
+    }
+    boolean waitingOnAwtLock = false;
+    for (StackTraceElement frame : stack) {
+      if (frame == null || frame.getClassName() == null) {
+        continue;
+      }
+      String className = frame.getClassName();
+      if (className.startsWith(WATCHDOG_PREFIX)) {
+        return false;
+      }
+      for (String appPrefix : APP_FRAME_PREFIXES) {
+        if (className.startsWith(appPrefix)) {
+          return false;
+        }
+      }
+      if ("sun.awt.SunToolkit".equals(className) && "awtLock".equals(frame.getMethodName())) {
+        waitingOnAwtLock = true;
+      } else if (waitingOnAwtLock
+          && "sun.java2d.pipe.RenderQueue".equals(className)
+          && "lock".equals(frame.getMethodName())) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * True when the EDT stack still shows the watchdog dispatching an event. False means the stalled
