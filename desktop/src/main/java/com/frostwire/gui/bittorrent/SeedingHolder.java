@@ -25,6 +25,11 @@ package com.frostwire.gui.bittorrent;
 final class SeedingHolder {
   private final BTDownload dl;
   private final String displayName;
+  // Seeding state, computed off the EDT by BTDownloadDataLine.update() so the shared seeding
+  // renderer never queries the transfer (libtorrent) while painting.
+  private volatile boolean canShare;
+  private volatile boolean seeding;
+  private volatile boolean pausing;
 
   public SeedingHolder(final BTDownload dl) {
     this.dl = dl;
@@ -33,6 +38,24 @@ final class SeedingHolder {
 
   public BTDownload getDl() {
     return dl;
+  }
+
+  void setSeedingState(boolean canShare, boolean seeding, boolean pausing) {
+    this.canShare = canShare;
+    this.seeding = seeding;
+    this.pausing = pausing;
+  }
+
+  boolean canShare() {
+    return canShare;
+  }
+
+  boolean isSeeding() {
+    return seeding;
+  }
+
+  boolean isPausing() {
+    return pausing;
   }
 
   public String toString() {

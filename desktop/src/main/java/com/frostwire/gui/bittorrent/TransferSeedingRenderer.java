@@ -105,27 +105,37 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     updateUIData((SeedingHolder) dataHolder);
   }
 
-  private void updateUIData(SeedingHolder actionsHolder) {
-    if (actionsHolder != null) {
-      dl = actionsHolder.getDl();
-      boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);
-      updateSeedingButton(canShareNow);
+  private void updateUIData(SeedingHolder seedingHolder) {
+    if (seedingHolder != null) {
+      dl = seedingHolder.getDl();
+      labelSeed.setVisible(true);
+      labelSeed.setIcon(
+          switch (seedIcon(dl instanceof BittorrentDownload, seedingHolder)) {
+            case SOLID -> seed_solid;
+            case LOADING -> loading;
+            case FADED -> seed_faded;
+          });
     }
   }
 
-  private void updateSeedingButton(boolean canShareNow) {
-    labelSeed.setVisible(true);
-    if (dl instanceof BittorrentDownload) {
-      final TransferState currentState = dl.getState();
-      boolean isSeeding = currentState.equals(TransferState.SEEDING) && dl.isCompleted();
-      boolean isPausing = currentState.equals(TransferState.PAUSING);
-      if (!canShareNow) {
-        labelSeed.setIcon(seed_faded);
-      } else {
-        labelSeed.setIcon(isPausing ? loading : (isSeeding ? seed_solid : seed_faded));
-      }
-    } else {
-      labelSeed.setIcon(seed_faded);
+  enum SeedIcon {
+    FADED,
+    SOLID,
+    LOADING
+  }
+
+  /**
+   * Picks the seeding icon from state precomputed off the EDT (see {@link
+   * SeedingHolder#setSeedingState}); renderers run for every painted row and must not query the
+   * transfer, whose getters call into libtorrent.
+   */
+  static SeedIcon seedIcon(boolean isBittorrent, SeedingHolder holder) {
+    if (!isBittorrent || !holder.canShare()) {
+      return SeedIcon.FADED;
     }
+    if (holder.isPausing()) {
+      return SeedIcon.LOADING;
+    }
+    return holder.isSeeding() ? SeedIcon.SOLID : SeedIcon.FADED;
   }
 }
