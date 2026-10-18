@@ -27,6 +27,7 @@ import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.SwingDebouncer;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
@@ -40,6 +41,9 @@ import org.limewire.setting.BooleanSetting;
  * status and the media player.
  */
 public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
+  /** Quiet period after the last window resize event before the bar is rebuilt. */
+  private static final int RESIZE_REFRESH_DELAY_MS = 200;
+
   /** The different connection status possibilities. */
   static final int STATUS_DISCONNECTED = 0;
 
@@ -154,6 +158,12 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
   /** Last VPN state the bar was built for; null until the first VPN check reports. */
   private Boolean lastVpnStatus;
 
+  /** Width the bar was last laid out for after a window resize. */
+  private int lastResizeRefreshWidth = -1;
+
+  private final SwingDebouncer resizeRefresh =
+      new SwingDebouncer(RESIZE_REFRESH_DELAY_MS, this::refreshAfterResize);
+
   private long _nextUpdateTime = System.currentTimeMillis();
 
   private boolean previousSeedingStatus;
@@ -173,7 +183,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
               .addComponentListener(
                   new ComponentListener() {
                     public void componentResized(ComponentEvent arg0) {
-                      refresh();
+                      // Live resizes fire many events; refresh() rebuilds the whole bar, so
+                      // do it once after the resize settles, and only for width changes.
+                      resizeRefresh.trigger();
                     }
 
                     public void componentMoved(ComponentEvent arg0) {}
@@ -795,6 +807,14 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
     lastVpnStatus = vpnIsOn;
     refresh();
+  }
+
+  private void refreshAfterResize() {
+    int width = GUIMediator.getAppFrame().getWidth();
+    if (width != lastResizeRefreshWidth) {
+      lastResizeRefreshWidth = width;
+      refresh();
+    }
   }
 
   /** Re-reads the polled indicators without rebuilding the status bar. */
