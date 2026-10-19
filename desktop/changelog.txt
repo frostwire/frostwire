@@ -1,4 +1,5 @@
 FrostWire 7.1.2 UNRELEASED
+   - fix:Scrolling the Library no longer freezes on slow or network drives — whether a file can be played is decided once per file, in the background, instead of checking the disk for every row on every repaint
    - fix:Scrolling or repainting the Library and other tables with Play/Download buttons no longer stalls on Windows — rows without an action show no icon instead of hiding the button, which forced a native cursor update for every painted row
    - new:Search results you already started downloading are marked with a download arrow in the Name column, in later searches too — FrostWire keeps no list of your downloads, only a fixed-size Bloom filter of hashes that can recognize a result but cannot be read back (#950)
    - fix:The Peers tab in Transfer Detail updates again — peer speeds, totals and sorting refresh every second, disconnected peers disappear, and the Uploaded column shows a size instead of a raw byte count (#1307)

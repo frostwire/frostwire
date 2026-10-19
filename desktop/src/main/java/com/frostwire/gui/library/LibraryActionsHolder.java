@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.tables.AbstractActionsHolder;
 import com.limegroup.gnutella.gui.tables.DataLine;
 import java.io.File;
@@ -28,17 +27,24 @@ import java.io.File;
  * @author aldenml
  */
 public final class LibraryActionsHolder extends AbstractActionsHolder {
-  LibraryActionsHolder(DataLine<?> dataLine, boolean playing) {
+  /**
+   * isPlayable() runs for every painted row on the EDT, so it never touches the disk: the data line
+   * decides by file name first and confirms with its background file check.
+   */
+  private volatile boolean playable;
+
+  LibraryActionsHolder(DataLine<?> dataLine, boolean playing, boolean playable) {
     super(dataLine, playing);
+    this.playable = playable;
   }
 
   @Override
   public boolean isPlayable() {
-    Object dl = getDataLine();
-    if (dl instanceof LibraryFilesTableDataLine) {
-      return PlaybackUtil.isPlayableFile(((LibraryFilesTableDataLine) dl).getFile());
-    }
-    return false;
+    return playable;
+  }
+
+  void setPlayable(boolean playable) {
+    this.playable = playable;
   }
 
   @Override

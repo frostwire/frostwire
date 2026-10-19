@@ -20,6 +20,7 @@ package com.frostwire.gui.library;
 
 import com.frostwire.bittorrent.BTInfoAdditionalMetadataHolder;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconManager;
@@ -137,7 +138,9 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
     _sizeHolder = ZERO_SIZED_HOLDER;
     lastModified = new Date(0);
-    this.actionsHolder = new LibraryActionsHolder(this, false);
+    final LibraryActionsHolder holder =
+        new LibraryActionsHolder(this, false, PlaybackUtil.isPlayableFile(file.getName()));
+    this.actionsHolder = holder;
     final String displayName = _name;
     this.nameCell = new NameHolder(displayName);
     license = "";
@@ -193,6 +196,8 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
           }
           final SizeHolder finalSizeHolder = sizeHolder;
           final Date finalModTime = modTime;
+          // Confirms the name-based guess on disk; the row repaint below picks it up.
+          holder.setPlayable(PlaybackUtil.isPlayableFile(file));
           GUIMediator.safeInvokeLater(
               () -> {
                 _model.updateResolvedFileData(

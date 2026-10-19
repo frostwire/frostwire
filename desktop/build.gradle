@@ -724,6 +724,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.util.SwingDebouncerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.trees.FileTreeModelLeafTest"
         includeTestsMatching "com.limegroup.gnutella.gui.tables.AbstractActionsRendererTest"
+        includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
     }
