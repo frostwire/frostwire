@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BooleanSupplier;
 
 /**
  * Drop this utility in your app and call it before you create any Swing UI. It will:
@@ -161,13 +162,18 @@ public final class StrictEdtMode {
                   SCH.schedule(
                       () -> {
                         if (currentTicket == my) {
-                          dumpEdtAndQueueReport(event, edt, SHUTDOWN_THRESHOLD_MS, SHUTDOWN_TAG);
+                          dumpEdtAndQueueReport(
+                              event,
+                              edt,
+                              SHUTDOWN_THRESHOLD_MS,
+                              SHUTDOWN_TAG,
+                              () -> currentTicket == my);
                         }
                       },
                       SHUTDOWN_THRESHOLD_MS - thresholdMs,
                       TimeUnit.MILLISECONDS);
                 } else {
-                  dumpEdtAndQueueReport(event, edt, thresholdMs, "");
+                  dumpEdtAndQueueReport(event, edt, thresholdMs, "", () -> currentTicket == my);
                 }
               },
               thresholdMs,
@@ -186,7 +192,11 @@ public final class StrictEdtMode {
     }
 
     private static void dumpEdtAndQueueReport(
-        AWTEvent event, Thread edt, long thresholdMs, String tag) {
+        AWTEvent event,
+        Thread edt,
+        long thresholdMs,
+        String tag,
+        BooleanSupplier stalledEventStillRunning) {
       System.err.printf(
           "=== STRICT-EDT VIOLATION: event took > %,d ms on %s ===%n", thresholdMs, edt);
       System.err.println("Event: " + event);
@@ -194,6 +204,8 @@ public final class StrictEdtMode {
       // Sample only the EDT: walking every thread is slow on small machines and widens the
       // window in which the stalled event finishes before its stack is captured.
       StackTraceElement[] edtStack = edt.getStackTrace();
+      // The stalled event may finish while the stack is taken; the sample then shows other work.
+      boolean sampledTheStalledEvent = stalledEventStillRunning.getAsBoolean();
       System.err.println("--- EDT stack ---");
       for (StackTraceElement ste : edtStack) {
         System.err.println("\tat " + ste);
@@ -215,13 +227,7 @@ public final class StrictEdtMode {
       // Production never halts: queue a throttled Icebase report and keep dispatching.
       // Bounded descriptor on purpose: the raw event string can carry coordinates and
       // other high-cardinality data that would explode server-side issue grouping.
-      if (tag.isEmpty() && !isInsideWatchedDispatch(edtStack)) {
-        tag = STACK_MISSED_TAG;
-      } else if (tag.isEmpty() && isRenderQueueLockWait(edtStack)) {
-        tag = RENDER_QUEUE_TAG;
-      } else if (tag.isEmpty() && isJdkShellFolderStall(edtStack)) {
-        tag = SHELL_FOLDER_TAG;
-      }
+      tag = reportTag(tag, edtStack, sampledTheStalledEvent);
       maybeQueueProductionReport(tag + event.getClass().getName() + "#" + event.getID(), edtStack);
     }
 
@@ -238,6 +244,30 @@ public final class StrictEdtMode {
         // Reporting must never break event dispatch.
       }
     }
+  }
+
+  /**
+   * The title prefix that groups a production stall report: the caller's tag when it has one,
+   * otherwise one derived from the sampled stack. {@code sampledTheStalledEvent} is false when the
+   * stalled event had already finished (or a nested event was running) once the stack was taken, so
+   * the stack belongs to other work.
+   *
+   * <p>Thread-safe: stateless.
+   */
+  static String reportTag(String tag, StackTraceElement[] stack, boolean sampledTheStalledEvent) {
+    if (!tag.isEmpty()) {
+      return tag;
+    }
+    if (!sampledTheStalledEvent || !isInsideWatchedDispatch(stack)) {
+      return STACK_MISSED_TAG;
+    }
+    if (isRenderQueueLockWait(stack)) {
+      return RENDER_QUEUE_TAG;
+    }
+    if (isJdkShellFolderStall(stack)) {
+      return SHELL_FOLDER_TAG;
+    }
+    return "";
   }
 
   static final String SHUTDOWN_TAG = "shutdown:";

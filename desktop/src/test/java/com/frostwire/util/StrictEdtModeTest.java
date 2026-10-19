@@ -7,6 +7,7 @@
 
 package com.frostwire.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -231,6 +232,27 @@ class StrictEdtModeTest {
     };
 
     assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalledInDialog));
+  }
+
+  /**
+   * The stalled event (a resize) finished while the stack was taken, and the sample caught the next
+   * event's repaint inside its own watched dispatch (Icebase #bc9c29f151b2).
+   */
+  @Test
+  void stackOfALaterEventIsTaggedStackMissed() {
+    StackTraceElement[] laterRepaint = {
+      frame("com.frostwire.gui.theme.SkinPanelUI", "paint"),
+      frame("javax.swing.RepaintManager", "paintDirtyRegions"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.EventDispatchThread", "run")
+    };
+
+    assertEquals(StrictEdtMode.STACK_MISSED_TAG, StrictEdtMode.reportTag("", laterRepaint, false));
+    assertEquals("", StrictEdtMode.reportTag("", laterRepaint, true));
+    assertEquals(
+        StrictEdtMode.SHUTDOWN_TAG,
+        StrictEdtMode.reportTag(StrictEdtMode.SHUTDOWN_TAG, laterRepaint, false));
   }
 
   @Test
