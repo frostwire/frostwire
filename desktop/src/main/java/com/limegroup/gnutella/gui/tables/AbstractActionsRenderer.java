@@ -88,9 +88,19 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     actionsHolder = (AbstractActionsHolder) dataHolder;
     showSolid = mouseIsOverRow(table, row);
     updatePlayButton();
-    labelPlay.setVisible(actionsHolder.isPlayable());
-    labelDownload.setIcon(showSolid ? download_solid : download_transparent);
-    labelDownload.setVisible(actionsHolder.isDownloadable());
+    showAction(
+        labelDownload,
+        actionsHolder.isDownloadable(),
+        showSolid ? download_solid : download_transparent);
+  }
+
+  /**
+   * Shows the action's icon when it applies to the row and no icon when it doesn't. The label is
+   * never hidden: hiding a label that has a peer updates the native cursor (a cross-thread call on
+   * Windows), and table rows flip it once per painted row.
+   */
+  static void showAction(JLabel label, boolean applies, Icon icon) {
+    label.setIcon(applies ? icon : null);
   }
 
   private void setupUI() {
@@ -155,7 +165,10 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
 
   private void updatePlayButton() {
     cancelEdit();
-    labelPlay.setIcon((showSolid) ? play_solid : play_transparent);
+    showAction(
+        labelPlay,
+        actionsHolder != null && actionsHolder.isPlayable(),
+        showSolid ? play_solid : play_transparent);
   }
 
   private void labelPlay_mouseReleased(MouseEvent e) {
@@ -168,7 +181,9 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
   }
 
   private void labelDownload_mouseReleased(MouseEvent e) {
-    if (e.getButton() == MouseEvent.BUTTON1) {
+    if (e.getButton() == MouseEvent.BUTTON1
+        && actionsHolder != null
+        && actionsHolder.isDownloadable()) {
       onDownloadAction();
     }
   }
