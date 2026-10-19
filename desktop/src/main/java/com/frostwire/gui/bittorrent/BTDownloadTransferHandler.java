@@ -30,9 +30,10 @@ import com.limegroup.gnutella.gui.search.SearchResultTransferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.swing.*;
 
 /**
@@ -81,23 +82,32 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
   protected Transferable createTransferable(JComponent c) {
     BTDownload[] downloads = BTDownloadMediator.instance().getSelectedBTDownloads();
     if (downloads.length > 0) {
-      List<File> filesToDrop = getListOfFilesFromBTDownloads(downloads);
-      return new FileTransferable(filesToDrop);
+      return transferableFor(downloads, TorrentUtil::getIgnorableFiles);
     }
     return null;
   }
 
-  private List<File> getListOfFilesFromBTDownloads(BTDownload[] downloads) {
-    List<File> files = new LinkedList<>();
-    Set<File> ignore = TorrentUtil.getIgnorableFiles();
+  /**
+   * Walking a download's folder (and finding its incomplete parts) touches the disk, so it waits
+   * until a drop target asks for the files instead of running on the EDT when the drag starts.
+   */
+  static FileTransferable transferableFor(BTDownload[] downloads, Supplier<Set<File>> ignorable) {
+    BTDownload[] dragged = downloads.clone();
+    return FileTransferable.listedOnDrop(() -> listFiles(dragged, ignorable.get()));
+  }
+
+  private static List<File> listFiles(BTDownload[] downloads, Set<File> ignore) {
+    List<File> files = new ArrayList<>();
     for (BTDownload download : downloads) {
       File saveLocation = download.getSaveLocation();
-      addFilesRecursively(files, saveLocation, ignore);
+      if (saveLocation != null) {
+        addFilesRecursively(files, saveLocation, ignore);
+      }
     }
     return files;
   }
 
-  private void addFilesRecursively(List<File> files, File saveLocation, Set<File> ignore) {
+  private static void addFilesRecursively(List<File> files, File saveLocation, Set<File> ignore) {
     if (saveLocation.isFile()) {
       if (!ignore.contains(saveLocation)) {
         files.add(saveLocation);

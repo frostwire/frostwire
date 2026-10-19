@@ -27,6 +27,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A Transferable that returns a javaFileListFlavor, built up from a list of 'FileTransfer' and
@@ -42,9 +43,20 @@ public class FileTransferable implements Transferable {
       Collections.emptyList();
   private final List<File> files;
   private final List<? extends FileTransfer> lazyFiles;
+  private Supplier<List<File>> pendingFiles;
 
   public FileTransferable(List<File> files) {
     this(files, EMPTY_FILE_TRANSFER_LiST);
+  }
+
+  /**
+   * Lists the files only when a drop target asks for them, once. Use it when listing touches the
+   * disk: drags start on the EDT, and most are cancelled or dropped on a target that never asks.
+   */
+  public static FileTransferable listedOnDrop(Supplier<List<File>> files) {
+    FileTransferable transferable = new FileTransferable(Collections.emptyList());
+    transferable.pendingFiles = files;
+    return transferable;
   }
 
   FileTransferable(List<File> realFiles, List<? extends FileTransfer> lazyFiles) {
@@ -76,6 +88,10 @@ public class FileTransferable implements Transferable {
   }
 
   private List<File> getFiles() {
+    if (pendingFiles != null) {
+      files.addAll(pendingFiles.get());
+      pendingFiles = null;
+    }
     if (!lazyFiles.isEmpty()) {
       for (FileTransfer transfer : lazyFiles) {
         File f = transfer.getFile();
