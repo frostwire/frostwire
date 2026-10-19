@@ -198,6 +198,41 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isInsideWatchedDispatch(null));
   }
 
+  /** The stalled event opened a modal dialog, whose nested event loop was idle when sampled. */
+  @Test
+  void idleNestedLoopOfAModalDialogIsNotInsideWatchedDispatch() {
+    StackTraceElement[] idleInDialog = {
+      frame("jdk.internal.misc.Unsafe", "park"),
+      frame("java.awt.EventQueue", "getNextEvent"),
+      frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+      frame("java.awt.WaitDispatchSupport", "enter"),
+      frame("java.awt.Dialog", "show"),
+      frame("com.limegroup.gnutella.gui.options.OptionsConstructor", "setOptionsVisible"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.EventDispatchThread", "run")
+    };
+
+    assertFalse(StrictEdtMode.isInsideWatchedDispatch(idleInDialog));
+  }
+
+  /** A nested event (inside a modal dialog's loop) that is itself stalled is still watched. */
+  @Test
+  void stalledEventInsideAModalDialogIsInsideWatchedDispatch() {
+    StackTraceElement[] stalledInDialog = {
+      frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+      frame("java.awt.Dialog", "show"),
+      frame("java.awt.EventQueue", "dispatchEvent"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+      frame("java.awt.EventDispatchThread", "run")
+    };
+
+    assertTrue(StrictEdtMode.isInsideWatchedDispatch(stalledInDialog));
+  }
+
   @Test
   void stalledEventStackIsInsideWatchedDispatch() {
     StackTraceElement[] stalled = {

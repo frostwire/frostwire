@@ -288,6 +288,11 @@ public final class StrictEdtMode {
    * event finished between the timer firing and the stack being sampled (the EDT is idle or on a
    * new event's pump), so the stack says nothing about what stalled.
    *
+   * <p>Read from the top: an EDT waiting in {@code EventQueue.getNextEvent} is idle even when a
+   * watched dispatch sits further down, as when the stalled event opened a modal dialog and the
+   * dialog's nested event loop is now waiting. The frames below still name the event that ran long,
+   * but not the work that made it slow.
+   *
    * <p>Thread-safe: stateless stack inspection.
    */
   static boolean isInsideWatchedDispatch(StackTraceElement[] stack) {
@@ -295,9 +300,14 @@ public final class StrictEdtMode {
       return false;
     }
     for (StackTraceElement frame : stack) {
-      if (frame != null
-          && frame.getClassName() != null
-          && frame.getClassName().startsWith(WATCHDOG_PREFIX)
+      if (frame == null || frame.getClassName() == null) {
+        continue;
+      }
+      if ("java.awt.EventQueue".equals(frame.getClassName())
+          && "getNextEvent".equals(frame.getMethodName())) {
+        return false;
+      }
+      if (frame.getClassName().startsWith(WATCHDOG_PREFIX)
           && "dispatchEvent".equals(frame.getMethodName())) {
         return true;
       }
