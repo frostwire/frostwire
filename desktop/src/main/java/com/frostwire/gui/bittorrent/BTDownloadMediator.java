@@ -1002,9 +1002,19 @@ public final class BTDownloadMediator
     // The BittorrentDownload constructor queries libtorrent (name, size, state, pause/resume)
     // and may clean up incomplete files: build it off the EDT, then add the row on the EDT.
     buildThenAdd(
-        () -> new BittorrentDownload(dl),
+        () -> buildRow(() -> new BittorrentDownload(dl)),
         BackgroundQueuedExecutorService::schedule,
         download -> GUIMediator.safeInvokeLater(() -> add(download)));
+  }
+
+  /**
+   * Builds a transfer row's object, including the payment and license metadata the row reads when
+   * it is added on the EDT: the first read parses the .torrent file from disk.
+   */
+  static <T extends BTDownload> T buildRow(Supplier<T> construct) {
+    T download = construct.get();
+    download.getPaymentOptions();
+    return download;
   }
 
   /** Builds a transfer row's object on {@code background} and hands it to {@code adder}. */
