@@ -1040,7 +1040,12 @@ final class Initializer {
       PeerProber prober = new RudpPeerProber(client);
       // Settings "Refresh / Ping" verifies cached servers with the same handshake.
       hostCache.setPingProber(prober);
-      relayResources.add(() -> hostCache.setPingProber(null));
+      relayResources.add(
+          () -> {
+            hostCache.setPingProber(null);
+            // Writes are coalesced; persist this run's pings when the relay stops (worker thread).
+            hostCache.flush();
+          });
       DhtPeerDiscoverySource dhtSource = new DhtPeerDiscoverySource(btEngine);
       // A new peer's signed identity record tells us whether it is a forwarder; failed handshakes
       // count against the host cache so dead entries are evicted instead of retried forever.
