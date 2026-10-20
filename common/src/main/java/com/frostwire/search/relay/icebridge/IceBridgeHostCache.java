@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 
 /**
  * Simple persistent cache of known IceBridge relay hosts (for bootstrapping
@@ -46,6 +48,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * {@link #MAX_CONSECUTIVE_FAILURES} consecutive pings are evicted so dead
  * hosts (and our own un-hairpinnable external IP) stop being retried every
  * discovery tick. Any success resets the streak.
+ *
+ * <p>Entries live in memory; the file is rewritten at most once per {@link #SAVE_INTERVAL_MS}
+ * (discovery and registry sync update dozens of hosts per round, each of which used to rewrite the
+ * whole file). The first change after a quiet interval is written immediately, the rest are
+ * written by a later change, {@link #flush()}, or the JVM shutdown hook registered by
+ * {@link #getInstance()}. Losing the last few minutes of ping timestamps on a crash is harmless.
  */
 public final class IceBridgeHostCache {
 
@@ -60,10 +68,21 @@ public final class IceBridgeHostCache {
      */
     public static final int MAX_CONSECUTIVE_FAILURES = 5;
 
+    /** Minimum time between two writes of the cache file caused by entry changes. */
+    static final long SAVE_INTERVAL_MS = TimeUnit.MINUTES.toMillis(5);
+
     private final File cacheFile;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
+    /** Monotonic milliseconds, injectable for tests. */
+    private final LongSupplier clock;
     /** True when entries changed since the last successful write; guarded by this. */
     private boolean dirty;
+    /**
+     * Whether this instance attempted a write, and when (clock time). Failed writes count too, so a
+     * read-only or full disk is retried once per interval instead of on every change. Guarded by this.
+     */
+    private boolean saveAttempted;
+    private long lastSaveAttemptMs;
     /**
      * How Settings "Refresh / Ping" authenticates a cached server: the rUDP identity-discovery
      * handshake. Without a prober (stack not running) there is nothing to ping with.
@@ -73,6 +92,8 @@ public final class IceBridgeHostCache {
     private static volatile IceBridgeHostCache INSTANCE;
     /** Optional platform path (Android: libtorrent home). Set before {@link #getInstance()}. */
     private static volatile File configuredCacheFile;
+    /** Guarded by the class lock. */
+    private static boolean shutdownFlushRegistered;
 
     /**
      * Point the singleton at a specific cache file (e.g. Android app-private
@@ -87,6 +108,7 @@ public final class IceBridgeHostCache {
             configuredCacheFile = cacheFile;
             if (INSTANCE != null
                     && !INSTANCE.cacheFile.getAbsolutePath().equals(cacheFile.getAbsolutePath())) {
+                INSTANCE.flush();
                 INSTANCE = new IceBridgeHostCache(cacheFile);
             }
         }
@@ -97,6 +119,7 @@ public final class IceBridgeHostCache {
             synchronized (IceBridgeHostCache.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new IceBridgeHostCache();
+                    registerShutdownFlush();
                 }
             }
         }
@@ -108,11 +131,30 @@ public final class IceBridgeHostCache {
     }
 
     public IceBridgeHostCache(File cacheFile) {
+        this(cacheFile, () -> TimeUnit.NANOSECONDS.toMillis(System.nanoTime()));
+    }
+
+    IceBridgeHostCache(File cacheFile, LongSupplier clock) {
         if (cacheFile == null) {
             throw new IllegalArgumentException("cacheFile is null");
         }
         this.cacheFile = cacheFile;
+        this.clock = clock;
         load();
+    }
+
+    /** Writes pending changes of whichever instance is current when the JVM exits. Class lock held. */
+    private static void registerShutdownFlush() {
+        if (shutdownFlushRegistered) {
+            return;
+        }
+        shutdownFlushRegistered = true;
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            IceBridgeHostCache cache = INSTANCE;
+            if (cache != null) {
+                cache.flush();
+            }
+        }, "IceBridgeHostCache-flush"));
     }
 
     /** Absolute path of the cache file (for settings UI). */
@@ -192,6 +234,8 @@ public final class IceBridgeHostCache {
      * full disk mid-write never leaves a truncated cache behind.
      */
     public synchronized void save() {
+        saveAttempted = true;
+        lastSaveAttemptMs = clock.getAsLong();
         File tmp = new File(cacheFile.getPath() + ".tmp");
         try {
             File parent = cacheFile.getParentFile();
@@ -222,10 +266,15 @@ public final class IceBridgeHostCache {
         return source.renameTo(target) || (target.delete() && source.renameTo(target));
     }
 
-    /** Records that the entries changed and persists them. Callers hold this object's lock. */
+    /**
+     * Records that the entries changed; writes them only if nothing was written during the last
+     * {@link #SAVE_INTERVAL_MS}. Callers hold this object's lock.
+     */
     private void changed() {
         dirty = true;
-        save();
+        if (!saveAttempted || clock.getAsLong() - lastSaveAttemptMs >= SAVE_INTERVAL_MS) {
+            save();
+        }
     }
 
     /**
