@@ -18,10 +18,10 @@
 
 package com.frostwire.gui.theme;
 
+import com.frostwire.util.InMemoryImageIO;
 import java.awt.*;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
-import javax.imageio.ImageIO;
 import javax.swing.plaf.nimbus.AbstractRegionPainter;
 
 /**
@@ -112,7 +112,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
   final Image getImage(String name) {
     String imagePath = IMAGES_PATH + name + ".png";
     try {
-      return ImageIO.read(ClassLoader.getSystemResource(imagePath));
+      return InMemoryImageIO.read(ClassLoader.getSystemResource(imagePath));
     } catch (Throwable e) {
       throw new RuntimeException("Error loading skin image: " + imagePath, e);
     }

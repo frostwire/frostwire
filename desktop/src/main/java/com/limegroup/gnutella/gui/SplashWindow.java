@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import java.awt.*;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
 
@@ -93,7 +93,7 @@ public final class SplashWindow {
     if (imageURL != null) {
       Image splashImage = null;
       try {
-        splashImage = ImageIO.read(imageURL);
+        splashImage = InMemoryImageIO.read(imageURL);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -137,7 +137,7 @@ public final class SplashWindow {
         try {
           URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
           if (iconURL != null) {
-            BufferedImage img = ImageIO.read(iconURL);
+            BufferedImage img = InMemoryImageIO.read(iconURL);
             if (img != null) {
               osIconCache.put(cacheKey, img);
             }

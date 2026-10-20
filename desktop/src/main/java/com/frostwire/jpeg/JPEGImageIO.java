@@ -13,6 +13,7 @@
  */
 package com.frostwire.jpeg;
 
+import com.frostwire.util.InMemoryImageIO;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
@@ -21,6 +22,7 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
 
 /**
  * JPEGImageIO supports reading of JPEG images with YUV, CMYK and YCCK color encoding.
@@ -141,7 +143,7 @@ public class JPEGImageIO {
   private static BufferedImage readImageFromYUVorGray(InputStream in) throws IOException {
     return (in instanceof ImageInputStream)
         ? ImageIO.read((ImageInputStream) in)
-        : ImageIO.read(in);
+        : InMemoryImageIO.read(in);
   }
 
   /**
@@ -164,7 +166,7 @@ public class JPEGImageIO {
     inputStream =
         (in instanceof ImageInputStream)
             ? (ImageInputStream) in
-            : ImageIO.createImageInputStream(in);
+            : new MemoryCacheImageInputStream(in);
     reader.setInput(inputStream);
     Raster raster = reader.readRaster(0, null);
     return createRGBImageFromCMYK(raster, cmykProfile);
@@ -190,7 +192,7 @@ public class JPEGImageIO {
     inputStream =
         (in instanceof ImageInputStream)
             ? (ImageInputStream) in
-            : ImageIO.createImageInputStream(in);
+            : new MemoryCacheImageInputStream(in);
     reader.setInput(inputStream);
     Raster raster = reader.readRaster(0, null);
     return createRGBImageFromYCCK(raster, cmykProfile);

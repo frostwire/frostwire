@@ -19,12 +19,12 @@
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -98,7 +98,7 @@ public class ImageCache {
       if (data == null) {
         throw new IOException("ImageCache.loadFromResource() got nothing at " + url.toString());
       }
-      BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+      BufferedImage image = InMemoryImageIO.read(data);
       saveToCache(url, image, 0);
       listener.onLoaded(url, image, false, false);
       return image;
@@ -122,7 +122,7 @@ public class ImageCache {
                 if (data == null) {
                   throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
                 }
-                image = ImageIO.read(new ByteArrayInputStream(data));
+                image = InMemoryImageIO.read(data);
                 saveToCache(url, image, System.currentTimeMillis());
                 if (listener != null && image != null) {
                   listener.onLoaded(url, image, false, false);

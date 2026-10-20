@@ -19,15 +19,14 @@
 package com.frostwire.gui.library.tags;
 
 import com.frostwire.mp4.*;
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.Logger;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -207,7 +206,7 @@ class MP4Parser extends AbstractTagParser {
             image = imageFromData(imageData);
           } else if (data.dataType() == 14) { // png
             try {
-              image = ImageIO.read(new ByteArrayInputStream(imageData, 0, imageData.length));
+              image = InMemoryImageIO.read(imageData);
             } catch (IIOException e) {
               LOG.warn("Unable to decode png image from data tag");
             }

@@ -19,12 +19,12 @@
 package com.frostwire.gui.library.tags;
 
 import com.frostwire.jpeg.JPEGImageIO;
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.Logger;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -42,9 +42,9 @@ abstract class AbstractTagParser implements TagsParser {
     BufferedImage image = null;
     try {
       try {
-        image = ImageIO.read(new ByteArrayInputStream(data, 0, data.length));
+        image = InMemoryImageIO.read(data);
       } catch (IIOException e) {
-        image = JPEGImageIO.read(new ByteArrayInputStream(data, 0, data.length));
+        image = JPEGImageIO.read(new ByteArrayInputStream(data));
       }
     } catch (Throwable e) {
       LOG.error("Unable to create artwork image from bytes");

@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -25,15 +26,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
@@ -189,7 +187,7 @@ public final class ResourceManager {
   private static ImageIcon createImageIcon(URL url) {
     if (!url.getPath().toLowerCase(Locale.ENGLISH).endsWith(".gif")) {
       try {
-        BufferedImage image = decode(url);
+        BufferedImage image = InMemoryImageIO.read(url);
         if (image != null) {
           return new ImageIcon(image);
         }
@@ -198,17 +196,6 @@ public final class ResourceManager {
       }
     }
     return createDeferredImageIcon(url);
-  }
-
-  /**
-   * Decodes an image through an in-memory stream. ImageIO.read(URL) caches the stream in a
-   * temporary file by default (ImageIO.getUseCache()), so the first load of each icon wrote to
-   * disk, often on the EDT. ImageIO.read(ImageInputStream) closes the image stream itself.
-   */
-  static BufferedImage decode(URL url) throws IOException {
-    try (InputStream in = url.openStream()) {
-      return ImageIO.read(new MemoryCacheImageInputStream(in));
-    }
   }
 
   /**
