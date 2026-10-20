@@ -77,11 +77,36 @@ class IceBridgeHostCacheTest {
     cache.markSuccess("10.9.9.9", 6888, "FORWARDER");
     cache.markFailure("10.9.9.9", 6888);
     cache.markFailure("10.9.9.9", 6888);
+    cache.flush();
     IceBridgeHostCache reloaded =
         new IceBridgeHostCache(new File(tempDir, "roundtrip.txt"));
     List<IceBridgeHostCache.Entry> entries = reloaded.getAll();
     assertEquals(1, entries.size());
     assertEquals(2, entries.get(0).consecutiveFailures);
     assertEquals("FORWARDER", entries.get(0).role);
+  }
+
+  @Test
+  void saveReplacesTheFileAndLeavesNoTemporaryFile() throws Exception {
+    File f = new File(tempDir, "replace.txt");
+    Files.write(f.toPath(), "10.1.1.1:6888,BOTH,1,0\n".getBytes(StandardCharsets.UTF_8));
+    IceBridgeHostCache cache = new IceBridgeHostCache(f);
+    cache.markSuccess("10.9.9.9", 6888, "FORWARDER");
+    cache.flush();
+
+    List<IceBridgeHostCache.Entry> entries = new IceBridgeHostCache(f).getAll();
+    assertEquals(2, entries.size());
+    assertEquals("10.9.9.9", entries.get(1).host);
+    assertFalse(new File(tempDir, "replace.txt.tmp").exists());
+  }
+
+  @Test
+  void flushWithoutChangesDoesNotWrite() {
+    File f = new File(tempDir, "untouched.txt");
+    IceBridgeHostCache cache = new IceBridgeHostCache(f);
+    cache.flush();
+    cache.markFailure("10.9.9.9", 6888); // unknown host: no change
+    cache.flush();
+    assertFalse(f.exists());
   }
 }
