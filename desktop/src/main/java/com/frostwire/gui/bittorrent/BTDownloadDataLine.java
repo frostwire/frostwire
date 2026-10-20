@@ -367,13 +367,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     } else if (column == UPLOAD_SPEED_COLUMN) {
       return uploadSpeed;
     } else if (column == TIME_COLUMN) {
-      if (initializer.isCompleted()) {
-        return new TimeRemainingHolder(0);
-      } else if (downloadSpeed < 0.001) {
-        return new TimeRemainingHolder(-1);
-      } else {
-        return new TimeRemainingHolder(timeLeft);
-      }
+      return timeRemaining();
     } else if (column == SEEDS_COLUMN) {
       return new SeedsHolder(seeds);
     } else if (column == PEERS_COLUMN) {
@@ -398,32 +392,25 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     return FILE_COLUMN.getModelIndex();
   }
 
+  /**
+   * Built from the values {@link #update()} cached: the tooltip timer fires on the EDT, and the
+   * live getters (getETA(), getSize()) call into libtorrent, which blocks while the session is
+   * busy.
+   */
   public String[] getToolTipArray(int col) {
     String[] info = new String[11];
     String name = getInitializeObject().getDisplayName();
-    String status = I18n.tr("Status") + ": " + I18n.tr(getInitializeObject().getState().name());
-    String progress = I18n.tr("Progress") + ": " + getInitializeObject().getProgress() + "%";
-    String downSpeed =
-        I18n.tr("Down Speed")
-            + ": "
-            + GUIUtils.rate2speed(getInitializeObject().getDownloadSpeed());
-    String upSpeed =
-        I18n.tr("Up Speed") + ": " + GUIUtils.rate2speed(getInitializeObject().getUploadSpeed());
-    String downloaded =
-        I18n.tr("Downloaded") + ": " + new SizeHolder(getInitializeObject().getBytesReceived());
-    String uploaded =
-        I18n.tr("Uploaded") + ": " + new SizeHolder(getInitializeObject().getBytesSent());
-    String peers = I18n.tr("Peers") + ": " + getInitializeObject().getPeersString();
-    String seeds = I18n.tr("Seeds") + ": " + getInitializeObject().getSeedsString();
-    String size = I18n.tr("Size") + ": " + new SizeHolder(getInitializeObject().getSize());
-    String time =
-        I18n.tr("ETA")
-            + ": "
-            + (getInitializeObject().isCompleted()
-                ? new TimeRemainingHolder(0)
-                : (getInitializeObject().getDownloadSpeed() < 0.001
-                    ? new TimeRemainingHolder(-1)
-                    : new TimeRemainingHolder(getInitializeObject().getETA())));
+    String status =
+        I18n.tr("Status") + ": " + (transferState == null ? "" : I18n.tr(transferState.name()));
+    String progress = I18n.tr("Progress") + ": " + this.progress + "%";
+    String downSpeed = I18n.tr("Down Speed") + ": " + GUIUtils.rate2speed(downloadSpeed);
+    String upSpeed = I18n.tr("Up Speed") + ": " + GUIUtils.rate2speed(uploadSpeed);
+    String downloaded = I18n.tr("Downloaded") + ": " + orZero(cachedBytesDownloadedHolder);
+    String uploaded = I18n.tr("Uploaded") + ": " + orZero(cachedBytesUploadedHolder);
+    String peers = I18n.tr("Peers") + ": " + (this.peers == null ? "" : this.peers);
+    String seeds = I18n.tr("Seeds") + ": " + (this.seeds == null ? "" : this.seeds);
+    String size = I18n.tr("Size") + ": " + orZero(cachedSizeHolder);
+    String time = I18n.tr("ETA") + ": " + timeRemaining();
     info[0] = name;
     info[1] = status;
     info[2] = progress;
@@ -436,6 +423,20 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     info[9] = size;
     info[10] = time;
     return info;
+  }
+
+  private TimeRemainingHolder timeRemaining() {
+    if (initializer.isCompleted()) {
+      return new TimeRemainingHolder(0);
+    } else if (downloadSpeed < 0.001) {
+      return new TimeRemainingHolder(-1);
+    } else {
+      return new TimeRemainingHolder(timeLeft);
+    }
+  }
+
+  private static SizeHolder orZero(SizeHolder holder) {
+    return holder != null ? holder : new SizeHolder(0);
   }
 
   private Icon getIcon() {
