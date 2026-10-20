@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.BuildConfig;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
+import com.frostwire.util.InMemoryImageIO;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
@@ -31,7 +32,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import org.limewire.util.CommonUtils;
 
@@ -201,7 +201,7 @@ public class Main {
     URL imageURL = getChosenSplashURL();
     if (imageURL != null) {
       try {
-        image = ImageIO.read(imageURL);
+        image = InMemoryImageIO.read(imageURL);
       } catch (IOException e) {
         e.printStackTrace();
       }
