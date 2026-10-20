@@ -33,12 +33,12 @@ import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -57,7 +57,6 @@ public final class IceBridgeUrlHandler {
   private static final int SEARCH_RESULT_LIMIT = 25;
   private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
   private static volatile boolean registered;
-  private static volatile String lastClipboardText;
 
   private IceBridgeUrlHandler() {}
 
@@ -141,7 +140,13 @@ public final class IceBridgeUrlHandler {
           () -> {
             Frame frame = GUIMediator.getAppFrame();
             if (frame instanceof Window) {
-              ((Window) frame).addWindowListener(new ClipboardMonitor());
+              ((Window) frame)
+                  .addWindowListener(
+                      new IceBridgeClipboardMonitor(
+                          DesktopParallelExecutor::execute,
+                          () -> GUIUtils.extractStringContentFromClipboard(CLIPBOARD),
+                          () -> CLIPBOARD.setContents(new StringSelection(""), null),
+                          url -> GUIMediator.safeInvokeLater(() -> handle(url))));
             }
           });
     } catch (Throwable t) {
@@ -542,41 +547,5 @@ public final class IceBridgeUrlHandler {
       i++;
     } while (v >= 1024 && i < units.length - 1);
     return String.format("%.1f %s", v, units[i]);
-  }
-
-  private static final class ClipboardMonitor extends WindowAdapter {
-    @Override
-    public void windowActivated(WindowEvent e) {
-      try {
-        java.awt.datatransfer.Transferable content = CLIPBOARD.getContents(null);
-        if (content == null
-            || !content.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.stringFlavor)) {
-          return;
-        }
-        String text =
-            (String) content.getTransferData(java.awt.datatransfer.DataFlavor.stringFlavor);
-        if (text == null) {
-          return;
-        }
-        text = text.trim();
-        if (text.isEmpty()) {
-          return;
-        }
-        String prev = lastClipboardText;
-        if (prev != null && prev.equals(text)) {
-          return;
-        }
-        lastClipboardText = text;
-        if (text.toLowerCase().startsWith(SCHEME)) {
-          try {
-            CLIPBOARD.setContents(new StringSelection(""), null);
-          } catch (Throwable ignored) {
-          }
-          handle(text);
-        }
-      } catch (Throwable t) {
-        LOG.debug("IceBridge clipboard monitor error", t);
-      }
-    }
   }
 }

@@ -1,4 +1,5 @@
 FrostWire 7.1.2 UNRELEASED
+   - fix:Switching back to FrostWire no longer freezes the UI on Windows while another application holds the clipboard — the check for a copied icebridge:// link reads the clipboard in the background
    - fix:Hovering over a transfer no longer freezes the UI while the BitTorrent engine is busy — the tooltip shows the values the Transfers table already refreshed instead of querying the engine
    - fix:Adding a transfer no longer freezes the UI while its .torrent file is read — the payment and license details shown for the transfer are loaded in the background along with the rest of the new row
    - fix:Starting to drag a transfer out of FrostWire no longer freezes the UI on large or slow folders — its files are listed when you drop them, not when the drag starts
