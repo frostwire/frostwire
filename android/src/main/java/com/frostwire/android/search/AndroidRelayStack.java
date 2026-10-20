@@ -965,7 +965,10 @@ public final class AndroidRelayStack implements AutoCloseable {
     } catch (Throwable t) {
       LOG.warn("Error closing server", t);
     }
-    IceBridgeHostCache.getInstance().setPingProber(null);
+    IceBridgeHostCache hostCache = IceBridgeHostCache.getInstance();
+    hostCache.setPingProber(null);
+    // Writes are coalesced; persist this run's pings now, Android rarely runs JVM shutdown hooks.
+    hostCache.flush();
     BTEngineListenerChain.remove(btEngine, indexer);
     BTEngineListenerChain.remove(btEngine, endorsementListener);
     indexer.close();
