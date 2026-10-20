@@ -16,6 +16,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -61,6 +62,8 @@ public final class IceBridgeHostCache {
 
     private final File cacheFile;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
+    /** True when entries changed since the last successful write; guarded by this. */
+    private boolean dirty;
     /**
      * How Settings "Refresh / Ping" authenticates a cached server: the rUDP identity-discovery
      * handshake. Without a prober (stack not running) there is nothing to ping with.
@@ -177,14 +180,26 @@ public final class IceBridgeHostCache {
         }
     }
 
+    /** Writes the cache now if it changed since the last successful write. */
+    public synchronized void flush() {
+        if (dirty) {
+            save();
+        }
+    }
+
+    /**
+     * Writes every entry to a temporary file and renames it over the cache file, so a crash or a
+     * full disk mid-write never leaves a truncated cache behind.
+     */
     public synchronized void save() {
+        File tmp = new File(cacheFile.getPath() + ".tmp");
         try {
             File parent = cacheFile.getParentFile();
             if (parent != null && !parent.exists()) {
                 parent.mkdirs();
             }
             try (BufferedWriter w = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(cacheFile), StandardCharsets.UTF_8))) {
+                    new OutputStreamWriter(new FileOutputStream(tmp), StandardCharsets.UTF_8))) {
                 w.write("# IceBridge host cache - host:port,ROLE,lastSuccessfulPingMs,consecutiveFailures\n");
                 for (Entry e : entries) {
                     String role = (e.role != null) ? e.role : "";
@@ -192,9 +207,25 @@ public final class IceBridgeHostCache {
                             + "," + e.consecutiveFailures + "\n");
                 }
             }
+            if (!replace(tmp, cacheFile)) {
+                throw new IOException("could not rename " + tmp + " to " + cacheFile);
+            }
+            dirty = false;
         } catch (Exception e) {
+            tmp.delete();
             LOG.warn("Failed to save IceBridge host cache: " + cacheFile, e);
         }
+    }
+
+    /** Atomic on POSIX; Windows cannot rename over an existing file, so it deletes the target first. */
+    private static boolean replace(File source, File target) {
+        return source.renameTo(target) || (target.delete() && source.renameTo(target));
+    }
+
+    /** Records that the entries changed and persists them. Callers hold this object's lock. */
+    private void changed() {
+        dirty = true;
+        save();
     }
 
     /**
@@ -210,12 +241,12 @@ public final class IceBridgeHostCache {
                 String newRole = (role != null && !role.isEmpty()) ? role : e.role;
                 long ts = e.lastSuccessfulPingMs; // keep existing success time
                 entries.set(i, new Entry(host, port, newRole, ts, e.consecutiveFailures));
-                save();
+                changed();
                 return;
             }
         }
         entries.add(new Entry(host, port, role, 0, 0));
-        save();
+        changed();
     }
 
     /** Mark a successful ping for the given host (updates timestamp and role, resets failures). */
@@ -227,12 +258,12 @@ public final class IceBridgeHostCache {
             if (e.host.equals(host) && e.port == port) {
                 String newRole = (role != null && !role.isEmpty()) ? role : e.role;
                 entries.set(i, new Entry(host, port, newRole, now, 0));
-                save();
+                changed();
                 return;
             }
         }
         entries.add(new Entry(host, port, role, now, 0));
-        save();
+        changed();
     }
 
     /** Refresh a cached host after a successful handshake; unknown hosts are never added. */
@@ -242,7 +273,7 @@ public final class IceBridgeHostCache {
             Entry e = entries.get(i);
             if (e.host.equals(host) && e.port == port) {
                 entries.set(i, new Entry(host, port, e.role, System.currentTimeMillis(), 0));
-                save();
+                changed();
                 return;
             }
         }
@@ -269,7 +300,7 @@ public final class IceBridgeHostCache {
                     entries.set(i, new Entry(host, port, e.role,
                             e.lastSuccessfulPingMs, failures));
                 }
-                save();
+                changed();
                 return failures >= MAX_CONSECUTIVE_FAILURES;
             }
         }
