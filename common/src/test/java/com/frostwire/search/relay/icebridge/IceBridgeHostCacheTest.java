@@ -15,6 +15,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -108,5 +109,45 @@ class IceBridgeHostCacheTest {
     cache.markFailure("10.9.9.9", 6888); // unknown host: no change
     cache.flush();
     assertFalse(f.exists());
+  }
+
+  @Test
+  void burstOfChangesIsWrittenOnceUntilFlush() {
+    File f = new File(tempDir, "burst.txt");
+    AtomicLong clock = new AtomicLong();
+    IceBridgeHostCache cache = new IceBridgeHostCache(f, clock::get);
+
+    cache.markSuccess("10.0.0.1", 6888, "BOTH");
+    assertEquals(1, persistedEntries(f), "the first change is written immediately");
+
+    for (int i = 2; i <= 1000; i++) {
+      cache.addOrUpdate("relay" + i + ".example", 6888, "FORWARDER");
+      cache.markSuccessIfKnown("10.0.0.1", 6888);
+    }
+    assertEquals(1, persistedEntries(f), "changes within the interval stay in memory");
+    assertEquals(1000, cache.getAll().size());
+
+    cache.flush();
+    assertEquals(1000, persistedEntries(f));
+  }
+
+  @Test
+  void changeAfterSaveIntervalIsWritten() {
+    File f = new File(tempDir, "interval.txt");
+    AtomicLong clock = new AtomicLong(1_000);
+    IceBridgeHostCache cache = new IceBridgeHostCache(f, clock::get);
+    cache.markSuccess("10.0.0.1", 6888, "BOTH");
+
+    clock.addAndGet(IceBridgeHostCache.SAVE_INTERVAL_MS - 1);
+    cache.markSuccess("10.0.0.2", 6888, "BOTH");
+    assertEquals(1, persistedEntries(f));
+
+    clock.addAndGet(1);
+    cache.markSuccess("10.0.0.3", 6888, "BOTH");
+    assertEquals(3, persistedEntries(f));
+  }
+
+  private static int persistedEntries(File f) {
+    return new IceBridgeHostCache(f).getAll().size();
   }
 }
