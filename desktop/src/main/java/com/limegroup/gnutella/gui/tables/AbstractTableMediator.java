@@ -34,6 +34,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputListener;
@@ -431,23 +433,40 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
    * @param index - index to insert into if the list is not sorted
    */
   public void add(I o, int index) {
+    insert(
+        index, () -> DATA_MODEL.addSorted(o), i -> DATA_MODEL.add(o, i), () -> DATA_MODEL.add(o));
+  }
+
+  /**
+   * Like {@link #add(Object, int)} for a line that was already initialized, typically off the EDT
+   * because initializing it is expensive. Returns the row it was added at, or -1 if the model
+   * filtered it out.
+   */
+  protected int addLine(E line, int index) {
+    return insert(
+        index,
+        () -> DATA_MODEL.addSorted(line),
+        i -> DATA_MODEL.add(line, i),
+        () -> DATA_MODEL.add(line));
+  }
+
+  private int insert(int index, IntSupplier sorted, IntUnaryOperator at, IntSupplier append) {
     if (TABLE.isEditing()) {
       CellEditor editor = TABLE.getCellEditor();
       editor.cancelCellEditing();
     }
     boolean inView = TABLE.isSelectionVisible();
     int addedAt;
-    if (SETTINGS.REAL_TIME_SORT.getValue() && DATA_MODEL.isSorted())
-      addedAt = DATA_MODEL.addSorted(o);
-    else {
-      if (index >= 0 && index <= DATA_MODEL.getRowCount()) {
-        addedAt = DATA_MODEL.add(o, index);
-      } else {
-        addedAt = DATA_MODEL.add(o);
-      }
+    if (SETTINGS.REAL_TIME_SORT.getValue() && DATA_MODEL.isSorted()) {
+      addedAt = sorted.getAsInt();
+    } else if (index >= 0 && index <= DATA_MODEL.getRowCount()) {
+      addedAt = at.applyAsInt(index);
+    } else {
+      addedAt = append.getAsInt();
     }
     // if it was added...
     fixSelection(addedAt, inView);
+    return addedAt;
   }
 
   /** Forces the object to be added unsorted. */

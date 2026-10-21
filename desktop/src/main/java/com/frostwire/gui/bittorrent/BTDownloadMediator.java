@@ -999,22 +999,36 @@ public final class BTDownloadMediator
   }
 
   public void addDownload(com.frostwire.bittorrent.BTDownload dl) {
-    // The BittorrentDownload constructor queries libtorrent (name, size, state, pause/resume)
-    // and may clean up incomplete files: build it off the EDT, then add the row on the EDT.
+    // Building a row queries libtorrent (name, size, state, ETA, pause/resume), reads the .torrent
+    // for payment and license metadata and checks the disk for a preview file: build and
+    // initialize the whole line off the EDT, then insert it on the EDT.
     buildThenAdd(
-        () -> buildRow(() -> new BittorrentDownload(dl)),
+        () -> buildLine(() -> new BittorrentDownload(dl)),
         BackgroundQueuedExecutorService::schedule,
-        download -> GUIMediator.safeInvokeLater(() -> add(download)));
+        line -> GUIMediator.safeInvokeLater(() -> addLine(line)));
   }
 
-  /**
-   * Builds a transfer row's object, including the payment and license metadata the row reads when
-   * it is added on the EDT: the first read parses the .torrent file from disk.
-   */
-  static <T extends BTDownload> T buildRow(Supplier<T> construct) {
-    T download = construct.get();
-    download.getPaymentOptions();
-    return download;
+  /** Builds and initializes a transfer row, which reads libtorrent and the disk. Not on the EDT. */
+  static BTDownloadDataLine buildLine(Supplier<? extends BTDownload> construct) {
+    BTDownloadDataLine line = new BTDownloadDataLine();
+    line.initialize(construct.get());
+    return line;
+  }
+
+  /** Inserts a row built by {@link #buildLine}, like {@link #add(BTDownload)}. EDT only. */
+  private void addLine(BTDownloadDataLine line) {
+    BTDownload downloader = line.getInitializeObject();
+    if (DATA_MODEL.contains(downloader)) {
+      return;
+    }
+    DATA_MODEL.addHash(downloader.getHash());
+    if (addLine(line, DATA_MODEL.getRowCount()) >= 0) {
+      int row = DATA_MODEL.getRow(downloader);
+      if (row != -1) {
+        TABLE.setSelectedRow(row);
+        TABLE.ensureSelectionVisible();
+      }
+    }
   }
 
   /** Builds a transfer row's object on {@code background} and hands it to {@code adder}. */

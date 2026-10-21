@@ -2,7 +2,7 @@ FrostWire 7.1.2 UNRELEASED
    - fix:Opening screens with many icons (such as lists with delete buttons), showing song artwork, slides and skin images no longer stalls on slow disks — images are decoded in memory instead of through a temporary file
    - fix:Switching back to FrostWire no longer freezes the UI on Windows while another application holds the clipboard — the check for a copied icebridge:// link reads the clipboard in the background
    - fix:Hovering over a transfer no longer freezes the UI while the BitTorrent engine is busy — the tooltip shows the values the Transfers table already refreshed instead of querying the engine
-   - fix:Adding a transfer no longer freezes the UI while its .torrent file is read — the payment and license details shown for the transfer are loaded in the background along with the rest of the new row
+   - fix:Adding a transfer no longer freezes the UI — the new row (its .torrent payment and license details, preview check and BitTorrent engine status) is built in the background and only inserted on screen
    - fix:Starting to drag a transfer out of FrostWire no longer freezes the UI on large or slow folders — its files are listed when you drop them, not when the drag starts
    - fix:Scrolling the Library no longer freezes on slow or network drives — whether a file can be played is decided once per file, in the background, instead of checking the disk for every row on every repaint
    - fix:Scrolling or repainting the Library and other tables with Play/Download buttons no longer stalls on Windows — rows without an action show no icon instead of hiding the button, which forced a native cursor update for every painted row

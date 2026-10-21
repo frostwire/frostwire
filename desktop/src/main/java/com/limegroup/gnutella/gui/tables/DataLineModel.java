@@ -70,9 +70,11 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
   @SuppressWarnings("unused")
   int add(T dl);
 
-  /** Adds a new DataLine to the model in whatever row will keep the DataLine sorted. */
-  @SuppressWarnings("unused")
-  void addSorted(T dl);
+  /**
+   * Adds a new DataLine to the model in whatever row will keep the DataLine sorted. Return the row
+   * it was added at.
+   */
+  int addSorted(T dl);
 
   /**
    * Add a new DataLine to the info, at a specific row initialized by o. Return the row it was added

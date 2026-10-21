@@ -194,6 +194,11 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     return Boolean.TRUE;
   }
 
+  /** Records a transfer whose row is added from an already initialized line. */
+  void addHash(String hash) {
+    _hashDownloads.add(hash);
+  }
+
   @Override
   public int add(BTDownload downloader) {
     _hashDownloads.add(downloader.getHash());
