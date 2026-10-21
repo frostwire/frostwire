@@ -113,6 +113,7 @@ public final class BTDownloadMediator
   private final CoalescingGate clearableScanGate = new CoalescingGate();
   // coalesce selection updates; only last result applies
   private final AtomicInteger selectionSeq = new AtomicInteger();
+  private final AtomicInteger endorseSeq = new AtomicInteger();
 
   /**
    * Constructs all of the elements of the download window, including the table, the buttons, etc.
@@ -631,7 +632,7 @@ public final class BTDownloadMediator
     pauseAction.setEnabled(pausable);
     copyMagnetAction.setEnabled(!isHttpTransfer(dl));
     copyHashAction.setEnabled(!isHttpTransfer(dl));
-    endorseSourcePeerAction.setEnabled(canEndorseSourcePeer(dl));
+    updateEndorseActionAsync(dl);
 
     shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dl.isPausable());
     // Compute media flags asynchronously and update actions when ready
@@ -647,6 +648,44 @@ public final class BTDownloadMediator
     }
   }
 
+  /**
+   * canEndorseSourcePeer() reads the torrent's info hash from libtorrent and checks the karma
+   * chain, so it is decided off the EDT; results for an earlier selection are dropped.
+   */
+  private void updateEndorseActionAsync(BTDownload dl) {
+    endorseSourcePeerAction.setEnabled(false);
+    decideLatest(
+        endorseSeq,
+        () -> canEndorseSourcePeer(dl),
+        DesktopParallelExecutor::execute,
+        GUIMediator::safeInvokeLater,
+        endorseSourcePeerAction::setEnabled);
+  }
+
+  /**
+   * Computes {@code decide} on {@code background} and hands the result to {@code apply} on {@code
+   * ui}, unless a newer decision was started on {@code seq} in the meantime.
+   */
+  static <T> void decideLatest(
+      AtomicInteger seq,
+      Supplier<T> decide,
+      Executor background,
+      Consumer<Runnable> ui,
+      Consumer<T> apply) {
+    final int ticket = seq.incrementAndGet();
+    background.execute(
+        () -> {
+          T result = decide.get();
+          ui.accept(
+              () -> {
+                if (ticket == seq.get()) {
+                  apply.accept(result);
+                }
+              });
+        });
+  }
+
+  /** Reads libtorrent and the karma chain: not on the EDT. */
   private boolean canEndorseSourcePeer(BTDownload download) {
     if (!(download instanceof BittorrentDownload)
         || download.getState() != TransferState.SEEDING
@@ -669,12 +708,28 @@ public final class BTDownloadMediator
 
   private void endorseSelectedSourcePeer() {
     BTDownload[] selected = getSelectedDownloaders();
-    if (selected.length != 1 || !canEndorseSourcePeer(selected[0])) {
+    if (selected.length != 1) {
       return;
     }
-    com.frostwire.bittorrent.BTDownload torrent = ((BittorrentDownload) selected[0]).getDl();
-    byte[] source = torrent.getDistributedSourcePeerPub();
-    byte[] infoHash = Hex.decode(torrent.getV1InfoHash());
+    BTDownload download = selected[0];
+    // The checks read libtorrent and the karma chain; ask the user only once they pass.
+    DesktopParallelExecutor.execute(
+        () -> {
+          if (!canEndorseSourcePeer(download)) {
+            return;
+          }
+          com.frostwire.bittorrent.BTDownload torrent = ((BittorrentDownload) download).getDl();
+          byte[] source = torrent.getDistributedSourcePeerPub();
+          String infoHashHex = torrent.getV1InfoHash();
+          if (infoHashHex == null) {
+            return;
+          }
+          byte[] infoHash = Hex.decode(infoHashHex);
+          GUIMediator.safeInvokeLater(() -> confirmAndEndorse(download, source, infoHash));
+        });
+  }
+
+  private void confirmAndEndorse(BTDownload download, byte[] source, byte[] infoHash) {
     KarmaChainWriter writer =
         com.limegroup.gnutella.gui.search.SearchEngine.getDistributedKarmaChainWriter();
     int answer =
@@ -682,7 +737,7 @@ public final class BTDownloadMediator
             GUIMediator.getAppFrame(),
             I18n.tr("Endorse this source peer for the torrent you are seeding?")
                 + "\n\n"
-                + selected[0].getDisplayName()
+                + download.getDisplayName()
                 + "\n"
                 + Hex.encode(source),
             I18n.tr("Endorse Source Peer"),

@@ -1,4 +1,5 @@
 FrostWire 7.1.2 UNRELEASED
+   - fix:Selecting a seeding transfer no longer freezes the UI while the BitTorrent engine is busy — whether "Endorse Source Peer" applies is decided in the background, and so are the checks when you click it
    - fix:Opening the file selection for a torrent no longer freezes the UI on Windows — file-type icons are fetched from Windows in the background and appear as they load
    - fix:Opening screens with many icons (such as lists with delete buttons), showing song artwork, slides and skin images no longer stalls on slow disks — images are decoded in memory instead of through a temporary file
    - fix:Switching back to FrostWire no longer freezes the UI on Windows while another application holds the clipboard — the check for a copied icebridge:// link reads the clipboard in the background
