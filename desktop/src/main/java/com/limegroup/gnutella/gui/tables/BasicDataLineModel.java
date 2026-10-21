@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,756 +20,688 @@ package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.limegroup.gnutella.gui.GUIMediator;
-
-import javax.swing.table.AbstractTableModel;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import javax.swing.table.AbstractTableModel;
 
 /**
- * Handles common tasks associated with storing the DataLine's of a table.
- * Previously, this class used to be split between a DataLineList and a
- * AbstractTableModel.  However, because the function of the DataLineList was
- * really to handle all interactions with the data, it essentially was a model.
- * Now, because the two classes are combined, the model can fire its own events.
+ * Handles common tasks associated with storing the DataLine's of a table. Previously, this class
+ * used to be split between a DataLineList and a AbstractTableModel. However, because the function
+ * of the DataLineList was really to handle all interactions with the data, it essentially was a
+ * model. Now, because the two classes are combined, the model can fire its own events.
  *
  * @author Sam Berlin
  */
 public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableModel
-        implements DataLineModel<T, E> {
-    private static final int ASCENDING = 1;
-    private static final int DESCENDING = -1;
-    /**
-     * Variable to determine which DataLine class
-     * to create instances of
-     */
-    private final Class<? extends T> _dataLineClass;
-    /**
-     * Variable for the instance of the DataLine that'll be used
-     * to determine column length/names/classes.
-     */
-    private final T _internalDataLine;
-    /**
-     * Internally used list object storing the DataLines.
-     */
-    protected final List<T> _list = new ArrayList<>();
-    /**
-     * Lock object for synchronizing access to _list to prevent ConcurrentModificationException.
-     */
-    private final Object _listLock = new Object();
-    
-    /**
-     * Protected access to the list lock for subclasses that need to synchronize
-     * their own operations with list access.
-     */
-    protected Object getListLock() {
-        return _listLock;
+    implements DataLineModel<T, E> {
+  private static final int ASCENDING = 1;
+  private static final int DESCENDING = -1;
+
+  /** Variable to determine which DataLine class to create instances of */
+  private final Class<? extends T> _dataLineClass;
+
+  /**
+   * Variable for the instance of the DataLine that'll be used to determine column
+   * length/names/classes.
+   */
+  private final T _internalDataLine;
+
+  /** Internally used list object storing the DataLines. */
+  protected final List<T> _list = new ArrayList<>();
+
+  /** Lock object for synchronizing access to _list to prevent ConcurrentModificationException. */
+  private final Object _listLock = new Object();
+
+  /**
+   * Protected access to the list lock for subclasses that need to synchronize their own operations
+   * with list access.
+   */
+  protected Object getListLock() {
+    return _listLock;
+  }
+
+  /**
+   * Variable for whether or not the current sorting scheme is ascending (value 1) or descending
+   * (value -1).
+   */
+  protected volatile int _ascending = ASCENDING;
+
+  /** Variable for which column is currently being sorted. */
+  protected volatile int _activeColumn = -1;
+
+  /** Variable for whether or not this list has been sorted at least once. */
+  private boolean _isSorted = false;
+
+  private boolean _resortRunning = false;
+  private boolean _resortPending = false;
+
+  /**
+   * Snapshot placeholder for a cell that threw while reading. Identity comparison guarantees the
+   * row is treated as changed and repainted.
+   */
+  private static final Object UNREADABLE_CELL = new Object();
+
+  /**
+   * Displayed values at the previous refresh, for change-scoped row events. Guarded by {@link
+   * #_listLock}.
+   */
+  private Object[][] lastRefreshSnapshot;
+
+  /*
+   * Constructor -- creates the model, tying it to
+   * a specific DataLine class.
+   */
+  protected BasicDataLineModel(Class<? extends T> dataLineClass) {
+    _dataLineClass = dataLineClass;
+    _internalDataLine = createDataLine();
+  }
+
+  // Implements DataLineModel interface
+  public String[] getToolTipArray(int row, int col) {
+    synchronized (_listLock) {
+      return _list.get(row).getToolTipArray(col);
     }
-    /**
-     * Variable for whether or not the current sorting scheme
-     * is ascending (value 1) or descending (value -1).
-     */
-    protected volatile int _ascending = ASCENDING;
-    /**
-     * Variable for which column is currently being sorted.
-     */
-    protected volatile int _activeColumn = -1;
-    /**
-     * Variable for whether or not this list has been sorted
-     * at least once.
-     */
-    private boolean _isSorted = false;
-    private boolean _resortRunning = false;
-    private boolean _resortPending = false;
-    /**
-     * Snapshot placeholder for a cell that threw while reading. Identity
-     * comparison guarantees the row is treated as changed and repainted.
-     */
-    private static final Object UNREADABLE_CELL = new Object();
-    /**
-     * Displayed values at the previous refresh, for change-scoped row events.
-     * Guarded by {@link #_listLock}.
-     */
-    private Object[][] lastRefreshSnapshot;
+  }
 
-    /*
-     * Constructor -- creates the model, tying it to
-     * a specific DataLine class.
-     */
-    protected BasicDataLineModel(Class<? extends T> dataLineClass) {
-        _dataLineClass = dataLineClass;
-        _internalDataLine = createDataLine();
+  public boolean isTooltipRequired(int row, int col) {
+    synchronized (_listLock) {
+      return _list.get(row).isTooltipRequired(col);
     }
+  }
 
-    //Implements DataLineModel interface
-    public String[] getToolTipArray(int row, int col) {
-        synchronized (_listLock) {
-            return _list.get(row).getToolTipArray(col);
-        }
+  // Implements DataLineModel interface.
+  public boolean isSortAscending() {
+    return _ascending == ASCENDING;
+  }
+
+  // Implements DataLineModel interface.
+  public int getSortColumn() {
+    return _activeColumn;
+  }
+
+  // Implements DataLineModel interface.
+  public boolean isSorted() {
+    return _isSorted;
+  }
+
+  // Implements DataLineModel interface.
+  public void sort(int col) {
+    if (col == _activeColumn) {
+      if (_ascending == DESCENDING) {
+        unsort();
+        return;
+      } else {
+        _ascending = DESCENDING;
+      }
+    } else {
+      _ascending = ASCENDING;
+      _activeColumn = col;
     }
+    _isSorted = true;
+    resort();
+  }
 
-    public boolean isTooltipRequired(int row, int col) {
-        synchronized (_listLock) {
-            return _list.get(row).isTooltipRequired(col);
-        }
-    }
-
-    //Implements DataLineModel interface.
-    public boolean isSortAscending() {
-        return _ascending == ASCENDING;
-    }
-
-    //Implements DataLineModel interface.
-    public int getSortColumn() {
-        return _activeColumn;
-    }
-
-    //Implements DataLineModel interface.
-    public boolean isSorted() {
-        return _isSorted;
-    }
-
-    //Implements DataLineModel interface.
-    public void sort(int col) {
-        if (col == _activeColumn) {
-            if (_ascending == DESCENDING) {
-                unsort();
-                return;
-            } else {
-                _ascending = DESCENDING;
-            }
-        } else {
-            _ascending = ASCENDING;
-            _activeColumn = col;
-        }
-        _isSorted = true;
-        resort();
-    }
-
-    // Re-sort the list to provide real-time sorting
-    public void resort() {
-        if (!_isSorted) {
-            return;
-        }
-
-        synchronized (_listLock) {
-            if (_resortRunning) {
-                _resortPending = true;
-                return;
-            }
-            _resortRunning = true;
-        }
-
-        ThreadExecutor.startThread(() -> {
-            while (true) {
-                doResort();
-                GUIMediator.safeInvokeLater(this::fireTableDataChanged);
-
-                synchronized (_listLock) {
-                    if (_resortPending) {
-                        _resortPending = false;
-                    } else {
-                        _resortRunning = false;
-                        break;
-                    }
-                }
-            }
-        }, "BasicDataLineModel:resort");
+  // Re-sort the list to provide real-time sorting
+  public void resort() {
+    if (!_isSorted) {
+      return;
     }
 
-    /**
-     * Stops sorting.
-     */
-    public void unsort() {
-        _isSorted = false;
-        _activeColumn = -1;
+    synchronized (_listLock) {
+      if (_resortRunning) {
+        _resortPending = true;
+        return;
+      }
+      _resortRunning = true;
     }
 
-    /**
-     * Implementation of resorting.
-     */
-    protected void doResort() {
-        synchronized (_listLock) {
-            _list.sort(pinnedComparator());
-        }
-    }
+    ThreadExecutor.startThread(
+        () -> {
+          while (true) {
+            doResort();
+            GUIMediator.safeInvokeLater(this::fireTableDataChanged);
 
-    /*
-     * Determines whether or not the active column is dynamic
-     * and needs resorting.
-     */
-    public boolean needsResort() {
-        return _isSorted &&
-                _internalDataLine.isDynamic(_activeColumn);
-    }
-
-    //Implements DataLineModel interface
-    public void clear() {
-        synchronized (_listLock) {
-            cleanup();
-            _list.clear();
-        }
-        fireTableDataChanged();
-    }
-
-    //Cleans up all the data lines.
-    protected void cleanup() {
-        synchronized (_listLock) {
-            for (T t : _list) {
-                t.cleanup();
-            }
-        }
-    }
-
-    /**
-     * Basic linear update.
-     * Extending classes may wish to override this function to provide
-     * a fine-tuned refresh, possibly receiving feedback from each
-     * row after it is updated.  The return value can be used to notify
-     * the Mediator of information related to the refresh.
-     *
-     * @return null
-     */
-    public Object refresh() {
-        if (getRowCount() == 0) {
-            return null;
-        }
-        synchronized (_listLock) {
-            for (T t : _list) t.update();
-        }
-        fireChangedRowsSinceLastRefresh();
-        return null;
-    }
-
-    /**
-     * Fires row-updated events only for rows whose displayed values changed
-     * since the previous refresh, so the 1-second GUI refresh does not repaint
-     * tables whose content did not change. Contiguous changed rows collapse
-     * into a single range event. A row-count change falls back to a
-     * full-range event.
-     *
-     * <p>The first call only stores the baseline and fires nothing: rows reach
-     * the view through their own insert events with freshly initialized values,
-     * so there is nothing to repaint yet. This keeps every table's first
-     * refresh tick (all firing at startup) from repainting the whole window.
-     *
-     * <p>Background: a full-table repaint walks every visible cell through the
-     * software Java2D pipeline (one native X call per primitive under XWayland),
-     * which can freeze the EDT for seconds on large tables. Repaints must stay
-     * proportional to what actually changed.
-     */
-    protected final void fireChangedRowsSinceLastRefresh() {
-        Object[][] now = snapshotDisplayedValues();
-        Object[][] last;
-        synchronized (_listLock) {
-            last = lastRefreshSnapshot;
-            lastRefreshSnapshot = now;
-        }
-        if (last == null || last.length != now.length) {
-            if (last != null && now.length > 0) {
-                fireTableRowsUpdated(0, now.length - 1);
-            }
-            return;
-        }
-        int rangeStart = -1;
-        for (int r = 0; r < now.length; r++) {
-            if (!rowsEqual(last[r], now[r])) {
-                if (rangeStart == -1) {
-                    rangeStart = r;
-                }
-            } else if (rangeStart != -1) {
-                fireTableRowsUpdated(rangeStart, r - 1);
-                rangeStart = -1;
-            }
-        }
-        if (rangeStart != -1) {
-            fireTableRowsUpdated(rangeStart, now.length - 1);
-        }
-    }
-
-    /**
-     * Snapshots the currently displayed cell values with one {@code getValueAt}
-     * pass per row. Pure model reads: fires no events.
-     */
-    private Object[][] snapshotDisplayedValues() {
-        int cols = getColumnCount();
-        synchronized (_listLock) {
-            Object[][] snapshot = new Object[_list.size()][];
-            for (int r = 0; r < snapshot.length; r++) {
-                Object[] values = new Object[cols];
-                for (int c = 0; c < cols; c++) {
-                    try {
-                        values[c] = _list.get(r).getValueAt(c);
-                    } catch (RuntimeException e) {
-                        // Unreadable cell: force the row event below.
-                        values[c] = UNREADABLE_CELL;
-                    }
-                }
-                snapshot[r] = values;
-            }
-            return snapshot;
-        }
-    }
-
-    private static boolean rowsEqual(Object[] a, Object[] b) {
-        if (a == b) {
-            return true;
-        }
-        if (a == null || b == null || a.length != b.length) {
-            return false;
-        }
-        for (int i = 0; i < a.length; i++) {
-            if (!Objects.equals(a[i], b[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Update a specific DataLine
-     * The DataLine updated is the one that was initialized by Object o
-     */
-    public int update(E o) {
-        int row = getRow(o);
-        synchronized (_listLock) {
-            _list.get(row).update();
-        }
-        fireTableRowsUpdated(row, row);
-        return row;
-    }
-
-    /**
-     * Instantiates a DataLine.
-     * <p>
-     * This uses reflection to create an instance of the DataLine class.
-     * The dataLineClass Class is used to determine which class should
-     * be created.
-     * Failure to create results in AssertFailures.
-     * <p>
-     * Extending classes should override this to change the way
-     * DataLine's are instantiated.
-     */
-    protected T createDataLine() {
-        try {
-            var ctor = _dataLineClass.getDeclaredConstructor();
-            ctor.setAccessible(true);
-            return ctor.newInstance();
-        } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Returns an initialized new dataline.
-     */
-    private T getNewDataLine(E o) {
-        T dl = createDataLine();
-        dl.initialize(o);
-        return dl;
-    }
-
-    /**
-     * Determines where the DataLine should be inserted.
-     * Runs in log(n) time ArrayLists and linear time for LinkedLists.
-     * <p>
-     * Extending classes should override this to change the method
-     * used to determine where to insert a new DataLine.
-     * <p>
-     * The current methodology is to use Collections.binarySearch
-     * with _list as the list, the DataLine as the key, and this
-     * as the Comparator.
-     */
-    private int getSortedPosition(T dl) {
-        // Collections.binarySearch return notes:
-        // index of the search key, if it is contained in the list;
-        // otherwise, (-(insertion point) - 1). The insertion point
-        // is defined as the point at which the key would be inserted
-        // into the list: the index of the first element greater than
-        // the key, or list.size(), if all elements in the list are
-        // less than the specified key. Note that this guarantees that
-        // the return value will be >= 0 if & only if the key is found.
-        // So....
-        // Remember we're comparing columns, not entire DataLines, so
-        // it is entirely likely that two columns will be the same.
-        // If the returned row is < 0, we want to convert it to
-        // the insertion point.
-        int row;
-        synchronized (_listLock) {
-            row = Collections.binarySearch(_list, dl, pinnedComparator());
-        }
-        if (row < 0) row = -(row + 1);
-        return row;
-    }
-
-    /**
-     * Helper function.
-     * <p>
-     * Adds a DataLine initialized by the object to row 0.
-     * <p>
-     * This should be overriden only if you want the default,
-     * non-sorting add to go someplace other than row 0.
-     * <p>
-     * Delegates to add(Object, int).
-     * <p>
-     * Extending classes should maintain the delegation to add(Object, int).
-     */
-    public int add(E o) {
-        return add(o, 0);
-    }
-
-    /**
-     * Helper function.
-     * <p>
-     * Uses getNewDataLine(Object) and add(DataLine, int).
-     * <p>
-     * Extending classes can override this, but it is recommended
-     * that they override the two above methods instead.
-     */
-    public int add(E o, int row) {
-        T dl = getNewDataLine(o);
-        return add(dl, row);
-    }
-
-    /**
-     * Adds a DataLine to row 0.
-     * Currently unused.
-     */
-    public int add(T dl) {
-        return add(dl, 0);
-    }
-
-    /**
-     * Adds a DataLine to the list at a row.
-     * <p>
-     * All forms of add(..) eventually end up here.
-     * <p>
-     * Extending classes should override this if they want
-     * to maintain a HashMap of any type for speedier access.
-     */
-    public int add(T dl, int row) {
-        synchronized (_listLock) {
-            _list.add(row, dl);
-        }
-        fireTableRowsInserted(row, row);
-        return row;
-    }
-
-    /**
-     * Helper function.
-     * <p>
-     * Uses getNewDataLine(Object), getSortedPosition(DataLine),
-     * and add(DataLine, int)
-     * <p>
-     * Extending classes can override this, but it is recommended
-     * they override the above mentioned methods instead.
-     */
-    public int addSorted(E o) {
-        T dl = getNewDataLine(o);
-        return add(dl, getSortedPosition(dl));
-    }
-
-    /**
-     * Helper function.
-     * <p>
-     * Uses getSortedPosition(DataLine) and add(DataLine, int).
-     * <p>
-     * Extending classes can override this, but it is recommended
-     * they override the above mentioned methods instead.
-     */
-    public void addSorted(T dl) {
-        add(dl, getSortedPosition(dl));
-    }
-
-    //Implements the DataLineModel interface.
-    public T get(int row) {
-        if (row == -1)
-            return null;
-        else {
             synchronized (_listLock) {
-                return _list.get(row);
+              if (_resortPending) {
+                _resortPending = false;
+              } else {
+                _resortRunning = false;
+                break;
+              }
             }
-        }
-    }
+          }
+        },
+        "BasicDataLineModel:resort");
+  }
 
-    /**
-     * Implements DataLineModel interface.
-     * Delegates the row find to getRow(Object o).
-     * Returns the first DataLine initialized by object o.
-     * If no object matches, null is returned.
-     */
-    public T get(E o) {
-        int row = getRow(o);
-        if (row != -1) {
-            synchronized (_listLock) {
-                return _list.get(row);
-            }
-        } else
-            return null;
-    }
+  /** Stops sorting. */
+  public void unsort() {
+    _isSorted = false;
+    _activeColumn = -1;
+  }
 
-    /**
-     * Implements DataLineModel interface.
-     * Delegates the row find to getRow(Object o, int col).
-     * Returns the first DataLine that contains object o in column col.
-     * If no object matches, null is returned.
-     */
-    public T get(Object o, int col) {
-        int row = getRow(o, col);
-        if (row != -1) {
-            synchronized (_listLock) {
-                return _list.get(row);
-            }
-        } else
-            return null;
+  /** Implementation of resorting. */
+  protected void doResort() {
+    synchronized (_listLock) {
+      _list.sort(pinnedComparator());
     }
+  }
 
-    /**
-     * Calls cleanup on the DataLine and then removes it from the list.
-     */
-    public void remove(int row) {
-        synchronized (_listLock) {
-            _list.get(row).cleanup();
-            _list.remove(row);
-        }
-        fireTableRowsDeleted(row, row);
+  /*
+   * Determines whether or not the active column is dynamic
+   * and needs resorting.
+   */
+  public boolean needsResort() {
+    return _isSorted && _internalDataLine.isDynamic(_activeColumn);
+  }
+
+  // Implements DataLineModel interface
+  public void clear() {
+    synchronized (_listLock) {
+      cleanup();
+      _list.clear();
     }
+    fireTableDataChanged();
+  }
 
-    /**
-     * Helper-function that resolves to remove(int).
-     * Removes the line associated with the DataLine line.
-     * If no matching DataLine exists, nothing happens.
-     */
-    public void remove(T line) {
-        int idx;
-        synchronized (_listLock) {
-            idx = _list.indexOf(line);
-        }
-        if (idx != -1)
-            remove(idx);
+  // Cleans up all the data lines.
+  protected void cleanup() {
+    synchronized (_listLock) {
+      for (T t : _list) {
+        t.cleanup();
+      }
     }
+  }
 
-    /**
-     * Helper function that resolves to remove(int).
-     * Removes the DataLine that was initialized by the Object o.
-     * Uses a linear search through the list to find a match.
-     * Extending objects that have large lists and call remove(Object)
-     * often may wish to override this, add(Object, int) and sort using
-     * a HashMap for more timely access.
-     */
-    public void remove(Object o) {
-        int rowToRemove = -1;
-        synchronized (_listLock) {
-            int end = _list.size();
-            for (int i = 0; i < end; i++) {
-                if (_list.get(i).getInitializeObject().equals(o)) {
-                    rowToRemove = i;
-                    break;
-                }
-            }
-        }
-        if (rowToRemove != -1) {
-            remove(rowToRemove);
-        }
+  /**
+   * Basic linear update. Extending classes may wish to override this function to provide a
+   * fine-tuned refresh, possibly receiving feedback from each row after it is updated. The return
+   * value can be used to notify the Mediator of information related to the refresh.
+   *
+   * @return null
+   */
+  public Object refresh() {
+    if (getRowCount() == 0) {
+      return null;
     }
-
-    //Implements the TableModel method
-    public Object getValueAt(int row, int col) {
-        synchronized (_listLock) {
-            return _list.get(row).getValueAt(col);
-        }
+    synchronized (_listLock) {
+      for (T t : _list) t.update();
     }
+    fireChangedRowsSinceLastRefresh();
+    return null;
+  }
 
-    //Implements the TableModel method
-    // Ignores the update if the row doesn't exist.
-    public void setValueAt(Object o, int row, int col) {
-        synchronized (_listLock) {
-            if (row >= 0 && row < _list.size()) {
-                _list.get(row).setValueAt(o, col);
-            }
-        }
-        if (row >= 0 && row < getRowCount()) {
-            fireTableRowsUpdated(row, row);
-        }
+  /**
+   * Fires row-updated events only for rows whose displayed values changed since the previous
+   * refresh, so the 1-second GUI refresh does not repaint tables whose content did not change.
+   * Contiguous changed rows collapse into a single range event. A row-count change falls back to a
+   * full-range event.
+   *
+   * <p>The first call only stores the baseline and fires nothing: rows reach the view through their
+   * own insert events with freshly initialized values, so there is nothing to repaint yet. This
+   * keeps every table's first refresh tick (all firing at startup) from repainting the whole
+   * window.
+   *
+   * <p>Background: a full-table repaint walks every visible cell through the software Java2D
+   * pipeline (one native X call per primitive under XWayland), which can freeze the EDT for seconds
+   * on large tables. Repaints must stay proportional to what actually changed.
+   */
+  protected final void fireChangedRowsSinceLastRefresh() {
+    Object[][] now = snapshotDisplayedValues();
+    Object[][] last;
+    synchronized (_listLock) {
+      last = lastRefreshSnapshot;
+      lastRefreshSnapshot = now;
     }
-
-    /**
-     * @return true if List contains the Object o in column col.
-     * if a particular column is searched frequently, using a HashMap.
-     * The add(Object, int) and sort function should be overriden to initialize
-     * the HashMap.
-     */
-    public boolean contains(Object o, int col) {
-        synchronized (_listLock) {
-            for (T t : _list) {
-                if (t.getValueAt(col).equals(o))
-                    return true;
-            }
+    if (last == null || last.length != now.length) {
+      if (last != null && now.length > 0) {
+        fireTableRowsUpdated(0, now.length - 1);
+      }
+      return;
+    }
+    int rangeStart = -1;
+    for (int r = 0; r < now.length; r++) {
+      if (!rowsEqual(last[r], now[r])) {
+        if (rangeStart == -1) {
+          rangeStart = r;
         }
+      } else if (rangeStart != -1) {
+        fireTableRowsUpdated(rangeStart, r - 1);
+        rangeStart = -1;
+      }
+    }
+    if (rangeStart != -1) {
+      fireTableRowsUpdated(rangeStart, now.length - 1);
+    }
+  }
+
+  /**
+   * Snapshots the currently displayed cell values with one {@code getValueAt} pass per row. Pure
+   * model reads: fires no events.
+   */
+  private Object[][] snapshotDisplayedValues() {
+    int cols = getColumnCount();
+    synchronized (_listLock) {
+      Object[][] snapshot = new Object[_list.size()][];
+      for (int r = 0; r < snapshot.length; r++) {
+        Object[] values = new Object[cols];
+        for (int c = 0; c < cols; c++) {
+          try {
+            values[c] = _list.get(r).getValueAt(c);
+          } catch (RuntimeException e) {
+            // Unreadable cell: force the row event below.
+            values[c] = UNREADABLE_CELL;
+          }
+        }
+        snapshot[r] = values;
+      }
+      return snapshot;
+    }
+  }
+
+  private static boolean rowsEqual(Object[] a, Object[] b) {
+    if (a == b) {
+      return true;
+    }
+    if (a == null || b == null || a.length != b.length) {
+      return false;
+    }
+    for (int i = 0; i < a.length; i++) {
+      if (!Objects.equals(a[i], b[i])) {
         return false;
+      }
     }
+    return true;
+  }
 
-    /**
-     * @return true if the List contains a DataLine that was initialized
-     * by Object o.
-     * if searching is done frequently, using a HashMap.
-     * The add(Object, int) and sort function should be overriden to initialize
-     * the HashMap.
-     */
-    public boolean contains(Object o) {
-        synchronized (_listLock) {
-            for (T t : _list) {
-                if (t.getInitializeObject().equals(o))
-                    return true;
-            }
+  /** Update a specific DataLine The DataLine updated is the one that was initialized by Object o */
+  public int update(E o) {
+    int row = getRow(o);
+    synchronized (_listLock) {
+      _list.get(row).update();
+    }
+    fireTableRowsUpdated(row, row);
+    return row;
+  }
+
+  /**
+   * Instantiates a DataLine.
+   *
+   * <p>This uses reflection to create an instance of the DataLine class. The dataLineClass Class is
+   * used to determine which class should be created. Failure to create results in AssertFailures.
+   *
+   * <p>Extending classes should override this to change the way DataLine's are instantiated.
+   */
+  protected T createDataLine() {
+    try {
+      var ctor = _dataLineClass.getDeclaredConstructor();
+      ctor.setAccessible(true);
+      return ctor.newInstance();
+    } catch (IllegalAccessException
+        | InstantiationException
+        | ClassCastException
+        | InvocationTargetException
+        | NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Returns an initialized new dataline. */
+  private T getNewDataLine(E o) {
+    T dl = createDataLine();
+    dl.initialize(o);
+    return dl;
+  }
+
+  /**
+   * Determines where the DataLine should be inserted. Runs in log(n) time ArrayLists and linear
+   * time for LinkedLists.
+   *
+   * <p>Extending classes should override this to change the method used to determine where to
+   * insert a new DataLine.
+   *
+   * <p>The current methodology is to use Collections.binarySearch with _list as the list, the
+   * DataLine as the key, and this as the Comparator.
+   */
+  private int getSortedPosition(T dl) {
+    // Collections.binarySearch return notes:
+    // index of the search key, if it is contained in the list;
+    // otherwise, (-(insertion point) - 1). The insertion point
+    // is defined as the point at which the key would be inserted
+    // into the list: the index of the first element greater than
+    // the key, or list.size(), if all elements in the list are
+    // less than the specified key. Note that this guarantees that
+    // the return value will be >= 0 if & only if the key is found.
+    // So....
+    // Remember we're comparing columns, not entire DataLines, so
+    // it is entirely likely that two columns will be the same.
+    // If the returned row is < 0, we want to convert it to
+    // the insertion point.
+    int row;
+    synchronized (_listLock) {
+      row = Collections.binarySearch(_list, dl, pinnedComparator());
+    }
+    if (row < 0) row = -(row + 1);
+    return row;
+  }
+
+  /**
+   * Helper function.
+   *
+   * <p>Adds a DataLine initialized by the object to row 0.
+   *
+   * <p>This should be overriden only if you want the default, non-sorting add to go someplace other
+   * than row 0.
+   *
+   * <p>Delegates to add(Object, int).
+   *
+   * <p>Extending classes should maintain the delegation to add(Object, int).
+   */
+  public int add(E o) {
+    return add(o, 0);
+  }
+
+  /**
+   * Helper function.
+   *
+   * <p>Uses getNewDataLine(Object) and add(DataLine, int).
+   *
+   * <p>Extending classes can override this, but it is recommended that they override the two above
+   * methods instead.
+   */
+  public int add(E o, int row) {
+    T dl = getNewDataLine(o);
+    return add(dl, row);
+  }
+
+  /** Adds a DataLine to row 0. Currently unused. */
+  public int add(T dl) {
+    return add(dl, 0);
+  }
+
+  /**
+   * Adds a DataLine to the list at a row.
+   *
+   * <p>All forms of add(..) eventually end up here.
+   *
+   * <p>Extending classes should override this if they want to maintain a HashMap of any type for
+   * speedier access.
+   */
+  public int add(T dl, int row) {
+    synchronized (_listLock) {
+      _list.add(row, dl);
+    }
+    fireTableRowsInserted(row, row);
+    return row;
+  }
+
+  /**
+   * Helper function.
+   *
+   * <p>Uses getNewDataLine(Object), getSortedPosition(DataLine), and add(DataLine, int)
+   *
+   * <p>Extending classes can override this, but it is recommended they override the above mentioned
+   * methods instead.
+   */
+  public int addSorted(E o) {
+    T dl = getNewDataLine(o);
+    return add(dl, getSortedPosition(dl));
+  }
+
+  /**
+   * Helper function.
+   *
+   * <p>Uses getSortedPosition(DataLine) and add(DataLine, int).
+   *
+   * <p>Extending classes can override this, but it is recommended they override the above mentioned
+   * methods instead.
+   */
+  public void addSorted(T dl) {
+    add(dl, getSortedPosition(dl));
+  }
+
+  // Implements the DataLineModel interface.
+  public T get(int row) {
+    if (row == -1) return null;
+    else {
+      synchronized (_listLock) {
+        return _list.get(row);
+      }
+    }
+  }
+
+  /**
+   * Implements DataLineModel interface. Delegates the row find to getRow(Object o). Returns the
+   * first DataLine initialized by object o. If no object matches, null is returned.
+   */
+  public T get(E o) {
+    int row = getRow(o);
+    if (row != -1) {
+      synchronized (_listLock) {
+        return _list.get(row);
+      }
+    } else return null;
+  }
+
+  /**
+   * Implements DataLineModel interface. Delegates the row find to getRow(Object o, int col).
+   * Returns the first DataLine that contains object o in column col. If no object matches, null is
+   * returned.
+   */
+  public T get(Object o, int col) {
+    int row = getRow(o, col);
+    if (row != -1) {
+      synchronized (_listLock) {
+        return _list.get(row);
+      }
+    } else return null;
+  }
+
+  /** Calls cleanup on the DataLine and then removes it from the list. */
+  public void remove(int row) {
+    synchronized (_listLock) {
+      _list.get(row).cleanup();
+      _list.remove(row);
+    }
+    fireTableRowsDeleted(row, row);
+  }
+
+  /**
+   * Helper-function that resolves to remove(int). Removes the line associated with the DataLine
+   * line. If no matching DataLine exists, nothing happens.
+   */
+  public void remove(T line) {
+    int idx;
+    synchronized (_listLock) {
+      idx = _list.indexOf(line);
+    }
+    if (idx != -1) remove(idx);
+  }
+
+  /**
+   * Helper function that resolves to remove(int). Removes the DataLine that was initialized by the
+   * Object o. Uses a linear search through the list to find a match. Extending objects that have
+   * large lists and call remove(Object) often may wish to override this, add(Object, int) and sort
+   * using a HashMap for more timely access.
+   */
+  public void remove(Object o) {
+    int rowToRemove = -1;
+    synchronized (_listLock) {
+      int end = _list.size();
+      for (int i = 0; i < end; i++) {
+        if (_list.get(i).getInitializeObject().equals(o)) {
+          rowToRemove = i;
+          break;
         }
-        return false;
+      }
     }
+    if (rowToRemove != -1) {
+      remove(rowToRemove);
+    }
+  }
 
-    /**
-     * @return the index of the matching DataLine.
-     */
-    public int getRow(T dl) {
-        synchronized (_listLock) {
-            return _list.indexOf(dl);
-        }
+  // Implements the TableModel method
+  public Object getValueAt(int row, int col) {
+    synchronized (_listLock) {
+      return _list.get(row).getValueAt(col);
     }
+  }
 
-    /**
-     * @return the index of the first DataLine that contains Object o
-     * in column col.
-     * if a particular column is searched frequently, using a HashMap.
-     * The add(Object, int) and sort function should be overriden to initialize
-     * the HashMap.
-     */
-    public int getRow(Object o, int col) {
-        synchronized (_listLock) {
-            int end = _list.size();
-            for (int i = 0; i < end; i++) {
-                if (_list.get(i).getValueAt(col).equals(o))
-                    return i;
-            }
-        }
-        return -1;
+  // Implements the TableModel method
+  // Ignores the update if the row doesn't exist.
+  public void setValueAt(Object o, int row, int col) {
+    synchronized (_listLock) {
+      if (row >= 0 && row < _list.size()) {
+        _list.get(row).setValueAt(o, col);
+      }
     }
+    if (row >= 0 && row < getRowCount()) {
+      fireTableRowsUpdated(row, row);
+    }
+  }
 
-    /**
-     * @return the index of the first DataLine that was initialized by Object o.
-     * if searching is done frequently, using a HashMap.
-     * The add(Object, int) and sort function should be overriden to initialize
-     * the HashMap.
-     */
-    public int getRow(E o) {
-        synchronized (_listLock) {
-            int end = _list.size();
-            for (int i = 0; i < end; i++) {
-                if (_list.get(i).getInitializeObject().equals(o))
-                    return i;
-            }
-        }
-        return -1;
+  /**
+   * @return true if List contains the Object o in column col. if a particular column is searched
+   *     frequently, using a HashMap. The add(Object, int) and sort function should be overriden to
+   *     initialize the HashMap.
+   */
+  public boolean contains(Object o, int col) {
+    synchronized (_listLock) {
+      for (T t : _list) {
+        if (t.getValueAt(col).equals(o)) return true;
+      }
     }
+    return false;
+  }
 
-    /**
-     * A generic compare function.
-     */
-    public int compare(T a, T b) {
-        return compare(a, b, _activeColumn, _ascending);
+  /**
+   * @return true if the List contains a DataLine that was initialized by Object o. if searching is
+   *     done frequently, using a HashMap. The add(Object, int) and sort function should be
+   *     overriden to initialize the HashMap.
+   */
+  public boolean contains(Object o) {
+    synchronized (_listLock) {
+      for (T t : _list) {
+        if (t.getInitializeObject().equals(o)) return true;
+      }
     }
+    return false;
+  }
 
-    /**
-     * Comparator pinned to the sort column and direction at the time it is created. Sorting
-     * runs off the EDT while the EDT can change or clear the sort column ({@link #unsort()}
-     * sets it to -1), so one sort must never re-read the live fields between comparisons.
-     */
-    private Comparator<T> pinnedComparator() {
-        final int column = _activeColumn;
-        final int ascending = _ascending;
-        return (a, b) -> compare(a, b, column, ascending);
+  /**
+   * @return the index of the matching DataLine.
+   */
+  public int getRow(T dl) {
+    synchronized (_listLock) {
+      return _list.indexOf(dl);
     }
+  }
 
-    /**
-     * Compares two lines by the given column and direction. Subclasses customizing the sort
-     * order override this, using the arguments rather than the live sort fields.
-     */
-    protected int compare(T a, T b, int column, int ascending) {
-        if (column < 0) {
-            return 0;
-        }
-        Object o1 = a.getValueAt(column);
-        Object o2 = b.getValueAt(column);
-        return AbstractTableMediator.compare(o1, o2) * ascending;
+  /**
+   * @return the index of the first DataLine that contains Object o in column col. if a particular
+   *     column is searched frequently, using a HashMap. The add(Object, int) and sort function
+   *     should be overriden to initialize the HashMap.
+   */
+  public int getRow(Object o, int col) {
+    synchronized (_listLock) {
+      int end = _list.size();
+      for (int i = 0; i < end; i++) {
+        if (_list.get(i).getValueAt(col).equals(o)) return i;
+      }
     }
+    return -1;
+  }
 
-    /**
-     * Returns the LimeTableColumn at the specific column this data line.
-     */
-    public LimeTableColumn getTableColumn(int col) {
-        if (_internalDataLine == null)
-            return null;
-        else
-            return _internalDataLine.getColumn(col);
+  /**
+   * @return the index of the first DataLine that was initialized by Object o. if searching is done
+   *     frequently, using a HashMap. The add(Object, int) and sort function should be overriden to
+   *     initialize the HashMap.
+   */
+  public int getRow(E o) {
+    synchronized (_listLock) {
+      int end = _list.size();
+      for (int i = 0; i < end; i++) {
+        if (_list.get(i).getInitializeObject().equals(o)) return i;
+      }
     }
+    return -1;
+  }
 
-    /**
-     * Returns the size of _list.
-     */
-    public int getRowCount() {
-        synchronized (_listLock) {
-            return _list.size();
-        }
-    }
+  /** A generic compare function. */
+  public int compare(T a, T b) {
+    return compare(a, b, _activeColumn, _ascending);
+  }
 
-    /**
-     * Returns the number of columns as specified by the data line.
-     */
-    public int getColumnCount() {
-        if (_internalDataLine == null)
-            return 0;
-        else
-            return _internalDataLine.getColumnCount();
-    }
+  /**
+   * Comparator pinned to the sort column and direction at the time it is created. Sorting runs off
+   * the EDT while the EDT can change or clear the sort column ({@link #unsort()} sets it to -1), so
+   * one sort must never re-read the live fields between comparisons.
+   */
+  private Comparator<T> pinnedComparator() {
+    final int column = _activeColumn;
+    final int ascending = _ascending;
+    return (a, b) -> compare(a, b, column, ascending);
+  }
 
-    /**
-     * Returns whether or not the specified column is clippable.
-     */
-    public boolean isClippable(int col) {
-        if (_internalDataLine == null)
-            return false;
-        else
-            return _internalDataLine.isClippable(col);
+  /**
+   * Compares two lines by the given column and direction. Subclasses customizing the sort order
+   * override this, using the arguments rather than the live sort fields.
+   */
+  protected int compare(T a, T b, int column, int ascending) {
+    if (column < 0) {
+      return 0;
     }
+    Object o1 = a.getValueAt(column);
+    Object o2 = b.getValueAt(column);
+    return AbstractTableMediator.compare(o1, o2) * ascending;
+  }
 
-    public int getTypeAheadColumn() {
-        if (_internalDataLine == null)
-            return -1;
-        else
-            return _internalDataLine.getTypeAheadColumn();
-    }
+  /** Returns the LimeTableColumn at the specific column this data line. */
+  public LimeTableColumn getTableColumn(int col) {
+    if (_internalDataLine == null) return null;
+    else return _internalDataLine.getColumn(col);
+  }
 
-    /**
-     * Returns the name of the TableColumn as specified by the data line.
-     */
-    public String getColumnName(int col) {
-        return getTableColumn(col).getName();
+  /** Returns the size of _list. */
+  public int getRowCount() {
+    synchronized (_listLock) {
+      return _list.size();
     }
+  }
 
-    /**
-     * Returns the Id of the TableColumn as specified by the data line.
-     */
-    public Object getColumnId(int col) {
-        return getTableColumn(col).getIdentifier();
-    }
+  /** Returns the number of columns as specified by the data line. */
+  public int getColumnCount() {
+    if (_internalDataLine == null) return 0;
+    else return _internalDataLine.getColumnCount();
+  }
 
-    /**
-     * Returns the class of the TableColumn as specified by the data line.
-     */
-    public Class<?> getColumnClass(int col) {
-        return getTableColumn(col).getColumnClass();
-    }
+  /** Returns whether or not the specified column is clippable. */
+  public boolean isClippable(int col) {
+    if (_internalDataLine == null) return false;
+    else return _internalDataLine.isClippable(col);
+  }
+
+  public int getTypeAheadColumn() {
+    if (_internalDataLine == null) return -1;
+    else return _internalDataLine.getTypeAheadColumn();
+  }
+
+  /** Returns the name of the TableColumn as specified by the data line. */
+  public String getColumnName(int col) {
+    return getTableColumn(col).getName();
+  }
+
+  /** Returns the Id of the TableColumn as specified by the data line. */
+  public Object getColumnId(int col) {
+    return getTableColumn(col).getIdentifier();
+  }
+
+  /** Returns the class of the TableColumn as specified by the data line. */
+  public Class<?> getColumnClass(int col) {
+    return getTableColumn(col).getColumnClass();
+  }
 }
-    

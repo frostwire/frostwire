@@ -1,25 +1,25 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.table.TableModel;
 import java.util.Comparator;
+import javax.swing.table.TableModel;
 
 /**
  * Interface for the model of a DataLineTable
@@ -27,185 +27,123 @@ import java.util.Comparator;
  * @author Sam Berlin, gubatron
  */
 public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, TableModel {
-    /**
-     * Whether or not the underlying data is sorted.
-     */
-    boolean isSorted();
+  /** Whether or not the underlying data is sorted. */
+  boolean isSorted();
 
-    /**
-     * Returns whether or not the underlying data is sorted ascending.
-     */
-    boolean isSortAscending();
+  /** Returns whether or not the underlying data is sorted ascending. */
+  boolean isSortAscending();
 
-    /**
-     * Returns the column by which the underlying data is sorted ascending.
-     */
-    int getSortColumn();
+  /** Returns the column by which the underlying data is sorted ascending. */
+  int getSortColumn();
 
-    /**
-     * Sort the underlying data by the column.
-     */
-    void sort(int col);
+  /** Sort the underlying data by the column. */
+  void sort(int col);
 
-    /**
-     * Whether or not the underlying data needs to be resorted.
-     */
-    boolean needsResort();
+  /** Whether or not the underlying data needs to be resorted. */
+  boolean needsResort();
 
-    /**
-     * Resorts the underlying data.
-     */
-    void resort();
+  /** Resorts the underlying data. */
+  void resort();
 
-    /**
-     * Clear the table of all data.
-     */
-    void clear();
+  /** Clear the table of all data. */
+  void clear();
 
-    /**
-     * Refresh the data's info.
-     */
-    Object refresh();
+  /** Refresh the data's info. */
+  Object refresh();
 
-    /**
-     * Update a specific DataLine.
-     * The dataline updated is one that was initialized by Object o.
-     * Should return the row of the DataLine updated.
-     */
-    int update(E o);
+  /**
+   * Update a specific DataLine. The dataline updated is one that was initialized by Object o.
+   * Should return the row of the DataLine updated.
+   */
+  int update(E o);
 
-    /**
-     * Add a new DataLine to the info, initialized by o.
-     * Return the row it was added at.
-     */
-    int add(E o);
+  /** Add a new DataLine to the info, initialized by o. Return the row it was added at. */
+  int add(E o);
 
-    /**
-     * Adds a new DataLine to the info, initialized by o.
-     * Added to whatever row will keep the DataLine sorted.
-     * Return the row it was added at.
-     */
-    int addSorted(E o);
+  /**
+   * Adds a new DataLine to the info, initialized by o. Added to whatever row will keep the DataLine
+   * sorted. Return the row it was added at.
+   */
+  int addSorted(E o);
 
-    /**
-     * Adds a new DataLine to the info.
-     * Return the row it was added at.
-     */
-    @SuppressWarnings("unused")
-    int add(T dl);
+  /** Adds a new DataLine to the info. Return the row it was added at. */
+  @SuppressWarnings("unused")
+  int add(T dl);
 
-    /**
-     * Adds a new DataLine to the model in whatever row will keep
-     * the DataLine sorted.
-     */
-    @SuppressWarnings("unused")
-    void addSorted(T dl);
+  /** Adds a new DataLine to the model in whatever row will keep the DataLine sorted. */
+  @SuppressWarnings("unused")
+  void addSorted(T dl);
 
-    /**
-     * Add a new DataLine to the info, at a specific row initialized by o.
-     * Return the row it was added at.
-     */
-    int add(E o, int row);
+  /**
+   * Add a new DataLine to the info, at a specific row initialized by o. Return the row it was added
+   * at.
+   */
+  int add(E o, int row);
 
-    /**
-     * Adds a new DataLine to the info at a specific row.
-     * Return the row it was added at.
-     */
-    @SuppressWarnings("unused")
-    int add(T dl, int row);
+  /** Adds a new DataLine to the info at a specific row. Return the row it was added at. */
+  @SuppressWarnings("unused")
+  int add(T dl, int row);
 
-    /**
-     * Get the DataLine associated with the row.
-     */
-    T get(int row);
+  /** Get the DataLine associated with the row. */
+  T get(int row);
 
-    /**
-     * Gets the DataLine that was initialized by Object o.
-     */
-    @SuppressWarnings("unused")
-    T get(E o);
+  /** Gets the DataLine that was initialized by Object o. */
+  @SuppressWarnings("unused")
+  T get(E o);
 
-    /**
-     * Gets the first DataLine that has Object o in column col.
-     */
-    @SuppressWarnings("unused")
-    T get(Object o, int col);
+  /** Gets the first DataLine that has Object o in column col. */
+  @SuppressWarnings("unused")
+  T get(Object o, int col);
 
-    /**
-     * Remove a row from the data.
-     */
-    void remove(int row);
+  /** Remove a row from the data. */
+  void remove(int row);
 
-    /**
-     * Remove the row associated with the DataLine 'line'.
-     */
-    @SuppressWarnings("unused")
-    void remove(T line);
+  /** Remove the row associated with the DataLine 'line'. */
+  @SuppressWarnings("unused")
+  void remove(T line);
 
-    /**
-     * Remove the row that was initialized by Object 'o'.
-     */
-    @SuppressWarnings("unused")
-    void remove(Object o);
+  /** Remove the row that was initialized by Object 'o'. */
+  @SuppressWarnings("unused")
+  void remove(Object o);
 
-    /**
-     * Determine if the list contains Object o in column col.
-     */
-    @SuppressWarnings("unused")
-    boolean contains(Object o, int col);
+  /** Determine if the list contains Object o in column col. */
+  @SuppressWarnings("unused")
+  boolean contains(Object o, int col);
 
-    /**
-     * Determine if the list contains a row that was initialized by Object o.
-     */
-    @SuppressWarnings("unused")
-    boolean contains(Object o);
+  /** Determine if the list contains a row that was initialized by Object o. */
+  @SuppressWarnings("unused")
+  boolean contains(Object o);
 
-    /**
-     * Get the row of the row that contains Object o in column col.
-     */
-    @SuppressWarnings("unused")
-    int getRow(Object o, int col);
+  /** Get the row of the row that contains Object o in column col. */
+  @SuppressWarnings("unused")
+  int getRow(Object o, int col);
 
-    /**
-     * Get the index of the DataLine that was initialized by Object o.
-     */
-    int getRow(E o);
+  /** Get the index of the DataLine that was initialized by Object o. */
+  int getRow(E o);
 
-    /**
-     * Get the index of this DataLine.
-     */
-    int getRow(T dl);
+  /** Get the index of this DataLine. */
+  int getRow(T dl);
 
-    /**
-     * Gets the tooltip for a specific row.
-     */
-    String[] getToolTipArray(int row, int col);
+  /** Gets the tooltip for a specific row. */
+  String[] getToolTipArray(int row, int col);
 
-    /**
-     * Determines if a tooltip must show, regardless of the table settings.
-     */
-    boolean isTooltipRequired(int row, int col);
+  /** Determines if a tooltip must show, regardless of the table settings. */
+  boolean isTooltipRequired(int row, int col);
 
-    /**
-     * Determines if the specified column can be clipped.
-     * This is generally true for all text columns.
-     */
-    boolean isClippable(int col);
+  /**
+   * Determines if the specified column can be clipped. This is generally true for all text columns.
+   */
+  boolean isClippable(int col);
 
-    /**
-     * Gets the LimeTableColumn for this column.
-     * A LimeTableColumn encapsulates access to the columnId,
-     * columnName, etc...
-     */
-    LimeTableColumn getTableColumn(int col);
+  /**
+   * Gets the LimeTableColumn for this column. A LimeTableColumn encapsulates access to the
+   * columnId, columnName, etc...
+   */
+  LimeTableColumn getTableColumn(int col);
 
-    /**
-     * Gets the id of the specified column.
-     */
-    Object getColumnId(int col);
+  /** Gets the id of the specified column. */
+  Object getColumnId(int col);
 
-    /**
-     * Gets the 'type ahead' column.
-     */
-    int getTypeAheadColumn();
+  /** Gets the 'type ahead' column. */
+  int getTypeAheadColumn();
 }
