@@ -21,9 +21,11 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.*;
 import java.awt.event.*;
@@ -43,6 +45,14 @@ class PartialFilesDialog extends JDialog {
   private final TorrentInfo torrent;
   private final String name;
   private final TorrentTableModel model;
+  // getValueAt runs while painting on the EDT; on Windows an uncached file-type icon is a shell COM
+  // call that can block for seconds, so those load in the background. Other platforms keep their
+  // chooser-based icon views on the EDT.
+  private final ExtensionIcons extensionIcons =
+      new ExtensionIcons(
+          extension -> IconManager.instance().getIconForExtension(extension),
+          DesktopParallelExecutor::execute,
+          () -> SwingUtilities.invokeLater(this::repaintTable));
   private LabeledTextField filter;
   private RowFilter<Object, Object> textBasedFilter;
   private JPanel panel;
@@ -483,6 +493,12 @@ class PartialFilesDialog extends JDialog {
     }
   }
 
+  private void repaintTable() {
+    if (table != null) {
+      table.repaint();
+    }
+  }
+
   private final class TorrentTableModel extends AbstractTableModel {
     private final TorrentInfo _torrent;
     private final TorrentFileInfo[] _fileInfos;
@@ -539,7 +555,9 @@ class PartialFilesDialog extends JDialog {
           return _fileInfos[rowIndex].selected;
         case 1:
           // icon
-          return IconManager.instance().getIconForExtension(extension);
+          return OSUtils.isWindows()
+              ? extensionIcons.get(extension)
+              : IconManager.instance().getIconForExtension(extension);
         case 2:
           // path
           return filePath;
