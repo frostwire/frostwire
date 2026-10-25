@@ -1,6 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- *  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  * 
  *     This program is free software: you can redistribute it and/or modify
