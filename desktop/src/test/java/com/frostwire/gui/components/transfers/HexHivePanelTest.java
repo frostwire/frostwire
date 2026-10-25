@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,6 +57,17 @@ class HexHivePanelTest {
         BACKGROUND,
         bitmap.getRGB(centerX, tipY) & 0xffffff,
         "bottom tip of the second to last row was clipped");
+  }
+
+  @Test
+  void backingBitmapIsRenderedAtDeviceScale() throws Exception {
+    HexHivePanel panel = newPanel();
+    set(panel, "renderScale", 2.0);
+    panel.updateData(adapter(40));
+    BufferedImage bitmap = awaitRender(panel);
+    Object props = get(panel, "drawingProperties");
+    assertEquals((int) get(props, "width") * 2, bitmap.getWidth());
+    assertEquals((int) get(props, "height") * 2, bitmap.getHeight());
   }
 
   private static HexHivePanel newPanel() {
@@ -105,5 +117,11 @@ class HexHivePanelTest {
     Field field = target.getClass().getDeclaredField(name);
     field.setAccessible(true);
     return field.get(target);
+  }
+
+  private static void set(Object target, String name, Object value) throws Exception {
+    Field field = target.getClass().getDeclaredField(name);
+    field.setAccessible(true);
+    field.set(target, value);
   }
 }

@@ -21,8 +21,11 @@ package com.frostwire.gui.components.transfers;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import javax.swing.*;
@@ -43,6 +46,15 @@ public class HexHivePanel extends JPanel {
   private DrawingProperties drawingProperties;
   private HexDataAdapter latestAdapter;
   private BufferedImage bitmap;
+
+  /**
+   * Device pixels per logical pixel of the backing bitmap (1.0 on regular screens, 1.25/1.5/2.0 on
+   * HiDPI ones). Rendering at device resolution keeps the cubes crisp instead of letting Java2D
+   * upscale a logical-size bitmap.
+   */
+  private double bitmapScale = 1.0;
+
+  private volatile double renderScale = 1.0;
   private final Area renderedArea = new Area();
   private int lastWidth;
   private int lastHeight;
@@ -90,6 +102,21 @@ public class HexHivePanel extends JPanel {
   public void addNotify() {
     super.addNotify();
     graphicsConfig = getGraphicsConfiguration();
+    if (graphicsConfig != null) {
+      renderScale = sanitizeScale(graphicsConfig.getDefaultTransform().getScaleX());
+    }
+  }
+
+  private static double sanitizeScale(double scale) {
+    return (Double.isNaN(scale) || scale <= 0) ? 1.0 : scale;
+  }
+
+  /**
+   * Maps a logical coordinate to the backing bitmap's device pixel grid. Every device-space
+   * rectangle is derived from this same mapping so batches merge 1:1 without resampling seams.
+   */
+  private static int toDevice(int logical, double scale) {
+    return (int) Math.round(logical * scale);
   }
 
   void clearRenderCache() {
@@ -137,11 +164,27 @@ public class HexHivePanel extends JPanel {
    * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
    */
   private static void getHexCorner(
-      final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
+      final Point2D.Float outCorner, final Point inCenter, int cornerNumber, float sideLength) {
     double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
+    // Sub-pixel corners: int truncation makes the cubes jagged once scaled on HiDPI screens
     outCorner.setLocation(
-        (int) (inCenter.x + sideLength * Math.cos(angle_rad)),
-        (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
+        inCenter.x + sideLength * Math.cos(angle_rad),
+        inCenter.y + sideLength * Math.sin(angle_rad));
+  }
+
+  private static void drawInnerEdge(
+      final DrawingProperties drawingProperties, final Graphics2D graphics, int cornerNumber) {
+    getHexCorner(
+        drawingProperties.cornerBuffer,
+        drawingProperties.hexCenterBuffer,
+        cornerNumber,
+        drawingProperties.hexSideLength);
+    drawingProperties.lineBuffer.setLine(
+        drawingProperties.hexCenterBuffer.x,
+        drawingProperties.hexCenterBuffer.y,
+        drawingProperties.cornerBuffer.x,
+        drawingProperties.cornerBuffer.y);
+    graphics.draw(drawingProperties.lineBuffer);
   }
 
   private static void drawHexagon(
@@ -239,36 +282,9 @@ public class HexHivePanel extends JPanel {
       // From center to 1, center to 3 and center to 5
       graphics.setPaint(borderStroke.getColor());
       graphics.setStroke(borderStroke);
-      getHexCorner(
-          drawingProperties.cornerBuffer,
-          drawingProperties.hexCenterBuffer,
-          1,
-          drawingProperties.hexSideLength);
-      graphics.drawLine(
-          drawingProperties.hexCenterBuffer.x,
-          drawingProperties.hexCenterBuffer.y,
-          drawingProperties.cornerBuffer.x,
-          drawingProperties.cornerBuffer.y);
-      getHexCorner(
-          drawingProperties.cornerBuffer,
-          drawingProperties.hexCenterBuffer,
-          3,
-          drawingProperties.hexSideLength);
-      graphics.drawLine(
-          drawingProperties.hexCenterBuffer.x,
-          drawingProperties.hexCenterBuffer.y,
-          drawingProperties.cornerBuffer.x,
-          drawingProperties.cornerBuffer.y);
-      getHexCorner(
-          drawingProperties.cornerBuffer,
-          drawingProperties.hexCenterBuffer,
-          5,
-          drawingProperties.hexSideLength);
-      graphics.drawLine(
-          drawingProperties.hexCenterBuffer.x,
-          drawingProperties.hexCenterBuffer.y,
-          drawingProperties.cornerBuffer.x,
-          drawingProperties.cornerBuffer.y);
+      drawInnerEdge(drawingProperties, graphics, 1);
+      drawInnerEdge(drawingProperties, graphics, 3);
+      drawInnerEdge(drawingProperties, graphics, 5);
       graphics.setPaint(fillPaint.getBaseColor());
     }
     // Paint outer border
@@ -339,6 +355,7 @@ public class HexHivePanel extends JPanel {
               topPadding,
               canvasWidth - rightPadding,
               canvasHeight - bottomPadding);
+      snapshot.scale = renderScale;
       synchronized (drawingPropertiesLock) {
         drawingProperties = snapshot;
         latestAdapter = hexDataAdapter;
@@ -362,17 +379,17 @@ public class HexHivePanel extends JPanel {
   private void ensureBackingBitmap(DrawingProperties snapshot) {
     boolean changed = false;
     synchronized (bitmapLock) {
+      int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
+      int deviceHeight = Math.max(1, toDevice(snapshot.height, snapshot.scale));
       if (bitmap == null
-          || bitmap.getWidth() != snapshot.width
-          || bitmap.getHeight() != snapshot.height) {
-        GraphicsConfiguration gc = graphicsConfig;
-        bitmap =
-            (gc != null)
-                ? gc.createCompatibleImage(snapshot.width, snapshot.height, Transparency.OPAQUE)
-                : new BufferedImage(snapshot.width, snapshot.height, BufferedImage.TYPE_INT_RGB);
+          || bitmap.getWidth() != deviceWidth
+          || bitmap.getHeight() != deviceHeight
+          || bitmapScale != snapshot.scale) {
+        bitmap = createOpaqueImage(deviceWidth, deviceHeight);
+        bitmapScale = snapshot.scale;
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
-        graphics.fillRect(0, 0, snapshot.width, snapshot.height);
+        graphics.fillRect(0, 0, deviceWidth, deviceHeight);
         graphics.dispose();
         renderedArea.reset();
         changed = true;
@@ -481,10 +498,15 @@ public class HexHivePanel extends JPanel {
           || mergeBounds.height <= 0) {
         continue;
       }
-      BufferedImage batchBitmap = createBatchBitmap(drawBounds);
+      double scale = drawingProperties.scale;
+      int deviceX = toDevice(drawBounds.x, scale);
+      int deviceY = toDevice(drawBounds.y, scale);
+      int deviceWidth = Math.max(1, toDevice(drawBounds.x + drawBounds.width, scale) - deviceX);
+      int deviceHeight = Math.max(1, toDevice(drawBounds.y + drawBounds.height, scale) - deviceY);
+      BufferedImage batchBitmap = createOpaqueImage(deviceWidth, deviceHeight);
       Graphics2D graphics = batchBitmap.createGraphics();
       graphics.setPaint(backgroundColor);
-      graphics.fillRect(0, 0, drawBounds.width, drawBounds.height);
+      graphics.fillRect(0, 0, deviceWidth, deviceHeight);
       boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
       graphics.setRenderingHint(
           RenderingHints.KEY_ANTIALIASING,
@@ -492,19 +514,20 @@ public class HexHivePanel extends JPanel {
       graphics.setRenderingHint(
           RenderingHints.KEY_STROKE_CONTROL,
           drawCubes ? RenderingHints.VALUE_STROKE_PURE : RenderingHints.VALUE_STROKE_NORMALIZE);
-      graphics.translate(-drawBounds.x, -drawBounds.y);
+      graphics.translate(-deviceX, -deviceY);
+      graphics.scale(scale, scale);
       drawRowsToGraphics(
           drawingProperties, adapter, graphics, drawBounds, drawFirstRow, drawLastRow, drawCubes);
       graphics.dispose();
-      mergeBatchBitmap(batchBitmap, drawBounds, mergeBounds);
+      mergeBatchBitmap(batchBitmap, deviceX, deviceY, scale, mergeBounds);
     }
   }
 
-  private BufferedImage createBatchBitmap(Rectangle batchBounds) {
+  private BufferedImage createOpaqueImage(int width, int height) {
     GraphicsConfiguration gc = graphicsConfig;
     return (gc != null)
-        ? gc.createCompatibleImage(batchBounds.width, batchBounds.height, Transparency.OPAQUE)
-        : new BufferedImage(batchBounds.width, batchBounds.height, BufferedImage.TYPE_INT_RGB);
+        ? gc.createCompatibleImage(width, height, Transparency.OPAQUE)
+        : new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
   }
 
   private void drawRowsToGraphics(
@@ -682,19 +705,31 @@ public class HexHivePanel extends JPanel {
   }
 
   private void mergeBatchBitmap(
-      BufferedImage renderedBitmap, Rectangle sourceBounds, Rectangle mergeBounds) {
-    int sourceX1 = mergeBounds.x - sourceBounds.x;
-    int sourceY1 = mergeBounds.y - sourceBounds.y;
-    int sourceX2 = sourceX1 + mergeBounds.width;
-    int sourceY2 = sourceY1 + mergeBounds.height;
+      BufferedImage renderedBitmap,
+      int sourceDeviceX,
+      int sourceDeviceY,
+      double scale,
+      Rectangle mergeBounds) {
+    int destX1 = toDevice(mergeBounds.x, scale);
+    int destY1 = toDevice(mergeBounds.y, scale);
+    int destX2 = toDevice(mergeBounds.x + mergeBounds.width, scale);
+    int destY2 = toDevice(mergeBounds.y + mergeBounds.height, scale);
+    int sourceX1 = destX1 - sourceDeviceX;
+    int sourceY1 = destY1 - sourceDeviceY;
+    int sourceX2 = destX2 - sourceDeviceX;
+    int sourceY2 = destY2 - sourceDeviceY;
     synchronized (bitmapLock) {
+      if (bitmap == null || bitmapScale != scale) {
+        // stale batch rendered for a different screen scale, a fresh render is already queued
+        return;
+      }
       Graphics2D graphics = bitmap.createGraphics();
       graphics.drawImage(
           renderedBitmap,
-          mergeBounds.x,
-          mergeBounds.y,
-          mergeBounds.x + mergeBounds.width,
-          mergeBounds.y + mergeBounds.height,
+          destX1,
+          destY1,
+          destX2,
+          destY2,
           sourceX1,
           sourceY1,
           sourceX2,
@@ -716,9 +751,32 @@ public class HexHivePanel extends JPanel {
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
+    AffineTransform transform = g2d.getTransform();
+    double deviceScale = sanitizeScale(transform.getScaleX());
+    boolean scaleChanged;
     synchronized (bitmapLock) {
+      scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
       if (bitmap != null) {
-        g2d.drawImage(bitmap, 0, 0, null);
+        if (!scaleChanged && transform.getShearX() == 0 && transform.getShearY() == 0) {
+          // Blit the device-resolution bitmap 1:1 onto the device pixels, no resampling
+          Graphics2D deviceGraphics = (Graphics2D) g2d.create();
+          deviceGraphics.setTransform(
+              AffineTransform.getTranslateInstance(
+                  Math.round(transform.getTranslateX()), Math.round(transform.getTranslateY())));
+          deviceGraphics.drawImage(bitmap, 0, 0, null);
+          deviceGraphics.dispose();
+        } else {
+          // Screen scale changed (window moved to another monitor), stretch until it re-renders
+          g2d.setRenderingHint(
+              RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+          g2d.drawImage(
+              bitmap,
+              0,
+              0,
+              (int) Math.round(bitmap.getWidth() / bitmapScale),
+              (int) Math.round(bitmap.getHeight() / bitmapScale),
+              null);
+        }
       }
     }
     DrawingProperties snapshotProperties;
@@ -726,6 +784,14 @@ public class HexHivePanel extends JPanel {
     synchronized (drawingPropertiesLock) {
       snapshotProperties = drawingProperties;
       adapterSnapshot = latestAdapter;
+    }
+    if (scaleChanged && renderScale != deviceScale) {
+      renderScale = deviceScale;
+      if (adapterSnapshot != null) {
+        final HexDataAdapter adapter = adapterSnapshot;
+        SwingUtilities.invokeLater(() -> updateData(adapter));
+      }
+      return;
     }
     if (snapshotProperties != null && adapterSnapshot != null) {
       requestFocusedRender(snapshotProperties, adapterSnapshot, false);
@@ -833,7 +899,10 @@ public class HexHivePanel extends JPanel {
      * Point object we'll reuse to draw hexagon sides (Object creation and destruction must be
      * avoided when calling onDraw())
      */
-    private final Point cornerBuffer = new Point(-1, -1);
+    private final Point2D.Float cornerBuffer = new Point2D.Float(-1, -1);
+
+    /** Line object we'll reuse to draw the inner cube edges */
+    private final Line2D.Float lineBuffer = new Line2D.Float();
 
     /** Path object we'll reuse to draw the filled areas of the hexagons */
     private final GeneralPath fillPathBuffer = new GeneralPath();
@@ -879,6 +948,9 @@ public class HexHivePanel extends JPanel {
 
     private int evenRowHexCount;
     private int oddRowHexCount;
+
+    /** Device pixels per logical pixel this snapshot renders at */
+    private double scale = 1.0;
 
     DrawingProperties(
         HexDataAdapter adapter,
