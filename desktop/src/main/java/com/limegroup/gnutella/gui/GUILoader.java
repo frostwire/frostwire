@@ -48,12 +48,14 @@ class GUILoader {
       System.out.printf(
           "FrostWire version %s build %d\n",
           FrostWireUtils.getFrostWireVersion(), FrostWireUtils.getBuildNumber());
+      // java.runtime.version is the full build, e.g. 27.0.1.0.3+1-2 (java.version would only say
+      // 27.0.1.0.3, or 27 for 27+35)
       System.out.println(
           System.getProperty("java.vm.name")
               + " "
               + System.getProperty("java.vendor")
               + " "
-              + System.getProperty("java.version")
+              + System.getProperty("java.runtime.version")
               + " "
               + System.getProperty("java.specification.vendor"));
       System.out.printf("JLibTorrent v%s\n", LibTorrent.jlibtorrentVersion());
