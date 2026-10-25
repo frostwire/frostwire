@@ -313,6 +313,16 @@ public class MacEventHandler {
 
     @Override
     public final Object invoke(Object proxy, Method method, Object[] args) {
+      // Listeners registered via addAppEventListener are stored in a HashSet,
+      // so the proxy must answer the Object methods with non-null values
+      switch (method.getName()) {
+        case "hashCode":
+          return System.identityHashCode(proxy);
+        case "equals":
+          return proxy == args[0];
+        case "toString":
+          return "MacOSHandler[" + handlerMethod + "]";
+      }
       try {
         if (handlerMethod.equals(method.getName()) && args.length > 0) {
           handler.handle(args);
