@@ -51,6 +51,7 @@ FrostWire 7.1.2 OCT/25/2026
    - fix:Transfer Detail > Pieces no longer cuts off the bottom of the second to last row of cubes when the last row is shorter
    - fix:Transfer Detail > Pieces draws its cubes crisp at display scaling above 100% (e.g. 125% or 150% on Windows) instead of stretching a low resolution picture of them
    - fix:Transfer Detail > Pieces no longer leaves stray line fragments below the cubes after resizing the window or switching transfers
+   - fix:Transfer Detail > Pieces re-wraps its cubes to the panel's width when the window is resized, filling the space vertically instead of needing a horizontal scrollbar
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported

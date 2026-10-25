@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JViewport;
 import org.junit.jupiter.api.Test;
 
 /** Drives the pieces hive off-screen and inspects its backing bitmap and hover state. */
@@ -127,6 +129,28 @@ class HexHivePanelTest {
     panel.updateData(adapter(3));
     panel.dispatchEvent(mouseEvent(panel, MouseEvent.MOUSE_MOVED, 290, 390));
     assertEquals(-1, (int) get(panel, "hoveredHex"));
+  }
+
+  @Test
+  void rowsWrapToTheViewportWidth() throws Exception {
+    HexHivePanel panel = newPanel();
+    JViewport viewport = new JViewport();
+    viewport.setView(panel);
+    viewport.setSize(600, 200);
+    viewport.doLayout();
+    panel.updateData(adapter(300));
+    awaitRender(panel);
+    int wideRowCount = (int) get(get(panel, "drawingProperties"), "evenRowHexCount");
+
+    viewport.setSize(250, 200);
+    viewport.doLayout();
+    assertEquals(
+        250, panel.getWidth(), "panel must shrink with the viewport, no horizontal scroll");
+    panel.dispatchEvent(new ComponentEvent(panel, ComponentEvent.COMPONENT_RESIZED));
+    awaitRender(panel);
+    int narrowRowCount = (int) get(get(panel, "drawingProperties"), "evenRowHexCount");
+    assertTrue(narrowRowCount < wideRowCount, "rows must re-wrap to the narrower width");
+    assertTrue(panel.getPreferredSize().height > 200, "extra rows must grow the panel vertically");
   }
 
   @Test

@@ -64,7 +64,7 @@ public final class TransferDetailPieces extends JPanel
     totalPiecesLabel = new JLabel();
     add(totalPiecesLabel, "gapleft 10px");
     add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
-    hexHivePanel.setBackground(Color.WHITE);
+    hexHivePanel.setBackground(new Color(backgroundColor));
     hexHivePanel.setOpaque(true);
     // Defer HTML content and JScrollPane creation to avoid EDT violation
     // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)

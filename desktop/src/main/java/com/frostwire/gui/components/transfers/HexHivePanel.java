@@ -55,13 +55,15 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeListener;
 
-public class HexHivePanel extends JPanel {
+public class HexHivePanel extends JPanel implements Scrollable {
   private static final Logger LOG = Logger.getLogger(HexHivePanel.class);
   private final boolean forceCubes;
   private final Object drawingPropertiesLock = new Object();
@@ -161,6 +163,27 @@ public class HexHivePanel extends JPanel {
         };
     addMouseListener(hoverListener);
     addMouseMotionListener(hoverListener);
+    addComponentListener(
+        new ComponentAdapter() {
+          @Override
+          public void componentResized(ComponentEvent e) {
+            relayoutIfWidthChanged();
+          }
+        });
+  }
+
+  /** Re-wraps the rows to the new width, e.g. when the window or the viewport is resized. */
+  private void relayoutIfWidthChanged() {
+    DrawingProperties snapshot;
+    HexDataAdapter adapter;
+    synchronized (drawingPropertiesLock) {
+      snapshot = drawingProperties;
+      adapter = latestAdapter;
+    }
+    // height follows the layout, reacting to it would only re-render the same rows
+    if (adapter != null && (snapshot == null || snapshot.canvasWidth != getWidth())) {
+      updateData(adapter);
+    }
   }
 
   @Override
@@ -608,6 +631,7 @@ public class HexHivePanel extends JPanel {
               canvasWidth - rightPadding,
               canvasHeight - bottomPadding);
       snapshot.scale = renderScale;
+      snapshot.canvasWidth = canvasWidth;
       synchronized (drawingPropertiesLock) {
         drawingProperties = snapshot;
         latestAdapter = hexDataAdapter;
@@ -1006,6 +1030,38 @@ public class HexHivePanel extends JPanel {
   }
 
   @Override
+  public Dimension getPreferredScrollableViewportSize() {
+    return getPreferredSize();
+  }
+
+  @Override
+  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+    DrawingProperties snapshot;
+    synchronized (drawingPropertiesLock) {
+      snapshot = drawingProperties;
+    }
+    // one row of cubes
+    return snapshot != null ? Math.max(1, Math.round(snapshot.hexHeight * 3f / 4f)) : 16;
+  }
+
+  @Override
+  public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+    return orientation == SwingConstants.VERTICAL ? visibleRect.height : visibleRect.width;
+  }
+
+  /** Rows wrap to the viewport's width, so only vertical scrolling is ever needed. */
+  @Override
+  public boolean getScrollableTracksViewportWidth() {
+    return true;
+  }
+
+  /** Fills the viewport when the rows are shorter than it, so no stale area is left below. */
+  @Override
+  public boolean getScrollableTracksViewportHeight() {
+    return getParent() instanceof JViewport && getParent().getHeight() > getPreferredSize().height;
+  }
+
+  @Override
   public Dimension getPreferredSize() {
     return new Dimension(lastWidth, lastHeight);
   }
@@ -1282,6 +1338,9 @@ public class HexHivePanel extends JPanel {
 
     /** Device pixels per logical pixel this snapshot renders at */
     private double scale = 1.0;
+
+    /** Panel width this layout wrapped its rows to */
+    private int canvasWidth;
 
     /** Whether a bitmap drawn for this layout puts every hexagon where {@code other} does. */
     private boolean hasSameLayout(DrawingProperties other) {
