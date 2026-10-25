@@ -20,14 +20,27 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.jlibtorrent.FileSlice;
+import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.PartialPieceInfo;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 
 public final class TransferDetailPieces extends JPanel
@@ -129,6 +142,9 @@ public final class TransferDetailPieces extends JPanel
     private int numFullPieces;
     private PieceIndexBitfield pieces;
     private String pieceSizeInHuman;
+    // read by the hover thread in describeHex
+    private volatile TorrentHandle torrentHandle;
+    private volatile TorrentInfo torrentInfo;
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
@@ -136,6 +152,8 @@ public final class TransferDetailPieces extends JPanel
       TorrentHandle torrentHandle = bittorrentDownload.getDl().getTorrentHandle();
       TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
       TorrentInfo torrentInfo = torrentHandle.torrentFile();
+      this.torrentHandle = torrentHandle;
+      this.torrentInfo = torrentInfo;
       pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0));
       totalPieces = torrentInfo.numPieces();
       pieces = status.pieces();
@@ -176,6 +194,113 @@ public final class TransferDetailPieces extends JPanel
 
     String getPieceSizeInHuman() {
       return pieceSizeInHuman;
+    }
+
+    private static final int MAX_LISTED_FILES = 4;
+    private static final int MAX_FILE_NAME_LENGTH = 48;
+
+    @Override
+    public Map<String, String> describeHex(int piece) {
+      TorrentHandle handle = torrentHandle;
+      TorrentInfo info = torrentInfo;
+      if (handle == null
+          || info == null
+          || !handle.isValid()
+          || piece < 0
+          || piece >= info.numPieces()) {
+        return null;
+      }
+      Map<String, String> rows = new LinkedHashMap<>();
+      int pieceSize = info.pieceSize(piece);
+      long firstByte = (long) piece * info.pieceLength();
+      rows.put(
+          I18n.tr("Piece"),
+          I18n.tr(
+              "#{0} of {1}", String.format("%,d", piece), String.format("%,d", info.numPieces())));
+      rows.put(I18n.tr("State"), describeState(handle, piece));
+      rows.put(
+          I18n.tr("Size"),
+          I18n.tr(
+              "{0} ({1} bytes)",
+              GUIUtils.getBytesInHuman(pieceSize), String.format("%,d", pieceSize)));
+      rows.put(
+          I18n.tr("Byte range"), String.format("%,d - %,d", firstByte, firstByte + pieceSize - 1));
+      int[] availability = handle.pieceAvailability();
+      if (availability != null && piece < availability.length) {
+        rows.put(I18n.tr("Peers with it"), String.valueOf(availability[piece]));
+      }
+      rows.put(I18n.tr("Priority"), describePriority(handle.piecePriority(piece)));
+      Sha1Hash hash = info.hashForPiece(piece);
+      if (hash != null && !hash.isAllZeros()) {
+        // v2-only torrents carry no per-piece SHA-1
+        rows.put("SHA-1", hash.toHex());
+      }
+      List<FileSlice> slices = info.mapBlock(piece, 0, pieceSize);
+      FileStorage files = info.files();
+      StringBuilder fileLines = new StringBuilder();
+      int listed = 0;
+      int skipped = 0;
+      for (FileSlice slice : slices) {
+        String path = files.filePath(slice.fileIndex());
+        if (path.startsWith(".pad") || path.contains("/.pad/") || path.contains("\\.pad\\")) {
+          continue; // BEP 47 padding files aren't real content
+        }
+        if (listed == MAX_LISTED_FILES) {
+          skipped++;
+          continue;
+        }
+        if (listed > 0) {
+          fileLines.append('\n');
+        }
+        fileLines
+            .append(abbreviate(files.fileName(slice.fileIndex()), MAX_FILE_NAME_LENGTH))
+            .append(" (")
+            .append(GUIUtils.getBytesInHuman(slice.size()))
+            .append(')');
+        listed++;
+      }
+      if (skipped > 0) {
+        fileLines.append('\n').append(I18n.tr("and {0} more", skipped));
+      }
+      if (listed > 0) {
+        rows.put(listed + skipped > 1 ? I18n.tr("Files") : I18n.tr("File"), fileLines.toString());
+      }
+      return rows;
+    }
+
+    private static String describeState(TorrentHandle handle, int piece) {
+      if (handle.havePiece(piece)) {
+        return I18n.tr("Downloaded and verified");
+      }
+      for (PartialPieceInfo partial : handle.getDownloadQueue()) {
+        if (partial.pieceIndex() == piece) {
+          return I18n.tr(
+              "Downloading, {0} of {1} blocks ({2} requested)",
+              partial.finished(), partial.blocksInPiece(), partial.requested());
+        }
+      }
+      if (handle.piecePriority(piece) == Priority.IGNORE) {
+        return I18n.tr("Not downloading (skipped files)");
+      }
+      return I18n.tr("Missing");
+    }
+
+    private static String describePriority(Priority priority) {
+      if (priority == Priority.IGNORE) {
+        return I18n.tr("Skip");
+      }
+      if (priority == Priority.NORMAL) {
+        return I18n.tr("Normal");
+      }
+      return I18n.tr("High") + " (" + priority.ordinal() + ")";
+    }
+
+    private static String abbreviate(String text, int maxLength) {
+      if (text == null || text.length() <= maxLength) {
+        return text;
+      }
+      int keep = (maxLength - 3) / 2;
+      return text.substring(0, keep) + "..." + text.substring(text.length() - keep);
     }
   }
 }

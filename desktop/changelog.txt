@@ -47,6 +47,7 @@ FrostWire 7.1.2 OCT/25/2026
    - fix:Starting to drag many files no longer freezes the UI — the drag preview shows the first few files with cached icons and a count of the rest
    - fix:Starting or restoring downloads no longer freezes the UI while each torrent's details are read — transfers are prepared in the background and then added to the list
    - fix:Distributed Search writes its list of known IceBridge servers to disk at most every 5 minutes instead of once per server it contacts, and replaces the file atomically so a crash can no longer leave it truncated
+   - new:Transfer Detail > Pieces: hovering a piece highlights its cube in orange and shows a card with its number, state (downloaded, downloading with block progress, missing or skipped), size, byte range, how many peers have it, priority, SHA-1 hash and the files it belongs to
    - fix:Transfer Detail > Pieces no longer cuts off the bottom of the second to last row of cubes when the last row is shorter
    - fix:Transfer Detail > Pieces draws its cubes crisp at display scaling above 100% (e.g. 125% or 150% on Windows) instead of stretching a low resolution picture of them
 

@@ -23,11 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
-/** Renders the pieces hive off-screen and inspects its backing bitmap. */
+/** Drives the pieces hive off-screen and inspects its backing bitmap and hover state. */
 class HexHivePanelTest {
 
   private static final int SIDE = 16;
@@ -68,6 +73,64 @@ class HexHivePanelTest {
     Object props = get(panel, "drawingProperties");
     assertEquals((int) get(props, "width") * 2, bitmap.getWidth());
     assertEquals((int) get(props, "height") * 2, bitmap.getHeight());
+  }
+
+  @Test
+  void hoveringAHexagonSelectsItAndAsksTheAdapterToDescribeIt() throws Exception {
+    BlockingQueue<Integer> described = new ArrayBlockingQueue<>(4);
+    HexHivePanel.HexDataAdapter<Object> adapter =
+        new HexHivePanel.HexDataAdapter<>() {
+          @Override
+          public void updateData(Object data) {}
+
+          @Override
+          public int getTotalHexagonsCount() {
+            return 40;
+          }
+
+          @Override
+          public int getFullHexagonsCount() {
+            return 0;
+          }
+
+          @Override
+          public boolean isFull(int hexOffset) {
+            return false;
+          }
+
+          @Override
+          public Map<String, String> describeHex(int hexOffset) {
+            described.add(hexOffset);
+            return Map.of("Piece", String.valueOf(hexOffset));
+          }
+        };
+    HexHivePanel panel = newPanel();
+    panel.updateData(adapter);
+    Object props = get(panel, "drawingProperties");
+    Point evenOrigin = (Point) get(props, "evenRowOrigin");
+    float hexWidth = (float) get(props, "hexWidth");
+    // third hexagon of the first row, nudged off-center but still inside it
+    int x = Math.round(evenOrigin.x + 2 * hexWidth) + SIDE / 3;
+    int y = evenOrigin.y - SIDE / 3;
+
+    panel.dispatchEvent(mouseEvent(panel, MouseEvent.MOUSE_MOVED, x, y));
+    assertEquals(2, (int) get(panel, "hoveredHex"));
+    assertEquals(2, described.poll(10, TimeUnit.SECONDS));
+
+    panel.dispatchEvent(mouseEvent(panel, MouseEvent.MOUSE_EXITED, x, y));
+    assertEquals(-1, (int) get(panel, "hoveredHex"));
+  }
+
+  @Test
+  void pointerOutsideTheHiveHoversNothing() throws Exception {
+    HexHivePanel panel = newPanel();
+    panel.updateData(adapter(3));
+    panel.dispatchEvent(mouseEvent(panel, MouseEvent.MOUSE_MOVED, 290, 390));
+    assertEquals(-1, (int) get(panel, "hoveredHex"));
+  }
+
+  private static MouseEvent mouseEvent(HexHivePanel panel, int id, int x, int y) {
+    return new MouseEvent(panel, id, System.currentTimeMillis(), 0, x, y, x, y, 0, false, 0);
   }
 
   private static HexHivePanel newPanel() {

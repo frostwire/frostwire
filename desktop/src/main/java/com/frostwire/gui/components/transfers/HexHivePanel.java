@@ -18,19 +18,51 @@
 
 package com.frostwire.gui.components.transfers;
 
-import java.awt.*;
+import com.frostwire.util.Logger;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JViewport;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeListener;
 
 public class HexHivePanel extends JPanel {
+  private static final Logger LOG = Logger.getLogger(HexHivePanel.class);
   private final boolean forceCubes;
   private final Object drawingPropertiesLock = new Object();
   private final Object bitmapLock = new Object();
@@ -65,6 +97,22 @@ public class HexHivePanel extends JPanel {
   private Rectangle lastVisibleRect = new Rectangle();
   private Color backgroundColor;
   private GraphicsConfiguration graphicsConfig;
+  // Hover highlight + floating details card. All hover state is EDT confined.
+  private static final CubePaint HOVER_PAINT = new CubePaint(0xff9800, 45);
+  private static final ColoredStroke HOVER_STROKE = new ColoredStroke(1f, new Color(0xb35c00));
+  private static final int CARD_CURSOR_OFFSET_X = 16;
+  private static final int CARD_CURSOR_OFFSET_Y = 18;
+  private static final int CARD_FLIPPED_GAP = 8;
+  private final ExecutorService hoverPool =
+      com.frostwire.util.ThreadPool.newThreadPool("HexHiveHoverPool", 1);
+  private int hoveredHex = -1;
+  private int hoverGeneration;
+  private Point hoverScreenLocation;
+  private Popup hoverPopup;
+  private JPanel hoverCard;
+  private JViewport observedViewport;
+  private Point lastViewPosition;
+  private final ChangeListener viewportListener = e -> onViewportChanged();
 
   /**
    * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
@@ -96,6 +144,20 @@ public class HexHivePanel extends JPanel {
     this.forceCubes = forceCubes;
     lastWidth = getWidth();
     lastHeight = getHeight();
+    MouseAdapter hoverListener =
+        new MouseAdapter() {
+          @Override
+          public void mouseMoved(MouseEvent e) {
+            updateHover(e.getPoint(), e.getLocationOnScreen());
+          }
+
+          @Override
+          public void mouseExited(MouseEvent e) {
+            clearHover();
+          }
+        };
+    addMouseListener(hoverListener);
+    addMouseMotionListener(hoverListener);
   }
 
   @Override
@@ -105,6 +167,193 @@ public class HexHivePanel extends JPanel {
     if (graphicsConfig != null) {
       renderScale = sanitizeScale(graphicsConfig.getDefaultTransform().getScaleX());
     }
+    Container viewport = SwingUtilities.getAncestorOfClass(JViewport.class, this);
+    if (viewport instanceof JViewport) {
+      observedViewport = (JViewport) viewport;
+      lastViewPosition = observedViewport.getViewPosition();
+      observedViewport.addChangeListener(viewportListener);
+    }
+  }
+
+  @Override
+  public void removeNotify() {
+    clearHover();
+    if (observedViewport != null) {
+      observedViewport.removeChangeListener(viewportListener);
+      observedViewport = null;
+    }
+    super.removeNotify();
+  }
+
+  private void onViewportChanged() {
+    if (observedViewport == null) {
+      return;
+    }
+    Point viewPosition = observedViewport.getViewPosition();
+    // Scrolling moves the cubes under a still mouse, the hovered piece is no longer under it
+    if (!viewPosition.equals(lastViewPosition)) {
+      lastViewPosition = viewPosition;
+      clearHover();
+    }
+  }
+
+  private void updateHover(Point mouse, Point mouseOnScreen) {
+    DrawingProperties snapshot;
+    HexDataAdapter adapter;
+    synchronized (drawingPropertiesLock) {
+      snapshot = drawingProperties;
+      adapter = latestAdapter;
+    }
+    int index = snapshot != null ? hexIndexAt(snapshot, mouse.x, mouse.y) : -1;
+    if (index == hoveredHex) {
+      return;
+    }
+    repaintHoveredHex(snapshot);
+    hoveredHex = index;
+    hoverScreenLocation = mouseOnScreen;
+    hideHoverPopup();
+    repaintHoveredHex(snapshot);
+    if (index >= 0 && adapter != null) {
+      requestHoverDetails(adapter, index);
+    }
+  }
+
+  private void clearHover() {
+    if (hoveredHex < 0 && hoverPopup == null) {
+      return;
+    }
+    DrawingProperties snapshot;
+    synchronized (drawingPropertiesLock) {
+      snapshot = drawingProperties;
+    }
+    repaintHoveredHex(snapshot);
+    hoveredHex = -1;
+    hoverGeneration++;
+    hideHoverPopup();
+  }
+
+  private void requestHoverDetails(HexDataAdapter<?> adapter, int index) {
+    final int generation = ++hoverGeneration;
+    // Adapters may hit JNI (e.g. libtorrent) to describe a piece, keep that off the EDT
+    hoverPool.execute(
+        () -> {
+          Map<String, String> details;
+          try {
+            details = adapter.describeHex(index);
+          } catch (Throwable t) {
+            LOG.warn("describeHex(" + index + ") failed", t);
+            details = null;
+          }
+          final Map<String, String> result = details;
+          SwingUtilities.invokeLater(
+              () -> {
+                if (generation == hoverGeneration
+                    && hoveredHex == index
+                    && result != null
+                    && !result.isEmpty()) {
+                  showHoverPopup(result);
+                }
+              });
+        });
+  }
+
+  private void showHoverPopup(Map<String, String> details) {
+    if (!isShowing() || hoverScreenLocation == null) {
+      return;
+    }
+    if (hoverCard == null) {
+      hoverCard = createInfoCard();
+    }
+    Dimension previousSize = hoverPopup != null ? hoverCard.getPreferredSize() : null;
+    fillInfoCard(hoverCard, details);
+    Dimension size = hoverCard.getPreferredSize();
+    if (hoverPopup != null && size.equals(previousSize)) {
+      // live refresh of the same piece, update in place to avoid flicker
+      hoverCard.revalidate();
+      hoverCard.repaint();
+      return;
+    }
+    hideHoverPopup();
+    Rectangle screen =
+        graphicsConfig != null
+            ? graphicsConfig.getBounds()
+            : new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+    // below-right of the cursor, flipped to the other side when it would leave the screen
+    int x = hoverScreenLocation.x + CARD_CURSOR_OFFSET_X;
+    int y = hoverScreenLocation.y + CARD_CURSOR_OFFSET_Y;
+    if (x + size.width > screen.x + screen.width) {
+      x = Math.max(screen.x, hoverScreenLocation.x - size.width - CARD_FLIPPED_GAP);
+    }
+    if (y + size.height > screen.y + screen.height) {
+      y = Math.max(screen.y, hoverScreenLocation.y - size.height - CARD_FLIPPED_GAP);
+    }
+    hoverPopup = PopupFactory.getSharedInstance().getPopup(this, hoverCard, x, y);
+    hoverPopup.show();
+  }
+
+  private void hideHoverPopup() {
+    if (hoverPopup != null) {
+      hoverPopup.hide();
+      hoverPopup = null;
+    }
+  }
+
+  private void repaintHoveredHex(DrawingProperties snapshot) {
+    if (hoveredHex < 0 || snapshot == null || hoveredHex >= snapshot.numHexs) {
+      return;
+    }
+    Point center = getHexCenter(snapshot, hoveredHex);
+    int reach = (int) Math.ceil(snapshot.hexSideLength) + 3;
+    repaint(center.x - reach, center.y - reach, reach * 2, reach * 2);
+  }
+
+  private static Point getHexCenter(DrawingProperties drawingProperties, int index) {
+    int row = drawingProperties.getRowIndexForPiece(index);
+    int col = index - drawingProperties.getRowStartIndex(row);
+    int rowOriginX =
+        (row % 2) == 0 ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+    float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+    return new Point(
+        Math.round(rowOriginX + (col * drawingProperties.hexWidth)),
+        Math.round(drawingProperties.evenRowOrigin.y + (row * verticalStep)));
+  }
+
+  /**
+   * @return the index of the hexagon under (x, y), or -1. In a hex grid the closest center is the
+   *     hexagon containing the point, so it's enough to check the neighbouring rows and columns.
+   */
+  private static int hexIndexAt(DrawingProperties drawingProperties, int x, int y) {
+    if (drawingProperties.numHexs <= 0 || drawingProperties.hexWidth <= 0) {
+      return -1;
+    }
+    float verticalStep = (drawingProperties.hexHeight * 3f) / 4f;
+    int approxRow = Math.round((y - drawingProperties.evenRowOrigin.y) / verticalStep);
+    int best = -1;
+    long bestDistance = Long.MAX_VALUE;
+    for (int row = Math.max(0, approxRow - 1); row <= approxRow + 1; row++) {
+      int rowHexCount = drawingProperties.getRowHexCount(row);
+      if (rowHexCount <= 0) {
+        continue;
+      }
+      int rowStartIndex = drawingProperties.getRowStartIndex(row);
+      int rowOriginX =
+          (row % 2) == 0 ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
+      int centerY = Math.round(drawingProperties.evenRowOrigin.y + (row * verticalStep));
+      int approxCol = Math.round((x - rowOriginX) / drawingProperties.hexWidth);
+      for (int col = Math.max(0, approxCol - 1);
+          col <= Math.min(rowHexCount - 1, approxCol + 1);
+          col++) {
+        long dx = x - Math.round(rowOriginX + (col * drawingProperties.hexWidth));
+        long dy = y - centerY;
+        long distance = dx * dx + dy * dy;
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = rowStartIndex + col;
+        }
+      }
+    }
+    float side = drawingProperties.hexSideLength;
+    return (best >= 0 && bestDistance <= side * side) ? best : -1;
   }
 
   private static double sanitizeScale(double scale) {
@@ -373,6 +622,12 @@ public class HexHivePanel extends JPanel {
         && canvasWidth > 0
         && canvasHeight > 0) {
       requestFocusedRender(snapshot, hexDataAdapter, true);
+    }
+    if (hoveredHex >= snapshot.numHexs) {
+      clearHover();
+    } else if (hoveredHex >= 0 && hexDataAdapter != null) {
+      // keep the details card live while the piece downloads
+      requestHoverDetails(hexDataAdapter, hoveredHex);
     }
   }
 
@@ -785,6 +1040,7 @@ public class HexHivePanel extends JPanel {
       snapshotProperties = drawingProperties;
       adapterSnapshot = latestAdapter;
     }
+    paintHoveredHex(g2d, snapshotProperties);
     if (scaleChanged && renderScale != deviceScale) {
       renderScale = deviceScale;
       if (adapterSnapshot != null) {
@@ -796,6 +1052,21 @@ public class HexHivePanel extends JPanel {
     if (snapshotProperties != null && adapterSnapshot != null) {
       requestFocusedRender(snapshotProperties, adapterSnapshot, false);
     }
+  }
+
+  private void paintHoveredHex(Graphics2D g2d, DrawingProperties snapshot) {
+    if (hoveredHex < 0 || snapshot == null || hoveredHex >= snapshot.numHexs) {
+      return;
+    }
+    // Own drawing buffers: the snapshot's are in use by the render thread
+    DrawingProperties painter = new DrawingProperties(snapshot.hexSideLength);
+    Point center = getHexCenter(snapshot, hoveredHex);
+    painter.hexCenterBuffer.setLocation(center);
+    Graphics2D graphics = (Graphics2D) g2d.create();
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+    drawHexagon(painter, graphics, HOVER_STROKE, HOVER_PAINT, true);
+    graphics.dispose();
   }
 
   private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor, int bgColor) {
@@ -814,6 +1085,58 @@ public class HexHivePanel extends JPanel {
     int getFullHexagonsCount();
 
     boolean isFull(int hexOffset);
+
+    /**
+     * Label/value rows shown in the floating card when the mouse hovers a hexagon. Called off the
+     * EDT. Values may contain '\n' to span several lines.
+     *
+     * @return null or empty for no card
+     */
+    default Map<String, String> describeHex(int hexOffset) {
+      return null;
+    }
+  }
+
+  /** Floating card listing a hovered hexagon's details, styled like the theme's tooltips. */
+  private static JPanel createInfoCard() {
+    JPanel card = new JPanel(new GridBagLayout());
+    Color background = UIManager.getColor("ToolTip.background");
+    card.setBackground(background != null ? background : new Color(0xffffe1));
+    Border border = UIManager.getBorder("ToolTip.border");
+    if (border == null) {
+      border = BorderFactory.createLineBorder(Color.GRAY);
+    }
+    card.setBorder(
+        BorderFactory.createCompoundBorder(border, BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+    return card;
+  }
+
+  private static void fillInfoCard(JPanel card, Map<String, String> details) {
+    card.removeAll();
+    Font font = UIManager.getFont("ToolTip.font");
+    GridBagConstraints c = new GridBagConstraints();
+    c.anchor = GridBagConstraints.FIRST_LINE_START;
+    c.gridy = 0;
+    for (Map.Entry<String, String> row : details.entrySet()) {
+      c.gridx = 0;
+      c.insets = new Insets(1, 0, 1, 10);
+      card.add(createCardLabel(row.getKey(), font != null ? font.deriveFont(Font.BOLD) : null), c);
+      c.gridx = 1;
+      c.insets = new Insets(1, 0, 1, 0);
+      for (String line : String.valueOf(row.getValue()).split("\\n")) {
+        card.add(createCardLabel(line, font), c);
+        c.gridy++;
+      }
+    }
+  }
+
+  private static JComponent createCardLabel(String text, Font font) {
+    JLabel label = new JLabel(text);
+    if (font != null) {
+      label.setFont(font);
+    }
+    label.setForeground(UIManager.getColor("ToolTip.foreground"));
+    return label;
   }
 
   private static final class ColoredStroke extends BasicStroke {
@@ -951,6 +1274,13 @@ public class HexHivePanel extends JPanel {
 
     /** Device pixels per logical pixel this snapshot renders at */
     private double scale = 1.0;
+
+    /** Geometry-less instance used only for its drawing buffers when painting a single hexagon. */
+    DrawingProperties(float hexSideLength) {
+      evenRowOrigin = new Point(0, 0);
+      oddRowOrigin = new Point(0, 0);
+      this.hexSideLength = hexSideLength;
+    }
 
     DrawingProperties(
         HexDataAdapter adapter,
