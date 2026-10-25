@@ -1,5 +1,5 @@
 FrostWire 7.1.2 OCT/25/2026
-   - update:Windows: the bundled Java runtime is updated from OpenJDK 27 to 27.0.1.0.3, which fixes the vulnerabilities in this week's severe Oracle Java security advisory
+   - update:The Java runtime bundled with the Windows, macOS and Linux installers is updated from OpenJDK 27 to 27.0.1.0.3, which fixes the vulnerabilities in this week's severe Oracle Java security advisory
    - fix:Windows: text is no longer blurry at display scaling above 100% — FrostWire.exe now declares per-monitor DPI awareness, so Windows no longer stretches the whole window as a bitmap (#1243, #1300)
    - fix:Windows: the UI no longer freezes waiting on the graphics driver — FrostWire.exe stopped forcing Java's OpenGL renderer and uses the default Direct3D one; OpenGL had been turned on to fix the blurry text, which it never did, and its render queue held up painting for over 5 seconds on many machines (#1306)
    - fix:Windows: FrostWire.exe is now signed by FrostWire LLC, like the installer
