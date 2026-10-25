@@ -86,6 +86,9 @@ public class HexHivePanel extends JPanel {
    */
   private double bitmapScale = 1.0;
 
+  /** Layout the backing bitmap was drawn for, batches rendered for any other one are dropped. */
+  private DrawingProperties bitmapLayout;
+
   private volatile double renderScale = 1.0;
   private final Area renderedArea = new Area();
   private int lastWidth;
@@ -636,12 +639,11 @@ public class HexHivePanel extends JPanel {
     synchronized (bitmapLock) {
       int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
       int deviceHeight = Math.max(1, toDevice(snapshot.height, snapshot.scale));
-      if (bitmap == null
-          || bitmap.getWidth() != deviceWidth
-          || bitmap.getHeight() != deviceHeight
-          || bitmapScale != snapshot.scale) {
+      if (bitmap == null || bitmapLayout == null || !bitmapLayout.hasSameLayout(snapshot)) {
+        // a fresh bitmap: pixels of the previous layout outside the new rows would linger
         bitmap = createOpaqueImage(deviceWidth, deviceHeight);
         bitmapScale = snapshot.scale;
+        bitmapLayout = snapshot;
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, deviceWidth, deviceHeight);
@@ -774,7 +776,10 @@ public class HexHivePanel extends JPanel {
       drawRowsToGraphics(
           drawingProperties, adapter, graphics, drawBounds, drawFirstRow, drawLastRow, drawCubes);
       graphics.dispose();
-      mergeBatchBitmap(batchBitmap, deviceX, deviceY, scale, mergeBounds);
+      if (!mergeBatchBitmap(batchBitmap, drawingProperties, deviceX, deviceY, mergeBounds)) {
+        // the layout changed meanwhile, its own render is queued
+        return;
+      }
     }
   }
 
@@ -959,12 +964,13 @@ public class HexHivePanel extends JPanel {
     return Math.round(drawingProperties.evenRowOrigin.y + (row * verticalStep));
   }
 
-  private void mergeBatchBitmap(
+  private boolean mergeBatchBitmap(
       BufferedImage renderedBitmap,
+      DrawingProperties drawingProperties,
       int sourceDeviceX,
       int sourceDeviceY,
-      double scale,
       Rectangle mergeBounds) {
+    double scale = drawingProperties.scale;
     int destX1 = toDevice(mergeBounds.x, scale);
     int destY1 = toDevice(mergeBounds.y, scale);
     int destX2 = toDevice(mergeBounds.x + mergeBounds.width, scale);
@@ -974,9 +980,10 @@ public class HexHivePanel extends JPanel {
     int sourceX2 = destX2 - sourceDeviceX;
     int sourceY2 = destY2 - sourceDeviceY;
     synchronized (bitmapLock) {
-      if (bitmap == null || bitmapScale != scale) {
-        // stale batch rendered for a different screen scale, a fresh render is already queued
-        return;
+      if (bitmap == null
+          || bitmapLayout == null
+          || !bitmapLayout.hasSameLayout(drawingProperties)) {
+        return false;
       }
       Graphics2D graphics = bitmap.createGraphics();
       graphics.drawImage(
@@ -995,6 +1002,7 @@ public class HexHivePanel extends JPanel {
     }
     SwingUtilities.invokeLater(
         () -> repaint(mergeBounds.x, mergeBounds.y, mergeBounds.width, mergeBounds.height));
+    return true;
   }
 
   @Override
@@ -1274,6 +1282,19 @@ public class HexHivePanel extends JPanel {
 
     /** Device pixels per logical pixel this snapshot renders at */
     private double scale = 1.0;
+
+    /** Whether a bitmap drawn for this layout puts every hexagon where {@code other} does. */
+    private boolean hasSameLayout(DrawingProperties other) {
+      return width == other.width
+          && height == other.height
+          && scale == other.scale
+          && numHexs == other.numHexs
+          && hexSideLength == other.hexSideLength
+          && evenRowHexCount == other.evenRowHexCount
+          && oddRowHexCount == other.oddRowHexCount
+          && evenRowOrigin.equals(other.evenRowOrigin)
+          && oddRowOrigin.equals(other.oddRowOrigin);
+    }
 
     /** Geometry-less instance used only for its drawing buffers when painting a single hexagon. */
     DrawingProperties(float hexSideLength) {

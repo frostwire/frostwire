@@ -50,6 +50,7 @@ FrostWire 7.1.2 OCT/25/2026
    - new:Transfer Detail > Pieces: hovering a piece highlights its cube in orange and shows a card with its number, state (downloaded, downloading with block progress, missing or skipped), size, byte range, how many peers have it, priority, SHA-1 hash and the files it belongs to
    - fix:Transfer Detail > Pieces no longer cuts off the bottom of the second to last row of cubes when the last row is shorter
    - fix:Transfer Detail > Pieces draws its cubes crisp at display scaling above 100% (e.g. 125% or 150% on Windows) instead of stretching a low resolution picture of them
+   - fix:Transfer Detail > Pieces no longer leaves stray line fragments below the cubes after resizing the window or switching transfers
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported

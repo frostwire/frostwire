@@ -129,6 +129,32 @@ class HexHivePanelTest {
     assertEquals(-1, (int) get(panel, "hoveredHex"));
   }
 
+  @Test
+  void relayoutWhileRenderingLeavesNoStalePixels() throws Exception {
+    HexHivePanel panel = newPanel();
+    panel.setSize(600, 400);
+    panel.updateData(adapter(400));
+    // re-wrap while the wide layout may still be rendering
+    panel.setSize(300, 400);
+    panel.updateData(adapter(400));
+    BufferedImage relaidOut = awaitRender(panel);
+
+    HexHivePanel fresh = newPanel();
+    fresh.setSize(300, 400);
+    fresh.updateData(adapter(400));
+    BufferedImage expected = awaitRender(fresh);
+
+    assertEquals(expected.getWidth(), relaidOut.getWidth());
+    assertEquals(expected.getHeight(), relaidOut.getHeight());
+    for (int y = 0; y < expected.getHeight(); y++) {
+      for (int x = 0; x < expected.getWidth(); x++) {
+        if (expected.getRGB(x, y) != relaidOut.getRGB(x, y)) {
+          throw new AssertionError("stale pixel at " + x + "," + y);
+        }
+      }
+    }
+  }
+
   private static MouseEvent mouseEvent(HexHivePanel panel, int id, int x, int y) {
     return new MouseEvent(panel, id, System.currentTimeMillis(), 0, x, y, x, y, 0, false, 0);
   }
