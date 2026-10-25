@@ -47,6 +47,7 @@ FrostWire 7.1.2 OCT/25/2026
    - fix:Starting to drag many files no longer freezes the UI — the drag preview shows the first few files with cached icons and a count of the rest
    - fix:Starting or restoring downloads no longer freezes the UI while each torrent's details are read — transfers are prepared in the background and then added to the list
    - fix:Distributed Search writes its list of known IceBridge servers to disk at most every 5 minutes instead of once per server it contacts, and replaces the file atomically so a crash can no longer leave it truncated
+   - fix:Transfer Detail > Pieces no longer cuts off the bottom of the second to last row of cubes when the last row is shorter
 
 FrostWire 7.1.1 OCT/15/2026
    - fix:SoundCloud search and downloads work with downloadable tracks served as HLS AAC; segmented audio is saved as M4A instead of a playlist, while MP3 progressive downloads remain supported

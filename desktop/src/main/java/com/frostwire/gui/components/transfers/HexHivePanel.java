@@ -609,7 +609,15 @@ public class HexHivePanel extends JPanel {
       int firstRow,
       int lastRow,
       int maxRow) {
-    Rectangle batch = computeBatchBounds(drawingProperties, targetBounds, firstRow, lastRow);
+    // The band between neighbouring row midpoints also holds the pointy tips of the rows above and
+    // below, so it must span those rows too, or a short last row leaves the second to last row's
+    // bottom tips unmerged.
+    Rectangle batch =
+        computeBatchBounds(
+            drawingProperties,
+            targetBounds,
+            Math.max(0, firstRow - 1),
+            Math.min(maxRow, lastRow + 1));
     if (batch.width <= 0 || batch.height <= 0) {
       return batch;
     }
