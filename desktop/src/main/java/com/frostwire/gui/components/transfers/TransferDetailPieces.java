@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,156 +26,156 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import java.awt.*;
+import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.*;
-import java.awt.*;
+public final class TransferDetailPieces extends JPanel
+    implements TransferDetailComponent.TransferDetailPanel {
+  private final JLabel pieceSizeLabel;
+  private final JLabel totalPiecesLabel;
+  private final HexHivePanel hexHivePanel;
+  private final HexHiveAdapter hexHivePanelAdapter;
+  private boolean pieceSizeAlreadySet = false;
+  private BittorrentDownload bittorrentDownload;
 
-public final class TransferDetailPieces extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    private final JLabel pieceSizeLabel;
-    private final JLabel totalPiecesLabel;
-    private final HexHivePanel hexHivePanel;
-    private final HexHiveAdapter hexHivePanelAdapter;
-    private boolean pieceSizeAlreadySet = false;
-    private BittorrentDownload bittorrentDownload;
-
-    TransferDetailPieces() {
-        super(new MigLayout("fillx, insets 0 0 0 0, gap 0 5px"));
-        int backgroundColor = ThemeMediator.isLightThemeOn() ?
-                0xffffff : ThemeMediator.APP_REALLY_DARK_COLOR.getRGB();
-        hexHivePanel = new HexHivePanel(
-                16,
-                0x264053,
-                0xf2f2f2,
-                0x33b5e5,
-                backgroundColor,
-                5,
-                0,
-                0,
-                5,
-                true);
-        hexHivePanelAdapter = new HexHiveAdapter();
-        // Create labels without HTML content to avoid EDT violation
-        pieceSizeLabel = new JLabel();
-        totalPiecesLabel = new JLabel();
-        add(totalPiecesLabel, "gapleft 10px");
-        add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
-        hexHivePanel.setBackground(Color.WHITE);
-        hexHivePanel.setOpaque(true);
-        // Defer HTML content and JScrollPane creation to avoid EDT violation
-        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-        SwingUtilities.invokeLater(() -> {
-            pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
-            totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
-            JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
-            jScrollPane.setOpaque(true);
-            jScrollPane.getViewport().setOpaque(true);
-            jScrollPane.getViewport().setBackground(new Color(backgroundColor));
-            jScrollPane.setBackground(new Color(backgroundColor));
-            jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-            jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
-            revalidate();
-            repaint();
+  TransferDetailPieces() {
+    super(new MigLayout("fillx, insets 0 0 0 0, gap 0 5px"));
+    int backgroundColor =
+        ThemeMediator.isLightThemeOn() ? 0xffffff : ThemeMediator.APP_REALLY_DARK_COLOR.getRGB();
+    hexHivePanel =
+        new HexHivePanel(16, 0x264053, 0xf2f2f2, 0x33b5e5, backgroundColor, 5, 0, 0, 5, true);
+    hexHivePanelAdapter = new HexHiveAdapter();
+    // Create labels without HTML content to avoid EDT violation
+    pieceSizeLabel = new JLabel();
+    totalPiecesLabel = new JLabel();
+    add(totalPiecesLabel, "gapleft 10px");
+    add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
+    hexHivePanel.setBackground(Color.WHITE);
+    hexHivePanel.setOpaque(true);
+    // Defer HTML content and JScrollPane creation to avoid EDT violation
+    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+    SwingUtilities.invokeLater(
+        () -> {
+          pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
+          totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
+          JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
+          jScrollPane.setOpaque(true);
+          jScrollPane.getViewport().setOpaque(true);
+          jScrollPane.getViewport().setBackground(new Color(backgroundColor));
+          jScrollPane.setBackground(new Color(backgroundColor));
+          jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+          jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+          jScrollPane.setHorizontalScrollBarPolicy(
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+          add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
+          revalidate();
+          repaint();
         });
+  }
+
+  @Override
+  public void updateData(BittorrentDownload btDownload) {
+    final boolean sameDownload = (bittorrentDownload == btDownload);
+    bittorrentDownload = btDownload;
+    // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
+    hexHivePanelAdapter.updateData(btDownload);
+    final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
+    final String pieceCounts =
+        hexHivePanelAdapter.getFullHexagonsCount()
+            + "/"
+            + hexHivePanelAdapter.getTotalHexagonsCount();
+    final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
+    final BittorrentDownload expectedDownload = btDownload;
+    SwingUtilities.invokeLater(
+        () -> {
+          if (bittorrentDownload != expectedDownload) {
+            return;
+          }
+          pieceSizeAlreadySet = sameDownload;
+          updatePieceSizeLabel(pieceSize);
+          updateTotalPiecesLabel(pieceCounts);
+          if (totalHexs >= 0) {
+            if (!sameDownload) {
+              hexHivePanel.clearRenderCache();
+            }
+            hexHivePanel.updateData(hexHivePanelAdapter);
+            hexHivePanel.revalidate();
+          }
+          revalidate();
+          repaint();
+        });
+  }
+
+  private void updatePieceSizeLabel(String pieceSize) {
+    if (!pieceSizeAlreadySet) {
+      pieceSizeLabel.setText(
+          "<html><b nowrap>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
+      pieceSizeAlreadySet = true;
     }
+  }
+
+  private void updateTotalPiecesLabel(String totalPieces) {
+    totalPiecesLabel.setText(
+        "<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
+  }
+
+  /// /////////////////////////////////////////////////////////////////////////////
+
+  private static final class HexHiveAdapter
+      implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
+    private BittorrentDownload bittorrentDownload;
+    private int totalPieces;
+    private int numFullPieces;
+    private PieceIndexBitfield pieces;
+    private String pieceSizeInHuman;
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        final boolean sameDownload = (bittorrentDownload == btDownload);
-        bittorrentDownload = btDownload;
-        // Already invoked from BackgroundQueuedExecutorService — JNI calls are safe here.
-        hexHivePanelAdapter.updateData(btDownload);
-        final String pieceSize = hexHivePanelAdapter.getPieceSizeInHuman();
-        final String pieceCounts = hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount();
-        final int totalHexs = hexHivePanelAdapter.getTotalHexagonsCount();
-        final BittorrentDownload expectedDownload = btDownload;
-        SwingUtilities.invokeLater(() -> {
-            if (bittorrentDownload != expectedDownload) {
-                return;
-            }
-            pieceSizeAlreadySet = sameDownload;
-            updatePieceSizeLabel(pieceSize);
-            updateTotalPiecesLabel(pieceCounts);
-            if (totalHexs >= 0) {
-                if (!sameDownload) {
-                    hexHivePanel.clearRenderCache();
-                }
-                hexHivePanel.updateData(hexHivePanelAdapter);
-                hexHivePanel.revalidate();
-            }
-            revalidate();
-            repaint();
-        });
+      bittorrentDownload = btDownload;
+      TorrentHandle torrentHandle = bittorrentDownload.getDl().getTorrentHandle();
+      TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
+      TorrentInfo torrentInfo = torrentHandle.torrentFile();
+      pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0));
+      totalPieces = torrentInfo.numPieces();
+      pieces = status.pieces();
+      if (pieces.isAllSet()) {
+        numFullPieces = totalPieces;
+      } else if (pieces.isNoneSet() || pieces.isEmpty()) {
+        numFullPieces = 0;
+      } else {
+        numFullPieces = 0;
+        for (int i = 0; i < pieces.count(); i++) {
+          if (pieces.getBit(i)) {
+            numFullPieces++;
+          }
+        }
+      }
     }
 
-    private void updatePieceSizeLabel(String pieceSize) {
-        if (!pieceSizeAlreadySet) {
-            pieceSizeLabel.setText("<html><b nowrap>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
-            pieceSizeAlreadySet = true;
-        }
+    @Override
+    public int getTotalHexagonsCount() {
+      if (bittorrentDownload == null) {
+        return 0;
+      }
+      return totalPieces;
     }
 
-    private void updateTotalPiecesLabel(String totalPieces) {
-        totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
+    @Override
+    public int getFullHexagonsCount() {
+      if (bittorrentDownload == null) {
+        return 0;
+      }
+      return numFullPieces;
     }
 
-    /// /////////////////////////////////////////////////////////////////////////////
-
-    private final static class HexHiveAdapter implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
-        private BittorrentDownload bittorrentDownload;
-        private int totalPieces;
-        private int numFullPieces;
-        private PieceIndexBitfield pieces;
-        private String pieceSizeInHuman;
-
-        @Override
-        public void updateData(BittorrentDownload btDownload) {
-            bittorrentDownload = btDownload;
-            TorrentHandle torrentHandle = bittorrentDownload.getDl().getTorrentHandle();
-            TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
-            TorrentInfo torrentInfo = torrentHandle.torrentFile();
-            pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSizeForReq(0));
-            totalPieces = torrentInfo.numPieces();
-            pieces = status.pieces();
-            if (pieces.isAllSet()) {
-                numFullPieces = totalPieces;
-            } else if (pieces.isNoneSet() || pieces.isEmpty()) {
-                numFullPieces = 0;
-            } else {
-                numFullPieces = 0;
-                for (int i = 0; i < pieces.count(); i++) {
-                    if (pieces.getBit(i)) {
-                        numFullPieces++;
-                    }
-                }
-            }
-        }
-
-        @Override
-        public int getTotalHexagonsCount() {
-            if (bittorrentDownload == null) {
-                return 0;
-            }
-            return totalPieces;
-        }
-
-        @Override
-        public int getFullHexagonsCount() {
-            if (bittorrentDownload == null) {
-                return 0;
-            }
-            return numFullPieces;
-        }
-
-        @Override
-        public boolean isFull(int hexOffset) {
-            return pieces.getBit(hexOffset);
-        }
-
-        String getPieceSizeInHuman() {
-            return pieceSizeInHuman;
-        }
+    @Override
+    public boolean isFull(int hexOffset) {
+      return pieces.getBit(hexOffset);
     }
+
+    String getPieceSizeInHuman() {
+      return pieceSizeInHuman;
+    }
+  }
 }
