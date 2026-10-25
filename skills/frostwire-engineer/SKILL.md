@@ -198,7 +198,7 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
 
 ### File Headers
 
-- Java files use the standard FrostWire Apache/GPL header; follow the neighboring file's actual license and authorship. Example:
+- Java files use the standard FrostWire Apache/GPL header; follow the neighboring file's actual license text. Example:
   ```java
   /*
    *     Created by Angel Leon (@gubatron)
@@ -207,7 +207,7 @@ These are hard-won from multi-hop mesh E2E + adversarial review (MentisDB frostw
    *     Licensed under GPL v3. See LICENSE file.
    */
   ```
-- Classes that are co-maintained by both gubatron and aldenml add `@author gubatron` and `@author aldenml` to the class javadoc.
+- **The author line is only `Created by Angel Leon (@gubatron)`.** Many legacy headers still read `Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)`; never copy that line into a new file, and replace it with the single-author line in any file you touch. Do not add `@author` tags for other people either.
 - One file = one top-level public class. Inner classes only for tightly-scoped helpers.
 
 ### Imports
