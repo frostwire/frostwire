@@ -139,6 +139,24 @@ tasks.named('run') {
         // Mutter (GNOME Wayland + XWayland) is a non-reparenting WM; without this
         // Java windows can appear blank or unmanaged.
         environment '_JAVA_AWT_WM_NONREPARENTING', '1'
+    } else if (OperatingSystem.current().isWindows()) {
+        // Java2D pipeline A/B testing (GitHub #1306): ./gradlew run -Pjava2d=d3d|opengl|software
+        // d3d is the JDK default and what FrostWire.exe uses from 7.1.2 on.
+        def pipeline = project.findProperty('java2d') ?: 'd3d'
+        switch (pipeline) {
+            case 'd3d':
+                jvmArgs '-Dsun.java2d.d3d=true', '-Dsun.java2d.opengl=false'
+                break
+            case 'opengl': // what FrostWire.exe forced up to 7.1.1
+                jvmArgs '-Dsun.java2d.opengl=true'
+                break
+            case 'software':
+                jvmArgs '-Dsun.java2d.d3d=false', '-Dsun.java2d.opengl=false', '-Dsun.java2d.noddraw=true'
+                break
+            default:
+                throw new GradleException("Unknown -Pjava2d=${pipeline}, expected d3d, opengl or software")
+        }
+        logger.lifecycle("Java2D pipeline: ${pipeline}")
     }
 }
 
