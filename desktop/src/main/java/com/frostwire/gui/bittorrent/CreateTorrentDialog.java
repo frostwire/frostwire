@@ -24,6 +24,7 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.util.BoundedFileWalker;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
@@ -354,20 +355,17 @@ public class CreateTorrentDialog extends JDialog {
     }
   }
 
-  private long calculateTotalSize(File file) {
+  /**
+   * Size of {@code file}, or of the files under it. Bounded by {@link BoundedFileWalker}, so a
+   * symlink loop in the chosen folder can't recurse until the stack overflows.
+   */
+  static long calculateTotalSize(File file) {
     if (file.isFile()) {
       return file.length();
-    } else if (file.isDirectory()) {
-      long total = 0;
-      File[] files = file.listFiles();
-      if (files != null) {
-        for (File f : files) {
-          total += calculateTotalSize(f);
-        }
-      }
-      return total;
     }
-    return 0;
+    long[] total = {0};
+    BoundedFileWalker.walk(file, (path, attrs) -> total[0] += attrs.size());
+    return total[0];
   }
 
   private void onButtonClose(ActionEvent e) {
