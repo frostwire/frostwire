@@ -7,50 +7,39 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
  * A label for frequently updated text that only asks its container for a new layout when the update
- * changes its preferred size.
- *
- * <p>{@code JLabel.setText} revalidates on every text change, and every validate pass of the window
- * ends in a native cursor update (a cross-thread call on Windows and macOS). Text that keeps the
- * same size only needs the repaint {@code setText} already schedules.
- *
- * <p>Only the revalidation coming from {@code setText} is filtered. Every other one (UI install,
- * border, font, icon) passes through untouched: Synth skins revalidate while installing the UI,
- * before the label has a style to measure its preferred size with.
+ * changes its size. See {@link SizeStableRevalidation}.
  */
-class SizeStableLabel extends JLabel {
-  private Dimension laidOutSize;
-  private boolean settingText;
+public class SizeStableLabel extends JLabel {
+  /** Null while JLabel's constructor runs. */
+  private final SizeStableRevalidation revalidation = new SizeStableRevalidation();
 
-  SizeStableLabel(Icon icon) {
+  /** An empty, leading-aligned label, like {@code new JLabel()}. */
+  public SizeStableLabel() {
+    super();
+  }
+
+  /** A centered label showing {@code icon}, like {@code new JLabel(icon)}. */
+  public SizeStableLabel(Icon icon) {
     super(icon);
   }
 
   @Override
   public void setText(String text) {
-    settingText = true;
-    try {
+    if (revalidation == null) {
       super.setText(text);
-    } finally {
-      settingText = false;
+    } else {
+      revalidation.setText(() -> super.setText(text));
     }
   }
 
   @Override
   public void revalidate() {
-    if (!settingText) {
-      laidOutSize = null;
-      super.revalidate();
-      return;
-    }
-    Dimension size = getPreferredSize();
-    if (!size.equals(laidOutSize)) {
-      laidOutSize = size;
+    if (revalidation == null || revalidation.allowsRevalidate(this)) {
       super.revalidate();
     }
   }

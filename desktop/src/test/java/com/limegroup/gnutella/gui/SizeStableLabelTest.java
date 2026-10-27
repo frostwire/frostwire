@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.Font;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
@@ -59,6 +60,56 @@ class SizeStableLabelTest {
   @Test
   void textChangeThatResizesTheLabelStillRequestsLayout() throws Exception {
     assertEquals(1, invalidationsAfter("3 @ 1.2 MB/s", "123 @ 1,234.5 MB/s"));
+  }
+
+  /**
+   * A per-second refresh (speeds, ETA, counters) whose text keeps its size must not ask for a
+   * layout: each request invalidates the hierarchy up to the window, whose next validate pass lays
+   * out every tab and ends in a native cursor update.
+   */
+  @Test
+  void repeatedSameSizeUpdatesDoNotRequestLayout() throws Exception {
+    int requests =
+        CountingRepaintManager.layoutRequestsDuring(
+            () -> {
+              JPanel parent = new JPanel();
+              SizeStableLabel label = new SizeStableLabel();
+              label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+              parent.add(label);
+              label.setText("1.0 MB/s");
+              CountingRepaintManager.reset();
+              for (int tick = 0; tick < 100; tick++) {
+                label.setText((tick % 10) + "." + (tick % 7) + " MB/s");
+                label.setText((tick % 10) + "." + (tick % 7) + " MB/s"); // identical repeat
+              }
+            });
+    assertEquals(0, requests);
+  }
+
+  @Test
+  void textChangeThatResizesTheLabelStillRequestsOneLayout() throws Exception {
+    int requests =
+        CountingRepaintManager.layoutRequestsDuring(
+            () -> {
+              JPanel parent = new JPanel();
+              SizeStableLabel label = new SizeStableLabel();
+              label.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+              parent.add(label);
+              label.setText("9 KB/s");
+              CountingRepaintManager.reset();
+              label.setText("10.5 MB/s");
+            });
+    assertEquals(1, requests);
+  }
+
+  /** Drop-in for {@code new JLabel()}: same leading alignment. */
+  @Test
+  void noArgumentLabelIsLeadingAlignedLikeJLabel() throws Exception {
+    SwingUtilities.invokeAndWait(
+        () ->
+            assertEquals(
+                new JLabel().getHorizontalAlignment(),
+                new SizeStableLabel().getHorizontalAlignment()));
   }
 
   /**
