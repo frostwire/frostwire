@@ -24,6 +24,7 @@ import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.RefreshListener;
+import com.limegroup.gnutella.gui.VisibleCardLayout;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import java.awt.*;
@@ -79,7 +80,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
   }
 
   private JPanel createDetailComponentHolder() {
-    detailComponentHolder = new JPanel(new CardLayout());
+    detailComponentHolder = new JPanel(new VisibleCardLayout());
     cardPanelMap = new HashMap<>();
     HashMap<String, JToggleButton> cardButtonMap = new HashMap<>();
     cardButtonMap.put(GENERAL_CARD, generalButton);
