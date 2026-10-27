@@ -32,10 +32,15 @@ public class NativeFileIconController implements FileIconController {
   /** A marker null icon so we don't create a file everytime if the icon can't be found. */
   private final Icon NULL = new ImageIcon();
 
+  /** Marks a file whose icon the view has not cached. */
+  private static final Icon UNCACHED = new ImageIcon();
+
   /**
-   * Runs native lookups requested from the EDT, and the preload. Windows: a background queue
-   * (FileSystemView shell calls run on the JDK's own COM thread and are safe from any thread).
-   * macOS: deferred EDT events, because the Aqua chooser view is confined to the EDT.
+   * Runs native lookups requested from the EDT, and the preload, on a background queue on every
+   * platform: on Windows an uncached icon is a shell COM call, on macOS a LaunchServices call
+   * (CImage.nativeCreateNSImageOfFileFromLaunchServices), on Linux disk I/O. Both views are safe
+   * off the EDT: FileSystemView hands shell calls to the JDK's own COM thread, and SmartChooserView
+   * serializes calls into the chooser's view, which only caches what it looked up.
    */
   private final Executor lookups;
 
@@ -57,9 +62,7 @@ public class NativeFileIconController implements FileIconController {
     this(
         getNativeFileView(),
         UISettings.PRELOAD_NATIVE_ICONS.getValue(),
-        OSUtils.isWindows()
-            ? ExecutorsHelper.newProcessingQueue("IconLoader")
-            : SwingUtilities::invokeLater,
+        newLookupQueue(),
         new BasicFileIconController()::getIconForExtension);
   }
 
@@ -76,6 +79,11 @@ public class NativeFileIconController implements FileIconController {
       VIEW = new DelegateFileView(view);
       if (preloadIcons) preload();
     }
+  }
+
+  /** The single background thread that runs native icon lookups. */
+  static Executor newLookupQueue() {
+    return ExecutorsHelper.newProcessingQueue("IconLoader");
   }
 
   /** Returns true if loading succeeded and the view hasn't screwed up. */
@@ -165,17 +173,21 @@ public class NativeFileIconController implements FileIconController {
    * for the extension of the file.
    *
    * <p>Never does a native lookup on the EDT: tables ask for icons from getValueAt() and while
-   * painting, and on Windows an uncached icon is a COM round-trip into the shell
-   * (Win32ShellFolder2.getIcon) that can block for seconds. An uncached icon requested from the EDT
-   * returns a placeholder and loads in the background; tables pick it up on their next refresh.
+   * painting, and an uncached icon is a COM round-trip into the shell on Windows
+   * (Win32ShellFolder2.getIcon) or a LaunchServices query on macOS, either of which can block for
+   * seconds. An uncached icon requested from the EDT returns a placeholder and loads in the
+   * background; tables pick it up on their next refresh.
    */
   public Icon getIconForFile(File f) {
     if (f == null) return null;
-    if (VIEW.isIconCached(f)) {
-      return VIEW.getIcon(f);
-    }
     if (!SwingUtilities.isEventDispatchThread()) {
       return lookUpIconForFile(f);
+    }
+    // One atomic cache read: checking isIconCached and then calling getIcon could do the native
+    // lookup here if the IconLoader evicted the file in between.
+    Icon cached = VIEW.getCachedIcon(f, UNCACHED);
+    if (cached != UNCACHED) {
+      return cached;
     }
     String extension = FilenameUtils.getExtension(f.getName());
     if (!attempted.contains(f)) {
@@ -292,7 +304,7 @@ public class NativeFileIconController implements FileIconController {
     }
   }
 
-  /** Preloads the icons of the default media types' extensions, never on the EDT on Windows. */
+  /** Preloads the icons of the default media types' extensions, never on the EDT. */
   private void preload() {
     final AtomicBoolean continueLoading = new AtomicBoolean(true);
     for (MediaType type : MediaType.getDefaultMediaTypes()) {
@@ -317,6 +329,15 @@ public class NativeFileIconController implements FileIconController {
 
     /** Removes a file from the cache, if possible. */
     protected abstract boolean removeFromCache(File f);
+
+    /**
+     * Returns the cached icon of the file (which may be null), or {@code uncached} if it isn't
+     * cached. Never does a native lookup; views whose cache can change concurrently override this
+     * to read it atomically.
+     */
+    protected Icon getCachedIcon(File f, Icon uncached) {
+      return isIconCached(f) ? getIcon(f) : uncached;
+    }
 
     /** Determines if this view is working. By default, returns true. */
     boolean isViewAvailable() {
@@ -412,6 +433,11 @@ public class NativeFileIconController implements FileIconController {
       return DELEGATE.isIconCached(f);
     }
 
+    @Override
+    protected Icon getCachedIcon(File f, Icon uncached) {
+      return DELEGATE.getCachedIcon(f, uncached);
+    }
+
     /** Does nothing. */
     @Override
     public boolean removeFromCache(File f) {
@@ -465,6 +491,13 @@ public class NativeFileIconController implements FileIconController {
       return CACHE.containsKey(f);
     }
 
+    @Override
+    protected Icon getCachedIcon(File f, Icon uncached) {
+      synchronized (CACHE) {
+        return CACHE.containsKey(f) ? CACHE.get(f) : uncached;
+      }
+    }
+
     /** Removes the given file from the cache. */
     @Override
     public boolean removeFromCache(File f) {
@@ -473,15 +506,23 @@ public class NativeFileIconController implements FileIconController {
   }
 
   /**
-   * A wrapper around JFileChooser's view that returns true for caching once a file has been looked
-   * up.
+   * A wrapper around JFileChooser's view that caches the icon of each file it looked up, so a
+   * cached icon is returned without asking the chooser's view again.
+   *
+   * <p>On macOS that view (AquaFileView) asks LaunchServices for every icon it doesn't hold, and
+   * holds only the last 256 files: the EDT must never call into it. Its cache is also an
+   * unsynchronized map, so calls into it are serialized.
    */
-  private static class SmartChooserView extends SmartFileView {
-    /** The view this uses. */
+  static class SmartChooserView extends SmartFileView {
+    /** The view this uses; also the lock that serializes calls into it. */
     private final FileView DELEGATE;
 
-    /** A set of the most recently requested Files. */
-    private final Set<File> CACHE = new FixedsizeForgetfulHashSet<>(5000, 1000);
+    /**
+     * The icons of the most recently looked-up files, nulls included. Synchronized: icons are
+     * looked up on the IconLoader thread and read from the EDT.
+     */
+    private final Map<File, Icon> CACHE =
+        Collections.synchronizedMap(new FixedsizeForgetfulHashMap<>(5000));
 
     SmartChooserView(FileView delegate) {
       DELEGATE = delegate;
@@ -489,38 +530,62 @@ public class NativeFileIconController implements FileIconController {
 
     @Override
     public String getDescription(File f) {
-      return DELEGATE.getDescription(f);
+      synchronized (DELEGATE) {
+        return DELEGATE.getDescription(f);
+      }
     }
 
     @Override
     public Icon getIcon(File f) {
-      CACHE.add(f);
-      return DELEGATE.getIcon(f);
+      synchronized (CACHE) {
+        if (CACHE.containsKey(f)) {
+          return CACHE.get(f);
+        }
+      }
+      Icon icon;
+      synchronized (DELEGATE) {
+        icon = DELEGATE.getIcon(f);
+      }
+      CACHE.put(f, icon);
+      return icon;
     }
 
     @Override
     public String getName(File f) {
-      return DELEGATE.getName(f);
+      synchronized (DELEGATE) {
+        return DELEGATE.getName(f);
+      }
     }
 
     @Override
     public String getTypeDescription(File f) {
-      return DELEGATE.getTypeDescription(f);
+      synchronized (DELEGATE) {
+        return DELEGATE.getTypeDescription(f);
+      }
     }
 
     @Override
     public Boolean isTraversable(File f) {
-      return DELEGATE.isTraversable(f);
+      synchronized (DELEGATE) {
+        return DELEGATE.isTraversable(f);
+      }
     }
 
     @Override
     public boolean isIconCached(File f) {
-      return CACHE.contains(f);
+      return CACHE.containsKey(f);
+    }
+
+    @Override
+    protected Icon getCachedIcon(File f, Icon uncached) {
+      synchronized (CACHE) {
+        return CACHE.containsKey(f) ? CACHE.get(f) : uncached;
+      }
     }
 
     @Override
     public boolean removeFromCache(File f) {
-      return CACHE.remove(f);
+      return CACHE.remove(f) != null;
     }
   }
 }

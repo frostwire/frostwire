@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,7 @@ import java.util.function.Function;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -136,6 +138,73 @@ class NativeFileIconControllerTest {
     assertFalse(view.lookedUpOnEdt());
   }
 
+  /**
+   * Icebase 8cba3fde74da, frostwire/frostwire#1320: on macOS lookups were deferred onto the EDT
+   * (invokeLater) instead of the IconLoader thread, so each one still ran LaunchServices there.
+   */
+  @Test
+  void theLookupQueueRunsOffTheEdtOnEveryPlatform() throws Exception {
+    Executor queue = NativeFileIconController.newLookupQueue();
+    AtomicReference<Boolean> onEdt = new AtomicReference<>();
+    CountDownLatch ran = new CountDownLatch(1);
+    queue.execute(
+        () -> {
+          onEdt.set(SwingUtilities.isEventDispatchThread());
+          ran.countDown();
+        });
+    assertTrue(ran.await(10, TimeUnit.SECONDS), "the lookup ran");
+    assertFalse(onEdt.get(), "native icon lookups ran on the EDT");
+  }
+
+  /**
+   * Icebase 8cba3fde74da, frostwire/frostwire#1320: SmartChooserView only remembered which files it
+   * had asked for, so a "cached" icon was fetched again from the chooser's view on the EDT, and
+   * macOS's AquaFileView keeps only 256 files, asking LaunchServices again for the rest.
+   */
+  @Test
+  void chooserViewIconsAreServedFromItsOwnCacheOnTheEdt(@TempDir Path dir) throws Exception {
+    File song = Files.createFile(dir.resolve("song.m4a")).toFile();
+    ForgetfulChooserView chooserView = new ForgetfulChooserView();
+    NativeFileIconController controller =
+        new NativeFileIconController(
+            new NativeFileIconController.SmartChooserView(chooserView),
+            false,
+            loader,
+            PLACEHOLDERS);
+
+    AtomicReference<Icon> icon = new AtomicReference<>();
+    onEdtWithin(2, () -> icon.set(controller.getIconForFile(song)));
+    assertSame(PLACEHOLDER, icon.get());
+    drain(loader);
+    for (int refresh = 0; refresh < 3; refresh++) {
+      onEdtWithin(2, () -> icon.set(controller.getIconForFile(song)));
+      assertSame(chooserView.icon, icon.get(), "the native icon once it is cached");
+    }
+
+    assertEquals(1, chooserView.iconRequests.get(), "one native lookup for the file");
+    assertFalse(chooserView.edt, "native icon lookups ran on the EDT: " + chooserView.threads);
+  }
+
+  /** AquaFileView's file cache is an unsynchronized LinkedHashMap: calls into it are serialized. */
+  @Test
+  void chooserViewLookupsNeverOverlap(@TempDir Path dir) throws Exception {
+    ForgetfulChooserView chooserView = new ForgetfulChooserView();
+    NativeFileIconController.SmartChooserView view =
+        new NativeFileIconController.SmartChooserView(chooserView);
+    ExecutorService callers = Executors.newFixedThreadPool(4);
+    try {
+      for (int i = 0; i < 40; i++) {
+        File f = dir.resolve("file" + i + ".mp3").toFile();
+        callers.execute(() -> view.getIcon(f));
+      }
+    } finally {
+      callers.shutdown();
+    }
+    assertTrue(callers.awaitTermination(10, TimeUnit.SECONDS));
+    assertEquals(40, chooserView.iconRequests.get());
+    assertFalse(chooserView.overlapped, "two threads were inside the chooser's view at once");
+  }
+
   private static void onEdtWithin(int seconds, Runnable r) throws Exception {
     CountDownLatch done = new CountDownLatch(1);
     SwingUtilities.invokeLater(
@@ -207,6 +276,37 @@ class NativeFileIconControllerTest {
     @Override
     public boolean removeFromCache(File file) {
       return cache.remove(file) != null;
+    }
+  }
+
+  /** A chooser FileView like AquaFileView once a file has left its cache: every call is native. */
+  private static final class ForgetfulChooserView extends FileView {
+    private final Icon icon = new ImageIcon();
+    private final AtomicInteger iconRequests = new AtomicInteger();
+    private final AtomicInteger inside = new AtomicInteger();
+    private final List<String> threads = new CopyOnWriteArrayList<>();
+    private volatile boolean edt;
+    private volatile boolean overlapped;
+
+    @Override
+    public Icon getIcon(File file) {
+      if (inside.incrementAndGet() > 1) {
+        overlapped = true;
+      }
+      try {
+        iconRequests.incrementAndGet();
+        threads.add(Thread.currentThread().getName());
+        if (SwingUtilities.isEventDispatchThread()) {
+          edt = true;
+        }
+        Thread.sleep(2);
+        return icon;
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return icon;
+      } finally {
+        inside.decrementAndGet();
+      }
     }
   }
 }
