@@ -46,7 +46,7 @@ class LanguagePanel extends JPanel {
     this.actionListener = actionListener;
     this.languageLabel = new JLabel();
     languageOptions = new JComboBox<>();
-    Font font = new Font("Dialog", Font.PLAIN, 11);
+    Font font = LanguageUtils.LANGUAGE_PICKER_FONT;
     languageOptions.setFont(font);
     Locale[] locales = LanguageUtils.getLocales(font);
     languageOptions.setModel(new DefaultComboBoxModel<>(locales));

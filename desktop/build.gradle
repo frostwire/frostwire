@@ -753,6 +753,7 @@ test {
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.limegroup.gnutella.gui.init.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ImageManipulatorResizeCacheTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.LanguageUtilsDisplayableLocalesTest"
     }
 
     testLogging {

@@ -20,12 +20,14 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.limewire.util.FileUtils;
@@ -45,6 +47,16 @@ public class LanguageUtils {
    * preloadLocales() on a background thread.
    */
   private static volatile Locale[] cachedLocales = null;
+
+  /** Font of the language pickers (setup wizard and language window). */
+  public static final Font LANGUAGE_PICKER_FONT = new Font("Dialog", Font.PLAIN, 11);
+
+  /**
+   * Locales whose names a font can display, by font. Checking a name in a script the font lacks
+   * walks the platform's fallback fonts (loading and parsing font files on Windows), so it is done
+   * once, off the EDT, by {@link #preloadLocales()}.
+   */
+  private static final Map<Font, Locale[]> DISPLAYABLE_LOCALES = new ConcurrentHashMap<>();
 
   /**
    * Pre-loads all available locales to avoid EDT violations. This method should be called early
@@ -69,6 +81,17 @@ public class LanguageUtils {
     locales.add(0, Locale.ENGLISH);
 
     cachedLocales = locales.toArray(new Locale[0]);
+    if (!OSUtils.isMacOSX()) {
+      // Most startups never show a language picker: check in the background, not on startup's path.
+      DesktopParallelExecutor.execute(
+          () -> {
+            try {
+              displayableLocales(LANGUAGE_PICKER_FONT);
+            } catch (Throwable t) {
+              LOG.warn("Could not check which languages the picker font can display", t);
+            }
+          });
+    }
   }
 
   /** Applies this language code to be the new language of the program. */
@@ -111,18 +134,26 @@ public class LanguageUtils {
       locales = localeList.toArray(new Locale[0]);
     }
 
-    // Filter by font capability if needed (this is fast)
     if (font != null && !OSUtils.isMacOSX()) {
-      List<Locale> filtered = new LinkedList<>();
-      for (Locale locale : locales) {
-        if (GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
-          filtered.add(locale);
-        }
-      }
-      return filtered.toArray(new Locale[0]);
+      return cachedLocales != null ? displayableLocales(font) : displayable(locales, font);
     }
 
     return locales;
+  }
+
+  /** The preloaded locales {@code font} can display, checked once per font. */
+  static Locale[] displayableLocales(Font font) {
+    return DISPLAYABLE_LOCALES.computeIfAbsent(font, f -> displayable(cachedLocales, f)).clone();
+  }
+
+  private static Locale[] displayable(Locale[] locales, Font font) {
+    List<Locale> filtered = new ArrayList<>();
+    for (Locale locale : locales) {
+      if (GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
+        filtered.add(locale);
+      }
+    }
+    return filtered.toArray(new Locale[0]);
   }
 
   /** Returns the languages as found from the classpath in messages.jar */
