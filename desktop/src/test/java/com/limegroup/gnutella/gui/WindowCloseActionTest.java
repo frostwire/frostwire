@@ -54,9 +54,13 @@ class WindowCloseActionTest {
   }
 
   @Test
-  void minimizeToTrayWithoutATrayKeepsTheWindowAndDoesNotSave() {
-    WindowCloseAction action = WindowCloseAction.decide(true, false, false, true);
-    assertEquals(WindowCloseAction.NONE, action);
-    assertFalse(action.savesSettingsInBackground());
+  void minimizeToTrayWithoutATrayMinimizesAndSavesInTheBackground() {
+    for (boolean mac : new boolean[] {false, true}) {
+      for (boolean fromFrame : new boolean[] {false, true}) {
+        WindowCloseAction action = WindowCloseAction.decide(true, false, mac, fromFrame);
+        assertEquals(WindowCloseAction.MINIMIZE, action);
+        assertTrue(action.savesSettingsInBackground());
+      }
+    }
   }
 }

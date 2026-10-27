@@ -457,7 +457,8 @@ public final class GUIMediator {
       case SHUTDOWN:
         shutdown();
         break;
-      case NONE:
+      case MINIMIZE:
+        getAppFrame().setExtendedState(getAppFrame().getExtendedState() | Frame.ICONIFIED);
         break;
     }
     if (action.savesSettingsInBackground()) {

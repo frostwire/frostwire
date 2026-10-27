@@ -20,8 +20,11 @@ enum WindowCloseAction {
   HIDE_WINDOW(true),
   /** Exit; the shutdown thread saves the settings. */
   SHUTDOWN(false),
-  /** Minimize to tray was chosen but no tray icon is available; nothing happens. */
-  NONE(false);
+  /**
+   * Minimize to tray was chosen but no tray icon is available: minimize the window instead, so the
+   * close button still does something and the app keeps running.
+   */
+  MINIMIZE(true);
 
   private final boolean savesSettingsInBackground;
 
@@ -36,7 +39,7 @@ enum WindowCloseAction {
   static WindowCloseAction decide(
       boolean minimizeToTray, boolean trayUsable, boolean macOSX, boolean fromFrame) {
     if (minimizeToTray) {
-      return trayUsable ? HIDE_TO_TRAY : NONE;
+      return trayUsable ? HIDE_TO_TRAY : MINIMIZE;
     }
     if (macOSX && fromFrame) {
       // On macOS the close button hides the window; the app keeps running until Quit.
