@@ -24,8 +24,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -184,12 +186,68 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     _activeColumn = -1;
   }
 
-  /** Implementation of resorting. */
+  /**
+   * Implementation of resorting. Sorts a snapshot outside {@link #_listLock}: each line's sort key
+   * is read once (a key can be costly, such as an icon lookup), the keys are compared without the
+   * lock, and only the reorder is done under it, so the EDT never waits on a running sort. Lines
+   * added while sorting are placed by key, and lines removed while sorting stay removed.
+   */
   protected void doResort() {
+    final int column = _activeColumn;
+    final int ascending = _ascending;
+    if (column < 0) {
+      return;
+    }
+    List<T> snapshot;
     synchronized (_listLock) {
-      _list.sort(pinnedComparator());
+      snapshot = new ArrayList<>(_list);
+    }
+    List<SortEntry<T>> sorted = new ArrayList<>(snapshot.size());
+    for (T line : snapshot) {
+      sorted.add(new SortEntry<>(line, sortKey(line, column)));
+    }
+    Comparator<SortEntry<T>> byKey = (a, b) -> compareSortKeys(a.key, b.key, ascending);
+    sorted.sort(byKey);
+    synchronized (_listLock) {
+      if (sameLines(snapshot, _list)) {
+        for (int i = 0; i < sorted.size(); i++) {
+          _list.set(i, sorted.get(i).line);
+        }
+        return;
+      }
+      Set<T> current = Collections.newSetFromMap(new IdentityHashMap<>());
+      current.addAll(_list);
+      Set<T> before = Collections.newSetFromMap(new IdentityHashMap<>());
+      before.addAll(snapshot);
+      sorted.removeIf(entry -> !current.contains(entry.line));
+      for (T line : _list) {
+        if (!before.contains(line)) {
+          SortEntry<T> entry = new SortEntry<>(line, sortKey(line, column));
+          int at = Collections.binarySearch(sorted, entry, byKey);
+          sorted.add(at < 0 ? -(at + 1) : at + 1, entry);
+        }
+      }
+      _list.clear();
+      for (SortEntry<T> entry : sorted) {
+        _list.add(entry.line);
+      }
     }
   }
+
+  private static boolean sameLines(List<?> a, List<?> b) {
+    if (a.size() != b.size()) {
+      return false;
+    }
+    for (int i = 0; i < a.size(); i++) {
+      if (a.get(i) != b.get(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** A line and its sort key, read once per sort. */
+  private record SortEntry<T>(T line, Object key) {}
 
   /*
    * Determines whether or not the active column is dynamic
@@ -647,17 +705,24 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     return (a, b) -> compare(a, b, column, ascending);
   }
 
-  /**
-   * Compares two lines by the given column and direction. Subclasses customizing the sort order
-   * override this, using the arguments rather than the live sort fields.
-   */
-  protected int compare(T a, T b, int column, int ascending) {
+  /** Compares two lines by the given column and direction. */
+  protected final int compare(T a, T b, int column, int ascending) {
     if (column < 0) {
       return 0;
     }
-    Object o1 = a.getValueAt(column);
-    Object o2 = b.getValueAt(column);
-    return AbstractTableMediator.compare(o1, o2) * ascending;
+    return compareSortKeys(sortKey(a, column), sortKey(b, column), ascending);
+  }
+
+  /**
+   * The value a line sorts by in the given column. Subclasses customizing the sort order override
+   * this; a background sort reads it once per line, without holding the list lock.
+   */
+  protected Object sortKey(T line, int column) {
+    return line.getValueAt(column);
+  }
+
+  private static int compareSortKeys(Object a, Object b, int ascending) {
+    return AbstractTableMediator.compare(a, b) * ascending;
   }
 
   /** Returns the LimeTableColumn at the specific column this data line. */

@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import java.util.HashMap;
@@ -61,24 +60,22 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
   }
 
   /**
-   * Overrides default compare to move spam results to the bottom, or to change the 'count' compare
-   * to use different values for multicast or secure results.
+   * Sorts the Type column by file extension (its value is an icon), the count column by seeds, and
+   * the size column by the raw byte count.
    */
   @Override
-  protected int compare(
-      SearchResultDataLine ta, SearchResultDataLine tb, int column, int ascending) {
-    // super.compare() will only sort Comparables and Strings.
-    // since the Type column returns an Icon, we compare by hand using the file extension.
+  protected Object sortKey(SearchResultDataLine line, int column) {
     if (column == SearchTableColumns.TYPE_IDX) {
-      return AbstractTableMediator.compare(ta.getExtension(), tb.getExtension()) * ascending;
+      return line.getExtension();
     }
     if (column == SearchTableColumns.COUNT_IDX) {
-      return compareSeeds(ta, tb, ascending);
+      Integer seeds = line.getSeedsAsInteger();
+      return seeds == null ? 0 : seeds;
     }
     if (column == SearchTableColumns.SIZE_IDX) {
-      return Long.compare(ta.getSize(), tb.getSize()) * ascending;
+      return line.getSize();
     }
-    return super.compare(ta, tb, column, ascending);
+    return super.sortKey(line, column);
   }
 
   /**
@@ -195,12 +192,6 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
   private String getHash(int idx) {
     if (idx >= getRowCount()) return null;
     return get(idx).getHash();
-  }
-
-  private int compareSeeds(SearchResultDataLine a, SearchResultDataLine b, int ascending) {
-    Integer aSeeds = a.getSeedsAsInteger();
-    Integer bSeeds = b.getSeedsAsInteger();
-    return Integer.compare(aSeeds == null ? 0 : aSeeds, bSeeds == null ? 0 : bSeeds) * ascending;
   }
 
   /** Fast match -- lookup in the table. */
