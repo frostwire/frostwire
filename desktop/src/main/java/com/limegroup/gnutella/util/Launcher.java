@@ -192,7 +192,11 @@ public final class Launcher {
         });
   }
 
-  /** Launches the Finder and selects the given File */
+  /**
+   * Launches the Finder and selects the given File. The path is passed to the script as an
+   * argument, never spliced into its source: file names come from torrents, and a name containing a
+   * double quote could otherwise close the AppleScript string and run its own commands.
+   */
   private static String[] selectFileCommand(File file) {
     String path = null;
     try {
@@ -203,9 +207,9 @@ public final class Launcher {
     return new String[] {
       "osascript",
       "-e",
-      "set unixPath to \"" + path + "\"",
+      "on run argv",
       "-e",
-      "set hfsPath to POSIX file unixPath",
+      "set hfsPath to POSIX file (item 1 of argv)",
       "-e",
       "tell application \"Finder\"",
       "-e",
@@ -213,7 +217,10 @@ public final class Launcher {
       "-e",
       "select hfsPath",
       "-e",
-      "end tell"
+      "end tell",
+      "-e",
+      "end run",
+      path
     };
   }
 }
