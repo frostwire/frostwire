@@ -747,6 +747,7 @@ test {
         includeTestsMatching "com.frostwire.gui.library.LibraryActionsHolderTest"
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
+        includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
     }
 
     testLogging {

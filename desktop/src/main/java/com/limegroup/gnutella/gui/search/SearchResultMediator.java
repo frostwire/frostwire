@@ -24,6 +24,7 @@ import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
 import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.gui.searchfield.GoogleSearchField;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
@@ -681,7 +682,7 @@ public final class SearchResultMediator
     browseAll.setForeground(Color.WHITE);
     browseAll.setOpaque(true);
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> browseAll.setFont(new Font("Helvetica", Font.BOLD, 12)));
+    SwingUtilities.invokeLater(() -> browseAll.setFont(PlatformFonts.sansSerif(Font.BOLD, 12)));
     browseAll.setBorder(new EmptyBorder(5, 20, 5, 20));
     browseAll.addMouseListener(
         new MouseAdapter() {
@@ -700,7 +701,7 @@ public final class SearchResultMediator
     browseAll.setForeground(Color.WHITE);
     browseAll.setOpaque(true);
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> browseAll.setFont(new Font("Helvetica", Font.BOLD, 12)));
+    SwingUtilities.invokeLater(() -> browseAll.setFont(PlatformFonts.sansSerif(Font.BOLD, 12)));
     browseAll.setBorder(new EmptyBorder(5, 20, 5, 20));
     browseAll.addMouseListener(
         new MouseAdapter() {

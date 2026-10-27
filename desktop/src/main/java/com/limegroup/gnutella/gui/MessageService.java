@@ -1,5 +1,6 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.service.Switch;
 import java.awt.*;
@@ -61,7 +62,7 @@ public final class MessageService {
           editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
           editorPane.setEditable(false);
           editorPane.setOpaque(false);
-          editorPane.setFont(new Font("Arial", Font.PLAIN, 12));
+          editorPane.setFont(PlatformFonts.sansSerif(Font.PLAIN, 12));
           editorPane.setContentType("text/html");
           editorPane.addHyperlinkListener(
               e -> {

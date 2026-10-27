@@ -19,6 +19,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
@@ -203,7 +204,7 @@ public class ShareTorrentDialog extends JDialog {
     feedbackLabel = new JLabel(I18n.tr("Feedback here to clipboard"));
     feedbackLabel.setVisible(false);
     // Defer font loading to avoid EDT violation
-    SwingUtilities.invokeLater(() -> feedbackLabel.setFont(new Font("Arial", Font.BOLD, 14)));
+    SwingUtilities.invokeLater(() -> feedbackLabel.setFont(PlatformFonts.sansSerif(Font.BOLD, 14)));
     glass.add(feedbackLabel);
     feedbackLabel.setBounds(100, 100, 300, 20);
     addEscapeKeyListener();
@@ -227,7 +228,7 @@ public class ShareTorrentDialog extends JDialog {
       JButton buttonAtIndex = buttonRow.getButtonAtIndex(i);
       // Defer font loading to avoid EDT violation
       SwingUtilities.invokeLater(
-          () -> buttonAtIndex.setFont(new Font("Lucida Grande", Font.BOLD, 16)));
+          () -> buttonAtIndex.setFont(PlatformFonts.sansSerif(Font.BOLD, 16)));
     }
   }
 

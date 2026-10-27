@@ -20,6 +20,7 @@ package com.frostwire.gui.tabs;
 
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
@@ -165,7 +166,7 @@ public final class TransfersTab extends AbstractTab {
     SwingUtilities.invokeLater(
         () -> {
           filterText.setText(FILTER_TEXT_HINT);
-          filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
+          filterText.setFont(PlatformFonts.sansSerif(Font.PLAIN, 12));
           filterText.setForeground(Color.GRAY);
           filterText.addMouseListener(new TextFilterMouseAdapter());
           filterText.addKeyListener(new TextFilterKeyAdapter());
@@ -191,10 +192,10 @@ public final class TransfersTab extends AbstractTab {
         new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
     filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
     filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
-    final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
+    final Font smallFont = PlatformFonts.sansSerif(Font.PLAIN, 12);
     final Dimension buttonDimension = new Dimension(115, 28);
     applyFontAndDimensionToButtons(
-        smallHelvetica,
+        smallFont,
         buttonDimension,
         filterAllButton,
         filterDownloadingButton,

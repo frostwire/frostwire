@@ -25,6 +25,7 @@ import com.frostwire.gui.searchfield.GoogleSearchField;
 import com.frostwire.gui.searchfield.SearchField;
 import com.frostwire.gui.tabs.LibraryTab;
 import com.frostwire.gui.tabs.Tab;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.frostwire.gui.theme.SkinApplicationHeaderUI;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.gui.updates.UpdateMediator;
@@ -210,7 +211,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
       }
       AbstractButton button = createTabButton(tabs.get(t));
       // Defer font loading to avoid EDT violation
-      SwingUtilities.invokeLater(() -> button.setFont(new Font("Helvetica", Font.BOLD, 10)));
+      SwingUtilities.invokeLater(() -> button.setFont(PlatformFonts.sansSerif(Font.BOLD, 10)));
       button.addActionListener(
           new ActionListener() {
             @Override

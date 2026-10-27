@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import java.awt.*;
@@ -54,7 +55,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
     JLabel label1 = new JLabel(I18n.tr("Min speed"));
     JLabel label2 = new JLabel(I18n.tr("Max speed"));
-    Font font = new Font("Helvetica", Font.BOLD, 10);
+    Font font = PlatformFonts.sansSerif(Font.BOLD, 10);
     label1.setFont(font);
     label2.setFont(font);
     labelTable.put(1, label1);

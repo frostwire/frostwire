@@ -20,6 +20,7 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.gui.theme.PlatformFonts;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.RefreshListener;
@@ -69,7 +70,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     SwingUtilities.invokeLater(
         () -> {
           hideLink.setText("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
-          hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13));
+          hideLink.setFont(PlatformFonts.sansSerif(Font.PLAIN, 13));
         });
     add(labelAndLink, "left, gapleft 10px, growx");
     add(createDetailSwitcherButtons(), "push, right, wrap");
@@ -151,10 +152,10 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     // Defer font loading and dimension setting to avoid EDT violation
     SwingUtilities.invokeLater(
         () -> {
-          final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 11);
+          final Font smallFont = PlatformFonts.sansSerif(Font.PLAIN, 11);
           final Dimension buttonDimension = new Dimension(80, 24);
           applyFontAndDimensionToFilterToggleButtons(
-              smallHelvetica,
+              smallFont,
               buttonDimension,
               generalButton,
               filesButton,
