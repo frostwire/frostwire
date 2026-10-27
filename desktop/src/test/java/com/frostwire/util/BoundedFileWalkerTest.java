@@ -102,6 +102,51 @@ class BoundedFileWalkerTest {
   }
 
   @Test
+  void cancelStopsTheWalkAndEveryEnteredDirectoryIsLeft() throws Exception {
+    Path sub = Files.createDirectories(tmp.resolve("sub"));
+    for (int i = 0; i < 20; i++) {
+      Files.createFile(sub.resolve("f" + i));
+    }
+    List<Path> left = new ArrayList<>();
+    int[] seen = {0};
+
+    boolean complete =
+        BoundedFileWalker.walk(
+            tmp.toFile(),
+            new BoundedFileWalker.Visitor() {
+              @Override
+              public void file(Path file, BasicFileAttributes attrs) {
+                seen[0]++;
+              }
+
+              @Override
+              public void leaveDirectory(Path dir) {
+                left.add(dir);
+              }
+            });
+    assertTrue(complete);
+    assertEquals(List.of(sub, tmp), left);
+
+    seen[0] = 0;
+    complete =
+        BoundedFileWalker.walk(
+            tmp.toFile(),
+            new BoundedFileWalker.Visitor() {
+              @Override
+              public void file(Path file, BasicFileAttributes attrs) {
+                seen[0]++;
+              }
+
+              @Override
+              public boolean isCanceled() {
+                return seen[0] >= 5;
+              }
+            });
+    assertFalse(complete);
+    assertEquals(5, seen[0]);
+  }
+
+  @Test
   void excludedDirectoriesAndMissingRootsAreSkipped() throws Exception {
     Path keep = Files.createFile(tmp.resolve("keep.mp3"));
     Path skipped = Files.createDirectories(tmp.resolve("skipped"));

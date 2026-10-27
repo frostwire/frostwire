@@ -21,6 +21,7 @@ package com.frostwire.gui.library;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.util.BoundedFileWalker;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -39,6 +40,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -47,7 +50,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.*;
-import org.limewire.util.FileUtils;
 
 /**
  * @author gubatron
@@ -452,31 +454,46 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
       if (getSelectedDirectoryHolder() == null) {
         selectMediaTypeSavedFilesDirectoryHolderbyType(_mtsfdh.getMediaType());
       }
-      List<File> directories = new ArrayList<>();
-      final List<File> files = new ArrayList<>();
-      for (File child : FileUtils.listFiles(file)) { // file.listFiles()) {
-        DirectoryHolder directoryHolder = getSelectedDirectoryHolder();
-        if (!_mtsfdh.equals(directoryHolder)) {
-          return;
-        }
-        if (ignore.contains(child)) {
-          continue;
-        }
-        if (child.isHidden()) {
-          continue;
-        }
-        if (child.isDirectory() && !exludedSubFolders.contains(child)) {
-          directories.add(child);
-        } else if (_mtsfdh.accept(child)) {
-          files.add(child);
-        }
-      }
-      _mtsfdh.addToCache(files);
-      Runnable r = () -> LibraryMediator.instance().addFilesToLibraryTable(files);
-      GUIMediator.safeInvokeLater(r);
-      for (File directory : directories) {
-        search(directory, ignore, exludedSubFolders);
-      }
+      File root = file.getAbsoluteFile();
+      // Bounded: symlinked folders are not entered and the walk is capped, so a symlink loop
+      // can't recurse forever while filling the cache (frostwire/frostwire#1336).
+      BoundedFileWalker.walk(
+          root,
+          new BoundedFileWalker.Visitor() {
+            private List<File> files = new ArrayList<>();
+
+            @Override
+            public boolean isCanceled() {
+              return !_mtsfdh.equals(getSelectedDirectoryHolder());
+            }
+
+            @Override
+            public boolean enterDirectory(Path dir) {
+              File d = dir.toFile();
+              return d.equals(root)
+                  || (!ignore.contains(d) && !d.isHidden() && !exludedSubFolders.contains(d));
+            }
+
+            @Override
+            public void file(Path path, BasicFileAttributes attrs) {
+              File f = path.toFile();
+              if (!ignore.contains(f) && !f.isHidden() && _mtsfdh.accept(f)) {
+                files.add(f);
+              }
+            }
+
+            @Override
+            public void leaveDirectory(Path dir) {
+              if (files.isEmpty()) {
+                return;
+              }
+              final List<File> batch = files;
+              files = new ArrayList<>();
+              _mtsfdh.addToCache(batch);
+              GUIMediator.safeInvokeLater(
+                  () -> LibraryMediator.instance().addFilesToLibraryTable(batch));
+            }
+          });
     }
   }
 

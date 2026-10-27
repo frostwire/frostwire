@@ -55,6 +55,14 @@ public final class BoundedFileWalker {
      * resolves to.
      */
     void file(Path file, BasicFileAttributes attrs);
+
+    /** Called after everything under an entered directory was visited. */
+    default void leaveDirectory(Path dir) {}
+
+    /** Checked before each entry; returning true stops the walk. */
+    default boolean isCanceled() {
+      return false;
+    }
   }
 
   private BoundedFileWalker() {}
@@ -67,7 +75,8 @@ public final class BoundedFileWalker {
   /**
    * Walks {@code root}, reporting regular files to {@code visitor}. Unreadable entries are skipped.
    *
-   * @return true if the whole tree was walked, false if it stopped at {@code maxEntries}
+   * @return true if the whole tree was walked, false if it stopped at {@code maxEntries} or was
+   *     canceled
    */
   public static boolean walk(File root, int maxEntries, int maxDepth, Visitor visitor) {
     if (root == null) {
@@ -93,7 +102,7 @@ public final class BoundedFileWalker {
               + maxEntries
               + " entries; results are incomplete");
     }
-    return !walk.truncated;
+    return !walk.truncated && !walk.canceled;
   }
 
   private static final class Walk extends SimpleFileVisitor<Path> {
@@ -102,6 +111,7 @@ public final class BoundedFileWalker {
     private final Visitor visitor;
     private int entries;
     private boolean truncated;
+    private boolean canceled;
 
     Walk(Path start, int maxEntries, Visitor visitor) {
       this.start = start;
@@ -109,7 +119,12 @@ public final class BoundedFileWalker {
       this.visitor = visitor;
     }
 
+    /** Counts one entry; true when the walk must stop because it is canceled or over budget. */
     private boolean overBudget() {
+      if (visitor.isCanceled()) {
+        canceled = true;
+        return true;
+      }
       if (++entries > maxEntries) {
         truncated = true;
         return true;
@@ -137,6 +152,12 @@ public final class BoundedFileWalker {
       if (attrs.isRegularFile()) {
         visitor.file(file, attrs);
       }
+      return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+      visitor.leaveDirectory(dir);
       return FileVisitResult.CONTINUE;
     }
 
