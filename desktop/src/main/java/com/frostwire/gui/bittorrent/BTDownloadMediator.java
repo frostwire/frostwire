@@ -896,54 +896,78 @@ public final class BTDownloadMediator
               if (seedDataFile.exists()) {
                 saveDir = torrentFile.getParentFile();
               }
-
-              // Ensure the .torrent exists under the configured Torrents directory
-              File torrentToUse = torrentFile;
-              try {
-                File torrentsDir =
-                    com.limegroup.gnutella.settings.SharingSettings.TORRENTS_DIR_SETTING.getValue();
-                if (torrentsDir != null) {
-                  if (!torrentsDir.exists()) {
-                    // noinspection ResultOfMethodCallIgnored
-                    torrentsDir.mkdirs();
-                  }
-                  File parent = torrentFile.getParentFile();
-                  // If the .torrent is outside the configured torrentsDir, copy it there
-                  if (parent == null || !torrentsDir.equals(parent)) {
-                    File target = new File(torrentsDir, torrentFile.getName());
-                    try {
-                      java.nio.file.Files.copy(
-                          torrentFile.toPath(),
-                          target.toPath(),
-                          java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                      torrentToUse = target;
-                    } catch (Throwable ignored) {
-                      // fall back to original file if copy fails
-                      torrentToUse = torrentFile;
-                    }
-                  }
-                }
-              } catch (Throwable ignored) {
-                // best effort only
-              }
-
-              if (saveDir == null) {
-                BTEngine.getInstance().download(torrentToUse, saveDirFromDialog, filesSelection);
-              } else {
-                GUIMediator.instance().openTorrentForSeed(torrentToUse, saveDir);
-              }
+              // Copying the .torrent and adding it to the session are disk and libtorrent work,
+              // and getting the engine waits until startup has set it up: never on the EDT
+              // (Icebase #57095c0f3115).
+              final File finalSaveDir = saveDir;
+              final File finalSaveDirFromDialog = saveDirFromDialog;
+              final boolean[] finalFilesSelection = filesSelection;
+              BackgroundQueuedExecutorService.schedule(
+                  () ->
+                      addOpenedTorrentFile(
+                          torrentFile, finalSaveDir, finalSaveDirFromDialog, finalFilesSelection));
             } catch (Exception e) {
-              LOG.error(e.toString(), e);
-              if (!e.toString().contains("No files selected by user")) {
-                // could not read torrent file or bad torrent file.
-                GUIMediator.showError(
-                    I18n.tr(
-                        "FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                        torrentFile.getName()),
-                    QuestionsHandler.TORRENT_OPEN_FAILURE);
-              }
+              reportTorrentOpenFailure(torrentFile, e);
             }
           });
+    }
+  }
+
+  /** Background half of {@link #openTorrentFile}: never call it on the EDT. */
+  private void addOpenedTorrentFile(
+      File torrentFile, File saveDir, File saveDirFromDialog, boolean[] filesSelection) {
+    try {
+      // Ensure the .torrent exists under the configured Torrents directory
+      File torrentToUse = torrentFile;
+      try {
+        File torrentsDir =
+            com.limegroup.gnutella.settings.SharingSettings.TORRENTS_DIR_SETTING.getValue();
+        if (torrentsDir != null) {
+          if (!torrentsDir.exists()) {
+            // noinspection ResultOfMethodCallIgnored
+            torrentsDir.mkdirs();
+          }
+          File parent = torrentFile.getParentFile();
+          // If the .torrent is outside the configured torrentsDir, copy it there
+          if (parent == null || !torrentsDir.equals(parent)) {
+            File target = new File(torrentsDir, torrentFile.getName());
+            try {
+              java.nio.file.Files.copy(
+                  torrentFile.toPath(),
+                  target.toPath(),
+                  java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+              torrentToUse = target;
+            } catch (Throwable ignored) {
+              // fall back to original file if copy fails
+              torrentToUse = torrentFile;
+            }
+          }
+        }
+      } catch (Throwable ignored) {
+        // best effort only
+      }
+
+      if (saveDir == null) {
+        BTEngine.getInstance().download(torrentToUse, saveDirFromDialog, filesSelection);
+      } else {
+        final File seedTorrent = torrentToUse;
+        GUIMediator.safeInvokeLater(
+            () -> GUIMediator.instance().openTorrentForSeed(seedTorrent, saveDir));
+      }
+    } catch (Exception e) {
+      GUIMediator.safeInvokeLater(() -> reportTorrentOpenFailure(torrentFile, e));
+    }
+  }
+
+  private static void reportTorrentOpenFailure(File torrentFile, Exception e) {
+    LOG.error(e.toString(), e);
+    if (!e.toString().contains("No files selected by user")) {
+      // could not read torrent file or bad torrent file.
+      GUIMediator.showError(
+          I18n.tr(
+              "FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+              torrentFile.getName()),
+          QuestionsHandler.TORRENT_OPEN_FAILURE);
     }
   }
 
