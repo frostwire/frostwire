@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import com.limegroup.gnutella.gui.util.CoalescingBackgroundSave;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -35,6 +37,10 @@ import javax.swing.table.TableColumnModel;
  */
 public class DefaultColumnPreferenceHandler
     implements ColumnPreferenceHandler, TableColumnModelListener, MouseListener {
+  private static final CoalescingBackgroundSave TABLES_SAVE =
+      new CoalescingBackgroundSave(
+          () -> TablesHandlerSettings.instance().save(), DesktopParallelExecutor::execute);
+
   /** The table that this is storing the column preferences for. */
   protected final LimeJTable table;
 
@@ -278,7 +284,7 @@ public class DefaultColumnPreferenceHandler
         }
       }
     }
-    if (changed) TablesHandlerSettings.instance().save();
+    if (changed) save();
     startListening();
   }
 
@@ -312,8 +318,12 @@ public class DefaultColumnPreferenceHandler
     startListening();
   }
 
+  /**
+   * Writes tables.props off the EDT. Column moves fire once per index crossed while the user drags
+   * a header, so a burst collapses into at most two writes.
+   */
   protected void save() {
-    TablesHandlerSettings.instance().save();
+    TABLES_SAVE.request();
   }
 
   private void startListening() {
