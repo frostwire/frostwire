@@ -767,6 +767,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.LanguageUtilsDisplayableLocalesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.CoalescingBackgroundSaveTest"
         includeTestsMatching "com.limegroup.gnutella.gui.WindowCloseActionTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"
     }
 
     testLogging {

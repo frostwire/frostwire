@@ -26,31 +26,46 @@ final class Finalizer {
     ShutdownWindow window = new ShutdownWindow();
     GUIUtils.centerOnScreen(window);
     window.setVisible(true);
-    // remove any user notification icons
-    NotifyUserProxy.instance().hideTrayIcon();
     // Do shutdown stuff in another thread.
     // We don't want to lockup the event thread
     // (which this was called on).
+    startShutdownThread(
+        // Removing the tray icon is a native call that stalled the EDT, so it runs first on the
+        // shutdown thread.
+        () -> NotifyUserProxy.instance().hideTrayIcon(),
+        () -> {
+          VPNStatusRefresher.getInstance().shutdown();
+          SearchMediator.instance().shutdown();
+          LimeWireCore.instance().getLifecycleManager().shutdown(null);
+        },
+        () -> System.exit(0));
+  }
+
+  /**
+   * Starts the "Shutdown Thread": removes the tray icon, shuts the core down, then exits, even if
+   * one of the first two steps fails.
+   */
+  static Thread startShutdownThread(Runnable removeTrayIcon, Runnable shutdownCore, Runnable exit) {
     Thread shutdown =
-        new Thread("Shutdown Thread") {
-          public void run() {
-            try {
-              LOG.info("Shutdown thread started");
-              VPNStatusRefresher.getInstance().shutdown();
-              // LOG.info("SearchMediator shutting down...");
-              SearchMediator.instance().shutdown();
-              // LOG.info("MediaPlayer stopping...");
-              // Media player instance removed
-              // LOG.info("Shutting down [updateCommand=" + toExecute + "]");
-              LimeWireCore.instance().getLifecycleManager().shutdown(null);
-              LOG.info("System exit");
-              System.exit(0);
-            } catch (Throwable t) {
-              t.printStackTrace();
-              System.exit(0);
-            }
-          }
-        };
+        new Thread(
+            () -> {
+              try {
+                LOG.info("Shutdown thread started");
+                try {
+                  removeTrayIcon.run();
+                } catch (Throwable t) {
+                  LOG.warn("Unable to remove the tray icon", t);
+                }
+                shutdownCore.run();
+                LOG.info("System exit");
+              } catch (Throwable t) {
+                t.printStackTrace();
+              } finally {
+                exit.run();
+              }
+            },
+            "Shutdown Thread");
     shutdown.start();
+    return shutdown;
   }
 }
