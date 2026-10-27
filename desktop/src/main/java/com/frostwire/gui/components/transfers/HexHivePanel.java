@@ -101,6 +101,9 @@ public class HexHivePanel extends JPanel implements Scrollable {
 
   private int bitmapWindowHeight;
 
+  /** Bumped whenever the backing window is reallocated or moved, guarded by bitmapLock. */
+  private int bitmapWindowGeneration;
+
   /** Height of the backing window in viewports, leaves room for the scroll look-ahead renders. */
   private static final int BACKING_WINDOW_VIEWPORTS = 2;
 
@@ -450,6 +453,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
   void clearRenderCache() {
     synchronized (bitmapLock) {
       bitmap = null;
+      bitmapWindowGeneration++;
       renderedArea.reset();
     }
     synchronized (renderLock) {
@@ -745,6 +749,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
         bitmapLayout = snapshot;
         bitmapOriginY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
         bitmapWindowHeight = windowHeight;
+        bitmapWindowGeneration++;
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, deviceWidth, deviceHeight);
@@ -800,6 +805,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
     bitmap = target;
     bitmapOriginY = originY;
     bitmapWindowHeight = windowHeight;
+    bitmapWindowGeneration++;
     renderedArea.intersect(new Area(new Rectangle(0, originY, snapshot.width, windowHeight)));
   }
 
@@ -882,6 +888,10 @@ public class HexHivePanel extends JPanel implements Scrollable {
       DrawingProperties drawingProperties,
       Rectangle renderBounds,
       boolean prioritizeLatency) {
+    final int windowGeneration;
+    synchronized (bitmapLock) {
+      windowGeneration = bitmapWindowGeneration;
+    }
     int[] rowRange = getRowRangeForBounds(drawingProperties, renderBounds);
     int firstRow = rowRange[0];
     int lastRow = rowRange[1];
@@ -927,6 +937,19 @@ public class HexHivePanel extends JPanel implements Scrollable {
       if (!mergeBatchBitmap(batchBitmap, drawingProperties, deviceX, deviceY, mergeBounds)) {
         // the layout changed meanwhile, its own render is queued
         return;
+      }
+    }
+    synchronized (bitmapLock) {
+      // The batches only cover the rows' cubes. The padding around them is already background,
+      // count it as rendered too, or the visible area never looks covered and every paint queues
+      // yet another render. Only valid if the window didn't move while the batches were merged.
+      if (bitmapWindowGeneration == windowGeneration
+          && bitmapLayout != null
+          && bitmapLayout.hasSameLayout(drawingProperties)) {
+        renderedArea.add(
+            new Area(
+                renderBounds.intersection(
+                    new Rectangle(0, bitmapOriginY, drawingProperties.width, bitmapWindowHeight))));
       }
     }
   }

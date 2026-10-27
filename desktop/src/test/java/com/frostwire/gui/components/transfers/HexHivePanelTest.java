@@ -282,6 +282,30 @@ class HexHivePanelTest {
     return copy;
   }
 
+  @Test
+  void paintingARenderedHiveQueuesNoMoreRenders() throws Exception {
+    HexHivePanel panel = newPanel();
+    viewportFor(panel, 600, 300, adapter(3000));
+    settle(panel);
+    // the padding left of and above the cubes is part of the visible area too
+    Rectangle visible =
+        panel
+            .getVisibleRect()
+            .intersection(
+                new Rectangle(0, 0, (int) get(get(panel, "drawingProperties"), "width"), 10_000));
+    assertTrue(
+        ((Area) get(panel, "renderedArea"))
+            .contains(visible.x, visible.y, visible.width, visible.height),
+        "a rendered visible area must count as rendered, or every paint renders it again");
+
+    requestFocusedRender(panel);
+    synchronized (get(panel, "renderLock")) {
+      assertTrue(
+          !(boolean) get(panel, "renderRunning") && get(panel, "pendingRenderRequest") == null,
+          "painting an up to date hive must not queue a render");
+    }
+  }
+
   /** Shows {@code panel} in a viewport and lays out the hive for {@code adapter}. */
   private static JViewport viewportFor(
       HexHivePanel panel, int width, int height, HexHivePanel.HexDataAdapter<Object> adapter)
@@ -301,6 +325,14 @@ class HexHivePanelTest {
 
   /** Renders the visible rows and their look-ahead the way painting does. */
   private static void settle(HexHivePanel panel) throws Exception {
+    for (int i = 0; i < 3; i++) {
+      requestFocusedRender(panel);
+      awaitRender(panel);
+    }
+  }
+
+  /** What every paint does: queue a render of whatever visible rows aren't rendered yet. */
+  private static void requestFocusedRender(HexHivePanel panel) throws Exception {
     Class<?> propertiesClass = Class.forName(HexHivePanel.class.getName() + "$DrawingProperties");
     Method requestFocusedRender =
         HexHivePanel.class.getDeclaredMethod(
@@ -309,11 +341,8 @@ class HexHivePanelTest {
             HexHivePanel.HexDataAdapter.class,
             boolean.class);
     requestFocusedRender.setAccessible(true);
-    for (int i = 0; i < 3; i++) {
-      requestFocusedRender.invoke(
-          panel, get(panel, "drawingProperties"), get(panel, "latestAdapter"), false);
-      awaitRender(panel);
-    }
+    requestFocusedRender.invoke(
+        panel, get(panel, "drawingProperties"), get(panel, "latestAdapter"), false);
   }
 
   private static MouseEvent mouseEvent(HexHivePanel panel, int id, int x, int y) {
