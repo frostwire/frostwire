@@ -436,11 +436,14 @@ public final class LibraryFilesTableMediator
           boolean somethingWasRemoved = false;
           for (File file : selected) {
             // stop seeding if seeding
-            BittorrentDownload dm;
-            if ((dm = TorrentUtil.getDownloadManager(file)) != null) {
+            final BittorrentDownload dm = TorrentUtil.getDownloadManager(file);
+            if (dm != null) {
               dm.setDeleteDataWhenRemove(false);
               dm.setDeleteTorrentWhenRemove(false);
-              BTDownloadMediator.instance().remove(dm);
+              // Release the file here, before deleting it, and drop the transfer's row on the EDT.
+              dm.remove();
+              GUIMediator.safeInvokeLater(
+                  () -> BTDownloadMediator.instance().removeRowOfRemovedTransfer(dm));
             }
             // close media player if still playing
             // Media player instance not available anymore, file can be deleted

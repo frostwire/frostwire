@@ -461,18 +461,27 @@ public final class BTDownloadMediator
   }
 
   /**
-   * Overrides the default remove.
+   * Removes the transfer's row, whether shown or filtered out, and removes the transfer itself
+   * once, on the background queue, honoring its delete-data and delete-torrent flags. EDT only.
    *
-   * <p>Takes action upon downloaded theme files, asking if the user wants to apply the theme.
-   *
-   * <p>Removes a download from the list if the user has configured their system to automatically
-   * clear completed download and if the download is complete.
-   *
-   * @param downloader the `Downloader` to remove from the list if it is complete.
+   * @param downloader the transfer to remove.
    */
   public void remove(BTDownload downloader) {
-    super.remove(downloader);
-    downloader.remove();
+    removeTransfer(DATA_MODEL, downloader);
+  }
+
+  static void removeTransfer(BTDownloadRowFilteredModel model, BTDownload downloader) {
+    model.removeLine(downloader);
+    BackgroundQueuedExecutorService.schedule(downloader::remove);
+  }
+
+  /**
+   * Drops the row of a transfer the caller already removed, without removing it again. Callers off
+   * the EDT that must release a transfer's files before touching them call {@link
+   * BTDownload#remove()} themselves, then post this to the EDT.
+   */
+  public void removeRowOfRemovedTransfer(BTDownload downloader) {
+    DATA_MODEL.removeLine(downloader);
   }
 
   BTDownload[] getSelectedBTDownloads() {

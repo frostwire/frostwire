@@ -5,6 +5,7 @@ import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingUtilities;
@@ -58,6 +59,27 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
   void filtersChanged() {
     rebuild();
     fireTableDataChanged();
+  }
+
+  /**
+   * Drops the row of a transfer, whether shown or filtered out, without removing the transfer
+   * itself. EDT only.
+   */
+  void removeLine(BTDownload downloader) {
+    int row = getRow(downloader);
+    if (row != -1) {
+      removeLine(row);
+      return;
+    }
+    for (Iterator<BTDownloadDataLine> it = HIDDEN.iterator(); it.hasNext(); ) {
+      BTDownloadDataLine line = it.next();
+      if (line.getInitializeObject().equals(downloader)) {
+        it.remove();
+        remove(downloader.getHash());
+        line.cleanup();
+        return;
+      }
+    }
   }
 
   /** Determines whether or not the specified line is allowed by the filter. */

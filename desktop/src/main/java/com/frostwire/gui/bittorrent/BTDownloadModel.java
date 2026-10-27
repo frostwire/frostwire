@@ -218,11 +218,16 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
    */
   @Override
   public void remove(int i) {
-    BTDownloadDataLine line = get(i);
-    BTDownload downloader = line.getInitializeObject();
+    BTDownload downloader = removeLine(i);
+    BackgroundQueuedExecutorService.schedule(downloader::remove);
+  }
+
+  /** Drops row i without removing its transfer, and returns that transfer. */
+  BTDownload removeLine(int i) {
+    BTDownload downloader = get(i).getInitializeObject();
     _hashDownloads.remove(downloader.getHash());
     super.remove(i);
-    BackgroundQueuedExecutorService.schedule(downloader::remove);
+    return downloader;
   }
 
   public void remove(String hash) {
