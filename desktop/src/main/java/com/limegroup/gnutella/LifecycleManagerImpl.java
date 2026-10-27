@@ -30,6 +30,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
   private final CountDownLatch startLatch = new CountDownLatch(1);
   private final LimeCoreGlue limeCoreGlue;
   private final Runnable stopEngine;
+  private final Runnable saveSettings;
 
   /** A list of items that require running prior to shutting down LW. */
   private final List<Thread> SHUTDOWN_ITEMS = new LinkedList<>();
@@ -40,8 +41,13 @@ public class LifecycleManagerImpl implements LifecycleManager {
   }
 
   LifecycleManagerImpl(LimeCoreGlue limeCoreGlue, Runnable stopEngine) {
+    this(limeCoreGlue, stopEngine, () -> SettingsGroupManager.instance().save());
+  }
+
+  LifecycleManagerImpl(LimeCoreGlue limeCoreGlue, Runnable stopEngine, Runnable saveSettings) {
     this.limeCoreGlue = limeCoreGlue;
     this.stopEngine = Objects.requireNonNull(stopEngine, "stopEngine");
+    this.saveSettings = Objects.requireNonNull(saveSettings, "saveSettings");
   }
 
   private static String parseCommand(String toCall) {
@@ -148,6 +154,17 @@ public class LifecycleManagerImpl implements LifecycleManager {
       items = new ArrayList<>(SHUTDOWN_ITEMS);
       SHUTDOWN_ITEMS.clear();
     }
+    // This is the only settings save on exit (the window close no longer saves on the EDT), so it
+    // must run on every path that claimed shutdown, including the ones that retain the engine.
+    AtomicBoolean settingsSaved = new AtomicBoolean();
+    try {
+      drainAndStop(items, settingsSaved);
+    } finally {
+      saveSettingsOnce(settingsSaved);
+    }
+  }
+
+  private void drainAndStop(List<Thread> items, AtomicBoolean settingsSaved) {
     // Start every owner before waiting, so one slow drain cannot delay another's revocation.
     AtomicBoolean failed = new AtomicBoolean();
     long deadline = System.nanoTime() + SHUTDOWN_ITEMS_TIMEOUT_NANOS;
@@ -193,12 +210,23 @@ public class LifecycleManagerImpl implements LifecycleManager {
       LOG.error("Interrupted while waiting to finish starting", ie);
       return;
     }
-    // save frostwire.props & other settings
-    SettingsGroupManager.instance().save();
+    // save frostwire.props & other settings before the engine stops
+    saveSettingsOnce(settingsSaved);
     LOG.info("Stopping BTEngine...");
     stopEngine.run();
     LOG.info("BTEngine stopped");
     shutdownDone.set(true);
+  }
+
+  private void saveSettingsOnce(AtomicBoolean settingsSaved) {
+    if (settingsSaved.getAndSet(true)) {
+      return;
+    }
+    try {
+      saveSettings.run();
+    } catch (Throwable t) {
+      LOG.error("Unable to save settings on shutdown", t);
+    }
   }
 
   /* (non-Javadoc)

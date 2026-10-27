@@ -16,6 +16,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -161,7 +162,7 @@ class LifecycleManagerImplTest {
   void shutdownBeforeCoreStartStillRevokesOwnersAndRejectsLateRegistration() {
     AtomicBoolean revoked = new AtomicBoolean();
     AtomicInteger stops = new AtomicInteger();
-    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, stops::incrementAndGet);
+    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, stops::incrementAndGet, () -> {});
     manager.addShutdownItem(item(() -> revoked.set(true)));
     manager.shutdown();
     assertTrue(revoked.get());
@@ -197,7 +198,7 @@ class LifecycleManagerImplTest {
 
   @Test
   void registrationRejectsNullAndPreviouslyStartedThreads() {
-    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, () -> {});
+    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, () -> {}, () -> {});
     assertThrows(NullPointerException.class, () -> manager.addShutdownItem(null));
     Thread completed = item(() -> {});
     completed.start();
@@ -205,8 +206,72 @@ class LifecycleManagerImplTest {
     assertThrows(IllegalArgumentException.class, () -> manager.addShutdownItem(completed));
   }
 
+  @Test
+  void cleanShutdownSavesSettingsOnceOffTheEdtBeforeNativeStop() {
+    AtomicInteger saves = new AtomicInteger();
+    AtomicInteger stops = new AtomicInteger();
+    AtomicReference<Thread> saver = new AtomicReference<>();
+    LifecycleManagerImpl manager =
+        startedManager(
+            () -> {
+              assertEquals(1, saves.get(), "Settings are saved before the engine stops");
+              stops.incrementAndGet();
+            },
+            () -> {
+              saver.set(Thread.currentThread());
+              saves.incrementAndGet();
+            });
+    get(shutdown(manager));
+    manager.shutdown();
+    assertEquals(1, saves.get());
+    assertEquals(1, stops.get());
+    assertEquals("shutdown-manager-test", saver.get().getName());
+  }
+
+  @Test
+  void shutdownThatRetainsTheNativeSessionStillSavesSettingsOnce() {
+    AtomicInteger saves = new AtomicInteger();
+    AtomicInteger stops = new AtomicInteger();
+    LifecycleManagerImpl failedOwner =
+        startedManager(stops::incrementAndGet, saves::incrementAndGet);
+    failedOwner.addShutdownItem(
+        item(
+            () -> {
+              throw new IllegalStateException("fixture failure");
+            }));
+    failedOwner.shutdown();
+    failedOwner.shutdown();
+    assertEquals(0, stops.get());
+    assertEquals(1, saves.get());
+
+    AtomicInteger notStartedSaves = new AtomicInteger();
+    LifecycleManagerImpl notStarted =
+        new LifecycleManagerImpl(null, stops::incrementAndGet, notStartedSaves::incrementAndGet);
+    notStarted.shutdown();
+    notStarted.shutdown();
+    assertEquals(0, stops.get());
+    assertEquals(1, notStartedSaves.get());
+  }
+
+  @Test
+  void failedSettingsSaveDoesNotSkipNativeStop() {
+    AtomicInteger stops = new AtomicInteger();
+    LifecycleManagerImpl manager =
+        startedManager(
+            stops::incrementAndGet,
+            () -> {
+              throw new IllegalStateException("fixture save failure");
+            });
+    manager.shutdown();
+    assertEquals(1, stops.get());
+  }
+
   private static LifecycleManagerImpl startedManager(Runnable stopEngine) {
-    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, stopEngine);
+    return startedManager(stopEngine, () -> {});
+  }
+
+  private static LifecycleManagerImpl startedManager(Runnable stopEngine, Runnable saveSettings) {
+    LifecycleManagerImpl manager = new LifecycleManagerImpl(null, stopEngine, saveSettings);
     // Avoid unrelated app startup, settings, services and native session creation.
     assertDoesNotThrow(
         () -> {
