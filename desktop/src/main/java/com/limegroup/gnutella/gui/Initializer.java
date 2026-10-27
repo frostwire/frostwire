@@ -135,6 +135,11 @@ final class Initializer {
     }
     System.out.println("Initializer.initialize() applying theme: " + saved);
     ThemeMediator.loadThemeAtStartup(saved);
+    // Pay the JDK's one-time costs (font files and character maps read from disk, HarfBuzz shaper
+    // init, drag-and-drop cursors) off the EDT as soon as the look and feel's fonts are known; on
+    // slow machines the first text measured on the EDT, the splash window's, stalled it for over 5
+    // seconds when this started only after the splash was up.
+    JdkWarmUp.startInBackground();
     // Various startup tasks...
     // System.out.println("Initializer.initialize() setup callbacks and listeners");
     setupCallbacksAndListeners();
@@ -335,10 +340,6 @@ final class Initializer {
     // Pre-load header button background images to avoid MediaTracker blocking the EDT during
     // MainFrame construction
     ApplicationHeader.preloadImages();
-    // Pay the JDK's one-time costs (HarfBuzz shaper init, fallback font character maps read from
-    // disk, drag-and-drop cursors) off the EDT; on slow machines the first paint or click that
-    // needed them stalled the EDT for over 5 seconds.
-    JdkWarmUp.startInBackground();
 
     // Load up the HTML engine.
     GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
