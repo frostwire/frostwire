@@ -20,21 +20,31 @@ package com.limegroup.gnutella.gui.init;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import javax.swing.*;
 import org.limewire.util.CommonUtils;
 
 /** State Your Intent. */
 final class IntentWindow extends SetupWindow {
+  /** Saves the intent file; applySettings runs on the EDT, so the write happens off it. */
+  private final Executor writer;
+
   private boolean setWillNot = false;
 
   IntentWindow(SetupManager manager) {
+    this(manager, BackgroundQueuedExecutorService::schedule);
+  }
+
+  IntentWindow(SetupManager manager, Executor writer) {
     super(manager, I18n.tr("State Your Intent"), I18n.tr("One more thing..."));
+    this.writer = writer;
   }
 
   /**
@@ -67,24 +77,32 @@ final class IntentWindow extends SetupWindow {
         e -> {
           if (intentPanel.hasSelection()) {
             setNext(IntentWindow.this);
-            setWillNot = intentPanel.isWillNot();
+            confirmWillNot(intentPanel.isWillNot());
             _manager.enableActions(getAppropriateActions());
           }
         });
   }
 
+  void confirmWillNot(boolean willNot) {
+    setWillNot = willNot;
+  }
+
+  /**
+   * Remembers the confirmation for later runs. Called on the EDT when the user finishes the wizard,
+   * so the intent file is written on a background thread.
+   */
   @Override
   public void applySettings(boolean loadCoreComponents) {
     if (setWillNot) {
-      saveConfirmedWillNot();
+      writer.execute(IntentWindow::saveConfirmedWillNot);
     }
   }
 
   private static void saveConfirmedWillNot() {
     Properties properties = loadProperties();
     properties.put("willnot", "true");
-    try {
-      properties.store(new FileOutputStream(getPropertiesFile()), "Started & Ran Versions");
+    try (FileOutputStream out = new FileOutputStream(getPropertiesFile())) {
+      properties.store(out, "Started & Ran Versions");
     } catch (IOException ignored) {
       System.out.println(ignored);
     }
