@@ -49,7 +49,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
 
   private SearchResultActionsHolder actionsHolder;
   private SearchResultNameHolder name;
-  private Icon icon;
+  private boolean downloading;
   private SizeHolder size;
   private SourceHolder source;
   private double relevanceScore;
@@ -74,7 +74,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     name = new SearchResultNameHolder(sr);
     // Show seeds for non-preliminary results (torrents, etc) that have seed counts
     // Preliminary results (YouTube, etc) have isPreliminary=true and should not show seeds
-    icon = getIcon();
+    downloading = isDownloading();
     size = new SizeHolder(getSize());
     source = new SourceHolder(RESULT);
     computeRankingMetrics();
@@ -109,16 +109,17 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     return _mediaType;
   }
 
-  /** Returns the icon. */
+  /**
+   * Returns the icon. Read on every getValueAt (a cache lookup), not once in initialize():
+   * IconManager answers the EDT with a placeholder until the native icon for the extension has
+   * loaded in the background, and the table's refresh repaints the row when the icon changes.
+   */
   private Icon getIcon() {
-    // gubs: seems like this didn't fly
-    // maybe the icon isn't refreshed.
-    // see MetadataModel.addProperties()
     if (GraphicsEnvironment.isHeadless()) {
       return null;
     }
     try {
-      if (isDownloading()) {
+      if (downloading) {
         return GUIMediator.getThemeImage("downloading");
       }
       String ext = FilenameUtils.getExtension(getFilename());
@@ -188,7 +189,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
       case SearchTableColumns.COUNT_IDX:
         return getSeedsAsInteger();
       case SearchTableColumns.TYPE_IDX:
-        return icon;
+        return getIcon();
       case SearchTableColumns.NAME_IDX:
         return name;
       case SearchTableColumns.SIZE_IDX:
