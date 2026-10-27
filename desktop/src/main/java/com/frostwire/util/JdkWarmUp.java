@@ -58,9 +58,9 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Glyph rasterization: each glyph of a font strike is rasterized the first time it is
  *       measured or painted.
  *   <li>Locale data and tables behind the first number format, date format and collator.
- *   <li>FrostWire's own classes for the main window and the big panes built right after it, see
- *       {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their static initializers may
- *       create Swing objects.
+ *   <li>FrostWire's own classes for the main window, the big panes built right after it and the
+ *       Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their
+ *       static initializers may create Swing objects.
  * </ul>
  *
  * Steps run in the order the EDT first needs them: the splash window's text and progress label,
@@ -100,9 +100,10 @@ public final class JdkWarmUp {
 
   /**
    * FrostWire packages whose classes the EDT reads from the jar and defines in bulk while it builds
-   * the main window and, right after startup, the Transfers, Search and Library panes. Every class
-   * directly in each package (subpackages are listed separately) is loaded without initialization,
-   * in this order, which is the order the EDT first needs them.
+   * the main window and, right after startup, the Transfers, Search and Library panes, and then on
+   * the first Options click. Every class directly in each package (subpackages are listed
+   * separately) is loaded without initialization, in this order, which is the order the EDT first
+   * needs them.
    */
   static final List<String> APP_PACKAGES_TO_LOAD =
       List.of(
@@ -122,7 +123,11 @@ public final class JdkWarmUp {
           // class of each engine.
           "com.limegroup.gnutella.gui.search",
           // Library tab: LibraryMediator, its tree and its table mediators.
-          "com.frostwire.gui.library");
+          "com.frostwire.gui.library",
+          // Options dialog, built on the first click: OptionsConstructor and the tree manager,
+          // and every pane item class the tree names (it reads their label constants).
+          "com.limegroup.gnutella.gui.options",
+          "com.limegroup.gnutella.gui.options.panes");
 
   /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
   private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";

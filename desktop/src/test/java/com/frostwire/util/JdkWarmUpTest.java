@@ -143,7 +143,14 @@ class JdkWarmUpTest {
             "com.limegroup.gnutella.gui.search.SearchOptionsPanel",
             "com.limegroup.gnutella.gui.search.SearchResultMediator", // (#bcd3f2f6fee1)
             "com.frostwire.gui.library.LibraryMediator", // (#9ea38cf3577b)
-            "com.frostwire.gui.library.LibraryFilesTableMediator")) {
+            "com.frostwire.gui.library.LibraryFilesTableMediator",
+            // First Options open (#ea3f1006d1d3): the dialog's listeners and every pane item
+            // class the options tree names.
+            "com.limegroup.gnutella.gui.options.OptionsConstructor$1",
+            "com.limegroup.gnutella.gui.options.OptionsTreeManager",
+            "com.limegroup.gnutella.gui.options.panes.AbstractPaneItem",
+            "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItem",
+            "com.limegroup.gnutella.gui.options.panes.SharedTorrentsDatabasePaneItem")) {
       assertTrue(classNames.contains(className), className);
       assertTrue(isLoadable(className), className);
     }
