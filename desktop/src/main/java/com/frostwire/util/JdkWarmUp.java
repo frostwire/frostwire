@@ -7,6 +7,7 @@
 
 package com.frostwire.util;
 
+import com.frostwire.gui.theme.PlatformFonts;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -220,8 +221,7 @@ public final class JdkWarmUp {
     try {
       Font label = UIManager.getFont("Label.font");
       if (label != null) {
-        Object hints = Toolkit.getDefaultToolkit().getDesktopProperty(DESKTOP_FONT_HINTS);
-        Map<?, ?> desktopHints = hints instanceof Map<?, ?> map ? map : null;
+        Map<?, ?> desktopHints = desktopFontHints();
         rasterizeGlyphs(label, desktopHints);
         rasterizeGlyphs(label.deriveFont(Font.BOLD), desktopHints);
       }
@@ -273,6 +273,14 @@ public final class JdkWarmUp {
       LOG.warn("App class warm-up failed: " + t.getMessage(), t);
     }
     try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      for (Font font : mainWindowPlatformFonts()) {
+        rasterizeGlyphs(font, desktopHints);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Main window glyph warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
@@ -282,6 +290,21 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Tooltip painter warm-up failed: " + t.getMessage(), t);
     }
+  }
+
+  /** The desktop's text antialiasing hints, or null when the toolkit has none. */
+  private static Map<?, ?> desktopFontHints() {
+    Object hints = Toolkit.getDefaultToolkit().getDesktopProperty(DESKTOP_FONT_HINTS);
+    return hints instanceof Map<?, ?> map ? map : null;
+  }
+
+  /**
+   * The {@link PlatformFonts} the main window paints with as soon as it shows: the header's tab
+   * buttons (ApplicationHeader) and the Transfers tab's filter field and buttons (TransfersTab).
+   * Each family, style and size is its own strike, so their glyphs are not the label font's.
+   */
+  static List<Font> mainWindowPlatformFonts() {
+    return List.of(PlatformFonts.sansSerif(Font.BOLD, 10), PlatformFonts.sansSerif(Font.PLAIN, 12));
   }
 
   /**

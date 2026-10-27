@@ -351,6 +351,22 @@ class JdkWarmUpTest {
         "not called by warmUp");
   }
 
+  /**
+   * The header's tab buttons paint with PlatformFonts.sansSerif(BOLD, 10), a strike of its own
+   * whose glyphs the main window's first paint rasterized on the EDT (Icebase #a06500b144a5, GitHub
+   * #1341).
+   */
+  @Test
+  void warmUpRasterizesTheMainWindowPlatformFonts() throws Exception {
+    List<Font> fonts = JdkWarmUp.mainWindowPlatformFonts();
+    assertTrue(
+        fonts.stream().anyMatch(f -> f.getStyle() == Font.BOLD && f.getSize() == 10),
+        fonts::toString);
+    assertTrue(
+        warmUpSource().replaceAll("\\s+", "").contains("(Fontfont:mainWindowPlatformFonts())"),
+        "not rasterized by warmUp");
+  }
+
   @Test
   void nimbusHasProgressBarPaintersToCreate() {
     assertTrue(
