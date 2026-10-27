@@ -22,11 +22,13 @@ import com.frostwire.util.OSUtils;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.*;
 
 class ShutdownWindow extends JDialog {
-  /** */
-  private final ImageIcon backgroundImage;
+  /** Decoded off the EDT; the panel paints without it until it arrives. Only touched on the EDT. */
+  private Image backgroundImage;
 
   ShutdownWindow() {
     super(GUIMediator.getAppFrame());
@@ -36,7 +38,6 @@ class ShutdownWindow extends JDialog {
             !OSUtils.isWindowsAppStoreInstall()
                 ? "app_shutdown"
                 : "windows_appstore_install_shutdown");
-    backgroundImage = ResourceManager.getImageFromResourcePath(image_path);
     final String backgroundUrl =
         !OSUtils.isWindowsAppStoreInstall()
             ? "https://www.frostwire.com/android/?from=shutdown"
@@ -50,7 +51,9 @@ class ShutdownWindow extends JDialog {
           @Override
           protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            g.drawImage(backgroundImage.getImage(), 0, 0, null);
+            if (backgroundImage != null) {
+              g.drawImage(backgroundImage, 0, 0, null);
+            }
           }
         };
     backgroundPanel.addMouseListener(
@@ -78,6 +81,35 @@ class ShutdownWindow extends JDialog {
     bar.setBounds(55 + insets.left, 428 + insets.top, 680, 30);
     getContentPane().setPreferredSize(new Dimension(800, 500));
     pack();
+    // Inflating and decoding the JPEG on the EDT stalled it while the window closed.
+    decodeOffEdt(
+        () -> {
+          ImageIcon icon = ResourceManager.getImageFromResourcePath(image_path);
+          return icon != null ? icon.getImage() : null;
+        },
+        image -> {
+          backgroundImage = image;
+          backgroundPanel.repaint();
+        });
+  }
+
+  /**
+   * Runs {@code decode} on a new daemon thread and hands a non-null result to {@code onEdt} on the
+   * EDT.
+   */
+  static Thread decodeOffEdt(Supplier<Image> decode, Consumer<Image> onEdt) {
+    Thread thread =
+        new Thread(
+            () -> {
+              Image image = decode.get();
+              if (image != null) {
+                SwingUtilities.invokeLater(() -> onEdt.accept(image));
+              }
+            },
+            "ShutdownWindow-image");
+    thread.setDaemon(true);
+    thread.start();
+    return thread;
   }
 
   public static void main(String[] args) {

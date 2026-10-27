@@ -768,6 +768,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.util.CoalescingBackgroundSaveTest"
         includeTestsMatching "com.limegroup.gnutella.gui.WindowCloseActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.ShutdownWindowImageTest"
     }
 
     testLogging {
