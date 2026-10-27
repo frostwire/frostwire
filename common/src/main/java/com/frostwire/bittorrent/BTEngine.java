@@ -41,1221 +41,1276 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  * @author aldenml
  */
 public final class BTEngine extends SessionManager {
-    private static final Logger LOG = Logger.getLogger(BTEngine.class);
-    private static final int[] INNER_LISTENER_TYPES = new int[]{
-            ADD_TORRENT.swig(),
-            LISTEN_SUCCEEDED.swig(),
-            LISTEN_FAILED.swig(),
-            EXTERNAL_IP.swig(),
-            FASTRESUME_REJECTED.swig(),
-            DHT_BOOTSTRAP.swig(),
-            TORRENT_LOG.swig(),
-            PEER_LOG.swig(),
-            AlertType.LOG.swig()
-    };
-    private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
-    private static final String STATE_VERSION_KEY = "state_version";
-    // this constant only changes when the libtorrent settings_pack ABI is
-    // incompatible with the previous version. It should only happen from
-    // time to time, not in every version
-    private static final String STATE_VERSION_VALUE = "1.2.0.6";
-    private final static CountDownLatch ctxSetupLatch = new CountDownLatch(1);
-    public static BTContext ctx;
-    private final InnerListener innerListener;
-    private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
-    private volatile BTEngineListener listener;
+  private static final Logger LOG = Logger.getLogger(BTEngine.class);
+  private static final int[] INNER_LISTENER_TYPES =
+      new int[] {
+        ADD_TORRENT.swig(),
+        LISTEN_SUCCEEDED.swig(),
+        LISTEN_FAILED.swig(),
+        EXTERNAL_IP.swig(),
+        FASTRESUME_REJECTED.swig(),
+        DHT_BOOTSTRAP.swig(),
+        TORRENT_LOG.swig(),
+        PEER_LOG.swig(),
+        AlertType.LOG.swig()
+      };
+  private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
+  private static final String STATE_VERSION_KEY = "state_version";
+  // this constant only changes when the libtorrent settings_pack ABI is
+  // incompatible with the previous version. It should only happen from
+  // time to time, not in every version
+  private static final String STATE_VERSION_VALUE = "1.2.0.6";
+  private static final CountDownLatch ctxSetupLatch = new CountDownLatch(1);
+  public static BTContext ctx;
+  private final InnerListener innerListener;
+  private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
+  private volatile BTEngineListener listener;
 
-    // Cached paused state to avoid blocking EDT calls
-    private volatile boolean cachedPausedState = false;
+  // Cached paused state to avoid blocking EDT calls
+  private volatile boolean cachedPausedState = false;
 
-    // Last externally-visible IP reported by libtorrent (external_ip alert).
-    // Used to skip our own hairpinned endpoint during peer discovery. Null
-    // until the first alert; can change on network rebinding (read fresh).
-    private volatile String lastExternalIp;
+  // Last externally-visible IP reported by libtorrent (external_ip alert).
+  // Used to skip our own hairpinned endpoint during peer discovery. Null
+  // until the first alert; can change on network rebinding (read fresh).
+  private volatile String lastExternalIp;
 
-    // Store priorities for V2-only torrents that are added as paused and need priority application when ADD_TORRENT alert fires
-    private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
-    private static final long PENDING_SOURCE_TTL_MS = 2 * 60_000L;
-    private static final int MAX_PENDING_SOURCE_PEERS = 256;
-    private final LinkedHashMap<String, PendingSourcePeer> pendingSourcePeers = new LinkedHashMap<>();
+  // Store priorities for V2-only torrents that are added as paused and need priority application
+  // when ADD_TORRENT alert fires
+  private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
+  private static final long PENDING_SOURCE_TTL_MS = 2 * 60_000L;
+  private static final int MAX_PENDING_SOURCE_PEERS = 256;
+  private final LinkedHashMap<String, PendingSourcePeer> pendingSourcePeers = new LinkedHashMap<>();
 
-    private BTEngine() {
-        super(false);
-        this.innerListener = new InnerListener();
-        this.restoreDownloadsQueue = new LinkedList<>();
+  private BTEngine() {
+    super(false);
+    this.innerListener = new InnerListener();
+    this.restoreDownloadsQueue = new LinkedList<>();
+  }
+
+  public static BTEngine getInstance() {
+    if (ctx == null) {
+      try {
+        ctxSetupLatch.await();
+      } catch (InterruptedException e) {
+        LOG.error(e.getMessage(), e);
+      }
+      if (ctx == null && Loader.INSTANCE.isRunning()) {
+        throw new IllegalStateException("BTContext can't be null");
+      }
+    }
+    return Loader.INSTANCE;
+  }
+
+  public static void onCtxSetupComplete() {
+    ctxSetupLatch.countDown();
+  }
+
+  // this is here until we have a properly done OS utils.
+  private static String escapeFilename(String s) {
+    return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
+  }
+
+  private static String dhtBootstrapNodes() {
+    return "dht.libtorrent.org:25401"
+        + ","
+        + "router.bittorrent.com:6881"
+        + ","
+        + "dht.transmissionbt.com:6881"
+        + ","
+        +
+        // for DHT IPv6
+        "router.silotis.us:6881";
+  }
+
+  private static SettingsPack defaultSettings() {
+    SettingsPack sp = new SettingsPack();
+    // sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
+    sp.validateHttpsTrackers(false);
+    if (ctx.optimizeMemory) {
+      int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
+      sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+      int sendBufferWatermark = sp.sendBufferWatermark();
+      sp.sendBufferWatermark(sendBufferWatermark / 2);
+      sp.activeDownloads(4);
+      sp.activeSeeds(4);
+      sp.maxPeerlistSize(200);
+      // sp.setGuidedReadCache(true);
+      sp.tickInterval(1000);
+      sp.inactivityTimeout(60);
+      sp.seedingOutgoingConnections(false);
+      sp.connectionsLimit(200);
+    } else {
+      sp.activeDownloads(10);
+      sp.activeSeeds(10);
+    }
+    return sp;
+  }
+
+  static void applyContextSettings(SettingsPack sp, BTContext ctx) {
+    sp.natpmpGateway(ctx.natpmpGateway != null ? ctx.natpmpGateway : "");
+    sp.natpmpLeaseDuration(ctx.natpmpLeaseDuration);
+    sp.allowMultipleConnectionsPerPid(ctx.allowMultipleConnectionsPerPid);
+  }
+
+  public BTEngineListener getListener() {
+    return listener;
+  }
+
+  /** Publishes a new listener; callbacks already using an older snapshot may finish. */
+  public synchronized void setListener(BTEngineListener listener) {
+    this.listener = listener;
+  }
+
+  /**
+   * See com.frostwire.android.gui.MainApplication#onCreate() for `ctx.interfaces` and the rest of
+   * the context
+   */
+  @Override
+  public void start() {
+    SessionParams params = loadSettings();
+    settings_pack sp = params.swig().getSettings();
+    sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
+    sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
+    sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
+    sp.set_int(settings_pack.int_types.active_limit.swigValue(), 2000);
+    sp.set_int(settings_pack.int_types.stop_tracker_timeout.swigValue(), 0);
+    sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
+    sp.set_bool(settings_pack.bool_types.enable_dht.swigValue(), ctx.enableDht);
+    applyContextSettings(new SettingsPack(sp), ctx);
+    // sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true); // will be
+    // dropped in libtorrent 1.2.4.0 (Feb 10th 2020)
+    if (ctx.optimizeMemory) {
+      sp.set_bool(settings_pack.bool_types.enable_ip_notifier.swigValue(), false);
+    }
+    // NOTE: generate_fingerprint needs a tag number between 0 and 19, otherwise it returns an
+    // invalid character that makes the app crash on android
+    String fwFingerPrint =
+        libtorrent.generate_fingerprint(
+            "FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 10);
+    sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
+    String userAgent =
+        String.format(
+            Locale.ENGLISH,
+            "FrostWire/%d.%d.%d libtorrent/%s",
+            ctx.version[0],
+            ctx.version[1],
+            ctx.version[2],
+            libtorrent.version());
+    sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
+    LOG.info(
+        "Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
+    LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
+
+    // I2P Configuration
+    if (ctx.i2pEnabled && ctx.i2pHostname != null && !ctx.i2pHostname.isEmpty()) {
+      sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), ctx.i2pHostname);
+      sp.set_int(settings_pack.int_types.i2p_port.swigValue(), ctx.i2pPort);
+      sp.set_bool(settings_pack.bool_types.allow_i2p_mixed.swigValue(), ctx.i2pAllowMixed);
+      sp.set_int(settings_pack.int_types.i2p_inbound_quantity.swigValue(), ctx.i2pInboundQuantity);
+      sp.set_int(
+          settings_pack.int_types.i2p_outbound_quantity.swigValue(), ctx.i2pOutboundQuantity);
+      sp.set_int(settings_pack.int_types.i2p_inbound_length.swigValue(), ctx.i2pInboundLength);
+      sp.set_int(settings_pack.int_types.i2p_outbound_length.swigValue(), ctx.i2pOutboundLength);
+      LOG.info(
+          "I2P enabled: SAM bridge at "
+              + ctx.i2pHostname
+              + ":"
+              + ctx.i2pPort
+              + " (mixed mode: "
+              + ctx.i2pAllowMixed
+              + ")");
+    } else {
+      // Ensure I2P is disabled by setting empty hostname
+      sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), "");
+      LOG.info("I2P disabled");
     }
 
-    public static BTEngine getInstance() {
-        if (ctx == null) {
-            try {
-                ctxSetupLatch.await();
-            } catch (InterruptedException e) {
-                LOG.error(e.getMessage(), e);
-            }
-            if (ctx == null && Loader.INSTANCE.isRunning()) {
-                throw new IllegalStateException("BTContext can't be null");
-            }
-        }
-        return Loader.INSTANCE;
+    try {
+      super.start(params);
+    } catch (Throwable t) {
+      LOG.error(t.getMessage(), t);
     }
+  }
 
-    public static void onCtxSetupComplete() {
-        ctxSetupLatch.countDown();
+  @Override
+  public void stop() {
+    super.stop();
+    if (ctx == null) {
+      onCtxSetupComplete();
     }
+  }
 
-    // this is here until we have a properly done OS utils.
-    private static String escapeFilename(String s) {
-        return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
+  @Override
+  protected void onBeforeStart() {
+    addListener(innerListener);
+  }
+
+  @Override
+  protected void onAfterStart() {
+    // Initialize cached paused state on start in the background thread to avoid EDT blocking
+    ThreadExecutor.startThread(
+        () -> {
+          try {
+            cachedPausedState = super.isPaused();
+          } catch (Exception e) {
+            // If there's an issue getting the initial state, assume it not paused
+            cachedPausedState = false;
+          }
+        },
+        "BTEngine::onAfterStart() cache BTEngine's first paused state in the background");
+    fireStarted();
+  }
+
+  @Override
+  protected void onBeforeStop() {
+    removeListener(innerListener);
+    saveSettings();
+  }
+
+  @Override
+  protected void onAfterStop() {
+    fireStopped();
+  }
+
+  @Override
+  public void moveStorage(File dataDir) {
+    if (swig() == null) {
+      return;
     }
+    ctx.dataDir = dataDir; // this will be removed when we start using the platform
+    super.moveStorage(dataDir);
+  }
 
-    private static String dhtBootstrapNodes() {
-        return "dht.libtorrent.org:25401" + "," +
-                "router.bittorrent.com:6881" + "," +
-                "dht.transmissionbt.com:6881" + "," +
-                // for DHT IPv6
-                "router.silotis.us:6881";
-    }
-
-    private static SettingsPack defaultSettings() {
-        SettingsPack sp = new SettingsPack();
-        //sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
-        sp.validateHttpsTrackers(false);
-        if (ctx.optimizeMemory) {
-            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
-            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
-            int sendBufferWatermark = sp.sendBufferWatermark();
-            sp.sendBufferWatermark(sendBufferWatermark / 2);
-            sp.activeDownloads(4);
-            sp.activeSeeds(4);
-            sp.maxPeerlistSize(200);
-            //sp.setGuidedReadCache(true);
-            sp.tickInterval(1000);
-            sp.inactivityTimeout(60);
-            sp.seedingOutgoingConnections(false);
-            sp.connectionsLimit(200);
-        } else {
-            sp.activeDownloads(10);
-            sp.activeSeeds(10);
-        }
-        return sp;
-    }
-
-    static void applyContextSettings(SettingsPack sp, BTContext ctx) {
-        sp.natpmpGateway(ctx.natpmpGateway != null ? ctx.natpmpGateway : "");
-        sp.natpmpLeaseDuration(ctx.natpmpLeaseDuration);
-        sp.allowMultipleConnectionsPerPid(ctx.allowMultipleConnectionsPerPid);
-    }
-
-    public BTEngineListener getListener() {
-        return listener;
-    }
-
-    /** Publishes a new listener; callbacks already using an older snapshot may finish. */
-    public synchronized void setListener(BTEngineListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * See com.frostwire.android.gui.MainApplication#onCreate() for `ctx.interfaces` and the rest of the context
-     */
-    @Override
-    public void start() {
-        SessionParams params = loadSettings();
-        settings_pack sp = params.swig().getSettings();
-        sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
-        sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
-        sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
-        sp.set_int(settings_pack.int_types.active_limit.swigValue(), 2000);
-        sp.set_int(settings_pack.int_types.stop_tracker_timeout.swigValue(), 0);
-        sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
-        sp.set_bool(settings_pack.bool_types.enable_dht.swigValue(), ctx.enableDht);
-        applyContextSettings(new SettingsPack(sp), ctx);
-        //sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true); // will be dropped in libtorrent 1.2.4.0 (Feb 10th 2020)
-        if (ctx.optimizeMemory) {
-            sp.set_bool(settings_pack.bool_types.enable_ip_notifier.swigValue(), false);
-        }
-        // NOTE: generate_fingerprint needs a tag number between 0 and 19, otherwise it returns an
-        // invalid character that makes the app crash on android
-        String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 10);
-        sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
-        String userAgent = String.format(Locale.ENGLISH,
-                "FrostWire/%d.%d.%d libtorrent/%s",
-                ctx.version[0],
-                ctx.version[1],
-                ctx.version[2],
-                libtorrent.version());
-        sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
-        LOG.info("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
-        LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
-
-        // I2P Configuration
-        if (ctx.i2pEnabled && ctx.i2pHostname != null && !ctx.i2pHostname.isEmpty()) {
-            sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), ctx.i2pHostname);
-            sp.set_int(settings_pack.int_types.i2p_port.swigValue(), ctx.i2pPort);
-            sp.set_bool(settings_pack.bool_types.allow_i2p_mixed.swigValue(), ctx.i2pAllowMixed);
-            sp.set_int(settings_pack.int_types.i2p_inbound_quantity.swigValue(), ctx.i2pInboundQuantity);
-            sp.set_int(settings_pack.int_types.i2p_outbound_quantity.swigValue(), ctx.i2pOutboundQuantity);
-            sp.set_int(settings_pack.int_types.i2p_inbound_length.swigValue(), ctx.i2pInboundLength);
-            sp.set_int(settings_pack.int_types.i2p_outbound_length.swigValue(), ctx.i2pOutboundLength);
-            LOG.info("I2P enabled: SAM bridge at " + ctx.i2pHostname + ":" + ctx.i2pPort +
-                    " (mixed mode: " + ctx.i2pAllowMixed + ")");
-        } else {
-            // Ensure I2P is disabled by setting empty hostname
-            sp.set_str(settings_pack.string_types.i2p_hostname.swigValue(), "");
-            LOG.info("I2P disabled");
-        }
-
-        try {
-            super.start(params);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-        if (ctx == null) {
-            onCtxSetupComplete();
-        }
-    }
-
-    @Override
-    protected void onBeforeStart() {
-        addListener(innerListener);
-    }
-
-    @Override
-    protected void onAfterStart() {
-        // Initialize cached paused state on start in the background thread to avoid EDT blocking
-        ThreadExecutor.startThread(() -> {
-            try {
-                cachedPausedState = super.isPaused();
-            } catch (Exception e) {
-                // If there's an issue getting the initial state, assume it not paused
-                cachedPausedState = false;
-            }
-        }, "BTEngine::onAfterStart() cache BTEngine's first paused state in the background");
-        fireStarted();
-    }
-
-    @Override
-    protected void onBeforeStop() {
-        removeListener(innerListener);
-        saveSettings();
-    }
-
-    @Override
-    protected void onAfterStop() {
-        fireStopped();
-    }
-
-    @Override
-    public void moveStorage(File dataDir) {
-        if (swig() == null) {
-            return;
-        }
-        ctx.dataDir = dataDir; // this will be removed when we start using the platform
-        super.moveStorage(dataDir);
-    }
-
-    private SessionParams loadSettings() {
-        try {
-            File f = settingsFile();
-            if (f.exists()) {
-                byte[] data = FileUtils.readFileToByteArray(f);
-                byte_vector buffer = Vectors.bytes2byte_vector(data);
-                bdecode_node n = new bdecode_node();
-                error_code ec = new error_code();
-                int ret = bdecode_node.bdecode(buffer, n, ec);
-                if (ret == 0) {
-                    String stateVersion = n.dict_find_string_value_s(STATE_VERSION_KEY);
-                    if (!STATE_VERSION_VALUE.equals(stateVersion)) {
-                        return defaultParams();
-                    }
-                    session_params params = session_params.read_session_params(n);
-                    buffer.clear(); // prevents GC
-                    SessionParams result = new SessionParams(params);
-                    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
-                        // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
-                        // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-                        result.setPosixDiskIO();
-                    } else {
-                        result.setDefaultDiskIO();
-                    }
-                    return result;
-                } else {
-                    LOG.error("Can't decode session state data: " + ec.message());
-                    return defaultParams();
-                }
-            } else {
-                return defaultParams();
-            }
-        } catch (Throwable e) {
-            LOG.error("Error loading session state", e);
+  private SessionParams loadSettings() {
+    try {
+      File f = settingsFile();
+      if (f.exists()) {
+        byte[] data = FileUtils.readFileToByteArray(f);
+        byte_vector buffer = Vectors.bytes2byte_vector(data);
+        bdecode_node n = new bdecode_node();
+        error_code ec = new error_code();
+        int ret = bdecode_node.bdecode(buffer, n, ec);
+        if (ret == 0) {
+          String stateVersion = n.dict_find_string_value_s(STATE_VERSION_KEY);
+          if (!STATE_VERSION_VALUE.equals(stateVersion)) {
             return defaultParams();
-        }
-    }
-
-    private SessionParams defaultParams() {
-        SettingsPack sp = defaultSettings();
-        SessionParams params = new SessionParams(sp);
-        if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+          }
+          session_params params = session_params.read_session_params(n);
+          buffer.clear(); // prevents GC
+          SessionParams result = new SessionParams(params);
+          if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
             // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
             // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
-            params.setPosixDiskIO();
+            result.setPosixDiskIO();
+          } else {
+            result.setDefaultDiskIO();
+          }
+          return result;
         } else {
-            params.setDefaultDiskIO();
+          LOG.error("Can't decode session state data: " + ec.message());
+          return defaultParams();
         }
-        return params;
+      } else {
+        return defaultParams();
+      }
+    } catch (Throwable e) {
+      LOG.error("Error loading session state", e);
+      return defaultParams();
+    }
+  }
+
+  private SessionParams defaultParams() {
+    SettingsPack sp = defaultSettings();
+    SessionParams params = new SessionParams(sp);
+    if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+      // Use POSIX disk I/O on macOS and Linux to avoid signal handler conflicts
+      // with memory-mapped I/O (SIGBUS/SIGSEGV errors leak to Java)
+      params.setPosixDiskIO();
+    } else {
+      params.setDefaultDiskIO();
+    }
+    return params;
+  }
+
+  @Override
+  protected void onApplySettings(SettingsPack sp) {
+    saveSettings();
+  }
+
+  @Override
+  public byte[] saveState() {
+    if (swig() == null) {
+      return null;
     }
 
-    @Override
-    protected void onApplySettings(SettingsPack sp) {
-        saveSettings();
+    com.frostwire.jlibtorrent.swig.session session = swig();
+    session_params params = session.session_state();
+    if (params == null) {
+      LOG.warn("Unable to save session state, session_params is null");
+      return null;
+    }
+    entry e = session_params.write_session_params(params, save_state_flags_t.all());
+    // entry e = entry.from_string_bytes(session_params.write_session_params_buf(params,
+    // save_state_flags_t.all()));
+    e.set(STATE_VERSION_KEY, STATE_VERSION_VALUE);
+    return Vectors.byte_vector2bytes(e.bencode());
+  }
+
+  private void saveSettings() {
+    if (swig() == null) {
+      return;
+    }
+    try {
+      byte[] data = saveState();
+      FileUtils.writeByteArrayToFile(settingsFile(), data);
+    } catch (Throwable e) {
+      LOG.error("Error saving session state", e);
+    }
+  }
+
+  public void revertToDefaultConfiguration() {
+    if (swig() == null) {
+      return;
+    }
+    SettingsPack sp = defaultSettings();
+    applySettings(sp);
+  }
+
+  /** Override pause method to maintain the cached state */
+  @Override
+  public void pause() {
+    super.pause();
+    cachedPausedState = true;
+  }
+
+  /** Override resume method to maintain the cached state */
+  @Override
+  public void resume() {
+    super.resume();
+    cachedPausedState = false;
+  }
+
+  /**
+   * Non-blocking method to check if the engine is paused Uses cached state to avoid EDT blocking
+   * calls
+   */
+  public boolean isPausedCached() {
+    return cachedPausedState;
+  }
+
+  public void download(File torrent, File saveDir, boolean[] selection) {
+    if (swig() == null) {
+      return;
+    }
+    saveDir = setupSaveDir(saveDir);
+    if (saveDir == null) {
+      return;
+    }
+    TorrentInfo ti = new TorrentInfo(torrent);
+    if (selection == null) {
+      selection = new boolean[ti.numFiles()];
+      Arrays.fill(selection, true);
+    }
+    Priority[] priorities = null;
+    Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+    TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
+    boolean torrentHandleExists = th != null;
+    if (th != null) {
+      if (th.isValid()) {
+        priorities = th.filePriorities();
+      }
+    } else {
+      priorities = Priority.array(Priority.IGNORE, ti.numFiles());
     }
 
-    @Override
-    public byte[] saveState() {
-        if (swig() == null) {
-            return null;
-        }
-
-        com.frostwire.jlibtorrent.swig.session session = swig();
-        session_params params = session.session_state();
-        if (params == null) {
-            LOG.warn("Unable to save session state, session_params is null");
-            return null;
-        }
-        entry e = session_params.write_session_params(params, save_state_flags_t.all());
-        //entry e = entry.from_string_bytes(session_params.write_session_params_buf(params, save_state_flags_t.all()));
-        e.set(STATE_VERSION_KEY, STATE_VERSION_VALUE);
-        return Vectors.byte_vector2bytes(e.bencode());
+    if (priorities != null) {
+      for (int i = 0; i < selection.length; i++) {
+        priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
+      }
     }
 
-    private void saveSettings() {
-        if (swig() == null) {
-            return;
+    download(ti, saveDir, priorities, null, null);
+    if (!torrentHandleExists) {
+      saveResumeTorrent(ti);
+    }
+  }
+
+  public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
+    download(ti, saveDir, selection, peers, false);
+  }
+
+  public void download(
+      TorrentInfo ti,
+      File saveDir,
+      boolean[] selection,
+      List<TcpEndpoint> peers,
+      boolean saveTorrentFile) {
+    download(ti, saveDir, selection, peers, saveTorrentFile, null);
+  }
+
+  /** Add a search-result torrent while retaining its verified distributed-source attribution. */
+  public void download(
+      TorrentInfo ti,
+      File saveDir,
+      boolean[] selection,
+      List<TcpEndpoint> peers,
+      boolean saveTorrentFile,
+      byte[] distributedSourcePeerPub) {
+    if (swig() == null) {
+      return;
+    }
+    saveDir = setupSaveDir(saveDir);
+    if (saveDir == null) {
+      return;
+    }
+    if (selection == null) {
+      selection = new boolean[ti.numFiles()];
+      Arrays.fill(selection, true);
+    }
+    Priority[] priorities = null;
+    Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+    TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
+    boolean torrentHandleExists = th != null;
+    if (torrentHandleExists) {
+      try {
+        if (th.isValid()) {
+          // Rescue metadata-less zombies (e.g. a magnet added while the
+          // seeder was unreachable): now that we hold the full .torrent
+          // (piece layers included), the zombie must go — merging into it
+          // leaves a handle that can never announce torrent_added, so the
+          // UI shows nothing and the download stays invisible.
+          TorrentInfo existingInfo = null;
+          try {
+            existingInfo = th.torrentFile();
+          } catch (Throwable ignored) {
+            // no metadata yet — torrentFile() throws on some handles
+          }
+          if (existingInfo == null) {
+            LOG.info(
+                "BTEngine.download(TorrentInfo): replacing metadata-less handle for "
+                    + infoHashV1
+                    + " with full .torrent bytes");
+            remove(th);
+            torrentHandleExists = false;
+          } else {
+            priorities = th.filePriorities();
+          }
         }
-        try {
-            byte[] data = saveState();
-            FileUtils.writeByteArrayToFile(settingsFile(), data);
-        } catch (Throwable e) {
-            LOG.error("Error saving session state", e);
-        }
+      } catch (Throwable t) {
+        LOG.error("Error loading session state", t);
+      }
+    }
+    if (priorities == null) {
+      priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+    }
+    // Update priorities based on selection
+    for (int i = 0; i < selection.length && i < priorities.length; i++) {
+      priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
+    }
+    // An existing transfer predates this search result, so do not reattribute it to a new
+    // search source. New and replaced handles consume the source on their add/update alert.
+    if (!torrentHandleExists) {
+      rememberSourcePeer(canonicalInfoHash(ti), distributedSourcePeerPub);
+    }
+    download(ti, saveDir, priorities, null, peers);
+
+    saveResumeTorrent(ti);
+    if (saveTorrentFile) {
+      saveTorrent(ti);
+    }
+  }
+
+  @Override
+  public void download(String magnetUri, File saveDir, torrent_flags_t flags) {
+    download(magnetUri, saveDir, flags, null);
+  }
+
+  /** Add a search-result magnet while retaining its verified source attribution. */
+  public void download(
+      String magnetUri, File saveDir, torrent_flags_t flags, byte[] distributedSourcePeerPub) {
+    if (swig() == null) {
+      return;
+    }
+    saveDir = setupSaveDir(saveDir);
+    if (saveDir == null) {
+      return;
     }
 
-    public void revertToDefaultConfiguration() {
-        if (swig() == null) {
-            return;
-        }
-        SettingsPack sp = defaultSettings();
-        applySettings(sp);
+    AddTorrentParams params = AddTorrentParams.parseMagnetUri(magnetUri);
+    InfoHash infoHash = params.getInfoHashes();
+    rememberSourcePeer(infoHash, distributedSourcePeerPub);
+    LOG.info("BTEngine.download(magnet): explicit peer count=" + params.peers().size());
+    TorrentHandle handle = infoHash.hasV1() ? find(infoHash.getV1()) : find(infoHash.getV2());
+    if (handle != null && handle.isValid()) {
+      for (TcpEndpoint peer : params.peers()) {
+        handle.swig().connect_peer(peer.swig());
+      }
+      handle.resume();
+      fireDownloadUpdate(handle);
+      return;
     }
+    rememberSourcePeer(infoHash, distributedSourcePeerPub);
+    super.download(magnetUri, saveDir, flags);
+  }
 
-    /**
-     * Override pause method to maintain the cached state
-     */
-    @Override
-    public void pause() {
-        super.pause();
-        cachedPausedState = true;
+  public void download(TorrentCrawledSearchResult sr, File saveDir) {
+    download(sr, saveDir, false);
+  }
+
+  public void download(TorrentCrawledSearchResult sr, File saveDir, boolean dontSaveTorrentFile) {
+    if (swig() == null) {
+      return;
     }
-
-    /**
-     * Override resume method to maintain the cached state
-     */
-    @Override
-    public void resume() {
-        super.resume();
-        cachedPausedState = false;
+    saveDir = setupSaveDir(saveDir);
+    if (saveDir == null) {
+      return;
     }
-
-    /**
-     * Non-blocking method to check if the engine is paused
-     * Uses cached state to avoid EDT blocking calls
-     */
-    public boolean isPausedCached() {
-        return cachedPausedState;
-    }
-
-    public void download(File torrent, File saveDir, boolean[] selection) {
-        if (swig() == null) {
-            return;
-        }
-        saveDir = setupSaveDir(saveDir);
-        if (saveDir == null) {
-            return;
-        }
-        TorrentInfo ti = new TorrentInfo(torrent);
-        if (selection == null) {
-            selection = new boolean[ti.numFiles()];
-            Arrays.fill(selection, true);
-        }
-        Priority[] priorities = null;
-        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
-        boolean torrentHandleExists = th != null;
-        if (th != null) {
-            if (th.isValid()) {
-                priorities = th.filePriorities();
-            }
-        } else {
-            priorities = Priority.array(Priority.IGNORE, ti.numFiles());
-        }
-
-        if (priorities != null) {
-            for (int i = 0; i < selection.length; i++) {
-                priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
-            }
-        }
-
+    TorrentInfo ti = sr.getTorrentInfo();
+    int fileIndex = sr.getFileIndex();
+    Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+    TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
+    boolean exists = th != null;
+    if (th != null) {
+      Priority[] priorities = th.filePriorities();
+      if (priorities[fileIndex] == Priority.IGNORE) {
+        priorities[fileIndex] = Priority.NORMAL;
         download(ti, saveDir, priorities, null, null);
-        if (!torrentHandleExists) {
-            saveResumeTorrent(ti);
-        }
+      }
+    } else {
+      Priority[] priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+      priorities[fileIndex] = Priority.NORMAL;
+      download(ti, saveDir, priorities, null, null);
     }
-
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
-        download(ti, saveDir, selection, peers, false);
+    if (!exists) {
+      saveResumeTorrent(ti);
+      if (!dontSaveTorrentFile) {
+        saveTorrent(ti);
+      }
     }
+  }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean saveTorrentFile) {
-        download(ti, saveDir, selection, peers, saveTorrentFile, null);
+  public void restoreDownloads() {
+    if (swig() == null) {
+      return;
     }
-
-    /** Add a search-result torrent while retaining its verified distributed-source attribution. */
-    public void download(
-            TorrentInfo ti,
-            File saveDir,
-            boolean[] selection,
-            List<TcpEndpoint> peers,
-            boolean saveTorrentFile,
-            byte[] distributedSourcePeerPub) {
-        if (swig() == null) {
-            return;
-        }
-        saveDir = setupSaveDir(saveDir);
-        if (saveDir == null) {
-            return;
-        }
-        if (selection == null) {
-            selection = new boolean[ti.numFiles()];
-            Arrays.fill(selection, true);
-        }
-        Priority[] priorities = null;
-        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
-        boolean torrentHandleExists = th != null;
-        if (torrentHandleExists) {
+    if (ctx.homeDir == null || !ctx.homeDir.exists()) {
+      LOG.warn("Wrong setup with BTEngine home dir");
+      return;
+    }
+    File[] torrents =
+        ctx.homeDir.listFiles(
+            (dir, name) ->
+                name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
+    LOG.info(
+        "restoreDownloads: "
+            + (torrents == null ? 0 : torrents.length)
+            + " session torrent file(s) in "
+            + ctx.homeDir);
+    if (torrents != null) {
+      for (File t : torrents) {
+        try {
+          String fileNameHash = FilenameUtils.getBaseName(t.getName());
+          if (fileNameHash != null) {
+            TorrentInfo restoredInfo = null;
             try {
-                if (th.isValid()) {
-                    // Rescue metadata-less zombies (e.g. a magnet added while the
-                    // seeder was unreachable): now that we hold the full .torrent
-                    // (piece layers included), the zombie must go — merging into it
-                    // leaves a handle that can never announce torrent_added, so the
-                    // UI shows nothing and the download stays invisible.
-                    TorrentInfo existingInfo = null;
-                    try {
-                        existingInfo = th.torrentFile();
-                    } catch (Throwable ignored) {
-                        // no metadata yet — torrentFile() throws on some handles
-                    }
-                    if (existingInfo == null) {
-                        LOG.info("BTEngine.download(TorrentInfo): replacing metadata-less handle for "
-                                + infoHashV1 + " with full .torrent bytes");
-                        remove(th);
-                        torrentHandleExists = false;
-                    } else {
-                        priorities = th.filePriorities();
-                    }
-                }
-            } catch (Throwable t) {
-                LOG.error("Error loading session state", t);
+              restoredInfo = new TorrentInfo(t);
+            } catch (Throwable ignored) {
+              // RestoreDownloadTask will report the failure
             }
+            File resumeFile = resumeFileFor(fileNameHash, restoredInfo);
+            File savePath = readSavePath(resumeFile);
+            File checked = setupSaveDir(savePath);
+            if (checked == null) {
+              checked = setupSaveDir(ctx.dataDir);
+            }
+            if (checked == null) {
+              LOG.warn(
+                  "Can't create data dir or mount point is not accessible for infoHash="
+                      + fileNameHash);
+              continue;
+            }
+            restoreDownloadsQueue.add(new RestoreDownloadTask(t, checked, null, resumeFile));
+          }
+        } catch (Throwable e) {
+          LOG.error("Error restoring torrent download: " + t, e);
         }
-        if (priorities == null) {
-            priorities = Priority.array(Priority.IGNORE, ti.numFiles());
-        }
-        // Update priorities based on selection
-        for (int i = 0; i < selection.length && i < priorities.length; i++) {
-            priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
-        }
-        // An existing transfer predates this search result, so do not reattribute it to a new
-        // search source. New and replaced handles consume the source on their add/update alert.
-        if (!torrentHandleExists) {
-            rememberSourcePeer(canonicalInfoHash(ti), distributedSourcePeerPub);
-        }
-        download(ti, saveDir, priorities, null, peers);
+        runNextRestoreDownloadTask();
+      }
+    }
+  }
 
-        saveResumeTorrent(ti);
-        if (saveTorrentFile) {
-            saveTorrent(ti);
+  File settingsFile() {
+    return new File(ctx.homeDir, "settings.dat");
+  }
+
+  File resumeTorrentFile(String infoHash) {
+    return new File(ctx.homeDir, infoHash + ".torrent");
+  }
+
+  /**
+   * Ensures the session .torrent file exists for a handle, using the same hash naming the resume
+   * backfill and serializer use. Magnet-origin torrents never go through a .torrent-saving download
+   * path, so without this the restore scan cannot see them on the next launch.
+   */
+  void ensureResumeTorrentFile(TorrentHandle th) {
+    try {
+      if (th == null || !th.isValid()) {
+        return;
+      }
+      String hash = canonicalInfoHash(th);
+      if (hash == null || resumeTorrentFile(hash).exists()) {
+        return;
+      }
+      TorrentInfo ti = th.torrentFile();
+      if (ti == null) {
+        return;
+      }
+      entry e = ti.toEntry().swig();
+      FileUtils.writeByteArrayToFile(
+          resumeTorrentFile(hash), Vectors.byte_vector2bytes(e.bencode()));
+    } catch (Throwable t) {
+      LOG.warn("Error ensuring resume torrent file", t);
+    }
+  }
+
+  File torrentFile(String name) {
+    return new File(ctx.torrentsDir, name + ".torrent");
+  }
+
+  File resumeDataFile(String infoHash) {
+    return new File(ctx.homeDir, infoHash + ".resume");
+  }
+
+  /**
+   * Canonical persistence hash used to name BOTH the session .torrent and its .resume sidecar: v1
+   * when the torrent has one, else v2. Hybrid/v2 torrents used to record the .torrent under v1
+   * ({@code ti.infoHashV1()}) but the resume under {@code torrent_handle.infoHash()} (v2), so
+   * restore looked up {@code <v1>.resume}, found nothing, and fell back to the default data dir.
+   */
+  String canonicalInfoHash(TorrentInfo ti) {
+    if (ti == null) {
+      return null;
+    }
+    try {
+      Sha1Hash v1 = ti.infoHashV1();
+      if (v1 != null) {
+        return v1.toString().toLowerCase();
+      }
+    } catch (Throwable ignored) {
+      // fall through to v2
+    }
+    try {
+      Sha256Hash v2 = ti.infoHashV2();
+      if (v2 != null && !v2.isAllZeros()) {
+        return v2.toString().toLowerCase();
+      }
+    } catch (Throwable ignored) {
+      // no usable hash
+    }
+    return null;
+  }
+
+  String canonicalInfoHash(TorrentHandle th) {
+    if (th == null) {
+      return null;
+    }
+    try {
+      String hash = canonicalInfoHash(th.torrentFile());
+      if (hash != null) {
+        return hash;
+      }
+    } catch (Throwable ignored) {
+      // fall back to the handle hash
+    }
+    try {
+      return th.infoHash().toString().toLowerCase();
+    } catch (Throwable ignored) {
+      return null;
+    }
+  }
+
+  private String canonicalInfoHash(InfoHash hashes) {
+    if (hashes == null) {
+      return null;
+    }
+    try {
+      if (hashes.hasV1()) {
+        return hashes.getV1().toString().toLowerCase(Locale.ROOT);
+      }
+      Sha256Hash v2 = hashes.getV2();
+      return v2 == null || v2.isAllZeros() ? null : v2.toString().toLowerCase(Locale.ROOT);
+    } catch (Throwable unavailable) {
+      return null;
+    }
+  }
+
+  private void rememberSourcePeer(String infoHash, byte[] sourcePeerPub) {
+    if (infoHash == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
+      return;
+    }
+    rememberSourcePeer(infoHash, new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis()));
+  }
+
+  private void rememberSourcePeer(InfoHash infoHashes, byte[] sourcePeerPub) {
+    if (infoHashes == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
+      return;
+    }
+    PendingSourcePeer pending = new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis());
+    if (infoHashes.hasV1()) {
+      rememberSourcePeer(infoHashes.getV1().toString().toLowerCase(Locale.ROOT), pending);
+    }
+    try {
+      Sha256Hash v2 = infoHashes.getV2();
+      if (v2 != null && !v2.isAllZeros()) {
+        rememberSourcePeer(v2.toString().toLowerCase(Locale.ROOT), pending);
+      }
+    } catch (Throwable ignored) {
+      // A v1-only magnet has no v2 alias.
+    }
+  }
+
+  private void rememberSourcePeer(String infoHash, PendingSourcePeer pending) {
+    if (infoHash == null || pending == null) {
+      return;
+    }
+    long now = System.currentTimeMillis();
+    synchronized (pendingSourcePeers) {
+      pendingSourcePeers
+          .entrySet()
+          .removeIf(entry -> now - entry.getValue().createdAtMs > PENDING_SOURCE_TTL_MS);
+      if (!pendingSourcePeers.containsKey(infoHash)
+          && pendingSourcePeers.size() >= MAX_PENDING_SOURCE_PEERS) {
+        pendingSourcePeers.remove(pendingSourcePeers.keySet().iterator().next());
+      }
+      pendingSourcePeers.putIfAbsent(infoHash, pending);
+    }
+  }
+
+  private void applyPendingSourcePeer(TorrentHandle handle, BTDownload download) {
+    String infoHash = canonicalInfoHash(handle);
+    if (infoHash == null || download == null) {
+      return;
+    }
+    PendingSourcePeer source;
+    synchronized (pendingSourcePeers) {
+      source = pendingSourcePeers.remove(infoHash);
+      if (source == null) {
+        try {
+          source = pendingSourcePeers.remove(handle.infoHash().toString().toLowerCase(Locale.ROOT));
+        } catch (Throwable ignored) {
+          // The canonical hash above is the normal path.
         }
+      }
+      if (source != null) {
+        PendingSourcePeer consumed = source;
+        pendingSourcePeers.entrySet().removeIf(entry -> entry.getValue() == consumed);
+        if (System.currentTimeMillis() - source.createdAtMs > PENDING_SOURCE_TTL_MS) {
+          source = null;
+        }
+      }
+    }
+    if (source != null) {
+      download.setDistributedSourcePeerPub(source.peerPub);
+    }
+  }
+
+  private static final class PendingSourcePeer {
+    final byte[] peerPub;
+    final long createdAtMs;
+
+    PendingSourcePeer(byte[] peerPub, long createdAtMs) {
+      this.peerPub = peerPub.clone();
+      this.createdAtMs = createdAtMs;
+    }
+  }
+
+  /**
+   * Locates the resume sidecar for a restored session torrent by trying the .torrent filename hash
+   * first, then both info hashes from its contents. Heals installs written before the naming was
+   * unified.
+   */
+  private File resumeFileFor(String fileNameHash, TorrentInfo ti) {
+    java.util.List<String> candidates = new java.util.ArrayList<>(3);
+    if (fileNameHash != null && !fileNameHash.isEmpty()) {
+      candidates.add(fileNameHash.toLowerCase());
+    }
+    if (ti != null) {
+      try {
+        Sha1Hash v1 = ti.infoHashV1();
+        if (v1 != null) {
+          candidates.add(v1.toString().toLowerCase());
+        }
+      } catch (Throwable ignored) {
+      }
+      try {
+        Sha256Hash v2 = ti.infoHashV2();
+        if (v2 != null && !v2.isAllZeros()) {
+          String v2hex = v2.toString().toLowerCase();
+          candidates.add(v2hex);
+          // Legacy resume naming used torrent_handle.infoHash(), a
+          // 20-byte hash: for v2 that is the truncated v2 prefix.
+          if (v2hex.length() > 40) {
+            candidates.add(v2hex.substring(0, 40));
+          }
+        }
+      } catch (Throwable ignored) {
+      }
+    }
+    for (String candidate : candidates) {
+      File file = resumeDataFile(candidate);
+      if (file.exists()) {
+        return file;
+      }
+    }
+    return resumeDataFile(fileNameHash != null ? fileNameHash.toLowerCase() : "");
+  }
+
+  File readSavePath(String infoHash) {
+    return readSavePath(resumeDataFile(infoHash));
+  }
+
+  private File readSavePath(File resumeFile) {
+    File savePath = null;
+    try {
+      byte[] arr = FileUtils.readFileToByteArray(resumeFile);
+      entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
+      savePath = new File(e.dict().get("save_path").string());
+    } catch (Throwable e) {
+      // can't recover the original torrent path
+    }
+    return savePath;
+  }
+
+  File readTorrentPath(String infoHash) {
+    File torrent = null;
+    try {
+      byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
+      entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
+      torrent = new File(e.dict().get(TORRENT_ORIG_PATH_KEY).string());
+    } catch (Throwable e) {
+      // can't recover an original torrent path
+    }
+    return torrent;
+  }
+
+  private void saveTorrent(TorrentInfo ti) {
+    File torrentFile;
+    try {
+      String name = getEscapedFilename(ti);
+      torrentFile = torrentFile(name);
+      File parent = torrentFile.getParentFile();
+      if (parent != null && !parent.exists()) {
+        parent.mkdirs();
+      }
+      byte[] arr = ti.toEntry().bencode();
+      FileSystem fs = Platforms.get().fileSystem();
+      fs.write(torrentFile, arr);
+    } catch (Throwable e) {
+      LOG.warn("Error saving torrent info to file", e);
+    }
+  }
+
+  private void saveResumeTorrent(TorrentInfo ti) {
+    try {
+      String name = getEscapedFilename(ti);
+      entry e = ti.toEntry().swig();
+      e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
+      byte[] arr = Vectors.byte_vector2bytes(e.bencode());
+      String hash = canonicalInfoHash(ti);
+      if (hash != null) {
+        FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), arr);
+      } else {
+        LOG.warn("Cannot save session torrent - no usable info hash");
+      }
+    } catch (Throwable e) {
+      LOG.warn("Error saving resume torrent", e);
+    }
+  }
+
+  private String getEscapedFilename(TorrentInfo ti) {
+    String name = ti.name();
+    if (name == null || name.isEmpty()) {
+      Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+      name = infoHashV1 != null ? infoHashV1.toString() : "unknown";
+    }
+    return escapeFilename(name);
+  }
+
+  private void fireStarted() {
+    BTEngineListener snapshot = listener;
+    if (snapshot != null) {
+      snapshot.started(this);
+    }
+  }
+
+  private void fireStopped() {
+    BTEngineListener snapshot = listener;
+    if (snapshot != null) {
+      snapshot.stopped(this);
+    }
+  }
+
+  private void fireDownloadAdded(TorrentAlert<?> alert) {
+    try {
+      TorrentHandle th = find(alert.handle().infoHash());
+      if (th != null) {
+        // Check if this is a V2-only torrent with stored priorities
+        String infoHashStr = alert.handle().infoHash().toString();
+        LOG.info("BTEngine.fireDownloadAdded() - alert hash: " + infoHashStr);
+
+        Priority[] storedPriorities;
+        synchronized (pendingV2TorrentPriorities) {
+          // Try to find stored priorities using the alert hash
+          storedPriorities = pendingV2TorrentPriorities.remove(infoHashStr);
+
+          // If not found, try to find by iterating through stored hashes (for debugging)
+          if (storedPriorities == null) {
+            LOG.info(
+                "BTEngine.fireDownloadAdded() - stored priority keys: "
+                    + pendingV2TorrentPriorities.keySet());
+            // Try to find a matching key by checking if this torrent is V2-only
+            try {
+              TorrentInfo ti = th.torrentFile();
+              if (ti != null) {
+                Sha1Hash v1Hash = null;
+                try {
+                  v1Hash = ti.infoHashV1();
+                } catch (Exception e) {
+                  // V2-only torrent
+                }
+
+                if (v1Hash == null) {
+                  // This is a V2-only torrent, try to match by V2 hash
+                  Sha256Hash v2Hash = ti.infoHashV2();
+                  if (v2Hash != null) {
+                    String v2HashStr = v2Hash.toString();
+                    LOG.info("BTEngine.fireDownloadAdded() - torrent V2 hash: " + v2HashStr);
+                    storedPriorities = pendingV2TorrentPriorities.remove(v2HashStr);
+                  }
+                }
+              }
+            } catch (Throwable t) {
+              LOG.warn(
+                  "BTEngine.fireDownloadAdded() - unable to get torrent info for hash matching", t);
+            }
+          }
+        }
+
+        if (storedPriorities != null) {
+          LOG.info(
+              "BTEngine.fireDownloadAdded() - applying stored priorities for v2-only torrent: "
+                  + infoHashStr);
+          try {
+            th.prioritizeFiles(storedPriorities);
+            th.resume(); // Resume the torrent now that priorities are set
+          } catch (Throwable t) {
+            LOG.warn("BTEngine.fireDownloadAdded() - unable to apply stored priorities", t);
+          }
+        } else {
+          LOG.info(
+              "BTEngine.fireDownloadAdded() - no stored priorities found for hash: " + infoHashStr);
+        }
+
+        BTDownload dl = new BTDownload(this, th);
+        applyPendingSourcePeer(th, dl);
+        BTEngineListener snapshot = listener;
+        if (snapshot != null) {
+          snapshot.downloadAdded(this, dl);
+        }
+      } else {
+        LOG.info("torrent was not successfully added");
+      }
+    } catch (Throwable e) {
+      LOG.error("Unable to create and/or notify the new download", e);
+    }
+  }
+
+  private void fireDownloadUpdate(TorrentHandle th) {
+    try {
+      BTDownload dl = new BTDownload(this, th);
+      applyPendingSourcePeer(th, dl);
+      BTEngineListener snapshot = listener;
+      if (snapshot != null) {
+        snapshot.downloadUpdate(this, dl);
+      }
+    } catch (Throwable e) {
+      LOG.error("Unable to notify update the a download", e);
+    }
+  }
+
+  private void onListenSucceeded(ListenSucceededAlert alert) {
+    try {
+      String endp = alert.address() + ":" + alert.port();
+      String s = "endpoint: " + endp + " type:" + alert.socketType();
+      LOG.info("Listen succeeded on " + s);
+    } catch (Throwable e) {
+      LOG.error("Error adding listen endpoint to internal list", e);
+    }
+  }
+
+  private void onListenFailed(ListenFailedAlert alert) {
+    String endp = alert.address() + ":" + alert.port();
+    String s = "endpoint: " + endp + " type:" + alert.socketType();
+    ErrorCode error = alert.error();
+    String message = error.message() + "/value=" + error.value();
+    String op;
+    String iface;
+    try {
+      op = String.valueOf(alert.operation());
+    } catch (Throwable ignored) {
+      op = "?";
+    }
+    try {
+      iface = String.valueOf(alert.listenInterface());
+    } catch (Throwable ignored) {
+      iface = "?";
+    }
+    LOG.info(
+        "Listen failed on " + s + " op=" + op + " iface=" + iface + " (error: " + message + ")");
+  }
+
+  private File setupSaveDir(File saveDir) {
+    File result = null;
+    if (saveDir == null) {
+      if (ctx.dataDir != null) {
+        result = ctx.dataDir;
+      } else {
+        LOG.warn(
+            "Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
+      }
+    } else {
+      result = saveDir;
+    }
+    FileSystem fs = Platforms.get().fileSystem();
+    if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
+      result = null;
+      LOG.warn("Failed to create save dir to download");
+    }
+    if (result != null && !fs.canWrite(result)) {
+      result = null;
+      LOG.warn("Failed to setup save dir with write access");
+    }
+    return result;
+  }
+
+  private void runNextRestoreDownloadTask() {
+    RestoreDownloadTask task = null;
+    try {
+      if (!restoreDownloadsQueue.isEmpty()) {
+        task = restoreDownloadsQueue.poll();
+      }
+    } catch (Throwable t) {
+      // on Android, LinkedList's .poll() implementation throws a NoSuchElementException
+    }
+    if (task != null) {
+      task.run();
+    }
+  }
+
+  private void download(
+      TorrentInfo ti,
+      File saveDir,
+      Priority[] priorities,
+      @SuppressWarnings("SameParameterValue") File resumeFile,
+      List<TcpEndpoint> peers) {
+    Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+    TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
+    if (th != null) {
+      // found a download with the same hash, just adjust the priorities if needed
+      if (priorities != null) {
+        if (ti.numFiles() != priorities.length) {
+          throw new IllegalArgumentException(
+              "The priorities length should be equals to the number of files");
+        }
+        th.prioritizeFiles(priorities);
+      } else {
+        // did they just add the entire torrent (therefore not selecting any priorities)
+        final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.numFiles());
+        th.prioritizeFiles(wholeTorrentPriorities);
+      }
+      fireDownloadUpdate(th);
+      th.resume();
+    } else { // new Download (including v2-only torrents)
+      // Adds paused to avoid the race where default priorities are used
+      download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
+
+      // For v2-only torrents, we can't find by v1 hash, so we need to find it differently
+      // We'll wait a bit and then look for it by iterating through handles or rely on alerts
+      if (infoHashV1 != null) {
+        // Try to find by v1 hash for v1-only and hybrid torrents
+        th = find(infoHashV1);
+      }
+
+      if (th != null) {
+        LOG.info("BTEngine.download() - new download - torrent_handle found in session");
+        // Re-apply priorities on the handle to be 100% sure they stick
+        if (priorities != null && priorities.length == ti.numFiles()) {
+          th.prioritizeFiles(priorities);
+        }
+        try {
+          th.setFlags(TorrentFlags.NEED_SAVE_RESUME);
+          th.saveResumeData(TorrentHandle.SAVE_INFO_DICT);
+        } catch (Throwable t) {
+          LOG.warn("BTEngine.download() - unable to trigger initial resume save", t);
+        }
+        fireDownloadUpdate(th);
+        th.resume();
+      } else {
+        if (infoHashV1 == null) {
+          LOG.info(
+              "BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
+          // Store priorities for V2-only torrents to apply them when the ADD_TORRENT alert fires
+          if (priorities != null) {
+            try {
+              Sha256Hash v2Hash = ti.infoHashV2();
+              if (v2Hash != null && !v2Hash.isAllZeros()) {
+                String hashKey = v2Hash.toString();
+                synchronized (pendingV2TorrentPriorities) {
+                  pendingV2TorrentPriorities.put(hashKey, priorities.clone());
+                }
+                LOG.info("BTEngine.download() - stored priorities for v2-only torrent: " + hashKey);
+              }
+            } catch (Throwable t) {
+              LOG.warn("BTEngine.download() - unable to store priorities for v2-only torrent", t);
+            }
+          }
+        } else {
+          LOG.warn(
+              "BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
+        }
+      }
+    }
+  }
+
+  private void onExternalIpAlert(ExternalIpAlert alert) {
+    try {
+      // libtorrent perform all kinds of tests
+      // to avoid non-usable addresses
+      String address = alert.externalAddress().toString();
+      LOG.info("External IP: " + address);
+      if (address != null && !address.isEmpty()) {
+        lastExternalIp = address;
+      }
+    } catch (Throwable e) {
+      LOG.error("Error saving reported external ip", e);
+    }
+  }
+
+  /**
+   * Last external IP reported by libtorrent, or null if unknown yet. Read fresh on every call —
+   * carriers rebind it (CGNAT), so never cache it.
+   */
+  public String getExternalIp() {
+    return lastExternalIp;
+  }
+
+  private void onFastresumeRejected(FastresumeRejectedAlert alert) {
+    try {
+      LOG.warn(
+          "Failed to load fastresume data, path: "
+              + alert.filePath()
+              + ", operation: "
+              + alert.operation()
+              + ", error: "
+              + alert.error().message());
+    } catch (Throwable e) {
+      LOG.error("Error logging fastresume rejected alert", e);
+    }
+  }
+
+  private void onDhtBootstrap() {
+    // long nodes = stats().dhtNodes();
+    // LOG.info("DHT bootstrap, total nodes=" + nodes);
+  }
+
+  private void printAlert(@SuppressWarnings("rawtypes") Alert alert) {
+    LOG.info("Log: " + alert);
+  }
+
+  /**
+   * Helper method to safely get a hash that can be used with the find() method. For v2-only
+   * torrents, this will try to use the torrent handle's infoHash() if available, but for finding
+   * existing torrents, we need to handle the case where v1 hash is null.
+   *
+   * @param ti TorrentInfo object
+   * @return Sha1Hash if available, or null if this is a v2-only torrent
+   */
+  private Sha1Hash getSafeHashForFind(TorrentInfo ti) {
+    try {
+      return ti.infoHashV1();
+    } catch (Exception e) {
+      LOG.warn("TorrentInfo.infoHashV1(): " + e.getMessage());
+      return null;
+    }
+  }
+
+  private static class Loader {
+    static final BTEngine INSTANCE = new BTEngine();
+  }
+
+  private final class InnerListener implements AlertListener {
+    @Override
+    public int[] types() {
+      return INNER_LISTENER_TYPES;
     }
 
     @Override
-    public void download(String magnetUri, File saveDir, torrent_flags_t flags) {
-        download(magnetUri, saveDir, flags, null);
+    public void alert(Alert<?> alert) {
+      AlertType type = alert.type();
+      switch (type) {
+        case ADD_TORRENT:
+          TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
+          fireDownloadAdded(torrentAlert);
+          runNextRestoreDownloadTask();
+          break;
+        case LISTEN_SUCCEEDED:
+          onListenSucceeded((ListenSucceededAlert) alert);
+          break;
+        case LISTEN_FAILED:
+          onListenFailed((ListenFailedAlert) alert);
+          break;
+        case EXTERNAL_IP:
+          onExternalIpAlert((ExternalIpAlert) alert);
+          break;
+        case FASTRESUME_REJECTED:
+          onFastresumeRejected((FastresumeRejectedAlert) alert);
+          break;
+        case DHT_BOOTSTRAP:
+          onDhtBootstrap();
+          break;
+        case TORRENT_LOG:
+        case PEER_LOG:
+        case LOG:
+          printAlert(alert);
+          break;
+      }
+    }
+  }
+
+  private final class RestoreDownloadTask implements Runnable {
+    private final File torrent;
+    private final File saveDir;
+    private final Priority[] priorities;
+    private final File resume;
+
+    public RestoreDownloadTask(File torrent, File saveDir, Priority[] priorities, File resume) {
+      this.torrent = torrent;
+      this.saveDir = saveDir;
+      this.priorities = priorities;
+      this.resume = resume;
     }
 
-    /** Add a search-result magnet while retaining its verified source attribution. */
-    public void download(
-            String magnetUri, File saveDir, torrent_flags_t flags, byte[] distributedSourcePeerPub) {
-        if (swig() == null) {
-            return;
-        }
-        saveDir = setupSaveDir(saveDir);
-        if (saveDir == null) {
-            return;
-        }
-
-        AddTorrentParams params = AddTorrentParams.parseMagnetUri(magnetUri);
-        InfoHash infoHash = params.getInfoHashes();
-        rememberSourcePeer(infoHash, distributedSourcePeerPub);
-        LOG.info("BTEngine.download(magnet): explicit peer count=" + params.peers().size());
-        TorrentHandle handle = infoHash.hasV1() ? find(infoHash.getV1()) : find(infoHash.getV2());
-        if (handle != null && handle.isValid()) {
-            for (TcpEndpoint peer : params.peers()) {
-                handle.swig().connect_peer(peer.swig());
-            }
-            handle.resume();
-            fireDownloadUpdate(handle);
-            return;
-        }
-        rememberSourcePeer(infoHash, distributedSourcePeerPub);
-        super.download(magnetUri, saveDir, flags);
+    @Override
+    public void run() {
+      try {
+        download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
+      } catch (Throwable e) {
+        LOG.error(
+            "Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")",
+            e);
+        // A corrupt or unloadable session file must not block later restores.
+        runNextRestoreDownloadTask();
+      }
     }
-
-    public void download(TorrentCrawledSearchResult sr, File saveDir) {
-        download(sr, saveDir, false);
-    }
-
-    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean dontSaveTorrentFile) {
-        if (swig() == null) {
-            return;
-        }
-        saveDir = setupSaveDir(saveDir);
-        if (saveDir == null) {
-            return;
-        }
-        TorrentInfo ti = sr.getTorrentInfo();
-        int fileIndex = sr.getFileIndex();
-        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
-        boolean exists = th != null;
-        if (th != null) {
-            Priority[] priorities = th.filePriorities();
-            if (priorities[fileIndex] == Priority.IGNORE) {
-                priorities[fileIndex] = Priority.NORMAL;
-                download(ti, saveDir, priorities, null, null);
-            }
-        } else {
-            Priority[] priorities = Priority.array(Priority.IGNORE, ti.numFiles());
-            priorities[fileIndex] = Priority.NORMAL;
-            download(ti, saveDir, priorities, null, null);
-        }
-        if (!exists) {
-            saveResumeTorrent(ti);
-            if (!dontSaveTorrentFile) {
-                saveTorrent(ti);
-            }
-        }
-    }
-
-    public void restoreDownloads() {
-        if (swig() == null) {
-            return;
-        }
-        if (ctx.homeDir == null || !ctx.homeDir.exists()) {
-            LOG.warn("Wrong setup with BTEngine home dir");
-            return;
-        }
-        File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
-        LOG.info("restoreDownloads: " + (torrents == null ? 0 : torrents.length) + " session torrent file(s) in " + ctx.homeDir);
-        if (torrents != null) {
-            for (File t : torrents) {
-                try {
-                    String fileNameHash = FilenameUtils.getBaseName(t.getName());
-                    if (fileNameHash != null) {
-                        TorrentInfo restoredInfo = null;
-                        try {
-                            restoredInfo = new TorrentInfo(t);
-                        } catch (Throwable ignored) {
-                            // RestoreDownloadTask will report the failure
-                        }
-                        File resumeFile = resumeFileFor(fileNameHash, restoredInfo);
-                        File savePath = readSavePath(resumeFile);
-                        File checked = setupSaveDir(savePath);
-                        if (checked == null) {
-                            checked = setupSaveDir(ctx.dataDir);
-                        }
-                        if (checked == null) {
-                            LOG.warn("Can't create data dir or mount point is not accessible for infoHash=" + fileNameHash);
-                            continue;
-                        }
-                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, checked, null, resumeFile));
-                    }
-                } catch (Throwable e) {
-                    LOG.error("Error restoring torrent download: " + t, e);
-                }
-                runNextRestoreDownloadTask();
-            }
-        }
-    }
-
-    File settingsFile() {
-        return new File(ctx.homeDir, "settings.dat");
-    }
-
-    File resumeTorrentFile(String infoHash) {
-        return new File(ctx.homeDir, infoHash + ".torrent");
-    }
-
-    /**
-     * Ensures the session .torrent file exists for a handle, using the same
-     * hash naming the resume backfill and serializer use. Magnet-origin
-     * torrents never go through a .torrent-saving download path, so without
-     * this the restore scan cannot see them on the next launch.
-     */
-    void ensureResumeTorrentFile(TorrentHandle th) {
-        try {
-            if (th == null || !th.isValid()) {
-                return;
-            }
-            String hash = canonicalInfoHash(th);
-            if (hash == null || resumeTorrentFile(hash).exists()) {
-                return;
-            }
-            TorrentInfo ti = th.torrentFile();
-            if (ti == null) {
-                return;
-            }
-            entry e = ti.toEntry().swig();
-            FileUtils.writeByteArrayToFile(
-                    resumeTorrentFile(hash), Vectors.byte_vector2bytes(e.bencode()));
-        } catch (Throwable t) {
-            LOG.warn("Error ensuring resume torrent file", t);
-        }
-    }
-
-    File torrentFile(String name) {
-        return new File(ctx.torrentsDir, name + ".torrent");
-    }
-
-    File resumeDataFile(String infoHash) {
-        return new File(ctx.homeDir, infoHash + ".resume");
-    }
-
-    /**
-     * Canonical persistence hash used to name BOTH the session .torrent and its
-     * .resume sidecar: v1 when the torrent has one, else v2. Hybrid/v2 torrents
-     * used to record the .torrent under v1 ({@code ti.infoHashV1()}) but the
-     * resume under {@code torrent_handle.infoHash()} (v2), so restore looked up
-     * {@code <v1>.resume}, found nothing, and fell back to the default data dir.
-     */
-    String canonicalInfoHash(TorrentInfo ti) {
-        if (ti == null) {
-            return null;
-        }
-        try {
-            Sha1Hash v1 = ti.infoHashV1();
-            if (v1 != null) {
-                return v1.toString().toLowerCase();
-            }
-        } catch (Throwable ignored) {
-            // fall through to v2
-        }
-        try {
-            Sha256Hash v2 = ti.infoHashV2();
-            if (v2 != null && !v2.isAllZeros()) {
-                return v2.toString().toLowerCase();
-            }
-        } catch (Throwable ignored) {
-            // no usable hash
-        }
-        return null;
-    }
-
-    String canonicalInfoHash(TorrentHandle th) {
-        if (th == null) {
-            return null;
-        }
-        try {
-            String hash = canonicalInfoHash(th.torrentFile());
-            if (hash != null) {
-                return hash;
-            }
-        } catch (Throwable ignored) {
-            // fall back to the handle hash
-        }
-        try {
-            return th.infoHash().toString().toLowerCase();
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
-
-    private String canonicalInfoHash(InfoHash hashes) {
-        if (hashes == null) {
-            return null;
-        }
-        try {
-            if (hashes.hasV1()) {
-                return hashes.getV1().toString().toLowerCase(Locale.ROOT);
-            }
-            Sha256Hash v2 = hashes.getV2();
-            return v2 == null || v2.isAllZeros()
-                    ? null
-                    : v2.toString().toLowerCase(Locale.ROOT);
-        } catch (Throwable unavailable) {
-            return null;
-        }
-    }
-
-    private void rememberSourcePeer(String infoHash, byte[] sourcePeerPub) {
-        if (infoHash == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
-            return;
-        }
-        rememberSourcePeer(infoHash, new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis()));
-    }
-
-    private void rememberSourcePeer(InfoHash infoHashes, byte[] sourcePeerPub) {
-        if (infoHashes == null || sourcePeerPub == null || sourcePeerPub.length != 32) {
-            return;
-        }
-        PendingSourcePeer pending = new PendingSourcePeer(sourcePeerPub, System.currentTimeMillis());
-        if (infoHashes.hasV1()) {
-            rememberSourcePeer(infoHashes.getV1().toString().toLowerCase(Locale.ROOT), pending);
-        }
-        try {
-            Sha256Hash v2 = infoHashes.getV2();
-            if (v2 != null && !v2.isAllZeros()) {
-                rememberSourcePeer(v2.toString().toLowerCase(Locale.ROOT), pending);
-            }
-        } catch (Throwable ignored) {
-            // A v1-only magnet has no v2 alias.
-        }
-    }
-
-    private void rememberSourcePeer(String infoHash, PendingSourcePeer pending) {
-        if (infoHash == null || pending == null) {
-            return;
-        }
-        long now = System.currentTimeMillis();
-        synchronized (pendingSourcePeers) {
-            pendingSourcePeers.entrySet().removeIf(
-                    entry -> now - entry.getValue().createdAtMs > PENDING_SOURCE_TTL_MS);
-            if (!pendingSourcePeers.containsKey(infoHash)
-                    && pendingSourcePeers.size() >= MAX_PENDING_SOURCE_PEERS) {
-                pendingSourcePeers.remove(pendingSourcePeers.keySet().iterator().next());
-            }
-            pendingSourcePeers.putIfAbsent(infoHash, pending);
-        }
-    }
-
-    private void applyPendingSourcePeer(TorrentHandle handle, BTDownload download) {
-        String infoHash = canonicalInfoHash(handle);
-        if (infoHash == null || download == null) {
-            return;
-        }
-        PendingSourcePeer source;
-        synchronized (pendingSourcePeers) {
-            source = pendingSourcePeers.remove(infoHash);
-            if (source == null) {
-                try {
-                    source = pendingSourcePeers.remove(handle.infoHash().toString().toLowerCase(Locale.ROOT));
-                } catch (Throwable ignored) {
-                    // The canonical hash above is the normal path.
-                }
-            }
-            if (source != null) {
-                PendingSourcePeer consumed = source;
-                pendingSourcePeers.entrySet().removeIf(entry -> entry.getValue() == consumed);
-                if (System.currentTimeMillis() - source.createdAtMs > PENDING_SOURCE_TTL_MS) {
-                    source = null;
-                }
-            }
-        }
-        if (source != null) {
-            download.setDistributedSourcePeerPub(source.peerPub);
-        }
-    }
-
-    private static final class PendingSourcePeer {
-        final byte[] peerPub;
-        final long createdAtMs;
-
-        PendingSourcePeer(byte[] peerPub, long createdAtMs) {
-            this.peerPub = peerPub.clone();
-            this.createdAtMs = createdAtMs;
-        }
-    }
-
-    /**
-     * Locates the resume sidecar for a restored session torrent by trying the
-     * .torrent filename hash first, then both info hashes from its contents.
-     * Heals installs written before the naming was unified.
-     */
-    private File resumeFileFor(String fileNameHash, TorrentInfo ti) {
-        java.util.List<String> candidates = new java.util.ArrayList<>(3);
-        if (fileNameHash != null && !fileNameHash.isEmpty()) {
-            candidates.add(fileNameHash.toLowerCase());
-        }
-        if (ti != null) {
-            try {
-                Sha1Hash v1 = ti.infoHashV1();
-                if (v1 != null) {
-                    candidates.add(v1.toString().toLowerCase());
-                }
-            } catch (Throwable ignored) {
-            }
-            try {
-                Sha256Hash v2 = ti.infoHashV2();
-                if (v2 != null && !v2.isAllZeros()) {
-                    String v2hex = v2.toString().toLowerCase();
-                    candidates.add(v2hex);
-                    // Legacy resume naming used torrent_handle.infoHash(), a
-                    // 20-byte hash: for v2 that is the truncated v2 prefix.
-                    if (v2hex.length() > 40) {
-                        candidates.add(v2hex.substring(0, 40));
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-        for (String candidate : candidates) {
-            File file = resumeDataFile(candidate);
-            if (file.exists()) {
-                return file;
-            }
-        }
-        return resumeDataFile(fileNameHash != null ? fileNameHash.toLowerCase() : "");
-    }
-
-    File readSavePath(String infoHash) {
-        return readSavePath(resumeDataFile(infoHash));
-    }
-
-    private File readSavePath(File resumeFile) {
-        File savePath = null;
-        try {
-            byte[] arr = FileUtils.readFileToByteArray(resumeFile);
-            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
-            savePath = new File(e.dict().get("save_path").string());
-        } catch (Throwable e) {
-            // can't recover the original torrent path
-        }
-        return savePath;
-    }
-
-    File readTorrentPath(String infoHash) {
-        File torrent = null;
-        try {
-            byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
-            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
-            torrent = new File(e.dict().get(TORRENT_ORIG_PATH_KEY).string());
-        } catch (Throwable e) {
-            // can't recover an original torrent path
-        }
-        return torrent;
-    }
-
-    private void saveTorrent(TorrentInfo ti) {
-        File torrentFile;
-        try {
-            String name = getEscapedFilename(ti);
-            torrentFile = torrentFile(name);
-            File parent = torrentFile.getParentFile();
-            if (parent != null && !parent.exists()) {
-                parent.mkdirs();
-            }
-            byte[] arr = ti.toEntry().bencode();
-            FileSystem fs = Platforms.get().fileSystem();
-            fs.write(torrentFile, arr);
-        } catch (Throwable e) {
-            LOG.warn("Error saving torrent info to file", e);
-        }
-    }
-
-    private void saveResumeTorrent(TorrentInfo ti) {
-        try {
-            String name = getEscapedFilename(ti);
-            entry e = ti.toEntry().swig();
-            e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
-            byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-            String hash = canonicalInfoHash(ti);
-            if (hash != null) {
-                FileUtils.writeByteArrayToFile(resumeTorrentFile(hash), arr);
-            } else {
-                LOG.warn("Cannot save session torrent - no usable info hash");
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error saving resume torrent", e);
-        }
-    }
-
-    private String getEscapedFilename(TorrentInfo ti) {
-        String name = ti.name();
-        if (name == null || name.isEmpty()) {
-            Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-            name = infoHashV1 != null ? infoHashV1.toString() : "unknown";
-        }
-        return escapeFilename(name);
-    }
-
-    private void fireStarted() {
-        BTEngineListener snapshot = listener;
-        if (snapshot != null) {
-            snapshot.started(this);
-        }
-    }
-
-    private void fireStopped() {
-        BTEngineListener snapshot = listener;
-        if (snapshot != null) {
-            snapshot.stopped(this);
-        }
-    }
-
-    private void fireDownloadAdded(TorrentAlert<?> alert) {
-        try {
-            TorrentHandle th = find(alert.handle().infoHash());
-            if (th != null) {
-                // Check if this is a V2-only torrent with stored priorities
-                String infoHashStr = alert.handle().infoHash().toString();
-                LOG.info("BTEngine.fireDownloadAdded() - alert hash: " + infoHashStr);
-
-                Priority[] storedPriorities;
-                synchronized (pendingV2TorrentPriorities) {
-                    // Try to find stored priorities using the alert hash
-                    storedPriorities = pendingV2TorrentPriorities.remove(infoHashStr);
-
-                    // If not found, try to find by iterating through stored hashes (for debugging)
-                    if (storedPriorities == null) {
-                        LOG.info("BTEngine.fireDownloadAdded() - stored priority keys: " + pendingV2TorrentPriorities.keySet());
-                        // Try to find a matching key by checking if this torrent is V2-only
-                        try {
-                            TorrentInfo ti = th.torrentFile();
-                            if (ti != null) {
-                                Sha1Hash v1Hash = null;
-                                try {
-                                    v1Hash = ti.infoHashV1();
-                                } catch (Exception e) {
-                                    // V2-only torrent
-                                }
-
-                                if (v1Hash == null) {
-                                    // This is a V2-only torrent, try to match by V2 hash
-                                    Sha256Hash v2Hash = ti.infoHashV2();
-                                    if (v2Hash != null) {
-                                        String v2HashStr = v2Hash.toString();
-                                        LOG.info("BTEngine.fireDownloadAdded() - torrent V2 hash: " + v2HashStr);
-                                        storedPriorities = pendingV2TorrentPriorities.remove(v2HashStr);
-                                    }
-                                }
-                            }
-                        } catch (Throwable t) {
-                            LOG.warn("BTEngine.fireDownloadAdded() - unable to get torrent info for hash matching", t);
-                        }
-                    }
-                }
-
-                if (storedPriorities != null) {
-                    LOG.info("BTEngine.fireDownloadAdded() - applying stored priorities for v2-only torrent: " + infoHashStr);
-                    try {
-                        th.prioritizeFiles(storedPriorities);
-                        th.resume(); // Resume the torrent now that priorities are set
-                    } catch (Throwable t) {
-                        LOG.warn("BTEngine.fireDownloadAdded() - unable to apply stored priorities", t);
-                    }
-                } else {
-                    LOG.info("BTEngine.fireDownloadAdded() - no stored priorities found for hash: " + infoHashStr);
-                }
-
-                BTDownload dl = new BTDownload(this, th);
-                applyPendingSourcePeer(th, dl);
-                BTEngineListener snapshot = listener;
-                if (snapshot != null) {
-                    snapshot.downloadAdded(this, dl);
-                }
-            } else {
-                LOG.info("torrent was not successfully added");
-            }
-        } catch (Throwable e) {
-            LOG.error("Unable to create and/or notify the new download", e);
-        }
-    }
-
-    private void fireDownloadUpdate(TorrentHandle th) {
-        try {
-            BTDownload dl = new BTDownload(this, th);
-            applyPendingSourcePeer(th, dl);
-            BTEngineListener snapshot = listener;
-            if (snapshot != null) {
-                snapshot.downloadUpdate(this, dl);
-            }
-        } catch (Throwable e) {
-            LOG.error("Unable to notify update the a download", e);
-        }
-    }
-
-    private void onListenSucceeded(ListenSucceededAlert alert) {
-        try {
-            String endp = alert.address() + ":" + alert.port();
-            String s = "endpoint: " + endp + " type:" + alert.socketType();
-            LOG.info("Listen succeeded on " + s);
-        } catch (Throwable e) {
-            LOG.error("Error adding listen endpoint to internal list", e);
-        }
-    }
-
-    private void onListenFailed(ListenFailedAlert alert) {
-        String endp = alert.address() + ":" + alert.port();
-        String s = "endpoint: " + endp + " type:" + alert.socketType();
-        ErrorCode error = alert.error();
-        String message = error.message() + "/value=" + error.value();
-        String op;
-        String iface;
-        try {
-            op = String.valueOf(alert.operation());
-        } catch (Throwable ignored) {
-            op = "?";
-        }
-        try {
-            iface = String.valueOf(alert.listenInterface());
-        } catch (Throwable ignored) {
-            iface = "?";
-        }
-        LOG.info("Listen failed on " + s + " op=" + op + " iface=" + iface + " (error: " + message + ")");
-    }
-
-    private File setupSaveDir(File saveDir) {
-        File result = null;
-        if (saveDir == null) {
-            if (ctx.dataDir != null) {
-                result = ctx.dataDir;
-            } else {
-                LOG.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
-            }
-        } else {
-            result = saveDir;
-        }
-        FileSystem fs = Platforms.get().fileSystem();
-        if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
-            result = null;
-            LOG.warn("Failed to create save dir to download");
-        }
-        if (result != null && !fs.canWrite(result)) {
-            result = null;
-            LOG.warn("Failed to setup save dir with write access");
-        }
-        return result;
-    }
-
-    private void runNextRestoreDownloadTask() {
-        RestoreDownloadTask task = null;
-        try {
-            if (!restoreDownloadsQueue.isEmpty()) {
-                task = restoreDownloadsQueue.poll();
-            }
-        } catch (Throwable t) {
-            // on Android, LinkedList's .poll() implementation throws a NoSuchElementException
-        }
-        if (task != null) {
-            task.run();
-        }
-    }
-
-    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, @SuppressWarnings("SameParameterValue") File resumeFile, List<TcpEndpoint> peers) {
-        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
-        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
-        if (th != null) {
-            // found a download with the same hash, just adjust the priorities if needed
-            if (priorities != null) {
-                if (ti.numFiles() != priorities.length) {
-                    throw new IllegalArgumentException("The priorities length should be equals to the number of files");
-                }
-                th.prioritizeFiles(priorities);
-            } else {
-                // did they just add the entire torrent (therefore not selecting any priorities)
-                final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.numFiles());
-                th.prioritizeFiles(wholeTorrentPriorities);
-            }
-            fireDownloadUpdate(th);
-            th.resume();
-        } else { // new Download (including v2-only torrents)
-            // Adds paused to avoid the race where default priorities are used
-            download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
-
-            // For v2-only torrents, we can't find by v1 hash, so we need to find it differently
-            // We'll wait a bit and then look for it by iterating through handles or rely on alerts
-            if (infoHashV1 != null) {
-                // Try to find by v1 hash for v1-only and hybrid torrents
-                th = find(infoHashV1);
-            }
-
-            if (th != null) {
-                LOG.info("BTEngine.download() - new download - torrent_handle found in session");
-                // Re-apply priorities on the handle to be 100% sure they stick
-                if (priorities != null && priorities.length == ti.numFiles()) {
-                    th.prioritizeFiles(priorities);
-                }
-                try {
-                    th.setFlags(TorrentFlags.NEED_SAVE_RESUME);
-                    th.saveResumeData(TorrentHandle.SAVE_INFO_DICT);
-                } catch (Throwable t) {
-                    LOG.warn("BTEngine.download() - unable to trigger initial resume save", t);
-                }
-                fireDownloadUpdate(th);
-                th.resume();
-            } else {
-                if (infoHashV1 == null) {
-                    LOG.info("BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
-                    // Store priorities for V2-only torrents to apply them when the ADD_TORRENT alert fires
-                    if (priorities != null) {
-                        try {
-                            Sha256Hash v2Hash = ti.infoHashV2();
-                            if (v2Hash != null && !v2Hash.isAllZeros()) {
-                                String hashKey = v2Hash.toString();
-                                synchronized (pendingV2TorrentPriorities) {
-                                    pendingV2TorrentPriorities.put(hashKey, priorities.clone());
-                                }
-                                LOG.info("BTEngine.download() - stored priorities for v2-only torrent: " + hashKey);
-                            }
-                        } catch (Throwable t) {
-                            LOG.warn("BTEngine.download() - unable to store priorities for v2-only torrent", t);
-                        }
-                    }
-                } else {
-                    LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
-                }
-            }
-        }
-    }
-
-    private void onExternalIpAlert(ExternalIpAlert alert) {
-        try {
-            // libtorrent perform all kinds of tests
-            // to avoid non-usable addresses
-            String address = alert.externalAddress().toString();
-            LOG.info("External IP: " + address);
-            if (address != null && !address.isEmpty()) {
-                lastExternalIp = address;
-            }
-        } catch (Throwable e) {
-            LOG.error("Error saving reported external ip", e);
-        }
-    }
-
-    /**
-     * Last external IP reported by libtorrent, or null if unknown yet. Read
-     * fresh on every call — carriers rebind it (CGNAT), so never cache it.
-     */
-    public String getExternalIp() {
-        return lastExternalIp;
-    }
-
-    private void onFastresumeRejected(FastresumeRejectedAlert alert) {
-        try {
-            LOG.warn("Failed to load fastresume data, path: " + alert.filePath() +
-                    ", operation: " + alert.operation() + ", error: " + alert.error().message());
-        } catch (Throwable e) {
-            LOG.error("Error logging fastresume rejected alert", e);
-        }
-    }
-
-    private void onDhtBootstrap() {
-        //long nodes = stats().dhtNodes();
-        //LOG.info("DHT bootstrap, total nodes=" + nodes);
-    }
-
-    private void printAlert(@SuppressWarnings("rawtypes") Alert alert) {
-        LOG.info("Log: " + alert);
-    }
-
-    /**
-     * Helper method to safely get a hash that can be used with the find() method.
-     * For v2-only torrents, this will try to use the torrent handle's infoHash() if available,
-     * but for finding existing torrents, we need to handle the case where v1 hash is null.
-     *
-     * @param ti TorrentInfo object
-     * @return Sha1Hash if available, or null if this is a v2-only torrent
-     */
-    private Sha1Hash getSafeHashForFind(TorrentInfo ti) {
-        try {
-            return ti.infoHashV1();
-        } catch (Exception e) {
-            LOG.warn("TorrentInfo.infoHashV1(): " + e.getMessage());
-            return null;
-        }
-    }
-
-    private static class Loader {
-        static final BTEngine INSTANCE = new BTEngine();
-    }
-
-    private final class InnerListener implements AlertListener {
-        @Override
-        public int[] types() {
-            return INNER_LISTENER_TYPES;
-        }
-
-        @Override
-        public void alert(Alert<?> alert) {
-            AlertType type = alert.type();
-            switch (type) {
-                case ADD_TORRENT:
-                    TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
-                    fireDownloadAdded(torrentAlert);
-                    runNextRestoreDownloadTask();
-                    break;
-                case LISTEN_SUCCEEDED:
-                    onListenSucceeded((ListenSucceededAlert) alert);
-                    break;
-                case LISTEN_FAILED:
-                    onListenFailed((ListenFailedAlert) alert);
-                    break;
-                case EXTERNAL_IP:
-                    onExternalIpAlert((ExternalIpAlert) alert);
-                    break;
-                case FASTRESUME_REJECTED:
-                    onFastresumeRejected((FastresumeRejectedAlert) alert);
-                    break;
-                case DHT_BOOTSTRAP:
-                    onDhtBootstrap();
-                    break;
-                case TORRENT_LOG:
-                case PEER_LOG:
-                case LOG:
-                    printAlert(alert);
-                    break;
-            }
-        }
-    }
-
-    private final class RestoreDownloadTask implements Runnable {
-        private final File torrent;
-        private final File saveDir;
-        private final Priority[] priorities;
-        private final File resume;
-
-        public RestoreDownloadTask(File torrent, File saveDir, Priority[] priorities, File resume) {
-            this.torrent = torrent;
-            this.saveDir = saveDir;
-            this.priorities = priorities;
-            this.resume = resume;
-        }
-
-        @Override
-        public void run() {
-            try {
-                download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
-            } catch (Throwable e) {
-                LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
-                // A corrupt or unloadable session file must not block later restores.
-                runNextRestoreDownloadTask();
-            }
-        }
-    }
+  }
 }
