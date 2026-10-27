@@ -748,6 +748,7 @@ test {
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailActionsTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesProgressTest"
         includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailFilesSelectionTest"
+        includeTestsMatching "com.frostwire.gui.components.transfers.TransferDetailRevalidationTest"
         includeTestsMatching "com.frostwire.gui.components.slides.*"
         includeTestsMatching "com.limegroup.gnutella.gui.util.CoalescingGateTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.SwingDebouncerTest"

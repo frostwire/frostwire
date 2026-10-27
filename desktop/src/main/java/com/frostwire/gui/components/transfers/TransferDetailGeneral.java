@@ -32,6 +32,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.SizeStableLabel;
 import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -45,6 +46,8 @@ import net.miginfocom.swing.MigLayout;
 
 public final class TransferDetailGeneral extends JPanel
     implements TransferDetailComponent.TransferDetailPanel {
+  // The value labels change text on every refresh; SizeStableLabel keeps a change that leaves their
+  // size alone from re-laying out the whole window (frostwire/frostwire#1342).
   private final JProgressBar completionPercentageProgressbar;
   private final JLabel timeElapsedLabel;
   private final JLabel torrentNameLabel;
@@ -121,9 +124,9 @@ public final class TransferDetailGeneral extends JPanel
     JLabel nameLabel = new JLabel();
     JLabel completeLabel = new JLabel();
     upperPanel.add(nameLabel, "left, gapleft 2px, gapright 10px");
-    upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 10px");
+    upperPanel.add(torrentNameLabel = new SizeStableLabel(), "left, gapright 10px");
     upperPanel.add(new JLabel("|"), "left, gapright 10px");
-    upperPanel.add(completionPercentageLabel = new JLabel(), "left, gapright 5px");
+    upperPanel.add(completionPercentageLabel = new SizeStableLabel(), "left, gapright 5px");
     upperPanel.add(completeLabel, "left, pushx, wrap");
     upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
     // Defer HTML content to avoid EDT violation
@@ -141,38 +144,38 @@ public final class TransferDetailGeneral extends JPanel
     midPanel.setOpaque(true);
     // time elapsed, time left, download speed, status
     midPanel.add(new JGrayLabel(I18n.tr("Time elapsed") + ":"), "split 2, gapright 10");
-    midPanel.add(timeElapsedLabel = new JLabel(), "gapright 50");
+    midPanel.add(timeElapsedLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Time left") + ":"), "split 2, gapright 10");
-    midPanel.add(timeLeftLabel = new JLabel(), "gapright 50");
+    midPanel.add(timeLeftLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Download speed") + ":"), "split 2, gapright 10");
-    midPanel.add(downloadSpeedLabel = new JLabel(), "gapright 50");
+    midPanel.add(downloadSpeedLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Status") + ":"), "split 2, gapright 10");
-    midPanel.add(statusLabel = new JLabel(), "gapright 50, wrap");
+    midPanel.add(statusLabel = new SizeStableLabel(), "gapright 50, wrap");
     // Downloaded, seeds, download limit
     midPanel.add(new JGrayLabel(I18n.tr("Downloaded") + ":"), "split 2, gapright 10");
-    midPanel.add(downloadedLabel = new JLabel(), "gapright 50");
+    midPanel.add(downloadedLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Seeds") + ":"), "split 2, gapright 10");
-    midPanel.add(seedsLabel = new JLabel(), "gapright 50");
+    midPanel.add(seedsLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Download limit") + ":"), "split 3, gapright 10");
-    midPanel.add(downloadSpeedLimitLabel = new JLabel(), "gapright 5");
+    midPanel.add(downloadSpeedLimitLabel = new SizeStableLabel(), "gapright 5");
     IconButton downloadSpeedLimitButton = new IconButton("SPEED_LIMIT_SETTINGS", 20, 20);
     downloadSpeedLimitButton.setToolTipText(I18n.tr("Adjust download speed limit"));
     downloadSpeedLimitButton.addActionListener(e -> onAdjustDownloadSpeedLimit());
     midPanel.add(downloadSpeedLimitButton, "gapright 50, wrap");
     // Uploaded, peers, upload speed
     midPanel.add(new JGrayLabel(I18n.tr("Uploaded") + ":"), "split 2, gapright 10");
-    midPanel.add(uploadedLabel = new JLabel(), "gapright 50");
+    midPanel.add(uploadedLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Peers") + ":"), "split 2, gapright 10");
-    midPanel.add(peersLabel = new JLabel(), "gapright 50");
+    midPanel.add(peersLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Upload speed") + ":"), "split 2, gapright 10");
-    midPanel.add(uploadSpeedLabel = new JLabel(), "gapright 50, wrap");
+    midPanel.add(uploadSpeedLabel = new SizeStableLabel(), "gapright 50, wrap");
     // Total Size, share ratio, upload limit
     midPanel.add(new JGrayLabel(I18n.tr("Total size") + ":"), "split 2, gapright 10");
-    midPanel.add(totalSizeLabel = new JLabel(), "gapright 50");
+    midPanel.add(totalSizeLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Share ratio")), "split 2, gapright 10");
-    midPanel.add(shareRatioLabel = new JLabel(), "gapright 50");
+    midPanel.add(shareRatioLabel = new SizeStableLabel(), "gapright 50");
     midPanel.add(new JGrayLabel(I18n.tr("Upload limit") + ":"), "split 3, gapright 10");
-    midPanel.add(uploadSpeedLimitLabel = new JLabel(), "gapright 5");
+    midPanel.add(uploadSpeedLimitLabel = new SizeStableLabel(), "gapright 5");
     IconButton uploadSpeedLimitButton = new IconButton("SPEED_LIMIT_SETTINGS", 20, 20);
     uploadSpeedLimitButton.setToolTipText(I18n.tr("Adjust upload speed limit"));
     uploadSpeedLimitButton.addActionListener(e -> onAdjustUploadSpeedLimit());
@@ -207,19 +210,19 @@ public final class TransferDetailGeneral extends JPanel
     saveLocationGrayLabel =
         new JGrayLabel("<html><a href=\"#\">" + I18n.tr("Save location") + "</a>:</html>");
     lowerPanel.add(saveLocationGrayLabel, "split 2, gapright 10");
-    lowerPanel.add(saveLocationLabel = new JLabel(), "gapright 60, wrap");
+    lowerPanel.add(saveLocationLabel = new SizeStableLabel(), "gapright 60, wrap");
     final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
     final ImageIcon copy_paste = GUIMediator.getThemeImage("copy_paste.png");
     lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash") + ":"), "split 3, gapright 10");
-    lowerPanel.add(infoHashLabel = new JLabel(), "gapright 10");
+    lowerPanel.add(infoHashLabel = new SizeStableLabel(), "gapright 10");
     lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray), "wrap");
     lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL") + ":"), "split 3, gapright 10");
-    lowerPanel.add(magnetURLLabel = new JLabel(), "gapright 10");
+    lowerPanel.add(magnetURLLabel = new SizeStableLabel(), "gapright 10");
     lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray), "wrap");
     lowerPanel.add(new JGrayLabel(I18n.tr("Created On") + ":"), "split 2, gapright 10");
-    lowerPanel.add(createdOnLabel = new JLabel(), "gapright 60, wrap");
+    lowerPanel.add(createdOnLabel = new SizeStableLabel(), "gapright 60, wrap");
     lowerPanel.add(new JGrayLabel(I18n.tr("Comment") + ":"), "split 2, gapright 10");
-    lowerPanel.add(commentLabel = new JLabel(), "gapright 60, wrap");
+    lowerPanel.add(commentLabel = new SizeStableLabel(), "gapright 60, wrap");
     copyInfoHashButton.setPressedIcon(copy_paste);
     copyInfoHashButton.setContentAreaFilled(false);
     copyMagnetURLButton.setContentAreaFilled(false);
