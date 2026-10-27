@@ -7132,7 +7132,7 @@ msgstr "Anda boleh menukar kedua-dua pilihan kemudian di Alat > Pilihan > IceBri
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr ""
+msgstr "Kepingan"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
@@ -7141,7 +7141,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:220
 msgid "State"
-msgstr ""
+msgstr "Keadaan"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:224
 #, java-format
@@ -7150,11 +7150,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:227
 msgid "Byte range"
-msgstr ""
+msgstr "Julat bait"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:230
 msgid "Peers with it"
-msgstr ""
+msgstr "Rakan yang memilikinya"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:265
 #, java-format
@@ -7163,7 +7163,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:275
 msgid "Downloaded and verified"
-msgstr ""
+msgstr "Dimuat turun dan disahkan"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:280
 #, java-format
@@ -7172,12 +7172,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:285
 msgid "Not downloading (skipped files)"
-msgstr ""
+msgstr "Tidak dimuat turun (fail dilangkau)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:287
 msgid "Missing"
-msgstr ""
+msgstr "Tiada"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
-msgstr ""
+msgstr "Langkau"

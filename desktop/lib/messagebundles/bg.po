@@ -7038,7 +7038,7 @@ msgstr "Можете да промените двете опции по-късн
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr ""
+msgstr "Част"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
@@ -7047,7 +7047,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:220
 msgid "State"
-msgstr ""
+msgstr "Състояние"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:224
 #, java-format
@@ -7056,11 +7056,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:227
 msgid "Byte range"
-msgstr ""
+msgstr "Диапазон от байтове"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:230
 msgid "Peers with it"
-msgstr ""
+msgstr "Участници, които я имат"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:265
 #, java-format
@@ -7069,7 +7069,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:275
 msgid "Downloaded and verified"
-msgstr ""
+msgstr "Изтеглена и проверена"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:280
 #, java-format
@@ -7078,12 +7078,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:285
 msgid "Not downloading (skipped files)"
-msgstr ""
+msgstr "Не се изтегля (пропуснати файлове)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:287
 msgid "Missing"
-msgstr ""
+msgstr "Липсва"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
-msgstr ""
+msgstr "Пропусни"

@@ -7057,7 +7057,7 @@ msgstr "どちらのオプションも、後で ツール > オプション > Ic
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr ""
+msgstr "ピース"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
@@ -7066,7 +7066,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:220
 msgid "State"
-msgstr ""
+msgstr "状態"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:224
 #, java-format
@@ -7075,11 +7075,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:227
 msgid "Byte range"
-msgstr ""
+msgstr "バイト範囲"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:230
 msgid "Peers with it"
-msgstr ""
+msgstr "保有しているピア"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:265
 #, java-format
@@ -7088,7 +7088,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:275
 msgid "Downloaded and verified"
-msgstr ""
+msgstr "ダウンロード済み・検証済み"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:280
 #, java-format
@@ -7097,12 +7097,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:285
 msgid "Not downloading (skipped files)"
-msgstr ""
+msgstr "ダウンロードしない（スキップしたファイル）"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:287
 msgid "Missing"
-msgstr ""
+msgstr "未取得"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
-msgstr ""
+msgstr "スキップ"

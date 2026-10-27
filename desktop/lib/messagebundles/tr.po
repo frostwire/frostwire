@@ -7071,7 +7071,7 @@ msgstr "Her iki seçeneği de daha sonra Araçlar > Seçenekler > IceBridge böl
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr ""
+msgstr "Parça"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
@@ -7080,7 +7080,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:220
 msgid "State"
-msgstr ""
+msgstr "Durum"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:224
 #, java-format
@@ -7089,11 +7089,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:227
 msgid "Byte range"
-msgstr ""
+msgstr "Bayt aralığı"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:230
 msgid "Peers with it"
-msgstr ""
+msgstr "Buna sahip eşler"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:265
 #, java-format
@@ -7102,7 +7102,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:275
 msgid "Downloaded and verified"
-msgstr ""
+msgstr "İndirildi ve doğrulandı"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:280
 #, java-format
@@ -7111,12 +7111,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:285
 msgid "Not downloading (skipped files)"
-msgstr ""
+msgstr "İndirilmiyor (atlanan dosyalar)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:287
 msgid "Missing"
-msgstr ""
+msgstr "Eksik"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
-msgstr ""
+msgstr "Atla"

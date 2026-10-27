@@ -6411,7 +6411,7 @@ msgstr "می‌توانید هر دو گزینه را بعداً در ابزار
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:217
 msgid "Piece"
-msgstr ""
+msgstr "قطعه"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:219
 #, java-format
@@ -6420,7 +6420,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:220
 msgid "State"
-msgstr ""
+msgstr "وضعیت"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:224
 #, java-format
@@ -6429,11 +6429,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:227
 msgid "Byte range"
-msgstr ""
+msgstr "محدوده بایت"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:230
 msgid "Peers with it"
-msgstr ""
+msgstr "همتاهایی که آن را دارند"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:265
 #, java-format
@@ -6442,7 +6442,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:275
 msgid "Downloaded and verified"
-msgstr ""
+msgstr "دانلود و تأیید شد"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:280
 #, java-format
@@ -6451,12 +6451,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:285
 msgid "Not downloading (skipped files)"
-msgstr ""
+msgstr "دانلود نمی‌شود (فایل‌های ردشده)"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:287
 msgid "Missing"
-msgstr ""
+msgstr "موجود نیست"
 
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/frostwire/gui/components/transfers/TransferDetailPieces.java:292
 msgid "Skip"
-msgstr ""
+msgstr "رد کردن"
