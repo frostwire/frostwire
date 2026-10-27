@@ -24,10 +24,12 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * @author gubatron
@@ -80,7 +82,18 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
 
   private void updateDefaultSaveFolders(File newSaveFolder) {
     SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(newSaveFolder);
-    BTEngine.getInstance().moveStorage(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
+    moveTorrentStorage(
+        SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(),
+        dir -> BTEngine.getInstance().moveStorage(dir));
+  }
+
+  /**
+   * Moves the unfinished torrents to {@code dir} on the background queue. libtorrent is asked for
+   * every torrent and then for each one's status, each call waiting on its network thread, so this
+   * must not run on the EDT, which applies the options.
+   */
+  static void moveTorrentStorage(File dir, Consumer<File> moveStorage) {
+    BackgroundQueuedExecutorService.schedule(() -> moveStorage.accept(dir));
   }
 
   @Override
