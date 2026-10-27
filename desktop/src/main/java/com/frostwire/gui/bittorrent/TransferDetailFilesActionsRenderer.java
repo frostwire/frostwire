@@ -218,9 +218,10 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
 
     public void actionPerformed(ActionEvent ae) {
       File selectedFile = transferItemHolder.transferItem.getFile();
-      if (selectedFile.isFile() && selectedFile.getParentFile() != null) {
-        GUIMediator.launchExplorer(selectedFile);
-      }
+      // isFile() reads the file system, so it runs with the launch, off the EDT
+      GUIMediator.launchExplorer(
+          () ->
+              selectedFile.isFile() && selectedFile.getParentFile() != null ? selectedFile : null);
     }
   }
 

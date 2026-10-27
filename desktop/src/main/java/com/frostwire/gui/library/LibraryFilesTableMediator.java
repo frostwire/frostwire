@@ -689,9 +689,10 @@ public final class LibraryFilesTableMediator
         return;
       }
       File selectedFile = getFile(sel[0]);
-      if (selectedFile.isFile() && selectedFile.getParentFile() != null) {
-        GUIMediator.launchExplorer(selectedFile);
-      }
+      // isFile() reads the file system, so it runs with the launch, off the EDT
+      GUIMediator.launchExplorer(
+          () ->
+              selectedFile.isFile() && selectedFile.getParentFile() != null ? selectedFile : null);
     }
   }
 
