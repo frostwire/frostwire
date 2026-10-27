@@ -9,19 +9,29 @@ package com.frostwire.util;
 
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
+import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.CodeSource;
 import java.text.Collator;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import javax.swing.UIManager;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
@@ -42,6 +52,9 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Slow static initializers of JDK classes first used while painting or clicking, see {@link
  *       #CLASSES_TO_INITIALIZE}.
  *   <li>Locale data and tables behind the first number format, date format and collator.
+ *   <li>FrostWire's own classes for the main window and the big panes built right after it, see
+ *       {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their static initializers may
+ *       create Swing objects.
  * </ul>
  *
  * Steps run in the order the EDT first needs them: the splash window's text and progress label,
@@ -68,10 +81,38 @@ public final class JdkWarmUp {
   static final List<String> CLASSES_TO_INITIALIZE =
       List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
 
+  /**
+   * FrostWire packages whose classes the EDT reads from the jar and defines in bulk while it builds
+   * the main window and, right after startup, the Transfers, Search and Library panes. Every class
+   * directly in each package (subpackages are listed separately) is loaded without initialization,
+   * in this order, which is the order the EDT first needs them.
+   */
+  static final List<String> APP_PACKAGES_TO_LOAD =
+      List.of(
+          // Layout of every MigLayout container, starting with MainFrame's content pane.
+          "net.miginfocom.layout",
+          "net.miginfocom.swing",
+          // MainFrame's menu bar and the actions behind its items.
+          "com.limegroup.gnutella.gui.menu",
+          "com.limegroup.gnutella.gui.actions",
+          // Table mediators, LimeJTable, renderers and editors shared by every table pane.
+          "com.limegroup.gnutella.gui.tables",
+          // Transfers tab, built just after the main window (BTDownloadMediator,
+          // TransferActionsRenderer), and its detail panes.
+          "com.frostwire.gui.bittorrent",
+          "com.frostwire.gui.components.transfers",
+          // Search tab: SearchResultMediator, SearchOptionsPanel, SearchEngine and the anonymous
+          // class of each engine.
+          "com.limegroup.gnutella.gui.search",
+          // Library tab: LibraryMediator, its tree and its table mediators.
+          "com.frostwire.gui.library");
+
   /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
   private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";
 
   private static final String SYNTH_UI_PREFIX = "javax.swing.plaf.synth.Synth";
+
+  private static final String CLASS_SUFFIX = ".class";
 
   private JdkWarmUp() {}
 
@@ -117,9 +158,76 @@ public final class JdkWarmUp {
       }
     }
     try {
+      Path location = codeSourceOf(JdkWarmUp.class);
+      if (location != null) {
+        loadWithoutInitializing(
+            classNamesIn(location, APP_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
+      }
+    } catch (Throwable t) {
+      LOG.warn("App class warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /** The jar or class directory a class was loaded from, or null when unknown. */
+  static Path codeSourceOf(Class<?> type) {
+    try {
+      CodeSource source = type.getProtectionDomain().getCodeSource();
+      return source == null || source.getLocation() == null
+          ? null
+          : Path.of(source.getLocation().toURI());
+    } catch (URISyntaxException | RuntimeException e) {
+      return null;
+    }
+  }
+
+  /**
+   * Names of the classes (nested and anonymous ones included) directly in each package, package by
+   * package in the given order, found in a jar or a class directory.
+   */
+  static List<String> classNamesIn(Path location, List<String> packages) throws IOException {
+    Map<String, List<String>> byPackage = new LinkedHashMap<>();
+    for (String pkg : packages) {
+      byPackage.put(pkg, new ArrayList<>());
+    }
+    if (Files.isDirectory(location)) {
+      for (String pkg : packages) {
+        Path dir = location.resolve(pkg.replace('.', '/'));
+        if (Files.isDirectory(dir)) {
+          try (DirectoryStream<Path> files = Files.newDirectoryStream(dir, "*" + CLASS_SUFFIX)) {
+            for (Path file : files) {
+              addClassName(byPackage, pkg.replace('.', '/') + "/" + file.getFileName());
+            }
+          }
+        }
+      }
+    } else {
+      try (JarFile jar = new JarFile(location.toFile())) {
+        for (JarEntry entry : Collections.list(jar.entries())) {
+          addClassName(byPackage, entry.getName());
+        }
+      }
+    }
+    List<String> classNames = new ArrayList<>();
+    for (List<String> names : byPackage.values()) {
+      Collections.sort(names);
+      classNames.addAll(names);
+    }
+    return classNames;
+  }
+
+  private static void addClassName(Map<String, List<String>> byPackage, String path) {
+    int slash = path.lastIndexOf('/');
+    if (slash < 0 || !path.endsWith(CLASS_SUFFIX) || path.contains("-")) {
+      return; // default package, resources, module-info and package-info
+    }
+    List<String> names = byPackage.get(path.substring(0, slash).replace('/', '.'));
+    if (names != null) {
+      names.add(path.substring(0, path.length() - CLASS_SUFFIX.length()).replace('/', '.'));
     }
   }
 
