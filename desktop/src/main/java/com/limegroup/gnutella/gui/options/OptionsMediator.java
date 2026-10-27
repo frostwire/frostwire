@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.options;
 import com.frostwire.bittorrent.BTEngine;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import java.io.IOException;
@@ -139,7 +140,7 @@ public final class OptionsMediator {
    */
   public final void applyOptions() throws IOException {
     _paneManager.applyOptions();
-    SettingsGroupManager.instance().save();
+    BackgroundSettingsSave.request();
   }
 
   /** Determines if any of the settings are dirty. */

@@ -20,6 +20,8 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
 import com.limegroup.gnutella.settings.StartupSettings;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -279,7 +281,7 @@ public final class TipOfTheDayMediator {
     close.addActionListener(
         e -> {
           dialog.dispose();
-          SettingsGroupManager.instance().save();
+          BackgroundSettingsSave.request();
         });
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     // construct content pane
@@ -302,18 +304,25 @@ public final class TipOfTheDayMediator {
     public void actionPerformed(ActionEvent e) {
       JCheckBox source = (JCheckBox) e.getSource();
       StartupSettings.SHOW_TOTD.setValue(source.isSelected());
-      SettingsGroupManager.instance().save();
-      // Force flush to disk so the setting survives force-quit/IDE stop
-      try {
-        java.io.File f =
-            new java.io.File(org.limewire.util.CommonUtils.getUserSettingsDir(), "frostwire.props");
-        if (f.exists()) {
-          java.io.RandomAccessFile raf = new java.io.RandomAccessFile(f, "rw");
+      BackgroundQueuedExecutorService.schedule(TipOfTheDayMediator::saveAndSyncSettings);
+    }
+  }
+
+  /**
+   * Saves the settings and forces frostwire.props to disk so the 'Show Tips on Startup' choice
+   * survives a force-quit. Runs on the background queue: writing and fsyncing on the EDT froze it.
+   */
+  private static void saveAndSyncSettings() {
+    SettingsGroupManager.instance().save();
+    try {
+      java.io.File f =
+          new java.io.File(org.limewire.util.CommonUtils.getUserSettingsDir(), "frostwire.props");
+      if (f.exists()) {
+        try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(f, "rw")) {
           raf.getFD().sync();
-          raf.close();
         }
-      } catch (Exception ignored) {
       }
+    } catch (Exception ignored) {
     }
   }
 

@@ -37,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.*;
 import org.limewire.setting.IntSetting;
-import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.CommonUtils;
 
 /**
@@ -134,8 +133,8 @@ public final class OptionsConstructor {
                         I18n.tr(
                             "You have made changes to some of FrostWire's settings. Would you like to save these changes?"));
                 if (answer == DialogOption.YES) {
+                  // applyOptions saves the settings off the EDT
                   OptionsMediator.instance().applyOptions();
-                  SettingsGroupManager.instance().save();
                 }
               }
               if (answer != DialogOption.CANCEL) {
