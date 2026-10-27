@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.util;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,10 +33,10 @@ public class DesktopParallelExecutor {
   /**
    * Thread pool for parallel background execution. 4 threads allows reasonable parallelism without
    * excessive resource consumption. The queue is unbounded: most callers run on the EDT and cannot
-   * handle RejectedExecutionException, so extra tasks wait their turn instead.
+   * handle RejectedExecutionException, so extra tasks wait their turn instead. The workers stay
+   * alive so a submission from the EDT never has to start a thread, see {@link WarmExecutors}.
    */
-  private static final ExecutorService POOL =
-      ExecutorsHelper.newFixedSizeUnboundedThreadPool(4, "DesktopParallelExecutor");
+  private static final ExecutorService POOL = WarmExecutors.pool(4, "DesktopParallelExecutor");
 
   private DesktopParallelExecutor() {}
 
