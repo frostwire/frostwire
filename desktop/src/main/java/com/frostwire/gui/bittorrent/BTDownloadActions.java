@@ -76,22 +76,23 @@ final class BTDownloadActions {
     public void performAction() {
       BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
       if (downloaders.length > 0) {
-        // when the downloader is a single file, this is appending a folder to the actual file path
-        // treating it like a bittorrent download.
-        File toExplore =
-            new File(downloaders[0].getSaveLocation(), downloaders[0].getDisplayName());
-        // but perhaps it's a single file, make sure it is then... (Re: Issue #366)
-        if (!toExplore.exists()
-            && downloaders[0].getSaveLocation() != null
-            && downloaders[0].getSaveLocation().isFile()) {
-          // (made this if very explicit and dumb on purpose to make logic clear, reverse logic is
-          // shorter)
-          toExplore = downloaders[0].getSaveLocation();
-        }
-        if (toExplore.exists()) {
-          GUIMediator.launchExplorer(toExplore);
-        }
+        final File saveLocation = downloaders[0].getSaveLocation();
+        final String displayName = downloaders[0].getDisplayName();
+        // exists()/isFile() read the file system, so they run with the launch, off the EDT
+        GUIMediator.launchExplorer(() -> fileToExplore(saveLocation, displayName));
       }
+    }
+
+    /**
+     * When the download is a single file, appending its name to the save location points nowhere,
+     * so fall back to the save location itself (Re: Issue #366). Reads the file system.
+     */
+    static File fileToExplore(File saveLocation, String displayName) {
+      File toExplore = new File(saveLocation, displayName);
+      if (!toExplore.exists() && saveLocation != null && saveLocation.isFile()) {
+        toExplore = saveLocation;
+      }
+      return toExplore;
     }
   }
 
