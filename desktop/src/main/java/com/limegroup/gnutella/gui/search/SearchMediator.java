@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.filters.SearchFilter;
@@ -36,6 +35,7 @@ import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.VPNDropGuard;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.SearchSettings;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,9 +56,12 @@ import org.limewire.util.StringUtils;
 public final class SearchMediator {
   private static final Logger LOG = Logger.getLogger(SearchMediator.class);
 
-  /** Single ordered worker for starting and stopping search performers off the EDT. */
+  /**
+   * Single ordered worker for starting and stopping search performers off the EDT. Its worker stays
+   * alive between searches, so pressing Enter only enqueues and never starts a thread.
+   */
   private static final ExecutorService SEARCH_QUEUE =
-      ExecutorsHelper.newProcessingQueue("SearchMediator-SearchQueue");
+      WarmExecutors.serialQueue("SearchMediator-SearchQueue");
 
   /** Query text is valid. */
   public static final int QUERY_VALID = 0;

@@ -26,12 +26,12 @@ import java.util.concurrent.TimeUnit;
  * wait on the JVM (e.g. while a GC holds the thread list) and stalled the EDT (Icebase
  * #146d5b141956). A few parked daemon threads cost nothing, so these executors keep theirs.
  */
-final class WarmExecutors {
+public final class WarmExecutors {
 
   private WarmExecutors() {}
 
   /** A single-worker FIFO queue: tasks run one at a time, in submission order. */
-  static ExecutorService serialQueue(String name) {
+  public static ExecutorService serialQueue(String name) {
     return pool(1, name);
   }
 
