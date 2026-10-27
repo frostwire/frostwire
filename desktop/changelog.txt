@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Less chance of a startup freeze while the splash screen appears on 2-CPU machines — the background warm-up now waits for the splash to show before loading app classes
    - fix:Startup no longer freezes before the first-run setup wizard appears — the wizard decides its pages (intent file, settings, file associations) on the startup thread, and saves the intent file in the background
    - fix:No more startup freezes on Windows while fonts load for the first time (setup wizard; main window in Japanese, Korean, Chinese, Hebrew or Thai) — the startup warm-up now covers the look and feel's own fonts, and a language's Windows font is used only if it is installed
    - fix:Pressing Enter to search no longer freezes the UI, nor do icon paints, file choosers or library selections after a few idle seconds — the background workers they hand work to stay alive, so the UI thread never has to start a new thread
