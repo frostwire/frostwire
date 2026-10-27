@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.SizeStableLabel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -79,7 +80,9 @@ final class SearchTabbedPane extends JTabbedPane {
       buttonClose.setBorderPainted(false);
       buttonClose.addActionListener(new CloseActionHandler());
       add(buttonClose, "h 17!, w 23!");
-      labelText = new JLabel(SafeText.sanitize(text.trim()));
+      // its "(N results)" count changes with every search result; see SizeStableLabel
+      labelText = new SizeStableLabel();
+      labelText.setText(SafeText.sanitize(text.trim()));
       labelText.setOpaque(false);
       labelText.setHorizontalTextPosition(SwingConstants.LEADING);
       labelText.setAlignmentX(SwingConstants.RIGHT);
