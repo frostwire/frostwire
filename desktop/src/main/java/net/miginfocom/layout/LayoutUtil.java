@@ -184,21 +184,6 @@ public final class LayoutUtil {
   }
 
   /**
-   * Sets/add the persistence delegates to be used for a class.
-   *
-   * @param c The class to set the registered deligate for.
-   * @param del The new delegate or <code>null</code> to erase to old one.
-   */
-  static synchronized void setDelegate(Class c, PersistenceDelegate del) {
-    try {
-      Introspector.getBeanInfo(c, Introspector.IGNORE_ALL_BEANINFO)
-          .getBeanDescriptor()
-          .setValue("persistenceDelegate", del);
-    } catch (Exception ignored) {
-    }
-  }
-
-  /**
    * Returns strings set with {@link #putCCString(Object, String)} or <code>null</code> if nothing
    * is associated or {@link LayoutUtil#isDesignTime(ContainerWrapper)} returns <code>false</code>.
    *

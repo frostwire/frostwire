@@ -1,8 +1,5 @@
 package net.miginfocom.layout;
 
-import java.beans.Encoder;
-import java.beans.Expression;
-import java.beans.PersistenceDelegate;
 import java.io.*;
 
 /*
@@ -54,42 +51,10 @@ public class BoundSize implements Serializable {
   public static final BoundSize NULL_SIZE = new BoundSize(null, null);
   private static final BoundSize ZERO_PIXEL = new BoundSize(UnitValue.ZERO, "0px");
 
-  // ************************************************
-  // Persistence Delegate and Serializable combined.
-  // ************************************************
-
-  static {
-    if (LayoutUtil.HAS_BEANS) {
-      LayoutUtil.setDelegate(
-          BoundSize.class,
-          new PersistenceDelegate() {
-            protected Expression instantiate(Object oldInstance, Encoder out) {
-              BoundSize bs = (BoundSize) oldInstance;
-              if (Grid.TEST_GAPS) {
-                return new Expression(
-                    oldInstance,
-                    BoundSize.class,
-                    "new",
-                    new Object[] {
-                      bs.getMin(),
-                      bs.getPreferred(),
-                      bs.getMax(),
-                      bs.getGapPush(),
-                      bs.getConstraintString()
-                    });
-              } else {
-                return new Expression(
-                    oldInstance,
-                    BoundSize.class,
-                    "new",
-                    new Object[] {
-                      bs.getMin(), bs.getPreferred(), bs.getMax(), bs.getConstraintString()
-                    });
-              }
-            }
-          });
-    }
-  }
+  // FrostWire: no XMLEncoder persistence delegate is registered here (nor in UnitValue). The
+  // registration introspected the class with java.beans.Introspector in this static initializer,
+  // on the EDT when the first MigLayout was built, and on current JDKs it was lost anyway:
+  // Introspector.getBeanInfo(c, IGNORE_ALL_BEANINFO) returns a new BeanInfo each call.
 
   private final transient UnitValue min;
   private final transient UnitValue pref;

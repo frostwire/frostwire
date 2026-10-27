@@ -34,9 +34,6 @@ package net.miginfocom.layout;
  *         Date: 2006-sep-08
  */
 
-import java.beans.Encoder;
-import java.beans.Expression;
-import java.beans.PersistenceDelegate;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,31 +186,6 @@ public final class UnitValue implements Serializable {
     UNIT_MAP.put("maximum", MAX_SIZE);
     UNIT_MAP.put("button", BUTTON);
     UNIT_MAP.put("label", LABEL_ALIGN);
-  }
-
-  static {
-    if (LayoutUtil.HAS_BEANS) {
-      LayoutUtil.setDelegate(
-          UnitValue.class,
-          new PersistenceDelegate() {
-            protected Expression instantiate(Object oldInstance, Encoder out) {
-              UnitValue uv = (UnitValue) oldInstance;
-              String cs = uv.getConstraintString();
-              if (cs == null)
-                throw new IllegalStateException(
-                    "Design time must be on to use XML persistence. See LayoutUtil.");
-              return new Expression(
-                  oldInstance,
-                  ConstraintParser.class,
-                  "parseUnitValueOrAlign",
-                  new Object[] {
-                    uv.getConstraintString(),
-                    (uv.isHorizontal() ? Boolean.TRUE : Boolean.FALSE),
-                    null
-                  });
-            }
-          });
-    }
   }
 
   private final transient float value;
