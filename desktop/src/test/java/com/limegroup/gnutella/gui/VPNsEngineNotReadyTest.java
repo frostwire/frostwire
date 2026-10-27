@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.settings.ConnectionSettings;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -72,5 +73,32 @@ class VPNsEngineNotReadyTest {
     BackgroundExecutorService.submit(() -> null).get(MAX_WAIT_MS, TimeUnit.MILLISECONDS);
     SwingUtilities.invokeAndWait(() -> {});
     assertEquals(List.of(), reports, "no VPN status may be reported before the engine is set up");
+  }
+
+  @Test
+  void dropProtectionDoesNotWaitForTheEngine() throws InterruptedException {
+    assumeTrue(BTEngine.ctx == null, "engine context already set up in this JVM");
+    boolean saved = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
+    ConnectionSettings.VPN_DROP_PROTECTION.setValue(true);
+    try {
+      CountDownLatch done = new CountDownLatch(1);
+      // Runs on the shared background queue from the status bar checkbox; a daemon thread here so
+      // a regression fails the test without parking that queue for the other tests.
+      Thread applier =
+          new Thread(
+              () -> {
+                VPNDropGuard.applyVPNDropProtection();
+                done.countDown();
+              },
+              "VPNsEngineNotReadyTest-applier");
+      applier.setDaemon(true);
+      applier.start();
+      assertTrue(
+          done.await(MAX_WAIT_MS, TimeUnit.MILLISECONDS),
+          "VPN-Drop protection waited for BTEngine before startup set it up; thread state: "
+              + applier.getState());
+    } finally {
+      ConnectionSettings.VPN_DROP_PROTECTION.setValue(saved);
+    }
   }
 }

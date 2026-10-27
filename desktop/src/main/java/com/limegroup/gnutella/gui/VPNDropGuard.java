@@ -103,8 +103,9 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
                     .showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
                 BackgroundQueuedExecutorService.schedule(
                     () -> {
-                      if (BTEngine.getInstance().isPausedCached()) {
-                        BTEngine.getInstance().resume();
+                      BTEngine engine = BTEngine.getInstanceIfReady();
+                      if (engine != null && engine.isPausedCached()) {
+                        engine.resume();
                       }
                     });
               });
@@ -136,10 +137,17 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
    * Applies VPN-Drop protection logic based on cached VPN status and protection setting. Uses the
    * last known VPN status to avoid expensive system calls. This is called both when VPN status
    * changes and when the protection setting changes.
+   *
+   * <p>Never waits for startup to set up the engine: it runs on the shared background queue (the
+   * status bar checkbox). Until the engine is set up there is nothing to pause or resume, and
+   * VPNStatusRefresher's first report once it is set up applies the setting.
    */
   public static void applyVPNDropProtection() {
     boolean vpnDropProtectionOn = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
-    BTEngine instance = BTEngine.getInstance();
+    BTEngine instance = BTEngine.getInstanceIfReady();
+    if (instance == null) {
+      return;
+    }
 
     if (vpnDropProtectionOn) {
       if (lastKnownVPNStatus && instance.isPausedCached()) {
