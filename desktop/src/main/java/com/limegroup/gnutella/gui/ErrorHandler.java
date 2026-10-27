@@ -1,28 +1,42 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *     Licensed under GPL v3. See LICENSE file.
  */
 
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.service.ErrorCallback;
 import com.limegroup.gnutella.gui.bugs.BugManager;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-/** Forwards error messages to the BugManager on the Swing thread. */
+/**
+ * Forwards error messages to Icebase and the BugManager on a background thread, so the failing
+ * caller (often the EDT) never does the report's disk writes or stack-trace printing itself.
+ */
 public final class ErrorHandler implements ErrorCallback {
+  private static final Executor REPORTER =
+      Executors.newSingleThreadExecutor(
+          r -> {
+            Thread thread = new Thread(r, "ErrorReporter");
+            thread.setDaemon(true);
+            return thread;
+          });
+
+  private final Executor reporter;
+  private final Report report;
+
+  public ErrorHandler() {
+    this(REPORTER, ErrorHandler::reportNow);
+  }
+
+  ErrorHandler(Executor reporter, Report report) {
+    this.reporter = reporter;
+    this.report = report;
+  }
+
   /** Displays the error to the user. */
   public void error(Throwable problem) {
     error(problem, null);
@@ -30,34 +44,31 @@ public final class ErrorHandler implements ErrorCallback {
 
   /** Displays the error to the user with a specific message. */
   public void error(Throwable problem, String msg) {
-    CrashReportSpooler.record(problem);
-    Runnable doWorkRunnable = new Error(problem, msg);
-    GUIMediator.safeInvokeLater(doWorkRunnable);
+    String threadName = Thread.currentThread().getName();
+    try {
+      reporter.execute(() -> report.report(problem, msg, threadName));
+    } catch (Throwable ignored) {
+      // Reporting must never break the failing caller.
+    }
   }
 
-  /** This class handles error callbacks. */
-  private static class Error implements Runnable {
-    /** The stack trace of the error. */
-    private final Throwable PROBLEM;
-
-    /** An extra message associated with the error. */
-    private final String MESSAGE;
-
-    /** The name of the thread the error occurred in. */
-    private final String CURRENT_THREAD_NAME;
-
-    private Error(Throwable problem, String msg) {
-      PROBLEM = problem;
-      MESSAGE = msg;
-      CURRENT_THREAD_NAME = Thread.currentThread().getName();
+  private static void reportNow(Throwable problem, String msg, String threadName) {
+    CrashReportSpooler.record(problem);
+    GUIMediator.safeInvokeLater(
+        () -> {
+          try {
+            GUIMediator.closeStartupDialogs();
+          } catch (Throwable ignored) {
+          }
+        });
+    try {
+      BugManager.instance().handleBug(problem, threadName, msg);
+    } catch (Throwable ignored) {
     }
+  }
 
-    public void run() {
-      try {
-        GUIMediator.closeStartupDialogs();
-        BugManager.instance().handleBug(PROBLEM, CURRENT_THREAD_NAME, MESSAGE);
-      } catch (Throwable ignored) {
-      }
-    }
+  /** Files one error report. */
+  interface Report {
+    void report(Throwable problem, String msg, String threadName);
   }
 }
