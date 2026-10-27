@@ -173,7 +173,7 @@ public final class MainFrame {
 
     // Defer expensive layout calculations to avoid EDT blocking
     // Set a default minimum size first to avoid issues
-    FRAME.setMinimumSize(new Dimension(800, 600));
+    FRAME.setMinimumSize(minimumWindowSize(new Dimension(), usableScreenArea(FRAME)));
 
     // Calculate the real minimum size in a background thread
     new Thread(
@@ -222,7 +222,41 @@ public final class MainFrame {
     // and in general the insets's frame
     // lets add some fixed value for now
     height += 50;
-    frame.setMinimumSize(new Dimension(width, height));
+    frame.setMinimumSize(minimumWindowSize(new Dimension(width, height), usableScreenArea(frame)));
+  }
+
+  /** Smallest window size the user may resize to, unless the screen itself is smaller. */
+  static final Dimension MINIMUM_WINDOW_SIZE = new Dimension(1000, 650);
+
+  /**
+   * The window's minimum size: the content's own minimum or {@link #MINIMUM_WINDOW_SIZE}, whichever
+   * is larger, but never more than the usable screen area, so a small or highly scaled screen (e.g.
+   * 1366x768 at 150%, about 910x512 logical) can still fit the whole window.
+   */
+  static Dimension minimumWindowSize(Dimension content, Dimension screen) {
+    int width = Math.max(content.width, MINIMUM_WINDOW_SIZE.width);
+    int height = Math.max(content.height, MINIMUM_WINDOW_SIZE.height);
+    if (screen != null && screen.width > 0 && screen.height > 0) {
+      width = Math.min(width, screen.width);
+      height = Math.min(height, screen.height);
+    }
+    return new Dimension(width, height);
+  }
+
+  /** The screen the window is on, minus taskbars and docks; null if unknown. */
+  private static Dimension usableScreenArea(Window window) {
+    try {
+      GraphicsConfiguration gc = window.getGraphicsConfiguration();
+      if (gc == null) {
+        return null;
+      }
+      Rectangle bounds = gc.getBounds();
+      Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+      return new Dimension(
+          bounds.width - insets.left - insets.right, bounds.height - insets.top - insets.bottom);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   public ApplicationHeader getApplicationHeader() {
