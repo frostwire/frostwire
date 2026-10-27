@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -19,201 +19,200 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.util.FileUtils;
 import com.frostwire.util.OSUtils;
-
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.limewire.util.FileUtils;
 
 /**
- * This class provides utility methods retrieving supported languages and
- * changing language settings.
+ * This class provides utility methods retrieving supported languages and changing language
+ * settings.
  */
 public class LanguageUtils {
-    private static final String BUNDLE_PREFIX = "org/limewire/i18n/Messages_";
-    private static final String BUNDLE_POSTFIX = ".class";
-    private static final String BUNDLE_MARKER = "org/limewire/i18n/Messages.class";
-    private static final Logger LOG = Logger.getLogger(LanguageUtils.class);
-    
-    /**
-     * Cached locales to avoid expensive I/O operations on EDT.
-     * This cache is populated by calling preloadLocales() on a background thread.
-     */
-    private static volatile Locale[] cachedLocales = null;
+  private static final String BUNDLE_PREFIX = "org/limewire/i18n/Messages_";
+  private static final String BUNDLE_POSTFIX = ".class";
+  private static final String BUNDLE_MARKER = "org/limewire/i18n/Messages.class";
+  private static final Logger LOG = Logger.getLogger(LanguageUtils.class);
 
-    /**
-     * Pre-loads all available locales to avoid EDT violations.
-     * This method should be called early during initialization, before any UI needs the locales.
-     * It caches the results so subsequent calls to getLocales() are fast.
-     * This method is thread-safe and can be called multiple times; it will only load once.
-     */
-    public static synchronized void preloadLocales() {
-        if (cachedLocales != null) {
-            return; // Already loaded
-        }
-        
-        final List<Locale> locales = new LinkedList<>();
-        File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
-        if (jar != null) {
-            addLocalesFromJar(locales, jar);
-        } else {
-            LOG.warn("Could not find bundle jar to determine locales");
-        }
-        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
-        locales.remove(Locale.ENGLISH);
-        locales.add(0, Locale.ENGLISH);
-        
-        cachedLocales = locales.toArray(new Locale[0]);
-    }
-    
-    /**
-     * Applies this language code to be the new language of the program.
-     */
-    public static void setLocale(Locale locale) {
-        ApplicationSettings.LANGUAGE.setValue(locale.getLanguage());
-        ApplicationSettings.COUNTRY.setValue(locale.getCountry());
-        ApplicationSettings.LOCALE_VARIANT.setValue(locale.getVariant());
-        GUIMediator.resetLocale();
+  /**
+   * Cached locales to avoid expensive I/O operations on EDT. This cache is populated by calling
+   * preloadLocales() on a background thread.
+   */
+  private static volatile Locale[] cachedLocales = null;
+
+  /**
+   * Pre-loads all available locales to avoid EDT violations. This method should be called early
+   * during initialization, before any UI needs the locales. It caches the results so subsequent
+   * calls to getLocales() are fast. This method is thread-safe and can be called multiple times; it
+   * will only load once.
+   */
+  public static synchronized void preloadLocales() {
+    if (cachedLocales != null) {
+      return; // Already loaded
     }
 
-    /**
-     * Returns an array of supported languages as a Locale[], always having
-     * the English language as the first element.
-     * <p>
-     * This will only include languages that can be displayed using the given
-     * font. If the font is null, all languages are returned.
-     * <p>
-     * Note: If preloadLocales() was called before this method, it will use
-     * the cached results and will be fast. Otherwise, it will perform
-     * expensive I/O operations which may cause EDT violations if called on the EDT.
-     */
-    public static Locale[] getLocales(Font font) {
-        // Use cached locales if available, otherwise load them now
-        Locale[] locales;
-        if (cachedLocales != null) {
-            // Use cached copy
-            locales = cachedLocales.clone();
-        } else {
-            // Fall back to loading them now (may be slow on EDT)
-            final List<Locale> localeList = new LinkedList<>();
-            File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
-            if (jar != null) {
-                addLocalesFromJar(localeList, jar);
-            } else {
-                LOG.warn("Could not find bundle jar to determine locales");
-            }
-            localeList.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
-            localeList.remove(Locale.ENGLISH);
-            localeList.add(0, Locale.ENGLISH);
-            locales = localeList.toArray(new Locale[0]);
-        }
-        
-        // Filter by font capability if needed (this is fast)
-        if (font != null && !OSUtils.isMacOSX()) {
-            List<Locale> filtered = new LinkedList<>();
-            for (Locale locale : locales) {
-                if (GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
-                    filtered.add(locale);
-                }
-            }
-            return filtered.toArray(new Locale[0]);
-        }
-        
-        return locales;
+    final List<Locale> locales = new LinkedList<>();
+    File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
+    if (jar != null) {
+      addLocalesFromJar(locales, jar);
+    } else {
+      LOG.warn("Could not find bundle jar to determine locales");
+    }
+    locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
+    locales.remove(Locale.ENGLISH);
+    locales.add(0, Locale.ENGLISH);
+
+    cachedLocales = locales.toArray(new Locale[0]);
+  }
+
+  /** Applies this language code to be the new language of the program. */
+  public static void setLocale(Locale locale) {
+    ApplicationSettings.LANGUAGE.setValue(locale.getLanguage());
+    ApplicationSettings.COUNTRY.setValue(locale.getCountry());
+    ApplicationSettings.LOCALE_VARIANT.setValue(locale.getVariant());
+    GUIMediator.resetLocale();
+  }
+
+  /**
+   * Returns an array of supported languages as a Locale[], always having the English language as
+   * the first element.
+   *
+   * <p>This will only include languages that can be displayed using the given font. If the font is
+   * null, all languages are returned.
+   *
+   * <p>Note: If preloadLocales() was called before this method, it will use the cached results and
+   * will be fast. Otherwise, it will perform expensive I/O operations which may cause EDT
+   * violations if called on the EDT.
+   */
+  public static Locale[] getLocales(Font font) {
+    // Use cached locales if available, otherwise load them now
+    Locale[] locales;
+    if (cachedLocales != null) {
+      // Use cached copy
+      locales = cachedLocales.clone();
+    } else {
+      // Fall back to loading them now (may be slow on EDT)
+      final List<Locale> localeList = new LinkedList<>();
+      File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
+      if (jar != null) {
+        addLocalesFromJar(localeList, jar);
+      } else {
+        LOG.warn("Could not find bundle jar to determine locales");
+      }
+      localeList.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
+      localeList.remove(Locale.ENGLISH);
+      localeList.add(0, Locale.ENGLISH);
+      locales = localeList.toArray(new Locale[0]);
     }
 
-    /**
-     * Returns the languages as found from the classpath in messages.jar
-     */
-    private static void addLocalesFromJar(List<Locale> locales, File jar) {
-        try (ZipFile zip = new ZipFile(jar)) {
-            Enumeration<? extends ZipEntry> entries = zip.entries();
-            while (entries.hasMoreElements()) {
-                String name = entries.nextElement().getName();
-                if (!name.startsWith(BUNDLE_PREFIX) || !name.endsWith(BUNDLE_POSTFIX) || name.contains("$")) {
-                    continue;
-                }
-                String iso = name.substring(BUNDLE_PREFIX.length(), name.length() - BUNDLE_POSTFIX.length());
-                List<String> tokens = new ArrayList<>(Arrays.asList(iso.split("_", 3)));
-                if (tokens.size() < 1) {
-                    continue;
-                }
-                while (tokens.size() < 3) {
-                    tokens.add("");
-                }
-                String language = tokens.get(0);
-                String region = tokens.get(1);
-                if (region.length() > 3 ||
-                        (region.length() == 3 && region.matches("[a-zA-Z]+"))) {
-                    region = "";
-                }
-                String variant = tokens.get(2);
-
-                LOG.info("LanguageUtils.addLocalesFromJar: name=%s, language=%s, region=%s, variant=%s".formatted(name, language, region, variant));
-
-                Locale locale = new Locale.Builder().
-                        setLanguage(language).
-                        setRegion(region).
-                        setVariant(variant).
-                        build();
-                locales.add(locale);
-            }
-        } catch (IOException e) {
-            LOG.warn("Could not determine locales", e);
+    // Filter by font capability if needed (this is fast)
+    if (font != null && !OSUtils.isMacOSX()) {
+      List<Locale> filtered = new LinkedList<>();
+      for (Locale locale : locales) {
+        if (GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
+          filtered.add(locale);
         }
+      }
+      return filtered.toArray(new Locale[0]);
     }
 
-    /**
-     * Returns true if the language of <code>locale</code> is English.
-     */
-    static boolean isEnglishLocale(Locale locale) {
-        return Locale.ENGLISH.getLanguage().equals(locale.getLanguage());
-    }
+    return locales;
+  }
 
-    /**
-     * Returns a score between -1 and 3 how well <code>specificLocale</code>
-     * matches <code>genericLocale</code>.
-     *
-     * @return -1, if locales do not match, 3 if locales are equal
-     */
-    static int getMatchScore(Locale specificLocale, Locale genericLocale) {
-        int i = 0;
-        if (specificLocale.getLanguage().equals(genericLocale.getLanguage())) {
-            i += 1;
-        } else if (genericLocale.getLanguage().length() > 0) {
-            return -1;
+  /** Returns the languages as found from the classpath in messages.jar */
+  private static void addLocalesFromJar(List<Locale> locales, File jar) {
+    try (ZipFile zip = new ZipFile(jar)) {
+      Enumeration<? extends ZipEntry> entries = zip.entries();
+      while (entries.hasMoreElements()) {
+        String name = entries.nextElement().getName();
+        if (!name.startsWith(BUNDLE_PREFIX)
+            || !name.endsWith(BUNDLE_POSTFIX)
+            || name.contains("$")) {
+          continue;
         }
-        if (specificLocale.getCountry().equals(genericLocale.getCountry())) {
-            i += 1;
-        } else if (genericLocale.getCountry().length() > 0) {
-            return -1;
+        String iso =
+            name.substring(BUNDLE_PREFIX.length(), name.length() - BUNDLE_POSTFIX.length());
+        List<String> tokens = new ArrayList<>(Arrays.asList(iso.split("_", 3)));
+        if (tokens.size() < 1) {
+          continue;
         }
-        if (specificLocale.getVariant().equals(genericLocale.getVariant())) {
-            i += 1;
-        } else if (genericLocale.getVariant().length() > 0) {
-            return -1;
+        while (tokens.size() < 3) {
+          tokens.add("");
         }
-        return i;
-    }
+        String language = tokens.get(0);
+        String region = tokens.get(1);
+        if (region.length() > 3 || (region.length() == 3 && region.matches("[a-zA-Z]+"))) {
+          region = "";
+        }
+        String variant = tokens.get(2);
 
-    /**
-     * Returns true, if <code>locale</code> is less specific than the system
-     * default locale.
-     *
-     * @see Locale#getDefault()
-     */
-    static boolean matchesDefaultLocale(Locale locale) {
-        Locale systemLocale = Locale.getDefault();
-        return matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage()) && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry()) && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
-    }
+        LOG.info(
+            "LanguageUtils.addLocalesFromJar: name=%s, language=%s, region=%s, variant=%s"
+                .formatted(name, language, region, variant));
 
-    private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
-        return generic.length() == 0 || detailed.equals(generic);
+        Locale locale =
+            new Locale.Builder()
+                .setLanguage(language)
+                .setRegion(region)
+                .setVariant(variant)
+                .build();
+        locales.add(locale);
+      }
+    } catch (IOException e) {
+      LOG.warn("Could not determine locales", e);
     }
+  }
+
+  /** Returns true if the language of <code>locale</code> is English. */
+  static boolean isEnglishLocale(Locale locale) {
+    return Locale.ENGLISH.getLanguage().equals(locale.getLanguage());
+  }
+
+  /**
+   * Returns a score between -1 and 3 how well <code>specificLocale</code> matches <code>
+   * genericLocale</code>.
+   *
+   * @return -1, if locales do not match, 3 if locales are equal
+   */
+  static int getMatchScore(Locale specificLocale, Locale genericLocale) {
+    int i = 0;
+    if (specificLocale.getLanguage().equals(genericLocale.getLanguage())) {
+      i += 1;
+    } else if (genericLocale.getLanguage().length() > 0) {
+      return -1;
+    }
+    if (specificLocale.getCountry().equals(genericLocale.getCountry())) {
+      i += 1;
+    } else if (genericLocale.getCountry().length() > 0) {
+      return -1;
+    }
+    if (specificLocale.getVariant().equals(genericLocale.getVariant())) {
+      i += 1;
+    } else if (genericLocale.getVariant().length() > 0) {
+      return -1;
+    }
+    return i;
+  }
+
+  /**
+   * Returns true, if <code>locale</code> is less specific than the system default locale.
+   *
+   * @see Locale#getDefault()
+   */
+  static boolean matchesDefaultLocale(Locale locale) {
+    Locale systemLocale = Locale.getDefault();
+    return matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage())
+        && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry())
+        && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
+  }
+
+  private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
+    return generic.length() == 0 || detailed.equals(generic);
+  }
 }
