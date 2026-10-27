@@ -76,20 +76,25 @@ public class ExecutorsHelper {
   }
 
   /**
-   * Creates a new ThreadPool. The pool is tuned to begin with zero threads and maintain zero
-   * threads, although an unlimited number of threads will be created to handle the tasks. Each
-   * thread is set to linger for a short period of time, ready to handle new tasks, before the
-   * thread terminates.
+   * Creates the pool behind {@code ThreadExecutor}: one worker, started now and never timed out,
+   * and an unbounded queue, so tasks run one at a time in submission order and {@code execute} only
+   * enqueues. Callers on the EDT (a new search's table sort, dialogs) therefore never start a
+   * thread: {@code Thread.start} waits on the JVM's thread list lock, held through GC safepoints,
+   * and on the OS, and stalled the EDT for over 5 s (frostwire/frostwire#1314, #1332).
    *
-   * @param factory the factory used for creating a new processing thread
+   * <p>The pool used to declare 0 core and 256 maximum threads, but with an unbounded queue a
+   * {@code ThreadPoolExecutor} never grows past its core size (or past one worker when that is 0):
+   * it always ran one worker, which died after 5 idle seconds.
+   *
+   * @param factory the factory used for creating the processing thread
    */
   static ExecutorService newThreadPool(
       @SuppressWarnings("SameParameterValue") ThreadFactory factory) {
-    // Use LinkedBlockingQueue instead of SynchronousQueue to prevent
-    // RejectedExecutionException when all 64 threads are busy.
-    // Tasks will queue up instead of being rejected.
-    return Executors.unconfigurableExecutorService(
-        new ThreadPoolExecutor(0, 256, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), factory));
+    ThreadPoolExecutor tpe =
+        new ThreadPoolExecutor(
+            1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), factory);
+    tpe.prestartCoreThread();
+    return Executors.unconfigurableExecutorService(tpe);
   }
 
   /**

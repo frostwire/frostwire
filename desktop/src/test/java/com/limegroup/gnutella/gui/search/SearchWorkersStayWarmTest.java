@@ -10,6 +10,7 @@ package com.limegroup.gnutella.gui.search;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -18,12 +19,12 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 
 /**
- * Pressing Enter in the search box hands work from the EDT to the search queue that starts the
- * engines' performers. Its worker used to die after 5 idle seconds, so the next search (nearly
- * always more than 5 s after the last one) made the EDT start an OS thread first. Thread.start
- * waits on the JVM and the OS and stalled the EDT for over 5 s (Icebase #c85877617043,
- * frostwire/frostwire#1332; same cause as #1314). It must reuse the same live worker across idle
- * gaps.
+ * Pressing Enter in the search box hands work from the EDT to two background executors: the search
+ * queue that starts the engines' performers, and ThreadExecutor, which re-sorts the new result
+ * table. Their workers used to die after 5 idle seconds, so the next search (nearly always more
+ * than 5 s after the last one) made the EDT start an OS thread first. Thread.start waits on the JVM
+ * and the OS and stalled the EDT for over 5 s (Icebase #c85877617043, frostwire/frostwire#1332;
+ * same cause as #1314). Both executors must reuse the same live worker across idle gaps.
  */
 class SearchWorkersStayWarmTest {
 
@@ -34,6 +35,12 @@ class SearchWorkersStayWarmTest {
   void searchQueueKeepsItsWorkerAcrossIdleGaps() throws Exception {
     ExecutorService searchQueue = searchQueue();
     assertKeepsItsWorkerAcrossIdleGaps(searchQueue::execute);
+  }
+
+  @Test
+  void threadExecutorKeepsItsWorkerAcrossIdleGaps() throws Exception {
+    assertKeepsItsWorkerAcrossIdleGaps(
+        r -> ThreadExecutor.startThread(r, "SearchWorkersStayWarmTest"));
   }
 
   private static void assertKeepsItsWorkerAcrossIdleGaps(Consumer<Runnable> schedule)
