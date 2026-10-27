@@ -5,6 +5,7 @@ FrostWire 7.1.3 build 335 UNRELEASED
    - fix:The splash screen no longer freezes on slow machines while Java reads the UI fonts from disk for the first time — the font warm-up now starts as soon as the theme is applied instead of after the splash screen is shown (#1308)
    - fix:Building the main window at startup no longer freezes the UI on slow machines while Java loads the classes that draw menus, tabs, tables and other components — they are loaded in the background while the splash screen is up (#1311, #1309)
    - fix:Opening the Search tab no longer freezes the UI while the promotional slideshow downloads its images — slide images are now loaded from disk or the network in the background and appear when ready (#1316)
+   - fix:Opening a .torrent file or link while FrostWire is still starting no longer freezes the UI until the BitTorrent engine is up — the status bar shows its connection indicator without waiting for the engine, and opened .torrent files are added to the engine in the background
 FrostWire 7.1.2 OCT/25/2026
    - update:The Java runtime bundled with the Windows, macOS and Linux installers is updated from OpenJDK 27 to 27.0.1.0.3, which fixes the vulnerabilities in this week's severe Oracle Java security advisory
    - fix:Windows: text is no longer blurry at display scaling above 100% — FrostWire.exe now declares per-monitor DPI awareness, so Windows no longer stretches the whole window as a bitmap (#1243, #1300)
