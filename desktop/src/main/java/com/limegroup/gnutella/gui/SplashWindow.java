@@ -1,5 +1,5 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
  *     This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
 
@@ -119,19 +120,36 @@ public final class SplashWindow {
     String suffix = "_desktop_splash.png";
     String on_off = on ? "on" : "off";
     String cacheKey = osName + "_" + on_off;
-    synchronized (osIconCache) {
-      if (!osIconCache.containsKey(cacheKey)) {
-        try {
-          URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
-          if (iconURL != null) {
-            BufferedImage img = InMemoryImageIO.read(iconURL);
-            if (img != null) {
-              osIconCache.put(cacheKey, img);
-            }
+    cacheIfAbsent(
+        osIconCache,
+        cacheKey,
+        () -> {
+          try {
+            URL iconURL = ClassLoader.getSystemResource(prefix + osName + "_" + on_off + suffix);
+            return iconURL == null ? null : InMemoryImageIO.read(iconURL);
+          } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
           }
-        } catch (Throwable t) {
-          t.printStackTrace();
-        }
+        });
+  }
+
+  /**
+   * Decodes the image outside the cache's monitor and only stores it under it: paintOSIcon reads
+   * the cache under the same monitor on the EDT, which waited for every PNG decode while the
+   * monitor was held for the whole decode.
+   */
+  static void cacheIfAbsent(
+      Map<String, BufferedImage> cache, String key, Supplier<BufferedImage> decode) {
+    synchronized (cache) {
+      if (cache.containsKey(key)) {
+        return;
+      }
+    }
+    BufferedImage img = decode.get();
+    if (img != null) {
+      synchronized (cache) {
+        cache.putIfAbsent(key, img);
       }
     }
   }

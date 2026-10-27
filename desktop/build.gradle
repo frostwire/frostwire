@@ -728,6 +728,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.SizeStableLabelTest"
         includeTestsMatching "com.limegroup.gnutella.gui.GridToolTipTest"
         includeTestsMatching "com.limegroup.gnutella.gui.MainSplashImageTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.SplashWindowIconCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.StatusLineEngineNotReadyTest"
         includeTestsMatching "com.limegroup.gnutella.gui.options.panes.TorrentSaveFolderPaneItemTest"
