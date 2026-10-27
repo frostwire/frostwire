@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -22,308 +22,326 @@ import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class TransfersTab extends AbstractTab {
-    public static final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
-    private final BTDownloadMediator downloadMediator; // holds the JTable
-    private final boolean dedicatedTransfersTabAvailable;
-    /**
-     * Visible only on non search/transfer split mode and
-     * upon a Torrent Download selection.
-     */
-    private JSplitPane transferDetailSplitter;
-    private TransferDetailComponent transferDetailComponent;
-    // it will be a reference to the download mediator above who is the one interested.
-    private TransfersFilterModeListener transfersFilterModeListener;
-    private JToggleButton filterAllButton;
-    private JToggleButton filterDownloadingButton;
-    private JToggleButton filterSeedingButton;
-    private JToggleButton filterFinishedButton;
-    private JPanel mainComponent;
-    private JTextArea filterText;
-    private int lastSplitterLocationWithDetailsVisible = -1;
+  public static final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
+  private final BTDownloadMediator downloadMediator; // holds the JTable
+  private final boolean dedicatedTransfersTabAvailable;
 
-    public TransfersTab(BTDownloadMediator downloadMediator) {
-        super(I18n.tr("Transfers"),
-                I18n.tr("Transfers tab description goes here."),
-                "transfers_tab");
-        dedicatedTransfersTabAvailable = !UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
-        this.downloadMediator = downloadMediator;
-        initComponents();
-    }
+  /** Visible only on non search/transfer split mode and upon a Torrent Download selection. */
+  private JSplitPane transferDetailSplitter;
 
-    public void showTransfers(FilterMode mode) {
-        // Defer doClick() to avoid EDT violation when called from background threads
-        SwingUtilities.invokeLater(() -> {
-            if (mode == FilterMode.ALL) {
-                filterAllButton.doClick();
-            } else if (mode == FilterMode.DOWNLOADING) {
-                filterDownloadingButton.doClick();
-            } else if (mode == FilterMode.FINISHED) {
-                filterFinishedButton.doClick();
-            } else if (mode == FilterMode.SEEDING) {
-                filterSeedingButton.doClick();
-            }
+  private TransferDetailComponent transferDetailComponent;
+  // it will be a reference to the download mediator above who is the one interested.
+  private TransfersFilterModeListener transfersFilterModeListener;
+  private JToggleButton filterAllButton;
+  private JToggleButton filterDownloadingButton;
+  private JToggleButton filterSeedingButton;
+  private JToggleButton filterFinishedButton;
+  private JPanel mainComponent;
+  private JTextArea filterText;
+  private int lastSplitterLocationWithDetailsVisible = -1;
+
+  public TransfersTab(BTDownloadMediator downloadMediator) {
+    super(I18n.tr("Transfers"), I18n.tr("Transfers tab description goes here."), "transfers_tab");
+    dedicatedTransfersTabAvailable = !UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
+    this.downloadMediator = downloadMediator;
+    initComponents();
+  }
+
+  public void showTransfers(FilterMode mode) {
+    // Defer doClick() to avoid EDT violation when called from background threads
+    SwingUtilities.invokeLater(
+        () -> {
+          if (mode == FilterMode.ALL) {
+            filterAllButton.doClick();
+          } else if (mode == FilterMode.DOWNLOADING) {
+            filterDownloadingButton.doClick();
+          } else if (mode == FilterMode.FINISHED) {
+            filterFinishedButton.doClick();
+          } else if (mode == FilterMode.SEEDING) {
+            filterSeedingButton.doClick();
+          }
         });
-    }
+  }
 
-    private void initComponents() {
-        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][][grow]"));
-        // removed last parameter: rowConstraints="[][grow]"
-        // it was causing the entire transfer tab not to grow vertically on bigger screens
-        // Transfers [ text filter]           [filter buttons] row
-        mainComponent.add(new JLabel(I18n.tr("Transfers")), "h 30!, gapleft 10px, left");
-        mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
-        mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
-        if (dedicatedTransfersTabAvailable) {
-            transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-            transferDetailSplitter.setDividerLocation(270);
-            transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
-            JComponent transfersComponent = downloadMediator.getComponent();
-            transfersComponent.setMinimumSize(new Dimension(100, 200));
-            transferDetailSplitter.add(transfersComponent);
-            transferDetailComponent = new TransferDetailComponent(new MouseAdapter() {
+  private void initComponents() {
+    mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][][grow]"));
+    // removed last parameter: rowConstraints="[][grow]"
+    // it was causing the entire transfer tab not to grow vertically on bigger screens
+    // Transfers [ text filter]           [filter buttons] row
+    mainComponent.add(new JLabel(I18n.tr("Transfers")), "h 30!, gapleft 10px, left");
+    mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
+    mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
+    if (dedicatedTransfersTabAvailable) {
+      transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+      transferDetailSplitter.setDividerLocation(270);
+      transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
+      JComponent transfersComponent = downloadMediator.getComponent();
+      transfersComponent.setMinimumSize(new Dimension(100, 200));
+      transferDetailSplitter.add(transfersComponent);
+      transferDetailComponent =
+          new TransferDetailComponent(
+              new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    downloadMediator.clearSelection();
+                  downloadMediator.clearSelection();
                 }
+              });
+      transferDetailSplitter.add(transferDetailComponent);
+      mainComponent.add(
+          transferDetailSplitter,
+          "cell 0 1 3 1, grow, pushy, hmax 10000px, wrap"); // "cell <column> <row> <width>
+      // <height>"
+    } else {
+      mainComponent.add(
+          downloadMediator.getComponent(),
+          "cell 0 1 3 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
+    }
+    setTransfersFilterModeListener(downloadMediator);
+    downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
+    // Detect when the Transfers tab becomes visible and show details for any pre-selected torrent.
+    // The selection listener above only fires on selection CHANGES. If a torrent was auto-selected
+    // while another tab was active, no event ever reached us. We must re-check when this tab shows.
+    mainComponent.addHierarchyListener(
+        e -> {
+          if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0
+              && mainComponent.isShowing()) {
+            BTDownload[] preSelected = downloadMediator.getSelectedDownloaders();
+            if (preSelected.length == 1
+                && preSelected[0] instanceof BittorrentDownload bittorrentDownload) {
+              showTransferDetailsComponent(bittorrentDownload);
+            }
+          }
+        });
+  }
+
+  private void hideTransferDetailsComponent() {
+    if (!dedicatedTransfersTabAvailable) {
+      return;
+    }
+    lastSplitterLocationWithDetailsVisible = transferDetailSplitter.getDividerLocation();
+    transferDetailComponent.setVisible(false);
+  }
+
+  private void showTransferDetailsComponent(BittorrentDownload selected) {
+    if (!dedicatedTransfersTabAvailable) {
+      return;
+    }
+    boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
+    transferDetailComponent.setVisible(true);
+    transferDetailComponent.updateData(selected);
+    if (!transferDetailComponentWasAlreadyVisible) {
+      Container parent = transferDetailSplitter.getParent();
+      int h = parent.getSize().height;
+      lastSplitterLocationWithDetailsVisible = 2 * h / 3;
+      // special case of too much space
+      if (h > 800) {
+        lastSplitterLocationWithDetailsVisible = h - 500;
+      }
+      transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
+    }
+  }
+
+  private void setTransfersFilterModeListener(
+      TransfersFilterModeListener transfersFilterModeListener) {
+    this.transfersFilterModeListener = transfersFilterModeListener;
+  }
+
+  private JTextArea createTextFilterComponent() {
+    filterText = new JTextArea();
+    filterText.setEditable(true);
+    // Defer heavy initialization to avoid EDT violation
+    SwingUtilities.invokeLater(
+        () -> {
+          filterText.setText(FILTER_TEXT_HINT);
+          filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
+          filterText.setForeground(Color.GRAY);
+          filterText.addMouseListener(new TextFilterMouseAdapter());
+          filterText.addKeyListener(new TextFilterKeyAdapter());
+          filterText.addFocusListener(new TextFilterFocusAdapter());
+          filterText.selectAll();
+          final CompoundBorder compoundBorder =
+              BorderFactory.createCompoundBorder(
+                  filterText.getBorder(), BorderFactory.createEmptyBorder(4, 2, 2, 2));
+          filterText.setBorder(compoundBorder);
+        });
+    return filterText;
+  }
+
+  private JPanel createFilterToggleButtons() {
+    JPanel filterButtonsContainer = new JPanel(new MigLayout("align right, ins 0 0 0 8"));
+    ButtonGroup filterGroup = new ButtonGroup();
+    filterAllButton = new JToggleButton(I18n.tr("All"), true);
+    filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"), false);
+    filterSeedingButton = new JToggleButton(I18n.tr("Seeding"), false);
+    filterFinishedButton = new JToggleButton(I18n.tr("Finished"), false);
+    filterAllButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.ALL));
+    filterDownloadingButton.addActionListener(
+        new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
+    filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
+    filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
+    final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
+    final Dimension buttonDimension = new Dimension(115, 28);
+    applyFontAndDimensionToButtons(
+        smallHelvetica,
+        buttonDimension,
+        filterAllButton,
+        filterDownloadingButton,
+        filterSeedingButton,
+        filterFinishedButton);
+    filterGroup.add(filterAllButton);
+    filterGroup.add(filterDownloadingButton);
+    filterGroup.add(filterSeedingButton);
+    filterGroup.add(filterFinishedButton);
+    filterButtonsContainer.add(filterAllButton);
+    filterButtonsContainer.add(filterDownloadingButton);
+    filterButtonsContainer.add(filterSeedingButton);
+    filterButtonsContainer.add(filterFinishedButton);
+    return filterButtonsContainer;
+  }
+
+  private void applyFontAndDimensionToButtons(
+      Font font, Dimension dimension, JComponent... buttons) {
+    for (JComponent button : buttons) {
+      button.setFont(font);
+      button.setMinimumSize(dimension);
+      button.setMaximumSize(dimension);
+      button.setPreferredSize(dimension);
+    }
+  }
+
+  public JComponent getComponent() {
+    return mainComponent;
+  }
+
+  private void onTextFilterKeyTyped() {
+    final String text = filterText.getText();
+    if (text.isEmpty()) {
+      restoreFilterTextHint();
+    } else {
+      filterText.setForeground(Color.BLACK);
+    }
+    if (transfersFilterModeListener != null) {
+      transfersFilterModeListener.onFilterUpdate(text);
+    }
+  }
+
+  private void clearFilterTextHint() {
+    if (filterText.getText().equals(FILTER_TEXT_HINT)) {
+      filterText.setText("");
+      filterText.setForeground(Color.BLACK);
+    }
+  }
+
+  private void restoreFilterTextHint() {
+    filterText.setText(FILTER_TEXT_HINT);
+    filterText.setForeground(Color.GRAY);
+    filterText.selectAll();
+  }
+
+  private void onFilterTextFocusLost() {
+    if (filterText.getText().isEmpty()) {
+      restoreFilterTextHint();
+    }
+  }
+
+  public enum FilterMode {
+    ALL,
+    DOWNLOADING,
+    SEEDING,
+    FINISHED
+  }
+
+  public interface TransfersFilterModeListener {
+    void onFilterUpdate(FilterMode mode, String searchKeywords);
+
+    void onFilterUpdate(String searchKeywords);
+  }
+
+  private class TransferTableSelectionListener
+      implements BTDownloadMediator.BTDownloadSelectionListener {
+    /**
+     * @param selected null if nothing has been selected, a BTDownload otherwise
+     */
+    @Override
+    public void onTransferSelected(BTDownload selected) {
+      if (!dedicatedTransfersTabAvailable) {
+        hideTransferDetailsComponent();
+        return;
+      }
+      if (selected == null
+          || selected instanceof SoundcloudDownload
+          || selected instanceof HttpDownload
+          || selected instanceof TorrentFetcherDownload) {
+        hideTransferDetailsComponent();
+      } else if (selected instanceof BittorrentDownload bittorrentDownload) {
+        showTransferDetailsComponent(bittorrentDownload);
+        GUIMediator.safeInvokeLater(
+            () -> {
+              transferDetailSplitter.revalidate();
+              transferDetailSplitter.repaint();
+              GUIMediator.safeInvokeLater(
+                  () -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
             });
-            transferDetailSplitter.add(transferDetailComponent);
-            mainComponent.add(transferDetailSplitter, "cell 0 1 3 1, grow, pushy, hmax 10000px, wrap"); // "cell <column> <row> <width> <height>"
-        } else {
-            mainComponent.add(downloadMediator.getComponent(), "cell 0 1 3 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
-        }
-        setTransfersFilterModeListener(downloadMediator);
-        downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
-        // Detect when the Transfers tab becomes visible and show details for any pre-selected torrent.
-        // The selection listener above only fires on selection CHANGES. If a torrent was auto-selected
-        // while another tab was active, no event ever reached us. We must re-check when this tab shows.
-        mainComponent.addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && mainComponent.isShowing()) {
-                BTDownload[] preSelected = downloadMediator.getSelectedDownloaders();
-                if (preSelected.length == 1 && preSelected[0] instanceof BittorrentDownload bittorrentDownload) {
-                    showTransferDetailsComponent(bittorrentDownload);
-                }
-            }
-        });
+      }
+    }
+  }
+
+  private class TextFilterMouseAdapter extends MouseAdapter {
+    @Override
+    public void mouseClicked(MouseEvent e) {
+      clearFilterTextHint();
     }
 
-    private void hideTransferDetailsComponent() {
-        if (!dedicatedTransfersTabAvailable) {
-            return;
-        }
-        lastSplitterLocationWithDetailsVisible = transferDetailSplitter.getDividerLocation();
-        transferDetailComponent.setVisible(false);
+    @Override
+    public void mousePressed(MouseEvent e) {
+      clearFilterTextHint();
+    }
+  }
+
+  private class TextFilterKeyAdapter extends KeyAdapter {
+    @Override
+    public void keyPressed(KeyEvent e) {
+      onTextFilterKeyTyped();
     }
 
-    private void showTransferDetailsComponent(BittorrentDownload selected) {
-        if (!dedicatedTransfersTabAvailable) {
-            return;
-        }
-        boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
-        transferDetailComponent.setVisible(true);
-        transferDetailComponent.updateData(selected);
-        if (!transferDetailComponentWasAlreadyVisible) {
-            Container parent = transferDetailSplitter.getParent();
-            int h = parent.getSize().height;
-            lastSplitterLocationWithDetailsVisible = 2 * h / 3;
-            // special case of too much space
-            if (h > 800) {
-                lastSplitterLocationWithDetailsVisible = h - 500;
-            }
-            transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
-        }
+    @Override
+    public void keyReleased(KeyEvent e) {
+      onTextFilterKeyTyped();
+    }
+  }
+
+  private class TextFilterFocusAdapter extends FocusAdapter {
+    @Override
+    public void focusLost(FocusEvent e) {
+      onFilterTextFocusLost();
+    }
+  }
+
+  private class OnFilterButtonToggledListener implements ActionListener {
+    private final FilterMode filterMode;
+
+    OnFilterButtonToggledListener(FilterMode filterMode) {
+      this.filterMode = filterMode;
     }
 
-    private void setTransfersFilterModeListener(TransfersFilterModeListener transfersFilterModeListener) {
-        this.transfersFilterModeListener = transfersFilterModeListener;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (transfersFilterModeListener != null) {
+        filterText.setText("");
+        transfersFilterModeListener.onFilterUpdate(filterMode, filterText.getText());
+      }
     }
-
-    private JTextArea createTextFilterComponent() {
-        filterText = new JTextArea();
-        filterText.setEditable(true);
-        // Defer heavy initialization to avoid EDT violation
-        SwingUtilities.invokeLater(() -> {
-            filterText.setText(FILTER_TEXT_HINT);
-            filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
-            filterText.setForeground(Color.GRAY);
-            filterText.addMouseListener(new TextFilterMouseAdapter());
-            filterText.addKeyListener(new TextFilterKeyAdapter());
-            filterText.addFocusListener(new TextFilterFocusAdapter());
-            filterText.selectAll();
-            final CompoundBorder compoundBorder =
-                    BorderFactory.createCompoundBorder(filterText.getBorder(),
-                            BorderFactory.createEmptyBorder(4, 2, 2, 2));
-            filterText.setBorder(compoundBorder);
-        });
-        return filterText;
-    }
-
-    private JPanel createFilterToggleButtons() {
-        JPanel filterButtonsContainer = new JPanel(new MigLayout("align right, ins 0 0 0 8"));
-        ButtonGroup filterGroup = new ButtonGroup();
-        filterAllButton = new JToggleButton(I18n.tr("All"), true);
-        filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"), false);
-        filterSeedingButton = new JToggleButton(I18n.tr("Seeding"), false);
-        filterFinishedButton = new JToggleButton(I18n.tr("Finished"), false);
-        filterAllButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.ALL));
-        filterDownloadingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
-        filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
-        filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
-        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
-        final Dimension buttonDimension = new Dimension(115, 28);
-        applyFontAndDimensionToButtons(smallHelvetica, buttonDimension,
-                filterAllButton, filterDownloadingButton, filterSeedingButton, filterFinishedButton);
-        filterGroup.add(filterAllButton);
-        filterGroup.add(filterDownloadingButton);
-        filterGroup.add(filterSeedingButton);
-        filterGroup.add(filterFinishedButton);
-        filterButtonsContainer.add(filterAllButton);
-        filterButtonsContainer.add(filterDownloadingButton);
-        filterButtonsContainer.add(filterSeedingButton);
-        filterButtonsContainer.add(filterFinishedButton);
-        return filterButtonsContainer;
-    }
-
-    private void applyFontAndDimensionToButtons(Font font, Dimension dimension, JComponent... buttons) {
-        for (JComponent button : buttons) {
-            button.setFont(font);
-            button.setMinimumSize(dimension);
-            button.setMaximumSize(dimension);
-            button.setPreferredSize(dimension);
-        }
-    }
-
-    public JComponent getComponent() {
-        return mainComponent;
-    }
-
-    private void onTextFilterKeyTyped() {
-        final String text = filterText.getText();
-        if (text.isEmpty()) {
-            restoreFilterTextHint();
-        } else {
-            filterText.setForeground(Color.BLACK);
-        }
-        if (transfersFilterModeListener != null) {
-            transfersFilterModeListener.onFilterUpdate(text);
-        }
-    }
-
-    private void clearFilterTextHint() {
-        if (filterText.getText().equals(FILTER_TEXT_HINT)) {
-            filterText.setText("");
-            filterText.setForeground(Color.BLACK);
-        }
-    }
-
-    private void restoreFilterTextHint() {
-        filterText.setText(FILTER_TEXT_HINT);
-        filterText.setForeground(Color.GRAY);
-        filterText.selectAll();
-    }
-
-    private void onFilterTextFocusLost() {
-        if (filterText.getText().isEmpty()) {
-            restoreFilterTextHint();
-        }
-    }
-
-    public enum FilterMode {
-        ALL,
-        DOWNLOADING,
-        SEEDING,
-        FINISHED
-    }
-
-    public interface TransfersFilterModeListener {
-        void onFilterUpdate(FilterMode mode, String searchKeywords);
-
-        void onFilterUpdate(String searchKeywords);
-    }
-
-    private class TransferTableSelectionListener implements BTDownloadMediator.BTDownloadSelectionListener {
-        /**
-         * @param selected null if nothing has been selected, a BTDownload otherwise
-         */
-        @Override
-        public void onTransferSelected(BTDownload selected) {
-            if (!dedicatedTransfersTabAvailable) {
-                hideTransferDetailsComponent();
-                return;
-            }
-            if (selected == null ||
-                    selected instanceof SoundcloudDownload ||
-                    selected instanceof HttpDownload ||
-                    selected instanceof TorrentFetcherDownload) {
-                hideTransferDetailsComponent();
-            } else if (selected instanceof BittorrentDownload bittorrentDownload) {
-                showTransferDetailsComponent(bittorrentDownload);
-                GUIMediator.safeInvokeLater(() -> {
-                    transferDetailSplitter.revalidate();
-                    transferDetailSplitter.repaint();
-                    GUIMediator.safeInvokeLater(() -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
-                });
-            }
-        }
-    }
-
-    private class TextFilterMouseAdapter extends MouseAdapter {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            clearFilterTextHint();
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            clearFilterTextHint();
-        }
-    }
-
-    private class TextFilterKeyAdapter extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            onTextFilterKeyTyped();
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            onTextFilterKeyTyped();
-        }
-    }
-
-    private class TextFilterFocusAdapter extends FocusAdapter {
-        @Override
-        public void focusLost(FocusEvent e) {
-            onFilterTextFocusLost();
-        }
-    }
-
-    private class OnFilterButtonToggledListener implements ActionListener {
-        final private FilterMode filterMode;
-
-        OnFilterButtonToggledListener(FilterMode filterMode) {
-            this.filterMode = filterMode;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (transfersFilterModeListener != null) {
-                filterText.setText("");
-                transfersFilterModeListener.onFilterUpdate(filterMode, filterText.getText());
-            }
-        }
-    }
+  }
 }
