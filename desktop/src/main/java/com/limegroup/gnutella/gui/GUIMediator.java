@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.setting.IntSetting;
 import org.limewire.util.StringUtils;
@@ -793,15 +794,17 @@ public final class GUIMediator {
    * Acts as a proxy for the Launcher class so that other classes only need to know about this
    * mediator class.
    *
-   * <p>Opens the specified url in a browser.
+   * <p>Opens the specified url in a browser. The browser is started on a background thread; if it
+   * cannot be, the error dialog is posted back to the EDT.
    *
    * @param url the url to open
-   * @return an int indicating the success of the browser launch
    */
-  public static int openURL(String url) {
-    try {
-      return Launcher.openURL(url);
-    } catch (UnsupportedOperationException e) {
+  public static void openURL(String url) {
+    Launcher.openURL(url, e -> safeInvokeLater(() -> showOpenURLError(url, e)));
+  }
+
+  private static void showOpenURLError(String url, Exception e) {
+    if (e instanceof UnsupportedOperationException) {
       if (OSUtils.isLinux()) {
         GUIMediator.showError(
             I18n.tr(
@@ -809,14 +812,11 @@ public final class GUIMediator {
       } else {
         GUIMediator.showError(I18n.tr("ERROR: Opening URLs isn't supported on this platform!"));
       }
-
-      return -1;
-    } catch (Throwable e) {
+    } else {
       GUIMediator.showError(
           I18n.tr(
               "FrostWire could not locate your web browser to display the following web page: {0}.",
               url));
-      return -1;
     }
   }
 
@@ -824,46 +824,54 @@ public final class GUIMediator {
    * Acts as a proxy for the Launcher class so that other classes only need to know about this
    * mediator class.
    *
-   * <p>Launches the file specified in its associated application.
+   * <p>Launches the file specified in its associated application. The launch runs on a background
+   * thread; if it fails, the error dialog is posted back to the EDT.
    *
    * @param file a `File` instance denoting the abstract pathname of the file to launch
    */
   public static void launchFile(File file) {
-    try {
-      Launcher.launchFile(file);
-    } catch (SecurityException se) {
-      showError(I18n.tr("FrostWire will not launch the specified file for security reasons."));
-    } catch (LaunchException e) {
-      GUIMediator.showError(
-          I18n.tr(
-              "FrostWire could not launch the specified file.\n\nExecuted command: {0}.",
-              StringUtils.explode(e.getCommand(), " ")));
-    } catch (IOException e) {
-      showError(I18n.tr("FrostWire could not launch the specified file."));
-    }
+    Launcher.launchFile(file, GUIMediator::reportLaunchFailure);
   }
 
   /**
    * Acts as a proxy for the Launcher class so that other classes only need to know about this
    * mediator class.
    *
-   * <p>Opens `file` in a platform specific file manager.
+   * <p>Opens `file` in a platform specific file manager, if it exists. The file manager is started
+   * on a background thread; if it cannot be, the error dialog is posted back to the EDT.
    *
    * @param file a `File` instance denoting the abstract pathname of the file to launch
    */
   public static void launchExplorer(File file) {
-    try {
-      Launcher.launchExplorer(file);
-    } catch (SecurityException e) {
-      showError(I18n.tr("FrostWire will not launch the specified file for security reasons."));
-    } catch (LaunchException e) {
-      GUIMediator.showError(
-          I18n.tr(
-              "FrostWire could not launch the specified file.\n\nExecuted command: {0}.",
-              StringUtils.explode(e.getCommand(), " ")));
-    } catch (IOException e) {
-      showError(I18n.tr("FrostWire could not launch the specified file."));
-    }
+    Launcher.launchExplorer(file, GUIMediator::reportLaunchFailure);
+  }
+
+  /**
+   * Opens the file that {@code target} picks in a platform specific file manager, if it exists.
+   * {@code target} runs on a background thread, so it may check the file system to pick the file.
+   *
+   * @param target picks the file to show, off the EDT; may return null to show nothing
+   */
+  public static void launchExplorer(Supplier<File> target) {
+    Launcher.launchExplorer(target, GUIMediator::reportLaunchFailure);
+  }
+
+  /** Called on a launcher pool thread: shows the matching error dialog on the EDT. */
+  private static void reportLaunchFailure(Exception e) {
+    safeInvokeLater(
+        () -> {
+          if (e instanceof SecurityException) {
+            showError(
+                I18n.tr("FrostWire will not launch the specified file for security reasons."));
+          } else if (e instanceof LaunchException) {
+            showError(
+                I18n.tr(
+                    "FrostWire could not launch the specified file.\n\nExecuted command: {0}.",
+                    StringUtils.explode(((LaunchException) e).getCommand(), " ")));
+          } else {
+            showError(I18n.tr("FrostWire could not launch the specified file."));
+          }
+        });
   }
 
   /** Notifies the user that LimeWire is disconnected */
