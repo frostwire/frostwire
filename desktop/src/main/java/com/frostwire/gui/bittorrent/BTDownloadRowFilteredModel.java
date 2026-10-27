@@ -58,7 +58,6 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
   /** Notification that the filters have changed. */
   void filtersChanged() {
     rebuild();
-    fireTableDataChanged();
   }
 
   /**
@@ -102,19 +101,27 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
     return downloads;
   }
 
-  /** Rebuilds the internal map to denote a new filter. */
+  /**
+   * Re-applies the filter to every transfer, shown or hidden: one sort of the shown lines and one
+   * table-changed event, instead of a sorted insert and an insert event per row.
+   */
   private void rebuild() {
-    List<BTDownloadDataLine> existing = new ArrayList<>(_list);
-    List<BTDownloadDataLine> hidden = new ArrayList<>(HIDDEN);
-    clear();
-    // For stuff in _list, we can just re-add the DataLines as-is.
-    for (BTDownloadDataLine anExisting : existing) {
-      addSorted(anExisting);
+    List<BTDownloadDataLine> all;
+    synchronized (getListLock()) {
+      all = new ArrayList<>(_list.size() + HIDDEN.size());
+      all.addAll(_list);
     }
-    // Merge the hidden TableLines
-    for (BTDownloadDataLine tl : hidden) {
-      addSorted(tl);
+    all.addAll(HIDDEN);
+    List<BTDownloadDataLine> shown = new ArrayList<>(all.size());
+    HIDDEN.clear();
+    for (BTDownloadDataLine line : all) {
+      if (allow(line)) {
+        shown.add(line);
+      } else {
+        HIDDEN.add(line);
+      }
     }
+    setRows(shown);
   }
 
   @Override

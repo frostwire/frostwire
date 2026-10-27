@@ -202,12 +202,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     synchronized (_listLock) {
       snapshot = new ArrayList<>(_list);
     }
-    List<SortEntry<T>> sorted = new ArrayList<>(snapshot.size());
-    for (T line : snapshot) {
-      sorted.add(new SortEntry<>(line, sortKey(line, column)));
-    }
     Comparator<SortEntry<T>> byKey = (a, b) -> compareSortKeys(a.key, b.key, ascending);
-    sorted.sort(byKey);
+    List<SortEntry<T>> sorted = sortByKey(snapshot, column, byKey);
     synchronized (_listLock) {
       if (sameLines(snapshot, _list)) {
         for (int i = 0; i < sorted.size(); i++) {
@@ -232,6 +228,39 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         _list.add(entry.line);
       }
     }
+  }
+
+  /**
+   * Replaces every row with the given lines, sorted by the current sort column if the table is
+   * sorted, and fires a single table-changed event. Reads each line's sort key once.
+   */
+  protected void setRows(List<T> lines) {
+    final int column = _activeColumn;
+    final int ascending = _ascending;
+    List<T> rows = new ArrayList<>(lines.size());
+    if (_isSorted && column >= 0) {
+      Comparator<SortEntry<T>> byKey = (a, b) -> compareSortKeys(a.key, b.key, ascending);
+      for (SortEntry<T> entry : sortByKey(lines, column, byKey)) {
+        rows.add(entry.line);
+      }
+    } else {
+      rows.addAll(lines);
+    }
+    synchronized (_listLock) {
+      _list.clear();
+      _list.addAll(rows);
+    }
+    fireTableDataChanged();
+  }
+
+  /** Stable sort of the lines by the column's sort key, each key read once. */
+  private List<SortEntry<T>> sortByKey(List<T> lines, int column, Comparator<SortEntry<T>> byKey) {
+    List<SortEntry<T>> sorted = new ArrayList<>(lines.size());
+    for (T line : lines) {
+      sorted.add(new SortEntry<>(line, sortKey(line, column)));
+    }
+    sorted.sort(byKey);
+    return sorted;
   }
 
   private static boolean sameLines(List<?> a, List<?> b) {
