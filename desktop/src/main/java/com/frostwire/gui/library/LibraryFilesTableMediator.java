@@ -335,6 +335,7 @@ public final class LibraryFilesTableMediator
 
   private static class RemoveElementsResults {
     boolean somethingWasRemoved = false;
+    List<File> removedFiles;
     List<String> undeletedFileNames;
   }
 
@@ -396,6 +397,12 @@ public final class LibraryFilesTableMediator
                 backgroundRemoveElements(listPanel, removeOptions, option).get();
             GUIMediator.safeInvokeLater(
                 () -> {
+                  for (File removedFile : removeElementsResults.removedFiles) {
+                    int row = DATA_MODEL.getRow(removedFile);
+                    if (row != -1) {
+                      DATA_MODEL.remove(row);
+                    }
+                  }
                   clearSelection();
                   if (removeElementsResults.somethingWasRemoved) {
                     LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
@@ -431,6 +438,7 @@ public final class LibraryFilesTableMediator
         () -> {
           // remove still selected files
           List<File> selected = listPanel.getSelectedElements();
+          List<File> removedFiles = new ArrayList<>();
           List<String> undeletedFileNames;
           undeletedFileNames = new ArrayList<>();
           boolean somethingWasRemoved = false;
@@ -454,13 +462,14 @@ public final class LibraryFilesTableMediator
                     removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
             if (removed) {
               somethingWasRemoved = true;
-              DATA_MODEL.remove(DATA_MODEL.getRow(file));
+              removedFiles.add(file);
             } else {
               undeletedFileNames.add(getCompleteFileName(file));
             }
           }
           RemoveElementsResults results = new RemoveElementsResults();
           results.somethingWasRemoved = somethingWasRemoved;
+          results.removedFiles = removedFiles;
           results.undeletedFileNames = undeletedFileNames;
           return results;
         });
