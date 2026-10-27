@@ -18,6 +18,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -102,6 +103,14 @@ class JdkWarmUpTest {
     assertEquals(List.of("no.such.DelegateUI", fixture), requested.subList(0, 2));
     // Static initializers may touch Swing state, so they must keep running on the EDT.
     assertFalse(FIXTURE_INITIALIZED.get());
+  }
+
+  @Test
+  void formatWarmUpsWorkForAnyLocale() {
+    for (Locale locale : List.of(Locale.getDefault(), Locale.ENGLISH, Locale.JAPAN, Locale.ROOT)) {
+      assertDoesNotThrow(() -> JdkWarmUp.warmUpNumberFormat(locale), locale::toString);
+      assertDoesNotThrow(() -> JdkWarmUp.warmUpDateFormatAndCollation(locale), locale::toString);
+    }
   }
 
   @Test

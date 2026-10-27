@@ -10,11 +10,16 @@ package com.frostwire.util;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.io.StringReader;
+import java.text.Collator;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.UIManager;
@@ -36,9 +41,14 @@ import javax.swing.text.html.HTMLEditorKit;
  *       the jar or the JDK's module image and defined the first time, on the EDT.
  *   <li>Slow static initializers of JDK classes first used while painting or clicking, see {@link
  *       #CLASSES_TO_INITIALIZE}.
+ *   <li>Locale data and tables behind the first number format, date format and collator.
  * </ul>
  *
- * Call after the look and feel is installed, so the UI fonts are the ones the app will paint with.
+ * Steps run in the order the EDT first needs them: the splash window's text and progress label,
+ * then the main window, then tables.
+ *
+ * <p>Call after the look and feel is installed, so the UI fonts are the ones the app will paint
+ * with.
  */
 public final class JdkWarmUp {
   private static final Logger LOG = Logger.getLogger(JdkWarmUp.class);
@@ -89,6 +99,11 @@ public final class JdkWarmUp {
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
     }
     try {
+      warmUpNumberFormat(Locale.getDefault());
+    } catch (Throwable t) {
+      LOG.warn("Number format warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       loadWithoutInitializing(
           uiDelegateClassNames(UIManager.getDefaults()), JdkWarmUp.class.getClassLoader());
     } catch (Throwable t) {
@@ -101,6 +116,32 @@ public final class JdkWarmUp {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
     }
+    try {
+      warmUpDateFormatAndCollation(Locale.getDefault());
+    } catch (Throwable t) {
+      LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /**
+   * The first NumberFormat in the JVM loads the locale provider and its number data. The splash
+   * window's progress percentage and GUIUtils' size and speed formats need one right away.
+   */
+  static void warmUpNumberFormat(Locale locale) {
+    NumberFormat.getNumberInstance(locale).format(1234.5);
+  }
+
+  /**
+   * Formatters needed later, once tables show up: the first SimpleDateFormat loads the calendar and
+   * date format data (date cells), and the first Collator builds the JDK's Unicode decomposition
+   * tables ({@code ComposedCharIter.<clinit>}) before its own rule tables (sorting string columns).
+   * Both are built lazily by FrostWire, on the EDT.
+   */
+  static void warmUpDateFormatAndCollation(Locale locale) {
+    new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", locale).format(new Date(0));
+    Collator collator = Collator.getInstance(locale);
+    collator.setDecomposition(Collator.FULL_DECOMPOSITION);
+    collator.compare("FrostWire", "frostwire");
   }
 
   /**
