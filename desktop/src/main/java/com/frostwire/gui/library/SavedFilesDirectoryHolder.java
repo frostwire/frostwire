@@ -19,19 +19,21 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.gui.bittorrent.TorrentUtil;
+import com.frostwire.util.BoundedFileWalker;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
 import org.limewire.setting.FileSetting;
-import org.limewire.util.FileUtils;
 
 /**
  * @author gubatron
@@ -57,31 +59,39 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
     return super.accept(file) && type.matches(file.getName()) && !file.isDirectory();
   }
 
-  private Set<File> getFilesRecursively(File folder, Set<File> excludeFolders) {
-    if (folder.isDirectory() && excludeFolders.contains(folder)) {
-      return Collections.emptySet();
-    }
-    File[] listFiles = FileUtils.listFiles(folder); // folder.listFiles();
-    if (listFiles == null || listFiles.length == 0) {
-      return Collections.emptySet();
-    }
+  /**
+   * Collects the files under {@code root} that the Library shows, skipping {@code excludeFolders},
+   * {@code hideFiles}, .DS_Store and .parts files. Bounded by {@link BoundedFileWalker}: symlinked
+   * folders are not entered and the walk stops after {@code maxEntries} entries, so a symlink loop
+   * or a huge Torrent Data folder can't exhaust the heap.
+   */
+  static Set<File> collectFiles(
+      File root, Set<File> excludeFolders, Set<File> hideFiles, int maxEntries) {
     Set<File> results = new HashSet<>();
-    for (File f : listFiles) {
-      if (f.exists()) {
-        if (!f.isDirectory()
-            && !_hideFiles.contains(f)
-            && !f.getName().toLowerCase().contains(".ds_store")
-            && !isPartsFile(f)) {
-          results.add(f);
-        } else if (f.isDirectory() && !excludeFolders.contains(f)) {
-          results.addAll(getFilesRecursively(f, excludeFolders));
-        }
-      }
-    }
+    BoundedFileWalker.walk(
+        root.getAbsoluteFile(),
+        maxEntries,
+        BoundedFileWalker.DEFAULT_MAX_DEPTH,
+        new BoundedFileWalker.Visitor() {
+          @Override
+          public boolean enterDirectory(Path dir) {
+            return !excludeFolders.contains(dir.toFile());
+          }
+
+          @Override
+          public void file(Path path, BasicFileAttributes attrs) {
+            File f = path.toFile();
+            if (!hideFiles.contains(f)
+                && !f.getName().toLowerCase().contains(".ds_store")
+                && !isPartsFile(f)) {
+              results.add(f);
+            }
+          }
+        });
     return results;
   }
 
-  private boolean isPartsFile(File f) {
+  private static boolean isPartsFile(File f) {
     return f.getName().startsWith(".") && f.getName().endsWith(".parts");
   }
 
@@ -104,7 +114,12 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
                     .getValue())); // LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue();
     Set<File> files = new HashSet<>();
     for (File directory : directoriesToInclude) {
-      files.addAll(getFilesRecursively(directory, directoriesToNotInclude));
+      files.addAll(
+          collectFiles(
+              directory,
+              directoriesToNotInclude,
+              _hideFiles,
+              BoundedFileWalker.DEFAULT_MAX_ENTRIES));
     }
     cache = Collections.unmodifiableSet(files);
     return files.toArray(new File[0]);
