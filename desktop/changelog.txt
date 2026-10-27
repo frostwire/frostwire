@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The startup splash does less work on the UI thread — its image is decoded once, off the UI thread, instead of twice, and its progress bar painters are prepared in the background
    - fix:Short UI hitches while idle in the dark theme are gone — dark-theme icons are brightened once and reused instead of rebuilt on every repaint and status update, so disabled buttons no longer re-gray their icon on every paint
    - fix:The status bar no longer lays itself out again on every VPN check, and torrent actions no longer freeze the UI at startup when VPN-Drop protection is on — the VPN icon is updated in place only when it changes, and VPN checks no longer wait for the BitTorrent engine to start
    - fix:Opening a folder chooser (e.g. Browse for the torrent save folder) no longer freezes while checking every parent folder on disk, worst on network or removable drives — folder names and icons in the "Look in" box are looked up once, in the background
