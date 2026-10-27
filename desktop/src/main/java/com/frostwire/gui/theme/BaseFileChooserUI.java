@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.theme;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.OSUtils;
 import java.awt.*;
 import java.awt.event.*;
@@ -26,10 +27,17 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
 import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,6 +55,10 @@ import javax.swing.plaf.basic.BasicFileChooserUI;
  * @author Jeff Dinkins
  */
 public class BaseFileChooserUI extends BasicFileChooserUI {
+  /** Looks up the directory combo box's display names and icons, off the EDT. */
+  private static final ExecutorService DIRECTORY_DISPLAY_LOADER =
+      ExecutorsHelper.newProcessingQueue("FileChooserDirectoryDisplayLoader");
+
   private static final int space = 10;
   private static final Dimension hstrut5 = new Dimension(5, 1);
 
@@ -891,14 +903,18 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         setText("");
         return this;
       }
+      // Only cached values here: a directory's display name and icon can touch the disk
+      // (File.exists on Windows), and this runs on the EDT for every row on every layout pass.
       File directory = (File) value;
-      setText(getFileChooser().getName(directory));
-      ii.icon = getFileChooser().getIcon(directory);
+      setText(directoryComboBoxModel.getDisplayName(directory));
+      ii.icon = directoryComboBoxModel.getDisplayIcon(directory);
       ii.depth = directoryComboBoxModel.getDepth(index);
       setIcon(ii);
       return this;
     }
   }
+
+  private record DirectoryDisplay(String name, Icon icon) {}
 
   static class IndentIcon implements Icon {
     Icon icon = null;
@@ -929,6 +945,9 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     File selectedDirectory = null;
     final JFileChooser chooser = getFileChooser();
     final FileSystemView fsv = chooser.getFileSystemView();
+    // EDT-confined: display names and icons of the directories shown, filled off the EDT.
+    private final Map<File, DirectoryDisplay> displays = new HashMap<>();
+    private final Set<File> displaysRequested = new HashSet<>();
 
     DirectoryComboBoxModel() {
       // Add the current directory to the model, and make it the
@@ -995,10 +1014,87 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
           }
         }
         calculateDepths();
+        loadDisplays();
         setSelectedItem(sf);
       } catch (FileNotFoundException ex) {
         calculateDepths();
+        loadDisplays();
       }
+    }
+
+    /**
+     * Looks up, once per directory, the display name and icon of each directory in the combo box.
+     * On Windows each lookup is a File.exists plus a shell call, slow on network or removable
+     * drives, so it runs off the EDT and the rows repaint when it is done.
+     */
+    private void loadDisplays() {
+      List<File> pending = new ArrayList<>();
+      for (File dir : directories) {
+        if (displaysRequested.add(dir)) {
+          pending.add(dir);
+        }
+      }
+      if (pending.isEmpty()) {
+        return;
+      }
+      if (chooser.getFileView() != null) {
+        // An application-supplied FileView may not be thread safe; still ask it only once.
+        for (File dir : pending) {
+          displays.put(dir, new DirectoryDisplay(chooser.getName(dir), chooser.getIcon(dir)));
+        }
+        return;
+      }
+      DIRECTORY_DISPLAY_LOADER.execute(
+          () -> {
+            Map<File, DirectoryDisplay> loaded = new HashMap<>();
+            for (File dir : pending) {
+              loaded.put(dir, new DirectoryDisplay(systemDisplayName(dir), systemIcon(dir)));
+            }
+            SwingUtilities.invokeLater(
+                () -> {
+                  displays.putAll(loaded);
+                  // With no selection JComboBox would treat this event as a selection change and
+                  // fire its action, which would reset the chooser's current directory.
+                  if (selectedDirectory != null && !directories.isEmpty()) {
+                    fireContentsChanged(this, 0, directories.size() - 1);
+                  }
+                });
+          });
+    }
+
+    private String systemDisplayName(File dir) {
+      try {
+        return fsv.getSystemDisplayName(dir);
+      } catch (RuntimeException e) {
+        return null;
+      }
+    }
+
+    private Icon systemIcon(File dir) {
+      try {
+        return fsv.getSystemIcon(dir);
+      } catch (RuntimeException e) {
+        return null;
+      }
+    }
+
+    /** The cached display name, or the bare file name until the lookup finishes. */
+    String getDisplayName(File dir) {
+      DirectoryDisplay display = displays.get(dir);
+      if (display != null && display.name() != null && !display.name().isEmpty()) {
+        return display.name();
+      }
+      String name = dir.getName();
+      return name.isEmpty() ? dir.getPath() : name;
+    }
+
+    /** The cached icon, or the look and feel's folder icon until the lookup finishes. */
+    Icon getDisplayIcon(File dir) {
+      DirectoryDisplay display = displays.get(dir);
+      if (display != null && display.icon() != null) {
+        return display.icon();
+      }
+      return UIManager.getIcon("FileView.directoryIcon");
     }
 
     private void calculateDepths() {
