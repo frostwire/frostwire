@@ -32,7 +32,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Collectors;
+import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.text.html.parser.DTD;
 import org.junit.jupiter.api.Test;
@@ -42,7 +46,7 @@ class JdkWarmUpTest {
 
   @Test
   void distinctFontsKeepsOneFontPerFamilyAndStyleAndSkipsOtherValues() {
-    Map<Object, Object> defaults = new LinkedHashMap<>();
+    UIDefaults defaults = new UIDefaults();
     defaults.put("Label.font", new Font(Font.DIALOG, Font.PLAIN, 12));
     defaults.put("Table.font", new Font(Font.DIALOG, Font.PLAIN, 13)); // same data, other size
     defaults.put("TitledBorder.font", new Font(Font.DIALOG, Font.BOLD, 12));
@@ -52,13 +56,42 @@ class JdkWarmUpTest {
 
     List<Font> fonts = JdkWarmUp.distinctFonts(defaults);
 
+    assertEquals(
+        Set.of("Dialog/0", "Dialog/1", "Monospaced/0"),
+        fonts.stream().map(f -> f.getName() + "/" + f.getStyle()).collect(Collectors.toSet()));
     assertEquals(3, fonts.size());
-    assertTrue(fonts.stream().allMatch(f -> f.getSize() == 12));
   }
 
   @Test
   void distinctFontsOfEmptyDefaultsIsEmpty() {
-    assertTrue(JdkWarmUp.distinctFonts(Map.of()).isEmpty());
+    assertTrue(JdkWarmUp.distinctFonts(new UIDefaults()).isEmpty());
+  }
+
+  /**
+   * The installed look and feel's own fonts must be warmed, not just the ones the app put in
+   * UIManager. Warming only those left the composite "SansSerif" font every Nimbus label paints
+   * with untouched, and the setup wizard's first HTML label initialized its fallback slots on the
+   * EDT (Icebase #c9979532ec80, GitHub #1329).
+   */
+  @Test
+  void distinctFontsOfInstalledLookAndFeelIncludeItsComponentFonts() throws Exception {
+    LookAndFeel previous = UIManager.getLookAndFeel();
+    UIManager.setLookAndFeel(new NimbusLookAndFeel());
+    try {
+      UIManager.put("Table.font.bold", new FontUIResource(Font.SANS_SERIF, Font.BOLD, 12));
+      Font label = UIManager.getFont("Label.font");
+
+      List<Font> fonts = JdkWarmUp.distinctFonts(UIManager.getDefaults());
+
+      assertTrue(
+          fonts.stream()
+              .anyMatch(f -> f.getName().equals(label.getName()) && f.getStyle() == Font.PLAIN),
+          fonts::toString);
+      assertTrue(fonts.stream().anyMatch(f -> f.getStyle() == Font.BOLD), fonts::toString);
+    } finally {
+      UIManager.put("Table.font.bold", null);
+      UIManager.setLookAndFeel(previous);
+    }
   }
 
   @Test

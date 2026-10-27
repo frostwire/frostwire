@@ -389,13 +389,23 @@ public final class JdkWarmUp {
     return created;
   }
 
-  /** One font per family and style among the values; sizes share the same font data. */
-  static List<Font> distinctFonts(Map<?, ?> defaults) {
+  /**
+   * One font per family and style among the fonts of the defaults; sizes share the same font data.
+   * Fonts are looked up by key, not read from {@code values()}: {@code UIManager.getDefaults()}
+   * answers {@code values()} with only the fonts the app put there itself, not the look and feel's,
+   * and look-and-feel fonts are often computed on lookup (Nimbus derives "Label.font" and the other
+   * component fonts from "defaultFont"). Missing the look and feel's plain font left the fallback
+   * slots of the font every label paints with to the first HTML label on the EDT.
+   */
+  static List<Font> distinctFonts(UIDefaults defaults) {
     Set<String> seen = new HashSet<>();
     List<Font> fonts = new ArrayList<>();
-    for (Object value : defaults.values().toArray()) {
-      if (value instanceof Font font && seen.add(font.getFontName() + "/" + font.getStyle())) {
-        fonts.add(font);
+    for (Object key : List.copyOf(defaults.keySet())) {
+      if (key instanceof String name && name.toLowerCase(Locale.ROOT).contains("font")) {
+        Font font = defaults.getFont(name);
+        if (font != null && seen.add(font.getFontName() + "/" + font.getStyle())) {
+          fonts.add(font);
+        }
       }
     }
     return fonts;
