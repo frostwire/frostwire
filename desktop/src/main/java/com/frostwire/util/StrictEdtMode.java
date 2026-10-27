@@ -25,6 +25,7 @@ import java.util.function.BooleanSupplier;
  */
 public final class StrictEdtMode {
   private static final ScheduledExecutorService SCH = newWatchdogScheduler();
+  private static final TimeUnit MS = TimeUnit.MILLISECONDS;
 
   /**
    * One timer is armed per dispatched event and cancelled when the event finishes, so cancelled
@@ -148,45 +149,83 @@ public final class StrictEdtMode {
       final long my = ticket.incrementAndGet();
       currentTicket = my;
 
-      // arm a one-shot timer: if we're still handling THIS event after threshold -> dump & report
-      ScheduledFuture<?> stallTimer =
-          SCH.schedule(
-              () -> {
-                if (currentTicket != my) {
-                  return;
-                }
-                // Only the event running Finalizer.shutdown gets extra time; everything else,
-                // including later events while the app exits, keeps the normal threshold.
-                if (isShutdownSequence(edt.getStackTrace())
-                    && SHUTDOWN_THRESHOLD_MS > thresholdMs) {
-                  SCH.schedule(
-                      () -> {
-                        if (currentTicket == my) {
-                          dumpEdtAndQueueReport(
-                              event,
-                              edt,
-                              SHUTDOWN_THRESHOLD_MS,
-                              SHUTDOWN_TAG,
-                              () -> currentTicket == my);
-                        }
-                      },
-                      SHUTDOWN_THRESHOLD_MS - thresholdMs,
-                      TimeUnit.MILLISECONDS);
-                } else {
-                  dumpEdtAndQueueReport(event, edt, thresholdMs, "", () -> currentTicket == my);
-                }
-              },
-              thresholdMs,
-              TimeUnit.MILLISECONDS);
+      // One timer per event, re-armed in steps: an early sample halfway, then the threshold check.
+      StallWatch watch = new StallWatch(event, my);
+      watch.timer = SCH.schedule(watch::takeEarlySample, earlySampleDelayMs(thresholdMs), MS);
 
       try {
         super.dispatchEvent(event);
       } finally {
         // A stall already being reported (or the shutdown re-arm) has started; cancel(false)
         // never interrupts it, and only drops timers for events that finished in time.
-        stallTimer.cancel(false);
+        watch.timer.cancel(false);
         if (currentTicket == my) {
           currentTicket = -1;
+        }
+      }
+    }
+
+    /**
+     * The timer steps of one dispatched event. Steps run one after another on the single watchdog
+     * thread; {@link #timer} is volatile because the EDT reads it to cancel the pending step.
+     */
+    private final class StallWatch {
+      private final AWTEvent event;
+      private final long my;
+      private volatile ScheduledFuture<?> timer;
+
+      /** The EDT stack halfway to the threshold, while this event was still running; or null. */
+      private StackTraceElement[] earlySample;
+
+      StallWatch(AWTEvent event, long my) {
+        this.event = event;
+        this.my = my;
+      }
+
+      private boolean stillRunning() {
+        return currentTicket == my;
+      }
+
+      /**
+       * Samples the EDT halfway to the threshold, so a stall that ends just before the threshold
+       * sample still has a stack showing what it was doing.
+       */
+      void takeEarlySample() {
+        if (!stillRunning()) {
+          return;
+        }
+        StackTraceElement[] stack = edt.getStackTrace();
+        if (stillRunning() && isInsideWatchedDispatch(stack)) {
+          earlySample = stack;
+        }
+        timer =
+            SCH.schedule(this::checkThreshold, thresholdMs - earlySampleDelayMs(thresholdMs), MS);
+      }
+
+      void checkThreshold() {
+        if (!stillRunning()) {
+          return;
+        }
+        // Only the event running Finalizer.shutdown gets extra time; everything else,
+        // including later events while the app exits, keeps the normal threshold.
+        if (isShutdownSequence(edt.getStackTrace()) && SHUTDOWN_THRESHOLD_MS > thresholdMs) {
+          timer =
+              SCH.schedule(
+                  () -> {
+                    if (stillRunning()) {
+                      dumpEdtAndQueueReport(
+                          event,
+                          edt,
+                          SHUTDOWN_THRESHOLD_MS,
+                          SHUTDOWN_TAG,
+                          this::stillRunning,
+                          null);
+                    }
+                  },
+                  SHUTDOWN_THRESHOLD_MS - thresholdMs,
+                  MS);
+        } else {
+          dumpEdtAndQueueReport(event, edt, thresholdMs, "", this::stillRunning, earlySample);
         }
       }
     }
@@ -196,7 +235,8 @@ public final class StrictEdtMode {
         Thread edt,
         long thresholdMs,
         String tag,
-        BooleanSupplier stalledEventStillRunning) {
+        BooleanSupplier stalledEventStillRunning,
+        StackTraceElement[] earlySample) {
       System.err.printf(
           "=== STRICT-EDT VIOLATION: event took > %,d ms on %s ===%n", thresholdMs, edt);
       System.err.println("Event: " + event);
@@ -224,16 +264,25 @@ public final class StrictEdtMode {
         System.err.flush();
         return;
       }
-      if (isWindowsToolkitOnlyStall(edtStack)) {
+      StallReport report = stallReport(tag, edtStack, sampledTheStalledEvent, earlySample);
+      // Checked on the stack to be reported, which may be the early sample.
+      if (isWindowsToolkitOnlyStall(report.stack())) {
         System.err.println("Strict EDT mode: Windows toolkit-only stall; skipping Icebase report.");
         System.err.flush();
         return;
       }
+      if (report.stack() != edtStack) {
+        System.err.println("--- EDT stack halfway to the threshold (reported instead) ---");
+        for (StackTraceElement ste : report.stack()) {
+          System.err.println("\tat " + ste);
+        }
+        System.err.flush();
+      }
       // Production never halts: queue a throttled Icebase report and keep dispatching.
       // Bounded descriptor on purpose: the raw event string can carry coordinates and
       // other high-cardinality data that would explode server-side issue grouping.
-      tag = reportTag(tag, edtStack, sampledTheStalledEvent);
-      maybeQueueProductionReport(tag + event.getClass().getName() + "#" + event.getID(), edtStack);
+      maybeQueueProductionReport(
+          report.tag() + event.getClass().getName() + "#" + event.getID(), report.stack());
     }
 
     private static void maybeQueueProductionReport(
@@ -275,9 +324,43 @@ public final class StrictEdtMode {
     return "";
   }
 
+  /** A production stall report's title prefix and the EDT stack it carries. */
+  record StallReport(String tag, StackTraceElement[] stack) {}
+
+  /**
+   * Picks the stack and title prefix of a production stall report. The threshold sample is used
+   * unless it missed the stalled event (see {@link #reportTag}); then an {@code earlySample} taken
+   * halfway to the threshold, while the same event was still running, is reported instead under
+   * {@link #EARLY_SAMPLE_TAG} (followed by any tag derived from that stack). Without an early
+   * sample the report stays {@link #STACK_MISSED_TAG} with the threshold sample, as before.
+   *
+   * <p>Thread-safe: stateless.
+   */
+  static StallReport stallReport(
+      String tag,
+      StackTraceElement[] atThreshold,
+      boolean sampledTheStalledEvent,
+      StackTraceElement[] earlySample) {
+    String thresholdTag = reportTag(tag, atThreshold, sampledTheStalledEvent);
+    if (STACK_MISSED_TAG.equals(thresholdTag) && isInsideWatchedDispatch(earlySample)) {
+      return new StallReport(EARLY_SAMPLE_TAG + reportTag("", earlySample, true), earlySample);
+    }
+    return new StallReport(thresholdTag, atThreshold);
+  }
+
+  /**
+   * When the early sample is taken: halfway to the threshold.
+   *
+   * <p>Thread-safe: stateless.
+   */
+  static long earlySampleDelayMs(long thresholdMs) {
+    return thresholdMs / 2;
+  }
+
   static final String SHUTDOWN_TAG = "shutdown:";
   static final String SHELL_FOLDER_TAG = "jdk-shellfolder:";
   static final String STACK_MISSED_TAG = "stack-missed:";
+  static final String EARLY_SAMPLE_TAG = "early-sample:";
   static final String RENDER_QUEUE_TAG = "render-queue:";
 
   /**

@@ -9,6 +9,7 @@ package com.frostwire.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -346,6 +347,77 @@ class StrictEdtModeTest {
     assertEquals(
         StrictEdtMode.SHUTDOWN_TAG,
         StrictEdtMode.reportTag(StrictEdtMode.SHUTDOWN_TAG, laterRepaint, false));
+  }
+
+  private static final StackTraceElement[] IDLE_EDT = {
+    frame("jdk.internal.misc.Unsafe", "park"),
+    frame("java.awt.EventQueue", "getNextEvent"),
+    frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+    frame("java.awt.EventDispatchThread", "run")
+  };
+
+  private static final StackTraceElement[] SLOW_ACTION = {
+    frame("com.frostwire.gui.SomeAction", "actionPerformed"),
+    frame("java.awt.EventQueue", "dispatchEvent"),
+    frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+    frame("java.awt.EventDispatchThread", "run")
+  };
+
+  /**
+   * The stall ended just before the threshold sample, which caught the EDT idle; the sample taken
+   * halfway through the same event is reported instead (Icebase #0c622d843b52).
+   */
+  @Test
+  void idleThresholdSampleReportsTheEarlySampleOfTheSameEvent() {
+    StrictEdtMode.StallReport report = StrictEdtMode.stallReport("", IDLE_EDT, false, SLOW_ACTION);
+
+    assertEquals(StrictEdtMode.EARLY_SAMPLE_TAG, report.tag());
+    assertSame(SLOW_ACTION, report.stack());
+  }
+
+  @Test
+  void earlySampleKeepsTheTagDerivedFromItsStack() {
+    StackTraceElement[] renderQueueWait = {
+      frame("sun.awt.SunToolkit", "awtLock"),
+      frame("sun.java2d.pipe.RenderQueue", "lock"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    assertEquals(
+        StrictEdtMode.EARLY_SAMPLE_TAG + StrictEdtMode.RENDER_QUEUE_TAG,
+        StrictEdtMode.stallReport("", IDLE_EDT, false, renderQueueWait).tag());
+  }
+
+  @Test
+  void thresholdSampleOfTheStalledEventWinsOverTheEarlySample() {
+    StackTraceElement[] early = {
+      frame("com.frostwire.gui.Other", "step"),
+      frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent")
+    };
+
+    StrictEdtMode.StallReport report = StrictEdtMode.stallReport("", SLOW_ACTION, true, early);
+
+    assertEquals("", report.tag());
+    assertSame(SLOW_ACTION, report.stack());
+    assertSame(
+        SLOW_ACTION,
+        StrictEdtMode.stallReport(StrictEdtMode.SHUTDOWN_TAG, SLOW_ACTION, false, early).stack());
+  }
+
+  @Test
+  void stackMissedOnlyWhenBothSamplesMissed() {
+    StrictEdtMode.StallReport noEarly = StrictEdtMode.stallReport("", IDLE_EDT, false, null);
+    StrictEdtMode.StallReport idleEarly = StrictEdtMode.stallReport("", IDLE_EDT, false, IDLE_EDT);
+
+    assertEquals(StrictEdtMode.STACK_MISSED_TAG, noEarly.tag());
+    assertSame(IDLE_EDT, noEarly.stack());
+    assertEquals(StrictEdtMode.STACK_MISSED_TAG, idleEarly.tag());
+  }
+
+  @Test
+  void earlySampleIsTakenHalfwayToTheThreshold() {
+    assertEquals(2_500, StrictEdtMode.earlySampleDelayMs(5_000));
+    assertTrue(StrictEdtMode.earlySampleDelayMs(1) < 1);
   }
 
   @Test
