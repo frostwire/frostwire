@@ -224,6 +224,11 @@ public final class StrictEdtMode {
         System.err.flush();
         return;
       }
+      if (isWindowsToolkitOnlyStall(edtStack)) {
+        System.err.println("Strict EDT mode: Windows toolkit-only stall; skipping Icebase report.");
+        System.err.flush();
+        return;
+      }
       // Production never halts: queue a throttled Icebase report and keep dispatching.
       // Bounded descriptor on purpose: the raw event string can carry coordinates and
       // other high-cardinality data that would explode server-side issue grouping.
@@ -409,6 +414,75 @@ public final class StrictEdtMode {
   private static final String[] APP_FRAME_PREFIXES = {
     "com.frostwire.", "com.limegroup.", "org.limewire."
   };
+
+  /**
+   * Stalled events spent entirely inside a Windows toolkit call FrostWire neither makes nor can
+   * change, sampled while the machine or the toolkit thread was busy. Each entry is the exact
+   * stalled segment as "class.method", top of stack first. Icebase drops the same signatures at
+   * ingest (frostwire-cloud {@code icebase.frostwire.com/src/report_filter.php}); keep both lists
+   * in sync.
+   */
+  static final String[][] WINDOWS_TOOLKIT_ONLY_STALLS = {
+    // The cursor manager's own periodic update, posted by the toolkit.
+    {
+      "sun.awt.windows.WGlobalCursorManager.findHeavyweightUnderCursor",
+      "sun.awt.GlobalCursorManager._updateCursor",
+      "sun.awt.GlobalCursorManager$NativeUpdater.run"
+    },
+    // Validation start of a native window resize event.
+    {
+      "sun.awt.windows.WComponentPeer.beginValidate",
+      "java.awt.Container.validate",
+      "java.awt.Window.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent"
+    }
+  };
+
+  /** Frames where the EDT's event loop dispatches; frames above the first one are the stall. */
+  private static final String[] DISPATCH_FRAME_PREFIXES = {
+    "java.awt.EventQueue",
+    "java.awt.EventDispatchThread",
+    "java.awt.event.InvocationEvent",
+    WATCHDOG_PREFIX
+  };
+
+  /**
+   * True when the frames above the event dispatch are exactly one of {@link
+   * #WINDOWS_TOOLKIT_ONLY_STALLS}. The same native call reached from FrostWire code or from a Swing
+   * layout pass (where an app revalidate storm can be the cause, GitHub #1321) does not match, so
+   * it is still reported.
+   *
+   * <p>Thread-safe: stateless stack inspection.
+   */
+  static boolean isWindowsToolkitOnlyStall(StackTraceElement[] stack) {
+    if (stack == null) {
+      return false;
+    }
+    java.util.List<String> segment = new java.util.ArrayList<>();
+    for (StackTraceElement frame : stack) {
+      if (frame == null || frame.getClassName() == null) {
+        return false;
+      }
+      String className = frame.getClassName();
+      boolean dispatch = false;
+      for (String prefix : DISPATCH_FRAME_PREFIXES) {
+        if (className.startsWith(prefix)) {
+          dispatch = true;
+          break;
+        }
+      }
+      if (dispatch) {
+        break;
+      }
+      segment.add(className + "." + frame.getMethodName());
+    }
+    for (String[] signature : WINDOWS_TOOLKIT_ONLY_STALLS) {
+      if (java.util.Arrays.asList(signature).equals(segment)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   static boolean isMacMetalRenderPipelineStall(StackTraceElement[] stack) {
     if (stack == null) {

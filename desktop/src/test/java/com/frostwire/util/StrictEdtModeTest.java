@@ -134,6 +134,99 @@ class StrictEdtModeTest {
     assertFalse(StrictEdtMode.isShutdownSequence(null));
   }
 
+  private static final StackTraceElement[] EDT_LOOP = {
+    frame("java.awt.EventQueue", "dispatchEventImpl"),
+    frame("java.awt.EventQueue", "dispatchEvent"),
+    frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"),
+    frame("java.awt.EventDispatchThread", "pumpOneEventForFilters"),
+    frame("java.awt.EventDispatchThread", "run")
+  };
+
+  private static StackTraceElement[] stack(StackTraceElement[]... parts) {
+    return java.util.Arrays.stream(parts)
+        .flatMap(java.util.Arrays::stream)
+        .toArray(StackTraceElement[]::new);
+  }
+
+  /** Icebase #a42f7908d37a: the toolkit's own cursor update, inside a FrostWire modal dialog. */
+  @Test
+  void toolkitCursorUpdateIsWindowsToolkitOnlyStall() {
+    StackTraceElement[] stack =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor"),
+              frame("sun.awt.GlobalCursorManager", "_updateCursor"),
+              frame("sun.awt.GlobalCursorManager$NativeUpdater", "run"),
+              frame("java.awt.event.InvocationEvent", "dispatch")
+            },
+            EDT_LOOP,
+            new StackTraceElement[] {
+              frame("java.awt.Dialog", "show"),
+              frame("com.limegroup.gnutella.gui.FramedDialog", "lambda$showDialog$0"),
+              frame("java.awt.event.InvocationEvent", "dispatch")
+            },
+            EDT_LOOP);
+
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
+  }
+
+  /** Icebase #c96101cf2130: validation start of a native resize. */
+  @Test
+  void nativeResizeValidationIsWindowsToolkitOnlyStall() {
+    StackTraceElement[] stack =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WComponentPeer", "beginValidate"),
+              frame("java.awt.Container", "validate"),
+              frame("java.awt.Window", "dispatchEventImpl"),
+              frame("java.awt.Component", "dispatchEvent")
+            },
+            EDT_LOOP);
+
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
+  }
+
+  /**
+   * Icebase #3ae4ef04e569: the same cursor call from a Swing layout pass was an app revalidate
+   * storm (GitHub #1321), so it must still be reported.
+   */
+  @Test
+  void cursorUpdateFromLayoutPassIsReported() {
+    StackTraceElement[] stack =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WGlobalCursorManager", "findHeavyweightUnderCursor"),
+              frame("sun.awt.GlobalCursorManager", "_updateCursor"),
+              frame("sun.awt.GlobalCursorManager", "updateCursorImmediately"),
+              frame("java.awt.Component", "updateCursorImmediately"),
+              frame("java.awt.Container", "validate"),
+              frame("javax.swing.RepaintManager", "validateInvalidComponents"),
+              frame("javax.swing.RepaintManager$ProcessingRunnable", "run"),
+              frame("java.awt.event.InvocationEvent", "dispatch")
+            },
+            EDT_LOOP);
+
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
+  }
+
+  @Test
+  void toolkitCallUnderAppFrameIsReported() {
+    StackTraceElement[] stack =
+        stack(
+            new StackTraceElement[] {
+              frame("sun.awt.windows.WComponentPeer", "beginValidate"),
+              frame("java.awt.Container", "validate"),
+              frame("com.limegroup.gnutella.gui.MainFrame", "resize"),
+              frame("java.awt.Window", "dispatchEventImpl"),
+              frame("java.awt.Component", "dispatchEvent")
+            },
+            EDT_LOOP);
+
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(null));
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(new StackTraceElement[0]));
+  }
+
   private static StackTraceElement frame(String className, String method) {
     return new StackTraceElement(className, method, null, -1);
   }
