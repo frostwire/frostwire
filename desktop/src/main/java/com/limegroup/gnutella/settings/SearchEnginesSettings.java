@@ -114,13 +114,17 @@ public class SearchEnginesSettings extends LimeProps {
       (BooleanSetting)
           FACTORY.createBooleanSetting("ICEBRIDGE_RUDP_AUTO_MIGRATED", false).setAlwaysSave(true);
 
+  /*
+   * No save here: this class is first loaded by whatever thread touches a setting, often the EDT
+   * (setup wizard, options panes). The marker and the port live in the same props file, so the next
+   * regular save writes both together; if the app dies before that, the migration simply reruns.
+   */
   static {
     if (!ICEBRIDGE_RUDP_AUTO_MIGRATED.getValue()) {
       ICEBRIDGE_RUDP_PORT.setValue(
           RudpPortMigration.port(
               ICEBRIDGE_RUDP_PORT.getValue(), false, ICEBRIDGE_USE_REMOTE.getValue()));
       ICEBRIDGE_RUDP_AUTO_MIGRATED.setValue(true);
-      LimeProps.instance().save();
     }
   }
 
