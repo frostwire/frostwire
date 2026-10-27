@@ -63,9 +63,9 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Locale data and tables behind the first number format, date format and collator.
  *   <li>String concatenation: the first {@code +} on strings that needs a generated class loads the
  *       class-file API, see {@link #linkStringConcat}.
- *   <li>FrostWire's own classes for the main window, the big panes built right after it and the
- *       Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their
- *       static initializers may create Swing objects.
+ *   <li>FrostWire's own classes for the setup wizard, the main window, the big panes built right
+ *       after it and the Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not
+ *       initialized, since their static initializers may create Swing objects.
  * </ul>
  *
  * Steps run in the order the EDT first needs them: the splash window's progress bar, text and
@@ -104,17 +104,27 @@ public final class JdkWarmUp {
       List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
 
   /**
-   * FrostWire packages whose classes the EDT reads from the jar and defines in bulk while it builds
-   * the main window and, right after startup, the Transfers, Search and Library panes, and then on
-   * the first Options click. Every class directly in each package (subpackages are listed
-   * separately) is loaded without initialization, in this order, which is the order the EDT first
-   * needs them.
+   * FrostWire packages whose classes the EDT reads from the jar and defines in bulk while it shows
+   * the first-run setup wizard, builds the main window and, right after startup, the Transfers,
+   * Search and Library panes, and then on the first Options click. Every class directly in each
+   * package (subpackages are listed separately) is loaded without initialization, in this order,
+   * which is the order the EDT first needs them.
    */
   static final List<String> APP_PACKAGES_TO_LOAD =
       List.of(
+          // First-run setup wizard, shown before the main window: SetupManager and its pages.
+          "com.limegroup.gnutella.gui.init",
           // Layout of every MigLayout container, starting with MainFrame's content pane.
           "net.miginfocom.layout",
           "net.miginfocom.swing",
+          // MainFrame itself and what its constructor builds from this package: ApplicationHeader,
+          // StatusLine and their listeners.
+          "com.limegroup.gnutella.gui",
+          // The tab objects MainFrame.buildTabs creates first (SearchTab, LibraryTab).
+          "com.frostwire.gui.tabs",
+          // ApplicationHeader's search box and its update button.
+          "com.frostwire.gui.searchfield",
+          "com.frostwire.gui.updates",
           // MainFrame's menu bar and the actions behind its items.
           "com.limegroup.gnutella.gui.menu",
           "com.limegroup.gnutella.gui.actions",

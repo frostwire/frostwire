@@ -137,6 +137,16 @@ class JdkWarmUpTest {
         List.of(
             "net.miginfocom.swing.MigLayout", // MainFrame.<init> (#311ada154787)
             "net.miginfocom.layout.UnitValue",
+            // MainFrame.buildTabs (#5a45d8b5bd73) and the rest of MainFrame.<init>.
+            "com.frostwire.gui.tabs.SearchTab",
+            "com.frostwire.gui.tabs.LibraryTab",
+            "com.frostwire.gui.tabs.AbstractTab",
+            "com.limegroup.gnutella.gui.MainFrame",
+            "com.limegroup.gnutella.gui.ApplicationHeader",
+            "com.limegroup.gnutella.gui.StatusLine",
+            "com.frostwire.gui.searchfield.GoogleSearchField",
+            // First-run setup wizard.
+            "com.limegroup.gnutella.gui.init.SetupManager",
             "com.limegroup.gnutella.gui.menu.FileMenu", // MainFrame menus (#b5afbd896e23)
             "com.limegroup.gnutella.gui.menu.AbstractMenu", // (#067474346501)
             "com.limegroup.gnutella.gui.tables.LimeJTable", // (#e84c15a648fd)
