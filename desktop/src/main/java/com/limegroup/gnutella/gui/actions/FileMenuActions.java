@@ -80,18 +80,22 @@ public final class FileMenuActions {
    */
   public static class OpenMagnetTorrentVideoUrlAction extends AbstractAction {
     private JDialog dialog = null;
-    private final LimeTextField PATH_FIELD;
+
+    /**
+     * Built with the dialog, not with the action: the action is created with the File menu while
+     * the main window is built on the EDT at startup.
+     */
+    private LimeTextField pathField;
 
     public OpenMagnetTorrentVideoUrlAction() {
       super(I18n.tr("O&pen .Torrent, Magnet or Video URL"));
-      PATH_FIELD = new LimeTextField(34);
       putValue(Action.LONG_DESCRIPTION, I18n.tr("Opens a magnet link or torrent file"));
     }
 
     public void actionPerformed(ActionEvent e) {
       if (dialog == null) createDialog();
       // clear input before dialog is shown
-      PATH_FIELD.setText(MagnetClipboardListener.getMagnetOrTorrentURLFromClipboard());
+      pathField.setText(MagnetClipboardListener.getMagnetOrTorrentURLFromClipboard());
       // display modal dialog centered
       dialog.pack();
       GUIUtils.centerOnScreen(dialog);
@@ -99,6 +103,7 @@ public final class FileMenuActions {
     }
 
     private void createDialog() {
+      pathField = new LimeTextField(34);
       dialog =
           new JDialog(GUIMediator.getAppFrame(), I18n.tr("Download .Torrent or Magnet link"), true);
       dialog.addWindowListener(new OpenDialogWindowAdapter());
@@ -148,7 +153,7 @@ public final class FileMenuActions {
       constraints.weightx = 1.0;
       constraints.gridwidth = GridBagConstraints.REMAINDER;
       constraints.insets = new Insets(0, SPACE, 0, 0);
-      panel.add(PATH_FIELD, constraints);
+      panel.add(pathField, constraints);
       ButtonRow row =
           new ButtonRow(
               new Action[] {new PasteAction(), new BrowseAction()},
@@ -191,7 +196,7 @@ public final class FileMenuActions {
 
     private class OpenDialogWindowAdapter extends WindowAdapter {
       public void windowOpened(WindowEvent e) {
-        PATH_FIELD.requestFocusInWindow();
+        pathField.requestFocusInWindow();
       }
     }
 
@@ -201,7 +206,7 @@ public final class FileMenuActions {
       }
 
       public void actionPerformed(ActionEvent a) {
-        PATH_FIELD.paste();
+        pathField.paste();
       }
     }
 
@@ -213,7 +218,7 @@ public final class FileMenuActions {
       public void actionPerformed(ActionEvent a) {
         File file =
             FileChooserHandler.getInputFile(GUIMediator.getAppFrame(), TorrentFileFilter.INSTANCE);
-        if (file != null) PATH_FIELD.setText(file.getAbsolutePath());
+        if (file != null) pathField.setText(file.getAbsolutePath());
       }
     }
 
@@ -223,7 +228,7 @@ public final class FileMenuActions {
       }
 
       public void actionPerformed(ActionEvent a) {
-        String str = PATH_FIELD.getText();
+        String str = pathField.getText();
         if (str.startsWith("http") && !str.endsWith(".torrent")) {
           // Cloud URL entered
           SearchInformation searchInfo =
