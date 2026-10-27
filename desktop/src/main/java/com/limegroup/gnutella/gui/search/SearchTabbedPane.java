@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,97 +20,94 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.util.SafeText;
 import com.limegroup.gnutella.gui.GUIMediator;
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.*;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 final class SearchTabbedPane extends JTabbedPane {
-    SearchTabbedPane() {
+  SearchTabbedPane() {}
+
+  @Override
+  public void addTab(String title, Icon icon, Component component) {
+    super.addTab(title, icon, component);
+    int tabIndex = getTabCount() - 1;
+    setTabComponentAt(tabIndex, new SearchTabHeader(component, title));
+  }
+
+  @Override
+  public void setTitleAt(int index, String title) {
+    Component c = getTabComponentAt(index);
+    if (c instanceof SearchTabHeader) {
+      ((SearchTabHeader) c).setTitle(title);
+    }
+  }
+
+  void setProgressActiveAt(int index, boolean active) {
+    Component c = getTabComponentAt(index);
+    if (c instanceof SearchTabHeader) {
+      ((SearchTabHeader) c).setProgressActive(active);
+    }
+  }
+
+  void switchToTabByOffset(int offset) {
+    int oldIndex = (getSelectedIndex() < 0) ? 0 : getSelectedIndex();
+    int newIndex = (oldIndex + offset) % getTabCount();
+    // java's modulo will return negative numbers... damn you Gosling.
+    if (newIndex < 0) {
+      newIndex += getTabCount();
+    }
+    setSelectedIndex(newIndex);
+  }
+
+  private final class SearchTabHeader extends JPanel {
+    private final Component component;
+    private final JLabel labelText;
+
+    SearchTabHeader(Component component, String text) {
+      this.component = component;
+      setOpaque(false);
+      setLayout(new MigLayout("insets 0, gap 0"));
+      JButton buttonClose = new JButton(CancelSearchIconProxy.createSelected());
+      buttonClose.setOpaque(false);
+      buttonClose.setContentAreaFilled(false);
+      buttonClose.setBorderPainted(false);
+      buttonClose.addActionListener(new CloseActionHandler());
+      add(buttonClose, "h 17!, w 23!");
+      labelText = new JLabel(SafeText.sanitize(text.trim()));
+      labelText.setOpaque(false);
+      labelText.setHorizontalTextPosition(SwingConstants.LEADING);
+      labelText.setAlignmentX(SwingConstants.RIGHT);
+      labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));
+      add(labelText);
     }
 
-    @Override
-    public void addTab(String title, Icon icon, Component component) {
-        super.addTab(title, icon, component);
-        int tabIndex = getTabCount() - 1;
-        setTabComponentAt(tabIndex, new SearchTabHeader(component, title));
+    void setTitle(String title) {
+      labelText.setText(SafeText.sanitize(title));
     }
 
-    @Override
-    public void setTitleAt(int index, String title) {
-        Component c = getTabComponentAt(index);
-        if (c instanceof SearchTabHeader) {
-            ((SearchTabHeader) c).setTitle(title);
-        }
+    void setProgressActive(boolean active) {
+      if (active) {
+        labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));
+      } else {
+        labelText.setIcon(null);
+      }
     }
 
-    void setProgressActiveAt(int index, boolean active) {
-        Component c = getTabComponentAt(index);
-        if (c instanceof SearchTabHeader) {
-            ((SearchTabHeader) c).setProgressActive(active);
+    class CloseActionHandler implements ActionListener {
+      CloseActionHandler() {}
+
+      public void actionPerformed(ActionEvent evt) {
+        int index = SearchMediator.getSearchResultDisplayer().getIndexForTabComponent(component);
+        if (index != -1) {
+          SearchMediator.getSearchResultDisplayer().killSearchAtIndex(index);
         }
+      }
     }
-
-    void switchToTabByOffset(int offset) {
-        int oldIndex = (getSelectedIndex() < 0) ? 0 : getSelectedIndex();
-        int newIndex = (oldIndex + offset) % getTabCount();
-        //java's modulo will return negative numbers... damn you Gosling.
-        if (newIndex < 0) {
-            newIndex += getTabCount();
-        }
-        setSelectedIndex(newIndex);
-    }
-
-    private final class SearchTabHeader extends JPanel {
-        private final Component component;
-        private final JLabel labelText;
-
-        SearchTabHeader(Component component, String text) {
-            this.component = component;
-            setOpaque(false);
-            setLayout(new MigLayout("insets 0, gap 0"));
-            JButton buttonClose = new JButton(CancelSearchIconProxy.createSelected());
-            buttonClose.setOpaque(false);
-            buttonClose.setContentAreaFilled(false);
-            buttonClose.setBorderPainted(false);
-            buttonClose.addActionListener(new CloseActionHandler());
-            add(buttonClose, "h 17!, w 23!");
-            labelText = new JLabel(SafeText.sanitize(text.trim()));
-            labelText.setOpaque(false);
-            labelText.setHorizontalTextPosition(SwingConstants.LEADING);
-            labelText.setAlignmentX(SwingConstants.RIGHT);
-            labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));
-            add(labelText);
-        }
-
-        void setTitle(String title) {
-            labelText.setText(SafeText.sanitize(title));
-        }
-
-        void setProgressActive(boolean active) {
-            if (active) {
-                labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));
-            } else {
-                labelText.setIcon(null);
-            }
-        }
-
-        class CloseActionHandler implements ActionListener {
-            CloseActionHandler() {
-            }
-
-            public void actionPerformed(ActionEvent evt) {
-                int index = SearchMediator.getSearchResultDisplayer().getIndexForTabComponent(component);
-                if (index != -1) {
-                    SearchMediator.getSearchResultDisplayer().killSearchAtIndex(index);
-                }
-            }
-        }
-    }
+  }
 }
