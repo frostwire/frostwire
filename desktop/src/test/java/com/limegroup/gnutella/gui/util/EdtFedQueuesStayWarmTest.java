@@ -10,6 +10,7 @@ package com.limegroup.gnutella.gui.util;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.frostwire.gui.library.LibraryUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -41,6 +42,7 @@ class EdtFedQueuesStayWarmTest {
         "FileChooserDirectoryDisplayLoader",
         (Executor)
             staticField("com.frostwire.gui.theme.BaseFileChooserUI", "DIRECTORY_DISPLAY_LOADER"));
+    queues.put("LibraryUtils-Executor", LibraryUtils.getExecutor());
 
     Map<String, Thread> before = new LinkedHashMap<>();
     for (Map.Entry<String, Executor> queue : queues.entrySet()) {

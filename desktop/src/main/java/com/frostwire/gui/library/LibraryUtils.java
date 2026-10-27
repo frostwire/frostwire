@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.library.tags.TagsData;
 import com.frostwire.gui.library.tags.TagsReader;
@@ -26,6 +25,7 @@ import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.frostwire.util.PlaybackUtil;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -43,14 +43,15 @@ public class LibraryUtils {
   @SuppressWarnings("unused")
   private static final Logger LOG = Logger.getLogger(LibraryUtils.class);
 
-  private static final ExecutorService executor;
+  /**
+   * Runs the library's file and tag reads off the EDT. The EDT feeds it on selections (lyrics, a
+   * transfer's media flags), so its worker never times out and feeding it never starts a thread.
+   */
+  private static final ExecutorService executor =
+      WarmExecutors.serialQueue("LibraryUtils-Executor");
 
   // Zero behavior change unless you start with -Dfw.debug.assertNoEdtIO=true
   private static final boolean ASSERT_NO_EDT_IO = Boolean.getBoolean("fw.debug.assertNoEdtIO");
-
-  static {
-    executor = ExecutorsHelper.newProcessingQueue("LibraryUtils-Executor");
-  }
 
   public static ExecutorService getExecutor() {
     return executor;
