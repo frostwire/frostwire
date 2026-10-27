@@ -1,8 +1,8 @@
 package com.limegroup.gnutella.gui;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import com.limegroup.gnutella.settings.UISettings;
 import java.io.File;
 import java.util.Collections;
@@ -81,9 +81,12 @@ public class NativeFileIconController implements FileIconController {
     }
   }
 
-  /** The single background thread that runs native icon lookups. */
+  /**
+   * The single background thread that runs native icon lookups. Paints feed it from the EDT, so its
+   * worker never times out: an idle queue would make the next paint start a thread.
+   */
   static Executor newLookupQueue() {
-    return ExecutorsHelper.newProcessingQueue("IconLoader");
+    return WarmExecutors.serialQueue("IconLoader");
   }
 
   /** Returns true if loading succeeded and the view hasn't screwed up. */
