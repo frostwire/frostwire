@@ -42,6 +42,7 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
+import com.limegroup.gnutella.gui.util.BackgroundSettingsSave;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
@@ -433,23 +434,34 @@ public final class GUIMediator {
         minimizeToTray = result == HideExitDialog.HIDE;
       }
     }
-    if (minimizeToTray) {
-      if (OSUtils.supportsTray()) {
-        if (ResourceManager.instance().isTrayIconAvailable()) {
-          applyWindowSettings();
-          GUIMediator.showTrayIcon();
-          hideView();
-        }
-      }
-    } else if (OSUtils.isMacOSX() && fromFrame) {
-      // If on OSX, don't close in response to clicking on the 'X'
-      // as that's not normal behavior. This can only be done on Java14
-      // though, because we need access to the
-      // com.apple.eawt.ApplicationListener.handleReOpenApplication event
-      // in order to restore the GUI.
-      GUIMediator.setAppVisible(false);
-    } else {
-      shutdown();
+    WindowCloseAction action =
+        WindowCloseAction.decide(
+            minimizeToTray,
+            OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable(),
+            OSUtils.isMacOSX(),
+            fromFrame);
+    switch (action) {
+      case HIDE_TO_TRAY:
+        applyWindowSettings();
+        GUIMediator.showTrayIcon();
+        hideView();
+        break;
+      case HIDE_WINDOW:
+        // If on OSX, don't close in response to clicking on the 'X'
+        // as that's not normal behavior. This can only be done on Java14
+        // though, because we need access to the
+        // com.apple.eawt.ApplicationListener.handleReOpenApplication event
+        // in order to restore the GUI.
+        GUIMediator.setAppVisible(false);
+        break;
+      case SHUTDOWN:
+        shutdown();
+        break;
+      case NONE:
+        break;
+    }
+    if (action.savesSettingsInBackground()) {
+      BackgroundSettingsSave.request();
     }
   }
 

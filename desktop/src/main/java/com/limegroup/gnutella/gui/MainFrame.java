@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.setting.SettingsGroupManager;
 
 /**
  * This class constructs the main `JFrame` for the program as well as all of the other GUI classes.
@@ -140,8 +139,9 @@ public final class MainFrame {
           }
 
           public void windowClosing(WindowEvent e) {
+            // Settings are saved by GUIMediator.close: in the background when the window only
+            // hides, and once by the shutdown thread when FrostWire exits.
             saveWindowState();
-            SettingsGroupManager.instance().save();
             GUIMediator.close(true);
           }
         });
