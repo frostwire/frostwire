@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -31,7 +31,10 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.UISettings;
-
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.ColorUIResource;
@@ -40,10 +43,6 @@ import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Class that mediates between themes and FrostWire.
@@ -52,820 +51,1035 @@ import java.lang.reflect.Method;
  * @author aldenml
  */
 public final class ThemeMediator {
-    public static final Font DIALOG_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
-    public static final Color LIGHT_BORDER_COLOR = SkinColors.GENERAL_BORDER_COLOR;
-    public static final Color APP_REALLY_DARK_COLOR = SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM;
-    public static final Color TABLE_ALTERNATE_ROW_COLOR = SkinColors.TABLE_ALTERNATE_ROW_COLOR;
-    public static final Color TABLE_SELECTED_BACKGROUND_ROW_COLOR = SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR;
-    public static final Color TAB_BUTTON_FOREGROUND_COLOR = new Color(0xFFFFFF);
-    public static final String SKIN_PROPERTY_DARK_BOX_BACKGROUND = "skin_property_dark_box_background";
-    private static final Logger LOG = Logger.getLogger(ThemeMediator.class);
-    private static final int TABLE_FONT_SIZE_MIN = 10;
-    private static final int TABLE_FONT_SIZE_MAX = 20;
+  public static final Font DIALOG_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
+  public static final Color LIGHT_BORDER_COLOR = SkinColors.GENERAL_BORDER_COLOR;
+  public static final Color APP_REALLY_DARK_COLOR =
+      SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM;
+  public static final Color TABLE_ALTERNATE_ROW_COLOR = SkinColors.TABLE_ALTERNATE_ROW_COLOR;
+  public static final Color TABLE_SELECTED_BACKGROUND_ROW_COLOR =
+      SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR;
+  public static final Color TAB_BUTTON_FOREGROUND_COLOR = new Color(0xFFFFFF);
+  public static final String SKIN_PROPERTY_DARK_BOX_BACKGROUND =
+      "skin_property_dark_box_background";
+  private static final Logger LOG = Logger.getLogger(ThemeMediator.class);
+  private static final int TABLE_FONT_SIZE_MIN = 10;
+  private static final int TABLE_FONT_SIZE_MAX = 20;
 
-    private static final String[] SYNTH_KEYS = {
-            /* ---------- popup / menu plumbing ---------- */
-            "PopupMenuUI", "MenuUI", "MenuItemUI",
-            "CheckBoxMenuItemUI", "RadioButtonMenuItemUI", "PopupMenuSeparatorUI",
+  private static final String[] SYNTH_KEYS = {
+    /* ---------- popup / menu plumbing ---------- */
+    "PopupMenuUI",
+    "MenuUI",
+    "MenuItemUI",
+    "CheckBoxMenuItemUI",
+    "RadioButtonMenuItemUI",
+    "PopupMenuSeparatorUI",
 
-            /* ---------- dialogs ---------- */
-            "OptionPaneUI", "FileChooserUI",
+    /* ---------- dialogs ---------- */
+    "OptionPaneUI",
+    "FileChooserUI",
 
-            /* ---------- containers ---------- */
-            "TabbedPaneUI", "ScrollBarUI", "ScrollPaneUI", "SplitPaneUI",
+    /* ---------- containers ---------- */
+    "TabbedPaneUI",
+    "ScrollBarUI",
+    "ScrollPaneUI",
+    "SplitPaneUI",
 
-            /* ---------- widgets that had Synth‑specific skins ---------- */
-            "RangeSliderUI",       // custom component
-            "TableUI", "TreeUI",   // data views
-            "TextFieldUI",         // buddies / prompt skin
-            "RadioButtonUI",       // custom painter variant
-            "LabelUI",              // custom painter variant
-            "MultilineToolTipUI" // custom painter variant
-    };
+    /* ---------- widgets that had Synth‑specific skins ---------- */
+    "RangeSliderUI", // custom component
+    "TableUI",
+    "TreeUI", // data views
+    "TextFieldUI", // buddies / prompt skin
+    "RadioButtonUI", // custom painter variant
+    "LabelUI", // custom painter variant
+    "MultilineToolTipUI" // custom painter variant
+  };
 
-    private ThemeMediator() {
+  private ThemeMediator() {}
+
+  /** Available UI themes. */
+  public enum ThemeEnum {
+    DEFAULT,
+    /// Default theme
+    DARK_FLAT_LAF,
+    /// Experimental dark-flat look and feel
+    LIGHT_FLAT_LAF
+    /// Experimental light-flat look and feel
+  }
+
+  /** Currently selected UI theme. */
+  private static ThemeEnum currentTheme;
+
+  static {
+    // Load persisted UI theme from settings
+    try {
+      UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
+
+      UISettings.UI_THEME.setAlwaysSave(true);
+      currentTheme = ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
+    } catch (Exception e) {
+      // Unknown theme enum or other error, fallback to DEFAULT and update settings
+      currentTheme = ThemeEnum.DEFAULT;
+      UISettings.UI_THEME.setValue(currentTheme.name());
+    }
+  }
+
+  /**
+   * Returns the current UI theme.
+   *
+   * @return the current theme
+   */
+  public static ThemeEnum getCurrentTheme() {
+    return currentTheme;
+  }
+
+  public static boolean isDarkLafThemeOn() {
+    return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_FLAT_LAF;
+  }
+
+  /**
+   * Helper for checking if a light theme is enabled.
+   *
+   * <p>Possible light themes in FrostWire are either the default theme or FlatLaf Light (also known
+   * as simply "Light (beta)")
+   *
+   * @return Whether or not the dark theme is disabled (i.e., either the default theme or the new
+   *     light theme is enabled).
+   */
+  public static boolean isLightThemeOn() {
+    return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT
+        || ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
+  }
+
+  public static boolean isDefaultThemeOn() {
+    return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
+  }
+
+  public static boolean isLightLafThemeOn() {
+    return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
+  }
+
+  /**
+   * Switches the application UI theme.
+   *
+   * @param theme the theme to apply
+   */
+  public static void switchTheme(final ThemeEnum theme) {
+    /* ------------------------------------------------------------------
+     * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
+     *    immediate change (handy when they click around in Options);
+     * 2.  tell the user that a **restart is required** for a 100 % clean
+     *    switch (many colours, borders & cached icons only update at
+     *    start‑up);
+     * 3.  spawn a fresh copy of FrostWire and let this process exit.
+     * ----------------------------------------------------------------*/
+
+    final ThemeEnum old = currentTheme;
+
+    // Delegate theme loading to ThemeMediator
+    if (theme == ThemeEnum.DEFAULT) {
+      com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
+    } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
+      com.frostwire.gui.theme.ThemeMediator.loadFlatDarkLafTheme();
+    } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
+      com.frostwire.gui.theme.ThemeMediator.loadFlatLightLafTheme();
     }
 
-    /**
-     * Available UI themes.
-     */
-    public enum ThemeEnum {
-        DEFAULT,
-        /// Default theme
-        DARK_FLAT_LAF,
-        /// Experimental dark-flat look and feel
-        LIGHT_FLAT_LAF  /// Experimental light-flat look and feel
-    }
+    // Persist selection immediately (used by the relaunch below)
+    currentTheme = theme;
+    UISettings.UI_THEME.setValue(theme.name());
 
-    /**
-     * Currently selected UI theme.
-     */
-    private static ThemeEnum currentTheme;
-
-    static {
-        // Load persisted UI theme from settings
-        try {
-            UIManager.put("ApplicationHeaderUI",
-                    "com.frostwire.gui.theme.SkinApplicationHeaderUI");
-
-            UISettings.UI_THEME.setAlwaysSave(true);
-            currentTheme = ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
-        } catch (Exception e) {
-            // Unknown theme enum or other error, fallback to DEFAULT and update settings
-            currentTheme = ThemeEnum.DEFAULT;
-            UISettings.UI_THEME.setValue(currentTheme.name());
-        }
-    }
-
-    /**
-     * Returns the current UI theme.
-     *
-     * @return the current theme
-     */
-    public static ThemeEnum getCurrentTheme() {
-        return currentTheme;
-    }
-
-    public static boolean isDarkLafThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_FLAT_LAF;
-    }
-
-    /**
-     * Helper for checking if a light theme is enabled.
-     * <p>
-     * Possible light themes in FrostWire are either the default theme or
-     * FlatLaf Light (also known as simply "Light (beta)")
-     *
-     * @return Whether or not the dark theme is disabled (i.e., either the
-     * default theme or the new light theme is enabled).
-     */
-    public static boolean isLightThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ||
-                ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
-    }
-
-    public static boolean isDefaultThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
-    }
-
-    public static boolean isLightLafThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
-    }
-
-    /**
-     * Switches the application UI theme.
-     *
-     * @param theme the theme to apply
-     */
-    public static void switchTheme(final ThemeEnum theme) {
-        /* ------------------------------------------------------------------
-         * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
-         *    immediate change (handy when they click around in Options);
-         * 2.  tell the user that a **restart is required** for a 100 % clean
-         *    switch (many colours, borders & cached icons only update at
-         *    start‑up);
-         * 3.  spawn a fresh copy of FrostWire and let this process exit.
-         * ----------------------------------------------------------------*/
-
-        final ThemeEnum old = currentTheme;
-
-        // Delegate theme loading to ThemeMediator
-        if (theme == ThemeEnum.DEFAULT) {
-            com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
-        } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
-            com.frostwire.gui.theme.ThemeMediator.loadFlatDarkLafTheme();
-        } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
-            com.frostwire.gui.theme.ThemeMediator.loadFlatLightLafTheme();
-        }
-
-        // Persist selection immediately (used by the relaunch below)
-        currentTheme = theme;
-        UISettings.UI_THEME.setValue(theme.name());
-
-        // refresh *this* instance so users see the effect right away
-        // Do this asynchronously to avoid blocking the EDT for long periods
-        SwingUtilities.invokeLater(() -> {
-            for (Window w : Window.getWindows()) {
-                try {
-                    SwingUtilities.updateComponentTreeUI(w);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+    // refresh *this* instance so users see the effect right away
+    // Do this asynchronously to avoid blocking the EDT for long periods
+    SwingUtilities.invokeLater(
+        () -> {
+          for (Window w : Window.getWindows()) {
+            try {
+              SwingUtilities.updateComponentTreeUI(w);
+            } catch (Throwable e) {
+              e.printStackTrace();
             }
+          }
         });
 
-        // Inform the user that a restart is needed for a 100% clean switch
-        if (old != theme) {
-            GUIMediator.showRestartDialog(
-                    I18n.tr("The new theme has been applied partially.\nFor the full theme to load please restart FrostWire.")
-            );
-        }
+    // Inform the user that a restart is needed for a 100% clean switch
+    if (old != theme) {
+      GUIMediator.showRestartDialog(
+          I18n.tr(
+              "The new theme has been applied partially.\nFor the full theme to load please restart FrostWire."));
     }
+  }
 
-    /**
-     * Loads the theme during application startup on the current thread.
-     * This avoids blocking the EDT since no Swing components exist yet.
-     */
-    public static void loadThemeAtStartup(ThemeEnum theme) {
-        try {
-            if (theme == ThemeEnum.DEFAULT) {
-                UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+  /**
+   * Loads the theme during application startup on the current thread. This avoids blocking the EDT
+   * since no Swing components exist yet.
+   */
+  public static void loadThemeAtStartup(ThemeEnum theme) {
+    try {
+      if (theme == ThemeEnum.DEFAULT) {
+        UIManager.setLookAndFeel(
+            new NimbusLookAndFeel() {
+              @Override
+              public UIDefaults getDefaults() {
+                return modifyNimbusDefaults(super.getDefaults());
+              }
+            });
+        applySkinSettings();
+        setupGlobalKeyManager();
+      } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
+        purgeSynthOverrides();
+        FlatDarkLaf.setup();
+        installFlatDarkLafDefaults();
+      } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
+        purgeSynthOverrides();
+        FlatLightLaf.setup();
+        installFlatLightLafDefaults();
+      }
+      currentTheme = theme;
+      UISettings.UI_THEME.setValue(theme.name());
+    } catch (Throwable e) {
+      e.printStackTrace();
+      throw new RuntimeException("Unable to load theme at startup", e);
+    }
+  }
+
+  public static void loadDefaultTheme() {
+    Runnable themeChanger =
+        new Runnable() {
+          public void run() {
+            try {
+              UIManager.setLookAndFeel(
+                  new NimbusLookAndFeel() {
                     @Override
                     public UIDefaults getDefaults() {
-                        return modifyNimbusDefaults(super.getDefaults());
+                      return modifyNimbusDefaults(super.getDefaults());
                     }
-                });
-                applySkinSettings();
-                setupGlobalKeyManager();
-            } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
-                purgeSynthOverrides();
-                FlatDarkLaf.setup();
-                installFlatDarkLafDefaults();
-            } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
-                purgeSynthOverrides();
-                FlatLightLaf.setup();
-                installFlatLightLafDefaults();
+                  });
+              applySkinSettings();
+              setupGlobalKeyManager();
+            } catch (Throwable e) {
+              e.printStackTrace();
+              throw new RuntimeException("Unable to change the L&F", e);
             }
-            currentTheme = theme;
-            UISettings.UI_THEME.setValue(theme.name());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException("Unable to load theme at startup", e);
-        }
-    }
-
-    public static void loadDefaultTheme() {
-        Runnable themeChanger = new Runnable() {
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(new NimbusLookAndFeel() {
-                        @Override
-                        public UIDefaults getDefaults() {
-                            return modifyNimbusDefaults(super.getDefaults());
-                        }
-                    });
-                    applySkinSettings();
-                    setupGlobalKeyManager();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Unable to change the L&F", e);
-                }
-            }
+          }
         };
 
-        try {
-            // Check if we're already on the EDT
-            if (EventQueue.isDispatchThread()) {
-                // If we are, run directly
-                themeChanger.run();
-            } else {
-                // If not, use invokeAndWait
-                SwingUtilities.invokeAndWait(themeChanger);
-            }
-        } catch (Throwable e) {
-            if (e instanceof InvocationTargetException) {
-                e = ((InvocationTargetException) e).getTargetException();
-            }
-            throw new RuntimeException("Unable to change the L&F", e);
-        }
+    try {
+      // Check if we're already on the EDT
+      if (EventQueue.isDispatchThread()) {
+        // If we are, run directly
+        themeChanger.run();
+      } else {
+        // If not, use invokeAndWait
+        SwingUtilities.invokeAndWait(themeChanger);
+      }
+    } catch (Throwable e) {
+      if (e instanceof InvocationTargetException) {
+        e = ((InvocationTargetException) e).getTargetException();
+      }
+      throw new RuntimeException("Unable to change the L&F", e);
     }
+  }
 
-    public static void loadFlatLightLafTheme() {
-        purgeSynthOverrides();
-        Runnable task = () -> {
-            purgeSynthOverrides();
-            FlatLightLaf.setup();
-            installFlatLightLafDefaults();
+  public static void loadFlatLightLafTheme() {
+    purgeSynthOverrides();
+    Runnable task =
+        () -> {
+          purgeSynthOverrides();
+          FlatLightLaf.setup();
+          installFlatLightLafDefaults();
 
-            for (Window w : Window.getWindows()) {
-                SwingUtilities.updateComponentTreeUI(w);
-            }
+          for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+          }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
-            task.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(task);
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to load new light theme", ex);
-            }
-        }
+    if (SwingUtilities.isEventDispatchThread()) {
+      task.run();
+    } else {
+      try {
+        SwingUtilities.invokeAndWait(task);
+      } catch (Exception ex) {
+        throw new RuntimeException("Unable to load new light theme", ex);
+      }
     }
+  }
 
-    /**
-     * Loads the dark UI theme (FlatLaf Dark).
-     */
-    public static void loadFlatDarkLafTheme() {
-        purgeSynthOverrides();
-        Runnable task = () -> {
-            purgeSynthOverrides();
-            FlatDarkLaf.setup();
-            installFlatDarkLafDefaults();
-            for (Window w : Window.getWindows()) {
-                SwingUtilities.updateComponentTreeUI(w);
-            }
+  /** Loads the dark UI theme (FlatLaf Dark). */
+  public static void loadFlatDarkLafTheme() {
+    purgeSynthOverrides();
+    Runnable task =
+        () -> {
+          purgeSynthOverrides();
+          FlatDarkLaf.setup();
+          installFlatDarkLafDefaults();
+          for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+          }
         };
 
-        if (EventQueue.isDispatchThread()) {
-            task.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(task);
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to load dark theme", ex);
-            }
-        }
+    if (EventQueue.isDispatchThread()) {
+      task.run();
+    } else {
+      try {
+        SwingUtilities.invokeAndWait(task);
+      } catch (Exception ex) {
+        throw new RuntimeException("Unable to load dark theme", ex);
+      }
     }
+  }
 
-    private static void installFlatDarkLafDefaults() {
-        ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
-        ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
-        UIManager.put("Table.background", reallyDark);
-        UIManager.put("Table.alternateRowColor", reallyDark);
-        // text fields should always have white background
-        ColorUIResource white = new ColorUIResource(Color.WHITE);
-        UIManager.put("TextField.background", white);
-        UIManager.put("TextPane.background", white);
-        UIManager.put("EditorPane.background", white);
+  private static void installFlatDarkLafDefaults() {
+    ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
+    ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
+    UIManager.put("Table.background", reallyDark);
+    UIManager.put("Table.alternateRowColor", reallyDark);
+    // text fields should always have white background
+    ColorUIResource white = new ColorUIResource(Color.WHITE);
+    UIManager.put("TextField.background", white);
+    UIManager.put("TextPane.background", white);
+    UIManager.put("EditorPane.background", white);
 
-        // test: make all table-header backgrounds bright yellow
-        UIManager.put("TableHeader.background", dark);
-        // Delete dialog buttons background gets fixed with this
-        UIManager.put("OptionPane.background", reallyDark);
-        // (you'll almost certainly want a contrasting foreground as well)
-        UIManager.put("TableHeader.foreground", new ColorUIResource(Color.WHITE));
+    // test: make all table-header backgrounds bright yellow
+    UIManager.put("TableHeader.background", dark);
+    // Delete dialog buttons background gets fixed with this
+    UIManager.put("OptionPane.background", reallyDark);
+    // (you'll almost certainly want a contrasting foreground as well)
+    UIManager.put("TableHeader.foreground", new ColorUIResource(Color.WHITE));
 
-        // everything that is a JPanel will now be dark:
-        UIManager.put("Panel.background", reallyDark);
-        // any JScrollPane border / background:
-        UIManager.put("ScrollPane.background", reallyDark);
-        // the viewport inside the scroll-pane:
-        UIManager.put("Viewport.background", reallyDark);
+    // everything that is a JPanel will now be dark:
+    UIManager.put("Panel.background", reallyDark);
+    // any JScrollPane border / background:
+    UIManager.put("ScrollPane.background", reallyDark);
+    // the viewport inside the scroll-pane:
+    UIManager.put("Viewport.background", reallyDark);
 
-        // all JToggleButtons get this bg:
-        UIManager.put("ToggleButton.background", reallyDark);
-        // when they are "selected":
-        UIManager.put("ToggleButton.select", reallyDark.darker());
+    // all JToggleButtons get this bg:
+    UIManager.put("ToggleButton.background", reallyDark);
+    // when they are "selected":
+    UIManager.put("ToggleButton.select", reallyDark.darker());
 
-        // Restore search field defaults for dark theme to match default LAF
-        installSearchFieldDefaults();
+    // Restore search field defaults for dark theme to match default LAF
+    installSearchFieldDefaults();
+  }
+
+  private static void installFlatLightLafDefaults() {
+    // text fields should always have white background
+    ColorUIResource white = new ColorUIResource(Color.WHITE);
+    UIManager.put("TextField.background", white);
+    UIManager.put("TextPane.background", white);
+    UIManager.put("EditorPane.background", white);
+    // Reset label background to transparent (don't override FlatLaf's default)
+    UIManager.put("Label.background", null);
+    installSearchFieldDefaults();
+  }
+
+  private static void installSearchFieldDefaults() {
+    // Set outer margin with left padding
+    UIManager.put("SearchField.buttonMargin", new InsetsUIResource(0, 4, 0, 0));
+    // Set layout style based on OS (MAC for macOS, VISTA for others)
+    String layoutStyle = OSUtils.isMacOSX() ? "MAC" : "VISTA";
+    UIManager.put("SearchField.layoutStyle", layoutStyle);
+    // Ensure search field has white background
+    UIManager.put("SearchField.background", new ColorUIResource(Color.WHITE));
+  }
+
+  public static Font fixLabelFont(JLabel label) {
+    return fixComponentFont(label, label.getText());
+  }
+
+  static Font fixComponentFont(JComponent c, Object msg) {
+    Font oldFont = null;
+    if (c != null && OSUtils.isWindows()) {
+      Font currentFont = c.getFont();
+      if (currentFont != null && !canDisplayMessage(currentFont, msg)) {
+        oldFont = currentFont;
+        c.setFont(ThemeMediator.DIALOG_FONT);
+      }
     }
+    return oldFont;
+  }
 
-    private static void installFlatLightLafDefaults() {
-        // text fields should always have white background
-        ColorUIResource white = new ColorUIResource(Color.WHITE);
-        UIManager.put("TextField.background", white);
-        UIManager.put("TextPane.background", white);
-        UIManager.put("EditorPane.background", white);
-        // Reset label background to transparent (don't override FlatLaf's default)
-        UIManager.put("Label.background", null);
-        installSearchFieldDefaults();
+  public static TitledBorder createTitledBorder(String title) {
+    return new SkinTitledBorder(title);
+  }
+
+  private static JSeparator createSeparator(Color color) {
+    JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+    UIDefaults defaults = new UIDefaults();
+    defaults.put(
+        "Separator[Enabled].backgroundPainter",
+        new SkinSeparatorBackgroundPainter(SkinSeparatorBackgroundPainter.State.Enabled, color));
+    defaults.put("Separator.thickness", 1);
+    sep.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
+    sep.putClientProperty("Nimbus.Overrides", defaults);
+    return sep;
+  }
+
+  private static JSeparator createVerticalSeparator(Color color) {
+    return createSeparator(color);
+  }
+
+  public static JSeparator createAppHeaderSeparator() {
+    return createVerticalSeparator(
+        currentTheme == ThemeEnum.DARK_FLAT_LAF
+            ? SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK
+            : SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
+  }
+
+  private static Font getDefaultFont() {
+    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    return defaults.getFont("defaultFont");
+  }
+
+  public static Font getCurrentTableFont() {
+    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    return defaults.getFont("Table.font");
+  }
+
+  public static void modifyTablesFont(int delta) {
+    int currentSize = ApplicationSettings.GUI_TABLES_FONT_SIZE.getValue();
+    if (currentSize == 0 || delta == 0) {
+      currentSize = getDefaultFont().getSize();
     }
-
-    private static void installSearchFieldDefaults() {
-        // Set outer margin with left padding
-        UIManager.put("SearchField.buttonMargin", new InsetsUIResource(0, 4, 0, 0));
-        // Set layout style based on OS (MAC for macOS, VISTA for others)
-        String layoutStyle = OSUtils.isMacOSX() ? "MAC" : "VISTA";
-        UIManager.put("SearchField.layoutStyle", layoutStyle);
-        // Ensure search field has white background
-        UIManager.put("SearchField.background", new ColorUIResource(Color.WHITE));
+    int newSize = currentSize + delta;
+    if (TABLE_FONT_SIZE_MIN <= newSize && newSize <= TABLE_FONT_SIZE_MAX) {
+      ApplicationSettings.GUI_TABLES_FONT_SIZE.setValue(currentSize + delta);
+      Font f = setupTableFont(UIManager.getLookAndFeelDefaults());
+      changeTablesFont(f);
     }
+  }
 
-    public static Font fixLabelFont(JLabel label) {
-        return fixComponentFont(label, label.getText());
+  public static void fixKeyStrokes(JTextComponent textField) {
+    if (OSUtils.isMacOSX()) {
+      fixKeyStroke(textField, "copy", KeyEvent.VK_C, 0);
+      fixKeyStroke(textField, "paste", KeyEvent.VK_V, 0);
+      fixKeyStroke(textField, "cut", KeyEvent.VK_X, 0);
+      fixKeyStroke(textField, "caret-begin-line", KeyEvent.VK_LEFT, 0);
+      fixKeyStroke(textField, "caret-end-line", KeyEvent.VK_RIGHT, 0);
+      fixKeyStroke(textField, "selection-begin-line", KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK);
+      fixKeyStroke(textField, "selection-end-line", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK);
+      fixKeyStroke(
+          textField,
+          "select-all",
+          KeyEvent.VK_A,
+          Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
     }
+  }
 
-    static Font fixComponentFont(JComponent c, Object msg) {
-        Font oldFont = null;
-        if (c != null && OSUtils.isWindows()) {
-            Font currentFont = c.getFont();
-            if (currentFont != null && !canDisplayMessage(currentFont, msg)) {
-                oldFont = currentFont;
-                c.setFont(ThemeMediator.DIALOG_FONT);
-            }
-        }
-        return oldFont;
+  static void testComponentCreationThreadingViolation() {
+    if (!EventQueue.isDispatchThread()) {
+      UiThreadingViolationException uiThreadingViolationError =
+          new UiThreadingViolationException(
+              "Component creation must be done on Event Dispatch Thread");
+      uiThreadingViolationError.printStackTrace(System.err);
+      throw uiThreadingViolationError;
     }
+  }
 
-    public static TitledBorder createTitledBorder(String title) {
-        return new SkinTitledBorder(title);
+  private static void fixKeyStroke(JTextComponent textField, String name, int vk, int mask) {
+    Action action = textField.getActionMap().get(name);
+    if (action != null) {
+      InputMap[] inputMaps =
+          new InputMap[] {
+            textField.getInputMap(JComponent.WHEN_FOCUSED),
+            textField.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT),
+            textField.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+          };
+      for (InputMap i : inputMaps) {
+        i.put(
+            KeyStroke.getKeyStroke(
+                vk, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | mask),
+            action);
+      }
     }
+  }
 
-    private static JSeparator createSeparator(Color color) {
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-        UIDefaults defaults = new UIDefaults();
-        defaults.put("Separator[Enabled].backgroundPainter", new SkinSeparatorBackgroundPainter(SkinSeparatorBackgroundPainter.State.Enabled, color));
-        defaults.put("Separator.thickness", 1);
-        sep.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
-        sep.putClientProperty("Nimbus.Overrides", defaults);
-        return sep;
+  private static void changeTablesFont(Font f) {
+    Frame[] frames = Frame.getFrames();
+    for (Frame frame : frames) {
+      changeTablesFont(frame, f);
     }
+  }
 
-    private static JSeparator createVerticalSeparator(Color color) {
-        return createSeparator(color);
-    }
-
-    public static JSeparator createAppHeaderSeparator() {
-        return createVerticalSeparator(
-                currentTheme == ThemeEnum.DARK_FLAT_LAF ?
-                        SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
-                        SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
-    }
-
-    private static Font getDefaultFont() {
-        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-        return defaults.getFont("defaultFont");
-    }
-
-    public static Font getCurrentTableFont() {
-        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-        return defaults.getFont("Table.font");
-    }
-
-    public static void modifyTablesFont(int delta) {
-        int currentSize = ApplicationSettings.GUI_TABLES_FONT_SIZE.getValue();
-        if (currentSize == 0 || delta == 0) {
-            currentSize = getDefaultFont().getSize();
-        }
-        int newSize = currentSize + delta;
-        if (TABLE_FONT_SIZE_MIN <= newSize && newSize <= TABLE_FONT_SIZE_MAX) {
-            ApplicationSettings.GUI_TABLES_FONT_SIZE.setValue(currentSize + delta);
-            Font f = setupTableFont(UIManager.getLookAndFeelDefaults());
-            changeTablesFont(f);
-        }
-    }
-
-    public static void fixKeyStrokes(JTextComponent textField) {
-        if (OSUtils.isMacOSX()) {
-            fixKeyStroke(textField, "copy", KeyEvent.VK_C, 0);
-            fixKeyStroke(textField, "paste", KeyEvent.VK_V, 0);
-            fixKeyStroke(textField, "cut", KeyEvent.VK_X, 0);
-            fixKeyStroke(textField, "caret-begin-line", KeyEvent.VK_LEFT, 0);
-            fixKeyStroke(textField, "caret-end-line", KeyEvent.VK_RIGHT, 0);
-            fixKeyStroke(textField, "selection-begin-line", KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK);
-            fixKeyStroke(textField, "selection-end-line", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK);
-            fixKeyStroke(textField, "select-all", KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-        }
-    }
-
-    static void testComponentCreationThreadingViolation() {
-        if (!EventQueue.isDispatchThread()) {
-            UiThreadingViolationException uiThreadingViolationError = new UiThreadingViolationException("Component creation must be done on Event Dispatch Thread");
-            uiThreadingViolationError.printStackTrace(System.err);
-            throw uiThreadingViolationError;
-        }
-    }
-
-    private static void fixKeyStroke(JTextComponent textField, String name, int vk, int mask) {
-        Action action = textField.getActionMap().get(name);
-        if (action != null) {
-            InputMap[] inputMaps = new InputMap[]{textField.getInputMap(JComponent.WHEN_FOCUSED), textField.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT), textField.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)};
-            for (InputMap i : inputMaps) {
-                i.put(KeyStroke.getKeyStroke(vk, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | mask), action);
-            }
-        }
-    }
-
-    private static void changeTablesFont(Font f) {
-        Frame[] frames = Frame.getFrames();
-        for (Frame frame : frames) {
-            changeTablesFont(frame, f);
-        }
-    }
-
-    // Where Tab shortcuts, Font Size changes,
-    private static void setupGlobalKeyManager() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
-            // handle Ctrl+- for font change in tables
-            //System.out.println(e.getSource());
-            if (e.getID() == KeyEvent.KEY_PRESSED && (e.isMetaDown() || e.isControlDown())) {
+  // Where Tab shortcuts, Font Size changes,
+  private static void setupGlobalKeyManager() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        .addKeyEventDispatcher(
+            e -> {
+              // handle Ctrl+- for font change in tables
+              // System.out.println(e.getSource());
+              if (e.getID() == KeyEvent.KEY_PRESSED && (e.isMetaDown() || e.isControlDown())) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_EQUALS:
-                        if (OSUtils.isMacOSX()) {
-                            if (e.getKeyChar() == '+') {
-                                modifyTablesFont(1);
-                            }
-                        } else {
-                            modifyTablesFont(1);
-                        }
-                        return true;
-                    case KeyEvent.VK_MINUS:
-                        modifyTablesFont(-1);
-                        return true;
-                    case KeyEvent.VK_0:
-                        modifyTablesFont(0);
-                        return true;
-                    case KeyEvent.VK_W:
-                        closeCurrentSearchTab(e);
+                  case KeyEvent.VK_EQUALS:
+                    if (OSUtils.isMacOSX()) {
+                      if (e.getKeyChar() == '+') {
+                        modifyTablesFont(1);
+                      }
+                    } else {
+                      modifyTablesFont(1);
+                    }
+                    return true;
+                  case KeyEvent.VK_MINUS:
+                    modifyTablesFont(-1);
+                    return true;
+                  case KeyEvent.VK_0:
+                    modifyTablesFont(0);
+                    return true;
+                  case KeyEvent.VK_W:
+                    closeCurrentSearchTab(e);
                 }
-                //Ctrl+Tab, Ctrl+Shift Tab to switch search tabs (Windows/Firefox Style)
+                // Ctrl+Tab, Ctrl+Shift Tab to switch search tabs (Windows/Firefox Style)
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_TAB) {
-                    int offset = (e.isShiftDown()) ? -1 : 1;
+                  int offset = (e.isShiftDown()) ? -1 : 1;
+                  SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
+                  return true;
+                }
+                // Cmd+Shift+[, Cmd+Shift+] Chrome Style.
+                if (e.isMetaDown() && e.isShiftDown()) {
+                  int offset = 0;
+                  if (e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET) {
+                    offset = -1;
+                  } else if (e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET) {
+                    offset = 1;
+                  }
+                  if (offset != 0) {
                     SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
                     return true;
+                  }
                 }
-                //Cmd+Shift+[, Cmd+Shift+] Chrome Style.
-                if (e.isMetaDown() && e.isShiftDown()) {
-                    int offset = 0;
-                    if (e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET) {
-                        offset = -1;
-                    } else if (e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET) {
-                        offset = 1;
-                    }
-                    if (offset != 0) {
-                        SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        });
-    }
+              }
+              return false;
+            });
+  }
 
-    private static void closeCurrentSearchTab(KeyEvent e) {
-        if (e.getSource() instanceof Component) {
-            Window eventParentWindow = SwingUtilities.getWindowAncestor((Component) e.getSource());
-            if (GUIMediator.getAppFrame().equals(eventParentWindow)) {
-                SearchTab searchTab = (SearchTab) GUIMediator.instance().getTab(Tabs.SEARCH);
-                if (searchTab.getComponent().isVisible()) {
-                    SearchMediator.getSearchResultDisplayer().closeCurrentTab();
-                }
-            }
+  private static void closeCurrentSearchTab(KeyEvent e) {
+    if (e.getSource() instanceof Component) {
+      Window eventParentWindow = SwingUtilities.getWindowAncestor((Component) e.getSource());
+      if (GUIMediator.getAppFrame().equals(eventParentWindow)) {
+        SearchTab searchTab = (SearchTab) GUIMediator.instance().getTab(Tabs.SEARCH);
+        if (searchTab.getComponent().isVisible()) {
+          SearchMediator.getSearchResultDisplayer().closeCurrentTab();
         }
+      }
     }
+  }
 
-    private static void changeTablesFont(Container c, Font f) {
-        Component[] comps = c.getComponents();
-        for (Component comp : comps) {
-            if (comp instanceof LimeJTable) {
-                changeTableFont((JTable) comp, f);
-            } else if (comp instanceof Container) {
-                changeTablesFont((Container) comp, f);
-            }
-        }
+  private static void changeTablesFont(Container c, Font f) {
+    Component[] comps = c.getComponents();
+    for (Component comp : comps) {
+      if (comp instanceof LimeJTable) {
+        changeTableFont((JTable) comp, f);
+      } else if (comp instanceof Container) {
+        changeTablesFont((Container) comp, f);
+      }
     }
+  }
 
-    private static void changeTableFont(JTable table, Font f) {
-        UIDefaults nimbusOverrides = new UIDefaults();
-        nimbusOverrides.put("Table.font", new FontUIResource(f));
-        table.putClientProperty("Nimbus.Overrides", nimbusOverrides);
-        TableCellEditor editor = table.getCellEditor();
-        if (editor != null) {
-            editor.cancelCellEditing();
-        }
-        FontMetrics fm = table.getFontMetrics(f);
-        int h = fm.getHeight() + 8;
-        table.setRowHeight(h);
-        SwingUtilities.updateComponentTreeUI(table);
+  private static void changeTableFont(JTable table, Font f) {
+    UIDefaults nimbusOverrides = new UIDefaults();
+    nimbusOverrides.put("Table.font", new FontUIResource(f));
+    table.putClientProperty("Nimbus.Overrides", nimbusOverrides);
+    TableCellEditor editor = table.getCellEditor();
+    if (editor != null) {
+      editor.cancelCellEditing();
     }
+    FontMetrics fm = table.getFontMetrics(f);
+    int h = fm.getHeight() + 8;
+    table.setRowHeight(h);
+    SwingUtilities.updateComponentTreeUI(table);
+  }
 
-    private static void applyCommonSkinUI() {
-        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
-            UIManager.put("PopupMenuUI", "com.frostwire.gui.theme.SkinPopupMenuUI");
-            UIManager.put("MenuItemUI", "com.frostwire.gui.theme.SkinMenuItemUI");
-            UIManager.put("MenuUI", "com.frostwire.gui.theme.SkinMenuUI");
-            UIManager.put("CheckBoxMenuItemUI", "com.frostwire.gui.theme.SkinCheckBoxMenuItemUI");
-            UIManager.put("MenuBarUI", "com.frostwire.gui.theme.SkinMenuBarUI");
-            UIManager.put("RadioButtonMenuItemUI", "com.frostwire.gui.theme.SkinRadioButtonMenuItemUI");
-            UIManager.put("PopupMenuSeparatorUI", "com.frostwire.gui.theme.SkinPopupMenuSeparatorUI");
-            UIManager.put("FileChooserUI", "com.frostwire.gui.theme.SkinFileChooserUI");
-            //UIManager.put("FileChooserUI", "javax.swing.plaf.FileChooserUI");
-            UIManager.put("TabbedPaneUI", "com.frostwire.gui.theme.SkinTabbedPaneUI");
-            UIManager.put("OptionPaneUI", "com.frostwire.gui.theme.SkinOptionPaneUI");
-            UIManager.put("LabelUI", "com.frostwire.gui.theme.SkinLabelUI");
-            UIManager.put("ProgressBarUI", "com.frostwire.gui.theme.SkinProgressBarUI");
-            UIManager.put("PanelUI", "com.frostwire.gui.theme.SkinPanelUI");
-            UIManager.put("ScrollBarUI", "com.frostwire.gui.theme.SkinScrollBarUI");
-            UIManager.put("ScrollPaneUI", "com.frostwire.gui.theme.SkinScrollPaneUI");
-            UIManager.put("SplitPaneUI", "com.frostwire.gui.theme.SkinSplitPaneUI");
-            UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
-            UIManager.put("MultilineToolTipUI", "com.frostwire.gui.theme.SkinMultilineToolTipUI");
-            UIManager.put("TreeUI", "com.frostwire.gui.theme.SkinTreeUI");
-            UIManager.put("TextFieldUI", "com.frostwire.gui.theme.SkinTextFieldUI");
-            UIManager.put("RangeSliderUI", "com.frostwire.gui.theme.SkinRangeSliderUI");
-            UIManager.put("TableUI", "com.frostwire.gui.theme.SkinTableUI");
-            UIManager.put("RadioButtonUI", "com.frostwire.gui.theme.SkinRadioButtonUI");
-        }
+  private static void applyCommonSkinUI() {
+    if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+      UIManager.put("PopupMenuUI", "com.frostwire.gui.theme.SkinPopupMenuUI");
+      UIManager.put("MenuItemUI", "com.frostwire.gui.theme.SkinMenuItemUI");
+      UIManager.put("MenuUI", "com.frostwire.gui.theme.SkinMenuUI");
+      UIManager.put("CheckBoxMenuItemUI", "com.frostwire.gui.theme.SkinCheckBoxMenuItemUI");
+      UIManager.put("MenuBarUI", "com.frostwire.gui.theme.SkinMenuBarUI");
+      UIManager.put("RadioButtonMenuItemUI", "com.frostwire.gui.theme.SkinRadioButtonMenuItemUI");
+      UIManager.put("PopupMenuSeparatorUI", "com.frostwire.gui.theme.SkinPopupMenuSeparatorUI");
+      UIManager.put("FileChooserUI", "com.frostwire.gui.theme.SkinFileChooserUI");
+      // UIManager.put("FileChooserUI", "javax.swing.plaf.FileChooserUI");
+      UIManager.put("TabbedPaneUI", "com.frostwire.gui.theme.SkinTabbedPaneUI");
+      UIManager.put("OptionPaneUI", "com.frostwire.gui.theme.SkinOptionPaneUI");
+      UIManager.put("LabelUI", "com.frostwire.gui.theme.SkinLabelUI");
+      UIManager.put("ProgressBarUI", "com.frostwire.gui.theme.SkinProgressBarUI");
+      UIManager.put("PanelUI", "com.frostwire.gui.theme.SkinPanelUI");
+      UIManager.put("ScrollBarUI", "com.frostwire.gui.theme.SkinScrollBarUI");
+      UIManager.put("ScrollPaneUI", "com.frostwire.gui.theme.SkinScrollPaneUI");
+      UIManager.put("SplitPaneUI", "com.frostwire.gui.theme.SkinSplitPaneUI");
+      UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
+      UIManager.put("MultilineToolTipUI", "com.frostwire.gui.theme.SkinMultilineToolTipUI");
+      UIManager.put("TreeUI", "com.frostwire.gui.theme.SkinTreeUI");
+      UIManager.put("TextFieldUI", "com.frostwire.gui.theme.SkinTextFieldUI");
+      UIManager.put("RangeSliderUI", "com.frostwire.gui.theme.SkinRangeSliderUI");
+      UIManager.put("TableUI", "com.frostwire.gui.theme.SkinTableUI");
+      UIManager.put("RadioButtonUI", "com.frostwire.gui.theme.SkinRadioButtonUI");
     }
+  }
 
-    private static FontUIResource getControlFont() {
-        FontUIResource font = null;
-        if (OSUtils.isWindows()) {
-            Font recommendedFont = fixWindowsOSFont();
-            if (recommendedFont != null) {
-                font = new FontUIResource(recommendedFont);
-            }
-        } else if (OSUtils.isMacOSX()) {
-            font = AquaFonts.getControlTextFont();
-        } else if (OSUtils.isLinux()) {
-            Font recommendedFont = fixLinuxOSFont();
-            if (recommendedFont != null) {
-                font = new FontUIResource(recommendedFont);
-            }
-        }
-        return font;
+  private static FontUIResource getControlFont() {
+    FontUIResource font = null;
+    if (OSUtils.isWindows()) {
+      Font recommendedFont = fixWindowsOSFont();
+      if (recommendedFont != null) {
+        font = new FontUIResource(recommendedFont);
+      }
+    } else if (OSUtils.isMacOSX()) {
+      font = AquaFonts.getControlTextFont();
+    } else if (OSUtils.isLinux()) {
+      Font recommendedFont = fixLinuxOSFont();
+      if (recommendedFont != null) {
+        font = new FontUIResource(recommendedFont);
+      }
     }
+    return font;
+  }
 
-    private static String getRecommendedFontName() {
-        String fontName = null;
-        String language = ApplicationSettings.getLanguage();
-        if (language != null) {
-            if (language.startsWith("ja")) {
-                //Meiryo for Japanese
-                fontName = "Meiryo";
-            } else if (language.startsWith("ko")) {
-                //Malgun Gothic for Korean
-                fontName = "Malgun Gothic";
-            } else if (language.startsWith("zh")) {
-                //Microsoft JhengHei for Chinese (Traditional)
-                //Microsoft YaHei for Chinese (Simplified)
-                fontName = "Microsoft JhengHei";
-            } else if (language.startsWith("he")) {
-                //Gisha for Hebrew
-                fontName = "Gisha";
-            } else if (language.startsWith("th")) {
-                //Leelawadee for Thai
-                fontName = "Leelawadee";
-            }
-        }
-        return fontName;
+  private static String getRecommendedFontName() {
+    String fontName = null;
+    String language = ApplicationSettings.getLanguage();
+    if (language != null) {
+      if (language.startsWith("ja")) {
+        // Meiryo for Japanese
+        fontName = "Meiryo";
+      } else if (language.startsWith("ko")) {
+        // Malgun Gothic for Korean
+        fontName = "Malgun Gothic";
+      } else if (language.startsWith("zh")) {
+        // Microsoft JhengHei for Chinese (Traditional)
+        // Microsoft YaHei for Chinese (Simplified)
+        fontName = "Microsoft JhengHei";
+      } else if (language.startsWith("he")) {
+        // Gisha for Hebrew
+        fontName = "Gisha";
+      } else if (language.startsWith("th")) {
+        // Leelawadee for Thai
+        fontName = "Leelawadee";
+      }
     }
+    return fontName;
+  }
 
-    private static boolean canDisplayMessage(Font f, Object msg) {
-        boolean result = true;
-        if (msg instanceof String s) {
-            result = f.canDisplayUpTo(s) == -1;
-        }
-        return result;
+  private static boolean canDisplayMessage(Font f, Object msg) {
+    boolean result = true;
+    if (msg instanceof String s) {
+      result = f.canDisplayUpTo(s) == -1;
     }
+    return result;
+  }
 
-    private static void applySkinSettings() {
-        applyCommonSkinUI();
-        // NOTE: this was necessary in old versions of java 7, it was unmodified
-        // when we migrated to java 8, but the classes has been removed in
-        // java 9.
-        //fixAAFontSettings();
-        UIManager.put("Tree.leafIcon", UIManager.getIcon("Tree.closedIcon"));
-        // remove split pane borders
-        UIManager.put("SplitPane.border", BorderFactory.createEmptyBorder());
-        if (!OSUtils.isMacOSX()) {
-            UIManager.put("Table.focusRowHighlightBorder", UIManager.get("Table.focusCellHighlightBorder"));
-        }
-        UIManager.put("Table.focusCellHighlightBorder", BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        // Add a bold text version of simple text.
-        Font normal = UIManager.getFont("Table.font");
-        FontUIResource bold = new FontUIResource(normal.getName(), Font.BOLD, normal.getSize());
-        UIManager.put("Table.font.bold", bold);
-        UIManager.put("Tree.rowHeight", 0);
+  private static void applySkinSettings() {
+    applyCommonSkinUI();
+    // NOTE: this was necessary in old versions of java 7, it was unmodified
+    // when we migrated to java 8, but the classes has been removed in
+    // java 9.
+    // fixAAFontSettings();
+    UIManager.put("Tree.leafIcon", UIManager.getIcon("Tree.closedIcon"));
+    // remove split pane borders
+    UIManager.put("SplitPane.border", BorderFactory.createEmptyBorder());
+    if (!OSUtils.isMacOSX()) {
+      UIManager.put(
+          "Table.focusRowHighlightBorder", UIManager.get("Table.focusCellHighlightBorder"));
     }
+    UIManager.put("Table.focusCellHighlightBorder", BorderFactory.createEmptyBorder(1, 1, 1, 1));
+    // Add a bold text version of simple text.
+    Font normal = UIManager.getFont("Table.font");
+    FontUIResource bold = new FontUIResource(normal.getName(), Font.BOLD, normal.getSize());
+    UIManager.put("Table.font.bold", bold);
+    UIManager.put("Tree.rowHeight", 0);
+  }
 
-    // windows font policy http://msdn.microsoft.com/en-us/library/windows/desktop/aa511282.aspx
-    // table of languages http://msdn.microsoft.com/en-us/library/ee825488(v=cs.20).aspx
-    private static Font fixWindowsOSFont() {
-        Font font = null;
-        try {
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Method method = Toolkit.class.getDeclaredMethod("setDesktopProperty", String.class, Object.class);
-            method.setAccessible(true);
-            String fontName = ThemeMediator.getRecommendedFontName();
-            if (fontName != null) {
-                font = new Font(fontName, Font.PLAIN, 12);
-                method.invoke(toolkit, "win.icon.font", font);
-                //SubstanceLookAndFeel.setFontPolicy(SubstanceFontUtilities.getDefaultFontPolicy());
-            }
-        } catch (Throwable e) {
-            LOG.error("Error fixing font", e);
-        }
-        return font;
+  // windows font policy http://msdn.microsoft.com/en-us/library/windows/desktop/aa511282.aspx
+  // table of languages http://msdn.microsoft.com/en-us/library/ee825488(v=cs.20).aspx
+  private static Font fixWindowsOSFont() {
+    Font font = null;
+    try {
+      Toolkit toolkit = Toolkit.getDefaultToolkit();
+      Method method =
+          Toolkit.class.getDeclaredMethod("setDesktopProperty", String.class, Object.class);
+      method.setAccessible(true);
+      String fontName = ThemeMediator.getRecommendedFontName();
+      if (fontName != null) {
+        font = new Font(fontName, Font.PLAIN, 12);
+        method.invoke(toolkit, "win.icon.font", font);
+        // SubstanceLookAndFeel.setFontPolicy(SubstanceFontUtilities.getDefaultFontPolicy());
+      }
+    } catch (Throwable e) {
+      LOG.error("Error fixing font", e);
     }
+    return font;
+  }
 
-    private static Font fixLinuxOSFont() {
-        Font font = null;
-        try {
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Method method = Toolkit.class.getDeclaredMethod("setDesktopProperty", String.class, Object.class);
-            method.setAccessible(true);
-            String fontName = ThemeMediator.getRecommendedFontName();
-            if (fontName != null) {
-                // linux is hardcoded to Dialog
-                fontName = "Dialog";
-                font = new Font(fontName, Font.PLAIN, 12);
-                method.invoke(toolkit, "gnome.Gtk/FontName", fontName);
-                //SubstanceLookAndFeel.setFontPolicy(SubstanceFontUtilities.getDefaultFontPolicy());
-            }
-        } catch (Throwable e) {
-            LOG.error("Error fixing font", e);
-        }
-        return font;
+  private static Font fixLinuxOSFont() {
+    Font font = null;
+    try {
+      Toolkit toolkit = Toolkit.getDefaultToolkit();
+      Method method =
+          Toolkit.class.getDeclaredMethod("setDesktopProperty", String.class, Object.class);
+      method.setAccessible(true);
+      String fontName = ThemeMediator.getRecommendedFontName();
+      if (fontName != null) {
+        // linux is hardcoded to Dialog
+        fontName = "Dialog";
+        font = new Font(fontName, Font.PLAIN, 12);
+        method.invoke(toolkit, "gnome.Gtk/FontName", fontName);
+        // SubstanceLookAndFeel.setFontPolicy(SubstanceFontUtilities.getDefaultFontPolicy());
+      }
+    } catch (Throwable e) {
+      LOG.error("Error fixing font", e);
     }
+    return font;
+  }
 
-    private static UIDefaults modifyNimbusDefaults(UIDefaults defaults) {
-        defaults.put("control", SkinColors.LIGHT_BACKGROUND_COLOR);
-        //defaults.put("nimbusBase", new Color(SkinColors.GENERAL_BORDER_COLOR.getRGB()));
-        defaults.put("nimbusSelection", SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
-        // font color
-        defaults.put("text", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("controlText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("infoText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("menuText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        FontUIResource font = getControlFont();
-        if (font != null) {
-            defaults.put("defaultFont", font);
-        }
-        defaults.put("Panel.background", SkinColors.LIGHT_BACKGROUND_COLOR);
-        // text fields should always have white background
-        defaults.put("TextField.background", new ColorUIResource(Color.WHITE));
-        defaults.put("TextPane.background", new ColorUIResource(Color.WHITE));
-        defaults.put("EditorPane.background", new ColorUIResource(Color.WHITE));
-        // progressbar
-        int paddingEnabled = defaults.getInt("ProgressBar[Enabled+Indeterminate].progressPadding");
-        int paddingDisabled = defaults.getInt("ProgressBar[Disabled+Indeterminate].progressPadding");
-        defaults.put("ProgressBar[Enabled].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.Enabled, paddingEnabled));
-        defaults.put("ProgressBar[Enabled+Finished].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.Enabled, paddingEnabled));
-        defaults.put("ProgressBar[Enabled+Indeterminate].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.EnabledIndeterminate, paddingEnabled));
-        defaults.put("ProgressBar[Disabled].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.Disabled, paddingDisabled));
-        defaults.put("ProgressBar[Disabled+Finished].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.Disabled, paddingDisabled));
-        defaults.put("ProgressBar[Disabled+Indeterminate].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.DisabledIndeterminate, paddingDisabled));
-        // scrollbar
-        defaults.put("ScrollBar:\"ScrollBar.button\".size", 18);
-        defaults.put("ScrollBar:\"ScrollBar.button\"[Disabled].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Disabled));
-        defaults.put("ScrollBar:\"ScrollBar.button\"[Enabled].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Enabled));
-        defaults.put("ScrollBar:\"ScrollBar.button\"[MouseOver].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.MouseOver));
-        defaults.put("ScrollBar:\"ScrollBar.button\"[Pressed].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Pressed));
-        defaults.put("ScrollBar:ScrollBarTrack[Disabled].backgroundPainter", new SkinScrollBarTrackPainter(SkinScrollBarTrackPainter.State.Disabled));
-        defaults.put("ScrollBar:ScrollBarTrack[Enabled].backgroundPainter", new SkinScrollBarTrackPainter(SkinScrollBarTrackPainter.State.Enabled));
-        defaults.put("ScrollBar:ScrollBarThumb[Enabled].backgroundPainter", new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.Enabled));
-        defaults.put("ScrollBar:ScrollBarThumb[MouseOver].backgroundPainter", new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.MouseOver));
-        defaults.put("ScrollBar:ScrollBarThumb[Pressed].backgroundPainter", new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.Pressed));
-        // table header
-        defaults.put("TableHeader.background", SkinColors.LIGHT_BACKGROUND_COLOR);
-        defaults.put("TableHeader:\"TableHeader.renderer\"[Enabled].backgroundPainter", new SkinTableHeaderPainter(SkinTableHeaderPainter.State.Enabled));
-        defaults.put("TableHeader:\"TableHeader.renderer\"[MouseOver].backgroundPainter", new SkinTableHeaderPainter(SkinTableHeaderPainter.State.MouseOver));
-        defaults.put("TableHeader:\"TableHeader.renderer\"[Pressed].backgroundPainter", new SkinTableHeaderPainter(SkinTableHeaderPainter.State.Pressed));
-        // table
-        defaults.put("Table.cellNoFocusBorder", new InsetsUIResource(0, 0, 0, 0));
-        defaults.put("Table.focusCellHighlightBorder", new InsetsUIResource(0, 0, 0, 0));
-        defaults.put("Table.alternateRowColor", new Color(SkinColors.TABLE_ALTERNATE_ROW_COLOR.getRGB()));
-        defaults.put("Table[Enabled+Selected].textBackground", new Color(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR.getRGB()));
-        defaults.put("Table[Enabled+Selected].textForeground", SkinColors.TABLE_SELECTED_FOREGROUND_ROW_COLOR);
-        // table row setting
-        setupTableFont(defaults);
-        // splitter
-        defaults.put("SplitPane:SplitPaneDivider[Enabled].backgroundPainter", new SkinSplitPaneDividerBackgroundPainter(SkinSplitPaneDividerBackgroundPainter.State.Enabled));
-        // tabbed pane tab
-        defaults.put("TabbedPane:TabbedPaneTabArea.contentMargins", new InsetsUIResource(3, 4, 0, 4));
-        defaults.put("TabbedPane:TabbedPaneTabArea[Disabled].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.Disabled));
-        defaults.put("TabbedPane:TabbedPaneTabArea[Enabled+MouseOver].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.EnableMouseOver));
-        defaults.put("TabbedPane:TabbedPaneTabArea[Enabled+Pressed].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.EnablePressed));
-        defaults.put("TabbedPane:TabbedPaneTabArea[Enabled].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.Enable));
-        defaults.put("TabbedPane:TabbedPaneTab.contentMargins", new InsetsUIResource(3, 4, 4, 8));
-        defaults.put("TabbedPane:TabbedPaneTab[Disabled+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.DisabledSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[Disabled].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Disabled));
-        defaults.put("TabbedPane:TabbedPaneTab[Enabled+MouseOver].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.EnabledMouseOver));
-        defaults.put("TabbedPane:TabbedPaneTab[Enabled+Pressed].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.EnabledPressed));
-        defaults.put("TabbedPane:TabbedPaneTab[Enabled].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Enabled));
-        defaults.put("TabbedPane:TabbedPaneTab[Focused+MouseOver+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.FocusedMouseOverSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[Focused+Pressed+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.FocusedPressedSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[Focused+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.FocusedSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[MouseOver+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.MouseOverSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[Pressed+Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.PressedSelected));
-        defaults.put("TabbedPane:TabbedPaneTab[Selected].backgroundPainter", new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Selected));
-        // tree
-        defaults.put("Tree.closedIcon", null);
-        defaults.put("Tree.openIcon", null);
-        defaults.put("Tree.leafIcon", null);
-        defaults.put("Tree.selectionForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("Tree:TreeCell[Enabled+Selected].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("Tree:TreeCell[Focused+Selected].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        //defaults.put("Tree.rendererFillBackground", Boolean.TRUE);
-        // list
-        defaults.put("List.cellNoFocusBorder", new InsetsUIResource(0, 0, 0, 0));
-        defaults.put("List.focusCellHighlightBorder", new InsetsUIResource(0, 0, 0, 0));
-        defaults.put("List[Selected].textBackground", new Color(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR.getRGB()));
-        defaults.put("List[Selected].textForeground", new Color(SkinColors.TEXT_FONT_FOREGROUND_COLOR.getRGB()));
-        // popup
-        defaults.put("PopupMenu[Disabled].backgroundPainter", new SkinPopupMenuBackgroundPainter(SkinPopupMenuBackgroundPainter.State.Disabled));
-        defaults.put("PopupMenu[Enabled].backgroundPainter", new SkinPopupMenuBackgroundPainter(SkinPopupMenuBackgroundPainter.State.Enabled));
-        // menuitem
-        defaults.put("MenuItem[Enabled].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
-        defaults.put("MenuItem[MouseOver].backgroundPainter", new SkinMenuItemBackgroundPainter(SkinMenuItemBackgroundPainter.State.MouseOver));
-        // textfield
-        //defaults.put("TextField.contentMargins", new InsetsUIResource(0, 0, 0, 0));
-        defaults.put("TextField[Disabled].borderPainter", new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Disabled));
-        defaults.put("TextField[Enabled].borderPainter", new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Enabled));
-        defaults.put("TextField[Focused].borderPainter", new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Focused));
-        defaults.put("TextField[Disabled].backgroundPainter", new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Disabled));
-        defaults.put("TextField[Enabled].backgroundPainter", new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Enabled));
-        defaults.put("TextField[Focused].backgroundPainter", new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Focused));
-        // scrollpane
-        defaults.put("ScrollPane.background", new ColorUIResource(Color.WHITE));
-        // editorpane
-        defaults.put("EditorPane[Enabled].backgroundPainter", SkinColors.LIGHT_BACKGROUND_COLOR);
-        // radio buttons
-        //defaults.put("RadioButton.icon", new IconUIResource());
-        defaults.put("RadioButton[Disabled+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.DisabledSelected));
-        defaults.put("RadioButton[Disabled].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Disabled));
-        defaults.put("RadioButton[Enabled].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Enabled));
-        defaults.put("RadioButton[Focused+MouseOver+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedMouseOverSelected));
-        defaults.put("RadioButton[Focused+MouseOver].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedMouseOver));
-        defaults.put("RadioButton[Focused+Pressed+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedPressedSelected));
-        defaults.put("RadioButton[Focused+Pressed].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedPressed));
-        defaults.put("RadioButton[Focused+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedSelected));
-        defaults.put("RadioButton[Focused].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Focused));
-        defaults.put("RadioButton[MouseOver+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.MouseOverSelected));
-        defaults.put("RadioButton[MouseOver].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.MouseOver));
-        defaults.put("RadioButton[Pressed+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.PressedSelected));
-        defaults.put("RadioButton[Pressed].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Pressed));
-        defaults.put("RadioButton[Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Selected));
-        // checkbox
-        defaults.put("CheckBox[Disabled+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.DisabledSelected));
-        defaults.put("CheckBox[Disabled].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Disabled));
-        defaults.put("CheckBox[Enabled].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Enabled));
-        defaults.put("CheckBox[Focused+MouseOver+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedMouseOverSelected));
-        defaults.put("CheckBox[Focused+MouseOver].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedMouseOver));
-        defaults.put("CheckBox[Focused+Pressed+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedPressedSelected));
-        defaults.put("CheckBox[Focused+Pressed].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedPressed));
-        defaults.put("CheckBox[Focused+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedSelected));
-        defaults.put("CheckBox[Focused].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Focused));
-        defaults.put("CheckBox[MouseOver+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.MouseOverSelected));
-        defaults.put("CheckBox[MouseOver].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.MouseOver));
-        defaults.put("CheckBox[Pressed+Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.PressedSelected));
-        defaults.put("CheckBox[Pressed].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Pressed));
-        defaults.put("CheckBox[Selected].iconPainter", new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Selected));
-        // slider
-        defaults.put("Slider:SliderThumb[Disabled].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Disabled));
-        defaults.put("Slider:SliderThumb[Enabled].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Enabled));
-        defaults.put("Slider:SliderThumb[Focused+MouseOver].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.FocusedMouseOver));
-        defaults.put("Slider:SliderThumb[Focused+Pressed].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.FocusedPressed));
-        defaults.put("Slider:SliderThumb[Focused].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Focused));
-        defaults.put("Slider:SliderThumb[MouseOver].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.MouseOver));
-        defaults.put("Slider:SliderThumb[Pressed].backgroundPainter", new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Pressed));
-        // popupmenuseparator
-        defaults.put("PopupMenuSeparator[Enabled].backgroundPainter", new SkinPopupMenuSeparatorPainter(SkinPopupMenuSeparatorPainter.State.Enabled));
-        return defaults;
+  private static UIDefaults modifyNimbusDefaults(UIDefaults defaults) {
+    defaults.put("control", SkinColors.LIGHT_BACKGROUND_COLOR);
+    // defaults.put("nimbusBase", new Color(SkinColors.GENERAL_BORDER_COLOR.getRGB()));
+    defaults.put("nimbusSelection", SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
+    // font color
+    defaults.put("text", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put("controlText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put("infoText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put("menuText", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put("textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    FontUIResource font = getControlFont();
+    if (font != null) {
+      defaults.put("defaultFont", font);
     }
+    defaults.put("Panel.background", SkinColors.LIGHT_BACKGROUND_COLOR);
+    // text fields should always have white background
+    defaults.put("TextField.background", new ColorUIResource(Color.WHITE));
+    defaults.put("TextPane.background", new ColorUIResource(Color.WHITE));
+    defaults.put("EditorPane.background", new ColorUIResource(Color.WHITE));
+    // progressbar
+    int paddingEnabled = defaults.getInt("ProgressBar[Enabled+Indeterminate].progressPadding");
+    int paddingDisabled = defaults.getInt("ProgressBar[Disabled+Indeterminate].progressPadding");
+    defaults.put(
+        "ProgressBar[Enabled].foregroundPainter",
+        new SkinProgressBarPainter(SkinProgressBarPainter.State.Enabled, paddingEnabled));
+    defaults.put(
+        "ProgressBar[Enabled+Finished].foregroundPainter",
+        new SkinProgressBarPainter(SkinProgressBarPainter.State.Enabled, paddingEnabled));
+    defaults.put(
+        "ProgressBar[Enabled+Indeterminate].foregroundPainter",
+        new SkinProgressBarPainter(
+            SkinProgressBarPainter.State.EnabledIndeterminate, paddingEnabled));
+    defaults.put(
+        "ProgressBar[Disabled].foregroundPainter",
+        new SkinProgressBarPainter(SkinProgressBarPainter.State.Disabled, paddingDisabled));
+    defaults.put(
+        "ProgressBar[Disabled+Finished].foregroundPainter",
+        new SkinProgressBarPainter(SkinProgressBarPainter.State.Disabled, paddingDisabled));
+    defaults.put(
+        "ProgressBar[Disabled+Indeterminate].foregroundPainter",
+        new SkinProgressBarPainter(
+            SkinProgressBarPainter.State.DisabledIndeterminate, paddingDisabled));
+    // scrollbar
+    defaults.put("ScrollBar:\"ScrollBar.button\".size", 18);
+    defaults.put(
+        "ScrollBar:\"ScrollBar.button\"[Disabled].foregroundPainter",
+        new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Disabled));
+    defaults.put(
+        "ScrollBar:\"ScrollBar.button\"[Enabled].foregroundPainter",
+        new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Enabled));
+    defaults.put(
+        "ScrollBar:\"ScrollBar.button\"[MouseOver].foregroundPainter",
+        new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.MouseOver));
+    defaults.put(
+        "ScrollBar:\"ScrollBar.button\"[Pressed].foregroundPainter",
+        new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Pressed));
+    defaults.put(
+        "ScrollBar:ScrollBarTrack[Disabled].backgroundPainter",
+        new SkinScrollBarTrackPainter(SkinScrollBarTrackPainter.State.Disabled));
+    defaults.put(
+        "ScrollBar:ScrollBarTrack[Enabled].backgroundPainter",
+        new SkinScrollBarTrackPainter(SkinScrollBarTrackPainter.State.Enabled));
+    defaults.put(
+        "ScrollBar:ScrollBarThumb[Enabled].backgroundPainter",
+        new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.Enabled));
+    defaults.put(
+        "ScrollBar:ScrollBarThumb[MouseOver].backgroundPainter",
+        new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.MouseOver));
+    defaults.put(
+        "ScrollBar:ScrollBarThumb[Pressed].backgroundPainter",
+        new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.Pressed));
+    // table header
+    defaults.put("TableHeader.background", SkinColors.LIGHT_BACKGROUND_COLOR);
+    defaults.put(
+        "TableHeader:\"TableHeader.renderer\"[Enabled].backgroundPainter",
+        new SkinTableHeaderPainter(SkinTableHeaderPainter.State.Enabled));
+    defaults.put(
+        "TableHeader:\"TableHeader.renderer\"[MouseOver].backgroundPainter",
+        new SkinTableHeaderPainter(SkinTableHeaderPainter.State.MouseOver));
+    defaults.put(
+        "TableHeader:\"TableHeader.renderer\"[Pressed].backgroundPainter",
+        new SkinTableHeaderPainter(SkinTableHeaderPainter.State.Pressed));
+    // table
+    defaults.put("Table.cellNoFocusBorder", new InsetsUIResource(0, 0, 0, 0));
+    defaults.put("Table.focusCellHighlightBorder", new InsetsUIResource(0, 0, 0, 0));
+    defaults.put(
+        "Table.alternateRowColor", new Color(SkinColors.TABLE_ALTERNATE_ROW_COLOR.getRGB()));
+    defaults.put(
+        "Table[Enabled+Selected].textBackground",
+        new Color(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR.getRGB()));
+    defaults.put(
+        "Table[Enabled+Selected].textForeground", SkinColors.TABLE_SELECTED_FOREGROUND_ROW_COLOR);
+    // table row setting
+    setupTableFont(defaults);
+    // splitter
+    defaults.put(
+        "SplitPane:SplitPaneDivider[Enabled].backgroundPainter",
+        new SkinSplitPaneDividerBackgroundPainter(
+            SkinSplitPaneDividerBackgroundPainter.State.Enabled));
+    // tabbed pane tab
+    defaults.put("TabbedPane:TabbedPaneTabArea.contentMargins", new InsetsUIResource(3, 4, 0, 4));
+    defaults.put(
+        "TabbedPane:TabbedPaneTabArea[Disabled].backgroundPainter",
+        new SkinTabbedPaneTabAreaBackgroundPainter(
+            SkinTabbedPaneTabAreaBackgroundPainter.State.Disabled));
+    defaults.put(
+        "TabbedPane:TabbedPaneTabArea[Enabled+MouseOver].backgroundPainter",
+        new SkinTabbedPaneTabAreaBackgroundPainter(
+            SkinTabbedPaneTabAreaBackgroundPainter.State.EnableMouseOver));
+    defaults.put(
+        "TabbedPane:TabbedPaneTabArea[Enabled+Pressed].backgroundPainter",
+        new SkinTabbedPaneTabAreaBackgroundPainter(
+            SkinTabbedPaneTabAreaBackgroundPainter.State.EnablePressed));
+    defaults.put(
+        "TabbedPane:TabbedPaneTabArea[Enabled].backgroundPainter",
+        new SkinTabbedPaneTabAreaBackgroundPainter(
+            SkinTabbedPaneTabAreaBackgroundPainter.State.Enable));
+    defaults.put("TabbedPane:TabbedPaneTab.contentMargins", new InsetsUIResource(3, 4, 4, 8));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Disabled+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.DisabledSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Disabled].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Disabled));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Enabled+MouseOver].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.EnabledMouseOver));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Enabled+Pressed].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.EnabledPressed));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Enabled].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Enabled));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Focused+MouseOver+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.FocusedMouseOverSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Focused+Pressed+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.FocusedPressedSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Focused+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.FocusedSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[MouseOver+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.MouseOverSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Pressed+Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(
+            SkinTabbedPaneTabBackgroundPainter.State.PressedSelected));
+    defaults.put(
+        "TabbedPane:TabbedPaneTab[Selected].backgroundPainter",
+        new SkinTabbedPaneTabBackgroundPainter(SkinTabbedPaneTabBackgroundPainter.State.Selected));
+    // tree
+    defaults.put("Tree.closedIcon", null);
+    defaults.put("Tree.openIcon", null);
+    defaults.put("Tree.leafIcon", null);
+    defaults.put("Tree.selectionForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put(
+        "Tree:TreeCell[Enabled+Selected].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put(
+        "Tree:TreeCell[Focused+Selected].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    // defaults.put("Tree.rendererFillBackground", Boolean.TRUE);
+    // list
+    defaults.put("List.cellNoFocusBorder", new InsetsUIResource(0, 0, 0, 0));
+    defaults.put("List.focusCellHighlightBorder", new InsetsUIResource(0, 0, 0, 0));
+    defaults.put(
+        "List[Selected].textBackground",
+        new Color(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR.getRGB()));
+    defaults.put(
+        "List[Selected].textForeground", new Color(SkinColors.TEXT_FONT_FOREGROUND_COLOR.getRGB()));
+    // popup
+    defaults.put(
+        "PopupMenu[Disabled].backgroundPainter",
+        new SkinPopupMenuBackgroundPainter(SkinPopupMenuBackgroundPainter.State.Disabled));
+    defaults.put(
+        "PopupMenu[Enabled].backgroundPainter",
+        new SkinPopupMenuBackgroundPainter(SkinPopupMenuBackgroundPainter.State.Enabled));
+    // menuitem
+    defaults.put("MenuItem[Enabled].textForeground", SkinColors.TEXT_FONT_FOREGROUND_COLOR);
+    defaults.put(
+        "MenuItem[MouseOver].backgroundPainter",
+        new SkinMenuItemBackgroundPainter(SkinMenuItemBackgroundPainter.State.MouseOver));
+    // textfield
+    // defaults.put("TextField.contentMargins", new InsetsUIResource(0, 0, 0, 0));
+    defaults.put(
+        "TextField[Disabled].borderPainter",
+        new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Disabled));
+    defaults.put(
+        "TextField[Enabled].borderPainter",
+        new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Enabled));
+    defaults.put(
+        "TextField[Focused].borderPainter",
+        new SkinTextFieldBorderPainter(SkinTextFieldBorderPainter.State.Focused));
+    defaults.put(
+        "TextField[Disabled].backgroundPainter",
+        new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Disabled));
+    defaults.put(
+        "TextField[Enabled].backgroundPainter",
+        new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Enabled));
+    defaults.put(
+        "TextField[Focused].backgroundPainter",
+        new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Focused));
+    // scrollpane
+    defaults.put("ScrollPane.background", new ColorUIResource(Color.WHITE));
+    // editorpane
+    defaults.put("EditorPane[Enabled].backgroundPainter", SkinColors.LIGHT_BACKGROUND_COLOR);
+    // radio buttons
+    // defaults.put("RadioButton.icon", new IconUIResource());
+    defaults.put(
+        "RadioButton[Disabled+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.DisabledSelected));
+    defaults.put(
+        "RadioButton[Disabled].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Disabled));
+    defaults.put(
+        "RadioButton[Enabled].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Enabled));
+    defaults.put(
+        "RadioButton[Focused+MouseOver+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedMouseOverSelected));
+    defaults.put(
+        "RadioButton[Focused+MouseOver].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedMouseOver));
+    defaults.put(
+        "RadioButton[Focused+Pressed+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedPressedSelected));
+    defaults.put(
+        "RadioButton[Focused+Pressed].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedPressed));
+    defaults.put(
+        "RadioButton[Focused+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.FocusedSelected));
+    defaults.put(
+        "RadioButton[Focused].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Focused));
+    defaults.put(
+        "RadioButton[MouseOver+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.MouseOverSelected));
+    defaults.put(
+        "RadioButton[MouseOver].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.MouseOver));
+    defaults.put(
+        "RadioButton[Pressed+Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.PressedSelected));
+    defaults.put(
+        "RadioButton[Pressed].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Pressed));
+    defaults.put(
+        "RadioButton[Selected].iconPainter",
+        new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Selected));
+    // checkbox
+    defaults.put(
+        "CheckBox[Disabled+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.DisabledSelected));
+    defaults.put(
+        "CheckBox[Disabled].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Disabled));
+    defaults.put(
+        "CheckBox[Enabled].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Enabled));
+    defaults.put(
+        "CheckBox[Focused+MouseOver+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedMouseOverSelected));
+    defaults.put(
+        "CheckBox[Focused+MouseOver].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedMouseOver));
+    defaults.put(
+        "CheckBox[Focused+Pressed+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedPressedSelected));
+    defaults.put(
+        "CheckBox[Focused+Pressed].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedPressed));
+    defaults.put(
+        "CheckBox[Focused+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.FocusedSelected));
+    defaults.put(
+        "CheckBox[Focused].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Focused));
+    defaults.put(
+        "CheckBox[MouseOver+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.MouseOverSelected));
+    defaults.put(
+        "CheckBox[MouseOver].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.MouseOver));
+    defaults.put(
+        "CheckBox[Pressed+Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.PressedSelected));
+    defaults.put(
+        "CheckBox[Pressed].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Pressed));
+    defaults.put(
+        "CheckBox[Selected].iconPainter",
+        new SkinCheckBoxIconPainter(SkinCheckBoxIconPainter.State.Selected));
+    // slider
+    defaults.put(
+        "Slider:SliderThumb[Disabled].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Disabled));
+    defaults.put(
+        "Slider:SliderThumb[Enabled].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Enabled));
+    defaults.put(
+        "Slider:SliderThumb[Focused+MouseOver].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.FocusedMouseOver));
+    defaults.put(
+        "Slider:SliderThumb[Focused+Pressed].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.FocusedPressed));
+    defaults.put(
+        "Slider:SliderThumb[Focused].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Focused));
+    defaults.put(
+        "Slider:SliderThumb[MouseOver].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.MouseOver));
+    defaults.put(
+        "Slider:SliderThumb[Pressed].backgroundPainter",
+        new SkinSliderThumbPainter(SkinSliderThumbPainter.State.Pressed));
+    // popupmenuseparator
+    defaults.put(
+        "PopupMenuSeparator[Enabled].backgroundPainter",
+        new SkinPopupMenuSeparatorPainter(SkinPopupMenuSeparatorPainter.State.Enabled));
+    return defaults;
+  }
 
-    private static Font setupTableFont(UIDefaults defaults) {
-        int sizeSetting = ApplicationSettings.GUI_TABLES_FONT_SIZE.getValue();
-        if (sizeSetting != 0 && (sizeSetting < TABLE_FONT_SIZE_MIN || TABLE_FONT_SIZE_MAX < sizeSetting)) {
-            ApplicationSettings.GUI_TABLES_FONT_SIZE.setValue(0);
-            sizeSetting = 0;
-        }
-        Font f;
-        if (sizeSetting != 0) {
-            f = defaults.getFont("defaultFont").deriveFont((float) sizeSetting);
-        } else {
-            f = defaults.getFont("defaultFont");
-        }
-        defaults.put("Table.font", new FontUIResource(f));
-        return f;
+  private static Font setupTableFont(UIDefaults defaults) {
+    int sizeSetting = ApplicationSettings.GUI_TABLES_FONT_SIZE.getValue();
+    if (sizeSetting != 0
+        && (sizeSetting < TABLE_FONT_SIZE_MIN || TABLE_FONT_SIZE_MAX < sizeSetting)) {
+      ApplicationSettings.GUI_TABLES_FONT_SIZE.setValue(0);
+      sizeSetting = 0;
     }
+    Font f;
+    if (sizeSetting != 0) {
+      f = defaults.getFont("defaultFont").deriveFont((float) sizeSetting);
+    } else {
+      f = defaults.getFont("defaultFont");
+    }
+    defaults.put("Table.font", new FontUIResource(f));
+    return f;
+  }
 
-    private static void purgeSynthOverrides() {
-        UIDefaults defs = UIManager.getDefaults();
-        for (String k : SYNTH_KEYS) defs.remove(k);
-    }
+  private static void purgeSynthOverrides() {
+    UIDefaults defs = UIManager.getDefaults();
+    for (String k : SYNTH_KEYS) defs.remove(k);
+  }
 }
