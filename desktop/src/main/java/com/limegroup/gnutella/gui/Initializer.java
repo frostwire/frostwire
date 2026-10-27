@@ -319,15 +319,21 @@ final class Initializer {
       // when the AWT splash already decoded it.
       Main.getChosenSplashImage();
     }
-    GUIMediator.safeInvokeAndWait(
-        () -> {
-          // Show the splash screen if we're not starting automatically on
-          // system startup
-          if (!isStartup) {
-            SplashWindow.instance().begin();
-            // stopwatch.resetAndLog("begin splash window");
-          }
-        });
+    try {
+      GUIMediator.safeInvokeAndWait(
+          () -> {
+            // Show the splash screen if we're not starting automatically on
+            // system startup
+            if (!isStartup) {
+              SplashWindow.instance().begin();
+              // stopwatch.resetAndLog("begin splash window");
+            }
+          });
+    } finally {
+      // JdkWarmUp held its bulk app class loading until now so it did not compete with the EDT
+      // building the splash.
+      JdkWarmUp.splashShown();
+    }
     if (awtSplash != null) {
       awtSplash.dispose();
       // stopwatch.resetAndLog("dispose AWT splash");

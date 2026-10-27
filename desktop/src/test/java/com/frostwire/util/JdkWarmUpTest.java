@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
@@ -367,6 +368,81 @@ class JdkWarmUpTest {
 
     assertTrue(warmUp >= 0 && end > warmUp, "warmUp() not found");
     assertTrue(source.substring(warmUp, end).contains("linkStringConcat("), "not called by warmUp");
+  }
+
+  /**
+   * Bulk app class loading competed with the EDT building the splash on 2-CPU machines (GitHub
+   * #1323), so it waits until the splash is showing.
+   */
+  @Test
+  void awaitSplashShownBlocksUntilTheSplashIsShowing() throws Exception {
+    CountDownLatch splashShown = new CountDownLatch(1);
+    CountDownLatch returned = new CountDownLatch(1);
+    Thread waiter =
+        new Thread(
+            () -> {
+              try {
+                JdkWarmUp.awaitSplashShown(splashShown, TimeUnit.MINUTES.toMillis(1));
+                returned.countDown();
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            });
+    waiter.start();
+
+    assertFalse(returned.await(300, TimeUnit.MILLISECONDS), "returned before the splash showed");
+    splashShown.countDown();
+    assertTrue(returned.await(5, TimeUnit.SECONDS), "still waiting after the splash showed");
+    waiter.join();
+  }
+
+  @Test
+  void awaitSplashShownGivesUpWhenNoSplashShows() throws Exception {
+    long start = System.nanoTime();
+    JdkWarmUp.awaitSplashShown(new CountDownLatch(1), 50);
+    assertTrue(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) >= 50);
+  }
+
+  @Test
+  void warmUpLoadsAppClassesOnlyAfterTheSplashSteps() throws Exception {
+    String source = warmUpSource();
+    int painters = source.indexOf("createPainters(");
+    int glyphs = source.indexOf("rasterizeGlyphs(");
+    int await = source.indexOf("awaitSplashShown(SPLASH_SHOWN");
+    int appClasses = source.indexOf("APP_PACKAGES_TO_LOAD");
+
+    assertTrue(painters >= 0 && glyphs >= 0, "splash steps not found");
+    assertTrue(await > painters && await > glyphs, "splash steps wait for the splash");
+    assertTrue(appClasses > await, "app classes load before the splash shows");
+  }
+
+  @Test
+  void switchSplashesReleasesTheWarmUpEvenIfTheSplashFails() throws Exception {
+    String source =
+        Files.readString(
+                Path.of(System.getProperty("user.dir"))
+                    .resolve("src/main/java/com/limegroup/gnutella/gui/Initializer.java"))
+            .replaceAll("\\s+", "");
+    int switchSplashes = source.indexOf("privatevoidswitchSplashes(");
+    int end = source.indexOf("privatevoid", switchSplashes + 1);
+    String body = source.substring(switchSplashes, end);
+
+    assertTrue(switchSplashes >= 0, "switchSplashes() not found");
+    assertTrue(body.contains("}finally{") && body.contains("JdkWarmUp.splashShown();"), body);
+    assertTrue(
+        body.indexOf("JdkWarmUp.splashShown();") > body.indexOf("}finally{"),
+        "not released in a finally block");
+  }
+
+  private static String warmUpSource() throws IOException {
+    String source =
+        Files.readString(
+            Path.of(System.getProperty("user.dir"))
+                .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"));
+    int warmUp = source.indexOf("private static void warmUp() {");
+    int end = source.indexOf("\n  }\n", warmUp);
+    assertTrue(warmUp >= 0 && end > warmUp, "warmUp() not found");
+    return source.substring(warmUp, end);
   }
 
   private static boolean loadsConcatClassGenerator(String mode)

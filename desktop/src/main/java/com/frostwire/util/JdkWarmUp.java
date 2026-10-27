@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.IntStream;
@@ -156,7 +158,25 @@ public final class JdkWarmUp {
 
   private static final String PAINTER_KEY_SUFFIX = "Painter";
 
+  /**
+   * Upper bound on how long app class loading waits for the splash window. Startup without a splash
+   * (system startup) still releases the wait, so this only matters if splash creation fails.
+   */
+  static final long SPLASH_WAIT_MS = 15_000;
+
+  /** Released once the Swing splash window is showing, or when no splash will be shown. */
+  private static final CountDownLatch SPLASH_SHOWN = new CountDownLatch(1);
+
   private JdkWarmUp() {}
+
+  /**
+   * Lets the warm-up thread move on to loading app classes. Until then it does only the steps the
+   * splash window itself needs, so on 2-CPU machines bulk class loading does not compete with the
+   * EDT building the splash.
+   */
+  public static void splashShown() {
+    SPLASH_SHOWN.countDown();
+  }
 
   public static void startInBackground() {
     Thread warmUp = new Thread(JdkWarmUp::warmUp, "JdkWarmUp");
@@ -221,11 +241,15 @@ public final class JdkWarmUp {
       }
     }
     try {
+      awaitSplashShown(SPLASH_SHOWN, SPLASH_WAIT_MS);
       Path location = codeSourceOf(JdkWarmUp.class);
       if (location != null) {
         loadWithoutInitializing(
             classNamesIn(location, APP_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
       }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return;
     } catch (Throwable t) {
       LOG.warn("App class warm-up failed: " + t.getMessage(), t);
     }
@@ -233,6 +257,17 @@ public final class JdkWarmUp {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /**
+   * Returns once the splash is showing, or after the timeout so a splash that never shows cannot
+   * keep the warm-up from finishing.
+   */
+  static void awaitSplashShown(CountDownLatch splashShown, long timeoutMs)
+      throws InterruptedException {
+    if (!splashShown.await(timeoutMs, TimeUnit.MILLISECONDS)) {
+      LOG.info("Splash not shown after " + timeoutMs + " ms, loading app classes anyway");
     }
   }
 
