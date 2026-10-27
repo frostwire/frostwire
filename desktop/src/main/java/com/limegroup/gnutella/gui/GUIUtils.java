@@ -57,8 +57,12 @@ public final class GUIUtils {
 
   private static NumberFormat NUMBER_FORMAT1; // localized "#,##0.0"
 
-  /** A full datetime format. */
-  private static DateFormat FULL_DATETIME_FORMAT;
+  /**
+   * A full datetime format, built on first use: the first SimpleDateFormat in the JVM loads the
+   * calendar and date format data, and this class is initialized on the EDT while the splash window
+   * is built.
+   */
+  private static volatile DateFormat FULL_DATETIME_FORMAT;
 
   /** Localizable constants */
   private static String GENERAL_UNIT_KILOBYTES;
@@ -95,8 +99,7 @@ public final class GUIUtils {
     NUMBER_FORMAT1.setMaximumFractionDigits(1);
     NUMBER_FORMAT1.setMinimumFractionDigits(1);
     NUMBER_FORMAT1.setGroupingUsed(true);
-    FULL_DATETIME_FORMAT =
-        new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", GUIMediator.getLocale());
+    FULL_DATETIME_FORMAT = null;
     GENERAL_UNIT_KILOBYTES = I18n.tr("KB");
     GENERAL_UNIT_MEGABYTES = I18n.tr("MB");
     GENERAL_UNIT_GIGABYTES = I18n.tr("GB");
@@ -156,7 +159,12 @@ public final class GUIUtils {
 
   /** Gets the full datetime formatter. */
   public static DateFormat getFullDateTimeFormat() {
-    return FULL_DATETIME_FORMAT;
+    DateFormat format = FULL_DATETIME_FORMAT;
+    if (format == null) {
+      format = new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", GUIMediator.getLocale());
+      FULL_DATETIME_FORMAT = format;
+    }
+    return format;
   }
 
   /** Sets the child components of a component to all be either opaque or not opaque. */
