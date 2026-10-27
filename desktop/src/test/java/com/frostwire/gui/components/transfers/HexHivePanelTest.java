@@ -23,10 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -176,6 +179,140 @@ class HexHivePanelTest {
           throw new AssertionError("stale pixel at " + x + "," + y);
         }
       }
+    }
+  }
+
+  @Test
+  void backingBitmapStaysViewportSizedForHugeTorrents() throws Exception {
+    // GitHub #1315: the bitmap used to be as tall as all the rows, ~560 MB for 50k pieces at 2x
+    int viewportWidth = 1200;
+    int viewportHeight = 300;
+    double scale = 2.0;
+    HexHivePanel panel = newPanel();
+    set(panel, "renderScale", scale);
+    JViewport viewport = viewportFor(panel, viewportWidth, viewportHeight, adapter(50_000));
+    BufferedImage bitmap = awaitRender(panel);
+
+    int contentHeight = (int) get(get(panel, "drawingProperties"), "height");
+    assertTrue(contentHeight > viewportHeight * 50, "the hive must be far taller than the view");
+    long maxPixels = (long) (viewportWidth * scale) * (long) (2 * viewportHeight * scale + 1);
+    assertTrue(
+        (long) bitmap.getWidth() * bitmap.getHeight() <= maxPixels,
+        "backing bitmap is "
+            + bitmap.getWidth()
+            + "x"
+            + bitmap.getHeight()
+            + ", it must stay bounded by the viewport");
+
+    // scrolled far down, the window follows the viewport and stays as small
+    viewport.setViewPosition(new Point(0, contentHeight / 2));
+    settle(panel);
+    bitmap = (BufferedImage) get(panel, "bitmap");
+    assertTrue((long) bitmap.getWidth() * bitmap.getHeight() <= maxPixels);
+    int originY = (int) get(panel, "bitmapOriginY");
+    int windowHeight = (int) get(panel, "bitmapWindowHeight");
+    assertTrue(originY <= contentHeight / 2, "window must start above the visible rows");
+    assertTrue(
+        originY + windowHeight >= contentHeight / 2 + viewportHeight,
+        "window must reach below the visible rows");
+  }
+
+  @Test
+  void movingTheWindowKeepsThePixelsOfTheRowsItStillCovers() throws Exception {
+    for (double scale : new double[] {1.0, 1.5, 2.0}) {
+      HexHivePanel panel = newPanel();
+      set(panel, "renderScale", scale);
+      JViewport viewport = viewportFor(panel, 600, 300, adapter(3000));
+      settle(panel);
+      BufferedImage before = copyOf((BufferedImage) get(panel, "bitmap"));
+      int beforeOriginY = (int) get(panel, "bitmapOriginY");
+
+      // far enough for the window to move, close enough for the old and new windows to overlap
+      viewport.setViewPosition(new Point(0, 300));
+      Class<?> propertiesClass = Class.forName(HexHivePanel.class.getName() + "$DrawingProperties");
+      Method ensureBackingBitmap =
+          HexHivePanel.class.getDeclaredMethod(
+              "ensureBackingBitmap", propertiesClass, Rectangle.class);
+      ensureBackingBitmap.setAccessible(true);
+      ensureBackingBitmap.invoke(panel, get(panel, "drawingProperties"), panel.getVisibleRect());
+
+      int originY = (int) get(panel, "bitmapOriginY");
+      assertTrue(originY > beforeOriginY, "the window must follow the viewport down");
+      BufferedImage after = (BufferedImage) get(panel, "bitmap");
+      Area kept = (Area) get(panel, "renderedArea");
+      assertTrue(!kept.isEmpty(), "rows both windows cover must stay rendered");
+      int shift = toDevice(originY, scale) - toDevice(beforeOriginY, scale);
+      int compared = 0;
+      for (int y = 0; y < after.getHeight(); y++) {
+        int beforeY = y + shift;
+        double contentY = originY + (y + 0.5) / scale;
+        for (int x = 0; x < after.getWidth(); x++) {
+          int pixel = after.getRGB(x, y) & 0xffffff;
+          if (kept.contains((x + 0.5) / scale, contentY)) {
+            compared++;
+            assertEquals(
+                before.getRGB(x, beforeY) & 0xffffff,
+                pixel,
+                "kept pixel " + x + "," + y + " moved wrong at scale " + scale);
+          } else if (beforeY >= before.getHeight()) {
+            assertEquals(BACKGROUND, pixel, "rows new to the window must start blank");
+          }
+        }
+      }
+      assertTrue(compared > after.getWidth() * 50, "too few kept pixels compared");
+
+      // the rows that came into view get rendered
+      settle(panel);
+      Rectangle visible = panel.getVisibleRect();
+      assertTrue(
+          ((Area) get(panel, "renderedArea"))
+              .contains(visible.x + 20, visible.y, visible.width - 60, visible.height),
+          "the visible rows must be rendered after scrolling");
+    }
+  }
+
+  private static int toDevice(int logical, double scale) {
+    return (int) Math.round(logical * scale);
+  }
+
+  private static BufferedImage copyOf(BufferedImage image) {
+    BufferedImage copy =
+        new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+    copy.getGraphics().drawImage(image, 0, 0, null);
+    return copy;
+  }
+
+  /** Shows {@code panel} in a viewport and lays out the hive for {@code adapter}. */
+  private static JViewport viewportFor(
+      HexHivePanel panel, int width, int height, HexHivePanel.HexDataAdapter<Object> adapter)
+      throws Exception {
+    JViewport viewport = new JViewport();
+    viewport.setView(panel);
+    viewport.setSize(width, height);
+    viewport.doLayout();
+    panel.updateData(adapter);
+    awaitRender(panel);
+    // the panel grows to the rows' height once they're laid out
+    viewport.doLayout();
+    panel.updateData(adapter);
+    awaitRender(panel);
+    return viewport;
+  }
+
+  /** Renders the visible rows and their look-ahead the way painting does. */
+  private static void settle(HexHivePanel panel) throws Exception {
+    Class<?> propertiesClass = Class.forName(HexHivePanel.class.getName() + "$DrawingProperties");
+    Method requestFocusedRender =
+        HexHivePanel.class.getDeclaredMethod(
+            "requestFocusedRender",
+            propertiesClass,
+            HexHivePanel.HexDataAdapter.class,
+            boolean.class);
+    requestFocusedRender.setAccessible(true);
+    for (int i = 0; i < 3; i++) {
+      requestFocusedRender.invoke(
+          panel, get(panel, "drawingProperties"), get(panel, "latestAdapter"), false);
+      awaitRender(panel);
     }
   }
 

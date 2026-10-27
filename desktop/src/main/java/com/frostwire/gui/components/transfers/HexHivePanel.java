@@ -91,6 +91,22 @@ public class HexHivePanel extends JPanel implements Scrollable {
   /** Layout the backing bitmap was drawn for, batches rendered for any other one are dropped. */
   private DrawingProperties bitmapLayout;
 
+  /**
+   * The backing bitmap only holds a window of the hive around the viewport, not the whole content:
+   * a torrent with tens of thousands of pieces is tens of thousands of pixels tall, hundreds of MB
+   * as a single bitmap on a HiDPI screen. The window spans the full content width and {@link
+   * #bitmapWindowHeight} logical pixels starting at content row {@link #bitmapOriginY}.
+   */
+  private int bitmapOriginY;
+
+  private int bitmapWindowHeight;
+
+  /** Height of the backing window in viewports, leaves room for the scroll look-ahead renders. */
+  private static final int BACKING_WINDOW_VIEWPORTS = 2;
+
+  /** Viewport height assumed while the hive is not showing yet. */
+  private static final int FALLBACK_VIEWPORT_HEIGHT = 600;
+
   private volatile double renderScale = 1.0;
   private final Area renderedArea = new Area();
   private int lastWidth;
@@ -394,6 +410,43 @@ public class HexHivePanel extends JPanel implements Scrollable {
     return (int) Math.round(logical * scale);
   }
 
+  /**
+   * @return logical height of the backing window for a viewport this tall, bounded by the viewport
+   *     instead of the piece count.
+   */
+  static int backingWindowHeight(int contentHeight, int viewportHeight) {
+    return Math.max(1, Math.min(contentHeight, viewportHeight * BACKING_WINDOW_VIEWPORTS));
+  }
+
+  /**
+   * @return the content row the backing window starts at, centered on the visible rows.
+   */
+  static int anchorBackingWindow(int contentHeight, int windowHeight, Rectangle visibleRect) {
+    int centered = visibleRect.y + (visibleRect.height - windowHeight) / 2;
+    return Math.max(0, Math.min(contentHeight - windowHeight, centered));
+  }
+
+  /**
+   * @return whether the backing window still holds the visible rows plus a small margin, so it
+   *     doesn't have to move on every scroll step.
+   */
+  static boolean backingWindowCovers(
+      int originY, int windowHeight, int contentHeight, Rectangle visibleRect) {
+    int margin = visibleRect.height / 8;
+    int top = Math.max(0, visibleRect.y - margin);
+    int bottom = Math.min(contentHeight, visibleRect.y + visibleRect.height + margin);
+    return top >= originY && bottom <= originY + windowHeight;
+  }
+
+  /**
+   * Device rows of a window this tall. At fractional scales the rounding of the window's top and
+   * bottom edges can add a row depending on where the window starts, so keep one spare.
+   */
+  private static int deviceWindowHeight(int windowHeight, double scale) {
+    boolean integralScale = scale == Math.rint(scale);
+    return Math.max(1, toDevice(windowHeight, scale) + (integralScale ? 0 : 1));
+  }
+
   void clearRenderCache() {
     synchronized (bitmapLock) {
       bitmap = null;
@@ -643,7 +696,7 @@ public class HexHivePanel extends JPanel implements Scrollable {
       // not ready yet (perhaps during animation or rotation)
       return;
     }
-    ensureBackingBitmap(snapshot);
+    ensureBackingBitmap(snapshot, currentVisibleRect());
     if (hexDataAdapter != null
         && hexDataAdapter.getFullHexagonsCount() >= 0
         && canvasWidth > 0
@@ -658,23 +711,53 @@ public class HexHivePanel extends JPanel implements Scrollable {
     }
   }
 
-  private void ensureBackingBitmap(DrawingProperties snapshot) {
+  private Rectangle currentVisibleRect() {
+    Rectangle visibleRect = getVisibleRect();
+    if (visibleRect.width <= 0 || visibleRect.height <= 0) {
+      // not showing yet, don't size the backing window after the whole content
+      visibleRect =
+          new Rectangle(
+              0,
+              0,
+              Math.max(1, getWidth()),
+              Math.max(1, Math.min(getHeight(), FALLBACK_VIEWPORT_HEIGHT)));
+    }
+    return visibleRect;
+  }
+
+  /**
+   * Makes the backing bitmap hold the rows around {@code visibleRect} for this layout, moving the
+   * window along when the viewport scrolls away from it.
+   *
+   * @return the content-space rectangle the backing bitmap covers
+   */
+  private Rectangle ensureBackingBitmap(DrawingProperties snapshot, Rectangle visibleRect) {
     boolean changed = false;
+    Rectangle window;
     synchronized (bitmapLock) {
-      int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
-      int deviceHeight = Math.max(1, toDevice(snapshot.height, snapshot.scale));
+      int windowHeight = backingWindowHeight(snapshot.height, visibleRect.height);
       if (bitmap == null || bitmapLayout == null || !bitmapLayout.hasSameLayout(snapshot)) {
         // a fresh bitmap: pixels of the previous layout outside the new rows would linger
+        int deviceWidth = Math.max(1, toDevice(snapshot.width, snapshot.scale));
+        int deviceHeight = deviceWindowHeight(windowHeight, snapshot.scale);
         bitmap = createOpaqueImage(deviceWidth, deviceHeight);
         bitmapScale = snapshot.scale;
         bitmapLayout = snapshot;
+        bitmapOriginY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
+        bitmapWindowHeight = windowHeight;
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, deviceWidth, deviceHeight);
         graphics.dispose();
         renderedArea.reset();
         changed = true;
+      } else if (windowHeight != bitmapWindowHeight
+          || !backingWindowCovers(
+              bitmapOriginY, bitmapWindowHeight, snapshot.height, visibleRect)) {
+        int originY = anchorBackingWindow(snapshot.height, windowHeight, visibleRect);
+        moveBackingWindow(snapshot, originY, windowHeight);
       }
+      window = new Rectangle(0, bitmapOriginY, snapshot.width, bitmapWindowHeight);
     }
     if (changed) {
       SwingUtilities.invokeLater(
@@ -683,23 +766,65 @@ public class HexHivePanel extends JPanel implements Scrollable {
             repaint();
           });
     }
+    return window;
+  }
+
+  /**
+   * Re-anchors the backing window at {@code originY}, keeping the pixels of the rows the old and
+   * new windows share. Must hold {@link #bitmapLock}.
+   */
+  private void moveBackingWindow(DrawingProperties snapshot, int originY, int windowHeight) {
+    double scale = bitmapScale;
+    int deviceWidth = bitmap.getWidth();
+    int deviceHeight = deviceWindowHeight(windowHeight, scale);
+    // device row the old window's first row lands on in the new one
+    int shift = toDevice(bitmapOriginY, scale) - toDevice(originY, scale);
+    BufferedImage target =
+        bitmap.getHeight() == deviceHeight ? bitmap : createOpaqueImage(deviceWidth, deviceHeight);
+    Graphics2D graphics = target.createGraphics();
+    if (target == bitmap) {
+      graphics.copyArea(0, 0, deviceWidth, deviceHeight, 0, shift);
+    } else {
+      graphics.drawImage(bitmap, 0, shift, null);
+    }
+    int keptTop = Math.max(0, shift);
+    int keptBottom = Math.min(deviceHeight, shift + bitmap.getHeight());
+    graphics.setPaint(backgroundColor);
+    if (keptBottom <= keptTop) {
+      graphics.fillRect(0, 0, deviceWidth, deviceHeight);
+    } else {
+      graphics.fillRect(0, 0, deviceWidth, keptTop);
+      graphics.fillRect(0, keptBottom, deviceWidth, deviceHeight - keptBottom);
+    }
+    graphics.dispose();
+    bitmap = target;
+    bitmapOriginY = originY;
+    bitmapWindowHeight = windowHeight;
+    renderedArea.intersect(new Area(new Rectangle(0, originY, snapshot.width, windowHeight)));
   }
 
   private void requestFocusedRender(
       DrawingProperties drawingProperties, HexDataAdapter adapter, boolean force) {
-    Rectangle visibleRect = getVisibleRect();
-    if (visibleRect.width <= 0 || visibleRect.height <= 0) {
-      visibleRect = new Rectangle(0, 0, Math.max(1, getWidth()), Math.max(1, getHeight()));
-    }
+    Rectangle visibleRect = currentVisibleRect();
+    Rectangle window = ensureBackingBitmap(drawingProperties, visibleRect);
+    // nothing outside the backing window can be kept, nor needs rendering
     Rectangle priorityBounds =
-        computePriorityRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
-    Rectangle targetBounds = computeRenderBounds(drawingProperties, visibleRect, lastVisibleRect);
+        computePriorityRenderBounds(drawingProperties, visibleRect, lastVisibleRect)
+            .intersection(window);
+    Rectangle targetBounds =
+        computeRenderBounds(drawingProperties, visibleRect, lastVisibleRect).intersection(window);
+    Rectangle visibleBounds = visibleRect.intersection(window);
+    lastVisibleRect = new Rectangle(visibleRect);
+    if (priorityBounds.isEmpty() || targetBounds.isEmpty()) {
+      return;
+    }
     boolean needsPriorityRender;
     boolean needsTargetRender;
     synchronized (bitmapLock) {
       boolean visibleCovered =
-          renderedArea.contains(
-              visibleRect.x, visibleRect.y, visibleRect.width, visibleRect.height);
+          visibleBounds.isEmpty()
+              || renderedArea.contains(
+                  visibleBounds.x, visibleBounds.y, visibleBounds.width, visibleBounds.height);
       needsPriorityRender =
           force
               || bitmap == null
@@ -712,7 +837,6 @@ public class HexHivePanel extends JPanel implements Scrollable {
               || !renderedArea.contains(
                   targetBounds.x, targetBounds.y, targetBounds.width, targetBounds.height);
     }
-    lastVisibleRect = new Rectangle(visibleRect);
     if (needsPriorityRender) {
       enqueueRender(new RenderRequest(adapter, drawingProperties, priorityBounds, true));
     } else if (needsTargetRender) {
@@ -995,37 +1119,41 @@ public class HexHivePanel extends JPanel implements Scrollable {
       int sourceDeviceY,
       Rectangle mergeBounds) {
     double scale = drawingProperties.scale;
-    int destX1 = toDevice(mergeBounds.x, scale);
-    int destY1 = toDevice(mergeBounds.y, scale);
-    int destX2 = toDevice(mergeBounds.x + mergeBounds.width, scale);
-    int destY2 = toDevice(mergeBounds.y + mergeBounds.height, scale);
-    int sourceX1 = destX1 - sourceDeviceX;
-    int sourceY1 = destY1 - sourceDeviceY;
-    int sourceX2 = destX2 - sourceDeviceX;
-    int sourceY2 = destY2 - sourceDeviceY;
+    final Rectangle merged;
     synchronized (bitmapLock) {
       if (bitmap == null
           || bitmapLayout == null
           || !bitmapLayout.hasSameLayout(drawingProperties)) {
         return false;
       }
+      // the window may have moved since this batch was requested, keep only what still fits
+      merged =
+          mergeBounds.intersection(
+              new Rectangle(0, bitmapOriginY, drawingProperties.width, bitmapWindowHeight));
+      if (merged.isEmpty()) {
+        return true;
+      }
+      int deviceOriginY = toDevice(bitmapOriginY, scale);
+      int destX1 = toDevice(merged.x, scale);
+      int destY1 = toDevice(merged.y, scale);
+      int destX2 = toDevice(merged.x + merged.width, scale);
+      int destY2 = toDevice(merged.y + merged.height, scale);
       Graphics2D graphics = bitmap.createGraphics();
       graphics.drawImage(
           renderedBitmap,
           destX1,
-          destY1,
+          destY1 - deviceOriginY,
           destX2,
-          destY2,
-          sourceX1,
-          sourceY1,
-          sourceX2,
-          sourceY2,
+          destY2 - deviceOriginY,
+          destX1 - sourceDeviceX,
+          destY1 - sourceDeviceY,
+          destX2 - sourceDeviceX,
+          destY2 - sourceDeviceY,
           null);
       graphics.dispose();
-      renderedArea.add(new Area(mergeBounds));
+      renderedArea.add(new Area(merged));
     }
-    SwingUtilities.invokeLater(
-        () -> repaint(mergeBounds.x, mergeBounds.y, mergeBounds.width, mergeBounds.height));
+    SwingUtilities.invokeLater(() -> repaint(merged.x, merged.y, merged.width, merged.height));
     return true;
   }
 
@@ -1072,7 +1200,21 @@ public class HexHivePanel extends JPanel implements Scrollable {
     Graphics2D g2d = (Graphics2D) g;
     AffineTransform transform = g2d.getTransform();
     double deviceScale = sanitizeScale(transform.getScaleX());
+    DrawingProperties snapshotProperties;
+    HexDataAdapter adapterSnapshot;
+    synchronized (drawingPropertiesLock) {
+      snapshotProperties = drawingProperties;
+      adapterSnapshot = latestAdapter;
+    }
     boolean scaleChanged;
+    synchronized (bitmapLock) {
+      scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
+    }
+    boolean rescale = scaleChanged && renderScale != deviceScale;
+    if (!rescale && snapshotProperties != null && adapterSnapshot != null) {
+      // moves the backing window to the visible rows before it's blitted
+      requestFocusedRender(snapshotProperties, adapterSnapshot, false);
+    }
     synchronized (bitmapLock) {
       scaleChanged = Math.abs(deviceScale - bitmapScale) > 0.001;
       if (bitmap != null) {
@@ -1081,7 +1223,8 @@ public class HexHivePanel extends JPanel implements Scrollable {
           Graphics2D deviceGraphics = (Graphics2D) g2d.create();
           deviceGraphics.setTransform(
               AffineTransform.getTranslateInstance(
-                  Math.round(transform.getTranslateX()), Math.round(transform.getTranslateY())));
+                  Math.round(transform.getTranslateX()),
+                  Math.round(transform.getTranslateY()) + toDevice(bitmapOriginY, bitmapScale)));
           deviceGraphics.drawImage(bitmap, 0, 0, null);
           deviceGraphics.dispose();
         } else {
@@ -1091,30 +1234,20 @@ public class HexHivePanel extends JPanel implements Scrollable {
           g2d.drawImage(
               bitmap,
               0,
-              0,
+              bitmapOriginY,
               (int) Math.round(bitmap.getWidth() / bitmapScale),
               (int) Math.round(bitmap.getHeight() / bitmapScale),
               null);
         }
       }
     }
-    DrawingProperties snapshotProperties;
-    HexDataAdapter adapterSnapshot;
-    synchronized (drawingPropertiesLock) {
-      snapshotProperties = drawingProperties;
-      adapterSnapshot = latestAdapter;
-    }
     paintHoveredHex(g2d, snapshotProperties);
-    if (scaleChanged && renderScale != deviceScale) {
+    if (rescale) {
       renderScale = deviceScale;
       if (adapterSnapshot != null) {
         final HexDataAdapter adapter = adapterSnapshot;
         SwingUtilities.invokeLater(() -> updateData(adapter));
       }
-      return;
-    }
-    if (snapshotProperties != null && adapterSnapshot != null) {
-      requestFocusedRender(snapshotProperties, adapterSnapshot, false);
     }
   }
 
