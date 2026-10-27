@@ -81,7 +81,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicHTML;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.NetworkUtils;
@@ -341,22 +340,10 @@ final class Initializer {
     // MainFrame construction
     ApplicationHeader.preloadImages();
 
-    // Load up the HTML engine.
+    // Load up the HTML engine (DTD, default style sheet) on this thread: parsing the DTD for a
+    // throwaway HTML label on the EDT stalled it for seconds on slow machines.
     GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
-    // stopwatch.resetAndLog("update splash for HTML engine");
-    GUIMediator.safeInvokeAndWait(
-        () -> {
-          // stopwatch.resetAndLog("enter evt queue");
-          JLabel label = new JLabel();
-          // setting font and color to null to minimize generated css
-          // script
-          // which causes a parser exception under circumstances
-          label.setFont(null);
-          label.setForeground(null);
-          BasicHTML.createHTMLView(label, "<html>.</html>");
-          // stopwatch.resetAndLog("create HTML view");
-        });
-    // stopwatch.resetAndLog("return from evt queue");
+    JdkWarmUp.loadHtmlEngine();
     // Initialize the bug manager
     BugManager.instance();
     // stopwatch.resetAndLog("BugManager instance");

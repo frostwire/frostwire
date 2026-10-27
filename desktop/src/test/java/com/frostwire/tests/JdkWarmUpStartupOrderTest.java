@@ -8,6 +8,7 @@
 package com.frostwire.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -39,5 +40,24 @@ class JdkWarmUpStartupOrderTest {
     assertTrue(lookAndFeel < warmUp, "warm-up starts before the look and feel is installed");
     assertTrue(warmUp < splash, "warm-up starts after the splash window measures text");
     assertEquals(warmUp, source.lastIndexOf(START_WARM_UP), "warm-up started twice");
+  }
+
+  /**
+   * The "Loading HTML Engine" startup step built an HTML label on the EDT, which parsed the HTML
+   * DTD there (Icebase #fb904a5d872d). The startup thread loads it into a model instead.
+   */
+  @Test
+  void htmlEngineLoadsOnTheStartupThreadNotOnTheEdt() throws Exception {
+    String source = Files.readString(INITIALIZER).replaceAll("\\s+", "");
+
+    assertFalse(source.contains("createHTMLView("), "an HTML view is built during startup");
+    int htmlEngine = source.indexOf("JdkWarmUp.loadHtmlEngine();");
+    assertTrue(htmlEngine >= 0, "HTML engine is not loaded at startup");
+    int earlyUi = source.indexOf("privatevoidinitializeEarlyUI(){");
+    int nextMethod = source.indexOf("privatevoid", earlyUi + 1);
+    assertTrue(earlyUi < htmlEngine && htmlEngine < nextMethod, "moved out of initializeEarlyUI");
+    assertFalse(
+        source.substring(earlyUi, nextMethod).contains("safeInvokeAndWait(()->{JdkWarmUp"),
+        "HTML engine loaded on the EDT");
   }
 }

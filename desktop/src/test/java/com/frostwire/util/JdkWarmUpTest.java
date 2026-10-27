@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.text.html.parser.DTD;
 import org.junit.jupiter.api.Test;
 
 class JdkWarmUpTest {
@@ -100,6 +102,23 @@ class JdkWarmUpTest {
     assertEquals(List.of("no.such.DelegateUI", fixture), requested.subList(0, 2));
     // Static initializers may touch Swing state, so they must keep running on the EDT.
     assertFalse(FIXTURE_INITIALIZED.get());
+  }
+
+  @Test
+  void loadHtmlEngineParsesTheDtdOffTheEdt() throws Exception {
+    AtomicBoolean onEdt = new AtomicBoolean(true);
+    Thread startup =
+        new Thread(
+            () -> {
+              onEdt.set(EventQueue.isDispatchThread());
+              JdkWarmUp.loadHtmlEngine();
+            });
+    startup.start();
+    startup.join();
+
+    assertFalse(onEdt.get());
+    // ParserDelegator fills the shared "html32" DTD once per JVM; later HTML labels reuse it.
+    assertTrue(DTD.getDTD("html32").elementHash.containsKey("body"));
   }
 
   private static final AtomicBoolean FIXTURE_INITIALIZED = new AtomicBoolean();

@@ -9,6 +9,7 @@ package com.frostwire.util;
 
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.UIManager;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
 
 /**
  * Pays the JDK's one-time initialization costs on a background thread at startup, so the first
@@ -97,6 +100,23 @@ public final class JdkWarmUp {
       } catch (Throwable t) {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
+    }
+  }
+
+  /**
+   * Loads Swing's HTML support by parsing a tiny document into a model: the HTML 3.2 DTD that
+   * {@code ParserDelegator} reads and parses once per JVM, the default style sheet, and the
+   * document, reader and parser classes. No component is created, so the startup thread calls this
+   * instead of building a throwaway HTML label on the EDT, where the DTD parse stalled it.
+   */
+  public static void loadHtmlEngine() {
+    try {
+      HTMLEditorKit kit = new HTMLEditorKit();
+      Document document = kit.createDefaultDocument();
+      kit.read(new StringReader("<html>.</html>"), document, 0);
+    } catch (Throwable t) {
+      // Best effort: the first HTML label on the EDT pays this instead.
+      LOG.warn("HTML engine warm-up failed: " + t.getMessage(), t);
     }
   }
 
