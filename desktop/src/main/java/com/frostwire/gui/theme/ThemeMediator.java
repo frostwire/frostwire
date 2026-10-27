@@ -29,6 +29,7 @@ import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.UISettings;
 import java.awt.*;
@@ -159,11 +160,20 @@ public final class ThemeMediator {
   }
 
   /**
-   * Switches the application UI theme.
+   * Switches the application UI theme. The look and feel classes the theme needs are initialized in
+   * the background first, see {@link ThemeSwitcher}, then the theme is applied on the EDT.
    *
    * @param theme the theme to apply
    */
   public static void switchTheme(final ThemeEnum theme) {
+    ThemeSwitcher.switchTheme(
+        theme,
+        BackgroundQueuedExecutorService::schedule,
+        ThemeSwitcher::initializeLookAndFeelClasses,
+        ThemeMediator::applyTheme);
+  }
+
+  private static void applyTheme(final ThemeEnum theme) {
     /* ------------------------------------------------------------------
      * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
      *    immediate change (handy when they click around in Options);
