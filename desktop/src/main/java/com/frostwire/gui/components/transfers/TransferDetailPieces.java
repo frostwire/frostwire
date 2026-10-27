@@ -31,6 +31,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.SizeStableLabel;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,8 +61,9 @@ public final class TransferDetailPieces extends JPanel
         new HexHivePanel(16, 0x264053, 0xf2f2f2, 0x33b5e5, backgroundColor, 5, 0, 0, 5, true);
     hexHivePanelAdapter = new HexHiveAdapter();
     // Create labels without HTML content to avoid EDT violation
-    pieceSizeLabel = new JLabel();
-    totalPiecesLabel = new JLabel();
+    // their text changes on refresh; see SizeStableLabel
+    pieceSizeLabel = new SizeStableLabel();
+    totalPiecesLabel = new SizeStableLabel();
     add(totalPiecesLabel, "gapleft 10px");
     add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
     hexHivePanel.setBackground(new Color(backgroundColor));
@@ -112,10 +114,9 @@ public final class TransferDetailPieces extends JPanel
             if (!sameDownload) {
               hexHivePanel.clearRenderCache();
             }
+            // revalidates itself when the cubes' layout (its preferred size) changes
             hexHivePanel.updateData(hexHivePanelAdapter);
-            hexHivePanel.revalidate();
           }
-          revalidate();
           repaint();
         });
   }

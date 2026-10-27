@@ -37,6 +37,21 @@ class TransferDetailRevalidationTest {
     assertRefreshSetsOnlySizeStableLabels(source, methodBody(source, "public void updateData("));
   }
 
+  /**
+   * The Pieces tab asked for a layout of itself and of the hive on every refresh. The hive asks for
+   * one when its cubes' layout changes (see HexHivePanelTest), and the labels are size-stable.
+   */
+  @Test
+  void piecesTabRefreshDoesNotRevalidate() throws Exception {
+    String source = readSource("TransferDetailPieces.java");
+    String refresh = methodBody(source, "public void updateData(");
+    assertFalse(refresh.contains("revalidate()"), "the Pieces refresh must not force a layout");
+    assertRefreshSetsOnlySizeStableLabels(
+        source,
+        methodBody(source, "private void updatePieceSizeLabel(")
+            + methodBody(source, "private void updateTotalPiecesLabel("));
+  }
+
   private static void assertRefreshSetsOnlySizeStableLabels(String source, String refresh) {
     Set<String> updated = new TreeSet<>();
     Matcher matcher = SET_TEXT.matcher(refresh);

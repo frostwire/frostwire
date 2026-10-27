@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.limegroup.gnutella.gui.CountingRepaintManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
@@ -34,7 +35,9 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JPanel;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
 /** Drives the pieces hive off-screen and inspects its backing bitmap and hover state. */
@@ -347,6 +350,33 @@ class HexHivePanelTest {
 
   private static MouseEvent mouseEvent(HexHivePanel panel, int id, int x, int y) {
     return new MouseEvent(panel, id, System.currentTimeMillis(), 0, x, y, x, y, 0, false, 0);
+  }
+
+  /** The Pieces tab refreshes every second; only a new cube layout may ask for a layout pass. */
+  @Test
+  void refreshWithTheSameLayoutRequestsNoLayout() throws Exception {
+    HexHivePanel panel = newPanel();
+    new JPanel().add(panel); // revalidate() is a no-op without a parent
+    HexHivePanel.HexDataAdapter<Object> pieces = adapter(400);
+    SwingUtilities.invokeAndWait(() -> panel.updateData(pieces));
+    int requests =
+        CountingRepaintManager.layoutRequestsDuring(
+            () -> {
+              for (int tick = 0; tick < 10; tick++) {
+                panel.updateData(pieces);
+              }
+            });
+    assertEquals(0, requests);
+  }
+
+  @Test
+  void refreshWithMoreRowsRequestsALayout() throws Exception {
+    HexHivePanel panel = newPanel();
+    new JPanel().add(panel);
+    SwingUtilities.invokeAndWait(() -> panel.updateData(adapter(40)));
+    int requests =
+        CountingRepaintManager.layoutRequestsDuring(() -> panel.updateData(adapter(400)));
+    assertTrue(requests > 0, "a taller hive must tell its scroll pane");
   }
 
   private static HexHivePanel newPanel() {
