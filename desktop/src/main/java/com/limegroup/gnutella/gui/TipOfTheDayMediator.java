@@ -160,13 +160,22 @@ public final class TipOfTheDayMediator {
     String foreHex = GUIUtils.colorToHex(_foreground);
     // Defer HTML content to avoid EDT violation
     // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-    final String htmlContent =
-        "<html><font face='arial,helvetica,sanserif' color='#" + foreHex + "'>" + tip + "</font>";
+    final String htmlContent = tipHtml(foreHex, tip);
     SwingUtilities.invokeLater(
         () -> {
           tipPane.setText(htmlContent);
           tipPane.setCaretPosition(0);
         });
+  }
+
+  /**
+   * The tip as HTML. Swing's HTML renderer creates a {@link Font} for the first family in {@code
+   * face} without checking it is installed; "arial" is missing on most Linux systems, and the JDK
+   * then opens every installed font file on the EDT before falling back (Icebase #d45a8ea5abbe,
+   * GitHub #1313). The logical SansSerif family always resolves and is Arial on Windows.
+   */
+  static String tipHtml(String foreHex, String tip) {
+    return "<html><font face='" + Font.SANS_SERIF + "' color='#" + foreHex + "'>" + tip + "</font>";
   }
 
   /** Iterates through all the tips' keys and stores the ones that are valid for this OS. */

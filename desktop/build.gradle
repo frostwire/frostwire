@@ -726,6 +726,7 @@ test {
         includeTestsMatching "com.frostwire.gui.searchfield.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SizeStableLabelTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.TipOfTheDayHtmlFontTest"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerReportTypesTest"
         includeTestsMatching "com.limegroup.gnutella.gui.BugDialogRemovalTest"
         includeTestsMatching "com.limegroup.gnutella.gui.DefaultErrorCatcherTest"
