@@ -1,28 +1,31 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.limegroup.gnutella.gui;
 
+import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW;
+
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.tabs.*;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.gui.updates.UpdateManager;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.TransferHandlerDropTargetListener;
@@ -30,11 +33,6 @@ import com.limegroup.gnutella.gui.menu.MenuMediator;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import net.miginfocom.swing.MigLayout;
-import org.limewire.setting.SettingsGroupManager;
-import com.frostwire.util.OSUtils;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ComponentEvent;
@@ -44,488 +42,496 @@ import java.awt.event.WindowEvent;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW;
+import javax.swing.*;
+import net.miginfocom.swing.MigLayout;
+import org.limewire.setting.SettingsGroupManager;
 
 /**
- * This class constructs the main `JFrame` for the program as well as
- * all of the other GUI classes.
+ * This class constructs the main `JFrame` for the program as well as all of the other GUI classes.
  */
 public final class MainFrame {
-    /**
-     * The main `JFrame` for the application.
-     */
-    private final JFrame FRAME;
-    /**
-     * Handle to the `JTabbedPane` instance.
-     */
-    private final JPanel TABBED_PANE;
-    private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
-    /**
-     * Constant handle to the `LibraryView` class that is
-     * responsible for displaying files in the user's repository.
-     */
-    private LibraryMediator LIBRARY_MEDIATOR;
-    /**
-     * Constant handle to the `OptionsMediator` class that is
-     * responsible for displaying customizable options to the user.
-     */
-    private OptionsMediator OPTIONS_MEDIATOR;
-    /**
-     * Constant handle to the `StatusLine` class that is
-     * responsible for displaying the status of the network and
-     * connectivity to the user.
-     */
-    private StatusLine STATUS_LINE;
-    /**
-     * The array of tabs in the main application window.
-     */
-    private final Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
-    private final EnumSet<Tabs> addedCards = EnumSet.noneOf(Tabs.class);
-    /**
-     * The last state of the X/Y location and the time it was set.
-     * This is necessary to preserve the maximize size & prior size,
-     * as on Windows a move event is occasionally triggered when
-     * maximizing, prior to the state actually becoming maximized.
-     */
-    private WindowState lastState = null;
-    private final ApplicationHeader APPLICATION_HEADER;
-    private Tabs currentSelectedTab;
+  /** The main `JFrame` for the application. */
+  private final JFrame FRAME;
 
-    /**
-     * Initializes the primary components of the main application window,
-     * including the `JFrame` and the `JTabbedPane`
-     * contained in that window.
-     */
-    MainFrame(JFrame frame) {
-        //starts the Frostwire update manager, and will trigger a task in 5 seconds.
-        // RELEASE
-        UpdateManager.scheduleUpdateCheckTask(0);
-        // DEBUG
-        //UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
-        FRAME = frame;
-        new DropTarget(FRAME, new TransferHandlerDropTargetListener(DNDUtils.DEFAULT_TRANSFER_HANDLER));
-        TABBED_PANE = new JPanel(new CardLayout());
-        TABBED_PANE.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-        // Add a listener for saving the dimensions of the window &
-        // position the search icon overlay correctly.
-        FRAME.addComponentListener(new ComponentListener() {
-            public void componentHidden(ComponentEvent e) {
-            }
+  /** Handle to the `JTabbedPane` instance. */
+  private final JPanel TABBED_PANE;
 
-            public void componentShown(ComponentEvent e) {
-            }
+  private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
 
-            public void componentMoved(ComponentEvent e) {
-                lastState = new WindowState();
-                saveWindowState();
-            }
+  /**
+   * Constant handle to the `LibraryView` class that is responsible for displaying files in the
+   * user's repository.
+   */
+  private LibraryMediator LIBRARY_MEDIATOR;
 
-            public void componentResized(ComponentEvent e) {
-                saveWindowState();
-            }
+  /**
+   * Constant handle to the `OptionsMediator` class that is responsible for displaying customizable
+   * options to the user.
+   */
+  private OptionsMediator OPTIONS_MEDIATOR;
+
+  /**
+   * Constant handle to the `StatusLine` class that is responsible for displaying the status of the
+   * network and connectivity to the user.
+   */
+  private StatusLine STATUS_LINE;
+
+  /** The array of tabs in the main application window. */
+  private final Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
+
+  private final EnumSet<Tabs> addedCards = EnumSet.noneOf(Tabs.class);
+
+  /**
+   * The last state of the X/Y location and the time it was set. This is necessary to preserve the
+   * maximize size & prior size, as on Windows a move event is occasionally triggered when
+   * maximizing, prior to the state actually becoming maximized.
+   */
+  private WindowState lastState = null;
+
+  private final ApplicationHeader APPLICATION_HEADER;
+  private Tabs currentSelectedTab;
+
+  /**
+   * Initializes the primary components of the main application window, including the `JFrame` and
+   * the `JTabbedPane` contained in that window.
+   */
+  MainFrame(JFrame frame) {
+    // starts the Frostwire update manager, and will trigger a task in 5 seconds.
+    // RELEASE
+    UpdateManager.scheduleUpdateCheckTask(0);
+    // DEBUG
+    // UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
+    FRAME = frame;
+    new DropTarget(FRAME, new TransferHandlerDropTargetListener(DNDUtils.DEFAULT_TRANSFER_HANDLER));
+    TABBED_PANE = new JPanel(new CardLayout());
+    TABBED_PANE.setBorder(
+        BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
+    // Add a listener for saving the dimensions of the window &
+    // position the search icon overlay correctly.
+    FRAME.addComponentListener(
+        new ComponentListener() {
+          public void componentHidden(ComponentEvent e) {}
+
+          public void componentShown(ComponentEvent e) {}
+
+          public void componentMoved(ComponentEvent e) {
+            lastState = new WindowState();
+            saveWindowState();
+          }
+
+          public void componentResized(ComponentEvent e) {
+            saveWindowState();
+          }
         });
-        // Listen for the size/state changing.
-        FRAME.addWindowStateListener(e -> saveWindowState());
-        // Listen for the window closing, to save settings.
-        FRAME.addWindowListener(new WindowAdapter() {
-            public void windowDeiconified(WindowEvent e) {
-                // Handle reactivation on systems which do not support
-                // the system tray.  Windows systems call the
-                // WindowsNotifyUser.restoreApplication()
-                // method to restore applications from minimize and
-                // auto-shutdown modes.  Non-windows systems restore
-                // the application using the following code.
-                if (!OSUtils.supportsTray() || !ResourceManager.instance().isTrayIconAvailable())
-                    GUIMediator.restoreView();
-            }
+    // Listen for the size/state changing.
+    FRAME.addWindowStateListener(e -> saveWindowState());
+    // Listen for the window closing, to save settings.
+    FRAME.addWindowListener(
+        new WindowAdapter() {
+          public void windowDeiconified(WindowEvent e) {
+            // Handle reactivation on systems which do not support
+            // the system tray.  Windows systems call the
+            // WindowsNotifyUser.restoreApplication()
+            // method to restore applications from minimize and
+            // auto-shutdown modes.  Non-windows systems restore
+            // the application using the following code.
+            if (!OSUtils.supportsTray() || !ResourceManager.instance().isTrayIconAvailable())
+              GUIMediator.restoreView();
+          }
 
-            public void windowClosing(WindowEvent e) {
-                saveWindowState();
-                SettingsGroupManager.instance().save();
-                GUIMediator.close(true);
-            }
+          public void windowClosing(WindowEvent e) {
+            saveWindowState();
+            SettingsGroupManager.instance().save();
+            GUIMediator.close(true);
+          }
         });
-        FRAME.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        this.setFrameDimensions();
-        FRAME.setJMenuBar(MenuMediator.instance().getMenuBar());
-        JPanel contentPane = new JPanel();
-        FRAME.setContentPane(contentPane);
-        contentPane.setLayout(new MigLayout("insets 0, gap 0"));
-        boolean useSearchTransfersSplitView = UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
-        // Build base tabs first to populate TABS map (but defer heavy tabs to avoid EDT violations)
-        buildTabs(useSearchTransfersSplitView);
-        APPLICATION_HEADER = new ApplicationHeader(TABS);
-        contentPane.add(APPLICATION_HEADER, "growx, dock north");
-        contentPane.add(TABBED_PANE, "wrap");
-        contentPane.add(getStatusLine().getComponent(), "dock south, shrink 0");
-        setSelectedTab(resolveDefaultTab());
-        SwingUtilities.invokeLater(() -> {
-            Tabs selected = getSelectedTab();
-            if (selected != null) {
-                Tab tab = TABS.get(selected);
-                if (tab != null) {
-                    APPLICATION_HEADER.selectTab(tab);
-                }
+    FRAME.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    this.setFrameDimensions();
+    FRAME.setJMenuBar(MenuMediator.instance().getMenuBar());
+    JPanel contentPane = new JPanel();
+    FRAME.setContentPane(contentPane);
+    contentPane.setLayout(new MigLayout("insets 0, gap 0"));
+    boolean useSearchTransfersSplitView = UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
+    // Build base tabs first to populate TABS map (but defer heavy tabs to avoid EDT violations)
+    buildTabs(useSearchTransfersSplitView);
+    APPLICATION_HEADER = new ApplicationHeader(TABS);
+    contentPane.add(APPLICATION_HEADER, "growx, dock north");
+    contentPane.add(TABBED_PANE, "wrap");
+    contentPane.add(getStatusLine().getComponent(), "dock south, shrink 0");
+    setSelectedTab(resolveDefaultTab());
+    SwingUtilities.invokeLater(
+        () -> {
+          Tabs selected = getSelectedTab();
+          if (selected != null) {
+            Tab tab = TABS.get(selected);
+            if (tab != null) {
+              APPLICATION_HEADER.selectTab(tab);
             }
+          }
         });
-        scheduleDeferredTabInitialization(useSearchTransfersSplitView);
+    scheduleDeferredTabInitialization(useSearchTransfersSplitView);
 
-        // Defer expensive layout calculations to avoid EDT blocking
-        // Set a default minimum size first to avoid issues
-        FRAME.setMinimumSize(new Dimension(800, 600));
+    // Defer expensive layout calculations to avoid EDT blocking
+    // Set a default minimum size first to avoid issues
+    FRAME.setMinimumSize(new Dimension(800, 600));
 
-        // Calculate the real minimum size in a background thread
-        new Thread(() -> {
-            try {
+    // Calculate the real minimum size in a background thread
+    new Thread(
+            () -> {
+              try {
                 Thread.sleep(100); // Give UI time to settle
-                SwingUtilities.invokeLater(() -> {
-                    try {
-                        setMinimalSize(FRAME, APPLICATION_HEADER, APPLICATION_HEADER, TABBED_PANE, getStatusLine().getComponent());
-                    } catch (Exception e) {
+                SwingUtilities.invokeLater(
+                    () -> {
+                      try {
+                        setMinimalSize(
+                            FRAME,
+                            APPLICATION_HEADER,
+                            APPLICATION_HEADER,
+                            TABBED_PANE,
+                            getStatusLine().getComponent());
+                      } catch (Exception e) {
                         // Ignore errors during deferred layout calculation
-                    }
-                });
-            } catch (InterruptedException ignored) {
-            }
-        }, "MainFrame-MinimalSizeCalculator").start();
+                      }
+                    });
+              } catch (InterruptedException ignored) {
+              }
+            },
+            "MainFrame-MinimalSizeCalculator")
+        .start();
 
-        if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
-            FRAME.addWindowListener(MagnetClipboardListener.getInstance());
-        }
-        if (OSUtils.isMacOSX()) {
-            FRAME.getRootPane().putClientProperty("apple.awt.fullscreenable", true);
-        }
+    if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
+      FRAME.addWindowListener(MagnetClipboardListener.getInstance());
     }
-
-    private void setMinimalSize(JFrame frame, JComponent horizontal, JComponent... verticals) {
-        int width = horizontal.getMinimumSize().width;
-        int height = 0;
-        for (JComponent c : verticals) {
-            height += c.getMinimumSize().height;
-        }
-        // for some reason I can pack the frame
-        // this disallow me of getting the right size of the title bar
-        // and in general the insets's frame
-        // lets add some fixed value for now
-        height += 50;
-        frame.setMinimumSize(new Dimension(width, height));
+    if (OSUtils.isMacOSX()) {
+      FRAME.getRootPane().putClientProperty("apple.awt.fullscreenable", true);
     }
+  }
 
-    public ApplicationHeader getApplicationHeader() {
-        return APPLICATION_HEADER;
+  private void setMinimalSize(JFrame frame, JComponent horizontal, JComponent... verticals) {
+    int width = horizontal.getMinimumSize().width;
+    int height = 0;
+    for (JComponent c : verticals) {
+      height += c.getMinimumSize().height;
     }
+    // for some reason I can pack the frame
+    // this disallow me of getting the right size of the title bar
+    // and in general the insets's frame
+    // lets add some fixed value for now
+    height += 50;
+    frame.setMinimumSize(new Dimension(width, height));
+  }
 
-    /**
-     * Saves the state of the Window to settings.
-     */
-    private void saveWindowState() {
-        int state = FRAME.getExtendedState();
-        if (state == Frame.NORMAL) {
-            // save the screen size and location
-            Dimension dim = GUIMediator.getAppSize();
+  public ApplicationHeader getApplicationHeader() {
+    return APPLICATION_HEADER;
+  }
 
-            int minAppWidth = ApplicationSettings.APP_WIDTH.getDefaultValue();
-            int minAppHeight = ApplicationSettings.APP_HEIGHT.getDefaultValue();
-            int appWidth = dim.width;
-            int appHeight = dim.height;
+  /** Saves the state of the Window to settings. */
+  private void saveWindowState() {
+    int state = FRAME.getExtendedState();
+    if (state == Frame.NORMAL) {
+      // save the screen size and location
+      Dimension dim = GUIMediator.getAppSize();
 
-            boolean forceMinimumDimensions = false;
+      int minAppWidth = ApplicationSettings.APP_WIDTH.getDefaultValue();
+      int minAppHeight = ApplicationSettings.APP_HEIGHT.getDefaultValue();
+      int appWidth = dim.width;
+      int appHeight = dim.height;
 
-            if (appWidth < minAppWidth) {
-                appWidth = minAppWidth;
-                forceMinimumDimensions = true;
-            }
+      boolean forceMinimumDimensions = false;
 
-            if (appHeight < minAppHeight) {
-                appHeight = minAppHeight;
-                forceMinimumDimensions = true;
-            }
+      if (appWidth < minAppWidth) {
+        appWidth = minAppWidth;
+        forceMinimumDimensions = true;
+      }
 
-            if (forceMinimumDimensions) {
-                FRAME.setSize(new Dimension(appWidth, appHeight));
-                FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
-                FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
-            }
+      if (appHeight < minAppHeight) {
+        appHeight = minAppHeight;
+        forceMinimumDimensions = true;
+      }
 
-            Point loc = GUIMediator.getAppLocation();
-            ApplicationSettings.APP_WIDTH.setValue(appWidth);
-            ApplicationSettings.APP_HEIGHT.setValue(appHeight);
-            ApplicationSettings.WINDOW_X.setValue(loc.x);
-            ApplicationSettings.WINDOW_Y.setValue(loc.y);
-            ApplicationSettings.MAXIMIZE_WINDOW.setValue(false);
-
-        } else if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
-            ApplicationSettings.MAXIMIZE_WINDOW.setValue(true);
-            if (lastState != null && lastState.time == System.currentTimeMillis()) {
-                ApplicationSettings.WINDOW_X.setValue(lastState.x);
-                ApplicationSettings.WINDOW_Y.setValue(lastState.y);
-                lastState = null;
-            }
-        }
-    }
-
-    /**
-     * Build the Tab Structure based on advertising mode and Windows
-     */
-    private void buildTabs(boolean useSearchTransfersSplitView) {
-        SearchTab searchTab = new SearchTab();
-        LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
-        // keep references to the tab objects.
-        TABS.put(Tabs.SEARCH, searchTab);
-        TABS.put(Tabs.LIBRARY, libraryTab);
-
-        TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
-        // Add Search and Library tabs immediately so they're visible
-        addTabsPartial(useSearchTransfersSplitView);
-    }
-
-    private void scheduleDeferredTabInitialization(boolean useSearchTransfersSplitView) {
-        SwingUtilities.invokeLater(() -> {
-            Tabs previousTab = getSelectedTab();
-            TransfersTab transfersTab;
-            if (!TABS.containsKey(Tabs.TRANSFERS)) {
-                transfersTab = new TransfersTab(getBTDownloadMediator());
-                TABS.put(Tabs.TRANSFERS, transfersTab);
-            } else {
-                Tab existingTransfers = TABS.get(Tabs.TRANSFERS);
-                transfersTab = existingTransfers instanceof TransfersTab ? (TransfersTab) existingTransfers : null;
-            }
-            if (!TABS.containsKey(Tabs.SEARCH_TRANSFERS) && transfersTab != null) {
-                Tab searchTab = TABS.get(Tabs.SEARCH);
-                if (searchTab instanceof SearchTab) {
-                    SearchTransfersTab searchTransfers = new SearchTransfersTab((SearchTab) searchTab, transfersTab);
-                    TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
-                }
-            }
-            // Add all tabs now that deferred tabs are populated
-            addTabs(useSearchTransfersSplitView);
-            TABBED_PANE.setRequestFocusEnabled(false);
-            ApplicationHeader header = APPLICATION_HEADER;
-            if (header != null) {
-                header.refreshTabButtons(TABS);
-            }
-            Tabs tabToRestore = previousTab != null ? previousTab : resolveDefaultTab();
-            if (tabToRestore == null || !tabToRestore.isEnabled()) {
-                tabToRestore = resolveDefaultTab();
-            }
-            setSelectedTab(tabToRestore);
-        });
-    }
-
-    private Tabs resolveDefaultTab() {
-        if (Tabs.SEARCH.isEnabled()) {
-            return Tabs.SEARCH;
-        }
-        if (Tabs.SEARCH_TRANSFERS.isEnabled() && TABS.containsKey(Tabs.SEARCH_TRANSFERS)) {
-            return Tabs.SEARCH_TRANSFERS;
-        }
-        if (Tabs.TRANSFERS.isEnabled() && TABS.containsKey(Tabs.TRANSFERS)) {
-            return Tabs.TRANSFERS;
-        }
-        return Tabs.LIBRARY;
-    }
-
-    /**
-     * Add only Search and Library tabs initially (lightweight tabs that don't block EDT)
-     */
-    private void addTabsPartial(boolean useSearchTransfersSplitView) {
-        updateEnabledTabs(useSearchTransfersSplitView);
-        // Only add Search and Library tabs initially
-        Tab searchTab = TABS.get(Tabs.SEARCH);
-        if (searchTab != null && Tabs.SEARCH.isEnabled()) {
-            addTabIfAbsent(Tabs.SEARCH, searchTab);
-        }
-        Tab libraryTab = TABS.get(Tabs.LIBRARY);
-        if (libraryTab != null && Tabs.LIBRARY.isEnabled()) {
-            addTabIfAbsent(Tabs.LIBRARY, libraryTab);
-        }
-    }
-
-    private void addTabs(boolean useSearchTransfersSplitView) {
-        updateEnabledTabs(useSearchTransfersSplitView);
-        for (Tabs tabEnum : Tabs.values()) {
-            final Tab tab = TABS.get(tabEnum);
-            if (tabEnum.isEnabled() && tab != null) {
-                addTabIfAbsent(tabEnum, tab);
-            }
-        }
-    }
-
-    /**
-     * Adds a tab to the `JTabbedPane` based on the data supplied
-     * in the `Tab` instance.
-     *
-     * @param tab the `Tab` instance containing data for the tab to
-     *            add
-     */
-    private void addTabIfAbsent(Tabs tabEnum, Tab tab) {
-        if (tab == null || addedCards.contains(tabEnum)) {
-            return;
-        }
-        String title = tab.getTitle();
-        JComponent component = tab.getComponent();
-        if (component == null) {
-            return;
-        }
-        TABBED_PANE.add(component, title);
-        addedCards.add(tabEnum);
-    }
-
-    /**
-     * @param useSearchTransfersSplitView true if you want the old split style.
-     */
-    private void updateEnabledTabs(boolean useSearchTransfersSplitView) {
-        Tabs.SEARCH.setEnabled(!useSearchTransfersSplitView);
-        Tabs.TRANSFERS.setEnabled(!useSearchTransfersSplitView);
-        Tabs.SEARCH_TRANSFERS.setEnabled(useSearchTransfersSplitView);
-        Tabs.LIBRARY.setEnabled(true);
-    }
-
-    /**
-     * Sets the x,y location as well as the height and width of the main
-     * application `Frame`.
-     */
-    private void setFrameDimensions() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        GraphicsConfiguration gc = gd.getDefaultConfiguration();
-        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int locX;
-        int locY;
-        int appWidth = Math.min(screenSize.width - insets.left - insets.right, ApplicationSettings.APP_WIDTH.getValue());
-        int appHeight = Math.min(screenSize.height - insets.top - insets.bottom, ApplicationSettings.APP_HEIGHT.getValue());
-        // Set the location of our window based on whether or not
-        // the user has run the program before, and therefore may have
-        // modified the location of the main window.
-        if (ApplicationSettings.RUN_ONCE.getValue()) {
-            locX = Math.max(insets.left, ApplicationSettings.WINDOW_X.getValue());
-            locY = Math.max(insets.top, ApplicationSettings.WINDOW_Y.getValue());
-        } else {
-            locX = (screenSize.width - appWidth) / 2;
-            locY = (screenSize.height - appHeight) / 2;
-        }
-        // Make sure the Window is visible and not for example
-        // somewhere in the very bottom right corner.
-        if (locX + appWidth > screenSize.width) {
-            locX = Math.max(insets.left, screenSize.width - insets.left - insets.right - appWidth);
-        }
-        if (locY + appHeight > screenSize.height) {
-            locY = Math.max(insets.top, screenSize.height - insets.top - insets.bottom - appHeight);
-        }
-        FRAME.setLocation(locX, locY);
+      if (forceMinimumDimensions) {
         FRAME.setSize(new Dimension(appWidth, appHeight));
         FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
         FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
-        //re-maximize if we shutdown while maximized.
-        if (ApplicationSettings.MAXIMIZE_WINDOW.getValue() && Toolkit.getDefaultToolkit().isFrameStateSupported(Frame.MAXIMIZED_BOTH)) {
-            FRAME.setExtendedState(Frame.MAXIMIZED_BOTH);
-        }
-    }
+      }
 
-    final BTDownloadMediator getBTDownloadMediator() {
-        if (BT_DOWNLOAD_MEDIATOR == null) {
-            BT_DOWNLOAD_MEDIATOR = BTDownloadMediator.instance();
-        }
-        return BT_DOWNLOAD_MEDIATOR;
-    }
+      Point loc = GUIMediator.getAppLocation();
+      ApplicationSettings.APP_WIDTH.setValue(appWidth);
+      ApplicationSettings.APP_HEIGHT.setValue(appHeight);
+      ApplicationSettings.WINDOW_X.setValue(loc.x);
+      ApplicationSettings.WINDOW_Y.setValue(loc.y);
+      ApplicationSettings.MAXIMIZE_WINDOW.setValue(false);
 
-    /**
-     * Returns a reference to the `LibraryMediator` instance.
-     *
-     * @return a reference to the `LibraryMediator` instance
-     */
-    private LibraryMediator getLibraryMediator() {
-        if (LIBRARY_MEDIATOR == null) {
-            LIBRARY_MEDIATOR = LibraryMediator.instance();
-        }
-        return LIBRARY_MEDIATOR;
+    } else if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+      ApplicationSettings.MAXIMIZE_WINDOW.setValue(true);
+      if (lastState != null && lastState.time == System.currentTimeMillis()) {
+        ApplicationSettings.WINDOW_X.setValue(lastState.x);
+        ApplicationSettings.WINDOW_Y.setValue(lastState.y);
+        lastState = null;
+      }
     }
+  }
 
-    /**
-     * Returns a reference to the `StatusLine` instance.
-     *
-     * @return a reference to the `StatusLine` instance
-     */
-    final StatusLine getStatusLine() {
-        if (STATUS_LINE == null) {
-            STATUS_LINE = new StatusLine();
-        }
-        return STATUS_LINE;
-    }
+  /** Build the Tab Structure based on advertising mode and Windows */
+  private void buildTabs(boolean useSearchTransfersSplitView) {
+    SearchTab searchTab = new SearchTab();
+    LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
+    // keep references to the tab objects.
+    TABS.put(Tabs.SEARCH, searchTab);
+    TABS.put(Tabs.LIBRARY, libraryTab);
 
-    /**
-     * Returns a reference to the `OptionsMediator` instance.
-     *
-     * @return a reference to the `OptionsMediator` instance
-     */
-    final OptionsMediator getOptionsMediator() {
-        if (OPTIONS_MEDIATOR == null) {
-            OPTIONS_MEDIATOR = OptionsMediator.instance();
-        }
-        return OPTIONS_MEDIATOR;
-    }
+    TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
+    // Add Search and Library tabs immediately so they're visible
+    addTabsPartial(useSearchTransfersSplitView);
+  }
 
-    final Tabs getSelectedTab() {
-        return currentSelectedTab != null ? currentSelectedTab : resolveDefaultTab();
-    }
-
-    /**
-     * Sets the selected index in the wrapped `JTabbedPane`.
-     *
-     * @param tab index to select
-     */
-    void setSelectedTab(GUIMediator.Tabs tab) {
-        if (tab == null) {
-            return;
-        }
-        if (!tab.isEnabled()) {
-            Tabs fallback = resolveDefaultTab();
-            if (fallback == tab) {
-                return;
+  private void scheduleDeferredTabInitialization(boolean useSearchTransfersSplitView) {
+    SwingUtilities.invokeLater(
+        () -> {
+          Tabs previousTab = getSelectedTab();
+          TransfersTab transfersTab;
+          if (!TABS.containsKey(Tabs.TRANSFERS)) {
+            transfersTab = new TransfersTab(getBTDownloadMediator());
+            TABS.put(Tabs.TRANSFERS, transfersTab);
+          } else {
+            Tab existingTransfers = TABS.get(Tabs.TRANSFERS);
+            transfersTab =
+                existingTransfers instanceof TransfersTab ? (TransfersTab) existingTransfers : null;
+          }
+          if (!TABS.containsKey(Tabs.SEARCH_TRANSFERS) && transfersTab != null) {
+            Tab searchTab = TABS.get(Tabs.SEARCH);
+            if (searchTab instanceof SearchTab) {
+              SearchTransfersTab searchTransfers =
+                  new SearchTransfersTab((SearchTab) searchTab, transfersTab);
+              TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
             }
-            setSelectedTab(fallback);
-            return;
-        }
-        CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
-        Tab t = TABS.get(tab);
-        if (t == null) {
-            Tabs fallback = resolveDefaultTab();
-            if (fallback != tab) {
-                setSelectedTab(fallback);
-            }
-            return;
-        }
-        addTabIfAbsent(tab, t);
-        cl.show(TABBED_PANE, t.getTitle());
-        currentSelectedTab = tab;
-        if (APPLICATION_HEADER != null) {
-            APPLICATION_HEADER.selectTab(t);
-        }
-    }
+          }
+          // Add all tabs now that deferred tabs are populated
+          addTabs(useSearchTransfersSplitView);
+          TABBED_PANE.setRequestFocusEnabled(false);
+          ApplicationHeader header = APPLICATION_HEADER;
+          if (header != null) {
+            header.refreshTabButtons(TABS);
+          }
+          Tabs tabToRestore = previousTab != null ? previousTab : resolveDefaultTab();
+          if (tabToRestore == null || !tabToRestore.isEnabled()) {
+            tabToRestore = resolveDefaultTab();
+          }
+          setSelectedTab(tabToRestore);
+        });
+  }
 
-    final Tab getTab(Tabs tabs) {
-        return TABS.get(tabs);
+  private Tabs resolveDefaultTab() {
+    if (Tabs.SEARCH.isEnabled()) {
+      return Tabs.SEARCH;
     }
-
-    public void resizeSearchTransferDivider(int newLocation) {
-        SearchTransfersTab searchTab = (SearchTransfersTab) TABS.get(Tabs.SEARCH_TRANSFERS);
-        searchTab.setDividerLocation(newLocation);
+    if (Tabs.SEARCH_TRANSFERS.isEnabled() && TABS.containsKey(Tabs.SEARCH_TRANSFERS)) {
+      return Tabs.SEARCH_TRANSFERS;
     }
-
-    /**
-     * simple state.
-     */
-    private static class WindowState {
-        private final int x;
-        private final int y;
-        private final long time;
-
-        WindowState() {
-            x = ApplicationSettings.WINDOW_X.getValue();
-            y = ApplicationSettings.WINDOW_Y.getValue();
-            time = System.currentTimeMillis();
-        }
+    if (Tabs.TRANSFERS.isEnabled() && TABS.containsKey(Tabs.TRANSFERS)) {
+      return Tabs.TRANSFERS;
     }
+    return Tabs.LIBRARY;
+  }
+
+  /** Add only Search and Library tabs initially (lightweight tabs that don't block EDT) */
+  private void addTabsPartial(boolean useSearchTransfersSplitView) {
+    updateEnabledTabs(useSearchTransfersSplitView);
+    // Only add Search and Library tabs initially
+    Tab searchTab = TABS.get(Tabs.SEARCH);
+    if (searchTab != null && Tabs.SEARCH.isEnabled()) {
+      addTabIfAbsent(Tabs.SEARCH, searchTab);
+    }
+    Tab libraryTab = TABS.get(Tabs.LIBRARY);
+    if (libraryTab != null && Tabs.LIBRARY.isEnabled()) {
+      addTabIfAbsent(Tabs.LIBRARY, libraryTab);
+    }
+  }
+
+  private void addTabs(boolean useSearchTransfersSplitView) {
+    updateEnabledTabs(useSearchTransfersSplitView);
+    for (Tabs tabEnum : Tabs.values()) {
+      final Tab tab = TABS.get(tabEnum);
+      if (tabEnum.isEnabled() && tab != null) {
+        addTabIfAbsent(tabEnum, tab);
+      }
+    }
+  }
+
+  /**
+   * Adds a tab to the `JTabbedPane` based on the data supplied in the `Tab` instance.
+   *
+   * @param tab the `Tab` instance containing data for the tab to add
+   */
+  private void addTabIfAbsent(Tabs tabEnum, Tab tab) {
+    if (tab == null || addedCards.contains(tabEnum)) {
+      return;
+    }
+    String title = tab.getTitle();
+    JComponent component = tab.getComponent();
+    if (component == null) {
+      return;
+    }
+    TABBED_PANE.add(component, title);
+    addedCards.add(tabEnum);
+  }
+
+  /**
+   * @param useSearchTransfersSplitView true if you want the old split style.
+   */
+  private void updateEnabledTabs(boolean useSearchTransfersSplitView) {
+    Tabs.SEARCH.setEnabled(!useSearchTransfersSplitView);
+    Tabs.TRANSFERS.setEnabled(!useSearchTransfersSplitView);
+    Tabs.SEARCH_TRANSFERS.setEnabled(useSearchTransfersSplitView);
+    Tabs.LIBRARY.setEnabled(true);
+  }
+
+  /** Sets the x,y location as well as the height and width of the main application `Frame`. */
+  private void setFrameDimensions() {
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice gd = ge.getDefaultScreenDevice();
+    GraphicsConfiguration gc = gd.getDefaultConfiguration();
+    Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    int locX;
+    int locY;
+    int appWidth =
+        Math.min(
+            screenSize.width - insets.left - insets.right,
+            ApplicationSettings.APP_WIDTH.getValue());
+    int appHeight =
+        Math.min(
+            screenSize.height - insets.top - insets.bottom,
+            ApplicationSettings.APP_HEIGHT.getValue());
+    // Set the location of our window based on whether or not
+    // the user has run the program before, and therefore may have
+    // modified the location of the main window.
+    if (ApplicationSettings.RUN_ONCE.getValue()) {
+      locX = Math.max(insets.left, ApplicationSettings.WINDOW_X.getValue());
+      locY = Math.max(insets.top, ApplicationSettings.WINDOW_Y.getValue());
+    } else {
+      locX = (screenSize.width - appWidth) / 2;
+      locY = (screenSize.height - appHeight) / 2;
+    }
+    // Make sure the Window is visible and not for example
+    // somewhere in the very bottom right corner.
+    if (locX + appWidth > screenSize.width) {
+      locX = Math.max(insets.left, screenSize.width - insets.left - insets.right - appWidth);
+    }
+    if (locY + appHeight > screenSize.height) {
+      locY = Math.max(insets.top, screenSize.height - insets.top - insets.bottom - appHeight);
+    }
+    FRAME.setLocation(locX, locY);
+    FRAME.setSize(new Dimension(appWidth, appHeight));
+    FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
+    FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
+    // re-maximize if we shutdown while maximized.
+    if (ApplicationSettings.MAXIMIZE_WINDOW.getValue()
+        && Toolkit.getDefaultToolkit().isFrameStateSupported(Frame.MAXIMIZED_BOTH)) {
+      FRAME.setExtendedState(Frame.MAXIMIZED_BOTH);
+    }
+  }
+
+  final BTDownloadMediator getBTDownloadMediator() {
+    if (BT_DOWNLOAD_MEDIATOR == null) {
+      BT_DOWNLOAD_MEDIATOR = BTDownloadMediator.instance();
+    }
+    return BT_DOWNLOAD_MEDIATOR;
+  }
+
+  /**
+   * Returns a reference to the `LibraryMediator` instance.
+   *
+   * @return a reference to the `LibraryMediator` instance
+   */
+  private LibraryMediator getLibraryMediator() {
+    if (LIBRARY_MEDIATOR == null) {
+      LIBRARY_MEDIATOR = LibraryMediator.instance();
+    }
+    return LIBRARY_MEDIATOR;
+  }
+
+  /**
+   * Returns a reference to the `StatusLine` instance.
+   *
+   * @return a reference to the `StatusLine` instance
+   */
+  final StatusLine getStatusLine() {
+    if (STATUS_LINE == null) {
+      STATUS_LINE = new StatusLine();
+    }
+    return STATUS_LINE;
+  }
+
+  /**
+   * Returns a reference to the `OptionsMediator` instance.
+   *
+   * @return a reference to the `OptionsMediator` instance
+   */
+  final OptionsMediator getOptionsMediator() {
+    if (OPTIONS_MEDIATOR == null) {
+      OPTIONS_MEDIATOR = OptionsMediator.instance();
+    }
+    return OPTIONS_MEDIATOR;
+  }
+
+  final Tabs getSelectedTab() {
+    return currentSelectedTab != null ? currentSelectedTab : resolveDefaultTab();
+  }
+
+  /**
+   * Sets the selected index in the wrapped `JTabbedPane`.
+   *
+   * @param tab index to select
+   */
+  void setSelectedTab(GUIMediator.Tabs tab) {
+    if (tab == null) {
+      return;
+    }
+    if (!tab.isEnabled()) {
+      Tabs fallback = resolveDefaultTab();
+      if (fallback == tab) {
+        return;
+      }
+      setSelectedTab(fallback);
+      return;
+    }
+    CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
+    Tab t = TABS.get(tab);
+    if (t == null) {
+      Tabs fallback = resolveDefaultTab();
+      if (fallback != tab) {
+        setSelectedTab(fallback);
+      }
+      return;
+    }
+    addTabIfAbsent(tab, t);
+    cl.show(TABBED_PANE, t.getTitle());
+    currentSelectedTab = tab;
+    if (APPLICATION_HEADER != null) {
+      APPLICATION_HEADER.selectTab(t);
+    }
+  }
+
+  final Tab getTab(Tabs tabs) {
+    return TABS.get(tabs);
+  }
+
+  public void resizeSearchTransferDivider(int newLocation) {
+    SearchTransfersTab searchTab = (SearchTransfersTab) TABS.get(Tabs.SEARCH_TRANSFERS);
+    searchTab.setDividerLocation(newLocation);
+  }
+
+  /** simple state. */
+  private static class WindowState {
+    private final int x;
+    private final int y;
+    private final long time;
+
+    WindowState() {
+      x = ApplicationSettings.WINDOW_X.getValue();
+      y = ApplicationSettings.WINDOW_Y.getValue();
+      time = System.currentTimeMillis();
+    }
+  }
 }
