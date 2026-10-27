@@ -769,6 +769,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.WindowCloseActionTest"
         includeTestsMatching "com.limegroup.gnutella.gui.FinalizerShutdownThreadTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ShutdownWindowImageTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.MainFrameWindowSizeTest"
     }
 
     testLogging {

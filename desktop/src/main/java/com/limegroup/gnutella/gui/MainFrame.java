@@ -225,36 +225,30 @@ public final class MainFrame {
     return APPLICATION_HEADER;
   }
 
+  /**
+   * The window size to persist, or null for a size too small to restore (an OS X bug could report
+   * one and leave the window permanently invisible, see GUIMediator.applyWindowSettings).
+   */
+  static Dimension sizeToSave(Dimension size) {
+    if (size.width <= 100 || size.height <= 100) {
+      return null;
+    }
+    return new Dimension(size);
+  }
+
   /** Saves the state of the Window to settings. */
   private void saveWindowState() {
     int state = FRAME.getExtendedState();
     if (state == Frame.NORMAL) {
-      // save the screen size and location
-      Dimension dim = GUIMediator.getAppSize();
-
-      int minAppWidth = ApplicationSettings.APP_WIDTH.getDefaultValue();
-      int minAppHeight = ApplicationSettings.APP_HEIGHT.getDefaultValue();
+      // Save the size the user chose. Never resize the frame here: this runs inside resize events,
+      // and a reshape there fought the user's drag. The frame's minimum size bounds the drag, and
+      // setFrameDimensions fits a saved size to the screen when restoring it.
+      Dimension dim = sizeToSave(GUIMediator.getAppSize());
+      if (dim == null) {
+        return;
+      }
       int appWidth = dim.width;
       int appHeight = dim.height;
-
-      boolean forceMinimumDimensions = false;
-
-      if (appWidth < minAppWidth) {
-        appWidth = minAppWidth;
-        forceMinimumDimensions = true;
-      }
-
-      if (appHeight < minAppHeight) {
-        appHeight = minAppHeight;
-        forceMinimumDimensions = true;
-      }
-
-      if (forceMinimumDimensions) {
-        FRAME.setSize(new Dimension(appWidth, appHeight));
-        FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
-        FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
-      }
-
       Point loc = GUIMediator.getAppLocation();
       ApplicationSettings.APP_WIDTH.setValue(appWidth);
       ApplicationSettings.APP_HEIGHT.setValue(appHeight);
