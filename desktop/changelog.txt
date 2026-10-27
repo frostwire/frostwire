@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The first Options open no longer freezes while the dialog's classes load from the jar — they now load in the background at startup
    - fix:Windows: the UI no longer freezes at startup or while the Library, Search and Transfers tables show file icons — native file-type icons are now looked up in the background and appear once loaded, instead of FrostWire waiting on the Windows shell for each one
    - fix:The setup wizard no longer freezes for seconds before it appears on first run or after an update — each page is built when you reach it instead of all of them up front, the wizard no longer writes the settings file while opening, scaled icons are reused, and the language list is checked in the background
    - fix:Dragging or resizing table columns no longer writes the column settings file on the UI thread for every column crossed — the save runs in the background, once per drag
