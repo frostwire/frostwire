@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui.util;
 
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -27,37 +26,37 @@ import java.util.concurrent.Future;
 /**
  * Static helper class for parallel background task execution from the GUI.
  *
- * Use this for independent, parallelizable tasks (file I/O, network requests, search operations).
- * For sequential operations that must be executed serially, use {@link BackgroundQueuedExecutorService}.
+ * <p>Use this for independent, parallelizable tasks (file I/O, network requests, search
+ * operations). For sequential operations that must be executed serially, use {@link
+ * BackgroundQueuedExecutorService}.
  */
 public class DesktopParallelExecutor {
-    /**
-     * Thread pool for parallel background execution.
-     * 4 threads allows reasonable parallelism without excessive resource consumption.
-     * The queue is unbounded: most callers run on the EDT and cannot handle
-     * RejectedExecutionException, so extra tasks wait their turn instead.
-     */
-    private static final ExecutorService POOL = ExecutorsHelper.newFixedSizeUnboundedThreadPool(4, "DesktopParallelExecutor");
+  /**
+   * Thread pool for parallel background execution. 4 threads allows reasonable parallelism without
+   * excessive resource consumption. The queue is unbounded: most callers run on the EDT and cannot
+   * handle RejectedExecutionException, so extra tasks wait their turn instead.
+   */
+  private static final ExecutorService POOL =
+      ExecutorsHelper.newFixedSizeUnboundedThreadPool(4, "DesktopParallelExecutor");
 
-    private DesktopParallelExecutor() {
-    }
+  private DesktopParallelExecutor() {}
 
-    /**
-     * Executes the specified runnable in parallel when threads are available.
-     *
-     * @param r the runnable to execute
-     */
-    public static void execute(Runnable r) {
-        POOL.execute(r);
-    }
+  /**
+   * Executes the specified runnable in parallel when threads are available.
+   *
+   * @param r the runnable to execute
+   */
+  public static void execute(Runnable r) {
+    POOL.execute(r);
+  }
 
-    /**
-     * Submits a callable task for parallel execution and returns a Future for the result.
-     *
-     * @param c the callable to execute
-     * @return a Future representing the pending result of the callable
-     */
-    public static <T> Future<T> submit(Callable<T> c) {
-        return POOL.submit(c);
-    }
+  /**
+   * Submits a callable task for parallel execution and returns a Future for the result.
+   *
+   * @param c the callable to execute
+   * @return a Future representing the pending result of the callable
+   */
+  public static <T> Future<T> submit(Callable<T> c) {
+    return POOL.submit(c);
+  }
 }
