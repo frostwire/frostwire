@@ -22,6 +22,7 @@ import com.frostwire.gui.theme.AbstractSkinPainter;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ImageManipulator;
+import com.limegroup.gnutella.gui.SizeStableRevalidation;
 import com.limegroup.gnutella.settings.SearchSettings;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -162,7 +163,7 @@ final class SchemaBox extends JPanel {
     Icon icon = type.getIcon();
     Icon disabledIcon = null;
     Icon rolloverIcon = null;
-    JToggleButton button = new JRadioButton("0");
+    JToggleButton button = new CounterButton("0");
     if (icon != null) {
       disabledIcon = ImageManipulator.darken(icon);
       rolloverIcon = ImageManipulator.brighten(icon);
@@ -274,6 +275,35 @@ final class SchemaBox extends JPanel {
         g.fill(s);
         g.setPaint(STROKE);
         g.draw(s);
+      }
+    }
+  }
+
+  /**
+   * A media type button whose result counter goes up with each search result. The count only asks
+   * for a layout when its new digits change the button's size (frostwire/frostwire#1342).
+   */
+  static final class CounterButton extends JRadioButton {
+    /** Null while JRadioButton's constructor runs. */
+    private final SizeStableRevalidation revalidation = new SizeStableRevalidation();
+
+    CounterButton(String count) {
+      super(count);
+    }
+
+    @Override
+    public void setText(String text) {
+      if (revalidation == null) {
+        super.setText(text);
+      } else {
+        revalidation.setText(() -> super.setText(text));
+      }
+    }
+
+    @Override
+    public void revalidate() {
+      if (revalidation == null || revalidation.allowsRevalidate(this)) {
+        super.revalidate();
       }
     }
   }
