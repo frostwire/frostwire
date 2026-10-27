@@ -10,6 +10,7 @@ package com.limegroup.gnutella.gui.util;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +37,10 @@ class EdtFedQueuesStayWarmTest {
         "IconLoader",
         (Executor)
             staticMethod("com.limegroup.gnutella.gui.NativeFileIconController", "newLookupQueue"));
+    queues.put(
+        "FileChooserDirectoryDisplayLoader",
+        (Executor)
+            staticField("com.frostwire.gui.theme.BaseFileChooserUI", "DIRECTORY_DISPLAY_LOADER"));
 
     Map<String, Thread> before = new LinkedHashMap<>();
     for (Map.Entry<String, Executor> queue : queues.entrySet()) {
@@ -55,6 +60,12 @@ class EdtFedQueuesStayWarmTest {
     Method method = Class.forName(className).getDeclaredMethod(name);
     method.setAccessible(true);
     return method.invoke(null);
+  }
+
+  private static Object staticField(String className, String name) throws Exception {
+    Field field = Class.forName(className).getDeclaredField(name);
+    field.setAccessible(true);
+    return field.get(null);
   }
 
   private static Thread workerOf(Executor queue) throws Exception {

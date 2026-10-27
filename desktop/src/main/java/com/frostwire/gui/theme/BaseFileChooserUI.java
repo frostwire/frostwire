@@ -18,8 +18,8 @@
 
 package com.frostwire.gui.theme;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.WarmExecutors;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -55,9 +55,13 @@ import javax.swing.plaf.basic.BasicFileChooserUI;
  * @author Jeff Dinkins
  */
 public class BaseFileChooserUI extends BasicFileChooserUI {
-  /** Looks up the directory combo box's display names and icons, off the EDT. */
+  /**
+   * Looks up the directory combo box's display names and icons, off the EDT. The EDT feeds it
+   * whenever the chooser changes folder, so its worker never times out and feeding it never starts
+   * a thread.
+   */
   private static final ExecutorService DIRECTORY_DISPLAY_LOADER =
-      ExecutorsHelper.newProcessingQueue("FileChooserDirectoryDisplayLoader");
+      WarmExecutors.serialQueue("FileChooserDirectoryDisplayLoader");
 
   private static final int space = 10;
   private static final Dimension hstrut5 = new Dimension(5, 1);
