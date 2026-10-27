@@ -87,12 +87,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   /** Variable for the path */
   private String _path;
 
-  /** Whether or not the icon has been loaded. */
-  private boolean _iconLoaded = false;
-
-  /** Whether or not the icon has been scheduled to load. */
-  private boolean _iconScheduledForLoad = false;
-
   private Date lastModified;
   private String license;
   private PaymentOptions paymentOptions;
@@ -102,6 +96,12 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   private PlayableCell cachedTypeCell;
   private PlayableCell cachedPathCell;
   private PlayableCell cachedModTimeCell;
+
+  /**
+   * Reused while the icon is the same, so the table's change-detecting refresh only repaints a row
+   * when its icon changes (e.g. the native icon replacing the placeholder).
+   */
+  private PlayableIconCell cachedIconCell;
 
   LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
     super();
@@ -234,7 +234,11 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
           actionsHolder.setPlaying(false);
           return actionsHolder;
         case ICON_IDX:
-          return new PlayableIconCell(getIcon());
+          Icon icon = getIcon();
+          if (cachedIconCell == null || cachedIconCell.getIcon() != icon) {
+            cachedIconCell = new PlayableIconCell(icon);
+          }
+          return cachedIconCell;
         case NAME_IDX:
           return nameCell;
         case SIZE_IDX:
@@ -339,23 +343,9 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
   }
 
   private Icon getIcon() {
-    boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
-    if (!iconAvailable && !_iconScheduledForLoad) {
-      _iconScheduledForLoad = true;
-      // The icon load runs on the EDT; queue it there directly rather than parking a pool
-      // thread on invokeAndWait for every rendered row. Deferred, never inline: getIcon()
-      // is called while the table paints.
-      SwingUtilities.invokeLater(
-          () -> {
-            IconManager.instance().getIconForFile(initializer);
-            _iconLoaded = true;
-            _model.refresh();
-          });
-      return null;
-    } else if (_iconLoaded || iconAvailable) {
-      return IconManager.instance().getIconForFile(initializer);
-    } else {
-      return null;
-    }
+    // Called from getValueAt on the EDT. IconManager never does the native lookup there: an
+    // uncached icon comes back as a placeholder and loads in the background, and the next refresh
+    // repaints this row with the native icon.
+    return IconManager.instance().getIconForFile(initializer);
   }
 }
