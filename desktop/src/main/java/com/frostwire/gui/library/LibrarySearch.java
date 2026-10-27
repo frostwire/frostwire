@@ -21,6 +21,7 @@ package com.frostwire.gui.library;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.searchfield.JXSearchField.SearchMode;
 import com.frostwire.gui.searchfield.SearchField;
+import com.frostwire.util.BoundedFileWalker;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -35,11 +36,12 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
 
 /**
@@ -342,51 +344,61 @@ public class LibrarySearch extends JPanel {
       if (haystackDir == null || !haystackDir.isDirectory() || !haystackDir.exists()) {
         return;
       }
-      final List<File> directories = new ArrayList<>();
-      final List<File> results = new ArrayList<>();
       SearchFileFilter searchFilter = new SearchFileFilter(_query);
-      for (File child :
-          FileUtils.listFiles(haystackDir)) { // haystackDir.listFiles(searchFilter)) {
-        if (canceled) {
-          return;
-        }
-        /////
-        // Stop search if the user selected another item in the library tree
-        DirectoryHolder currentDirectoryHolder =
-            LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
-        if (!directoryHolder.equals(currentDirectoryHolder)) {
-          return;
-        }
-        /////
-        if (excludeFiles.contains(child)) {
-          continue;
-        }
-        if (child.isHidden()) {
-          continue;
-        }
-        if (child.isDirectory() && !excludedSubFolders.contains(child)) {
-          directories.add(child);
-        } else if (child.isFile()) {
-          if (directoryHolder instanceof FileSettingDirectoryHolder) {
-            if (searchFilter.accept(child, false)) {
-              results.add(child);
+      File root = haystackDir.getAbsoluteFile();
+      // Bounded: symlinked folders are not entered and the walk is capped, so a symlink loop
+      // can't make the search recurse forever (frostwire/frostwire#1336).
+      BoundedFileWalker.walk(
+          root,
+          new BoundedFileWalker.Visitor() {
+            private List<File> results = new ArrayList<>();
+
+            @Override
+            public boolean isCanceled() {
+              // Stop search if the user selected another item in the library tree
+              return canceled
+                  || !directoryHolder.equals(
+                      LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder());
             }
-          } else if (directoryHolder.accept(child)) {
-            results.add(child);
-          }
-        }
-      }
-      Runnable r =
-          () -> {
-            LibraryMediator.instance().addFilesToLibraryTable(results);
-            if (directoryHolder instanceof SavedFilesDirectoryHolder) {
-              LibraryFilesTableMediator.instance().resetAudioPlayerFileView();
+
+            @Override
+            public boolean enterDirectory(Path dir) {
+              File d = dir.toFile();
+              return d.equals(root)
+                  || (!excludeFiles.contains(d)
+                      && !d.isHidden()
+                      && !excludedSubFolders.contains(d));
             }
-          };
-      GUIMediator.safeInvokeLater(r);
-      for (File directory : directories) {
-        search(directory, excludeFiles, excludedSubFolders);
-      }
+
+            @Override
+            public void file(Path path, BasicFileAttributes attrs) {
+              File child = path.toFile();
+              if (excludeFiles.contains(child) || child.isHidden()) {
+                return;
+              }
+              if (directoryHolder instanceof FileSettingDirectoryHolder
+                  ? searchFilter.accept(child, false)
+                  : directoryHolder.accept(child)) {
+                results.add(child);
+              }
+            }
+
+            @Override
+            public void leaveDirectory(Path dir) {
+              if (results.isEmpty() && !dir.toFile().equals(root)) {
+                return;
+              }
+              final List<File> batch = results;
+              results = new ArrayList<>();
+              GUIMediator.safeInvokeLater(
+                  () -> {
+                    LibraryMediator.instance().addFilesToLibraryTable(batch);
+                    if (directoryHolder instanceof SavedFilesDirectoryHolder) {
+                      LibraryFilesTableMediator.instance().resetAudioPlayerFileView();
+                    }
+                  });
+            }
+          });
     }
 
     private void search(List<File> cache) {
