@@ -162,6 +162,41 @@ class JdkWarmUpTest {
   }
 
   @Test
+  void everySplashPackageToLoadHasClasses() throws Exception {
+    Path build = JdkWarmUp.codeSourceOf(JdkWarmUp.class);
+    assertNotNull(build);
+    for (String pkg : JdkWarmUp.SPLASH_PACKAGES_TO_LOAD) {
+      assertFalse(JdkWarmUp.classNamesIn(build, List.of(pkg)).isEmpty(), pkg);
+    }
+  }
+
+  /**
+   * The splash window's progress bar paints with the skin's SkinProgressBarPainter, whose first
+   * paint loaded ShapeGenerator from the jar on the EDT (Icebase #75b997df1b51, GitHub #1341).
+   */
+  @Test
+  void splashClassWarmUpCoversTheSkinPainterClassesAndRunsBeforeTheSplashWait() throws Exception {
+    List<String> classNames =
+        JdkWarmUp.classNamesIn(
+            JdkWarmUp.codeSourceOf(JdkWarmUp.class), JdkWarmUp.SPLASH_PACKAGES_TO_LOAD);
+    for (String className :
+        List.of(
+            "com.frostwire.gui.theme.SkinProgressBarPainter",
+            "com.frostwire.gui.theme.ShapeGenerator",
+            "com.frostwire.gui.theme.ShapeGenerator$CornerStyle")) {
+      assertTrue(classNames.contains(className), className);
+      assertTrue(isLoadable(className), className);
+    }
+
+    String source = warmUpSource();
+    int splashClasses = source.indexOf("SPLASH_PACKAGES_TO_LOAD");
+    assertTrue(splashClasses >= 0, "splash classes not loaded by warmUp");
+    assertTrue(
+        splashClasses < source.indexOf("awaitSplashShown(SPLASH_SHOWN"),
+        "splash classes wait for the splash they are needed by");
+  }
+
+  @Test
   void appClassWarmUpCoversTheClassesTheEdtLoadedInIcebaseReports() throws Exception {
     List<String> classNames =
         JdkWarmUp.classNamesIn(

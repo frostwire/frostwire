@@ -65,8 +65,9 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Locale data and tables behind the first number format, date format and collator.
  *   <li>String concatenation: the first {@code +} on strings that needs a generated class loads the
  *       class-file API, see {@link #linkStringConcat}.
- *   <li>FrostWire's own classes for the setup wizard, the main window, the big panes built right
- *       after it and the Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not
+ *   <li>FrostWire's own classes for the splash window's skin painters, see {@link
+ *       #SPLASH_PACKAGES_TO_LOAD}, and for the setup wizard, the main window, the big panes built
+ *       right after it and the Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not
  *       initialized, since their static initializers may create Swing objects.
  * </ul>
  *
@@ -104,6 +105,13 @@ public final class JdkWarmUp {
    */
   static final List<String> CLASSES_TO_INITIALIZE =
       List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
+
+  /**
+   * FrostWire packages whose classes the splash window paints with, loaded before it shows like the
+   * other splash steps: the skin's progress bar painter (SkinProgressBarPainter) builds its shape
+   * with ShapeGenerator, which the splash's first paint read from the jar on the EDT.
+   */
+  static final List<String> SPLASH_PACKAGES_TO_LOAD = List.of("com.frostwire.gui.theme");
 
   /**
    * FrostWire packages whose classes the EDT reads from the jar and defines in bulk while it shows
@@ -240,9 +248,17 @@ public final class JdkWarmUp {
         LOG.warn("Warm-up of " + className + " failed: " + t.getMessage(), t);
       }
     }
+    Path location = codeSourceOf(JdkWarmUp.class);
+    try {
+      if (location != null) {
+        loadWithoutInitializing(
+            classNamesIn(location, SPLASH_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
+      }
+    } catch (Throwable t) {
+      LOG.warn("Splash class warm-up failed: " + t.getMessage(), t);
+    }
     try {
       awaitSplashShown(SPLASH_SHOWN, SPLASH_WAIT_MS);
-      Path location = codeSourceOf(JdkWarmUp.class);
       if (location != null) {
         loadWithoutInitializing(
             classNamesIn(location, APP_PACKAGES_TO_LOAD), JdkWarmUp.class.getClassLoader());
