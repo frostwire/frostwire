@@ -751,6 +751,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.dnd.TransferVisualizerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.init.*"
     }
 
     testLogging {

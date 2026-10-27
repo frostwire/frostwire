@@ -224,11 +224,6 @@ abstract class SetupWindow extends JPanel {
     validate();
   }
 
-  Dimension calculatePreferredSize() {
-    createWindow();
-    return getLayout().preferredLayoutSize(this);
-  }
-
   static class MultiLineLabel extends JTextArea {
     /**
      * Creates a label that can have multiple lines and that has the default width.

@@ -54,7 +54,6 @@ public final class SetupManager {
   /** holder for the current setup window. */
   private SetupWindow _currentWindow;
 
-  private Dimension holderPreferredSize;
   private final PreviousAction previousAction = new PreviousAction();
   private final NextAction nextAction = new NextAction();
   private final FinishAction finishAction = new FinishAction();
@@ -131,45 +130,36 @@ public final class SetupManager {
     // insert the WelcomeWindow & FinishWindow at all.
     // if(partial && !(windows.size() == 1 && windows.get(0) instanceof IntentWindow))
     windows.add(0, new WelcomeWindow(this, partial));
-    holderPreferredSize = new Dimension(0, 0);
-    // Iterate through each displayed window and set them up correctly.
-    SetupWindow prior = null;
-    for (SetupWindow current : windows) {
-      _setupWindowHolder.add(current);
-      //noinspection ReplaceNullCheck
-      if (prior == null) {
-        current.setPrevious(current);
-      } else {
-        current.setPrevious(prior);
-      }
-      if (prior != null) {
-        prior.setNext(current);
-      }
-      prior = current;
-      Dimension d = current.calculatePreferredSize();
-      if (d.width > holderPreferredSize.width) {
-        holderPreferredSize.width = d.width;
-      }
-      if (d.height > holderPreferredSize.height) {
-        holderPreferredSize.height = d.height;
-      }
-    }
-    holderPreferredSize.width += 20;
-    holderPreferredSize.height += 20;
-    if (holderPreferredSize.width > 900) {
-      holderPreferredSize.width = 900;
-    }
-    if (holderPreferredSize.height > 750) {
-      holderPreferredSize.height = 750;
-    }
-    assert prior != null;
-    prior.setNext(prior);
+    linkPages(_setupWindowHolder, windows);
     // Build the dialog structure first
     SetupWindow firstWindow = windows.get(0);
     buildDialog(firstWindow);
     // Defer pack and show to a separate EDT event to avoid blocking current event
     // This allows the EDT watchdog timer to reset between events
     SwingUtilities.invokeLater(this::packAndShowDialog);
+  }
+
+  /**
+   * Adds the pages to the card holder and chains them in order. The first page is its own previous
+   * page and the last page is its own next page.
+   *
+   * <p>Pages are not built here. Each page builds its components when it is shown ({@link
+   * SetupWindow#handleWindowOpeningEvent()}), so the first-run event only builds the first page
+   * instead of every page in the wizard.
+   */
+  static void linkPages(SetupWindowHolder holder, List<SetupWindow> windows) {
+    SetupWindow prior = null;
+    for (SetupWindow current : windows) {
+      holder.add(current);
+      current.setPrevious(prior == null ? current : prior);
+      if (prior != null) {
+        prior.setNext(current);
+      }
+      prior = current;
+    }
+    if (prior != null) {
+      prior.setNext(prior);
+    }
   }
 
   /*
@@ -204,9 +194,6 @@ public final class SetupManager {
     dialog.setLocation((screenSize.width - d.width) / 2, (screenSize.height - d.height) / 2);
     dialog.setSize((int) d.getWidth(), (int) d.getHeight());
     // create the setup buttons panel
-    if (OSUtils.isWindows()) {
-      _setupWindowHolder.setPreferredSize(holderPreferredSize);
-    }
     setupPanel.add(_setupWindowHolder);
     setupPanel.add(Box.createVerticalStrut(17));
     JPanel bottomRow = new JPanel();
@@ -222,9 +209,8 @@ public final class SetupManager {
     show(firstWindow);
     // add the panel and make it visible
     container.add(setupPanel);
-    if (!OSUtils.isWindows()) {
-      container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
-    }
+    // Every page is laid out for this size, so the dialog is sized without building them all.
+    container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
   }
 
   /*
