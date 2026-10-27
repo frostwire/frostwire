@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.IntStream;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
@@ -45,6 +46,8 @@ import javax.swing.text.html.HTMLEditorKit;
  * paint or click that needs them does not stall the EDT.
  *
  * <ul>
+ *   <li>Painters: Nimbus builds the splash window's progress bar painters by reflection, see {@link
+ *       #createPainters}.
  *   <li>Shaping: the first complex-text layout initializes HarfBuzz ({@code HBShaper.<clinit>},
  *       which builds a Foreign Function linker).
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
@@ -63,8 +66,8 @@ import javax.swing.text.html.HTMLEditorKit;
  *       static initializers may create Swing objects.
  * </ul>
  *
- * Steps run in the order the EDT first needs them: the splash window's text and progress label,
- * then the main window, then tables.
+ * Steps run in the order the EDT first needs them: the splash window's progress bar, text and
+ * label, then the main window, then tables.
  *
  * <p>Call after the look and feel is installed, so the UI fonts are the ones the app will paint
  * with.
@@ -136,6 +139,11 @@ public final class JdkWarmUp {
 
   private static final String CLASS_SUFFIX = ".class";
 
+  /** Painters of the splash window's progress bar, the first painted component Nimbus builds. */
+  static final String SPLASH_PAINTER_KEY_PREFIX = "ProgressBar[";
+
+  private static final String PAINTER_KEY_SUFFIX = "Painter";
+
   private JdkWarmUp() {}
 
   public static void startInBackground() {
@@ -145,6 +153,11 @@ public final class JdkWarmUp {
   }
 
   private static void warmUp() {
+    try {
+      createPainters(UIManager.getDefaults(), SPLASH_PAINTER_KEY_PREFIX);
+    } catch (Throwable t) {
+      LOG.warn("Painter warm-up failed: " + t.getMessage(), t);
+    }
     try {
       char[] text = SHAPING_SAMPLE.toCharArray();
       new Font(Font.DIALOG, Font.PLAIN, 12)
@@ -321,6 +334,28 @@ public final class JdkWarmUp {
       // Best effort: the first HTML label on the EDT pays this instead.
       LOG.warn("HTML engine warm-up failed: " + t.getMessage(), t);
     }
+  }
+
+  /**
+   * Creates and discards the lazily built painters whose keys start with the prefix
+   * ("ProgressBar[Enabled].foregroundPainter"). Nimbus constructs each painter by reflection when a
+   * component's style first needs it, and the first such construction builds the painter class's
+   * constructor accessor and its method handle adapters; the splash window's progress bar paid that
+   * on the EDT. Painters are plain objects, and the table keeps its lazy values. Returns how many
+   * painters were created.
+   */
+  static int createPainters(UIDefaults defaults, String keyPrefix) {
+    int created = 0;
+    for (Map.Entry<?, ?> entry : List.copyOf(defaults.entrySet())) {
+      if (entry.getKey() instanceof String key
+          && key.startsWith(keyPrefix)
+          && key.endsWith(PAINTER_KEY_SUFFIX)
+          && entry.getValue() instanceof UIDefaults.LazyValue painter) {
+        painter.createValue(defaults);
+        created++;
+      }
+    }
+    return created;
   }
 
   /** One font per family and style among the values; sizes share the same font data. */

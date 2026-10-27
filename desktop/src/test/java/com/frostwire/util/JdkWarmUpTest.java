@@ -17,6 +17,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.RenderingHints;
+import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import javax.swing.UIDefaults;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.text.html.parser.DTD;
 import org.junit.jupiter.api.Test;
@@ -208,6 +210,74 @@ class JdkWarmUpTest {
       assertDoesNotThrow(() -> JdkWarmUp.warmUpNumberFormat(locale), locale::toString);
       assertDoesNotThrow(() -> JdkWarmUp.warmUpDateFormatAndCollation(locale), locale::toString);
     }
+  }
+
+  @Test
+  void createPaintersBuildsOnlyThePrefixedLazyPaintersOnTheCallingThread() throws Exception {
+    List<String> built = new ArrayList<>();
+    List<Boolean> builtOnEdt = new ArrayList<>();
+    UIDefaults defaults = new UIDefaults();
+    for (String key :
+        List.of(
+            "ProgressBar[Enabled].foregroundPainter",
+            "ProgressBar[Disabled].backgroundPainter",
+            "Button[Enabled].backgroundPainter",
+            "ProgressBar[Enabled].cycleTime")) {
+      defaults.put(key, recordingLazyValue(key, built, builtOnEdt));
+    }
+    defaults.put("ProgressBar[Enabled+Finished].foregroundPainter", "not lazy");
+
+    int[] created = new int[1];
+    Thread warmUp =
+        new Thread(
+            () ->
+                created[0] =
+                    JdkWarmUp.createPainters(defaults, JdkWarmUp.SPLASH_PAINTER_KEY_PREFIX));
+    warmUp.start();
+    warmUp.join();
+
+    assertEquals(2, created[0]);
+    assertEquals(
+        Set.of("ProgressBar[Enabled].foregroundPainter", "ProgressBar[Disabled].backgroundPainter"),
+        Set.copyOf(built));
+    assertEquals(List.of(false, false), builtOnEdt);
+    // The table keeps its lazy values: the warm-up does not change what the EDT later resolves.
+    assertTrue(
+        Proxy.isProxyClass(
+            defaults.entrySet().stream()
+                .filter(e -> "ProgressBar[Enabled].foregroundPainter".equals(e.getKey()))
+                .findFirst()
+                .orElseThrow()
+                .getValue()
+                .getClass()));
+  }
+
+  @Test
+  void nimbusHasProgressBarPaintersToCreate() {
+    assertTrue(
+        JdkWarmUp.createPainters(
+                new NimbusLookAndFeel().getDefaults(), JdkWarmUp.SPLASH_PAINTER_KEY_PREFIX)
+            > 0);
+  }
+
+  private static UIDefaults.LazyValue recordingLazyValue(
+      String key, List<String> built, List<Boolean> builtOnEdt) {
+    return (UIDefaults.LazyValue)
+        Proxy.newProxyInstance(
+            JdkWarmUpTest.class.getClassLoader(),
+            new Class<?>[] {UIDefaults.LazyValue.class},
+            (proxy, method, args) -> {
+              if (method.getName().equals("createValue")) {
+                built.add(key);
+                builtOnEdt.add(EventQueue.isDispatchThread());
+                return new Object();
+              }
+              return switch (method.getName()) {
+                case "hashCode" -> System.identityHashCode(proxy);
+                case "equals" -> proxy == args[0];
+                default -> key;
+              };
+            });
   }
 
   @Test
