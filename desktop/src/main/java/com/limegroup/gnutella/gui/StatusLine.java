@@ -943,6 +943,18 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
   }
 
+  private static final int BANDWIDTH_RATE_COLUMN = 3;
+
+  /** The bandwidth tooltip's rows, laid out by {@link GridToolTip}. */
+  static String bandwidthToolTipText(
+      int downloads, String sDown, int uploads, String sUp, String totalDown, String totalUp) {
+    return GridToolTip.text(
+        new String[] {I18n.tr("Downloads:"), String.valueOf(downloads), "@", sDown},
+        new String[] {I18n.tr("Uploads:"), String.valueOf(uploads), "@", sUp},
+        new String[] {I18n.tr("Total Downstream:"), totalDown},
+        new String[] {I18n.tr("Total Upstream:"), totalUp});
+  }
+
   /** Bandwidth labels: their text changes every second, see {@link SizeStableLabel}. */
   private class LazyTooltip extends SizeStableLabel {
     LazyTooltip(ImageIcon icon) {
@@ -960,33 +972,21 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
       String totalUp = GUIUtils.getBytesInHuman(btDownloadMediator.getTotalBytesUploaded());
       int downloads = GUIMediator.instance().getCurrentDownloads();
       int uploads = GUIMediator.instance().getCurrentUploads();
-      //  create good-looking table tooltip
-      return "<html><table>"
-          + "<tr><td>"
-          + I18n.tr("Downloads:")
-          + "</td><td>"
-          + downloads
-          + "</td><td>@</td><td align=right>"
-          + sDown
-          + "</td></tr>"
-          + "<tr><td>"
-          + I18n.tr("Uploads:")
-          + "</td><td>"
-          + uploads
-          + "</td><td>@</td><td align=right>"
-          + sUp
-          + "</td></tr>"
-          + "<tr><td>"
-          + I18n.tr("Total Downstream:")
-          + "</td><td>"
-          + totalDown
-          + "</td></tr>"
-          + "<tr><td>"
-          + I18n.tr("Total Upstream:")
-          + "</td><td>"
-          + totalUp
-          + "</td></tr>"
-          + "</table></html>";
+      return bandwidthToolTipText(downloads, sDown, uploads, sUp, totalDown, totalUp);
     }
+
+    /**
+     * A plain grid: the HTML table it replaces was parsed and laid out on the EDT on each hover.
+     */
+    @Override
+    public JToolTip createToolTip() {
+      return createBandwidthToolTip(this);
+    }
+  }
+
+  static JToolTip createBandwidthToolTip(JComponent owner) {
+    JToolTip tip = new GridToolTip(BANDWIDTH_RATE_COLUMN);
+    tip.setComponent(owner);
+    return tip;
   }
 }
