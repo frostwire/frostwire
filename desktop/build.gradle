@@ -755,6 +755,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.util.RestartDialogGateTest"
         includeTestsMatching "com.frostwire.gui.theme.PlatformFontsTest"
         includeTestsMatching "com.frostwire.gui.theme.BaseFileChooserUIDirectoryComboTest"
+        includeTestsMatching "com.frostwire.gui.theme.IconRepainterCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.init.*"
         includeTestsMatching "com.limegroup.gnutella.gui.ImageManipulatorResizeCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.LanguageUtilsDisplayableLocalesTest"

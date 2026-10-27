@@ -3,6 +3,10 @@ package com.frostwire.gui.theme;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.*;
 
 /**
@@ -10,6 +14,16 @@ import javax.swing.*;
  * maybe we can paint them lighter
  */
 public class IconRepainter {
+  /**
+   * Brightened copies by source icon and scale factor. Callers brighten from renderers that run on
+   * every paint (the Library tree repaints each second) and from refresh code that sets the result
+   * on a button or label; a fresh copy each time re-ran the filter on the EDT and, set on a button,
+   * dropped the disabled icon Swing caches for it. Weak keys let a dropped source icon take its
+   * copies with it.
+   */
+  private static final Map<Icon, Map<Float, Icon>> BRIGHTENED =
+      Collections.synchronizedMap(new WeakHashMap<>());
+
   /**
    * Brightens the icon if the current theme is not the default one. It uses a default scale factor
    * of 4f to make the icon pretty much white.
@@ -27,7 +41,8 @@ public class IconRepainter {
    *
    * @param original The original icon to be brightened.
    * @param scaleFactor The scale factor for brightness adjustment.
-   * @return A new ImageIcon that is brightened if the current theme is not the default one.
+   * @return An ImageIcon that is brightened if the current theme is not the default one. It is
+   *     shared between callers, so it must not be modified.
    */
   public static Icon brightenIfDarkTheme(Icon original, float scaleFactor) {
     if (original == null || !ThemeMediator.isDarkLafThemeOn()) {
@@ -37,7 +52,18 @@ public class IconRepainter {
       // Always ensure the returned icon is an ImageIcon
       return toImageIcon(original);
     }
+    return brighten(original, scaleFactor);
+  }
 
+  /**
+   * Returns {@code original} brightened by {@code scaleFactor}, filtered once per icon and factor.
+   */
+  static Icon brighten(Icon original, float scaleFactor) {
+    Map<Float, Icon> copies = BRIGHTENED.computeIfAbsent(original, k -> new ConcurrentHashMap<>());
+    return copies.computeIfAbsent(scaleFactor, f -> filter(original, f));
+  }
+
+  private static Icon filter(Icon original, float scaleFactor) {
     BufferedImage buffered = toBufferedImage(original);
 
     // Apply a brightness scale (1.2f = 20% brighter, 3f = 300% brighter)
