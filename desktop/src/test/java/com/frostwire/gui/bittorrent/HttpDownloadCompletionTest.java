@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -229,6 +230,57 @@ class HttpDownloadCompletionTest {
       assertTrue(fixture.download.isCompleted());
       assertEquals(1, fixture.postprocessCalls.get());
       assertEquals(0, fixture.seedCalls.get());
+    }
+  }
+
+  @Test
+  void stateReadersDoNotWaitForWorkUnderTheCompletionLock() throws Exception {
+    // frostwire/frostwire#1319: the transfers table reads isCompleted()/getState() while painting.
+    CountDownLatch seeding = new CountDownLatch(1);
+    CountDownLatch releaseSeeding = new CountDownLatch(1);
+    HttpDownload download =
+        new HttpDownload(
+            "http://127.0.0.1:1/unused",
+            "locked",
+            "locked.mp4",
+            VIDEO.length,
+            null,
+            false,
+            true,
+            null,
+            task -> {},
+            dl -> {
+              // Runs while the completing thread holds completionLock.
+              seeding.countDown();
+              try {
+                releaseSeeding.await(10, TimeUnit.SECONDS);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            });
+    File incomplete = new File(HttpBTDownload.getIncompleteFolder(), "locked.incomplete.mp4");
+    Files.write(incomplete.toPath(), VIDEO);
+    download.httpClient.getListener().onData(download.httpClient, VIDEO, 0, VIDEO.length);
+    ExecutorService threads = Executors.newFixedThreadPool(2);
+    try {
+      Future<?> completion =
+          threads.submit(() -> download.httpClient.getListener().onComplete(download.httpClient));
+      assertTrue(seeding.await(5, TimeUnit.SECONDS), "Completion did not reach the seed hook");
+      Future<Boolean> reader =
+          threads.submit(
+              () -> download.isCompleted() && download.getState() == TransferState.FINISHED);
+      try {
+        assertTrue(reader.get(2, TimeUnit.SECONDS), "Readers must see the published state");
+      } catch (TimeoutException e) {
+        fail("isCompleted()/getState() blocked on the completion lock");
+      } finally {
+        releaseSeeding.countDown();
+      }
+      completion.get(5, TimeUnit.SECONDS);
+    } finally {
+      releaseSeeding.countDown();
+      threads.shutdownNow();
+      assertTrue(threads.awaitTermination(5, TimeUnit.SECONDS));
     }
   }
 

@@ -197,19 +197,15 @@ public class HttpDownload extends HttpBTDownload {
     }
   }
 
+  /**
+   * Lock-free: the transfers table calls this while painting, and completionLock can be held across
+   * the incomplete-file move and cleanup. FINISHED is the last volatile write of completion, after
+   * onComplete() returns and bytesReceived is final, so a reader never sees it early.
+   */
   @Override
   public boolean isCompleted() {
-    synchronized (completionLock) {
-      // Receiving all HTTP bytes is not completion while a subclass is replacing the file.
-      return bytesReceived > 0 && state == TransferState.FINISHED;
-    }
-  }
-
-  @Override
-  public TransferState getState() {
-    synchronized (completionLock) {
-      return state;
-    }
+    // Receiving all HTTP bytes is not completion while a subclass is replacing the file.
+    return state == TransferState.FINISHED && bytesReceived > 0;
   }
 
   @Override

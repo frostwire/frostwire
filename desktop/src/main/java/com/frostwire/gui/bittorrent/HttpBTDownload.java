@@ -41,9 +41,10 @@ abstract class HttpBTDownload implements BTDownload {
   final File completeFile;
   final HttpClient httpClient;
   private final Date dateCreated;
-  long size;
-  TransferState state;
-  long bytesReceived;
+  // Volatile: written by download threads, read lock-free by the transfers table on the EDT.
+  volatile long size;
+  volatile TransferState state;
+  volatile long bytesReceived;
   HttpClient.HttpClientListener httpClientListener;
   private long averageSpeed; // in bytes
   private boolean deleteDataWhenRemoved;
