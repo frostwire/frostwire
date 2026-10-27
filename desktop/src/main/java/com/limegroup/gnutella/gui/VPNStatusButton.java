@@ -1,143 +1,155 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.limegroup.gnutella.gui;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.VPNStatusListener {
-    static final String VPN_URL = "http://www.frostwire.com/vpn";
-    private final IconButton iconButton;
-    private final VPNBitTorrentDisabledWarningLabel vpnDropGuardLabel;
-    private boolean lastVPNStatus;
+  static final String VPN_URL = "http://www.frostwire.com/vpn";
+  private final IconButton iconButton;
+  private final VPNBitTorrentDisabledWarningLabel vpnDropGuardLabel;
+  private boolean lastVPNStatus;
 
-    VPNStatusButton() {
-        // Use compact FlowLayout with minimal gaps
-        super(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        setOpaque(false);
-        zeroInsets(this);
+  VPNStatusButton() {
+    // Use compact FlowLayout with minimal gaps
+    super(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    setOpaque(false);
+    zeroInsets(this);
 
-        iconButton = new IconButton("vpn_off", true);
-        iconButton.setBorder(null);
-        iconButton.setMargin(new Insets(0, 0, 0, 0));
-        iconButton.setContentAreaFilled(false);
-        iconButton.setBorderPainted(false);
-        iconButton.setOpaque(false);
+    iconButton = new IconButton("vpn_off", true);
+    iconButton.setBorder(null);
+    iconButton.setMargin(new Insets(0, 0, 0, 0));
+    iconButton.setContentAreaFilled(false);
+    iconButton.setBorderPainted(false);
+    iconButton.setOpaque(false);
 
-        vpnDropGuardLabel = createVPNDisconnectLabel();
-        initActionListener();
+    vpnDropGuardLabel = createVPNDisconnectLabel();
+    initActionListener();
 
-        // Set compact size
-        Dimension size = new Dimension(20, 20);
-        setMinimumSize(size);
-        setPreferredSize(size);
-        setMaximumSize(size);
-    }
+    // Set compact size
+    Dimension size = new Dimension(20, 20);
+    setMinimumSize(size);
+    setPreferredSize(size);
+    setMaximumSize(size);
+  }
 
-    private static void zeroInsets(JComponent jc) {
-        Insets insets = jc.getInsets();
-        insets.left = 0;
-        insets.right = 0;
-        insets.top = 0;
-        insets.bottom = 0;
-    }
+  private static void zeroInsets(JComponent jc) {
+    Insets insets = jc.getInsets();
+    insets.left = 0;
+    insets.right = 0;
+    insets.top = 0;
+    insets.bottom = 0;
+  }
 
-    private void initActionListener() {
-        iconButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                GUIMediator.openURL(VPN_URL);
-            }
+  private void initActionListener() {
+    iconButton.addActionListener(
+        new java.awt.event.ActionListener() {
+          public void actionPerformed(java.awt.event.ActionEvent e) {
+            GUIMediator.openURL(VPN_URL);
+          }
         });
-    }
+  }
 
-    /**
-     * Sets up the bittorrent connection disabled due to vpn settings info
-     */
-    private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
-        VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning = new VPNBitTorrentDisabledWarningLabel();
-        bitTorrentDisabledWarning.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
-        // Defer HTML content to avoid EDT violation
-        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-        SwingUtilities.invokeLater(() -> {
-            bitTorrentDisabledWarning.setText("<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
+  /** Sets up the bittorrent connection disabled due to vpn settings info */
+  private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
+    VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning =
+        new VPNBitTorrentDisabledWarningLabel();
+    bitTorrentDisabledWarning.setToolTipText(
+        I18n.tr(
+            "Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
+    // Defer HTML content to avoid EDT violation
+    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+    SwingUtilities.invokeLater(
+        () -> {
+          bitTorrentDisabledWarning.setText(
+              "<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
         });
-        bitTorrentDisabledWarning.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onVPNBitTorrentDisabledWarningLabelClicked();
-            }
+    bitTorrentDisabledWarning.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            onVPNBitTorrentDisabledWarningLabelClicked();
+          }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                onVPNBitTorrentDisabledWarningLabelClicked();
-            }
+          @Override
+          public void mousePressed(MouseEvent e) {
+            onVPNBitTorrentDisabledWarningLabelClicked();
+          }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                onVPNBitTorrentDisabledWarningLabelClicked();
-            }
+          @Override
+          public void mouseReleased(MouseEvent e) {
+            onVPNBitTorrentDisabledWarningLabelClicked();
+          }
         });
-        return bitTorrentDisabledWarning;
-    }
+    return bitTorrentDisabledWarning;
+  }
 
-    private void onVPNBitTorrentDisabledWarningLabelClicked() {
-        VPNDropGuard.canUseBitTorrent(true, () -> {
-            updateVPNIcon(false);
-            GUIMediator.instance().getStatusLine().refresh();
+  private void onVPNBitTorrentDisabledWarningLabelClicked() {
+    VPNDropGuard.canUseBitTorrent(
+        true,
+        () -> {
+          updateVPNIcon(false);
+          GUIMediator.instance().getStatusLine().refresh();
         });
-    }
+  }
 
-    private void updateVPNIcon(boolean vpnIsOn) {
-        lastVPNStatus = vpnIsOn;
-        iconButton.setIcon(GUIMediator.getThemeImage(vpnIsOn ? "vpn_on" : "vpn_off"));
-        // Defer HTML ToolTipText to avoid EDT violation
-        // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
-        SwingUtilities.invokeLater(() -> {
-            if (vpnIsOn) {
-                iconButton.setToolTipText("<html><p width=\"260\">" +
-                        I18n.tr("FrostWire has detected a VPN connection, your privacy is safe from prying eyes.") +
-                        "</p></html>");
-            } else {
-                iconButton.setToolTipText("<html><p width=\"260\">" +
-                        I18n.tr("FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.") +
-                        "</p></html>");
-            }
+  private void updateVPNIcon(boolean vpnIsOn) {
+    lastVPNStatus = vpnIsOn;
+    iconButton.setIcon(GUIMediator.getThemeImage(vpnIsOn ? "vpn_on" : "vpn_off"));
+    // Defer HTML ToolTipText to avoid EDT violation
+    // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
+    SwingUtilities.invokeLater(
+        () -> {
+          if (vpnIsOn) {
+            iconButton.setToolTipText(
+                "<html><p width=\"260\">"
+                    + I18n.tr(
+                        "FrostWire has detected a VPN connection, your privacy is safe from prying eyes.")
+                    + "</p></html>");
+          } else {
+            iconButton.setToolTipText(
+                "<html><p width=\"260\">"
+                    + I18n.tr(
+                        "FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.")
+                    + "</p></html>");
+          }
         });
-        removeAll();
-        add(iconButton);
-        if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {
-            add(vpnDropGuardLabel);
-        }
+    removeAll();
+    add(iconButton);
+    if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {
+      add(vpnDropGuardLabel);
     }
+  }
 
-    @Override
-    public void onStatusUpdated(boolean vpnIsOn) {
-        updateVPNIcon(vpnIsOn);
-    }
+  @Override
+  public void onStatusUpdated(boolean vpnIsOn) {
+    updateVPNIcon(vpnIsOn);
+  }
 
-    public boolean getLastVPNStatus() {
-        return lastVPNStatus;
-    }
+  public boolean getLastVPNStatus() {
+    return lastVPNStatus;
+  }
 }
