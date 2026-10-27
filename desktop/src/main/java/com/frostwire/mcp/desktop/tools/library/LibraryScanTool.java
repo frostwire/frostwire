@@ -8,12 +8,10 @@
 package com.frostwire.mcp.desktop.tools.library;
 
 import com.frostwire.mcp.MCPTool;
-import com.frostwire.mcp.desktop.adapters.LibraryAdapter;
+import com.frostwire.util.BoundedFileWalker;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.settings.SharingSettings;
 import java.io.File;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 public final class LibraryScanTool implements MCPTool {
 
@@ -25,7 +23,7 @@ public final class LibraryScanTool implements MCPTool {
   @Override
   public String description() {
     return "Scan a directory for files, optionally filtering by media type. Returns the count of"
-               + " files found.";
+        + " files found.";
   }
 
   @Override
@@ -79,31 +77,19 @@ public final class LibraryScanTool implements MCPTool {
     return result;
   }
 
-  private int scanFiles(File root, String mediaType) {
-    int count = 0;
-    Deque<File> stack = new ArrayDeque<>();
-    stack.push(root);
-    while (!stack.isEmpty()) {
-      File dir = stack.pop();
-      File[] children = dir.listFiles();
-      if (children == null) continue;
-      for (File child : children) {
-        if (child.isDirectory()) {
-          stack.push(child);
-        } else {
-          if ("all".equals(mediaType)) {
-            count++;
-          } else {
-            String name = child.getName();
-            int dot = name.lastIndexOf('.');
-            String ext = (dot >= 0 && dot < name.length() - 1) ? name.substring(dot + 1) : "";
-            if (mediaType.equals(LibraryAdapter.getMediaType(ext))) {
-              count++;
-            }
+  /**
+   * Counts the files of {@code mediaType} under {@code root}. Bounded by {@link BoundedFileWalker},
+   * so a symlink loop can't make the scan run forever.
+   */
+  static int scanFiles(File root, String mediaType) {
+    int[] count = {0};
+    BoundedFileWalker.walk(
+        root,
+        (path, attrs) -> {
+          if (LibraryListTool.matchesMediaType(path.toFile(), mediaType)) {
+            count[0]++;
           }
-        }
-      }
-    }
-    return count;
+        });
+    return count[0];
   }
 }

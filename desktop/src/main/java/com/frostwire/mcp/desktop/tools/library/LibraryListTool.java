@@ -9,6 +9,7 @@ package com.frostwire.mcp.desktop.tools.library;
 
 import com.frostwire.mcp.MCPTool;
 import com.frostwire.mcp.desktop.adapters.LibraryAdapter;
+import com.frostwire.util.BoundedFileWalker;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -102,31 +103,32 @@ public final class LibraryListTool implements MCPTool {
     return result;
   }
 
-  private List<File> collectFiles(File root, String mediaType) {
+  /**
+   * Collects the files of {@code mediaType} under {@code root}. Bounded by {@link
+   * BoundedFileWalker}, so a symlink loop or a huge folder can't recurse forever or exhaust the
+   * heap.
+   */
+  static List<File> collectFiles(File root, String mediaType) {
     List<File> result = new ArrayList<>();
-    collectFilesRecursive(root, mediaType, result);
+    BoundedFileWalker.walk(
+        root,
+        (path, attrs) -> {
+          File file = path.toFile();
+          if (matchesMediaType(file, mediaType)) {
+            result.add(file);
+          }
+        });
     return result;
   }
 
-  private void collectFilesRecursive(File dir, String mediaType, List<File> result) {
-    File[] children = dir.listFiles();
-    if (children == null) return;
-    for (File child : children) {
-      if (child.isDirectory()) {
-        collectFilesRecursive(child, mediaType, result);
-      } else {
-        if ("all".equals(mediaType)) {
-          result.add(child);
-        } else {
-          String name = child.getName();
-          int dot = name.lastIndexOf('.');
-          String ext = (dot >= 0 && dot < name.length() - 1) ? name.substring(dot + 1) : "";
-          if (mediaType.equals(LibraryAdapter.getMediaType(ext))) {
-            result.add(child);
-          }
-        }
-      }
+  static boolean matchesMediaType(File file, String mediaType) {
+    if ("all".equals(mediaType)) {
+      return true;
     }
+    String name = file.getName();
+    int dot = name.lastIndexOf('.');
+    String ext = (dot >= 0 && dot < name.length() - 1) ? name.substring(dot + 1) : "";
+    return mediaType.equals(LibraryAdapter.getMediaType(ext));
   }
 
   private void sortFiles(List<File> files, String sortBy) {
