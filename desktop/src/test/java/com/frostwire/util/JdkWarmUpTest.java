@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.RenderingHints;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -182,6 +183,16 @@ class JdkWarmUpTest {
 
     assertEquals(
         List.of("b.B", "a.A", "a.A$Inner"), JdkWarmUp.classNamesIn(dir, List.of("b", "a", "c")));
+  }
+
+  @Test
+  void rasterizeGlyphsWorksWithAndWithoutDesktopHints() {
+    Font font = new Font(Font.DIALOG, Font.PLAIN, 12);
+    Map<RenderingHints.Key, Object> lcd =
+        Map.of(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+    assertDoesNotThrow(() -> JdkWarmUp.rasterizeGlyphs(font, null));
+    assertDoesNotThrow(() -> JdkWarmUp.rasterizeGlyphs(font.deriveFont(Font.BOLD), lcd));
   }
 
   @Test

@@ -8,7 +8,10 @@
 package com.frostwire.util;
 
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.font.FontRenderContext;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -32,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.IntStream;
 import javax.swing.UIManager;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
@@ -51,6 +55,8 @@ import javax.swing.text.html.HTMLEditorKit;
  *       the jar or the JDK's module image and defined the first time, on the EDT.
  *   <li>Slow static initializers of JDK classes first used while painting or clicking, see {@link
  *       #CLASSES_TO_INITIALIZE}.
+ *   <li>Glyph rasterization: each glyph of a font strike is rasterized the first time it is
+ *       measured or painted.
  *   <li>Locale data and tables behind the first number format, date format and collator.
  *   <li>FrostWire's own classes for the main window and the big panes built right after it, see
  *       {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their static initializers may
@@ -69,6 +75,17 @@ public final class JdkWarmUp {
   /** Complex script text: layoutGlyphVector always goes through GlyphLayout and the shaper. */
   private static final String SHAPING_SAMPLE =
       "FrostWire " + new String(new int[] {0x0915, 0x094D, 0x0937}, 0, 3);
+
+  /** Printable ASCII, the glyphs nearly every label measures and paints. */
+  private static final String GLYPH_SAMPLE =
+      IntStream.rangeClosed(' ', '~')
+          .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+          .toString();
+
+  private static final int GLYPH_IMAGE_WIDTH = 1024;
+
+  /** Toolkit property with the text antialiasing hints the desktop uses for UI text. */
+  private static final String DESKTOP_FONT_HINTS = "awt.font.desktophints";
 
   /** Unassigned code point no font maps, so the lookup walks (and initializes) every slot. */
   private static final int UNMAPPED_CODE_POINT = 0x0378;
@@ -140,6 +157,17 @@ public final class JdkWarmUp {
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
     }
     try {
+      Font label = UIManager.getFont("Label.font");
+      if (label != null) {
+        Object hints = Toolkit.getDefaultToolkit().getDesktopProperty(DESKTOP_FONT_HINTS);
+        Map<?, ?> desktopHints = hints instanceof Map<?, ?> map ? map : null;
+        rasterizeGlyphs(label, desktopHints);
+        rasterizeGlyphs(label.deriveFont(Font.BOLD), desktopHints);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Glyph warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpNumberFormat(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Number format warm-up failed: " + t.getMessage(), t);
@@ -170,6 +198,27 @@ public final class JdkWarmUp {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
+    }
+  }
+
+  /**
+   * Measures and draws the printable ASCII characters in the font into an offscreen image, with the
+   * desktop's text antialiasing hints so the glyph cache entries (one per font, size, style and
+   * hints) are the ones labels use. The first measurement of each glyph rasterizes it (on Windows
+   * through GDI), which the splash window and the setup wizard otherwise pay on the EDT.
+   */
+  static void rasterizeGlyphs(Font font, Map<?, ?> desktopHints) {
+    BufferedImage image = new BufferedImage(GLYPH_IMAGE_WIDTH, 32, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g = image.createGraphics();
+    try {
+      if (desktopHints != null) {
+        g.addRenderingHints(desktopHints);
+      }
+      g.setFont(font);
+      g.getFontMetrics().stringWidth(GLYPH_SAMPLE);
+      g.drawString(GLYPH_SAMPLE, 0, 24);
+    } finally {
+      g.dispose();
     }
   }
 
