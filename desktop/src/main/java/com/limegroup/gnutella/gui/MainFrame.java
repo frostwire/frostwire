@@ -102,7 +102,7 @@ public final class MainFrame {
     // UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
     FRAME = frame;
     new DropTarget(FRAME, new TransferHandlerDropTargetListener(DNDUtils.DEFAULT_TRANSFER_HANDLER));
-    TABBED_PANE = new JPanel(new CardLayout());
+    TABBED_PANE = new JPanel(new VisibleCardLayout());
     TABBED_PANE.setBorder(
         BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
     // Add a listener for saving the dimensions of the window &

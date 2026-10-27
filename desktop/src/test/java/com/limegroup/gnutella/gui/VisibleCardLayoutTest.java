@@ -8,10 +8,13 @@
 package com.limegroup.gnutella.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -69,6 +72,27 @@ class VisibleCardLayoutTest {
           assertEquals(new Dimension(900, 901), holder.getPreferredSize());
           assertEquals(0, small.measured.get(), "the hidden card must not be measured");
         });
+  }
+
+  /** Both need the running app to be built, so check their sources. */
+  @Test
+  void tabHolderAndTransferDetailHolderUseIt() throws Exception {
+    assertTrue(
+        readSource("com/limegroup/gnutella/gui/MainFrame.java")
+            .contains("TABBED_PANE = new JPanel(new VisibleCardLayout());"),
+        "the main window's tabs must be sized from the tab on show");
+    assertTrue(
+        readSource("com/frostwire/gui/components/transfers/TransferDetailComponent.java")
+            .contains("detailComponentHolder = new JPanel(new VisibleCardLayout());"),
+        "the transfer detail panels must be sized from the panel on show");
+  }
+
+  private static String readSource(String file) throws Exception {
+    Path path = Path.of("src/main/java", file);
+    if (!Files.exists(path)) {
+      path = Path.of("desktop/src/main/java", file);
+    }
+    return Files.readString(path);
   }
 
   @Test
