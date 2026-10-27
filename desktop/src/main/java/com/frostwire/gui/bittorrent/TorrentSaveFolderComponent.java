@@ -34,7 +34,7 @@ import org.limewire.util.CommonUtils;
  * @author gubatron
  * @author aldenml
  */
-public final class TorrentSaveFolderComponent extends JPanel {
+public class TorrentSaveFolderComponent extends JPanel {
   private static String errorMessage;
   private final JTextField folderTextField;
 

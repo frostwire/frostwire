@@ -52,17 +52,35 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
 
   @Override
   public boolean applyOptions() throws IOException {
-    if (!COMPONENT.isTorrentSaveFolderPathValid(true)) {
+    return applyIfChanged(
+        SharingSettings.TORRENT_DATA_DIR_SETTING.getValueAsString(),
+        COMPONENT,
+        newSaveFolder -> {
+          updateLibraryFolders(newSaveFolder);
+          updateDefaultSaveFolders(newSaveFolder);
+        });
+  }
+
+  /**
+   * Applies the folder typed in {@code component} if it differs from {@code currentFolder}. Options
+   * are applied on the EDT and every Apply reaches every pane, so the folder is only checked on
+   * disk when the user actually changed it.
+   *
+   * @return whether the folder changed
+   * @throws IOException if the changed folder is not usable; the error was shown
+   */
+  static boolean applyIfChanged(
+      String currentFolder, TorrentSaveFolderComponent component, Consumer<File> applyFolder)
+      throws IOException {
+    if (currentFolder.equals(component.getTorrentSaveFolderPath())) {
+      return false;
+    }
+    if (!component.isTorrentSaveFolderPathValid(true)) {
       GUIMediator.showError(TorrentSaveFolderComponent.getError());
       throw new IOException();
     }
-    boolean dirty = isDirty();
-    if (dirty) {
-      final File newSaveFolder = new File(COMPONENT.getTorrentSaveFolderPath());
-      updateLibraryFolders(newSaveFolder);
-      updateDefaultSaveFolders(newSaveFolder);
-    }
-    return dirty;
+    applyFolder.accept(new File(component.getTorrentSaveFolderPath()));
+    return true;
   }
 
   /**
