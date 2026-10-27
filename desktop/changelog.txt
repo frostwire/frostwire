@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Pressing Enter to search no longer freezes the UI, nor do icon paints, file choosers or library selections after a few idle seconds — the background workers they hand work to stay alive, so the UI thread never has to start a new thread
    - fix:No multi-second freeze while the setup wizard, the main window or its tabs first appear, or on the first status-bar speed update — their classes are preloaded and the JVM's first generated string concatenation is linked in the background
    - fix:Hovering the status bar's bandwidth indicators no longer freezes the UI — the tooltip is a plain label grid instead of an HTML table
    - fix:Switching to a Flat theme from Tools → Switch Theme no longer freezes the window on Windows — FlatLaf and its native library now load in the background before the theme is applied
