@@ -6,13 +6,13 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.settings.UISettings;
 import java.io.File;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
@@ -33,14 +33,43 @@ public class NativeFileIconController implements FileIconController {
   private final Icon NULL = new ImageIcon();
 
   /**
+   * Runs native lookups requested from the EDT, and the preload. Windows: a background queue
+   * (FileSystemView shell calls run on the JDK's own COM thread and are safe from any thread).
+   * macOS: deferred EDT events, because the Aqua chooser view is confined to the EDT.
+   */
+  private final Executor lookups;
+
+  /** Icon shown while the native one loads: the generic icon for the file type. */
+  private final Function<String, Icon> placeholders;
+
+  /** Files and extensions whose lookup is queued, so each is requested once. */
+  private final Set<Object> pending = ConcurrentHashMap.newKeySet();
+
+  /** Files already looked up that the view did not cache (missing files, failed lookups). */
+  private final Set<File> attempted =
+      Collections.synchronizedSet(new FixedsizeForgetfulHashSet<>(5000, 1000));
+
+  /**
    * Constructs the NativeFileIconController. This constructor may block as the JFileChooser is
    * constructed.
    */
   NativeFileIconController() {
-    this(getNativeFileView(), UISettings.PRELOAD_NATIVE_ICONS.getValue());
+    this(
+        getNativeFileView(),
+        UISettings.PRELOAD_NATIVE_ICONS.getValue(),
+        OSUtils.isWindows()
+            ? ExecutorsHelper.newProcessingQueue("IconLoader")
+            : SwingUtilities::invokeLater,
+        new BasicFileIconController()::getIconForExtension);
   }
 
-  NativeFileIconController(SmartFileView view, boolean preloadIcons) {
+  NativeFileIconController(
+      SmartFileView view,
+      boolean preloadIcons,
+      Executor lookups,
+      Function<String, Icon> placeholders) {
+    this.lookups = lookups;
+    this.placeholders = placeholders;
     if (view == null) {
       VIEW = null;
     } else {
@@ -134,27 +163,98 @@ public class NativeFileIconController implements FileIconController {
   /**
    * Returns the native file icon for a file, if it exists. If it doesn't exist, returns the icon
    * for the extension of the file.
+   *
+   * <p>Never does a native lookup on the EDT: tables ask for icons from getValueAt() and while
+   * painting, and on Windows an uncached icon is a COM round-trip into the shell
+   * (Win32ShellFolder2.getIcon) that can block for seconds. An uncached icon requested from the EDT
+   * returns a placeholder and loads in the background; tables pick it up on their next refresh.
    */
   public Icon getIconForFile(File f) {
     if (f == null) return null;
-    // We return the icon if it was previously cached,
-    // or if it exists.  We cannot get a nonexistant (non-cached)
-    // file from the view, otherwise they'll be spurious exceptions.
+    if (VIEW.isIconCached(f)) {
+      return VIEW.getIcon(f);
+    }
+    if (!SwingUtilities.isEventDispatchThread()) {
+      return lookUpIconForFile(f);
+    }
+    String extension = FilenameUtils.getExtension(f.getName());
+    if (!attempted.contains(f)) {
+      requestLookup(
+          f,
+          () -> {
+            lookUpIconForFile(f);
+            attempted.add(f);
+          });
+    }
+    Icon icon = cachedIconForExtension(extension);
+    return icon != null ? icon : placeholder(extension);
+  }
+
+  /** The native lookup itself; f.exists() is disk I/O too, so this never runs on the EDT. */
+  private Icon lookUpIconForFile(File f) {
+    // We cannot get a nonexistent (non-cached) file from the view,
+    // otherwise there'll be spurious exceptions.
     if (VIEW.isIconCached(f) || f.exists()) {
       return VIEW.getIcon(f);
-    } else {
-      String extension = FilenameUtils.getExtension(f.getName());
-      if (extension != null) return getIconForExtension(extension);
-      else return null;
+    }
+    String extension = FilenameUtils.getExtension(f.getName());
+    return extension != null ? lookUpIconForExtension(extension) : null;
+  }
+
+  /**
+   * Returns the icon associated with the extension. From the EDT, an uncached extension returns a
+   * placeholder and loads in the background (see {@link #getIconForFile(File)}).
+   */
+  public Icon getIconForExtension(String ext) {
+    if (ext == null) {
+      return null;
+    }
+    String key = ext.trim().toLowerCase();
+    if (EXTENSIONS.containsKey(key) || !SwingUtilities.isEventDispatchThread()) {
+      return lookUpIconForExtension(key);
+    }
+    requestLookup(key, () -> lookUpIconForExtension(key));
+    return placeholder(key);
+  }
+
+  /** The cached icon for the extension, without a native lookup; null when not cached yet. */
+  private Icon cachedIconForExtension(String ext) {
+    Icon icon = ext == null ? null : EXTENSIONS.get(ext.trim().toLowerCase());
+    return icon == NULL ? null : icon;
+  }
+
+  private Icon placeholder(String ext) {
+    try {
+      return placeholders.apply(ext);
+    } catch (RuntimeException e) {
+      return null;
     }
   }
 
-  /** Returns the icon associated with the extension. */
-  public Icon getIconForExtension(String ext) {
+  /** Queues one lookup per key; requests for a key whose lookup is already queued are dropped. */
+  private void requestLookup(Object key, Runnable lookup) {
+    if (!pending.add(key)) {
+      return;
+    }
     try {
-      if (ext == null) {
-        return null;
-      }
+      lookups.execute(
+          () -> {
+            try {
+              lookup.run();
+            } catch (Throwable ignored) {
+              // a failed lookup leaves the placeholder; see lookUpIconForExtension
+            } finally {
+              pending.remove(key);
+            }
+          });
+    } catch (RuntimeException rejected) {
+      pending.remove(key);
+    }
+  }
+
+  /** Looks up (once) and caches the native icon for the extension. Never call on the EDT. */
+  private Icon lookUpIconForExtension(String ext) {
+    try {
       ext = ext.trim().toLowerCase();
       Icon icon = EXTENSIONS.get(ext);
       // If we already had a cached icon..
@@ -168,25 +268,22 @@ public class NativeFileIconController implements FileIconController {
       try {
         file = File.createTempFile("dummy", "." + ext);
       } catch (Exception e1) {
+        EXTENSIONS.put(ext, NULL);
         return null;
       }
-      Icon iconCandidate = null;
       try {
         // The native FileView is constructed once with this controller. Creating a new
         // JFileChooser for every extension repeatedly initializes Aqua on the EDT and
         // can stall startup while preload walks the media types.
-        iconCandidate = VIEW.getIcon(file);
+        icon = VIEW.getIcon(file);
       } catch (Exception e) {
+        icon = null;
+      } finally {
         file.delete();
-        return null;
       }
-      if (iconCandidate != null) {
-        icon = iconCandidate;
-      }
-      file.delete();
-      if (icon != null) { // ConcurrentHashMap rejects nulls; a null result is retried next time
-        EXTENSIONS.put(ext, icon);
-      }
+      // Remember failures too (NULL marker): an EDT request would otherwise queue
+      // the same failing lookup again on every paint.
+      EXTENSIONS.put(ext, icon != null ? icon : NULL);
       return icon;
     } catch (Throwable e) {
       // due to a NPE reported in BugManager
@@ -195,22 +292,20 @@ public class NativeFileIconController implements FileIconController {
     }
   }
 
-  /** Preloads a bunch of icons. */
+  /** Preloads the icons of the default media types' extensions, never on the EDT on Windows. */
   private void preload() {
-    ExecutorService queue = ExecutorsHelper.newProcessingQueue("IconLoader");
-    final MediaType[] types = MediaType.getDefaultMediaTypes();
     final AtomicBoolean continueLoading = new AtomicBoolean(true);
-    for (int i = 0; i < types.length && continueLoading.get(); i++) {
-      final Set<?> exts = types[i].getExtensions();
-      for (Iterator<?> j = exts.iterator(); j.hasNext() && continueLoading.get(); ) {
-        final String next = (String) j.next();
-        queue.execute(
-            () ->
-                GUIMediator.safeInvokeAndWait(
-                    () -> {
-                      getIconForExtension(next);
-                      if (!VIEW.isViewAvailable()) continueLoading.set(false);
-                    }));
+    for (MediaType type : MediaType.getDefaultMediaTypes()) {
+      for (Object ext : type.getExtensions()) {
+        final String next = (String) ext;
+        requestLookup(
+            next,
+            () -> {
+              if (continueLoading.get()) {
+                lookUpIconForExtension(next);
+                if (!VIEW.isViewAvailable()) continueLoading.set(false);
+              }
+            });
       }
     }
   }
@@ -241,7 +336,7 @@ public class NativeFileIconController implements FileIconController {
    */
   private static class DelegateFileView extends SmartFileView {
     private final SmartFileView DELEGATE;
-    private boolean linkFailed = false;
+    private volatile boolean linkFailed = false;
 
     DelegateFileView(SmartFileView real) {
       DELEGATE = real;
@@ -327,7 +422,7 @@ public class NativeFileIconController implements FileIconController {
   /** A FileSystemView FileView. */
   private static class FSVFileView extends SmartFileView {
     private final FileSystemView VIEW = FileSystemView.getFileSystemView();
-    // Synchronized: on Windows, BTDownloadDataLine loads uncached icons off the EDT.
+    // Synchronized: icons are looked up on the IconLoader thread and read from the EDT.
     private final Map<File, Icon> CACHE =
         Collections.synchronizedMap(new FixedsizeForgetfulHashMap<>(50000));
 
@@ -338,11 +433,15 @@ public class NativeFileIconController implements FileIconController {
 
     @Override
     public Icon getIcon(final File f) {
-      Icon icon = CACHE.get(f);
-      if (icon == null) {
-        icon = VIEW.getSystemIcon(f);
-        CACHE.put(f, icon);
+      // containsKey, not a null check: a file the shell has no icon for is cached as null and
+      // must not trigger another COM lookup on every call.
+      synchronized (CACHE) {
+        if (CACHE.containsKey(f)) {
+          return CACHE.get(f);
+        }
       }
+      Icon icon = VIEW.getSystemIcon(f);
+      CACHE.put(f, icon);
       return icon;
     }
 
