@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:macOS: the Library no longer freezes while fetching file icons from the system — native icons load in the background on every platform and are cached with the icon itself
    - fix:Options → Apply no longer freezes the window while the BitTorrent engine saves its session state — the state is saved in the background, once per Apply; moving torrents to a new save folder also runs in the background
    - fix:The first-run setup wizard no longer freezes on slow Windows PCs, and the main window and BitTorrent engine no longer start behind it before you have finished choosing your settings — startup now waits for the wizard to close
    - fix:The Transfers table no longer freezes when an HTTP download finishes — its state is read without waiting for the lock held while the file is moved into place
