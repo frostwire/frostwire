@@ -10,7 +10,9 @@ package com.frostwire.util;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,9 @@ import javax.swing.UIManager;
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
  *       fallback "slot" fonts, and each slot reads its character map from disk the first time it is
  *       consulted (several MB for CJK fonts).
+ *   <li>Class loading: building the main window creates a UI delegate per component type, and each
+ *       delegate class (FrostWire's skin classes and their Synth/Basic superclasses) is read from
+ *       the jar or the JDK's module image and defined the first time, on the EDT.
  *   <li>Slow static initializers of JDK classes first used while painting or clicking, see {@link
  *       #CLASSES_TO_INITIALIZE}.
  * </ul>
@@ -49,6 +54,11 @@ public final class JdkWarmUp {
    */
   static final List<String> CLASSES_TO_INITIALIZE =
       List.of("java.awt.dnd.DragSource", "sun.awt.SunGraphicsCallback");
+
+  /** Synth-based looks (Nimbus) map every delegate key to this class, which creates "Synth"+key. */
+  private static final String SYNTH_LOOK_AND_FEEL = "javax.swing.plaf.synth.SynthLookAndFeel";
+
+  private static final String SYNTH_UI_PREFIX = "javax.swing.plaf.synth.Synth";
 
   private JdkWarmUp() {}
 
@@ -75,6 +85,12 @@ public final class JdkWarmUp {
       // Best effort: the first on-EDT use pays these costs instead.
       LOG.warn("Text warm-up failed: " + t.getMessage(), t);
     }
+    try {
+      loadWithoutInitializing(
+          uiDelegateClassNames(UIManager.getDefaults()), JdkWarmUp.class.getClassLoader());
+    } catch (Throwable t) {
+      LOG.warn("UI delegate warm-up failed: " + t.getMessage(), t);
+    }
     for (String className : CLASSES_TO_INITIALIZE) {
       try {
         Class.forName(className);
@@ -94,5 +110,38 @@ public final class JdkWarmUp {
       }
     }
     return fonts;
+  }
+
+  /**
+   * Class names of the look and feel's component UI delegates, the String values of its "*UI" keys
+   * ("PopupMenuSeparatorUI" to "com.frostwire.gui.theme.SkinPopupMenuSeparatorUI"). Keys a
+   * Synth-based look maps to {@code SynthLookAndFeel} yield the Synth delegate it creates for them
+   * ("ButtonUI" to "javax.swing.plaf.synth.SynthButtonUI"); the few it names differently are
+   * skipped when loaded.
+   */
+  static Set<String> uiDelegateClassNames(Map<?, ?> defaults) {
+    Set<String> classNames = new LinkedHashSet<>();
+    for (Map.Entry<?, ?> entry : List.copyOf(defaults.entrySet())) {
+      if (entry.getKey() instanceof String key
+          && key.endsWith("UI")
+          && entry.getValue() instanceof String className) {
+        classNames.add(SYNTH_LOOK_AND_FEEL.equals(className) ? SYNTH_UI_PREFIX + key : className);
+      }
+    }
+    return classNames;
+  }
+
+  /**
+   * Loads each class (and so its superclasses and interfaces) without running static initializers,
+   * which stay on the thread that first uses the class. Missing classes are skipped.
+   */
+  static void loadWithoutInitializing(Collection<String> classNames, ClassLoader loader) {
+    for (String className : classNames) {
+      try {
+        Class.forName(className, false, loader);
+      } catch (ClassNotFoundException | LinkageError e) {
+        // Not on this look and feel or platform; the EDT loads (or fails) it as it would have.
+      }
+    }
   }
 }
