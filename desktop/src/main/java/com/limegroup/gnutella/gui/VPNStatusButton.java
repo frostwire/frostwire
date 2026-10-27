@@ -33,6 +33,12 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
   private final VPNBitTorrentDisabledWarningLabel vpnDropGuardLabel;
   private boolean lastVPNStatus;
 
+  /** VPN state the icon and tooltip show; null until the first VPN check reports. */
+  private Boolean shownVPNStatus;
+
+  /** Whether the "VPN Off: BitTorrent disabled" label is currently a child of this panel. */
+  private boolean dropGuardLabelShown;
+
   VPNStatusButton() {
     // Use compact FlowLayout with minimal gaps
     super(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -116,8 +122,34 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
         });
   }
 
+  /**
+   * Called on every VPN status refresh. Updates the icon, tooltip and children in place and only
+   * when what they show changes: rebuilding the children on each refresh invalidated and re-laid
+   * out the whole status bar every time (Icebase #4e805e1c9aba).
+   */
   private void updateVPNIcon(boolean vpnIsOn) {
     lastVPNStatus = vpnIsOn;
+    boolean showDropGuardLabel = !vpnIsOn && vpnDropGuardLabel.shouldBeShown();
+    if (shownVPNStatus == null) {
+      add(iconButton);
+    }
+    if (shownVPNStatus == null || shownVPNStatus != vpnIsOn) {
+      shownVPNStatus = vpnIsOn;
+      updateIconAndToolTip(vpnIsOn);
+    }
+    if (showDropGuardLabel != dropGuardLabelShown) {
+      dropGuardLabelShown = showDropGuardLabel;
+      if (showDropGuardLabel) {
+        add(vpnDropGuardLabel);
+      } else {
+        remove(vpnDropGuardLabel);
+      }
+      revalidate();
+      repaint();
+    }
+  }
+
+  private void updateIconAndToolTip(boolean vpnIsOn) {
     iconButton.setIcon(GUIMediator.getThemeImage(vpnIsOn ? "vpn_on" : "vpn_off"));
     // Defer HTML ToolTipText to avoid EDT violation
     // HTML rendering triggers expensive font metrics calculations (>2 second EDT block)
@@ -137,11 +169,6 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
                     + "</p></html>");
           }
         });
-    removeAll();
-    add(iconButton);
-    if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {
-      add(vpnDropGuardLabel);
-    }
   }
 
   @Override
