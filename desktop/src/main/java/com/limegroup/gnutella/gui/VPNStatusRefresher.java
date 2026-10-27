@@ -19,13 +19,15 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.bittorrent.BTEngine;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import java.util.HashSet;
 import java.util.Set;
 
 public class VPNStatusRefresher {
   private static VPNStatusRefresher instance;
-  private long lastRefresh = 0;
+  // volatile: throttled on the EDT, reset by the background check while the engine isn't set up
+  private volatile long lastRefresh = 0;
   private final Set<VPNStatusListener> clients = new HashSet<>();
   private boolean active = true;
 
@@ -53,6 +55,13 @@ public class VPNStatusRefresher {
       BackgroundExecutorService.schedule(
           () -> {
             if (!active) {
+              return;
+            }
+            if (BTEngine.getInstanceIfReady() == null) {
+              // The VPN check needs the engine. Until startup sets it up, report nothing rather
+              // than a guessed "VPN off" that VPN-Drop protection would act on, and let the next
+              // refresh try again instead of waiting out the throttle.
+              lastRefresh = 0;
               return;
             }
             // possibly blocking code

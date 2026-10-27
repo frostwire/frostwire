@@ -31,23 +31,29 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class VPNs {
+  /**
+   * Reports whether a VPN is active, or false while the engine is not set up yet. Callers include
+   * the EDT (VPN-Drop protection checks on torrent actions), so this must never wait for startup to
+   * set up BTEngine: BTEngine.getInstance() parks the caller on a latch until then.
+   */
   public static boolean isVPNActive() {
     boolean result = false;
-    if (BTEngine.getInstance().swig() == null) {
+    BTEngine engine = BTEngine.getInstanceIfReady();
+    if (engine == null || engine.swig() == null) {
       // still not started or already stopped
       return false;
     }
     if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
       DesktopPlatform platform = (DesktopPlatform) Platforms.get();
 
-      result = isPosixVPNActive();
+      result = isPosixVPNActive(engine);
       if (!result) {
         // not returning all the interfaces on macos, could be a false positive
         platform.vpn().refresh();
         result = result || platform.vpn().active();
       }
     } else if (OSUtils.isWindows()) {
-      result = isWindowsVPNActive();
+      result = isWindowsVPNActive(engine);
     }
     return result;
   }
@@ -70,10 +76,10 @@ public final class VPNs {
    * @return true if it finds a line that starts with "0" and contains "tun" in the output of
    *     "netstat -nr"
    */
-  private static boolean isPosixVPNActive() {
+  private static boolean isPosixVPNActive(BTEngine engine) {
     boolean result = false;
     try {
-      List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
+      List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(engine);
       for (EnumNet.IpRoute route : routes) {
         String route_name = route.name();
         String destination = route.destination().toString();
@@ -88,10 +94,10 @@ public final class VPNs {
     return result;
   }
 
-  private static boolean isWindowsVPNActive() {
+  private static boolean isWindowsVPNActive(BTEngine engine) {
     try {
-      List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
-      List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
+      List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(engine);
+      List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(engine);
       return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter")
           || // PIA
           isWindowsVPNAdapterActive(interfaces, routes, "Private Internet Access Network Adapter")
