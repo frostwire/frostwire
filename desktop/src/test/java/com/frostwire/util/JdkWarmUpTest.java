@@ -17,7 +17,9 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.RenderingHints;
+import java.io.IOException;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -295,6 +298,64 @@ class JdkWarmUpTest {
     assertFalse(onEdt.get());
     // ParserDelegator fills the shared "html32" DTD once per JVM; later HTML labels reuse it.
     assertTrue(DTD.getDTD("html32").elementHash.containsKey("body"));
+  }
+
+  /**
+   * The JVM's first string concatenation that needs a generated class loads the class-file API;
+   * StatusLine.updateBandwidth paid that on the EDT (Icebase #ce4392e7bb9a, GitHub #1328). This JVM
+   * linked its own concatenations long ago, so each case runs in a fresh one.
+   */
+  @Test
+  void linkStringConcatGeneratesTheFirstConcatClassOfAFreshJvm() throws Exception {
+    assertFalse(
+        loadsConcatClassGenerator(ConcatProbe.INITIALIZE_ONLY), "probe itself concatenates");
+    assertTrue(
+        loadsConcatClassGenerator(ConcatProbe.LINK), "concatenation folded or not generated");
+  }
+
+  @Test
+  void warmUpLinksStringConcat() throws Exception {
+    String source =
+        Files.readString(
+            Path.of(System.getProperty("user.dir"))
+                .resolve("src/main/java/com/frostwire/util/JdkWarmUp.java"));
+    int warmUp = source.indexOf("private static void warmUp() {");
+    int end = source.indexOf("\n  }\n", warmUp);
+
+    assertTrue(warmUp >= 0 && end > warmUp, "warmUp() not found");
+    assertTrue(source.substring(warmUp, end).contains("linkStringConcat("), "not called by warmUp");
+  }
+
+  private static boolean loadsConcatClassGenerator(String mode)
+      throws IOException, InterruptedException {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Djava.awt.headless=true",
+                "-cp",
+                System.getProperty("java.class.path"),
+                ConcatProbe.class.getName(),
+                mode)
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(60, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    return log.contains("java.lang.invoke.StringConcatFactory$InlineHiddenClassStrategy ");
+  }
+
+  /** Runs in a fresh JVM; must not concatenate strings itself. */
+  static final class ConcatProbe {
+    static final String INITIALIZE_ONLY = "initialize";
+    static final String LINK = "link";
+
+    public static void main(String[] args) throws Exception {
+      Class.forName(JdkWarmUp.class.getName());
+      if (LINK.equals(args[0])) {
+        JdkWarmUp.linkStringConcat(args.length, args[0]);
+      }
+    }
   }
 
   private static final AtomicBoolean FIXTURE_INITIALIZED = new AtomicBoolean();

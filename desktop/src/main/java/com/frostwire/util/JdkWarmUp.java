@@ -61,6 +61,8 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Glyph rasterization: each glyph of a font strike is rasterized the first time it is
  *       measured or painted.
  *   <li>Locale data and tables behind the first number format, date format and collator.
+ *   <li>String concatenation: the first {@code +} on strings that needs a generated class loads the
+ *       class-file API, see {@link #linkStringConcat}.
  *   <li>FrostWire's own classes for the main window, the big panes built right after it and the
  *       Options dialog, see {@link #APP_PACKAGES_TO_LOAD}: loaded, not initialized, since their
  *       static initializers may create Swing objects.
@@ -191,6 +193,11 @@ public final class JdkWarmUp {
       LOG.warn("Number format warm-up failed: " + t.getMessage(), t);
     }
     try {
+      linkStringConcat(Runtime.getRuntime().availableProcessors(), GLYPH_SAMPLE);
+    } catch (Throwable t) {
+      LOG.warn("String concatenation warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       loadWithoutInitializing(
           uiDelegateClassNames(UIManager.getDefaults()), JdkWarmUp.class.getClassLoader());
     } catch (Throwable t) {
@@ -304,6 +311,20 @@ public final class JdkWarmUp {
    */
   static void warmUpNumberFormat(Locale locale) {
     NumberFormat.getNumberInstance(locale).format(1234.5);
+  }
+
+  /**
+   * Links one string concatenation of the shape {@code int + "constant" + Object}, the status
+   * line's "3 @ 1.2 MB/s". javac compiles {@code +} on non-constant operands to an invokedynamic,
+   * linked by StringConcatFactory the first time it runs. Any shape other than a plain join of
+   * references gets a hidden class generated with the class-file API, and the first one in the JVM
+   * loads and initializes that API, which stalled the EDT for seconds in
+   * StatusLine.updateBandwidth. Later call sites only define one small class per new shape, and
+   * this shape's class is cached. The operands are parameters so javac cannot fold the expression
+   * into a constant.
+   */
+  static String linkStringConcat(int count, String text) {
+    return count + " @ " + text;
   }
 
   /**
