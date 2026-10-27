@@ -18,6 +18,7 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
@@ -81,6 +82,10 @@ public final class BTEngine extends SessionManager {
   private static final long PENDING_SOURCE_TTL_MS = 2 * 60_000L;
   private static final int MAX_PENDING_SOURCE_PEERS = 256;
   private final LinkedHashMap<String, PendingSourcePeer> pendingSourcePeers = new LinkedHashMap<>();
+  // Settings are often applied on the Swing EDT; the session state is written on this queue.
+  private final SessionStateSaver stateSaver =
+      new SessionStateSaver(
+          this::saveSettings, ExecutorsHelper.newProcessingQueue("BTEngine-SaveSessionState"));
 
   private BTEngine() {
     super(false);
@@ -257,6 +262,7 @@ public final class BTEngine extends SessionManager {
 
   @Override
   protected void onBeforeStart() {
+    stateSaver.start();
     addListener(innerListener);
   }
 
@@ -279,7 +285,7 @@ public final class BTEngine extends SessionManager {
   @Override
   protected void onBeforeStop() {
     removeListener(innerListener);
-    saveSettings();
+    stateSaver.saveAndStop();
   }
 
   @Override
@@ -349,7 +355,7 @@ public final class BTEngine extends SessionManager {
 
   @Override
   protected void onApplySettings(SettingsPack sp) {
-    saveSettings();
+    stateSaver.requestSave();
   }
 
   @Override
