@@ -358,6 +358,8 @@ final class Initializer {
   private void startSetupManager(final SetupManager setupManager) {
     // Run through the initialization sequence -- this must always be
     // called before GUIMediator constructs the LibraryTree!
+    // Decide the pages here: that reads files and the registry, which must not happen on the EDT.
+    setupManager.decidePages();
     GUIMediator.safeInvokeAndWait(setupManager::createIfNeeded);
     // The wizard shows from a later EDT event; startup continues only once it has closed.
     setupManager.awaitClosed();

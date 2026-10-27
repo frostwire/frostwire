@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.CommonUtils;
@@ -65,7 +66,40 @@ public final class SetupManager {
   private final LanguageAwareAction[] actions =
       new LanguageAwareAction[] {previousAction, nextAction, finishAction, cancelAction};
 
-  private boolean shouldShowAssociationsWindow() {
+  /** Decides which pages to show; {@link #decide()} outside of tests. */
+  private final Supplier<Pages> decider;
+
+  /** The pages {@link #decidePages()} chose, read by {@link #createIfNeeded()} on the EDT. */
+  private volatile Pages pages;
+
+  public SetupManager() {
+    this(SetupManager::decide);
+  }
+
+  SetupManager(Supplier<Pages> decider) {
+    this.decider = decider;
+  }
+
+  /**
+   * Decides which pages the wizard needs. That reads settings, the intent file and, on Windows, the
+   * file associations in the registry, so it must run on the startup thread before {@link
+   * #createIfNeeded()}: done on the EDT, a slow disk or an antivirus scan froze startup before the
+   * wizard appeared.
+   */
+  public void decidePages() {
+    pages = decider.get();
+  }
+
+  private static Pages decide() {
+    return new Pages(
+        shouldShowSaveDirectoryWindow() != SaveStatus.NO,
+        !InstallSettings.START_STARTUP.getValue() && GUIUtils.shouldShowStartOnStartupWindow(),
+        shouldShowAssociationsWindow(),
+        !IntentWindow.isConfirmedOnDisk(),
+        ApplicationSettings.INSTALLED.getValue());
+  }
+
+  private static boolean shouldShowAssociationsWindow() {
     if (CommonUtils.isPortable()
         || (InstallSettings.ASSOCIATION_OPTION.getValue()
             == FrostAssociations.CURRENT_ASSOCIATIONS)) {
@@ -75,7 +109,7 @@ public final class SetupManager {
     return !GUIMediator.getAssociationManager().checkAndGrab(false);
   }
 
-  private SaveStatus shouldShowSaveDirectoryWindow() {
+  private static SaveStatus shouldShowSaveDirectoryWindow() {
     // If it's not setup, definitely show it!
     if (!InstallSettings.SAVE_DIRECTORY.getValue()) {
       return SaveStatus.NEEDS;
@@ -92,30 +126,35 @@ public final class SetupManager {
     return SaveStatus.NO;
   }
 
-  /** Constructs the appropriate setup windows if needed. */
+  /**
+   * Builds the pages {@link #decidePages()} chose and shows the wizard, on the EDT. It does no file
+   * or registry I/O.
+   */
   public void createIfNeeded() {
+    Pages pages = this.pages;
+    if (pages == null) {
+      throw new IllegalStateException("decidePages() must run first, off the EDT");
+    }
     _setupWindowHolder = new SetupWindowHolder();
     List<SetupWindow> windows = new LinkedList<>();
-    SaveStatus saveDirectoryStatus = shouldShowSaveDirectoryWindow();
-    if (saveDirectoryStatus != SaveStatus.NO) {
+    if (pages.saveDirectory()) {
       windows.add(new BitTorrentSettingsWindow(this));
       // Seeding/publishing privacy opt-in, shown alongside the BitTorrent sharing
       // settings on first run and after each version update.
       windows.add(new SeedingPublishingWindow(this));
     }
-    if (!InstallSettings.START_STARTUP.getValue() && GUIUtils.shouldShowStartOnStartupWindow()) {
+    if (pages.startOnStartup()) {
       windows.add(new MiscWindow(this));
     }
-    if (shouldShowAssociationsWindow()) {
+    if (pages.associations()) {
       windows.add(new AssociationsWindow(this));
     }
     if (windows.size() > 0) {
       windows.add(new SocialRecommendationsWindow(this));
     }
     // THIS HAS TO GO LAST
-    IntentWindow intentWindow = new IntentWindow(this);
-    if (!intentWindow.isConfirmedWillNot()) {
-      windows.add(intentWindow);
+    if (pages.intent()) {
+      windows.add(new IntentWindow(this));
     }
     // Nothing to install?.. Begone.
     if (windows.size() == 0) {
@@ -125,7 +164,7 @@ public final class SetupManager {
 
     // If the INSTALLED value is set, that means that a previous
     // installer has already been run.
-    boolean partial = ApplicationSettings.INSTALLED.getValue();
+    boolean partial = pages.partial();
     // We need to ask the user's language very very first,
     // so make sure that if the LanguageWindow is the first item,
     // that the WelcomeWindow is inserted second.
@@ -359,6 +398,21 @@ public final class SetupManager {
     window.handleWindowOpeningEvent();
     _setupWindowHolder.show(window.getKey());
     _currentWindow = window;
+  }
+
+  /**
+   * Which pages the wizard shows, decided off the EDT.
+   *
+   * @param partial whether a previous run already completed setup, so this run only asks about new
+   *     features
+   */
+  record Pages(
+      boolean saveDirectory,
+      boolean startOnStartup,
+      boolean associations,
+      boolean intent,
+      boolean partial) {
+    static final Pages NONE = new Pages(false, false, false, false, false);
   }
 
   private enum SaveStatus {

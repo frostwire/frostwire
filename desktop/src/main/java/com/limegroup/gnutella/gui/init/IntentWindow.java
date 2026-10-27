@@ -27,38 +27,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import javax.swing.*;
-import org.apache.commons.io.IOUtils;
 import org.limewire.util.CommonUtils;
 
 /** State Your Intent. */
 final class IntentWindow extends SetupWindow {
   private boolean setWillNot = false;
-  private Properties properties;
 
   IntentWindow(SetupManager manager) {
     super(manager, I18n.tr("State Your Intent"), I18n.tr("One more thing..."));
   }
 
-  private boolean isCurrentVersionChecked() {
-    if (properties == null) {
-      properties = new Properties();
-      FileInputStream fis = null;
-      try {
-        fis = new FileInputStream(getPropertiesFile());
-        properties.load(fis);
-      } catch (IOException iox) {
-        System.out.println("Could not load properties from property file.");
-        return false;
-      } finally {
-        IOUtils.closeQuietly(fis);
-      }
-    }
-    String exists = properties.getProperty("willnot");
-    return exists != null && exists.equals("true");
+  /**
+   * Whether the user already confirmed, on an earlier run, that they will not use FrostWire to
+   * infringe copyright, in which case this page is not shown. Reads the intent file, so it must not
+   * run on the EDT: {@link SetupManager} calls it while deciding the pages, before any is built.
+   */
+  static boolean isConfirmedOnDisk() {
+    return "true".equals(loadProperties().getProperty("willnot"));
   }
 
+  /**
+   * Whether the user confirmed on this page. It is only shown when {@link #isConfirmedOnDisk()} is
+   * false.
+   */
   boolean isConfirmedWillNot() {
-    return isCurrentVersionChecked() || setWillNot;
+    return setWillNot;
   }
 
   @Override
@@ -83,16 +76,31 @@ final class IntentWindow extends SetupWindow {
   @Override
   public void applySettings(boolean loadCoreComponents) {
     if (setWillNot) {
-      properties.put("willnot", "true");
-      try {
-        properties.store(new FileOutputStream(getPropertiesFile()), "Started & Ran Versions");
-      } catch (IOException ignored) {
-        System.out.println(ignored);
-      }
+      saveConfirmedWillNot();
     }
   }
 
-  private File getPropertiesFile() {
+  private static void saveConfirmedWillNot() {
+    Properties properties = loadProperties();
+    properties.put("willnot", "true");
+    try {
+      properties.store(new FileOutputStream(getPropertiesFile()), "Started & Ran Versions");
+    } catch (IOException ignored) {
+      System.out.println(ignored);
+    }
+  }
+
+  private static Properties loadProperties() {
+    Properties properties = new Properties();
+    try (FileInputStream fis = new FileInputStream(getPropertiesFile())) {
+      properties.load(fis);
+    } catch (IOException iox) {
+      System.out.println("Could not load properties from property file.");
+    }
+    return properties;
+  }
+
+  private static File getPropertiesFile() {
     return new File(CommonUtils.getUserSettingsDir(), "intent.props");
   }
 }
