@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The first-run setup wizard no longer freezes on slow Windows PCs, and the main window and BitTorrent engine no longer start behind it before you have finished choosing your settings — startup now waits for the wizard to close
    - fix:The Transfers table no longer freezes when an HTTP download finishes — its state is read without waiting for the lock held while the file is moved into place
    - fix:The first Options open no longer freezes while the dialog's classes load from the jar — they now load in the background at startup
    - fix:Windows: the UI no longer freezes at startup or while the Library, Search and Transfers tables show file icons — native file-type icons are now looked up in the background and appear once loaded, instead of FrostWire waiting on the Windows shell for each one
