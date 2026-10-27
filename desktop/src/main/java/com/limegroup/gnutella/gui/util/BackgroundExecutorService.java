@@ -18,16 +18,17 @@
 
 package com.limegroup.gnutella.gui.util;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /** Static helper class that allows background tasks to be scheduled from the GUI. */
 public class BackgroundExecutorService {
-  /** Queue for items to be run in the background. */
+  /**
+   * Queue for items to be run in the background; its worker stays alive, see {@link WarmExecutors}.
+   */
   private static final ExecutorService QUEUE =
-      ExecutorsHelper.newProcessingQueue("BackgroundExecutorService");
+      WarmExecutors.serialQueue("BackgroundExecutorService");
 
   private BackgroundExecutorService() {}
 
