@@ -2,11 +2,24 @@ package com.limegroup.gnutella.gui;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.*;
 import javax.swing.plaf.IconUIResource;
 
 /** Utility class for manipulating images and icons. */
 public class ImageManipulator extends RGBImageFilter {
+  /**
+   * Scaled copies by source icon and target size. Source icons come from shared caches (such as
+   * IconManager's button icons), so components that are rebuilt, like setup wizard pages, reuse the
+   * scaled copy instead of area-averaging the image again on the EDT. Weak keys let a dropped
+   * source icon (theme or icon-size switch) take its copies with it.
+   */
+  private static final Map<Icon, Map<Dimension, Icon>> RESIZED =
+      Collections.synchronizedMap(new WeakHashMap<>());
+
   /** Whether or not we are going to brighten the image. */
   private final boolean brighter;
 
@@ -53,8 +66,19 @@ public class ImageManipulator extends RGBImageFilter {
     return Toolkit.getDefaultToolkit().createImage(prod);
   }
 
-  /** Resizes an icon. */
+  /**
+   * Returns {@code icon} scaled to {@code width} x {@code height}. The result is cached per source
+   * icon and size and shared between callers, so it must not be modified.
+   */
   public static Icon resize(Icon icon, int width, int height) {
+    if (icon == null) {
+      return null;
+    }
+    Map<Dimension, Icon> sizes = RESIZED.computeIfAbsent(icon, k -> new ConcurrentHashMap<>());
+    return sizes.computeIfAbsent(new Dimension(width, height), d -> scale(icon, width, height));
+  }
+
+  private static Icon scale(Icon icon, int width, int height) {
     Image image = getImage(icon);
     if (image == null) return icon;
     image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
