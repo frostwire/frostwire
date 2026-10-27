@@ -334,6 +334,23 @@ class JdkWarmUpTest {
                 .getClass()));
   }
 
+  /**
+   * The first tooltip built Nimbus's ToolTip painters by reflection on the EDT (Icebase
+   * #68ba98469e57, GitHub #1341).
+   */
+  @Test
+  void warmUpCreatesNimbusToolTipPainters() throws Exception {
+    assertTrue(
+        JdkWarmUp.createPainters(
+                new NimbusLookAndFeel().getDefaults(), JdkWarmUp.TOOLTIP_PAINTER_KEY_PREFIX)
+            > 0);
+    assertTrue(
+        warmUpSource()
+            .replaceAll("\\s+", "")
+            .contains("createPainters(UIManager.getDefaults(),TOOLTIP_PAINTER_KEY_PREFIX)"),
+        "not called by warmUp");
+  }
+
   @Test
   void nimbusHasProgressBarPaintersToCreate() {
     assertTrue(

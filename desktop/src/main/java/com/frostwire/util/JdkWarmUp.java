@@ -48,8 +48,8 @@ import javax.swing.text.html.HTMLEditorKit;
  * paint or click that needs them does not stall the EDT.
  *
  * <ul>
- *   <li>Painters: Nimbus builds the splash window's progress bar painters by reflection, see {@link
- *       #createPainters}.
+ *   <li>Painters: Nimbus builds the splash window's progress bar painters and the tooltip painters
+ *       by reflection, see {@link #createPainters}.
  *   <li>Shaping: the first complex-text layout initializes HarfBuzz ({@code HBShaper.<clinit>},
  *       which builds a Foreign Function linker).
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
@@ -164,6 +164,9 @@ public final class JdkWarmUp {
   /** Painters of the splash window's progress bar, the first painted component Nimbus builds. */
   static final String SPLASH_PAINTER_KEY_PREFIX = "ProgressBar[";
 
+  /** Painters of tooltips, built the first time the pointer rests on a component with one. */
+  static final String TOOLTIP_PAINTER_KEY_PREFIX = "ToolTip[";
+
   private static final String PAINTER_KEY_SUFFIX = "Painter";
 
   /**
@@ -273,6 +276,11 @@ public final class JdkWarmUp {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
+    }
+    try {
+      createPainters(UIManager.getDefaults(), TOOLTIP_PAINTER_KEY_PREFIX);
+    } catch (Throwable t) {
+      LOG.warn("Tooltip painter warm-up failed: " + t.getMessage(), t);
     }
   }
 
