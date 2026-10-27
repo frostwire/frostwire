@@ -81,10 +81,24 @@ public final class TorrentSaveFolderComponent extends JPanel {
         return false;
       }
     }
-    String lowerCaseFolderPath = folder.getAbsolutePath().toLowerCase();
     // avoid user stupidity, do not save files anywhere in program files.
-    return !OSUtils.isWindows()
-        || !lowerCaseFolderPath.contains(System.getenv("ProgramFiles").toLowerCase());
+    if (OSUtils.isWindows()
+        && isInsideProgramFiles(folder.getAbsolutePath(), System.getenv("ProgramFiles"))) {
+      errorMessage = I18n.tr("Please enter a valid path for the Torrent Data Folder");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Whether {@code path} is inside {@code programFiles}, the ProgramFiles environment variable,
+   * which may be missing.
+   */
+  static boolean isInsideProgramFiles(String path, String programFiles) {
+    if (programFiles == null || programFiles.isBlank()) {
+      return false;
+    }
+    return path.toLowerCase().contains(programFiles.toLowerCase());
   }
 
   public static String getError() {
