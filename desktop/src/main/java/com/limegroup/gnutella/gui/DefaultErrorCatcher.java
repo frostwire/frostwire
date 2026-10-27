@@ -1,19 +1,8 @@
 /*
- *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ *     Created by Angel Leon (@gubatron)
  *     Copyright (c) 2011-2026, FrostWire(R). All rights reserved.
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *     Licensed under GPL v3. See LICENSE file.
  */
 
 package com.limegroup.gnutella.gui;
@@ -24,29 +13,56 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * @author jum, gubatron
- *     <p>Implement a generic error handler that catches all errors thrown by ActionListeners in the
- *     AWT event dispatcher thread.
+ * Catches every uncaught exception, including those thrown by listeners on the AWT event dispatch
+ * thread, and forwards the app's own failures to {@link ErrorService} (and so to Icebase).
  */
-class DefaultErrorCatcher {
+class DefaultErrorCatcher implements Thread.UncaughtExceptionHandler {
+  /**
+   * Installs the catcher as the JVM-wide default uncaught exception handler. The EDT has no handler
+   * of its own, so {@code EventDispatchThread.processException} reaches this through its {@link
+   * ThreadGroup}. The legacy {@code sun.awt.exception.handler} property is no longer read by the
+   * JDK.
+   */
   static void install() {
-    System.setProperty("sun.awt.exception.handler", DefaultErrorCatcher.class.getName());
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultErrorCatcher());
   }
 
   /**
-   * Entry point invoked by the AWT event dispatch thread for uncaught exceptions (via the
-   * "sun.awt.exception.handler" property). Trivial exceptions are dropped; everything else is
-   * forwarded to the ErrorService, which queues a silent Icebase report and shows the usual error
-   * dialog.
+   * Never prints on the EDT: on a console-less javaw the stderr write can block event dispatch for
+   * seconds. Other threads keep the JDK's stderr trace for anything not reported.
+   */
+  @Override
+  public void uncaughtException(Thread thread, Throwable bug) {
+    if (report(bug) || EventQueue.isDispatchThread()) {
+      return;
+    }
+    try {
+      System.err.print("Exception in thread \"" + thread.getName() + "\" ");
+      bug.printStackTrace(System.err);
+    } catch (Throwable ignored) {
+      // Nothing left to do with it.
+    }
+  }
+
+  /**
+   * Trivial exceptions are dropped; everything else is forwarded to the ErrorService, which queues
+   * a silent Icebase report off the calling thread.
    */
   public void handle(Throwable bug) {
+    report(bug);
+  }
+
+  /** Returns true if the bug was forwarded to the ErrorService. */
+  private boolean report(Throwable bug) {
     try {
       if (bug == null || isIgnorable(bug, stackTraceToString(bug))) {
-        return;
+        return false;
       }
       ErrorService.error(bug);
+      return true;
     } catch (Throwable ignored) {
       // Reporting must never break event dispatch.
+      return true;
     }
   }
 
