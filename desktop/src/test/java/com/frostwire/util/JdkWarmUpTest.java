@@ -16,8 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -365,6 +368,72 @@ class JdkWarmUpTest {
     assertTrue(
         warmUpSource().replaceAll("\\s+", "").contains("(Fontfont:mainWindowPlatformFonts())"),
         "not rasterized by warmUp");
+  }
+
+  /**
+   * Clipping a table cell's complex text measured it with no font, so the JDK ran the bidi
+   * algorithm and asked every installed font for the characters the default font lacks, reading
+   * each font's character map from disk, on the EDT (Icebase #3e80aae69c6e, #624cbfa1c9da,
+   * #09b427973a88, #14587f62871d, GitHub #1341). Fonts and the bidi data load once per JVM, so each
+   * case runs in a fresh one.
+   */
+  @Test
+  void warmUpTextLayoutReadsEveryFontsCharacterMapAndLoadsBidi() throws Exception {
+    String before = runTextLayoutProbe(TextLayoutProbe.INITIALIZE_ONLY);
+    String after = runTextLayoutProbe(TextLayoutProbe.LAYOUT);
+
+    assertFalse(before.lines().anyMatch("unread=0"::equals), before);
+    assertFalse(before.contains(BIDI_DATA_CLASS), "probe itself runs bidi");
+    assertTrue(after.lines().anyMatch("unread=0"::equals), after);
+    assertTrue(after.contains(BIDI_DATA_CLASS), "bidi data not loaded");
+    assertTrue(warmUpSource().contains("warmUpTextLayout();"), "not called by warmUp");
+  }
+
+  private static final String BIDI_DATA_CLASS = "jdk.internal.icu.impl.UBiDiProps ";
+
+  private static String runTextLayoutProbe(String mode) throws IOException, InterruptedException {
+    Process probe =
+        new ProcessBuilder(
+                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-Xlog:class+load=info",
+                "-Djava.awt.headless=true",
+                "--add-opens",
+                "java.desktop/sun.font=ALL-UNNAMED",
+                "-cp",
+                System.getProperty("java.class.path"),
+                TextLayoutProbe.class.getName(),
+                mode)
+            .redirectErrorStream(true)
+            .start();
+    String log = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    assertTrue(probe.waitFor(120, TimeUnit.SECONDS), "probe timed out");
+    assertEquals(0, probe.exitValue(), log);
+    return log;
+  }
+
+  /**
+   * Runs in a fresh JVM and prints how many installed fonts have not read their character map yet.
+   */
+  static final class TextLayoutProbe {
+    static final String INITIALIZE_ONLY = "initialize";
+    static final String LAYOUT = "layout";
+
+    public static void main(String[] args) throws Exception {
+      Class.forName(JdkWarmUp.class.getName());
+      if (LAYOUT.equals(args[0])) {
+        JdkWarmUp.warmUpTextLayout();
+      }
+      Field mapper = Class.forName("sun.font.Font2D").getDeclaredField("mapper");
+      mapper.setAccessible(true);
+      Method font2D = Class.forName("sun.font.FontUtilities").getMethod("getFont2D", Font.class);
+      int unread = 0;
+      for (Font font : GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
+        if (mapper.get(font2D.invoke(null, font)) == null) {
+          unread++;
+        }
+      }
+      System.out.println("unread=" + unread);
+    }
   }
 
   @Test

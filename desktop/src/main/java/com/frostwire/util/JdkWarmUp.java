@@ -12,6 +12,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
@@ -20,6 +21,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
+import java.text.AttributedString;
+import java.text.BreakIterator;
 import java.text.Collator;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -56,6 +59,9 @@ import javax.swing.text.html.HTMLEditorKit;
  *   <li>Fallback fonts: a composite UI font maps characters missing from its primary font through
  *       fallback "slot" fonts, and each slot reads its character map from disk the first time it is
  *       consulted (several MB for CJK fonts).
+ *   <li>Font resolution and bidi: clipping complex text in a cell measures it with no font, so the
+ *       JDK looks for a font per character among all installed fonts, see {@link
+ *       #warmUpTextLayout}.
  *   <li>Class loading: building the main window creates a UI delegate per component type, and each
  *       delegate class (FrostWire's skin classes and their Synth/Basic superclasses) is read from
  *       the jar or the JDK's module image and defined the first time, on the EDT.
@@ -98,6 +104,16 @@ public final class JdkWarmUp {
 
   /** Unassigned code point no font maps, so the lookup walks (and initializes) every slot. */
   private static final int UNMAPPED_CODE_POINT = 0x0378;
+
+  /**
+   * Text that needs complex layout: Arabic and Hebrew (right to left, so the JDK runs its bidi
+   * algorithm), Devanagari, Thai, CJK and Cyrillic, then {@link #UNMAPPED_CODE_POINT}, which no
+   * font maps, so resolving its font consults every installed font.
+   */
+  static final String TEXT_LAYOUT_SAMPLE =
+      "FrostWire \u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u05e2\u05d1\u05e8\u05d9\u05ea"
+          + " \u0915\u094d\u0937 \u0e44\u0e17\u0e22 \u4e2d\u6587 \u0420\u0443\u0441 "
+          + new String(new int[] {UNMAPPED_CODE_POINT}, 0, 1);
 
   /**
    * JDK classes whose static initializers are slow and would otherwise run on the EDT: DragSource
@@ -290,6 +306,11 @@ public final class JdkWarmUp {
     } catch (Throwable t) {
       LOG.warn("Tooltip painter warm-up failed: " + t.getMessage(), t);
     }
+    try {
+      warmUpTextLayout();
+    } catch (Throwable t) {
+      LOG.warn("Text layout warm-up failed: " + t.getMessage(), t);
+    }
   }
 
   /** The desktop's text antialiasing hints, or null when the toolkit has none. */
@@ -305,6 +326,22 @@ public final class JdkWarmUp {
    */
   static List<Font> mainWindowPlatformFonts() {
     return List.of(PlatformFonts.sansSerif(Font.BOLD, 10), PlatformFonts.sansSerif(Font.PLAIN, 12));
+  }
+
+  /**
+   * Clips {@link #TEXT_LAYOUT_SAMPLE} the way Swing clips a cell's complex text that does not fit
+   * (SwingUtilities2.clipString): a LineBreakMeasurer over text with no font attribute. That runs
+   * the bidi algorithm (loading the ICU bidi data) and resolves a font per character through
+   * FontResolver, which asks every installed font in turn whether it can display a character the
+   * default font lacks, reading each font's character map from disk the first time. A table cell
+   * with such text paid that on the EDT.
+   */
+  static void warmUpTextLayout() {
+    new LineBreakMeasurer(
+            new AttributedString(TEXT_LAYOUT_SAMPLE).getIterator(),
+            BreakIterator.getCharacterInstance(),
+            new FontRenderContext(null, true, true))
+        .nextOffset(50);
   }
 
   /**
