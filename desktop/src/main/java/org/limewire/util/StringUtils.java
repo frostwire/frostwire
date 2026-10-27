@@ -28,8 +28,15 @@ import java.util.regex.Pattern;
  * with additional string utility methods.
  */
 public class StringUtils {
-  /** Collator used for internationalization. */
-  private static volatile Collator COLLATOR;
+  /** Locale of the string comparisons, see {@link #setLocale(Locale)}. */
+  private static Locale collatorLocale = Locale.getDefault();
+
+  /**
+   * Collator for {@link #compareFullPrimary}, built on the first comparison. Building one is slow
+   * the first time in the JVM (Unicode decomposition tables) and this class is loaded early at
+   * startup, on the EDT, where only table sorting needs it.
+   */
+  private static volatile Collator collator;
 
   /**
    * Pre-compiled pattern for matching multiple consecutive whitespace characters. Used by hot-path
@@ -37,18 +44,26 @@ public class StringUtils {
    */
   private static final Pattern MULTI_SPACE = Pattern.compile("\\s+");
 
-  static {
-    COLLATOR = Collator.getInstance(Locale.getDefault());
-    COLLATOR.setDecomposition(Collator.FULL_DECOMPOSITION);
-    COLLATOR.setStrength(Collator.PRIMARY);
+  /** Updates the locale that string-matching will use. */
+  public static synchronized void setLocale(Locale locale) {
+    collatorLocale = locale;
+    collator = null;
   }
 
-  /** Updates the locale that string-matching will use. */
-  public static void setLocale(Locale locale) {
-    Collator later = Collator.getInstance(locale);
-    later.setDecomposition(Collator.FULL_DECOMPOSITION);
-    later.setStrength(Collator.PRIMARY);
-    COLLATOR = later;
+  private static Collator collator() {
+    Collator current = collator;
+    if (current != null) {
+      return current;
+    }
+    synchronized (StringUtils.class) {
+      if (collator == null) {
+        Collator created = Collator.getInstance(collatorLocale);
+        created.setDecomposition(Collator.FULL_DECOMPOSITION);
+        created.setStrength(Collator.PRIMARY);
+        collator = created;
+      }
+      return collator;
+    }
   }
 
   /**
@@ -216,7 +231,7 @@ public class StringUtils {
    * differences The comparision will ignore case as well as differences like FULLWIDTH vs HALFWIDTH
    */
   public static int compareFullPrimary(String s1, String s2) {
-    return COLLATOR.compare(s1, s2);
+    return collator().compare(s1, s2);
   }
 
   /**
