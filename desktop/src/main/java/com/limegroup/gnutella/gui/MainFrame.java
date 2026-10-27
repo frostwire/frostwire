@@ -211,7 +211,11 @@ public final class MainFrame {
     int width = horizontal.getMinimumSize().width;
     int height = 0;
     for (JComponent c : verticals) {
-      height += c.getMinimumSize().height;
+      // A tab holder measures only the tab on show; the window must fit every tab.
+      height +=
+          c.getLayout() instanceof VisibleCardLayout cards
+              ? cards.largestCardMinimumSize(c).height
+              : c.getMinimumSize().height;
     }
     // for some reason I can pack the frame
     // this disallow me of getting the right size of the title bar

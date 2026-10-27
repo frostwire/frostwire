@@ -74,6 +74,32 @@ class VisibleCardLayoutTest {
         });
   }
 
+  /** The window's smallest size must still fit the largest tab, not just the one on show. */
+  @Test
+  void largestCardMinimumSizeCoversHiddenCards() throws Exception {
+    SwingUtilities.invokeAndWait(
+        () -> {
+          VisibleCardLayout layout = new VisibleCardLayout();
+          JPanel holder = new JPanel(layout);
+          holder.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+          holder.add(new Card(10, 20), "small");
+          holder.add(new Card(500, 900), "huge");
+
+          assertEquals(new Dimension(500, 501), layout.largestCardMinimumSize(holder));
+          assertEquals(new Dimension(10, 11), holder.getMinimumSize());
+        });
+  }
+
+  @Test
+  void windowMinimumSizeMeasuresEveryTab() throws Exception {
+    String source = readSource("com/limegroup/gnutella/gui/MainFrame.java").replaceAll("\\s+", "");
+    int setMinimalSize = source.indexOf("privatevoidsetMinimalSize(");
+    assertTrue(setMinimalSize >= 0, "setMinimalSize not found");
+    assertTrue(
+        source.substring(setMinimalSize).contains("cards.largestCardMinimumSize(c)"),
+        "the window's minimum size must fit every tab");
+  }
+
   /** Both need the running app to be built, so check their sources. */
   @Test
   void tabHolderAndTransferDetailHolderUseIt() throws Exception {

@@ -36,6 +36,15 @@ public class VisibleCardLayout extends CardLayout {
     return sizeOfVisibleCard(parent, Component::getMinimumSize);
   }
 
+  /**
+   * The minimum size over every card, hidden ones included, as plain {@link CardLayout} computes
+   * it. For a one-off measurement, such as the smallest size a window may take, where any card can
+   * be shown later.
+   */
+  public Dimension largestCardMinimumSize(Container parent) {
+    return super.minimumLayoutSize(parent);
+  }
+
   private Dimension sizeOfVisibleCard(Container parent, Function<Component, Dimension> size) {
     synchronized (parent.getTreeLock()) {
       Dimension card = new Dimension();
