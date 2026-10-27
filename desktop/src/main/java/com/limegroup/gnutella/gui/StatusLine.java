@@ -765,7 +765,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         tip = I18n.tr("Your connection to the network is extremely strong");
         break;
     }
-    long dhtNodes = BTEngine.getInstance().dhtNodes();
+    long dhtNodes = dhtNodesIfEngineReady();
     if (dhtNodes > 0) {
       String updatedToolTip = tip + ". (DHT: " + dhtNodes + " " + I18n.tr("nodes") + ")";
       connectionQualityMeter.setToolTipText(updatedToolTip);
@@ -773,6 +773,16 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
       connectionQualityMeter.setToolTipText(tip);
     }
     connectionQualityMeter.setText(status);
+  }
+
+  /**
+   * DHT node count for the connection tooltip, 0 until the engine is set up. Runs on the EDT, so it
+   * must never wait for the engine: the first call comes from the constructor's setup block, which
+   * can run before startup has set up BTEngine (Icebase #57095c0f3115).
+   */
+  static long dhtNodesIfEngineReady() {
+    BTEngine engine = BTEngine.getInstanceIfReady();
+    return engine != null ? engine.dhtNodes() : 0;
   }
 
   /**

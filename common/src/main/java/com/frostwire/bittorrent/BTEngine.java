@@ -61,7 +61,8 @@ public final class BTEngine extends SessionManager {
   // time to time, not in every version
   private static final String STATE_VERSION_VALUE = "1.2.0.6";
   private static final CountDownLatch ctxSetupLatch = new CountDownLatch(1);
-  public static BTContext ctx;
+  // volatile: set by the startup thread, read by UI threads through getInstanceIfReady()
+  public static volatile BTContext ctx;
   private final InnerListener innerListener;
   private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
   private volatile BTEngineListener listener;
@@ -87,6 +88,11 @@ public final class BTEngine extends SessionManager {
     this.restoreDownloadsQueue = new LinkedList<>();
   }
 
+  /**
+   * Returns the engine, waiting until the startup code has set up {@link #ctx}. Never call this
+   * from the UI thread (Swing EDT, Android main thread): before setup it parks the caller for as
+   * long as startup takes. UI code uses {@link #getInstanceIfReady()}.
+   */
   public static BTEngine getInstance() {
     if (ctx == null) {
       try {
@@ -99,6 +105,15 @@ public final class BTEngine extends SessionManager {
       }
     }
     return Loader.INSTANCE;
+  }
+
+  /**
+   * Returns the engine once the startup code has set up {@link #ctx}, or {@code null} before that.
+   * Never waits, so UI refreshers can call it and show a neutral "not connected yet" state until
+   * the engine is ready.
+   */
+  public static BTEngine getInstanceIfReady() {
+    return ctx != null ? Loader.INSTANCE : null;
   }
 
   public static void onCtxSetupComplete() {
