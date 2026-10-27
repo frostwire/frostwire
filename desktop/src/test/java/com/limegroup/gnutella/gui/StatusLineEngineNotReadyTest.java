@@ -8,11 +8,15 @@
 package com.limegroup.gnutella.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.frostwire.bittorrent.BTEngine;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,5 +60,17 @@ class StatusLineEngineNotReadyTest {
         "StatusLine waited for BTEngine before startup set it up; thread state: "
             + reader.getState());
     assertEquals(0, nodes.get());
+  }
+
+  @Test
+  void statusLineNeverWaitsForTheEngine() throws IOException {
+    // Whitespace-stripped so reformatting cannot hide a call. Every StatusLine path runs on the EDT
+    // or on the shared background queue, and both must not park until startup sets up the engine.
+    String source =
+        Files.readString(Path.of("src/main/java/com/limegroup/gnutella/gui/StatusLine.java"))
+            .replaceAll("\\s+", "");
+    assertFalse(
+        source.contains("BTEngine.getInstance()"),
+        "StatusLine must use BTEngine.getInstanceIfReady(), never the blocking getInstance()");
   }
 }

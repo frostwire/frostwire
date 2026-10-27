@@ -681,12 +681,17 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
   /** Updates the firewall text. */
   private void updateFirewall() {
-    // isFirewalled() queries the libtorrent session synchronously: keep it off the EDT.
+    // isFirewalled() queries the libtorrent session synchronously: keep it off the EDT. Don't wait
+    // for the engine either, that would park the shared background queue until startup sets it up.
     BackgroundQueuedExecutorService.schedule(
         () -> {
           final boolean notFirewalled;
           try {
-            notFirewalled = !BTEngine.getInstance().isFirewalled();
+            BTEngine engine = BTEngine.getInstanceIfReady();
+            if (engine == null) {
+              return;
+            }
+            notFirewalled = !engine.isFirewalled();
           } catch (Throwable ignored) {
             return;
           }
