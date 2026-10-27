@@ -9,6 +9,11 @@ package com.frostwire.gui.theme;
 
 import com.frostwire.util.OSUtils;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Fonts by family name that are installed wherever FrostWire runs.
@@ -33,5 +38,58 @@ public final class PlatformFonts {
 
   static String sansSerifFamily(boolean macOS) {
     return macOS ? MAC_SANS_SERIF : Font.DIALOG;
+  }
+
+  /**
+   * The Windows UI font family recommended for the language, or null. These are physical families
+   * and not every Windows has them: Windows 10 and 11 ship Gisha, Leelawadee and Meiryo only as
+   * optional supplemental fonts. Use {@link #windowsUIFamily(String)} to pick one.
+   */
+  static String recommendedFamily(String language) {
+    if (language == null) {
+      return null;
+    } else if (language.startsWith("ja")) {
+      return "Meiryo";
+    } else if (language.startsWith("ko")) {
+      return "Malgun Gothic";
+    } else if (language.startsWith("zh")) {
+      // Microsoft JhengHei for Chinese (Traditional), Microsoft YaHei for Chinese (Simplified)
+      return "Microsoft JhengHei";
+    } else if (language.startsWith("he")) {
+      return "Gisha";
+    } else if (language.startsWith("th")) {
+      return "Leelawadee";
+    }
+    return null;
+  }
+
+  /**
+   * The recommended Windows UI font family for the language if this system has it, else null, which
+   * keeps the look and feel's logical font: its fallback fonts cover these scripts, and it is what
+   * the JDK falls back to for a missing family anyway, after the scan. The installed families are
+   * read once, on the first call for such a language; at startup that is the thread installing the
+   * look and feel, not the EDT, and reading them also builds the JDK's map of platform font files
+   * that resolving the family needs.
+   */
+  public static String windowsUIFamily(String language) {
+    return recommendedFamily(language) == null
+        ? null
+        : windowsUIFamily(language, InstalledFamilies.LOWER_CASE);
+  }
+
+  static String windowsUIFamily(String language, Set<String> installedLowerCase) {
+    String family = recommendedFamily(language);
+    return family != null && installedLowerCase.contains(family.toLowerCase(Locale.ROOT))
+        ? family
+        : null;
+  }
+
+  /** The system's font family names, lower case, read on first use. */
+  private static final class InstalledFamilies {
+    static final Set<String> LOWER_CASE =
+        Arrays.stream(
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
+            .map(name -> name.toLowerCase(Locale.ROOT))
+            .collect(Collectors.toUnmodifiableSet());
   }
 }

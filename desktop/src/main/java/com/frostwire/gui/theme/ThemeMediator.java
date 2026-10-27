@@ -647,28 +647,7 @@ public final class ThemeMediator {
   }
 
   private static String getRecommendedFontName() {
-    String fontName = null;
-    String language = ApplicationSettings.getLanguage();
-    if (language != null) {
-      if (language.startsWith("ja")) {
-        // Meiryo for Japanese
-        fontName = "Meiryo";
-      } else if (language.startsWith("ko")) {
-        // Malgun Gothic for Korean
-        fontName = "Malgun Gothic";
-      } else if (language.startsWith("zh")) {
-        // Microsoft JhengHei for Chinese (Traditional)
-        // Microsoft YaHei for Chinese (Simplified)
-        fontName = "Microsoft JhengHei";
-      } else if (language.startsWith("he")) {
-        // Gisha for Hebrew
-        fontName = "Gisha";
-      } else if (language.startsWith("th")) {
-        // Leelawadee for Thai
-        fontName = "Leelawadee";
-      }
-    }
-    return fontName;
+    return PlatformFonts.recommendedFamily(ApplicationSettings.getLanguage());
   }
 
   private static boolean canDisplayMessage(Font f, Object msg) {
@@ -709,7 +688,9 @@ public final class ThemeMediator {
       Method method =
           Toolkit.class.getDeclaredMethod("setDesktopProperty", String.class, Object.class);
       method.setAccessible(true);
-      String fontName = ThemeMediator.getRecommendedFontName();
+      // Only a family this Windows has: asking for a missing one makes the JDK scan every
+      // installed font file the first time text in it is measured (GitHub #1329).
+      String fontName = PlatformFonts.windowsUIFamily(ApplicationSettings.getLanguage());
       if (fontName != null) {
         font = new Font(fontName, Font.PLAIN, 12);
         method.invoke(toolkit, "win.icon.font", font);
