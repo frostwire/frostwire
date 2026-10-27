@@ -31,6 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.*;
 import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.CommonUtils;
@@ -47,6 +48,9 @@ public final class SetupManager {
 
   /** the dialog window that holds all other gui elements for the setup. */
   private FramedDialog dialogFrame;
+
+  /** Released once the wizard has closed, or right away when there is no wizard to show. */
+  private final CountDownLatch closed = new CountDownLatch(1);
 
   /** the holder for the setup windows */
   private SetupWindowHolder _setupWindowHolder;
@@ -115,6 +119,7 @@ public final class SetupManager {
     }
     // Nothing to install?.. Begone.
     if (windows.size() == 0) {
+      closed.countDown();
       return;
     }
 
@@ -218,12 +223,43 @@ public final class SetupManager {
    * This defers the expensive pack() operation to prevent EDT blocking.
    */
   private void packAndShowDialog() {
-    JDialog dialog = dialogFrame.getDialog();
-    // Pack the dialog to realize components and trigger native initialization
-    dialog.pack();
-    SplashWindow.instance().setVisible(false);
-    dialogFrame.showDialog();
+    boolean showing = false;
+    try {
+      JDialog dialog = dialogFrame.getDialog();
+      // Pack the dialog to realize components and trigger native initialization
+      dialog.pack();
+      SplashWindow.instance().setVisible(false);
+      dialogFrame.showDialog(this::wizardClosed);
+      showing = true;
+    } finally {
+      if (!showing) {
+        wizardClosed();
+      }
+    }
+  }
+
+  /** Brings the splash back for the rest of startup and lets {@link #awaitClosed()} return. */
+  void wizardClosed() {
     SplashWindow.instance().setVisible(true);
+    closed.countDown();
+  }
+
+  /**
+   * Blocks the calling (startup) thread until the wizard has closed. The wizard opens in a later
+   * EDT event and runs its own modal loop, so {@link #createIfNeeded()} returns while it is still
+   * up; without this wait, startup went on to start the BitTorrent core and build and show the main
+   * window inside the wizard's modal loop, before the user had chosen the settings they depend on.
+   * Returns right away on the EDT, which must never wait for its own modal loop.
+   */
+  public void awaitClosed() {
+    if (EventQueue.isDispatchThread()) {
+      return;
+    }
+    try {
+      closed.await();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /** Enables the bitmask of specified actions, the other actions are explicitly disabled. */

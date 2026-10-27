@@ -354,6 +354,8 @@ final class Initializer {
     // Run through the initialization sequence -- this must always be
     // called before GUIMediator constructs the LibraryTree!
     GUIMediator.safeInvokeAndWait(setupManager::createIfNeeded);
+    // The wizard shows from a later EDT event; startup continues only once it has closed.
+    setupManager.awaitClosed();
   }
 
   /** Loads the UI. */

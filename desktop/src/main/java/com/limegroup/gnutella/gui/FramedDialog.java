@@ -38,8 +38,11 @@ public class FramedDialog extends LimeJFrame {
    * Shows the dialog modally on the EDT and disposes the owner frame only once the dialog has
    * closed. Disposing the owner earlier also disposes the dialog, which made the setup wizard
    * vanish the instant it appeared: a non-modal {@code setVisible(true)} returns immediately.
+   *
+   * <p>Returns before the dialog is shown, from a later EDT event; {@code onClosed} runs on the EDT
+   * once the dialog has closed (or failed to show), after the owner frame is disposed.
    */
-  public void showDialog() {
+  public void showDialog(Runnable onClosed) {
     toFront();
     setVisible(true);
     dialog.toFront();
@@ -50,6 +53,7 @@ public class FramedDialog extends LimeJFrame {
             dialog.setVisible(true); // blocks (nested event loop) while the dialog is modal
           } finally {
             dispose();
+            onClosed.run();
           }
         });
   }

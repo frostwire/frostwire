@@ -29,7 +29,7 @@ class FramedDialogTest {
                 .resolve("src/main/java/com/limegroup/gnutella/gui/FramedDialog.java"),
             StandardCharsets.UTF_8);
     String compact = source.replaceAll("\\s+", "");
-    int start = compact.indexOf("publicvoidshowDialog(){");
+    int start = compact.indexOf("publicvoidshowDialog(RunnableonClosed){");
     int end = compact.indexOf("publicJDialoggetDialog()");
     assertTrue(start >= 0 && end > start);
     return compact.substring(start, end);
@@ -44,8 +44,10 @@ class FramedDialogTest {
   void ownerFrameIsDisposedOnlyAfterTheDialogReturns() throws Exception {
     String body = showDialogBody();
     int shown = body.indexOf("dialog.setVisible(true);");
-    int disposed = body.indexOf("finally{dispose();}");
+    int disposed = body.indexOf("finally{dispose();onClosed.run();}");
     assertTrue(shown >= 0, "dialog must be shown");
-    assertTrue(disposed > shown, "dispose() must run after setVisible returns, in a finally");
+    assertTrue(
+        disposed > shown,
+        "dispose(), then onClosed, must run after setVisible returns, in a finally");
   }
 }
