@@ -87,6 +87,9 @@ public class Main {
 
   private static URL CHOSEN_SPLASH_URL = null;
 
+  /** The splash image, decoded once and shared by the AWT splash and the Swing splash. */
+  private static Image CHOSEN_SPLASH_IMAGE = null;
+
   /**
    * Creates an `Initializer` instance that constructs the necessary classes for the application.
    *
@@ -197,19 +200,30 @@ public class Main {
   /** Shows the initial splash window. */
   private static Frame showInitialSplash() {
     Frame splashFrame = null;
-    Image image = null;
-    URL imageURL = getChosenSplashURL();
-    if (imageURL != null) {
-      try {
-        image = InMemoryImageIO.read(imageURL);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      if (image != null) {
-        splashFrame = AWTSplashWindow.splash(image);
-      }
+    Image image = getChosenSplashImage();
+    if (image != null) {
+      splashFrame = AWTSplashWindow.splash(image);
     }
     return splashFrame;
+  }
+
+  /**
+   * The decoded splash image, or null when it is missing or unreadable. The first call decodes the
+   * PNG, so callers make it off the EDT: the startup thread showing the AWT splash, and the
+   * Initializer before it builds the Swing splash on the EDT.
+   */
+  public static synchronized Image getChosenSplashImage() {
+    if (CHOSEN_SPLASH_IMAGE == null) {
+      URL imageURL = getChosenSplashURL();
+      if (imageURL != null) {
+        try {
+          CHOSEN_SPLASH_IMAGE = InMemoryImageIO.read(imageURL);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return CHOSEN_SPLASH_IMAGE;
   }
 
   /**

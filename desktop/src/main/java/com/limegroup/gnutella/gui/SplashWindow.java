@@ -23,7 +23,6 @@ import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -84,34 +83,22 @@ public final class SplashWindow {
     // Preload OS icons to avoid file I/O during painting
     BackgroundExecutorService.schedule(this::preloadOSIcons);
 
-    URL imageURL = null;
-    try {
-      imageURL = Main.getChosenSplashURL();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    if (imageURL != null) {
-      Image splashImage = null;
-      try {
-        splashImage = InMemoryImageIO.read(imageURL);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      if (splashImage != null) {
-        int imgWidth = splashImage.getWidth(null);
-        if (imgWidth < 1) imgWidth = 1;
-        int imgHeight = splashImage.getHeight(null);
-        if (imgHeight < 1) imgHeight = 1;
-        Dimension size = new Dimension(imgWidth + 2, imgHeight + 2);
-        splashWindow.setSize(size);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        splashWindow.setLocation(
-            (screenSize.width - size.width) / 2, (screenSize.height - size.height) / 2);
-        splashLabel.setIcon(new ImageIcon(splashImage));
-        splashWindow.getContentPane().add(splashLabel, BorderLayout.CENTER);
-        splashWindow.setGlassPane(glassPane);
-        splashWindow.pack();
-      }
+    // Already decoded off the EDT (AWT splash, Initializer.switchSplashes): a lookup here.
+    Image splashImage = Main.getChosenSplashImage();
+    if (splashImage != null) {
+      int imgWidth = splashImage.getWidth(null);
+      if (imgWidth < 1) imgWidth = 1;
+      int imgHeight = splashImage.getHeight(null);
+      if (imgHeight < 1) imgHeight = 1;
+      Dimension size = new Dimension(imgWidth + 2, imgHeight + 2);
+      splashWindow.setSize(size);
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      splashWindow.setLocation(
+          (screenSize.width - size.width) / 2, (screenSize.height - size.height) / 2);
+      splashLabel.setIcon(new ImageIcon(splashImage));
+      splashWindow.getContentPane().add(splashLabel, BorderLayout.CENTER);
+      splashWindow.setGlassPane(glassPane);
+      splashWindow.pack();
     }
   }
 

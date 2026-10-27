@@ -314,6 +314,11 @@ final class Initializer {
 
   /** Switches from the AWT splash to the Swing splash. */
   private void switchSplashes(Frame awtSplash) {
+    if (!isStartup) {
+      // Decode the splash image on this thread, not on the EDT while it builds the splash; a lookup
+      // when the AWT splash already decoded it.
+      Main.getChosenSplashImage();
+    }
     GUIMediator.safeInvokeAndWait(
         () -> {
           // Show the splash screen if we're not starting automatically on
