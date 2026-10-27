@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Errors on the UI thread no longer freeze the app for seconds, and they are now reported — FrostWire installs a real uncaught-exception handler (the old one was ignored by current Java) and files reports in the background
    - fix:No more freezes on the first tooltip, the first table showing Arabic, Hebrew, Indic, Thai or CJK names, the main window's first paint, or the splash's progress bar and OS icons — the startup warm-up prepares those fonts, text layout and painters in the background
    - fix:The Pieces tab no longer uses hundreds of MB for torrents with many pieces (UI freezes, possible out-of-memory), and stops redrawing itself nonstop while open — it now keeps only the visible rows in memory
    - update:Freeze reports keep a useful stack more often — when a freeze ends just as it is sampled, the report carries a sample taken halfway through it instead of an empty one
