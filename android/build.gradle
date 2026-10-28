@@ -340,7 +340,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.browser:browser:1.10.0'
-    implementation 'androidx.core:core:1.18.0'
+    implementation 'androidx.core:core:1.19.1'
     implementation 'androidx.exifinterface:exifinterface:1.4.2'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
     implementation 'androidx.preference:preference:1.2.1'
