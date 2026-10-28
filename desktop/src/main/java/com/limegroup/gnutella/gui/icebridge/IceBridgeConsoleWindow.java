@@ -111,6 +111,7 @@ public final class IceBridgeConsoleWindow {
           });
 
   private final IceBridgeTrafficMeter trafficMeter = new IceBridgeTrafficMeter();
+  private final IceBridgeTrafficGraph trafficGraph = new IceBridgeTrafficGraph();
   private boolean paused;
 
   private IceBridgeConsoleWindow() {
@@ -188,9 +189,17 @@ public final class IceBridgeConsoleWindow {
     table.getColumnModel().getColumn(3).setPreferredWidth(150);
     table.getColumnModel().getColumn(4).setPreferredWidth(700);
 
+    // The traffic graph sits at the right end of the button row.
+    trafficGraph.setToolTipText(I18n.tr("Last 5 minutes: blue is received, red is sent"));
+    JPanel graphCell = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
+    graphCell.add(trafficGraph);
+    JPanel toolbar = new JPanel(new BorderLayout());
+    toolbar.add(controls, BorderLayout.CENTER);
+    toolbar.add(graphCell, BorderLayout.EAST);
+
     JPanel top = new JPanel(new BorderLayout());
     top.add(filters, BorderLayout.NORTH);
-    top.add(controls, BorderLayout.SOUTH);
+    top.add(toolbar, BorderLayout.SOUTH);
     top.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -240,8 +249,11 @@ public final class IceBridgeConsoleWindow {
     double out = trafficMeter.bytesOutPerSecond();
     long totalIn = trafficMeter.totalBytesIn();
     long totalOut = trafficMeter.totalBytesOut();
+    double[] receivedHistory = trafficMeter.receiveHistory();
+    double[] sentHistory = trafficMeter.sendHistory();
     SwingUtilities.invokeLater(
         () -> {
+          trafficGraph.setHistory(receivedHistory, sentHistory);
           trafficRates.setText("\u2193 " + speed(in) + "    \u2191 " + speed(out));
           trafficTotals.setText(
               I18n.tr("Received")
