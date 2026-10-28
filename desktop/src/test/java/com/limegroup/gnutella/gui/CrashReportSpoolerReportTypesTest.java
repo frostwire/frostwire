@@ -55,6 +55,7 @@ class CrashReportSpoolerReportTypesTest {
                 "cpu_count",
                 "max_memory_mb",
                 "memory_bucket",
+                "heap_used_mb",
                 "violation_class",
                 "violation_count",
                 "report_nonce"));
@@ -106,7 +107,8 @@ class CrashReportSpoolerReportTypesTest {
     File spoolDir = new File(tempDir.toFile(), "long-stack");
     CrashReportSpooler spooler = new CrashReportSpooler(spoolDir, null, "7.1.1", 333);
     StackTraceElement[] captured = new StackTraceElement[100];
-    Arrays.fill(captured, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
+    Arrays.fill(
+        captured, new StackTraceElement("com.frostwire.Example", "run", "Example.java", 42));
 
     spooler.spoolStrictMode("java.awt.event.FocusEvent#1004", 1, captured);
 
@@ -140,6 +142,7 @@ class CrashReportSpoolerReportTypesTest {
                 "cpu_count",
                 "max_memory_mb",
                 "memory_bucket",
+                "heap_used_mb",
                 "missed_heartbeats",
                 "report_nonce"));
 
@@ -202,15 +205,25 @@ class CrashReportSpoolerReportTypesTest {
     highWatch.spoolWatchdog(500);
 
     assertEquals(
-        1, spooledJson(new File(tempDir.toFile(), "low-strict").toPath()).get("violation_count").getAsInt());
+        1,
+        spooledJson(new File(tempDir.toFile(), "low-strict").toPath())
+            .get("violation_count")
+            .getAsInt());
     assertEquals(
-        1, spooledJson(new File(tempDir.toFile(), "low-watch").toPath()).get("missed_heartbeats").getAsInt());
+        1,
+        spooledJson(new File(tempDir.toFile(), "low-watch").toPath())
+            .get("missed_heartbeats")
+            .getAsInt());
     assertEquals(
         1000,
-        spooledJson(new File(tempDir.toFile(), "high-strict").toPath()).get("violation_count").getAsInt());
+        spooledJson(new File(tempDir.toFile(), "high-strict").toPath())
+            .get("violation_count")
+            .getAsInt());
     assertEquals(
         100,
-        spooledJson(new File(tempDir.toFile(), "high-watch").toPath()).get("missed_heartbeats").getAsInt());
+        spooledJson(new File(tempDir.toFile(), "high-watch").toPath())
+            .get("missed_heartbeats")
+            .getAsInt());
   }
 
   @Test

@@ -245,7 +245,8 @@ public final class CrashReportSpooler {
     spoolStrictMode(violationClass, violationCount, null);
   }
 
-  void spoolStrictMode(String violationClass, int violationCount, StackTraceElement[] capturedStack) {
+  void spoolStrictMode(
+      String violationClass, int violationCount, StackTraceElement[] capturedStack) {
     spoolPayload(strictModeReportFor(violationClass, violationCount, capturedStack));
   }
 
@@ -290,7 +291,9 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().availableProcessors(),
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
+        heapUsedMb(),
         problem.getClass().getName(),
+        oomKind(problem),
         frames,
         UUID.randomUUID().toString().replace("-", ""));
   }
@@ -321,6 +324,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().availableProcessors(),
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
+        heapUsedMb(),
         sanitizeViolationClass(violationClass),
         clamp(violationCount, 1, 1000),
         capturedStack == null ? null : framesFor(capturedStack),
@@ -342,6 +346,7 @@ public final class CrashReportSpooler {
         Runtime.getRuntime().availableProcessors(),
         Runtime.getRuntime().maxMemory() / (1024 * 1024),
         memoryBucket(),
+        heapUsedMb(),
         clamp(missedHeartbeats, 1, 100),
         UUID.randomUUID().toString().replace("-", ""));
   }
@@ -404,6 +409,31 @@ public final class CrashReportSpooler {
     return "gte_2g";
   }
 
+  /** Java heap in use now, in MB. */
+  static int heapUsedMb() {
+    Runtime runtime = Runtime.getRuntime();
+    return (int) ((runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024));
+  }
+
+  /**
+   * What an OutOfMemoryError ran out of, from the JVM's message, or null for any other problem.
+   * Only this fixed name is reported, never the message.
+   */
+  static String oomKind(Throwable problem) {
+    if (!(problem instanceof OutOfMemoryError)) {
+      return null;
+    }
+    String message = problem.getMessage() == null ? "" : problem.getMessage();
+    if (message.contains("Java heap space")) return "heap";
+    if (message.contains("GC overhead limit exceeded")) return "gc_overhead";
+    if (message.contains("Compressed class space")) return "compressed_class";
+    if (message.contains("Metaspace")) return "metaspace";
+    if (message.contains("unable to create native thread")) return "native_thread";
+    if (message.contains("irect buffer memory")) return "direct_buffer";
+    if (message.contains("Requested array size exceeds VM limit")) return "array_size";
+    return "other";
+  }
+
   private void uploadPending() {
     if (client == null || !directory.isDirectory()) return;
     try (var files = Files.list(directory.toPath())) {
@@ -443,7 +473,12 @@ public final class CrashReportSpooler {
     private final String cpu_count;
     private final String max_memory_mb;
     private final String memory_bucket;
+    private final int heap_used_mb;
     private final String exception_class;
+
+    /** Null, and then left out of the JSON, for anything but an OutOfMemoryError. */
+    private final String oom_kind;
+
     private final Frame[] stack_frames;
     private final String report_nonce;
 
@@ -461,7 +496,9 @@ public final class CrashReportSpooler {
         int cpuCount,
         long maxMemoryMb,
         String memoryBucket,
+        int heapUsedMb,
         String exceptionClass,
+        String oomKind,
         Frame[] stackFrames,
         String nonce) {
       this.app_version = appVersion;
@@ -477,7 +514,9 @@ public final class CrashReportSpooler {
       this.cpu_count = Integer.toString(cpuCount);
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
+      this.heap_used_mb = heapUsedMb;
       this.exception_class = exceptionClass;
+      this.oom_kind = oomKind;
       this.stack_frames = stackFrames;
       this.report_nonce = nonce;
     }
@@ -514,6 +553,7 @@ public final class CrashReportSpooler {
     private final String cpu_count;
     private final String max_memory_mb;
     private final String memory_bucket;
+    private final int heap_used_mb;
     private final String violation_class;
     private final int violation_count;
     private final Frame[] stack_frames;
@@ -533,6 +573,7 @@ public final class CrashReportSpooler {
         int cpuCount,
         long maxMemoryMb,
         String memoryBucket,
+        int heapUsedMb,
         String violationClass,
         int violationCount,
         Frame[] stackFrames,
@@ -550,6 +591,7 @@ public final class CrashReportSpooler {
       this.cpu_count = Integer.toString(cpuCount);
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
+      this.heap_used_mb = heapUsedMb;
       this.violation_class = violationClass;
       this.violation_count = violationCount;
       this.stack_frames = stackFrames;
@@ -574,6 +616,7 @@ public final class CrashReportSpooler {
     private final String cpu_count;
     private final String max_memory_mb;
     private final String memory_bucket;
+    private final int heap_used_mb;
     private final int missed_heartbeats;
     private final String report_nonce;
 
@@ -591,6 +634,7 @@ public final class CrashReportSpooler {
         int cpuCount,
         long maxMemoryMb,
         String memoryBucket,
+        int heapUsedMb,
         int missedHeartbeats,
         String nonce) {
       this.app_version = appVersion;
@@ -606,6 +650,7 @@ public final class CrashReportSpooler {
       this.cpu_count = Integer.toString(cpuCount);
       this.max_memory_mb = Long.toString(maxMemoryMb);
       this.memory_bucket = memoryBucket;
+      this.heap_used_mb = heapUsedMb;
       this.missed_heartbeats = missedHeartbeats;
       this.report_nonce = nonce;
     }

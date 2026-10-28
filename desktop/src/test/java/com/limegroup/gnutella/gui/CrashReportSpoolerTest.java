@@ -56,6 +56,7 @@ class CrashReportSpoolerTest {
                 "cpu_count",
                 "max_memory_mb",
                 "memory_bucket",
+                "heap_used_mb",
                 "exception_class",
                 "stack_frames",
                 "report_nonce"));
@@ -78,6 +79,49 @@ class CrashReportSpoolerTest {
         json.get("stack_frames").getAsJsonArray().get(0).getAsJsonObject().keySet());
     assertNotNull(json.get("report_nonce").getAsString());
     assertTrue(json.get("report_nonce").getAsString().matches("[0-9a-f]{32}"));
+  }
+
+  @Test
+  void outOfMemoryReportsSayWhatRanOutButNotTheMessage() throws Exception {
+    Path directory = Files.createTempDirectory("frostwire-crash-spool");
+    CrashReportSpooler spooler = new CrashReportSpooler(directory.toFile(), null, "7.0.4", 331);
+
+    spooler.spool(new OutOfMemoryError("Metaspace"));
+
+    Path report = Files.list(directory).findFirst().orElseThrow();
+    JsonObject json = JsonParser.parseString(Files.readString(report)).getAsJsonObject();
+    assertEquals(OutOfMemoryError.class.getName(), json.get("exception_class").getAsString());
+    assertEquals("metaspace", json.get("oom_kind").getAsString());
+    assertFalse(json.toString().contains("Metaspace"));
+    assertTrue(json.getAsJsonPrimitive("heap_used_mb").isNumber());
+    assertTrue(json.get("heap_used_mb").getAsInt() >= 0);
+  }
+
+  @Test
+  void oomKindNamesEachJvmMessage() {
+    assertEquals("heap", CrashReportSpooler.oomKind(new OutOfMemoryError("Java heap space")));
+    assertEquals(
+        "gc_overhead",
+        CrashReportSpooler.oomKind(new OutOfMemoryError("GC overhead limit exceeded")));
+    assertEquals("metaspace", CrashReportSpooler.oomKind(new OutOfMemoryError("Metaspace")));
+    assertEquals(
+        "compressed_class",
+        CrashReportSpooler.oomKind(new OutOfMemoryError("Compressed class space")));
+    assertEquals(
+        "native_thread",
+        CrashReportSpooler.oomKind(
+            new OutOfMemoryError(
+                "unable to create native thread: possibly out of memory or process/resource limits"
+                    + " reached")));
+    assertEquals(
+        "direct_buffer",
+        CrashReportSpooler.oomKind(
+            new OutOfMemoryError("Cannot reserve 1048576 bytes of direct buffer memory")));
+    assertEquals(
+        "array_size",
+        CrashReportSpooler.oomKind(new OutOfMemoryError("Requested array size exceeds VM limit")));
+    assertEquals("other", CrashReportSpooler.oomKind(new OutOfMemoryError()));
+    assertEquals(null, CrashReportSpooler.oomKind(new IllegalStateException("Java heap space")));
   }
 
   @Test
@@ -162,7 +206,8 @@ class CrashReportSpoolerTest {
   @Test
   void recordSyncSpoolsValidCrashJsonWithoutStartedInstance() {
     Set<String> before = listReportNames();
-    assertDoesNotThrow(() -> CrashReportSpooler.recordSync(new IllegalStateException("sync probe")));
+    assertDoesNotThrow(
+        () -> CrashReportSpooler.recordSync(new IllegalStateException("sync probe")));
     Set<String> newcomers = listReportNames();
     newcomers.removeAll(before);
     try {
