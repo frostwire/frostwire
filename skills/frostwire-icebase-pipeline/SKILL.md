@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 name: frostwire-icebase-pipeline
-description: The tech-debt engineering pipeline that turns open Icebase reports (FrostWire Desktop crashes and EDT freezes) into GitHub tickets and root-cause fixes. For each report, or each group with one root cause: open a GitHub ticket and close the Icebase issue; then fix the tickets one at a time (most severe and hardest first, no parallel agents unless asked) everywhere the pattern occurs, with a regression test and the UNRELEASED changelog line, then close each ticket or leave the maintainer questions on it. Use when asked to "go over the open issues on build N", "open tickets for the Icebase issues", "run the pipeline", or to burn down Icebase tech debt.
+description: The tech-debt engineering pipeline that turns open Icebase reports (FrostWire Desktop crashes and EDT freezes) into GitHub tickets and root-cause fixes. For each report, or each group with one root cause, open a GitHub ticket and close the Icebase issue; then fix the tickets one at a time (most severe and hardest first, no parallel agents unless asked) everywhere the pattern occurs, with a regression test and the UNRELEASED changelog line, then close each ticket or leave the maintainer questions on it. Use when asked to "go over the open issues on build N", "open tickets for the Icebase issues", "run the pipeline", or to burn down Icebase tech debt.
 tags: [frostwire, desktop, icebase, tech-debt, pipeline, github-issues, edt, strictmode]
 triggers: [icebase pipeline, tech debt pipeline, open tickets for icebase issues, open issues on build, go over each open issue, burn down icebase]
 ---
