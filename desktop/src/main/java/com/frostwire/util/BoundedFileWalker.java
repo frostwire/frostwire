@@ -16,15 +16,17 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Walks a directory tree with a hard bound on the work it does, so a symlink loop, a huge or a very
  * deep folder can neither hang the caller nor exhaust the heap.
  *
  * <ul>
- *   <li>The root is followed if it is a symbolic link; symbolic links to directories below it are
- *       not entered, so a link back to an ancestor (or anywhere else) cannot loop or duplicate a
- *       tree. Symbolic links to regular files are reported like regular files.
+ *   <li>Symbolic links are followed, the root included, but each real directory is entered at most
+ *       once: a link back to an ancestor cannot loop, and two links to the same folder do not walk
+ *       it twice. Symbolic links to regular files are reported like regular files.
  *   <li>The walk stops after {@code maxEntries} files and directories and never goes deeper than
  *       {@code maxDepth} levels below the root.
  *   <li>It is iterative ({@link Files#walkFileTree}), so depth does not grow the Java stack, and
@@ -86,10 +88,10 @@ public final class BoundedFileWalker {
     if (!Files.isDirectory(start)) {
       return true;
     }
-    Walk walk = new Walk(start, maxEntries, visitor);
+    Walk walk = new Walk(maxEntries, visitor);
     try {
-      // FOLLOW_LINKS lets a symlinked root through and reports a symlinked file with its target's
-      // attributes; walk.preVisitDirectory refuses every symlinked directory below the root.
+      // FOLLOW_LINKS enters symlinked directories and reports a symlinked file with its target's
+      // attributes; walk.preVisitDirectory enters each real directory only once.
       Files.walkFileTree(start, EnumSet.of(FileVisitOption.FOLLOW_LINKS), maxDepth, walk);
     } catch (IOException e) {
       LOG.warn("BoundedFileWalker: error walking " + root + ": " + e.getMessage());
@@ -106,15 +108,17 @@ public final class BoundedFileWalker {
   }
 
   private static final class Walk extends SimpleFileVisitor<Path> {
-    private final Path start;
     private final int maxEntries;
     private final Visitor visitor;
+
+    /** Real directories already entered, so no folder is walked twice through different links. */
+    private final Set<Object> enteredDirectories = new HashSet<>();
+
     private int entries;
     private boolean truncated;
     private boolean canceled;
 
-    Walk(Path start, int maxEntries, Visitor visitor) {
-      this.start = start;
+    Walk(int maxEntries, Visitor visitor) {
       this.maxEntries = maxEntries;
       this.visitor = visitor;
     }
@@ -137,10 +141,26 @@ public final class BoundedFileWalker {
       if (overBudget()) {
         return FileVisitResult.TERMINATE;
       }
-      if (!dir.equals(start) && Files.isSymbolicLink(dir)) {
+      if (!enteredDirectories.add(directoryKey(dir, attrs))) {
         return FileVisitResult.SKIP_SUBTREE;
       }
       return visitor.enterDirectory(dir) ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+    }
+
+    /**
+     * Identity of the real directory behind {@code dir}: its file key (device and inode) where the
+     * file system has one, else its real path (Windows).
+     */
+    private static Object directoryKey(Path dir, BasicFileAttributes attrs) {
+      Object key = attrs.fileKey();
+      if (key != null) {
+        return key;
+      }
+      try {
+        return dir.toRealPath();
+      } catch (IOException e) {
+        return dir.toAbsolutePath().normalize();
+      }
     }
 
     @Override

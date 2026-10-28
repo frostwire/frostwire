@@ -455,7 +455,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         selectMediaTypeSavedFilesDirectoryHolderbyType(_mtsfdh.getMediaType());
       }
       File root = file.getAbsoluteFile();
-      // Bounded: symlinked folders are not entered and the walk is capped, so a symlink loop
+      // Bounded: symlinked folders are entered once each and the walk is capped, so a symlink loop
       // can't recurse forever while filling the cache (frostwire/frostwire#1336).
       BoundedFileWalker.walk(
           root,

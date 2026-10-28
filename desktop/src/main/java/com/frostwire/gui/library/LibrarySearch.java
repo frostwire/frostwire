@@ -346,7 +346,7 @@ public class LibrarySearch extends JPanel {
       }
       SearchFileFilter searchFilter = new SearchFileFilter(_query);
       File root = haystackDir.getAbsoluteFile();
-      // Bounded: symlinked folders are not entered and the walk is capped, so a symlink loop
+      // Bounded: symlinked folders are entered once each and the walk is capped, so a symlink loop
       // can't make the search recurse forever (frostwire/frostwire#1336).
       BoundedFileWalker.walk(
           root,

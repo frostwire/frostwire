@@ -61,6 +61,29 @@ class BoundedFileWalkerTest {
   }
 
   @Test
+  void symlinkedFoldersAreScannedOnce() throws Exception {
+    Path library = Files.createDirectories(tmp.resolve("library"));
+    Path elsewhere = Files.createDirectories(tmp.resolve("elsewhere"));
+    Path song = Files.createFile(elsewhere.resolve("song.mp3"));
+    Path own = Files.createFile(library.resolve("own.mp3"));
+    // Two links to the same folder outside the library: its files are found, once.
+    assumeTrue(symlink(library.resolve("music"), elsewhere));
+    assumeTrue(symlink(library.resolve("music2"), elsewhere));
+    List<Path> found = new ArrayList<>();
+
+    boolean complete =
+        BoundedFileWalker.walk(library.toFile(), 100, 64, (p, attrs) -> found.add(p));
+
+    assertTrue(complete);
+    assertEquals(2, found.size(), "found " + found);
+    assertTrue(found.contains(own));
+    assertTrue(
+        found.contains(library.resolve("music").resolve(song.getFileName()))
+            || found.contains(library.resolve("music2").resolve(song.getFileName())),
+        "found " + found);
+  }
+
+  @Test
   void symlinkedRootAndSymlinkedFilesAreReported() throws Exception {
     Path real = Files.createDirectories(tmp.resolve("real"));
     Path song = Files.createFile(real.resolve("song.mp3"));

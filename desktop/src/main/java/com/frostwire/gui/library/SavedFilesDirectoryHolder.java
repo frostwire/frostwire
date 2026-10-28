@@ -61,9 +61,9 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
 
   /**
    * Collects the files under {@code root} that the Library shows, skipping {@code excludeFolders},
-   * {@code hideFiles}, .DS_Store and .parts files. Bounded by {@link BoundedFileWalker}: symlinked
-   * folders are not entered and the walk stops after {@code maxEntries} entries, so a symlink loop
-   * or a huge Torrent Data folder can't exhaust the heap.
+   * {@code hideFiles}, .DS_Store and .parts files. Bounded by {@link BoundedFileWalker}: each real
+   * folder is entered once, even through symlinks, and the walk stops after {@code maxEntries}
+   * entries, so a symlink loop or a huge Torrent Data folder can't exhaust the heap.
    */
   static Set<File> collectFiles(
       File root, Set<File> excludeFolders, Set<File> hideFiles, int maxEntries) {
