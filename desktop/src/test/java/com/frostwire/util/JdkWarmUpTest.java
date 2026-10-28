@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -368,6 +369,67 @@ class JdkWarmUpTest {
     assertTrue(
         warmUpSource().replaceAll("\\s+", "").contains("(Fontfont:mainWindowPlatformFonts())"),
         "not rasterized by warmUp");
+  }
+
+  /**
+   * Search suggestions in the UI language and file names in any script are drawn from fallback slot
+   * fonts, whose first glyph read the font file on the EDT (Icebase #61abd02df47d, #475a8918f3b8,
+   * #81509d7f5ce6, GitHub #1346).
+   */
+  @Test
+  void scriptGlyphSampleCoversTheScriptsDrawnFromFallbackFonts() {
+    Set<Character.UnicodeScript> scripts = new HashSet<>();
+    boolean latinExtended = false;
+    for (int cp : JdkWarmUp.SCRIPT_GLYPH_SAMPLE.codePoints().toArray()) {
+      if (Character.isLetter(cp)) {
+        scripts.add(Character.UnicodeScript.of(cp));
+        latinExtended |=
+            cp >= 0x100 && Character.UnicodeScript.of(cp) == Character.UnicodeScript.LATIN;
+      }
+    }
+    assertTrue(latinExtended, "no Latin letters past Latin-1");
+    for (Character.UnicodeScript script :
+        List.of(
+            Character.UnicodeScript.GREEK,
+            Character.UnicodeScript.CYRILLIC,
+            Character.UnicodeScript.ARABIC,
+            Character.UnicodeScript.HEBREW,
+            Character.UnicodeScript.DEVANAGARI,
+            Character.UnicodeScript.THAI,
+            Character.UnicodeScript.HANGUL,
+            Character.UnicodeScript.HIRAGANA,
+            Character.UnicodeScript.KATAKANA,
+            Character.UnicodeScript.HAN)) {
+      assertTrue(scripts.contains(script), "missing " + script);
+    }
+    Font font = new Font(Font.DIALOG, Font.PLAIN, 12);
+    assertDoesNotThrow(() -> JdkWarmUp.rasterizeGlyphs(font, null, JdkWarmUp.SCRIPT_GLYPH_SAMPLE));
+  }
+
+  /**
+   * Table cells paint with Table.font, its own strike when the user picked a table font size, and
+   * the search suggestions on Windows with a plain 12 pt Dialog: both are warmed, besides the label
+   * font, and each strike once.
+   */
+  @Test
+  void textFontsAreTheLabelTheTableAndTheSuggestionsFonts() throws Exception {
+    UIDefaults defaults = new UIDefaults();
+    Font label = new FontUIResource(Font.SANS_SERIF, Font.PLAIN, 13);
+    defaults.put("Label.font", label);
+    defaults.put("Table.font", new FontUIResource(label.deriveFont(16f)));
+    Set<Font> fonts = JdkWarmUp.textFonts(defaults);
+    assertTrue(fonts.contains(label), fonts::toString);
+    assertTrue(fonts.stream().anyMatch(f -> f.getSize() == 16), fonts::toString);
+    assertTrue(fonts.contains(new Font(Font.DIALOG, Font.PLAIN, 12)), fonts::toString);
+
+    defaults.put("Table.font", label);
+    assertEquals(2, JdkWarmUp.textFonts(defaults).size(), "the same strike twice");
+
+    String warmUp = warmUpSource().replaceAll("\\s+", "");
+    assertTrue(
+        warmUp.contains("(Fontfont:textFonts(UIManager.getDefaults()))")
+            && warmUp.contains("rasterizeGlyphs(font,desktopHints,SCRIPT_GLYPH_SAMPLE)"),
+        "script glyphs not rasterized by warmUp");
   }
 
   /**

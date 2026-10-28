@@ -116,6 +116,23 @@ public final class JdkWarmUp {
           + new String(new int[] {UNMAPPED_CODE_POINT}, 0, 1);
 
   /**
+   * Letters of scripts the UI fonts draw from fallback slot fonts: Latin Extended, Greek, Cyrillic,
+   * Arabic, Hebrew, Devanagari, Thai, Hangul, kana and CJK. Search suggestions come in the UI
+   * language and file names in any script; the first glyph of each slot font read that font's file
+   * on the EDT (Icebase #61abd02df47d, #475a8918f3b8, #81509d7f5ce6, GitHub #1346).
+   */
+  static final String SCRIPT_GLYPH_SAMPLE =
+      "\u0105\u010d\u0119\u0142\u0144\u0161\u017e\u0151\u0171 "
+          + "\u1ea1\u1ec7 "
+          + "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac "
+          + "\u0420\u0443\u0441\u0441\u043a\u0438\u0439 "
+          + "\u0627\u0644\u0639\u0631\u0628\u064a\u0629 "
+          + "\u05e2\u05d1\u05e8\u05d9\u05ea "
+          + "\u0939\u093f\u0928\u094d\u0926\u0940 \u0e44\u0e17\u0e22 "
+          + "\ud55c\uad6d\uc5b4 \u3072\u3089\u304c\u306a "
+          + "\u30ab\u30bf\u30ab\u30ca \u4e2d\u6587\u6f22\u5b57";
+
+  /**
    * JDK classes whose static initializers are slow and would otherwise run on the EDT: DragSource
    * decodes the drag cursors (first mouse press in a drag-enabled table), SunGraphicsCallback
    * brings up java.util.logging through its PlatformLogger (first container paint).
@@ -297,6 +314,15 @@ public final class JdkWarmUp {
       LOG.warn("Main window glyph warm-up failed: " + t.getMessage(), t);
     }
     try {
+      Map<?, ?> desktopHints = desktopFontHints();
+      for (Font font : textFonts(UIManager.getDefaults())) {
+        rasterizeGlyphs(font, desktopHints, GLYPH_SAMPLE);
+        rasterizeGlyphs(font, desktopHints, SCRIPT_GLYPH_SAMPLE);
+      }
+    } catch (Throwable t) {
+      LOG.warn("Script glyph warm-up failed: " + t.getMessage(), t);
+    }
+    try {
       warmUpDateFormatAndCollation(Locale.getDefault());
     } catch (Throwable t) {
       LOG.warn("Date format and collation warm-up failed: " + t.getMessage(), t);
@@ -326,6 +352,23 @@ public final class JdkWarmUp {
    */
   static List<Font> mainWindowPlatformFonts() {
     return List.of(PlatformFonts.sansSerif(Font.BOLD, 10), PlatformFonts.sansSerif(Font.PLAIN, 12));
+  }
+
+  /**
+   * The fonts that show text in any script: labels, table cells (Table.font, a strike of its own
+   * when the user picked a table font size) and the search suggestions on Windows (a plain 12 pt
+   * Dialog, ThemeMediator.DIALOG_FONT).
+   */
+  static Set<Font> textFonts(UIDefaults defaults) {
+    Set<Font> fonts = new LinkedHashSet<>();
+    for (String key : new String[] {"Label.font", "Table.font"}) {
+      Font font = defaults.getFont(key);
+      if (font != null) {
+        fonts.add(font);
+      }
+    }
+    fonts.add(new Font(Font.DIALOG, Font.PLAIN, 12));
+    return fonts;
   }
 
   /**
@@ -362,6 +405,11 @@ public final class JdkWarmUp {
    * through GDI), which the splash window and the setup wizard otherwise pay on the EDT.
    */
   static void rasterizeGlyphs(Font font, Map<?, ?> desktopHints) {
+    rasterizeGlyphs(font, desktopHints, GLYPH_SAMPLE);
+  }
+
+  /** Measures and draws {@code text} in the font, see {@link #rasterizeGlyphs(Font, Map)}. */
+  static void rasterizeGlyphs(Font font, Map<?, ?> desktopHints, String text) {
     BufferedImage image = new BufferedImage(GLYPH_IMAGE_WIDTH, 32, BufferedImage.TYPE_INT_RGB);
     Graphics2D g = image.createGraphics();
     try {
@@ -369,8 +417,8 @@ public final class JdkWarmUp {
         g.addRenderingHints(desktopHints);
       }
       g.setFont(font);
-      g.getFontMetrics().stringWidth(GLYPH_SAMPLE);
-      g.drawString(GLYPH_SAMPLE, 0, 24);
+      g.getFontMetrics().stringWidth(text);
+      g.drawString(text, 0, 24);
     } finally {
       g.dispose();
     }
