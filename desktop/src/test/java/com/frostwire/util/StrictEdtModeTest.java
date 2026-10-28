@@ -187,6 +187,56 @@ class StrictEdtModeTest {
     assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack));
   }
 
+  /** The Windows input method deactivating on focus loss, from the bottom of the stall up. */
+  private static final StackTraceElement[] IME_FOCUS_LOST = {
+    frame("sun.awt.windows.WInputMethod", "getNativeLocale"),
+    frame("sun.awt.windows.WInputMethod", "getLocale"),
+    frame("sun.awt.windows.WInputMethod", "deactivate"),
+    frame("sun.awt.im.InputContext", "deactivateInputMethod"),
+    frame("sun.awt.im.InputContext", "focusLost"),
+    frame("sun.awt.im.InputContext", "dispatchEvent"),
+    frame("sun.awt.im.InputMethodContext", "dispatchEvent"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent"),
+    frame("java.awt.KeyboardFocusManager", "redispatchEvent"),
+    frame("java.awt.DefaultKeyboardFocusManager", "typeAheadAssertions"),
+    frame("java.awt.DefaultKeyboardFocusManager", "dispatchEvent"),
+    frame("java.awt.Component", "dispatchEventImpl"),
+    frame("java.awt.Container", "dispatchEventImpl"),
+    frame("java.awt.Component", "dispatchEvent")
+  };
+
+  /**
+   * Icebase #347fc77bd6d5 (GitHub #1351): the Windows IME deactivating on a focus change, sampled
+   * in the JDK code its native call went back into. Any JDK frames may sit on top.
+   */
+  @Test
+  void imeDeactivationOnFocusLossIsWindowsToolkitOnlyStall() {
+    StackTraceElement[] sampled = {
+      frame("java.text.ParsePosition", "<init>"), frame("java.util.Locale", "forLanguageTag")
+    };
+    assertTrue(StrictEdtMode.isWindowsToolkitOnlyStall(stack(sampled, IME_FOCUS_LOST, EDT_LOOP)));
+    assertTrue(
+        StrictEdtMode.isWindowsToolkitOnlyStall(stack(IME_FOCUS_LOST, EDT_LOOP)),
+        "sampled in the native call itself");
+  }
+
+  /** An app frame above the IME call, e.g. a focus listener it called back, is still reported. */
+  @Test
+  void imeDeactivationUnderAnAppFrameIsReported() {
+    StackTraceElement[] sampled = {
+      frame("com.frostwire.gui.SomeListener", "localeChanged"),
+      frame("java.util.Locale", "forLanguageTag")
+    };
+    assertFalse(StrictEdtMode.isWindowsToolkitOnlyStall(stack(sampled, IME_FOCUS_LOST, EDT_LOOP)));
+    StackTraceElement[] partial =
+        java.util.Arrays.copyOfRange(IME_FOCUS_LOST, 4, IME_FOCUS_LOST.length);
+    assertFalse(
+        StrictEdtMode.isWindowsToolkitOnlyStall(stack(partial, EDT_LOOP)),
+        "only the bottom of the signature");
+  }
+
   /**
    * Icebase #3ae4ef04e569: the same cursor call from a Swing layout pass was an app revalidate
    * storm (GitHub #1321), so it must still be reported.

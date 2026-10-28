@@ -499,6 +499,14 @@ public final class StrictEdtMode {
   };
 
   /**
+   * First element of a {@link #WINDOWS_TOOLKIT_ONLY_STALLS} signature whose top frames vary: any
+   * number of JDK frames ({@link #JDK_FRAME_PREFIXES}) may sit above the rest of the signature.
+   */
+  static final String ANY_JDK_FRAMES = "*";
+
+  private static final String[] JDK_FRAME_PREFIXES = {"java.", "javax.", "sun.", "jdk."};
+
+  /**
    * Stalled events spent entirely inside a Windows toolkit call FrostWire neither makes nor can
    * change, sampled while the machine or the toolkit thread was busy. Each entry is the exact
    * stalled segment as "class.method", top of stack first. Icebase drops the same signatures at
@@ -517,6 +525,27 @@ public final class StrictEdtMode {
       "sun.awt.windows.WComponentPeer.beginValidate",
       "java.awt.Container.validate",
       "java.awt.Window.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent"
+    },
+    // The Windows input method (IME) deactivating on a focus change, before any focus listener
+    // runs; the sample lands anywhere in the JDK code the native call goes back into.
+    {
+      ANY_JDK_FRAMES,
+      "sun.awt.windows.WInputMethod.getNativeLocale",
+      "sun.awt.windows.WInputMethod.getLocale",
+      "sun.awt.windows.WInputMethod.deactivate",
+      "sun.awt.im.InputContext.deactivateInputMethod",
+      "sun.awt.im.InputContext.focusLost",
+      "sun.awt.im.InputContext.dispatchEvent",
+      "sun.awt.im.InputMethodContext.dispatchEvent",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
+      "java.awt.Component.dispatchEvent",
+      "java.awt.KeyboardFocusManager.redispatchEvent",
+      "java.awt.DefaultKeyboardFocusManager.typeAheadAssertions",
+      "java.awt.DefaultKeyboardFocusManager.dispatchEvent",
+      "java.awt.Component.dispatchEventImpl",
+      "java.awt.Container.dispatchEventImpl",
       "java.awt.Component.dispatchEvent"
     }
   };
@@ -560,11 +589,37 @@ public final class StrictEdtMode {
       segment.add(className + "." + frame.getMethodName());
     }
     for (String[] signature : WINDOWS_TOOLKIT_ONLY_STALLS) {
-      if (java.util.Arrays.asList(signature).equals(segment)) {
+      if (matchesStallSignature(signature, segment)) {
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * Whether the stalled segment is the signature: exactly, or for a signature starting with {@link
+   * #ANY_JDK_FRAMES}, the rest of the signature below only JDK frames.
+   */
+  private static boolean matchesStallSignature(String[] signature, java.util.List<String> segment) {
+    java.util.List<String> frames = java.util.Arrays.asList(signature);
+    if (frames.isEmpty() || !ANY_JDK_FRAMES.equals(frames.get(0))) {
+      return frames.equals(segment);
+    }
+    java.util.List<String> tail = frames.subList(1, frames.size());
+    int above = segment.size() - tail.size();
+    if (above < 0 || !segment.subList(above, segment.size()).equals(tail)) {
+      return false;
+    }
+    for (String frame : segment.subList(0, above)) {
+      boolean jdk = false;
+      for (String prefix : JDK_FRAME_PREFIXES) {
+        jdk |= frame.startsWith(prefix);
+      }
+      if (!jdk) {
+        return false;
+      }
+    }
+    return true;
   }
 
   static boolean isMacMetalRenderPipelineStall(StackTraceElement[] stack) {
