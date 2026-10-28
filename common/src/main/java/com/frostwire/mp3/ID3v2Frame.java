@@ -40,9 +40,20 @@ public class ID3v2Frame {
     }
 
     protected void unpackFrame(byte[] buffer, int offset) throws InvalidDataException {
+        if (offset < 0 || offset > buffer.length - getHeaderLength()) {
+            throw new InvalidDataException("Frame header runs past the end of the tag");
+        }
         int dataOffset = unpackHeader(buffer, offset);
         sanityCheckUnpackedHeader();
+        // The length comes from the frame header: it must fit in what is left of the tag.
+        if (dataLength < 0 || dataLength > buffer.length - dataOffset) {
+            throw new InvalidDataException("Frame data of " + dataLength + " bytes runs past the end of the tag");
+        }
         data = BufferTools.copyBuffer(buffer, dataOffset, dataLength);
+    }
+
+    protected int getHeaderLength() {
+        return HEADER_LENGTH;
     }
 
     protected int unpackHeader(byte[] buffer, int offset) {

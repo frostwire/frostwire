@@ -107,8 +107,11 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 
     protected abstract void unpackFlags(byte[] bytes);
 
-    private int unpackExtendedHeader(byte[] bytes, int offset) {
+    private int unpackExtendedHeader(byte[] bytes, int offset) throws InvalidDataException {
         extendedHeaderLength = BufferTools.unpackSynchsafeInteger(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]) + 4;
+        if (extendedHeaderLength < 4 || extendedHeaderLength > bytes.length - offset - 4) {
+            throw new InvalidDataException("Extended header runs past the end of the tag");
+        }
         extendedHeaderData = BufferTools.copyBuffer(bytes, offset + 4, extendedHeaderLength);
         return extendedHeaderLength;
     }

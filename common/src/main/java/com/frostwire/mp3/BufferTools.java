@@ -114,7 +114,14 @@ public class BufferTools {
         bytes[offset + 0] = (byte) ((i >> 21) & 0x7F);
     }
 
+    /**
+     * Copies {@code length} bytes from {@code offset}. The bounds are checked before the copy is
+     * allocated: lengths come from tag data, and a bad one must not allocate gigabytes first.
+     */
     public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
+        if (offset < 0 || length < 0 || offset > bytes.length - length) {
+            throw new ArrayIndexOutOfBoundsException("Copy of " + length + " bytes at " + offset + " runs past a " + bytes.length + "-byte buffer");
+        }
         byte[] copy = new byte[length];
         System.arraycopy(bytes, offset + 0, copy, 0, length);
         return copy;

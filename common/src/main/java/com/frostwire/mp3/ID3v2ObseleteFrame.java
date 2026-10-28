@@ -31,4 +31,9 @@ public class ID3v2ObseleteFrame extends ID3v2Frame {
     public int getLength() {
         return dataLength + HEADER_LENGTH;
     }
+
+    @Override
+    protected int getHeaderLength() {
+        return HEADER_LENGTH;
+    }
 }
