@@ -24,11 +24,14 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 import com.limegroup.gnutella.gui.search.SearchInformation;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -94,12 +97,37 @@ public final class FileMenuActions {
 
     public void actionPerformed(ActionEvent e) {
       if (dialog == null) createDialog();
-      // clear input before dialog is shown
-      pathField.setText(MagnetClipboardListener.getMagnetOrTorrentURLFromClipboard());
+      // clear input before dialog is shown, then offer a magnet or torrent URL from the clipboard
+      pathField.setText("");
+      prefillFromClipboard(
+          pathField,
+          MagnetClipboardListener::getMagnetOrTorrentURLFromClipboard,
+          DesktopParallelExecutor::execute);
       // display modal dialog centered
       dialog.pack();
       GUIUtils.centerOnScreen(dialog);
       dialog.setVisible(true);
+    }
+
+    /**
+     * Reads the clipboard on {@code worker} and puts what {@code reader} finds in the field, unless
+     * the user typed something meanwhile. Reading the clipboard waits on the application that owns
+     * it, seconds when that application is busy, so it never runs on the EDT (GitHub #1349).
+     */
+    static void prefillFromClipboard(JTextField field, Supplier<String> reader, Executor worker) {
+      worker.execute(
+          () -> {
+            String text = reader.get();
+            if (text == null || text.isEmpty()) {
+              return;
+            }
+            SwingUtilities.invokeLater(
+                () -> {
+                  if (field.getText().isEmpty()) {
+                    field.setText(text);
+                  }
+                });
+          });
     }
 
     private void createDialog() {
