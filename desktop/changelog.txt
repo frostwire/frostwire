@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:File → Open .Torrent, Magnet or Video URL no longer freezes when another application holds the clipboard — the dialog opens at once and the clipboard's link is filled in when it arrives
    - fix:Switching to a FlatLaf theme freezes the window for less time — FlatLaf's interface classes are loaded in the background before the theme is applied
    - fix:The search tabs, the header search field and the search home screen no longer re-measure hidden panels on every layout — only the panel on show is measured
    - fix:Typing a search in a non-Latin language and showing tables with non-Latin file names or a custom table font size no longer freeze the window the first time — those glyphs are prepared in the background at startup
