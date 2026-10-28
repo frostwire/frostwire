@@ -342,7 +342,7 @@ dependencies {
     implementation 'androidx.browser:browser:1.10.0'
     implementation 'androidx.core:core:1.19.1'
     implementation 'androidx.exifinterface:exifinterface:1.4.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.2.0'
