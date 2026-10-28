@@ -845,6 +845,7 @@ test {
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageLoadingTest"
         includeTestsMatching "com.limegroup.gnutella.gui.ResourceManagerImageCacheTest"
         includeTestsMatching "com.limegroup.gnutella.gui.NativeFileIconControllerTest"
+        includeTestsMatching "com.limegroup.gnutella.gui.IconManagerNativeInitTest"
         includeTestsMatching "com.frostwire.gui.searchfield.*"
         includeTestsMatching "com.limegroup.gnutella.gui.CrashReportSpoolerTest"
         includeTestsMatching "com.limegroup.gnutella.gui.SizeStableLabelTest"

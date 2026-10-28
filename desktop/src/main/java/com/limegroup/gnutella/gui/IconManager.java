@@ -1,7 +1,10 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -10,24 +13,33 @@ public class IconManager {
   /** The sole instance of this IconManager class. */
   private static volatile IconManager INSTANCE;
 
-  /** The current FileIconController. */
-  private FileIconController fileController;
+  /** The current FileIconController; the native one replaces the basic one once it is built. */
+  private volatile FileIconController fileController;
 
   /** The current ButtonIconController. */
   private final ButtonIconController buttonController;
 
   /** Constructs a new IconManager. */
   private IconManager() {
+    this(
+        OSUtils.isMacOSX() || OSUtils.isWindows(),
+        NativeFileIconController::new,
+        DesktopParallelExecutor::execute);
+  }
+
+  /**
+   * Starts with the basic controller, whose construction never blocks, and builds the native one on
+   * {@code background}. Never on the EDT: on macOS the native controller builds a JFileChooser,
+   * which checks every folder above the home folder on disk (frostwire/frostwire#1361).
+   */
+  IconManager(
+      boolean nativeIcons, Supplier<FileIconController> nativeController, Executor background) {
     buttonController = new ButtonIconController();
-    // Always begin with the basic controller, whose
-    // construction can never block.
     fileController = new BasicFileIconController();
-    // Then, in a new thread, try to change it to a controller
-    // that can block.
-    if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
-      SwingUtilities.invokeLater(
+    if (nativeIcons) {
+      background.execute(
           () -> {
-            FileIconController newController = new NativeFileIconController();
+            FileIconController newController = nativeController.get();
             if (newController.isValid()) {
               fileController = newController;
             }
