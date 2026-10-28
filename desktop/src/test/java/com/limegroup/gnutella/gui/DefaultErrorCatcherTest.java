@@ -82,6 +82,58 @@ class DefaultErrorCatcherTest {
     }
   }
 
+  @Test
+  void exceptionsInFrostWireUiCodeAreReported() throws Exception {
+    RecordingCallback callback = new RecordingCallback();
+    ErrorCallback previous = swapErrorCallback(callback);
+    try {
+      IllegalStateException bug = new IllegalStateException("frostwire ui probe");
+      bug.setStackTrace(
+          edtStack(frame("com.frostwire.gui.library.LibraryFilesTableMediator", "updateRow")));
+      new DefaultErrorCatcher().handle(bug);
+      RuntimeException wrapper = new RuntimeException("wrapper", bug);
+      wrapper.setStackTrace(edtStack());
+      new DefaultErrorCatcher().handle(wrapper);
+      assertEquals(List.of(bug, wrapper), callback.seen);
+    } finally {
+      ErrorService.setErrorCallback(previous);
+    }
+  }
+
+  @Test
+  void exceptionsThatOnlyPassThroughAppFramesAreDropped() throws Exception {
+    RecordingCallback callback = new RecordingCallback();
+    ErrorCallback previous = swapErrorCallback(callback);
+    try {
+      IllegalStateException jdkOnly = new IllegalStateException("jdk probe");
+      jdkOnly.setStackTrace(edtStack());
+      new DefaultErrorCatcher().handle(jdkOnly);
+      IllegalStateException tableMouse = new IllegalStateException("table mouse probe");
+      tableMouse.setStackTrace(
+          edtStack(frame("com.limegroup.gnutella.gui.tables.LimeJTable", "processMouseEvent")));
+      new DefaultErrorCatcher().handle(tableMouse);
+      assertEquals(0, callback.seen.size());
+    } finally {
+      ErrorService.setErrorCallback(previous);
+    }
+  }
+
+  /** A Swing call failing inside the given app frames, dispatched through StrictEdtMode's queue. */
+  private static StackTraceElement[] edtStack(StackTraceElement... appFrames) {
+    List<StackTraceElement> stack = new ArrayList<>();
+    stack.add(frame("javax.swing.JTable", "getValueAt"));
+    stack.addAll(List.of(appFrames));
+    stack.add(frame("java.awt.EventQueue", "dispatchEvent"));
+    stack.add(
+        frame("com.frostwire.util.StrictEdtMode$ProductionTimingEventQueue", "dispatchEvent"));
+    stack.add(frame("java.awt.EventDispatchThread", "run"));
+    return stack.toArray(StackTraceElement[]::new);
+  }
+
+  private static StackTraceElement frame(String className, String method) {
+    return new StackTraceElement(className, method, null, 1);
+  }
+
   private static ErrorCallback swapErrorCallback(ErrorCallback next) throws Exception {
     Field field = ErrorService.class.getDeclaredField("_errorCallback");
     field.setAccessible(true);

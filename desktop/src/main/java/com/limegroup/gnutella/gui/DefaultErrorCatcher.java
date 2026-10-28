@@ -11,6 +11,7 @@ import com.frostwire.service.ErrorService;
 import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 /**
  * Catches every uncaught exception, including those thrown by listeners on the AWT event dispatch
@@ -130,28 +131,55 @@ class DefaultErrorCatcher implements Thread.UncaughtExceptionHandler {
     if (bug instanceof InternalError) {
       if (msg.contains("getGraphics not implemented for this component")) return true;
     }
-    // if we're not somewhere in the bug, ignore it.
-    // no need for us to debug sun's internal errors.
-    if (!msg.contains("com.limegroup.gnutella") && !msg.contains("org.limewire")) return true;
-    // we intercept calls in various places -- check if the only
-    // com.limegroup.gnutella is from an intercepted call.
-    if (intercepts(msg, "com.limegroup.gnutella.tables.MouseEventConsumptionChecker")) return true;
-    return intercepts(msg, "com.limegroup.gnutella.gui.tables.LimeJTable.processMouseEvent");
+    // Exceptions only in JDK code are not ours to debug.
+    return !hasAppFrame(bug);
   }
 
-  /** Determines if the given string is the only place where 'com.limegroup.gnutella' exists. */
-  private boolean intercepts(String msg, String inter) {
-    int i = msg.indexOf(inter);
-    // not intercepted at all?
-    if (i == -1) return false;
-    // something before it?
-    if (msg.lastIndexOf("com.limegroup.gnutella", i) != -1
-        && msg.lastIndexOf("org.limewire", i) != -1) return false;
-    i += inter.length();
-    if (i >= msg.length()) return false;
-    // something after it?
-    return msg.indexOf("com.limegroup.gnutella", i) == -1
-        || msg.lastIndexOf("org.limewire", i) == -1;
-    // yup, it's the only com.limegroup.gnutella in there.
+  /** FrostWire's own code, including the jlibtorrent bindings. */
+  private static final List<String> APP_PACKAGES =
+      List.of("com.limegroup.", "org.limewire.", "com.frostwire.");
+
+  /**
+   * App frames that events only pass through: the EDT's event queue is on every EDT stack, and
+   * LimeJTable hands every table mouse event to Swing. On their own they don't make an exception
+   * ours.
+   */
+  private static final List<String> PASS_THROUGH_CLASS_PREFIXES =
+      List.of("com.frostwire.util.StrictEdtMode");
+
+  private static final String PASS_THROUGH_TABLE_CLASS =
+      "com.limegroup.gnutella.gui.tables.LimeJTable";
+
+  private static final String PASS_THROUGH_TABLE_METHOD = "processMouseEvent";
+
+  /** Bounds the walk down a cause chain, which may loop. */
+  private static final int MAX_CAUSES = 16;
+
+  /**
+   * True if the bug or one of its causes has a frame of FrostWire code that isn't a pass-through.
+   */
+  static boolean hasAppFrame(Throwable bug) {
+    Throwable current = bug;
+    for (int depth = 0; current != null && depth < MAX_CAUSES; depth++) {
+      for (StackTraceElement frame : current.getStackTrace()) {
+        if (isAppFrame(frame)) {
+          return true;
+        }
+      }
+      current = current.getCause() == current ? null : current.getCause();
+    }
+    return false;
+  }
+
+  private static boolean isAppFrame(StackTraceElement frame) {
+    String className = frame.getClassName();
+    if (APP_PACKAGES.stream().noneMatch(className::startsWith)) {
+      return false;
+    }
+    if (PASS_THROUGH_CLASS_PREFIXES.stream().anyMatch(className::startsWith)) {
+      return false;
+    }
+    return !(className.equals(PASS_THROUGH_TABLE_CLASS)
+        && frame.getMethodName().equals(PASS_THROUGH_TABLE_METHOD));
   }
 }
