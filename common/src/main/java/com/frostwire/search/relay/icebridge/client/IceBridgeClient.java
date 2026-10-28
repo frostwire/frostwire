@@ -224,6 +224,38 @@ public final class IceBridgeClient implements AutoCloseable {
         }
     }
 
+    /** The daemon's cumulative IceBridge network traffic: rUDP payload bytes received and sent. */
+    public record TrafficBytes(long bytesIn, long bytesOut) {}
+
+    /**
+     * Reads the daemon's traffic counters from {@code GET /metrics}, or null when the daemon can't
+     * be reached or doesn't report them. Quiet: the IceBridge console polls it every second, and an
+     * unreachable daemon is shown there, not logged.
+     */
+    public TrafficBytes trafficBytes(long timeoutMs) {
+        if (timeoutMs <= 0) {
+            return null;
+        }
+        try {
+            ApiResponse<com.google.gson.JsonObject> response = getQuiet("/metrics",
+                    new TypeToken<ApiResponse<com.google.gson.JsonObject>>() {}, timeoutMs);
+            return response == null || !response.ok ? null : trafficBytes(response.data);
+        } catch (Exception unavailable) {
+            return null;
+        }
+    }
+
+    static TrafficBytes trafficBytes(com.google.gson.JsonObject metrics) {
+        if (metrics == null || !metrics.has("rudpBytesIn") || !metrics.has("rudpBytesOut")) {
+            return null;
+        }
+        try {
+            return new TrafficBytes(metrics.get("rudpBytesIn").getAsLong(), metrics.get("rudpBytesOut").getAsLong());
+        } catch (RuntimeException malformed) {
+            return null;
+        }
+    }
+
     /**
      * Look up recent forward-capable peers.
      *
