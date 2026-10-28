@@ -75,10 +75,9 @@ class DefaultErrorCatcher implements Thread.UncaughtExceptionHandler {
 
   /** Determines if the message can be ignored. */
   private boolean isIgnorable(Throwable bug, String msg) {
-    // ignore all overflows & out of memory errors,
-    // since they'll give us absolutely no debugging information
+    // Overflows give us no debugging information. OutOfMemoryErrors go on, and are reported like
+    // anything else when an app frame is on their stack: it shows where the allocation failed.
     if (bug instanceof StackOverflowError) return true;
-    if (bug instanceof OutOfMemoryError) return true;
     // no bug?  kinda impossible, but shouldn't report.
     if (msg == null) return true;
     // frickin' repaint manager stinks.

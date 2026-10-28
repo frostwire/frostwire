@@ -75,7 +75,9 @@ class DefaultErrorCatcherTest {
       assertDoesNotThrow(() -> new DefaultErrorCatcher().handle(null));
       new DefaultErrorCatcher().handle(new IllegalStateException("cannot open system clipboard"));
       new DefaultErrorCatcher().handle(new StackOverflowError("overflow"));
-      new DefaultErrorCatcher().handle(new OutOfMemoryError("oom"));
+      OutOfMemoryError jdkOnlyOom = new OutOfMemoryError("Java heap space");
+      jdkOnlyOom.setStackTrace(edtStack());
+      new DefaultErrorCatcher().handle(jdkOnlyOom);
       assertEquals(0, callback.seen.size());
     } finally {
       ErrorService.setErrorCallback(previous);
@@ -95,6 +97,21 @@ class DefaultErrorCatcherTest {
       wrapper.setStackTrace(edtStack());
       new DefaultErrorCatcher().handle(wrapper);
       assertEquals(List.of(bug, wrapper), callback.seen);
+    } finally {
+      ErrorService.setErrorCallback(previous);
+    }
+  }
+
+  @Test
+  void outOfMemoryErrorsInAppCodeAreReported() throws Exception {
+    RecordingCallback callback = new RecordingCallback();
+    ErrorCallback previous = swapErrorCallback(callback);
+    try {
+      OutOfMemoryError oom = new OutOfMemoryError("Java heap space");
+      oom.setStackTrace(
+          edtStack(frame("com.frostwire.gui.library.SavedFilesDirectoryHolder", "getFiles")));
+      new DefaultErrorCatcher().handle(oom);
+      assertEquals(List.of(oom), callback.seen);
     } finally {
       ErrorService.setErrorCallback(previous);
     }
