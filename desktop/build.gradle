@@ -575,11 +575,25 @@ tasks.register('verifySimulationIsolation') {
 def fuzzBaseDir = file('../common/fuzz')
 
 sourceSets {
+    // Android classes with no Android-framework dependency, compiled for the JVM so the fuzz
+    // harnesses can reach them: Jazzer's JUnit integration needs JUnit 5 and a JVM, and the Android
+    // unit tests run on JUnit 4 and Robolectric. List only files that compile against desktop's
+    // classpath; Android logic that needs framework types is extracted into a plain class first.
+    androidFuzzTargets {
+        java {
+            srcDir '../android/src/main/java'
+            include 'com/frostwire/android/gui/transfers/TorrentDownloadInfo.java'
+            include 'com/frostwire/android/gui/transfers/TorrentUrlInfo.java'
+            include 'com/frostwire/android/core/IceBridgePortPreferences.java'
+        }
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
     fuzzTest {
         java.srcDir '../common/fuzz/src/test/java'
         resources.srcDir '../common/fuzz/src/test/resources'
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.main.output + sourceSets.androidFuzzTargets.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.androidFuzzTargets.output
     }
 }
 
