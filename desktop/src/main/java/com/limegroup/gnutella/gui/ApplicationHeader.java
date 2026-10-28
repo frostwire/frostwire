@@ -145,7 +145,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
   private JPanel createSearchPanel() {
     JPanel panel =
-        new JPanel(new CardLayout()) {
+        new JPanel(new VisibleCardLayout()) {
           @Override
           public Dimension getMaximumSize() {
             Dimension pref = getPreferredSize();

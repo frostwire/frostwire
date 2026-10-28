@@ -24,6 +24,7 @@ import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.OkHttpClientWrapper;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.VisibleCardLayout;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import java.awt.*;
@@ -98,7 +99,7 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
   }
 
   private void setupUI() {
-    setLayout(new CardLayout());
+    setLayout(new VisibleCardLayout());
   }
 
   private void setup(List<Slide> slides) {

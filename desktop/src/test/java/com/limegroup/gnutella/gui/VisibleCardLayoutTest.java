@@ -15,7 +15,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -132,5 +135,41 @@ class VisibleCardLayoutTest {
           assertEquals(plain.getMinimumSize(), visibleOnly.getMinimumSize());
           assertEquals(plain.getPreferredSize(), visibleOnly.getPreferredSize());
         });
+  }
+
+  /**
+   * A plain CardLayout measures every card, hidden ones too, on each layout pass of its window.
+   * Holders in the main window must measure only the card on show (GitHub #1342, #1347: the search
+   * tabs re-measured the hidden search-field card, Icebase #b7135455d885, #470fc855fd81). Plain
+   * CardLayout stays only where it is harmless, each with its reason.
+   */
+  @Test
+  void mainWindowCardHoldersMeasureOnlyTheVisibleCard() throws Exception {
+    Map<String, String> allowed =
+        Map.of(
+            "CopyrightLicenseSelectorPanel.java", "dialog",
+            "LibraryMediator.java", "a single card",
+            "TransferDetailGeneral.java", "two small cards: the recheck button and its label",
+            "SetupWindowHolder.java", "setup wizard dialog, sized to fit every page",
+            "OptionsPaneManager.java", "Options dialog, sized to fit every pane");
+    List<String> offenders;
+    try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+      offenders =
+          files
+              .filter(f -> f.toString().endsWith(".java"))
+              .filter(f -> !allowed.containsKey(f.getFileName().toString()))
+              .filter(f -> read(f).contains("new CardLayout()"))
+              .map(Path::toString)
+              .toList();
+    }
+    assertTrue(offenders.isEmpty(), "plain CardLayout in " + offenders);
+  }
+
+  private static String read(Path file) {
+    try {
+      return Files.readString(file);
+    } catch (java.io.IOException e) {
+      throw new java.io.UncheckedIOException(e);
+    }
   }
 }
