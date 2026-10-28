@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:Opening a magnet link while FrostWire is already running no longer changes its name or trackers — the forwarded link was decoded twice, turning + into spaces and %25 into a bare %
    - fix:Search results from TPB, 1337x, Torrentz2 and Nyaa no longer show a size of 0 for files of a terabyte or more, or negative sizes from a broken page — all engines parse sizes in one place
    - fix:Opening a magnet link whose name contains a lone % (like "50% off") no longer fails — a % that isn't part of an escape is kept as is, the way browsers do
    - fix:A SoundCloud MP3 with an invalid text encoding in its ID3 tag is re-tagged without errors — the bad frame is skipped when the tag is read
