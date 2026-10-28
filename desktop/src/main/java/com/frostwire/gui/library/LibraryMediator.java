@@ -22,217 +22,227 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.DividerLocationSettingUpdater;
 import com.limegroup.gnutella.settings.UISettings;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import javax.swing.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class LibraryMediator {
-    private static final String FILES_TABLE_KEY = "LIBRARY_FILES_TABLE";
-    private static JPanel MAIN_PANEL;
-    /**
-     * Singleton instance of this class.
-     */
-    private static LibraryMediator INSTANCE;
+  private static final String FILES_TABLE_KEY = "LIBRARY_FILES_TABLE";
+  private static JPanel MAIN_PANEL;
 
-    private LibraryExplorer libraryExplorer;
-    private LibraryCoverArtPanel libraryCoverArtPanel;
-    private LibraryLeftPanel libraryLeftPanel;
-    private LibrarySearch librarySearch;
-    private CardLayout _tablesViewLayout = new CardLayout();
-    private JPanel _tablesPanel;
-    private final Map<Object, Integer> scrollbarValues;
-    private Object lastSelectedKey;
-    private AbstractLibraryTableMediator<?, ?, ?> lastSelectedMediator;
-    private final Set<Integer> idScanned;
-    private AbstractLibraryTableMediator<?, ?, ?> currentMediator;
+  /** Singleton instance of this class. */
+  private static LibraryMediator INSTANCE;
 
-    private LibraryMediator() {
-        GUIMediator.setSplashScreenString(I18n.tr("Loading Library Window..."));
-        idScanned = new HashSet<>();
-        getComponent(); // creates MAIN_PANEL
-        scrollbarValues = new HashMap<>();
-        // Defer split pane creation to avoid EDT violation from LibraryFilesTableMediator class loading
-        SwingUtilities.invokeLater(this::initializeSplitPane);
-    }
+  private LibraryExplorer libraryExplorer;
+  private LibraryCoverArtPanel libraryCoverArtPanel;
+  private LibraryLeftPanel libraryLeftPanel;
+  private LibrarySearch librarySearch;
+  private CardLayout _tablesViewLayout = new CardLayout();
+  private JPanel _tablesPanel;
+  private final Map<Object, Integer> scrollbarValues;
+  private Object lastSelectedKey;
+  private AbstractLibraryTableMediator<?, ?, ?> lastSelectedMediator;
+  private final Set<Integer> idScanned;
+  private AbstractLibraryTableMediator<?, ?, ?> currentMediator;
 
-    private void initializeSplitPane() {
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
-        splitPane.setContinuousLayout(true);
-        splitPane.setResizeWeight(0.5);
-        splitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
-            JSplitPane splitPane1 = (JSplitPane) evt.getSource();
-            int current = splitPane1.getDividerLocation();
-            if (current > LibraryLeftPanel.MAX_WIDTH) {
-                splitPane1.setDividerLocation(LibraryLeftPanel.MAX_WIDTH);
-            } else if (current < LibraryLeftPanel.MIN_WIDTH) {
-                splitPane1.setDividerLocation(LibraryLeftPanel.MIN_WIDTH);
-            }
+  private LibraryMediator() {
+    GUIMediator.setSplashScreenString(I18n.tr("Loading Library Window..."));
+    idScanned = new HashSet<>();
+    getComponent(); // creates MAIN_PANEL
+    scrollbarValues = new HashMap<>();
+    // Defer split pane creation to avoid EDT violation from LibraryFilesTableMediator class loading
+    SwingUtilities.invokeLater(this::initializeSplitPane);
+  }
+
+  private void initializeSplitPane() {
+    JSplitPane splitPane =
+        new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
+    splitPane.setContinuousLayout(true);
+    splitPane.setResizeWeight(0.5);
+    splitPane.addPropertyChangeListener(
+        JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY,
+        evt -> {
+          JSplitPane splitPane1 = (JSplitPane) evt.getSource();
+          int current = splitPane1.getDividerLocation();
+          if (current > LibraryLeftPanel.MAX_WIDTH) {
+            splitPane1.setDividerLocation(LibraryLeftPanel.MAX_WIDTH);
+          } else if (current < LibraryLeftPanel.MIN_WIDTH) {
+            splitPane1.setDividerLocation(LibraryLeftPanel.MIN_WIDTH);
+          }
         });
-        DividerLocationSettingUpdater.install(splitPane, UISettings.UI_LIBRARY_MAIN_DIVIDER_LOCATION);
-        MAIN_PANEL.add(splitPane);
-        MAIN_PANEL.revalidate();
-        MAIN_PANEL.repaint();
-    }
+    DividerLocationSettingUpdater.install(splitPane, UISettings.UI_LIBRARY_MAIN_DIVIDER_LOCATION);
+    MAIN_PANEL.add(splitPane);
+    MAIN_PANEL.revalidate();
+    MAIN_PANEL.repaint();
+  }
 
-    /**
-     * @return the `LibraryMediator` instance
-     */
-    public static LibraryMediator instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LibraryMediator();
-        }
-        return INSTANCE;
+  /**
+   * @return the `LibraryMediator` instance
+   */
+  public static LibraryMediator instance() {
+    if (INSTANCE == null) {
+      INSTANCE = new LibraryMediator();
     }
+    return INSTANCE;
+  }
 
-    private Object getSelectedKey() {
-        return getLibraryExplorer().getSelectedDirectoryHolder();
+  private Object getSelectedKey() {
+    return getLibraryExplorer().getSelectedDirectoryHolder();
+  }
+
+  public LibraryExplorer getLibraryExplorer() {
+    if (libraryExplorer == null) {
+      libraryExplorer = new LibraryExplorer();
     }
+    return libraryExplorer;
+  }
 
-    public LibraryExplorer getLibraryExplorer() {
-        if (libraryExplorer == null) {
-            libraryExplorer = new LibraryExplorer();
-        }
-        return libraryExplorer;
+  public LibrarySearch getLibrarySearch() {
+    if (librarySearch == null) {
+      librarySearch = new LibrarySearch();
     }
+    return librarySearch;
+  }
 
-    public LibrarySearch getLibrarySearch() {
-        if (librarySearch == null) {
-            librarySearch = new LibrarySearch();
-        }
-        return librarySearch;
+  public LibraryCoverArtPanel getLibraryCoverArtPanel() {
+    if (libraryCoverArtPanel == null) {
+      libraryCoverArtPanel = new LibraryCoverArtPanel();
     }
+    return libraryCoverArtPanel;
+  }
 
-    public LibraryCoverArtPanel getLibraryCoverArtPanel() {
-        if (libraryCoverArtPanel == null) {
-            libraryCoverArtPanel = new LibraryCoverArtPanel();
-        }
-        return libraryCoverArtPanel;
+  public JComponent getComponent() {
+    if (MAIN_PANEL == null) {
+      MAIN_PANEL = new JPanel(new BorderLayout());
     }
+    return MAIN_PANEL;
+  }
 
-    public JComponent getComponent() {
-        if (MAIN_PANEL == null) {
-            MAIN_PANEL = new JPanel(new BorderLayout());
-        }
-        return MAIN_PANEL;
-    }
-
-    private void showView() {
-        GUIMediator.safeInvokeAndWait(() -> {
-            rememberScrollbarsOnMediators();
-            _tablesViewLayout.show(_tablesPanel, LibraryMediator.FILES_TABLE_KEY);
+  private void showView() {
+    GUIMediator.safeInvokeAndWait(
+        () -> {
+          rememberScrollbarsOnMediators();
+          _tablesViewLayout.show(_tablesPanel, LibraryMediator.FILES_TABLE_KEY);
         });
-        currentMediator = LibraryFilesTableMediator.instance();
-    }
+    currentMediator = LibraryFilesTableMediator.instance();
+  }
 
-    private void rememberScrollbarsOnMediators() {
-        AbstractLibraryTableMediator<?, ?, ?> tableMediator;
-        tableMediator = LibraryFilesTableMediator.instance();
-        if (tableMediator == null) {
-            return;
-        }
-        if (lastSelectedMediator != null && lastSelectedKey != null) {
-            scrollbarValues.put(lastSelectedKey, lastSelectedMediator.getScrollbarValue());
-        }
-        lastSelectedMediator = tableMediator;
-        lastSelectedKey = getSelectedKey();
-        int lastScrollValue = scrollbarValues.getOrDefault(lastSelectedKey, 0);
-        tableMediator.scrollTo(lastScrollValue);
+  private void rememberScrollbarsOnMediators() {
+    AbstractLibraryTableMediator<?, ?, ?> tableMediator;
+    tableMediator = LibraryFilesTableMediator.instance();
+    if (tableMediator == null) {
+      return;
     }
-
-    void updateTableFiles(DirectoryHolder dirHolder) {
-        clearLibraryTable();
-        showView();
-        LibraryFilesTableMediator.instance().updateTableFiles(dirHolder);
+    if (lastSelectedMediator != null && lastSelectedKey != null) {
+      scrollbarValues.put(lastSelectedKey, lastSelectedMediator.getScrollbarValue());
     }
+    lastSelectedMediator = tableMediator;
+    lastSelectedKey = getSelectedKey();
+    int lastScrollValue = scrollbarValues.getOrDefault(lastSelectedKey, 0);
+    tableMediator.scrollTo(lastScrollValue);
+  }
 
-    public void clearDirectoryHolderCaches() {
-        getLibraryExplorer().clearDirectoryHolderCaches();
+  void updateTableFiles(DirectoryHolder dirHolder) {
+    clearLibraryTable();
+    showView();
+    LibraryFilesTableMediator.instance().updateTableFiles(dirHolder);
+  }
+
+  public void clearDirectoryHolderCaches() {
+    getLibraryExplorer().clearDirectoryHolderCaches();
+  }
+
+  void clearLibraryTable() {
+    LibraryFilesTableMediator.instance().clearTable();
+    getLibrarySearch().clear();
+  }
+
+  void addFilesToLibraryTable(List<File> files) {
+    for (File file : files) {
+      LibraryFilesTableMediator.instance().add(file);
     }
+    getLibrarySearch().addResults(files.size());
+  }
 
-    void clearLibraryTable() {
-        LibraryFilesTableMediator.instance().clearTable();
-        getLibrarySearch().clear();
+  private JComponent getLibraryLeftPanel() {
+    if (libraryLeftPanel == null) {
+      libraryLeftPanel = new LibraryLeftPanel(getLibraryExplorer(), getLibraryCoverArtPanel());
     }
+    return libraryLeftPanel;
+  }
 
-    void addFilesToLibraryTable(List<File> files) {
+  private JComponent getLibraryRightPanel() {
+    JPanel panel = new JPanel(new BorderLayout());
+    _tablesViewLayout = new CardLayout();
+    _tablesPanel = new JPanel(_tablesViewLayout);
+    _tablesPanel.add(LibraryFilesTableMediator.instance().getComponent(), FILES_TABLE_KEY);
+    panel.add(getLibrarySearch(), BorderLayout.PAGE_START);
+    panel.add(_tablesPanel, BorderLayout.CENTER);
+    return panel;
+  }
+
+  public boolean isScanned(int id) {
+    return idScanned.contains(id);
+  }
+
+  public void scan(int hashCode, File location) {
+    if (location == null) {
+      return;
+    }
+    idScanned.add(hashCode);
+    com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService.schedule(
+        () -> scanInternal(hashCode, location));
+  }
+
+  private void scanInternal(int hashCode, File location) {
+    if (location.isDirectory()) {
+      final File[] files = location.listFiles();
+      if (files != null) {
         for (File file : files) {
-            LibraryFilesTableMediator.instance().add(file);
+          scanInternal(hashCode, file);
         }
-        getLibrarySearch().addResults(files.size());
-    }
-
-    private JComponent getLibraryLeftPanel() {
-        if (libraryLeftPanel == null) {
-            libraryLeftPanel = new LibraryLeftPanel(getLibraryExplorer(), getLibraryCoverArtPanel());
+      }
+    } else {
+      List<MediaTypeSavedFilesDirectoryHolder> holders =
+          getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
+      for (MediaTypeSavedFilesDirectoryHolder holder : holders) {
+        if (holder.accept(location)) {
+          holder.getCache().add(location);
         }
-        return libraryLeftPanel;
+      }
     }
+  }
 
-    private JComponent getLibraryRightPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        _tablesViewLayout = new CardLayout();
-        _tablesPanel = new JPanel(_tablesViewLayout);
-        _tablesPanel.add(LibraryFilesTableMediator.instance().getComponent(), FILES_TABLE_KEY);
-        panel.add(getLibrarySearch(), BorderLayout.PAGE_START);
-        panel.add(_tablesPanel, BorderLayout.CENTER);
-        return panel;
+  /**
+   * If a file has been selected on the right hand side, this method will select such file.
+   *
+   * <p>If there's a radio station, or if there's more than one file selected, or none, it will
+   * return null.
+   */
+  File getSelectedFile() {
+    File toExplore = null;
+    DirectoryHolder selectedDirectoryHolder =
+        LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
+    boolean fileBasedDirectoryHolderSelected =
+        selectedDirectoryHolder instanceof SavedFilesDirectoryHolder
+            || selectedDirectoryHolder instanceof MediaTypeSavedFilesDirectoryHolder
+            || selectedDirectoryHolder instanceof TorrentDirectoryHolder;
+    if (fileBasedDirectoryHolderSelected
+        && LibraryFilesTableMediator.instance().getSelectedLines().size() == 1) {
+      toExplore = LibraryFilesTableMediator.instance().getSelectedLines().get(0).getFile();
     }
+    return toExplore;
+  }
 
-    public boolean isScanned(int id) {
-        return idScanned.contains(id);
+  public void playCurrentSelection() {
+    if (currentMediator != null) {
+      currentMediator.playCurrentSelection();
     }
-
-    public void scan(int hashCode, File location) {
-        if (location == null) {
-            return;
-        }
-        idScanned.add(hashCode);
-        com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService.schedule(() -> scanInternal(hashCode, location));
-    }
-
-    private void scanInternal(int hashCode, File location) {
-        if (location.isDirectory()) {
-            final File[] files = location.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    scanInternal(hashCode, file);
-                }
-            }
-        } else {
-            List<MediaTypeSavedFilesDirectoryHolder> holders = getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
-            for (MediaTypeSavedFilesDirectoryHolder holder : holders) {
-                if (holder.accept(location)) {
-                    holder.getCache().add(location);
-                }
-            }
-        }
-    }
-
-    /**
-     * If a file has been selected on the right hand side, this method will select such file.
-     * <p>
-     * If there's a radio station, or if there's more than one file selected, or none, it will return null.
-     */
-    File getSelectedFile() {
-        File toExplore = null;
-        DirectoryHolder selectedDirectoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
-        boolean fileBasedDirectoryHolderSelected = selectedDirectoryHolder instanceof SavedFilesDirectoryHolder || selectedDirectoryHolder instanceof MediaTypeSavedFilesDirectoryHolder || selectedDirectoryHolder instanceof TorrentDirectoryHolder;
-        if (fileBasedDirectoryHolderSelected && LibraryFilesTableMediator.instance().getSelectedLines().size() == 1) {
-            toExplore = LibraryFilesTableMediator.instance().getSelectedLines().get(0).getFile();
-        }
-        return toExplore;
-    }
-
-    public void playCurrentSelection() {
-        if (currentMediator != null) {
-            currentMediator.playCurrentSelection();
-        }
-    }
+  }
 }
