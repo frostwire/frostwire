@@ -32,6 +32,10 @@ buildscript {
     }
     dependencies {
         classpath "org.apache.groovy:groovy-swing:5.1.3"
+        // AGP 9.x built-in Kotlin defaults to KGP 2.2.10, whose compiler cannot read
+        // the 2.4 metadata of kotlin-stdlib 2.4.x (and of libraries built with it,
+        // e.g. Coil 3.6). Pin KGP to the same version as kotlin-stdlib below.
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.21"
     }
 }
 
@@ -354,7 +358,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:5.3.2'
     implementation 'io.coil-kt.coil3:coil:3.4.0'
     implementation 'io.coil-kt.coil3:coil-network-okhttp:3.4.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.21'
     implementation 'androidx.work:work-runtime-ktx:2.11.2'
     implementation 'androidx.datastore:datastore-preferences:1.2.1'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
