@@ -7033,3 +7033,7 @@ msgstr "Odesláno"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Total"
 msgstr "Celkem"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Last 5 minutes: blue is received, red is sent"
+msgstr "Posledních 5 minut: modrá je přijato, červená odesláno"

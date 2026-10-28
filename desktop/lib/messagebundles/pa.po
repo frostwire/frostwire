@@ -6663,3 +6663,7 @@ msgstr "ਭੇਜਿਆ"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Total"
 msgstr "ਕੁੱਲ"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Last 5 minutes: blue is received, red is sent"
+msgstr "ਪਿਛਲੇ 5 ਮਿੰਟ: ਨੀਲਾ ਪ੍ਰਾਪਤ, ਲਾਲ ਭੇਜਿਆ"

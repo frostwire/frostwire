@@ -6602,3 +6602,7 @@ msgstr "Geschéckt"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Total"
 msgstr "Total"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Last 5 minutes: blue is received, red is sent"
+msgstr "Lescht 5 Minutten: blo ass empfaangen, rout ass geschéckt"

@@ -6493,3 +6493,7 @@ msgstr "Испратено"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Total"
 msgstr "Вкупно"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Last 5 minutes: blue is received, red is sent"
+msgstr "Последните 5 минути: сино е примено, црвено е испратено"

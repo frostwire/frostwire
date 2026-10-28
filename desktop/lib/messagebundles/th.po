@@ -7084,3 +7084,7 @@ msgstr "ส่งแล้ว"
 #: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
 msgid "Total"
 msgstr "รวม"
+
+#: /Users/gubatron/workspace/frostwire/desktop/src/main/java/com/limegroup/gnutella/gui/icebridge/IceBridgeConsoleWindow.java
+msgid "Last 5 minutes: blue is received, red is sent"
+msgstr "5 นาทีล่าสุด: สีน้ำเงินคือที่ได้รับ สีแดงคือที่ส่ง"
