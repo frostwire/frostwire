@@ -8,11 +8,17 @@ public abstract class AbstractID3v2FrameData {
     }
 
     protected void synchroniseAndUnpackFrameData(byte[] bytes) throws InvalidDataException {
-        if (unsynchronisation && BufferTools.sizeSynchronisationWouldSubtract(bytes) > 0) {
-            byte[] synchronisedBytes = BufferTools.synchroniseBuffer(bytes);
-            unpackFrameData(synchronisedBytes);
-        } else {
-            unpackFrameData(bytes);
+        try {
+            if (unsynchronisation && BufferTools.sizeSynchronisationWouldSubtract(bytes) > 0) {
+                byte[] synchronisedBytes = BufferTools.synchroniseBuffer(bytes);
+                unpackFrameData(synchronisedBytes);
+            } else {
+                unpackFrameData(bytes);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // The frame's fields (encoding byte, MIME type, picture type, terminators) come from the
+            // file and ran past the end of its data, like a truncated tag in unpackTag.
+            throw new InvalidDataException("Frame data is shorter than its fields", e);
         }
     }
 
