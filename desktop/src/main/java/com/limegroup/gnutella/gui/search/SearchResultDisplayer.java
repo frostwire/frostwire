@@ -25,6 +25,7 @@ import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.RefreshListener;
+import com.limegroup.gnutella.gui.VisibleCardLayout;
 import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.settings.UpdateManagerSettings;
 import java.awt.*;
@@ -73,7 +74,7 @@ public final class SearchResultDisplayer implements RefreshListener {
   private final JPanel results;
 
   /** The layout that switches between the dummy result panel and the JTabbedPane. */
-  private final CardLayout cardLayoutSwitcher = new CardLayout();
+  private final CardLayout cardLayoutSwitcher = new VisibleCardLayout();
 
   /** The listener to notify about the currently displaying search changing. */
   private ChangeListener _activeSearchListener;
