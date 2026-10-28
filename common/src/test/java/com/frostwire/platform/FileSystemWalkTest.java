@@ -19,9 +19,9 @@
 package com.frostwire.platform;
 
 import com.frostwire.desktop.DesktopPlatform;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,14 +82,16 @@ public class FileSystemWalkTest {
         assertFalse(b.get());
     }
 
+    /**
+     * Walks a directory of its own. It used to create its file in the system temp directory and walk
+     * that, which on a developer machine holds hundreds of thousands of files: the walk collected 1.4
+     * million into a list and ran the test JVM out of heap (frostwire/frostwire#1343).
+     */
     @Test
-    public void testDir() throws IOException {
-        File f1 = File.createTempFile("aaa", null);
-        File d1 = f1.getParentFile();
+    public void testDir(@TempDir File d1) throws IOException {
+        File f1 = new File(d1, "aaa");
+        assertTrue(f1.createNewFile());
         final File d2 = new File(d1, "d2");
-        if (d2.exists()) {
-            FileUtils.deleteDirectory(d2);
-        }
         assertTrue(d2.mkdir());
         File f2 = new File(d2, "bbb");
         assertTrue(f2.createNewFile());
@@ -110,6 +112,7 @@ public class FileSystemWalkTest {
 
         Set<File> set = new LinkedHashSet<>(l);
         assertEquals(set.size(), l.size());
+        assertEquals(Set.of(f1, d2, f2), set, "the walk stays inside its directory");
 
         assertFalse(l.contains(d1));
         assertTrue(l.contains(f1));
