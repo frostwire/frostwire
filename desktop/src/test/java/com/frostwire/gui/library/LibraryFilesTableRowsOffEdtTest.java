@@ -117,6 +117,24 @@ class LibraryFilesTableRowsOffEdtTest {
     }
   }
 
+  /**
+   * Switching Library views quickly let the previous folder's pending batches land in the new view
+   * (found with GitHub #1345). Every batch, and the background listing itself, checks that its view
+   * is still the current one, and clearing the table starts a new view.
+   */
+  @Test
+  void batchesOfAViewTheUserLeftAreDropped() throws Exception {
+    String mediator =
+        source(Path.of("src/main/java/com/frostwire/gui/library/LibraryFilesTableMediator.java"));
+    assertTrue(mediator.contains("finalintview=viewGeneration;"));
+    assertTrue(mediator.contains("if(view!=viewGeneration){return;//theusermovedontoanotherview"));
+    assertTrue(
+        mediator.contains("()->{if(view!=viewGeneration){return;}addResolvedFiles(resolved);"),
+        "an EDT batch from another view is added");
+    assertTrue(mediator.contains("if(view==viewGeneration){forceResort();}"));
+    assertTrue(mediator.contains("publicvoidclearTable(){viewGeneration++;super.clearTable();}"));
+  }
+
   private static String source(Path path) throws IOException {
     return Files.readString(path).replaceAll("\\s+", "");
   }

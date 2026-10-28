@@ -291,22 +291,47 @@ public final class LibraryFilesTableMediator
       setMediaType(MediaType.getAnyTypeMediaType());
     }
     clearTable();
+    final int view = viewGeneration;
     BackgroundQueuedExecutorService.schedule(
         () -> {
           final File[] files = dirHolder.getFiles();
           List<List<File>> partitionedFiles = split(Arrays.asList(files));
           for (List<File> partition : partitionedFiles) {
+            if (view != viewGeneration) {
+              return; // the user moved on to another view
+            }
             // canonical paths and directory flags are read here, never on the EDT
             List<LibraryFilesTableDataLine.ResolvedFile> resolved =
                 LibraryFilesTableDataLine.resolveAll(partition);
             GUIMediator.safeInvokeLater(
                 () -> {
+                  if (view != viewGeneration) {
+                    return;
+                  }
                   addResolvedFiles(resolved);
                   LibraryMediator.instance().getLibrarySearch().addResults(resolved.size());
                 });
           }
-          GUIMediator.safeInvokeLater(this::forceResort);
+          GUIMediator.safeInvokeLater(
+              () -> {
+                if (view == viewGeneration) {
+                  forceResort();
+                }
+              });
         });
+  }
+
+  /**
+   * Counts the times the table was cleared for another view. A folder's rows are listed in the
+   * background and added in batches; a batch from a view the user already left must not land in the
+   * current one. Written on the EDT, read by the background listing.
+   */
+  private volatile int viewGeneration;
+
+  @Override
+  public void clearTable() {
+    viewGeneration++;
+    super.clearTable();
   }
 
   /**
