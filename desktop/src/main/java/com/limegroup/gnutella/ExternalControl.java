@@ -40,7 +40,7 @@ public class ExternalControl {
   private final ActivityCallback activityCallback;
   private volatile String enqueuedRequest = null;
 
-  private ExternalControl(ActivityCallback activityCallback) {
+  ExternalControl(ActivityCallback activityCallback) {
     this.activityCallback = activityCallback;
   }
 
@@ -100,7 +100,7 @@ public class ExternalControl {
   }
 
   @SuppressWarnings("RedundantThrows")
-  private boolean process(String get, OutputStream os) throws IOException {
+  boolean process(String get, OutputStream os) throws IOException {
     Map<String, String> original_params = new HashMap<>();
     Map<String, String> lc_params = new HashMap<>();
     List<String> source_params = new ArrayList<>();
@@ -147,8 +147,10 @@ public class ExternalControl {
         return true;
       } else {
         // this handles when FrostWire is already open. The second instance forwarded
-        // parameters to us via HTTP.
-        String url = UrlUtils.decode(lc_params.get("url"));
+        // parameters to us via HTTP, encoding the url once (testForFrostWire); the parameter
+        // parsing above already decoded it. Decoding it again turned the link's own escapes
+        // (%25, +) into literal characters.
+        String url = lc_params.get("url");
         if (!StringUtils.isNullOrEmpty(url) && activityCallback.isRemoteDownloadsAllowed()) {
           if (url.startsWith("magnet:?")) {
             handleTorrentMagnetRequest(url);
