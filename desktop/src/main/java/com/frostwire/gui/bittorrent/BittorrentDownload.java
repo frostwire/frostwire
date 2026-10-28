@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gubatron
@@ -354,8 +355,32 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     return new TorrentInfo(dl.getTorrentFile());
   }
 
+  /**
+   * Gates the lookup of a transfer's .torrent while it can't be read yet (a magnet still fetching
+   * its metadata, or a .torrent that was moved). Each lookup reads and bdecodes the transfer's
+   * resume file, and the getters below are called several times per update tick, so look again at
+   * most once per {@link #RETRY_NANOS}.
+   */
+  static final class MetadataLookupGate {
+    static final long RETRY_NANOS = TimeUnit.SECONDS.toNanos(30);
+    private boolean looked;
+    private long lastLookup;
+
+    /** Whether to look now, given the current {@link System#nanoTime()}; records the lookup. */
+    synchronized boolean tryNow(long nowNanos) {
+      if (looked && nowNanos - lastLookup < RETRY_NANOS) {
+        return false;
+      }
+      looked = true;
+      lastLookup = nowNanos;
+      return true;
+    }
+  }
+
+  private final MetadataLookupGate metadataLookupGate = new MetadataLookupGate();
+
   private void setupMetadataHolder() {
-    if (holder == null) {
+    if (holder == null && metadataLookupGate.tryNow(System.nanoTime())) {
       File torrent;
       try {
         torrent = dl.getTorrentFile();
