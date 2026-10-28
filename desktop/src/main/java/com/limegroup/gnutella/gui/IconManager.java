@@ -1,7 +1,6 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.OSUtils;
-import com.limegroup.gnutella.gui.util.DesktopParallelExecutor;
 import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -24,20 +23,20 @@ public class IconManager {
     this(
         OSUtils.isMacOSX() || OSUtils.isWindows(),
         NativeFileIconController::new,
-        DesktopParallelExecutor::execute);
+        SwingUtilities::invokeLater);
   }
 
   /**
-   * Starts with the basic controller, whose construction never blocks, and builds the native one on
-   * {@code background}. Never on the EDT: on macOS the native controller builds a JFileChooser,
-   * which checks every folder above the home folder on disk (frostwire/frostwire#1361).
+   * Starts with the basic controller, whose construction never blocks, and builds the native one
+   * later through {@code later}: the EDT in production, since on macOS the native controller builds
+   * a JFileChooser, a Swing component. Building it no longer touches the disk
+   * (NativeFileIconController.NativeUiChooser, frostwire/frostwire#1361).
    */
-  IconManager(
-      boolean nativeIcons, Supplier<FileIconController> nativeController, Executor background) {
+  IconManager(boolean nativeIcons, Supplier<FileIconController> nativeController, Executor later) {
     buttonController = new ButtonIconController();
     fileController = new BasicFileIconController();
     if (nativeIcons) {
-      background.execute(
+      later.execute(
           () -> {
             FileIconController newController = nativeController.get();
             if (newController.isValid()) {

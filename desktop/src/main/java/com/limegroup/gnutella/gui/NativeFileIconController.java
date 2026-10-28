@@ -16,6 +16,7 @@ import java.util.function.Function;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
+import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.FileChooserUI;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
@@ -55,8 +56,8 @@ public class NativeFileIconController implements FileIconController {
       Collections.synchronizedSet(new FixedsizeForgetfulHashSet<>(5000, 1000));
 
   /**
-   * Constructs the NativeFileIconController. This constructor may block as the JFileChooser is
-   * constructed.
+   * Constructs the NativeFileIconController. Call it on the EDT: on macOS it builds a JFileChooser
+   * to borrow the native file view (see {@link NativeUiChooser}).
    */
   NativeFileIconController() {
     this(
@@ -142,14 +143,7 @@ public class NativeFileIconController implements FileIconController {
     // If after 10 times we still can't set it just give up.
     for (int i = 0; i < 10; i++) {
       try {
-        chooser =
-            new JFileChooser() {
-              {
-                FileChooserUI ui = (FileChooserUI) ResourceManager.getNativeUI(this);
-                setUI(ui);
-                setFileView(ui.getFileView(this));
-              }
-            };
+        chooser = new NativeUiChooser(ResourceManager::getNativeUI);
       } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {
       }
       if (chooser != null) break;
@@ -158,6 +152,31 @@ public class NativeFileIconController implements FileIconController {
       return null;
     } else {
       return new SmartChooserView(chooser.getFileView());
+    }
+  }
+
+  /**
+   * A JFileChooser that only ever installs the given native UI. The default updateUI() would first
+   * install our skin's chooser UI, which checks every folder above the home folder on disk while
+   * the chooser sets its current directory, and the chooser must be built on the EDT like any
+   * component (frostwire/frostwire#1361).
+   */
+  static final class NativeUiChooser extends JFileChooser {
+    private final transient Function<JComponent, ComponentUI> nativeUi;
+
+    NativeUiChooser(Function<JComponent, ComponentUI> nativeUi) {
+      // The constructor's updateUI() call finds nativeUi still null and installs nothing.
+      super();
+      this.nativeUi = nativeUi;
+      updateUI();
+      setFileView(((FileChooserUI) getUI()).getFileView(this));
+    }
+
+    @Override
+    public void updateUI() {
+      if (nativeUi != null) {
+        setUI(nativeUi.apply(this));
+      }
     }
   }
 

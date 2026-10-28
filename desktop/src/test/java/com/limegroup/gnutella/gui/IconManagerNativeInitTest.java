@@ -12,44 +12,29 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.junit.jupiter.api.Test;
 
 /**
- * The native file icon controller is built off the EDT (frostwire/frostwire#1361): on macOS it
- * builds a JFileChooser, which checks every folder above the home folder on disk.
+ * The native file icon controller is built after IconManager, through the executor it is given (the
+ * EDT in production: on macOS it builds a JFileChooser, frostwire/frostwire#1361).
  */
 class IconManagerNativeInitTest {
 
   @Test
-  void nativeControllerIsBuiltOffTheEdtAndThenUsed() throws Exception {
+  void nativeControllerIsBuiltLaterAndThenUsed() {
     Icon nativeIcon = new ImageIcon();
-    AtomicBoolean builtOnEdt = new AtomicBoolean(true);
-    List<Runnable> background = new ArrayList<>();
-    AtomicReference<IconManager> manager = new AtomicReference<>();
-    EventQueue.invokeAndWait(
-        () ->
-            manager.set(
-                new IconManager(
-                    true,
-                    () -> {
-                      builtOnEdt.set(EventQueue.isDispatchThread());
-                      return new FakeController(nativeIcon);
-                    },
-                    background::add)));
-    assertEquals(1, background.size(), "the native controller must be built on the background");
-    Thread builder = new Thread(background.get(0));
-    builder.start();
-    builder.join();
-    assertFalse(builtOnEdt.get(), "the native controller was built on the EDT");
-    assertSame(nativeIcon, manager.get().getIconForExtension("mp3"));
+    List<Runnable> later = new ArrayList<>();
+    IconManager manager = new IconManager(true, () -> new FakeController(nativeIcon), later::add);
+    assertEquals(1, later.size(), "the native controller must be built through the executor");
+    assertTrue(manager.getIconForExtension("mp3") != nativeIcon, "basic icons until it is built");
+    later.get(0).run();
+    assertSame(nativeIcon, manager.getIconForExtension("mp3"));
   }
 
   @Test
