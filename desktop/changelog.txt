@@ -1,4 +1,5 @@
 FrostWire 7.1.3 build 335 UNRELEASED
+   - fix:The first multi-line tooltip no longer freezes the window for a moment — the text-wrapping rules it needs are loaded in the background at startup
    - fix:Startup no longer pauses while building the main window's layout for the first time — the layout library's one-time setup now runs in the background with the other startup preparation
    - fix:Opening a search tab no longer stalls on slow computers while it redraws the media-type button icons — they are prepared once in the background at startup and reused for every tab
    - fix:Starting a video, audio, SoundCloud or slide download no longer freezes the window on slow or network drives — the download is prepared in the background while it picks a free file name
