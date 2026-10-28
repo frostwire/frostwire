@@ -1,9 +1,9 @@
 ---
 schema_version: 1
 name: frostwire-fuzz-pipeline
-description: The bug pipeline that finds FrostWire bugs with coverage-guided fuzzing (Jazzer) instead of user reports, then runs every finding through the Icebase pipeline (GitHub ticket, one-at-a-time root-cause fix with a regression test, changelog, CI gate, close or ask). Covers choosing targets (common/ parsers and decoders of untrusted input first, then desktop non-UI logic, then what of android runs on the JVM), writing @FuzzTest harnesses, replaying the committed corpus (fuzzTest) versus fuzzing one target for a fixed time (fuzz), deduplicating and minimizing findings, and turning a crash input into a deterministic regression test. Use when asked to "run the fuzz pipeline", "fuzz common/", "find bugs with Jazzer", write a fuzz harness, or triage a fuzzing finding.
-tags: [frostwire, fuzzing, jazzer, libfuzzer, common, desktop, pipeline, github-issues, security]
-triggers: [fuzz pipeline, run the fuzz pipeline, fuzz common, fuzz testing, find bugs with jazzer, jazzer, fuzz harness, fuzzing finding]
+description: The bug pipeline that finds FrostWire bugs with coverage-guided fuzzing (Jazzer) instead of user reports, then runs every finding through the Icebase pipeline (GitHub ticket, one-at-a-time root-cause fix with a regression test, changelog, CI gate, close or ask). Covers choosing targets (common/ parsers and decoders of untrusted input first, then desktop non-UI logic, then Android classes compiled into a JVM source set), writing @FuzzTest harnesses, replaying the committed corpus (fuzzTest) versus fuzzing one target for a fixed time (fuzz), deduplicating and minimizing findings, and turning a crash input into a deterministic regression test. Use when asked to "run the fuzz pipeline", "fuzz common/", "find bugs with Jazzer", write a fuzz harness, or triage a fuzzing finding.
+tags: [frostwire, fuzzing, jazzer, libfuzzer, common, desktop, android, pipeline, github-issues, security]
+triggers: [fuzz pipeline, run the fuzz pipeline, fuzz common, fuzz android, fuzz testing, find bugs with jazzer, jazzer, fuzz harness, fuzzing finding]
 ---
 
 # frostwire-fuzz-pipeline
@@ -40,10 +40,11 @@ Rank by how directly untrusted bytes reach the code, then by how much custom par
    - Relay and IceBridge wire formats from peers: `SearchPayloadCodec` decoders, `RemoteSearchResponse.fromBencodeableMap`, `RemoteIndexFetcher.parseManifest`, `IndexDigest.fromBytes`, `RelayFrame.decode`, `MeshEnvelope.unwrap`, the rUDP codec and `FragmentReassembler` (stateful: drive it with a sequence of operations from one `FuzzedDataProvider`).
    - URL, magnet and string utilities applied to network data: `UrlUtils`, `SizeParser`, `DateParser`, `HtmlManipulator`, `StringUtils`, `Hex`.
 2. **`desktop/` non-UI logic.** Models, filters, validators, settings and file-format parsers (e.g. `com.frostwire.gui.library.tags`, the magnet and torrent-URL handling in `ExternalControl` and `TorrentFetcherDownload`). Never fuzz a Swing component: extract the logic into a plain class or static method first, in its own commit, and fuzz that.
-3. **`android/`, only what runs on a plain JVM.**
-   - `common/` is compiled into the Android app, so the harnesses above already cover the shared parsers on Android too.
-   - Android-only classes with no `android.*`/`androidx.*` dependency (directly or through what they call) can be fuzzed only after moving them into `common/`. The Android unit tests use JUnit 4 and Robolectric, and Jazzer's JUnit integration needs JUnit 5, so there is no Android fuzz source set.
-   - Not fuzzable on the JVM: anything touching the Android framework (Activities, Services, ContentProviders, `MediaStore`, `SharedPreferences`), the bundled Python (Telluride), and jlibtorrent's native code. Fuzzing those needs on-device or native (libFuzzer/C++) fuzzing, out of scope here.
+3. **`android/`, on the JVM through the `androidFuzzTargets` source set** (§2.1).
+   - `common/` is compiled into the Android app, so the harnesses above already cover the shared parsers on Android too. Fuzz Android-only code only where it parses something itself.
+   - Priority inside `android/`: what parses intents, clipboard text, shared links, deep links, magnet and torrent URLs, preferences values typed by users, and files other apps hand us. A link that comes from another app is untrusted input.
+   - Framework-free classes (no `android.*`/`androidx.*`/`R` import, directly or through what they call) are added to `androidFuzzTargets` as they are. Classes that mix parsing with framework calls: extract the parsing into a plain class or static method (in `android/` when only Android uses it, in `common/` when desktop has the same logic) in its own commit, then fuzz that. Find candidates with `grep -L -E '^import (android|androidx)\.|\bR\.' $(find android/src/main/java -name '*.java')` and confirm each compiles in the source set.
+   - Not fuzzable on the JVM: anything that needs the Android framework at runtime (Activities, Services, ContentProviders, `MediaStore`, `SharedPreferences`), the bundled Python (Telluride), and jlibtorrent's native code. On-device Jazzer (its AOSP integration) is experimental and no longer maintained, and has no Android sanitizers; don't build on it. Robolectric can't host Jazzer either (JUnit 4 only). Native code needs libFuzzer/C++ fuzzing, out of scope here.
 4. **Skip:** code whose input is fully under our control (our own settings files written by our own code), thin wrappers around JDK parsers, and code that only works with native libraries loaded.
 
 When the entry point hides the bug (a decoder that catches `Throwable` and returns `null`), fuzz the first method under the catch that does the parsing, and treat a hang or an `OutOfMemoryError` swallowed by the catch as a finding.
@@ -70,6 +71,14 @@ Conventions:
 - **Not findings:** the checked or unchecked exceptions the API documents. Catch exactly those types, nothing broader.
 - **Seeds:** 2–5 small, valid inputs per harness that reach deep code (a real ID3v2.3 tag, a minimal `ftyp`+`moov`+`mdat` file, one row of each HTML layout a search pattern accepts). Generate binary seeds with a short script and commit only the output files. Seeds must pass: they run in `fuzzTest`.
 - **No product code changes in a harness commit.** Harness commits only add tests. Findings are fixed in their own ticket (§6).
+
+### 2.1 Android targets
+
+- `androidFuzzTargets` in `desktop/build.gradle` compiles an explicit `include` list of files from `../android/src/main/java` against desktop's main output and classpath (common/ and its dependencies); the `fuzzTest`/`fuzz` classpaths include its output. To fuzz another Android class, add it (and the framework-free types it needs) to the `include` list. A compile error naming `android.*` means it isn't framework-free: extract first.
+- Harnesses and inputs go under the target's Android package in the same `common/fuzz/src/test/...` trees, like any other harness.
+- Fixing an Android finding also needs: a JUnit 4 test under `android/src/test/java/...` (the Android module's normal suite) that fails without the fix; that test added to the `--tests` filter in `.github/workflows/android-unit-tests.yml`, which runs only listed tests; a line in `android/changelog.txt` under its UNRELEASED header (the desktop changelog too only when desktop behavior changes); `./gradlew compilePlus1DebugJavaWithJavac` from `android/`; and a `frostwire-code-reviewer` pass before committing. A shared helper moved to `common/` also gets a test in `common/src/test/java` (desktop suite).
+- Run the Android test from `android/`: `./gradlew testPlus1DebugUnitTest --tests '<FQCN>'`.
+- First pass (2026-10, #1367): `TorrentUrlInfo.getHash()` took `substring(20, 60)` of any magnet, throwing on links cut short and returning garbage for base32 hashes; found in seconds. The same mistake (fixed offsets into a magnet or URL) is the first thing to grep for in new Android targets.
 
 ## 3. Run
 
