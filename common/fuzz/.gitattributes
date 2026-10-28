@@ -1,0 +1,2 @@
+# Fuzz inputs are raw bytes: no EOL conversion, no text diffs.
+src/test/resources/** binary

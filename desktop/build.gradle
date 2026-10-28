@@ -22,7 +22,7 @@ version = (file('src/main/java/com/limegroup/gnutella/util/FrostWireUtils.java')
 
 spotless {
     java {
-        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/simulation/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java'
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/simulation/java/**/*.java', '../common/src/main/java/**/*.java', '../common/src/test/java/**/*.java', '../common/fuzz/src/test/java/**/*.java'
         ratchetFrom 'origin/master'
         googleJavaFormat('1.36.1')
         toggleOffOn()
@@ -556,6 +556,124 @@ tasks.register('verifySimulationIsolation') {
                 throw new org.gradle.api.GradleException(
                         "Simulation classes leaked into ${artifact.name}: ${leaked}")
             }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Coverage-guided fuzzing with Jazzer (skills/frostwire-fuzz-pipeline).
+// Harnesses live in ../common/fuzz/src/test/java, their committed seed and
+// crash inputs in ../common/fuzz/src/test/resources/<pkg>/<Class>Inputs/<method>/.
+// Neither task is wired into test, check or build, so CI never runs them.
+//   ./gradlew fuzzTest
+//       replays every committed input as plain JUnit (regression mode, no fuzzing)
+//   ./gradlew fuzz -Pfuzz.target=<FQCN> [-Pfuzz.duration=300s] [-Pfuzz.keepGoing=N]
+//       fuzzes ONE harness for a fixed time (Jazzer runs one fuzz test per JVM)
+// ---------------------------------------------------------------------------
+def fuzzBaseDir = file('../common/fuzz')
+
+sourceSets {
+    fuzzTest {
+        java.srcDir '../common/fuzz/src/test/java'
+        resources.srcDir '../common/fuzz/src/test/resources'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    fuzzTestImplementation.extendsFrom implementation
+    fuzzTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+dependencies {
+    fuzzTestImplementation platform('org.junit:junit-bom:5.13.4')
+    fuzzTestImplementation 'org.junit.jupiter:junit-jupiter'
+    fuzzTestImplementation 'com.code-intelligence:jazzer-junit:0.30.0'
+    fuzzTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def configureFuzzTask = { Test t ->
+    t.group = 'verification'
+    t.dependsOn tasks.named('fuzzTestClasses')
+    t.testClassesDirs = sourceSets.fuzzTest.output.classesDirs
+    t.classpath = sourceSets.fuzzTest.runtimeClasspath
+    t.useJUnitPlatform()
+    t.maxParallelForks = 1
+    t.maxHeapSize = '2g'
+    // Jazzer writes crash files to <basedir>/src/test/resources/<pkg>/<Class>Inputs/<method>/
+    // and the generated corpus to <basedir>/.cifuzz-corpus/<Class>/<method>/.
+    t.workingDir = fuzzBaseDir
+    t.systemProperty 'jazzer.internal.basedir', fuzzBaseDir.absolutePath
+    // One input running longer than this is a hang finding (libFuzzer -timeout).
+    t.systemProperty 'junit.jupiter.execution.timeout.testtemplate.method.default', '10s'
+    t.systemProperty 'java.awt.headless', 'true'
+    t.systemProperty 'java.util.logging.config.file', new File(fuzzBaseDir, 'logging.properties').absolutePath
+    // Jazzer self-attaches its agent and loads libFuzzer through JNI.
+    t.jvmArgs '-XX:+EnableDynamicAgentLoading', '--enable-native-access=ALL-UNNAMED'
+    t.filter {
+        includeTestsMatching '*FuzzTest'
+    }
+    t.testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('fuzzTest', Test) { t ->
+    description = 'Replays the committed Jazzer seed and crash inputs as plain JUnit tests (no fuzzing).'
+    configureFuzzTask(t)
+}
+
+tasks.register('fuzz', Test) { t ->
+    description = 'Fuzzes one Jazzer harness: -Pfuzz.target=<FQCN> [-Pfuzz.duration=300s] [-Pfuzz.keepGoing=N].'
+    configureFuzzTask(t)
+    outputs.upToDateWhen { false }
+    // libFuzzer progress, the finding's stack trace and the crash file path go to stdout/stderr.
+    testLogging.showStandardStreams = true
+    def target = project.findProperty('fuzz.target')
+    environment 'JAZZER_FUZZ', '1'
+    // Jazzer turns the 10 s default above into libFuzzer's per-input -timeout. JUnit itself must
+    // not enforce it, or it fails the whole fuzzing invocation once it has run for 10 s.
+    systemProperty 'junit.jupiter.execution.timeout.mode', 'disabled'
+    systemProperty 'jazzer.max_duration', project.findProperty('fuzz.duration') ?: '300s'
+    if (project.hasProperty('fuzz.keepGoing')) {
+        systemProperty 'jazzer.keep_going', project.property('fuzz.keepGoing')
+    }
+    // Comma-separated DEDUP_TOKENs of known findings, to fuzz past them before they are fixed.
+    if (project.hasProperty('fuzz.ignore')) {
+        systemProperty 'jazzer.ignore', project.property('fuzz.ignore')
+    }
+    // Jazzer's bundled ASM may not read the newest JDK's class files yet ("Unsupported class file
+    // major version"); the hooks into JDK classes (ReDoS, command injection sanitizers) then stay
+    // off. -Pfuzz.javaVersion=24 runs the fuzzer on an older toolchain JDK instead.
+    if (project.hasProperty('fuzz.javaVersion')) {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(project.property('fuzz.javaVersion').toString().toInteger())
+        }
+    }
+    if (target) {
+        filter.includePatterns.clear()
+        filter.includeTestsMatching target.toString()
+    }
+    long startedAt = 0
+    doFirst {
+        if (!target) {
+            throw new GradleException('Jazzer fuzzes one harness per run: pass -Pfuzz.target=<fully qualified FuzzTest class>')
+        }
+        startedAt = System.currentTimeMillis()
+    }
+    // With -Pfuzz.keepGoing the test passes as long as fewer findings than N were made, so
+    // fail on any crash file this run wrote instead of trusting the JUnit result.
+    doLast {
+        def findings = fileTree(fuzzBaseDir) {
+            include 'src/test/resources/**/crash-*', 'src/test/resources/**/timeout-*',
+                    'src/test/resources/**/oom-*', 'src/test/resources/**/slow-unit-*',
+                    'crash-*', 'timeout-*', 'oom-*', 'slow-unit-*'
+        }.files.findAll { it.lastModified() >= startedAt }
+        if (!findings.isEmpty()) {
+            throw new GradleException("Fuzzing wrote ${findings.size()} finding(s):\n  " +
+                    findings.collect { it.absolutePath }.sort().join('\n  '))
         }
     }
 }

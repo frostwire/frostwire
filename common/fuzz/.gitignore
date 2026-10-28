@@ -1,0 +1,8 @@
+# Jazzer's generated corpus (inputs that found new coverage). Local per machine; only seeds and
+# crash inputs of fixed findings are committed, under src/test/resources/.
+/.cifuzz-corpus/
+# libFuzzer drops findings here when a harness has no inputs directory yet.
+/crash-*
+/timeout-*
+/oom-*
+/slow-unit-*
